@@ -1,0 +1,82 @@
+{
+  "pth" : "/r/rss/5ca255fe3742ef00010d1392/5ca23f813742ef00010d138f",
+  "phash" : "173ce0f4992179d2eddd3df51f7f8926ec45bf833bc83a7b2c2049c2ca478230",
+  "typ" : "sn:rssfeed",
+  "_id" : "5ca23f813742ef00010d138f",
+  "ord" : 0,
+  "own" : "5ca1351983e58b00016163e7",
+  "ctm" : 1554136961689,
+  "mtm" : 1554142826497,
+  "prp" : {
+    "sn:rssFeedSrc" : {
+      "value" : "http://joeroganexp.joerogan.libsynpro.com/rss"
+    },
+    "sn:content" : {
+      "value" : ""
+    },
+    "sn:lastModified" : {
+      "value" : 1554142826474
+    }
+  }
+}
+,
+{
+  "pth" : "/r/rss/5ca255dd3742ef00010d1391/5ca254c63742ef00010d1390",
+  "phash" : "a8930c13e3b8a068c7b285cc1d568b4a9e6506ebfcfbbe22938421ef22f9f47a",
+  "typ" : "sn:rssfeed",
+  "_id" : "5ca254c63742ef00010d1390",
+  "ord" : 0,
+  "own" : "5ca1351983e58b00016163e7",
+  "ctm" : 1554142406817,
+  "mtm" : 1554142796347,
+  "prp" : {
+    "sn:rssFeedSrc" : {
+      "value" : "http://wakingup.libsyn.com/rss"
+    },
+    "sn:content" : {
+      "value" : ""
+    },
+    "sn:lastModified" : {
+      "value" : 1554142796323
+    }
+  }
+}
+,
+{
+  "pth" : "/r/rss/5ca255dd3742ef00010d1391",
+  "phash" : "cfeb09a7fea25d647d5db04b0b585c9d463e4e02be46eb8476f31d35a24450ae",
+  "typ" : "nt:unstructured",
+  "_id" : "5ca255dd3742ef00010d1391",
+  "ord" : 2,
+  "own" : "5ca1351983e58b00016163e7",
+  "ctm" : 1554142685077,
+  "mtm" : 1554142758579,
+  "prp" : {
+    "sn:content" : {
+      "value" : "## Sam Harris"
+    },
+    "sn:lastModified" : {
+      "value" : 1554142737683
+    }
+  }
+}
+,
+{
+  "pth" : "/r/rss/5ca255fe3742ef00010d1392",
+  "phash" : "7440d495bcc55f49a7cf9d13c39ec47ba0672f3107fd48ff06ef7348fbf70b30",
+  "typ" : "nt:unstructured",
+  "_id" : "5ca255fe3742ef00010d1392",
+  "ord" : 0,
+  "own" : "5ca1351983e58b00016163e7",
+  "ctm" : 1554142718395,
+  "mtm" : 1554142728467,
+  "prp" : {
+    "sn:content" : {
+      "value" : "## Joe Rogan "
+    },
+    "sn:lastModified" : {
+      "value" : 1554142728444
+    }
+  }
+}
+,

@@ -1,0 +1,74 @@
+package org.subnode.response;
+
+import org.subnode.model.RefInfo;
+import org.subnode.model.UserPreferences;
+import org.subnode.response.base.ResponseBase;
+
+public class LoginResponse extends ResponseBase {
+
+	private RefInfo rootNode;
+
+	/* will be username or 'anonymous' if server rejected login */
+	private String userName;
+
+	private String anonUserLandingPageNode;
+
+	/*
+	 * we can optionally send back something here to force the client to load the specified node
+	 * instead of whatever other node it would have loaded for whatever series of reasons. This is a
+	 * hard override for anything else.
+	 */
+	private String homeNodeOverride;
+
+	private UserPreferences userPreferences;
+
+	private boolean allowFileSystemSearch;
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public RefInfo getRootNode() {
+		return rootNode;
+	}
+
+	public void setRootNode(RefInfo rootNode) {
+		this.rootNode = rootNode;
+	}
+
+	public String getAnonUserLandingPageNode() {
+		return anonUserLandingPageNode;
+	}
+
+	public void setAnonUserLandingPageNode(String anonUserLandingPageNode) {
+		this.anonUserLandingPageNode = anonUserLandingPageNode;
+	}
+
+	public String getHomeNodeOverride() {
+		return homeNodeOverride;
+	}
+
+	public void setHomeNodeOverride(String homeNodeOverride) {
+		this.homeNodeOverride = homeNodeOverride;
+	}
+
+	public UserPreferences getUserPreferences() {
+		return userPreferences;
+	}
+
+	public void setUserPreferences(UserPreferences userPreferences) {
+		this.userPreferences = userPreferences;
+	}
+
+	public boolean isAllowFileSystemSearch() {
+		return allowFileSystemSearch;
+	}
+
+	public void setAllowFileSystemSearch(boolean allowFileSystemSearch) {
+		this.allowFileSystemSearch = allowFileSystemSearch;
+	}
+}
