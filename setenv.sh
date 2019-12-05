@@ -2,7 +2,7 @@
 
 # Directory that contains the SubNode project (pom.xml is here, for example). This is the only
 # hard-coded path, in the bash scripts
-export PRJROOT=/home/clay/ferguson/Quantizr-Project
+export PRJROOT=/home/clay/ferguson/Quantizr
 
 # Directory where we put the final output image that the 'build.sh' script builds. (i.e. the output
 # of the 'docker save' will go into this folder, and is the image ready for distrobution/installation)

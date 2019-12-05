@@ -18,7 +18,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class SharingDlg extends DialogBase {
 
-    privsTable: Div;
+    privsTable: EditPrivsTable;
     //publicCommentingCheckbox: Checkbox;
 
     constructor() {

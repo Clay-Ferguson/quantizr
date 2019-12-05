@@ -27,6 +27,7 @@ export class Button extends Comp {
     }
 
     setText = (text: string) => {
+        //todo-0: If this is called too early 'setState' can be null. Need to fix.
         this.setState({
             text
         });
