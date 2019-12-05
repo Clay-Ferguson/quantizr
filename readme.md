@@ -8,20 +8,7 @@ Experimental IPFS Connectivity is now working in Quantizr (not at quantizr.com y
 
 ## Link to a live instance:
 
-https://quantizr.com/r/public/home
-
-## Sample Content (book): War and Peace
-
-View this to see a demonstration of how browsing large structured documents works on the Quantizr platform.
-
-https://quantizr.com/r/books/war-and-peace
-
-## Sample Plugin: Podcast Reader
-
-A simple podcast reader built on the Quantizr platform, implemented as a plugin.
-
-https://quantizr.com/r/rss
-
+https://quantizr.com
 
 # Tech-Stack Summary
 
