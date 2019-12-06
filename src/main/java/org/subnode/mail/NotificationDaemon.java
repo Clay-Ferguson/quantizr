@@ -5,6 +5,7 @@ import java.util.List;
 import org.subnode.AppServer;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeProp;
+import org.subnode.config.SpringContextUtil;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
@@ -46,9 +47,6 @@ public class NotificationDaemon {
 	@Autowired
 	private JcrOutboxMgr outboxMgr;
 
-	@Autowired
-	private MailSender mailSender;
-
 	private int runCounter = 0;
 
 	/*
@@ -63,7 +61,7 @@ public class NotificationDaemon {
 	 */
 	@Scheduled(fixedDelay = 30 * 1000)
 	public void run() {
-		//todo-0: remove this!
+		// todo-0: remove this.
 		log.debug("NotificationDeamon.run");
 
 		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling())
@@ -88,12 +86,14 @@ public class NotificationDaemon {
 	}
 
 	private void sendAllMail(MongoSession session, List<SubNode> nodes) {
+		MailSender mailSender = null;
 		try {
 			if (CollectionUtils.isEmpty(nodes)) {
-				//todo-0: remove this!
+				// todo-0: remove this!
 				log.debug("nothing to send.");
 				return;
 			}
+			mailSender = (MailSender) SpringContextUtil.getBean(MailSender.class);
 			mailSender.init();
 
 			for (SubNode node : nodes) {
@@ -102,16 +102,17 @@ public class NotificationDaemon {
 				String content = node.getStringProp(NodeProp.EMAIL_CONTENT);
 
 				if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject) && !StringUtils.isEmpty(content)) {
-					
+
 					log.debug("Found mail to send to: " + email);
-					if (mailSender.sendMail(email, null, content, subject)) {
-						api.delete(session, node);
-					}
+					mailSender.sendMail(email, null, content, subject);
+					api.delete(session, node);
 				}
 			}
 		} finally {
 			log.debug("Closing mail sender after mail cycle.");
-			mailSender.close();
+			if (mailSender != null) {
+				mailSender.close();
+			}
 		}
 	}
 }

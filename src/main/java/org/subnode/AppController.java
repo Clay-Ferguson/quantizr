@@ -230,9 +230,6 @@ public class AppController {
 	// private ActivityPubService actPubService;
 
 	@Autowired
-	private MailSender mailSender;
-
-	@Autowired
 	private IPFSService ipfsService;
 
 	@Autowired
@@ -267,8 +264,8 @@ public class AppController {
 		if (signupCode != null) {
 			userManagerService.processSignupCode(signupCode, model);
 		}
-		
-		//It's ok for id to be null here.
+
+		// It's ok for id to be null here.
 		sessionContext.setUrlId(id);
 
 		if (passCode != null) {
@@ -502,8 +499,8 @@ public class AppController {
 				throw ExUtil.newEx("admin only function.");
 			}
 
-			//todo-1: disabling pending security audit.
-			//bashService.executeNode(ms, req, res);
+			// todo-1: disabling pending security audit.
+			// bashService.executeNode(ms, req, res);
 			return res;
 		});
 	}
@@ -926,13 +923,17 @@ public class AppController {
 				throw ExUtil.newEx("admin only function.");
 			}
 			log.debug("SendEmailTest detected on server.");
+			MailSender mailSender = null;
 			try {
+				mailSender = (MailSender) SpringContextUtil.getBean(MailSender.class);
 				mailSender.init();
 				String timeString = new Date().toString();
 				mailSender.sendMail("wclayf@gmail.com", null, "<h1>Hi Clay! Time=" + timeString + "</h1>",
 						"Test Subject");
 			} finally {
-				mailSender.close();
+				if (mailSender != null) {
+					mailSender.close();
+				}
 			}
 
 			res.setSuccess(true);

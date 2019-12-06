@@ -428,7 +428,9 @@ public class SubNode {
 				return null;
 			return (Date) v.getValue();
 		} catch (Exception e) {
-			ExUtil.error(log, "failed to get Date from key: " + key, e);
+			//todo-0: This is cluttering up the log file, becasue we still have "sn:lastModified" which is an obsolete property, and a string or integer 
+			//representation also. Need to have a db cleanup to remove all those props.
+			//ExUtil.error(log, "failed to get Date from key: " + key, e);
 			return null;
 		}
 	}

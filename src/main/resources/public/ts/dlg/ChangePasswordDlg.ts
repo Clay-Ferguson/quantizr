@@ -72,7 +72,7 @@ export class ChangePasswordDlg extends DialogBase {
             let msg = "Password changed successfully.";
 
             if (this.passCode) {
-                msg += `<p>You may now login as <b>${res.user}</b> with your new password.`;
+                msg += `<p>You can now login as <b>${res.user}</b> with your new password.`;
             }
 
             let dlg = new MessageDlg(msg, "Password Change",

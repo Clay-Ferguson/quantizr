@@ -311,7 +311,7 @@ public class UserManagerService {
 		 */
 		log.debug("Signup URL: " + signupLink);
 
-		content = "Confirmation for new SubNode account: " + userName + //
+		content = "Confirmation for new Quantizr account: " + userName + //
 				"<p>\nClick this link to complete signup: <br>\n" + signupLink;
 
 		if (!StringUtils.isEmpty(appProp.getMailHost())) {

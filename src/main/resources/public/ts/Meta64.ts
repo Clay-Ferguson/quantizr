@@ -952,7 +952,7 @@ export class Meta64 implements Meta64Intf {
         if (signupElm) {
             let signupResponse = signupElm.textContent;
             if (signupResponse === "ok") {
-                S.util.showMessage("Signup complete. You may now login.");
+                S.util.showMessage("Signup complete.");
             }
         }
     }

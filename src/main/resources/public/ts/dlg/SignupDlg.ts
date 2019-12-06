@@ -24,7 +24,7 @@ export class SignupDlg extends DialogBase {
     captchaImage: Captcha;
 
     constructor() {
-        super("Create SubNode Account", "app-modal-content-login-dlg");
+        super("Create Account", "app-modal-content-login-dlg");
         
         this.setChildren([
             new Form(null, [
