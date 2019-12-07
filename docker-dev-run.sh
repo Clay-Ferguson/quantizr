@@ -20,7 +20,7 @@ source ${SECRET_SCRIPT}
 cd $PRJROOT
 
 if [ "$RESTART_IPFS" == "true" ]; then
-    echo Stopping IPFS
+    echo Removing IPFS
     docker rm -f ipfs_host -f || true
 fi
 
@@ -28,7 +28,7 @@ echo Stopping SubNode
 docker rm -f subnode -f || true
 
 if [ "$RESTART_MONGODB" == "true" ]; then
-    echo Stopping MongoDB
+    echo Removing MongoDB
     docker rm -f subnode_mongo -f || true
 fi
 
@@ -84,7 +84,8 @@ PORT=8182
 #(-d=daemon -t=terminal)
 docker run -d \
     --name subnode \
-    --network="host" \
+    --network=host \
+    --expose=${PORT} \
     -e "JAVA_TOOL_OPTIONS=\"-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n\"" \
     -v ${SUBNODE_TMP_FOLDER}:/subnode-tmp \
     -v ${SUBNODE_LOG_FOLDER}:/subnode-log \
@@ -99,6 +100,7 @@ docker run -d \
     "--resourcesBaseFolder=file:///dev-resource-base/" \
     "--spring.config.location=classpath:/application.properties" \
     "--mongodb.host=127.0.0.1" \
+    "--mongodb.port=27016" \
     "--profileName=dev" \
     "--server.port=${PORT}" \
  	"--httpProtocol=http" \
@@ -121,4 +123,3 @@ if docker ps | grep subnode-0.0.1; then
 else
     echo "subnode-0.0.1 failed to start"
 fi
-

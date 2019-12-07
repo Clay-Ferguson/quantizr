@@ -25,10 +25,10 @@ MAVEN_PROFILE=dev
 
 # NOTE: These need to both be true if you're running for the first time like since a machine reboot, because they 
 # won't be running and without 'true' on these they won't be started.
-export RESTART_MONGODB=false
+export RESTART_MONGODB=true
 export RESTART_IPFS=false
 
-CLEAN=true
+CLEAN=false
 # =====================================================
 
 mkdir -p $DOCKER_IMAGES_FOLDER
@@ -39,7 +39,8 @@ fi
 
 rm -rf $PRJROOT/target/*
 rm -rf $PRJROOT/bin/*
-rm -rf $PRJROOT/src/main/resources/public/dist/*
+rm -rf $PRJROOT/src/main/resources/public/bundle.js
+rm -rf $PRJROOT/src/main/resources/public/index.html
 
 cd $PRJROOT/src/main/resources/public
 npm config set ignore-scripts true
@@ -83,12 +84,7 @@ if [ "$MAVEN_PROFILE" == "prod" ]; then
     verifySuccess "Docker Save"
 fi
 
-# For dev build's lets go ahead and run
-if [ "$MAVEN_PROFILE" == "dev" ]; then
-    
-    #didn't have much time to do this, but this script run seems to just get ignored afaik
-    #gnome-terminal -- /bin/bash -c '../scripts/exec-daemon.sh'
-    
+if [ "$MAVEN_PROFILE" == "dev" ]; then    
     ./docker-dev-run.sh
 fi
 

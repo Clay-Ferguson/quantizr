@@ -23,9 +23,10 @@ cd $PRJROOT
 # Normally we have this DB folder: -v /var/lib/mongodb:/data/db \
 docker run -d \
     --name subnode_mongo \
-    --network="host" \
+    --network=host \
     -v ${hostMongoDbPath}:/data/db \
-    mongo
+    mongo \
+    --port 27016
 
 verifySuccess "Docker Run (mongo)"
 
