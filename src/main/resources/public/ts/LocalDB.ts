@@ -20,7 +20,7 @@ export class LocalDB implements LocalDBIntf {
         if (!indexedDB) {
             throw "IndexedDB API not available in browser.";
         }
-        let req = indexedDB.open(LocalDB.DB_NAME, LocalDB.VERSION);
+        let req : IDBOpenDBRequest = indexedDB.open(LocalDB.DB_NAME, LocalDB.VERSION);
 
         req.onupgradeneeded = () => {
             req.result.createObjectStore(LocalDB.STORE_NAME, { keyPath: LocalDB.KEY_NAME });
@@ -29,18 +29,18 @@ export class LocalDB implements LocalDBIntf {
     }
 
     /* Runs a transaction by first opening the database, and then running the transaction */
-    runTrans = (access: IDBTransactionMode, runner: (store: any) => void) => {
-        let req = this.openDB();
+    runTrans = (access: IDBTransactionMode, runner: (store: IDBObjectStore) => void) => {
+        let req : IDBOpenDBRequest = this.openDB();
         req.onsuccess = () => {
-            let db = req.result;
+            let db : IDBDatabase = req.result;
             this.runTransWithDb(db, access, runner);
         }
     }
 
     /* Runs a transaction on the database provided */
-    runTransWithDb = (db: IDBDatabase, access: IDBTransactionMode, runner: (store: any) => void) => {
-        let tx = db.transaction(LocalDB.STORE_NAME, access);
-        let store = tx.objectStore(LocalDB.STORE_NAME);
+    runTransWithDb = (db: IDBDatabase, access: IDBTransactionMode, runner: (store: IDBObjectStore) => void) => {
+        let tx : IDBTransaction = db.transaction(LocalDB.STORE_NAME, access);
+        let store : IDBObjectStore = tx.objectStore(LocalDB.STORE_NAME);
 
         runner(store);
 
@@ -54,26 +54,15 @@ export class LocalDB implements LocalDBIntf {
     /* Saves an object under the specified name. Basically emulating a simple "map" with string key. */
     writeObject = (val: Object): void => {
         this.runTrans(LocalDB.ACCESS_READWRITE,
-            (store: any) => {
+            (store: IDBObjectStore) => {
                 store.put(val);
             });
     }
 
-    // readObject_oldNonPromise = (name: string, dataSuccessCallback: (val: Object) => void): any => {
-    //     this.runTrans(LocalDB.ACCESS_READONLY,
-    //         (store: any) => {
-    //             //NOTE: name is the "keyPath" value.
-    //             let promise = store.get(name);
-    //             promise.onsuccess = () => {
-    //                 dataSuccessCallback(promise.result);
-    //             };
-    //         });
-    // }
-
     readObject = async (name: string): Promise<Object> => {
         return new Promise<Object>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READONLY,
-                (store: any) => {
+                (store: IDBObjectStore) => {
                     //NOTE: name is the "keyPath" value.
                     let promise = store.get(name);
 
