@@ -22,7 +22,7 @@ mkdir -p ${ipfs_staging}
 docker run -d \
     --init \
     --restart unless-stopped \
-    --name ipfs_host \
+    --name ipfs_host_dev \
     -v ${ipfs_staging}:/export \
     -v ${ipfs_data}:/data/ipfs \
     -w /export \
@@ -35,7 +35,7 @@ docker run -d \
 
 verifySuccess "Docker Run (IPFS)"
 
-if docker ps | grep ipfs_host; then
+if docker ps | grep ipfs_host_dev; then
     echo "IPFS started successfully."
 else 
     echo "IPFS FAILED to restart."

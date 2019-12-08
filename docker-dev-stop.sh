@@ -4,7 +4,7 @@ source ./define-functions.sh
 cd $PRJROOT
 
 echo Stopping IPFS+SubNode+MongoDB
-docker rm -f ipfs_host subnode subnode_mongo -f || true
+docker rm -f ipfs_host subnode_dev subnode_mongo_dev -f || true
 
 read -p "done."
 

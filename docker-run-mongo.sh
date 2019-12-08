@@ -22,7 +22,7 @@ cd $PRJROOT
 # Note for -v arg, on the left of the colon is the real 'host' folder, and the right hand side never changes.
 # Normally we have this DB folder: -v /var/lib/mongodb:/data/db \
 docker run -d \
-    --name subnode_mongo \
+    --name subnode_mongo_dev \
     --network=host \
     -v ${hostMongoDbPath}:/data/db \
     mongo \
@@ -30,7 +30,7 @@ docker run -d \
 
 verifySuccess "Docker Run (mongo)"
 
-if docker ps | grep subnode_mongo; then
+if docker ps | grep subnode_mongo_dev; then
     echo "MongoDb started successfully."
 else 
     echo "MongoDb FAILED to restart."

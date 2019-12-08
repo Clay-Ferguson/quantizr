@@ -2,7 +2,7 @@
 #################################################################
 #
 # NOTE: Normally we don't run this script directly, but it's run indirectly
-#       because 'build.sh' calls it.
+#       when 'build.sh' calls it.
 #
 # This is a script for use during development. It will run the web
 # app at http port 8181, and sets up a debugging port at 8000, and also
@@ -21,15 +21,15 @@ cd $PRJROOT
 
 if [ "$RESTART_IPFS" == "true" ]; then
     echo Removing IPFS
-    docker rm -f ipfs_host -f || true
+    docker rm -f ipfs_host_dev -f || true
 fi
 
 echo Stopping SubNode
-docker rm -f subnode -f || true
+docker rm -f subnode_dev -f || true
 
 if [ "$RESTART_MONGODB" == "true" ]; then
     echo Removing MongoDB
-    docker rm -f subnode_mongo -f || true
+    docker rm -f subnode_mongo_dev -f || true
 fi
 
 rm -f ${SUBNODE_LOG_FOLDER}/*
@@ -80,10 +80,10 @@ PORT=8182
 # 	"--httpProtocol=https" \
 #
 #   "--forceIndexRebuild=true" \
-#################################################################################################
+################################################################p################################
 #(-d=daemon -t=terminal)
 docker run -d \
-    --name subnode \
+    --name subnode_dev \
     --network=host \
     --expose=${PORT} \
     -e "JAVA_TOOL_OPTIONS=\"-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n\"" \
@@ -116,7 +116,7 @@ docker run -d \
 	"--mail.host=smtp.mailgun.org" \
     "--mail.from=SubNode@reply.com"
 
-verifySuccess "Docker Run (subnode)"
+verifySuccess "Docker Run (subnode_dev)"
 
 if docker ps | grep subnode-0.0.1; then
     echo "subnode-0.0.1 successfully started"
