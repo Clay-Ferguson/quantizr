@@ -78,10 +78,6 @@ export class View implements ViewIntf {
             }
             S.util.updateHistory(res.node);
 
-            if (scrollToFirstChild && res.node.children && res.node.children.length > 0) {
-                highlightId = res.node.children[0].id;
-            }
-
             this.refreshTreeResponse(res, highlightId, false);
         });
     }
@@ -187,27 +183,27 @@ export class View implements ViewIntf {
                     it is better looking to just scroll to zero index, because that will always
                     be what user wants to see */
                     let currentSelNode: I.NodeInfo = S.meta64.getHighlightedNode();
-                    if (currentSelNode) {
-                        console.log("Scrolling to currentSelNode.id=" + currentSelNode.id);
-                    }
-
                     if (currentSelNode && S.meta64.currentNodeData.node.id == currentSelNode.id) {
                         this.docElm.scrollTop = 0;
-                        console.log("was ROOT node. top=0");
+                        //console.log("was ROOT node. top=0");
                         return;
                     }
 
                     let elm: any = S.nav.getSelectedDomElement();
 
                     if (elm) {
-                        if (elm.scrollIntoView) {
+                        // This method of scrolling DOES work, but it doesn't take into account the fact that we are using
+                        // a top margin in the body to account for the vertical height of the header bar, and thus it doesn't
+                        // quite work. I'm leaving the code here for future reference. (may try it again some day)
+                        if (false && elm.scrollIntoView) {
                             //As of 2019 there are lots of browsers that ONLY currently support this boolean, but more advanced
                             //way of calling this commented out below is better and we'll use that some day.
                             elm.scrollIntoView(true);
                             //elm.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
                         }
                         else {
-                            let elmTop = elm.getBoundingClientRect().top + document.body.scrollTop;
+                            let top = elm.getBoundingClientRect().top;
+                            let elmTop = top + document.body.scrollTop;
                             let docElmScrollTop = elmTop - S.meta64.navBarHeight;
                             this.docElm.scrollTop = docElmScrollTop;
                         }
