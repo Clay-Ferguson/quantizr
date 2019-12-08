@@ -16,11 +16,13 @@ export class LocalDB implements LocalDBIntf {
     static ACCESS_READONLY: IDBTransactionMode = "readonly";
     static KEY_NAME = "name";
 
+    static KEY_VAL_NAME_PREFIX = "kv_";
+
     openDB = (): IDBOpenDBRequest => {
         if (!indexedDB) {
             throw "IndexedDB API not available in browser.";
         }
-        let req : IDBOpenDBRequest = indexedDB.open(LocalDB.DB_NAME, LocalDB.VERSION);
+        let req: IDBOpenDBRequest = indexedDB.open(LocalDB.DB_NAME, LocalDB.VERSION);
 
         req.onupgradeneeded = () => {
             req.result.createObjectStore(LocalDB.STORE_NAME, { keyPath: LocalDB.KEY_NAME });
@@ -30,17 +32,17 @@ export class LocalDB implements LocalDBIntf {
 
     /* Runs a transaction by first opening the database, and then running the transaction */
     runTrans = (access: IDBTransactionMode, runner: (store: IDBObjectStore) => void) => {
-        let req : IDBOpenDBRequest = this.openDB();
+        let req: IDBOpenDBRequest = this.openDB();
         req.onsuccess = () => {
-            let db : IDBDatabase = req.result;
+            let db: IDBDatabase = req.result;
             this.runTransWithDb(db, access, runner);
         }
     }
 
     /* Runs a transaction on the database provided */
     runTransWithDb = (db: IDBDatabase, access: IDBTransactionMode, runner: (store: IDBObjectStore) => void) => {
-        let tx : IDBTransaction = db.transaction(LocalDB.STORE_NAME, access);
-        let store : IDBObjectStore = tx.objectStore(LocalDB.STORE_NAME);
+        let tx: IDBTransaction = db.transaction(LocalDB.STORE_NAME, access);
+        let store: IDBObjectStore = tx.objectStore(LocalDB.STORE_NAME);
 
         runner(store);
 
@@ -51,14 +53,36 @@ export class LocalDB implements LocalDBIntf {
         };
     }
 
-    /* Saves an object under the specified name. Basically emulating a simple "map" with string key. */
-    writeObject = (val: Object): void => {
-        this.runTrans(LocalDB.ACCESS_READWRITE,
-            (store: IDBObjectStore) => {
-                store.put(val);
-            });
+    // gets the value stored under the key (like a simple map/keystore)
+    getVal = (key: string): Promise<any> => {
+        return new Promise<any>(async (resolve, reject) => {
+            let obj: any = await this.readObject(LocalDB.KEY_VAL_NAME_PREFIX + key);
+            resolve(!!obj ? obj.val : null);
+        });
     }
 
+    // stores the value under this key  (like a simple map/keystore)
+    setVal = (key: string, val: any): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            await this.writeObject({ name: LocalDB.KEY_VAL_NAME_PREFIX + key, val });
+            resolve();
+        });
+    }
+
+    /* Saves an object under the specified name, assuming the object itself has a 'name' property.
+     Basically emulating a simple "map" with string key. */
+    writeObject = (val: Object): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            this.runTrans(LocalDB.ACCESS_READWRITE,
+                (store: IDBObjectStore) => {
+                    store.put(val);
+                    resolve();
+                });
+        });
+    }
+
+    /* Looks up the object and returns that object which will have the 'name' as a propety in it
+    just like it did when stored under that 'name' as the key */
     readObject = async (name: string): Promise<Object> => {
         return new Promise<Object>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READONLY,

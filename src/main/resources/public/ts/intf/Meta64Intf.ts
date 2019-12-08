@@ -107,7 +107,7 @@ export interface Meta64Intf {
     removeBinaryByUid(uid): void;
     initNode(node: I.NodeInfo, updateMaps?: boolean): void;
     initConstants();
-    initApp(): void;
+    initApp(): Promise<void>;
     addTypeHandler(typeName: string, typeHandler : TypeHandlerIntf): void;
     processUrlParams(): void;
     tabChangeEvent(tabName): void

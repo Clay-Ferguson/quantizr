@@ -698,148 +698,151 @@ export class Meta64 implements Meta64Intf {
         S.passwordPlugin.init();
     }
 
-    initApp = (): void => {
-        console.log("initApp running.");
+    initApp = async (): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            console.log("initApp running.");
 
-        this.initPlugins();
+            this.initPlugins();
 
-        this.isMobile = this.mobileCheck();
-        this.isMobileOrTablet = this.mobileOrTabledCheck();
-        // If you want to test out 'mobile' rendering, you can simply set isMobile to true here.
-        // this.isMobile = true;
+            this.isMobile = this.mobileCheck();
+            this.isMobileOrTablet = this.mobileOrTabledCheck();
+            // If you want to test out 'mobile' rendering, you can simply set isMobile to true here.
+            // this.isMobile = true;
 
-        // SystemFolder and File handling stuff is disabled for now (todo-1), but will eventually be brought
-        // back as a plugin similar to rssPlugin, coreTypesPlugin, etc. Also the new way of doing this
-        // rendering and property ordering is what's being done in BashPlugin and CoreTypesPlugin via TypeHandlers so refer
-        // to that when you ever bring back these types.
-        //
-        // this.renderFunctionsByType["meta64:systemfolder"] = systemfolder.renderNode;
-        // this.propOrderingFunctionsByType["meta64:systemfolder"] = systemfolder.propOrdering;
-        //
-        // this.renderFunctionsByType["meta64:filelist"] = systemfolder.renderFileListNode;
-        // this.propOrderingFunctionsByType["meta64:filelist"] = systemfolder.fileListPropOrdering;
+            // SystemFolder and File handling stuff is disabled for now (todo-1), but will eventually be brought
+            // back as a plugin similar to rssPlugin, coreTypesPlugin, etc. Also the new way of doing this
+            // rendering and property ordering is what's being done in BashPlugin and CoreTypesPlugin via TypeHandlers so refer
+            // to that when you ever bring back these types.
+            //
+            // this.renderFunctionsByType["meta64:systemfolder"] = systemfolder.renderNode;
+            // this.propOrderingFunctionsByType["meta64:systemfolder"] = systemfolder.propOrdering;
+            //
+            // this.renderFunctionsByType["meta64:filelist"] = systemfolder.renderFileListNode;
+            // this.propOrderingFunctionsByType["meta64:filelist"] = systemfolder.fileListPropOrdering;
 
-        (window as any).addEvent = (object: any, type: any, callback: any) => {
-            if (object == null || typeof (object) == 'undefined')
-                return;
-            if (object.addEventListener) {
-                object.addEventListener(type, callback, false);
-            } else if (object.attachEvent) {
-                object.attachEvent("on" + type, callback);
-            } else {
-                object["on" + type] = callback;
-            }
-        };
-
-        window.onpopstate = function (event) {
-            //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
-            if (event.state && event.state.nodeId) {
-                S.view.refreshTree(event.state.nodeId, true, event.state.nodeId, false);
-                S.meta64.selectTab("mainTab");
-            }
-        };
-
-        document.body.addEventListener("keydown", (event: KeyboardEvent) => {
-            if (event.ctrlKey) {
-                switch (event.code) {
-                    case "ArrowDown":
-                        S.meta64.selectTab("mainTab");
-                        S.view.scrollRelativeToNode("down");
-                        break;
-
-                    case "ArrowUp":
-                        S.meta64.selectTab("mainTab");
-                        S.view.scrollRelativeToNode("up");
-                        break;
-
-                    case "ArrowLeft":
-                        S.meta64.selectTab("mainTab");
-                        S.nav.navUpLevel();
-                        break;
-
-                    case "ArrowRight":
-                        S.meta64.selectTab("mainTab");
-                        S.nav.navOpenSelectedNode();
-                        break;
-
-                    default: break;
+            (window as any).addEvent = (object: any, type: any, callback: any) => {
+                if (object == null || typeof (object) == 'undefined')
+                    return;
+                if (object.addEventListener) {
+                    object.addEventListener(type, callback, false);
+                } else if (object.attachEvent) {
+                    object.attachEvent("on" + type, callback);
+                } else {
+                    object["on" + type] = callback;
                 }
-            }
+            };
+
+            window.onpopstate = function (event) {
+                //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+                if (event.state && event.state.nodeId) {
+                    S.view.refreshTree(event.state.nodeId, true, event.state.nodeId, false);
+                    S.meta64.selectTab("mainTab");
+                }
+            };
+
+            document.body.addEventListener("keydown", (event: KeyboardEvent) => {
+                if (event.ctrlKey) {
+                    switch (event.code) {
+                        case "ArrowDown":
+                            S.meta64.selectTab("mainTab");
+                            S.view.scrollRelativeToNode("down");
+                            break;
+
+                        case "ArrowUp":
+                            S.meta64.selectTab("mainTab");
+                            S.view.scrollRelativeToNode("up");
+                            break;
+
+                        case "ArrowLeft":
+                            S.meta64.selectTab("mainTab");
+                            S.nav.navUpLevel();
+                            break;
+
+                        case "ArrowRight":
+                            S.meta64.selectTab("mainTab");
+                            S.nav.navOpenSelectedNode();
+                            break;
+
+                        default: break;
+                    }
+                }
+            });
+
+            //This works fine, but i ended up not needing the mainTabPanelWidth after all
+            // $(window).resize(() => {
+            //     S.domBind.whenElm("#mainTabPanel", (elm) => {
+            //         let newWidth = $(elm).width();
+            //         if (newWidth != this.mainTabPanelWidth) {
+            //             this.mainTabPanelWidth = newWidth;
+            //             console.log("mainTabPanelWidth=" + this.mainTabPanelWidth);
+            //         }
+            //     });
+            // });
+
+            if (this.appInitialized)
+                return;
+
+            this.appInitialized = true;
+
+            this.initConstants();
+            this.displaySignupMessage();
+
+            /*
+             * $ (window).on("orientationchange", _.orientationHandler);
+             */
+
+            //todo-1: actually this is a nuisance unless user is actually EDITING a node right now
+            //so until i make it able to detect if user is editing i'm removing this.
+            // window.onbeforeunload = () => {
+            //     return "Leave Meta64 ?";
+            // };
+
+            /*
+             * I thought this was a good idea, but actually it destroys the session, when the user is entering an
+             * "id=\my\path" type of url to open a specific node. Need to rethink  Basically for now I'm thinking
+             * going to a different url shouldn't blow up the session, which is what 'logout' does.
+             *
+             * $ (window).on("unload", function() { user.logout(false); });
+             */
+
+            this.deviceWidth = window.innerWidth;
+            this.deviceHeight = window.innerHeight;
+
+            let mainTabPanel = new TabPanel();
+            mainTabPanel.reactRenderToDOM("mainTabPanel");
+
+            let mainNavPanel = new MainNavPanel(null);
+            mainNavPanel.reactRenderToDOM("mainNavPanel");
+
+            /*
+             * This call checks the server to see if we have a session already, and gets back the login information from
+             * the session, and then renders page content, after that.
+             */
+
+            //this.pingServer();
+            S.user.refreshLogin();
+
+            S.util.initProgressMonitor();
+            this.processUrlParams();
+
+            this.setOverlay(false);
+
+            // todo-1: could replace this pull with a push.
+            setTimeout(() => {
+                S.view.displayNotifications(null);
+            }, 1000);
+
+            setTimeout(() => {
+                S.encryption.initKeys();
+            }, 100);
+
+            // Initialize the 'ServerPush' client-side connection
+            S.push.init();
+
+            //this.enableAppAsDropTarget();
+            console.log("initApp complete.");
+            resolve();
         });
-
-        //This works fine, but i ended up not needing the mainTabPanelWidth after all
-        // $(window).resize(() => {
-        //     S.domBind.whenElm("#mainTabPanel", (elm) => {
-        //         let newWidth = $(elm).width();
-        //         if (newWidth != this.mainTabPanelWidth) {
-        //             this.mainTabPanelWidth = newWidth;
-        //             console.log("mainTabPanelWidth=" + this.mainTabPanelWidth);
-        //         }
-        //     });
-        // });
-
-        if (this.appInitialized)
-            return;
-
-        this.appInitialized = true;
-
-        this.initConstants();
-        this.displaySignupMessage();
-
-        /*
-         * $ (window).on("orientationchange", _.orientationHandler);
-         */
-
-        //todo-1: actually this is a nuisance unless user is actually EDITING a node right now
-        //so until i make it able to detect if user is editing i'm removing this.
-        // window.onbeforeunload = () => {
-        //     return "Leave Meta64 ?";
-        // };
-
-        /*
-         * I thought this was a good idea, but actually it destroys the session, when the user is entering an
-         * "id=\my\path" type of url to open a specific node. Need to rethink  Basically for now I'm thinking
-         * going to a different url shouldn't blow up the session, which is what 'logout' does.
-         *
-         * $ (window).on("unload", function() { user.logout(false); });
-         */
-
-        this.deviceWidth = window.innerWidth;
-        this.deviceHeight = window.innerHeight;
-
-        let mainTabPanel = new TabPanel();
-        mainTabPanel.reactRenderToDOM("mainTabPanel");
-
-        let mainNavPanel = new MainNavPanel(null);
-        mainNavPanel.reactRenderToDOM("mainNavPanel");
-
-        /*
-         * This call checks the server to see if we have a session already, and gets back the login information from
-         * the session, and then renders page content, after that.
-         */
-
-        //this.pingServer();
-        S.user.refreshLogin();
-
-        S.util.initProgressMonitor();
-        this.processUrlParams();
-
-        this.setOverlay(false);
-
-        // todo-1: could replace this pull with a push.
-        setTimeout(() => {
-            S.view.displayNotifications(null);
-        }, 1000);
-
-        setTimeout(() => {
-            S.encryption.initKeys();
-        }, 100);
-
-        // Initialize the 'ServerPush' client-side connection
-        S.push.init();
-
-        //this.enableAppAsDropTarget();
-        console.log("initApp complete.");
     }
 
     /**
