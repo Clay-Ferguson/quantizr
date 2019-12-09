@@ -12,8 +12,8 @@ export interface UserIntf {
     openSignupPg(): void;
     openLoginPg(): void;
     refreshLogin(): void;
-    logout(updateLoginStateCookie);
+    logout(updateLocalDb: boolean);
     login(loginDlg, usr, pwd);
-    deleteAllUserCookies();
-    loginResponse(res?: I.LoginResponse, usr?: string, pwd?: string, usingCookies?: boolean, loginDlg?: LoginDlg);
+    deleteAllUserLocalDbEntries();
+    loginResponse(res?: I.LoginResponse, usr?: string, pwd?: string, usingLocalDb?: boolean, loginDlg?: LoginDlg);
 }

@@ -375,10 +375,10 @@ export class Util implements UtilIntf {
             this._ajaxCounter++;
             S.meta64.setOverlay(true);
             axiosRequest = axios.post(this.getRpcPath() + postName, postData, <AxiosRequestConfig>{
-                //Without this withCredentials axios (at least for CORS requests) doesn't send enough info (cookies?) to allow the server
+                //Without this withCredentials axios (at least for CORS requests) doesn't send enough info to allow the server
                 //to recognize the same "session", and makes the server malfunction becasue it basically thinks each request is a 
                 //new session and fails the login security. This reminds me that there is the classic security hole here where a sniffer
-                //can get the cookie from a request and forge a new request as any user they please, yet this will be impossible in SSL of course.
+                //can get the localDb from a request and forge a new request as any user they please, yet this will be impossible in SSL of course.
                 withCredentials: true
             });
 
@@ -899,22 +899,6 @@ export class Util implements UtilIntf {
         let instance = Object.create(context[name].prototype);
         instance.constructor.apply(instance, args);
         return <T>instance;
-    }
-
-    //todo-0: need to remove the Cookie functiuons (all 3 below), and replace with direct localDb calls.
-    setCookie = async (name: string, val: string): Promise<void> => {
-        return S.localDB.setVal(name, val);
-    }
-
-    deleteCookie = (name: string): Promise<void> => {
-        return S.localDB.setVal(name, null);
-    }
-
-    getCookie = (name: string): Promise<string> => {
-        return new Promise<string>(async (resolve, reject) => {
-            let val = await S.localDB.getVal(name);
-            resolve(val as string)
-        });
     }
 
     changeOrAddClassToElm = (elm: HTMLElement, oldClass: string, newClass: string) => {

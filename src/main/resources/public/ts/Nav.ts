@@ -42,7 +42,7 @@ export class Nav implements NavIntf {
 
     login = (): void => {
         let dlg = new LoginDlg(null);
-        dlg.populateFromCookies();
+        dlg.populateFromLocalDb();
         dlg.open();
     }
 

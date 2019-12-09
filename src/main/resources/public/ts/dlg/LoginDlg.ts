@@ -68,14 +68,14 @@ export class LoginDlg extends DialogBase {
     }
 
     init = (): void => {
-        this.populateFromCookies();
+        this.populateFromLocalDb();
     }
 
-    populateFromCookies = async (): Promise<void> => {
+    populateFromLocalDb = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                this.userTextField.setValue(await S.util.getCookie(Constants.COOKIE_LOGIN_USR));
-                this.passwordTextField.setValue(await S.util.getCookie(Constants.COOKIE_LOGIN_PWD));
+                this.userTextField.setValue(await S.localDB.getVal(Constants.LOCALDB_LOGIN_USR));
+                this.passwordTextField.setValue(await S.localDB.getVal(Constants.LOCALDB_LOGIN_PWD));
             }
             finally {
                 resolve();

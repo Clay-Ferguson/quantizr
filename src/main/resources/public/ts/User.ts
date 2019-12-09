@@ -35,7 +35,7 @@ export class User implements UserIntf {
             () => {
                 new ConfirmDlg("Your data will be deleted and can never be recovered.<p> Are you sure?", "Last Chance... One more Click",
                     () => {
-                        this.deleteAllUserCookies();
+                        this.deleteAllUserLocalDbEntries();
                         S.util.ajax<I.CloseAccountRequest, I.CloseAccountResponse>("closeAccount", {}, this.closeAccountResponse);
                     }
                 ).open();
@@ -111,7 +111,7 @@ export class User implements UserIntf {
      */
     openLoginPg = (): void => {
         let dlg = new LoginDlg(null);
-        dlg.populateFromCookies();
+        dlg.populateFromLocalDb();
         dlg.open();
     }
 
@@ -122,11 +122,8 @@ export class User implements UserIntf {
 
                 let callUsr: string;
                 let callPwd: string;
-                let usingCookies: boolean = false;
-
-                /* todo-1: stop using cookies and use Local Store instead ? Will any modern browsers fail on this? */
-                // is holding login state in a cookie insane or good idea?
-                let loginState: string = await S.util.getCookie(cnst.COOKIE_LOGIN_STATE);
+                let usingLocalDb: boolean = false;
+                let loginState: string = await S.localDB.getVal(cnst.LOCALDB_LOGIN_STATE);
 
                 /* if we have known state as logged out, then do nothing here */
                 if (loginState === "0") {
@@ -135,11 +132,11 @@ export class User implements UserIntf {
                     return;
                 }
 
-                let usr = await S.util.getCookie(cnst.COOKIE_LOGIN_USR);
-                let pwd = await S.util.getCookie(cnst.COOKIE_LOGIN_PWD);
+                let usr = await S.localDB.getVal(cnst.LOCALDB_LOGIN_USR);
+                let pwd = await S.localDB.getVal(cnst.LOCALDB_LOGIN_PWD);
 
-                usingCookies = !S.util.emptyString(usr) && !S.util.emptyString(pwd);
-                console.log("cookieUser=" + usr + " usingCookies = " + usingCookies);
+                usingLocalDb = !S.util.emptyString(usr) && !S.util.emptyString(pwd);
+                console.log("User=" + usr + " usingLocalDb = " + usingLocalDb);
 
                 /*
                  * empyt credentials causes server to try to log in with any active session credentials.
@@ -160,8 +157,8 @@ export class User implements UserIntf {
                         "tzOffset": new Date().getTimezoneOffset(),
                         "dst": S.util.daylightSavingsTime
                     }, (res: I.LoginResponse) => {
-                        if (usingCookies) {
-                            this.loginResponse(res, callUsr, callPwd, usingCookies);
+                        if (usingLocalDb) {
+                            this.loginResponse(res, callUsr, callPwd, usingLocalDb);
                         } else {
                             this.refreshLoginResponse(res);
                         }
@@ -174,7 +171,7 @@ export class User implements UserIntf {
         });
     }
 
-    logout = async (updateLoginStateCookie: any): Promise<void> => {
+    logout = async (updateLocalDb: any): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 if (S.meta64.isAnonUser) {
@@ -184,8 +181,8 @@ export class User implements UserIntf {
                 /* Remove warning dialog to ask user about leaving the page */
                 window.onbeforeunload = null;
 
-                if (updateLoginStateCookie) {
-                    await S.util.setCookie(cnst.COOKIE_LOGIN_STATE, "0");
+                if (updateLocalDb) {
+                    await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
                 }
 
                 S.util.ajax<I.LogoutRequest, I.LogoutResponse>("logout", {}, this.logoutResponse);
@@ -208,12 +205,12 @@ export class User implements UserIntf {
         });
     }
 
-    deleteAllUserCookies = async (): Promise<void> => {
+    deleteAllUserLocalDbEntries = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                await S.util.deleteCookie(cnst.COOKIE_LOGIN_USR);
-                await S.util.deleteCookie(cnst.COOKIE_LOGIN_PWD);
-                await S.util.deleteCookie(cnst.COOKIE_LOGIN_STATE);
+                await S.localDB.setVal(cnst.LOCALDB_LOGIN_USR, null);
+                await S.localDB.setVal(cnst.LOCALDB_LOGIN_PWD, null);
+                await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, null);
             }
             finally {
                 resolve();
@@ -221,16 +218,16 @@ export class User implements UserIntf {
         });
     }
 
-    loginResponse = async (res?: I.LoginResponse, usr?: string, pwd?: string, usingCookies?: boolean, loginDlg?: LoginDlg): Promise<void> => {
+    loginResponse = async (res?: I.LoginResponse, usr?: string, pwd?: string, usingLocalDb?: boolean, loginDlg?: LoginDlg): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 if (S.util.checkSuccess("Login", res)) {
                     console.log("loginResponse: usr=" + usr + " homeNodeOverride: " + res.homeNodeOverride);
 
                     if (usr !== "anonymous") {
-                        await S.util.setCookie(cnst.COOKIE_LOGIN_USR, usr);
-                        await S.util.setCookie(cnst.COOKIE_LOGIN_PWD, pwd);
-                        await S.util.setCookie(cnst.COOKIE_LOGIN_STATE, "1");
+                        await S.localDB.setVal(cnst.LOCALDB_LOGIN_USR, usr);
+                        await S.localDB.setVal(cnst.LOCALDB_LOGIN_PWD, pwd);
+                        await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "1");
                     }
 
                     if (loginDlg) {
@@ -261,16 +258,16 @@ export class User implements UserIntf {
                     S.view.refreshTree(id, false, null, true);
                     this.setTitleUsingLoginResponse(res);
                 } else {
-                    if (usingCookies) {
-                        S.util.showMessage("Cookie login failed.");
+                    if (usingLocalDb) {
+                        S.util.showMessage("LocalDb login failed.");
 
                         /*
-                         * blow away failed cookie credentials and reload page, should result in brand new page load as anon
+                         * blow away failed credentials and reload page, should result in brand new page load as anon
                          * this.
                          */
-                        await S.util.deleteCookie(cnst.COOKIE_LOGIN_USR);
-                        await S.util.deleteCookie(cnst.COOKIE_LOGIN_PWD);
-                        await S.util.setCookie(cnst.COOKIE_LOGIN_STATE, "0");
+                        await S.localDB.setVal(cnst.LOCALDB_LOGIN_USR, null);
+                        await S.localDB.setVal(cnst.LOCALDB_LOGIN_PWD, null);
+                        await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
 
                         location.reload();
                     }

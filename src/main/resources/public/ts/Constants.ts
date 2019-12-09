@@ -6,13 +6,14 @@ export class Constants {
     static readonly PUBSUB_SingletonsReady = "pubsub-singletons-ready";
 
     static readonly ANON: string = "anonymous";
-    static readonly COOKIE_LOGIN_USR: string = "loginUsr";
-    static readonly COOKIE_LOGIN_PWD: string = "loginPwd";
+    static readonly LOCALDB_LOGIN_USR: string = "loginUsr";
+    static readonly LOCALDB_LOGIN_PWD: string = "loginPwd";
 
     /*
      * loginState="0" if user logged out intentionally. loginState="1" if last known state of user was 'logged in'
      */
-    static readonly COOKIE_LOGIN_STATE: string = "loginState";
+    static readonly LOCALDB_LOGIN_STATE: string = "loginState";
+
     static readonly INSERT_ATTACHMENT: string = "{{insert-attachment}}";
     static readonly NEW_ON_TOOLBAR: boolean = true;
     static readonly INS_ON_TOOLBAR: boolean = false;
