@@ -901,31 +901,20 @@ export class Util implements UtilIntf {
         return <T>instance;
     }
 
-    //todo-2: I probably should use browser localStore and stop using cookies? issues with that?
-    setCookie = (name: string, val: string): void => {
-        let d = new Date();
-        d.setTime(d.getTime() + (365 * 24 * 60 * 60 * 1000));
-        let expires = "expires=" + d.toUTCString();
-        document.cookie = name + "=" + val + ";" + expires + ";path=/";
+    //todo-0: need to remove the Cookie functiuons (all 3 below), and replace with direct localDb calls.
+    setCookie = async (name: string, val: string): Promise<void> => {
+        return S.localDB.setVal(name, val);
     }
 
-    deleteCookie = (name: string): void => {
-        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+    deleteCookie = (name: string): Promise<void> => {
+        return S.localDB.setVal(name, null);
     }
 
-    getCookie = (name: string): string => {
-        name += "=";
-        let ca = document.cookie.split(';');
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) == ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) == 0) {
-                return c.substring(name.length, c.length);
-            }
-        }
-        return "";
+    getCookie = (name: string): Promise<string> => {
+        return new Promise<string>(async (resolve, reject) => {
+            let val = await S.localDB.getVal(name);
+            resolve(val as string)
+        });
     }
 
     changeOrAddClassToElm = (elm: HTMLElement, oldClass: string, newClass: string) => {

@@ -13,7 +13,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
@@ -22,10 +22,10 @@ export class LoginDlg extends DialogBase {
 
     userTextField: TextField;
     passwordTextField: PasswordTextField;
-  
+
     constructor(paramsTest: Object) {
         super("Login", "app-modal-content-login-dlg");
-       
+
         this.setChildren([
             new Form(null, [
                 new Div(null, {
@@ -35,7 +35,7 @@ export class LoginDlg extends DialogBase {
                         this.userTextField = new TextField({
                             placeholder: "",
                             label: "User",
-                            onKeyPress : (e) => {
+                            onKeyPress: (e) => {
                                 if (e.which == 13) { // 13==enter key code
                                     this.login();
                                     return false;
@@ -45,7 +45,7 @@ export class LoginDlg extends DialogBase {
                         this.passwordTextField = new PasswordTextField({
                             "placeholder": "",
                             "label": "Password",
-                            onKeyPress : (e) => {
+                            onKeyPress: (e) => {
                                 if (e.which == 13) { // 13==enter key code
                                     this.login();
                                     return false;
@@ -71,9 +71,16 @@ export class LoginDlg extends DialogBase {
         this.populateFromCookies();
     }
 
-    populateFromCookies = (): void => {
-        this.userTextField.setValue(S.util.getCookie(Constants.COOKIE_LOGIN_USR));
-        this.passwordTextField.setValue(S.util.getCookie(Constants.COOKIE_LOGIN_PWD));
+    populateFromCookies = async (): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                this.userTextField.setValue(await S.util.getCookie(Constants.COOKIE_LOGIN_USR));
+                this.passwordTextField.setValue(await S.util.getCookie(Constants.COOKIE_LOGIN_PWD));
+            }
+            finally {
+                resolve();
+            }
+        });
     }
 
     login = (): void => {
@@ -89,10 +96,10 @@ export class LoginDlg extends DialogBase {
         new ConfirmDlg("Reset your password ?<p>You'll still be able to login with your old password until the new one is set.",
 
             "Confirm Reset Password",
-                () => {
-                    this.close();
-                    new ResetPasswordDlg({ "user": usr }).open();
-                }
+            () => {
+                this.close();
+                new ResetPasswordDlg({ "user": usr }).open();
+            }
         ).open();
     }
 }

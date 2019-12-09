@@ -93,9 +93,9 @@ export interface UtilIntf {
     printKeys(obj: Object): string;
     setEnablement(elmId: string, enable: boolean): void;
     getInstance<T>(context: Object, name: string, ...args: any[]): T;
-    setCookie(name: string, val: string): void;
-    deleteCookie(name: string): void;
-    getCookie(name: string): string;
+    setCookie(name: string, val: string): Promise<void>;
+    deleteCookie(name: string): Promise<void>;
+    getCookie(name: string): Promise<string>;
     changeOrAddClassToElm(elm: HTMLElement, oldClass: string, newClass: string);
     changeOrAddClass(id: string, oldClass: string, newClass: string);
     removeClassFromElmById(id: string, clazz: string);

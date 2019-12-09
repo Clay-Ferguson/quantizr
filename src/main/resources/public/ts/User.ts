@@ -115,71 +115,86 @@ export class User implements UserIntf {
         dlg.open();
     }
 
-    refreshLogin = (): void => {
-        console.log("refreshLogin.");
+    refreshLogin = async (): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                console.log("refreshLogin.");
 
-        let callUsr: string;
-        let callPwd: string;
-        let usingCookies: boolean = false;
+                let callUsr: string;
+                let callPwd: string;
+                let usingCookies: boolean = false;
 
-        /* todo-1: stop using cookies and use Local Store instead ? Will any modern browsers fail on this? */
-        // is holding login state in a cookie insane or good idea?
-        let loginState: string = S.util.getCookie(cnst.COOKIE_LOGIN_STATE);
+                /* todo-1: stop using cookies and use Local Store instead ? Will any modern browsers fail on this? */
+                // is holding login state in a cookie insane or good idea?
+                let loginState: string = await S.util.getCookie(cnst.COOKIE_LOGIN_STATE);
 
-        /* if we have known state as logged out, then do nothing here */
-        if (loginState === "0") {
-            console.log("loginState known as logged out. Sending to anon home page. [no, new logic overriding this now]");
-            S.meta64.loadAnonPageHome();
-            return;
-        }
-        
-        let usr = S.util.getCookie(cnst.COOKIE_LOGIN_USR);
-        let pwd = S.util.getCookie(cnst.COOKIE_LOGIN_PWD);
-
-        usingCookies = !S.util.emptyString(usr) && !S.util.emptyString(pwd);
-        console.log("cookieUser=" + usr + " usingCookies = " + usingCookies);
-
-        /*
-         * empyt credentials causes server to try to log in with any active session credentials.
-         */
-        callUsr = usr || "";
-        callPwd = pwd || "";
-
-        console.log("refreshLogin with name: " + callUsr);
-
-        if (!callUsr) {
-            //alert('loadAnonPageHome');
-            S.meta64.loadAnonPageHome();
-        } else {
-            //alert('calling login: currently at: '+location.href);
-            S.util.ajax<I.LoginRequest, I.LoginResponse>("login", {
-                "userName": callUsr,
-                "password": callPwd,
-                "tzOffset": new Date().getTimezoneOffset(),
-                "dst": S.util.daylightSavingsTime
-            }, (res: I.LoginResponse) => {
-                if (usingCookies) {
-                    this.loginResponse(res, callUsr, callPwd, usingCookies);
-                } else {
-                    this.refreshLoginResponse(res);
+                /* if we have known state as logged out, then do nothing here */
+                if (loginState === "0") {
+                    console.log("loginState known as logged out. Sending to anon home page. [no, new logic overriding this now]");
+                    S.meta64.loadAnonPageHome();
+                    return;
                 }
-            });
-        }
+
+                let usr = await S.util.getCookie(cnst.COOKIE_LOGIN_USR);
+                let pwd = await S.util.getCookie(cnst.COOKIE_LOGIN_PWD);
+
+                usingCookies = !S.util.emptyString(usr) && !S.util.emptyString(pwd);
+                console.log("cookieUser=" + usr + " usingCookies = " + usingCookies);
+
+                /*
+                 * empyt credentials causes server to try to log in with any active session credentials.
+                 */
+                callUsr = usr || "";
+                callPwd = pwd || "";
+
+                console.log("refreshLogin with name: " + callUsr);
+
+                if (!callUsr) {
+                    //alert('loadAnonPageHome');
+                    S.meta64.loadAnonPageHome();
+                } else {
+                    //alert('calling login: currently at: '+location.href);
+                    S.util.ajax<I.LoginRequest, I.LoginResponse>("login", {
+                        "userName": callUsr,
+                        "password": callPwd,
+                        "tzOffset": new Date().getTimezoneOffset(),
+                        "dst": S.util.daylightSavingsTime
+                    }, (res: I.LoginResponse) => {
+                        if (usingCookies) {
+                            this.loginResponse(res, callUsr, callPwd, usingCookies);
+                        } else {
+                            this.refreshLoginResponse(res);
+                        }
+                    });
+                }
+            }
+            finally {
+                resolve();
+            }
+        });
     }
 
-    logout = (updateLoginStateCookie: any) => {
-        if (S.meta64.isAnonUser) {
-            return;
-        }
+    logout = async (updateLoginStateCookie: any): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                if (S.meta64.isAnonUser) {
+                    return;
+                }
 
-        /* Remove warning dialog to ask user about leaving the page */
-        window.onbeforeunload = null;
+                /* Remove warning dialog to ask user about leaving the page */
+                window.onbeforeunload = null;
 
-        if (updateLoginStateCookie) {
-            S.util.setCookie(cnst.COOKIE_LOGIN_STATE, "0");
-        }
+                if (updateLoginStateCookie) {
+                    await S.util.setCookie(cnst.COOKIE_LOGIN_STATE, "0");
+                }
 
-        S.util.ajax<I.LogoutRequest, I.LogoutResponse>("logout", {}, this.logoutResponse);
+                S.util.ajax<I.LogoutRequest, I.LogoutResponse>("logout", {}, this.logoutResponse);
+            }
+            //todo-0: everywhere in the app that I have a resolve() that isn't in a finally block needs to be checked for correctness.
+            finally {
+                resolve();
+            }
+        });
     }
 
     login = (loginDlg: any, usr: string, pwd: string) => {
@@ -193,67 +208,80 @@ export class User implements UserIntf {
         });
     }
 
-    deleteAllUserCookies = () => {
-        S.util.deleteCookie(cnst.COOKIE_LOGIN_USR);
-        S.util.deleteCookie(cnst.COOKIE_LOGIN_PWD);
-        S.util.deleteCookie(cnst.COOKIE_LOGIN_STATE);
+    deleteAllUserCookies = async (): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                await S.util.deleteCookie(cnst.COOKIE_LOGIN_USR);
+                await S.util.deleteCookie(cnst.COOKIE_LOGIN_PWD);
+                await S.util.deleteCookie(cnst.COOKIE_LOGIN_STATE);
+            }
+            finally {
+                resolve();
+            }
+        });
     }
 
-    loginResponse = (res?: I.LoginResponse, usr?: string, pwd?: string, usingCookies?: boolean, loginDlg?: LoginDlg) => {
-        if (S.util.checkSuccess("Login", res)) {
-            console.log("loginResponse: usr=" + usr + " homeNodeOverride: " + res.homeNodeOverride);
+    loginResponse = async (res?: I.LoginResponse, usr?: string, pwd?: string, usingCookies?: boolean, loginDlg?: LoginDlg): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                if (S.util.checkSuccess("Login", res)) {
+                    console.log("loginResponse: usr=" + usr + " homeNodeOverride: " + res.homeNodeOverride);
 
-            if (usr !== "anonymous") {
-                S.util.setCookie(cnst.COOKIE_LOGIN_USR, usr);
-                S.util.setCookie(cnst.COOKIE_LOGIN_PWD, pwd);
-                S.util.setCookie(cnst.COOKIE_LOGIN_STATE, "1");
-            }
+                    if (usr !== "anonymous") {
+                        await S.util.setCookie(cnst.COOKIE_LOGIN_USR, usr);
+                        await S.util.setCookie(cnst.COOKIE_LOGIN_PWD, pwd);
+                        await S.util.setCookie(cnst.COOKIE_LOGIN_STATE, "1");
+                    }
 
-            if (loginDlg) {
-                loginDlg.close();
-            }
+                    if (loginDlg) {
+                        loginDlg.close();
+                    }
 
-            this.setStateVarsUsingLoginResponse(res);
+                    this.setStateVarsUsingLoginResponse(res);
 
-            /* set ID to be the page we want to show user right after login */
-            let id: string = null;
+                    /* set ID to be the page we want to show user right after login */
+                    let id: string = null;
 
-            if (!S.util.emptyString(res.homeNodeOverride)) {
-                console.log("loading homeNodeOverride=" + res.homeNodeOverride);
-                id = res.homeNodeOverride;
-                S.meta64.homeNodeOverride = id;
-            } else {
-                let lastNode = localStorage.getItem("lastNode");
-                if (lastNode) {
-                    console.log("loading lastNode=" + lastNode);
-                    id = lastNode;
+                    if (!S.util.emptyString(res.homeNodeOverride)) {
+                        console.log("loading homeNodeOverride=" + res.homeNodeOverride);
+                        id = res.homeNodeOverride;
+                        S.meta64.homeNodeOverride = id;
+                    } else {
+                        let lastNode = localStorage.getItem("lastNode");
+                        if (lastNode) {
+                            console.log("loading lastNode=" + lastNode);
+                            id = lastNode;
+                        } else {
+                            console.log("loading homeNodeId=" + S.meta64.homeNodeId);
+                            id = S.meta64.homeNodeId;
+                        }
+                    }
+
+                    // alert("refreshTree: id="+id);
+                    S.view.refreshTree(id, false, null, true);
+                    this.setTitleUsingLoginResponse(res);
                 } else {
-                    console.log("loading homeNodeId=" + S.meta64.homeNodeId);
-                    id = S.meta64.homeNodeId;
+                    if (usingCookies) {
+                        S.util.showMessage("Cookie login failed.");
+
+                        /*
+                         * blow away failed cookie credentials and reload page, should result in brand new page load as anon
+                         * this.
+                         */
+                        await S.util.deleteCookie(cnst.COOKIE_LOGIN_USR);
+                        await S.util.deleteCookie(cnst.COOKIE_LOGIN_PWD);
+                        await S.util.setCookie(cnst.COOKIE_LOGIN_STATE, "0");
+
+                        location.reload();
+                    }
                 }
+
+                S.meta64.refreshAllGuiEnablement();
             }
-
-            // alert("refreshTree: id="+id);
-            S.view.refreshTree(id, false, null, true);
-            this.setTitleUsingLoginResponse(res);
-        } else {
-            if (usingCookies) {
-                S.util.showMessage("Cookie login failed.");
-
-                /*
-                 * blow away failed cookie credentials and reload page, should result in brand new page load as anon
-                 * this.
-                 */
-                S.util.deleteCookie(cnst.COOKIE_LOGIN_USR);
-                S.util.deleteCookie(cnst.COOKIE_LOGIN_PWD);
-                S.util.setCookie(cnst.COOKIE_LOGIN_STATE, "0");
-
-                // alert("calling location.reload");
-                location.reload();
+            finally {
+                resolve();
             }
-        }
-
-        S.meta64.refreshAllGuiEnablement();
+        });
     }
 
     private refreshLoginResponse = (res: I.LoginResponse): void => {
