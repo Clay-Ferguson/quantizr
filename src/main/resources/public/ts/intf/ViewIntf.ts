@@ -19,7 +19,7 @@ export interface ViewIntf {
     nextPage(): void;
     lastPage(): void;
     scrollRelativeToNode(dir: string): void;
-    scrollToSelectedNode(delay?: number): Promise<void>;
+    scrollToSelectedNode(): Promise<void>;
     scrollToTop(afterFunc?: Function): Promise<void>;
     initEditPathDisplayById(e: HTMLElement): any;
     runServerCommand(command: string): any;

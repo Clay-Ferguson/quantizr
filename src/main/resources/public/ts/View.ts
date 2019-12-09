@@ -173,7 +173,7 @@ export class View implements ViewIntf {
         }
     }
 
-    scrollToSelectedNode = async (delay: number = 100): Promise<void> => {
+    scrollToSelectedNode = async (): Promise<void> => {
         return new Promise<void>((resolve, reject) => {
             S.meta64.setOverlay(true);
 
@@ -185,32 +185,20 @@ export class View implements ViewIntf {
                     let currentSelNode: I.NodeInfo = S.meta64.getHighlightedNode();
                     if (currentSelNode && S.meta64.currentNodeData.node.id == currentSelNode.id) {
                         this.docElm.scrollTop = 0;
-                        //console.log("was ROOT node. top=0");
                         return;
                     }
 
                     let elm: any = S.nav.getSelectedDomElement();
-
                     if (elm) {
-                        // This method of scrolling DOES work, but it doesn't take into account the fact that we are using
-                        // a top margin in the body to account for the vertical height of the header bar, and thus it doesn't
-                        // quite work. I'm leaving the code here for future reference. (may try it again some day)
-                        if (false && elm.scrollIntoView) {
-                            //As of 2019 there are lots of browsers that ONLY currently support this boolean, but more advanced
-                            //way of calling this commented out below is better and we'll use that some day.
-                            elm.scrollIntoView(true);
-                            //elm.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
-                        }
-                        else {
-                            let top = elm.getBoundingClientRect().top;
-                            let elmTop = top + document.body.scrollTop;
-                            let docElmScrollTop = elmTop - S.meta64.navBarHeight;
-                            this.docElm.scrollTop = docElmScrollTop;
-                        }
+                        elm.scrollIntoView(true);
+
+                        //the 'scrollIntoView' function doesn't work well when we have margin/padding on the document (for our toolbar at the top)
+                        //so we have to account for that by scrolling up a bit from where the 'scrollIntoView' will have put is.
+                        //Only in the rare case of the very last node on the page will this have slightly undesirable effect of
+                        //scrolling up more than we wanted to, but instead of worrying about that I'm keeping this simple.
+                        scrollBy(0, -S.meta64.navBarHeight);
                     }
                     else {
-                        //sets vertical top position of scrollbar to zero (top), using a more simple
-                        //way to scroll.
                         this.docElm.scrollTop = 0;
                     }
 
@@ -218,9 +206,9 @@ export class View implements ViewIntf {
                     setTimeout(() => {
                         S.meta64.setOverlay(false);
                         resolve();
-                    }, 250);
+                    }, 100);
                 }
-            }, delay);
+            }, 100);
         });
     }
 

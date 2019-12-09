@@ -501,7 +501,7 @@ export class Meta64 implements Meta64Intf {
 
             if (scroll) {
                 console.log("highlightNode calling scrollToSelectedNode.");
-                await S.view.scrollToSelectedNode(10);
+                await S.view.scrollToSelectedNode();
             }
             resolve();
         });
