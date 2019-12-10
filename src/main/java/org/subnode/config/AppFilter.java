@@ -25,10 +25,9 @@ import org.subnode.util.ThreadLocals;
  * This is Web Filter to measure basic application statistics (number of users,
  * etc)
  */
-@Component //for #spring-sec, remove this annotation
-public class AppFilter 
-//extends GenericFilterBean { #spring-sec
-	implements Filter {
+@Component
+public class AppFilter extends GenericFilterBean {
+	//implements Filter {
 	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
 
 	private static final HashMap<String, Integer> uniqueIpHits = new HashMap<String, Integer>();

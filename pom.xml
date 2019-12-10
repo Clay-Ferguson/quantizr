@@ -103,6 +103,7 @@
 
 <!-- WARNING: adding this will totally disable the app, until ALL
      of the spring configs for security are also perfected. 
+	 (but our custom security is better than Spring for now at least)
 
 				<dependency>
         			<groupId>org.springframework.boot</groupId>
@@ -562,6 +563,7 @@
 
 <!-- WARNING: adding this will totally disable the app, until ALL
      of the spring configs for security are also perfected. 
+	  (but our custom security is better than Spring for now at least)
 
 				<dependency>
         			<groupId>org.springframework.boot</groupId>
@@ -983,6 +985,7 @@
 
 <!-- WARNING: adding this will totally disable the app, until ALL
      of the spring configs for security are also perfected. 
+	  (but our custom security is better than Spring for now at least)
 
 				<dependency>
         			<groupId>org.springframework.boot</groupId>
