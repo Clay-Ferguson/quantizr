@@ -323,7 +323,6 @@ export interface SignupRequest {
     userName: string;
     password: string;
     email: string;
-    captcha: string;
 }
 
 export interface SplitNodeRequest {

@@ -257,9 +257,8 @@ public class UserManagerService {
 		final String userName = req.getUserName().trim();
 		final String password = req.getPassword();
 		final String email = req.getEmail();
-		final String captcha = req.getCaptcha() == null ? "" : req.getCaptcha();
 
-		log.debug("Signup: userName=" + userName + " email=" + email + " captcha=" + captcha);
+		log.debug("Signup: userName=" + userName + " email=" + email);
 
 		/* throw exceptions of the username or password are not valid */
 		validator.checkUserName(userName);
@@ -267,14 +266,6 @@ public class UserManagerService {
 		validator.checkEmail(email);
 
 		if (!automated) {
-			/*
-			 * test cases will simply pass null, for captcha, and we let that pass
-			 */
-			if (captcha != null && !captcha.equals(sessionContext.getCaptcha())) {
-				log.debug("Captcha match!");
-				throw ExUtil.newEx("Wrong captcha text.");
-			}
-
 			initiateSignup(session, userName, password, email);
 		} else {
 			initNewUser(session, userName, password, email, automated);

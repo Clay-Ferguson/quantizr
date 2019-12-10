@@ -904,7 +904,8 @@ public class MongoApi {
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
 				.regex(regexDirectChildrenOfPath(node == null ? "" : node.getPath()));
 		if (ordered) {
-			query.with(new Sort(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
+
+			query.with(Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
 		}
 		query.addCriteria(criteria);
 
@@ -942,7 +943,7 @@ public class MongoApi {
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
 				.regex(regexDirectChildrenOfPath(node == null ? "" : node.getPath()));
 		if (ordered) {
-			query.with(new Sort(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
+			query.with(Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
 		}
 		query.addCriteria(criteria);
 
@@ -981,7 +982,7 @@ public class MongoApi {
 		// callingfindOne at the end? What's best practice here?
 		Query query = new Query();
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(node.getPath()));
-		query.with(new Sort(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
+		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
 		query.addCriteria(criteria);
 
 		SubNode nodeFound = ops.findOne(query, SubNode.class);
@@ -1002,7 +1003,7 @@ public class MongoApi {
 		// calling findOne at the end? What's best practice here?
 		Query query = new Query();
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(node.getParentPath()));
-		query.with(new Sort(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
+		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
 		query.addCriteria(criteria);
 
 		// leave this example. you can do a RANGE like this.
@@ -1023,7 +1024,7 @@ public class MongoApi {
 		// calling findOne at the end? What's best practice here?
 		Query query = new Query();
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(node.getParentPath()));
-		query.with(new Sort(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
+		query.with(Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
 		query.addCriteria(criteria);
 
 		// leave this example. you can do a RANGE like this.
@@ -1114,7 +1115,7 @@ public class MongoApi {
 		}
 
 		if (!StringUtils.isEmpty(sortField)) {
-			query.with(new Sort(Sort.Direction.DESC, sortField));
+			query.with(Sort.by(Sort.Direction.DESC, sortField));
 		}
 
 		return ops.find(query, SubNode.class);

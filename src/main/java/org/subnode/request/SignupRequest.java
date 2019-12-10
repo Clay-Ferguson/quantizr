@@ -6,7 +6,6 @@ public class SignupRequest extends RequestBase {
 	private String userName;
 	private String password;
 	private String email;
-	private String captcha;
 
 	public String getUserName() {
 		return userName;
@@ -30,13 +29,5 @@ public class SignupRequest extends RequestBase {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getCaptcha() {
-		return captcha;
-	}
-
-	public void setCaptcha(String captcha) {
-		this.captcha = captcha;
 	}
 }

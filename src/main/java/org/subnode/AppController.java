@@ -26,7 +26,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
-import org.subnode.image.CaptchaMaker;
 import org.subnode.mail.MailSender;
 import org.subnode.model.ExportOutputType;
 import org.subnode.mongo.AclService;
@@ -273,20 +272,6 @@ public class AppController {
 		}
 
 		return "forward:/index.html";
-	}
-
-	/**
-	 * todo-p2: convert this to return ResponseEntity<StreamingResponseBody>. I
-	 * haven't done this yet and left this as byte[] for now just becasue these
-	 * images are so small it will be ok to hold all in memory for now
-	 */
-	@RequestMapping(value = API_PATH + "/captcha", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
-	public @ResponseBody byte[] captcha(HttpSession session) {
-		return (byte[]) callProc.run("captcha", null, session, ms -> {
-			String captcha = CaptchaMaker.createCaptchaString();
-			sessionContext.setCaptcha(captcha);
-			return CaptchaMaker.makeCaptcha(captcha);
-		});
 	}
 
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)

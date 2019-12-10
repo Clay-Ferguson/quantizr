@@ -4,7 +4,6 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
 import { PasswordTextField } from "../widget/PasswordTextField";
-import { Captcha } from "../widget/Captcha";
 import { PubSub } from "../PubSub";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
@@ -20,8 +19,6 @@ export class SignupDlg extends DialogBase {
     userTextField: TextField;
     passwordTextField: PasswordTextField;
     emailTextField: TextField;
-    captchaTextField: TextField;
-    captchaImage: Captcha;
 
     constructor() {
         super("Create Account", "app-modal-content-login-dlg");
@@ -40,14 +37,6 @@ export class SignupDlg extends DialogBase {
                     "placeholder": "",
                     "label": "Email"
                 }),
-                this.captchaTextField = new TextField({
-                    "placeholder": "",
-                    "label": "Captcha"
-                }),
-                this.captchaImage = new Captcha(),
-                new ButtonBar([
-                    new Button("Try Another Image", this.tryAnotherCaptcha),
-                ]),
                 new ButtonBar([
                     new Button("Create Account", this.signup),
                     new Button("Cancel", this.close)
@@ -60,13 +49,11 @@ export class SignupDlg extends DialogBase {
         let userName = this.userTextField.getValue();
         let password = this.passwordTextField.getValue();
         let email = this.emailTextField.getValue();
-        let captcha = this.captchaTextField.getValue();
 
         /* no real validation yet, other than non-empty */
         if (!userName || userName.length == 0 || //
             !password || password.length == 0 || //
-            !email || email.length == 0 || //
-            !captcha || captcha.length == 0) {
+            !email || email.length == 0) {
             S.util.showMessage("You cannot leave any fields blank.");
             return;
         }
@@ -74,8 +61,7 @@ export class SignupDlg extends DialogBase {
         S.util.ajax<I.SignupRequest, I.SignupResponse>("signup", {
             "userName": userName,
             "password": password,
-            "email": email,
-            "captcha": captcha
+            "email": email
         }, this.signupResponse);
 
         this.close();
@@ -93,14 +79,7 @@ export class SignupDlg extends DialogBase {
         }
     }
 
-    tryAnotherCaptcha = (): void => {
-        let cacheBuster = S.util.currentTimeMillis();
-        let src = S.util.getRpcPath() + "captcha?t=" + cacheBuster;
-        this.captchaImage.setSrc(src);
-    }
-
     pageInitSignupPg = (): void => {
-        this.tryAnotherCaptcha();
     }
 
     init = (): void => {
