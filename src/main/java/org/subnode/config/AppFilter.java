@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.GenericFilterBean;
 import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.util.ThreadLocals;
 
@@ -24,15 +25,21 @@ import org.subnode.util.ThreadLocals;
  * This is Web Filter to measure basic application statistics (number of users,
  * etc)
  */
-@Component
-public class AppFilter implements Filter {
+@Component //for #spring-sec, remove this annotation
+public class AppFilter 
+//extends GenericFilterBean { #spring-sec
+	implements Filter {
 	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
 
 	private static final HashMap<String, Integer> uniqueIpHits = new HashMap<String, Integer>();
 
+	private static int reqId = 0;
+
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
+
+		int thisReqId = ++reqId;
 
 		boolean initialSessionExisted = false;
 
@@ -55,11 +62,11 @@ public class AppFilter implements Filter {
 			ThreadLocals.setHttpSession(session);
 			String queryString = httpReq.getQueryString();
 
-			String url = "REQ: URI=" + httpReq.getRequestURI() + "  QueryString=" + queryString;
-			String uri = httpReq.getRequestURI();
-			if (uri.startsWith("/r/")) {
-				session.setAttribute("uri", uri);
-			}
+			String url = "REQ["+String.valueOf(thisReqId)+"]: URI=" + httpReq.getRequestURI() + "  QueryString=" + queryString;
+			// String uri = httpReq.getRequestURI();
+			// if (uri.startsWith("/r/")) {
+			// 	session.setAttribute("uri", uri);
+			// }
 			log.debug(url);
 
 			updateHitCounter(httpReq);
@@ -76,7 +83,7 @@ public class AppFilter implements Filter {
 		try {
 			chain.doFilter(req, res);
 			HttpServletResponse httpRes = (HttpServletResponse) res;
-			log.trace("    RES: "/* +httpRes.getStatus() */ + HttpStatus.valueOf(httpRes.getStatus()));
+			log.debug("    RES: [" +String.valueOf(thisReqId)+ "]" /* +httpRes.getStatus() */ + HttpStatus.valueOf(httpRes.getStatus()));
 		} catch (RuntimeException ex) {
 			log.error("Request Failed", ex);
 			throw ex;
@@ -138,13 +145,13 @@ public class AppFilter implements Filter {
 		return ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip);
 	}
 
-	@Override
-	public void destroy() {
-	}
+	// @Override
+	// public void destroy() {
+	// }
 
-	@Override
-	public void init(FilterConfig arg0) throws ServletException {
-	}
+	// @Override
+	// public void init(FilterConfig arg0) throws ServletException {
+	// }
 
 	public static HashMap<String, Integer> getUniqueIpHits() {
 		return uniqueIpHits;

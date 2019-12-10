@@ -60,6 +60,7 @@ export class Util implements UtilIntf {
 
     waitCounter: number = 0;
     pgrsDlg: ProgressDlg = null;
+
     autoReloadIfSessionTimeout: boolean = true;
 
     hashOfString = (s: string): number => {
@@ -369,7 +370,7 @@ export class Util implements UtilIntf {
             }
 
             if (this.logAjax) {
-                console.log("JSON-POST[gen]: [" + postName + "]" + JSON.stringify(postData));
+                console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + JSON.stringify(postData));
             }
 
             this._ajaxCounter++;
@@ -377,8 +378,7 @@ export class Util implements UtilIntf {
             axiosRequest = axios.post(this.getRpcPath() + postName, postData, <AxiosRequestConfig>{
                 //Without this withCredentials axios (at least for CORS requests) doesn't send enough info to allow the server
                 //to recognize the same "session", and makes the server malfunction becasue it basically thinks each request is a 
-                //new session and fails the login security. This reminds me that there is the classic security hole here where a sniffer
-                //can get the localDb from a request and forge a new request as any user they please, yet this will be impossible in SSL of course.
+                //new session and fails the login security. 
                 withCredentials: true
             });
 
