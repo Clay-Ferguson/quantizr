@@ -40,7 +40,9 @@ export class MenuPanel extends Div {
                 // new MenuItem("Quantizr on GitHub", S.nav.openGitHubSite),
                 
                 new MenuItem("Getting Started", () => { S.nav.openContentNode("/r/public/getting-started"); }),
-                new MenuItem("Documentation", () => { S.nav.openContentNode("/r/public/subnode-docs"); }),
+
+                //I decided ALL information will be stored native right in mongo, and no filesystem stuff.
+                //new MenuItem("Documentation", () => { S.nav.openContentNode("/r/public/subnode-docs"); }),
             ]),
             new Menu("Edit", [
                 new MenuItem("Edit", S.edit.runEditNode,
@@ -146,7 +148,9 @@ export class MenuPanel extends Div {
                 new MenuItem("Preferences", S.edit.editPreferences, () => { return !S.meta64.isAnonUser }), //
                 new MenuItem("Change Password", S.edit.openChangePasswordDlg, () => { return !S.meta64.isAnonUser }), //
                 new MenuItem("Manage Account", S.edit.openManageAccountDlg, () => { return !S.meta64.isAnonUser }), //
-                new MenuItem("Encryption Keys", S.meta64.openManageKeysDlg, () => { return !S.meta64.isAnonUser }), //
+                
+                //This isn't mature enough yet to show to users
+                //new MenuItem("Encryption Keys", S.meta64.openManageKeysDlg, () => { return !S.meta64.isAnonUser }), //
 
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //

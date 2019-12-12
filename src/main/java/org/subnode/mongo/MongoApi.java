@@ -1339,6 +1339,9 @@ public class MongoApi {
 
 		requireAdmin(session);
 		String newUserNodePath = "/" + NodeName.ROOT + "/" + NodeName.USER + "/?";
+		//todo-0: is user validated here (no invalid characters, etc. and invalid flowpaths tested?)
+		//String newUserNodePath = "/" + NodeName.ROOT + "/" + NodeName.USER + "/" + user;
+
 		/*
 		 * todo-p1: need to create this node as if it were also renamed to 'user', so
 		 * that immediately all user root nodes are addressible as "/r/usr/myName".
@@ -1384,6 +1387,11 @@ public class MongoApi {
 		Criteria criteria = Criteria.where(//
 				SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath("/" + NodeName.ROOT + "/" + NodeName.USER))//
 				.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
+
+		//todo-0: once this is proven, need to rename the existing nodes to embed username in this new way
+		// Criteria criteria = Criteria.where(//
+		// 		SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath("/" + NodeName.ROOT + "/" + NodeName.USER + "/" + user));
+
 		query.addCriteria(criteria);
 		SubNode ret = ops.findOne(query, SubNode.class);
 		auth(session, ret, PrivilegeType.READ);

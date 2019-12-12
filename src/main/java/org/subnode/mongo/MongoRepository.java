@@ -118,7 +118,6 @@ public class MongoRepository {
 			}
 
 			api.createAllIndexes(adminSession);
-
 			api.createAdminUser(adminSession);
 			repoUtil.createTestAccounts();
 

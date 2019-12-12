@@ -204,16 +204,18 @@ public class UserManagerService {
 					throw new RuntimeException("processSignupCode should not be called fror admin user.");
 				}
 
-				String password = node.getStringProp(NodeProp.PASSWORD);
+				// String password = node.getStringProp(NodeProp.PASSWORD);
 
-				// Currently we just store password on server in cleartext (security isn't a priority yet on the platform), 
-				// and we will never go back to even encrypting the password. The modern best practice for this is to store 
-				// a hash of the password only so that even the server itself doesn't know what the actual password is.
-				// password = encryptor.decrypt(password);
+				// // Currently we just store password on server in cleartext (security isn't a priority yet on the platform), 
+				// // and we will never go back to even encrypting the password. The modern best practice for this is to store 
+				// // a hash of the password only so that even the server itself doesn't know what the actual password is.
+				// // password = encryptor.decrypt(password);
 
-				String email = node.getStringProp(NodeProp.EMAIL);
+				// String email = node.getStringProp(NodeProp.EMAIL);
 
-				initNewUser(session, userName, password, email, false);
+				//I'm leaving this here commented, but it was the bug where two user nodes
+				//got created!
+				//initNewUser(session, userName, password, email, false);
 
 				/*
 				 * allow JavaScript to detect all it needs to detect which is to display a
@@ -255,7 +257,7 @@ public class UserManagerService {
 		MongoSession session = api.getAdminSession();
 
 		final String userName = req.getUserName().trim();
-		final String password = req.getPassword();
+		final String password = req.getPassword().trim();
 		final String email = req.getEmail();
 
 		log.debug("Signup: userName=" + userName + " email=" + email);
@@ -276,7 +278,7 @@ public class UserManagerService {
 	}
 
 	/*
-	 * Adds user to the JCR list of pending accounts and they will stay in pending
+	 * Adds user to the list of pending accounts and they will stay in pending
 	 * status until their signupCode has been used to validate their email address.
 	 */
 	public void initiateSignup(MongoSession session, String userName, String password, String email) {

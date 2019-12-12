@@ -571,7 +571,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     getNumChildNodes = (): number => {
-        if (!this.currentNodeData || !this.currentNodeData.node.children)
+        if (!this.currentNodeData || !this.currentNodeData.node || !this.currentNodeData.node.children)
             return 0;
 
         return this.currentNodeData.node.children.length;
