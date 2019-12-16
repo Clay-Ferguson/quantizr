@@ -9,7 +9,6 @@ import { PasswordTextField } from "../widget/PasswordTextField";
 import { TextContent } from "../widget/TextContent";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
-import { UtilIntf as Util } from "../intf/UtilIntf";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
@@ -58,6 +57,7 @@ export class ChangePasswordDlg extends DialogBase {
         this.pwd = this.passwordField.getValue();
 
         if (this.pwd && this.pwd.length >= 4) {
+            debugger;
             S.util.ajax<I.ChangePasswordRequest, I.ChangePasswordResponse>("changePassword", {
                 "newPassword": this.pwd,
                 "passCode": this.passCode

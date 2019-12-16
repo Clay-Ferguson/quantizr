@@ -664,6 +664,7 @@ export class Render implements RenderIntf {
                     //console.log("Setting lastNode="+data.node.id);
                     if (data && data.node) {
                         localStorage.setItem("lastNode", data.node.id);
+                        S.util.updateHistory(data.node);
                     }
 
                     let newData: boolean = false;

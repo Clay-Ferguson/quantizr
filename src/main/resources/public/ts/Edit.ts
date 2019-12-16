@@ -43,8 +43,6 @@ export class Edit implements EditIntf {
      */
     editingUnsavedNode: boolean = false;
 
-    sendNotificationPendingSave: boolean = false;
-
     /*
      * Node being edited
      *
@@ -260,7 +258,7 @@ export class Edit implements EditIntf {
         else {
             S.meta64.userPreferences.editMode = S.meta64.userPreferences.editMode ? false : true;
         }
-       
+
         S.meta64.saveUserPreferences();
         await S.render.renderPageFromData();
     }
@@ -461,7 +459,7 @@ export class Edit implements EditIntf {
          * we take the simple approach and just re-render the page. There is no call to the server, so this is
          * actually very efficient.
          */
-       
+
         await S.render.renderPageFromData();
     }
 
@@ -554,28 +552,17 @@ export class Edit implements EditIntf {
 
     //location=inside | inline
     pasteSelNodes = (location: string): void => {
-        let msg;
-        if (location == 'inline') {
-            msg = "Paste " + this.nodesToMove.length + " node(s) inline at selected location ?"
-        }
-        else {
-            msg = "Paste " + this.nodesToMove.length + " node(s) under selected parent node ?";
-        }
-        new ConfirmDlg(msg, "Comfirm Paste",
-            () => {
-                let highlightNode = S.meta64.getHighlightedNode();
-                /*
-                 * For now, we will just cram the nodes onto the end of the children of the currently selected
-                 * page. Later on we can get more specific about allowing precise destination location for moved
-                 * nodes.
-                 */
-                S.util.ajax<I.MoveNodesRequest, I.MoveNodesResponse>("moveNodes", {
-                    "targetNodeId": highlightNode.id,
-                    "nodeIds": this.nodesToMove,
-                    "location": location
-                }, this.moveNodesResponse);
-            }
-        ).open();
+        let highlightNode = S.meta64.getHighlightedNode();
+        /*
+         * For now, we will just cram the nodes onto the end of the children of the currently selected
+         * page. Later on we can get more specific about allowing precise destination location for moved
+         * nodes.
+         */
+        S.util.ajax<I.MoveNodesRequest, I.MoveNodesResponse>("moveNodes", {
+            "targetNodeId": highlightNode.id,
+            "nodeIds": this.nodesToMove,
+            "location": location
+        }, this.moveNodesResponse);
     }
 
     insertBookWarAndPeace = (): void => {

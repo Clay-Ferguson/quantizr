@@ -6,8 +6,8 @@ console.log("LocalDB.ts");
 export class LocalDB implements LocalDBIntf {
 
     /* DB and Store names */
-    static STORE_NAME = "SubNodeObjStore";
-    static DB_NAME = "SubNodeDB";
+    static STORE_NAME = "objstore";
+    static DB_NAME = "DB-" + window.location.hostname + "-" + window.location.port;
 
     /* WARNING: boosting the version will WIPE OUT the old database, and create a brand new one */
     static VERSION = 1;

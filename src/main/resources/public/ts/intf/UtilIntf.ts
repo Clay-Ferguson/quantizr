@@ -4,10 +4,11 @@ import * as I from "../Interfaces";
 import { NodeInfo } from "../Interfaces";
 export interface UtilIntf {
     logAjax: boolean;
-    offline: boolean;
+    //offline: boolean;
     waitCounter: number;
     pgrsDlg: any;
 
+    validUsername(inputtxt: string): boolean;
     hashOfString(s: string) : number;
     isImageFileName(fileName: string): boolean;
     isAudioFileName(fileName: string): boolean;

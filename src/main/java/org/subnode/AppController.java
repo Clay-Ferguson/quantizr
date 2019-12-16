@@ -237,6 +237,9 @@ public class AppController {
 	// @Autowired
 	// private ApplicationEventPublisher eventPublisher;
 
+	@Autowired
+	private MailSender mailSender;
+
 	private static final boolean logRequests = false;
 
 	// private final CopyOnWriteArrayList<SseEmitter> emitters = new
@@ -908,21 +911,11 @@ public class AppController {
 				throw ExUtil.newEx("admin only function.");
 			}
 			log.debug("SendEmailTest detected on server.");
-			MailSender mailSender = null;
-			try {
-				mailSender = (MailSender) SpringContextUtil.getBean(MailSender.class);
-				mailSender.init();
-				String timeString = new Date().toString();
-				mailSender.sendMail("wclayf@gmail.com", null, "<h1>Hi Clay! Time=" + timeString + "</h1>",
-						"Test Subject");
-			} finally {
-				if (mailSender != null) {
-					mailSender.close();
-				}
-			}
+
+			String timeString = new Date().toString();
+			mailSender.sendMail("wclayf@gmail.com", null, "<h1>Hi Clay! Time=" + timeString + "</h1>", "Test Subject");
 
 			res.setSuccess(true);
-
 			return res;
 		});
 	}

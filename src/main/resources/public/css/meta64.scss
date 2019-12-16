@@ -5,8 +5,9 @@ $modalContentBackground: #c0c0c0;
 $mainContentBackground: #cecece;
 
 html {
-    // not supported by all browers but we turn on if possible.
+    // not supported by all browers.
     // scroll-behavior: smooth;
+
     font-family: "Roboto", "Verdana", "Aria";
 }
 
@@ -14,6 +15,7 @@ body {
     /* This top-padding is how the bootstrap example keept the main content from being covered by the navbar */
     font-family: "Roboto", "Verdana", "Aria";
     padding-top: 5rem;
+    padding-bottom: 1rem;
     background-color: $appBackgroundColor;
 }
 

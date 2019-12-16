@@ -13,6 +13,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.request.AnonPageLoadRequest;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.LoginRequest;
+import org.subnode.request.ResetPasswordRequest;
 import org.subnode.request.SignupRequest;
 import org.subnode.request.base.RequestBase;
 import org.subnode.response.LoginResponse;
@@ -71,8 +72,11 @@ public class CallProcessor {
 			if (!(req instanceof LoginRequest) && //
 					!(req instanceof AnonPageLoadRequest) && //
 					!(req instanceof SignupRequest) && //
+					!(req instanceof ResetPasswordRequest) && //
+					!(req instanceof ChangePasswordRequest) && //
 					!ThreadLocals.getInitialSessionExisted()) {
-				log.debug("Ignoring attempt to process req class "+req.getClass().getName()+" when not logged in .");
+				log.debug(
+						"Ignoring attempt to process req class " + req.getClass().getName() + " when not logged in .");
 				throw new NotLoggedInException();
 			}
 
@@ -80,7 +84,9 @@ public class CallProcessor {
 			ThreadLocals.setMongoSession(mongoSession);
 
 			if (mongoSession == null || mongoSession.getUser() == null) {
-				throw new NotLoggedInException();
+				if (!(req instanceof ChangePasswordRequest)) {
+					throw new NotLoggedInException();
+				}
 			}
 
 			ret = runner.run(mongoSession);
@@ -159,8 +165,7 @@ public class CallProcessor {
 			if (userName == null) {
 				return null;
 			}
-		} 
-		else if (req instanceof ChangePasswordRequest && ((ChangePasswordRequest) req).getPassCode() != null) {
+		} else if (req instanceof ChangePasswordRequest && ((ChangePasswordRequest) req).getPassCode() != null) {
 			/*
 			 * we will have no session for user here, return null;
 			 */

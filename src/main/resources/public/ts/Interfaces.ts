@@ -277,7 +277,6 @@ export interface SaveNodeRequest {
     content: string;
     name?: string;
     properties: PropertyInfo[];
-    sendNotification: boolean;
 }
 
 export interface SetNodeTypeRequest {

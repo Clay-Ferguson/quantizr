@@ -6,13 +6,12 @@ declare var prettyPrint;
 
 import { MessageDlg } from "./dlg/MessageDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
-import { PasswordDlg } from "./dlg/PasswordDlg";
 import * as I from "./Interfaces";
 import { UtilIntf } from "./intf/UtilIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants } from "./Constants";
-
+import { Constants as cnst } from "./Constants";
 import axios, { AxiosRequestConfig } from 'axios';
 import { NodeInfo } from "./Interfaces";
 
@@ -56,12 +55,19 @@ export class Util implements UtilIntf {
     rhost: string;
     logAjax: boolean = true;
     timeoutMessageShown: boolean = false;
-    offline: boolean = false;
+    //offline: boolean = false;
 
     waitCounter: number = 0;
     pgrsDlg: ProgressDlg = null;
 
     autoReloadIfSessionTimeout: boolean = true;
+
+    // accepts letters, numbers, underscore, dash.
+    validUsername = (inputtxt: string): boolean => {
+        //return !!inputtxt.match(/^[0-9a-zA-Z]+$/);
+        return !!inputtxt.match(/^[0-9a-zA-Z\-_]+$/);
+    }
+
 
     hashOfString = (s: string): number => {
         let hash = 0, i, chr;
@@ -364,10 +370,10 @@ export class Util implements UtilIntf {
         let axiosRequest;
 
         try {
-            if (this.offline) {
-                console.log("offline: ignoring call for " + postName);
-                return;
-            }
+            // if (this.offline) {
+            //     console.log("offline: ignoring call for " + postName);
+            //     return;
+            // }
 
             if (this.logAjax) {
                 console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + JSON.stringify(postData));
@@ -448,23 +454,24 @@ export class Util implements UtilIntf {
 
                     if (error.response && error.response.status === 401) {
                         console.log("Not logged in detected.");
-                        this.offline = true;
+                        //this.offline = true;
                         if (!this.timeoutMessageShown) {
                             this.timeoutMessageShown = true;
 
                             //removing this message. It used to display right before the page autorefreshes using the window.location.href below
                             //after the short timeout.
-                            //this.showMessage("Session timed out?");
+                            this.showMessage("Session timed out? Refresh your browser.");
                         }
 
-                        if (this.autoReloadIfSessionTimeout) {
-                            //we wait about a second for user to have time to see the message that their session had timed out.
-                            setTimeout(() => {
-                                window.onbeforeunload = null;
-                                window.location.href = window.location.origin;
-                            }, 1000);
-                            return;
-                        }
+                        //if (this.autoReloadIfSessionTimeout) {
+                        //we wait about a second for user to have time to see the message that their session had timed out.
+                        setTimeout(async () => {
+                            // window.onbeforeunload = null;
+                            // window.location.href = window.location.origin;
+                            await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
+                        }, 1000);
+                        return;
+                        //}
                     }
 
                     let msg: string = `Server request failed: \nPostName: ${postName}\n`;

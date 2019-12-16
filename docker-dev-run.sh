@@ -111,10 +111,10 @@ docker run -d \
     "--aeskey=${subnodeAESKey}" \
     "--adminDataFolder=/subnode-tmp" \
     "--mongoAdminPassword=${subnodePassword}" \
-    "--mail.user=postmaster@subnode.org" \
+    "--mail.user=postmaster@quantizr.com" \
 	"--mail.password=${emailPassword}" \
 	"--mail.host=smtp.mailgun.org" \
-    "--mail.from=SubNode@reply.com"
+    "--mail.from=admin@quantizr.com"
 
 verifySuccess "Docker Run (subnode_dev)"
 

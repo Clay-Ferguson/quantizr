@@ -16,7 +16,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-/* This is the password dialog for storing Master Encryption Key that is used to encrypt all passwords SubNode manages. */
+/* This is the password dialog for storing Master Encryption Key that is used to encrypt all passwords Quantizr manages. */
 export class PasswordDlg extends DialogBase {
     passwordTextField: PasswordTextField;
     textField: TextField;
@@ -26,7 +26,7 @@ export class PasswordDlg extends DialogBase {
         super("Encryption Master Password");
         
         this.setChildren([
-            new TextContent("Enter the password that is the master encryption key for accessing all other passwords that SubNode manages for your account.<br><br>"+
+            new TextContent("Enter the password that is the master encryption key for accessing all other passwords that Quantizr manages for your account.<br><br>"+
             "Note: Your browser password manager will store this under 'Master Password'"),
             this.textField = new TextField({
                 style : {display: "none"},

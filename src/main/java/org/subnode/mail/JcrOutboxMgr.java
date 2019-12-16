@@ -64,7 +64,7 @@ public class JcrOutboxMgr {
 					String email = userNode.getStringProp(NodeProp.EMAIL);
 					log.debug("sending email to: " + email + " because his node was appended under.");
 
-					String content = String.format("User '%s' has created a new subnode under one of your nodes.<p>\n\n" + //
+					String content = String.format("User '%s' replied to you.<p>\n\n" + //
 					"%s?id=%s", userName, constProvider.getHostAndPort(), node.getId().toHexString());
 
 					queueMailUsingAdminSession(session, email, "New SubNode Notification", content);

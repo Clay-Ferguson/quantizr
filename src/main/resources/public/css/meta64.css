@@ -5,6 +5,7 @@ body {
   /* This top-padding is how the bootstrap example keept the main content from being covered by the navbar */
   font-family: "Roboto", "Verdana", "Aria";
   padding-top: 5rem;
+  padding-bottom: 1rem;
   background-color: black; }
 
 .button-font {

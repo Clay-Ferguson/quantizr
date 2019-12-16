@@ -58,6 +58,26 @@ export class SignupDlg extends DialogBase {
             return;
         }
 
+        if (userName.length > 25) {
+            S.util.showMessage("Maximum username length allowed is 25");
+            return;
+        }
+
+        if (!S.util.validUsername(userName)) {
+            S.util.showMessage("Invalid Username. Only letters numbers dashes and underscores allowed.");
+            return;
+        }
+
+        if (email.length > 25) {
+            S.util.showMessage("Maximum email length allowed is 25");
+            return;
+        }
+
+        if (password.length > 25) {
+            S.util.showMessage("Maximum password length allowed is 25");
+            return;
+        }
+
         S.util.ajax<I.SignupRequest, I.SignupResponse>("signup", {
             "userName": userName,
             "password": password,

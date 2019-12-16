@@ -63,7 +63,7 @@ export class ResetPasswordDlg extends DialogBase {
 
     resetPasswordResponse = (res: I.ResetPasswordResponse): void => {
         if (util.checkSuccess("Reset password", res)) {
-            util.showMessage("Password reset email was sent. Check your inbox.");
+            util.showMessage("Password reset email was sent. Check your email.");
         }
     }
 

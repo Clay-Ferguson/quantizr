@@ -76,7 +76,7 @@ export class View implements ViewIntf {
             if (res.offsetOfNodeFound > -1) {
                 S.nav.mainOffset = res.offsetOfNodeFound;
             }
-            S.util.updateHistory(res.node);
+            //S.util.updateHistory(res.node);
 
             this.refreshTreeResponse(res, highlightId, false);
         });
@@ -122,7 +122,7 @@ export class View implements ViewIntf {
                     S.nav.mainOffset = res.offsetOfNodeFound;
                 }
             }
-            S.util.updateHistory(res.node);
+            //S.util.updateHistory(res.node);
             this.refreshTreeResponse(res, null, true);
         });
     }
@@ -228,8 +228,9 @@ export class View implements ViewIntf {
             S.util.setInnerHTML(e, "");
             S.util.setElmDisplay(e, false);
         } else {
-            var pathDisplay = "<span style='overflow-x: auto;'>Path: " + node.path + "</span>";
-            pathDisplay += "<br>Type: " + node.type;
+            //overflow-x quit working, but also I decided I don't need this path here, so rather than fighting this i'm just removing it for now.
+            var pathDisplay = ""; //"<span style='overflow-x: auto;'>Path: " + node.path + "</span>";
+            pathDisplay += "Type: " + node.type;
 
             if (node.path.indexOf(node.id) != -1) {
                 pathDisplay += "<br>ID: " + node.id;

@@ -123,7 +123,7 @@ export class MainNavPanel extends NavTag {
                         new NavBarButton("Signup", {
                             "onClick": e => { S.nav.signup(); },
                             "id": "openSignupPgButton",
-                            "title": "Signup for a SubNode Account"
+                            "title": "Create new Quantizr Account"
                         },
                             //isEnabled func
                             () => { return S.meta64.isAnonUser; },
@@ -168,7 +168,7 @@ export class MainNavPanel extends NavTag {
                         new NavBarIconButton("fa-sign-in", "Login", {
                             "onClick": e => { S.nav.login(); },
                             "id": "openLoginDlgButton",
-                            "title": "Login to your SubNode account"
+                            "title": "Login to Quantizr"
                         },
                             //isEnabled func
                             () => { return S.meta64.isAnonUser; },

@@ -9,7 +9,6 @@ export interface EditIntf {
     nodesToMoveSet: Object;
     parentOfNewNode: I.NodeInfo;
     editingUnsavedNode: boolean;
-    sendNotificationPendingSave: boolean;
     editNode: I.NodeInfo;
     editNodeDlgInst: any; //todo-1: add this type back -> EditNodeDlg ;
     nodeInsertTarget: any;

@@ -120,7 +120,7 @@ export class Nav implements NavIntf {
         }, 
         //success callback
         (res: I.RenderNodeResponse) => {
-            S.util.updateHistory(res.node);
+            //S.util.updateHistory(res.node);
             this.upLevelResponse(res, S.meta64.currentNodeData.node.id);
         }
         , 
@@ -207,7 +207,7 @@ export class Nav implements NavIntf {
     navPageNodeResponse = async (res: I.RenderNodeResponse): Promise<void> => {
         console.log("navPageNodeResponse.");
         S.meta64.clearSelectedNodes();
-        S.util.updateHistory(res.node);
+        //S.util.updateHistory(res.node); //todo-0: remove all of these that are commented out.
         await S.render.renderPageFromData(res, true);
     }
 

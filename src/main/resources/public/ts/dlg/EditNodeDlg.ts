@@ -120,7 +120,10 @@ export class EditNodeDlg extends DialogBase {
                         }, null),
                         this.setTypeButton = new Button("Set Type", this.openChangeNodeTypeDlg),
                         //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
-                        this.encryptionButton = new Button("Encryption", this.openEncryptionDlg),
+                        
+                        //Encryption is a work in progress. Disabling for now for end users.
+                        //this.encryptionButton = new Button("Encryption", this.openEncryptionDlg),
+                        
                         this.cancelButton = new Button("Cancel", this.cancelEdit)
                     ])
             ])
@@ -461,10 +464,10 @@ export class EditNodeDlg extends DialogBase {
          * If we didn't create the node we are inserting under, and neither did "admin", then we need to send notification
          * email upon saving this new node.
          */
-        if (S.meta64.userName != S.edit.parentOfNewNode.owner && //
-            S.edit.parentOfNewNode.owner != "admin") {
-            S.edit.sendNotificationPendingSave = true;
-        }
+        // if (S.meta64.userName != S.edit.parentOfNewNode.owner && //
+        //     S.edit.parentOfNewNode.owner != "admin") {
+        //     S.edit.sendNotificationPendingSave = true;
+        // }
 
         S.meta64.treeDirty = true;
         if (S.edit.nodeInsertTarget) {
@@ -588,7 +591,6 @@ export class EditNodeDlg extends DialogBase {
                 nodeId: S.edit.editNode.id,
                 content: content,
                 properties: saveList,
-                sendNotification: S.edit.sendNotificationPendingSave,
                 name: nodeName
             };
             // console.log("calling saveNode(). PostData=" + S.util.toJson(postData));
@@ -597,7 +599,6 @@ export class EditNodeDlg extends DialogBase {
                     savedId: S.edit.editNode.id
                 });
             });
-            S.edit.sendNotificationPendingSave = false;
 
             resolve();
         });
@@ -766,15 +767,6 @@ export class EditNodeDlg extends DialogBase {
 
     cancelEdit = (): void => {
         this.close();
-
-        // canceling edit doesn't need to do anything here...right? just a visual annoyance. 
-        // need dialog to go away. period.
-        // if (S.meta64.treeDirty) {
-        //     S.meta64.goToMainPage(true);
-        // } else {
-        //     S.meta64.selectTab("mainTab");
-        //     S.view.scrollToSelectedNode();
-        // }
     }
 
     init = (): void => {

@@ -18,8 +18,6 @@ public class SaveNodeRequest extends RequestBase {
 	private String content; 
 	private String name;
 
-	private boolean sendNotification;
-
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -50,13 +48,5 @@ public class SaveNodeRequest extends RequestBase {
 
 	public void setProperties(List<PropertyInfo> properties) {
 		this.properties = properties;
-	}
-
-	public boolean isSendNotification() {
-		return sendNotification;
-	}
-
-	public void setSendNotification(boolean sendNotification) {
-		this.sendNotification = sendNotification;
 	}
 }

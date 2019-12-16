@@ -243,9 +243,7 @@ public class NodeEditService {
 			Calendar lastModified = Calendar.getInstance();
 			node.setModifyTime(lastModified.getTime());
 
-			if (req.isSendNotification()) {
-				outboxMgr.sendNotificationForChildNodeCreate(node, sessionContext.getUserName());
-			}
+			outboxMgr.sendNotificationForChildNodeCreate(node, sessionContext.getUserName());
 
 			boolean savePending = true;
 			String nameOnPath = node.getNameOnPath();

@@ -86,6 +86,10 @@ export class LoginDlg extends DialogBase {
     login = (): void => {
         let usr = this.userTextField.getValue();
         let pwd = this.passwordTextField.getValue();
+        
+        //todo-0: this variable turned into a mess. Need totally revamp login flow.
+        //S.util.offline = false;
+
         S.user.login(this, usr, pwd);
         this.close();
     }
@@ -93,9 +97,9 @@ export class LoginDlg extends DialogBase {
     resetPassword = (): any => {
         let usr = this.userTextField.getValue();
 
-        new ConfirmDlg("Reset your password ?<p>You'll still be able to login with your old password until the new one is set.",
+        new ConfirmDlg("Reset your password ?",
 
-            "Confirm Reset Password",
+            "Confirm",
             () => {
                 this.close();
                 new ResetPasswordDlg({ "user": usr }).open();
