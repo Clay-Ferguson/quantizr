@@ -625,7 +625,6 @@ export class Meta64 implements Meta64Intf {
      */
     initNode = (node: I.NodeInfo, updateMaps?: boolean): void => {
         if (!node) {
-            debugger;
             console.log("initNode has null node");
             return;
         }

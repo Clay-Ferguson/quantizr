@@ -460,7 +460,7 @@ export class Util implements UtilIntf {
 
                             //removing this message. It used to display right before the page autorefreshes using the window.location.href below
                             //after the short timeout.
-                            this.showMessage("Session timed out? Refresh your browser.");
+                            //this.showMessage("Session timed out? Refresh your browser.");
                         }
 
                         //if (this.autoReloadIfSessionTimeout) {
@@ -468,8 +468,9 @@ export class Util implements UtilIntf {
                         setTimeout(async () => {
                             // window.onbeforeunload = null;
                             // window.location.href = window.location.origin;
-                            await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
-                        }, 1000);
+                            // await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
+                            S.nav.login();
+                        }, 200);
                         return;
                         //}
                     }
