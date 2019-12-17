@@ -829,12 +829,12 @@ export class Render implements RenderIntf {
                         let firstButton: Comp = new Button("First Page", this.firstPage,
                             {
                                 id: "firstPageButton",
-                                iconclass: "fa fa-eject fa-lg"
+                                iconclass: "fa fa-angle-double-left fa-lg"
                             });
                         let prevButton: Comp = new Button("Prev Page", this.prevPage,
                             {
                                 id: "prevPageButton",
-                                iconclass: "fa fa-chevron-left fa-lg"
+                                iconclass: "fa fa-angle-left fa-lg"
                             });
                         output.push(this.centeredButtonBar([firstButton, prevButton], "paging-button-bar"));
                     }
@@ -855,7 +855,7 @@ export class Render implements RenderIntf {
                         let nextButton = new Button("Next Page", this.nextPage,
                             {
                                 id: "nextPageButton",
-                                iconclass: "fa fa-chevron-right fa-lg"
+                                iconclass: "fa fa-angle-right fa-lg"
                             });
 
                         //todo-1: last page button disabled pending refactoring
@@ -1018,22 +1018,18 @@ export class Render implements RenderIntf {
     }
 
     firstPage = (): void => {
-        console.log("First page button click.");
         S.view.firstPage();
     }
 
     prevPage = (): void => {
-        console.log("Prev page button click.");
         S.view.prevPage();
     }
 
     nextPage = (): void => {
-        console.log("Next page button click.");
         S.view.nextPage();
     }
 
     lastPage = (): void => {
-        console.log("Last page button click.");
         S.view.lastPage();
     }
 

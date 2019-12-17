@@ -105,7 +105,10 @@ export class MenuPanel extends Div {
             ]),
             new Menu("View", [
                 //todo-1: properties toggle really should be a preferences setting i think, and not a menu option here.
-                new MenuItem("Toggle Properties", S.props.propsToggle, () => { return S.meta64.state.propsToggle }, () => { return !S.meta64.isAnonUser }), //
+                
+                //this is broken, so I'm just disabling it for now, since this is low priority. todo-0
+                //new MenuItem("Toggle Properties", S.props.propsToggle, () => { return S.meta64.state.propsToggle }, () => { return !S.meta64.isAnonUser }), //
+                
                 new MenuItem("Refresh", S.meta64.refresh), //
                 new MenuItem("Show URL", S.render.showNodeUrl, () => { return S.meta64.state.highlightNode != null }), //
                 new MenuItem("Show Node JSON", () => {S.view.runServerCommand("getJson")}, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
