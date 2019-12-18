@@ -112,7 +112,6 @@ export class MainNavPanel extends NavTag {
                         )
                     ]),
 
-
                     new Li(null, {
                         className: "nav-item"
                     }, [

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="quantizr.com">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=3">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=3">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <link rel="stylesheet" href="/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/bootstrap-4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/js/dropzone/dropzone.css?v=dz7" />
+    <link rel="stylesheet" href="/css/meta64.css?<%=htmlWebpackPlugin.options.cachebuster%>" />
+    <link rel="stylesheet" href="/css/highlightjs/darcula.css" />
+
+    <title>Quantizr</title>
+</head>
+
+<body>
+    <noscript>
+        This app requires JavaScript.
+    </noscript>
+
+    <div role="toolbar" id="mainNavPanel">
+    </div>
+
+    <main role="main" class="container">       
+        <div id="mainTabPanel" class="mainTabPanel" />
+    </main>
+
+    <script src="/js/jquery/jquery-3.3.1.min.js"></script>
+    <script src="/js/popper/popper.min.js?v=1"></script>
+    <script src="/bootstrap-4/js/bootstrap.min.js"></script>
+    <script src="/js/dropzone/dropzone.js?dz8"></script>
+    <script src="/js/ace/src-noconflict/ace.js?v=141"></script>
+
+    <!--
+    IMPORTANT: WebPack drops this index.html file into the /dist/ folder and processes it to contain the bundle 
+    script load tag right here, automatically (end of body tag) and also will have the cache buster added 
+    
+    <div id="overlayDiv" class="overlay" />
+-->
+</body>
+
+</html>

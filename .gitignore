@@ -4,3 +4,4 @@
 .vscode/
 target/
 node_modules/
+src/main/resources/public/index.html
