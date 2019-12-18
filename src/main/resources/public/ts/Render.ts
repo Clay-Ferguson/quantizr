@@ -506,6 +506,8 @@ export class Render implements RenderIntf {
         let insertNodeButton: Button;
         let replyButton: Button;
         let deleteNodeButton: Button;
+        let pasteInsideButton: Button;
+        let pasteInlineButton: Button;
 
         /*
          * Show Reply button if this is a publicly appendable node and not created by current user,
@@ -612,10 +614,17 @@ export class Render implements RenderIntf {
                 deleteNodeButton = new Button(null, () => { S.edit.deleteSelNodes([node.id]); }, {
                     "iconclass": "fa fa-trash fa-lg"
                 });
+
+                if (!S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
+                    pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes('inside'); }, {
+                    });
+                    pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes('inline'); }, {
+                    });
+                }
             }
         }
 
-        return new ButtonBar([selButton, typeIcon, openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, moveNodeDownButton, deleteNodeButton, replyButton],
+        return new ButtonBar([selButton, typeIcon, openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
             "left-justified", "10px");
     }
 
@@ -724,10 +733,14 @@ export class Render implements RenderIntf {
                         let uid: string = data.node.uid;
                         let cssId: string = "row_" + uid;
 
+                        //todo-1: lots of these buttons are replicated in both the 'page root node' and 'child node' renderings
+                        //and to i need to consolidate it into a component?
                         let buttonBar: ButtonBar = null;
                         let editNodeButton: Button = null;
                         let createSubNodeButton: Button = null;
                         let replyButton: Button = null;
+                        let pasteInsideButton: Button = null;
+                        let pasteInlineButton: Button = null;
 
                         // console.log("data.node.path="+data.node.path);
                         // console.log("isNonOwnedCommentNode="+props.isNonOwnedCommentNode(data.node));
@@ -769,6 +782,13 @@ export class Render implements RenderIntf {
                                 { "iconclass": "fa fa-edit fa-lg" });
                         }
 
+                        if (editAllowed && !S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
+                            pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes('inside'); }, {
+                            });
+                            pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes('inline'); }, {
+                            });
+                        }
+
                         let typeIcon = null;
                         if (typeHandler) {
                             /* For now let's only show type icons when we're in edit mode */
@@ -790,8 +810,8 @@ export class Render implements RenderIntf {
                             console.log("selected: focusNode.uid=" + focusNode.uid + " selected=" + selected);
                         }
 
-                        if (typeIcon || createSubNodeButton || editNodeButton || replyButton) {
-                            buttonBar = new ButtonBar([typeIcon, createSubNodeButton, editNodeButton, replyButton],
+                        if (typeIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton) {
+                            buttonBar = new ButtonBar([typeIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
                                 "left-justified", "10px");
                         }
 
