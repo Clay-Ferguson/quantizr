@@ -832,14 +832,6 @@ public class MongoApi {
 		return ret;
 	}
 
-	// public SubNode findByPathHash(MongoSession session, String pathHash) {
-	// SubNode ret = null;
-	// Query query = new Query();
-	// query.addCriteria(Criteria.where(SubNode.FIELD _PATH_HASH).is(pathHash));
-	// ret = ops.findOne(query, SubNode.class);
-	// return ret;
-	// }
-
 	public SubNode getNode(MongoSession session, ObjectId objId) {
 		return getNode(session, objId, true);
 	}

@@ -261,6 +261,7 @@ export interface RemovePrivilegeRequest {
 export interface RenderNodeRequest {
     nodeId: string;
     upLevel: number;
+    siblingOffset: number;
     offset: number;
     renderParentIfLeaf: boolean;
     goToLastPage: boolean;

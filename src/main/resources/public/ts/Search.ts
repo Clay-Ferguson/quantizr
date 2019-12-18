@@ -87,6 +87,7 @@ export class Search implements SearchIntf {
         S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
             "nodeId": res.searchResultNodeId,
             "upLevel": null,
+            "siblingOffset": 0,
             "renderParentIfLeaf": null,
             "offset": 0,
             "goToLastPage": false

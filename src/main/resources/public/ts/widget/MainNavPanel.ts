@@ -85,6 +85,37 @@ export class MainNavPanel extends NavTag {
                     new Li(null, {
                         className: "nav-item"
                     }, [
+                        new NavBarIconButton("fa-chevron-circle-left", null, {
+                            "onClick": e => { S.nav.navToSibling(-1); },
+                            "id": "upPrevSiblingButton",
+                            "title": "Go to Previous SubNode"
+                        },
+                            //isEnabled func
+                            () => { return true; },
+                            //isVisible func
+                            () => { return true; }
+                        )
+                    ]),
+
+                    new Li(null, {
+                        className: "nav-item"
+                    }, [
+                        new NavBarIconButton("fa-chevron-circle-right", null, {
+                            "onClick": e => { S.nav.navToSibling(1); },
+                            "id": "nextSiblingButton",
+                            "title": "Go to Next SubNode"
+                        },
+                            //isEnabled func
+                            () => { return true; },
+                            //isVisible func
+                            () => { return true; }
+                        )
+                    ]),
+
+
+                    new Li(null, {
+                        className: "nav-item"
+                    }, [
                         new NavBarIconButton("fa-database", null, {
                             "onClick": e => { S.nav.navHome(); },
                             "id": "navHomeButton",

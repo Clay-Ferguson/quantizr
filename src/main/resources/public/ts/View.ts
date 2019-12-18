@@ -68,6 +68,7 @@ export class View implements ViewIntf {
         S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
             "nodeId": nodeId,
             "upLevel": null,
+            "siblingOffset": 0,
             "renderParentIfLeaf": !!renderParentIfLeaf,
             "offset": S.nav.mainOffset,
             "goToLastPage": false,
@@ -76,8 +77,6 @@ export class View implements ViewIntf {
             if (res.offsetOfNodeFound > -1) {
                 S.nav.mainOffset = res.offsetOfNodeFound;
             }
-            //S.util.updateHistory(res.node);
-
             this.refreshTreeResponse(res, highlightId, false);
         });
     }
@@ -113,6 +112,7 @@ export class View implements ViewIntf {
         S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
             "nodeId": S.meta64.currentNodeData.node.id,
             "upLevel": null,
+            "siblingOffset": 0,
             "renderParentIfLeaf": true,
             "offset": S.nav.mainOffset,
             "goToLastPage": goToLastPage
@@ -122,7 +122,6 @@ export class View implements ViewIntf {
                     S.nav.mainOffset = res.offsetOfNodeFound;
                 }
             }
-            //S.util.updateHistory(res.node);
             this.refreshTreeResponse(res, null, true);
         });
     }
@@ -227,9 +226,9 @@ export class View implements ViewIntf {
         //overflow-x quit working, but also I decided I don't need this path here, so rather than fighting this i'm just removing it for now.
         var path = ""; //"<span style='overflow-x: auto;'>Path: " + node.path + "</span>";
 
-        if (node.path.indexOf(node.id) != -1) {
+        //if (node.path.indexOf(node.id) != -1) {
             path += "ID: " + node.id;
-        }
+        //}
 
         if (node.lastModified) {
             if (path) {

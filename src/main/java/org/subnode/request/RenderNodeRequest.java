@@ -9,15 +9,23 @@ public class RenderNodeRequest extends RequestBase {
 	private String nodeId;
 
 	/*
-	 * offset for render of a child node which works like OFFSET on RDBMS. It's the point at which
-	 * we start gathering nodes to return (or the number to skip over), use for pagination support.
-	 * In other words, offset is the index of the first child to render in the results.
+	 * offset for render of a child node which works like OFFSET on RDBMS. It's the
+	 * point at which we start gathering nodes to return (or the number to skip
+	 * over), use for pagination support. In other words, offset is the index of the
+	 * first child to render in the results.
 	 */
 	private int offset;
 
+	/**
+	 * If this is 0, it has no effect. If it's 1 that means try to jump to the next
+	 * sibling of the current page root node, and if -1 then it tries to go to
+	 * previous sibling.
+	 */
+	private int siblingOffset;
+
 	/*
-	 * holds number of levels to move up the parent chain from 'nodeId' before rendering, or zero to
-	 * render at nodeId itself
+	 * holds number of levels to move up the parent chain from 'nodeId' before
+	 * rendering, or zero to render at nodeId itself
 	 */
 	private int upLevel;
 	private boolean renderParentIfLeaf;
@@ -74,4 +82,12 @@ public class RenderNodeRequest extends RequestBase {
 	public void setGoToLastPage(boolean goToLastPage) {
 		this.goToLastPage = goToLastPage;
 	}
+
+	public int getSiblingOffset() {
+		return siblingOffset;
+	}
+
+	public void setSiblingOffset(int siblingOffset) {
+		this.siblingOffset = siblingOffset;
+	} 
 }

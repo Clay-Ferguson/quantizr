@@ -63,6 +63,7 @@ export class Nav implements NavIntf {
         S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
             "nodeId": nodePathOrId,
             "upLevel": null,
+            "siblingOffset": 0,
             "renderParentIfLeaf": null,
             "offset": this.mainOffset,
             "goToLastPage": false
@@ -100,6 +101,34 @@ export class Nav implements NavIntf {
         S.nav.openNode(currentSelNode.uid, true);
     }
 
+    navToSibling = (siblingOffset: number): void => {
+        if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node) return null;
+        if (!this.parentVisibleToUser()) {
+            // Already at root. Can't go up.
+            return;
+        }
+
+        this.mainOffset = 0;
+        var ironRes = S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
+            "nodeId": S.meta64.currentNodeData.node.id,
+            "upLevel": null,
+            "siblingOffset": siblingOffset,
+            "renderParentIfLeaf": true,
+            "offset": this.mainOffset,
+            "goToLastPage": false
+        }, 
+        //success callback
+        (res: I.RenderNodeResponse) => {
+            this.upLevelResponse(res, S.meta64.currentNodeData.node.id);
+        }
+        , 
+        //fail callback
+        (res: string) => {
+           this.navHome();
+        });
+    }
+
+
     navUpLevel = (): void => {
         if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node) return null;
         if (!this.parentVisibleToUser()) {
@@ -107,29 +136,24 @@ export class Nav implements NavIntf {
             return;
         }
 
-        /* todo-1: for now an uplevel will reset to zero offset, but eventually I want to have each level of the tree, be able to
-        remember which offset it was at so when user drills down, and then comes back out, they page back out from the same pages they
-        drilled down from */
         this.mainOffset = 0;
         var ironRes = S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
             "nodeId": S.meta64.currentNodeData.node.id,
             "upLevel": 1,
+            "siblingOffset": 0,
             "renderParentIfLeaf": false,
             "offset": this.mainOffset,
             "goToLastPage": false
         }, 
         //success callback
         (res: I.RenderNodeResponse) => {
-            //S.util.updateHistory(res.node);
             this.upLevelResponse(res, S.meta64.currentNodeData.node.id);
         }
         , 
         //fail callback
         (res: string) => {
            this.navHome();
-        }
-        
-        );
+        });
     }
 
     /*
@@ -207,7 +231,6 @@ export class Nav implements NavIntf {
     navPageNodeResponse = async (res: I.RenderNodeResponse): Promise<void> => {
         console.log("navPageNodeResponse.");
         S.meta64.clearSelectedNodes();
-        //S.util.updateHistory(res.node); //todo-0: remove all of these that are commented out.
         await S.render.renderPageFromData(res, true);
     }
 
@@ -246,6 +269,7 @@ export class Nav implements NavIntf {
             S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
                 "nodeId": S.meta64.homeNodeId,
                 "upLevel": null,
+                "siblingOffset": 0,
                 "renderParentIfLeaf": null,
                 "offset": this.mainOffset,
                 "goToLastPage": false

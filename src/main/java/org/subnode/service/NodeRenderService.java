@@ -112,28 +112,55 @@ public class NodeRenderService {
 			req.setUpLevel(1);
 		}
 
-		int levelsUpRemaining = req.getUpLevel();
-		if (levelsUpRemaining > 0) {
-			scanToNode = true;
+		//the 'siblingOffset' is for jumping forward or backward thru at the same level of the tree without
+		//having to first 'uplevel' and then click on the prev or next node.
+		if (req.getSiblingOffset() != 0) {
+			SubNode parent = api.getParent(session, node);
+			if (req.getSiblingOffset() < 0) {
+				SubNode nodeAbove = api.getSiblingAbove(session, node);
+				if (nodeAbove != null) {
+					node = nodeAbove;
+				}
+				else {
+					node = parent != null ? parent : node;
+				}
+			}
+			else if (req.getSiblingOffset() > 0) {
+				SubNode nodeBelow = api.getSiblingBelow(session, node);
+				if (nodeBelow != null) {
+					node = nodeBelow;
+				}
+				else {
+					node = parent != null ? parent : node;
+				}
+			}
+			else {
+				node = parent != null ? parent : node;
+			}
+		} else {
+			int levelsUpRemaining = req.getUpLevel();
+			if (levelsUpRemaining > 0) {
+				scanToNode = true;
 
-			while (node != null && levelsUpRemaining > 0) {
-				try {
-					SubNode parent = api.getParent(session, node);
-					if (parent != null) {
-						node = parent;
+				while (node != null && levelsUpRemaining > 0) {
+					try {
+						SubNode parent = api.getParent(session, node);
+						if (parent != null) {
+							node = parent;
+						} else {
+							break;
+						}
+						log.trace("   upLevel to nodeid: " + node.getPath());
+						levelsUpRemaining--;
 					}
-					else {
+					// if we fail to get the node above, that is ok we just render the best one we
+					// were able to get to. This can happen when user is rendering their User node
+					// and
+					// adding an attachment, before any children are ever created.
+					catch (Exception e) {
+						// scanToNode = false;
 						break;
 					}
-					log.trace("   upLevel to nodeid: " + node.getPath());
-					levelsUpRemaining--;
-				}
-				// if we fail to get the node above, that is ok we just render the best one we
-				// were able to get to. This can happen when user is rendering their User node and
-				// adding an attachment, before any children are ever created.
-				catch (Exception e) {
-					// scanToNode = false;
-					break;
 				}
 			}
 		}

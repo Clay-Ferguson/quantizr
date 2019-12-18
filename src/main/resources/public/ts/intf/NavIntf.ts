@@ -35,5 +35,6 @@ export interface NavIntf {
     navHome(): void;
     navPublicHome(): void;
     showMainMenu(): void;
+    navToSibling(siblingOffset: number): void;
 }
 
