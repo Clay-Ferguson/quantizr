@@ -21,6 +21,7 @@ export interface ViewIntf {
     scrollRelativeToNode(dir: string): void;
     scrollToSelectedNode(): Promise<void>;
     scrollToTop(afterFunc?: Function): Promise<void>;
+    getPathDisplay(node: I.NodeInfo, delim: string): string;
     initEditPathDisplayById(e: HTMLElement): any;
     runServerCommand(command: string): any;
     graphDisplayTest(): any;

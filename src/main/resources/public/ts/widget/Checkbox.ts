@@ -22,6 +22,7 @@ export class Checkbox extends Comp {
         }
     
         this.attribs.type = "checkbox";
+        this.attribs.className = "checkbox-indicator";
     }
 
     setChecked(checked: boolean) {
@@ -38,7 +39,12 @@ export class Checkbox extends Comp {
     render = (p) => {
         this.repairProps(p);
         if (this.label) {
-            return S.e('span', { key: p.id + "_span" }, S.e('input', p), S.e('label', { key: p.id + "_label", htmlFor: p.id }, this.label));
+            return S.e('span', { key: p.id + "_span" }, S.e('input', p), 
+            S.e('label', { 
+                key: p.id + "_label", 
+                className: "checkbox-label",
+                htmlFor: p.id 
+            }, this.label));
         }
         else {
             return S.e('span', { key: p.id + "_span" }, S.e('input', p));

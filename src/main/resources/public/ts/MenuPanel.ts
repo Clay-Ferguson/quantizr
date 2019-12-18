@@ -7,7 +7,6 @@ import { Div } from "./widget/Div";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants } from "./Constants";
-import { Encryption } from "./Encryption";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -24,11 +23,11 @@ export class MenuPanel extends Div {
 
         this.setChildren([
 
-            new Menu("Site Index", [
-                new MenuItem("Your Home Node", S.nav.navHome, () => {
+            new Menu("Portal", [
+                new MenuItem("Your Node", S.nav.navHome, () => {
                     return !S.meta64.isAnonUser;
                 }),
-                new MenuItem("Site Home Node", () => { S.meta64.loadAnonPageHome() }),
+                new MenuItem("Portal Node", () => { S.meta64.loadAnonPageHome() }),
                 
                 //I'm removing my RSS feeds, for now (mainly to remove any political or interest-specific content from the platform)
                 //new MenuItem("Podcast Feeds", () => { S.nav.openContentNode("/r/rss"); }),

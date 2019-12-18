@@ -51,7 +51,8 @@ export class TextField extends Comp {
             //username that makes sense for that, so we use "Master Password" prefill value to make this whole thing hidden;
             children.push(S.e('label', {
                 id: this.getId()+"_label",
-                style : this.prefillVal=="Master Password" ? {display: "none"} : {display: "block"},
+                //style : this.prefillVal=="Master Password" ? {display: "none"} : {display: "block"},
+                className: 'textfield-label',
                 htmlFor: this.getId()
             }, p.label));
         }

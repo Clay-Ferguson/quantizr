@@ -5,10 +5,8 @@ import * as I from "../Interfaces";
 import { EditNodeDlg } from "./EditNodeDlg";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
-import { TextContent } from "../widget/TextContent";
 import { Div } from "../widget/Div";
 import { Textarea } from "../widget/Textarea";
-import { Constants as cnst } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
@@ -24,7 +22,6 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
  */
 export class EditPropertyDlg extends DialogBase {
 
-    editPropertyPathDisplay: TextContent;
     propertyNameTextarea: Textarea;
     propertyValTextarea: Textarea;
 
@@ -35,8 +32,6 @@ export class EditPropertyDlg extends DialogBase {
         this.editNodeDlg = args.editNodeDlg;
 
         this.setChildren([
-            cnst.SHOW_PATH_IN_DLGS ?
-                this.editPropertyPathDisplay = new TextContent(null, "path-display-in-editor") : null,
             new Div(null, null, [
                 this.propertyNameTextarea = new TextField({
                     "placeholder": "Enter property name",
@@ -57,32 +52,25 @@ export class EditPropertyDlg extends DialogBase {
         ]);
     }
 
-    populatePropertyEdit = (): void => {
-        /* display the node path at the top of the edit page */
-        S.domBind.whenElm(this.editPropertyPathDisplay.getId(), (elm: HTMLElement) => {
-            S.view.initEditPathDisplayById(elm);
-        });
-    }
-
     saveProperty = (): void => {
-        let propertyNameData = this.propertyNameTextarea.getValue();
-        let propertyValueData = this.propertyValTextarea.getValue();
+        let name = this.propertyNameTextarea.getValue();
+        let val = this.propertyValTextarea.getValue();
 
-        let valPromise: Promise<string> = Promise.resolve(propertyValueData);
-        valPromise.then((saveVal) => {
-            var postData = {
-                nodeId: S.edit.editNode.id,
-                propertyName: propertyNameData,
-                propertyValue: saveVal
-            };
-            S.util.ajax<I.SavePropertyRequest, I.SavePropertyResponse>("saveProperty", postData, this.savePropertyResponse);
-        });
-
-        this.close();
+        var postData = {
+            nodeId: S.edit.editNode.id,
+            propertyName: name,
+            propertyValue: val
+        };
+        S.util.ajax<I.SavePropertyRequest, I.SavePropertyResponse>("saveProperty", postData, this.savePropertyResponse);
     }
 
     savePropertyResponse = (res: I.SavePropertyResponse): void => {
         S.util.checkSuccess("Save properties", res);
+        this.close();
+
+        if (!S.edit.editNode.properties) {
+            S.edit.editNode.properties = [];
+        }
 
         S.edit.editNode.properties.push(res.propertySaved);
         S.meta64.treeDirty = true;
@@ -91,6 +79,5 @@ export class EditPropertyDlg extends DialogBase {
     }
 
     init = (): void => {
-        this.populatePropertyEdit();
     }
 }

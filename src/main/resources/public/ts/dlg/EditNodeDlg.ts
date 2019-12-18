@@ -38,6 +38,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 declare var ace;
 
 export class EditNodeDlg extends DialogBase {
+    node: I.NodeInfo;
     header: Header;
     buttonBar: ButtonBar;
     propsButtonBar: ButtonBar;
@@ -79,7 +80,11 @@ export class EditNodeDlg extends DialogBase {
 
         this.typeName = (<any>args).typeName;
         this.createAtTop = (<any>args).createAtTop;
+        this.node = (<any>args).node;
+
         this.propEntries = new Array<I.PropEntry>();
+
+        let path: string = S.view.getPathDisplay(this.node, "<br>");
 
         this.setChildren([
             new Form(null, [
@@ -89,7 +94,7 @@ export class EditNodeDlg extends DialogBase {
                     [
                         this.propertyEditFieldContainer = new Div("", {
                         }),
-                        this.pathDisplay = cnst.SHOW_PATH_IN_DLGS ? new Div("", {
+                        this.pathDisplay = cnst.SHOW_PATH_IN_DLGS ? new Div(path, {
                             style: { backgroundColor: '#FAD7A0', padding: '5px', border: '1px solid lightGray' }
                         }) : null,
                     ]
@@ -164,9 +169,9 @@ export class EditNodeDlg extends DialogBase {
      */
     populateEditNodePg = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            S.domBind.whenElm(this.pathDisplay.getId(), (elm: HTMLElement) => {
-                S.view.initEditPathDisplayById(elm);
-            });
+            // S.domBind.whenElm(this.pathDisplay.getId(), (elm: HTMLElement) => {
+            //     S.view.initEditPathDisplayById(elm);
+            // });
 
             let counter = 0;
 
@@ -294,7 +299,7 @@ export class EditNodeDlg extends DialogBase {
                     this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
                 ])
 
-            let collapsiblePanel = new CollapsiblePanel("Properties", null, [collapsiblePropsTable, this.propsButtonBar]);
+            let collapsiblePanel = new CollapsiblePanel("More...", null, [this.nodeNameTextField, collapsiblePropsTable, this.propsButtonBar]);
 
             this.propertyEditFieldContainer.setChildren([editPropsTable, collapsiblePanel]);
             this.propertyEditFieldContainer.reactRenderToDOM();
@@ -475,13 +480,13 @@ export class EditNodeDlg extends DialogBase {
                 "parentId": S.edit.parentOfNewNode.id,
                 "targetOrdinal": S.edit.nodeInsertTarget.ordinal,
                 "newNodeName": newNodeName,
-                "typeName": this.typeName ? this.typeName : "nt:unstructured"
+                "typeName": this.typeName ? this.typeName : "u"
             }, S.edit.insertNodeResponse);
         } else {
             S.util.ajax<I.CreateSubNodeRequest, I.CreateSubNodeResponse>("createSubNode", {
                 "nodeId": S.edit.parentOfNewNode.id,
                 "newNodeName": newNodeName,
-                "typeName": this.typeName ? this.typeName : "nt:unstructured",
+                "typeName": this.typeName ? this.typeName : "u",
                 "createAtTop": this.createAtTop
             }, S.edit.createSubNodeResponse);
         }
@@ -540,13 +545,13 @@ export class EditNodeDlg extends DialogBase {
                 content = aceEditorInfo.editor.getValue();
 
                 // if we need to encrypt and the content is not currently encrypted.
-                if (this.encryptionOptions.encryptForOwnerOnly && !content.startsWith(cnst.ENC_TAG)) {
+                if (content && this.encryptionOptions.encryptForOwnerOnly && !content.startsWith(cnst.ENC_TAG)) {
                     content = await S.encryption.symEncryptString(null, content);
                     content = cnst.ENC_TAG + content;
                 }
             }
 
-            let nodeName = this.nodeNameTextField.getValue();
+            let nodeName = this.nodeNameTextField ? this.nodeNameTextField.getValue() : null;
 
             /* Now scan over all properties to build up what to save */
             if (this.propEntries) {
@@ -698,7 +703,6 @@ export class EditNodeDlg extends DialogBase {
 
         if (multiLine) {
             editorComp = new AceEditPropTextarea(value, "25em", isPre, isWordWrap);
-
             this.aceEditor = editorComp;
 
             editorComp.whenElm((elm: HTMLElement) => {
@@ -723,7 +727,7 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             editorComp = new TextField({
-                "placeholder": "Enter node name",
+                "placeholder": "",
                 "label": prompt
             }, value);
 
@@ -732,7 +736,11 @@ export class EditNodeDlg extends DialogBase {
             }
         }
 
-        formGroup.addChild(editorComp);
+        //we add to form group only if this isn't 'name' because we put name into the collapsed area under "More..." button
+        //to save space on the screen, since name is not that frequently edited
+        if (propName != "name") {
+            formGroup.addChild(editorComp);
+        }
 
         if (setFocus) {
             this.focusId = editorComp.getId();

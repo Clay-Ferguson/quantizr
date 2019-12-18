@@ -13,12 +13,12 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class NodeTypeListBox extends ListBox {
-    selType: string = "nt:unstructured";
+    selType: string = "u";
     
     constructor(defaultSel: string, allowFileSysCreate : boolean) {
     
         super({ }, [
-            new ListBoxRow("Text/Markdown", () => { this.selType = "nt:unstructured"; }, true),
+            new ListBoxRow("Text/Markdown", () => { this.selType = "u"; }, true),
 
             /* Note: the isAdminUser is a temporary hack, and there will be a better way to do this eventually (i.e. types themselves
                probably will specify what roles of users they are available on or something like that) */

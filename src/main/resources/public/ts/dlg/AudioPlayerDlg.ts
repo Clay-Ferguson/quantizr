@@ -8,7 +8,6 @@ import { Singletons } from "../Singletons";
 import { Constants } from "../Constants";
 import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
-import { Heading } from "../widget/Heading";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -28,7 +27,6 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
  */
 export class AudioPlayerDlg extends DialogBase {
 
-    
     audioPlayer: AudioPlayer;
     playButton: Button;
 

@@ -16,7 +16,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ChangeNodeTypeDlg extends DialogBase {
 
-    selType: string = "nt:unstructured";
+    selType: string = "u";
     selCallback: Function = null;
     inlineButton: Button;
     nodeTypeListBox: NodeTypeListBox;

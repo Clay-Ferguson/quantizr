@@ -23,7 +23,7 @@ export class CreateNodeDlg extends DialogBase {
     constructor() {
         super("Create New Node");
 
-        this.nodeTypeList = new NodeTypeListBox("nt:unstructured", true);
+        this.nodeTypeList = new NodeTypeListBox("n", true);
         let collapsiblePanel = new CollapsiblePanel("Select Type", null, [ this.nodeTypeList ]);
 
         this.setChildren([

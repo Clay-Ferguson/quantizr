@@ -34,7 +34,7 @@ export class TextContent extends Comp {
 
         this.repairProps(p);
         //todo-1: this is an ugly hack to check for "<". Need to review this.
-        if (this.state.text.indexOf("<") != -1) {
+        if (this.state.text && this.state.text.indexOf("<") != -1) {
             let _p: any= {};
             _p.dangerouslySetInnerHTML = { "__html": this.state.text };
             return S.e(this.preformatted ? 'pre' : 'div', _p);

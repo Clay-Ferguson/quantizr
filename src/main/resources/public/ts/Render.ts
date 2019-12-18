@@ -616,7 +616,7 @@ export class Render implements RenderIntf {
         }
 
         return new ButtonBar([selButton, typeIcon, openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, moveNodeDownButton, deleteNodeButton, replyButton],
-            "left-justified");
+            "left-justified", "10px");
     }
 
     allowAction = (typeHandler: TypeHandlerIntf, action: string): boolean => {
@@ -792,7 +792,7 @@ export class Render implements RenderIntf {
 
                         if (typeIcon || createSubNodeButton || editNodeButton || replyButton) {
                             buttonBar = new ButtonBar([typeIcon, createSubNodeButton, editNodeButton, replyButton],
-                                "left-justified");
+                                "left-justified", "10px");
                         }
 
                         let children = [];

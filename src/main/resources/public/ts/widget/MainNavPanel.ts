@@ -85,10 +85,20 @@ export class MainNavPanel extends NavTag {
                     new Li(null, {
                         className: "nav-item"
                     }, [
-                        new NavBarIconButton("fa-home", null, {
+                        new NavBarIconButton("fa-database", null, {
                             "onClick": e => { S.nav.navHome(); },
                             "id": "navHomeButton",
                             "title": "Go to Your Root Node"
+                        })
+                    ]),
+
+                    new Li(null, {
+                        className: "nav-item"
+                    }, [
+                        new NavBarIconButton("fa-home", null, {
+                            "onClick": e => { S.meta64.loadAnonPageHome(); },
+                            "id": "navHomeButton",
+                            "title": "Go to Portal Root Node"
                         })
                     ]),
 

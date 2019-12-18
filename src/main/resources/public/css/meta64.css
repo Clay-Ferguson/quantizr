@@ -8,11 +8,18 @@ body {
   padding-bottom: 1rem;
   background-color: black; }
 
+.textfield-label {
+  margin-bottom: 0px; }
+
+.checkbox-label {
+  margin-bottom: 0px; }
+
 .button-font {
   font-family: "Roboto", "Verdana", "Aria"; }
 
 .edit-props-table {
-  margin: 15px; }
+  margin-top: 10px;
+  margin-bottom: 10px; }
 
 .app-modal-title {
   margin-bottom: 15px;
@@ -214,6 +221,9 @@ input[type="radio"] {
 
 .selectedListItem {
   background-color: lightGray; }
+
+.btn-group {
+  margin-left: 0px; }
 
 /* Warning: setting any kind of left margin won't work becasue the btn-group? style of bootstrap overrides it in button groups */
 .basicButton {

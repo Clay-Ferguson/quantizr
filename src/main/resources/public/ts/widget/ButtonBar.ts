@@ -13,11 +13,11 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ButtonBar extends Comp {
 
-    constructor(initialButtons: Comp[] = null, justify: string = "center-justified") {
+    constructor(initialButtons: Comp[] = null, justify: string = "center-justified", marginLeft: string = "0px") {
         super(null);
         this.attribs.className = "btn-group";
         this.attribs.role = "group";
-        this.attribs.style = { marginTop: '5px', marginLeft: '10px' };
+        this.attribs.style = { marginTop: '8px', marginLeft };
         this.setChildren(initialButtons);
     }
 

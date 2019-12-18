@@ -23,7 +23,7 @@ export class CollapsiblePanel extends Comp {
         let innerStyle = this.textLink ? "file-link" : "";
 
         return S.e('div', {
-            style: {margin: "10px"}
+            style: {marginTop: "10px", marginBottom: "10px"}
         },//
             S.e('a', {
                 href: "#" + this.getId(),

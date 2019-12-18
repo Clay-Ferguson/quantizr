@@ -47,7 +47,7 @@ export class View implements ViewIntf {
      */
     refreshTree = (nodeId?: string, renderParentIfLeaf?: boolean, highlightId?: string, isInitialRender?: boolean, forceIPFSRefresh?: boolean,
         scrollToFirstChild?: boolean): void => {
-    
+
         if (!nodeId) {
             if (S.meta64.currentNodeData && S.meta64.currentNodeData.node) {
                 nodeId = S.meta64.currentNodeData.node.id;
@@ -221,6 +221,35 @@ export class View implements ViewIntf {
         });
     }
 
+    getPathDisplay = (node: I.NodeInfo): string => {
+        if (node==null) return "";
+
+        //overflow-x quit working, but also I decided I don't need this path here, so rather than fighting this i'm just removing it for now.
+        var path = ""; //"<span style='overflow-x: auto;'>Path: " + node.path + "</span>";
+
+        if (node.path.indexOf(node.id) != -1) {
+            path += "ID: " + node.id;
+        }
+
+        if (node.lastModified) {
+            if (path) {
+                path += "  ";
+            }
+            let lastModStr = S.util.formatDate(new Date(node.lastModified));
+            path += "(Mod: " + lastModStr + ")";
+        }
+
+        //nt:unstructured is included just for legacy support unless/until I put into DB converter.
+        if (node.type && node.type != "u" && node.type != "nt:unstructured") {
+            if (path) {
+                path += "  ";
+            }
+            path += "Type: " + node.type;
+        }
+        return path;
+    }
+
+    //todo-0: replacing this method with getPathDisplay (above)
     initEditPathDisplayById = (e: HTMLElement) => {
         let node: I.NodeInfo = S.edit.editNode;
 
@@ -230,16 +259,30 @@ export class View implements ViewIntf {
         } else {
             //overflow-x quit working, but also I decided I don't need this path here, so rather than fighting this i'm just removing it for now.
             var pathDisplay = ""; //"<span style='overflow-x: auto;'>Path: " + node.path + "</span>";
-            pathDisplay += "Type: " + node.type;
 
             if (node.path.indexOf(node.id) != -1) {
-                pathDisplay += "<br>ID: " + node.id;
+                if (pathDisplay) {
+                    pathDisplay += "<br>";
+                }
+                pathDisplay += "ID: " + node.id;
             }
 
             if (node.lastModified) {
+                if (pathDisplay) {
+                    pathDisplay += "<br>";
+                }
                 let lastModStr = S.util.formatDate(new Date(node.lastModified));
-                pathDisplay += "<br>Modified: " + lastModStr;
+                pathDisplay += "Modified: " + lastModStr;
             }
+
+            //nt:unstructured is included just for legacy support unless/until I put into DB converter.
+            if (node.type && node.type != "u" && node.type != "nt:unstructured") {
+                if (pathDisplay) {
+                    pathDisplay += "<br>";
+                }
+                pathDisplay += "Type: " + node.type;
+            }
+
             S.util.setInnerHTML(e, pathDisplay);
             S.util.setElmDisplay(e, true);
         }
