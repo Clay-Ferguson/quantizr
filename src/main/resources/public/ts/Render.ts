@@ -213,7 +213,9 @@ export class Render implements RenderIntf {
 
         //console.log("MARKDOWN IN:\n"+jcrContent);
 
-        let clazz = rowStyling ? "jcr-content" : "jcr-root-content";
+        //the content-narrow, content-medium, and content-wide should be able to be set using user preference, OR able to be overridden on each
+        //node at will also, like for a code block you'd want it very wide.
+        let clazz = (rowStyling ? "jcr-content" : "jcr-root-content") + " content-narrow";
         let val = this.renderRawMarkdown(node);
 
         //When doing server-side markdown we had this processing the HTML that was generated

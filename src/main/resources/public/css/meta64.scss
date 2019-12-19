@@ -3,6 +3,7 @@ $appBackgroundColor: black; // #343a40;
 $modalTitleBackground: lightslategray;
 $modalContentBackground: #c0c0c0;
 $mainContentBackground: #cecece;
+$tabButtonBackground: lightSlateGray;
 
 html {
     // not supported by all browers.
@@ -136,25 +137,42 @@ body {
     border: none;
 }
 
-/* NOTE: border sizes (thickness itself) of all nav-tabs should be same everywhere */
+.my-tab-pane {
+    width: 100%;
+}
 
+.tab-content {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.nav-tabs {
+    border: none;
+}
+
+/* NOTE: border sizes (thickness itself) of all nav-tabs should be same everywhere */
 .tab-buttons-container {
-    background-color: $mainContentBackground;
-    border-bottom: 3px solid lightslategray;
-    margin: 0px;
-    /* padding: 5px; */
+    background-color: $tabButtonBackground;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding: 0px;
+}
+
+.nav-tabs>.nav-item>.nav-link {
+    border: none;
+    color: black;
 }
 
 .nav-tabs>.nav-item>.nav-link:hover {
-    border: 1px solid transparent;
+    //border-bottom: 4px solid lightslategray;
 }
 
 .nav-tabs>.nav-item>.nav-link.active,
 .nav-tabs>.nav-item>.nav-link.active:hover,
 .nav-tabs>.nav-item>.nav-link.active:focus {
-    border: 1px solid transparent;
-    background-color: lightslategray;
-    color: black;
+    background-color: $mainContentBackground;
+    //color: black;
 }
 
 .small-margin-right {
@@ -175,6 +193,8 @@ input[type="radio"] {
 
 /* This app uses all square corners which is done with this one CSS style */
 
+//todo-0: rethink this. A lot of bootstrap has lots of good looking rounded borders, so i'm really
+//throwing the baby out with the bathwater here.
 * {
     border-radius: 0 !important;
 }
@@ -432,13 +452,23 @@ samp {
     //I'd prefer to have NO margin, but the top margin is getting forced so I'll add a bottom margin for consistency for now
     margin-bottom: 15px;
     //margin-top: 0px;
+    width: 100%;
+}
+
+.searchResultsPanel {
+    padding: 15px;
+    margin: 15px;
+}
+
+.timelinePanel {
+    padding: 15px;
+    margin: 15px;
 }
 
 .mainNodeContentStyle {
     outline: none;
     border-bottom: 10px solid lightslategray;
     background-color: $mainContentBackground; 
-    margin-right: 1em;
 }
 
 .propertyEditListItem {
@@ -545,6 +575,18 @@ samp {
     background: lightGray;
 }
 
+.content-narrow {
+    max-width: 650px;
+}
+
+.content-medium {
+    max-width: 800px;
+}
+
+.content-wide {
+    max-width: 950px;
+}
+
 .jcr-content {
     margin: 1em;
 }
@@ -598,7 +640,7 @@ samp {
 .node-table-row {
     position: relative;
     border-bottom: 2px dotted lightslategray;
-    padding-right: 1.5em;
+    padding-right: 1em;
     outline: none;
     background-color: $mainContentBackground; 
 }
@@ -682,16 +724,41 @@ samp {
 
 /* Media Queries below are per Bootstap 4 standard */
 
-/* Small devices (landscape phones, 576px and up) */
+/* Small devices (tiny, 320px and up) */
+
+/* Small devices (portrait phones?, 576px and up) */
+@media (min-width: 576px) {
+    .modal-lg {
+        width: 500px;
+        height: 800px;
+    }
+
+    .container{
+        max-width: 500px;
+    }
+}
 
 /* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .modal-lg {
+        width: 700px;
+        height: 700px;
+    }
+
+    .container{
+        max-width: 700px;
+    }
+}
 
 /* Large devices (desktops, 992px and up) */
-
 @media (min-width: 992px) {
     .modal-lg {
         width: 900px;
         height: 900px;
+    }
+
+    .container{
+        max-width: 800px;
     }
 }
 
@@ -701,6 +768,10 @@ samp {
     .modal-lg {
         width: 1198px;
         height: 1198px;
+    }
+
+    .container{
+        max-width: 1000px;
     }
 }
 

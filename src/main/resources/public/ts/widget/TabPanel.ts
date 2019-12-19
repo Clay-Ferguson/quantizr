@@ -73,7 +73,7 @@ export class TabPanel extends Comp {
 
         //Tab content below buttons
         let tabContent = new Div(null, {
-            className: "tab-content",
+            className: "row tab-content",
             // id: "mainScrollingArea",
             role: "main",
         }, [
@@ -81,7 +81,7 @@ export class TabPanel extends Comp {
                 //--------
                 new Div(null, {
                     id: "mainTab",
-                    className: "tab-pane fade"
+                    className: "tab-pane fade my-tab-pane"
                 }, [
                         new Div(null, {
                             id: "mainNodeContent",
@@ -97,20 +97,22 @@ export class TabPanel extends Comp {
                 //----------
                 new Div(null, {
                     id: "searchTab",
-                    className: "tab-pane fade"
+                    className: "tab-pane fade my-tab-pane"
                 }, [
                         new Div("No Search Displaying", {
-                            id: "searchResultsPanel"
+                            id: "searchResultsPanel",
+                            className: "searchResultsPanel"
                         })]
                 ),
                 //TIMELINE TAB
                 //------------
                 new Div(null, {
                     id: "timelineTab",
-                    className: "tab-pane fade"
+                    className: "tab-pane fade my-tab-pane"
                 }, [
                         new Div("No Timeline Displaying", {
-                            id: "timelineResultsPanel"
+                            id: "timelineResultsPanel",
+                            className: "timelinePanel"
                         })]
                 ),
 

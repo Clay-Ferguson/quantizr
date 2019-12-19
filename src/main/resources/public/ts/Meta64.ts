@@ -768,17 +768,6 @@ export class Meta64 implements Meta64Intf {
                 }
             });
 
-            //This works fine, but i ended up not needing the mainTabPanelWidth after all
-            // $(window).resize(() => {
-            //     S.domBind.whenElm("#mainTabPanel", (elm) => {
-            //         let newWidth = $(elm).width();
-            //         if (newWidth != this.mainTabPanelWidth) {
-            //             this.mainTabPanelWidth = newWidth;
-            //             console.log("mainTabPanelWidth=" + this.mainTabPanelWidth);
-            //         }
-            //     });
-            // });
-
             if (this.appInitialized)
                 return;
 
