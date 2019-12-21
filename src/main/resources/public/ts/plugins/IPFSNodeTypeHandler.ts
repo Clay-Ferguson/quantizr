@@ -4,7 +4,6 @@ import * as I from "../Interfaces";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Constants as cnst } from "../Constants";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { CoreTypesPlugin } from "./CoreTypesPlugin";
 import { Comp } from "../widget/base/Comp";
@@ -27,18 +26,24 @@ export class IPFSNodeTypeHandler implements TypeHandlerIntf {
         if (name) {
             let linkName = S.props.getNodePropertyVal("ipfs:linkName", node);
             if (linkName) {
-                ret.push(new Heading(4, linkName, { style: { margin: "15px;" } }));
+                ret.push(new Heading(6, "Link Name: " + linkName, { className: "ipfs-text" }));
+            }
+
+            let link = S.props.getNodePropertyVal("ipfs:link", node);
+            if (link) {
+                ret.push(new Heading(6, "Link: " + link, { className: "ipfs-text" }));
             }
             ret.push(S.render.renderMarkdown(rowStyling, node, {}));
         }
         else {
-            let folderName = "";
             let displayName = S.props.getNodePropertyVal("ipfs:link", node);
-            if (displayName) {
-                folderName = S.util.getNameFromPath(displayName);
-            }
+            // let folderName = "";
+            // let displayName = S.props.getNodePropertyVal("ipfs:link", node);
+            // if (displayName) {
+            //     folderName = S.util.getNameFromPath(displayName);
+            // }
 
-            ret.push(new Heading(4, folderName, { style: { margin: "15px;" } }));
+            ret.push(new Heading(6, "Link: " + displayName, { className: "ipfs-text" }));
         }
 
         return new Div(null, null, ret);

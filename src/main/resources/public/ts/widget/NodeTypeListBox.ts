@@ -24,12 +24,15 @@ export class NodeTypeListBox extends ListBox {
                probably will specify what roles of users they are available on or something like that) */
             new ListBoxRow("RSS Feed", () => { this.selType = "sn:rssfeed"; }, false),
             
-            // Experimental types currently disabled;
+            //Experimental types currently disabled, by commenting out.
             //S.meta64.allowBashScripting ? new ListBoxRow("Bash Script", () => { this.selType = "bash"; }, false) : null,
             //new ListBoxRow("Password", () => { this.selType = "sn:passwordType"; }, false),
-            !S.meta64.isAdminUser ? null : new ListBoxRow("FileSystem Folder", () => { this.selType = "fs:folder"; }, false),
-            !S.meta64.isAdminUser ? null : new ListBoxRow("Lucene Index Folder", () => { this.selType = "luceneIndex"; }, false),
-            //new ListBoxRow("IPFS Node", () => { this.selType = "ipfs:node"; }, false),
+            //!S.meta64.isAdminUser ? null : new ListBoxRow("FileSystem Folder", () => { this.selType = "fs:folder"; }, false),
+            //!S.meta64.isAdminUser ? null : new ListBoxRow("Lucene Index Folder", () => { this.selType = "luceneIndex"; }, false),
+
+            //todo-0: need a limit on each account stopping people from using too much MongoDB disk space.
+            new ListBoxRow("IPFS Node", () => { this.selType = "ipfs:node"; }, false),
+            
             //!meta64.isAdminUser ? null : new ListBoxRow("System Folder", () => { this.selType = "meta64:systemfolder"; }, false)
         ]);
     }

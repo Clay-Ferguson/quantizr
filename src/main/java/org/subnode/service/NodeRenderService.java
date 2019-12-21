@@ -24,7 +24,6 @@ import org.subnode.response.RenderNodeResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.XString;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,6 +164,8 @@ public class NodeRenderService {
 			}
 		}
 
+		//For IPFS Proof-of-Concept work we just code the call right here, rather than having a plugin-based polymorphic
+		//interface we can call to fully decouple the IPFS from this rener service.
 		if (session.isAdmin()) {
 			if (node.isType(TYPES.FS_FOLDER)) {
 				fileSyncService.syncFolder(session, node, false, null);

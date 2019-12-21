@@ -146,6 +146,12 @@ body {
     margin-right: 0px;
 }
 
+.ipfs-text {
+    //background-color: $tabButtonBackground;
+    margin: 10px;
+    padding: 5px;
+}
+
 .nav-tabs {
     border: none;
 }
@@ -469,6 +475,7 @@ samp {
     outline: none;
     border-bottom: 10px solid lightslategray;
     background-color: $mainContentBackground; 
+    padding-right: 1em;
 }
 
 .propertyEditListItem {

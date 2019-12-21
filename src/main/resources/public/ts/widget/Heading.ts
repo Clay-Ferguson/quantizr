@@ -17,6 +17,6 @@ export class Heading extends Comp {
     }
 
     render = (p: any) => {
-        return S.e("h" + this.level, this.attribs, this.content);
+        return S.e("h" + this.level, p, this.content);
     }
 }

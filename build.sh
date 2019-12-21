@@ -25,23 +25,23 @@ MAVEN_PROFILE=dev
 
 # NOTE: These need to both be true if you're running for the first time like since a machine reboot, because they 
 # won't be running and without 'true' on these they won't be started.
-export RESTART_MONGODB=true
+export RESTART_MONGODB=false
 export RESTART_IPFS=false
 
 CLEAN=false
 # =====================================================
 
+# Ensure output folder for out docier images exists
 mkdir -p $DOCKER_IMAGES_FOLDER
 
-if [ "$MAVEN_PROFILE" == "prod" ]; then
-    rm -rf $DOCKER_IMAGES_FOLDER/subnode-0.0.1.tar
-fi
-
+# Wipe some existing stuff to ensure it gets rebuild
+rm -rf $DOCKER_IMAGES_FOLDER/subnode-0.0.1.tar
 rm -rf $PRJROOT/target/*
 rm -rf $PRJROOT/bin/*
 rm -rf $PRJROOT/src/main/resources/public/bundle.js
 rm -rf $PRJROOT/src/main/resources/public/index.html
 
+# Run ignore-scripts for some security from NodeJS
 cd $PRJROOT/src/main/resources/public
 npm config set ignore-scripts true
 
@@ -49,10 +49,11 @@ npm config set ignore-scripts true
 cd $PRJROOT
 
 # These aren't normally needed, so I'll just keep commented out most of time. 
-# (Not also it looks like: the 'sources' one ALWAYS downloads sources even if we already have them.)
-#mvn dependency:sources
-#mvn dependency:resolve -Dclassifier=javadoc
+# mvn dependency:sources
+# mvn dependency:resolve -Dclassifier=javadoc
+# mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
 
+#For prod builds always force CLEAN
 if [ "$MAVEN_PROFILE" == "prod" ]; then
     CLEAN=true
 fi
@@ -66,9 +67,6 @@ fi
 
 verifySuccess "Maven Build"
 
-# Maven Dependency Analysis Build
-# mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
-
 # Builds a docker image to run the jar in the target folder. If you're not using Docker you can 
 # just delete this line, and use the JAR and run it like a normal SpringBoot jar
 docker build --tag=subnode-0.0.1 .
@@ -76,7 +74,7 @@ docker build --tag=subnode-0.0.1 .
 #apparently this command setting a fail exit code????
 verifySuccess "Docker Build"
 
-# Finally, only if building 'prod' then we save the docker image into a TAR file so that we can send it up to the remote Linode server
+# If building 'prod', we save the docker image into a TAR file so that we can send it up to the remote Linode server
 # which can then on the remote server be loaded into registry for user on that host using the following command:
 #     docker load -i <path to image tar file>
 if [ "$MAVEN_PROFILE" == "prod" ]; then
@@ -84,6 +82,9 @@ if [ "$MAVEN_PROFILE" == "prod" ]; then
     verifySuccess "Docker Save"
 fi
 
+# If we're doing a dev build, we want to go ahead and run the docker images immediately.
+# This starts MongoDB, IPFS, and Quantizr as three separate docker instances.
+# (Some day we can combine these into one using 'Docker Compose', but I haven't learned how to do that yet)
 if [ "$MAVEN_PROFILE" == "dev" ]; then    
     ./docker-dev-run.sh
 fi

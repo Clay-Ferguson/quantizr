@@ -60,6 +60,7 @@ export class TextField extends Comp {
         console.log("render input");
 
         children.push(S.e('input', this.attribs));
+
         return S.e('div', {
             id: this.getId()+"_textfield",
         }, children);

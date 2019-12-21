@@ -175,9 +175,10 @@ public class AttachmentService {
 				SubNode newNode = api.createNode(session, node, null, null, null, CreateNodeLocation.LAST);
 				newNode.setContent("### " + fileName);
 
-				// todo-1: saving multiple uploads isn't working right now. It's a work in progress. This isn't a bug, but just incomplete code.
+				// todo-1: saving multiple uploads isn't working right now. It's a work in
+				// progress. This isn't a bug, but just incomplete code.
 				api.save(session, newNode);
-				//api.saveSession(session);
+				// api.saveSession(session);
 
 				node = newNode;
 			} catch (Exception ex) {
@@ -244,8 +245,15 @@ public class AttachmentService {
 				imageBytes = IOUtils.toByteArray(is);
 				isTemp = new ByteArrayInputStream(imageBytes);
 				bufImg = ImageIO.read(isTemp);
-				node.setProp(NodeProp.IMG_WIDTH, bufImg.getWidth());
-				node.setProp(NodeProp.IMG_HEIGHT, bufImg.getHeight());
+
+				try {
+					node.setProp(NodeProp.IMG_WIDTH, bufImg.getWidth());
+					node.setProp(NodeProp.IMG_HEIGHT, bufImg.getHeight());
+				} catch (Exception e) {
+					//reading files from IPFS caused this exception, and I didn't investigate why yet, because
+					//I don't think it's a bug in my code, but something in IPFS.
+					log.error("Failed to get image length.", e);
+				}
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			} finally {
@@ -308,9 +316,12 @@ public class AttachmentService {
 		// What can happen if you ever delete BIN_VER is that it will reset the version
 		// back to '1', and then when the user's browser
 		// finds the URL with 'ver=1' it will display the OLD IMAGE (assuming it's an
-		// image attachment). The way this would happen is a user uploads an image, then deletes it
-		// and then uploads another image. So really the places in the code where we check for BIN_VER
-		// to see if there's an attachment or not should be changed to look for BIN_MIME instead.
+		// image attachment). The way this would happen is a user uploads an image, then
+		// deletes it
+		// and then uploads another image. So really the places in the code where we
+		// check for BIN_VER
+		// to see if there's an attachment or not should be changed to look for BIN_MIME
+		// instead.
 		// node.deleteProp(NodeProp.BIN_VER);
 	}
 
@@ -385,8 +396,10 @@ public class AttachmentService {
 			String fullFileName = appProp.getAdminDataFolder() + File.separator + fileName;
 			File file = new File(fullFileName);
 			String checkPath = file.getCanonicalPath();
-			/* todo-1: for better security make a REAL '/file/' folder under admin folder
-			 and assert that the file is in there directly */
+			/*
+			 * todo-1: for better security make a REAL '/file/' folder under admin folder
+			 * and assert that the file is in there directly
+			 */
 			if (!checkPath.startsWith(appProp.getAdminDataFolder()))
 				throw ExUtil.newEx("bad request.");
 
@@ -415,7 +428,7 @@ public class AttachmentService {
 			throw ExUtil.newEx(ex);
 		}
 	}
-	
+
 	public ResponseEntity<StreamingResponseBody> getFileSystemResourceStream(MongoSession session, String nodeId,
 			String disposition) {
 		try {
@@ -490,11 +503,17 @@ public class AttachmentService {
 	 * or any other kind of content actually.
 	 */
 	public void uploadFromUrl(MongoSession session, UploadFromUrlRequest req, UploadFromUrlResponse res) {
-		uploadFromUrl(session, req.getSourceUrl(), req.getNodeId());
+		uploadFromUrl(session, req.getSourceUrl(), req.getNodeId(), null);
 		res.setSuccess(true);
 	}
 
-	public void uploadFromUrl(MongoSession session, String sourceUrl, String nodeId) {
+	/**
+	 * @param mimeHint  This is an additional string invented because IPFS urls
+	 *                  don't contain the file extension always and in that case we
+	 *                  need to get it from the IPFS filename itself and that's what
+	 *                  the hint is in that case. Normally however mimeHint is null
+	 */
+	public void uploadFromUrl(MongoSession session, String sourceUrl, String nodeId, String mimeHint) {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -511,6 +530,9 @@ public class AttachmentService {
 			URL url = new URL(sourceUrl);
 
 			String mimeType = URLConnection.guessContentTypeFromName(sourceUrl);
+			if (StringUtils.isEmpty(mimeType)) {
+				mimeType = URLConnection.guessContentTypeFromName(mimeHint);
+			}
 
 			/*
 			 * if this is an image extension, handle it in a special way, mainly to extract
@@ -615,4 +637,3 @@ public class AttachmentService {
 		return false;
 	}
 }
-

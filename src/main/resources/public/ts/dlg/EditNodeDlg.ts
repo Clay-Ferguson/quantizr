@@ -125,10 +125,10 @@ export class EditNodeDlg extends DialogBase {
                         }, null),
                         this.setTypeButton = new Button("Set Type", this.openChangeNodeTypeDlg),
                         //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
-                        
+
                         //Encryption is a work in progress. Disabling for now for end users.
                         //this.encryptionButton = new Button("Encryption", this.openEncryptionDlg),
-                        
+
                         this.cancelButton = new Button("Cancel", this.cancelEdit)
                     ])
             ])
@@ -224,7 +224,7 @@ export class EditNodeDlg extends DialogBase {
 
                 let content = S.edit.editNode.content;
 
-                if (content.startsWith(cnst.ENC_TAG) && "priv"==S.props.getNodePropertyVal(cnst.ENC, S.edit.editNode)) {
+                if (content.startsWith(cnst.ENC_TAG) && "priv" == S.props.getNodePropertyVal(cnst.ENC, S.edit.editNode)) {
                     content = content.substring(cnst.ENC_TAG.length);
                     content = await S.encryption.symDecryptString(null, content);
                 }
@@ -555,12 +555,13 @@ export class EditNodeDlg extends DialogBase {
 
             /* Now scan over all properties to build up what to save */
             if (this.propEntries) {
+                debugger;
                 this.propEntries.forEach((prop: I.PropEntry) => {
                     /* Ignore this property if it's one that cannot be edited as text, or has already been handled/processed */
                     if (prop.readOnly || prop.binary || handled[prop.property.name])
                         return;
 
-                    console.log("property field: " + JSON.stringify(prop));
+                    //console.log("property field: " + JSON.stringify(prop));
 
                     let propVal: string;
                     let aceEditorInfo: AceEditorInfo = this.aceEditorMap["prp." + prop.property.name];
@@ -568,11 +569,13 @@ export class EditNodeDlg extends DialogBase {
                     /* If we are editing with an ace editor get the value from it */
                     if (aceEditorInfo) {
                         propVal = aceEditorInfo.editor.getValue();
+                        //console.log("ACE propVal[" + prop.id + "]=" + propVal);
                     }
                     /* Else get from the plain text area we must be using (pre-ace design) */
                     else {
                         try {
                             propVal = S.util.getTextAreaValById(prop.id);
+                            //console.log("TEXTAREA propVal[" + prop.id + "]=" + propVal);
                         }
                         catch (error) {
                             //todo-0: this was seeing the obsolete "sn:lastModified" and blowing up here. Need to look into it.
@@ -648,7 +651,6 @@ export class EditNodeDlg extends DialogBase {
             formGroup.addChild(checkbox);
 
             let editorComp: any = null;
-
             let multiLine = false;
 
             if (multiLine) {

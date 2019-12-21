@@ -114,6 +114,11 @@ body {
   margin-left: 0px;
   margin-right: 0px; }
 
+.ipfs-text {
+  background-color: lightSlateGray;
+  margin: 10px;
+  padding: 5px; }
+
 .nav-tabs {
   border: none; }
 
@@ -363,7 +368,8 @@ samp {
 .mainNodeContentStyle {
   outline: none;
   border-bottom: 10px solid lightslategray;
-  background-color: #cecece; }
+  background-color: #cecece;
+  padding-right: 1em; }
 
 .propertyEditListItem {
   padding-left: 16px;

@@ -542,8 +542,8 @@ export class Render implements RenderIntf {
         on a page and we don't want to burn that much CPU just to prevent empty-folders from being explored. Empty folders are rare. */
         if (!isInlineChildren && //
             (this.nodeHasChildren(node.uid) || node.type == "fs:folder" || node.type == "fs:lucene" || node.type == "ipfs:node")) {
-            /* For some unknown reason the ability to style this with a class broke isn't working, so i used a 'style' attibute
-                 as a last resort */
+
+            /* convert this button to a className attribute for styles */
             openButton = new Button("Open", () => { S.nav.openNode(node.uid, true) }, {
                 "style": {
                     backgroundColor: "#4caf50",

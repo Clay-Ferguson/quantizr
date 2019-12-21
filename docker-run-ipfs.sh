@@ -12,12 +12,14 @@ source ./define-functions.sh
 
 cd $PRJROOT
 
-echo "Docker Run IPFS"
+echo "Starting IPFS"
 
+# Ensure out staging folder exists.
 mkdir -p ${ipfs_staging}
 
-# IPFS, as far as i can tell, it's impossible to stop IPFS from consuming lots of bandwith, and this 'trickle'
-# command was an attempt to fix that, which did not work.
+# An earlier version of IPFS used to consuming lots of bandwith, and this 'trickle'
+# command was one attempt to fix that, which did not work, HOWEVER, as of December 2019 at least based on my testing
+# it appears the the IPFS devs HAVE fixed that bug and IPFS runs without using bandwith when sitting idle.
 # trickle -w 10 -t .1 -u 10 -d 20 \
 docker run -d \
     --init \
@@ -32,6 +34,9 @@ docker run -d \
     --network="host" \
     ipfs/go-ipfs:latest \
     --routing=dhtclient 
+
+#todo-0: I need to investigate if ipfs/go-ipfs:latest is really stable always, and not some nightly build. I can't remember
+#if I ever scrutinized that to be sure I'm using an image that's always production-ready.
 
 verifySuccess "Docker Run (IPFS)"
 

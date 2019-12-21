@@ -7,7 +7,8 @@
 # This is a script for use during development. It will run the web
 # app at http port 8181, and sets up a debugging port at 8000, and also
 # takes care of making sure MongoDb docker container is also up and running
-# before it starts whe SubNode web app
+# before it starts whe SubNode web app. Also IPFS docker will be started
+# if we have it configured to run IPFS.
 # 
 #################################################################
 source ./setenv.sh
@@ -19,25 +20,31 @@ source ./define-functions.sh
 source ${SECRET_SCRIPT}
 cd $PRJROOT
 
+# Stop/Remove IPFS instance 
 if [ "$RESTART_IPFS" == "true" ]; then
     echo Removing IPFS
     docker rm -f ipfs_host_dev -f || true
 fi
 
+# Stop/Remove Quantizr instance 
 echo Stopping SubNode
 docker rm -f subnode_dev -f || true
 
+# Stop/Remove MongoDB instance 
 if [ "$RESTART_MONGODB" == "true" ]; then
     echo Removing MongoDB
     docker rm -f subnode_mongo_dev -f || true
 fi
 
+# Remove all prior existing log files
 rm -f ${SUBNODE_LOG_FOLDER}/*
 
+# Start IPFS 
 if [ "$RESTART_IPFS" == "true" ]; then
     ./docker-run-ipfs.sh
 fi
 
+# Start MongoDB
 if [ "$RESTART_MONGODB" == "true" ]; then
     ./docker-run-mongo.sh
 fi
@@ -82,6 +89,8 @@ PORT=8182
 #   "--forceIndexRebuild=true" \
 ################################################################p################################
 #(-d=daemon -t=terminal)
+
+# Start MongoDB, and pass in a bunch of params that override whatever's in application.properties.
 docker run -d \
     --name subnode_dev \
     --network=host \

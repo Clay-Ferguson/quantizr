@@ -19,14 +19,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import org.subnode.util.Util;
+
 // https://docs.ipfs.io/reference/api/http/
 
 /**
  * Right now exception handling in here is just temporary (not final) because
- * I'm just throwing together quick proof-of-concept IPFS browser capability in
- * SubNode, and not trying to polish the code yet.
+ * I'm just throwing together quick proof-of-concept IPFS browser capability.
  */
-
 @Component
 public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
@@ -39,7 +39,7 @@ public class IPFSService {
      * RestTempalte is thread-safe and reusable, and has no state, so we need only
      * one final static instance ever
      */
-    private static final RestTemplate restTemplate = new RestTemplate();
+    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
 
     @Autowired
     private MongoApi api;

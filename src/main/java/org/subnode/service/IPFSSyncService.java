@@ -70,7 +70,7 @@ public class IPFSSyncService {
 
 	/*
 	 * Main entry point to perform a sync of 'node' against IPFS. The forceRefresh
-	 * theoretically never needs to be true and the main point if it would be if we
+	 * theoretically never needs to be true and the main point of it would be if we
 	 * for some reason do want to forcably re-read information from the IPFS Web.
 	 */
 	public void syncNode(MongoSession session, SubNode node, boolean recursive, MerkleDAGSyncStats stats,
@@ -134,7 +134,6 @@ public class IPFSSyncService {
 		String merkContent = ipfs.objectCat(hash);
 
 		if (merkContent != null) {
-
 			/* Save this property if it has changed */
 			if (!merkContent.equals(content)) {
 				node.setContent(merkContent);
@@ -162,7 +161,7 @@ public class IPFSSyncService {
 		HashMap<String, SubNode> nodeMap = new HashMap<String, SubNode>();
 		List<SubNode> nodesToDelete = new LinkedList<SubNode>();
 
-		/* Get iterator for al lchildren under 'node' */
+		/* Get iterator for all children under 'node' */
 		Iterable<SubNode> iter = api.getChildren(session, node, false, 10000);
 
 		/*
@@ -243,7 +242,7 @@ public class IPFSSyncService {
 
 		List<String> keysToDelete = new LinkedList<String>();
 		/*
-		 * And finally we clean out orphaned nodes. Any nodes that exist in SubNode DB
+		 * And finally we clean out orphaned nodes. Any nodes that exist in Quantizr DB
 		 * for which there is no longer an associated IPFS node.
 		 */
 		for (Map.Entry<String, SubNode> entry : nodeMap.entrySet()) {
@@ -278,7 +277,7 @@ public class IPFSSyncService {
 		// one level at a time as the user expands in the gui using the "open" button to
 		// explore nodes. Enabling a fully-recursive crawl feature will ONLY require
 		// code like the
-		// following 10 lines or to to be uncommented.
+		// following 10 lines to be uncommented.
 		//
 		// if (recursive && folders != null) {
 		// for (File folder : folders) {
@@ -302,8 +301,8 @@ public class IPFSSyncService {
 		log.debug("IPFS resource: linkName=" + merkleLink.getName() + " hash=" + merkleLink.getHash());
 
 		SubNode newNode = api.createNode(session, parentNode.getPath() + "/?", TYPES.IPFS_NODE.getName());
-
 		String content = null;
+
 		if (fileUtils.isImageFile(merkleLink.getName())) {
 			//This query just returns an empty array as a 'links' property and then a json string representation of the image in the 'Data' property (not useful)
 			//MerkleNode merkNode = ipfs.getMerkleNode(merkleLink.getHash(), "json");
@@ -319,7 +318,7 @@ public class IPFSSyncService {
 			content = ""; //"IMAGE: "+merkleLink.getName();
 			api.save(session, newNode);
 			
-			attachmentService.uploadFromUrl(session, imageUrl, newNode.getId().toHexString());
+			attachmentService.uploadFromUrl(session, imageUrl, newNode.getId().toHexString(), merkleLink.getName());
 
 			//this re-query of the node is kind of ugly, and I need to tweak the design so that this isn't required, but currently it is.
 			newNode = api.getNode(session, newNode.getId());
@@ -355,4 +354,3 @@ public class IPFSSyncService {
 		return node.isType(TYPES.IPFS_NODE);
 	}
 }
-
