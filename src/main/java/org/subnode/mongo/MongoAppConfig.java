@@ -2,6 +2,9 @@ package org.subnode.mongo;
 
 import org.subnode.config.AppProp;
 import org.subnode.util.ExUtil;
+
+import javax.annotation.PostConstruct;
+
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
@@ -30,20 +33,48 @@ public class MongoAppConfig extends AbstractMongoConfiguration {
 	private MongoClient mongoClient;
 	private GridFSBucket gridFsBucket;
 
+	// we have this so we can set it to true and know that MongoDb failed and
+	// gracefully run
+	// in case we need to run for debugging purposes.
+	public static boolean connectionFailed = false;
+
 	@Autowired
 	private AppProp appProp;
 
+	@PostConstruct
+	public void postConstruct() {
+		log.debug("MongoAppConfig.postConstruct: mongoAdminPassword="+appProp.getMongoAdminPassword());
+	}
+
 	@Bean
 	public MongoDbFactory mongoDbFactory() {
-		SimpleMongoDbFactory simpleMongoDbFactory = new SimpleMongoDbFactory(mongoClient(), databaseName);
-		return simpleMongoDbFactory;
+		if (connectionFailed)
+			return null;
+		try {
+			MongoClient mc = mongoClient();
+			if (mc != null) {
+				SimpleMongoDbFactory simpleMongoDbFactory = new SimpleMongoDbFactory(mc, databaseName);
+				return simpleMongoDbFactory;
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			connectionFailed = true;
+			log.debug("Unable to connect to MongoDb");
+			return null;
+		}
 	}
 
 	@Bean
 	public GridFSBucket gridFsBucket() {
+		if (connectionFailed)
+			return null;
 		if (gridFsBucket == null) {
-			MongoDatabase db = mongoDbFactory().getDb();
-			gridFsBucket = GridFSBuckets.create(db);
+			MongoDbFactory mdbf = mongoDbFactory();
+			if (mdbf != null) {
+				MongoDatabase db = mdbf.getDb();
+				gridFsBucket = GridFSBuckets.create(db);
+			}
 		}
 		return gridFsBucket;
 	}
@@ -55,6 +86,8 @@ public class MongoAppConfig extends AbstractMongoConfiguration {
 
 	@Override
 	public MongoClient mongoClient() {
+		if (connectionFailed)
+			return null;
 		if (mongoClient == null) {
 			// Set credentials
 			// MongoCredential credential = MongoCredential.createCredential(mongoUser,
@@ -67,23 +100,29 @@ public class MongoAppConfig extends AbstractMongoConfiguration {
 				String mongoHost = appProp.getMongoDbHost();
 				Integer mongoPort = appProp.getMongoDbPort();
 
-				if (mongoHost==null) {
+				if (mongoHost == null) {
 					throw new RuntimeException("mongodb.host property is missing");
 				}
 
-				if (mongoPort==null) {
+				if (mongoPort == null) {
 					throw new RuntimeException("mongodb.port property is missing");
 				}
 
 				String uri = "mongodb://" + mongoHost + ":" + String.valueOf(mongoPort);
+
 				log.info("Connecting to MongoDb (" + uri + ")...");
 				mongoClient = new MongoClient(new MongoClientURI(uri));
-				log.info("Connected to Mongo OK.");
+				if (mongoClient != null) {
+					mongoClient.getAddress();
+					log.info("Connected to Mongo OK.");
+				} else {
+					connectionFailed = true;
+					log.error("Unable to connect MongoClient");
+				}
 
-				mongoClient.getAddress();
-		
 			} catch (Exception e) {
-				ExUtil.error(log, "********** Unable to connect to MongoDb. Did you forget to start Mongo? **********",
+				connectionFailed = true;
+				ExUtil.error(log, "********** Unable to connect to MongoDb. **********",
 						e);
 				throw e;
 			}
@@ -96,9 +135,14 @@ public class MongoAppConfig extends AbstractMongoConfiguration {
 	 */
 	@Bean
 	public MongoTemplate mongoTemplate() throws Exception {
-		MongoTemplate mt = new MongoTemplate(mongoDbFactory());
-		mt.setWriteResultChecking(WriteResultChecking.EXCEPTION);
-		return mt;
+		MongoDbFactory mdbf = mongoDbFactory();
+		if (mdbf != null) {
+			MongoTemplate mt = new MongoTemplate(mdbf);
+			mt.setWriteResultChecking(WriteResultChecking.EXCEPTION);
+			return mt;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
@@ -113,6 +157,11 @@ public class MongoAppConfig extends AbstractMongoConfiguration {
 
 	@Bean
 	public GridFsTemplate gridFsTemplate() throws Exception {
-		return new GridFsTemplate(mongoDbFactory(), mappingMongoConverter());
+		MongoDbFactory mdbf = mongoDbFactory();
+		if (mdbf != null) {
+			return new GridFsTemplate(mdbf, mappingMongoConverter());
+		} else {
+			return null;
+		}
 	}
 }

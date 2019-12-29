@@ -307,7 +307,8 @@ public class IPFSSyncService {
 			//This query just returns an empty array as a 'links' property and then a json string representation of the image in the 'Data' property (not useful)
 			//MerkleNode merkNode = ipfs.getMerkleNode(merkleLink.getHash(), "json");
 
-			String imageUrl = "http://localhost:8080/ipfs/" + merkleLink.getHash();
+			//todo-0: get this host/port/and protocol into application.properties
+			String imageUrl = "http://ipfs:8080/ipfs/" + merkleLink.getHash();
 
 			// generating markdown that is nothing but a link to the image. Would be one approach we could use if we wanted to always query ipfs for the 
 			// image data live, but as a proof-of-concept, what I'm instead doing below is pulling in the actual image data from IPFS to save 

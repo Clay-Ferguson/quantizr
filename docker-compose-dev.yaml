@@ -1,0 +1,80 @@
+version: '3.7'
+services:
+
+    mongo: 
+        container_name: subnode_mongo_dev 
+        volumes:
+            - '${hostMongoDbPath}:/data/db'
+            - '/home/clay/ferguson/mongo-dumps:/mongo-dumps'
+        ports:
+            - '27017:27017'
+        networks:
+          - mynet
+        image: mongo
+
+    ipfs: 
+        container_name: ipfs_host_dev 
+        environment:
+            routing: "dhtclient" 
+            IPFS_PROFILE: "server"
+            IPFS_PATH: "/ipfsdata"
+        volumes:
+            - '${ipfs_staging}:/export'
+            - '${ipfs_data}:/ipfsdata'
+        ports:
+            - "4001:4001"
+            - "8080:8080"
+            - "8081:8081"
+            - "5001:5001"
+        networks:
+          - mynet
+        image: ipfs/go-ipfs:latest
+
+    subnode-0.0.1:
+        build: .
+        container_name: subnode_dev
+        expose:
+            - '8182'
+            - '8000'
+        volumes:
+            - '${SUBNODE_TMP_FOLDER}:/subnode-tmp'
+            - '${SUBNODE_LOG_FOLDER}:/subnode-log'
+            - '${SUBNODE_LUCENE_FOLDER}:/subnode-lucene'
+            - '${PRJROOT}/src/main/resources/public:/dev-resource-base'
+        ports:
+            - '8182:8182'
+            - '8000:8000'
+        networks:
+          - mynet
+        environment:
+            mongoAdminPassword: "${subnodePassword}"
+            testUserAccounts: "adam:password:${devEmail},bob:password:${devEmail},cory:password:${devEmail},dan:password:${devEmail}" 
+            resourcesBaseFolder: "file:///dev-resource-base/" 
+            spring.config.location: "classpath:/application.properties" 
+            mongodb.host: "mongo" 
+            mongodb.port: "27017" 
+            profileName: "dev" 
+            server.port: "8182" 
+            httpProtocol: "http" 
+            metaHost: "localhost" 
+            allowFileSystemSearch: "false" 
+            spring.http.multipart.max-file-size: "200MB" 
+            spring.http.multipart.max-request-size: "200MB" 
+            spring.servlet.multipart.max-file-size: "200MB"
+            spring.servlet.multipart.max-request-size: "200MB"
+            adminDataFolder: "/subnode-tmp" 
+            mail.port: ""
+            mail.user: "postmaster@quantizr.com" 
+            mail.password: "${emailPassword}" 
+            mail.host: "smtp.mailgun.org" 
+            mail.from: "admin@quantizr.com"
+            JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+            ipfs.host: "http://ipfs:5001"
+        image: subnode-0.0.1
+        depends_on:
+            - mongo
+            - ipfs
+
+networks:
+    mynet:
+        driver: bridge

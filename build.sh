@@ -25,16 +25,17 @@ MAVEN_PROFILE=dev
 
 # NOTE: These need to both be true if you're running for the first time like since a machine reboot, because they 
 # won't be running and without 'true' on these they won't be started.
-export RESTART_MONGODB=false
-export RESTART_IPFS=false
+export RESTART_MONGODB=true
+export RESTART_IPFS=true
 
 CLEAN=false
 # =====================================================
 
 # Ensure output folder for out docier images exists
 mkdir -p $DOCKER_IMAGES_FOLDER
+mkdir -p ${ipfs_staging}
 
-# Wipe some existing stuff to ensure it gets rebuild
+# Wipe some existing stuff to ensure it gets rebuilt
 rm -rf $DOCKER_IMAGES_FOLDER/subnode-0.0.1.tar
 rm -rf $PRJROOT/target/*
 rm -rf $PRJROOT/bin/*
@@ -64,32 +65,87 @@ if [ "$CLEAN" == "true" ]; then
 else
     mvn package -P$MAVEN_PROFILE -DskipTests=true
 fi
-
 verifySuccess "Maven Build"
-
-# Builds a docker image to run the jar in the target folder. If you're not using Docker you can 
-# just delete this line, and use the JAR and run it like a normal SpringBoot jar
-docker build --tag=subnode-0.0.1 .
-
-#apparently this command setting a fail exit code????
-verifySuccess "Docker Build"
 
 # If building 'prod', we save the docker image into a TAR file so that we can send it up to the remote Linode server
 # which can then on the remote server be loaded into registry for user on that host using the following command:
 #     docker load -i <path to image tar file>
+#
 if [ "$MAVEN_PROFILE" == "prod" ]; then
+    echo "prod path not yet ready, after transition to docker-compose"
+    exit 0
     docker save -o $DOCKER_IMAGES_FOLDER/subnode-0.0.1.tar subnode-0.0.1
     verifySuccess "Docker Save"
 fi
 
 # If we're doing a dev build, we want to go ahead and run the docker images immediately.
-# This starts MongoDB, IPFS, and Quantizr as three separate docker instances.
-# (Some day we can combine these into one using 'Docker Compose', but I haven't learned how to do that yet)
+# This starts MongoDB, IPFS, and Quantizr containers
 if [ "$MAVEN_PROFILE" == "dev" ]; then    
-    ./docker-dev-run.sh
+    # Note: This 'secrets.sh' script is my way of setting ${subnodePassword} environment varible from a secure location
+    source ${SECRET_SCRIPT}
+    cd $PRJROOT
+
+    # Stop/Remove IPFS instance 
+    if [ "$RESTART_IPFS" == "true" ]; then
+        echo Removing IPFS
+        docker rm -f ipfs_host_dev -f || true
+    fi
+
+    # Stop/Remove Quantizr instance 
+    echo Stopping Quantizr
+    docker rm -f subnode_dev -f || true
+
+    # Stop/Remove MongoDB instance 
+    if [ "$RESTART_MONGODB" == "true" ]; then
+        echo Removing MongoDB
+        docker rm -f subnode_mongo_dev -f || true
+    fi
+
+    # Remove all prior existing log files
+    rm -f ${SUBNODE_LOG_FOLDER}/*
+
+    cd $PRJROOT
+
+    #
+    # NOTE: The 'dev-resource-base' in the run command below sets up a property (resourceBaseFolder)
+    # which allows Spring to load resources directly from the specified folder in a way that it overrides
+    # the built in resources deployed into docker. This allows us to then edit LESS, HTML, or TS files
+    # and then simply by running the maven command: "mvn generate-resources -DskipTests -Pwebpack"
+    # which you can find in (.vscode/tasks.json), it allows is to then see those chagnes LIVE in the deployed
+    # web app without doing a full build/redeploy. 
+    #
+    #   Use these additional options to enable HTTPS.
+    #   -p 443:443 \
+    #   "--server.port=443" \
+    # 	"--security.require-ssl=true" \
+    # 	"--server.ssl.key-store=classpath:keystore.p12" \
+    # 	"--server.ssl.key-store-password=????" \
+    # 	"--server.ssl.keyStoreType=PKCS12" \
+    # 	"--server.ssl.keyAlias=tomcat" \
+    # 	"--httpProtocol=https" \
+    #
+    #   "--forceIndexRebuild=true" \
+    ################################################################################################
+
+    # I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up findingn
+    # this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
+    # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
+    docker-compose -f docker-compose-dev.yaml build --no-cache
+    verifySuccess "Docker Compose: build"
+
+    docker-compose -f docker-compose-dev.yaml up -d
+    verifySuccess "Docker Compose: up"
+
+    if docker ps | grep subnode-0.0.1; then
+        echo "subnode-0.0.1 successfully started"
+    else
+        echo "subnode-0.0.1 failed to start"
+    fi
+
+#########################################
 fi
 
-# We do prod builds from an OS terminal so we want to pause to see how it went.
+# We do prod builds from an OS terminal so we want to pause to show a message.
 if [ "$MAVEN_PROFILE" == "prod" ]; then
     read -p "All Done!  Press any key"
 fi
