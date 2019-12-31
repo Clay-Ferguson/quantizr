@@ -2,9 +2,7 @@
 
 This app uses maven as the builder (see pom.xml), and the languages involved are Java and TypeScript. The build generates a 'fat jar' containing Tomcat and the WebApp itself, and is a free-standing Java JAR that contains everything needed at runtime except for the MongoDB database. The way MongoDB is normally integrated into the runtime is by having a docker instance that contains both the MongoDB and the App fat JAR deployed.
 
-All of the following was verified correct as of 4/5/2019...
-
-There is a build script named 'build.sh' that is in the root of the project, which you can use during development by setting "MAVEN_PROFILE=dev", in it where you see that line in the script, or building a prod version by making the line be "MAVEN_PROFILE=prod" in the script.
+There are two build scripts in the root of the project: build-dev.sh, and build-test.sh. The 'build-dev.sh' is for running locally during development and will startup a debuggable instance of the docker containers when run. The build-test.sh builds and saves the docker containers into a TAR file for deploying into a test environment.
 
 # Prerequisites
 
@@ -14,17 +12,10 @@ Linode Config: 4GB RAM, 2CPU, 80GB Storage
 
 ## Install Java
 
-You should use only Java11 or later. Trust me on that. :)
-
-So I'm trying this: 
+You should use only Java11 or later.
+ 
 https://www.linode.com/docs/development/java/install-java-on-ubuntu-18-04/
 
-
-## Check your Ubuntu Version:
-
-```
-lsb_release -a
-```
 
 ## Install Maven
 
@@ -36,7 +27,7 @@ mvn -version
 
 ## Install Docker
 
-Docker install commands are all inside docker-install.sh (in this same folder). As of 4/5/2019 they are known to be correct, and you would need to just uncomment all the non-comments (i.e. all commands you see in that entire file), and then run them all in the order they appear in that file, to install docker.
+Docker install commands are all inside docker-install.sh (in this same folder), so you would need to just uncomment all the non-comments (i.e. all commands you see in that entire file), and then run them all in the order they appear in that file, to install docker. That script is not 'guaranteed' to work but should be complete however, and serves as a good hint at how to get things installed.
 
 ```
 ./docker-install.sh
@@ -74,7 +65,7 @@ If you do use VSCode you will be able to use the file */.vscode/tasks.json* to r
 
 # Maven Build
 
-WARNING: Before you run the 'build.sh' you will need to read and understand the 'setenv.sh' variables and set up your own folders for those. Unfortunately this application is not something you can just download, and build, and run in a matter of a few minutes, because there are several paths that you will need to understand and several moving parts involving the app itself, MongoDB (maybe IPFS if you are enabling that), and how it all is connected and run via Docker setup. The good news is that the *only* paths you need to set are all contained in 'setenv.sh' and each one is docmented as to what it is. However, in general before truing to run a build or run the app, you should open and read every "*.sh" script in the project root. If you don't understand what's going on in those you should probably not even consider building/running the app until you know those things.
+WARNING: Before you run 'build-dev.sh' (or 'build-test.sh') you will need to read and understand the 'setenv.sh' variables and set up your own folders for those. Unfortunately this application is not something you can just download, and build, and run in a matter of a few minutes, because there are several paths that you will need to understand and several moving parts involving the app itself, MongoDB (maybe IPFS if you are enabling that), and how it all is connected and run via Docker setup. The good news is that the *only* paths you need to set are all contained in 'setenv.sh' and each one is docmented as to what it is. However, in general before truing to run a build or run the app, you should open and read every "*.sh" script in the project root. If you don't understand what's going on in those you should probably not even consider building/running the app until you know those things.
 
 # Maven 'dev' Profile
 

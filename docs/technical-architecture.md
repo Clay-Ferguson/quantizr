@@ -2,7 +2,7 @@
 
 ## SpringBoot
 
-Quantizr uses a SpringBoot back-end that provides a browser web app, and connects to a local MOngoDB instance for storage. The back-end code is pure Java
+Quantizr uses a SpringBoot back-end that provides a browser web app, and connects to a local MongoDB instance for storage. The back-end code is pure Java
 
 ## TypeScript
 

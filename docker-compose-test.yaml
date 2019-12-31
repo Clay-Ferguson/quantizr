@@ -1,0 +1,86 @@
+version: '3.7'
+services:
+
+    mongo-test: 
+        container_name: mongo-test 
+        volumes:
+            - '/home/clay/ferguson/subnode-run/data:/data/db'
+            - '/home/clay/ferguson/subnode-run/dumps:/mongo-dumps'
+        ports:
+            - '27017:27017'
+        networks:
+            - net-test
+        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
+        # and we don't want that happening unexpectedly
+        image: mongo:4.0
+
+    # IPFS is fully functional, but commented out for now just to save CPU+Bandwidth
+    # ipfs: 
+    #     container_name: ipfs_host_test 
+    #     environment:
+    #         routing: "dhtclient" 
+    #         IPFS_PROFILE: "server"
+    #         IPFS_PATH: "/ipfsdata"
+    #     volumes:
+    #         - '${ipfs_staging}:/export'
+    #         - '${ipfs_data}:/ipfsdata'
+    #     ports:
+    #         - "4001:4001"
+    #         - "8080:8080"
+    #         - "8081:8081"
+    #         - "5001:5001"
+    #     networks:
+    #         - nettest
+    #     image: ipfs/go-ipfs:latest
+
+    subnode-test:
+        build: 
+            context: .
+            dockerfile: dockerfile-test
+        container_name: subnode-test
+        expose:
+            - '8181'
+        volumes:
+            - '/home/clay/ferguson/subnode-run/tmp:/subnode-tmp'
+            - '/home/clay/ferguson/subnode-run/log:/subnode-log'
+        ports:
+            - '8181:8181'
+        networks:
+            - net-test
+        environment:
+            mongoAdminPassword: "${subnodePassword}"
+            testUserAccounts: "adam:password:${devEmail},bob:password:${devEmail},cory:password:${devEmail},dan:password:${devEmail}" 
+            spring.config.location: "classpath:/application.properties" 
+            mongodb.host: "mongo-test" 
+            mongodb.port: "27017"
+            #todo-0: verify dev is ok here, because I put 'prod' in for maven profile 
+            profileName: "dev" 
+            server.port: "8181" 
+            httpProtocol: "http" 
+            metaHost: "localhost" 
+            allowFileSystemSearch: "false" 
+            spring.http.multipart.max-file-size: "200MB" 
+            spring.http.multipart.max-request-size: "200MB" 
+            spring.servlet.multipart.max-file-size: "200MB"
+            spring.servlet.multipart.max-request-size: "200MB"
+            adminDataFolder: "/subnode-tmp" 
+            #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+            ipfs.host: "http://ipfs:5001"
+        image: subnode-test
+        depends_on:
+            - mongo-test
+            #- ipfs
+
+# https://docs.docker.com/compose/networking/
+
+networks:
+  net-test:
+    driver: bridge
+    external: false
+    name: net-test
+
+# To force compose to use an externally pre-created network outside this compose file you can do this
+# networks:
+#   default:
+#     external:
+#       name: my-pre-existing-network
