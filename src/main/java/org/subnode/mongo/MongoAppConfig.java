@@ -5,8 +5,9 @@ import org.subnode.util.ExUtil;
 
 import javax.annotation.PostConstruct;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
@@ -17,9 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.core.SimpleMongoClientDbFactory;
 import org.springframework.data.mongodb.core.WriteResultChecking;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
@@ -27,11 +28,12 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @Configuration
 @EnableMongoRepositories(basePackages = "org.subnode.mongo")
 // see also: ServerMonitorListener to detect heartbeats, etc.
-public class MongoAppConfig extends AbstractMongoConfiguration {
+public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	private static final Logger log = LoggerFactory.getLogger(MongoAppConfig.class);
 	public static final String databaseName = "database";
 	private MongoClient mongoClient;
 	private GridFSBucket gridFsBucket;
+	private SimpleMongoClientDbFactory factory;
 
 	// we have this so we can set it to true and know that MongoDb failed and
 	// gracefully run
@@ -43,32 +45,36 @@ public class MongoAppConfig extends AbstractMongoConfiguration {
 
 	@PostConstruct
 	public void postConstruct() {
-		log.debug("MongoAppConfig.postConstruct: mongoAdminPassword="+appProp.getMongoAdminPassword());
+		log.debug("MongoAppConfig.postConstruct: mongoAdminPassword=" + appProp.getMongoAdminPassword());
 	}
 
 	@Bean
 	public MongoDbFactory mongoDbFactory() {
 		if (connectionFailed)
 			return null;
-		try {
-			MongoClient mc = mongoClient();
-			if (mc != null) {
-				SimpleMongoDbFactory simpleMongoDbFactory = new SimpleMongoDbFactory(mc, databaseName);
-				return simpleMongoDbFactory;
-			} else {
+			
+		if (factory == null) {
+			try {
+				MongoClient mc = mongoClient();
+				if (mc != null) {
+					factory = new SimpleMongoClientDbFactory(mc, databaseName);
+				} else {
+					return null;
+				}
+			} catch (Exception e) {
+				connectionFailed = true;
+				log.debug("Unable to connect to MongoDb");
 				return null;
 			}
-		} catch (Exception e) {
-			connectionFailed = true;
-			log.debug("Unable to connect to MongoDb");
-			return null;
 		}
+		return factory;
 	}
 
 	@Bean
 	public GridFSBucket gridFsBucket() {
 		if (connectionFailed)
 			return null;
+
 		if (gridFsBucket == null) {
 			MongoDbFactory mdbf = mongoDbFactory();
 			if (mdbf != null) {
@@ -88,12 +94,12 @@ public class MongoAppConfig extends AbstractMongoConfiguration {
 	public MongoClient mongoClient() {
 		if (connectionFailed)
 			return null;
+
 		if (mongoClient == null) {
 			// Set credentials
 			// MongoCredential credential = MongoCredential.createCredential(mongoUser,
 			// databaseName, mongoPass.toCharArray());
 			// ServerAddress serverAddress = new ServerAddress(mongoHost, mongoPort);
-
 			// mongoClient = new MongoClient(serverAddress, Arrays.asList(credential));
 
 			try {
@@ -109,11 +115,15 @@ public class MongoAppConfig extends AbstractMongoConfiguration {
 				}
 
 				String uri = "mongodb://" + mongoHost + ":" + String.valueOf(mongoPort);
+				log.info("Connecting to MongoDb: " + uri);
 
-				log.info("Connecting to MongoDb (" + uri + ")...");
-				mongoClient = new MongoClient(new MongoClientURI(uri));
+				mongoClient = MongoClients.create(uri);
 				if (mongoClient != null) {
-					mongoClient.getAddress();
+
+					for (String db : mongoClient.listDatabaseNames()) {
+						log.debug("MONGO DB NAME: " + db);
+					}
+
 					log.info("Connected to Mongo OK.");
 				} else {
 					connectionFailed = true;
@@ -122,8 +132,7 @@ public class MongoAppConfig extends AbstractMongoConfiguration {
 
 			} catch (Exception e) {
 				connectionFailed = true;
-				ExUtil.error(log, "********** Unable to connect to MongoDb. **********",
-						e);
+				ExUtil.error(log, "********** Unable to connect to MongoDb. **********", e);
 				throw e;
 			}
 		}
