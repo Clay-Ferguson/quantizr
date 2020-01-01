@@ -1,0 +1,22 @@
+FROM openjdk:11-jre
+LABEL maintainer="wclayf@gmail.com"
+
+RUN mkdir -p /subnode-tmp
+RUN echo "SubNode temp folder" > /subnode-tmp/readme.md
+
+RUN mkdir -p /subnode-log
+RUN echo "SubNode log folder" > /subnode-log/readme.md
+
+RUN mkdir -p /dev-resource-base
+RUN echo "SubNode resources" > /dev-resource-base/readme.md
+
+WORKDIR /subnode
+
+EXPOSE 8181
+
+ADD target/org.subnode-0.0.1-SNAPSHOT.jar /subnode/subnode.jar
+RUN sh -c 'touch /subnode/subnode.jar' 
+VOLUME ["/subnode-tmp", "/subnode-log"]
+
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/subnode/subnode.jar"]
+CMD ["-Xms2000m", "-Xmx3200m"]

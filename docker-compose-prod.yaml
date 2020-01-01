@@ -1,22 +1,22 @@
 version: '3.7'
 services:
 
-    mongo-test: 
-        container_name: mongo-test 
+    mongo-prod: 
+        container_name: mongo-prod
         volumes:
-            - '/home/clay/ferguson/subnode-run/data:/data/db'
-            - '/home/clay/ferguson/subnode-run/dumps:/mongo-dumps'
+            - '/var/lib/mongodb:/data/db'
+            - '/home/clay/quantizr/mongo-dumps:/mongo-dumps'
         ports:
             - '27017:27017'
         networks:
-            - net-test
+            - net-prod
         # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
         # and we don't want that happening unexpectedly
         image: mongo:4.0
 
     # IPFS is fully functional, but commented out for now just to save CPU+Bandwidth
     # ipfs: 
-    #     container_name: ipfs_host_test 
+    #     container_name: ipfs_host_prod 
     #     environment:
     #         routing: "dhtclient" 
     #         IPFS_PROFILE: "server"
@@ -33,51 +33,67 @@ services:
     #         - nettest
     #     image: ipfs/go-ipfs:latest
 
-    subnode-test:
+    subnode-prod:
         build: 
             context: .
-            dockerfile: dockerfile-test
-        container_name: subnode-test
+            dockerfile: dockerfile-prod
+        container_name: subnode-prod
         expose:
             - '8181'
         volumes:
-            - '/home/clay/ferguson/subnode-run/tmp:/subnode-tmp'
-            - '/home/clay/ferguson/subnode-run/log:/subnode-log'
+            - '/home/clay/quantizr/docs:/docs'
+            - '/home/clay/quantizr/tmp:/subnode-tmp'
+            - '/home/clay/quantizr/log:/subnode-log'
+            - '/etc/letsencrypt/live/quantizr.com:/letsencrypt'
         ports:
-            - '8181:8181'
+            - '443:443'
         networks:
-            - net-test
+            - net-prod
         environment:
             mongoAdminPassword: "${subnodePassword}"
             testUserAccounts: "adam:password:${devEmail},bob:password:${devEmail},cory:password:${devEmail},dan:password:${devEmail}" 
             spring.config.location: "classpath:/application.properties" 
-            mongodb.host: "mongo-test" 
+            mongodb.host: "mongo-prod" 
             mongodb.port: "27017"
-            #todo-0: verify dev is ok here
-            profileName: "dev" 
-            server.port: "8181" 
-            httpProtocol: "http" 
-            metaHost: "localhost" 
+            #todo-0: verify dev is ok here, because I put 'prod' in for maven profile 
+            profileName: "prod" 
+            server.port: "443" 
+            httpProtocol: "https" 
+            metaHost: "quantizr.com" 
             allowFileSystemSearch: "false" 
-            spring.http.multipart.max-file-size: "200MB" 
-            spring.http.multipart.max-request-size: "200MB" 
-            spring.servlet.multipart.max-file-size: "200MB"
-            spring.servlet.multipart.max-request-size: "200MB"
+            forceIndexRebuild: "false"
+            spring.http.multipart.max-file-size: "5MB" 
+            spring.http.multipart.max-request-size: "5MB" 
+            spring.servlet.multipart.max-file-size: "5MB"
+            spring.servlet.multipart.max-request-size: "5MB"
             adminDataFolder: "/subnode-tmp" 
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
-            ipfs.host: "http://ipfs:5001"
-        image: subnode-test
+            #ipfs.host: "http://ipfs:5001"
+            enableRssDaemon: "false"
+
+            security.require-ssl: "true" 
+            server.ssl.key-store: "/letsencrypt/keystore.p12" 
+            server.ssl.key-store-password: "${prodKeyStorePassword}" 
+            server.ssl.keyStoreType: "PKCS12" 
+            server.ssl.keyAlias: "tomcat" 
+                    
+            mail.user: "postmaster@quantizr.com" 
+            mail.password: "${emailPassword}" 
+            mail.host: "smtp.mailgun.org" 
+            mail.from: "admin@quantizr.com"
+
+        image: subnode-prod
         depends_on:
-            - mongo-test
+            - mongo-prod
             #- ipfs
 
 # https://docs.docker.com/compose/networking/
 
 networks:
-  net-test:
+  net-prod:
     driver: bridge
     external: false
-    name: net-test
+    name: net-prod
 
 # To force compose to use an externally pre-created network outside this compose file you can do this
 # networks:

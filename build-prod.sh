@@ -2,13 +2,14 @@
 clear
 source ./setenv.sh
 source ./define-functions.sh
+# Note: This 'secrets.sh' script is my way of setting password environment varible from a secure location
+source ${SECRET_SCRIPT}
 
-# Ensure output folder for out docier images exists
-mkdir -p $DOCKER_IMAGES_FOLDER
-mkdir -p ${ipfs_staging}
+cp ./docker-compose-prod.yaml ~/ferguson/scripts/linode/docker-compose-prod.yaml
+cp ./dockerfile-prod          ~/ferguson/scripts/linode/dockerfile-prod
 
 # Wipe some existing stuff to ensure it gets rebuilt
-rm -rf $DOCKER_IMAGES_FOLDER/subnode-test.tar
+rm -rf ~/ferguson/scripts/linode/subnode-prod.tar
 rm -rf $PRJROOT/target/*
 rm -rf $PRJROOT/bin/*
 rm -rf $PRJROOT/src/main/resources/public/bundle.js
@@ -27,16 +28,8 @@ cd $PRJROOT
 # mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
 
 # This build command creates the SpringBoot fat jar in the /target/ folder.
-# todo-0: should this be 'prod' maven profile ?
 mvn clean package -Pprod -DskipTests=true
 verifySuccess "Maven Build"
-
-# Note: This 'secrets.sh' script is my way of setting ${subnodePassword} environment varible from a secure location
-source ${SECRET_SCRIPT}
-cd $PRJROOT
-
-# Remove all prior existing log files
-rm -f ${SUBNODE_LOG_FOLDER}/*
 
 #
 # NOTE: The 'dev-resource-base' in the run command below sets up a property (resourceBaseFolder)
@@ -62,19 +55,12 @@ rm -f ${SUBNODE_LOG_FOLDER}/*
 # I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up findingn
 # this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
 # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
-docker-compose -f docker-compose-test.yaml build --no-cache
+docker-compose -f docker-compose-prod.yaml build --no-cache
 verifySuccess "Docker Compose: build"
 
 # save the docker image into a TAR file so that we can send it up to the remote Linode server
 # which can then on the remote server be loaded into registry for user on that host using the following command:
 #     docker load -i <path to image tar file>
 #
-docker save -o $DOCKER_IMAGES_FOLDER/subnode-test.tar subnode-test
+docker save -o ~/ferguson/scripts/linode/subnode-prod.tar subnode-prod
 verifySuccess "Docker Save"
-
-sudo cp $DOCKER_IMAGES_FOLDER/subnode-test.tar /home/clay/ferguson/subnode-run/subnode-test.tar
-verifySuccess "Copy image to run dir"
-
-echo "done!"
-sleep 3
-
