@@ -27,7 +27,6 @@ cd $PRJROOT
 # mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
 
 # This build command creates the SpringBoot fat jar in the /target/ folder.
-# todo-0: should this be 'prod' maven profile ?
 mvn clean package -Pprod -DskipTests=true
 verifySuccess "Maven Build"
 

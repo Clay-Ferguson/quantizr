@@ -53,8 +53,7 @@ services:
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "mongo-test" 
             mongodb.port: "27017"
-            #todo-0: verify dev is ok here
-            profileName: "dev" 
+            profileName: "prod" 
             server.port: "8181" 
             httpProtocol: "http" 
             metaHost: "localhost" 

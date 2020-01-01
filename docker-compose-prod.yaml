@@ -55,7 +55,6 @@ services:
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "mongo-prod" 
             mongodb.port: "27017"
-            #todo-0: verify dev is ok here, because I put 'prod' in for maven profile 
             profileName: "prod" 
             server.port: "443" 
             httpProtocol: "https" 
