@@ -1,7 +1,4 @@
-console.log("Icon.ts");
-
 import { Comp } from "./base/Comp";
-import { DialogBase } from "../DialogBase";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";

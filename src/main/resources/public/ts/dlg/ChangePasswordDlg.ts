@@ -1,6 +1,3 @@
-console.log("ChangePasswordDlg.ts");
-
-
 import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 import { MessageDlg } from "./MessageDlg";

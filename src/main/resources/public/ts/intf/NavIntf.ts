@@ -1,6 +1,3 @@
-console.log("NavIntf.ts");
-
-
 import * as I from "../Interfaces";
 
 export interface NavIntf {

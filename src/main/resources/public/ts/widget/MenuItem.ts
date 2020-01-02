@@ -1,5 +1,3 @@
-console.log("MenuItem.ts");
-
 import { Div } from "./Div";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";

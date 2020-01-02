@@ -1,6 +1,3 @@
-console.log("EditPropTextarea.ts");
-
-import { Textarea } from "./Textarea";
 import * as I from "../Interfaces";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";

@@ -1,5 +1,3 @@
-console.log("FileTypeHandler.ts");
-
 import * as I from "../Interfaces";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";

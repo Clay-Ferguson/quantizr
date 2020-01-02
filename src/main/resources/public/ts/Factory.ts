@@ -1,6 +1,3 @@
-console.log("Factory.ts");
-
-
 /* 
 This is a 'Factory', but the main thing it does is manage the singletons, somewhat analoglous to a SpringContext
 but actually existing for mostly different reasons having to do with our need to support circular 

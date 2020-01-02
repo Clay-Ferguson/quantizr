@@ -1,7 +1,5 @@
 import { EncryptionKeyPair } from "../EncryptionKeyPair";
 
-console.log("EncryptionIntf.ts");
-
 export interface EncryptionIntf {
 
     KEY_SAVE_FORMAT: string;

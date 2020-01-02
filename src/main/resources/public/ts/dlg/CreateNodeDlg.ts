@@ -1,5 +1,3 @@
-console.log("CreateNodeDlg.ts");
-
 import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
 import { ButtonBar } from "../widget/ButtonBar";

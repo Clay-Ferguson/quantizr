@@ -1,5 +1,3 @@
-console.log("EditNodeDlg.ts");
-
 import * as I from "../Interfaces"
 import { DialogBase } from "../DialogBase";
 import { EditPropertyDlg } from "./EditPropertyDlg";

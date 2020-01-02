@@ -1,5 +1,3 @@
-console.log("EditSystemFileDlg.ts");
-
 import {DialogBase} from "../DialogBase";
 
 /*

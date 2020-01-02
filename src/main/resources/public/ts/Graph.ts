@@ -1,5 +1,3 @@
-console.log("Search.ts");
-
 import * as I from "./Interfaces";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";

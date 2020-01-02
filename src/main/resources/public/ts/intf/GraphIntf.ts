@@ -1,5 +1,3 @@
-console.log("SearchIntf.ts");
-
 import * as I from "../Interfaces";
 
 export interface GraphIntf {

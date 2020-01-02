@@ -1,5 +1,3 @@
-console.log("PropTableCell.ts");
-
 import { Comp } from "./base/Comp";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";

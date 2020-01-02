@@ -1,6 +1,3 @@
-console.log("Menu.ts");
-
-
 import { MenuItem } from "./MenuItem";
 import { Div } from "./Div";
 import { Singletons } from "../Singletons";

@@ -1,5 +1,3 @@
-console.log("Meta64Intf.ts");
-
 import * as I from "../Interfaces";
 import { TypeHandlerIntf } from "./TypeHandlerIntf";
 import { GraphPanel } from "../widget/GraphPanel";

@@ -1,5 +1,3 @@
-console.log("TabPanel.ts");
-
 import { Comp } from "./base/Comp";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
@@ -8,7 +6,6 @@ import { Div } from "./Div";
 import { Ul } from "./Ul";
 import { Li } from "./Li";
 import { Anchor } from "./Anchor";
-import { GraphPanel } from "./GraphPanel";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {

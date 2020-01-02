@@ -1,5 +1,3 @@
-console.log("LoginDlg.ts");
-
 import { ConfirmDlg } from "./ConfirmDlg";
 import { ResetPasswordDlg } from "./ResetPasswordDlg";
 import { PasswordTextField } from "../widget/PasswordTextField";

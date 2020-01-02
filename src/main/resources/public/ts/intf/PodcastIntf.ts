@@ -1,6 +1,3 @@
-console.log("PodcastIntf.ts");
-
-
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 
 export interface PodcastIntf {

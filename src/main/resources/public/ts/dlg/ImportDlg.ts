@@ -1,6 +1,3 @@
-console.log("ImportDlg.ts");
-
-
 import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
 import { MessageDlg } from "./MessageDlg";

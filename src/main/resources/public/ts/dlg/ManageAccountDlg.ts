@@ -1,5 +1,3 @@
-console.log("ManageAccountDlg.ts");
-
 import { DialogBase } from "../DialogBase";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";

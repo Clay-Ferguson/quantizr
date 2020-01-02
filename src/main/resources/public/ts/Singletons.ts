@@ -1,5 +1,3 @@
-console.log("Singletons.ts");
-
 import { Meta64Intf } from "./intf/Meta64Intf";
 import { AttachmentIntf } from "./intf/AttachmentIntf";
 import { EditIntf } from "./intf/EditIntf";

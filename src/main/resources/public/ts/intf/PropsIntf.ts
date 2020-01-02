@@ -1,5 +1,3 @@
-console.log("PropsIntf.ts");
-
 import * as I from "../Interfaces";
 import { PropTable } from "../widget/PropTable";
 

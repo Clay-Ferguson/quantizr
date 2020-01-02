@@ -1,5 +1,3 @@
-console.log("AudioPlayer.ts");
-
 import { Comp } from "./base/Comp";
 import { Singletons } from "../Singletons";
 import { Constants } from "../Constants";

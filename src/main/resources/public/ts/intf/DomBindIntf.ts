@@ -1,5 +1,3 @@
-console.log("DomBindIntf.ts");
-
 export interface DomBindIntf {
     init();
 

@@ -1,5 +1,3 @@
-console.log("RenderIntf.ts");
-
 import * as I from "../Interfaces";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";

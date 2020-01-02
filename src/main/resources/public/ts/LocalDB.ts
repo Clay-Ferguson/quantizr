@@ -1,7 +1,5 @@
 import { LocalDBIntf } from "./intf/LocalDBIntf";
 
-console.log("LocalDB.ts");
-
 /* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
 export class LocalDB implements LocalDBIntf {
 

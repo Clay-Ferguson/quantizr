@@ -1,5 +1,3 @@
-console.log("UserIntf.ts");
-
 import * as I from "../Interfaces";
 import { LoginDlg } from "../dlg/LoginDlg";
 

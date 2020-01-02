@@ -1,5 +1,3 @@
-console.log("NotificationPopupDlg.ts");
-
 import { TextContent } from "../widget/TextContent";
 import { DialogBase } from "../DialogBase";
 

@@ -1,5 +1,3 @@
-console.log("Comp.ts");
-
 //https://reactjs.org/docs/react-api.html
 
 import { CompIntf, ReactRenderFunc } from "./CompIntf";

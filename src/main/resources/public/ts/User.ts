@@ -1,5 +1,3 @@
-console.log("User.ts");
-
 import * as I from "./Interfaces";
 import { LoginDlg } from "./dlg/LoginDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
@@ -79,8 +77,6 @@ export class User implements UserIntf {
 
         S.meta64.isAnonUser = res.userName === "anonymous";
 
-        console.log("isAnonUser = " + S.meta64.isAnonUser);
-
         S.meta64.anonUserLandingPageNode = res.anonUserLandingPageNode;
         S.meta64.allowFileSystemSearch = res.allowFileSystemSearch;
 
@@ -98,8 +94,6 @@ export class User implements UserIntf {
             S.meta64.showMetaData = res.userPreferences.showMetaData;
             S.meta64.showPath = res.userPreferences.showPath;
         }
-
-        console.log("from server: meta64.editModeOption=" + S.meta64.editModeOption);
     }
 
     openSignupPg = (): void => {

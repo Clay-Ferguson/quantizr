@@ -1,5 +1,3 @@
-console.log("BashPlugin.ts");
-
 import * as I from "../Interfaces";
 import { BashPluginIntf } from "../intf/BashPluginIntf";
 import { Constants } from "../Constants";

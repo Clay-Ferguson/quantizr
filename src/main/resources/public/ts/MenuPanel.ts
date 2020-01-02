@@ -1,5 +1,3 @@
-console.log("MenuPanel.ts");
-
 import * as I from "./Interfaces";
 import { Menu } from "./widget/Menu";
 import { MenuItem } from "./widget/MenuItem";

@@ -1,6 +1,3 @@
-console.log("CoreTypesPlugin.ts");
-
-import * as I from "../Interfaces";
 import { CoreTypesPluginIntf } from "../intf/CoreTypesPluginIntf";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
@@ -9,7 +6,6 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { FileTypeHandler } from "./FileTypeHandler";
 import { FolderTypeHandler } from "./FolderTypeHandler";
 import { IPFSNodeTypeHandler } from "./IPFSNodeTypeHandler";
-import { LuceneIndexTypeHandler } from "./LuceneIndexPlugin";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {

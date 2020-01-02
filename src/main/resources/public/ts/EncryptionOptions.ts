@@ -1,5 +1,3 @@
-console.log("DomBind.ts");
-
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants } from "./Constants";

@@ -1,5 +1,3 @@
-console.log("ConfirmDlg.ts");
-
 import { DialogBase } from "../DialogBase";
 import { TextContent } from "../widget/TextContent";
 import { ButtonBar } from "../widget/ButtonBar";

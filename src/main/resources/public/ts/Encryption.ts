@@ -1,5 +1,3 @@
-console.log("Encryption.ts");
-
 import * as I from "./Interfaces";
 import { EncryptionKeyPair } from "./EncryptionKeyPair";
 import { EncryptionIntf } from "./intf/EncryptionIntf";
@@ -182,7 +180,7 @@ export class Encryption implements EncryptionIntf {
             let val = await S.localDB.readObject(this.STORE_ASYMKEY);
 
             if (val && !forceUpdate) {
-                console.log("AsymKey: " + S.util.toJson(val));
+                //console.log("AsymKey: " + S.util.toJson(val));
             }
             else {
                 /* NOTE: These parameters are all production-ready 

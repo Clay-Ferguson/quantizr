@@ -1,5 +1,3 @@
-console.log("RadioButtonGroup.ts");
-
 import { Comp } from "./base/Comp";
 import { RadioButton } from "./RadioButton";
 import { Singletons } from "../Singletons";

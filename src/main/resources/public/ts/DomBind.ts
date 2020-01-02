@@ -1,5 +1,3 @@
-console.log("DomBind.ts");
-
 import { DomBindIntf } from "./intf/DomBindIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";

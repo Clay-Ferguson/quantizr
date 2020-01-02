@@ -1,5 +1,3 @@
-console.log("DialogBase.ts");
-
 import { DialogBaseImpl } from "./DialogBaseImpl";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";

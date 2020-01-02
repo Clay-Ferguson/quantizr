@@ -1,5 +1,3 @@
-console.log("AttachmentIntf.ts");
-
 import * as I from "../Interfaces";
 
 export interface AttachmentIntf {

@@ -1,6 +1,3 @@
-console.log("LoginDlg.ts");
-
-
 import { DialogBase } from "../DialogBase";
 import { PasswordTextField } from "../widget/PasswordTextField";
 import { ButtonBar } from "../widget/ButtonBar";

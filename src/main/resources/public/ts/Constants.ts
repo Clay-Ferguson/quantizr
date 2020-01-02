@@ -1,5 +1,3 @@
-console.log("Constants.ts");
-
 export class Constants {
 
     static readonly PUBSUB_RefreshEnablement = "pubsub-refresh-enablement";

@@ -1,8 +1,5 @@
-console.log("TypeHandleIntf.ts");
-
 import * as I from "../Interfaces";
 import { Comp } from "../widget/base/Comp";
-
 
 export interface TypeHandlerIntf {
     render(node: I.NodeInfo, rowStyling: boolean): Comp;

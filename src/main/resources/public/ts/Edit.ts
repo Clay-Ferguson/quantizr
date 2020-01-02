@@ -1,5 +1,3 @@
-console.log("Edit.ts");
-
 import * as I from "./Interfaces";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";

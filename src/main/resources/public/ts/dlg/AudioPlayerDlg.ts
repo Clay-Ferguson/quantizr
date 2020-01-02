@@ -1,5 +1,3 @@
-console.log("AudioPlayerDlg.ts");
-
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { AudioPlayer } from "../widget/AudioPlayer";

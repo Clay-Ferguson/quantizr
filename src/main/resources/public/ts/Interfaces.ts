@@ -1,5 +1,3 @@
-console.log("Interfaces.ts");
-
 /* These are Client-side only models, and are not seen on the server side ever */
 
 /* Function Prototype/Signatore, It is assumed that a return value of false, will abort the iteration, and true continues iterating */

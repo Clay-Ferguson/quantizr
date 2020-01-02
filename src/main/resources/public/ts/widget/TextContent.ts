@@ -1,5 +1,3 @@
-console.log("Header.ts");
-
 import { Comp } from "../widget/base/Comp";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";

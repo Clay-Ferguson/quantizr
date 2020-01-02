@@ -1,5 +1,3 @@
-console.log("Util.ts");
-
 declare var Dropzone;
 declare var ace;
 declare var prettyPrint;
@@ -11,7 +9,6 @@ import { UtilIntf } from "./intf/UtilIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants } from "./Constants";
-import { Constants as cnst } from "./Constants";
 import axios, { AxiosRequestConfig } from 'axios';
 import { NodeInfo } from "./Interfaces";
 
@@ -53,7 +50,7 @@ export class Util implements UtilIntf {
     };
 
     rhost: string;
-    logAjax: boolean = true;
+    logAjax: boolean = false;
     timeoutMessageShown: boolean = false;
 
     waitCounter: number = 0;
@@ -365,7 +362,7 @@ export class Util implements UtilIntf {
 
         try {
             if (this.logAjax) {
-                console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + this.prettyPrint(postData));
+                console.log("JSON-POST2: [" + this.getRpcPath() + postName + "]" + this.prettyPrint(postData));
             }
 
             this._ajaxCounter++;

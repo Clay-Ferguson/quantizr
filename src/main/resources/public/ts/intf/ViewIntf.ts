@@ -1,6 +1,3 @@
-console.log("ViewIntf.ts");
-
-
 import * as I from "../Interfaces";
 
 export interface ViewIntf {

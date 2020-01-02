@@ -1,5 +1,3 @@
-console.log("PasswordTextField.ts");
-
 import { TextField } from "./TextField";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";

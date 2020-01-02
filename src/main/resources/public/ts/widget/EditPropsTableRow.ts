@@ -1,5 +1,3 @@
-console.log("EditPropsTableRow.ts");
-
 import { Comp } from "./base/Comp";
 import * as I from "../Interfaces";
 import { Singletons } from "../Singletons";

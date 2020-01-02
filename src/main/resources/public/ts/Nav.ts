@@ -1,5 +1,3 @@
-console.log("Nav.ts");
-
 import * as I from "./Interfaces";
 import { NavIntf } from "./intf/NavIntf";
 import { LoginDlg } from "./dlg/LoginDlg";

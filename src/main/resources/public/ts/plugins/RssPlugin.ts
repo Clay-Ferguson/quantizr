@@ -1,5 +1,3 @@
-console.log("RssPlugin.ts");
-
 import * as I from "../Interfaces";
 import { RssPluginIntf } from "../intf/RssPluginIntf";
 import { Constants } from "../Constants";

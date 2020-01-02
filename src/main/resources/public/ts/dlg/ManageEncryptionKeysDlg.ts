@@ -1,5 +1,3 @@
-console.log("MessageDlg.ts");
-
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { TextContent } from "../widget/TextContent";

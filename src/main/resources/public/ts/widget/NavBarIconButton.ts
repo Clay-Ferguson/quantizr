@@ -1,10 +1,7 @@
-console.log("NavBarButton.ts");
-
 import { Comp } from "./base/Comp";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Span } from "./Span";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {

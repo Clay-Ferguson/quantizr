@@ -1,14 +1,9 @@
-console.log("PasswordPlugin.ts");
-
 import * as I from "../Interfaces";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Button } from "../widget/Button";
-import { VerticalLayout } from "../widget/VerticalLayout";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { PasswordPluginIntf } from "../intf/PasswordPluginIntf";
-import { NotificationPopupDlg } from "../dlg/NotificationPopupDlg";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {

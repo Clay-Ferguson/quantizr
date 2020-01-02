@@ -1,5 +1,3 @@
-console.log("AceEditorInfo.ts");
-
 import { AceEditPropTextarea } from "./AceEditPropTextarea";
 
 /**

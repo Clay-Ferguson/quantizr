@@ -1,5 +1,3 @@
-console.log("EditIntf.ts");
-
 import * as I from "../Interfaces";
 
 export interface EditIntf {

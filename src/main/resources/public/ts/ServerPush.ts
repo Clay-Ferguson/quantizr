@@ -1,5 +1,3 @@
-console.log("ServerPush.ts");
-
 import { ServerPushIntf } from "./intf/ServerPushIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";

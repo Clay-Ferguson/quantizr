@@ -1,5 +1,3 @@
-console.log("Attachment.ts");
-
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";

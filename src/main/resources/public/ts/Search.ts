@@ -1,5 +1,3 @@
-console.log("Search.ts");
-
 import * as I from "./Interfaces";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchIntf } from "./intf/SearchIntf";

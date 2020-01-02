@@ -1,5 +1,3 @@
-console.log("EditPropsTable.ts");
-
 import { Comp } from "./base/Comp";
 import * as I from "../Interfaces";
 import { Div } from "./Div";

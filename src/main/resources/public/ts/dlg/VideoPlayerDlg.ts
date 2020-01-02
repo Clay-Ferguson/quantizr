@@ -1,5 +1,3 @@
-console.log("AudioPlayerDlg.ts");
-
 import { DialogBase } from "../DialogBase";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
@@ -14,7 +12,6 @@ let S : Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
-
 
 /**
  * See also: AudioPlayerDlg (which is very similar)

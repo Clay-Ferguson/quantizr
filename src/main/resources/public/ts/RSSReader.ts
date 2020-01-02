@@ -1,5 +1,3 @@
-console.log("Render.ts");
-
 import { RSSReaderIntf } from "./intf/RSSReaderIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";

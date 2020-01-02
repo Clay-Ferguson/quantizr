@@ -1,5 +1,3 @@
-console.log("Render.ts");
-
 import * as I from "./Interfaces";
 import { Comp } from "./widget/base/Comp";
 import { Button } from "./widget/Button";
@@ -844,7 +842,7 @@ export class Render implements RenderIntf {
 
                     // $('[href="#main"]').tab('show');
 
-                    console.log("update status bar.");
+                    //console.log("update status bar.");
                     S.view.updateStatusBar();
 
                     if (S.nav.mainOffset > 0) {

@@ -1,6 +1,3 @@
-console.log("NodeTypeListBox.ts");
-
-
 import { ListBoxRow } from "./ListBoxRow";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";

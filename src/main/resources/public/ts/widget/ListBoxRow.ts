@@ -1,5 +1,3 @@
-console.log("ListBoxRow.ts");
-
 import { Comp } from "./base/Comp";
 import { ListBox } from "./ListBox";
 import { Singletons } from "../Singletons";

@@ -1,7 +1,6 @@
-console.log("UtilIntf.ts");
-
 import * as I from "../Interfaces";
 import { NodeInfo } from "../Interfaces";
+
 export interface UtilIntf {
     logAjax: boolean;
     //offline: boolean;

@@ -1,5 +1,3 @@
-console.log("CompIntf.ts");
-
 export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[]) => React.ReactNode;
 
 export interface CompIntf {

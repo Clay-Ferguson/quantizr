@@ -1,5 +1,3 @@
-console.log("MainNavPanel.ts");
-
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";

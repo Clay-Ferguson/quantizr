@@ -1,5 +1,3 @@
-console.log("RssPluginIntf.ts");
-
 import * as I from "../Interfaces";
 
 export interface RssPluginIntf {

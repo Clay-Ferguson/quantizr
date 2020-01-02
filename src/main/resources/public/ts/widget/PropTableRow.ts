@@ -1,5 +1,3 @@
-console.log("PropTableRow.ts");
-
 import { Comp } from "./base/Comp";
 import { PropTableCell } from "./PropTableCell";
 import * as I from "../Interfaces";

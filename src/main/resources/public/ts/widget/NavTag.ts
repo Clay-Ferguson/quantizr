@@ -1,5 +1,3 @@
-console.log("NavTag.ts");
-
 import { Comp } from "./base/Comp";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";

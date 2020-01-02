@@ -1,5 +1,3 @@
-console.log("Meta64.ts");
-
 import * as I from "./Interfaces";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { Constants as cnst } from "./Constants";
@@ -247,8 +245,8 @@ export class Meta64 implements Meta64Intf {
         }
     }
 
-    selectTab = (tabName): void => {
-        console.log("selectTab: " + tabName);
+    selectTab = (tabName: string): void => {
+        //console.log("selectTab: " + tabName);
         let tabElm = document.querySelector("[href='#" + tabName + "']");
         if (!tabElm) {
             //console.error("unable to find tab: " + tabName + " modify this code to use something like whenElm");
@@ -448,7 +446,7 @@ export class Meta64 implements Meta64Intf {
         return new Promise<void>(async (resolve, reject) => {
             let node: I.NodeInfo = this.getNodeFromId(id);
             if (node) {
-                console.log("highlightRowById calling highlightNode");
+                //console.log("highlightRowById calling highlightNode");
                 await this.highlightNode(node, scroll);
             } else {
                 console.log("highlightRowById failed to find id: " + id);
@@ -463,7 +461,7 @@ export class Meta64 implements Meta64Intf {
      */
     highlightNode = async (node: I.NodeInfo, scroll: boolean): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            console.log("highlight node: " + node.id);
+            //console.log("highlight node: " + node.id);
             if (!node) {
                 console.log("ignoring null node.");
                 resolve();
@@ -500,7 +498,7 @@ export class Meta64 implements Meta64Intf {
             }
 
             if (scroll) {
-                console.log("highlightNode calling scrollToSelectedNode.");
+                //console.log("highlightNode calling scrollToSelectedNode.");
                 await S.view.scrollToSelectedNode();
             }
             resolve();
@@ -892,7 +890,7 @@ export class Meta64 implements Meta64Intf {
             setTimeout(() => {
                 //after the timer we check for the counter still being greater than zero (not an ==1 this time).
                 if (Meta64.overlayCounter > 0) {
-                    console.log("showing overlay.");
+                    //console.log("showing overlay.");
                     let elm = S.util.domElm("overlayDiv");
                     if (elm) {
                         elm.style.display = "block";
@@ -902,7 +900,7 @@ export class Meta64 implements Meta64Intf {
             }, 1200);
         }
         else if (Meta64.overlayCounter == 0) {
-            console.log("hiding overlay.");
+            //console.log("hiding overlay.");
             let elm = S.util.domElm("overlayDiv");
             if (elm) {
                 elm.style.display = "none";

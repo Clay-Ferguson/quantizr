@@ -1,7 +1,5 @@
-console.log("SearchIntf.ts");
-
 import * as I from "../Interfaces";
-import { NodeInfo, NodeSearchResponse } from "../Interfaces";
+import { NodeSearchResponse } from "../Interfaces";
 
 export interface SearchIntf {
     _UID_ROWID_PREFIX: string;
