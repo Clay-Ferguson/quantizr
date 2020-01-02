@@ -24,6 +24,7 @@ import org.subnode.util.NotLoggedInException;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,8 +116,10 @@ public class CallProcessor {
 						/*
 						 * for now, we can just send back the actual exception message
 						 */
-						orb.setMessage("Request Failed."); // e.getMessage());
+						orb.setMessage("Request Failed: "+e.getMessage());
 					}
+
+					orb.setStackTrace(ExceptionUtils.getStackTrace(e));
 				}
 			}
 		} finally {

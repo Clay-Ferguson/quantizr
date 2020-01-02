@@ -340,107 +340,107 @@ export interface BrowseFolderRequest {
     nodeId: string;
 }
 
-export interface AddPrivilegeResponse extends OakResponseBase {
+export interface AddPrivilegeResponse extends ResponseBase {
 }
 
-export interface AnonPageLoadResponse extends OakResponseBase {
+export interface AnonPageLoadResponse extends ResponseBase {
     content: string;
     renderNodeResponse: RenderNodeResponse;
 }
 
-export interface ChangePasswordResponse extends OakResponseBase {
+export interface ChangePasswordResponse extends ResponseBase {
     user: string;
 }
 
-export interface CloseAccountResponse extends OakResponseBase {
+export interface CloseAccountResponse extends ResponseBase {
 }
 
-export interface CreateSubNodeResponse extends OakResponseBase {
+export interface CreateSubNodeResponse extends ResponseBase {
     newNode: NodeInfo;
 }
 
-export interface DeleteAttachmentResponse extends OakResponseBase {
+export interface DeleteAttachmentResponse extends ResponseBase {
 }
 
-export interface DeleteNodesResponse extends OakResponseBase {
+export interface DeleteNodesResponse extends ResponseBase {
 }
 
-export interface SelectAllNodesResponse extends OakResponseBase {
+export interface SelectAllNodesResponse extends ResponseBase {
     nodeIds : string[];
 }
 
-export interface DeletePropertyResponse extends OakResponseBase {
+export interface DeletePropertyResponse extends ResponseBase {
 }
 
-export interface ExportResponse extends OakResponseBase {
+export interface ExportResponse extends ResponseBase {
     /* the generated output for the user to now view after exporting */
     fileName: string;
 }
 
-export interface GetNodePrivilegesResponse extends OakResponseBase {
+export interface GetNodePrivilegesResponse extends ResponseBase {
     aclEntries: AccessControlEntryInfo[];
     owners: string[];
     publicAppend: boolean;
 }
 
-export interface GetServerInfoResponse extends OakResponseBase {
+export interface GetServerInfoResponse extends ResponseBase {
     serverInfo: string;
 }
 
-export interface PingResponse extends OakResponseBase {
+export interface PingResponse extends ResponseBase {
     serverInfo: string;
 }
 
-export interface RebuildIndexesResponse extends OakResponseBase {
+export interface RebuildIndexesResponse extends ResponseBase {
 }
 
-export interface ShutdownServerNodeResponse extends OakResponseBase {
+export interface ShutdownServerNodeResponse extends ResponseBase {
 }
 
-export interface SendTestEmailResponse extends OakResponseBase {
+export interface SendTestEmailResponse extends ResponseBase {
 }
 
-export interface GenerateNodeHashResponse extends OakResponseBase {
+export interface GenerateNodeHashResponse extends ResponseBase {
     hashInfo: string;
 }
 
-export interface CompareSubGraphResponse extends OakResponseBase {
+export interface CompareSubGraphResponse extends ResponseBase {
     compareInfo: string;
 }
 
-export interface GetSharedNodesResponse extends OakResponseBase {
+export interface GetSharedNodesResponse extends ResponseBase {
     searchResults: NodeInfo[];
 }
 
-export interface ImportResponse extends OakResponseBase {
+export interface ImportResponse extends ResponseBase {
 }
 
-export interface InitNodeEditResponse extends OakResponseBase {
+export interface InitNodeEditResponse extends ResponseBase {
     nodeInfo: NodeInfo;
 }
 
-export interface InsertBookResponse extends OakResponseBase {
+export interface InsertBookResponse extends ResponseBase {
     newNode: NodeInfo;
 }
 
-export interface ExecuteNodeResponse extends OakResponseBase {
+export interface ExecuteNodeResponse extends ResponseBase {
     returnCode: number;
     output: string;
 }
 
-export interface ActivityPubPostResponse extends OakResponseBase {
+export interface ActivityPubPostResponse extends ResponseBase {
     returnCode: number;
     output: string;
 }
 
-export interface InsertNodeResponse extends OakResponseBase {
+export interface InsertNodeResponse extends ResponseBase {
     newNode: NodeInfo;
 }
 
-export interface AppDropResponse extends OakResponseBase {
+export interface AppDropResponse extends ResponseBase {
 }
 
-export interface LoginResponse extends OakResponseBase {
+export interface LoginResponse extends ResponseBase {
     rootNode: RefInfo;
     userName: string;
     anonUserLandingPageNode: string;
@@ -449,29 +449,29 @@ export interface LoginResponse extends OakResponseBase {
     allowFileSystemSearch: boolean;
 }
 
-export interface LogoutResponse extends OakResponseBase {
+export interface LogoutResponse extends ResponseBase {
 }
 
-export interface MoveNodesResponse extends OakResponseBase {
+export interface MoveNodesResponse extends ResponseBase {
 }
 
-export interface NodeSearchResponse extends OakResponseBase {
+export interface NodeSearchResponse extends ResponseBase {
     searchResults: NodeInfo[];
 }
 
-export interface GraphResponse extends OakResponseBase {
+export interface GraphResponse extends ResponseBase {
     nodes: any[];
     edges: any[];
 }
 
-export interface FileSearchResponse extends OakResponseBase {
+export interface FileSearchResponse extends ResponseBase {
     searchResultNodeId: string;
 }
 
-export interface RemovePrivilegeResponse extends OakResponseBase {
+export interface RemovePrivilegeResponse extends ResponseBase {
 }
 
-export interface RenderNodeResponse extends OakResponseBase {
+export interface RenderNodeResponse extends ResponseBase {
     node: NodeInfo;
     offsetOfNodeFound: number;
 
@@ -483,40 +483,41 @@ export interface RenderNodeResponse extends OakResponseBase {
     noDataResponse: string;
 }
 
-export interface ResetPasswordResponse extends OakResponseBase {
+export interface ResetPasswordResponse extends ResponseBase {
 }
 
-export interface SaveNodeResponse extends OakResponseBase {
+export interface SaveNodeResponse extends ResponseBase {
     node: NodeInfo;
 }
 
-export interface SavePropertyResponse extends OakResponseBase {
+export interface SavePropertyResponse extends ResponseBase {
     propertySaved: PropertyInfo;
 }
 
-export interface SaveUserPreferencesResponse extends OakResponseBase {
+export interface SaveUserPreferencesResponse extends ResponseBase {
 }
 
-export interface OpenSystemFileResponse extends OakResponseBase {
+export interface OpenSystemFileResponse extends ResponseBase {
 }
 
-export interface SetNodePositionResponse extends OakResponseBase {
+export interface SetNodePositionResponse extends ResponseBase {
 }
 
-export interface SignupResponse extends OakResponseBase {
+export interface SignupResponse extends ResponseBase {
 }
 
-export interface SplitNodeResponse extends OakResponseBase {
+export interface SplitNodeResponse extends ResponseBase {
 }
 
-export interface UploadFromUrlResponse extends OakResponseBase {
+export interface UploadFromUrlResponse extends ResponseBase {
 }
 
-export interface BrowseFolderResponse extends OakResponseBase {
+export interface BrowseFolderResponse extends ResponseBase {
     listingJson: string;
 }
 
-export interface OakResponseBase {
+export interface ResponseBase {
     success: boolean;
     message: string;
+    stackTrace: string;
 }

@@ -5,6 +5,7 @@ import org.subnode.util.ThreadLocals;
 public class ResponseBase {
 	private boolean success;
 	private String message;
+	private String stackTrace;
 
 	public ResponseBase() {
 		ThreadLocals.setResponse(this);
@@ -24,5 +25,13 @@ public class ResponseBase {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public String getStackTrace() {
+		return this.stackTrace;
+	}
+
+	public void setStackTrace(String stackTrace) {
+		this.stackTrace = stackTrace;
 	}
 }

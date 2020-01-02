@@ -55,19 +55,14 @@ export class Util implements UtilIntf {
     rhost: string;
     logAjax: boolean = true;
     timeoutMessageShown: boolean = false;
-    //offline: boolean = false;
 
     waitCounter: number = 0;
     pgrsDlg: ProgressDlg = null;
 
-    autoReloadIfSessionTimeout: boolean = true;
-
     // accepts letters, numbers, underscore, dash.
     validUsername = (inputtxt: string): boolean => {
-        //return !!inputtxt.match(/^[0-9a-zA-Z]+$/);
         return !!inputtxt.match(/^[0-9a-zA-Z\-_]+$/);
     }
-
 
     hashOfString = (s: string): number => {
         let hash = 0, i, chr;
@@ -175,7 +170,6 @@ export class Util implements UtilIntf {
         ret = this.replaceAll(ret, '&lt;', '<');
         ret = this.replaceAll(ret, '&quot;', '"');
         ret = this.replaceAll(ret, '&#39;', "'");
-
         return ret;
     }
 
@@ -275,7 +269,7 @@ export class Util implements UtilIntf {
 
     /*
      * We use this variable to determine if we are waiting for an ajax call, but the server also enforces that each
-     * session is only allowed one concurrent call and simultaneous calls would just "queue up".
+     * session is only allowed one concurrent call and simultaneous calls just "queue up".
      */
     private _ajaxCounter: number = 0;
 
@@ -370,20 +364,15 @@ export class Util implements UtilIntf {
         let axiosRequest;
 
         try {
-            // if (this.offline) {
-            //     console.log("offline: ignoring call for " + postName);
-            //     return;
-            // }
-
             if (this.logAjax) {
-                console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + JSON.stringify(postData));
+                console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + this.prettyPrint(postData));
             }
 
             this._ajaxCounter++;
             S.meta64.setOverlay(true);
             axiosRequest = axios.post(this.getRpcPath() + postName, postData, <AxiosRequestConfig>{
                 //Without this withCredentials axios (at least for CORS requests) doesn't send enough info to allow the server
-                //to recognize the same "session", and makes the server malfunction becasue it basically thinks each request is a 
+                //to recognize the same "session", and makes the server malfunction becasue it thinks each request is a 
                 //new session and fails the login security. 
                 withCredentials: true
             });
@@ -412,24 +401,27 @@ export class Util implements UtilIntf {
         axiosRequest.then(//
             //------------------------------------------------
             // Handle Success
-            // Note all paths out of this function MUST call setOverlay(false) before returning
             //------------------------------------------------
             (response) => {
                 try {
                     this._ajaxCounter--;
                     this.progressInterval();
 
-                    if (this.logAjax) {
-                        console.log("    JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: "
-                            + JSON.stringify(response));
-                    }
-
                     if (!response.data.success) {
                         if (response.data.message) {
                             this.showMessage(response.data.message);
+
+                            console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: "
+                                + this.prettyPrint(response));
                             return;
                         }
-                        //return; //this is VERY much not able to work here yet! looks right but we can'd do it yet
+                        // WARNING: this looks like the right place for a return but does NOT work. Be careful.
+                        // return;
+                    }
+
+                    if (this.logAjax) {
+                        console.log("    JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: "
+                            + this.prettyPrint(response));
                     }
 
                     if (typeof callback == "function") {
@@ -445,7 +437,6 @@ export class Util implements UtilIntf {
             //------------------------------------------------
             // Handle Fail
             //------------------------------------------------
-            //todo-2: lookup format for what ths error object will be.
             (error) => {
                 try {
                     this._ajaxCounter--;
@@ -454,16 +445,10 @@ export class Util implements UtilIntf {
 
                     if (error.response && error.response.status === 401) {
                         console.log("Not logged in detected.");
-                        //this.offline = true;
                         if (!this.timeoutMessageShown) {
                             this.timeoutMessageShown = true;
-
-                            //removing this message. It used to display right before the page autorefreshes using the window.location.href below
-                            //after the short timeout.
-                            //this.showMessage("Session timed out? Refresh your browser.");
                         }
 
-                        //if (this.autoReloadIfSessionTimeout) {
                         //we wait about a second for user to have time to see the message that their session had timed out.
                         setTimeout(async () => {
                             // window.onbeforeunload = null;
@@ -472,27 +457,25 @@ export class Util implements UtilIntf {
                             S.nav.login();
                         }, 200);
                         return;
-                        //}
                     }
 
                     let msg: string = `Server request failed: \nPostName: ${postName}\n`;
                     msg += "PostData: " + this.prettyPrint(postData) + "\n";
 
                     if (error.response && error.response.data) {
-                        msg += "Status: " + this.prettyPrint(error.response.data) + "\n";
+                        msg += "Error Response: " + this.prettyPrint(error.response) + "\n";
                     }
 
-                    console.log("Request failed: msg=" + msg);
+                    console.error("Request failed: msg=" + msg);
 
                     if (typeof failCallback == "function") {
                         failCallback(msg);
                     }
                     else {
-                        // That's TMI for getting into to a user.
                         this.showMessage("Request failed: ERROR: " + error.response.status, true);
                     }
                 } catch (ex) {
-                    this.logAndReThrow("Failed processing server-side fail of: " + postName, ex);
+                    this.logAndReThrow("Failed processing: " + postName, ex);
                 }
                 finally {
                     S.meta64.setOverlay(false);
@@ -543,23 +526,16 @@ export class Util implements UtilIntf {
         }
     }
 
-    //todo-3: Haven't yet verified this is correct, but i'm not using it anywhere important yet.
     isElmVisible = (elm: HTMLElement) => {
         return elm && elm.offsetHeight > 0;
     }
 
-    /* set focus to element by id (id must be a query selector) */
+    /* set focus to element by id */
     delayedFocus = (id: string): void => {
         /* so user sees the focus fast we try at .5 seconds */
         setTimeout(() => {
             this.focusElmById(id);
-        }, 500);
-
-        /* we try again a full second later. Normally not required, but never undesirable */
-        setTimeout(() => {
-            //console.log("Focusing ID: "+id);
-            this.focusElmById(id);
-        }, 1000);
+        }, 750);
     }
 
     /*
@@ -611,7 +587,7 @@ export class Util implements UtilIntf {
         return uid;
     }
 
-    elementExists = (id): boolean => {
+    elementExists = (id: string): boolean => {
         if (this.startsWith(id, "#")) {
             id = id.substring(1);
         }
@@ -626,7 +602,7 @@ export class Util implements UtilIntf {
     }
 
     /* Takes textarea dom Id (# optional) and returns its value */
-    getTextAreaValById = (id): string => {
+    getTextAreaValById = (id: string): string => {
         let de: HTMLInputElement = <HTMLInputElement>this.domElm(id);
         return de.value;
     }
@@ -664,8 +640,8 @@ export class Util implements UtilIntf {
     }
 
     /*
-         * Gets the RAW DOM element and displays an error message if it's not found. Do not prefix with "#"
-         */
+    * Gets the RAW DOM element and displays an error message if it's not found. Do not prefix with "#"
+    */
     domElm = (id: string): HTMLElement => {
 
         if (this.startsWith(id, "#")) {
@@ -763,14 +739,11 @@ export class Util implements UtilIntf {
     }
 
     setElmDisplay = (elm: HTMLElement, showing: boolean) => {
-        //elm.style.display = showing ? "" : "none";
         if (showing) {
-            //$(elm).show();
             elm.style.display = '';
         }
         else {
             elm.style.display = 'none';
-            //$(elm).hide();
         }
     }
 
@@ -1035,7 +1008,6 @@ export class Util implements UtilIntf {
         }
 
         let url: string = window.location.origin + "?id=" + node.path;
-
         history.pushState({ "nodeId": node.path }, node.path, url);
     }
 }

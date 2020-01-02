@@ -3,9 +3,7 @@ package org.subnode.config;
 import java.io.IOException;
 import java.util.HashMap;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -27,11 +25,8 @@ import org.subnode.util.ThreadLocals;
  */
 @Component
 public class AppFilter extends GenericFilterBean {
-	//implements Filter {
 	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
-
 	private static final HashMap<String, Integer> uniqueIpHits = new HashMap<String, Integer>();
-
 	private static int reqId = 0;
 
 	@Override
@@ -62,10 +57,6 @@ public class AppFilter extends GenericFilterBean {
 			String queryString = httpReq.getQueryString();
 
 			String url = "REQ["+String.valueOf(thisReqId)+"]: URI=" + httpReq.getRequestURI() + "  QueryString=" + queryString;
-			// String uri = httpReq.getRequestURI();
-			// if (uri.startsWith("/r/")) {
-			// 	session.setAttribute("uri", uri);
-			// }
 			log.debug(url);
 
 			updateHitCounter(httpReq);
@@ -143,14 +134,6 @@ public class AppFilter extends GenericFilterBean {
 	public static boolean unknownIp(String ip) {
 		return ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip);
 	}
-
-	// @Override
-	// public void destroy() {
-	// }
-
-	// @Override
-	// public void init(FilterConfig arg0) throws ServletException {
-	// }
 
 	public static HashMap<String, Integer> getUniqueIpHits() {
 		return uniqueIpHits;

@@ -140,6 +140,7 @@ public class LockEx extends ReentrantLock {
 		log.trace(sb.toString());
 	}
 
+	//todo-1: change to ExceptionUtils.getStackTrace(e)
 	public static final String getStackTrace(Thread thread) {
 		if (thread==null) {
 			thread = Thread.currentThread();
