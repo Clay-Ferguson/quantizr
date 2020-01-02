@@ -140,7 +140,7 @@ public class NodeMoveService {
 		//DO NOT DELETE: this is the legacy delete. (switching to soft-deletes, below)
 		api.delete(session, node);
 
-		// todo-0: this code was completed, but failed my testing. doesn't work, but it's late so i'm stopping and re-enabling the above.
+		// todo-1: this code was completed, but failed my testing. doesn't work, but it's late so i'm stopping and re-enabling the above.
 		// api.softDelete(session, node);
 		// api.saveSession(session);
 	}

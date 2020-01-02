@@ -163,7 +163,7 @@ public class ImportZipService {
 			}
 			// save last node (required, it won't get saved without this)
 			saveIfPending();
-			zis.close(); //todo-0: this close should be in a finally block
+			zis.close(); //todo-1: this close should be in a finally block
 		} catch (Exception ex) {
 			throw ExUtil.newEx(ex);
 		}

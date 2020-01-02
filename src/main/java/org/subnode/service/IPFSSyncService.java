@@ -308,6 +308,7 @@ public class IPFSSyncService {
 			//MerkleNode merkNode = ipfs.getMerkleNode(merkleLink.getHash(), "json");
 
 			//todo-0: get this host/port/and protocol into application.properties
+			//also this WILL be wrong right now. The name will be ipfs-dev, or ipfs-test, or ipfs-prod (based on docker-compose network naming)
 			String imageUrl = "http://ipfs:8080/ipfs/" + merkleLink.getHash();
 
 			// generating markdown that is nothing but a link to the image. Would be one approach we could use if we wanted to always query ipfs for the 

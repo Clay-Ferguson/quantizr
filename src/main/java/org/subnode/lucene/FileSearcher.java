@@ -34,7 +34,7 @@ import org.subnode.util.StreamUtil;
  * todo-1: - need ability to search only specific fields (path, content, date?)
  * - need ability to order either by score or by date (rev chron)
  */
-//todo-0: make this a prototype-scope bean.
+// todo-1: make this a prototype-scope bean?
 @Component
 public class FileSearcher {
 	private static final Logger log = LoggerFactory.getLogger(FileSearcher.class);
@@ -50,9 +50,11 @@ public class FileSearcher {
 		String field = "contents";
 		int hitsPerPage = 10;
 
-		// todo-0: Is it more efficient (or even threadsafe?) to hold one or more of
-		// these two resources open for multiple
-		// searches, and potentially simultaneous/threads?
+		/**
+		 * todo-1: Is it more efficient (or even threadsafe?) to hold one or more of
+		 * these two resources open for multiple searches, and potentially
+		 * simultaneous/threads?
+		 */
 		FSDirectory fsDir = null;
 		IndexReader reader = null;
 

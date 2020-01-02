@@ -1331,8 +1331,7 @@ public class MongoApi {
 
 		requireAdmin(session);
 		String newUserNodePath = "/" + NodeName.ROOT + "/" + NodeName.USER + "/?";
-		//todo-0: is user validated here (no invalid characters, etc. and invalid flowpaths tested?)
-		//String newUserNodePath = "/" + NodeName.ROOT + "/" + NodeName.USER + "/" + user;
+		//todo-1: is user validated here (no invalid characters, etc. and invalid flowpaths tested?)
 
 		/*
 		 * todo-p1: need to create this node as if it were also renamed to 'user', so
@@ -1356,7 +1355,7 @@ public class MongoApi {
 		/*
 		 * The user root nodes are the owners of themselves.
 		 * 
-		 * todo-0: fix the uglyness of having to do TWO saves when adding a user.
+		 * todo-1: is there a way to avoid doing two saves in this method?
 		 * 
 		 * Also remember there's a bug where TWO user root nodes are getting created.
 		 */
@@ -1380,7 +1379,7 @@ public class MongoApi {
 				SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath("/" + NodeName.ROOT + "/" + NodeName.USER))//
 				.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
 
-		//todo-0: once this is proven, need to rename the existing nodes to embed username in this new way
+		//todo-1: once this is proven, need to rename the existing nodes to embed username in this new way
 		// Criteria criteria = Criteria.where(//
 		// 		SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath("/" + NodeName.ROOT + "/" + NodeName.USER + "/" + user));
 
@@ -1450,11 +1449,7 @@ public class MongoApi {
 
 			adminNode.setProp(NodeProp.USER, NodePrincipal.ADMIN);
 
-			// todo-0: need to store ONLY hash of the password, not only for admin but for
-			// all users...BUT with password for admin
-			// ALWAYS available directly from app property why am I putting THIS critical
-			// one INSIDE the DB also?
-			// adminNode.setProp(NodeProp.PASSWORD, adminPwd);
+			// todo-1: need to store ONLY hash of the password
 			adminNode.setProp(NodeProp.USER_PREF_ADV_MODE, false);
 			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE, false);
 			save(session, adminNode);

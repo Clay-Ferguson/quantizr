@@ -63,9 +63,6 @@ public class NotificationDaemon {
 	 */
 	@Scheduled(fixedDelay = 30 * 1000)
 	public void run() {
-		// todo-0: remove this.
-		log.debug("NotificationDeamon.run");
-
 		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling())
 			return;
 
@@ -89,24 +86,22 @@ public class NotificationDaemon {
 
 	private void sendAllMail(MongoSession session, List<SubNode> nodes) {
 		synchronized (MailSender.getLock()) {
-				if (CollectionUtils.isEmpty(nodes)) {
-					// todo-0: remove this!
-					log.debug("nothing to send.");
-					return;
+			if (CollectionUtils.isEmpty(nodes)) {
+				return;
+			}
+
+			for (SubNode node : nodes) {
+				String email = node.getStringProp(NodeProp.EMAIL_RECIP);
+				String subject = node.getStringProp(NodeProp.EMAIL_SUBJECT);
+				String content = node.getStringProp(NodeProp.EMAIL_CONTENT);
+
+				if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject) && !StringUtils.isEmpty(content)) {
+
+					log.debug("Found mail to send to: " + email);
+					mailSender.sendMail(email, null, content, subject);
+					api.delete(session, node);
 				}
-
-				for (SubNode node : nodes) {
-					String email = node.getStringProp(NodeProp.EMAIL_RECIP);
-					String subject = node.getStringProp(NodeProp.EMAIL_SUBJECT);
-					String content = node.getStringProp(NodeProp.EMAIL_CONTENT);
-
-					if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject) && !StringUtils.isEmpty(content)) {
-
-						log.debug("Found mail to send to: " + email);
-						mailSender.sendMail(email, null, content, subject);
-						api.delete(session, node);
-					}
-				}
+			}
 		}
 	}
 }

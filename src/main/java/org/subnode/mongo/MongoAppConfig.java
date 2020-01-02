@@ -35,9 +35,10 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	private GridFSBucket gridFsBucket;
 	private SimpleMongoClientDbFactory factory;
 
-	// we have this so we can set it to true and know that MongoDb failed and
-	// gracefully run
-	// in case we need to run for debugging purposes.
+	/**
+	 * we have this so we can set it to true and know that MongoDb failed and
+	 * gracefully run in case we need to run for debugging purposes.
+	 */
 	public static boolean connectionFailed = false;
 
 	@Autowired
@@ -52,7 +53,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	public MongoDbFactory mongoDbFactory() {
 		if (connectionFailed)
 			return null;
-			
+
 		if (factory == null) {
 			try {
 				MongoClient mc = mongoClient();

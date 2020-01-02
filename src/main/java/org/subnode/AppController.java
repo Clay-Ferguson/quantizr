@@ -807,7 +807,7 @@ public class AppController {
 			}
 
 			/*
-			 * todo-0: If we are searching a large directory structure here the search will
+			 * todo-1: If we are searching a large directory structure here the search will
 			 * take a long time and just show a generic non-updated progress base on the
 			 * browser. We need a better way to push status back to server and also not make
 			 * user wait, but be able to close the dlg and move on. Probably we need a

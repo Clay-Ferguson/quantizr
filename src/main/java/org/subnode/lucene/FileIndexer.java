@@ -58,13 +58,13 @@ import org.apache.lucene.document.LongPoint;
  * Recursively scans all files in a folder (and subfolders) and indexes them
  * into Lucene.
  * 
- * todo-0: - need to do threadsafety in this class. That's not considered yet. -
+ * todo-1: - need to do threadsafety in this class. That's not considered yet. -
  * make multiple simultaneous searches work ok (no shared vars) - make an attemp
  * to search while indexing is underway get blocked (with error message saying
  * why) * actually doublecheck this, and see if the index SUPPORTS reads to it
  * DURING indexing process.
  * 
- * todo-0: for any inputstreams that are not wrapped in a BufferedInputStream I
+ * todo-1: for any inputstreams that are not wrapped in a BufferedInputStream I
  * need to do that.
  * 
  */
@@ -307,7 +307,7 @@ public class FileIndexer {
 
 				// if we encountered a zip file inside a zip file this is the recursion for
 				// that.
-				if (isZipFileFormatFileName(absPath)) { // todo-0: (or tar! handle tars)
+				if (isZipFileFormatFileName(absPath)) { // todo-1: (or tar! handle tars)
 					indexZipInputStream(zis, zipParent + "->" + absPath);
 				} else {
 					indexZipEntry(entry, zis, zipParent);
@@ -328,13 +328,13 @@ public class FileIndexer {
 				}
 
 				if (entry.isDirectory()) {
-					// todo-0: I know for ZIPs we can ignore directories, but I'm not sure if this
+					// todo-1: I know for ZIPs we can ignore directories, but I'm not sure if this
 					// is the case for TAR files. Check this.
 				} else {
 					String absPath = entry.getName();
 					log.debug("TAR ENTRY:" + absPath);
-					// todo-0: oops ZIP is missing here. plain zip in a tar
-					// todo-0: need to also support a tar in a zip
+					// todo-1: oops ZIP is missing here. plain zip in a tar
+					// todo-1: need to also support a tar in a zip
 					if (isTarFileFormatFileName(absPath)) {
 						indexTarInputStream(tis, zipParent + "->" + absPath, CompressionType.NONE);
 					} else if (isTgzFileFormatFileName(absPath)) {

@@ -132,8 +132,8 @@ public class AclService {
 				}
 				mapKey = principleNode.getId().toHexString();
 
-				//todo-0: send not just notification email, but send to people's INBOX node also.
-				//will require me to invent the INBOX for user. Doesn't yet exist.
+				//todo-1: send not just notification email, but send to people's INBOX node also.
+				//will require us to invent the INBOX for user. Doesn't yet exist.
 			}
 
 			HashMap<String, String> acl = node.getAcl();

@@ -42,7 +42,7 @@ public class MailSender implements TransportListener {
 
 	public MailSender() {
 		final MailSender instance = this;
-		//todo-0: Need to look into using appContext.registerShutdownHook for shutdown hook, instead of pure java, and then I think
+		//todo-1: Need to look into using appContext.registerShutdownHook for shutdown hook, instead of pure java, and then I think
 		//the PreDestroy on all the beans can be the actual hook.
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {

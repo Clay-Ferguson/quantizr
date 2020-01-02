@@ -59,7 +59,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({ SubNode.FIELD_PATH, /* SubNode.FIELD _PATH_HASH, */ SubNode.FIELD_TYPE, SubNode.FIELD_ID,
+@JsonPropertyOrder({ SubNode.FIELD_PATH, SubNode.FIELD_TYPE, SubNode.FIELD_ID,
 		SubNode.FIELD_MAX_CHILD_ORDINAL, SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
 		SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_ACL, SubNode.FIELD_PROPERTIES })
 public class SubNode {
@@ -83,13 +83,6 @@ public class SubNode {
 	public static final String FIELD_PATH = "pth";
 	@Field(FIELD_PATH)
 	private String path;
-
-	// /* todo-0: this was invented to enforce uniqueness of the path, but I think I
-	// can just let a unique index on the pth itself
-	// take care of this and not bother with the overhead of this hashingn algo */
-	// public static final String FIELD _PATH_HASH = "phash";
-	// @Field(FIELD _PATH_HASH)
-	// private String pathHash;
 
 	public static final String FIELD_TYPE = "typ";
 	@Field(FIELD_TYPE)
@@ -167,11 +160,6 @@ public class SubNode {
 		return path;
 	}
 
-	// @JsonProperty(FIELD _PATH_HASH)
-	// public String getPathHash() {
-	// return pathHash;
-	// }
-
 	@Transient
 	@JsonIgnore
 	public String getParentPath() {
@@ -202,37 +190,8 @@ public class SubNode {
 	@JsonProperty(FIELD_PATH)
 	public void setPath(String path) {
 		MongoThreadLocal.dirty(this);
-		// if (path == null) {
-		// pathHash = "";
-		// }
-		// /*
-		// * todo-2: need to add smarts to have this not update the pathHash if it's
-		// * already going to match, but not sure how to ensure that.
-		// */
-		// else { // if (this.path == null || pathHash==null || !this.path.equals(path))
-		// {
-		// pathHash = Sha256Service.getHashOfString(path);
-		// }
-		// log.debug("Generated PathHash: "+pathHash);
 		this.path = path;
 	}
-
-	// public void forcePathHashUpdate() {
-	// if (path == null) {
-	// pathHash = "";
-	// log.debug("path was null during forcePathHashUpdate");
-	// } else {
-	// pathHash = Sha256Service.getHashOfString(path);
-	// }
-	// // log.debug("PathHash [" + path + "]: " + pathHash);
-	// MongoThreadLocal.dirty(this);
-	// }
-
-	// @JsonProperty(FIELD _PATH_HASH)
-	// public void setPathHash(String pathHash) {
-	// MongoThreadLocal.dirty(this);
-	// this.pathHash = pathHash;
-	// }
 
 	@JsonProperty(FIELD_ORDINAL)
 	public Long getOrdinal() {
@@ -428,7 +387,7 @@ public class SubNode {
 				return null;
 			return (Date) v.getValue();
 		} catch (Exception e) {
-			//todo-0: This is cluttering up the log file, becasue we still have "sn:lastModified" which is an obsolete property, and a string or integer 
+			//todo-1: This is cluttering up the log file, because we still have "sn:lastModified" which is an obsolete property, and a string or integer 
 			//representation also. Need to have a db cleanup to remove all those props.
 			//ExUtil.error(log, "failed to get Date from key: " + key, e);
 			return null;
