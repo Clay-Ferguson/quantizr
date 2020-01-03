@@ -241,8 +241,7 @@ export class MainNavPanel extends NavTag {
                     //     </div>
                     // </li>
                 ])
-            ]
-            )
+            ])
         ]);
 
         this.whenElm((elm: HTMLElement) => {

@@ -65,6 +65,13 @@ export abstract class Comp implements CompIntf {
         let id = this.attribs.id || ("c" + Comp.nextGuid());
         this.attribs.id = id;
 
+        //If I put any other property other than 'key' here then Chrome Element explorer displays it, but due to an apparent Bug in Chrome,
+        //if this is 'key' then it simply doesn't show up in element explorer.
+        //Also, forcing key attrib to exist for EVERY Comp element was initially for 
+        //troubleshooting, but i'm not sure what React really needs, and wether this is
+        //only reuired for things like UL, an UL html lists. (todo-0 research) 
+        //this.attribs.key = id;
+    
         //This map allows us to lookup the Comp directly by its ID similar to a DOM lookup
         Comp.idToCompMap[id] = this;
 
@@ -310,6 +317,7 @@ export abstract class Comp implements CompIntf {
 
         if (p.style && typeof p.style === 'string') {
             console.error("element id: " + p.id + " has a style specified as string: " + p.style);
+            alert("Error. Check browser log."); //todo-0 remove
             p.style = { border: '4px solid red' };
             p.title = "ERROR: style specified as string instead of object.";
         }
@@ -319,6 +327,7 @@ export abstract class Comp implements CompIntf {
             p.style = { border: '4px solid green' };
             delete p.class;
             console.error("class was corrected to className: Value was " + p.class);
+            alert("Error. Check browser log."); //todo-remove
         }
 
         if (p.for) {
@@ -326,6 +335,7 @@ export abstract class Comp implements CompIntf {
             p.style = { border: '4px solid blue' };
             console.error("for was changed to htmlFor");
             delete p.for;
+            alert("Error. Check browser log."); //todo-remove
         }
     }
 
@@ -369,8 +379,15 @@ export abstract class Comp implements CompIntf {
                 }
 
                 //React needs to have unique keys
-                child.attribs.key = child.attribs.id;
-
+                if (child.attribs.id) {
+                    child.attribs.key = child.attribs.id;
+                }
+                else {
+                    if (!child.getId()) {
+                        console.log("oops. child.getId() is null!");
+                    }
+                    child.attribs.key = child.getId();
+                }    
                 this.repairProps(child.attribs);
                 reChildren.push(S.e(child.render, child.attribs, child.makeReactChildren()));
             }

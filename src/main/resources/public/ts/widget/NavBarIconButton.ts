@@ -19,12 +19,16 @@ export class NavBarIconButton extends Comp {
     }
 
     render = (p: any) => {
-        this.repairProps(p);
-        return S.e('button', p,
+        this.repairProps(this.attribs);
+        return S.e('button', this.attribs,
             S.e("i", {
+                key: "i_"+this.getId(),
                 className: "fa fa-lg " + this.iconClass,
             }, [
-                S.e('span', {className: 'button-font'}, this.text == null ? null : " " + this.text)
+                S.e('span', {
+                    key: "s_"+this.getId(), 
+                    className: 'button-font'
+                }, this.text == null ? null : " " + this.text)
             ], true)
         );
     }

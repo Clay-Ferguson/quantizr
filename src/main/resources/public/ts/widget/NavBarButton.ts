@@ -23,6 +23,7 @@ export class NavBarButton extends Comp {
         this.repairProps(p);
         return S.e('button', p,
             S.e("i", {
+                key: "s_"+this.getId(),
                 className: "fa fa-lg button-font",
             }, this.content, true)
         );

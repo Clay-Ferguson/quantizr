@@ -770,7 +770,7 @@ export class Util implements UtilIntf {
         });
     }
 
-    /* Equivalent of ES6 Object.assign(). Takes all properties from src and merges them onto dst, except this one
+    /* Very similar to ES6 Object.assign(), but slightly different. Takes all properties from src and merges them onto dst, except this one
     will notice if the src and dest both have any of the keys defined and will combine the dest by concatinating it to the source 
     rather than setting (overwriting) that property value from the source */
     mergeAndMixProps = (dst: Object, src: Object, mixPrefix: string): void => {

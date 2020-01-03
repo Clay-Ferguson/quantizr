@@ -19,6 +19,7 @@ export class ButtonTag extends Comp {
     render = (p): string => {
         this.repairProps(p);
         return S.e('button', p, S.e('span', {
+            key: "s_"+this.getId(),
             className: "navbar-toggler-icon"
         }));
     }

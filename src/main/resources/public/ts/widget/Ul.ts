@@ -18,7 +18,7 @@ export class Ul extends Comp {
     }
 
     render = (p: any): ReactNode => {
-        this.repairProps(p);
-        return S.e('ul', p, this.makeReactChildren());
+        this.repairProps(this.attribs);
+        return S.e('ul', this.attribs, this.makeReactChildren());
     }
 }

@@ -38,6 +38,7 @@ export class Button extends Comp {
 
         if (p.iconclass) {
             icon = S.e('i', { 
+                key: "s_"+this.getId(),
                 className: p.iconclass,
                 style: {
                     marginRight: "6px"
@@ -46,7 +47,6 @@ export class Button extends Comp {
         }
 
         this.repairProps(p);
-
         let elm = S.e('button', p, [icon, this.state.text]);
         return elm;
     }

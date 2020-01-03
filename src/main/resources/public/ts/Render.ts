@@ -892,7 +892,7 @@ export class Render implements RenderIntf {
                 //console.log("rendering output=: " + S.util.toJson(output));
                 S.domBind.whenElm("listView", async (elm) => {
                     try {
-                        console.log("listView found.");
+                        //console.log("listView found.");
                         let outputDiv = new Div(null, null, output);
                         outputDiv.reactRenderToDOM("listView");
                         S.meta64.selectTab("mainTab");
