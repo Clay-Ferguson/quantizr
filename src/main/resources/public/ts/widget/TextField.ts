@@ -45,17 +45,13 @@ export class TextField extends Comp {
         let children = [];
     
         if (p.label) {
-            //This is a hack to get the password managers of browsers to work the way we want. When prompting for an encryption password, there is NO
-            //username that makes sense for that, so we use "Master Password" prefill value to make this whole thing hidden;
             children.push(S.e('label', {
                 id: this.getId()+"_label",
-                //style : this.prefillVal=="Master Password" ? {display: "none"} : {display: "block"},
+                key: this.getId()+"_label",
                 className: 'textfield-label',
                 htmlFor: this.getId()
             }, p.label));
         }
-
-        console.log("render input");
 
         children.push(S.e('input', this.attribs));
 

@@ -17,6 +17,7 @@ export class ButtonTag extends Comp {
 
     /* Div element is a special case where it renders just its children if there are any, and if not it renders 'content' */
     render = (p): string => {
+        p = this.attribs;
         this.repairProps(p);
         return S.e('button', p, S.e('span', {
             key: "s_"+this.getId(),

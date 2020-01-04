@@ -3,12 +3,19 @@ clear
 source ./setenv.sh
 source ./define-functions.sh
 
-# Ensure output folder for out docier images exists
-mkdir -p $DOCKER_IMAGES_FOLDER
+#cd ~/ferguson/subnode-run
+docker-compose -f docker-compose-test.yaml down --remove-orphans
+verifySuccess "Docker Compose (test): down"
+
+cd $PRJROOT
+docker-compose -f docker-compose-dev.yaml down --remove-orphans
+verifySuccess "Docker Compose (dev): down"
+
+# Ensure output folder for out docir images exists
 mkdir -p ${ipfs_staging}
 
 # Wipe some existing stuff to ensure it gets rebuilt
-rm -rf $DOCKER_IMAGES_FOLDER/subnode-test.tar
+rm -rf ${TAR_OUTPUT_FOLDER}/subnode-test.tar
 rm -rf $PRJROOT/target/*
 rm -rf $PRJROOT/bin/*
 rm -rf $PRJROOT/src/main/resources/public/bundle.js
@@ -61,18 +68,15 @@ rm -f ${SUBNODE_LOG_FOLDER}/*
 # I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up findingn
 # this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
 # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
-docker-compose -f docker-compose-test.yaml build --no-cache
+sudo docker-compose -f docker-compose-test.yaml build --no-cache
 verifySuccess "Docker Compose: build"
 
 # save the docker image into a TAR file so that we can send it up to the remote Linode server
 # which can then on the remote server be loaded into registry for user on that host using the following command:
 #     docker load -i <path to image tar file>
 #
-docker save -o $DOCKER_IMAGES_FOLDER/subnode-test.tar subnode-test
+sudo docker save -o ${TAR_OUTPUT_FOLDER}/subnode-test.tar subnode-test
 verifySuccess "Docker Save"
-
-sudo cp $DOCKER_IMAGES_FOLDER/subnode-test.tar /home/clay/ferguson/subnode-run/subnode-test.tar
-verifySuccess "Copy image to run dir"
 
 echo "done!"
 sleep 3

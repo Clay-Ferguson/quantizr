@@ -553,7 +553,6 @@ export class EditNodeDlg extends DialogBase {
 
             /* Now scan over all properties to build up what to save */
             if (this.propEntries) {
-                debugger;
                 this.propEntries.forEach((prop: I.PropEntry) => {
                     /* Ignore this property if it's one that cannot be edited as text, or has already been handled/processed */
                     if (prop.readOnly || prop.binary || handled[prop.property.name])
@@ -698,7 +697,7 @@ export class EditNodeDlg extends DialogBase {
         let formGroup = new FormGroup();
 
         value = S.util.escapeForAttrib(value);
-        console.log("making field editor for [" + propName + "] val[" + value + "]");
+        //console.log("making field editor for [" + propName + "] val[" + value + "]");
         let editorComp: any = null;
 
         if (multiLine) {
@@ -718,7 +717,6 @@ export class EditNodeDlg extends DialogBase {
                             editorComp.getAceEditor().focus();
                         }
                     }
-
                 }, 250);
             });
 

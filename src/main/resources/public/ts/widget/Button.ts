@@ -33,8 +33,9 @@ export class Button extends Comp {
 
     render = (p: any): React.ReactNode => {
         this.hookState(this.state);
+        p = this.attribs;
 
-        let icon;
+        let icon: any;
 
         if (p.iconclass) {
             icon = S.e('i', { 

@@ -5,6 +5,7 @@ verifySuccess () {
         echo "$1 successful."
     else
         echo "$1 failed. EXIT CODE: $?"
+        read -p "Press any key to exit."
         exit $?
     fi
 }

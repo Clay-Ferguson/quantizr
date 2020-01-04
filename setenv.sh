@@ -20,6 +20,8 @@ export SUBNODE_LUCENE_FOLDER=/home/clay/quantizr-tmp/lucene
 # Path that Quantizr app will use at runtime as it's temp folder
 export SUBNODE_TMP_FOLDER=/home/clay/quantizr-tmp/tmp
 
+export TAR_OUTPUT_FOLDER=~/ferguson/subnode-run
+
 export ipfs_data=/home/clay/.ipfs
 export ipfs_staging=/home/clay/.ipfs/staging
 

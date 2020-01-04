@@ -21,20 +21,24 @@ export class CollapsiblePanel extends Comp {
         let innerStyle = this.textLink ? "file-link" : "";
 
         return S.e('div', {
-            style: {marginTop: "10px", marginBottom: "10px"}
+            style: {marginTop: "10px", marginBottom: "10px"},
+            key: "div_"+this.getId()
         },//
             S.e('a', {
                 href: "#" + this.getId(),
                 className: style,
-                "data-toggle": "collapse"
+                "data-toggle": "collapse",
+                key: "div_a_"+this.getId()
             }, //
                 S.e('div', {
-                    className: innerStyle
+                    className: innerStyle,
+                    key: "div_a_div_"+this.getId()
                 }, this.buttonText),
             ),
             S.e('div', {
                 id: this.getId(),
-                className: "collapse"
+                className: "collapse",
+                key: "div_div_d"+this.getId()
             },
                 this.makeReactChildren()
             ));

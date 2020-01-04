@@ -35,6 +35,7 @@ export class Checkbox extends Comp {
     }
 
     render = (p) => {
+        p = this.attribs;
         this.repairProps(p);
         if (this.label) {
             return S.e('span', { key: p.id + "_span" }, S.e('input', p), 
