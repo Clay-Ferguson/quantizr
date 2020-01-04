@@ -10,6 +10,9 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
+//This is magically defined in webpack.common.js;
+declare var __BUILDTIME__;
+
 export class View implements ViewIntf {
 
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
@@ -300,6 +303,7 @@ export class View implements ViewIntf {
             "nodeId": !!node ? node.id : null
         },
             (res: I.GetServerInfoResponse) => {
+                res.serverInfo += "<br>Build Time: "+__BUILDTIME__;
                 S.util.showMessage(res.serverInfo, true);
             });
     }

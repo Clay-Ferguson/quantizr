@@ -995,7 +995,7 @@ export class Util implements UtilIntf {
         let ampm = hours >= 12 ? "pm" : "am";
         hours = hours % 12;
         hours = hours ? hours : 12; // the hour '0' should be '12'
-        let strTime = hours + ":" + minutes + ampm;
+        let strTime = hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + ampm;
         return (date.getMonth() + 1) + "-" + date.getDate() + "-" + date.getFullYear() + " " + strTime;
     }
 

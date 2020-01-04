@@ -113,7 +113,7 @@ public class SystemService {
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
 		long freeMem = runtime.freeMemory() / ONE_MB;
-		sb.append(String.format("Free Memory %dMB<br>", freeMem));
+		sb.append(String.format("Free Memory: %dMB<br>", freeMem));
 		sb.append(String.format("Session Count: %d<br>", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());
 		sb.append("<p>" + api.getNodeReport());
