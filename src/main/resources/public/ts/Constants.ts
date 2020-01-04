@@ -33,9 +33,6 @@ export class Constants {
     static readonly EMAIL_RECIP: string = "sn:recip";
     static readonly EMAIL_SUBJECT: string = "sn:subject";
 
-    //todo-0: wtf, I also see "sn:pwd" in use in some places????
-    static readonly PASSWORD: string = "sn:password";
-
     //static readonly CONTENT: string = "sn: content";
 
     static readonly IPFS_NODE: string = "sn:ipfsNode"; 

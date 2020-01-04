@@ -84,10 +84,6 @@ export class LoginDlg extends DialogBase {
     login = (): void => {
         let usr = this.userTextField.getValue();
         let pwd = this.passwordTextField.getValue();
-        
-        //todo-0: this variable turned into a mess. Need totally revamp login flow.
-        //S.util.offline = false;
-
         S.user.login(this, usr, pwd);
         this.close();
     }

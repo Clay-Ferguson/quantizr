@@ -582,7 +582,7 @@ export class Meta64 implements Meta64Intf {
     // go ahead and make this async
     anonPageLoadResponse = (res: I.AnonPageLoadResponse): void => {
 
-        //todo-0: should I just have some wait state that waits for ALL the common DIVS to load when the page loads,
+        //todo-0: should I just have some wait state that waits for ALL the HTML-hardcoded DIVS to load when the page loads,
         //and then never do these whenElms throughout the rest of the code? Specifically I mean the ones that are 
         //in the static HTML and always guaranteed to exist.
         S.domBind.whenElm("listView", async (elm: HTMLElement) => {

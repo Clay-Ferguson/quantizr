@@ -45,6 +45,8 @@ export class Textarea extends Comp {
     }
 
     render = (p) => {
+        p = this.attribs;
+
         this.repairProps(p);
         let children = [];
     

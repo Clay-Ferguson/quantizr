@@ -47,11 +47,10 @@ export interface UtilIntf {
     getHostAndPort(): string;
     getRpcPath(): string;
 
-    //todo-0: need to make all calls to these functions use promises (be careful about failure case)
+    //todo-1: need to make all calls to these functions use promises (be careful about failure case)
     ajax<RequestType, ResponseType>(postName: string, postData: RequestType,
         callback?: (response: ResponseType) => void,
-         failCallback?: (response: string) => void
-        );
+         failCallback?: (response: string) => void);
     logAndThrow(message: string);
     logAndReThrow(message: string, exception: any);
     ajaxReady(requestName): boolean;

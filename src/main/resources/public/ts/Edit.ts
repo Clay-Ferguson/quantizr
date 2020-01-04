@@ -197,7 +197,7 @@ export class Edit implements EditIntf {
     startEditingNewNode = (typeName?: string, createAtTop?: boolean): void => {
         this.editingUnsavedNode = false;
         this.editNode = null;
-        //todo-0: need to use async/await, and mek this EditNodeDlg come up AFTER the node has been created on the server
+        //todo-1: need to use async/await, and make this EditNodeDlg come up AFTER the node has been created on the server
         let dlg = new EditNodeDlg({ "typeName": typeName, "createAtTop": createAtTop });
         this.editNodeDlgInst = dlg;
         dlg.saveNewNode("");
@@ -219,7 +219,7 @@ export class Edit implements EditIntf {
         this.editingUnsavedNode = true;
         this.editNode = null;
 
-        //todo-0: need to use async/await, and mek this EditNodeDlg come up AFTER the node has been created on the server
+        //todo-1: need to use async/await, and mek this EditNodeDlg come up AFTER the node has been created on the server
         let dlg = new EditNodeDlg({});
         this.editNodeDlgInst = dlg;
         dlg.saveNewNode("");

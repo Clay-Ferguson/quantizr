@@ -167,10 +167,6 @@ export class EditNodeDlg extends DialogBase {
      */
     populateEditNodePg = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            // S.domBind.whenElm(this.pathDisplay.getId(), (elm: HTMLElement) => {
-            //     S.view.initEditPathDisplayById(elm);
-            // });
-
             let counter = 0;
 
             /* clear this map to get rid of old properties */
@@ -252,7 +248,7 @@ export class EditNodeDlg extends DialogBase {
                             return;
                         }
 
-                        console.log("Creating edit field for property " + prop.name);
+                        //console.log("Creating edit field for property " + prop.name);
 
                         let isReadOnlyProp = S.render.isReadOnlyProperty(prop.name);
                         let isBinaryProp = S.render.isBinaryProperty(prop.name);
@@ -408,7 +404,7 @@ export class EditNodeDlg extends DialogBase {
      * Deletes the property of the specified name on the node being edited, but first gets confirmation from user
      */
     deleteProperty(propName: string) {
-        console.log("Asking to confirm delete property.");
+        //console.log("Asking to confirm delete property.");
         new ConfirmDlg("Delete the Property: " + propName, "Confirm Delete",
             () => {
                 this.deletePropertyImmediate(propName);
@@ -575,7 +571,7 @@ export class EditNodeDlg extends DialogBase {
                             //console.log("TEXTAREA propVal[" + prop.id + "]=" + propVal);
                         }
                         catch (error) {
-                            //todo-0: this was seeing the obsolete "sn:lastModified" and blowing up here. Need to look into it.
+                            //todo-1: this was seeing the obsolete "sn:lastModified" and blowing up here. Need to look into it.
                             console.log("not able to get propVal for any prob with DOM ID " + prop.id);
                             propVal = "[err]";
                         }
@@ -612,12 +608,12 @@ export class EditNodeDlg extends DialogBase {
     makePropEditor = (propEntry: I.PropEntry, isPre: boolean, isWordWrap: boolean): EditPropsTableRow => {
         let tableRow = new EditPropsTableRow({
         });
-        console.log("Property single-type: " + propEntry.property.name);
+        //console.log("Property single-type: " + propEntry.property.name);
 
         let formGroup = new FormGroup();
         let propVal = propEntry.binary ? "[binary]" : propEntry.property.value;
 
-        let isPassword = propEntry.property.name == cnst.PASSWORD || propEntry.property.name == "sn:pwd"
+        let isPassword = propEntry.property.name == "sn:pwd"
             || propEntry.property.name == "sn:user"
             || propEntry.property.name == "sn:email";
 
@@ -627,8 +623,8 @@ export class EditNodeDlg extends DialogBase {
         let label = S.render.sanitizePropertyName(propEntry.property.name);
         let propValStr = propVal ? propVal : "";
         propValStr = S.util.escapeForAttrib(propValStr);
-        console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
-            + "] fieldId=" + propEntry.id);
+        // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
+        //     + "] fieldId=" + propEntry.id);
 
         //todo-p1: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
         //and be better with a Textfield based editor

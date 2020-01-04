@@ -249,45 +249,6 @@ export class View implements ViewIntf {
         return path;
     }
 
-    //todo-0: replacing this method with getPathDisplay (above)
-    initEditPathDisplayById = (e: HTMLElement) => {
-        let node: I.NodeInfo = S.edit.editNode;
-
-        if (S.edit.editingUnsavedNode) {
-            S.util.setInnerHTML(e, "");
-            S.util.setElmDisplay(e, false);
-        } else {
-            //overflow-x quit working, but also I decided I don't need this path here, so rather than fighting this i'm just removing it for now.
-            var pathDisplay = ""; //"<span style='overflow-x: auto;'>Path: " + node.path + "</span>";
-
-            if (node.path.indexOf(node.id) != -1) {
-                if (pathDisplay) {
-                    pathDisplay += "<br>";
-                }
-                pathDisplay += "ID: " + node.id;
-            }
-
-            if (node.lastModified) {
-                if (pathDisplay) {
-                    pathDisplay += "<br>";
-                }
-                let lastModStr = S.util.formatDate(new Date(node.lastModified));
-                pathDisplay += "Modified: " + lastModStr;
-            }
-
-            //nt:unstructured is included just for legacy support unless/until I put into DB converter.
-            if (node.type && node.type != "u" && node.type != "nt:unstructured") {
-                if (pathDisplay) {
-                    pathDisplay += "<br>";
-                }
-                pathDisplay += "Type: " + node.type;
-            }
-
-            S.util.setInnerHTML(e, pathDisplay);
-            S.util.setElmDisplay(e, true);
-        }
-    }
-
     graphDisplayTest = () => {
         //let node = S.meta64.getHighlightedNode();
 

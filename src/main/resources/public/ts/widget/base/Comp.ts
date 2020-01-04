@@ -65,12 +65,7 @@ export abstract class Comp implements CompIntf {
         let id = this.attribs.id || ("c" + Comp.nextGuid());
         this.attribs.id = id;
 
-        //If I put any other property other than 'key' here then Chrome Element explorer displays it, but due to an apparent Bug in Chrome,
-        //if this is 'key' then it simply doesn't show up in element explorer.
-        //Also, forcing key attrib to exist for EVERY Comp element was initially for 
-        //troubleshooting, but i'm not sure what React really needs, and wether this is
-        //only reuired for things like UL, an UL html lists. (todo-0 research) 
-        //this.attribs.key = id;
+        this.attribs.key = id;
     
         //This map allows us to lookup the Comp directly by its ID similar to a DOM lookup
         Comp.idToCompMap[id] = this;
@@ -311,32 +306,34 @@ export abstract class Comp implements CompIntf {
     
     All instances of this should be now gone, but i'm gonna run the  app for a while more, and just be sure I don't see any 
     errors in the log or colored borders indicating a violation
+
+    todo-0: will be deleting this function soon, not yet.
     */
     repairProps(p: any) {
         if (p == null) return;
 
-        if (p.style && typeof p.style === 'string') {
-            console.error("element id: " + p.id + " has a style specified as string: " + p.style);
-            alert("Error. Check browser log."); //todo-0 remove
-            p.style = { border: '4px solid red' };
-            p.title = "ERROR: style specified as string instead of object.";
-        }
+        // if (p.style && typeof p.style === 'string') {
+        //     console.error("element id: " + p.id + " has a style specified as string: " + p.style);
+        //     alert("Error. Check browser log."); 
+        //     p.style = { border: '4px solid red' };
+        //     p.title = "ERROR: style specified as string instead of object.";
+        // }
 
-        if (p.class) {
-            p.className = p.class;
-            p.style = { border: '4px solid green' };
-            delete p.class;
-            console.error("class was corrected to className: Value was " + p.class);
-            alert("Error. Check browser log."); //todo-remove
-        }
+        // if (p.class) {
+        //     p.className = p.class;
+        //     p.style = { border: '4px solid green' };
+        //     delete p.class;
+        //     console.error("class was corrected to className: Value was " + p.class);
+        //     alert("Error. Check browser log."); 
+        // }
 
-        if (p.for) {
-            p.htmlFor = p.for;
-            p.style = { border: '4px solid blue' };
-            console.error("for was changed to htmlFor");
-            delete p.for;
-            alert("Error. Check browser log."); //todo-remove
-        }
+        // if (p.for) {
+        //     p.htmlFor = p.for;
+        //     p.style = { border: '4px solid blue' };
+        //     console.error("for was changed to htmlFor");
+        //     delete p.for;
+        //     alert("Error. Check browser log."); 
+        // }
     }
 
     /* Attaches a react element directly to the dom at the DOM id specified. Throws exception of not a react element. */

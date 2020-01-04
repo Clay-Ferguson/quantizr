@@ -33,12 +33,13 @@ export class Div extends Comp {
     }
 
     render = (p) => {
+        p = this.attribs;
         this.hookState(this.state);
 
         /* Note this renders content AND CHILDREN if there are any. 
         
         NOTE: for a LONG time i have had 'p' here instead of 'attribs' and finally realized that was not right?
         */
-        return this.tagRender('div', this.state.content, this.attribs);
+        return this.tagRender('div', this.state.content, p);
     }
 }
