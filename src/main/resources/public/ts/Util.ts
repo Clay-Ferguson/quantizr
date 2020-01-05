@@ -642,20 +642,37 @@ export class Util implements UtilIntf {
             // First we immediately try to get the element.
             let e: HTMLElement = document.getElementById(id);
             if (e) {
+                console.log("ELM found immediately: "+id);
                 resolve(e);
             }
             // If element not found we just go into a wait for it (polling)
             // (is there a better native JS approach than polling for the element?)
             else {
+                let accumWaitTime = 0;
+                let timeSlice = 250;
+
+                //don't hang the promise more than 5 seconds, before reporting error and continuing.
+                let maxWaitTime = 5000;
+
                 //todo-0: check all code for 'setInterval' calls that aren't doing 'clearInterval' (that's a resource leak)
                 let interval = setInterval(() => {
+
+                    // oops I only want this on PROD because when debugging it can timeout too much when breakpoints are set.
+                    accumWaitTime += timeSlice;
+                    if (accumWaitTime >= maxWaitTime) {
+                        console.error("waited for but never found element: "+id);
+                        clearInterval(interval);
+                        resolve(null);
+                    }
+
                     let e: HTMLElement = document.getElementById(id);
+                    console.log("waiting for elm: "+id);
                     if (e) {
                         clearInterval(interval);
-                        console.log("Got Elm: "+id);
+                        //console.log("Got Elm: "+id);
                         resolve(e);
                     }
-                }, 250);
+                }, timeSlice);
             }
         });
     }
