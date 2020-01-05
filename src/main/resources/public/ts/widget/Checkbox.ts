@@ -24,7 +24,7 @@ export class Checkbox extends Comp {
     }
 
     setChecked(checked: boolean) {
-        S.domBind.whenElm(this.getId(), (elm) => {
+        S.dom.whenElm(this.getId(), (elm) => {
             (<any>elm).checked = checked;
         });
     }

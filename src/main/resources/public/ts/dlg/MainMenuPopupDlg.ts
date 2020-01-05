@@ -19,7 +19,7 @@ export class MainMenuPopupDlg extends DialogBase {
             menu
         ]);
 
-        S.domBind.whenElm(this.getId(), (elm : HTMLElement) => {
+        S.dom.whenElm(this.getId(), (elm : HTMLElement) => {
             S.meta64.refreshAllGuiEnablement();
             elm.style.display = "inline-block";
         });

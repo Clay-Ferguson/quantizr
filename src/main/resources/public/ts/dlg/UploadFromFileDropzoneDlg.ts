@@ -98,7 +98,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             }
         };
 
-        S.domBind.whenElm(this.dropzoneDiv.getId(), (elm) => {
+        S.dom.whenElm(this.dropzoneDiv.getId(), (elm) => {
             this.dropzone = new Dropzone("#" + this.dropzoneDiv.getId(), config);
         });
     }

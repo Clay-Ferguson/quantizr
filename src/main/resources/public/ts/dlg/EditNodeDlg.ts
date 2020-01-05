@@ -132,7 +132,7 @@ export class EditNodeDlg extends DialogBase {
             ])
         ]);
 
-        S.domBind.whenElm(this.getId(), (elm: HTMLElement) => {
+        S.dom.whenElm(this.getId(), (elm: HTMLElement) => {
             elm.style.display = "inline-block";
 
             if (this.focusId) {
@@ -320,7 +320,7 @@ export class EditNodeDlg extends DialogBase {
             let tagsPropExists = S.props.getNodePropertyVal("sn:tags", S.edit.editNode) != null;
             this.addTagsPropertyButton.setVisible(!tagsPropExists);
 
-            // S.domBind.whenElm(this.getId(), (elm : HTMLElement) => {
+            // S.dom.whenElm(this.getId(), (elm : HTMLElement) => {
             //     elm.style.display = "inline-block";
             // });
 

@@ -585,7 +585,7 @@ export class Meta64 implements Meta64Intf {
         //todo-0: should I just have some wait state that waits for ALL the HTML-hardcoded DIVS to load when the page loads,
         //and then never do these whenElms throughout the rest of the code? Specifically I mean the ones that are 
         //in the static HTML and always guaranteed to exist.
-        S.domBind.whenElm("listView", async (elm: HTMLElement) => {
+        S.dom.whenElm("listView", async (elm: HTMLElement) => {
             if (res.renderNodeResponse) {
                 S.util.setElmDisplayById("mainNodeContent", true);
 
@@ -836,7 +836,7 @@ export class Meta64 implements Meta64Intf {
      * This app doesn't support drag-n-drop yet, but this code is the beginning of a proof-of-concept for that feature.
      */
     enableAppAsDropTarget = () => {
-        S.domBind.whenElm("app", (elm: HTMLElement) => {
+        S.dom.whenElm("app", (elm: HTMLElement) => {
             elm.addEventListener("dragover", function (event) {
                 console.log("dragover detected.");
                 // event.preventDefault();

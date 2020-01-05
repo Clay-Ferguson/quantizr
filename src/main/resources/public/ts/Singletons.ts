@@ -45,7 +45,7 @@ export interface Singletons {
     activityPub: ActivityPubIntf;
     podcast: PodcastIntf;
     //systemFolder: SystemFolderIntf;
-    domBind: DomBindIntf;
+    dom: DomBindIntf;
     rssPlugin: RssPluginIntf;
     coreTypesPlugin: CoreTypesPluginIntf;
     bashPlugin: BashPluginIntf;

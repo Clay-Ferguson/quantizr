@@ -29,7 +29,7 @@ export class ListBoxRow extends Comp {
     }
 
     setSelectedState = (selected: boolean) => {
-        S.domBind.whenElm(this.getId(), (elm) => {
+        S.dom.whenElm(this.getId(), (elm) => {
             if (selected) {
                 S.util.addClassToElm(elm, "selectedListItem");
             }

@@ -71,7 +71,7 @@ export class Factory {
             user: new User(),
             view: new View(),
             podcast: new Podcast(),
-            domBind: new DomBind(),
+            dom: new DomBind(),
             rssPlugin: new RssPlugin(),
             coreTypesPlugin: new CoreTypesPlugin(),
             bashPlugin: new BashPlugin(),

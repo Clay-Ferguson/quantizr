@@ -48,7 +48,7 @@ export class RadioButton extends Comp {
 
     // setChecked(checked: boolean) {
     //     console.log("setChecked()="+checked);
-    //     // S.domBind.whenElm(this.getId(), (elm) => {
+    //     // S.dom.whenElm(this.getId(), (elm) => {
     //     //     (<any>elm).checked = checked;
     //     // });
     //     this.state = {checked};
