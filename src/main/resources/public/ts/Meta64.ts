@@ -582,9 +582,6 @@ export class Meta64 implements Meta64Intf {
     // go ahead and make this async
     anonPageLoadResponse = (res: I.AnonPageLoadResponse): void => {
 
-        //todo-0: should I just have some wait state that waits for ALL the HTML-hardcoded DIVS to load when the page loads,
-        //and then never do these whenElms throughout the rest of the code? Specifically I mean the ones that are 
-        //in the static HTML and always guaranteed to exist.
         S.dom.whenElm("listView", async (elm: HTMLElement) => {
             if (res.renderNodeResponse) {
                 S.util.setElmDisplayById("mainNodeContent", true);
@@ -778,8 +775,8 @@ export class Meta64 implements Meta64Intf {
              * $ (window).on("orientationchange", _.orientationHandler);
              */
 
-            //todo-1: actually this is a nuisance unless user is actually EDITING a node right now
-            //so until i make it able to detect if user is editing i'm removing this.
+            // todo-1: actually this is a nuisance unless user is actually EDITING a node right now
+            // so until i make it able to detect if user is editing i'm removing this.
             // window.onbeforeunload = () => {
             //     return "Leave Meta64 ?";
             // };

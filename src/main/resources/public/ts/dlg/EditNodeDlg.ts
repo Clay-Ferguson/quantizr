@@ -132,7 +132,8 @@ export class EditNodeDlg extends DialogBase {
             ])
         ]);
 
-        S.dom.whenElm(this.getId(), (elm: HTMLElement) => {
+        (async () => {
+            let elm = await S.util.getElm(this.getId());
             elm.style.display = "inline-block";
 
             if (this.focusId) {
@@ -148,7 +149,7 @@ export class EditNodeDlg extends DialogBase {
                     }
                 }, 300);
             }
-        });
+        })();
     }
 
     createLayoutSelection = (): Selection => {

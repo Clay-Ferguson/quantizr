@@ -636,6 +636,30 @@ export class Util implements UtilIntf {
         }
     }
 
+    getElm = (id: string): Promise<HTMLElement> => {
+        return new Promise<HTMLElement>((resolve, reject) => {
+
+            // First we immediately try to get the element.
+            let e: HTMLElement = document.getElementById(id);
+            if (e) {
+                resolve(e);
+            }
+            // If element not found we just go into a wait for it (polling)
+            // (is there a better native JS approach than polling for the element?)
+            else {
+                //todo-0: check all code for 'setInterval' calls that aren't doing 'clearInterval' (that's a resource leak)
+                let interval = setInterval(() => {
+                    let e: HTMLElement = document.getElementById(id);
+                    if (e) {
+                        clearInterval(interval);
+                        console.log("Got Elm: "+id);
+                        resolve(e);
+                    }
+                }, 250);
+            }
+        });
+    }
+
     /*
     * Gets the RAW DOM element and displays an error message if it's not found. Do not prefix with "#"
     */

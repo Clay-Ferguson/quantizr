@@ -104,4 +104,5 @@ export interface UtilIntf {
     trigger(elm: HTMLElement, evt: string): void;
     formatDate(date) : string;
     updateHistory(node: NodeInfo): void;
+    getElm(id: string): Promise<HTMLElement>;
 }

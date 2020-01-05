@@ -31,7 +31,8 @@ export class MenuPanel extends Div {
                 //new MenuItem("Podcast Feeds", () => { S.nav.openContentNode("/r/rss"); }),
 
                 new MenuItem("User Guide", () => { S.nav.openContentNode("/r/public/user-guide"); }),
-                new MenuItem("Sample Document", () => { S.nav.openContentNode("/r/books/war-and-peace"); }),
+                
+                //new MenuItem("Sample Document", () => { S.nav.openContentNode("/r/books/war-and-peace"); }),
 
                 // commenting this only because I don't have the github created yet.
                 // new MenuItem("Quantizr on GitHub", S.nav.openGitHubSite),

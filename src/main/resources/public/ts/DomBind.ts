@@ -45,7 +45,7 @@ export class DomBind implements DomBindIntf {
     functions can be attached to all execute once the element is detected to exist. */
     private idToFuncMap: { [key: string]: Function } = {};
 
-    // WARNING: Don't delete this, because we will probably eventually need it.
+    // WARNING: Don't delete this, because we will may eventually need it.
     // private initMutationObserver = (): void => {
     //     // select the target node
     //     let target = document.getElementById("x-app");
@@ -70,11 +70,6 @@ export class DomBind implements DomBindIntf {
     // }
 
     private interval = (): void => {
-        if (!S.util) {
-            //console.log("util module not yet loaded.");
-            return;
-        }
-
         /* The loop below may have multiple entries targeting the same element, so just to avoid as many DOM operations
         as possible (for performance) we cache them in this map once we find them */
         let idToElmMap: { [key: string]: HTMLElement } = {};
@@ -106,7 +101,7 @@ export class DomBind implements DomBindIntf {
                 keysToDelete.push(key);
             }
             else {
-                //todo-1: periorically uncomment to see if anything is showing up here
+                //todo-1: periorically uncomment to see if anything is showing up here for too long (indicating a problem)
                 //console.log("DomBind " + id + " waiting...");
             }
             return true;
