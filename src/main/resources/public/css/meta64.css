@@ -152,9 +152,6 @@ input[type="radio"] {
   margin: 8px; }
 
 /* This app uses all square corners which is done with this one CSS style */
-* {
-  border-radius: 0 !important; }
-
 .edit-prop-checkbox-col {
   width: 50px;
   display: table-cell;

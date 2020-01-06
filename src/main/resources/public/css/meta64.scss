@@ -197,10 +197,10 @@ input[type="radio"] {
     margin: 8px;
 }
 
-/* This app uses all square corners which is done with this one CSS style */
-
-//todo-0: rethink this. A lot of bootstrap has lots of good looking rounded borders, so i'm really
-//throwing the baby out with the bathwater here.
+/* This app uses all square corners which is done with this one CSS style. I'd like to turn on round corners
+but at least on buttons bootstrap tries to get clever and make some corners square to fit next to other things
+and is ugly for this app. 
+*/
 * {
     border-radius: 0 !important;
 }

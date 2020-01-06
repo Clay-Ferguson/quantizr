@@ -362,7 +362,7 @@ export class Util implements UtilIntf {
 
         try {
             if (this.logAjax) {
-                console.log("JSON-POST2: [" + this.getRpcPath() + postName + "]" + this.prettyPrint(postData));
+                console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + this.prettyPrint(postData));
             }
 
             this._ajaxCounter++;

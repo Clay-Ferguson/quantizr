@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * todo-0: after refactor how is node.getContent being exported? haven't done it yet.
+ * todo-1: after refactor how is node.getContent being exported? haven't done it yet.
  * 
  * Syncs content into SubNode (i.e. MongoDB) from an IPFS node (and it's
  * chilren, etc), so that SubNode can be used to browse, search, and sort
@@ -307,7 +307,7 @@ public class IPFSSyncService {
 			//This query just returns an empty array as a 'links' property and then a json string representation of the image in the 'Data' property (not useful)
 			//MerkleNode merkNode = ipfs.getMerkleNode(merkleLink.getHash(), "json");
 
-			//todo-0: get this host/port/and protocol into application.properties
+			//todo-1: put this host/port/and protocol in application.properties
 			//also this WILL be wrong right now. The name will be ipfs-dev, or ipfs-test, or ipfs-prod (based on docker-compose network naming)
 			String imageUrl = "http://ipfs:8080/ipfs/" + merkleLink.getHash();
 
