@@ -3,26 +3,16 @@
 // different reasons. I did too, and finally also realized a better solution for what I wanted (simple conversion of SCSS to CSS files)
 // was to put that logic in 'on-build-start.sh'.
 
-let webpack = require('webpack');
-let CircularDependencyPlugin = require('circular-dependency-plugin');
-let WebpackShellPlugin = require('webpack-shell-plugin');
-let HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
+const CircularDependencyPlugin = require('circular-dependency-plugin');
+const WebpackShellPlugin = require('webpack-shell-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 // let MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-let prod = process.argv.indexOf('-p') !== -1;
-let env = prod ? "prod" : "dev";
+const prod = process.argv.indexOf('-p') !== -1;
+const env = prod ? "prod" : "dev";
 
 console.log("TARGET ENV: " + env);
-
-function formatDate(date) {
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    var ampm = hours >= 12 ? "pm" : "am";
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    var strTime = hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + ampm;
-    return (date.getMonth() + 1) + "-" + date.getDate() + "-" + date.getFullYear() + " " + strTime;
-}
 
 module.exports = {
     entry: "./ts/index.ts",
@@ -72,11 +62,6 @@ module.exports = {
     },
 
     plugins: [
-        new webpack.DefinePlugin({
-            //this was a test: Didn't work. I tried it in the index.html and it was not translated.
-            //Ended up accomplishing this using my 'cachebuster' option on HtmlWebpackPlugin instead.
-            __BUILDTIME__: JSON.stringify(formatDate(new Date()))
-        }),
         new WebpackShellPlugin({
             onBuildStart: ["./on-build-start.sh"],
             //onBuildEnd: ['whatever else']

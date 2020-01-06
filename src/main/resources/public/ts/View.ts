@@ -11,7 +11,8 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 //This is magically defined in webpack.common.js;
-declare var __BUILDTIME__;
+declare var BUILDTIME;
+declare var PROFILE;
 
 export class View implements ViewIntf {
 
@@ -222,13 +223,13 @@ export class View implements ViewIntf {
     }
 
     getPathDisplay = (node: I.NodeInfo): string => {
-        if (node==null) return "";
+        if (node == null) return "";
 
         //overflow-x quit working, but also I decided I don't need this path here, so rather than fighting this i'm just removing it for now.
         var path = ""; //"<span style='overflow-x: auto;'>Path: " + node.path + "</span>";
 
         //if (node.path.indexOf(node.id) != -1) {
-            path += "ID: " + node.id;
+        path += "ID: " + node.id;
         //}
 
         if (node.lastModified) {
@@ -264,7 +265,8 @@ export class View implements ViewIntf {
             "nodeId": !!node ? node.id : null
         },
             (res: I.GetServerInfoResponse) => {
-                res.serverInfo += "<br>Build Time: "+__BUILDTIME__;
+                res.serverInfo += "<br>Build Time: " + BUILDTIME;
+                res.serverInfo += "<br>Profile: " + PROFILE;
                 S.util.showMessage(res.serverInfo, true);
             });
     }
