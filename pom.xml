@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!-- There are 5 profiles: DEV,PROD,DEV-VSCODE,Webpack -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -18,6 +20,11 @@
 		<!-- lookup parent from repository -->
 	</parent>
 
+	<!-- 
+	===========================================================================
+	DEV PROFILE BEGIN 
+	===========================================================================	
+	-->
 	<profiles>
 		<profile>
 			<id>dev</id>
@@ -466,9 +473,12 @@
 			</build>
 		</profile>
 
-
-		<!-- =============================================================================================== -->
-		<!-- This profile 'dev-vscode' is the one we activate by default so that when opening in VSCode we don't run into the
+	<!-- 
+	===========================================================================
+	DEV-VSCODE PROFILE BEGIN 
+	===========================================================================	
+	-->		
+	<!-- This profile 'dev-vscode' is the one we activate by default so that when opening in VSCode we don't run into the
 		bug that exists where 'node' process will HANG forever with maxed out CPU usage. This profile is identical to the 'dev' 
 		profile except for omitting the webpack part which causes this bug/hang. All profiles work just fine with or without
 		webpack when run on the command line, but it seems VSCode is not able to run any webpack without this bug happening, so the 
@@ -912,7 +922,11 @@
 			</build>
 		</profile>
 
-
+	<!-- 
+	===========================================================================
+	PROD PROFILE BEGIN 
+	===========================================================================	
+	-->
 		<profile>
 			<id>prod</id>
 			<properties>
@@ -1326,6 +1340,11 @@
 
 		</profile>
 
+	<!-- 
+	===========================================================================
+	WEBPACK PROFILE BEGIN 
+	===========================================================================	
+	-->
 		<!-- This profile does the minimal work of just compiling TS files, so that we can run this profile, which is extremely fast (couple of seconds), 
 		and then be able to simply refresh the browser and see the changes immediately without doing an actual full maven build -->
 		<profile>
