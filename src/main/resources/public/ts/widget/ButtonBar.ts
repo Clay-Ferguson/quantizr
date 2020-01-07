@@ -19,8 +19,7 @@ export class ButtonBar extends Comp {
         this.setChildren(initialButtons);
     }
 
-    render = (p: any): ReactNode => {
-        p = this.attribs;
+    compRender = (p: any): ReactNode => {
         if (this.childrenExist()) {
             return S.e('div', p, this.makeReactChildren());
         }

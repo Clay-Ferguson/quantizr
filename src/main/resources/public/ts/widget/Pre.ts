@@ -15,7 +15,7 @@ export class Pre extends Comp {
         super(attribs);
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return S.e('pre', this.attribs, (this.content || ""));
     }
 }

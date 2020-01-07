@@ -26,8 +26,7 @@ export class Icon extends Comp {
         this.attribs.onClick = callback;
     }
 
-    render = (p: any): ReactNode => {
-        this.repairProps(p);
+    compRender = (p: any): ReactNode => {
         return S.e('i', p, null);
     }
 

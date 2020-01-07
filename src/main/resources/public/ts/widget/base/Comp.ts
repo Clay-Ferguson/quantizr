@@ -1,4 +1,5 @@
-//https://reactjs.org/docs/react-api.html
+// https://reactjs.org/docs/react-api.html
+// https://reactjs.org/docs/hooks-reference.html#usestate
 
 import { CompIntf, ReactRenderFunc } from "./CompIntf";
 import { PubSub } from "../../PubSub";
@@ -27,16 +28,21 @@ export abstract class Comp implements CompIntf {
     /* Mainly invented to support markdown rendering this forces React to render the raw html */
     public renderRawHtml: boolean = false;
     
-    public state: any;
+    //This must private so that getState us used instead which might return 'state' but it also might return 'initialState'
+    private state: any;
+    
+    //This is the state that is in effect up until the first 'render' call, which is when hookState first gets called, and
+    //the setState becomes the function returned from react useState, and the whole React-controlled rendering goes into effect.
+    public initialState: any;
 
+    //Flag that indicates if hookState has been called, and we also use it to know if initialState is no longer in use but state is instead.
+    public stateHooked: boolean = false;
+    
     static idToCompMap: { [key: string]: Comp } = {};
     attribs: any;
 
     /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored */
     children: CompIntf[];
-
-    /* State tells us if the widget is currently about to re-render itself as soon as it can */
-    renderPending: boolean = false;
 
     logEnablementLogic: boolean = false;
 
@@ -66,7 +72,6 @@ export abstract class Comp implements CompIntf {
         /* If an ID was specifically provided, then use it, or else generate one */
         let id = this.attribs.id || ("c" + Comp.nextGuid());
         this.attribs.id = id;
-
         this.attribs.key = id;
     
         //This map allows us to lookup the Comp directly by its ID similar to a DOM lookup
@@ -79,7 +84,6 @@ export abstract class Comp implements CompIntf {
     bindExampleFunction() {
     }
 
-    //Tip: always call this instead of accessing children directly.
     childrenExist = (): boolean => {
         if (this.children == null || this.children.length == 0) return false;
         let ret = false;
@@ -344,9 +348,9 @@ export abstract class Comp implements CompIntf {
         if (!id) {
             id = this.getId();
         }
-        if (!this.render) {
-            throw new Error("Attempted to treat non-react component as react: " + this.constructor.name);
-        }
+        // if (!this.render) {
+        //     throw new Error("Attempted to treat non-react component as react: " + this.constructor.name);
+        // }
         S.dom.whenElm(id, (elm: HTMLElement) => {
             this.repairProps(this.attribs);
             ReactDOM.render(S.e(this.render, this.attribs), elm);
@@ -368,7 +372,7 @@ export abstract class Comp implements CompIntf {
                 /* If this is an old-school non-react component (i.e. no render method, then we render it's HTML 'dangerously' and put it into a 
                 react span Element, as the inner html. This mess will go away once we are fully converted to ReactJS in this app, at which
                 time none of our components will render to HTML string */
-                if (!child.render || child.renderRawHtml) {
+                if (/* !child.render || */ child.renderRawHtml) {
                     let content = (child.renderRawHtml && (<any>child).content) ? (<any>child).content : "";
                     let p = child.attribs;
                     p.key = this.getId() + "_md" + idx;
@@ -378,16 +382,6 @@ export abstract class Comp implements CompIntf {
                     return;
                 }
 
-                //React needs to have unique keys
-                if (child.attribs.id) {
-                    child.attribs.key = child.attribs.id;
-                }
-                else {
-                    if (!child.getId()) {
-                        console.log("oops. child.getId() is null!");
-                    }
-                    child.attribs.key = child.getId();
-                }    
                 this.repairProps(child.attribs);
                 reChildren.push(S.e(child.render, child.attribs, child.makeReactChildren()));
             }
@@ -424,11 +418,6 @@ export abstract class Comp implements CompIntf {
     /* Haven't tested this variation but it will add (merge in) new state into existing state without
      overwiting existing state */
     mergeState = (newState: any) => {
-        if (!this.setState) {
-            console.error("this.setState was null. initState was never called.");
-            return;
-        }
-
         this.setState(prevState => {
             // Object.assign would also work
             return { ...prevState, ...newState };
@@ -436,25 +425,44 @@ export abstract class Comp implements CompIntf {
     }
 
     /* Currently each react functional component must call this, because there's no clean way to wrap it since non-react methods
-    have a null value for "this.render", by design */
+    have a null value for "this.render", by design. This i */
     hookState = (newState: any) => {
         const [state, setState] = useState(newState);
         this.setState = setState;
         this.state = state;
+        this.stateHooked = true;
+        this.initialState = null;
     }
 
     /* Note: this method performs a direct state mod, but for react comps it gets overridden using useState return value */
-    setState = null;
+    setState = (state: any) => {
+        // If 'hookState' has been called then this function should be pointing to whatever was returned from 'useState' 
+        if (this.stateHooked) {
+            throw new Error("setState called when stateHooked is set. This is an invalid, and indicates a bug.");
+        }
+        // If state not yet hooked, we keep the 'state' in initialState
+        this.initialState = state;
+    }
 
-    // FYI: Here's how TypeScript defines these types (ReactNode v.s. ReactElement)
-    // type ReactText = string | number;
-    // type ReactChild = ReactElement | ReactText;
+    getState = (): any => {
+        return this.stateHooked ? this.state : this.initialState;
+    }
 
-    // interface ReactNodeArray extends Array<ReactNode> {}
-    // type ReactFragment = {} | ReactNodeArray;
-    // type ReactNode = ReactChild | ReactFragment | ReactPortal | boolean | null | undefined;
+    // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
+    render = (p: any): React.ReactNode => {
+        p = this.attribs;
+        this.repairProps(p);
+        //todo-0: Currently this ends up calling 'useState' again after every state change which I think is probably not
+        //the standard approach nor performant. Research this.
+        this.hookState(this.initialState || this.state || {});
+        return this.compRender(p);
+    }
 
-    /* This is a little tricky, but what's happening here is that we define this render as null, and then 
-    whichever derived classed implement themselves as 'react' an simply override the method to be the react-required method */
-    render: ReactRenderFunc = null;
+    // This is the function you override/define to implement the actual render method, which is simple and decoupled from state
+    //manageent aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
+    compRender = (p: any): React.ReactNode => {
+        if (true) {
+            throw new Error("compRender should be overridden by the derived class.");
+        }
+    }
 }

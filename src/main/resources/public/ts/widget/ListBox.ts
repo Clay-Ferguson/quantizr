@@ -39,7 +39,7 @@ export class ListBox extends Comp {
         this.selectedRow.setSelectedState(true);
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return this.tagRender('div', null, p);
     }
 }

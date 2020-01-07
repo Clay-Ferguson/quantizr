@@ -18,23 +18,16 @@ export class Button extends Comp {
         }, " ");
 
         this.attribs.onClick = callback;
-
-        this.state = {
-            text
-        };
+        this.setText(text);
     }
 
     setText = (text: string) => {
-        //todo-0: If this is called too early 'setState' can be null. Need to fix.
         this.setState({
             text
         });
     }
 
-    render = (p: any): React.ReactNode => {
-        this.hookState(this.state);
-        p = this.attribs;
-
+    compRender = (p: any): React.ReactNode => {
         let icon: any;
 
         if (p.iconclass) {
@@ -48,7 +41,7 @@ export class Button extends Comp {
         }
 
         this.repairProps(p);
-        let elm = S.e('button', p, [icon, this.state.text]);
+        let elm = S.e('button', p, [icon, this.getState().text]);
         return elm;
     }
 }

@@ -14,7 +14,7 @@ export class SelectionOption extends Comp {
         this.attribs.value = this.key;
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return S.e('option', p, this.val);
     }
 }

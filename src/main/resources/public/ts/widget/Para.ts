@@ -15,7 +15,7 @@ export class Para extends Comp {
         super(attribs);
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return S.e('p', this.attribs, (this.content || ""));
     }
 }

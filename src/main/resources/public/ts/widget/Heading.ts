@@ -14,7 +14,7 @@ export class Heading extends Comp {
         super(attrs);
     }
 
-    render = (p: any) => {
+    compRender = (p: any) => {
         return S.e("h" + this.level, p, this.content);
     }
 }

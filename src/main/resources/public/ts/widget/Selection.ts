@@ -39,7 +39,7 @@ export class Selection extends Comp {
         });
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return this.tagRender('select', null, p);
     }
 }

@@ -15,7 +15,7 @@ export class NavTag extends Comp {
         this.setChildren(initialChildren);
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return this.tagRender('nav', this.content, p);
     }
 }

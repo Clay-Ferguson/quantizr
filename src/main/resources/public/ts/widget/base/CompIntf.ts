@@ -37,5 +37,6 @@ export interface CompIntf {
 
     getAttribs() : Object;
 
-    render(type: any, props: any, children: React.ReactNode[]): React.ReactNode;
+    render(p: any): React.ReactNode;
+    compRender(p: any): React.ReactNode;
 }

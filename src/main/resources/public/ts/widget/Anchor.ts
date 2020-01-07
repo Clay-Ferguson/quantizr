@@ -17,8 +17,7 @@ export class Anchor extends Comp {
         S.util.mergeProps(this.attribs, _attribs);
     }
 
-    render = (p) => {
-        this.repairProps(p);
+    compRender = (p) => {
         return S.e('a', p, this.children || this.content || this.url);
     }
 }

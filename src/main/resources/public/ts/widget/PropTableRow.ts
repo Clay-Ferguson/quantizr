@@ -21,7 +21,7 @@ export class PropTableRow extends Comp {
         this.setChildren(initialChildren);
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return this.tagRender('tr', null, p);
     }
 }

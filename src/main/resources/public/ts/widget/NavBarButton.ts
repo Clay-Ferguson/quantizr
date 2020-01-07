@@ -19,8 +19,7 @@ export class NavBarButton extends Comp {
         this.setIsVisibleFunc(_isVisibleFunc);
     }
 
-    render = (p) => {
-        this.repairProps(p);
+    compRender = (p: any) => {
         return S.e('button', p,
             S.e("i", {
                 key: "s_"+this.getId(),

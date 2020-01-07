@@ -26,7 +26,7 @@ export class VerticalLayout extends Comp {
         this.setChildren(divWrapComps);
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return this.tagRender('div', null, p);
     }
 }

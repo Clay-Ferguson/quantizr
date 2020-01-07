@@ -18,7 +18,7 @@ export class EditPrivsTable extends Comp {
         this.setClass("list-group");
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return this.tagRender('div', null, p);
     }
 }

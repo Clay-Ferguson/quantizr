@@ -14,7 +14,7 @@ export class Img extends Comp {
         super(attribs);
     }
 
-    render = (p: any) => {
+    compRender = (p: any) => {
         return S.e("img", p);
     }
 }

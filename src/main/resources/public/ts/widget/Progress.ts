@@ -21,7 +21,7 @@ export class Progress extends Comp {
         });
     }
 
-    render = () => {
-        return S.e('div', this.attribs);
+    compRender = (p: any) => {
+        return S.e('div', p);
     }
 }

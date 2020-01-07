@@ -15,10 +15,7 @@ export class TextContent extends Comp {
         super(null);
         this.attribs.className = classes || "alert alert-info";
         this.attribs.role = "alert";
-
-        this.state = {
-            text
-        };
+        this.setText(text);
     }
 
     setText = (text: string) => {
@@ -27,19 +24,18 @@ export class TextContent extends Comp {
         });
     }
 
-    render = (p: any): ReactNode => {
-        this.hookState(this.state);
+    compRender = (p: any): ReactNode => {
+        let state = this.getState();
 
-        this.repairProps(p);
         //todo-1: this is an ugly hack to check for "<". Need to review this.
-        if (this.state.text && this.state.text.indexOf("<") != -1) {
+        if (state.text && state.text.indexOf("<") != -1) {
             let _p: any= {};
-            _p.dangerouslySetInnerHTML = { "__html": this.state.text };
+            _p.dangerouslySetInnerHTML = { "__html": state.text };
             return S.e(this.preformatted ? 'pre' : 'div', _p);
         }
         else {
             console.log("Building (TextContent) react element: " + p.id);
-            return S.e(this.preformatted ? 'pre' : 'div', p, this.state.text);
+            return S.e(this.preformatted ? 'pre' : 'div', p, state.text);
         }
     }
 }

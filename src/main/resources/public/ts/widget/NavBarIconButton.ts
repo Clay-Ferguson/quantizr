@@ -18,9 +18,8 @@ export class NavBarIconButton extends Comp {
         this.setIsVisibleFunc(_isVisibleFunc);
     }
 
-    render = (p: any) => {
-        this.repairProps(this.attribs);
-        return S.e('button', this.attribs,
+    compRender = (p: any) => {
+        return S.e('button', p,
             S.e("i", {
                 key: "i_"+this.getId(),
                 className: "fa fa-lg " + this.iconClass,

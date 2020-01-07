@@ -44,7 +44,7 @@ export class Textarea extends Comp {
         }
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         p = this.attribs;
 
         this.repairProps(p);

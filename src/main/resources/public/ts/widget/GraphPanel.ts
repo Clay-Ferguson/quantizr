@@ -70,7 +70,7 @@ export class GraphPanel extends Comp {
         });
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         this.init();
         return this.tagRender('div', "", p);
     }

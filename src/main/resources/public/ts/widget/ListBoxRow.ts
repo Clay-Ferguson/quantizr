@@ -43,7 +43,7 @@ export class ListBoxRow extends Comp {
         this.listBox = listBox;
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return this.tagRender('div', this.content, p);
     }
 }

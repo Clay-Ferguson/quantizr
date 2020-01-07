@@ -15,7 +15,7 @@ export class PropTableCell extends Comp {
         this.setChildren(initialChildren);
     }
 
-    render = (p): string => {
+    compRender = (p: any): string => {
         return this.tagRender('td', (this.content || ""), p);
     }
 }

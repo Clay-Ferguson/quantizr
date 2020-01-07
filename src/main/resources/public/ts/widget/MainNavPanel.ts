@@ -255,7 +255,7 @@ export class MainNavPanel extends NavTag {
         });
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return this.tagRender('nav', this.content, p);
     }
 }

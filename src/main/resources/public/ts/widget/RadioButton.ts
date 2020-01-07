@@ -62,12 +62,11 @@ export class RadioButton extends Comp {
         //return this.state.checked;
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         // this.initState({
         //     checked: p.checked
         // });
 
-        this.repairProps(p);
         let _p = p; //{...p, checked : this.state.checked};
         if (this.label) {
             return S.e('span', { key: _p.id + "_span" }, S.e('input', _p), S.e('label', { key: _p.id + "_label", htmlFor: _p.id }, this.label));

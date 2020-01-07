@@ -18,7 +18,7 @@ export class TabPanel extends Comp {
         super(null);
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
 
         //the row of buttons that ARE the tabs where you click to change tabs.
         let tabButtons = new Div(null, {
@@ -129,6 +129,6 @@ export class TabPanel extends Comp {
         return new Div(null, {
         }, [
                 tabButtons, tabContent
-            ]).render(p);
+            ]).compRender(p);
     }
 }

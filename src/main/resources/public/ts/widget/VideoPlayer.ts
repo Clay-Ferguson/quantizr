@@ -21,7 +21,7 @@ export class VideoPlayer extends Comp {
         return <HTMLVideoElement>this.getElement();
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         //this method not yet converted to react
         console.error("Feature not currently available.");
         //return S.tag.video(this.attribs, this.render_Children());

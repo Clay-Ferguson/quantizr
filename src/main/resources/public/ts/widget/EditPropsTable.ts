@@ -14,7 +14,7 @@ export class EditPropsTable extends Comp {
         super(attribs);
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return this.tagRender('div', null, p);
     }
 }

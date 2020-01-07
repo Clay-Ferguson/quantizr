@@ -3,20 +3,19 @@ import { TextContent } from "../widget/TextContent";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { Form } from "../widget/Form";
-import * as React from "react";
-
-let e = React.createElement;
 
 export class ConfirmDlg extends DialogBase {
 
     constructor(private text: string, title: string, private yesCallback: Function, private noCallback: Function = null) {
         super(title);
 
+        let yesButton: Button;
+
         this.setChildren([
             new Form(null, [
                 new TextContent(text),
                 new ButtonBar([
-                    new Button("Yes", () => {
+                    yesButton = new Button("Yes", () => {
                         this.close();
                         this.yesCallback();
                     }),
@@ -27,5 +26,11 @@ export class ConfirmDlg extends DialogBase {
                 ])
             ])
         ]);
+
+        //for testing reactive re-rendering
+        // let i = 0;
+        // setInterval(() => {
+        //     yesButton.setText("YES "+(i++));
+        // }, 2000);
     }
 }

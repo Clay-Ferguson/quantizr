@@ -38,7 +38,7 @@ export class EditPrivsTableRow extends Comp {
         });
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return this.tagRender('div', null, p);
     }
 }

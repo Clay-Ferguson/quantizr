@@ -16,7 +16,7 @@ export class Span extends Comp {
         this.setChildren(initialChildren);
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return this.tagRender('span', this.content, p);
     }
 }

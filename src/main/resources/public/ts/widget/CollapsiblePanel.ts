@@ -16,7 +16,7 @@ export class CollapsiblePanel extends Comp {
         this.setChildren(initialChildren);
     }
 
-    render = (p: any) => {
+    compRender = (p: any) => {
         let style = this.textLink ? "" : "btn btn-info ";
         let innerStyle = this.textLink ? "file-link" : "";
 

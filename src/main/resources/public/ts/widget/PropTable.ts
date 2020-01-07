@@ -16,7 +16,7 @@ export class PropTable extends Comp {
         //(<any>this.attribs).sourceClass = "EditPropsTable";
     }
 
-    render = (p) => {
+    compRender = (p: any) => {
         return this.tagRender('table', null, p);
     }
 }

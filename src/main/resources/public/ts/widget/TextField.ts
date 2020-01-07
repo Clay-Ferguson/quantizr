@@ -41,7 +41,7 @@ export class TextField extends Comp {
         S.util.delayedFocus(this.getId());
     }
 
-    render = (p: any): string => {
+    compRender = (p: any): string => {
         let children = [];
     
         if (p.label) {
