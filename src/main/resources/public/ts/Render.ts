@@ -237,14 +237,13 @@ export class Render implements RenderIntf {
                 setTimeout(async () => {
                     content = content.substring(cnst.ENC_TAG.length);
 
-                    //todo-0: for lots of my new async stuff it's not yet handling the error/exception case properly
                     let clearText = await S.encryption.symDecryptString(null, content);
                     if (clearText) {
                         node.content = clearText;
                         let val2 = this.renderRawMarkdown(node);
 
                         //todo-0: This setInnerContent function isn't working correctly yet because of the complexity of the Div.renderRawHtml,
-                        //so for now any encrypted content is just using innerHTML to set it for now, and not ReactJs.
+                        //so for now any encrypted content is just using innerHTML, and not ReactJs.
                         //div.setInnerContent(val2);
                         elm.innerHTML = val2;
                     }

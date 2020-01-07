@@ -28,7 +28,8 @@ export class NodeTypeListBox extends ListBox {
             //!S.meta64.isAdminUser ? null : new ListBoxRow("Lucene Index Folder", () => { this.selType = "luceneIndex"; }, false),
 
             //todo-0: need a limit on each account stopping people from using too much MongoDB disk space.
-            new ListBoxRow("IPFS Node", () => { this.selType = "ipfs:node"; }, false),
+            //       (so for now I'm removing IPFS as an option, for all but admin users)
+            !S.meta64.isAdminUser ? null : new ListBoxRow("IPFS Node", () => { this.selType = "ipfs:node"; }, false),
             
             //!meta64.isAdminUser ? null : new ListBoxRow("System Folder", () => { this.selType = "meta64:systemfolder"; }, false)
         ]);
