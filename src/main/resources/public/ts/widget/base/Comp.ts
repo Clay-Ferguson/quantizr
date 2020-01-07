@@ -13,6 +13,8 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+declare var PROFILE;
+
 /**
  * This base class is a hybrid that can render React components or can be used to render plain HTML to be used in innerHTML of elements.
  * The innerHTML approach is being phased out in order to transition fully over to normal ReactJS. 
@@ -302,38 +304,39 @@ export abstract class Comp implements CompIntf {
     }
 
     /* This is a stop-gap measure to ease the convertion of the app to spring, and auto-fix certain nuances of attributes
-    that are special in React (reserved) that we are using pervasively currently 
-    
-    All instances of this should be now gone, but i'm gonna run the  app for a while more, and just be sure I don't see any 
-    errors in the log or colored borders indicating a violation
+    that are special in React
 
-    todo-0: will be deleting this function soon, not yet.
+    todo-1: will be deleting this function soon, not yet.
     */
     repairProps(p: any) {
+        if (PROFILE=="prod") {
+            return;
+        }
+        
         if (p == null) return;
 
-        // if (p.style && typeof p.style === 'string') {
-        //     console.error("element id: " + p.id + " has a style specified as string: " + p.style);
-        //     alert("Error. Check browser log."); 
-        //     p.style = { border: '4px solid red' };
-        //     p.title = "ERROR: style specified as string instead of object.";
-        // }
+        if (p.style && typeof p.style === 'string') {
+            console.error("element id: " + p.id + " has a style specified as string: " + p.style);
+            alert("Error. Check browser log."); 
+            p.style = { border: '4px solid red' };
+            p.title = "ERROR: style specified as string instead of object.";
+        }
 
-        // if (p.class) {
-        //     p.className = p.class;
-        //     p.style = { border: '4px solid green' };
-        //     delete p.class;
-        //     console.error("class was corrected to className: Value was " + p.class);
-        //     alert("Error. Check browser log."); 
-        // }
+        if (p.class) {
+            p.className = p.class;
+            p.style = { border: '4px solid green' };
+            delete p.class;
+            console.error("class was corrected to className: Value was " + p.class);
+            alert("Error. Check browser log."); 
+        }
 
-        // if (p.for) {
-        //     p.htmlFor = p.for;
-        //     p.style = { border: '4px solid blue' };
-        //     console.error("for was changed to htmlFor");
-        //     delete p.for;
-        //     alert("Error. Check browser log."); 
-        // }
+        if (p.for) {
+            p.htmlFor = p.for;
+            p.style = { border: '4px solid blue' };
+            console.error("for was changed to htmlFor");
+            delete p.for;
+            alert("Error. Check browser log."); 
+        }
     }
 
     /* Attaches a react element directly to the dom at the DOM id specified. Throws exception of not a react element. */

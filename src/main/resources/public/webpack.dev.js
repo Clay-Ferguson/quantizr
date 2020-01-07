@@ -23,7 +23,7 @@ module.exports = merge(common, {
             //Ended up accomplishing this using my 'cachebuster' option on HtmlWebpackPlugin instead.
             //WARNING: The 'stringify' here looks redundant but it's actually requird here by DefinePlugin
             "BUILDTIME": JSON.stringify(formatDate(new Date())),
-            "PROFILE": JSON.stringify("development"),
+            "PROFILE": JSON.stringify("dev"),
         }),
     ]
 });

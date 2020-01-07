@@ -181,7 +181,7 @@ export class User implements UserIntf {
 
                 S.util.ajax<I.LogoutRequest, I.LogoutResponse>("logout", {}, this.logoutResponse);
             }
-            //todo-0: everywhere in the app that I have a resolve() that isn't in a finally block needs to be checked for correctness.
+            //todo-1: everywhere in the app that I have a resolve() that isn't in a finally block needs to be checked for correctness.
             finally {
                 resolve();
             }

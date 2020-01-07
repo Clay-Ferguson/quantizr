@@ -308,6 +308,7 @@ export class Util implements UtilIntf {
     }
 
     initProgressMonitor = (): void => {
+        //This timer is a singleton that runs always so we don't need to ever clear the timeout. Not a resource leak.
         setInterval(this.progressInterval, 1000);
     }
 
@@ -654,7 +655,6 @@ export class Util implements UtilIntf {
                 //don't hang the promise more than 5 seconds, before reporting error and continuing.
                 let maxWaitTime = 5000;
 
-                //todo-0: check all code for 'setInterval' calls that aren't doing 'clearInterval' (that's a resource leak)
                 let interval = setInterval(() => {
 
                     // oops I only want this on PROD because when debugging it can timeout too much when breakpoints are set.
