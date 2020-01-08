@@ -362,7 +362,7 @@ export abstract class Comp implements CompIntf {
 
         this.children.forEach((child: Comp) => {
             if (child) {
-                reChildren.push(child.render(child.attribs));
+                reChildren.push(child.render());
             }
         });
         return reChildren;
@@ -426,8 +426,8 @@ export abstract class Comp implements CompIntf {
     }
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
-    render = (p: any): ReactNode => {
-        p = this.attribs;
+    render = (): ReactNode => {
+        let p = this.attribs;
         this.repairProps(p);
         // todo-1: Based on my reading of the React docs, calling 'useState' (inside hookState) shouldn't have to be done each time
         // in here, but I can see just from testing that unless we ALWAYS call 'hookState' again in here, things don't work. I'll just 
