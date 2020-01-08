@@ -3,6 +3,7 @@ import * as I from "../Interfaces";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants } from "../Constants";
+import { ReactNode } from "react";
 
 let S : Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -18,7 +19,7 @@ export class EditPropsTableRow extends Comp {
     }
 
     /* Div element is a special case where it renders just its children if there are any, and if not it renders 'content' */
-    compRender = (p: any): string => {
+    compRender = (p: any): ReactNode => {
         return this.tagRender('div', null, p);
     }
 }

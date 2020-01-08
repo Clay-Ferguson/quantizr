@@ -9,6 +9,7 @@ import { ButtonTag } from "./ButtonTag";
 import { Span } from "./Span";
 import { NavBarIconButton } from "./NavBarIconButton";
 import { Div } from "./Div";
+import { ReactNode } from "react";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -255,7 +256,7 @@ export class MainNavPanel extends NavTag {
         });
     }
 
-    compRender = (p: any) => {
+    compRender = (p: any): ReactNode => {
         return this.tagRender('nav', this.content, p);
     }
 }

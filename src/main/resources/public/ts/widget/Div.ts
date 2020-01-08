@@ -3,6 +3,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants } from "../Constants";
 import { CompIntf } from "./base/CompIntf";
+import { ReactNode } from "react";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -31,7 +32,7 @@ export class Div extends Comp {
         });
     }
 
-    compRender = (p) => {
+    compRender = (p: any): ReactNode => {
         return this.tagRender('div', this.getState().content, p);
     }
 }

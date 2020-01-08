@@ -2,6 +2,7 @@ import { Comp } from "./base/Comp";
 import { Singletons } from "../Singletons";
 import { Constants } from "../Constants";
 import { PubSub } from "../PubSub";
+import { ReactNode } from "react";
 
 let S : Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,7 +22,7 @@ export class VideoPlayer extends Comp {
         return <HTMLVideoElement>this.getElement();
     }
 
-    compRender = (p: any) => {
+    compRender = (p: any): ReactNode => {
         //this method not yet converted to react
         console.error("Feature not currently available.");
         //return S.tag.video(this.attribs, this.render_Children());

@@ -2,6 +2,7 @@ import { Comp } from "./base/Comp";
 import { Singletons } from "../Singletons";
 import { Constants } from "../Constants";
 import { PubSub } from "../PubSub";
+import { ReactNode } from "react";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -34,7 +35,7 @@ export class Checkbox extends Comp {
         return elm && (<any>elm).checked;
     }
 
-    compRender = (p) => {
+    compRender = (p: any): ReactNode  => {
         if (this.label) {
             return S.e('span', { key: p.id + "_span" }, S.e('input', p), 
             S.e('label', { 

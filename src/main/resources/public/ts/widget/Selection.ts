@@ -3,6 +3,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants } from "../Constants";
 import { SelectionOption } from "./SelectionOption";
+import { ReactNode } from "react";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -39,7 +40,7 @@ export class Selection extends Comp {
         });
     }
 
-    compRender = (p: any) => {
+    compRender = (p: any): ReactNode => {
         return this.tagRender('select', null, p);
     }
 }

@@ -2,6 +2,7 @@ import { Comp } from "./base/Comp";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
+import { ReactNode } from "react";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -41,7 +42,7 @@ export class TextField extends Comp {
         S.util.delayedFocus(this.getId());
     }
 
-    compRender = (p: any): string => {
+    compRender = (p: any): ReactNode => {
         let children = [];
     
         if (p.label) {

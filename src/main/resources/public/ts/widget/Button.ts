@@ -2,6 +2,7 @@ import { Comp } from "./base/Comp";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
+import { ReactNode } from "react";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -27,7 +28,7 @@ export class Button extends Comp {
         });
     }
 
-    compRender = (p: any): React.ReactNode => {
+    compRender = (p: any): ReactNode => {
         let icon: any;
 
         if (p.iconclass) {

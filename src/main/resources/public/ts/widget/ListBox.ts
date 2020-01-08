@@ -3,6 +3,7 @@ import { ListBoxRow } from "./ListBoxRow";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants } from "../Constants";
+import { ReactNode } from "react";
 
 let S : Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -39,7 +40,7 @@ export class ListBox extends Comp {
         this.selectedRow.setSelectedState(true);
     }
 
-    compRender = (p: any) => {
+    compRender = (p: any): ReactNode => {
         return this.tagRender('div', null, p);
     }
 }

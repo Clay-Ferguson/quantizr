@@ -2,6 +2,7 @@ import { Comp } from "./base/Comp";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
+import { ReactNode } from "react";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -19,7 +20,7 @@ export class NavBarButton extends Comp {
         this.setIsVisibleFunc(_isVisibleFunc);
     }
 
-    compRender = (p: any) => {
+    compRender = (p: any): ReactNode => {
         return S.e('button', p,
             S.e("i", {
                 key: "s_"+this.getId(),

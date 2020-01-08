@@ -2,6 +2,7 @@ import { Comp } from "./base/Comp";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
+import { ReactNode } from "react";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -16,7 +17,7 @@ export class ButtonTag extends Comp {
     }
 
     /* Div element is a special case where it renders just its children if there are any, and if not it renders 'content' */
-    compRender = (p): string => {
+    compRender = (p: any): ReactNode => {
         return S.e('button', p, S.e('span', {
             key: "s_"+this.getId(),
             className: "navbar-toggler-icon"

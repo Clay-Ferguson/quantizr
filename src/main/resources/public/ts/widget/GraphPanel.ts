@@ -4,6 +4,7 @@ import { PubSub } from "../PubSub";
 import { Constants } from "../Constants";
 
 import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
+import { ReactNode } from "react";
 
 // https://github.com/visjs/vis-network
 //      npm install vis-network
@@ -70,7 +71,7 @@ export class GraphPanel extends Comp {
         });
     }
 
-    compRender = (p: any) => {
+    compRender = (p: any): ReactNode => {
         this.init();
         return this.tagRender('div', "", p);
     }

@@ -78,6 +78,8 @@ export class Encryption implements EncryptionIntf {
         to be large enough and random enough, but is not required to be secret. 16 randomly chosen prime numbers. 
         WARNING: If you change this you will NEVER be able to recover any data encrypted with it in effect, even with the correct password. So 
         beware if you change this you've basically lost ALL your passwords. So just don't change it.
+
+        todo-1: Some crypto experts told me this IV should not be reused like this but instead stored along with the encryption key.
         */
         //iv = window.crypto.getRandomValues(new Uint8Array(16)); <--- I saw this in a reputable example. Try it out!
         this.vector = new Uint8Array([71, 73, 79, 83, 89, 37, 41, 47, 53, 67, 97, 103, 107, 109, 127, 131]);

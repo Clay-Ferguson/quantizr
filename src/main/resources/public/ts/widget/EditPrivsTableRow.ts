@@ -8,6 +8,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants } from "../Constants";
 import { Heading } from "./Heading";
+import { ReactNode } from "react";
 
 let S : Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -38,7 +39,7 @@ export class EditPrivsTableRow extends Comp {
         });
     }
 
-    compRender = (p: any) => {
+    compRender = (p: any): ReactNode => {
         return this.tagRender('div', null, p);
     }
 }

@@ -2,6 +2,7 @@ import { Comp } from "./base/Comp";
 import { Singletons } from "../Singletons";
 import { Constants } from "../Constants";
 import { PubSub } from "../PubSub";
+import { ReactNode } from "react";
 
 let S : Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,7 +22,7 @@ export class AudioPlayer extends Comp {
         return <HTMLAudioElement>this.getElement();
     }
 
-    compRender = (p: any): React.ReactNode => {
+    compRender = (p: any): ReactNode => {
         let elm = S.e('audio', p);
         return elm;
     }

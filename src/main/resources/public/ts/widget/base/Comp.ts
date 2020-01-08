@@ -27,17 +27,17 @@ export abstract class Comp implements CompIntf {
 
     /* Mainly invented to support markdown rendering this forces React to render the raw html */
     public renderRawHtml: boolean = false;
-    
+
     //This must private so that getState us used instead which might return 'state' but it also might return 'initialState'
     private state: any;
-    
+
     //This is the state that is in effect up until the first 'render' call, which is when hookState first gets called, and
     //the setState becomes the function returned from react useState, and the whole React-controlled rendering goes into effect.
     public initialState: any;
 
     //Flag that indicates if hookState has been called, and we also use it to know if initialState is no longer in use but state is instead.
     public stateHooked: boolean = false;
-    
+
     static idToCompMap: { [key: string]: Comp } = {};
     attribs: any;
 
@@ -57,6 +57,8 @@ export abstract class Comp implements CompIntf {
     extraEnabledClass: string;
     extraDisabledClass: string;
 
+    setStateFunc: Function;
+
     /**
      * 'react' should be true only if this component and all its decendants are true React components that are rendered and
      * controlled by ReactJS (rather than our own innerHTML)
@@ -73,7 +75,7 @@ export abstract class Comp implements CompIntf {
         let id = this.attribs.id || ("c" + Comp.nextGuid());
         this.attribs.id = id;
         this.attribs.key = id;
-    
+
         //This map allows us to lookup the Comp directly by its ID similar to a DOM lookup
         Comp.idToCompMap[id] = this;
 
@@ -313,15 +315,15 @@ export abstract class Comp implements CompIntf {
     todo-1: will be deleting this function soon, not yet.
     */
     repairProps(p: any) {
-        if (PROFILE=="prod") {
+        if (PROFILE == "prod") {
             return;
         }
-        
+
         if (p == null) return;
 
         if (p.style && typeof p.style === 'string') {
             console.error("element id: " + p.id + " has a style specified as string: " + p.style);
-            alert("Error. Check browser log."); 
+            alert("Error. Check browser log.");
             p.style = { border: '4px solid red' };
             p.title = "ERROR: style specified as string instead of object.";
         }
@@ -331,7 +333,7 @@ export abstract class Comp implements CompIntf {
             p.style = { border: '4px solid green' };
             delete p.class;
             console.error("class was corrected to className: Value was " + p.class);
-            alert("Error. Check browser log."); 
+            alert("Error. Check browser log.");
         }
 
         if (p.for) {
@@ -339,7 +341,7 @@ export abstract class Comp implements CompIntf {
             p.style = { border: '4px solid blue' };
             console.error("for was changed to htmlFor");
             delete p.for;
-            alert("Error. Check browser log."); 
+            alert("Error. Check browser log.");
         }
     }
 
@@ -424,24 +426,33 @@ export abstract class Comp implements CompIntf {
         });
     }
 
-    /* Currently each react functional component must call this, because there's no clean way to wrap it since non-react methods
-    have a null value for "this.render", by design. This i */
     hookState = (newState: any) => {
-        const [state, setState] = useState(newState);
-        this.setState = setState;
+        const [state, setStateFunc] = useState(newState);
+        this.setStateFunc = setStateFunc;
         this.state = state;
         this.stateHooked = true;
         this.initialState = null;
     }
 
-    /* Note: this method performs a direct state mod, but for react comps it gets overridden using useState return value */
+    /* Note: this method performs a direct state mod, but for react comps it gets overridden using useState return value 
+    
+    To add new properties...use this pattern (mergeState above does this)
+    setState(prevState => {
+        // Object.assign would also work
+        return {...prevState, ...updatedValues};
+    });
+    */
     setState = (state: any) => {
         // If 'hookState' has been called then this function should be pointing to whatever was returned from 'useState' 
         if (this.stateHooked) {
-            throw new Error("setState called when stateHooked is set. This is an invalid, and indicates a bug.");
+            //throw new Error("setState called when stateHooked is set. This is an invalid, and indicates a bug.");
+            this.state = state;
+            this.setStateFunc(state);
         }
-        // If state not yet hooked, we keep the 'state' in initialState
-        this.initialState = state;
+        else {
+            // If state not yet hooked, we keep the 'state' in initialState
+            this.initialState = state;
+        }
     }
 
     getState = (): any => {
@@ -449,18 +460,22 @@ export abstract class Comp implements CompIntf {
     }
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
-    render = (p: any): React.ReactNode => {
+    render = (p: any): ReactNode => {
         p = this.attribs;
         this.repairProps(p);
-        //todo-0: Currently this ends up calling 'useState' again after every state change which I think is probably not
-        //the standard approach nor performant. Research this.
-        this.hookState(this.initialState || this.state || {});
+        // todo-1: Based on my reading of the React docs, calling 'useState' (inside hookState) shouldn't have to be done each time
+        // in here, but I can see just from testing that unless we ALWAYS call 'hookState' again in here, things don't work. I'll just 
+        // have to assume I'm not understanding the docs, and leave the 'hookState' here for every call, since that works fine AND is also
+        // consistent with what the docs say (translation: Docs are unclear, but this works!)
+        //if (!this.stateHooked) {
+            this.hookState(this.initialState || this.state || {});
+        //}
         return this.compRender(p);
     }
 
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state
-    //manageent aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
-    compRender = (p: any): React.ReactNode => {
+    // manageent aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
+    compRender = (p: any): ReactNode => {
         if (true) {
             throw new Error("compRender should be overridden by the derived class.");
         }

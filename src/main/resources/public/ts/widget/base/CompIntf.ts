@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[]) => React.ReactNode;
 
 export interface CompIntf {
@@ -37,6 +39,6 @@ export interface CompIntf {
 
     getAttribs() : Object;
 
-    render(p: any): React.ReactNode;
-    compRender(p: any): React.ReactNode;
+    render(p: any): ReactNode;
+    compRender(p: any): ReactNode;
 }
