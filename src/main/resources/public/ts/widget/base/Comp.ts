@@ -104,7 +104,7 @@ export abstract class Comp implements CompIntf {
         this.subscribedToRefresh = true;
 
         PubSub.sub(Constants.PUBSUB_RefreshEnablement, (unused: Object) => {
-            this.whenElm((elm) => {
+            this.whenElm((elm: HTMLElement) => {
                 if (this.logEnablementLogic) {
                     //console.log("PubSub driven refreshState: on ID=" + this.getId());
                 }
@@ -128,7 +128,7 @@ export abstract class Comp implements CompIntf {
     }
 
     setDomAttr = (attrName: string, attrVal: string) => {
-        this.whenElm((elm) => {
+        this.whenElm((elm: HTMLElement) => {
             elm.setAttribute(attrName, attrVal);
             this.attribs[attrName] = attrVal;
         });
@@ -261,7 +261,7 @@ export abstract class Comp implements CompIntf {
     }
 
     setInnerHTML = (html: string) => {
-        S.dom.whenElm(this.getId(), (elm) => {
+        S.dom.whenElm(this.getId(), (elm: HTMLElement) => {
             elm.innerHTML = html;
         });
     }

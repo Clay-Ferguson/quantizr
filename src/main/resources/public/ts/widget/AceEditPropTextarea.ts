@@ -186,7 +186,7 @@ export class AceEditPropTextarea extends Div {
     }
 
     setValue = (val: string): void => {
-        this.whenElm((elm) => {
+        this.whenElm((elm: HTMLElement) => {
             //console.log("Ace.setValue="+val);
             this.aceEditor.setValue(val /* S.util.escapeHtml(val) */, 0);
         });

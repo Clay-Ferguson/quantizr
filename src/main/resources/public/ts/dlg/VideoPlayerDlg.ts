@@ -89,7 +89,7 @@ export class VideoPlayerDlg extends DialogBase {
     }
 
     init = (): void => {
-        // this.videoPlayer.whenElm((elm) => {
+        // this.videoPlayer.whenElm((elm: HTMLElement) => {
         //     //S.podcast.player = elm;
         // });
     }

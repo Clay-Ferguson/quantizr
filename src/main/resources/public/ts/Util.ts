@@ -606,7 +606,7 @@ export class Util implements UtilIntf {
     }
 
     setInnerHTMLById = (id: string, val: string): void => {
-        S.dom.whenElm(id, (elm) => {
+        S.dom.whenElm(id, (elm: HTMLElement) => {
             this.setInnerHTML(elm, val);
         });
     }
@@ -936,7 +936,7 @@ export class Util implements UtilIntf {
     }
 
     removeClassFromElmById = (id: string, clazz: string) => {
-        S.dom.whenElm(id, (elm) => {
+        S.dom.whenElm(id, (elm: HTMLElement) => {
             this.removeClassFromElm(elm, clazz);
         });
     }
@@ -953,7 +953,7 @@ export class Util implements UtilIntf {
 
     addClassToElmById = (id: string, clazz: string): void => {
         //console.log("Adding class "+clazz+" to dom id "+id);
-        S.dom.whenElm(id, (elm) => {
+        S.dom.whenElm(id, (elm: HTMLElement) => {
             //console.log("found dom id, adding class now.");
             this.addClassToElm(elm, clazz);
         });

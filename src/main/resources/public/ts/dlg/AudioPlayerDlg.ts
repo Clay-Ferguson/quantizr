@@ -150,7 +150,7 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     init = (): void => {
-        this.audioPlayer.whenElm((elm) => {
+        this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
             S.podcast.player = elm;
             setTimeout(this.updatePlayButtonText, 1000);
         });
