@@ -19,8 +19,8 @@ export class NavBarIconButton extends Comp {
         this.setIsVisibleFunc(_isVisibleFunc);
     }
 
-    compRender = (p: any): ReactNode => {
-        return S.e('button', p,
+    compRender = (): ReactNode => {
+        return S.e('button', this.attribs,
             S.e("i", {
                 key: "i_"+this.getId(),
                 className: "fa fa-lg " + this.iconClass,

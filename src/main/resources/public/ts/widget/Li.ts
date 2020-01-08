@@ -18,7 +18,7 @@ export class Li extends Comp {
         this.setChildren(initialChildren);
     }
 
-    compRender = (p: any): ReactNode => {
-        return S.e('li', p, this.makeReactChildren());
+    compRender = (): ReactNode => {
+        return S.e('li', this.attribs, this.makeReactChildren());
     }
 }

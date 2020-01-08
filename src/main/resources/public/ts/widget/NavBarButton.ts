@@ -20,8 +20,8 @@ export class NavBarButton extends Comp {
         this.setIsVisibleFunc(_isVisibleFunc);
     }
 
-    compRender = (p: any): ReactNode => {
-        return S.e('button', p,
+    compRender = (): ReactNode => {
+        return S.e('button', this.attribs,
             S.e("i", {
                 key: "s_"+this.getId(),
                 className: "fa fa-lg button-font",

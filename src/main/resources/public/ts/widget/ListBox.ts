@@ -40,7 +40,7 @@ export class ListBox extends Comp {
         this.selectedRow.setSelectedState(true);
     }
 
-    compRender = (p: any): ReactNode => {
-        return this.tagRender('div', null, p);
+    compRender = (): ReactNode => {
+        return this.tagRender('div', null, this.attribs);
     }
 }

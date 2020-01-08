@@ -15,7 +15,7 @@ export class SelectionOption extends Comp {
         this.attribs.value = this.key;
     }
 
-    compRender = (p: any): ReactNode => {
-        return S.e('option', p, this.val);
+    compRender = (): ReactNode => {
+        return S.e('option', this.attribs, this.val);
     }
 }

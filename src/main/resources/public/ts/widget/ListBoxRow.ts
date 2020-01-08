@@ -44,7 +44,7 @@ export class ListBoxRow extends Comp {
         this.listBox = listBox;
     }
 
-    compRender = (p: any): ReactNode => {
-        return this.tagRender('div', this.content, p);
+    compRender = (): ReactNode => {
+        return this.tagRender('div', this.content, this.attribs);
     }
 }

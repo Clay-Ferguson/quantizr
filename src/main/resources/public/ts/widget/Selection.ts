@@ -40,7 +40,7 @@ export class Selection extends Comp {
         });
     }
 
-    compRender = (p: any): ReactNode => {
-        return this.tagRender('select', null, p);
+    compRender = (): ReactNode => {
+        return this.tagRender('select', null, this.attribs);
     }
 }

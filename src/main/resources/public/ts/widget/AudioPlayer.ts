@@ -22,8 +22,8 @@ export class AudioPlayer extends Comp {
         return <HTMLAudioElement>this.getElement();
     }
 
-    compRender = (p: any): ReactNode => {
-        let elm = S.e('audio', p);
+    compRender = (): ReactNode => {
+        let elm = S.e('audio', this.attribs);
         return elm;
     }
 }

@@ -256,7 +256,7 @@ export class MainNavPanel extends NavTag {
         });
     }
 
-    compRender = (p: any): ReactNode => {
-        return this.tagRender('nav', this.content, p);
+    compRender = (): ReactNode => {
+        return this.tagRender('nav', this.content, this.attribs);
     }
 }

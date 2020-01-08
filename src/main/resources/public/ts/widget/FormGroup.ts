@@ -17,7 +17,7 @@ export class FormGroup extends Comp {
         this.setChildren(initialChildren);
     }
 
-    compRender = (p: any): ReactNode => {
-        return this.tagRender('div', null, p);
+    compRender = (): ReactNode => {
+        return this.tagRender('div', null, this.attribs);
     }
 }

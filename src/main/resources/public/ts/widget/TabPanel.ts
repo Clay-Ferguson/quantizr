@@ -19,7 +19,7 @@ export class TabPanel extends Comp {
         super(null);
     }
 
-    compRender = (p: any): ReactNode => {
+    compRender = (): ReactNode => {
 
         //the row of buttons that ARE the tabs where you click to change tabs.
         let tabButtons = new Div(null, {
@@ -127,9 +127,9 @@ export class TabPanel extends Comp {
         ]
         );
 
-        return new Div(null, {
-        }, [
+        return new Div(null, this.attribs
+        , [
             tabButtons, tabContent
-        ]).compRender(p);
+        ]).compRender();
     }
 }

@@ -32,7 +32,7 @@ export class Div extends Comp {
         });
     }
 
-    compRender = (p: any): ReactNode => {
-        return this.tagRender('div', this.getState().content, p);
+    compRender = (): ReactNode => {
+        return this.tagRender('div', this.getState().content, this.attribs);
     }
 }

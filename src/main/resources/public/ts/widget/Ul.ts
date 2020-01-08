@@ -17,7 +17,7 @@ export class Ul extends Comp {
         this.setChildren(initialChildren);
     }
 
-    compRender = (p: any): ReactNode => {
-        return S.e('ul', p, this.makeReactChildren());
+    compRender = (): ReactNode => {
+        return S.e('ul', this.attribs, this.makeReactChildren());
     }
 }

@@ -17,7 +17,7 @@ export class Span extends Comp {
         this.setChildren(initialChildren);
     }
 
-    compRender = (p: any): ReactNode => {
-        return this.tagRender('span', this.content, p);
+    compRender = (): ReactNode => {
+        return this.tagRender('span', this.content, this.attribs);
     }
 }

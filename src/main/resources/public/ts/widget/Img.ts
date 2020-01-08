@@ -15,7 +15,7 @@ export class Img extends Comp {
         super(attribs);
     }
 
-    compRender = (p: any): ReactNode => {
-        return S.e("img", p);
+    compRender = (): ReactNode => {
+        return S.e("img", this.attribs);
     }
 }

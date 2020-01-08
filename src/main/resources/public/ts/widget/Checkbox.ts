@@ -35,17 +35,17 @@ export class Checkbox extends Comp {
         return elm && (<any>elm).checked;
     }
 
-    compRender = (p: any): ReactNode  => {
+    compRender = (): ReactNode  => {
         if (this.label) {
-            return S.e('span', { key: p.id + "_span" }, S.e('input', p), 
+            return S.e('span', { key: this.attribs.id + "_span" }, S.e('input', this.attribs), 
             S.e('label', { 
-                key: p.id + "_label", 
+                key: this.attribs.id + "_label", 
                 className: "checkbox-label",
-                htmlFor: p.id 
+                htmlFor: this.attribs.id 
             }, this.label));
         }
         else {
-            return S.e('span', { key: p.id + "_span" }, S.e('input', p));
+            return S.e('span', { key: this.attribs.id + "_span" }, S.e('input', this.attribs));
         }
     }
 }

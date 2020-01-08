@@ -42,16 +42,16 @@ export class TextField extends Comp {
         S.util.delayedFocus(this.getId());
     }
 
-    compRender = (p: any): ReactNode => {
+    compRender = (): ReactNode => {
         let children = [];
     
-        if (p.label) {
+        if (this.attribs.label) {
             children.push(S.e('label', {
                 id: this.getId()+"_label",
                 key: this.getId()+"_label",
                 className: 'textfield-label',
                 htmlFor: this.getId()
-            }, p.label));
+            }, this.attribs.label));
         }
 
         children.push(S.e('input', this.attribs));

@@ -28,21 +28,19 @@ export class Button extends Comp {
         });
     }
 
-    compRender = (p: any): ReactNode => {
+    compRender = (): ReactNode => {
         let icon: any;
 
-        if (p.iconclass) {
+        if (this.attribs.iconclass) {
             icon = S.e('i', { 
                 key: "s_"+this.getId(),
-                className: p.iconclass,
+                className: this.attribs.iconclass,
                 style: {
                     marginRight: "6px"
                 }
             });
         }
 
-        this.repairProps(p);
-        let elm = S.e('button', p, [icon, this.getState().text]);
-        return elm;
+        return S.e('button', this.attribs, [icon, this.getState().text]);
     }
 }

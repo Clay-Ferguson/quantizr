@@ -71,9 +71,9 @@ export class GraphPanel extends Comp {
         });
     }
 
-    compRender = (p: any): ReactNode => {
+    compRender = (): ReactNode => {
         this.init();
-        return this.tagRender('div', "", p);
+        return this.tagRender('div', "", this.attribs);
     }
 }
 

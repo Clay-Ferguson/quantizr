@@ -63,17 +63,17 @@ export class RadioButton extends Comp {
         //return this.state.checked;
     }
 
-    compRender = (p: any): ReactNode => {
+    compRender = (): ReactNode => {
         // this.initState({
         //     checked: p.checked
         // });
 
-        let _p = p; //{...p, checked : this.state.checked};
         if (this.label) {
-            return S.e('span', { key: _p.id + "_span" }, S.e('input', _p), S.e('label', { key: _p.id + "_label", htmlFor: _p.id }, this.label));
+            return S.e('span', { key: this.attribs.id + "_span" }, 
+            S.e('input', this.attribs), S.e('label', { key: this.attribs.id + "_label", htmlFor: this.attribs.id }, this.label));
         }
         else {
-            return S.e('span', { key: _p.id + "_span" }, S.e('input', _p));
+            return S.e('span', { key: this.attribs.id + "_span" }, S.e('input', this.attribs));
         }
     }
 }

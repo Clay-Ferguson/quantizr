@@ -18,7 +18,7 @@ export class Anchor extends Comp {
         S.util.mergeProps(this.attribs, _attribs);
     }
 
-    compRender = (p: any): ReactNode => {
-        return S.e('a', p, this.children || this.content || this.url);
+    compRender = (): ReactNode => {
+        return S.e('a', this.attribs, this.children || this.content || this.url);
     }
 }

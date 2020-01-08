@@ -64,7 +64,6 @@ export abstract class Comp implements CompIntf {
      * whatever reason we want to disable react rendering, and fall back on render-to-text approach
      */
     constructor(attribs: any) {
-        this.repairProps(attribs);
         this.attribs = attribs || {};
         this.children = [];
 
@@ -306,42 +305,6 @@ export abstract class Comp implements CompIntf {
         return "<span id='" + this.getId() + "_re'></span>";
     }
 
-    /* This is a stop-gap measure to ease the convertion of the app to spring, and auto-fix certain nuances of attributes
-    that are special in React
-
-    todo-1: will be deleting this function soon, not yet.
-    */
-    repairProps(p: any) {
-        if (PROFILE == "prod") {
-            return;
-        }
-
-        if (p == null) return;
-
-        if (p.style && typeof p.style === 'string') {
-            console.error("element id: " + p.id + " has a style specified as string: " + p.style);
-            alert("Error. Check browser log.");
-            p.style = { border: '4px solid red' };
-            p.title = "ERROR: style specified as string instead of object.";
-        }
-
-        if (p.class) {
-            p.className = p.class;
-            p.style = { border: '4px solid green' };
-            delete p.class;
-            console.error("class was corrected to className: Value was " + p.class);
-            alert("Error. Check browser log.");
-        }
-
-        if (p.for) {
-            p.htmlFor = p.for;
-            p.style = { border: '4px solid blue' };
-            console.error("for was changed to htmlFor");
-            delete p.for;
-            alert("Error. Check browser log.");
-        }
-    }
-
     /* Attaches a react element directly to the dom at the DOM id specified. Throws exception of not a react element. */
     reactRenderToDOM = (id: string = null) => {
         if (!id) {
@@ -351,7 +314,6 @@ export abstract class Comp implements CompIntf {
         //     throw new Error("Attempted to treat non-react component as react: " + this.constructor.name);
         // }
         S.dom.whenElm(id, (elm: HTMLElement) => {
-            this.repairProps(this.attribs);
             ReactDOM.render(S.e(this.render, this.attribs), elm);
         });
     }
@@ -379,7 +341,6 @@ export abstract class Comp implements CompIntf {
         else {
             children = [content];
         }
-        this.repairProps(props);
         return S.e(tag, props, children);
     }
 
@@ -427,21 +388,13 @@ export abstract class Comp implements CompIntf {
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
     render = (): ReactNode => {
-        let p = this.attribs;
-        this.repairProps(p);
-        // todo-1: Based on my reading of the React docs, calling 'useState' (inside hookState) shouldn't have to be done each time
-        // in here, but I can see just from testing that unless we ALWAYS call 'hookState' again in here, things don't work. I'll just 
-        // have to assume I'm not understanding the docs, and leave the 'hookState' here for every call, since that works fine AND is also
-        // consistent with what the docs say (translation: Docs are unclear, but this works!)
-        //if (!this.stateHooked) {
         this.hookState(this.initialState || this.state || {});
-        //}
-        return this.compRender(p);
+        return this.compRender();
     }
 
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state
     // manageent aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
-    compRender = (p: any): ReactNode => {
+    compRender = (): ReactNode => {
         if (true) {
             throw new Error("compRender should be overridden by the derived class.");
         }

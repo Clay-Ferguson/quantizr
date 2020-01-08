@@ -39,5 +39,5 @@ export interface CompIntf {
 
     getAttribs() : Object;
 
-    compRender(p: any): ReactNode;
+    compRender(): ReactNode;
 }

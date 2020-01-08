@@ -32,12 +32,12 @@ export class MarkdownDiv extends Comp {
         });
     }
 
-    compRender = (p: any): ReactNode => {
+    compRender = (): ReactNode => {
         if (this.children) {
             console.error("dangerouslySetInnerHTML component had children. This is a bug.");
         }
 
-        p.dangerouslySetInnerHTML = { "__html": this.getState().content };
-        return S.e('div', p);
+        this.attribs.dangerouslySetInnerHTML = { "__html": this.getState().content };
+        return S.e('div', this.attribs);
     }
 }

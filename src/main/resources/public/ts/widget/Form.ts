@@ -16,7 +16,7 @@ export class Form extends Comp {
         this.setChildren(initialChildren);
     }
 
-    compRender = (p: any): ReactNode => {
-        return S.e('div', p, this.makeReactChildren());
+    compRender = (): ReactNode => {
+        return S.e('div', this.attribs, this.makeReactChildren());
     }
 }

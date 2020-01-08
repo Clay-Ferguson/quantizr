@@ -45,21 +45,18 @@ export class Textarea extends Comp {
         }
     }
 
-    compRender = (p: any): ReactNode => {
-        p = this.attribs;
-
-        this.repairProps(p);
+    compRender = (): ReactNode => {
         let children = [];
     
-        if (p.label) {
+        if (this.attribs.label) {
             children.push(S.e('label', {
                 id: this.getId()+"_label",
                 key: this.getId()+"_label",
                 htmlFor: this.getId()
-            }, p.label));
+            }, this.attribs.label));
         }
 
-        children.push(S.e('textarea', p, this.attribs.value));
+        children.push(S.e('textarea', this.attribs, this.attribs.value));
         return S.e('div', {
             id: this.getId()+"_textfield",
             key: this.getId()+"_textfield",

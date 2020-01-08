@@ -17,8 +17,8 @@ export class PropTable extends Comp {
         //(<any>this.attribs).sourceClass = "EditPropsTable";
     }
 
-    compRender = (p: any): ReactNode => {
-        return this.tagRender('table', null, p);
+    compRender = (): ReactNode => {
+        return this.tagRender('table', null, this.attribs);
     }
 }
 

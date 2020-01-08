@@ -16,7 +16,7 @@ export class Para extends Comp {
         super(attribs);
     }
 
-    compRender = (p: any): ReactNode => {
+    compRender = (): ReactNode => {
         return S.e('p', this.attribs, (this.content || ""));
     }
 }
