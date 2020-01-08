@@ -16,6 +16,7 @@ import { Para } from "../widget/Para";
 import { Img } from "../widget/Img";
 import { Anchor } from "../widget/Anchor";
 import { ButtonBar } from "../widget/ButtonBar";
+import { MarkdownDiv } from "../widget/MarkdownDiv";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -174,13 +175,11 @@ export class RssPlugin implements RssPluginIntf {
 
         //item += "CONTENT:ENCODED"+entry["content:encoded"];
         if (entry["content:encoded"]) {
-            let contentDiv = new Div(entry["content:encoded"]);
-            contentDiv.renderRawHtml = true;
+            let contentDiv = new MarkdownDiv(entry["content:encoded"]);
             children.push(contentDiv);
         }
         else if (entry.contentSnippet) {
-            let contentDiv = new Div(entry.contentSnippet);
-            contentDiv.renderRawHtml = true;
+            let contentDiv = new MarkdownDiv(entry.contentSnippet);
             children.push(contentDiv);
         }
 

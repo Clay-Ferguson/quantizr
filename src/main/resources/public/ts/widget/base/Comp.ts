@@ -25,9 +25,6 @@ export abstract class Comp implements CompIntf {
     public debug: boolean = false;
     private static guid: number = 0;
 
-    /* Mainly invented to support markdown rendering this forces React to render the raw html */
-    public renderRawHtml: boolean = false;
-
     //This must private so that getState us used instead which might return 'state' but it also might return 'initialState'
     private state: any;
 
@@ -359,33 +356,13 @@ export abstract class Comp implements CompIntf {
         });
     }
 
-    /* Using the 'children' property this returns an array that's guaranteed to be a react Element, even if
-    some of the components are *not* yet converted to react (i.e. their render method being null, and them being components that still
-    render to HTML string). Note this is a recursive function and renders all children and their children. */
     makeReactChildren = (): ReactNode[] => {
         if (this.children == null || this.children.length == 0) return null;
         let reChildren: ReactNode[] = [];
 
-        let idx = 0;
         this.children.forEach((child: Comp) => {
-            idx++;
             if (child) {
-
-                /* If this is an old-school non-react component (i.e. no render method, then we render it's HTML 'dangerously' and put it into a 
-                react span Element, as the inner html. This mess will go away once we are fully converted to ReactJS in this app, at which
-                time none of our components will render to HTML string */
-                if (/* !child.render || */ child.renderRawHtml) {
-                    let content = (child.renderRawHtml && (<any>child).content) ? (<any>child).content : "";
-                    let p = child.attribs;
-                    p.key = this.getId() + "_md" + idx;
-                    p.dangerouslySetInnerHTML = { "__html": content };
-                    this.repairProps(p);
-                    reChildren.push(S.e('div', p));
-                    return;
-                }
-
-                this.repairProps(child.attribs);
-                reChildren.push(S.e(child.render, child.attribs, child.makeReactChildren()));
+                reChildren.push(child.render(child.attribs));
             }
         });
         return reChildren;
@@ -393,28 +370,17 @@ export abstract class Comp implements CompIntf {
 
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
     tagRender = (tag: string, content: string, props: any) => {
-        if (this.renderRawHtml) {
-            if (this.children) {
-                console.log("tagRender on comp with renderRawHtml also has children. This is probably a bug. Children will not be rendered.");
+        let children: any[] = this.makeReactChildren();
+        if (children) {
+            if (content) {
+                children.unshift(content);
             }
-
-            let p: any = { key: this.getId() + "_rawhtm" };
-            p.dangerouslySetInnerHTML = { "__html": content };
-            return S.e(tag, p);
         }
         else {
-            let children: any[] = this.makeReactChildren();
-            if (children) {
-                if (content) {
-                    children.unshift(content);
-                }
-            }
-            else {
-                children = [content];
-            }
-            this.repairProps(props);
-            return S.e(tag, props, children);
+            children = [content];
         }
+        this.repairProps(props);
+        return S.e(tag, props, children);
     }
 
     /* Haven't tested this variation but it will add (merge in) new state into existing state without
@@ -468,7 +434,7 @@ export abstract class Comp implements CompIntf {
         // have to assume I'm not understanding the docs, and leave the 'hookState' here for every call, since that works fine AND is also
         // consistent with what the docs say (translation: Docs are unclear, but this works!)
         //if (!this.stateHooked) {
-            this.hookState(this.initialState || this.state || {});
+        this.hookState(this.initialState || this.state || {});
         //}
         return this.compRender(p);
     }
