@@ -124,9 +124,7 @@ export class EditNodeDlg extends DialogBase {
                         this.setTypeButton = new Button("Set Type", this.openChangeNodeTypeDlg),
                         //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
 
-                        //Encryption is a work in progress. Disabling for now for end users.
-                        //this.encryptionButton = new Button("Encryption", this.openEncryptionDlg),
-
+                        this.encryptionButton = new Button("Encryption", this.openEncryptionDlg),
                         this.cancelButton = new Button("Cancel", this.cancelEdit)
                     ])
             ])

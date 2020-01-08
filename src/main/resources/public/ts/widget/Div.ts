@@ -26,7 +26,7 @@ export class Div extends Comp {
         return "div";
     }
 
-    setInnerContent = (content: string) => {
+    setContent = (content: string) => {
         this.setState({
             content
         });

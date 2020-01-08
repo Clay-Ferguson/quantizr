@@ -204,7 +204,6 @@ export class Render implements RenderIntf {
 
     /* Renders 'content' property as markdown */
     renderMarkdown = (rowStyling: boolean, node: I.NodeInfo, retState: any): Comp => {
-        let div: MarkdownDiv = null;
         let content = node.content || "";
 
         //console.log("contentProp: " + contentProp);
@@ -215,7 +214,14 @@ export class Render implements RenderIntf {
         //the content-narrow, content-medium, and content-wide should be able to be set using user preference, OR able to be overridden on each
         //node at will also, like for a code block you'd want it very wide.
         let clazz = (rowStyling ? "jcr-content" : "jcr-root-content") + " content-narrow";
-        let val = this.renderRawMarkdown(node);
+
+        let val;
+        if (content.startsWith(cnst.ENC_TAG)) {
+            val = "Decrypting...";
+        }
+        else {
+            val = this.renderRawMarkdown(node);
+        }
 
         //When doing server-side markdown we had this processing the HTML that was generated
         //but I haven't looked into how to get this back now that we are doing markdown on client.
@@ -225,7 +231,7 @@ export class Render implements RenderIntf {
         // images under each markdown element to apply a styling update post-render.
         // todo-1: need to research the built-in support in React that allows these kinds of 'post-render' updates.
         // see: https://reactjs.org/docs/hooks-reference.html#useeffect
-        div = new MarkdownDiv(val, {
+        let div = new MarkdownDiv(val, {
             className: clazz + " markdown-html",
         });
 
@@ -239,17 +245,16 @@ export class Render implements RenderIntf {
                 setTimeout(async () => {
                     content = content.substring(cnst.ENC_TAG.length);
 
+                    //todo-1: for performance we could create a map of the hash of the encrypted content (key) to the
+                    //decrypted text (val), and hold that map so that once we decrypt a message we never use encryption again at least
+                    //until of course browser refresh (would be Javascript hash)
                     let clearText = await S.encryption.symDecryptString(null, content);
                     if (clearText) {
                         node.content = clearText;
                         let val2 = this.renderRawMarkdown(node);
-
-                        //div.setInnerContent(val2);
-                        //
-                        //todo-0: now that we have MarkdownDiv, probably a 'setState({content})' will be able to update this content!
-                        elm.innerHTML = val2;
+                        div.setContent(val2);
                     }
-                }, 1000);
+                }, 1);
             }
         });
 
