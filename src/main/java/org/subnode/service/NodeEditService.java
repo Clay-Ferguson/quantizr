@@ -88,7 +88,7 @@ public class NodeEditService {
 		newNode.setContent("");
 
 		api.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false));
+		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false, false, false));
 		res.setSuccess(true);
 	}
 
@@ -147,7 +147,7 @@ public class NodeEditService {
 		newNode.setContent("");
 
 		api.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false));
+		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false, false, false));
 		// }
 		res.setSuccess(true);
 	}
@@ -256,7 +256,7 @@ public class NodeEditService {
 				savePending = false;
 			}
 
-			NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, -1, false);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, -1, false, false, false);
 			res.setNode(nodeInfo);
 
 			if (savePending) {

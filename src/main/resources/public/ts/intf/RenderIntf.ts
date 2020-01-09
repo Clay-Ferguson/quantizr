@@ -14,7 +14,7 @@ export interface RenderIntf {
     getTopRightImageTag(node: I.NodeInfo): Img;
     getNodeBkgImageStyle(node: I.NodeInfo): string;
     centeredButtonBar(buttons: Comp[], classes?: string): Comp;
-    makeRowButtonBar(node: I.NodeInfo, canMoveUp: boolean, canMoveDown: boolean, editingAllowed: boolean): ButtonBar;
+    makeRowButtonBar(node: I.NodeInfo, editingAllowed: boolean): ButtonBar;
     makeHorizontalFieldSet(content: Comp[], extraClasses?: string): Comp;
     nodeHasChildren(uid: string): boolean;
     renderPageFromData(data?: I.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string): Promise<void>;

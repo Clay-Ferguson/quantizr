@@ -645,7 +645,7 @@ export class Util implements UtilIntf {
             // First we immediately try to get the element.
             let e: HTMLElement = document.getElementById(id);
             if (e) {
-                console.log("ELM found immediately: "+id);
+                //console.log("ELM found immediately: "+id);
                 if (exResolve) {
                     exResolve(e);
                 }
@@ -671,7 +671,7 @@ export class Util implements UtilIntf {
                     }
 
                     let e: HTMLElement = document.getElementById(id);
-                    console.log("waiting for elm: "+id);
+                    //console.log("waiting for elm: "+id);
                     if (e) {
                         clearInterval(interval);
                         //console.log("Got Elm: "+id);

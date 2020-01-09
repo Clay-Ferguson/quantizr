@@ -49,6 +49,8 @@ export interface NodeInfo {
     type: string;
     properties: PropertyInfo[];
     hasChildren: boolean;
+    firstChild: boolean;
+    lastChild: boolean;
     hasBinary: boolean;
     binaryIsImage: boolean;
     binVer: number;

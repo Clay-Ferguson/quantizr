@@ -62,7 +62,7 @@ public class NodeSearchService {
 		int counter = 0;
 
 		for (SubNode node : api.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(), MAX_NODES)) {
-			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter+1, false);
+			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter+1, false, false, false);
 			searchResults.add(info);
 			if (counter++ > MAX_NODES) {
 				break;

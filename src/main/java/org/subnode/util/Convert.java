@@ -55,7 +55,7 @@ public class Convert {
 	 */
 	public NodeInfo convertToNodeInfo(SessionContext sessionContext, MongoSession session, SubNode node,
 			boolean htmlOnly, boolean allowAbbreviated, boolean initNodeEdit, long logicalOrdinal,
-			boolean allowInlineChildren) {
+			boolean allowInlineChildren, boolean firstChild, boolean lastChild) {
 		boolean hasBinary = false;
 		boolean binaryIsImage = false;
 		ImageSize imageSize = null;
@@ -99,7 +99,7 @@ public class Convert {
 				node.getModifyTime(), propList, hasNodes, hasBinary, binaryIsImage, binVer, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
-				node.getType(), logicalOrdinal);
+				node.getType(), logicalOrdinal, firstChild, lastChild);
 
 		if (allowInlineChildren) {
 			boolean hasInlineChildren = node.getBooleanProp("inlineChildren");
@@ -126,7 +126,7 @@ public class Convert {
 
 					/* todo-1: what's diff between calling processRenderNode v.s. convertToNodeInfo here? */
 					nodeInfo.getChildren().add(convertToNodeInfo(sessionContext, session, n, htmlOnly, allowAbbreviated,
-							initNodeEdit, logicalOrdinal, false));
+							initNodeEdit, logicalOrdinal, false, firstChild, lastChild));
 
 					// nodeInfo.getChildren().add(processRenderNode(session, req, res, sn, false,
 					// null,

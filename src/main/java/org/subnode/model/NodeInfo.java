@@ -23,6 +23,12 @@ public class NodeInfo {
 	private String type;
 	private List<PropertyInfo> properties;
 	private boolean hasChildren;
+
+	// NOTE: These two booleans are hints for gui enablement (for moveUp, moveDown, etc) in the browser, 
+	// and are not necessarily reqired to be always even correct
+	private boolean firstChild;
+	private boolean lastChild;
+	
 	private boolean hasBinary;
 	private boolean binaryIsImage;
 	private long binVer;
@@ -45,7 +51,8 @@ public class NodeInfo {
 
 	public NodeInfo(String id, String path, String content, String owner, Long ordinal, Date lastModified,
 			List<PropertyInfo> properties, boolean hasChildren,
-			boolean hasBinary, boolean binaryIsImage, long binVer, int width, int height, String type, long logicalOrdinal) {
+			boolean hasBinary, boolean binaryIsImage, long binVer, int width, int height, String type, long logicalOrdinal,
+			boolean firstChild, boolean lastChild) {
 		this.id = id;
 		this.path = path;
 		this.content = content;
@@ -54,6 +61,8 @@ public class NodeInfo {
 		this.ordinal = ordinal;
 		this.properties = properties;
 		this.hasChildren = hasChildren;
+		this.firstChild = firstChild;
+		this.lastChild = lastChild;
 		this.hasBinary = hasBinary;
 		this.binaryIsImage = binaryIsImage;
 		this.binVer = binVer;
@@ -207,5 +216,21 @@ public class NodeInfo {
 
 	public void setLogicalOrdinal(Long logicalOrdinal) {
 		this.logicalOrdinal = logicalOrdinal;
+	}
+
+	public boolean isFirstChild() {
+		return this.firstChild;
+	}
+
+	public void setFirstChild(boolean firstChild) {
+		this.firstChild = firstChild;
+	}
+
+	public boolean isLastChild() {
+		return this.lastChild;
+	}
+
+	public void setLastChild(boolean lastChild) {
+		this.lastChild = lastChild;
 	}
 }

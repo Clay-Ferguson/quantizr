@@ -111,29 +111,26 @@ public class NodeRenderService {
 			req.setUpLevel(1);
 		}
 
-		//the 'siblingOffset' is for jumping forward or backward thru at the same level of the tree without
-		//having to first 'uplevel' and then click on the prev or next node.
+		// the 'siblingOffset' is for jumping forward or backward thru at the same level
+		// of the tree without
+		// having to first 'uplevel' and then click on the prev or next node.
 		if (req.getSiblingOffset() != 0) {
 			SubNode parent = api.getParent(session, node);
 			if (req.getSiblingOffset() < 0) {
 				SubNode nodeAbove = api.getSiblingAbove(session, node);
 				if (nodeAbove != null) {
 					node = nodeAbove;
-				}
-				else {
+				} else {
 					node = parent != null ? parent : node;
 				}
-			}
-			else if (req.getSiblingOffset() > 0) {
+			} else if (req.getSiblingOffset() > 0) {
 				SubNode nodeBelow = api.getSiblingBelow(session, node);
 				if (nodeBelow != null) {
 					node = nodeBelow;
-				}
-				else {
+				} else {
 					node = parent != null ? parent : node;
 				}
-			}
-			else {
+			} else {
 				node = parent != null ? parent : node;
 			}
 		} else {
@@ -164,8 +161,9 @@ public class NodeRenderService {
 			}
 		}
 
-		//For IPFS Proof-of-Concept work we just code the call right here, rather than having a plugin-based polymorphic
-		//interface we can call to fully decouple the IPFS from this rener service.
+		// For IPFS Proof-of-Concept work we just code the call right here, rather than
+		// having a plugin-based polymorphic
+		// interface we can call to fully decouple the IPFS from this rener service.
 		if (session.isAdmin()) {
 			if (node.isType(TYPES.FS_FOLDER)) {
 				fileSyncService.syncFolder(session, node, false, null);
@@ -185,16 +183,16 @@ public class NodeRenderService {
 	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res,
 			final SubNode node, boolean scanToNode, String scanToPath, boolean isWebPage, int ordinal, int level) {
 
-		// log.debug("RENDER: " + XString.prettyPrint(node) + " ordinal=" + ordinal +
-		// "level=" + level);
+		//log.debug(
+		//		"RENDER: " + node.getPath() /* XString.prettyPrint(node) */ + " ordinal=" + ordinal + "level=" + level);
 		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, ordinal,
-				level > 0);
+				level > 0, false, false);
 
 		/*
 		 * If we are not processing a webpage, then we don't recurse deep into the tree
 		 * for rendering
 		 */
-		// Commenting. isWebPage faature is not fully tested yet, may not even currently
+		// Commenting. isWebPage feature is not fully tested yet, may not even currently
 		// work after much refactoring.
 		if (!isWebPage && level > 0) {
 			return nodeInfo;
@@ -242,6 +240,9 @@ public class NodeRenderService {
 		 * paginating so this should be fine, because there will be a very small number
 		 * of nodes that are not visible to the user, so I can't think of a pathological
 		 * case here. Just noting that this IS an imperfection/flaw.
+		 * 
+		 * todo-0: Instead of running 'skip' here we should be setting an 'offset' on
+		 * the initial query.
 		 */
 		if (!scanToNode && offset > 0) {
 			idx = api.skip(iterator, offset);
@@ -259,6 +260,8 @@ public class NodeRenderService {
 		if (offset == 0 && scanToNode) {
 			slidingWindow = new LinkedList<SubNode>();
 		}
+
+		NodeInfo ninfo = null;
 
 		/*
 		 * Main loop to keep reading nodes from the database until we have enough to
@@ -305,8 +308,12 @@ public class NodeRenderService {
 								// + XString.prettyPrint(node));
 								// nodeInfo.getChildren().add(convert.convertToNodeInfo(sessionContext,
 								// session, sn, true, true, false, offset + count));
-								nodeInfo.getChildren().add(processRenderNode(session, req, res, sn, false, null,
-										isWebPage, offset + count, level + 1));
+								ninfo = processRenderNode(session, req, res, sn, false, null, isWebPage,
+										offset + count, level + 1);
+								nodeInfo.getChildren().add(ninfo);
+								if (offset==0 && nodeInfo.getChildren().size() == 1) {
+									ninfo.setFirstChild(true);
+								}
 							}
 						} else {
 							idxOfNodeFound = idx;
@@ -342,15 +349,20 @@ public class NodeRenderService {
 				// if (isWebPage) {
 				// processRenderNode(session, req, res, n, n.getPath(), scanToNode, isWebPage);
 				// }
-				nodeInfo.getChildren().add(
-						processRenderNode(session, req, res, n, false, null, isWebPage, offset + count, level + 1));
+				ninfo = processRenderNode(session, req, res, n, false, null, isWebPage, offset + count,
+						level + 1);
+				nodeInfo.getChildren().add(ninfo);
+
+				if (offset==0 && nodeInfo.getChildren().size() == 1) {
+					ninfo.setFirstChild(true);
+				}
 
 				if (!isWebPage && count >= ROWS_PER_PAGE) {
 					if (!iterator.hasNext()) {
 						endReached = true;
 						break;
 					}
-					SubNode finalNode = iterator.next();
+					SubNode finalNode = iterator.next(); // todo-0: why is this line here? mistake?
 
 					/* break out of while loop, we have enough children to send back */
 					break;
@@ -365,6 +377,11 @@ public class NodeRenderService {
 		if (idxOfNodeFound != -1) {
 			res.setOffsetOfNodeFound(idxOfNodeFound);
 		}
+
+		if (endReached && ninfo!=null && nodeInfo.getChildren().size() > 1) {
+			ninfo.setLastChild(true);
+		}
+
 		res.setEndReached(endReached);
 		return nodeInfo;
 	}
@@ -383,7 +400,8 @@ public class NodeRenderService {
 			return;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, false, false, true, -1, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, false, false, true, -1, false,
+				false, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 	}

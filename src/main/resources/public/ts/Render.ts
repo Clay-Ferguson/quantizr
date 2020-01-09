@@ -399,13 +399,11 @@ export class Render implements RenderIntf {
         let uid: string = node.uid;
         let prevPageExists: boolean = S.nav.mainOffset > 0;
         let nextPageExists: boolean = !S.nav.endReached;
-        let canMoveUp: boolean = (index > 0 && rowCount > 1) || prevPageExists;
-        let canMoveDown: boolean = (index < count - 1) || nextPageExists;
 
         let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[node.type];
         if (typeHandler) {
-            canMoveUp = typeHandler.allowAction("moveUp");
-            canMoveDown = typeHandler.allowAction("moveDown");
+            // canMoveUp = typeHandler.allowAction("moveUp");
+            // canMoveDown = typeHandler.allowAction("moveDown");
         }
 
         // let editingAllowed: boolean = S.props.isOwnedCommentNode(node);
@@ -428,7 +426,7 @@ export class Render implements RenderIntf {
         let focusNode: I.NodeInfo = S.meta64.getHighlightedNode();
         let selected: boolean = (focusNode && focusNode.uid === uid);
 
-        let buttonBar: ButtonBar = this.makeRowButtonBar(node, canMoveUp, canMoveDown, editingAllowed);
+        let buttonBar: ButtonBar = this.makeRowButtonBar(node, editingAllowed);
         //let bkgStyle: string = this.getNodeBkgImageStyle(node);
         let indentLevel = layoutClass === "node-grid-item" ? 0 : level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
@@ -496,7 +494,7 @@ export class Render implements RenderIntf {
         }, buttons);
     }
 
-    makeRowButtonBar = (node: I.NodeInfo, canMoveUp: boolean, canMoveDown: boolean, editingAllowed: boolean): ButtonBar => {
+    makeRowButtonBar = (node: I.NodeInfo, editingAllowed: boolean): ButtonBar => {
 
         let createdBy: string = node.owner;
         let commentBy: string = S.props.getNodePropertyVal(cnst.COMMENT_BY, node);
@@ -602,14 +600,14 @@ export class Render implements RenderIntf {
 
                 if (cnst.MOVE_UPDOWN_ON_TOOLBAR && !commentBy) {
 
-                    if (canMoveUp) {
+                    if (!node.firstChild) {
                         /* Construct Create Subnode Button */
                         moveNodeUpButton = new Button(null, () => { S.meta64.moveNodeUp(node.uid); }, {
                             "iconclass": "fa fa-arrow-up fa-lg"
                         });
                     }
 
-                    if (canMoveDown) {
+                    if (!node.lastChild) {
                         /* Construct Create Subnode Button */
                         moveNodeDownButton = new Button(null, () => { S.meta64.moveNodeDown(node.uid); }, {
                             "iconclass": "fa fa-arrow-down fa-lg"

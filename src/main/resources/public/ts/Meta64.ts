@@ -10,6 +10,7 @@ import { TabPanel } from "./widget/TabPanel";
 import { MainNavPanel } from "./widget/MainNavPanel";
 import { GraphPanel } from "./widget/GraphPanel";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
+
 declare var chrome;
 
 let S: Singletons;
@@ -524,9 +525,10 @@ export class Meta64 implements Meta64Intf {
         this.state.exportFeatureEnabled = true; //this.isAdminUser || this.userPreferences.exportAllowed;
 
         this.state.highlightOrdinal = this.getOrdinalOfNode(this.state.highlightNode);
+
         this.state.numChildNodes = this.getNumChildNodes();
-        this.state.canMoveUp = (this.state.highlightOrdinal > 0 && this.state.numChildNodes > 1) || this.state.prevPageExists;
-        this.state.canMoveDown = (this.state.highlightOrdinal < this.state.numChildNodes - 1 && this.state.numChildNodes > 1) || this.state.nextPageExists;
+        this.state.canMoveUp = this.state.highlightNode && !this.state.highlightNode.firstChild;
+        this.state.canMoveDown = this.state.highlightNode && !this.state.highlightNode.lastChild;
 
         //todo-1: need to add to this selNodeIsMine || selParentIsMine;
         this.state.canCreateNode = this.userPreferences.editMode && this.state.highlightNode && (this.isAdminUser || (!this.isAnonUser /* && selNodeIsMine */));
