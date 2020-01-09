@@ -32,6 +32,10 @@ export class Render implements RenderIntf {
     private debug: boolean = false;
     private markedRenderer = null;
 
+    //This flag makes the text ALWAYS decrypt and display onscreen if the person owning the content is viewing it, but this
+    //is most likely never wanted, because it's insecure in screen-share context, or when someone can see your screen for any reason.
+    private immediateDecrypting: boolean = false;
+
     private renderBinary = (node: I.NodeInfo): Comp => {
         /*
          * If this is an image render the image directly onto the page as a visible image
@@ -205,11 +209,7 @@ export class Render implements RenderIntf {
     /* Renders 'content' property as markdown */
     renderMarkdown = (rowStyling: boolean, node: I.NodeInfo, retState: any): Comp => {
         let content = node.content || "";
-
-        //console.log("contentProp: " + contentProp);
         retState.renderComplete = true;
-
-        //console.log("MARKDOWN IN:\n"+jcrContent);
 
         //the content-narrow, content-medium, and content-wide should be able to be set using user preference, OR able to be overridden on each
         //node at will also, like for a code block you'd want it very wide.
@@ -217,7 +217,7 @@ export class Render implements RenderIntf {
 
         let val;
         if (content.startsWith(cnst.ENC_TAG)) {
-            val = "Decrypting...";
+            val = "[Encrypted]";
         }
         else {
             val = this.renderRawMarkdown(node);
@@ -241,7 +241,7 @@ export class Render implements RenderIntf {
         div.whenElm((elm: HTMLElement) => {
             this.setImageMaxWidths();
 
-            if (content.startsWith(cnst.ENC_TAG)) {
+            if (this.immediateDecrypting && content.startsWith(cnst.ENC_TAG)) {
                 setTimeout(async () => {
                     content = content.substring(cnst.ENC_TAG.length);
 

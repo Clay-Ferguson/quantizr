@@ -33,8 +33,8 @@ export class MarkdownDiv extends Comp {
     }
 
     compRender = (): ReactNode => {
-        if (this.children) {
-            console.error("dangerouslySetInnerHTML component had children. This is a bug.");
+        if (this.children && this.children.length > 0) {
+            console.error("dangerouslySetInnerHTML component had children. This is a bug: id="+this.getId()+" constructor.name="+this.constructor.name);
         }
 
         this.attribs.dangerouslySetInnerHTML = { "__html": this.getState().content };

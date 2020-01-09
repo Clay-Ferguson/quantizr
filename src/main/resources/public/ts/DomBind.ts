@@ -116,7 +116,6 @@ export class DomBind implements DomBindIntf {
         }
     }
 
-    // todo-1: need to make this use promises instead of callbacks.
     public whenElm = (domId: string, callback: Function) => {
 
         if (S.util.startsWith(domId, "#")) {
