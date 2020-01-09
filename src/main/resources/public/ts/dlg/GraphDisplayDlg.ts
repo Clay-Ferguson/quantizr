@@ -41,7 +41,7 @@ export class GraphDisplayDlg extends DialogBase {
     }
 
     init = (): void => {
-        S.dom.whenElm(this.getId(), (elm: HTMLElement) => {
+        this.whenElm((elm: HTMLElement) => {
 
             // create an array with nodes
             var nodes = new DataSet([

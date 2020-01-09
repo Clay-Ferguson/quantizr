@@ -17,7 +17,6 @@ import { Attachment } from "./Attachment";
 import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
 import { Constants } from "./Constants";
-import { DomBind } from "./DomBind";
 import { Nav } from "./Nav";
 import { Podcast } from "./Podcast";
 import { Props } from "./Props";
@@ -71,7 +70,6 @@ export class Factory {
             user: new User(),
             view: new View(),
             podcast: new Podcast(),
-            dom: new DomBind(),
             rssPlugin: new RssPlugin(),
             coreTypesPlugin: new CoreTypesPlugin(),
             bashPlugin: new BashPlugin(),

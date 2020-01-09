@@ -582,7 +582,7 @@ export class Meta64 implements Meta64Intf {
     // go ahead and make this async
     anonPageLoadResponse = (res: I.AnonPageLoadResponse): void => {
 
-        S.dom.whenElm("listView", async (elm: HTMLElement) => {
+        S.util.getElm("listView", async (elm: HTMLElement) => {
             if (res.renderNodeResponse) {
                 S.util.setElmDisplayById("mainNodeContent", true);
 
@@ -833,7 +833,7 @@ export class Meta64 implements Meta64Intf {
      * This app doesn't support drag-n-drop yet, but this code is the beginning of a proof-of-concept for that feature.
      */
     enableAppAsDropTarget = () => {
-        S.dom.whenElm("app", (elm: HTMLElement) => {
+        S.util.getElm("app", (elm: HTMLElement) => {
             elm.addEventListener("dragover", function (event) {
                 console.log("dragover detected.");
                 // event.preventDefault();

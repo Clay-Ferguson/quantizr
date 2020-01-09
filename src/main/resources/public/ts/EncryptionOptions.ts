@@ -5,7 +5,6 @@ import { Constants } from "./Constants";
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
-    s.dom.init();
 });
 
 export class EncryptionOptions {

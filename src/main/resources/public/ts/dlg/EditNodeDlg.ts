@@ -319,7 +319,7 @@ export class EditNodeDlg extends DialogBase {
             let tagsPropExists = S.props.getNodePropertyVal("sn:tags", S.edit.editNode) != null;
             this.addTagsPropertyButton.setVisible(!tagsPropExists);
 
-            // S.dom.whenElm(this.getId(), (elm : HTMLElement) => {
+            // S.util.getElm(this.getId(), (elm : HTMLElement) => {
             //     elm.style.display = "inline-block";
             // });
 

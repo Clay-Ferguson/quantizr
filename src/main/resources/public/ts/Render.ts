@@ -691,7 +691,7 @@ export class Render implements RenderIntf {
 
                     S.nav.endReached = data && data.endReached;
 
-                    S.dom.whenElm("listView", (elm: HTMLElement) => {
+                    S.util.getElm("listView", (elm: HTMLElement) => {
                         if (!data || !data.node) {
                             S.util.setElmDisplayById("listView", false);
                             let contentDiv = new Div("No content available");
@@ -896,7 +896,7 @@ export class Render implements RenderIntf {
                 }
 
                 //console.log("rendering output=: " + S.util.toJson(output));
-                S.dom.whenElm("listView", async (elm: HTMLElement) => {
+                S.util.getElm("listView", async (elm: HTMLElement) => {
                     try {
                         //console.log("listView found.");
                         let outputDiv = new Div(null, null, output);

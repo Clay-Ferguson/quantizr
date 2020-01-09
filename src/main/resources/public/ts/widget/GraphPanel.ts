@@ -29,7 +29,7 @@ export class GraphPanel extends Comp {
     }
 
     init = (): void => {
-        // S.dom.whenElm(this.getId(), (elm: HTMLElement) => {
+        // S.util.getElm(this.getId(), (elm: HTMLElement) => {
 
         //     // create an array with nodes
         //     var nodes = new DataSet([
@@ -58,7 +58,7 @@ export class GraphPanel extends Comp {
     }
 
     setGraphData = (data: any): void => {
-        S.dom.whenElm(this.getId(), (elm: HTMLElement) => {
+        this.whenElm((elm: HTMLElement) => {
 
             // Lazy create network, and populate with data.
             if (!this.network) {

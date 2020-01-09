@@ -606,7 +606,7 @@ export class Util implements UtilIntf {
     }
 
     setInnerHTMLById = (id: string, val: string): void => {
-        S.dom.whenElm(id, (elm: HTMLElement) => {
+        S.util.getElm(id, (elm: HTMLElement) => {
             this.setInnerHTML(elm, val);
         });
     }
@@ -637,13 +637,18 @@ export class Util implements UtilIntf {
         }
     }
 
-    getElm = (id: string): Promise<HTMLElement> => {
+    /* We return a promise that resolves to the element, but also support a callback function
+    that can be used optionally whenver that's more convenient */
+    getElm = (id: string, exResolve: (elm: HTMLElement) => void = null): Promise<HTMLElement> => {
         return new Promise<HTMLElement>((resolve, reject) => {
 
             // First we immediately try to get the element.
             let e: HTMLElement = document.getElementById(id);
             if (e) {
                 console.log("ELM found immediately: "+id);
+                if (exResolve) {
+                    exResolve(e);
+                }
                 resolve(e);
             }
             // If element not found we just go into a wait for it (polling)
@@ -670,6 +675,9 @@ export class Util implements UtilIntf {
                     if (e) {
                         clearInterval(interval);
                         //console.log("Got Elm: "+id);
+                        if (exResolve) {
+                            exResolve(e);
+                        }
                         resolve(e);
                     }
                 }, timeSlice);
@@ -936,7 +944,7 @@ export class Util implements UtilIntf {
     }
 
     removeClassFromElmById = (id: string, clazz: string) => {
-        S.dom.whenElm(id, (elm: HTMLElement) => {
+        S.util.getElm(id, (elm: HTMLElement) => {
             this.removeClassFromElm(elm, clazz);
         });
     }
@@ -953,7 +961,7 @@ export class Util implements UtilIntf {
 
     addClassToElmById = (id: string, clazz: string): void => {
         //console.log("Adding class "+clazz+" to dom id "+id);
-        S.dom.whenElm(id, (elm: HTMLElement) => {
+        S.util.getElm(id, (elm: HTMLElement) => {
             //console.log("found dom id, adding class now.");
             this.addClassToElm(elm, clazz);
         });

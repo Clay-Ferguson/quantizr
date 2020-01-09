@@ -2,7 +2,6 @@ import { Meta64Intf } from "./intf/Meta64Intf";
 import { AttachmentIntf } from "./intf/AttachmentIntf";
 import { EditIntf } from "./intf/EditIntf";
 import { EncryptionIntf } from "./intf/EncryptionIntf";
-import { DomBindIntf } from "./intf/DomBindIntf";
 import { NavIntf } from "./intf/NavIntf";
 import { PodcastIntf } from "./intf/PodcastIntf";
 import { PropsIntf } from "./intf/PropsIntf";
@@ -45,7 +44,6 @@ export interface Singletons {
     activityPub: ActivityPubIntf;
     podcast: PodcastIntf;
     //systemFolder: SystemFolderIntf;
-    dom: DomBindIntf;
     rssPlugin: RssPluginIntf;
     coreTypesPlugin: CoreTypesPluginIntf;
     bashPlugin: BashPluginIntf;

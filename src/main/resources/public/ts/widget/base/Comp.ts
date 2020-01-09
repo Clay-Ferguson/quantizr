@@ -177,20 +177,20 @@ export abstract class Comp implements CompIntf {
         return this.attribs.id;
     }
 
-    /* Warning: Under lots of circumstances it's better to call dom.whenElm rather than getElement() because getElement returns
+    /* Warning: Under lots of circumstances it's better to call util.getElm rather than getElement() because getElement returns
     null unless the element is already created and rendered onto the DOM */
     getElement = (): HTMLElement => {
         return <HTMLElement>document.getElementById(this.getId());
     }
 
-    whenElm = (func: Function) => {
-        S.dom.whenElm(this.getId(), func);
+    whenElm = (func: (elm: HTMLElement) => void) => {
+        S.util.getElm(this.getId(), func);
     }
 
     /* WARNING: this is NOT a setter for 'this.visible'. Perhaps i need to rename it for better clarity, it takes
     this.visible as its input sometimes. Slightly confusing */
     setVisible = (visible: boolean) => {
-        S.dom.whenElm(this.getId(), (elm: HTMLElement) => {
+        this.whenElm((elm: HTMLElement) => {
             S.util.setElmDisplay(elm, visible);
         });
     }
@@ -198,7 +198,7 @@ export abstract class Comp implements CompIntf {
     /* WARNING: this is NOT the setter for 'this.enabled' */
     setEnabled = (enabled: boolean) => {
         this.enabled = enabled;
-        S.dom.whenElm(this.getId(), (elm: HTMLElement) => {
+        this.whenElm((elm: HTMLElement) => {
             (<any>elm).disabled = !enabled;
 
             if (!enabled) {
@@ -257,7 +257,7 @@ export abstract class Comp implements CompIntf {
     }
 
     setInnerHTML = (html: string) => {
-        S.dom.whenElm(this.getId(), (elm: HTMLElement) => {
+        this.whenElm((elm: HTMLElement) => {
             elm.innerHTML = html;
         });
     }
@@ -313,7 +313,7 @@ export abstract class Comp implements CompIntf {
         // if (!this.render) {
         //     throw new Error("Attempted to treat non-react component as react: " + this.constructor.name);
         // }
-        S.dom.whenElm(id, (elm: HTMLElement) => {
+        S.util.getElm(id, (elm: HTMLElement) => {
             ReactDOM.render(S.e(this.render, this.attribs), elm);
         });
     }
