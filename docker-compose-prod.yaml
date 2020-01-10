@@ -59,6 +59,7 @@ services:
             server.port: "443" 
             httpProtocol: "https" 
             metaHost: "quantizr.com" 
+            reSaveAll: "true"
             allowFileSystemSearch: "false" 
             forceIndexRebuild: "false"
             spring.http.multipart.max-file-size: "5MB" 

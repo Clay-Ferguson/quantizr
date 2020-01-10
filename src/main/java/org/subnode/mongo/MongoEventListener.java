@@ -7,6 +7,8 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.util.XString;
 
+import org.subnode.service.Sha256Service;
+
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -26,11 +28,16 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Autowired
 	private AllSubNodeTypes TYPES;
 
-	/* todo-2: This is a temporary hack to allow our ExportJsonService.resetNode importer to work. This is importing nodes that should be all
-	self contained as a directed graph and there's no risk if nodes without parents, but they MAY be out of order so that the children 
-	of some nodes may appear in the JSON being imported BEFORE their parents (which would cause the parent check to fail, up until the full
-	node graph has been imported), and so I'm creating this hack to globally disable
-	the check during the import only. There are hardly any website users thus far, so this temporary hack will be ok for now */
+	/*
+	 * todo-2: This is a temporary hack to allow our ExportJsonService.resetNode
+	 * importer to work. This is importing nodes that should be all self contained
+	 * as a directed graph and there's no risk if nodes without parents, but they
+	 * MAY be out of order so that the children of some nodes may appear in the JSON
+	 * being imported BEFORE their parents (which would cause the parent check to
+	 * fail, up until the full node graph has been imported), and so I'm creating
+	 * this hack to globally disable the check during the import only. There are
+	 * hardly any website users thus far, so this temporary hack will be ok for now
+	 */
 	public static boolean parentCheckEnabled = true;
 
 	/**
@@ -86,8 +93,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.setPath(path);
 		}
 
-		// node.forcePathHashUpdate();
-		// dbObj.put(SubNode.FIELD _PATH_HASH, node.getPathHash());
+		String pathHash = Sha256Service.getHashOfString(node.getPath());
+		if (!pathHash.equals(node.getPathHash())) {
+			dbObj.put(SubNode.FIELD_PATH_HASH, pathHash);
+			node.setPathHash(pathHash);
+			log.debug("RESET PathHash=" + pathHash);
+		}
 
 		Date now = new Date();
 		if (node.getCreateTime() == null) {
@@ -113,4 +124,3 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	// node.setWriting(false);
 	// }
 }
-

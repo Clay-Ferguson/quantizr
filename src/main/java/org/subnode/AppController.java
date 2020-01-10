@@ -31,6 +31,7 @@ import org.subnode.model.ExportOutputType;
 import org.subnode.mongo.AclService;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddPrivilegeRequest;
 import org.subnode.request.AnonPageLoadRequest;
 import org.subnode.request.AppDropRequest;
@@ -130,6 +131,7 @@ import org.subnode.service.SolrSearchService;
 import org.subnode.service.SystemService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.ExUtil;
+import org.subnode.util.ValContainer;
 
 /**
  * Primary Spring MVC controller. All application logic from the browser
@@ -267,8 +269,23 @@ public class AppController {
 			userManagerService.processSignupCode(signupCode, model);
 		}
 
-		// It's ok for id to be null here.
-		sessionContext.setUrlId(id);
+		if (id != null) {
+			ValContainer<String> vcId = new ValContainer<String>(id);
+			log.debug("ID specified on url: " + id);
+			adminRunner.run(mongoSession -> {
+				// we don't check ownership of node at this time, but merely check sanity of
+				// whether this ID is even existing or not.
+				SubNode node = api.getNode(mongoSession, id);
+				if (node == null) {
+					log.debug("Node did not exist.");
+					vcId.setVal(null);
+				} else {
+					log.debug("Node exists.");
+				}
+			});
+			// It's ok for id to be null here.
+			sessionContext.setUrlId(vcId.getVal());
+		}
 
 		if (passCode != null) {
 			return "forward:/index.html?passCode=" + passCode;

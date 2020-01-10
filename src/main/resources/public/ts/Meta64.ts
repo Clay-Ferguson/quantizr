@@ -233,6 +233,7 @@ export class Meta64 implements Meta64Intf {
             if (this.treeDirty) {
                 S.view.refreshTree(null, true);
             } else {
+                //console.log("goToMainPage.");
                 await S.render.renderPageFromData();
             }
         }
@@ -597,6 +598,7 @@ export class Meta64 implements Meta64Intf {
                     this.refreshAllGuiEnablement();
                 }
                 else {
+                    //console.log("anonPageLoad");
                     await S.render.renderPageFromData(res.renderNodeResponse);
                 }
 

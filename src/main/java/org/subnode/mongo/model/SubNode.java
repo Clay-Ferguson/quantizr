@@ -59,7 +59,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({ SubNode.FIELD_PATH, SubNode.FIELD_TYPE, SubNode.FIELD_ID,
+@JsonPropertyOrder({ SubNode.FIELD_PATH, SubNode.FIELD_PATH_HASH, SubNode.FIELD_TYPE, SubNode.FIELD_ID,
 		SubNode.FIELD_MAX_CHILD_ORDINAL, SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
 		SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_ACL, SubNode.FIELD_PROPERTIES })
 public class SubNode {
@@ -83,6 +83,10 @@ public class SubNode {
 	public static final String FIELD_PATH = "pth";
 	@Field(FIELD_PATH)
 	private String path;
+
+	public static final String FIELD_PATH_HASH = "phash";
+	@Field(FIELD_PATH_HASH)
+	private String pathHash;
 
 	public static final String FIELD_TYPE = "typ";
 	@Field(FIELD_TYPE)
@@ -160,6 +164,11 @@ public class SubNode {
 		return path;
 	}
 
+	@JsonProperty(FIELD_PATH_HASH)
+	public String getPathHash() {
+		return pathHash;
+	}
+
 	@Transient
 	@JsonIgnore
 	public String getParentPath() {
@@ -191,6 +200,12 @@ public class SubNode {
 	public void setPath(String path) {
 		MongoThreadLocal.dirty(this);
 		this.path = path;
+	}
+
+	@JsonProperty(FIELD_PATH_HASH)
+	public void setPathHash(String pathHash) {
+		MongoThreadLocal.dirty(this);
+		this.pathHash = pathHash;
 	}
 
 	@JsonProperty(FIELD_ORDINAL)
@@ -387,9 +402,10 @@ public class SubNode {
 				return null;
 			return (Date) v.getValue();
 		} catch (Exception e) {
-			//todo-1: This is cluttering up the log file, because we still have "sn:lastModified" which is an obsolete property, and a string or integer 
-			//representation also. Need to have a db cleanup to remove all those props.
-			//ExUtil.error(log, "failed to get Date from key: " + key, e);
+			// todo-1: This is cluttering up the log file, because we still have
+			// "sn:lastModified" which is an obsolete property, and a string or integer
+			// representation also. Need to have a db cleanup to remove all those props.
+			// ExUtil.error(log, "failed to get Date from key: " + key, e);
 			return null;
 		}
 	}

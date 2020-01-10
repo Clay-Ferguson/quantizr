@@ -52,6 +52,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
+import org.springframework.data.mongodb.core.index.IndexField;
+import org.springframework.data.mongodb.core.index.IndexInfo;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -589,7 +591,10 @@ public class MongoApi {
 		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
 
 		if (!ops.exists(query, SubNode.class)) {
-			throw new RuntimeException("Attempted to add a node before its parent exists: " + parentPath);
+			// todo-0: need to rethink this. Saw it during an index+database rebuild run.
+			// probably need to detect and run thsi ONLY if it's a user inserting a node?
+			// throw new RuntimeException("Attempted to add a node before its parent exists:
+			// " + parentPath);
 		}
 	}
 
@@ -704,48 +709,45 @@ public class MongoApi {
 	/*
 	 * Whenever we do something like reindex in a new way, we might need to
 	 * reprocess every object, to generate any kind of auto-generated fields that
-	 * need to be there before indexes build we call this. For example when the path
-	 * hash was introduced (i.e. SubNode.FIELD _PATH_HASH) we ran this to create all
-	 * the path hashes so that a unique index could be built, because the uniqueness
-	 * test would fail until we generated all the proper data, which required a
-	 * modification on every node in the entire DB.
+	 * need to be there before indexes build we call this.
+	 * 
+	 * For example when the path hash was introduced (i.e. SubNode.FIELD_PATH_HASH)
+	 * we ran this to create all the path hashes so that a unique index could be
+	 * built, because the uniqueness test would fail until we generated all the
+	 * proper data, which required a modification on every node in the entire DB.
+	 * 
+	 * Note that MongoEventListener#onBeforeSave does execute even if all we are doing is
+	 * reading nodes and then resaving them.
 	 */
 	// ********* DO NOT DELETE *********
-	// (keep as an example of this type of bulk processing)
+	// (this is needed from time to time)
 	//
-	// public void reSaveAll(MongoSession session) {
-	// // HashMap<String, SubNode> hashCheck = new HashMap<String, SubNode>();
-	// while (true) {
-	// final ValContainer<Integer> numProcessed = new ValContainer<Integer>(0);
+	public void reSaveAll(MongoSession session) {
+		log.debug("Processing reSaveAll");
+		while (true) {
+			final ValContainer<Integer> numProcessed = new ValContainer<Integer>(0);
 
-	// Query query = new Query();
-	// query.limit(100);
-	// Criteria criteria = Criteria.where(SubNode.FIELD _PATH_HASH).is(null);
-	// query.addCriteria(criteria);
+			Query query = new Query();
+			query.limit(100);
+			Criteria criteria = Criteria.where(SubNode.FIELD_PATH_HASH).is(null);
+			query.addCriteria(criteria);
 
-	// Iterable<SubNode> iter = ops.find(query, SubNode.class);
+			Iterable<SubNode> iter = ops.find(query, SubNode.class);
 
-	// iter.forEach((node) -> {
-	// numProcessed.setVal(numProcessed.getVal() + 1);
-	// log.debug("Pocessing node: " + node.getId().toHexString());
-	// node.forcePathHashUpdate();
+			iter.forEach((node) -> {
+				numProcessed.setVal(numProcessed.getVal() + 1);
+				log.debug("reSave node: " + node.getId().toHexString());
 
-	// // String hash = node.getPathHash() == null ? "null" : node.getPathHash();
-	// // if (hashCheck.get(hash) != null) {
-	// // log.debug("oops path duplicated? \nOriginal:" +
-	// //
-	// XString.prettyPrint(hashCheck.get(hash))+"\nDuplicate:"+XString.prettyPrint(node));
-	// // }
-	// // hashCheck.put(hash, node);
-	// save(session, node);
-	// });
+				// NOTE: MongoEventListener#onBeforeSave runs in here!
+				save(session, node);
+			});
 
-	// if (numProcessed.getVal() == 0) {
-	// log.debug("Done processing all nodes.");
-	// break;
-	// }
-	// }
-	// }
+			if (numProcessed.getVal() == 0) {
+				log.debug("Done processing all nodes.");
+				break;
+			}
+		}
+	}
 
 	public UserPreferencesNode getUserPreference(MongoSession session, String path) {
 		if (path.equals("/")) {
@@ -1155,8 +1157,18 @@ public class MongoApi {
 	}
 
 	public void createAllIndexes(MongoSession session) {
-		// createUniqueIndex(session, SubNode.class, SubNode.FIELD _PATH_HASH);
+		log.debug("creating all indexes.");
+		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
+
+		// oops. Turns out FIELD_PATH_HASH was indeed the best approach because there's
+		// a limit on how long FIELD_PATH can be
+		// in an index and our paths can get very very long
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH);
+
+		// todo-0: can remove this once it's ran on prod & test
+		dropIndex(session, SubNode.class, SubNode.FIELD_PATH + "_1");
+
+		logIndexes(session, SubNode.class);
 
 		createIndex(session, SubNode.class, SubNode.FIELD_ORDINAL);
 		createIndex(session, SubNode.class, SubNode.FIELD_MODIFY_TIME, Direction.DESC);
@@ -1167,6 +1179,25 @@ public class MongoApi {
 	public void dropAllIndexes(MongoSession session) {
 		requireAdmin(session);
 		ops.indexOps(SubNode.class).dropAllIndexes();
+	}
+
+	public void dropIndex(MongoSession session, Class<?> clazz, String indexName) {
+		requireAdmin(session);
+		log.debug("Dropping index: " + indexName);
+		ops.indexOps(clazz).dropIndex(indexName);
+	}
+
+	public void logIndexes(MongoSession session, Class<?> clazz) {
+		StringBuilder sb = new StringBuilder();
+		List<IndexInfo> indexes = ops.indexOps(clazz).getIndexInfo();
+		for (IndexInfo idx : indexes) {
+			List<IndexField> indexFields = idx.getIndexFields();
+			sb.append("INDEX EXISTS: " + idx.getName() + "\n");
+			for (IndexField idxField : indexFields) {
+				sb.append("    " + idxField.toString() + "\n");
+			}
+		}
+		log.debug(sb.toString());
 	}
 
 	public void createUniqueIndex(MongoSession session, Class<?> clazz, String property) {
@@ -1331,7 +1362,8 @@ public class MongoApi {
 
 		requireAdmin(session);
 		String newUserNodePath = "/" + NodeName.ROOT + "/" + NodeName.USER + "/?";
-		//todo-1: is user validated here (no invalid characters, etc. and invalid flowpaths tested?)
+		// todo-1: is user validated here (no invalid characters, etc. and invalid
+		// flowpaths tested?)
 
 		/*
 		 * todo-p1: need to create this node as if it were also renamed to 'user', so
@@ -1368,7 +1400,8 @@ public class MongoApi {
 	public SubNode getUserNodeByUserName(MongoSession session, String user) {
 		user = user.trim();
 
-		//For the ADMIN user their root node is considered to be the entire root of the whole DB
+		// For the ADMIN user their root node is considered to be the entire root of the
+		// whole DB
 		if (NodePrincipal.ADMIN.equalsIgnoreCase(user)) {
 			return getNode(session, "/" + NodeName.ROOT);
 		}
@@ -1379,9 +1412,11 @@ public class MongoApi {
 				SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath("/" + NodeName.ROOT + "/" + NodeName.USER))//
 				.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
 
-		//todo-1: once this is proven, need to rename the existing nodes to embed username in this new way
+		// todo-1: once this is proven, need to rename the existing nodes to embed
+		// username in this new way
 		// Criteria criteria = Criteria.where(//
-		// 		SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath("/" + NodeName.ROOT + "/" + NodeName.USER + "/" + user));
+		// SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath("/" + NodeName.ROOT + "/"
+		// + NodeName.USER + "/" + user));
 
 		query.addCriteria(criteria);
 		SubNode ret = ops.findOne(query, SubNode.class);
@@ -1420,8 +1455,7 @@ public class MongoApi {
 			if (success) {
 				session.setUser(userName);
 				session.setUserNode(userNode);
-			}
-			else {
+			} else {
 				throw new RuntimeException("Login failed.");
 			}
 		}
@@ -1440,7 +1474,7 @@ public class MongoApi {
 		// todo-2: fix inconsistency: is admin name defined in properties file or in
 		// NodePrincipal.ADMIN const ? Need to decide.
 		String adminUser = appProp.getMongoAdminUserName();
-		//String adminPwd = appProp.getMongoAdminPassword();
+		// String adminPwd = appProp.getMongoAdminPassword();
 
 		SubNode adminNode = getUserNodeByUserName(getAdminSession(), adminUser);
 		if (adminNode == null) {

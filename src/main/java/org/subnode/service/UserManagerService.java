@@ -159,8 +159,8 @@ public class UserManagerService {
 			res.setHomeNodeOverride(uri);
 			httpSession.removeAttribute("uri");
 		}
-		
 		else if (sessionContext.getUrlId()!=null) {
+			//todo-0: this is where it's picking up the bogus url failing on test.
 			log.debug("setHomeNodeOverride (from session urlId): "+sessionContext.getUrlId());
 			res.setHomeNodeOverride(sessionContext.getUrlId());
 		}

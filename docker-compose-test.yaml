@@ -57,6 +57,7 @@ services:
             server.port: "8181" 
             httpProtocol: "http" 
             metaHost: "localhost" 
+            reSaveAll: "true"
             allowFileSystemSearch: "false" 
             spring.http.multipart.max-file-size: "200MB" 
             spring.http.multipart.max-request-size: "200MB" 
