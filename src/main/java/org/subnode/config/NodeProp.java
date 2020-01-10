@@ -73,7 +73,6 @@ public class NodeProp {
 	public static final String NAME = "sn:name";
 	public static final String JSON_FILE_SEARCH_RESULT = "sn:jsonFileSearchResult";
 	public static final String DISABLE_INSERT = "sn:disableInsert";
-	public static final String WEB_PAGE = "sn:webPage";
 
 	/* property used to indicate we should not query the IPFS network again for this conten becasue we
 	have already loaded it */

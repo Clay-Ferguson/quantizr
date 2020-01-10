@@ -35,10 +35,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	 * MAY be out of order so that the children of some nodes may appear in the JSON
 	 * being imported BEFORE their parents (which would cause the parent check to
 	 * fail, up until the full node graph has been imported), and so I'm creating
-	 * this hack to globally disable the check during the import only. There are
-	 * hardly any website users thus far, so this temporary hack will be ok for now
+	 * this hack to globally disable the check during the import only. 
 	 */
-	public static boolean parentCheckEnabled = true;
+	public static boolean parentCheckEnabled = false;
 
 	/**
 	 * What we are doing in this method is assigning the ObjectId ourselves, because

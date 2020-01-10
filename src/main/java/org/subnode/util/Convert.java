@@ -12,7 +12,6 @@ import org.subnode.config.SessionContext;
 import org.subnode.image.ImageSize;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;
-import org.subnode.model.UserPreferences;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -35,18 +34,6 @@ public class Convert {
 	public static final PropertyInfoComparator propertyInfoComparator = new PropertyInfoComparator();
 
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);
-
-	// public static String JsonStringify(Object obj) {
-	// //ObjectMapper is not reusable or thread-safe. We create a new one here each
-	// time.
-	// ObjectMapper mapper = new ObjectMapper();
-	// mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-	// try {
-	// return mapper.writeValueAsString(obj);
-	// } catch (JsonProcessingException e) {
-	// throw ExUtil.newEx(e);
-	// }
-	// }
 
 	/*
 	 * Generates a NodeInfo object, which is the primary data type that is also used
@@ -71,18 +58,13 @@ public class Convert {
 			}
 		}
 
-		UserPreferences userPreferences = sessionContext.getUserPreferences();
-		boolean advancedMode = userPreferences != null ? userPreferences.isAdvancedMode() : false;
+		//UserPreferences userPreferences = sessionContext.getUserPreferences();
+		//boolean advancedMode = userPreferences != null ? userPreferences.isAdvancedMode() : false;
 		boolean hasNodes = (api.getChildCount(node) > 0);
 		// log.trace("hasNodes=" + hasNodes + " path=" + node.getPath());
 
 		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly, allowAbbreviated,
 				initNodeEdit);
-
-		/*
-		 * log.debug("convertNodeInfo: " + node.getPath() + node.getName() + " type: " +
-		 * primaryTypeName + " hasBinary=" + hasBinary);
-		 */
 
 		/*
 		 * todo-2: this is a spot that can be optimized. We should be able to send just
@@ -91,9 +73,6 @@ public class Convert {
 		 */
 		SubNode userNode = api.getNode(session, node.getOwner(), false);
 		String owner = userNode == null ? "?" : userNode.getStringProp(NodeProp.USER);
-
-		//acutally since this is formatting for the client to display i should have left it a string. oops
-		//String lastModStr = sessionContext.formatTime(node.getModifyTime());
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getContent(), owner, node.getOrdinal(), //
 				node.getModifyTime(), propList, hasNodes, hasBinary, binaryIsImage, binVer, //
@@ -116,21 +95,13 @@ public class Convert {
 					if (nodeInfo.getChildren() == null) {
 						nodeInfo.setChildren(new LinkedList<NodeInfo>());
 					}
-					// // log.debug("renderNode DUMP[count=" + count + " idx=" +
-					// // String.valueOf(idx) + " logicalOrdinal=" + String.valueOf(offset
-					// // + count) + "]: "
-					// // + XString.prettyPrint(node));
+					// log.debug("renderNode DUMP[count=" + count + " idx=" +
+					// String.valueOf(idx) + " logicalOrdinal=" + String.valueOf(offset
+					// + count) + "]: "
+					// + XString.prettyPrint(node));
 
-					// // nodeInfo.getChildren().add(convert.convertToNodeInfo(sessionContext,
-					// // session, sn, true, true, false, offset + count));
-
-					/* todo-1: what's diff between calling processRenderNode v.s. convertToNodeInfo here? */
 					nodeInfo.getChildren().add(convertToNodeInfo(sessionContext, session, n, htmlOnly, allowAbbreviated,
 							initNodeEdit, logicalOrdinal, false, firstChild, lastChild));
-
-					// nodeInfo.getChildren().add(processRenderNode(session, req, res, sn, false,
-					// null,
-					// isWebPage, offset + count, level + 1));
 				}
 			}
 		}
@@ -159,8 +130,7 @@ public class Convert {
 
 	public List<PropertyInfo> buildPropertyInfoList(SessionContext sessionContext, SubNode node, //
 			boolean htmlOnly, boolean allowAbbreviated, boolean initNodeEdit) {
-		// log.debug("buildPropertyInfoList");
-
+		
 		List<PropertyInfo> props = null;
 		SubNodePropertyMap propMap = node.getProperties();
 
@@ -202,17 +172,6 @@ public class Convert {
 		}
 	}
 
-	// public String appendInlineChildren(SubNode node) {
-	// boolean hasInlineChildren = node.getBooleanProp("inlineChildren");
-	// if (!hasInlineChildren) return "";
-
-	// StringBuilder sb = new StringBuilder();
-	// if (hasInlineChildren) {
-	// sb.append("\n\n[INLINE-CHILDREN]");
-	// }
-	// return sb.toString();
-	// }
-
 	public String basicTextFormatting(String val) {
 		val = val.replace("\n\r", "<p>");
 		val = val.replace("\n", "<p>");
@@ -220,39 +179,6 @@ public class Convert {
 		return val;
 	}
 
-	//
-	// public String formatValue(SessionContext sessionContext, Value value, boolean
-	// convertToHtml,
-	// boolean initNodeEdit) {
-	// try {
-	// if (value.getType() == PropertyType.DATE) {
-	// return sessionContext.formatTime(value.getDate().getTime());
-	// }
-	// else {
-	// String ret = value.getString();
-	//
-	// /*
-	// * If we are doing an initNodeEdit we don't do this, because we want the text
-	// to
-	// * render to the user exactly as they had typed it and not with links
-	// converted.
-	// */
-	// if (!initNodeEdit) {
-	// ret = convertLinksToMarkdown(ret);
-	// }
-	//
-	// // may need to revisit this (todo-2)
-	// // ret = finalTagReplace(ret);
-	// // ret = basicTextFormatting(ret);
-	//
-	// return ret;
-	// }
-	// }
-	// catch (Exception e) {
-	// return "";
-	// }
-	// }
-	//
 	public String formatValue(SessionContext sessionContext, Object value, boolean convertToHtml,
 			boolean initNodeEdit) {
 		try {
@@ -268,10 +194,6 @@ public class Convert {
 				if (!initNodeEdit) {
 					ret = convertLinksToMarkdown(ret);
 				}
-
-				// may need to revisit this (todo-2)
-				// ret = finalTagReplace(ret);
-				// ret = basicTextFormatting(ret);
 
 				return ret;
 			}
@@ -330,14 +252,6 @@ public class Convert {
 			String right = val.substring(endOfLink);
 			val = left + "[" + link + "](" + link + ")" + right;
 		}
-		return val;
-	}
-
-	public static String finalTagReplace(String val) {
-		val = val.replace("[pre]<p></p>", "<pre class='customPre'>");
-		val = val.replace("[pre]<p>", "<pre class='customPre'>");
-		val = val.replace("[pre]", "<pre class='customPre'>");
-		val = val.replace("[/pre]", "</pre>");
 		return val;
 	}
 }

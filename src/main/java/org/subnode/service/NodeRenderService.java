@@ -172,29 +172,20 @@ public class NodeRenderService {
 			}
 		}
 
-		// this webPage flag thing isn't fully working/tested yet, but partially does
-		// work.
-		boolean isWebPage = node.getBooleanProp(NodeProp.WEB_PAGE);
-
-		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, scanToPath, isWebPage, 0, 0);
+		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, scanToPath, 0, 0);
 		res.setNode(nodeInfo);
 	}
 
 	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res,
-			final SubNode node, boolean scanToNode, String scanToPath, boolean isWebPage, int ordinal, int level) {
+			final SubNode node, boolean scanToNode, String scanToPath, int ordinal, int level) {
 
-		//log.debug(
-		//		"RENDER: " + node.getPath() /* XString.prettyPrint(node) */ + " ordinal=" + ordinal + "level=" + level);
+		// log.debug(
+		// "RENDER: " + node.getPath() /* XString.prettyPrint(node) */ + " ordinal=" +
+		// ordinal + "level=" + level);
 		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, ordinal,
 				level > 0, false, false);
 
-		/*
-		 * If we are not processing a webpage, then we don't recurse deep into the tree
-		 * for rendering
-		 */
-		// Commenting. isWebPage feature is not fully tested yet, may not even currently
-		// work after much refactoring.
-		if (!isWebPage && level > 0) {
+		if (level > 0) {
 			return nodeInfo;
 		}
 
@@ -202,7 +193,7 @@ public class NodeRenderService {
 		 * If we are scanning to a node we know we need to start from zero offset, or
 		 * else we use the offset passed in
 		 */
-		int offset = isWebPage ? 0 : (scanToNode ? 0 : req.getOffset());
+		int offset = scanToNode ? 0 : req.getOffset();
 
 		/*
 		 * load a LARGE number (todo-2: what should this large number be, 1000?) if we
@@ -210,7 +201,7 @@ public class NodeRenderService {
 		 * is. Unfortunately this would mean broken pagination at large offsets. todo:
 		 * need to check how to do basically an SQL "offset" index here but in MongoDB.
 		 */
-		int queryLimit = (isWebPage || scanToNode) ? 1000 : offset + ROWS_PER_PAGE + 1;
+		int queryLimit = scanToNode ? 1000 : offset + ROWS_PER_PAGE + 1;
 
 		/*
 		 * we request ROWS_PER_PAGE+1, because that is enough to trigger 'endReached'
@@ -241,7 +232,7 @@ public class NodeRenderService {
 		 * of nodes that are not visible to the user, so I can't think of a pathological
 		 * case here. Just noting that this IS an imperfection/flaw.
 		 * 
-		 * todo-0: Instead of running 'skip' here we should be setting an 'offset' on
+		 * todo-1: Instead of running 'skip' here we should be setting an 'offset' on
 		 * the initial query.
 		 */
 		if (!scanToNode && offset > 0) {
@@ -306,12 +297,10 @@ public class NodeRenderService {
 								// String.valueOf(idx) + " logicalOrdinal=" + String.valueOf(offset
 								// + count) + "]: "
 								// + XString.prettyPrint(node));
-								// nodeInfo.getChildren().add(convert.convertToNodeInfo(sessionContext,
-								// session, sn, true, true, false, offset + count));
-								ninfo = processRenderNode(session, req, res, sn, false, null, isWebPage,
-										offset + count, level + 1);
+								ninfo = processRenderNode(session, req, res, sn, false, null, offset + count,
+										level + 1);
 								nodeInfo.getChildren().add(ninfo);
-								if (offset==0 && nodeInfo.getChildren().size() == 1) {
+								if (offset == 0 && nodeInfo.getChildren().size() == 1) {
 									ninfo.setFirstChild(true);
 								}
 							}
@@ -342,22 +331,14 @@ public class NodeRenderService {
 				// "
 				// logicalOrdinal=" + String.valueOf(offset + count) + "]: "
 				// + XString.prettyPrint(node));
-				// nodeInfo.getChildren().add(convert.convertToNodeInfo(sessionContext, session,
-				// n,
-				// true, true, false, offset + count));
-				//
-				// if (isWebPage) {
-				// processRenderNode(session, req, res, n, n.getPath(), scanToNode, isWebPage);
-				// }
-				ninfo = processRenderNode(session, req, res, n, false, null, isWebPage, offset + count,
-						level + 1);
+				ninfo = processRenderNode(session, req, res, n, false, null, offset + count, level + 1);
 				nodeInfo.getChildren().add(ninfo);
 
-				if (offset==0 && nodeInfo.getChildren().size() == 1) {
+				if (offset == 0 && nodeInfo.getChildren().size() == 1) {
 					ninfo.setFirstChild(true);
 				}
 
-				if (!isWebPage && count >= ROWS_PER_PAGE) {
+				if (count >= ROWS_PER_PAGE) {
 					if (!iterator.hasNext()) {
 						endReached = true;
 						break;
@@ -378,7 +359,7 @@ public class NodeRenderService {
 			res.setOffsetOfNodeFound(idxOfNodeFound);
 		}
 
-		if (endReached && ninfo!=null && nodeInfo.getChildren().size() > 1) {
+		if (endReached && ninfo != null && nodeInfo.getChildren().size() > 1) {
 			ninfo.setLastChild(true);
 		}
 

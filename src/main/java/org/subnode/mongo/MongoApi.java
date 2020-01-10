@@ -591,10 +591,7 @@ public class MongoApi {
 		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
 
 		if (!ops.exists(query, SubNode.class)) {
-			// todo-0: need to rethink this. Saw it during an index+database rebuild run.
-			// probably need to detect and run thsi ONLY if it's a user inserting a node?
-			// throw new RuntimeException("Attempted to add a node before its parent exists:
-			// " + parentPath);
+			throw new RuntimeException("Attempted to add a node before its parent exists:" + parentPath);
 		}
 	}
 
