@@ -10,7 +10,7 @@ import java.util.StringTokenizer;
 
 import org.subnode.config.NodePrincipal;
 import org.subnode.config.NodeProp;
-import org.subnode.mail.JcrOutboxMgr;
+import org.subnode.mail.OutboxMgr;
 import org.subnode.mongo.model.MongoPrincipal;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddPrivilegeRequest;
@@ -46,7 +46,7 @@ public class AclService {
 	private UserManagerService userManagerService;
 
 	@Autowired
-	private JcrOutboxMgr outboxMgr;
+	private OutboxMgr outboxMgr;
 
 	/**
 	 * Returns the privileges that exist on the node identified in the request.

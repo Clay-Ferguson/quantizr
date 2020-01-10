@@ -44,7 +44,7 @@ public class NotificationDaemon {
 	private RunAsMongoAdmin adminRunner;
 
 	@Autowired
-	private JcrOutboxMgr outboxMgr;
+	private OutboxMgr outboxMgr;
 
 	@Autowired
 	private MailSender mailSender;

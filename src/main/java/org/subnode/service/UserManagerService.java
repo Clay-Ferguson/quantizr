@@ -11,7 +11,7 @@ import org.subnode.config.ConstantsProvider;
 import org.subnode.config.NodePrincipal;
 import org.subnode.config.NodeProp;
 import org.subnode.config.SessionContext;
-import org.subnode.mail.JcrOutboxMgr;
+import org.subnode.mail.OutboxMgr;
 import org.subnode.model.RefInfo;
 import org.subnode.model.UserPreferences;
 import org.subnode.mongo.AclService;
@@ -69,7 +69,7 @@ public class UserManagerService {
 	private SessionContext sessionContext;
 
 	@Autowired
-	private JcrOutboxMgr outboxMgr;
+	private OutboxMgr outboxMgr;
 
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
@@ -160,7 +160,6 @@ public class UserManagerService {
 			httpSession.removeAttribute("uri");
 		}
 		else if (sessionContext.getUrlId()!=null) {
-			//todo-0: this is where it's picking up the bogus url failing on test.
 			log.debug("setHomeNodeOverride (from session urlId): "+sessionContext.getUrlId());
 			res.setHomeNodeOverride(sessionContext.getUrlId());
 		}

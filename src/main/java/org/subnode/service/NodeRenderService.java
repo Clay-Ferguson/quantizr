@@ -341,10 +341,7 @@ public class NodeRenderService {
 				if (count >= ROWS_PER_PAGE) {
 					if (!iterator.hasNext()) {
 						endReached = true;
-						break;
 					}
-					SubNode finalNode = iterator.next(); // todo-0: why is this line here? mistake?
-
 					/* break out of while loop, we have enough children to send back */
 					break;
 				}

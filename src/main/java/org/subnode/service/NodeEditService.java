@@ -4,7 +4,7 @@ import java.util.Calendar;
 
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
-import org.subnode.mail.JcrOutboxMgr;
+import org.subnode.mail.OutboxMgr;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;
 import org.subnode.mongo.CreateNodeLocation;
@@ -66,7 +66,7 @@ public class NodeEditService {
 	private SessionContext sessionContext;
 
 	@Autowired
-	private JcrOutboxMgr outboxMgr;
+	private OutboxMgr outboxMgr;
 
 	@Autowired
 	private AllSubNodeTypes TYPES;

@@ -25,9 +25,9 @@ import org.springframework.stereotype.Component;
  * 
  */
 @Component
-public class JcrOutboxMgr {
+public class OutboxMgr {
 
-	private static final Logger log = LoggerFactory.getLogger(JcrOutboxMgr.class);
+	private static final Logger log = LoggerFactory.getLogger(OutboxMgr.class);
 
 	@Autowired
 	MongoApi api;
@@ -61,6 +61,10 @@ public class JcrOutboxMgr {
 				 */
 				if (parentNode != null && !parentNode.getOwner().equals(node.getOwner())) {
 					SubNode userNode = api.getNode(session, parentNode.getOwner());
+					if (userNode==null) {
+						log.warn("No userNode was found for parentNode.owner="+parentNode.getOwner());
+						return;
+					}
 					String email = userNode.getStringProp(NodeProp.EMAIL);
 					log.debug("sending email to: " + email + " because his node was appended under.");
 

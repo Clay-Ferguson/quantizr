@@ -28,6 +28,8 @@ public class AppFilter extends GenericFilterBean {
 	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
 	private static final HashMap<String, Integer> uniqueIpHits = new HashMap<String, Integer>();
 	private static int reqId = 0;
+	private static boolean logRequests = true;
+	private static boolean logResponses = false;
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -56,8 +58,11 @@ public class AppFilter extends GenericFilterBean {
 			ThreadLocals.setHttpSession(session);
 			String queryString = httpReq.getQueryString();
 
-			String url = "REQ["+String.valueOf(thisReqId)+"]: URI=" + httpReq.getRequestURI() + "  QueryString=" + queryString;
-			log.debug(url);
+			if (logRequests) {
+				String url = "REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString="
+						+ queryString;
+				log.debug(url);
+			}
 
 			updateHitCounter(httpReq);
 		} else {
@@ -72,8 +77,12 @@ public class AppFilter extends GenericFilterBean {
 
 		try {
 			chain.doFilter(req, res);
-			HttpServletResponse httpRes = (HttpServletResponse) res;
-			log.debug("    RES: [" +String.valueOf(thisReqId)+ "]" /* +httpRes.getStatus() */ + HttpStatus.valueOf(httpRes.getStatus()));
+
+			if (logResponses) {
+				HttpServletResponse httpRes = (HttpServletResponse) res;
+				log.debug("    RES: [" + String.valueOf(thisReqId) + "]" /* +httpRes.getStatus() */
+						+ HttpStatus.valueOf(httpRes.getStatus()));
+			}
 		} catch (RuntimeException ex) {
 			log.error("Request Failed", ex);
 			throw ex;
