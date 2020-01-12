@@ -109,10 +109,6 @@ public class MongoRepository {
 				api.dropAllIndexes(adminSession);
 			}
 
-			if (appProp.getReSaveAll()) {
-				api.reSaveAll(adminSession);
-			}
-
 			if (appProp.getForceIndexRebuild()) {
 				api.convertDb(adminSession);
 			}
@@ -120,6 +116,10 @@ public class MongoRepository {
 			api.createAllIndexes(adminSession);
 			api.createAdminUser(adminSession);
 			repoUtil.createTestAccounts();
+
+			if (appProp.getReSaveAll()) {
+				api.reSaveAll(adminSession);
+			}
 
 			// if (appProp.getMongoTest()) {
 			// mongoTest.mainTest();

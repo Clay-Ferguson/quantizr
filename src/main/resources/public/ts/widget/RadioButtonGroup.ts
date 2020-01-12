@@ -23,7 +23,7 @@ export class RadioButtonGroup extends Comp {
         });
     }
 
-    renderComp = (p: any): ReactNode => {
-        return S.e('div', p, this.makeReactChildren());
+    compRender = (): ReactNode => {
+        return S.e('div', this.attribs, this.makeReactChildren());
     }
 }

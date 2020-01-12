@@ -1,10 +1,12 @@
 package org.subnode.service;
 
 import java.security.MessageDigest;
+import java.util.StringTokenizer;
 
 import org.subnode.util.ExUtil;
-
+import org.subnode.util.SubNodeUtil;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -73,33 +75,65 @@ public class Sha256Service {
 	// // private MessageDigest globalDigester;
 	//
 
+	/**
+	 * Returns only 'chars' characters of the hash, or the ebntire sha256 if chars
+	 * is -1
+	 */
+	public static String getHashOfString(String val, int chars) {
+		String pathHash = DigestUtils.sha256Hex(val.getBytes());
+		return chars == -1 ? pathHash : pathHash.substring(0, chars);
+	}
+
+	// todo-0: I plan to be doing this, but I need to first get completely away from the current
+	// way of allowing a node to be 'named', and have the name replicated out in each child path. 
+	// That was VERY bad design choice. Named nodes need to just use a kind of domain-name lookup concept
+	// and shuold be completely independend of the node itself. Node shouldn't even know it's named, just like a IP
+	// address doesn't know what DNS name(s) point to them.
+	//
+	// public static String compressPath(String val) {
+	// 	if (val == null)
+	// 		return null;
+	// 	if (!val.startsWith("/"))
+	// 		return val;
+
+	// 	log.debug("Input Path: " + val);
+	// 	StringTokenizer t = new StringTokenizer(val, "/", false);
+	// 	StringBuilder sb = new StringBuilder();
+
+	// 	while (t.hasMoreTokens()) {
+	// 		String tok = t.nextToken();
+	// 		if (tok.length() > SubNodeUtil.PATH_HASH_LEN) {
+	// 			tok = getHashOfString(tok, SubNodeUtil.PATH_HASH_LEN);
+	// 		}
+	// 		log.debug("    TOK: " + tok);
+	// 		sb.append("/");
+	// 		sb.append(tok);
+	// 	}
+	// 	return sb.toString();
+	// }
+
 	/*
 	 * A good optimization here would be to have a round-robin buffer of the 1000
 	 * last in/out values of this and and always consult that before running the
 	 * actual hashing code, which will take some decent CPU i would think
+	 * 
+	 * This old impl was replaced by apache codec "DigestUtils.sha256Hex", which
+	 * generates the identical output.
 	 */
-	public static String getHashOfString(String val) {
-		if (val == null) {
-			return null;
-		}
-
-		try {
-			/*
-			 * todo-2: theoretically we could attach a MessageDigest to each thread
-			 * (threadlocal) if the overhead of them is much, to instantiate. Haven't checked into that yet.
-			 * That would mean we only create as many of them as we have threads in the
-			 * threadpool and would be zero perofrmance head to ever get these during
-			 * processing any given request.
-			 */
-			MessageDigest globalDigester = MessageDigest.getInstance(SHA_ALGO);
-			globalDigester.update(val.getBytes());
-			byte[] hashBytes = globalDigester.digest();
-			String hash = Hex.encodeHexString(hashBytes);
-			return hash;
-		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
-		}
-	}
+	// public static String getHashOfString(String val) {
+	// if (val == null) {
+	// return null;
+	// }
+	// try {
+	// MessageDigest globalDigester = MessageDigest.getInstance(SHA_ALGO);
+	// globalDigester.update(val.getBytes());
+	// byte[] hashBytes = globalDigester.digest();
+	// String hash = Hex.encodeHexString(hashBytes);
+	// return hash;
+	// } catch (Exception ex) {
+	// throw ExUtil.newEx(ex);
+	// }
+	// }
 
 	// public void generateNodeHash(Session session, GenerateNodeHashRequest req,
 	// GenerateNodeHashResponse res) {

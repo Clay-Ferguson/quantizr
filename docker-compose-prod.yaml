@@ -5,7 +5,7 @@ services:
         container_name: mongo-prod
         volumes:
             - '/var/lib/mongodb:/data/db'
-            - '/home/clay/quantizr/mongo-dumps:/mongo-dumps'
+            - '/home/clay/quantizr-data/mongo-dumps:/mongo-dumps'
         ports:
             - '27017:27017'
         networks:
@@ -39,14 +39,16 @@ services:
             dockerfile: dockerfile-prod
         container_name: subnode-prod
         expose:
-            - '8181'
+            - '443'
+            - '80'
         volumes:
-            - '/home/clay/quantizr/docs:/docs'
-            - '/home/clay/quantizr/tmp:/subnode-tmp'
-            - '/home/clay/quantizr/log:/subnode-log'
+            - '/home/clay/quantizr-data/docs:/docs'
+            - '/home/clay/quantizr-data/tmp:/subnode-tmp'
+            - '/home/clay/quantizr-data/log:/subnode-log'
             - '/etc/letsencrypt/live/quantizr.com:/letsencrypt'
         ports:
             - '443:443'
+            - '80:80'
         networks:
             - net-prod
         environment:
@@ -59,7 +61,7 @@ services:
             server.port: "443" 
             httpProtocol: "https" 
             metaHost: "quantizr.com" 
-            reSaveAll: "true"
+            reSaveAll: "false"
             allowFileSystemSearch: "false" 
             forceIndexRebuild: "false"
             spring.http.multipart.max-file-size: "5MB" 

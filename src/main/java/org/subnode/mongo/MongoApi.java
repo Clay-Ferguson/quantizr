@@ -726,8 +726,8 @@ public class MongoApi {
 
 			Query query = new Query();
 			query.limit(100);
-			Criteria criteria = Criteria.where(SubNode.FIELD_PATH_HASH).is(null);
-			query.addCriteria(criteria);
+			//Criteria criteria = Criteria.where(SubNode.FIELD_PATH_HASH).is(null);
+			//query.addCriteria(criteria);
 
 			Iterable<SubNode> iter = ops.find(query, SubNode.class);
 
@@ -743,7 +743,10 @@ public class MongoApi {
 				log.debug("Done processing all nodes.");
 				break;
 			}
+
+			//if (true) break; // <--- temporary hack. DO NOT CHECK IN. todo-0
 		}
+		log.debug("reSaveAll completed.");
 	}
 
 	public UserPreferencesNode getUserPreference(MongoSession session, String path) {
@@ -1154,23 +1157,20 @@ public class MongoApi {
 	}
 
 	public void createAllIndexes(MongoSession session) {
+		// try {
+		// 	dropIndex(session, SubNode.class, SubNode.FIELD_PATH + "_1");
+		// }
+		// catch (Exception e) {
+		// 	log.debug("no pth_1 index found. ok. this is fine.");
+		// }
 		log.debug("creating all indexes.");
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
-
-		// oops. Turns out FIELD_PATH_HASH was indeed the best approach because there's
-		// a limit on how long FIELD_PATH can be
-		// in an index and our paths can get very very long
-		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH);
-
-		// todo-0: can remove this once it's ran on prod & test
-		dropIndex(session, SubNode.class, SubNode.FIELD_PATH + "_1");
-
-		logIndexes(session, SubNode.class);
-
 		createIndex(session, SubNode.class, SubNode.FIELD_ORDINAL);
 		createIndex(session, SubNode.class, SubNode.FIELD_MODIFY_TIME, Direction.DESC);
 		createIndex(session, SubNode.class, SubNode.FIELD_CREATE_TIME, Direction.DESC);
 		createTextIndexes(session, SubNode.class);
+
+		logIndexes(session, SubNode.class);
 	}
 
 	public void dropAllIndexes(MongoSession session) {
@@ -1340,6 +1340,9 @@ public class MongoApi {
 	// I think now that I'm including the trailing slash after path in this regex
 	// that I can remove the (.+) piece?
 	// I think i need to write some test cases just to text my regex functions!
+	//
+	// todo-0: Also what's the 'human readable' description of what's going on here. For performance we DO want this to be
+	// finding all nodes that 'start with' the path as opposed to simply 'contain' the path right? To make best use of indexes etc?
 	public String regexRecursiveChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
 		return "^" + Pattern.quote(path) + "\\/(.+)$";

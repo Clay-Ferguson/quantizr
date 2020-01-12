@@ -8,7 +8,6 @@ import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.util.XString;
 
 import org.subnode.service.Sha256Service;
-
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -92,7 +91,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.setPath(path);
 		}
 
-		String pathHash = Sha256Service.getHashOfString(node.getPath());
+		//todo-0
+		//work in progress here...gonna shorten path
+		//Sha256Service.compressPath(node.getPath());
+
+		String pathHash = Sha256Service.getHashOfString(node.getPath(), 14);
+		//log.debug("CHECK PathHash=" + pathHash);
 		if (!pathHash.equals(node.getPathHash())) {
 			dbObj.put(SubNode.FIELD_PATH_HASH, pathHash);
 			node.setPathHash(pathHash);

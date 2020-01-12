@@ -34,7 +34,7 @@ export class TextContent extends Comp {
             return S.e(this.preformatted ? 'pre' : 'div', _p);
         }
         else {
-            console.log("Building (TextContent) react element: " + this.attribs.id);
+            //console.log("Building (TextContent) react element: " + this.attribs.id);
             return S.e(this.preformatted ? 'pre' : 'div', this.attribs, state.text);
         }
     }

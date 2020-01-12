@@ -26,6 +26,10 @@ import org.springframework.stereotype.Component;
 public class SubNodeUtil {
 	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
 
+	//number of hex digits to use from the SHA256 string, and in general needs to only guarantee
+	//uniquess inside a single node (sibling uniqueness) so this can be kinda short.
+	public static final int PATH_HASH_LEN = 7;
+
 	@Autowired
 	private MongoApi api;
 

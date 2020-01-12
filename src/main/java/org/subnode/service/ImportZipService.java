@@ -200,7 +200,11 @@ public class ImportZipService {
 		List<String> pathItems = XString.tokenize(path, "/", true);
 		StringBuilder sb = new StringBuilder();
 		for (String pathPart : pathItems) {
-			sb.append("/" + String.valueOf(Math.abs(pathPart.hashCode())));
+			//todo-1: It would be better if we had a way to make the actual path parts match the hash of the node ID which is the normal
+			//standard because generating the hash here like this is *safe* but is kind of the equivalent of 'naming' the node, becasue the node
+			//can also have any name, and this is like naming it the hash we generate here.
+			String p = Sha256Service.getHashOfString(pathPart, SubNodeUtil.PATH_HASH_LEN);
+			sb.append("/" + p);
 		}
 		// log.info("HASHED PATH: " + sb.toString());
 		return sb.toString();
