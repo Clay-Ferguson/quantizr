@@ -78,14 +78,15 @@ public class NodeRenderService {
 			session = ThreadLocals.getMongoSession();
 		}
 		res.setOffsetOfNodeFound(-1);
-
+		
 		String targetId = req.getNodeId();
 
 		log.debug("renderNode targetId:" + targetId);
 		SubNode node = api.getNode(session, targetId);
+		
 
 		if (node == null) {
-			res.setNoDataResponse("Node not found: " + targetId);
+			res.setNoDataResponse("Node not found.");
 			return;
 		}
 
@@ -398,13 +399,19 @@ public class NodeRenderService {
 
 		HttpSession httpSession = ThreadLocals.getHttpSession();
 		if (httpSession.getAttribute("uri") != null) {
+			// todo-0: is this code path obsolete?
 			id = (String) httpSession.getAttribute("uri");
 			httpSession.removeAttribute("uri");
-		} else if (sessionContext.getUrlId() != null) {
+		} //
+		else if (sessionContext.getUrlId() != null) {
 			id = sessionContext.getUrlId();
 			sessionContext.setUrlId(null);
 			log.debug("anonPageRedirected it's id to load to: " + id);
-		} else {
+		} //
+		else {
+			// todo-0: landing page in app props will now be need to be interpreted as
+			// 'name' (soon) will still work for now since nodes ARE named
+			// in the path itself from legacy code.
 			id = appProp.getUserLandingPageNode();
 		}
 
@@ -413,16 +420,19 @@ public class NodeRenderService {
 			RenderNodeRequest renderNodeReq = new RenderNodeRequest();
 
 			/*
-			 * if user specified an ID= parameter on the url, we display that immediately,
-			 * or else we display the node that the admin has configured to be the default
+			 * if user specified an ID= parameter on the url we display that immediately, or
+			 * else we display the node that the admin has configured to be the default
 			 * landing page node.
 			 */
+
 			log.debug("Render Node ID: " + id);
 			renderNodeReq.setNodeId(id);
+
 			renderNode(session, renderNodeReq, renderNodeRes);
 			res.setRenderNodeResponse(renderNodeRes);
 			res.setSuccess(true);
-		} else {
+		}  //
+		else {
 			res.setContent("No content available.");
 			res.setSuccess(true);
 		}

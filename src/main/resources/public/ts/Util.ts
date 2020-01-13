@@ -93,22 +93,6 @@ export class Util implements UtilIntf {
         return this.editableExtensions[ext];
     }
 
-    getNameFromPath = (fileName: string): string => {
-        let name = fileName;
-        let idx = fileName.lastIndexOf("/");
-        if (idx != -1) {
-            name = fileName.substring(idx + 1);
-        }
-        return name;
-    }
-
-    /* The node name is considered to be the last part of the path, but if it matches the 'id' then
-    the node is not considered to have a 'name' at all and we return null to indicate that */
-    getNodeName = (node: NodeInfo): string => {
-        let pathName = this.getNameFromPath(node.path);
-        return pathName === node.id ? null : pathName;
-    }
-
     isImageFileName = (fileName: string): boolean => {
         return "img" == this.getFileTypeFormFileName(fileName);
     }

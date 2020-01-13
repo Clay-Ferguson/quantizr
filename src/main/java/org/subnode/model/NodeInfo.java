@@ -16,6 +16,7 @@ public class NodeInfo {
 
 	private String id;
 	private String path;
+	private String name;
 	private String content;
 	private Date lastModified;
 	private Long logicalOrdinal;
@@ -49,12 +50,13 @@ public class NodeInfo {
 	public NodeInfo() {
 	}
 
-	public NodeInfo(String id, String path, String content, String owner, Long ordinal, Date lastModified,
+	public NodeInfo(String id, String path, String name, String content, String owner, Long ordinal, Date lastModified,
 			List<PropertyInfo> properties, boolean hasChildren,
 			boolean hasBinary, boolean binaryIsImage, long binVer, int width, int height, String type, long logicalOrdinal,
 			boolean firstChild, boolean lastChild) {
 		this.id = id;
 		this.path = path;
+		this.name = name;
 		this.content = content;
 		this.lastModified = lastModified;
 		this.owner = owner;
@@ -112,7 +114,13 @@ public class NodeInfo {
 		this.path = path;
 	}
 
-	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public List<PropertyInfo> getProperties() {
 		return properties;

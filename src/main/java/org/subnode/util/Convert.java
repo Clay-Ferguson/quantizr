@@ -74,7 +74,7 @@ public class Convert {
 		SubNode userNode = api.getNode(session, node.getOwner(), false);
 		String owner = userNode == null ? "?" : userNode.getStringProp(NodeProp.USER);
 
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getContent(), owner, node.getOrdinal(), //
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), owner, node.getOrdinal(), //
 				node.getModifyTime(), propList, hasNodes, hasBinary, binaryIsImage, binVer, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //

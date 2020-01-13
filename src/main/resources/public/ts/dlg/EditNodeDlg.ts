@@ -212,7 +212,8 @@ export class EditNodeDlg extends DialogBase {
                     isWordWrap = true;
                 }
 
-                let nameTableRow = this.makeTextFieldEditor("name", "Name", S.util.getNodeName(S.edit.editNode), false, isPre, false, false);
+                //todo-0: this is ugly, and should change because there's no 'name' property any longer!
+                let nameTableRow = this.makeTextFieldEditor("name", "Name", S.edit.editNode.name, false, isPre, false, false);
                 editPropsTable.addChild(nameTableRow);
 
                 let content = S.edit.editNode.content;

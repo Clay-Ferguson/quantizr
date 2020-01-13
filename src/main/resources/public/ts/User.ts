@@ -216,7 +216,8 @@ export class User implements UserIntf {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 if (S.util.checkSuccess("Login", res)) {
-                    console.log("loginResponse: usr=" + usr + " homeNodeOverride: " + res.homeNodeOverride);
+                    console.log("loginResponse: usr=" + usr);
+                    console.log("homeNodeOverride: " + res.homeNodeOverride);
 
                     if (usr !== "anonymous") {
                         await S.localDB.setVal(cnst.LOCALDB_LOGIN_USR, usr);
@@ -232,12 +233,13 @@ export class User implements UserIntf {
 
                     /* set ID to be the page we want to show user right after login */
                     let id: string = null;
-
+                
                     if (!S.util.emptyString(res.homeNodeOverride)) {
                         console.log("loading homeNodeOverride=" + res.homeNodeOverride);
                         id = res.homeNodeOverride;
                         S.meta64.homeNodeOverride = id;
-                    } else {
+                    } //
+                    else {
                         let lastNode = localStorage.getItem("lastNode");
                         if (lastNode) {
                             console.log("loading lastNode=" + lastNode);

@@ -27,7 +27,7 @@ export class FolderTypeHandler implements TypeHandlerIntf {
             let folderName = "";
             let displayName = S.props.getNodePropertyVal("fs:link", node);
             if (displayName) {
-                folderName = S.util.getNameFromPath(displayName);
+                folderName = node.name;
             }
 
             ret = new Heading(4, folderName, {

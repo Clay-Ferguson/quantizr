@@ -51,7 +51,7 @@ public class NodeEditService {
 	private static final Logger log = LoggerFactory.getLogger(NodeEditService.class);
 
 	private static final String SPLIT_TAG1 = "{split}";
-	private static final String SPLIT_TAG2 = "\n\n\n"; //splits at double-spacing in the text.
+	private static final String SPLIT_TAG2 = "\n\n\n"; // splits at double-spacing in the text.
 
 	@Autowired
 	private Convert convert;
@@ -88,7 +88,8 @@ public class NodeEditService {
 		newNode.setContent("");
 
 		api.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false, false, false));
+		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false, false,
+				false));
 		res.setSuccess(true);
 	}
 
@@ -147,7 +148,8 @@ public class NodeEditService {
 		newNode.setContent("");
 
 		api.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false, false, false));
+		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false, false,
+				false));
 		// }
 		res.setSuccess(true);
 	}
@@ -214,6 +216,9 @@ public class NodeEditService {
 			throw new RuntimeException("Unable find node to save: nodeId=" + nodeId);
 		}
 		node.setContent(req.getContent());
+		if (req.getName() != null) {
+			node.setName(req.getName());
+		}
 
 		if (req.getProperties() != null) {
 			for (PropertyInfo property : req.getProperties()) {
@@ -245,23 +250,10 @@ public class NodeEditService {
 
 			outboxMgr.sendNotificationForChildNodeCreate(node, sessionContext.getUserName());
 
-			boolean savePending = true;
-			String nameOnPath = node.getNameOnPath();
-			if (StringUtils.isNotEmpty(req.getName()) && !nameOnPath.equals(req.getName())) {
-				api.renameNode(session, node, req.getName());
-				api.saveSession(session);
-
-				// reload the node after a rename.
-				node = api.getNode(session, nodeId);
-				savePending = false;
-			}
-
-			NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, -1, false, false, false);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, -1, false,
+					false, false);
 			res.setNode(nodeInfo);
-
-			if (savePending) {
-				api.saveSession(session);
-			}
+			api.saveSession(session);
 		}
 
 		res.setSuccess(true);

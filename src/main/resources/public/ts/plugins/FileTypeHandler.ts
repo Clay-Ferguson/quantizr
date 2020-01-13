@@ -31,7 +31,7 @@ export class FileTypeHandler implements TypeHandlerIntf {
         let fsLink = S.props.getNodePropertyVal("fs:link", node);
         console.log("fsLink=" + fsLink);
         if (fsLink) {
-            let displayName = S.util.getNameFromPath(fsLink);
+            let displayName = node.name;
             let hostAndPort: string = S.util.getHostAndPort();
             let dataUrl = hostAndPort + "/filesys/" + node.id;
 
@@ -47,7 +47,6 @@ export class FileTypeHandler implements TypeHandlerIntf {
                         "sourceUrl": dataUrl,
                     }).open();
                 });
-                let displayName = S.util.getNameFromPath(fsLink);
                 ret.push(new Heading(3, displayName));
 
                 ret.push(playButton);

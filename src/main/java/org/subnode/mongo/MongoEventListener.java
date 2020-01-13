@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
+import org.springframework.util.StringUtils;
 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
@@ -62,6 +63,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.setId(id);
 			// log.debug("New Node ID generated: " + id);
 		}
+
+		// Because of uniqueness constraint any node that isn't named, will use the id hex as it's name.
+		// (Actually for now let's not waste the space doing this and cope with non-unique node names instead)
+		// if (StringUtils.isEmpty(node.getName())) {
+		// 	node.setName(id.toHexString())
+		// }
 
 		/* if no owner is assigned... */
 		if (node.getOwner() == null) {

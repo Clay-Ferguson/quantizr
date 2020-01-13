@@ -154,6 +154,7 @@ public class UserManagerService {
 
 		HttpSession httpSession = ThreadLocals.getHttpSession();
 		if (httpSession.getAttribute("uri")!=null) {
+			//todo-0: is this path obsolete?
 			String uri = (String)httpSession.getAttribute("uri");
 			log.debug("setHomeNodeOverride (from uri attrib): "+uri);
 			res.setHomeNodeOverride(uri);

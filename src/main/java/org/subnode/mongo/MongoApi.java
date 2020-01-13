@@ -28,7 +28,6 @@ import org.subnode.mongo.model.UserPreferencesNode;
 import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
-import org.subnode.util.FileTools;
 import org.subnode.util.NotLoggedInException;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ValContainer;
@@ -284,36 +283,39 @@ public class MongoApi {
 		return userNode.getStringProp(NodeProp.USER);
 	}
 
-	public void renameNode(MongoSession session, SubNode node, String newName) {
-		auth(session, node, PrivilegeType.WRITE);
+	// This whole entire approach was a very bad idea...
+	// We will be converting this to something mroe akin to DNS where a node that's named, doesn't even need to 
+	// know it's named (decoupled)
+	// public void renameNode(MongoSession session, SubNode node, String newName) {
+	// 	auth(session, node, PrivilegeType.WRITE);
 
-		newName = FileTools.ensureValidFileNameChars(newName);
-		newName = newName.trim();
-		if (newName.length() == 0) {
-			throw ExUtil.newEx("No node name provided.");
-		}
+	// 	newName = FileTools.ensureValidFileNameChars(newName);
+	// 	newName = newName.trim();
+	// 	if (newName.length() == 0) {
+	// 		throw ExUtil.newEx("No node name provided.");
+	// 	}
 
-		log.debug("Renaming node: " + node.getId().toHexString());
+	// 	log.debug("Renaming node: " + node.getId().toHexString());
 
-		int nodePathLen = node.getPath().length();
-		String newPathPrefix = node.getParentPath() + "/" + newName;
+	// 	int nodePathLen = node.getPath().length();
+	// 	String newPathPrefix = node.getParentPath() + "/" + newName;
 
-		SubNode checkExists = getNode(session, newPathPrefix);
-		if (checkExists != null) {
-			throw ExUtil.newEx("Node already exists");
-		}
+	// 	SubNode checkExists = getNode(session, newPathPrefix);
+	// 	if (checkExists != null) {
+	// 		throw ExUtil.newEx("Node already exists");
+	// 	}
 
-		// change all paths of all children (recursively) to start with the new path
-		for (SubNode n : getSubGraph(session, node)) {
-			String path = n.getPath();
-			String chopPath = path.substring(nodePathLen);
-			String newPath = newPathPrefix + chopPath;
-			n.setPath(newPath);
-			n.setDisableParentCheck(true);
-		}
+	// 	// change all paths of all children (recursively) to start with the new path
+	// 	for (SubNode n : getSubGraph(session, node)) {
+	// 		String path = n.getPath();
+	// 		String chopPath = path.substring(nodePathLen);
+	// 		String newPath = newPathPrefix + chopPath;
+	// 		n.setPath(newPath);
+	// 		n.setDisableParentCheck(true);
+	// 	}
 
-		node.setPath(newPathPrefix);
-	}
+	// 	node.setPath(newPathPrefix);
+	// }
 
 	// Basically renames all nodes that don't start with '/r/d/' to start with that.
 	// Work in progress. Not yet functional.
@@ -744,7 +746,9 @@ public class MongoApi {
 				break;
 			}
 
-			//if (true) break; // <--- temporary hack. DO NOT CHECK IN. todo-0
+			//todo-0: warning: for the full WarAndPeace db this could run for a LONG time now that the SubNode object has chaged
+			//(by adding 'name' as a property)
+			if (true) break; // <--- don't leave this here (todo-0)
 		}
 		log.debug("reSaveAll completed.");
 	}
@@ -807,14 +811,37 @@ public class MongoApi {
 		return info;
 	}
 
+	public SubNode getNodeByName(MongoSession session, String name) {
+		return getNodeByName(session, name, true);
+	}
+
+	public SubNode getNodeByName(MongoSession session, String name, boolean allowAuth) {
+		SubNode ret = null;
+
+		Query query = new Query();
+		query.addCriteria(Criteria.where(SubNode.FIELD_NAME).is(name));
+		ret = ops.findOne(query, SubNode.class);
+
+		if (allowAuth) {
+			auth(session, ret, PrivilegeType.READ);
+		}
+		return ret;
+	}
+
 	public SubNode getNode(MongoSession session, String path) {
 		return getNode(session, path, true);
 	}
 
+	//Gets a node using any of the three naming types:
+	//ID, or path (starts with slash), or name (starts with colon)
 	public SubNode getNode(MongoSession session, String path, boolean allowAuth) {
 		if (path.equals("/")) {
 			throw new RuntimeException(
 					"SubNode doesn't implement the root node. Root is implicit and never needs an actual node to represent it.");
+		}
+
+		if (path.startsWith(":")) {
+			return getNodeByName(session, path.substring(1), allowAuth);
 		}
 
 		if (!path.startsWith("/")) {
@@ -1157,14 +1184,21 @@ public class MongoApi {
 	}
 
 	public void createAllIndexes(MongoSession session) {
-		// try {
-		// 	dropIndex(session, SubNode.class, SubNode.FIELD_PATH + "_1");
-		// }
-		// catch (Exception e) {
-		// 	log.debug("no pth_1 index found. ok. this is fine.");
-		// }
+		try {
+			//dropIndex(session, SubNode.class, SubNode.FIELD_PATH + "_1");
+			dropIndex(session, SubNode.class, SubNode.FIELD_NAME + "_1");
+		}
+		catch (Exception e) {
+			log.debug("no field name index found. ok. this is fine.");
+		}
 		log.debug("creating all indexes.");
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
+
+		//todo-1: A future enhancement will probably be to use the event listener to make it so that when anyone other than admin tries
+		//to set the name on a node, their username (node ID) will automatically get prefixed onto the front of it so that each user will basically
+		//have their own namespace to use for node naming uniqueness constraint.
+		createIndex(session, SubNode.class, SubNode.FIELD_NAME);
+		
 		createIndex(session, SubNode.class, SubNode.FIELD_ORDINAL);
 		createIndex(session, SubNode.class, SubNode.FIELD_MODIFY_TIME, Direction.DESC);
 		createIndex(session, SubNode.class, SubNode.FIELD_CREATE_TIME, Direction.DESC);
@@ -1341,7 +1375,7 @@ public class MongoApi {
 	// that I can remove the (.+) piece?
 	// I think i need to write some test cases just to text my regex functions!
 	//
-	// todo-0: Also what's the 'human readable' description of what's going on here. For performance we DO want this to be
+	// todo-0: Also what's the 'human readable' description of what's going on here? substring or prefix? For performance we DO want this to be
 	// finding all nodes that 'start with' the path as opposed to simply 'contain' the path right? To make best use of indexes etc?
 	public String regexRecursiveChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");

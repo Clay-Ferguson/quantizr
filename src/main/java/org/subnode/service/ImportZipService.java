@@ -117,7 +117,7 @@ public class ImportZipService {
 		api.saveSession(session);
 
 		if (nodeName != null) {
-			api.renameNode(session, rootNode, nodeName);
+			rootNode.setName(nodeName);
 			api.save(session, rootNode);
 			log.debug("CurNode Saved (renamed): " + rootNode.getPath());
 			api.saveSession(session);

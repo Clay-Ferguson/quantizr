@@ -60,8 +60,6 @@ export interface UtilIntf {
     delayedFocus(id: string): void;
     checkSuccess(opFriendlyName, res): boolean;
     showMessage(message: string, preformatted?: boolean, sizeStyle?: string): void;
-    getNameFromPath(fileName: string): string;
-    getNodeName(node: NodeInfo): string;
     addAll(obj, a): void;
     addAll(obj, a): void;
     nullOrUndef(obj): boolean;

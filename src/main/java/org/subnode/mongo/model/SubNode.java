@@ -59,7 +59,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({ SubNode.FIELD_PATH, SubNode.FIELD_PATH_HASH, SubNode.FIELD_TYPE, SubNode.FIELD_ID,
+@JsonPropertyOrder({ SubNode.FIELD_PATH, SubNode.FIELD_PATH_HASH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME, SubNode.FIELD_ID,
 		SubNode.FIELD_MAX_CHILD_ORDINAL, SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
 		SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_ACL, SubNode.FIELD_PROPERTIES })
 public class SubNode {
@@ -95,6 +95,10 @@ public class SubNode {
 	public static final String FIELD_CONTENT = "cont";
 	@Field(FIELD_CONTENT)
 	private String content;
+
+	public static final String FIELD_NAME = "name";
+	@Field(FIELD_NAME)
+	private String name;
 
 	public static final String FIELD_OWNER = "own";
 	@Field(FIELD_OWNER)
@@ -177,23 +181,14 @@ public class SubNode {
 		return XString.truncateAfterLast(getPath(), "/");
 	}
 
+	//todo-0: this should be renamed to 'getLastPathPart' probably, and also we probably
+	//won't need it after completing refactoring to new way of 'naming' nodes.
 	@Transient
 	@JsonIgnore
 	public String getNameOnPath() {
 		if (getPath() == null)
 			return null;
 		return XString.parseAfterLast(getPath(), "/");
-	}
-
-	/* Returns the last part of the path, but null if it's the same as _id */
-	@Transient
-	@JsonIgnore
-	public String getName() {
-		String nameOnPath = this.getNameOnPath();
-		if (StringUtils.isNotEmpty(nameOnPath) && !nameOnPath.equals(this.jsonId())) {
-			return nameOnPath;
-		}
-		return null;
 	}
 
 	@JsonProperty(FIELD_PATH)
@@ -467,6 +462,17 @@ public class SubNode {
 	public void setType(String type) {
 		MongoThreadLocal.dirty(this);
 		this.type = type;
+	}
+
+	@JsonProperty(FIELD_NAME)
+	public String getName() {
+		return name;
+	}
+
+	@JsonProperty(FIELD_NAME)
+	public void setName(String name) {
+		MongoThreadLocal.dirty(this);
+		this.name = name;
 	}
 
 	@JsonProperty(FIELD_CONTENT)

@@ -34,16 +34,16 @@ public class RenderNodeRequest extends RequestBase {
 
 	private boolean forceIPFSRefresh;
 
-	public String getNodeId() {
-		return nodeId;
-	}
-
 	public boolean isForceIPFSRefresh() {
 		return forceIPFSRefresh;
 	}
 
 	public void setForceIPFSRefresh(boolean forceIPFSRefresh) {
 		this.forceIPFSRefresh = forceIPFSRefresh;
+	}
+
+	public String getNodeId() {
+		return nodeId;
 	}
 
 	public void setNodeId(String nodeId) {

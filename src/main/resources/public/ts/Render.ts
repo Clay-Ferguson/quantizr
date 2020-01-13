@@ -103,9 +103,8 @@ export class Render implements RenderIntf {
          * The !showPath condition here is because if we are showing the path then the end of that is always the
          * name, so we don't need to show the path AND the name. One is a substring of the other.
          */
-        let nodeName = S.util.getNodeName(node);
-        if (showName && !showPath && nodeName) {
-            nodeNameSpan = new Span(`Name: ${nodeName} [uid=${node.uid}]`);
+        if (showName && !showPath && node.name) {
+            nodeNameSpan = new Span(`Name: ${node.name} [uid=${node.uid}]`);
         }
 
         let children = [];
