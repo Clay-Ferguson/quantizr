@@ -1033,12 +1033,18 @@ export class Util implements UtilIntf {
     }
 
     updateHistory = (node: NodeInfo): void => {
-        if (!node || !node.path) {
+        if (!node) {
             return;
         }
 
-        let url: string = window.location.origin + "?id=" + node.path;
-        history.pushState({ "nodeId": node.path }, node.path, url);
+        if (node.name) {
+            let url: string = window.location.origin + "?name=" + node.name;
+            history.pushState({ "nodeId": node.name }, node.name, url);
+        }
+        else if (node.path) {
+            let url: string = window.location.origin + "?id=" + node.path;
+            history.pushState({ "nodeId": node.path }, node.path, url);
+        }
     }
 }
 
