@@ -21,6 +21,7 @@ export class MainNavPanel extends NavTag {
     constructor(attribs: any) {
         super(attribs);
         this.attribs.className = "navbar navbar-expand-sm navbar-dark bg-dark fixed-top";
+
         this.setChildren([
             new Ul(null, {
                 className: "navbar-nav"
@@ -71,7 +72,6 @@ export class MainNavPanel extends NavTag {
                     }, [
                         new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
                             "onClick": e => { S.nav.navUpLevel(); },
-                            "id": "upLevelButton",
                             "title": "Go to Parent SubNode"
                         },
                             //isEnabled func
@@ -86,7 +86,6 @@ export class MainNavPanel extends NavTag {
                     }, [
                         new NavBarIconButton("fa-chevron-circle-left", null, {
                             "onClick": e => { S.nav.navToSibling(-1); },
-                            "id": "upPrevSiblingButton",
                             "title": "Go to Previous SubNode"
                         },
                             //isEnabled func
@@ -101,7 +100,6 @@ export class MainNavPanel extends NavTag {
                     }, [
                         new NavBarIconButton("fa-chevron-circle-right", null, {
                             "onClick": e => { S.nav.navToSibling(1); },
-                            "id": "nextSiblingButton",
                             "title": "Go to Next SubNode"
                         },
                             //isEnabled func
@@ -116,7 +114,6 @@ export class MainNavPanel extends NavTag {
                     }, [
                         new NavBarIconButton("fa-database", null, {
                             "onClick": e => { S.nav.navHome(); },
-                            "id": "navHomeButton",
                             "title": "Go to Your Root Node"
                         })
                     ]),
@@ -126,7 +123,6 @@ export class MainNavPanel extends NavTag {
                     }, [
                         new NavBarIconButton("fa-home", null, {
                             "onClick": e => { S.meta64.loadAnonPageHome(); },
-                            "id": "navHomeButton",
                             "title": "Go to Portal Root Node"
                         })
                     ]),
@@ -136,9 +132,12 @@ export class MainNavPanel extends NavTag {
                     }, [
                         new NavBarIconButton("fa-gear", null, {
                             "onClick": e => { S.edit.editPreferences(); },
-                            "id": "navHomeButton",
-                            "title": "Edit your Account Preferences"
-                        })
+                            "title": "Edit your Account Preferences2"
+                        },
+                            //isEnabled func
+                            () => { return !S.meta64.isAnonUser; },
+                            //isVisible func
+                            () => { return !S.meta64.isAnonUser; })
                     ]),
 
                     new Li(null, {
@@ -146,7 +145,6 @@ export class MainNavPanel extends NavTag {
                     }, [
                         new NavBarIconButton("fa-pencil", null, {
                             "onClick": e => { S.nav.editMode(); },
-                            "id": "editModeButton",
                             "title": "Toggle Edit Mode on/off"
                         },
                             //isEnabled func
@@ -161,7 +159,6 @@ export class MainNavPanel extends NavTag {
                     }, [
                         new NavBarButton("Signup", {
                             "onClick": e => { S.nav.signup(); },
-                            "id": "openSignupPgButton",
                             "title": "Create new Quantizr Account"
                         },
                             //isEnabled func
@@ -176,7 +173,6 @@ export class MainNavPanel extends NavTag {
                     }, [
                         new NavBarIconButton("fa-search", null, {
                             "onClick": e => { S.nav.search(); },
-                            "id": "searchMainAppButton",
                             "title": "Search under selected node"
                         },
                             //isEnabled func
@@ -191,7 +187,6 @@ export class MainNavPanel extends NavTag {
                     }, [
                         new NavBarIconButton("fa-clock-o", null, {
                             "onClick": e => { S.srch.timeline("mtm"); },
-                            "id": "timelineMainAppButton",
                             "title": "View Timeline of selected node (by Mod Time)"
                         },
                             //isEnabled func
@@ -206,7 +201,6 @@ export class MainNavPanel extends NavTag {
                     }, [
                         new NavBarIconButton("fa-sign-in", "Login", {
                             "onClick": e => { S.nav.login(); },
-                            "id": "openLoginDlgButton",
                             "title": "Login to Quantizr"
                         },
                             //isEnabled func
@@ -221,7 +215,6 @@ export class MainNavPanel extends NavTag {
                     }, [
                         new NavBarIconButton("fa-sign-out", null, {
                             "onClick": e => { S.nav.logout(); },
-                            "id": "navLogoutButton",
                             "title": "Logout"
                         },
                             //isEnabled func

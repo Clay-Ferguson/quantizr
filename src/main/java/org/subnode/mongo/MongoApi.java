@@ -1432,6 +1432,7 @@ public class MongoApi {
 	}
 
 	public SubNode getUserNodeByUserName(MongoSession session, String user) {
+		if (user==null) return null;
 		user = user.trim();
 
 		// For the ADMIN user their root node is considered to be the entire root of the
