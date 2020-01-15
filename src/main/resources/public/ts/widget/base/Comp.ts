@@ -7,7 +7,7 @@ import { Constants } from "../../Constants";
 import { Singletons } from "../../Singletons";
 import * as ReactDOM from "react-dom";
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
-import { ReactNode, ReactElement, useState } from "react";
+import { ReactNode, ReactElement, useState, useEffect } from "react";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -41,18 +41,12 @@ export abstract class Comp implements CompIntf {
     /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored */
     children: CompIntf[];
 
-    logEnablementLogic: boolean = false;
-
-    /* These are primarily used by Buttons and MenuItems based on enablement updater */
-    private enabled: boolean = true;
-    private visible: boolean = true;
+    logEnablementLogic: boolean = true;
 
     isEnabledFunc: Function;
     isVisibleFunc: Function;
-    subscribedToRefresh: boolean;
 
-    extraEnabledClass: string;
-    extraDisabledClass: string;
+    jsClassName: string;
 
     setStateFunc: Function;
 
@@ -72,11 +66,18 @@ export abstract class Comp implements CompIntf {
         this.attribs.id = id;
         this.attribs.key = id;
 
+        this.jsClassName = this.constructor.name + "[" + id + "]";
+        console.log("jsClassName: " + this.jsClassName);
+
         //This map allows us to lookup the Comp directly by its ID similar to a DOM lookup
         Comp.idToCompMap[id] = this;
 
-        //supposedly this pattern works but I'm not sure it's better than what I'm doing.
+        //supposedly this pattern works but I'm not sure it's better than what I'm doing, unless this allows an ability
+        //to call super.method() which I'm not sure my current architecture can support super calls to functions that are overridden
+        //in base classes
         this.bindExampleFunction = this.bindExampleFunction.bind(this);
+
+        this.setState({ visible: true, enabled: true });
     }
 
     bindExampleFunction() {
@@ -93,34 +94,33 @@ export abstract class Comp implements CompIntf {
         return ret;
     }
 
-    subscribeToRefresh = () => {
-        if (this.subscribedToRefresh) {
-            return;
-        }
-        this.subscribedToRefresh = true;
-
-        PubSub.sub(Constants.PUBSUB_RefreshEnablement, (unused: Object) => {
-            this.whenElm((elm: HTMLElement) => {
-                if (this.logEnablementLogic) {
-                    //console.log("PubSub driven refreshState: on ID=" + this.getId());
-                }
-                this.refreshState();
-            });
-        });
-    }
 
     /* Function refreshes all enablement and visibility based on current state of app 
     
     Now that we have true ReactHook for setState, all pre-existing state management of menus needs to be updated to 
     use that new way (todo-1)
+
+    todo-0: this is currently disabled, because lifecycle of DOM elements is mucking things up relativie to garbage collection in listener impl, etc.
     */
     refreshState(): void {
-        //todo-1: future optimization. For components that don't implement any enablement/visibilty functions, we can
-        //just only do this enablement stuff ONCE and then not do it again on the same element.
-        this.updateState();
-        this.setVisible(this.visible);
-        this.setEnabled(this.enabled);
-        //console.log("refreshState: id=" + this.getId() + " enabled=" + this.enabled);
+        let enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
+        let visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
+
+        console.log("refreshState. " + this.jsClassName + " visible=" + visible + " enabled=" + enabled);
+
+        this.mergeState({
+            enabled,
+            visible
+        });
+
+        //recursively set all children states
+        if (this.children && this.children.length > 0) {
+            this.children.forEach((child: Comp) => {
+                if (child) {
+                    child.refreshState();
+                }
+            });
+        }
     }
 
     setDomAttr = (attrName: string, attrVal: string) => {
@@ -133,32 +133,13 @@ export abstract class Comp implements CompIntf {
     setIsEnabledFunc = (isEnabledFunc: Function) => {
         if (!isEnabledFunc) return;
         this.isEnabledFunc = isEnabledFunc;
-        this.subscribeToRefresh();
+        this.mergeState({ enabled: isEnabledFunc() });
     }
 
     setIsVisibleFunc = (isVisibleFunc: Function) => {
         if (!isVisibleFunc) return;
         this.isVisibleFunc = isVisibleFunc;
-        this.subscribeToRefresh();
-    }
-
-    updateState = (): boolean => {
-        let ret = false;
-
-        if (this.isEnabledFunc) {
-            this.setEnabled(this.isEnabledFunc());
-            //console.log("in updateState: id=" + this.getId() + " enablement function said: " + this.enabled);
-            ret = true;
-        }
-        else {
-            //console.log("in updateState: id=" + this.getId() + " has no ENABLEMENT function");
-        }
-
-        if (this.isVisibleFunc) {
-            this.visible = this.isVisibleFunc();
-            ret = true;
-        }
-        return ret;
+        this.mergeState({ visible: isVisibleFunc() });
     }
 
     static nextGuid(): number {
@@ -183,6 +164,7 @@ export abstract class Comp implements CompIntf {
         return <HTMLElement>document.getElementById(this.getId());
     }
 
+    //todo-0: the 'lifecycle' methods below *should* be able to help out with this in some way, rather than this timer approach???
     whenElm = (func: (elm: HTMLElement) => void) => {
         S.util.getElm(this.getId(), func);
     }
@@ -190,58 +172,12 @@ export abstract class Comp implements CompIntf {
     /* WARNING: this is NOT a setter for 'this.visible'. Perhaps i need to rename it for better clarity, it takes
     this.visible as its input sometimes. Slightly confusing */
     setVisible = (visible: boolean) => {
-        this.whenElm((elm: HTMLElement) => {
-            S.util.setElmDisplay(elm, visible);
-        });
+        this.mergeState({ visible });
     }
 
     /* WARNING: this is NOT the setter for 'this.enabled' */
     setEnabled = (enabled: boolean) => {
-        this.enabled = enabled;
-        this.whenElm((elm: HTMLElement) => {
-            (<any>elm).disabled = !enabled;
-
-            if (!enabled) {
-                elm.setAttribute("disabled", "disabled");
-            }
-            else {
-                elm.removeAttribute("disabled");
-            }
-
-            //IF NOT ENABLED
-            if (!enabled) {
-                S.util.addClassToElm(elm, "disabled");
-
-                if (this.extraDisabledClass) {
-                    S.util.addClassToElm(elm, this.extraDisabledClass);
-                }
-                if (this.extraEnabledClass) {
-                    S.util.removeClassFromElm(elm, this.extraEnabledClass);
-                }
-            }
-            //IF ENBALED
-            else {
-                S.util.removeClassFromElm(elm, "disabled");
-                if (this.extraEnabledClass) {
-                    S.util.addClassToElm(elm, this.extraEnabledClass);
-                }
-                else {
-                    if (this.logEnablementLogic) {
-                        console.log("No extraEnabledClass on id: " + this.getId());
-                    }
-                }
-
-                if (this.extraDisabledClass) {
-                    S.util.removeClassFromElm(elm, this.extraDisabledClass);
-                }
-                else {
-                    if (this.logEnablementLogic) {
-                        console.log("No extraDisabledClass on id: " + this.getId());
-                    }
-                }
-            }
-            //console.log("class proof[enabled="+enabled+"]: id="+this.getId()+" class=" + document.getElementById(this.getId()).className);
-        });
+        this.mergeState({ enabled });
     }
 
     setClass = (clazz: string): void => {
@@ -344,15 +280,6 @@ export abstract class Comp implements CompIntf {
         return S.e(tag, props, children);
     }
 
-    /* Haven't tested this variation but it will add (merge in) new state into existing state without
-     overwiting existing state */
-    mergeState = (newState: any) => {
-        this.setState(prevState => {
-            // Object.assign would also work
-            return { ...prevState, ...newState };
-        });
-    }
-
     hookState = (newState: any) => {
         const [state, setStateFunc] = useState(newState);
         this.setStateFunc = setStateFunc;
@@ -361,10 +288,23 @@ export abstract class Comp implements CompIntf {
         this.initialState = null;
     }
 
+    /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
+    both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact */
+    mergeState = (state: any): any => {
+        //If we still have an initial state then it's the 'active' state we need to merge into
+        if (this.initialState) {
+            this.setState({ ...this.initialState, ...state });
+        }
+        //otherwise the actual 'state' itself is currently the active state to merge into.
+        else {
+            this.setState({ ...this.state, ...state });
+        }
+    }
+
     /* Note: this method performs a direct state mod, but for react comps it gets overridden using useState return value 
     
     To add new properties...use this pattern (mergeState above does this)
-    setState(prevState => {
+    setStateFunc(prevState => {
         // Object.assign would also work
         return {...prevState, ...updatedValues};
     });
@@ -389,6 +329,23 @@ export abstract class Comp implements CompIntf {
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
     render = (): ReactNode => {
         this.hookState(this.initialState || this.state || {});
+
+        // useEffect(() => {
+        //     console.log("$$$$ DOM ADD: " + this.jsClassName);
+        // }, []);
+
+        // useEffect(() => {
+        //     console.log("$$$$ DOM UPDATE: " + this.jsClassName);
+        // });
+
+        // //todo-0: this never ran (for popup menu) and my best guess is that dialogs are
+        // //being hidden, but not 'detatched' when closed, bc that menu runs inside a dialog container.
+        // useEffect(() => {
+        //     return () => {
+        //         console.log("$$$$ DOM REMOVE:" + this.jsClassName);
+        //     }
+        // }, []);
+
         return this.compRender();
     }
 

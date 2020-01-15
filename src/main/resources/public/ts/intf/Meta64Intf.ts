@@ -1,6 +1,7 @@
 import * as I from "../Interfaces";
 import { TypeHandlerIntf } from "./TypeHandlerIntf";
 import { GraphPanel } from "../widget/GraphPanel";
+import { CompIntf } from "../widget/base/CompIntf";
 
 export interface Meta64Intf {
 

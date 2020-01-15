@@ -19,7 +19,7 @@ export class TextContent extends Comp {
     }
 
     setText = (text: string) => {
-        this.setState({
+        this.mergeState({
             text
         });
     }

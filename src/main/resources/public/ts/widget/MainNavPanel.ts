@@ -115,127 +115,131 @@ export class MainNavPanel extends NavTag {
                         new NavBarIconButton("fa-database", null, {
                             "onClick": e => { S.nav.navHome(); },
                             "title": "Go to Your Root Node"
-                        })
-                    ]),
-
-                    new Li(null, {
-                        className: "nav-item"
-                    }, [
-                        new NavBarIconButton("fa-home", null, {
-                            "onClick": e => { S.meta64.loadAnonPageHome(); },
-                            "title": "Go to Portal Root Node"
-                        })
-                    ]),
-
-                    new Li(null, {
-                        className: "nav-item"
-                    }, [
-                        new NavBarIconButton("fa-gear", null, {
-                            "onClick": e => { S.edit.editPreferences(); },
-                            "title": "Edit your Account Preferences2"
                         },
                             //isEnabled func
                             () => { return !S.meta64.isAnonUser; },
                             //isVisible func
                             () => { return !S.meta64.isAnonUser; })
-                    ]),
+                ]),
 
-                    new Li(null, {
-                        className: "nav-item"
-                    }, [
-                        new NavBarIconButton("fa-pencil", null, {
-                            "onClick": e => { S.nav.editMode(); },
-                            "title": "Toggle Edit Mode on/off"
-                        },
-                            //isEnabled func
-                            () => { return S.meta64.state.allowEditMode; },
-                            //isVisible func
-                            () => { return S.meta64.state.allowEditMode; }
-                        ),
-                    ]),
+                new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-home", null, {
+                        "onClick": e => { S.meta64.loadAnonPageHome(); },
+                        "title": "Go to Portal Root Node"
+                    })
+                ]),
 
-                    new Li(null, {
-                        className: "nav-item"
-                    }, [
-                        new NavBarButton("Signup", {
-                            "onClick": e => { S.nav.signup(); },
-                            "title": "Create new Quantizr Account"
-                        },
-                            //isEnabled func
-                            () => { return S.meta64.isAnonUser; },
-                            //isVisible func
-                            () => { return S.meta64.isAnonUser; }
-                        )
-                    ]),
+                new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-gear", null, {
+                        "onClick": e => { S.edit.editPreferences(); },
+                        "title": "Edit your Account Preferences"
+                    },
+                        //isEnabled func
+                        () => { return !S.meta64.isAnonUser; },
+                        //isVisible func
+                        () => { return !S.meta64.isAnonUser; })
+                ]),
 
-                    new Li(null, {
-                        className: "nav-item"
-                    }, [
-                        new NavBarIconButton("fa-search", null, {
-                            "onClick": e => { S.nav.search(); },
-                            "title": "Search under selected node"
-                        },
-                            //isEnabled func
-                            () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null; },
-                            //isVisible func
-                            () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null; }
-                        ),
-                    ]),
+                new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-pencil", null, {
+                        "onClick": e => { S.nav.editMode(); },
+                        "title": "Toggle Edit Mode on/off"
+                    },
+                        //isEnabled func
+                        () => { return S.meta64.state.allowEditMode; },
+                        //isVisible func
+                        () => { return S.meta64.state.allowEditMode; }
+                    ),
+                ]),
 
-                    new Li(null, {
-                        className: "nav-item"
-                    }, [
-                        new NavBarIconButton("fa-clock-o", null, {
-                            "onClick": e => { S.srch.timeline("mtm"); },
-                            "title": "View Timeline of selected node (by Mod Time)"
-                        },
-                            //isEnabled func
-                            () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null; },
-                            //isVisible func
-                            () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null; }
-                        ),
-                    ]),
+                new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarButton("Signup", {
+                        "onClick": e => { S.nav.signup(); },
+                        "title": "Create new Quantizr Account"
+                    },
+                        //isEnabled func
+                        () => { return S.meta64.isAnonUser; },
+                        //isVisible func
+                        () => { return S.meta64.isAnonUser; }
+                    )
+                ]),
 
-                    new Li(null, {
-                        className: "nav-item"
-                    }, [
-                        new NavBarIconButton("fa-sign-in", "Login", {
-                            "onClick": e => { S.nav.login(); },
-                            "title": "Login to Quantizr"
-                        },
-                            //isEnabled func
-                            () => { return S.meta64.isAnonUser; },
-                            //isVisible func
-                            () => { return S.meta64.isAnonUser; }
-                        )
-                    ]),
+                new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-search", null, {
+                        "onClick": e => { S.nav.search(); },
+                        "title": "Search under selected node"
+                    },
+                        //isEnabled func
+                        () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null; },
+                        //isVisible func
+                        () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null; }
+                    ),
+                ]),
 
-                    new Li(null, {
-                        className: "nav-item"
-                    }, [
-                        new NavBarIconButton("fa-sign-out", null, {
-                            "onClick": e => { S.nav.logout(); },
-                            "title": "Logout"
-                        },
-                            //isEnabled func
-                            () => { return !S.meta64.isAnonUser; },
-                            //isVisible func
-                            () => { return !S.meta64.isAnonUser; }
-                        )
-                    ])
+                new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-clock-o", null, {
+                        "onClick": e => { S.srch.timeline("mtm"); },
+                        "title": "View Timeline of selected node (by Mod Time)"
+                    },
+                        //isEnabled func
+                        () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null; },
+                        //isVisible func
+                        () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null; }
+                    ),
+                ]),
 
-                    //example of a dropdown menu would go here.
-                    // <li class="nav-item dropdown">
-                    //     <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown"
-                    //     aria-haspopup="true" aria-expanded="false">Dropdown</a>
-                    //     <div class="dropdown-menu" aria-labelledby="dropdown01">
-                    //     <a class="dropdown-item" href="#">Action</a>
-                    //     <a class="dropdown-item" href="#">Another action</a>
-                    //     <a class="dropdown-item" href="#">Something else here</a>
-                    //     </div>
-                    // </li>
+                new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-sign-in", "Login", {
+                        "onClick": e => { S.nav.login(); },
+                        "title": "Login to Quantizr"
+                    },
+                        //isEnabled func
+                        () => { return S.meta64.isAnonUser; },
+                        //isVisible func
+                        () => { return S.meta64.isAnonUser; }
+                    )
+                ]),
+
+                new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-sign-out", null, {
+                        "onClick": e => { S.nav.logout(); },
+                        "title": "Logout"
+                    },
+                        //isEnabled func
+                        () => { return !S.meta64.isAnonUser; },
+                        //isVisible func
+                        () => { return !S.meta64.isAnonUser; }
+                    )
                 ])
+
+                //example of a dropdown menu would go here.
+                // <li class="nav-item dropdown">
+                //     <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown"
+                //     aria-haspopup="true" aria-expanded="false">Dropdown</a>
+                //     <div class="dropdown-menu" aria-labelledby="dropdown01">
+                //     <a class="dropdown-item" href="#">Action</a>
+                //     <a class="dropdown-item" href="#">Another action</a>
+                //     <a class="dropdown-item" href="#">Something else here</a>
+                //     </div>
+                // </li>
             ])
+        ])
         ]);
 
         this.whenElm((elm: HTMLElement) => {

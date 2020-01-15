@@ -3,8 +3,9 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants } from "../Constants";
 import { MainMenuPopupDlg } from "../dlg/MainMenuPopupDlg";
+import { ReactNode } from "react";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
@@ -15,14 +16,6 @@ export class MenuItem extends Div {
         super(name, {
             className: "list-group-item list-group-item-action",
         });
-
-        if (!isEnabledFunc) {
-            isEnabledFunc = () => {return true;};
-        }
-
-        if (!isVisibleFunc) {
-            isVisibleFunc = () => {return true;};
-        }
 
         let func = () => {
             /* always dispose the menu before running the menu function */
@@ -35,7 +28,21 @@ export class MenuItem extends Div {
         this.setOnClick(func);
         this.setIsEnabledFunc(isEnabledFunc);
         this.setIsVisibleFunc(isVisibleFunc);
-        this.extraDisabledClass = "mainMenuItemDisabled";
-        this.extraEnabledClass = "mainMenuItemEnabled";
+    }
+
+    compRender = (): ReactNode => {
+        let state = this.getState();
+        console.log("compRender " + this.jsClassName + "[" + this.name + "] visible=" + state.visible + " enabled=" + state.enabled);
+        //todo-0: for now if someething's disabled we just hide it, but eventually we'll put back in the logic
+        //for enablement logic as found in Comp base class.
+        let _style = { display: (state.visible ? '' : 'none') };
+        let enablement = state.enabled ? {} : { disabled: "disabled" };
+        let enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
+
+        //we have to create a clone for sending to S.e, because React has a rule that once it renders the object
+        //then becomes readonly
+        let _attribs = { ...this.attribs, ...enablement, ...{ style: _style }, ...{ className: "list-group-item list-group-item-action " + enablementClass } };
+
+        return this.tagRender('div', state.content, _attribs);
     }
 }

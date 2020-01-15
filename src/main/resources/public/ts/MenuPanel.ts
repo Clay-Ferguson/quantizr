@@ -22,21 +22,24 @@ export class MenuPanel extends Div {
         this.setChildren([
 
             new Menu("Portal", [
-                new MenuItem("Your Node", S.nav.navHome, () => {
-                    return !S.meta64.isAnonUser;
-                }),
+                new MenuItem("Your Node", S.nav.navHome,
+                    //enabled func
+                    () => {
+                        return !S.meta64.isAnonUser;
+                    }
+                ),
                 new MenuItem("Portal Node", () => { S.meta64.loadAnonPageHome() }),
-                
+
                 //I'm removing my RSS feeds, for now (mainly to remove any political or interest-specific content from the platform)
                 //new MenuItem("Podcast Feeds", () => { S.nav.openContentNode("/r/rss"); }),
 
                 new MenuItem("User Guide", () => { S.nav.openContentNode("/r/public/user-guide"); }),
-                
+
                 //new MenuItem("Sample Document", () => { S.nav.openContentNode("/r/books/war-and-peace"); }),
 
                 // commenting this only because I don't have the github created yet.
                 // new MenuItem("Quantizr on GitHub", S.nav.openGitHubSite),
-                
+
                 new MenuItem("Getting Started", () => { S.nav.openContentNode("/r/public/getting-started"); }),
 
                 //I decided ALL information will be stored native right in mongo, and no filesystem stuff.
@@ -100,18 +103,18 @@ export class MenuPanel extends Div {
             //     new MenuItem("Tree Structure", S.graph.graphTreeStructure, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
             // ]),
             new Menu("Timeline", [
-                new MenuItem("Created", () => {S.srch.timeline('ctm')}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
-                new MenuItem("Modified", () => {S.srch.timeline('mtm')}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
+                new MenuItem("Created", () => { S.srch.timeline('ctm') }, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
+                new MenuItem("Modified", () => { S.srch.timeline('mtm') }, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
             ]),
             new Menu("View", [
                 //todo-1: properties toggle really should be a preferences setting i think, and not a menu option here.
-                
+
                 //this is broken, so I'm just disabling it for now, since this is low priority. todo-1
                 //new MenuItem("Toggle Properties", S.props.propsToggle, () => { return S.meta64.state.propsToggle }, () => { return !S.meta64.isAnonUser }), //
-                
+
                 new MenuItem("Refresh", S.meta64.refresh), //
                 new MenuItem("Show URL", S.render.showNodeUrl, () => { return S.meta64.state.highlightNode != null }), //
-                new MenuItem("Show Node JSON", () => {S.view.runServerCommand("getJson")}, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
+                new MenuItem("Show Node JSON", () => { S.view.runServerCommand("getJson") }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
             ]),
             new Menu("Transform", [
                 new MenuItem("Split Inline", () => { S.edit.splitNode('inline') }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
@@ -151,7 +154,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Preferences", S.edit.editPreferences, () => { return !S.meta64.isAnonUser }), //
                 new MenuItem("Change Password", S.edit.openChangePasswordDlg, () => { return !S.meta64.isAnonUser }), //
                 new MenuItem("Manage Account", S.edit.openManageAccountDlg, () => { return !S.meta64.isAnonUser }), //
-                
+
                 //This isn't mature enough yet to show to users
                 //new MenuItem("Encryption Keys", S.meta64.openManageKeysDlg, () => { return !S.meta64.isAnonUser }), //
 
@@ -161,13 +164,13 @@ export class MenuPanel extends Div {
 
             new Menu("IPFS",
                 [
-                    new MenuItem("Display Node Info", () => {S.view.runServerCommand("ipfsGetNodeInfo")},
+                    new MenuItem("Display Node Info", () => { S.view.runServerCommand("ipfsGetNodeInfo") },
                         () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && S.meta64.state.selNodeIsMine) },
                         () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && S.meta64.state.selNodeIsMine) }
                     ),
                     new MenuItem("Force Refresh", () => {
                         let currentSelNode: I.NodeInfo = S.meta64.getHighlightedNode();
-                        let nodeId:string = currentSelNode != null ? currentSelNode.id : null;
+                        let nodeId: string = currentSelNode != null ? currentSelNode.id : null;
                         S.view.refreshTree(nodeId, false, nodeId, false, true);
                     },
                         () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && S.meta64.state.selNodeIsMine) },
@@ -183,27 +186,27 @@ export class MenuPanel extends Div {
                     //     () => { return S.meta64.isAdminUser },
                     //     () => { return S.meta64.isAdminUser }
                     // ),
-                    new MenuItem("Refresh Index", () => {S.view.runServerCommand("refreshLuceneIndex")},
-                    () => { return S.meta64.isAdminUser },
-                    () => { return S.meta64.isAdminUser }
-                ),
+                    new MenuItem("Refresh Index", () => { S.view.runServerCommand("refreshLuceneIndex") },
+                        () => { return S.meta64.isAdminUser },
+                        () => { return S.meta64.isAdminUser }
+                    ),
                 ],
                 () => { return S.meta64.isAdminUser; },
                 () => { return S.meta64.isAdminUser; }),
-                
+
             new Menu("Admin",
                 [
                     //new MenuItem("Graph Display Test", () => {S.view.graphDisplayTest()}, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
-                    new MenuItem("Server Info", () => {S.view.runServerCommand("getServerInfo")}, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
-                    new MenuItem("Compact DB", () => {S.view.runServerCommand("compactDb")}, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
-        
-                    new MenuItem("Backup DB", () => {S.view.runServerCommand("BackupDb")}, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
-                    new MenuItem("Reset Public Node", () => {S.view.runServerCommand("initializeAppContent")}, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
+                    new MenuItem("Server Info", () => { S.view.runServerCommand("getServerInfo") }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
+                    new MenuItem("Compact DB", () => { S.view.runServerCommand("compactDb") }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
+
+                    new MenuItem("Backup DB", () => { S.view.runServerCommand("BackupDb") }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
+                    new MenuItem("Reset Public Node", () => { S.view.runServerCommand("initializeAppContent") }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
                     new MenuItem("Insert Book: War and Peace", S.edit.insertBookWarAndPeace,
                         () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && S.meta64.state.selNodeIsMine) },
                         () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && S.meta64.state.selNodeIsMine) }
                     ),
-                   
+
                     new MenuItem("Rebuild Indexes", S.meta64.rebuildIndexes, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }),
                     new MenuItem("Shutdown Server Node", S.meta64.shutdownServerNode, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }),
                     new MenuItem("Send Test Email", S.meta64.sendTestEmail, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser })

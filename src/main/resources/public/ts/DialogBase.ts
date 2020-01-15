@@ -27,9 +27,9 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
 
     /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is 
     closed. */
-    open = (): Promise<DialogBase> => {
+    open = (display: string=null): Promise<DialogBase> => {
         return new Promise<DialogBase>((resolve, reject) => {
-            let displayStyle = this.initiallyInvisible ? "none" : "block";
+            let displayStyle = display ? display : (this.initiallyInvisible ? "none" : "block");
 
             // Create dialog container and attach to document.body.
             let elm = document.createElement('div');

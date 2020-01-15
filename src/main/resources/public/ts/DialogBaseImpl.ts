@@ -1,7 +1,7 @@
 import { CompIntf } from "./widget/base/CompIntf";
 
 export interface DialogBaseImpl {
-    open(): Promise<CompIntf>;
+    open(display?: string): Promise<CompIntf>;
     init() : void;
     close(): void;
 }

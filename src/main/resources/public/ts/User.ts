@@ -269,7 +269,8 @@ export class User implements UserIntf {
                     }
                 }
 
-                S.meta64.refreshAllGuiEnablement();
+                //this is redundant (refreshTree does it)
+                //S.meta64.refreshAllGuiEnablement();
             }
             finally {
                 resolve();
@@ -286,6 +287,8 @@ export class User implements UserIntf {
         }
 
         S.meta64.loadAnonPageHome();
-        S.meta64.refreshAllGuiEnablement();
+
+        //this is redundant
+        //S.meta64.refreshAllGuiEnablement();
     }
 }

@@ -539,7 +539,16 @@ export class Meta64 implements Meta64Intf {
 
     refreshAllGuiEnablement = () => {
         this.updateState();
-        PubSub.pub(Constants.PUBSUB_RefreshEnablement, {});
+
+        if (S.nav.mainNavPanel) {
+            S.nav.mainNavPanel.refreshState();
+        }
+
+        // we don't refresh state on popup menu, because currently we regenerate completely each time and we
+        // are calling updateState() before doing so, but aside from react performance we could do it differently if we ever need to.
+        // if (S.nav.mainMenuPopupDlg) {
+        //     S.nav.mainMenuPopupDlg.refreshState();
+        // }
     }
 
     /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */
@@ -799,8 +808,8 @@ export class Meta64 implements Meta64Intf {
             let mainTabPanel = new TabPanel();
             mainTabPanel.reactRenderToDOM("mainTabPanel");
 
-            let mainNavPanel = new MainNavPanel(null);
-            mainNavPanel.reactRenderToDOM("mainNavPanel");
+            S.nav.mainNavPanel = new MainNavPanel(null);
+            S.nav.mainNavPanel.reactRenderToDOM("mainNavPanel");
 
             /*
              * This call checks the server to see if we have a session already, and gets back the login information from

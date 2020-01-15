@@ -41,9 +41,6 @@ export class Props implements PropsIntf {
      */
     propsToggle = async (): Promise<void> => {
         S.meta64.showProperties = S.meta64.showProperties ? false : true;
-        // setDataIconUsingId("#editModeButton", editMode ? "edit" :
-        // "forbidden");
-
         await S.render.renderPageFromData();
     }
 

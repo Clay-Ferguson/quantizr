@@ -12,8 +12,6 @@ export interface CompIntf {
 
     setIsVisibleFunc(isVisibleFunc: Function);
 
-    updateState(): boolean;
-
     removeAllChildren(): void;
 
     getId(): string;
@@ -32,6 +30,7 @@ export interface CompIntf {
 
     reactRenderHtmlInDiv(type: any): string;
     reactRenderHtmlInSpan(type: any): string;
+    reactRenderToDOM(id: string): void;
 
     setInnerHTML(html: string); 
 

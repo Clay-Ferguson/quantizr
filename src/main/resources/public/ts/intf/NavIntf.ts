@@ -1,9 +1,12 @@
 import * as I from "../Interfaces";
+import { CompIntf } from "../widget/base/CompIntf";
+import { DialogBaseImpl } from "../DialogBaseImpl";
 
 export interface NavIntf {
     _UID_ROWID_PREFIX: string;
 
-    mainMenuPopupDlg: any;
+    mainMenuPopupDlg: DialogBaseImpl;
+    mainNavPanel: CompIntf;
 
     mainOffset: number;
     endReached: boolean;

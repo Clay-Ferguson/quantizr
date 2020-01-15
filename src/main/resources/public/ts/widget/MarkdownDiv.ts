@@ -16,10 +16,7 @@ export class MarkdownDiv extends Comp {
     constructor(public content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {
         super(attribs);
         this.setChildren(initialChildren);
-
-        this.setState({
-            content
-        });
+        this.setContent(content);
     }
 
     getTag = (): string => {
@@ -27,7 +24,7 @@ export class MarkdownDiv extends Comp {
     }
 
     setContent = (content: string) => {
-        this.setState({
+        this.mergeState({
             content
         });
     }
