@@ -912,6 +912,7 @@ export class Util implements UtilIntf {
         return <T>instance;
     }
 
+    //todo-1: is this still used ? eliminate it.
     changeOrAddClassToElm = (elm: HTMLElement, oldClass: string, newClass: string) => {
         this.removeClassFromElmById(elm.id, oldClass);
         this.addClassToElmById(elm.id, newClass);
@@ -927,14 +928,14 @@ export class Util implements UtilIntf {
         this.addClassToElmById(id, newClass);
     }
 
-    //todo-0: is this still used ?
+    //todo-1: is this still used ? eliminate it.
     removeClassFromElmById = (id: string, clazz: string) => {
         S.util.getElm(id, (elm: HTMLElement) => {
             this.removeClassFromElm(elm, clazz);
         });
     }
 
-    //todo-0: is this still used?
+    //todo-1: is this still used ? eliminate it.
     removeClassFromElm = (el: HTMLElement, clazz: string): void => {
         if (el.classList)
             el.classList.remove(clazz);
@@ -945,7 +946,7 @@ export class Util implements UtilIntf {
         }
     }
 
-    //todo-0: is this still used?
+    //todo-1: is this still used ? eliminate it.
     addClassToElmById = (id: string, clazz: string): void => {
         //console.log("Adding class "+clazz+" to dom id "+id);
         S.util.getElm(id, (elm: HTMLElement) => {
@@ -954,6 +955,7 @@ export class Util implements UtilIntf {
         });
     }
 
+    //todo-1: is this still used ? eliminate it.
     addClassToElm = (el: HTMLElement, clazz: string): void => {
         if (el.classList) {
             //console.log("add to classList " + clazz);
@@ -971,6 +973,7 @@ export class Util implements UtilIntf {
         }
     }
 
+    //todo-1: is this still used ? eliminate it.
     toggleClassFromElm = (el: any, clazz: string): void => {
         if (el.classList) {
             el.classList.toggle(clazz);

@@ -36,14 +36,6 @@ export class Edit implements EditIntf {
 
     parentOfNewNode: I.NodeInfo = null;
 
-    /*
-     * Node being edited
-     *
-     * todo-2: this and several other variables can now be moved into the dialog class? Is that good or bad
-     * coupling/responsibility?
-     */
-    editNode: I.NodeInfo = null;
-
     /* Instance of EditNodeDialog: For now creating new one each time */
     editNodeDlgInst: EditNodeDlg = null;
 
@@ -140,9 +132,11 @@ export class Edit implements EditIntf {
                  * Server will have sent us back the raw text content, that should be markdown instead of any HTML, so
                  * that we can display this and save.
                  */
-                this.editNode = res.nodeInfo;
+                let editNode = res.nodeInfo;
 
-                let dlg = new EditNodeDlg({node: this.editNode});
+                let dlg = new EditNodeDlg({node: editNode});
+
+                //this tight-coupling is ugly. remove it (todo-0)
                 this.editNodeDlgInst = dlg;
                 dlg.open();
             } else {
@@ -190,8 +184,6 @@ export class Edit implements EditIntf {
     }
 
     startEditingNewNode = (typeName?: string, createAtTop?: boolean): void => {
-        this.editNode = null;
-
         /*
          * If we didn't create the node we are inserting under, and neither did "admin", then we need to send notification
          * email upon saving this new node.
@@ -363,7 +355,6 @@ export class Edit implements EditIntf {
         }
 
         if (!node) {
-            this.editNode = null;
             S.util.showMessage("Unknown nodeId in editNodeClick: " + uid);
             return;
         }

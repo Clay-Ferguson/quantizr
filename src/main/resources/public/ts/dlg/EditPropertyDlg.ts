@@ -22,12 +22,13 @@ export class EditPropertyDlg extends DialogBase {
 
     propertyNameTextarea: Textarea;
     propertyValTextarea: Textarea;
-
     private editNodeDlg: EditNodeDlg;
+    editNode: I.NodeInfo;
 
     constructor(args: any) {
         super("Edit Node Property");
         this.editNodeDlg = args.editNodeDlg;
+        this.editNode = args.editNode; 
 
         this.setChildren([
             new Div(null, null, [
@@ -55,7 +56,7 @@ export class EditPropertyDlg extends DialogBase {
         let val = this.propertyValTextarea.getValue();
 
         var postData = {
-            nodeId: S.edit.editNode.id,
+            nodeId: this.editNode.id,
             propertyName: name,
             propertyValue: val
         };
@@ -66,11 +67,11 @@ export class EditPropertyDlg extends DialogBase {
         S.util.checkSuccess("Save properties", res);
         this.close();
 
-        if (!S.edit.editNode.properties) {
-            S.edit.editNode.properties = [];
+        if (!this.editNode.properties) {
+            this.editNode.properties = [];
         }
 
-        S.edit.editNode.properties.push(res.propertySaved);
+        this.editNode.properties.push(res.propertySaved);
         S.meta64.treeDirty = true;
 
         //todo-0: this is a super-ugly tight-coupling. change to something better.

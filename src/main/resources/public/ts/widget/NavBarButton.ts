@@ -23,12 +23,7 @@ export class NavBarButton extends Comp {
     compRender = (): ReactNode => {
         let state = this.getState();
         //console.log("compRender " + this.jsClassName + "(" + this.content + ") state to visible=" + state.visible);
-        //todo-0: for now if someething's disabled we just hide it, but eventually we'll put back in the logic
-        //for enablement logic as found in Comp base class.
         let _style = { display: (state.visible && !state.disabled ? '' : 'none') };
-
-        //we have to create a clone for sending to S.e, because React has a rule that once it renders the object
-        //then becomes readonly
         let _attribs = { ...this.attribs, ...{ style: _style } };
 
         return S.e('button', _attribs,

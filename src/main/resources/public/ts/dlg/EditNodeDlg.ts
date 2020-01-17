@@ -148,7 +148,7 @@ export class EditNodeDlg extends DialogBase {
 
         console.log("Editing existing node.");
 
-        let editOrderedProps: I.PropertyInfo[] = S.props.getPropertiesInEditingOrder(S.edit.editNode, S.edit.editNode.properties);
+        let editOrderedProps: I.PropertyInfo[] = S.props.getPropertiesInEditingOrder(this.node, this.node.properties);
         //console.log("POPULATING PROPS: " + S.util.prettyPrint(editOrderedProps));
 
         let isPre = false;
@@ -188,17 +188,17 @@ export class EditNodeDlg extends DialogBase {
         this.nodeNameTextField = new TextField({
             "placeholder": "",
             "label": "Node Name"
-        }, S.edit.editNode.name);
+        }, this.node.name);
         nodeNameFormGroup.addChild(this.nodeNameTextField);
 
         editPropsTable.addChild(nodeNameFormGroup);
 
-        let content = S.edit.editNode.content;
+        let content = this.node.content;
         let encrypted = false;
 
         //new logic means when turning encryption option back off we will come thru here with PRIV property not set but
         //data still encrypted but we detect still and decrypt in this case too.
-        if (content.startsWith(cnst.ENC_TAG) /* && "priv" == S.props.getNodePropertyVal(cnst.ENC, S.edit.editNode) */) {
+        if (content.startsWith(cnst.ENC_TAG) /* && "priv" == S.props.getNodePropertyVal(cnst.ENC, this.node) */) {
             encrypted = true;
         }
 
@@ -256,7 +256,7 @@ export class EditNodeDlg extends DialogBase {
 
         //this.addPropertyButton.setVisible(!S.edit.editingUnsavedNode);
 
-        let tagsPropExists = S.props.getNodePropertyVal("sn:tags", S.edit.editNode) != null;
+        let tagsPropExists = S.props.getNodePropertyVal("sn:tags", this.node) != null;
         this.addTagsPropertyButton.setVisible(!tagsPropExists);
     }
 
@@ -270,7 +270,7 @@ export class EditNodeDlg extends DialogBase {
     addProperty = (): void => {
         (async () => {
             /* always save existing node before opening new property dialog */
-            let dlg = new EditPropertyDlg({ "editNodeDlg": this });
+            let dlg = new EditPropertyDlg({ editNode: this.node, editNodeDlg: this });
             this.editPropertyDlgInst = dlg;
             await this.editPropertyDlgInst.open();
 
@@ -304,7 +304,7 @@ export class EditNodeDlg extends DialogBase {
             await dlg.open();
             console.log("EncOptions after EncDlg: " + S.util.prettyPrint(this.encryptionOptions));
 
-            S.props.setNodePropertyVal(cnst.ENC, S.edit.editNode, this.encryptionOptions.encryptForOwnerOnly ? "priv" : "[delete-node-indicator]");
+            S.props.setNodePropertyVal(cnst.ENC, this.node, this.encryptionOptions.encryptForOwnerOnly ? "priv" : "[delete-node-indicator]");
 
             this.rebuildDlg(); //todo-1: this is overkill. Will do it with targeted react setState eventually
         })();
@@ -312,7 +312,7 @@ export class EditNodeDlg extends DialogBase {
 
     setNodeType = (newType: string): void => {
         let postData = {
-            nodeId: S.edit.editNode.id,
+            nodeId: this.node.id,
             type: newType
         };
         S.util.ajax<I.SetNodeTypeRequest, I.SetNodeTypeResponse>("setNodeType", postData, this.setNodeTypeResponse);
@@ -325,12 +325,12 @@ export class EditNodeDlg extends DialogBase {
     }
 
     addTagsProperty = (): void => {
-        if (S.props.getNodePropertyVal("sn:tags", S.edit.editNode)) {
+        if (S.props.getNodePropertyVal("sn:tags", this.node)) {
             return;
         }
 
         let postData = {
-            nodeId: S.edit.editNode.id,
+            nodeId: this.node.id,
             propertyName: "sn:tags",
             propertyValue: ""
         };
@@ -346,7 +346,7 @@ export class EditNodeDlg extends DialogBase {
     savePropertyResponse(res: any): void {
         S.util.checkSuccess("Save properties", res);
 
-        S.edit.editNode.properties.push(res.propertySaved);
+        this.node.properties.push(res.propertySaved);
         S.meta64.treeDirty = true;
         this.rebuildDlg();
     }
@@ -365,7 +365,7 @@ export class EditNodeDlg extends DialogBase {
 
     deletePropertyImmediate = (propName: string) => {
         S.util.ajax<I.DeletePropertyRequest, I.DeletePropertyResponse>("deleteProperty", {
-            "nodeId": S.edit.editNode.id,
+            "nodeId": this.node.id,
             "propName": propName
         }, (res) => {
             this.deletePropertyResponse(res, propName);
@@ -375,12 +375,11 @@ export class EditNodeDlg extends DialogBase {
     deletePropertyResponse = (res: any, propertyToDelete: any) => {
 
         if (S.util.checkSuccess("Delete property", res)) {
-
             /*
              * remove deleted property from client side data, so we can re-render screen without making another call to
              * server
              */
-            S.props.deletePropertyFromLocalData(propertyToDelete);
+            S.props.deletePropertyFromLocalData(this.node, propertyToDelete);
 
             /* now just re-render screen from local variables */
             S.meta64.treeDirty = true;
@@ -400,7 +399,7 @@ export class EditNodeDlg extends DialogBase {
     saveCheckboxVal = (checkbox: Checkbox, saveList: I.PropertyInfo[], handled: any, propName: string): void => {
         //todo-1: delete-node-indicator was a quick ugly hack. Need to do something reasonable instead.
         let val = checkbox.getChecked() ? "1" : "[delete-node-indicator]";
-        let changed = S.props.setNodePropertyVal(propName, S.edit.editNode, val);
+        let changed = S.props.setNodePropertyVal(propName, this.node, val);
         if (changed) {
             handled[propName] = true;
             saveList.push({
@@ -416,7 +415,7 @@ export class EditNodeDlg extends DialogBase {
             let saveList: I.PropertyInfo[] = [];
             let handled = {};
 
-            if (S.edit.editNode) {
+            if (this.node) {
                 this.saveCheckboxVal(this.preformattedCheckBox, saveList, handled, "pre");
                 this.saveCheckboxVal(this.inlineChildrenCheckBox, saveList, handled, "inlineChildren");
                 this.saveCheckboxVal(this.wordWrapCheckBox, saveList, handled, "wrap");
@@ -424,7 +423,7 @@ export class EditNodeDlg extends DialogBase {
                 /* Get state of the 'layout' dropdown */
                 let layout = this.layoutSelection.getSelection();
                 if (layout == "v") layout = "[delete-node-indicator]";
-                let changed = S.props.setNodePropertyVal("layout", S.edit.editNode, layout);
+                let changed = S.props.setNodePropertyVal("layout", this.node, layout);
                 if (changed) {
                     handled["layout"] = true;
                     saveList.push({
@@ -505,7 +504,7 @@ export class EditNodeDlg extends DialogBase {
             }
 
             let postData = {
-                nodeId: S.edit.editNode.id,
+                nodeId: this.node.id,
                 content: content,
                 properties: saveList,
                 name: nodeName
@@ -513,7 +512,7 @@ export class EditNodeDlg extends DialogBase {
             // console.log("calling saveNode(). PostData=" + S.util.toJson(postData));
             S.util.ajax<I.SaveNodeRequest, I.SaveNodeResponse>("saveNode", postData, (res) => {
                 S.edit.saveNodeResponse(res, {
-                    savedId: S.edit.editNode.id
+                    savedId: this.node.id
                 });
             });
 

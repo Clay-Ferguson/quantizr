@@ -52,20 +52,14 @@ export class Menu extends Div {
             ]
         );
 
-        // todo-0: might be bringing this back. not sure
-        // this.setIsEnabledFunc(isEnabledFunc);
-        // this.setIsVisibleFunc(isVisibleFunc);
+        this.setIsEnabledFunc(isEnabledFunc);
+        this.setIsVisibleFunc(isVisibleFunc);
     }
 
     compRender = (): ReactNode => {
         let state = this.getState();
         //console.log("compRender " + this.jsClassName + " state to visible=" + state.visible);
-        //todo-0: for now if someething's disabled we just hide it, but eventually we'll put back in the logic
-        //for enablement logic as found in Comp base class.
         let _style = { display: (state.visible && !state.disabled ? '' : 'none') };
-
-        //we have to create a clone for sending to S.e, because React has a rule that once it renders the object
-        //then becomes readonly
         let _attribs = { ...this.attribs, ...{ style: _style } };
 
         return this.tagRender('div', state.content, _attribs);

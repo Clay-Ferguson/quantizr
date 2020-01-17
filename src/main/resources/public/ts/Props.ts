@@ -44,12 +44,12 @@ export class Props implements PropsIntf {
         await S.render.renderPageFromData();
     }
 
-    deletePropertyFromLocalData = (propertyName: string): void => {
-        if (S.edit.editNode.properties) {
-            for (let i = 0; i < S.edit.editNode.properties.length; i++) {
-                if (propertyName === S.edit.editNode.properties[i].name) {
-                    // splice is how you delete array elements in js.
-                    S.edit.editNode.properties.splice(i, 1);
+    deletePropertyFromLocalData = (node: I.NodeInfo, propertyName: string): void => {
+        if (node.properties) {
+            for (let i = 0; i < node.properties.length; i++) {
+                if (propertyName === node.properties[i].name) {
+                    // splice is how to delete array elements in js.
+                    node.properties.splice(i, 1);
                     break;
                 }
             }

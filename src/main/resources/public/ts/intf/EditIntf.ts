@@ -6,7 +6,6 @@ export interface EditIntf {
     nodesToMove: any;
     nodesToMoveSet: Object;
     parentOfNewNode: I.NodeInfo;
-    editNode: I.NodeInfo;
     editNodeDlgInst: any; //todo-1: add this type back -> EditNodeDlg ;
     nodeInsertTarget: any;
 

@@ -5,7 +5,7 @@ export interface PropsIntf {
     orderProps(propOrder: string[], _props: I.PropertyInfo[]): I.PropertyInfo[];
     moveNodePosition(props: I.PropertyInfo[], idx: number, typeName: string): number;
     propsToggle(): void;
-    deletePropertyFromLocalData(propertyName : string): void;
+    deletePropertyFromLocalData(node: I.NodeInfo, propertyName : string): void;
     getPropertiesInEditingOrder(node: I.NodeInfo, _props: I.PropertyInfo[]): I.PropertyInfo[];
     renderProperties(properties : I.PropertyInfo[]): PropTable;
     getNodeProperty(propertyName: string, node: I.NodeInfo): I.PropertyInfo;

@@ -361,12 +361,15 @@ export abstract class Comp implements CompIntf {
 
             useEffect(this.domAddEvent, []);
 
+            // These two other effect hooks should work fine but just aren't needed yet.
             // useEffect(() => {
             //     console.log("$$$$ DOM UPDATE: " + this.jsClassName);
             // });
 
-            // //todo-0: this never ran (for popup menu) and my best guess is that dialogs are
-            // //being hidden, but not 'detatched' when closed, bc that menu runs inside a dialog container.
+            // todo-0: this never ran (for popup menu) and my best guess is that dialogs are
+            // being hidden, but not 'detatched' when closed, bc that menu runs inside a dialog container.
+            // (update: actually this didn't run b/c dialog is done using pure DOM Javascript, which is the same reason
+            // whenElmEx has to still exist right now)
             // useEffect(() => {
             //     return () => {
             //         console.log("$$$$ DOM REMOVE:" + this.jsClassName);
