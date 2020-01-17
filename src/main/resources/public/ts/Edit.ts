@@ -37,11 +37,6 @@ export class Edit implements EditIntf {
     parentOfNewNode: I.NodeInfo = null;
 
     /*
-     * indicates editor is displaying a node that is not yet saved on the server
-     */
-    editingUnsavedNode: boolean = false;
-
-    /*
      * Node being edited
      *
      * todo-2: this and several other variables can now be moved into the dialog class? Is that good or bad
@@ -195,34 +190,33 @@ export class Edit implements EditIntf {
     }
 
     startEditingNewNode = (typeName?: string, createAtTop?: boolean): void => {
-        this.editingUnsavedNode = false;
-        this.editNode = null;
-        //todo-1: need to use async/await, and make this EditNodeDlg come up AFTER the node has been created on the server
-        let dlg = new EditNodeDlg({ "typeName": typeName, "createAtTop": createAtTop });
-        this.editNodeDlgInst = dlg;
-        dlg.saveNewNode("");
-    }
-
-    /*
-     * called to display editor that will come up BEFORE any node is saved onto the server, so that the first time
-     * any save is performed we will have the correct node name, at least.
-     *
-     * This version is no longer being used, and currently this means 'editingUnsavedNode' is not currently ever
-     * triggered. The new approach now that we have the ability to 'rename' nodes is to just create one with a
-     * random name an let user start editing right away and then rename the node IF a custom node name is needed.
-     *
-     * This means if we call this function (startEditingNewNodeWithName) instead of 'startEditingNewNode()'
-     * that will cause the GUI to always prompt for the node name before creating the node. This was the original
-     * functionality and still works.
-     */
-    startEditingNewNodeWithName = (): void => {
-        this.editingUnsavedNode = true;
         this.editNode = null;
 
-        //todo-1: need to use async/await, and mek this EditNodeDlg come up AFTER the node has been created on the server
-        let dlg = new EditNodeDlg({});
-        this.editNodeDlgInst = dlg;
-        dlg.saveNewNode("");
+        /*
+         * If we didn't create the node we are inserting under, and neither did "admin", then we need to send notification
+         * email upon saving this new node.
+         */
+        // if (S.meta64.userName != S.edit.parentOfNewNode.owner && //
+        //     S.edit.parentOfNewNode.owner != "admin") {
+        //     S.edit.sendNotificationPendingSave = true;
+        // }
+
+        S.meta64.treeDirty = true;
+        if (S.edit.nodeInsertTarget) {
+            S.util.ajax<I.InsertNodeRequest, I.InsertNodeResponse>("insertNode", {
+                "parentId": S.edit.parentOfNewNode.id,
+                "targetOrdinal": S.edit.nodeInsertTarget.ordinal,
+                "newNodeName": "",
+                "typeName": typeName ? typeName : "u"
+            }, S.edit.insertNodeResponse);
+        } else {
+            S.util.ajax<I.CreateSubNodeRequest, I.CreateSubNodeResponse>("createSubNode", {
+                "nodeId": S.edit.parentOfNewNode.id,
+                "newNodeName": "",
+                "typeName": typeName ? typeName : "u",
+                "createAtTop": createAtTop
+            }, S.edit.createSubNodeResponse);
+        }
     }
 
     insertNodeResponse = (res: I.InsertNodeResponse): void => {
@@ -373,7 +367,6 @@ export class Edit implements EditIntf {
             S.util.showMessage("Unknown nodeId in editNodeClick: " + uid);
             return;
         }
-        this.editingUnsavedNode = false;
 
         S.util.ajax<I.InitNodeEditRequest, I.InitNodeEditResponse>("initNodeEdit", {
             "nodeId": node.id

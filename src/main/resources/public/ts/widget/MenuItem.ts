@@ -32,7 +32,7 @@ export class MenuItem extends Div {
 
     compRender = (): ReactNode => {
         let state = this.getState();
-        console.log("compRender " + this.jsClassName + "[" + this.name + "] visible=" + state.visible + " enabled=" + state.enabled);
+        //console.log("compRender " + this.jsClassName + "[" + this.name + "] visible=" + state.visible + " enabled=" + state.enabled);
         //todo-0: for now if someething's disabled we just hide it, but eventually we'll put back in the logic
         //for enablement logic as found in Comp base class.
         let _style = { display: (state.visible ? '' : 'none') };

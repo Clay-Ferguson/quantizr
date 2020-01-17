@@ -456,10 +456,15 @@ export class Render implements RenderIntf {
 
         // should include in this message if the node is shared or not, or at least a button to open sharing dialog, or even just
         // make the dialog using this open the sharing dialog instead?
-        let url: string = window.location.origin + "?id=" + node.path;
+        // It's now obsolete for an end user to EVER see the actual full node path. Nodes always referenced by ID or Name only from now on!
+        // (todo-0: checi the entire app to be sure this is the case!)
+        // let url: string = window.location.origin + "?id=" + node.path;
+
         S.meta64.selectTab("mainTab");
-        let message: string = "Full Path URL:\n" + url + "\n\n" +
-            "Short URL: \n" + window.location.origin + "?id=" + node.id;
+        let message: string = "ID-based URL: \n" + window.location.origin + "?id=" + node.id;
+        if (node.name) {
+            message += "\n\nName-based URL: \n" + window.location.origin + "?name=" + node.name;
+        }
 
         S.util.showMessage(message, true);
     }

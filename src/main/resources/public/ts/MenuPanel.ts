@@ -46,8 +46,6 @@ export class MenuPanel extends Div {
                 //new MenuItem("Documentation", () => { S.nav.openContentNode("/r/public/subnode-docs"); }),
             ]),
             new Menu("Edit", [
-                new MenuItem("Edit", S.edit.runEditNode,
-                    () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //
                 new MenuItem("Create", S.edit.createNode, () => { return S.meta64.state.canCreateNode }), //                
                 new MenuItem("Cut", S.edit.cutSelNodes, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 && S.meta64.state.selNodeIsMine }), //
                 new MenuItem("Undo Cut", S.edit.undoCutSelNodes, () => { return !S.meta64.isAnonUser && S.edit.nodesToMove != null }), //

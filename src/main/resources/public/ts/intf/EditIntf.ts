@@ -6,7 +6,6 @@ export interface EditIntf {
     nodesToMove: any;
     nodesToMoveSet: Object;
     parentOfNewNode: I.NodeInfo;
-    editingUnsavedNode: boolean;
     editNode: I.NodeInfo;
     editNodeDlgInst: any; //todo-1: add this type back -> EditNodeDlg ;
     nodeInsertTarget: any;
@@ -21,7 +20,6 @@ export interface EditIntf {
     isEditAllowed(node: any): boolean;
     isInsertAllowed(node: any): boolean;
     startEditingNewNode(typeName?: string, createAtTop?: boolean): void;
-    startEditingNewNodeWithName(): void;
     insertNodeResponse(res: I.InsertNodeResponse): void;
     createSubNodeResponse(res: I.CreateSubNodeResponse): void;
     saveNodeResponse(res: I.SaveNodeResponse, payload: any): void;

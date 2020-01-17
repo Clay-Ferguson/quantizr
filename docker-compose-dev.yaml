@@ -12,7 +12,7 @@ services:
         container_name: mongo-dev 
         volumes:
             - '${hostMongoDbPath}:/data/db'
-            - '/home/clay/ferguson/mongo-dumps:/mongo-dumps'
+            - '/home/clay/ferguson/mongo-dumps-dev:/mongo-dumps'
         #NOTE: This 'command' property is only needed when we want to start mongod on a port other than 27017    
         command: mongod --port 27016
         ports:

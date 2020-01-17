@@ -25,18 +25,23 @@ export class Selection extends Comp {
 
     getSelection = (): string => {
         let elm: HTMLSelectElement = this.getElement() as HTMLSelectElement;
-        if (!elm) return null;
+        if (!elm) {
+            console.error("getSelection called on element "+this.jsClassName+" before it existed.")
+            return null;
+        }
         return elm.options[elm.selectedIndex].value;
     }
 
     setSelection = (key: string) => {
-        let idx = -1;
-        this.children.forEach((row: SelectionOption) => {
-            idx++;
-            if (row.key == key) {
-                let elm: HTMLSelectElement = this.getElement() as HTMLSelectElement;
-                elm.selectedIndex = idx;
-            }
+        this.whenElm((elm: HTMLSelectElement) => {
+            let idx = -1;
+            this.children.forEach((row: SelectionOption) => {
+                idx++;
+                if (row.key == key) {
+                    //let elm: HTMLSelectElement = this.getElement() as HTMLSelectElement;
+                    elm.selectedIndex = idx;
+                }
+            });
         });
     }
 

@@ -26,12 +26,5 @@ export class ConfirmDlg extends DialogBase {
                 ])
             ])
         ]);
-
-        // for testing reactive re-rendering
-        // let i = 0;
-        // setInterval(() => {
-        //     debugger;
-        //     yesButton.setText("YES "+(i++));
-        // }, 2000);
     }
 }

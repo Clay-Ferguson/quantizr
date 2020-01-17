@@ -73,7 +73,8 @@ export class EditPropertyDlg extends DialogBase {
         S.edit.editNode.properties.push(res.propertySaved);
         S.meta64.treeDirty = true;
 
-        this.editNodeDlg.populateEditNodePg();
+        //todo-0: this is a super-ugly tight-coupling. change to something better.
+        this.editNodeDlg.rebuildDlg(); 
     }
 
     init = (): void => {

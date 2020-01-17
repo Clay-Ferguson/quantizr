@@ -17,35 +17,54 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
     static backdropZIndex: number = 16000000;
     resolve: Function;
 
+    elm: HTMLElement;
+    dlgComp: Comp;
+
     constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: boolean = false,
         private initiallyInvisible: boolean = false) {
         super(null);
     }
 
+    /* To be overridden by derived classes */
     init = () => {
     }
 
     /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is 
     closed. */
-    open = (display: string=null): Promise<DialogBase> => {
+    open = (display: string = null): Promise<DialogBase> => {
         return new Promise<DialogBase>((resolve, reject) => {
             let displayStyle = display ? display : (this.initiallyInvisible ? "none" : "block");
 
+            if (this.initiallyInvisible) {
+                this.whenElm((elm: HTMLElement) => {
+                    elm.style.display = "inline-block";
+                });
+            }
+
             // Create dialog container and attach to document.body.
-            let elm = document.createElement('div');
-            elm.setAttribute("id", this.getId());
+            this.elm = document.createElement('div');
+            this.elm.setAttribute("id", this.getId());
 
             // WARNING: Don't use 'className' here, this is pure javascript.
-            elm.setAttribute("class", "app-modal");
-            elm.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex) + "; display: " + displayStyle + ";");
-            document.body.appendChild(elm);
+            this.elm.setAttribute("class", "app-modal");
+            this.elm.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex) + "; display: " + displayStyle + ";");
+            document.body.appendChild(this.elm);
 
-            let dlgComp = this.makeComp(elm);
-            ReactDOM.render(S.e(dlgComp.render, dlgComp.attribs), elm);
-
+            //This basically creates the 'children'
             this.init();
+
+            //this renders the dlgComp onto the screen (on the backdrop elm)
+            this.domRender();
+
             this.resolve = resolve;
         });
+    }
+
+    domRender = (): void => {
+        //this wraps the childern inside the actual dialog component itself
+        this.dlgComp = this.makeComp(this.elm);
+
+        ReactDOM.render(S.e(this.dlgComp.render, this.dlgComp.attribs), this.elm);
     }
 
     //DO NOT DELETE.
@@ -60,18 +79,22 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
         S.util.domElmRemove(this.getId());
     }
 
+    /* Returns the single Component to go inside the dialog, which is the entire content of the dialog
+    as a Div that contains the header of the dialog and all the 'this.children' appended below it, so we expect
+    this.children to already be populated by the time we get in here, which can safely be put in init() to make
+    sure they are */
     makeComp = (backdrop: HTMLElement): Comp => {
         let content: CompIntf[] = this.title ? [new Div(this.title, {
             className: "app-modal-title"
         })] : [];
 
         content = content.concat(this.children);
-        
+
         /* Display dialogs fullscreen on mobile devices */
         let clazz = S.meta64.isMobile ? "app-modal-content-fullscreen" : "app-modal-content";
 
         // Note this optionally uses overrideClass which can come from above
-        let contentDiv = new Div(null, {
+        let contentDiv: Div = new Div(null, {
             className: this.overrideClass ? this.overrideClass : clazz
         }, content)
 

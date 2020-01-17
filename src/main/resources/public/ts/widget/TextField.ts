@@ -57,7 +57,8 @@ export class TextField extends Comp {
         children.push(S.e('input', this.attribs));
 
         return S.e('div', {
-            id: this.getId()+"_textfield",
+            id: this.getId()+"_text",
+            key: this.getId()+"_text",
         }, children);
     }
 }

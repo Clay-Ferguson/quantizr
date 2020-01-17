@@ -7,8 +7,6 @@ import { Header } from "../widget/Header";
 import { Selection } from "../widget/Selection";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
-import { TextContent } from "../widget/TextContent";
-import { Textarea } from "../widget/Textarea";
 import { Checkbox } from "../widget/Checkbox";
 import { EditPropsTable } from "../widget/EditPropsTable";
 import { EditPropsTableRow } from "../widget/EditPropsTableRow";
@@ -43,7 +41,7 @@ export class EditNodeDlg extends DialogBase {
     layoutSelection: Selection;
     optionsBar: Div;
     pathDisplay: Div;
-    help: TextContent;
+    //help: TextContent;
     propertyEditFieldContainer: Div;
 
     preformattedCheckBox: Checkbox;
@@ -59,7 +57,7 @@ export class EditNodeDlg extends DialogBase {
     cancelButton: Button;
 
     focusId: string;
-    propEntries: Array<I.PropEntry> = new Array<I.PropEntry>();
+    propEntries: Array<I.PropEntry>;
     editPropertyDlgInst: any;
     typeName: string;
     createAtTop: boolean;
@@ -79,14 +77,24 @@ export class EditNodeDlg extends DialogBase {
         this.typeName = (<any>args).typeName;
         this.createAtTop = (<any>args).createAtTop;
         this.node = (<any>args).node;
+    }
 
-        this.propEntries = new Array<I.PropEntry>();
+    createLayoutSelection = (): Selection => {
+        let selection: Selection = new Selection(null, [
+            { key: "v", val: "Vertical", selected: true },
+            { key: "c2", val: "2 Columns" },
+            { key: "c3", val: "3 Columns" },
+            { key: "c4", val: "4 Columns" }
+        ]);
+        return selection;
+    }
 
+    initChildren = (): void => {
         let path: string = S.view.getPathDisplay(this.node, "<br>");
 
         this.setChildren([
             new Form(null, [
-                this.help = new TextContent("Help content."),
+                //this.help = new TextContent("Help content."),
                 new Div(null, {
                 },
                     [
@@ -130,202 +138,126 @@ export class EditNodeDlg extends DialogBase {
             ])
         ]);
 
-        (async () => {
-            let elm = await S.util.getElm(this.getId());
-            elm.style.display = "inline-block";
+        /* clear this map to get rid of old properties */
+        this.propEntries = new Array<I.PropEntry>();
 
-            if (this.focusId) {
-
-                // Before trying to set focus to something who's display style we just changed, we need to wait for the browser
-                // to have it on the screen.
-                setTimeout(() => {
-                    if (this.aceEditor && this.aceEditor.getAceEditor()) {
-                        this.aceEditor.getAceEditor().focus();
-                    }
-                    else {
-                        S.util.delayedFocus(this.focusId);
-                    }
-                }, 300);
-            }
-        })();
-    }
-
-    createLayoutSelection = (): Selection => {
-        let selection: Selection = new Selection(null, [
-            { key: "v", val: "Vertical", selected: true },
-            { key: "c2", val: "2 Columns" },
-            { key: "c3", val: "3 Columns" },
-            { key: "c4", val: "4 Columns" }
-        ]);
-        return selection;
-    }
-
-    /*
-     * Generates all the HTML edit fields and puts them into the DOM model of the property editor dialog box.
-     *
-     */
-    populateEditNodePg = async (): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            let counter = 0;
-
-            /* clear this map to get rid of old properties */
-            this.propEntries = new Array<I.PropEntry>();
-            let collapsiblePropsTable = new EditPropsTable({
-                className: "edit-props-table"
-            });
-            let editPropsTable = new EditPropsTable();
-
-            /* editNode will be null if this is a new node being created */
-            if (S.edit.editNode) {
-                console.log("Editing existing node.");
-
-                let editOrderedProps = S.props.getPropertiesInEditingOrder(S.edit.editNode, S.edit.editNode.properties);
-                let isPre = false;
-                let isWordWrap = false;
-
-                /* We have to scan properties in this loop before we do the loop below. So it is not redundant to have two loops
-                scanning the properties. This is by design, and not a mistake */
-                if (editOrderedProps) {
-                    editOrderedProps.forEach((prop: I.PropertyInfo) => {
-                        if (prop.name == "pre") {
-                            isPre = true;
-                            this.preformattedCheckBox.setChecked(true);
-                            return;
-                        }
-                        if (prop.name == "wrap") {
-                            isWordWrap = true;
-                            this.wordWrapCheckBox.setChecked(true);
-                            return;
-                        }
-
-                        if (prop.name == cnst.ENC && prop.value == "priv") {
-                            this.encryptionOptions.encryptForOwnerOnly = true;
-                        }
-
-                        //console.log("Populate Prop: " + prop.name + "=" + prop.value);
-                    });
-                }
-
-                /* If not preformatted text, then always turn on word-wrap because for now at least this means the content
-                will be in markdown mode, and we definitely want wordwrap on for markdown editing */
-                if (!isPre) {
-                    isWordWrap = true;
-                }
-
-                //todo-0: this is ugly, and should change because there's no 'name' property any longer!
-                let nameTableRow = this.makeTextFieldEditor("name", "Name", S.edit.editNode.name, false, isPre, false, false);
-                editPropsTable.addChild(nameTableRow);
-
-                let content = S.edit.editNode.content;
-
-                if (content.startsWith(cnst.ENC_TAG) && "priv" == S.props.getNodePropertyVal(cnst.ENC, S.edit.editNode)) {
-                    content = content.substring(cnst.ENC_TAG.length);
-                    content = await S.encryption.symDecryptString(null, content);
-                }
-
-                let contentTableRow = this.makeTextFieldEditor("content", "Content", content, true, isPre, isWordWrap, true);
-                editPropsTable.addChild(contentTableRow);
-
-                if (editOrderedProps) {
-                    // Iterate PropertyInfo.java objects
-                    editOrderedProps.forEach((prop: I.PropertyInfo) => {
-
-                        if (prop.name == "layout") {
-                            this.layoutSelection.setSelection(prop.value);
-                            return;
-                        }
-
-                        if (prop.name == "inlineChildren") {
-                            this.inlineChildrenCheckBox.setChecked(true);
-                            return;
-                        }
-
-                        /*
-                         * if property not allowed to display return to bypass this property/iteration
-                         */
-                        if (!S.render.allowPropertyToDisplay(prop.name)) {
-                            console.log("Hiding property: " + prop.name);
-                            return;
-                        }
-
-                        //console.log("Creating edit field for property " + prop.name);
-
-                        let isReadOnlyProp = S.render.isReadOnlyProperty(prop.name);
-                        let isBinaryProp = S.render.isBinaryProperty(prop.name);
-                        let propEntry: I.PropEntry = new I.PropEntry(/* fieldId */ null, /* checkboxId */ null, prop, isReadOnlyProp, isBinaryProp);
-
-                        this.propEntries.push(propEntry);
-
-                        if ((!isReadOnlyProp && !isBinaryProp) || S.edit.showReadOnlyProperties) {
-                            let tableRow = this.makePropEditor(propEntry, false, false);
-                            collapsiblePropsTable.addChild(tableRow);
-                        }
-                    });
-                }
-            }
-            /* Editing a new node */
-            else {
-                let tableRow = new EditPropsTableRow();
-                console.log("Editing new node.");
-
-                tableRow.addChild(new Textarea({
-                    "placeholder": "Enter new node name",
-                    "label": "New Node Name"
-                }));
-
-                editPropsTable.addChild(tableRow);
-            }
-
-            //I'm not quite ready to add this button yet.
-            // var toggleReadonlyVisButton = tag.button({
-            //     "raised": "raised",
-            //     "onClick": toggleShowReadOnly(); //
-            // }, //
-            //     (edit.showReadOnlyProperties ? "Hide Read-Only Properties" : "Show Read-Only Properties"));
-            //
-            // fields += toggleReadonlyVisButton;
-            //let row = tag.div( { "display": "table-row" }, left + center + right);
-
-            this.propsButtonBar = new ButtonBar(
-                [
-                    this.addPropertyButton = new Button("Add Property", this.addProperty),
-                    this.addTagsPropertyButton = new Button("Add Tags", this.addTagsProperty),
-                    this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
-                ])
-
-            let collapsiblePanel = new CollapsiblePanel("More...", null, [this.nodeNameTextField, collapsiblePropsTable, this.propsButtonBar]);
-
-            this.propertyEditFieldContainer.setChildren([editPropsTable, collapsiblePanel]);
-            this.propertyEditFieldContainer.reactRenderToDOM();
-
-            let instr = S.edit.editingUnsavedNode ? //
-                "You may leave this field blank and a unique ID will be assigned. You only need to provide a name if you want this node to have a more meaningful URL."
-                : //
-                "";
-
-            if (!instr) {
-                this.help.setVisible(false);
-            }
-            else {
-                this.help.setInnerHTML(instr);
-            }
-
-            /*
-             * Allow adding of new properties as long as this is a saved node we are editing, because we don't want to start
-             * managing new properties on the client side. We need a genuine node already saved on the server before we allow
-             * any property editing to happen.
-             */
-            this.addPropertyButton.setVisible(!S.edit.editingUnsavedNode);
-
-            let tagsPropExists = S.props.getNodePropertyVal("sn:tags", S.edit.editNode) != null;
-            this.addTagsPropertyButton.setVisible(!tagsPropExists);
-
-            // S.util.getElm(this.getId(), (elm : HTMLElement) => {
-            //     elm.style.display = "inline-block";
-            // });
-
-            resolve();
+        let collapsiblePropsTable = new EditPropsTable({
+            className: "edit-props-table"
         });
+        let editPropsTable = new EditPropsTable();
+
+        console.log("Editing existing node.");
+
+        let editOrderedProps: I.PropertyInfo[] = S.props.getPropertiesInEditingOrder(S.edit.editNode, S.edit.editNode.properties);
+        //console.log("POPULATING PROPS: " + S.util.prettyPrint(editOrderedProps));
+
+        let isPre = false;
+        let isWordWrap = false;
+
+        /* We have to scan properties in this loop before we do the loop below. So it is not redundant to have two loops
+        scanning the properties. This is by design, and not a mistake */
+        if (editOrderedProps) {
+            editOrderedProps.forEach((prop: I.PropertyInfo) => {
+                if (prop.name == "pre") {
+                    isPre = true;
+                    this.preformattedCheckBox.setChecked(true);
+                    return;
+                }
+                if (prop.name == "wrap") {
+                    isWordWrap = true;
+                    this.wordWrapCheckBox.setChecked(true);
+                    return;
+                }
+
+                if (prop.name == cnst.ENC && prop.value == "priv") {
+                    this.encryptionOptions.encryptForOwnerOnly = true;
+                }
+
+                //console.log("Populate Prop: " + prop.name + "=" + prop.value);
+            });
+        }
+
+        /* If not preformatted text, then always turn on word-wrap because for now at least this means the content
+        will be in markdown mode, and we definitely want wordwrap on for markdown editing */
+        if (!isPre) {
+            isWordWrap = true;
+        }
+
+        //todo-1: does it make sense for FormGroup to contain single fields, or multiple fields? This seems wrong to have a group with one in it.
+        let nodeNameFormGroup = new FormGroup();
+        this.nodeNameTextField = new TextField({
+            "placeholder": "",
+            "label": "Node Name"
+        }, S.edit.editNode.name);
+        nodeNameFormGroup.addChild(this.nodeNameTextField);
+
+        editPropsTable.addChild(nodeNameFormGroup);
+
+        let content = S.edit.editNode.content;
+        let encrypted = false;
+
+        //new logic means when turning encryption option back off we will come thru here with PRIV property not set but
+        //data still encrypted but we detect still and decrypt in this case too.
+        if (content.startsWith(cnst.ENC_TAG) /* && "priv" == S.props.getNodePropertyVal(cnst.ENC, S.edit.editNode) */) {
+            encrypted = true;
+        }
+
+        let contentTableRow = this.makeTextFieldEditor("content", "Content", content, true, isPre, isWordWrap, true, encrypted);
+        editPropsTable.addChild(contentTableRow);
+
+        if (editOrderedProps) {
+            editOrderedProps.forEach((prop: I.PropertyInfo) => {
+
+                if (prop.name == "layout") {
+                    this.layoutSelection.setSelection(prop.value);
+                    return;
+                }
+
+                if (prop.name == "inlineChildren") {
+                    this.inlineChildrenCheckBox.setChecked(true);
+                    return;
+                }
+
+                /*
+                 * if property not allowed to display return to bypass this property/iteration
+                 */
+                if (!S.render.allowPropertyToDisplay(prop.name)) {
+                    console.log("Hiding property: " + prop.name);
+                    return;
+                }
+
+                //console.log("Creating edit field for property " + prop.name);
+
+                let isReadOnlyProp = S.render.isReadOnlyProperty(prop.name);
+                let isBinaryProp = S.render.isBinaryProperty(prop.name);
+
+                //todo-1: does PropEntry EVER need these first two arguments?
+                let propEntry: I.PropEntry = new I.PropEntry(/* fieldId */ null, /* checkboxId */ null, prop, isReadOnlyProp, isBinaryProp);
+
+                this.propEntries.push(propEntry);
+
+                if ((!isReadOnlyProp && !isBinaryProp) || S.edit.showReadOnlyProperties) {
+                    let tableRow = this.makePropEditor(propEntry, false, false);
+                    collapsiblePropsTable.addChild(tableRow);
+                }
+            });
+        }
+
+        this.propsButtonBar = new ButtonBar(
+            [
+                this.addPropertyButton = new Button("Add Property", this.addProperty),
+                this.addTagsPropertyButton = new Button("Add Tags", this.addTagsProperty),
+                this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
+            ])
+
+        let collapsiblePanel = new CollapsiblePanel("More...", null, [collapsiblePropsTable, this.propsButtonBar]);
+
+        this.propertyEditFieldContainer.setChildren([editPropsTable, collapsiblePanel]);
+
+        //this.addPropertyButton.setVisible(!S.edit.editingUnsavedNode);
+
+        let tagsPropExists = S.props.getNodePropertyVal("sn:tags", S.edit.editNode) != null;
+        this.addTagsPropertyButton.setVisible(!tagsPropExists);
     }
 
     toggleShowReadOnly = (): void => {
@@ -336,10 +268,16 @@ export class EditNodeDlg extends DialogBase {
     }
 
     addProperty = (): void => {
-        /* always save existing node before opening new property dialog */
-        let dlg = new EditPropertyDlg({ "editNodeDlg": this });
-        this.editPropertyDlgInst = dlg;
-        this.editPropertyDlgInst.open();
+        (async () => {
+            /* always save existing node before opening new property dialog */
+            let dlg = new EditPropertyDlg({ "editNodeDlg": this });
+            this.editPropertyDlgInst = dlg;
+            await this.editPropertyDlgInst.open();
+
+            //the EditPropertyDlg already has a way of calling this itself, and probably would be ok ot pass a callback into the dialog
+            //rather than doing a bunch of confusing 'awaits' here
+            //this.rebuildDlg(); //todo-1: this is overkill. Will do it with targeted react setState eventually
+        })();
     }
 
     insertTime = (): void => {
@@ -350,11 +288,26 @@ export class EditNodeDlg extends DialogBase {
     }
 
     openChangeNodeTypeDlg = (): void => {
-        new ChangeNodeTypeDlg(this.setNodeType).open();
+        (async () => {
+            let dlg = new ChangeNodeTypeDlg(this.setNodeType);
+            await dlg.open();
+
+            //actually this happens inside setNodeType function, but really we could get rid of that callback
+            //and use an await to do all that here.
+            //this.rebuildDlg(); //todo-1: this is overkill. Will do it with targeted react setState eventually
+        })();
     }
 
     openEncryptionDlg = (): void => {
-        new EncryptionDlg(this.encryptionOptions).open();
+        (async () => {
+            let dlg = new EncryptionDlg(this.encryptionOptions);
+            await dlg.open();
+            console.log("EncOptions after EncDlg: " + S.util.prettyPrint(this.encryptionOptions));
+
+            S.props.setNodePropertyVal(cnst.ENC, S.edit.editNode, this.encryptionOptions.encryptForOwnerOnly ? "priv" : "[delete-node-indicator]");
+
+            this.rebuildDlg(); //todo-1: this is overkill. Will do it with targeted react setState eventually
+        })();
     }
 
     setNodeType = (newType: string): void => {
@@ -368,8 +321,7 @@ export class EditNodeDlg extends DialogBase {
     setNodeTypeResponse = (res: any): void => {
         S.util.checkSuccess("Save properties", res);
         S.meta64.treeDirty = true;
-
-        this.populateEditNodePg();
+        this.rebuildDlg();
     }
 
     addTagsProperty = (): void => {
@@ -396,8 +348,7 @@ export class EditNodeDlg extends DialogBase {
 
         S.edit.editNode.properties.push(res.propertySaved);
         S.meta64.treeDirty = true;
-
-        this.populateEditNodePg();
+        this.rebuildDlg();
     }
 
     /*
@@ -433,8 +384,7 @@ export class EditNodeDlg extends DialogBase {
 
             /* now just re-render screen from local variables */
             S.meta64.treeDirty = true;
-
-            this.populateEditNodePg();
+            this.rebuildDlg();
         }
     }
 
@@ -443,47 +393,8 @@ export class EditNodeDlg extends DialogBase {
      * itself from any kind of damage.
      */
     saveNode = (): void => {
-        /*
-         * If editing an unsaved node it's time to run the insertNode, or createSubNode, which actually saves onto the
-         * server, and will initiate further editing like for properties, etc.
-         */
-        if (S.edit.editingUnsavedNode) {
-            this.saveNewNode(null);
-        }
-        /*
-         * Else we are editing a saved node, which is already saved on server.
-         */
-        else {
-            this.saveExistingNode();
-        }
-    }
-
-    saveNewNode = (newNodeName?: string): void => {
-        /*
-         * If we didn't create the node we are inserting under, and neither did "admin", then we need to send notification
-         * email upon saving this new node.
-         */
-        // if (S.meta64.userName != S.edit.parentOfNewNode.owner && //
-        //     S.edit.parentOfNewNode.owner != "admin") {
-        //     S.edit.sendNotificationPendingSave = true;
-        // }
-
-        S.meta64.treeDirty = true;
-        if (S.edit.nodeInsertTarget) {
-            S.util.ajax<I.InsertNodeRequest, I.InsertNodeResponse>("insertNode", {
-                "parentId": S.edit.parentOfNewNode.id,
-                "targetOrdinal": S.edit.nodeInsertTarget.ordinal,
-                "newNodeName": newNodeName,
-                "typeName": this.typeName ? this.typeName : "u"
-            }, S.edit.insertNodeResponse);
-        } else {
-            S.util.ajax<I.CreateSubNodeRequest, I.CreateSubNodeResponse>("createSubNode", {
-                "nodeId": S.edit.parentOfNewNode.id,
-                "newNodeName": newNodeName,
-                "typeName": this.typeName ? this.typeName : "u",
-                "createAtTop": this.createAtTop
-            }, S.edit.createSubNodeResponse);
-        }
+        //due to refactoring these two functions can now be the same. todo-1
+        this.saveExistingNode();
     }
 
     saveCheckboxVal = (checkbox: Checkbox, saveList: I.PropertyInfo[], handled: any, propName: string): void => {
@@ -545,7 +456,12 @@ export class EditNodeDlg extends DialogBase {
                 }
             }
 
-            let nodeName = this.nodeNameTextField ? this.nodeNameTextField.getValue() : null;
+            let nodeName = this.nodeNameTextField.getValue();
+
+            //convert any empty string to null here to be sure DB storage is least amount.
+            if (!nodeName) {
+                nodeName = null;
+            }
 
             /* Now scan over all properties to build up what to save */
             if (this.propEntries) {
@@ -689,7 +605,8 @@ export class EditNodeDlg extends DialogBase {
         return tableRow;
     }
 
-    makeTextFieldEditor = (propName: string, prompt: string, value: string, multiLine: boolean, isPre: boolean, isWordWrap: boolean, setFocus: boolean): FormGroup => {
+    makeTextFieldEditor = (propName: string, prompt: string, value: string, multiLine: boolean, isPre: boolean, isWordWrap: boolean, setFocus: boolean,
+        encrypted: boolean): FormGroup => {
         let formGroup = new FormGroup();
 
         value = S.util.escapeForAttrib(value);
@@ -697,12 +614,23 @@ export class EditNodeDlg extends DialogBase {
         let editorComp: any = null;
 
         if (multiLine) {
-            editorComp = new AceEditPropTextarea(value, "25em", isPre, isWordWrap);
+            editorComp = new AceEditPropTextarea(encrypted ? "[encrypted]" : value, "25em", isPre, isWordWrap);
             this.aceEditor = editorComp;
 
             editorComp.whenElm((elm: HTMLElement) => {
                 let timer = setInterval(() => {
                     if (editorComp.getAceEditor()) {
+
+                        if (encrypted) {
+                            //console.log('decrypting: ' + value);
+                            value = value.substring(cnst.ENC_TAG.length);
+                            (async () => {
+                                value = await S.encryption.symDecryptString(null, value);
+                                //console.log('decrypted to:' + value);
+                                editorComp.setValue(value);
+                            })();
+                        }
+
                         clearInterval(timer);
                         if (!multiLine) {
                             //todo-p1: this worked BUT the ace editor is doesn't do what i was hoping for here. It leaves the wrapping capability ENABLED.
@@ -724,17 +652,9 @@ export class EditNodeDlg extends DialogBase {
                 "placeholder": "",
                 "label": prompt
             }, value);
-
-            if (propName === "name") {
-                this.nodeNameTextField = editorComp;
-            }
         }
 
-        //we add to form group only if this isn't 'name' because we put name into the collapsed area under "More..." button
-        //to save space on the screen, since name is not that frequently edited
-        if (propName != "name") {
-            formGroup.addChild(editorComp);
-        }
+        formGroup.addChild(editorComp);
 
         if (setFocus) {
             this.focusId = editorComp.getId();
@@ -773,7 +693,27 @@ export class EditNodeDlg extends DialogBase {
 
     init = (): void => {
         console.log("EditNodeDlg.init");
-        this.populateEditNodePg();
+        this.initChildren();
+
+        this.whenElm((elm: HTMLElement) => {
+            if (this.focusId) {
+                // Before trying to set focus to something who's display style we just changed, we need to wait for the browser
+                // to have it on the screen.
+                setTimeout(() => {
+                    if (this.aceEditor && this.aceEditor.getAceEditor()) {
+                        this.aceEditor.getAceEditor().focus();
+                    }
+                    else {
+                        S.util.delayedFocus(this.focusId);
+                    }
+                }, 300);
+            }
+        });
+    }
+
+    rebuildDlg = (): void => {
+        this.initChildren();
+        this.domRender();
     }
 }
 

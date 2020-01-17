@@ -72,6 +72,8 @@ export class SharingDlg extends DialogBase {
                 this.privsTable.addChild(new EditPrivsTableRow(this, aclEntry));
             });
         }
+        
+        //todo-0: change this the same way we changed EditNodeDlg to work. (without this)
         this.privsTable.reactRenderToDOM();
 
         //this.publicCommentingCheckbox.setChecked(res.publicAppend);

@@ -30,10 +30,7 @@ export abstract class Comp implements CompIntf {
 
     //This is the state that is in effect up until the first 'render' call, which is when hookState first gets called, and
     //the setState becomes the function returned from react useState, and the whole React-controlled rendering goes into effect.
-    public initialState: any;
-
-    //Flag that indicates if hookState has been called, and we also use it to know if initialState is no longer in use but state is instead.
-    public stateHooked: boolean = false;
+    public initialState: any = { visible: true, enabled: true };
 
     static idToCompMap: { [key: string]: Comp } = {};
     attribs: any;
@@ -67,7 +64,7 @@ export abstract class Comp implements CompIntf {
         this.attribs.key = id;
 
         this.jsClassName = this.constructor.name + "[" + id + "]";
-        console.log("jsClassName: " + this.jsClassName);
+        //console.log("jsClassName: " + this.jsClassName);
 
         //This map allows us to lookup the Comp directly by its ID similar to a DOM lookup
         Comp.idToCompMap[id] = this;
@@ -76,8 +73,6 @@ export abstract class Comp implements CompIntf {
         //to call super.method() which I'm not sure my current architecture can support super calls to functions that are overridden
         //in base classes
         this.bindExampleFunction = this.bindExampleFunction.bind(this);
-
-        this.setState({ visible: true, enabled: true });
     }
 
     bindExampleFunction() {
@@ -106,7 +101,7 @@ export abstract class Comp implements CompIntf {
         let enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
         let visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
 
-        console.log("refreshState. " + this.jsClassName + " visible=" + visible + " enabled=" + enabled);
+        //console.log("refreshState. " + this.jsClassName + " visible=" + visible + " enabled=" + enabled);
 
         this.mergeState({
             enabled,
@@ -241,7 +236,10 @@ export abstract class Comp implements CompIntf {
         return "<span id='" + this.getId() + "_re'></span>";
     }
 
-    /* Attaches a react element directly to the dom at the DOM id specified. Throws exception of not a react element. */
+    /* Attaches a react element directly to the dom at the DOM id specified. Throws exception of not a react element. 
+    
+    todo-0: this needs to be really removed if at all possible.
+    */
     reactRenderToDOM = (id: string = null) => {
         if (!id) {
             id = this.getId();
@@ -260,7 +258,16 @@ export abstract class Comp implements CompIntf {
 
         this.children.forEach((child: Comp) => {
             if (child) {
-                reChildren.push(child.render());
+                let reChild: ReactNode = null;
+                try {
+                    reChild = child.render();
+                }
+                catch (e) {
+                    console.error("Failed to render child " + child.jsClassName + " attribs.key=" + child.attribs.key);
+                }
+                if (reChild) {
+                    reChildren.push(reChild);
+                }
             }
         });
         return reChildren;
@@ -284,7 +291,6 @@ export abstract class Comp implements CompIntf {
         const [state, setStateFunc] = useState(newState);
         this.setStateFunc = setStateFunc;
         this.state = state;
-        this.stateHooked = true;
         this.initialState = null;
     }
 
@@ -293,11 +299,12 @@ export abstract class Comp implements CompIntf {
     mergeState = (state: any): any => {
         //If we still have an initial state then it's the 'active' state we need to merge into
         if (this.initialState) {
-            this.setState({ ...this.initialState, ...state });
+            this.initialState = { ...this.initialState, ...state };
         }
         //otherwise the actual 'state' itself is currently the active state to merge into.
         else {
-            this.setState({ ...this.state, ...state });
+            this.state = { ...this.state, ...state };
+            this.setStateFunc(this.state);
         }
     }
 
@@ -311,10 +318,10 @@ export abstract class Comp implements CompIntf {
     */
     setState = (state: any) => {
         // If 'hookState' has been called then this function should be pointing to whatever was returned from 'useState' 
-        if (this.stateHooked) {
+        if (!this.initialState) {
             //throw new Error("setState called when stateHooked is set. This is an invalid, and indicates a bug.");
             this.state = state;
-            this.setStateFunc(state);
+            this.setStateFunc(this.state);
         }
         else {
             // If state not yet hooked, we keep the 'state' in initialState
@@ -323,30 +330,37 @@ export abstract class Comp implements CompIntf {
     }
 
     getState = (): any => {
-        return this.stateHooked ? this.state : this.initialState;
+        return this.state || this.initialState;
     }
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
     render = (): ReactNode => {
-        this.hookState(this.initialState || this.state || {});
+        let ret: ReactNode = null;
+        try {
+            this.hookState(this.initialState || this.state || {});
 
-        // useEffect(() => {
-        //     console.log("$$$$ DOM ADD: " + this.jsClassName);
-        // }, []);
+            // useEffect(() => {
+            //     console.log("$$$$ DOM ADD: " + this.jsClassName);
+            // }, []);
 
-        // useEffect(() => {
-        //     console.log("$$$$ DOM UPDATE: " + this.jsClassName);
-        // });
+            // useEffect(() => {
+            //     console.log("$$$$ DOM UPDATE: " + this.jsClassName);
+            // });
 
-        // //todo-0: this never ran (for popup menu) and my best guess is that dialogs are
-        // //being hidden, but not 'detatched' when closed, bc that menu runs inside a dialog container.
-        // useEffect(() => {
-        //     return () => {
-        //         console.log("$$$$ DOM REMOVE:" + this.jsClassName);
-        //     }
-        // }, []);
+            // //todo-0: this never ran (for popup menu) and my best guess is that dialogs are
+            // //being hidden, but not 'detatched' when closed, bc that menu runs inside a dialog container.
+            // useEffect(() => {
+            //     return () => {
+            //         console.log("$$$$ DOM REMOVE:" + this.jsClassName);
+            //     }
+            // }, []);
 
-        return this.compRender();
+            ret = this.compRender();
+        }
+        catch (e) {
+            console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key);
+        }
+        return ret;
     }
 
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state

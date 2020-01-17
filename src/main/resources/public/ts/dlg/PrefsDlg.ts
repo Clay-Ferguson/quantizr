@@ -24,7 +24,9 @@ export class PrefsDlg extends DialogBase {
 
     constructor() {
         super("Preferences");
-        
+    }
+
+    init = (): void => {
         this.setChildren([
             new Form(null, [
                 new Div(null, {

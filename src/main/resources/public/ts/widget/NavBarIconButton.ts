@@ -21,7 +21,7 @@ export class NavBarIconButton extends Comp {
 
     compRender = (): ReactNode => {
         let state = this.getState();
-        console.log("compRender " + this.jsClassName + "(" + this.text + ", icon=" + this.iconClass + ") state to visible=" + state.visible);
+        //console.log("compRender " + this.jsClassName + "(" + this.text + ", icon=" + this.iconClass + ") state to visible=" + state.visible);
         //todo-0: for now if someething's disabled we just hide it, but eventually we'll put back in the logic
         //for enablement logic as found in Comp base class.
         let _style = { display: (state.visible && !state.disabled ? '' : 'none') };

@@ -25,7 +25,7 @@ export class Checkbox extends Comp {
     }
 
     setChecked(checked: boolean) {
-        S.util.getElm(this.getId(), (elm: HTMLElement) => {
+        this.whenElm((elm: HTMLElement) => {
             (<any>elm).checked = checked;
         });
     }
@@ -36,16 +36,19 @@ export class Checkbox extends Comp {
     }
 
     compRender = (): ReactNode  => {
+
+        let _attribs = this.attribs; //todo-1: remove unnecessary varible.
+
         if (this.label) {
-            return S.e('span', { key: this.attribs.id + "_span" }, S.e('input', this.attribs), 
+            return S.e('span', { key: _attribs.id + "_span" }, S.e('input', _attribs), 
             S.e('label', { 
-                key: this.attribs.id + "_label", 
+                key: _attribs.id + "_label", 
                 className: "checkbox-label",
-                htmlFor: this.attribs.id 
+                htmlFor: _attribs.id 
             }, this.label));
         }
         else {
-            return S.e('span', { key: this.attribs.id + "_span" }, S.e('input', this.attribs));
+            return S.e('span', { key: _attribs.id + "_span" }, S.e('input', _attribs));
         }
     }
 }
