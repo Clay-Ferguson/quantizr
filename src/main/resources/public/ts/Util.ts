@@ -639,7 +639,7 @@ export class Util implements UtilIntf {
             // (is there a better native JS approach than polling for the element?)
             else {
                 let accumWaitTime = 0;
-                let timeSlice = 250;
+                let timeSlice = 100;
 
                 //don't hang the promise more than 5 seconds, before reporting error and continuing.
                 let maxWaitTime = 5000;
@@ -927,12 +927,14 @@ export class Util implements UtilIntf {
         this.addClassToElmById(id, newClass);
     }
 
+    //todo-0: is this still used ?
     removeClassFromElmById = (id: string, clazz: string) => {
         S.util.getElm(id, (elm: HTMLElement) => {
             this.removeClassFromElm(elm, clazz);
         });
     }
 
+    //todo-0: is this still used?
     removeClassFromElm = (el: HTMLElement, clazz: string): void => {
         if (el.classList)
             el.classList.remove(clazz);
@@ -943,6 +945,7 @@ export class Util implements UtilIntf {
         }
     }
 
+    //todo-0: is this still used?
     addClassToElmById = (id: string, clazz: string): void => {
         //console.log("Adding class "+clazz+" to dom id "+id);
         S.util.getElm(id, (elm: HTMLElement) => {

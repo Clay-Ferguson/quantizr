@@ -19,6 +19,7 @@ export interface CompIntf {
     getElement(): HTMLElement; 
 
     whenElm(func: Function); 
+    whenElmEx(func: Function); 
 
     setVisible(visible: boolean); 
 

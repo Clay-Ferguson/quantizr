@@ -47,6 +47,15 @@ export abstract class Comp implements CompIntf {
 
     setStateFunc: Function;
 
+    //holds queue of functions to be ran once this component is rendered.
+    domAddFuncs: ((elm: HTMLElement) => void)[];
+
+    //keeps track of knowledge that the element already got rendered so any whenElm
+    //functions will run immediately rather than wait for the lifecycle even which will never happen again?
+    //I'm actually not sure if lifecycle runs again when setStat is called, but using this state variable should
+    //nonetheless be correct.
+    domAddEventRan: boolean;
+
     /**
      * 'react' should be true only if this component and all its decendants are true React components that are rendered and
      * controlled by ReactJS (rather than our own innerHTML)
@@ -90,13 +99,7 @@ export abstract class Comp implements CompIntf {
     }
 
 
-    /* Function refreshes all enablement and visibility based on current state of app 
-    
-    Now that we have true ReactHook for setState, all pre-existing state management of menus needs to be updated to 
-    use that new way (todo-1)
-
-    todo-0: this is currently disabled, because lifecycle of DOM elements is mucking things up relativie to garbage collection in listener impl, etc.
-    */
+    /* Function refreshes all enablement and visibility based on current state of app */
     refreshState(): void {
         let enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
         let visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
@@ -159,9 +162,26 @@ export abstract class Comp implements CompIntf {
         return <HTMLElement>document.getElementById(this.getId());
     }
 
-    //todo-0: the 'lifecycle' methods below *should* be able to help out with this in some way, rather than this timer approach???
-    whenElm = (func: (elm: HTMLElement) => void) => {
+    //This is the original implementation of whenElm which uses a timer to wait for the element to come into existence
+    //and is only used in one odd place where we manually attach Dialogs to the DOM (see DialogBase.ts)
+    whenElmEx = (func: (elm: HTMLElement) => void) => {
         S.util.getElm(this.getId(), func);
+    }
+
+    whenElm = (func: (elm: HTMLElement) => void) => {
+        if (this.domAddEventRan) {
+            //console.log("ran whenElm event immediately. domAddEvent had already ran");
+            func(this.getElement());
+            return;
+        }
+
+        //queue up the 'func' to be called once the domAddEvent gets executed.
+        if (!this.domAddFuncs) {
+            this.domAddFuncs = [func];
+        }
+        else {
+            this.domAddFuncs.push(func);
+        }
     }
 
     /* WARNING: this is NOT a setter for 'this.visible'. Perhaps i need to rename it for better clarity, it takes
@@ -339,9 +359,7 @@ export abstract class Comp implements CompIntf {
         try {
             this.hookState(this.initialState || this.state || {});
 
-            // useEffect(() => {
-            //     console.log("$$$$ DOM ADD: " + this.jsClassName);
-            // }, []);
+            useEffect(this.domAddEvent, []);
 
             // useEffect(() => {
             //     console.log("$$$$ DOM UPDATE: " + this.jsClassName);
@@ -361,6 +379,25 @@ export abstract class Comp implements CompIntf {
             console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key);
         }
         return ret;
+    }
+
+    domAddEvent = (): void => {
+        this.domAddEventRan = true;
+
+        if (this.domAddFuncs) {
+            let elm: HTMLElement = this.getElement();
+            if (!elm) {
+                console.error("elm not found in domAddEvent: " + this.jsClassName);
+                return;
+            }
+            else {
+                // console.log("domAddFuncs running for "+this.jsClassName+" for "+this.domAddFuncs.length+" functions.");
+            }
+            this.domAddFuncs.forEach((func) => {
+                func(elm);
+            });
+            this.domAddFuncs = null;
+        }
     }
 
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state

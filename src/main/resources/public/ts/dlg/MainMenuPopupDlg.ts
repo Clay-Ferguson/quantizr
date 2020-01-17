@@ -17,10 +17,5 @@ export class MainMenuPopupDlg extends DialogBase {
         this.setChildren([
             menu
         ]);
-
-        this.whenElm((elm: HTMLElement) => {
-            //todo-0: check the code flow once more and be sure this isn't redundat here!
-            S.meta64.refreshAllGuiEnablement();
-        });
     }
 }

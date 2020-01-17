@@ -36,7 +36,7 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
             let displayStyle = display ? display : (this.initiallyInvisible ? "none" : "block");
 
             if (this.initiallyInvisible) {
-                this.whenElm((elm: HTMLElement) => {
+                this.whenElmEx((elm: HTMLElement) => {
                     elm.style.display = "inline-block";
                 });
             }
