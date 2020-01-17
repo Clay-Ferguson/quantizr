@@ -22,12 +22,12 @@ export class EditPropertyDlg extends DialogBase {
 
     propertyNameTextarea: Textarea;
     propertyValTextarea: Textarea;
-    private editNodeDlg: EditNodeDlg;
+    propSavedFunc: Function;
     editNode: I.NodeInfo;
 
     constructor(args: any) {
         super("Edit Node Property");
-        this.editNodeDlg = args.editNodeDlg;
+        this.propSavedFunc = args.propSavedFunc;
         this.editNode = args.editNode; 
 
         this.setChildren([
@@ -73,9 +73,7 @@ export class EditPropertyDlg extends DialogBase {
 
         this.editNode.properties.push(res.propertySaved);
         S.meta64.treeDirty = true;
-
-        //todo-0: this is a super-ugly tight-coupling. change to something better.
-        this.editNodeDlg.rebuildDlg(); 
+        this.propSavedFunc();
     }
 
     init = (): void => {

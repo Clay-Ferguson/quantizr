@@ -258,7 +258,7 @@ export abstract class Comp implements CompIntf {
 
     /* Attaches a react element directly to the dom at the DOM id specified. Throws exception of not a react element. 
     
-    todo-0: this needs to be really removed if at all possible.
+    todo-1: this needs to be really removed if at all possible.
     */
     reactRenderToDOM = (id: string = null) => {
         if (!id) {

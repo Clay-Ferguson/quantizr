@@ -36,9 +36,6 @@ export class Edit implements EditIntf {
 
     parentOfNewNode: I.NodeInfo = null;
 
-    /* Instance of EditNodeDialog: For now creating new one each time */
-    editNodeDlgInst: EditNodeDlg = null;
-
     /*
      * type=NodeInfo.java
      *
@@ -135,9 +132,6 @@ export class Edit implements EditIntf {
                 let editNode = res.nodeInfo;
 
                 let dlg = new EditNodeDlg({node: editNode});
-
-                //this tight-coupling is ugly. remove it (todo-0)
-                this.editNodeDlgInst = dlg;
                 dlg.open();
             } else {
                 S.util.showMessage("You cannot edit nodes that you don't own.");

@@ -270,7 +270,10 @@ export class EditNodeDlg extends DialogBase {
     addProperty = (): void => {
         (async () => {
             /* always save existing node before opening new property dialog */
-            let dlg = new EditPropertyDlg({ editNode: this.node, editNodeDlg: this });
+            let dlg = new EditPropertyDlg({ 
+                editNode: this.node, 
+                propSavedFunc: this.propertySaved 
+            });
             this.editPropertyDlgInst = dlg;
             await this.editPropertyDlgInst.open();
 
@@ -278,6 +281,10 @@ export class EditNodeDlg extends DialogBase {
             //rather than doing a bunch of confusing 'awaits' here
             //this.rebuildDlg(); //todo-1: this is overkill. Will do it with targeted react setState eventually
         })();
+    }
+
+    propertySaved = (): void => {
+        this.rebuildDlg();
     }
 
     insertTime = (): void => {
