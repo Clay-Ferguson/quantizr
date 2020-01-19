@@ -66,7 +66,6 @@ export class User implements UserIntf {
     setStateVarsUsingLoginResponse = (res: I.LoginResponse): void => {
         if (res.rootNode) {
             S.meta64.homeNodeId = res.rootNode.id;
-            S.meta64.homeNodePath = res.rootNode.path;
         }
         S.meta64.userName = res.userName;
         S.meta64.isAdminUser = res.userName === "admin";
@@ -268,9 +267,6 @@ export class User implements UserIntf {
                         location.reload();
                     }
                 }
-
-                //this is redundant (refreshTree does it)
-                //S.meta64.refreshAllGuiEnablement();
             }
             finally {
                 resolve();
@@ -287,8 +283,5 @@ export class User implements UserIntf {
         }
 
         S.meta64.loadAnonPageHome();
-
-        //this is redundant
-        //S.meta64.refreshAllGuiEnablement();
     }
 }

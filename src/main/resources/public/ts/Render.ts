@@ -64,7 +64,7 @@ export class Render implements RenderIntf {
 
         if (cnst.SHOW_PATH_ON_ROWS) {
             let ordinalStr = node.logicalOrdinal != -1 ? " [" + node.logicalOrdinal + "] " : " ";
-            pathDiv = new Div(node.path + ordinalStr + node.type, {
+            pathDiv = new Div(node.id + ordinalStr + " Type: " + node.type, {
                 className: "path-display"
             });
         }
@@ -744,10 +744,6 @@ export class Render implements RenderIntf {
                         let pasteInsideButton: Button = null;
                         let pasteInlineButton: Button = null;
 
-                        // console.log("data.node.path="+data.node.path);
-                        // console.log("isNonOwnedCommentNode="+props.isNonOwnedCommentNode(data.node));
-                        // console.log("isNonOwnedNode="+props.isNonOwnedNode(data.node));
-
                         let createdBy: string = data.node.owner;
                         let commentBy: string = S.props.getNodePropertyVal(cnst.COMMENT_BY, data.node);
                         let publicAppend: string = S.props.getNodePropertyVal(cnst.PUBLIC_APPEND, data.node);
@@ -1074,6 +1070,7 @@ export class Render implements RenderIntf {
     }
 
     getUrlForNodeAttachment = (node: I.NodeInfo): string => {
+        //todo-0: Change to node.id and then re-test this
         return S.util.getRpcPath() + "bin/file-name" + node.binVer + "?nodeId=" + encodeURIComponent(node.path) + "&ver=" + node.binVer;
     }
 

@@ -203,7 +203,6 @@ public class NodeEditService {
 	 * request.
 	 */
 	public void saveNode(MongoSession session, SaveNodeRequest req, SaveNodeResponse res) {
-
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -211,6 +210,7 @@ public class NodeEditService {
 
 		log.debug("saveNode. nodeId=" + nodeId + " nodeName=" + req.getName());
 		SubNode node = api.getNode(session, nodeId);
+		api.authRequireOwnerOfNode(session, node);
 
 		if (node == null) {
 			throw new RuntimeException("Unable find node to save: nodeId=" + nodeId);

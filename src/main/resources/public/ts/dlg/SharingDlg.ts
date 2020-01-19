@@ -70,7 +70,9 @@ export class SharingDlg extends DialogBase {
 
     removePrivilegeResponse = (res: I.RemovePrivilegeResponse): void => {
         S.util.ajax<I.GetNodePrivilegesRequest, I.GetNodePrivilegesResponse>("getNodePrivileges", {
-            "nodeId": S.share.sharingNode.path,
+
+            //todo-0: rest after changing path to id here.
+            "nodeId": S.share.sharingNode.id,
             "includeAcl": true,
             "includeOwners": true
         }, this.populate);

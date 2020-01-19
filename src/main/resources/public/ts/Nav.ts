@@ -264,9 +264,7 @@ export class Nav implements NavIntf {
 
     navHome = (): void => {
         if (S.meta64.isAnonUser) {
-            console.log("loadAnonPageHome.");
             S.meta64.loadAnonPageHome();
-            // window.location.href = window.location.origin;
         } else {
             this.mainOffset = 0;
             S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {

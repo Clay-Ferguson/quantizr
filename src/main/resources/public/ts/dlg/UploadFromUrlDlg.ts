@@ -24,7 +24,7 @@ export class UploadFromUrlDlg extends DialogBase {
        
         this.setChildren([
             new Form(null, [
-                Constants.SHOW_PATH_IN_DLGS ? new TextContent("Path: " + S.attachment.uploadNode.path, "path-display-in-editor") : null,
+                Constants.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.attachment.uploadNode.id, "path-display-in-editor") : null,
                 this.uploadFromUrlTextField = new TextField({
                     "placeholder": "",
                     "label": "Upload From URL"

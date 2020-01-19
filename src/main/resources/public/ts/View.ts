@@ -226,12 +226,7 @@ export class View implements ViewIntf {
     getPathDisplay = (node: I.NodeInfo): string => {
         if (node == null) return "";
 
-        //overflow-x quit working, but also I decided I don't need this path here, so rather than fighting this i'm just removing it for now.
-        var path = ""; //"<span style='overflow-x: auto;'>Path: " + node.path + "</span>";
-
-        //if (node.path.indexOf(node.id) != -1) {
-        path += "ID: " + node.id;
-        //}
+        var path = "ID: " + node.id;
 
         if (node.lastModified) {
             if (path) {
@@ -241,7 +236,7 @@ export class View implements ViewIntf {
             path += "(Mod: " + lastModStr + ")";
         }
 
-        //nt:unstructured is included just for legacy support unless/until I put into DB converter.
+        //todo-1: nt:unstructured is included just for legacy support unless/until I put into DB converter.
         if (node.type && node.type != "u" && node.type != "nt:unstructured") {
             if (path) {
                 path += "  ";

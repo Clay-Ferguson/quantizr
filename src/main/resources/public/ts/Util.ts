@@ -1047,9 +1047,9 @@ export class Util implements UtilIntf {
             let url: string = window.location.origin + "?name=" + node.name;
             history.pushState({ "nodeId": node.name }, node.name, url);
         }
-        else if (node.path) {
-            let url: string = window.location.origin + "?id=" + node.path;
-            history.pushState({ "nodeId": node.path }, node.path, url);
+        else {
+            let url: string = window.location.origin + "?id=" + node.id;
+            history.pushState({ "nodeId": node.id }, node.id, url);
         }
     }
 }

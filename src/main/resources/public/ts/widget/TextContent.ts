@@ -27,8 +27,7 @@ export class TextContent extends Comp {
     compRender = (): ReactNode => {
         let state = this.getState();
 
-        //todo-0: research this hack. It's ok if we need to dangerously render sometimes, but not based on 
-        //checking for HTML delimiters. That was just a crazy temp hack.
+        //todo-1: research this hack. Not sure I want to keep detecting HTML this way.
         if (state.text && state.text.indexOf("<") != -1) {
             //console.log("Dangerously setting html: "+this.jsClassName);
             let _p: any = { key: "renderhtml" + this.getId() };
