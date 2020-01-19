@@ -33,14 +33,14 @@ export class MenuPanel extends Div {
                 //I'm removing my RSS feeds, for now (mainly to remove any political or interest-specific content from the platform)
                 //new MenuItem("Podcast Feeds", () => { S.nav.openContentNode("/r/rss"); }),
 
-                new MenuItem("User Guide", () => { S.nav.openContentNode("/r/public/user-guide"); }),
+                new MenuItem("User Guide", () => { S.nav.openContentNode(":user-guide"); }),
 
                 //new MenuItem("Sample Document", () => { S.nav.openContentNode("/r/books/war-and-peace"); }),
 
                 // commenting this only because I don't have the github created yet.
                 // new MenuItem("Quantizr on GitHub", S.nav.openGitHubSite),
 
-                new MenuItem("Getting Started", () => { S.nav.openContentNode("/r/public/getting-started"); }),
+                new MenuItem("Getting Started", () => { S.nav.openContentNode(":getting-started"); }),
 
                 //I decided ALL information will be stored native right in mongo, and no filesystem stuff.
                 //new MenuItem("Documentation", () => { S.nav.openContentNode("/r/public/subnode-docs"); }),

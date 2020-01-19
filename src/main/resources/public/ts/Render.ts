@@ -457,7 +457,7 @@ export class Render implements RenderIntf {
         S.meta64.selectTab("mainTab");
         let message: string = "ID-based URL: \n" + window.location.origin + "?id=" + node.id;
         if (node.name) {
-            message += "\n\nName-based URL: \n" + window.location.origin + "?name=" + node.name;
+            message += "\n\nName-based URL: \n" + window.location.origin + "?n=" + node.name;
         }
 
         S.util.showMessage(message, true);
@@ -544,7 +544,7 @@ export class Render implements RenderIntf {
             (this.nodeHasChildren(node.uid) || node.type == "fs:folder" || node.type == "fs:lucene" || node.type == "ipfs:node")) {
 
             /* convert this button to a className attribute for styles */
-            openButton = new Button("Open", () => { S.nav.openNode(node.uid, true) }, {
+            openButton = new Button("Open", () => { S.nav.openNodeByUid(node.uid, true) }, {
                 "style": {
                     backgroundColor: "#4caf50",
                     color: "white"

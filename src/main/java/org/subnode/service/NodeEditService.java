@@ -216,7 +216,17 @@ public class NodeEditService {
 			throw new RuntimeException("Unable find node to save: nodeId=" + nodeId);
 		}
 		node.setContent(req.getContent());
-		if (req.getName() != null) {
+
+		//if we're setting node name to a different node name
+		if (req.getName() != null && !req.getName().equals(node.getName())) {
+
+			//We don't use unique index on node name, because we want to save storage space on the server, so we have to
+			//do the uniqueness check ourselves here manually
+			SubNode nodeByName = api.getNodeByName(session, req.getName());
+			if (nodeByName!=null) {
+				throw new RuntimeException("Node name is already in use. Duplicates not allowed.");
+			}
+
 			node.setName(req.getName());
 		}
 

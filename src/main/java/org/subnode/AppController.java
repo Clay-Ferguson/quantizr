@@ -259,7 +259,7 @@ public class AppController {
 	@RequestMapping(value = "/")
 	public String index(//
 			@RequestParam(value = "id", required = false) String id, //
-			@RequestParam(value = "name", required = false) String name, //
+			@RequestParam(value = "n", required = false) String name, //
 			@RequestParam(value = "signupCode", required = false) String signupCode, //
 			@RequestParam(value = "passCode", required = false) String passCode, //
 			Model model) {

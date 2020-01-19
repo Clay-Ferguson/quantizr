@@ -84,7 +84,6 @@ public class NodeRenderService {
 		log.debug("renderNode targetId:" + targetId);
 		SubNode node = api.getNode(session, targetId);
 		
-
 		if (node == null) {
 			res.setNoDataResponse("Node not found.");
 			return;

@@ -59,18 +59,6 @@ export class Nav implements NavIntf {
         new PrefsDlg().open();
     }
 
-    openContentNode = (nodePathOrId: string): void => {
-        this.mainOffset = 0;
-        S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
-            "nodeId": nodePathOrId,
-            "upLevel": null,
-            "siblingOffset": 0,
-            "renderParentIfLeaf": null,
-            "offset": this.mainOffset,
-            "goToLastPage": false
-        }, this.navPageNodeResponse);
-    }
-
     openGitHubSite = (): void => {
         window.open("http://github.com/Clay-Ferguson/quantizr.com", "_blank");
     }
@@ -99,7 +87,7 @@ export class Nav implements NavIntf {
     navOpenSelectedNode = (): void => {
         let currentSelNode: I.NodeInfo = S.meta64.getHighlightedNode();
         if (!currentSelNode) return;
-        S.nav.openNode(currentSelNode.uid, true);
+        S.nav.openNodeByUid(currentSelNode.uid, true);
     }
 
     navToSibling = (siblingOffset: number): void => {
@@ -207,12 +195,28 @@ export class Nav implements NavIntf {
         S.meta64.refreshAllGuiEnablement();
     }
 
-    openNode = (uid: string, scrollToFirstChild?: boolean): void => {
+    openContentNode = (nodePathOrId: string): void => {
+        this.mainOffset = 0;
+        S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
+            "nodeId": nodePathOrId,
+            "upLevel": null,
+            "siblingOffset": 0,
+            "renderParentIfLeaf": null,
+            "offset": this.mainOffset,
+            "goToLastPage": false
+        }, this.navPageNodeResponse);
+    }
+
+    /* UID is the 'client-only' id assigned for this node, and will not apply to any server-side data nor any other 'instance'
+    of the running application. All browser session javascript scoped */
+    openNodeByUid = (uid: string, scrollToFirstChild?: boolean): void => {
+        //todo-0: Need to rethink about how to keep uidToNodeMap clean (garbage collected), and look into whether
+        //something like this is mapping DOM id to Comp instances also, and if THAT is also needed and if it's garbage collected yet.
         let node: I.NodeInfo = S.meta64.uidToNodeMap[uid];
         S.meta64.highlightNode(node, false);
 
         if (!node) {
-            S.util.showMessage("Unknown nodeId in openNode: " + uid);
+            S.util.showMessage("Unknown nodeId in openNodeByUid: " + uid);
         } else {
             S.view.refreshTree(node.id, true, null, false, false, scrollToFirstChild);
         }

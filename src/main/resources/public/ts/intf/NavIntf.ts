@@ -29,7 +29,7 @@ export interface NavIntf {
     navOpenSelectedNode(): void;
     getSelectedDomElement(): HTMLElement;
     clickOnNodeRow(uid: string): void;
-    openNode(uid: string, scrollToFirstChild: boolean): void;
+    openNodeByUid(uid: string, scrollToFirstChild: boolean): void;
     toggleNodeSel(selected: boolean, uid: string): void;
     navPageNodeResponse(res: I.RenderNodeResponse): void;
     navHome(): void;
