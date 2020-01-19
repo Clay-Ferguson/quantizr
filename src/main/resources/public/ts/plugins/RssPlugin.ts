@@ -150,8 +150,7 @@ export class RssPlugin implements RssPluginIntf {
             itemListContainer.children.push(this.buildFeedItem(item));
         });
 
-        //todo-0: change this the same way we changed EditNodeDlg to work. (without this)
-        itemListContainer.reactRenderToDOM();
+        itemListContainer.updateDOM();
     }
 
     buildFeedItem = (entry): Comp => {

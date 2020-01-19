@@ -691,7 +691,7 @@ export class Render implements RenderIntf {
                         if (!data || !data.node) {
                             S.util.setElmDisplayById("listView", false);
                             let contentDiv = new Div("No content available");
-                            contentDiv.reactRenderToDOM("mainNodeContent");
+                            contentDiv.updateDOM("mainNodeContent");
                         } else {
                             S.util.setElmDisplayById("listView", true);
                         }
@@ -831,7 +831,7 @@ export class Render implements RenderIntf {
                             children);
 
                         S.util.setElmDisplayById("mainNodeContent", true);
-                        contentDiv.reactRenderToDOM("mainNodeContent");
+                        contentDiv.updateDOM("mainNodeContent");
 
                     } else {
                         S.util.setElmDisplayById("mainNodeContent", false);
@@ -896,7 +896,7 @@ export class Render implements RenderIntf {
                     try {
                         //console.log("listView found.");
                         let outputDiv = new Div(null, null, output);
-                        outputDiv.reactRenderToDOM("listView");
+                        outputDiv.updateDOM("listView");
                         S.meta64.selectTab("mainTab");
 
                         if (S.meta64.codeFormatDirty) {

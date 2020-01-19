@@ -806,10 +806,10 @@ export class Meta64 implements Meta64Intf {
             this.deviceHeight = window.innerHeight;
 
             let mainTabPanel = new TabPanel();
-            mainTabPanel.reactRenderToDOM("mainTabPanel");
+            mainTabPanel.updateDOM("mainTabPanel");
 
             S.nav.mainNavPanel = new MainNavPanel(null);
-            S.nav.mainNavPanel.reactRenderToDOM("mainNavPanel");
+            S.nav.mainNavPanel.updateDOM("mainNavPanel");
 
             /*
              * This call checks the server to see if we have a session already, and gets back the login information from
@@ -836,6 +836,7 @@ export class Meta64 implements Meta64Intf {
             // Initialize the 'ServerPush' client-side connection
             S.push.init();
 
+            //I think for now I'm gonna make it where only individual nodes are drop-targets.
             //this.enableAppAsDropTarget();
             console.log("initApp complete.");
             resolve();

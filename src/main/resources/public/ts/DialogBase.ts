@@ -7,6 +7,7 @@ import { Div } from "./widget/Div";
 import * as ReactDOM from "react-dom";
 import { CompIntf } from "./widget/base/CompIntf";
 
+
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
@@ -63,7 +64,6 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
     domRender = (): void => {
         //this wraps the childern inside the actual dialog component itself
         this.dlgComp = this.makeComp(this.elm);
-
         ReactDOM.render(S.e(this.dlgComp.render, this.dlgComp.attribs), this.elm);
     }
 

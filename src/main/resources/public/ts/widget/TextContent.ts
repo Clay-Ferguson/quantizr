@@ -11,7 +11,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class TextContent extends Comp {
 
-    constructor(text: string, classes: string=null, public preformatted: boolean=false) {
+    constructor(text: string, classes: string = null, public preformatted: boolean = false) {
         super(null);
         this.attribs.className = classes || "alert alert-info";
         this.attribs.role = "alert";
@@ -27,9 +27,11 @@ export class TextContent extends Comp {
     compRender = (): ReactNode => {
         let state = this.getState();
 
-        //todo-1: this is an ugly hack to check for "<". Need to review this.
+        //todo-0: research this hack. It's ok if we need to dangerously render sometimes, but not based on 
+        //checking for HTML delimiters. That was just a crazy temp hack.
         if (state.text && state.text.indexOf("<") != -1) {
-            let _p: any = {};
+            //console.log("Dangerously setting html: "+this.jsClassName);
+            let _p: any = { key: "renderhtml" + this.getId() };
             _p.dangerouslySetInnerHTML = { "__html": state.text };
             return S.e(this.preformatted ? 'pre' : 'div', _p);
         }

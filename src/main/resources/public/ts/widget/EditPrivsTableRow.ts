@@ -10,33 +10,32 @@ import { Constants } from "../Constants";
 import { Heading } from "./Heading";
 import { ReactNode } from "react";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
 export class EditPrivsTableRow extends Comp {
 
-    constructor(public sharingDlg: SharingDlg, public aclEntry: I.AccessControlEntryInfo) {
+    constructor(public aclEntry: I.AccessControlEntryInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
         super(null);
         this.setClass("list-group-item list-group-item-action");
-        this.addChild(new Heading(4, "User: " + aclEntry.principalName));
 
-        let privElementsDiv = new Div();
-        this.renderAclPrivileges(privElementsDiv, aclEntry);
-        this.addChild(privElementsDiv);
+        this.addChild(new Heading(4, "User: " + this.aclEntry.principalName));
+        this.addChild(this.renderAclPrivileges(this.aclEntry));
     }
 
-    renderAclPrivileges = (div: Div, aclEntry: I.AccessControlEntryInfo): void => {
+    renderAclPrivileges = (aclEntry: I.AccessControlEntryInfo): Div => {
 
-        aclEntry.privileges.forEach( (privilege, index) => {
-            let removeButton = new Button("Remove", () => {
-                this.sharingDlg.removePrivilege(aclEntry.principalNodeId, privilege.privilegeName);
-            })
-            div.addChild(removeButton);
-            div.addChild(new TextContent("<b>" + aclEntry.principalName + "</b> has privilege <b>" + privilege.privilegeName + "</b> on this node.",
+        let div = new Div();
+        aclEntry.privileges.forEach((privilege, index) => {
+            div.addChild(new Button("Remove", () => {
+                this.removePrivilege(aclEntry.principalNodeId, privilege.privilegeName);
+            }));
+            div.addChild(new TextContent(aclEntry.principalName + " has privilege " + privilege.privilegeName + " on this node.",
                 "privilege-entry"));
         });
+        return div;
     }
 
     compRender = (): ReactNode => {

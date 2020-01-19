@@ -29,8 +29,9 @@ export class Button extends Comp {
     }
 
     compRender = (): ReactNode => {
-        let icon: any;
+        //console.log("CompRender Button: "+this.jsClassName);
 
+        let icon: any;
         if (this.attribs.iconclass) {
             icon = S.e('i', { 
                 key: "s_"+this.getId(),
@@ -41,6 +42,6 @@ export class Button extends Comp {
             });
         }
 
-        return S.e('button', this.attribs, [icon, this.getState().text]);
+        return S.e('button', {...this.attribs}, [icon, this.getState().text]);
     }
 }

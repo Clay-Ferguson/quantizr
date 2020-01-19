@@ -384,6 +384,12 @@ export interface GetNodePrivilegesResponse extends ResponseBase {
     publicAppend: boolean;
 }
 
+export interface NodePrivilegesInfo {
+    aclEntries: AccessControlEntryInfo[];
+    owners: string[];
+    publicAppend: boolean;
+}
+
 export interface GetServerInfoResponse extends ResponseBase {
     serverInfo: string;
 }

@@ -23,6 +23,10 @@ export interface CompIntf {
 
     setVisible(visible: boolean); 
 
+    setState(newState: any): void;
+
+    updateState(newState: any): void;
+
     setEnabled(enabled: boolean);
 
     setClass(clazz: string): void; 
@@ -31,7 +35,7 @@ export interface CompIntf {
 
     reactRenderHtmlInDiv(type: any): string;
     reactRenderHtmlInSpan(type: any): string;
-    reactRenderToDOM(id: string): void;
+    updateDOM(id: string): void;
 
     setInnerHTML(html: string); 
 

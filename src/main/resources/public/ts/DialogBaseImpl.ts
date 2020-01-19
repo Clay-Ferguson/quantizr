@@ -5,3 +5,4 @@ export interface DialogBaseImpl {
     init() : void;
     close(): void;
 }
+

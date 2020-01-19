@@ -138,7 +138,7 @@ export class Search implements SearchIntf {
 
 
         let div = new Div(null, null, output);
-        div.reactRenderToDOM(viewName);
+        div.updateDOM(viewName);
     }
 
     /*

@@ -18,11 +18,11 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ShareToPersonDlg extends DialogBase {
 
     shareToUserTextField: TextField;
-    sharingDlg: SharingDlg;
+    sharedNodeFunc: Function;
 
     constructor(args: Object) {
         super("Share Node to Person");
-        this.sharingDlg = (<any>args).sharingDlg;
+        this.sharedNodeFunc = (<any>args).sharedNodeFunc;
         
         this.setChildren([
             new Form(null, [
@@ -70,7 +70,7 @@ export class ShareToPersonDlg extends DialogBase {
 
     reloadFromShareWithPerson = (res: I.AddPrivilegeResponse): void => {
         if (S.util.checkSuccess("Share Node with Person", res)) {
-            this.sharingDlg.reload();
+            this.sharedNodeFunc();
         }
     }
 }

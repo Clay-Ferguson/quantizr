@@ -1,5 +1,6 @@
 // https://reactjs.org/docs/react-api.html
 // https://reactjs.org/docs/hooks-reference.html#usestate
+// #RulesOfHooks: https://fb.me/rules-of-hooks
 
 import { CompIntf, ReactRenderFunc } from "./CompIntf";
 import { PubSub } from "../../PubSub";
@@ -247,20 +248,19 @@ export abstract class Comp implements CompIntf {
     }
 
     reactRenderHtmlInDiv = (): string => {
-        this.reactRenderToDOM(this.getId() + "_re");
+        this.updateDOM(this.getId() + "_re");
         return "<div id='" + this.getId() + "_re'></div>";
     }
 
     reactRenderHtmlInSpan = (): string => {
-        this.reactRenderToDOM(this.getId() + "_re");
+        this.updateDOM(this.getId() + "_re");
         return "<span id='" + this.getId() + "_re'></span>";
     }
 
-    /* Attaches a react element directly to the dom at the DOM id specified. Throws exception of not a react element. 
-    
-    todo-1: this needs to be really removed if at all possible.
+    /* Attaches a react element directly to the dom at the DOM id specified. 
+       WARNING: This will only re-render the *children* under the target node and not the attributes or tag of the node itself.   
     */
-    reactRenderToDOM = (id: string = null) => {
+    updateDOM = (id: string = null) => {
         if (!id) {
             id = this.getId();
         }
@@ -268,6 +268,8 @@ export abstract class Comp implements CompIntf {
         //     throw new Error("Attempted to treat non-react component as react: " + this.constructor.name);
         // }
         S.util.getElm(id, (elm: HTMLElement) => {
+            //See #RulesOfHooks in this file, for the reason we blowaway the existing element to force a rebuild.
+            ReactDOM.unmountComponentAtNode(elm);
             ReactDOM.render(S.e(this.render, this.attribs), elm);
         });
     }
@@ -280,13 +282,18 @@ export abstract class Comp implements CompIntf {
             if (child) {
                 let reChild: ReactNode = null;
                 try {
+                    //console.log("ChildRender: " + child.jsClassName);
                     reChild = child.render();
                 }
                 catch (e) {
                     console.error("Failed to render child " + child.jsClassName + " attribs.key=" + child.attribs.key);
                 }
+
                 if (reChild) {
                     reChildren.push(reChild);
+                }
+                else {
+                    console.log("ChildRenderd to null: " + child.jsClassName);
                 }
             }
         });
@@ -302,13 +309,30 @@ export abstract class Comp implements CompIntf {
             }
         }
         else {
-            children = [content];
+            children = content ? [content] : null;
         }
-        return S.e(tag, props, children);
+
+        if (children && children.length > 0) {
+            //console.log("Render Tag with children.");
+            return S.e(tag, props, children);
+        }
+        else {
+            //console.log("Render Tag no children.");
+            return S.e(tag, props);
+        }
     }
 
+    // WARNING: If you get an error like this:
+    // react-dom.development.js:506 Warning: React has detected a change in the order of Hooks called by null. This will lead to bugs and errors if not fixed. 
+    // For more information, read the Rules of Hooks: https://fb.me/rules-of-hooks 
+    // #RulesOfHooks
+    // that's an indication you've hit the MAJOR WEAKNESS in the design of React, that I won't discuss here, but the solution is to not
+    // use setState to render a component that will structurally change in ANY WAY at all (other than perhsps style change or actual content data 
+    // inside the already existing DOM elements)
     hookState = (newState: any) => {
+        //console.log("hookState[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(newState));
         const [state, setStateFunc] = useState(newState);
+        //console.log("   hookState ok.");
         this.setStateFunc = setStateFunc;
         this.state = state;
         this.initialState = null;
@@ -316,15 +340,19 @@ export abstract class Comp implements CompIntf {
 
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
     both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact */
-    mergeState = (state: any): any => {
+    mergeState = (moreState: any): any => {
         //If we still have an initial state then it's the 'active' state we need to merge into
         if (this.initialState) {
-            this.initialState = { ...this.initialState, ...state };
+            this.initialState = { ...this.initialState, ...moreState };
         }
         //otherwise the actual 'state' itself is currently the active state to merge into.
         else {
-            this.state = { ...this.state, ...state };
-            this.setStateFunc(this.state);
+            //NOTE: We use the functional variant of the setStateFunc so we can safely build on top of existing state, because remember
+            //React itself always has it's own internal copy of the state even aside from our 'this.state'
+            this.setStateFunc((state: any) => {
+                this.state = { ...state, ...moreState };
+                return this.state;
+            });
         }
     }
 
@@ -336,16 +364,41 @@ export abstract class Comp implements CompIntf {
         return {...prevState, ...updatedValues};
     });
     */
-    setState = (state: any) => {
+    setState = (newState: any) => {
+        newState = newState || {};
+
         // If 'hookState' has been called then this function should be pointing to whatever was returned from 'useState' 
         if (!this.initialState) {
-            //throw new Error("setState called when stateHooked is set. This is an invalid, and indicates a bug.");
-            this.state = state;
-            this.setStateFunc(this.state);
+            this.setStateFunc((state: any) => {
+                //Note that we abandon the old state with this function, and just take the 'newState'
+                this.state = newState;
+                return newState;
+            });
         }
         else {
             // If state not yet hooked, we keep the 'state' in initialState
-            this.initialState = state;
+            this.initialState = newState;
+        }
+    }
+
+    // /* Sets the state bypassing the React re-render cycle. Because of the rules mentioned here: https://fb.me/rules-of-hooks, which are 
+    // completely unacceptable to me, I have a strategy where, whenever the DOM structure of some component can change dramatically,
+    // when re-rendered we just rely on being able to update the state with this method and then just call updateDOM at any point to
+    // completely re-render that entire element of the DOM tree, recursively deep also (without any risk of React stupidly barking at us that
+    // something in our DOM is 'out of order' */
+    updateState = (newState: any) => {
+        //these two lines proven to work.
+        // this.state = newState || {};
+        // this.initialState = null;
+
+        //but switching to these instead.
+        // If 'hookState' has been called then this function should be pointing to whatever was returned from 'useState' 
+        if (!this.initialState) {
+            this.state = newState;
+        }
+        else {
+            // If state not yet hooked, we keep the 'state' in initialState
+            this.initialState = newState;
         }
     }
 
@@ -358,7 +411,6 @@ export abstract class Comp implements CompIntf {
         let ret: ReactNode = null;
         try {
             this.hookState(this.initialState || this.state || {});
-
             useEffect(this.domAddEvent, []);
 
             // These two other effect hooks should work fine but just aren't needed yet.
@@ -366,9 +418,7 @@ export abstract class Comp implements CompIntf {
             //     console.log("$$$$ DOM UPDATE: " + this.jsClassName);
             // });
 
-            // todo-0: this never ran (for popup menu) and my best guess is that dialogs are
-            // being hidden, but not 'detatched' when closed, bc that menu runs inside a dialog container.
-            // (update: actually this didn't run b/c dialog is done using pure DOM Javascript, which is the same reason
+            // (NOTE: Remember this won't run for DialogBase because it's done using pure DOM Javascript, which is the same reason
             // whenElmEx has to still exist right now)
             // useEffect(() => {
             //     return () => {
