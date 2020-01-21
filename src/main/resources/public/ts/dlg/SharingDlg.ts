@@ -107,8 +107,8 @@ export class SharingDlg extends DialogBase {
             new Form(null, [
                 this.privsTable = new EditPrivsTable(this.nodePrivsInfo, this.removePrivilege),
                 new ButtonBar([
-                    new Button("Share with Person", this.shareToPersonDlg),
-                    new Button("Share to Public", this.shareNodeToPublic),
+                    new Button("Share with Person", this.shareToPersonDlg, null, "primary"),
+                    new Button("Share to Public", this.shareNodeToPublic, null, "primary"),
 
                     //NOTE: Currently this dialog just autosaves everything you change as you change it.
                     // new Button("Save", () => {

@@ -1,22 +1,19 @@
-$appBackgroundColor: black; // #343a40;
-$modalTitleBackground: lightslategray;
-$modalContentBackground: #c0c0c0;
-$mainContentBackground: #cecece;
-$tabButtonBackground: lightSlateGray;
-$menuBorderColor: #888;
-$menuBackgroundColor: #fefefe;
-$elementBorderColor: lightGray;
-$listBoxBorderColor: lightGray;
-$menuItemHoverBackgroundColor: #f4d03f;
-$listItemBorderBottomColor: gray;
-$basicModalHeaderBackgroundColor: lightGray;
-$selectedListItemBackgroundColor: lightGray;
-$nodeBorderBottomColor: lightslategray;
+
+@import "variables.scss";
+
+$border-radius: .3rem;
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+@import "bootswatch.scss";
+
+$menuItemHoverBackgroundColor: $primary;
+$nodeBorderBottomColor: $gray-600;
+
 $createdByMeBackgroundColor: green;
 $createdByMeTextColor: white;
-$createdByOtherBackgroundColor: lightGray;
-$listBackgroundColor: lightGray;
 
+$listBackgroundColor: lightGray;
 
 html {
     // not supported by all browers.
@@ -30,7 +27,6 @@ body {
     font-family: "Roboto", "Verdana", "Aria";
     padding-top: 5rem;
     padding-bottom: 1rem;
-    background-color: $appBackgroundColor;
 }
 
 .textfield-label {
@@ -48,13 +44,6 @@ body {
 .edit-props-table {
     margin-top: 10px;
     margin-bottom: 10px;
-}
-
-.app-modal-title {
-    margin-bottom: 15px;
-    padding: 8px;
-    font-size: 140%;
-    background-color: $modalTitleBackground;
 }
 
 .fixedFont {
@@ -77,6 +66,11 @@ body {
 
 /* The Modal (background) */
 
+.app-modal-title {
+    margin-bottom: 15px;
+    font-size: 150%;
+}
+
 .app-modal {
     display: none;
     position: fixed;
@@ -91,41 +85,44 @@ body {
 
 /* Modal Content/ Dialog Box. This is the outter frame of the dialog itself */
 
+//todo-0: need some narrow versions of this using the sizes in the ones below commented out.
 .app-modal-content {
-    background-color: $modalContentBackground;
+    background-color: $modal-content-bg;
+    border: 2px solid $modal-content-border-color;
     margin: 15px/*15%*/ auto;
     /* 15% from the top and centered */
-    border: 1px solid $menuBorderColor;
     padding: 15px;
     width: 75%;
     /* Could be more or less, depending on screen size */
     max-width: 800px;
+    border-radius: .7em;
 }
 
-/* Learn how to inherit this style and only alter max-width */
-.app-modal-content-login-dlg {
-    background-color: $modalContentBackground;
-    margin: 15px/*15%*/ auto;
-    /* 15% from the top and centered */
-    border: 1px solid $menuBorderColor;
-    padding: 15px;
-    width: 75%;
-    max-width: 350px;
-}
+// /* Learn how to inherit this style and only alter max-width */
+// .app-modal-content-login-dlg {
+//     background-color: $modalContentBackground;
+//     margin: 15px/*15%*/ auto;
+//     /* 15% from the top and centered */
+//     //border: 1px solid $menuBorderColor;
+//     padding: 15px;
+//     width: 75%;
+//     max-width: 350px;
+// }
 
-/* Learn how to inherit this style and only alter max-width */
-.app-modal-content-edit-dlg {
-    background-color: $modalContentBackground;
-    margin: 15px/*15%*/ auto;
-    /* 15% from the top and centered */
-    border: 1px solid $menuBorderColor;
-    padding: 15px;
-    width: 85%;
-    max-width: 700px;
-}
+// /* Learn how to inherit this style and only alter max-width */
+// .app-modal-content-edit-dlg {
+//     background-color: $modalContentBackground;
+//     margin: 15px/*15%*/ auto;
+//     /* 15% from the top and centered */
+//     //border: 1px solid $menuBorderColor;
+//     padding: 15px;
+//     width: 85%;
+//     max-width: 700px;
+// }
 
+//todo-0: need to re-test fullscreen mode after all the style refactoring.
 .app-modal-content-fullscreen {
-    background-color: $modalContentBackground;
+    //background-color: $modalContentBackground;
     padding: 15px;
     width: 100%;
     height: 100%;
@@ -134,19 +131,13 @@ body {
 /* Modal Content/ Dialog Box */
 
 .app-modal-menu {
-    background-color: $menuBackgroundColor;
     left: 0;
     top: 0;
-    border: 1px solid $menuBorderColor;
     padding: 15px;
     width: 20%;
     margin-top: 60px;
     max-width: 400px;
     min-width: 350px;
-}
-
-.no-border {
-    border: none;
 }
 
 .my-tab-pane {
@@ -159,7 +150,6 @@ body {
 }
 
 .ipfs-text {
-    //background-color: $tabButtonBackground;
     margin: 10px;
     padding: 5px;
 }
@@ -169,29 +159,29 @@ body {
 }
 
 /* NOTE: border sizes (thickness itself) of all nav-tabs should be same everywhere */
-.tab-buttons-container {
-    background-color: $tabButtonBackground;
-    margin-bottom: 0px;
-    margin-left: 0px;
-    margin-right: 0px;
-    padding: 0px;
-}
+// .tab-buttons-container {
+//     //background-color: $tabButtonBackground;
+//     margin-bottom: 0px;
+//     margin-left: 0px;
+//     margin-right: 0px;
+//     padding: 0px;
+// }
 
-.nav-tabs>.nav-item>.nav-link {
-    border: none;
-    color: black;
-}
+// .nav-tabs>.nav-item>.nav-link {
+//     //border: none;
+//     //color: black;
+// }
 
-.nav-tabs>.nav-item>.nav-link:hover {
-    //border-bottom: 4px solid lightslategray;
-}
+// .nav-tabs>.nav-item>.nav-link:hover {
+//     //border-bottom: 4px solid lightslategray;
+// }
 
-.nav-tabs>.nav-item>.nav-link.active,
-.nav-tabs>.nav-item>.nav-link.active:hover,
-.nav-tabs>.nav-item>.nav-link.active:focus {
-    background-color: $mainContentBackground;
-    //color: black;
-}
+// .nav-tabs>.nav-item>.nav-link.active,
+// .nav-tabs>.nav-item>.nav-link.active:hover,
+// .nav-tabs>.nav-item>.nav-link.active:focus {
+//     //background-color: $mainContentBackground;
+//     //color: black;
+// }
 
 .small-margin-right {
     margin-right: 8px;
@@ -207,14 +197,6 @@ input[type="radio"] {
     height: 25px;
     width: 25px;
     margin: 8px;
-}
-
-/* This app uses all square corners which is done with this one CSS style. I'd like to turn on round corners
-but at least on buttons bootstrap tries to get clever and make some corners square to fit next to other things
-and is ugly for this app. 
-*/
-* {
-    border-radius: 0 !important;
 }
 
 .edit-prop-checkbox-col {
@@ -240,51 +222,51 @@ and is ugly for this app.
     max-height: 650px;
 }   
 
-.expandableNodeContent {
-    /*
-  max-height: 300px;
-  overflow-y: auto;
-  border: 2px solid lightGray;
-  */
-}
-
-.borderedElm {
-    border: 4px solid $elementBorderColor;
-}
-
 .centeredTitle {
     width: 500px;
     /* This margin trick causes horizontal centering */
     margin: 0 auto;
 }
 
-.listBox {
-    overflow: scroll;
-    /* This margin trick causes horizontal centering */
-    margin: 0 auto;
-    margin-bottom: 16px;
-    border: 4px solid $listBoxBorderColor;
-}
-
 .mainMenuItemDisabled {
     cursor: pointer;
-    font-weight: normal;
+    //font-weight: normal;
 }
 
 .mainMenuItemDisabled:hover {
     cursor: pointer;
-    /* background-color: #F4D03F; */
 }
 
 .mainMenuItemEnabled {
     cursor: pointer;
-    font-weight: bold;
+    //font-weight: bold;
+}
+
+.menuCard {
+    border: none;
+    border-radius: 0;
+}
+
+.menuHeading {
+    cursor: pointer;
+    background-color: $list-group-bg;
+    border: none;
+    border-radius: 0;
+}
+
+.menuHeading:hover {
+    background-color: $menuItemHoverBackgroundColor;
+    border-radius: 0;
+}
+
+.menuHeading[aria-expanded=true] {
+    background-color: $secondary;
+    border-radius: 0;
 }
 
 .mainMenuItemEnabled:hover {
     cursor: pointer;
     background-color: $menuItemHoverBackgroundColor;
-    font-weight: bold;
 }
 
 .listBoxRow {
@@ -296,26 +278,8 @@ and is ugly for this app.
     background-color: $menuItemHoverBackgroundColor;
 }
 
-.listItem {
-    cursor: pointer;
-    border-bottom: 1px dotted $listItemBorderBottomColor;
-    padding: 16px;
-}
-
-.basicModalBody {
-    /* ended up not needing this styling but leaving this class defined for now, for the future */
-}
-
-.basicModalTitle {
-    margin-bottom: 0px;
-}
-
-.basicModalHeader {
-    background-color: $basicModalHeaderBackgroundColor;
-}
-
 .selectedListItem {
-    background-color: $selectedListItemBackgroundColor;
+    background-color: $secondary;
 }
 
 //warning: this is altering a bootstrap style.
@@ -323,10 +287,19 @@ and is ugly for this app.
     margin-left: 0px;
 }
 
+.small-padding {
+    padding: 4px;
+}
+
+.horizontalLayout {
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
 /* Warning: setting any kind of left margin won't work becasue the btn-group? style of bootstrap overrides it in button groups */
 
 .basicButton {
-    margin-right: 7px;
+    //margin-right: 7px;
 }
 
 .pre-textarea {
@@ -434,13 +407,9 @@ samp {
     height: 0.5em;
 }
 
-.meta64-menu-heading {
-    cursor: pointer;
-}
-
 .mainTabPanel {
-    border: 1px solid black;
-    background-color: $mainContentBackground;
+    //border: 1px solid black;
+    //background-color: $mainContentBackground;
     //setting a max-width here ruins the centering horizontally on the page, my goal was
     //to narrow the main tab content in center of page
     //WARNING: I think the bootstrap 'main' entity is what is setting the width here and it didn't work to chagne it here.
@@ -465,7 +434,6 @@ samp {
 .mainNodeContentStyle {
     outline: none;
     border-bottom: 10px solid $nodeBorderBottomColor;
-    background-color: $mainContentBackground; 
     padding-right: 1em;
 }
 
@@ -514,7 +482,6 @@ samp {
 }
 
 .created-by-other {
-    background: $createdByOtherBackgroundColor;
     padding: 4px;
 }
 
@@ -530,16 +497,6 @@ samp {
     padding-top: 10px;
 }
 
-.privilege-list {
-    background: $listBackgroundColor;
-}
-
-.privilege-entry {
-    margin: 16px;
-    padding: 16px;
-    background: $listBackgroundColor;
-}
-
 .content-narrow {
     max-width: 650px;
 }
@@ -552,11 +509,7 @@ samp {
     max-width: 950px;
 }
 
-.jcr-content {
-    margin: 1em;
-}
-
-.jcr-root-content {
+.markdown-content {
     margin: 1em;
 }
 
@@ -568,12 +521,6 @@ samp {
     border: 1px dotted lightGray;
     max-width: 800px;
     background: #f9e79f;
-}
-
-.corner-style {
-    position: absolute;
-    top: 0;
-    right: 0;
 }
 
 .property-table {
@@ -607,17 +554,15 @@ samp {
     border-bottom: 2px dotted lightslategray;
     padding-right: 1em;
     outline: none;
-    background-color: $mainContentBackground; 
 }
 
 .node-grid {
-    background-color:$mainContentBackground; 
+    //background-color:$mainContentBackground; 
 }
 
 .node-grid-item {
     padding-right: 1.5em;
     outline: none;
-    background-color: $mainContentBackground;
     margin-left: 0px;
     padding-left: 0px;
 }
@@ -625,14 +570,8 @@ samp {
 .node-grid-cell {
     border-bottom: 2px solid lightGray;
     border-right: 2px solid lightGray;
-    background-color: $mainContentBackground;
     margin-bottom: 0px;
     padding-bottom: 0px;
-}
-
-.page-parent-node {
-    background: #ededed;
-    padding-top: 10px;
 }
 
 .node-table-row .top-right-image {
@@ -642,49 +581,15 @@ samp {
 }
 
 .active-row {
-    border-left: 10px solid red;
+    border-left: 10px solid $primary;
 }
 
 .inactive-row {
     border-left: 10px solid transparent;
 }
 
-.property-column {
-    width: 20%;
-}
-
-.value-column {
-    width: 80%;
-}
-
-.modelessDialog {
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-bottom: 16px;
-}
-
-.nav-menu {
-    border-right: 1px solid #ccc;
-}
-
 .main {
     background-color: #eee;
-}
-
-.my-menu-section {
-    padding-left: 32px;
-    background-color: white;
-    color: black;
-}
-
-.meta64-menu-heading {
-    background-color: lightGray;
-    color: black;
-}
-
-.page-title {
-    margin-left: 16px;
-    font-size: 24px !important;
 }
 
 /* Media Queries below are per Bootstap 4 standard */
@@ -740,35 +645,35 @@ samp {
     }
 }
 
-.App {
-    text-align: center;
-}
+// .App {
+//     text-align: center;
+// }
 
-.App-logo {
-    animation: App-logo-spin infinite 20s linear;
-    height: 80px;
-}
+// .App-logo {
+//     animation: App-logo-spin infinite 20s linear;
+//     height: 80px;
+// }
 
-.App-header {
-    background-color: #222;
-    height: 150px;
-    padding: 20px;
-    color: white;
-}
+// .App-header {
+//     background-color: #222;
+//     height: 150px;
+//     padding: 20px;
+//     color: white;
+// }
 
-.App-title {
-    font-size: 1.5em;
-}
+// .App-title {
+//     font-size: 1.5em;
+// }
 
-.App-intro {
-    font-size: large;
-}
+// .App-intro {
+//     font-size: large;
+// }
 
-.feather {
-    width: 16px;
-    height: 16px;
-    vertical-align: text-bottom;
-}
+// .feather {
+//     width: 16px;
+//     height: 16px;
+//     vertical-align: text-bottom;
+// }
 
 /*
 * Sidebar
@@ -855,16 +760,4 @@ samp {
     max-width: 800px;
 }
 
-.fullscreen-modal-dialog {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-.fullscreen-modal-content {
-    height: auto;
-    min-height: 100%;
-    border-radius: 0;
-}
 

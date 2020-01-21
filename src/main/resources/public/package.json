@@ -15,6 +15,7 @@
     "@types/react": "^16.8.14",
     "@types/react-dom": "^16.8.4",
     "axios": "^0.18.0",
+    "bootstrap": "^4.4.1",
     "circular-dependency-plugin": "^5.0.2",
     "highlightjs": "^9.12.0",
     "marked": "^0.6.1",

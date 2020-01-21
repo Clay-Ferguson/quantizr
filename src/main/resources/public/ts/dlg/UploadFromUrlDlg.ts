@@ -30,7 +30,7 @@ export class UploadFromUrlDlg extends DialogBase {
                     "label": "Upload From URL"
                 }),
                 new ButtonBar([
-                    this.uploadButton = new Button("Upload", this.upload),
+                    this.uploadButton = new Button("Upload", this.upload, null, "primary"),
                     new Button("Close", () => {
                         this.close();
                     })

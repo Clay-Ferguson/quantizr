@@ -36,7 +36,7 @@ export class ChangePasswordDlg extends DialogBase {
                     new Button("Change Password", () => {
                         this.changePassword();
                         this.close();
-                    }),
+                    }, null, "primary"),
                     new Button("Close", () =>{
                         this.close();
                     })

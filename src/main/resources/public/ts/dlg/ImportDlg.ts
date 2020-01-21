@@ -26,7 +26,7 @@ export class ImportDlg extends DialogBase {
                 "label": "File Name to Import"
             }),
             new ButtonBar([
-                new Button("Import", this.importNodes),
+                new Button("Import", this.importNodes, null, "primary"),
                 new Button("Close", () => {
                     this.close();
                 })

@@ -18,6 +18,7 @@ import * as highlightjs from 'highlightjs';
 import { Icon } from "./widget/Icon";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { MarkdownDiv } from "./widget/MarkdownDiv";
+import { HorizontalLayout } from "./widget/HorizontalLayout";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -64,7 +65,16 @@ export class Render implements RenderIntf {
 
         if (cnst.SHOW_PATH_ON_ROWS) {
             let ordinalStr = node.logicalOrdinal != -1 ? " [" + node.logicalOrdinal + "] " : " ";
-            pathDiv = new Div(node.id + ordinalStr + " Type: " + node.type, {
+
+            let idOrName;
+            if (node.name) {
+                idOrName = "Name: " + node.name;
+            }
+            else {
+                idOrName = "ID: " + node.id;
+            }
+
+            pathDiv = new Div(idOrName + ordinalStr + " Type: " + node.type, {
                 className: "path-display"
             });
         }
@@ -211,7 +221,8 @@ export class Render implements RenderIntf {
 
         //the content-narrow, content-medium, and content-wide should be able to be set using user preference, OR able to be overridden on each
         //node at will also, like for a code block you'd want it very wide.
-        let clazz = (rowStyling ? "jcr-content" : "jcr-root-content") + " content-narrow";
+        //todo-0: is rowStyling variable stull used? clazz var needed?
+        let clazz = "markdown-content content-narrow";
 
         let val;
         if (content.startsWith(cnst.ENC_TAG)) {
@@ -523,15 +534,12 @@ export class Render implements RenderIntf {
 
         let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[node.type];
         if (typeHandler) {
-            /* For now let's only show type icons when we're in edit mode */
-            if (S.meta64.userPreferences.editMode) {
-                let iconClass = typeHandler.getIconClass(node);
-                if (iconClass) {
-                    typeIcon = new Icon("", null, {
-                        "style": { margin: '8px', verticalAlign: 'middle' },
-                        className: iconClass
-                    });
-                }
+            let iconClass = typeHandler.getIconClass(node);
+            if (iconClass) {
+                typeIcon = new Icon("", null, {
+                    "style": { margin: '8px', verticalAlign: 'middle' },
+                    className: iconClass
+                });
             }
         }
 
@@ -546,12 +554,7 @@ export class Render implements RenderIntf {
             (this.nodeHasChildren(node.uid) || node.type == "fs:folder" || node.type == "fs:lucene" || node.type == "ipfs:node")) {
 
             /* convert this button to a className attribute for styles */
-            openButton = new Button("Open", () => { S.nav.openNodeByUid(node.uid, true) }, {
-                "style": {
-                    backgroundColor: "#4caf50",
-                    color: "white"
-                }
-            });
+            openButton = new Button("Open", () => { S.nav.openNodeByUid(node.uid, true) }, null, "primary");
         }
 
         /*
@@ -628,8 +631,15 @@ export class Render implements RenderIntf {
             }
         }
 
-        return new ButtonBar([selButton, typeIcon, openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
+        let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
             "left-justified", "10px");
+
+        if (selButton || typeIcon) {
+            return new HorizontalLayout([selButton, typeIcon, buttonBar]);
+        }
+        else {
+            return buttonBar;
+        }
     }
 
     allowAction = (typeHandler: TypeHandlerIntf, action: string): boolean => {
@@ -1088,12 +1098,12 @@ export class Render implements RenderIntf {
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
         let img: Img = new Img({
             "src": src,
-            style: { 
-                maxWidth: maxWidth, 
-                cursor: "pointer", 
-                marginLeft: "20px", 
-                marginBottom: "15px", 
-                paddingRight: "20px" 
+            style: {
+                maxWidth: maxWidth,
+                cursor: "pointer",
+                marginLeft: "20px",
+                marginBottom: "15px",
+                paddingRight: "20px"
             },
             "title": "Click image to enlarge"
         });

@@ -36,7 +36,7 @@ export class ResetPasswordDlg extends DialogBase {
                     "label": "Email Address"
                 }),
                 new ButtonBar([
-                    new Button("Reset my Password", this.resetPassword),
+                    new Button("Reset my Password", this.resetPassword, null, "primary"),
                     new Button("Close", () => {
                         this.close();
                     })

@@ -36,7 +36,7 @@ export class SearchContentDlg extends DialogBase {
                     }
                 }, SearchContentDlg.defaultSearchText),
                 new ButtonBar([
-                    new Button("Search", this.searchNodes),
+                    new Button("Search", this.searchNodes, null, "primary"),
                     new Button("Close", () => {
                         this.close();
                     })

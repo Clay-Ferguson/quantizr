@@ -47,7 +47,7 @@ export class PrefsDlg extends DialogBase {
                 ),
                 new ButtonBar(
                     [
-                        new Button("Save", this.savePreferences),
+                        new Button("Save", this.savePreferences, null, "primary"),
                         new Button("Cancel", () => {
                             this.close();
                         })

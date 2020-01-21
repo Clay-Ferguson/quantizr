@@ -72,7 +72,7 @@ export class EditNodeDlg extends DialogBase {
     encryptionOptions: EncryptionOptions = new EncryptionOptions();
 
     constructor(args: Object) {
-        super("Edit Node", "app-modal-content-edit-dlg", false, true);
+        super("Edit Node", "app-modal-content", false, true);
 
         this.typeName = (<any>args).typeName;
         this.createAtTop = (<any>args).createAtTop;
@@ -101,7 +101,7 @@ export class EditNodeDlg extends DialogBase {
                         this.propertyEditFieldContainer = new Div("", {
                         }),
                         this.pathDisplay = cnst.SHOW_PATH_IN_DLGS ? new Div(path, {
-                            style: { backgroundColor: '#FAD7A0', padding: '5px', border: '1px solid lightGray' }
+                           className : "alert alert-info small-padding"
                         }) : null,
                     ]
                 ),
@@ -128,7 +128,7 @@ export class EditNodeDlg extends DialogBase {
                         this.saveNodeButton = new Button("Save", () => {
                             this.saveNode();
                             this.close();
-                        }, null),
+                        }, null, "primary"),
                         this.setTypeButton = new Button("Set Type", this.openChangeNodeTypeDlg),
                         //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
 

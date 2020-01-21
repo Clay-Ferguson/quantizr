@@ -22,7 +22,7 @@ export class LoginDlg extends DialogBase {
     passwordTextField: PasswordTextField;
 
     constructor(paramsTest: Object) {
-        super("Login", "app-modal-content-login-dlg");
+        super("Login", "app-modal-content");
 
         this.setChildren([
             new Form(null, [
@@ -54,7 +54,7 @@ export class LoginDlg extends DialogBase {
                 ),
                 new ButtonBar(
                     [
-                        new Button("Login", this.login),
+                        new Button("Login", this.login, null, "primary"),
                         new Button("Forgot Password", this.resetPassword),
                         new Button("Close", () => {
                             this.close();

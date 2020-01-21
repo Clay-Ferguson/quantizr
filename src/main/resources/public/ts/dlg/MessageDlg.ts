@@ -22,7 +22,7 @@ export class MessageDlg extends DialogBase {
                     if (this.callback) {
                         this.callback();
                     }
-                })
+                }, null, "primary")
             ])
         ]);
     }

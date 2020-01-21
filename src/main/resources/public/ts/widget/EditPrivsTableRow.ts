@@ -32,8 +32,7 @@ export class EditPrivsTableRow extends Comp {
             div.addChild(new Button("Remove", () => {
                 this.removePrivilege(aclEntry.principalNodeId, privilege.privilegeName);
             }));
-            div.addChild(new TextContent(aclEntry.principalName + " has privilege " + privilege.privilegeName + " on this node.",
-                "privilege-entry"));
+            div.addChild(new TextContent(aclEntry.principalName + " has privilege " + privilege.privilegeName + " on this node."));
         });
         return div;
     }

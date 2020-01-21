@@ -21,7 +21,7 @@ export class SignupDlg extends DialogBase {
     emailTextField: TextField;
 
     constructor() {
-        super("Create Account", "app-modal-content-login-dlg");
+        super("Create Account", "app-modal-content");
         
         this.setChildren([
             new Form(null, [
@@ -38,7 +38,7 @@ export class SignupDlg extends DialogBase {
                     "label": "Email"
                 }),
                 new ButtonBar([
-                    new Button("Create Account", this.signup),
+                    new Button("Create Account", this.signup, null, "primary"),
                     new Button("Cancel", this.close)
                 ])
             ])

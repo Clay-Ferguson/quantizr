@@ -15,7 +15,6 @@
     <link rel="manifest" href="/site.webmanifest">
 
     <link rel="stylesheet" href="/font-awesome-4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/bootstrap-4/css/bootstrap.min.css">
     <link rel="stylesheet" href="/js/dropzone/dropzone.css?v=dz7" />
     <link rel="stylesheet" href="/css/meta64.css?<%=htmlWebpackPlugin.options.cachebuster%>" />
     <link rel="stylesheet" href="/css/highlightjs/darcula.css" />
@@ -37,7 +36,10 @@
 
     <script src="/js/jquery/jquery-3.3.1.min.js"></script>
     <script src="/js/popper/popper.min.js?v=1"></script>
+
+    <!-- todo-0: load this in javascript instead as a module ? -->
     <script src="/bootstrap-4/js/bootstrap.min.js"></script>
+
     <script src="/js/dropzone/dropzone.js?dz8"></script>
     <script src="/js/ace/src-noconflict/ace.js?v=141"></script>
 
@@ -45,6 +47,7 @@
     IMPORTANT: WebPack drops this index.html file into the /dist/ folder and processes it to contain the bundle 
     script load tag right here, automatically (end of body tag) and also will have the cache buster added 
     
+    todo-0: why did I commeng out this overlay div? The TypeScipt for managing it still exists.
     <div id="overlayDiv" class="overlay" />
 -->
 </body>
