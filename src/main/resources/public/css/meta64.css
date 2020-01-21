@@ -52,7 +52,6 @@ body {
   width: 100%;
   height: 100%;
   overflow: auto;
-  /* background-color: #000000; */
   background-color: rgba(0, 0, 0, 0.4); }
 
 /* Modal Content/ Dialog Box. This is the outter frame of the dialog itself */
@@ -246,14 +245,6 @@ and is ugly for this app.
 .basicButton {
   margin-right: 7px; }
 
-.standardButton {
-  background-color: lightGray;
-  color: black; }
-
-.playButton {
-  background-color: #4caf50;
-  color: white; }
-
 .pre-textarea {
   font-family: monospace;
   font-size: 125%; }
@@ -312,15 +303,6 @@ samp {
   padding: 0;
   overflow-y: auto;
   /* min-height: 0px !important; */ }
-
-.customPre {
-  background: lightGray;
-  padding: 10px; }
-
-.moreLinkStyle {
-  cursor: pointer;
-  background: lightGray;
-  padding: 4px; }
 
 .systemFileRow {
   margin-botom: 16px; }
@@ -398,28 +380,6 @@ samp {
 .page-top-button-bar {
   margin-top: 0; }
 
-.property-edit-button-bar {
-  margin-top: 0; }
-
-.property-edit-field {
-  margin-top: 0;
-  margin-bottom: 0;
-  padding-left: 16px;
-  padding-right: 16px; }
-
-.property-edit-field:nth-child(odd) {
-  background: #efefef; }
-
-.property-edit-field:nth-child(even) {
-  background: #dedede; }
-
-.compact-field-contain {
-  margin-bottom: 0;
-  margin-left: 16px; }
-
-.dialog-message {
-  width: 400px; }
-
 .dialog-header {
   font-weight: bold;
   font-size: large;
@@ -439,9 +399,6 @@ samp {
   margin-bottom: 4px;
   overflow-x: auto;
   white-space: nowrap; }
-
-.page-node-header {
-  border-left: 10px solid gray; }
 
 .header-text {
   font-size: small;
@@ -667,9 +624,6 @@ samp {
 
 .sidebar-heading {
   font-size: 0.75rem; }
-
-.my-sidebar {
-  border: 1px solid red; }
 
 /*
 * Navbar

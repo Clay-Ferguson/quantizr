@@ -48,16 +48,20 @@ export class SharingDlg extends DialogBase {
         this.privsTable.updateDOM();
     }
 
-    /* Note: this really only saves the checkbox value because the other list modifications are made as soon as user does them */
-    save = (): void => {
-        S.meta64.treeDirty = true;
-        S.util.ajax<I.AddPrivilegeRequest, I.AddPrivilegeResponse>("addPrivilege", {
-            "nodeId": S.share.sharingNode.id,
-            "privileges": null,
-            "principal": null,
-            "publicAppend": false //this.publicCommentingCheckbox.getChecked()
-        });
-    }
+    /* Note: this really only saves the checkbox value because the other list modifications are made as soon as user does them 
+    
+    But to be consistent, i'm just removing, and when i re-add the public commenting checkbox (maybe), i'll revisit if we need
+    the save button at all, or just auto-save this dialog as it currently does
+    */
+    // save = (): void => {
+    //     S.meta64.treeDirty = true;
+    //     S.util.ajax<I.AddPrivilegeRequest, I.AddPrivilegeResponse>("addPrivilege", {
+    //         "nodeId": S.share.sharingNode.id,
+    //         "privileges": null,
+    //         "principal": null,
+    //         "publicAppend": false //this.publicCommentingCheckbox.getChecked()
+    //     });
+    // }
 
     removePrivilege = (principalNodeId: string, privilege: string): void => {
         S.meta64.treeDirty = true;
@@ -70,8 +74,6 @@ export class SharingDlg extends DialogBase {
 
     removePrivilegeResponse = (res: I.RemovePrivilegeResponse): void => {
         S.util.ajax<I.GetNodePrivilegesRequest, I.GetNodePrivilegesResponse>("getNodePrivileges", {
-
-            //todo-0: rest after changing path to id here.
             "nodeId": S.share.sharingNode.id,
             "includeAcl": true,
             "includeOwners": true
@@ -107,10 +109,12 @@ export class SharingDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Share with Person", this.shareToPersonDlg),
                     new Button("Share to Public", this.shareNodeToPublic),
-                    new Button("Save", () => {
-                        this.save();
-                        this.close();
-                    }),
+
+                    //NOTE: Currently this dialog just autosaves everything you change as you change it.
+                    // new Button("Save", () => {
+                    //     this.save();
+                    //     this.close();
+                    // }),
                     new Button("Close", () => {
                         this.close();
                     })

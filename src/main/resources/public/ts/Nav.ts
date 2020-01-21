@@ -210,7 +210,7 @@ export class Nav implements NavIntf {
     /* UID is the 'client-only' id assigned for this node, and will not apply to any server-side data nor any other 'instance'
     of the running application. All browser session javascript scoped */
     openNodeByUid = (uid: string, scrollToFirstChild?: boolean): void => {
-        //todo-0: Need to rethink about how to keep uidToNodeMap clean (garbage collected), and look into whether
+        //todo-1: Need to rethink about how to keep uidToNodeMap clean (garbage collected), and look into whether
         //something like this is mapping DOM id to Comp instances also, and if THAT is also needed and if it's garbage collected yet.
         let node: I.NodeInfo = S.meta64.uidToNodeMap[uid];
         S.meta64.highlightNode(node, false);

@@ -1070,7 +1070,7 @@ export class Render implements RenderIntf {
     }
 
     getUrlForNodeAttachment = (node: I.NodeInfo): string => {
-        //todo-0: Change to node.id and then re-test this
+        //todo-1: Change to node.id and then re-test this
         return S.util.getRpcPath() + "bin/file-name" + node.binVer + "?nodeId=" + encodeURIComponent(node.path) + "&ver=" + node.binVer;
     }
 
@@ -1086,7 +1086,13 @@ export class Render implements RenderIntf {
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
         let img: Img = new Img({
             "src": src,
-            style: { maxWidth: maxWidth, cursor: "pointer", marginLeft: "20px", marginBottom: "15px", paddingRight: "20px" },
+            style: { 
+                maxWidth: maxWidth, 
+                cursor: "pointer", 
+                marginLeft: "20px", 
+                marginBottom: "15px", 
+                paddingRight: "20px" 
+            },
             "title": "Click image to enlarge"
         });
 

@@ -428,7 +428,7 @@ export class Meta64 implements Meta64Intf {
         return this.idToNodeMap[id];
     }
 
-    //todo-0: research if we EVER need to even send the actual long 'node.path' back to browser now that we basically are
+    //todo-1: research if we EVER need to even send the actual long 'node.path' back to browser now that we basically are
     //never showing it to end users any longer?
     getPathOfUid = (uid: string): string => {
         let node: I.NodeInfo = this.uidToNodeMap[uid];

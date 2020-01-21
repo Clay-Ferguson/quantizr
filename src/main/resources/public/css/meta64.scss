@@ -1,9 +1,19 @@
 $appBackgroundColor: black; // #343a40;
-
 $modalTitleBackground: lightslategray;
 $modalContentBackground: #c0c0c0;
 $mainContentBackground: #cecece;
 $tabButtonBackground: lightSlateGray;
+$menuBorderColor: #888;
+$menuBackgroundColor: #fefefe;
+$elementBorderColor: lightGray;
+$listBoxBorderColor: lightGray;
+$menuItemHoverBackgroundColor: #f4d03f;
+$listItemBorderBottomColor: gray;
+$basicModalHeaderBackgroundColor: lightGray;
+$selectedListItemBackgroundColor: lightGray;
+$nodeBorderBottomColor: lightslategray;
+$createdByMeBackgroundColor: green;
+$createdByOtherBackgroundColor: lightGray;
 
 html {
     // not supported by all browers.
@@ -73,7 +83,6 @@ body {
     width: 100%;
     height: 100%;
     overflow: auto;
-    /* background-color: #000000; */
     background-color: rgba(0, 0, 0, 0.4);
 }
 
@@ -83,7 +92,7 @@ body {
     background-color: $modalContentBackground;
     margin: 15px/*15%*/ auto;
     /* 15% from the top and centered */
-    border: 1px solid #888;
+    border: 1px solid $menuBorderColor;
     padding: 15px;
     width: 75%;
     /* Could be more or less, depending on screen size */
@@ -95,7 +104,7 @@ body {
     background-color: $modalContentBackground;
     margin: 15px/*15%*/ auto;
     /* 15% from the top and centered */
-    border: 1px solid #888;
+    border: 1px solid $menuBorderColor;
     padding: 15px;
     width: 75%;
     max-width: 350px;
@@ -106,7 +115,7 @@ body {
     background-color: $modalContentBackground;
     margin: 15px/*15%*/ auto;
     /* 15% from the top and centered */
-    border: 1px solid #888;
+    border: 1px solid $menuBorderColor;
     padding: 15px;
     width: 85%;
     max-width: 700px;
@@ -122,10 +131,10 @@ body {
 /* Modal Content/ Dialog Box */
 
 .app-modal-menu {
-    background-color: #fefefe;
+    background-color: $menuBackgroundColor;
     left: 0;
     top: 0;
-    border: 1px solid #888;
+    border: 1px solid $menuBorderColor;
     padding: 15px;
     width: 20%;
     margin-top: 60px;
@@ -237,7 +246,7 @@ and is ugly for this app.
 }
 
 .borderedElm {
-    border: 4px solid lightGray;
+    border: 4px solid $elementBorderColor;
 }
 
 .centeredTitle {
@@ -251,7 +260,7 @@ and is ugly for this app.
     /* This margin trick causes horizontal centering */
     margin: 0 auto;
     margin-bottom: 16px;
-    border: 4px solid lightGray;
+    border: 4px solid $listBoxBorderColor;
 }
 
 .mainMenuItemDisabled {
@@ -271,7 +280,7 @@ and is ugly for this app.
 
 .mainMenuItemEnabled:hover {
     cursor: pointer;
-    background-color: #f4d03f;
+    background-color: $menuItemHoverBackgroundColor;
     font-weight: bold;
 }
 
@@ -281,12 +290,12 @@ and is ugly for this app.
 
 .listBoxRow:hover {
     cursor: pointer;
-    background-color: #f4d03f;
+    background-color: $menuItemHoverBackgroundColor;
 }
 
 .listItem {
     cursor: pointer;
-    border-bottom: 1px dotted gray;
+    border-bottom: 1px dotted $listItemBorderBottomColor;
     padding: 16px;
 }
 
@@ -299,11 +308,11 @@ and is ugly for this app.
 }
 
 .basicModalHeader {
-    background-color: lightGray;
+    background-color: $basicModalHeaderBackgroundColor;
 }
 
 .selectedListItem {
-    background-color: lightGray;
+    background-color: $selectedListItemBackgroundColor;
 }
 
 //warning: this is altering a bootstrap style.
@@ -315,16 +324,6 @@ and is ugly for this app.
 
 .basicButton {
     margin-right: 7px;
-}
-
-.standardButton {
-    background-color: lightGray;
-    color: black;
-}
-
-.playButton {
-    background-color: #4caf50;
-    color: white;
 }
 
 .pre-textarea {
@@ -399,17 +398,6 @@ samp {
     /* min-height: 0px !important; */
 }
 
-.customPre {
-    background: lightGray;
-    padding: 10px;
-}
-
-.moreLinkStyle {
-    cursor: pointer;
-    background: lightGray;
-    padding: 4px;
-}
-
 .systemFileRow {
     margin-botom: 16px;
 }
@@ -473,7 +461,7 @@ samp {
 
 .mainNodeContentStyle {
     outline: none;
-    border-bottom: 10px solid lightslategray;
+    border-bottom: 10px solid $nodeBorderBottomColor;
     background-color: $mainContentBackground; 
     padding-right: 1em;
 }
@@ -509,34 +497,6 @@ samp {
     margin-top: 0;
 }
 
-.property-edit-button-bar {
-    margin-top: 0;
-}
-
-.property-edit-field {
-    margin-top: 0;
-    margin-bottom: 0;
-    padding-left: 16px;
-    padding-right: 16px;
-}
-
-.property-edit-field:nth-child(odd) {
-    background: #efefef;
-}
-
-.property-edit-field:nth-child(even) {
-    background: #dedede;
-}
-
-.compact-field-contain {
-    margin-bottom: 0;
-    margin-left: 16px;
-}
-
-.dialog-message {
-    width: 400px;
-}
-
 .dialog-header {
     font-weight: bold;
     font-size: large;
@@ -545,25 +505,20 @@ samp {
 }
 
 .created-by-me {
-    background: green;
+    background: $createdByMeBackgroundColor;
     color: white;
     padding: 4px;
 }
 
 .created-by-other {
-    background: lightGray;
+    background: $createdByOtherBackgroundColor;
     padding: 4px;
-
 }
 
 .path-display {
     margin-bottom: 4px;
     overflow-x: auto;
     white-space: nowrap;
-}
-
-.page-node-header {
-    border-left: 10px solid gray;
 }
 
 .header-text {
@@ -854,10 +809,6 @@ samp {
 
 .sidebar-heading {
     font-size: 0.75rem;
-}
-
-.my-sidebar {
-    border: 1px solid red;
 }
 
 /*
