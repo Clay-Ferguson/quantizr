@@ -170,7 +170,6 @@ export class Render implements RenderIntf {
                 if (node.path.trim() == "/") {
                     ret.push(new Heading(1, "Root Node"));
                 }
-                /* ret += "< div>[No Content Property]</div>"; */
                 let properties = S.props.renderProperties(node.properties);
                 if (properties) {
                     ret.push(properties);
@@ -184,9 +183,9 @@ export class Render implements RenderIntf {
             /*
              * We append the binary image or resource link either at the end of the text or at the location where
              * the user has put {{insert-attachment}} if they are using that to make the image appear in a specific
-             * locatio in the content text.
+             * location in the content text.
              *
-             * NOTE: temporarily removing during refactoring into Widgets.
+             * NOTE: temporarily removing during refactoring.
              */
             // if (util.contains(ret, cnst.INSERT_ATTACHMENT)) {
             //     ret = S.util.replaceAll(ret, cnst.INSERT_ATTACHMENT, binary.render());
@@ -303,7 +302,10 @@ export class Render implements RenderIntf {
     }
 
     /* todo-1: This is pretty ugly because images can render extremely large, and then noticably shrink, 
-    and the user can see this and it's ugly. */
+    and the user can see this and it's ugly. 
+    
+    NOTE: I think there's a way to do this cleaner with react 'effects' hooks 
+    */
     setImageMaxWidths = (): void => {
         S.util.domSelExec([".markdown-html", "img"], (elm: HTMLElement) => {
             elm.style.maxWidth = "100%";

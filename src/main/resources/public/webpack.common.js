@@ -1,13 +1,9 @@
-// Note on SASS (SCSS to CSS conversion): 
-// Based on what I see online most people have massive troubles getting SASS to work with WebPack for a variety of 
-// different reasons. I did too, and finally also realized a better solution for what I wanted (simple conversion of SCSS to CSS files)
-// was to put that logic in 'on-build-start.sh'.
+// Note on compiling SASS/SCSS to CSS: That happens in 'on-build-start.sh'.
 
 const webpack = require('webpack');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const WebpackShellPlugin = require('webpack-shell-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-// let MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const prod = process.argv.indexOf('-p') !== -1;
 const env = prod ? "prod" : "dev";
@@ -49,15 +45,6 @@ module.exports = {
                 test: /\.htm$/,
                 use: ['html-loader']
             },
-
-            // {
-            //     test: /\.scss$/,
-            //     use: [
-            //         "style-loader", //MiniCssExtractPlugin.loader, 
-            //         "css-loader", // translates CSS into CommonJS
-            //         "sass-loader" // compiles Sass to CSS, using Node Sass by default
-            //     ]
-            // }
         ]
     },
 
@@ -83,8 +70,5 @@ module.exports = {
             hash: true,
             cachebuster: '' + new Date().getTime()
         }),
-        // new MiniCssExtractPlugin({
-        //     filename: '[name].css'
-        // })
     ]
 };

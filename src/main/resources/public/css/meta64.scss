@@ -13,7 +13,10 @@ $basicModalHeaderBackgroundColor: lightGray;
 $selectedListItemBackgroundColor: lightGray;
 $nodeBorderBottomColor: lightslategray;
 $createdByMeBackgroundColor: green;
+$createdByMeTextColor: white;
 $createdByOtherBackgroundColor: lightGray;
+$listBackgroundColor: lightGray;
+
 
 html {
     // not supported by all browers.
@@ -506,7 +509,7 @@ samp {
 
 .created-by-me {
     background: $createdByMeBackgroundColor;
-    color: white;
+    color: $createdByMeTextColor;
     padding: 4px;
 }
 
@@ -528,13 +531,13 @@ samp {
 }
 
 .privilege-list {
-    background: lightGray;
+    background: $listBackgroundColor;
 }
 
 .privilege-entry {
     margin: 16px;
     padding: 16px;
-    background: lightGray;
+    background: $listBackgroundColor;
 }
 
 .content-narrow {
