@@ -91,11 +91,13 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
         content = content.concat(this.children);
 
         /* Display dialogs fullscreen on mobile devices */
-        let clazz = S.meta64.isMobile ? "app-modal-content-fullscreen" : "app-modal-content";
+        let clazz = S.meta64.isMobile ? 
+            (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen") : 
+            (this.overrideClass ? this.overrideClass : "app-modal-content");
 
         // Note this optionally uses overrideClass which can come from above
         let contentDiv: Div = new Div(null, {
-            className: this.overrideClass ? this.overrideClass : clazz
+            className: clazz
         }, content)
 
         //clicking outside the dialog will close it. We only use this for the main menu of the app, because clicking outside a dialog
