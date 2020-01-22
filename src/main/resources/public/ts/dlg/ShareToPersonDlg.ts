@@ -21,7 +21,7 @@ export class ShareToPersonDlg extends DialogBase {
     sharedNodeFunc: Function;
 
     constructor(args: Object) {
-        super("Share Node to Person");
+        super("Share Node to Person", "app-modal-content-medium-width");
         this.sharedNodeFunc = (<any>args).sharedNodeFunc;
         
         this.setChildren([

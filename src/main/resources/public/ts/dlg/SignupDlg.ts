@@ -21,7 +21,7 @@ export class SignupDlg extends DialogBase {
     emailTextField: TextField;
 
     constructor() {
-        super("Create Account", "app-modal-content");
+        super("Create Account", "app-modal-content-medium-width");
         
         this.setChildren([
             new Form(null, [

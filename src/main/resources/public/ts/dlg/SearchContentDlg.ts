@@ -20,7 +20,7 @@ export class SearchContentDlg extends DialogBase {
     searchTextField: TextField;
   
     constructor() {
-        super("Search Content");
+        super("Search Content", "app-modal-content-medium-width");
         
         this.setChildren([
             new Form(null, [

@@ -20,7 +20,7 @@ export class SharingDlg extends DialogBase {
     nodePrivsInfo: I.NodePrivilegesInfo;
 
     constructor() {
-        super("Node Sharing");
+        super("Node Sharing", "app-modal-content-medium-width");
     }
 
     init = (): void => {

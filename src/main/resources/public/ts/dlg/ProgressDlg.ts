@@ -5,7 +5,7 @@ import { Div } from "../widget/Div";
 export class ProgressDlg extends DialogBase {
 
     constructor() {
-        super("Processing...");
+        super("Processing...", "app-modal-content-narrow-width");
 
         this.setChildren([
             new Div(null, {

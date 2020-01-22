@@ -22,7 +22,7 @@ export class ChangePasswordDlg extends DialogBase {
     private passCode: string;
 
     constructor(args: Object) {
-        super((<any>args).passCode ? "Password Reset" : "Change Password");
+        super((<any>args).passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width");
         this.passCode = (<any>args).passCode;
         
         this.setChildren([

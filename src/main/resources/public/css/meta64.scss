@@ -89,36 +89,22 @@ body {
 .app-modal-content {
     background-color: $modal-content-bg;
     border: 2px solid $modal-content-border-color;
-    margin: 15px/*15%*/ auto;
-    /* 15% from the top and centered */
+    margin: 15px auto;
     padding: 15px;
     width: 75%;
-    /* Could be more or less, depending on screen size */
-    max-width: 800px;
     border-radius: .7em;
+    max-width: 800px;
 }
 
-// /* Learn how to inherit this style and only alter max-width */
-// .app-modal-content-login-dlg {
-//     background-color: $modalContentBackground;
-//     margin: 15px/*15%*/ auto;
-//     /* 15% from the top and centered */
-//     //border: 1px solid $menuBorderColor;
-//     padding: 15px;
-//     width: 75%;
-//     max-width: 350px;
-// }
+.app-modal-content-narrow-width {
+    @extend .app-modal-content;
+    max-width: 400px;
+}
 
-// /* Learn how to inherit this style and only alter max-width */
-// .app-modal-content-edit-dlg {
-//     background-color: $modalContentBackground;
-//     margin: 15px/*15%*/ auto;
-//     /* 15% from the top and centered */
-//     //border: 1px solid $menuBorderColor;
-//     padding: 15px;
-//     width: 85%;
-//     max-width: 700px;
-// }
+.app-modal-content-medium-width {
+    @extend .app-modal-content;
+    max-width: 650px;
+}
 
 //todo-0: need to re-test fullscreen mode after all the style refactoring.
 .app-modal-content-fullscreen {

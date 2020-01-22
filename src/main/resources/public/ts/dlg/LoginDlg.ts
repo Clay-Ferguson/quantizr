@@ -22,7 +22,7 @@ export class LoginDlg extends DialogBase {
     passwordTextField: PasswordTextField;
 
     constructor(paramsTest: Object) {
-        super("Login", "app-modal-content");
+        super("Login", "app-modal-content-narrow-width");
 
         this.setChildren([
             new Form(null, [

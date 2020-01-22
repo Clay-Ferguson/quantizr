@@ -22,7 +22,7 @@ export class EncryptionDlg extends DialogBase {
     encryptAsPrivate: Checkbox;
   
     constructor(public encryptionOptions: EncryptionOptions) {
-        super("Node Encryption");
+        super("Node Encryption", "app-modal-content-medium-width");
 
         this.setChildren([
             new Form(null, [
