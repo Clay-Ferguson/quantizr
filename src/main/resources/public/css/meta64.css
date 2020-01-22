@@ -7473,6 +7473,9 @@ input[type="radio"] {
   font-family: monospace;
   font-size: 125%; }
 
+.my-ace-editor {
+  border: 1px solid #adb5bd; }
+
 .textfield {
   margin-bottom: 10px; }
 
@@ -7798,14 +7801,3 @@ samp {
   margin-top: 15px;
   margin-left: 20px;
   max-width: 800px; }
-
-.fullscreen-modal-dialog {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0; }
-
-.fullscreen-modal-content {
-  height: auto;
-  min-height: 100%;
-  border-radius: 0; }

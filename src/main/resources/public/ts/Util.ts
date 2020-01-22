@@ -795,6 +795,8 @@ export class Util implements UtilIntf {
     }
 
     /* Equivalent of ES6 Object.assign(). Takes all properties from src and merges them onto dst */
+    //todo-0: replace this with return {...dst, ...src}, but actually better yet, once that works, just
+    //do it inline and don't even keep this function.
     mergeProps = (dst: Object, src: Object): void => {
         if (!src) return;
         this.forEachProp(src, (k, v): boolean => {

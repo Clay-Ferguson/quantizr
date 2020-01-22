@@ -307,7 +307,8 @@ input[type="radio"] {
     font-size: 125%;
 }
 
-.subnode-ace-editor {
+.my-ace-editor {
+    border: 1px solid $gray-500;
 }
 
 .textfield {
