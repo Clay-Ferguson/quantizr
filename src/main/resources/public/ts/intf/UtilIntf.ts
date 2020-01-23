@@ -101,6 +101,6 @@ export interface UtilIntf {
     triggerCustom(elm: HTMLElement, evt: string, obj: Object): void;
     trigger(elm: HTMLElement, evt: string): void;
     formatDate(date) : string;
-    updateHistory(node: NodeInfo): void;
+    updateHistory(node: NodeInfo, childNode?: NodeInfo): void;
     getElm(id: string, exResolve?: (elm: HTMLElement) => void): Promise<HTMLElement>;
 }

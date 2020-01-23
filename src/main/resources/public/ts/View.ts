@@ -19,22 +19,6 @@ export class View implements ViewIntf {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
     compareNodeA: I.NodeInfo;
 
-    updateStatusBar = (): void => {
-        if (!S.meta64.currentNodeData)
-            return;
-        var statusLine = "";
-
-        if (S.meta64.editModeOption === S.meta64.MODE_ADVANCED) {
-            if (S.meta64.currentNodeData && S.meta64.currentNodeData.node.children) {
-                statusLine += "count: " + S.meta64.currentNodeData.node.children.length;
-            }
-        }
-
-        if (S.meta64.userPreferences.editMode) {
-            statusLine += " Selections: " + S.util.getPropertyCount(S.meta64.selectedNodes);
-        }
-    }
-
     /*
      * newId is optional parameter which, if supplied, should be the id we scroll to when finally done with the
      * render.

@@ -1,6 +1,5 @@
 declare var Dropzone;
 declare var ace;
-declare var prettyPrint;
 
 import { MessageDlg } from "./dlg/MessageDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
@@ -649,7 +648,7 @@ export class Util implements UtilIntf {
                     // oops I only want this on PROD because when debugging it can timeout too much when breakpoints are set.
                     accumWaitTime += timeSlice;
                     if (accumWaitTime >= maxWaitTime) {
-                        console.error("waited for but never found element: "+id);
+                        console.error("waited for but never found element: " + id);
                         clearInterval(interval);
                         resolve(null);
                     }
@@ -794,15 +793,16 @@ export class Util implements UtilIntf {
         Array.prototype.forEach.call(elements, callback);
     }
 
-    /* Equivalent of ES6 Object.assign(). Takes all properties from src and merges them onto dst */
-    //todo-0: replace this with return {...dst, ...src}, but actually better yet, once that works, just
-    //do it inline and don't even keep this function.
+    /* Equivalent of ES6 Object.assign(). Takes all properties from src and merges them onto dst 
+    todo-1: get rid of this function and just use Object.assign
+    */
     mergeProps = (dst: Object, src: Object): void => {
-        if (!src) return;
-        this.forEachProp(src, (k, v): boolean => {
-            dst[k] = v;
-            return true;
-        });
+        if (!src || !dst) return;
+        Object.assign(dst, src);
+        // this.forEachProp(src, (k, v): boolean => {
+        //     dst[k] = v;
+        //     return true;
+        // });
     }
 
     /* Very similar to ES6 Object.assign(), but slightly different. Takes all properties from src and merges them onto dst, except this one
@@ -1040,19 +1040,48 @@ export class Util implements UtilIntf {
         return (date.getMonth() + 1) + "-" + date.getDate() + "-" + date.getFullYear() + " " + strTime;
     }
 
-    updateHistory = (node: NodeInfo): void => {
+    /* Our 'hash' part of the history works perfectly when entering into browser and refreshing browser, 
+    but in general using the back button is not working correctly quite yet (will come back to this later. is good enough for now)
+    todo-1 
+    
+    NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
+    the current location is. 
+
+    NOTE: todo-1 We don't currently have a call to updateHistory for 1) initial page load 2) Search results click 3) timeline click, but those
+    would be nice additions.
+    */
+    updateHistory = (node: NodeInfo, childNode: NodeInfo = null): void => {
         if (!node) {
-            return;
+            node = S.meta64.currentNodeData.node;
         }
+        let url, title, state;
 
         if (node.name) {
-            let url: string = window.location.origin + "?n=" + node.name;
-            history.pushState({ "nodeId": node.name }, node.name, url);
+            //todo-0: need to test how things behave with a space in the name. Should I just require that to be dashes?
+            url = window.location.origin + "?n=" + node.name;
+            if (childNode && childNode.id != node.id) {
+                url += "#" + childNode.id;
+            }
+            state = {
+                "nodeId": ":" + node.name,
+                "highlightId": (childNode && childNode.id != node.id) ? childNode.id : null
+            };
+            title = node.name;
         }
         else {
-            let url: string = window.location.origin + "?id=" + node.id;
-            history.pushState({ "nodeId": node.id }, node.id, url);
+            url = window.location.origin + "?id=" + node.id;
+            if (childNode && childNode.id != node.id) {
+                url += "#" + childNode.id;
+            }
+            state = {
+                "nodeId": node.id,
+                "highlightId": (childNode && childNode.id != node.id) ? childNode.id : null
+            };
+            title = node.id;
         }
+
+        //console.log("PUSHSTATE: url: " + url + ", state: " + JSON.stringify(state));
+        history.pushState(state, title, url);
+
     }
 }
-

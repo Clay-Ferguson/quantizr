@@ -3,7 +3,6 @@ import * as I from "../Interfaces";
 export interface ViewIntf {
     compareNodeA: I.NodeInfo;
 
-    updateStatusBar(): void;
     refreshTreeResponse(res?: I.RenderNodeResponse, targetId?: any, scrollToTop?: boolean): void;
     refreshTree(nodeId?: string, 
         renderParentIfLeaf?: boolean, 

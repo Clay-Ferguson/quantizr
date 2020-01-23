@@ -7,6 +7,7 @@ export interface Meta64Intf {
 
     state: any; //todo-1: create an interface for State properties
     appInitialized: boolean;
+    pendingLocationHash: string;
 
     isMobile: boolean;
     isMobileOrTablet: boolean;
@@ -14,8 +15,6 @@ export interface Meta64Intf {
     curUrlPath: string;
     urlCmd: string;
     homeNodeOverride: string;
-
-    codeFormatDirty: boolean;
 
     nextGuid: number;
 
@@ -113,7 +112,6 @@ export interface Meta64Intf {
     loadAnonPageHome(): void;
     saveUserPreferences(): void;
     openSystemFile(fileName: string);
-    clickOnNodeRow(uid): void;
     replyToComment(uid: any): void;
     createSubNode(uid?: any, typeName?: string, createAtTop?: boolean): void;
     insertNode(uid?: any, typeName?: string): void;

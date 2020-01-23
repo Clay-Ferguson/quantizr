@@ -65,11 +65,12 @@ rm -f ${SUBNODE_LOG_FOLDER}/*
 #   "--forceIndexRebuild=true" \
 ################################################################################################
 
-# I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up findingn
-# this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
-# https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
 docker-compose -f docker-compose-dev.yaml down --remove-orphans
 verifySuccess "Docker Compose: down"
+
+# I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up finding
+# this stackoverflow saying how to work around this (i.e. solution is first do the 'build' and then do 'up') 
+# https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
 
 docker-compose -f docker-compose-dev.yaml build --no-cache
 verifySuccess "Docker Compose: build"

@@ -21,6 +21,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Meta64 implements Meta64Intf {
 
     navBarHeight: number = 0;
+    pendingLocationHash: string;
 
     /* This is the state that all enablement and visibility must reference to determine how to enable gui */
     state = {
@@ -49,8 +50,6 @@ export class Meta64 implements Meta64Intf {
     curUrlPath: string = window.location.pathname + window.location.search;
     urlCmd: string;
     homeNodeOverride: string;
-
-    codeFormatDirty: boolean = false;
 
     /* used as a kind of 'sequence' in the app, when unique vals a needed */
     nextGuid: number = 0;
@@ -711,6 +710,7 @@ export class Meta64 implements Meta64Intf {
         return new Promise<void>(async (resolve, reject) => {
             console.log("initApp running.");
 
+            this.pendingLocationHash = window.location.hash;
             this.initPlugins();
 
             this.isMobile = this.mobileCheck();
@@ -742,10 +742,15 @@ export class Meta64 implements Meta64Intf {
                 }
             };
 
+            /* 
+            NOTE: This works in conjunction with pushState, and is part of what it takes to make the back button (browser hisotry) work
+            in the context of SPAs
+            */
             window.onpopstate = function (event) {
-                //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+                //console.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
+
                 if (event.state && event.state.nodeId) {
-                    S.view.refreshTree(event.state.nodeId, true, event.state.nodeId, false);
+                    S.view.refreshTree(event.state.nodeId, true, event.state.highlightId, false);
                     S.meta64.selectTab("mainTab");
                 }
             };
@@ -995,10 +1000,6 @@ export class Meta64 implements Meta64Intf {
     //         callback(mod);
     //     });
     // }
-
-    clickOnNodeRow = (uid): void => {
-        S.nav.clickOnNodeRow(uid);
-    }
 
     replyToComment = (uid: any): void => {
         S.edit.replyToComment(uid);

@@ -182,6 +182,8 @@ export class Nav implements NavIntf {
          */
         S.meta64.highlightNode(node, false);
 
+        S.util.updateHistory(null, node);
+
         if (S.meta64.userPreferences.editMode) {
             /*
              * if node.owner is currently null, that means we have not retrieved the owner from the server yet, but
@@ -229,7 +231,6 @@ export class Nav implements NavIntf {
             delete S.meta64.selectedNodes[uid];
         }
 
-        S.view.updateStatusBar();
         S.meta64.refreshAllGuiEnablement();
     }
 

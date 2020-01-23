@@ -25,8 +25,6 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-declare var prettyPrint;
-
 export class Render implements RenderIntf {
 
     private PRETTY_TAGS: boolean = true;
@@ -214,14 +212,12 @@ export class Render implements RenderIntf {
         return ret;
     }
 
-    /* Renders 'content' property as markdown */
+    /* Renders 'content' property as markdown. Note: rowStyling arg is not currently being used
+    but will eventually be used again to tweak clazz, the way it originally was used for. */
     renderMarkdown = (rowStyling: boolean, node: I.NodeInfo, retState: any): Comp => {
         let content = node.content || "";
         retState.renderComplete = true;
 
-        //the content-narrow, content-medium, and content-wide should be able to be set using user preference, OR able to be overridden on each
-        //node at will also, like for a code block you'd want it very wide.
-        //todo-0: is rowStyling variable stull used? clazz var needed?
         let clazz = "markdown-content content-narrow";
 
         let val;
@@ -449,9 +445,9 @@ export class Render implements RenderIntf {
 
         return new Div(null, {
             className: layoutClass + (selected ? (" " + activeClass) : (" " + inactiveClass)),
-            "onClick": (elm: HTMLElement) => { S.meta64.clickOnNodeRow(uid); }, //
-            "id": cssId,
-            "style": style
+            onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(uid); }, //
+            id: cssId,
+            style: style
         },
             [
                 buttonBar, new Div(null, {
@@ -669,8 +665,7 @@ export class Render implements RenderIntf {
 
     renderPageFromData = async (data?: I.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string): Promise<void> => {
 
-        S.meta64.codeFormatDirty = false;
-        console.log("renderPageFromData()");
+        //console.log("renderPageFromData()");
 
         let elm = S.util.domElm("mainTab");
         if (elm) {
@@ -686,8 +681,8 @@ export class Render implements RenderIntf {
                 try {
                     //console.log("Setting lastNode="+data.node.id);
                     if (data && data.node) {
+                        //todo-0: make sure that we aren't saving leaf nodes here but the ACTUAL page parent node we were last on.
                         localStorage.setItem("lastNode", data.node.id);
-                        S.util.updateHistory(data.node);
                     }
 
                     let newData: boolean = false;
@@ -833,7 +828,7 @@ export class Render implements RenderIntf {
 
                         let contentDiv = new Div(null, {
                             className: (selected ? "mainNodeContentStyle active-row" : "mainNodeContentStyle inactive-row"),
-                            onClick: (elm: HTMLElement) => { S.meta64.clickOnNodeRow(uid); },
+                            onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(uid); },
                             id: cssId
                         },//
                             children);
@@ -844,16 +839,6 @@ export class Render implements RenderIntf {
                     } else {
                         S.util.setElmDisplayById("mainNodeContent", false);
                     }
-
-                    // $('[href="#main"]').click(function (e) {
-                    //     e.preventDefault()
-                    //     $(this).tab('show')
-                    // })
-
-                    // $('[href="#main"]').tab('show');
-
-                    //console.log("update status bar.");
-                    S.view.updateStatusBar();
 
                     if (S.nav.mainOffset > 0) {
                         let firstButton: Comp = new Button("First Page", this.firstPage,
@@ -907,15 +892,17 @@ export class Render implements RenderIntf {
                         outputDiv.updateDOM("listView");
                         S.meta64.selectTab("mainTab");
 
-                        if (S.meta64.codeFormatDirty) {
-                            prettyPrint();
-                        }
-
                         S.util.forEachElmBySel("a", (el, i) => {
                             el.setAttribute("target", "_blank");
                         });
 
-                        if (targetNodeId) {
+                        if (S.meta64.pendingLocationHash) { 
+                            window.location.hash = S.meta64.pendingLocationHash;
+                            //Note: the substring(1) trims the "#" character off.
+                            await S.meta64.highlightRowById(S.meta64.pendingLocationHash.substring(1), true);
+                            S.meta64.pendingLocationHash = null;
+                        }
+                        else if (targetNodeId) {
                             await S.meta64.highlightRowById(targetNodeId, true);
                         } //
                         else if (scrollToTop || !S.meta64.getHighlightedNode()) {
