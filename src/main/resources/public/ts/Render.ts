@@ -434,7 +434,7 @@ export class Render implements RenderIntf {
         let focusNode: I.NodeInfo = S.meta64.getHighlightedNode();
         let selected: boolean = (focusNode && focusNode.uid === uid);
 
-        let buttonBar: ButtonBar = this.makeRowButtonBar(node, editingAllowed);
+        let buttonBar: Comp = this.makeRowButtonBar(node, editingAllowed);
         //let bkgStyle: string = this.getNodeBkgImageStyle(node);
         let indentLevel = layoutClass === "node-grid-item" ? 0 : level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
@@ -493,15 +493,7 @@ export class Render implements RenderIntf {
         return bkgImgStyle;
     }
 
-    centeredButtonBar = (buttons: Comp[], classes?: string): Comp => {
-        classes = classes || "";
-
-        return new Div(null, {
-            className: "horizontal center-justified layout vertical-layout-row " + classes
-        }, buttons);
-    }
-
-    makeRowButtonBar = (node: I.NodeInfo, editingAllowed: boolean): ButtonBar => {
+    makeRowButtonBar = (node: I.NodeInfo, editingAllowed: boolean): Comp => {
 
         let createdBy: string = node.owner;
         let commentBy: string = S.props.getNodePropertyVal(cnst.COMMENT_BY, node);
@@ -627,8 +619,7 @@ export class Render implements RenderIntf {
             }
         }
 
-        let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
-            "left-justified", "10px");
+        let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton]);
 
         if (selButton || typeIcon) {
             return new HorizontalLayout([selButton, typeIcon, buttonBar]);
@@ -816,8 +807,7 @@ export class Render implements RenderIntf {
                         }
 
                         if (typeIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton) {
-                            buttonBar = new ButtonBar([typeIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
-                                "left-justified", "10px");
+                            buttonBar = new ButtonBar([typeIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton]);
                         }
 
                         let children = [];
@@ -851,7 +841,7 @@ export class Render implements RenderIntf {
                                 id: "prevPageButton",
                                 iconclass: "fa fa-angle-left fa-lg"
                             });
-                        output.push(this.centeredButtonBar([firstButton, prevButton], "paging-button-bar"));
+                        output.push(new ButtonBar([firstButton, prevButton], "text-center")); //todo-0: dead class? -> "paging-button-bar"));
                     }
 
                     if (data.node.children) {
@@ -875,7 +865,7 @@ export class Render implements RenderIntf {
 
                         //todo-1: last page button disabled pending refactoring
                         //let lastButton = this.makeButton("Last Page", "lastPageButton", this.lastPage);
-                        output.push(this.centeredButtonBar([nextButton] /* + lastButton */, "paging-button-bar"));
+                        output.push(new ButtonBar([nextButton], "text-center")); 
                     }
                 }
                 catch (err) {

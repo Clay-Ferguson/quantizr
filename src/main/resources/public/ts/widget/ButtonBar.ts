@@ -11,22 +11,25 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ButtonBar extends Comp {
 
-    constructor(initialButtons: Comp[] = null, justify: string = "center-justified", marginLeft: string = "0px") {
+    //wrapperClass can be 'text-center' for centering.
+    constructor(initialButtons: Comp[] = null, private wrapperClass: string = "") {
         super(null);
         this.attribs.className = "btn-group";
         this.attribs.role = "group";
-        this.attribs.style = { marginTop: '8px', marginLeft };
+        this.attribs.style = { margin: '10px' };
         this.setChildren(initialButtons);
     }
 
     compRender = (): ReactNode => {
         //console.log("compRender: "+this.jsClassName);
-        if (this.childrenExist()) {
-            return S.e('div', this.attribs, this.makeReactChildren());
+        if (!this.childrenExist()) return null;
+
+        if (this.wrapperClass) {
+            return S.e('div', { className: "wrapper " + this.wrapperClass },
+                S.e('div', this.attribs, this.makeReactChildren()));
         }
         else {
-            //console.warn("no children in ButtonBar: "+this.jsClassName)
-            return null;
+            return S.e('div', this.attribs, this.makeReactChildren());
         }
     }
 }
