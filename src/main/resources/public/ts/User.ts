@@ -232,6 +232,7 @@ export class User implements UserIntf {
 
                     /* set ID to be the page we want to show user right after login */
                     let id: string = null;
+                    let childId: string = null;
                 
                     if (!S.util.emptyString(res.homeNodeOverride)) {
                         console.log("loading homeNodeOverride=" + res.homeNodeOverride);
@@ -239,18 +240,19 @@ export class User implements UserIntf {
                         S.meta64.homeNodeOverride = id;
                     } //
                     else {
-                        let lastNode = localStorage.getItem("lastNode");
+                        let lastNode = await S.localDB.getVal(Constants.LOCALDB_LAST_PARENT_NODEID);
+
                         if (lastNode) {
                             console.log("loading lastNode=" + lastNode);
                             id = lastNode;
+                            childId = await S.localDB.getVal(Constants.LOCALDB_LAST_CHILD_NODEID);
                         } else {
                             console.log("loading homeNodeId=" + S.meta64.homeNodeId);
                             id = S.meta64.homeNodeId;
                         }
                     }
 
-                    // alert("refreshTree: id="+id);
-                    S.view.refreshTree(id, false, null, true);
+                    S.view.refreshTree(id, true, childId, true);
                     this.setTitleUsingLoginResponse(res);
                 } else {
                     if (usingLocalDb) {

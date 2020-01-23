@@ -11,6 +11,11 @@ export class Constants {
      */
     static readonly LOCALDB_LOGIN_STATE: string = "loginState";
 
+    /* These two persist what the user is viewing so when the come back later we can go to same node
+     location they were last viewing */
+    static readonly LOCALDB_LAST_PARENT_NODEID: string = "lastParentId";
+    static readonly LOCALDB_LAST_CHILD_NODEID: string = "lastChildId";
+
     static readonly INSERT_ATTACHMENT: string = "{{insert-attachment}}";
     static readonly NEW_ON_TOOLBAR: boolean = true;
     static readonly INS_ON_TOOLBAR: boolean = false;

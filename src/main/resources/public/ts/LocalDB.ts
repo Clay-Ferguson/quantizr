@@ -13,7 +13,6 @@ export class LocalDB implements LocalDBIntf {
     static ACCESS_READWRITE: IDBTransactionMode = "readwrite";
     static ACCESS_READONLY: IDBTransactionMode = "readonly";
     static KEY_NAME = "name";
-
     static KEY_VAL_NAME_PREFIX = "kv_";
 
     openDB = (): IDBOpenDBRequest => {

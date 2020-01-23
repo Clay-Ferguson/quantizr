@@ -1057,7 +1057,6 @@ export class Util implements UtilIntf {
         let url, title, state;
 
         if (node.name) {
-            //todo-0: need to test how things behave with a space in the name. Should I just require that to be dashes?
             url = window.location.origin + "?n=" + node.name;
             if (childNode && childNode.id != node.id) {
                 url += "#" + childNode.id;

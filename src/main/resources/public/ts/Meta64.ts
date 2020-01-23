@@ -473,8 +473,8 @@ export class Meta64 implements Meta64Intf {
             let activeClass = "active-row";
             let inactiveClass = "inactive-row";
 
-            //console.log("Setting lastNode (in highlight)="+node.id);
-            localStorage.setItem("lastNode", node.id);
+            S.localDB.setVal(Constants.LOCALDB_LAST_PARENT_NODEID, S.meta64.currentNodeData.node.id);
+            S.localDB.setVal(Constants.LOCALDB_LAST_CHILD_NODEID, node.id);
 
             let doneHighlighting: boolean = false;
 
@@ -741,6 +741,10 @@ export class Meta64 implements Meta64Intf {
                     object["on" + type] = callback;
                 }
             };
+
+            // Interesting function. not needed.
+            // window.onhashchange = function (e) {
+            // }
 
             /* 
             NOTE: This works in conjunction with pushState, and is part of what it takes to make the back button (browser hisotry) work

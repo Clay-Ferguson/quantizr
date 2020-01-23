@@ -681,8 +681,8 @@ export class Render implements RenderIntf {
                 try {
                     //console.log("Setting lastNode="+data.node.id);
                     if (data && data.node) {
-                        //todo-0: make sure that we aren't saving leaf nodes here but the ACTUAL page parent node we were last on.
-                        localStorage.setItem("lastNode", data.node.id);
+                        S.localDB.setVal(Constants.LOCALDB_LAST_PARENT_NODEID, data.node.id);
+                        S.localDB.setVal(Constants.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
                     }
 
                     let newData: boolean = false;
