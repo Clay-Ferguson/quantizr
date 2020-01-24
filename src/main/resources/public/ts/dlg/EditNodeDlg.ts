@@ -52,7 +52,6 @@ export class EditNodeDlg extends DialogBase {
     encryptionButton: Button;
     insertTimeButton: Button;
     addPropertyButton: Button;
-    addTagsPropertyButton: Button;
     deletePropButton: Button;
     cancelButton: Button;
 
@@ -246,18 +245,14 @@ export class EditNodeDlg extends DialogBase {
         this.propsButtonBar = new ButtonBar(
             [
                 this.addPropertyButton = new Button("Add Property", this.addProperty),
-                this.addTagsPropertyButton = new Button("Add Tags", this.addTagsProperty),
                 this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
             ])
 
-        let collapsiblePanel = new CollapsiblePanel("More...", null, [collapsiblePropsTable, this.propsButtonBar]);
+        let collapsiblePanel = new CollapsiblePanel("Properties...", null, [collapsiblePropsTable, this.propsButtonBar]);
 
         this.propertyEditFieldContainer.setChildren([editPropsTable, collapsiblePanel]);
 
         //this.addPropertyButton.setVisible(!S.edit.editingUnsavedNode);
-
-        let tagsPropExists = S.props.getNodePropertyVal("sn:tags", this.node) != null;
-        this.addTagsPropertyButton.setVisible(!tagsPropExists);
     }
 
     toggleShowReadOnly = (): void => {
@@ -329,25 +324,6 @@ export class EditNodeDlg extends DialogBase {
         S.util.checkSuccess("Save properties", res);
         S.meta64.treeDirty = true;
         this.rebuildDlg();
-    }
-
-    addTagsProperty = (): void => {
-        if (S.props.getNodePropertyVal("sn:tags", this.node)) {
-            return;
-        }
-
-        let postData = {
-            nodeId: this.node.id,
-            propertyName: "sn:tags",
-            propertyValue: ""
-        };
-        S.util.ajax<I.SavePropertyRequest, I.SavePropertyResponse>("saveProperty", postData, this.addTagsPropertyResponse);
-    }
-
-    addTagsPropertyResponse = (res: I.SavePropertyResponse): void => {
-        if (S.util.checkSuccess("Add Tags Property", res)) {
-            this.savePropertyResponse(res);
-        }
     }
 
     savePropertyResponse(res: any): void {

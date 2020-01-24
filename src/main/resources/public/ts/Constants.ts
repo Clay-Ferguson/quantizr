@@ -45,8 +45,6 @@ export class Constants {
     static readonly NAME: string = "sn:name";
     static readonly FILE_NAME: string = "sn:fileName";
 
-    
-    static readonly TAGS: string = "sn:tags";
     static readonly UUID: string = "sn:uuid";
     static readonly JSON_FILE_SEARCH_RESULT: string = "sn:json";
     static readonly PRE: string = "pre";

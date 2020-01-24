@@ -202,13 +202,6 @@ export class Render implements RenderIntf {
             //}
         }
 
-        let tags: string = S.props.getNodePropertyVal(cnst.TAGS, node);
-        if (tags) {
-            ret.push(new Div("Tags: " + tags, {
-                className: "tags-content"
-            }));
-        }
-
         return ret;
     }
 
@@ -841,7 +834,7 @@ export class Render implements RenderIntf {
                                 id: "prevPageButton",
                                 iconclass: "fa fa-angle-left fa-lg"
                             });
-                        output.push(new ButtonBar([firstButton, prevButton], "text-center")); //todo-0: dead class? -> "paging-button-bar"));
+                        output.push(new ButtonBar([firstButton, prevButton], "text-center")); 
                     }
 
                     if (data.node.children) {

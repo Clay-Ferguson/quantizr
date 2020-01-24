@@ -61,17 +61,17 @@ export class AudioPlayerDlg extends DialogBase {
                     preload: "auto"
                 }),
                 new ButtonBar([
+                    this.playButton = new Button("Play", this.playButtonFunction, null, "primary"),
+                    new Button("Close", this.closeBtn)
+                ]),
+                new ButtonBar([
                     new Button("< 30s", this.skipBack30Button),
                     new Button("30s >", this.skipForward30Button)
                 ]),
                 new ButtonBar([
-                    new Button("1X", this.normalSpeedButton),
-                    new Button("1.5X", this.speed15Button),
-                    new Button("2X", this.speed2Button)
-                ]),
-                new ButtonBar([
-                    this.playButton = new Button("Play", this.playButtonFunction),
-                    new Button("Close", this.closeBtn)
+                    new Button("1x", this.normalSpeedButton),
+                    new Button("1.5x", this.speed15Button),
+                    new Button("2x", this.speed2Button)
                 ])
             ])
         ]);
