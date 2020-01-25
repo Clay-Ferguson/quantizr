@@ -11,7 +11,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Textarea extends Comp {
 
-    constructor(public attribs: any) {
+    constructor(public attribs: any, private label: string=null) {
         super(attribs);
         S.util.mergeProps(this.attribs, {
             //"name": this.getId(),
@@ -48,12 +48,12 @@ export class Textarea extends Comp {
     compRender = (): ReactNode => {
         let children = [];
     
-        if (this.attribs.label) {
+        if (this.label) {
             children.push(S.e('label', {
                 id: this.getId()+"_label",
                 key: this.getId()+"_label",
                 htmlFor: this.getId()
-            }, this.attribs.label));
+            }, this.label));
         }
 
         children.push(S.e('textarea', this.attribs, this.attribs.value));

@@ -26,6 +26,7 @@ import { TextField } from "../widget/TextField";
 import { EncryptionDlg } from "./EncryptionDlg";
 import { EncryptionOptions } from "../EncryptionOptions";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { FormInline } from "../widget/FormInline";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -82,24 +83,24 @@ export class EditNodeDlg extends DialogBase {
     }
 
     createLayoutSelection = (): Selection => {
-        let selection: Selection = new Selection({ label: "Child Layout" }, [
+        let selection: Selection = new Selection(null,"Child Layout", [
             { key: "v", val: "Vertical", selected: true },
             { key: "c2", val: "2 Columns" },
             { key: "c3", val: "3 Columns" },
             { key: "c4", val: "4 Columns" }
-        ], "w-50 m-2");
+        ], "m-2"); // "w-25 m-2");
         return selection;
     }
 
     createPrioritySelection = (): Selection => {
-        let selection: Selection = new Selection({ label: "Priority" }, [
+        let selection: Selection = new Selection(null, "Priority", [
             { key: "0", val: "none", selected: true },
             { key: "1", val: "Top" },
             { key: "2", val: "High" },
             { key: "3", val: "Medium" },
             { key: "4", val: "Low" },
             { key: "5", val: "Backlog" }
-        ], "w-50 m-2");
+        ], "m-2"); // "w-25 m-2");
         return selection;
     }
 
@@ -152,10 +153,10 @@ export class EditNodeDlg extends DialogBase {
             this.inlineChildrenCheckBox = new Checkbox("Inline Children", false)
         ]);
 
-        let selectionsBar = new HorizontalLayout([
+        let selectionsBar = new FormInline(null, [
             this.layoutSelection = this.createLayoutSelection(),
             this.prioritySelection = this.createPrioritySelection()
-        ], "form-inline");
+        ]); 
 
         /* clear this map to get rid of old properties */
         this.propEntries = new Array<I.PropEntry>();
@@ -204,10 +205,7 @@ export class EditNodeDlg extends DialogBase {
 
         //todo-1: does it make sense for FormGroup to contain single fields, or multiple fields? This seems wrong to have a group with one in it.
         let nodeNameFormGroup = new FormGroup();
-        this.nodeNameTextField = new TextField({
-            "placeholder": "",
-            "label": "Node Name"
-        }, this.node.name);
+        this.nodeNameTextField = new TextField(null, "Node Name", this.node.name);
         nodeNameFormGroup.addChild(this.nodeNameTextField);
 
         editPropsTable.addChild(nodeNameFormGroup);
@@ -676,10 +674,7 @@ export class EditNodeDlg extends DialogBase {
             this.aceEditorMap[propName] = new AceEditorInfo(editorComp);
         }
         else {
-            editorComp = new TextField({
-                "placeholder": "",
-                "label": prompt
-            }, value);
+            editorComp = new TextField(null, prompt, value);
         }
 
         formGroup.addChild(editorComp);

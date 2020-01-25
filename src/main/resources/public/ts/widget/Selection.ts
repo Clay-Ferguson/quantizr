@@ -12,8 +12,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Selection extends Comp {
 
-    //todo-0: do I really want the 'label' passed in the 'attribs' here still? Same question for TextField and other fields?
-    constructor(attribs: any, public selectionOptions: Object[] = null, moreClasses: string="") {
+    constructor(attribs: any, private label: string=null, public selectionOptions: Object[] = null, moreClasses: string="") {
         super(attribs || {});
         //w-25 = width 25%
         //https://hackerthemes.com/bootstrap-cheatsheet/#m-1 
@@ -50,13 +49,12 @@ export class Selection extends Comp {
     compRender = (): ReactNode => {
         let children = [];
     
-        if (this.attribs.label) {
+        if (this.label) {
             children.push(S.e('label', {
                 id: this.getId()+"_label",
                 key: this.getId()+"_label",
-                // className: 'textfield-label', 
                 htmlFor: this.getId()
-            }, this.attribs.label));
+            }, this.label));
         }
 
         children.push(this.tagRender('select', null, this.attribs));

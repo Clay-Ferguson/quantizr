@@ -26,15 +26,13 @@ export class SearchContentDlg extends DialogBase {
             new Form(null, [
                 new TextContent("Enter text to find. Only content text will be searched. All sub-nodes under the selected node are included in the search."),
                 this.searchTextField = new TextField({
-                    placeholder: "",
-                    label: "Search",
-                    onKeyPress : (e) => {
+                    onKeyPress : (e: KeyboardEvent) => { 
                         if (e.which == 13) { // 13==enter key code
                             this.searchNodes();
                             return false;
                         }
                     }
-                }, SearchContentDlg.defaultSearchText),
+                }, "Search", SearchContentDlg.defaultSearchText),
                 new ButtonBar([
                     new Button("Search", this.searchNodes, null, "primary"),
                     new Button("Close", () => {

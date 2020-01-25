@@ -5,7 +5,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
 import { Form } from "../widget/Form";
-import { Div } from "../widget/Div";
+import { FormGroup } from "../widget/FormGroup";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
@@ -26,30 +26,24 @@ export class LoginDlg extends DialogBase {
 
         this.setChildren([
             new Form(null, [
-                new Div(null, {
-                    className: "form-group"
-                },
+                new FormGroup(null,
                     [
                         this.userTextField = new TextField({
-                            placeholder: "",
-                            label: "User",
-                            onKeyPress: (e) => {
+                            onKeyPress: (e: KeyboardEvent) => {
                                 if (e.which == 13) { // 13==enter key code
                                     this.login();
                                     return false;
                                 }
                             }
-                        }),
+                        }, "User"),
                         this.passwordTextField = new PasswordTextField({
-                            "placeholder": "",
-                            "label": "Password",
-                            onKeyPress: (e) => {
+                            onKeyPress: (e: KeyboardEvent) => {
                                 if (e.which == 13) { // 13==enter key code
                                     this.login();
                                     return false;
                                 }
                             }
-                        }),
+                        }, "Password"),
                     ]
                 ),
                 new ButtonBar(

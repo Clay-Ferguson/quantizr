@@ -25,18 +25,11 @@ export class SignupDlg extends DialogBase {
         
         this.setChildren([
             new Form(null, [
-                this.userTextField = new TextField({
-                    "placeholder": "",
-                    "label": "User"
-                }),
+                this.userTextField = new TextField(null, "User"),
                 this.passwordTextField = new PasswordTextField({
                     "placeholder": "",
-                    "label": "Password"
-                }),
-                this.emailTextField = new TextField({
-                    "placeholder": "",
-                    "label": "Email"
-                }),
+                }, "Password"),
+                this.emailTextField = new TextField(null, "Email"),
                 new ButtonBar([
                     new Button("Create Account", this.signup, null, "primary"),
                     new Button("Cancel", this.close)

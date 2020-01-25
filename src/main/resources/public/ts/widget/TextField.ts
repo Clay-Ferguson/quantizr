@@ -9,9 +9,10 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+//for textfield, adn textarea, the placleholder text should default to "", and not be required in attribs in constructor.
 export class TextField extends Comp {
 
-    constructor(public attribs: any = null, private prefillVal : string=null) {
+    constructor(attribs: any = null, public label: string=null, private prefillVal : string=null) {
         super(attribs);
         S.util.mergeProps(this.attribs, {
             "name": this.getId(),
@@ -45,13 +46,13 @@ export class TextField extends Comp {
     compRender = (): ReactNode => {
         let children = [];
     
-        if (this.attribs.label) {
+        if (this.label) {
             children.push(S.e('label', {
                 id: this.getId()+"_label",
                 key: this.getId()+"_label",
                 className: 'textfield-label', //is this still needed ?
                 htmlFor: this.getId()
-            }, this.attribs.label));
+            }, this.label));
         }
 
         children.push(S.e('input', this.attribs));

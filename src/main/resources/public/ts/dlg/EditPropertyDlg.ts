@@ -1,6 +1,5 @@
 import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
-import { EditNodeDlg } from "./EditNodeDlg";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { Div } from "../widget/Div";
@@ -20,7 +19,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
  */
 export class EditPropertyDlg extends DialogBase {
 
-    propertyNameTextarea: Textarea;
+    propertyNameTextarea: TextField;
     propertyValTextarea: Textarea;
     propSavedFunc: Function;
     editNode: I.NodeInfo;
@@ -32,14 +31,8 @@ export class EditPropertyDlg extends DialogBase {
 
         this.setChildren([
             new Div(null, null, [
-                this.propertyNameTextarea = new TextField({
-                    "placeholder": "Enter property name",
-                    "label": "Name"
-                }),
-                this.propertyValTextarea = new Textarea({
-                    "placeholder": "Enter property text",
-                    "label": "Value"
-                })
+                this.propertyNameTextarea = new TextField(null, "Name"),
+                this.propertyValTextarea = new Textarea(null, "Value")
             ]),
 
             new ButtonBar([

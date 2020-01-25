@@ -27,14 +27,8 @@ export class ResetPasswordDlg extends DialogBase {
         this.setChildren([
             new Form(null, [
                 new TextContent("Enter your user name and email address and a change-password link will be sent to you"),
-                this.userTextField = new TextField({
-                    "placeholder": "",
-                    "label": "User Name"
-                }),
-                this.emailTextField = new TextField({
-                    "placeholder": "",
-                    "label": "Email Address"
-                }),
+                this.userTextField = new TextField(null, "User Name"),
+                this.emailTextField = new TextField(null, "Email Address"),
                 new ButtonBar([
                     new Button("Reset my Password", this.resetPassword, null, "primary"),
                     new Button("Close", () => {
