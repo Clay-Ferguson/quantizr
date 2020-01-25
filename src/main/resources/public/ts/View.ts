@@ -245,8 +245,12 @@ export class View implements ViewIntf {
             "nodeId": !!node ? node.id : null
         },
             (res: I.GetServerInfoResponse) => {
-                res.serverInfo += "<br>Build Time: " + BUILDTIME;
-                res.serverInfo += "<br>Profile: " + PROFILE;
+                /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
+                there are other commands that exist also */
+                if (command == "getServerInfo") {
+                    res.serverInfo += "<br>Build Time: " + BUILDTIME;
+                    res.serverInfo += "<br>Profile: " + PROFILE;
+                }
                 S.util.showMessage(res.serverInfo, true);
             });
     }

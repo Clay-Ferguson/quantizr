@@ -83,6 +83,14 @@ body {
     font-size: 150%;
 }
 
+.app-modal-title-close-icon {
+    cursor: pointer;
+    font-size: 125%;
+
+    //this icon vertical centering doesn't work, but it's acceptable looking.
+    vertical-align: middle;
+}
+ 
 .app-modal {
     display: none;
     position: fixed;
@@ -110,7 +118,7 @@ body {
 
 .app-modal-content-narrow-width {
     @extend .app-modal-content;
-    max-width: 400px;
+    max-width: 500px;
 }
 
 .app-modal-content-medium-width {

@@ -4,8 +4,10 @@ import { PubSub } from "./PubSub";
 import { Constants } from "./Constants";
 import { Comp } from "./widget/base/Comp";
 import { Div } from "./widget/Div";
+import { Span } from "./widget/Span";
 import * as ReactDOM from "react-dom";
 import { CompIntf } from "./widget/base/CompIntf";
+import { Icon } from "./widget/Icon";
 
 
 let S: Singletons;
@@ -96,9 +98,18 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
     this.children to already be populated by the time we get in here, which can safely be put in init() to make
     sure they are */
     makeComp = (backdrop: HTMLElement): Comp => {
-        let content: CompIntf[] = this.title ? [new Div(this.title, {
+
+        let timesIcon: Comp;
+        //Dialog Header with close button (x) right justified on it.
+        let content: CompIntf[] = [new Div(this.title, {
             className: "app-modal-title"
-        })] : [];
+        },
+            [timesIcon = new Span("&times;", {
+                className: "float-right app-modal-title-close-icon",
+                onClick: this.close
+            })]
+        )];
+        timesIcon.renderRawHtml = true;
 
         content = content.concat(this.children);
 

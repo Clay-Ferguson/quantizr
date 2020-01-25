@@ -57,6 +57,8 @@ export abstract class Comp implements CompIntf {
     //nonetheless be correct.
     domAddEventRan: boolean;
 
+    renderRawHtml: boolean = false;
+
     /**
      * 'react' should be true only if this component and all its decendants are true React components that are rendered and
      * controlled by ReactJS (rather than our own innerHTML)

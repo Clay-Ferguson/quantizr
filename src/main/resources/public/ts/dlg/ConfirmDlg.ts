@@ -7,7 +7,7 @@ import { Form } from "../widget/Form";
 export class ConfirmDlg extends DialogBase {
 
     constructor(private text: string, title: string, private yesCallback: Function, private noCallback: Function = null) {
-        super(title);
+        super(title, "app-modal-content-narrow-width");
 
         let yesButton: Button;
 

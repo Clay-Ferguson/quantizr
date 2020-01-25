@@ -18,6 +18,13 @@ export class Span extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return this.tagRender('span', this.content, this.attribs);
+        if (this.renderRawHtml) {
+            let _p: any = { id: this.getId(), key: this.getId() };
+            _p.dangerouslySetInnerHTML = { "__html": this.content };
+            return S.e('span', {...this.attribs, ..._p});
+        }
+        else {
+            return this.tagRender('span', this.content, this.attribs);
+        }
     }
 }

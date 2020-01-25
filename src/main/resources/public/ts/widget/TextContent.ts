@@ -30,9 +30,9 @@ export class TextContent extends Comp {
         //todo-1: research this hack. Not sure I want to keep detecting HTML this way.
         if (state.text && state.text.indexOf("<") != -1) {
             //console.log("Dangerously setting html: "+this.jsClassName);
-            let _p: any = { key: "renderhtml" + this.getId() };
+            let _p: any = { id: this.getId(), key: this.getId() };
             _p.dangerouslySetInnerHTML = { "__html": state.text };
-            return S.e(this.preformatted ? 'pre' : 'div', _p);
+            return S.e(this.preformatted ? 'pre' : 'div', {...this.attribs, ..._p});
         }
         else {
             //console.log("Building (TextContent) react element: " + this.attribs.id);
