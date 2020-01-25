@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 /**
@@ -207,7 +208,15 @@ public class NodeRenderService {
 		 * we request ROWS_PER_PAGE+1, because that is enough to trigger 'endReached'
 		 * logic to be set correctly
 		 */
-		Iterable<SubNode> nodeIter = api.getChildren(session, node, true, queryLimit);
+		String orderBy = node.getStringProp("orderBy");
+		Sort sort = null;
+		if ("priority asc".equalsIgnoreCase(orderBy)) {
+			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_PROPERTIES+".priority");
+		}
+		else {
+			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
+		}
+		Iterable<SubNode> nodeIter = api.getChildren(session, node, sort, queryLimit);
 		Iterator<SubNode> iterator = nodeIter.iterator();
 
 		int idx = 0, count = 0, idxOfNodeFound = -1;

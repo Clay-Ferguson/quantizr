@@ -12,37 +12,56 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class CollapsiblePanel extends Comp {
 
     /* If textLink=true that means we show just a text link and not a button */
-    constructor(private buttonText: string = "", attribs: Object = {}, initialChildren: Comp[] = null, private textLink: boolean = false) {
+    constructor(private buttonText: string = "", attribs: Object = {}, initialChildren: Comp[] = null, private textLink: boolean = false,
+        private stateCallback: Function = null, expanded: boolean = false) {
         super(attribs);
         this.setChildren(initialChildren);
+        this.setExpanded(expanded)
+    }
+
+    setExpanded = (expanded: boolean) => {
+        this.mergeState({
+            expanded
+        });
     }
 
     compRender = (): ReactNode => {
         let style = this.textLink ? "" : "btn btn-info ";
         let innerStyle = this.textLink ? "file-link" : "";
+        let collapseClass = this.getState().expanded ? "expand" : "collapse";
 
         return S.e('div', {
-            style: {marginTop: "10px", marginBottom: "10px"},
-            key: "div_"+this.getId()
+            style: { marginTop: "10px", marginBottom: "10px" },
+            key: "div_" + this.getId()
         },//
             S.e('a', {
                 href: "#" + this.getId(),
                 className: style,
-                "data-toggle": "collapse",
-                key: "div_a_"+this.getId()
+                "data-toggle": collapseClass,
+                id: "div_a_" + this.getId(),
+                key: "div_a_" + this.getId(),
+                onClick: this.onToggle
             }, //
                 S.e('div', {
                     className: innerStyle,
-                    key: "div_a_div_"+this.getId()
+                    key: "div_a_div_" + this.getId()
                 }, this.buttonText),
             ),
             S.e('div', {
                 id: this.getId(),
-                className: "collapse",
-                key: "div_div_d"+this.getId()
+                className: collapseClass,
+                key: "div_div_d" + this.getId()
             },
                 this.makeReactChildren()
             ));
+    }
+
+    onToggle = (): void => {
+        let expanded = !this.getState().expanded;
+        this.setExpanded(expanded);
+        if (this.stateCallback) {
+            this.stateCallback(expanded);
+        }
     }
 }
 

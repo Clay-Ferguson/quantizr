@@ -21,6 +21,7 @@ import org.subnode.mongo.model.SubNodePropertyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 /**
@@ -83,7 +84,7 @@ public class Convert {
 		if (allowInlineChildren) {
 			boolean hasInlineChildren = node.getBooleanProp("inlineChildren");
 			if (hasInlineChildren) {
-				Iterable<SubNode> nodeIter = api.getChildren(session, node, true, 100);
+				Iterable<SubNode> nodeIter = api.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100);
 				Iterator<SubNode> iterator = nodeIter.iterator();
 
 				while (true) {

@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 
 /**
  * Base class for exporting to archives. Two superclasses will exist: 1) Zip
@@ -135,7 +136,7 @@ public abstract class ExportArchiveBase {
 		/* process the current node */
 		String folder = processNodeExport(parentFolder, node);
 
-		for (SubNode n : api.getChildren(session, node, true, null)) {
+		for (SubNode n : api.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null)) {
 			recurseNode(parentFolder + "/" + folder, n, level + 1);
 		}
 	}

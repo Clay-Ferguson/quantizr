@@ -162,7 +162,7 @@ public class IPFSSyncService {
 		List<SubNode> nodesToDelete = new LinkedList<SubNode>();
 
 		/* Get iterator for all children under 'node' */
-		Iterable<SubNode> iter = api.getChildren(session, node, false, 10000);
+		Iterable<SubNode> iter = api.getChildren(session, node, null, 10000);
 
 		/*
 		 * build up a hashmap of all the SubNode objects keyed by the merkle hash, by

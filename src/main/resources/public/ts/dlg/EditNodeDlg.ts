@@ -25,6 +25,7 @@ import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { TextField } from "../widget/TextField";
 import { EncryptionDlg } from "./EncryptionDlg";
 import { EncryptionOptions } from "../EncryptionOptions";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -39,7 +40,7 @@ export class EditNodeDlg extends DialogBase {
     buttonBar: ButtonBar;
     propsButtonBar: ButtonBar;
     layoutSelection: Selection;
-    optionsBar: Div;
+    prioritySelection: Selection;
     pathDisplay: Div;
     //help: TextContent;
     propertyEditFieldContainer: Div;
@@ -70,6 +71,8 @@ export class EditNodeDlg extends DialogBase {
 
     encryptionOptions: EncryptionOptions = new EncryptionOptions();
 
+    static morePanelExpanded: boolean = false;
+
     constructor(args: Object) {
         super("Edit Node", "app-modal-content", false, true);
 
@@ -79,12 +82,24 @@ export class EditNodeDlg extends DialogBase {
     }
 
     createLayoutSelection = (): Selection => {
-        let selection: Selection = new Selection(null, [
+        let selection: Selection = new Selection({ label: "Child Layout" }, [
             { key: "v", val: "Vertical", selected: true },
             { key: "c2", val: "2 Columns" },
             { key: "c3", val: "3 Columns" },
             { key: "c4", val: "4 Columns" }
-        ]);
+        ], "w-50 m-2");
+        return selection;
+    }
+
+    createPrioritySelection = (): Selection => {
+        let selection: Selection = new Selection({ label: "Priority" }, [
+            { key: "0", val: "none", selected: true },
+            { key: "1", val: "Top" },
+            { key: "2", val: "High" },
+            { key: "3", val: "Medium" },
+            { key: "4", val: "Low" },
+            { key: "5", val: "Backlog" }
+        ], "w-50 m-2");
         return selection;
     }
 
@@ -100,28 +115,10 @@ export class EditNodeDlg extends DialogBase {
                         this.propertyEditFieldContainer = new Div("", {
                         }),
                         this.pathDisplay = cnst.SHOW_PATH_IN_DLGS ? new Div(path, {
-                           className : "alert alert-info small-padding"
+                            className: "alert alert-info small-padding"
                         }) : null,
                     ]
                 ),
-                this.optionsBar = new Div("", null, [
-                    this.preformattedCheckBox = new Checkbox("Plain Text", false, {
-                        onChange: (evt: any) => {
-                            if (this.aceEditor && this.aceEditor.getAceEditor()) {
-                                this.aceEditor.getAceEditor().session.setMode(evt.target.checked ? "ace/mode/text" : "ace/mode/markdown");
-                            }
-                        }
-                    }),
-                    this.wordWrapCheckBox = new Checkbox("Word Wrap", false, {
-                        onChange: (evt: any) => {
-                            if (this.aceEditor && this.aceEditor.getAceEditor()) {
-                                this.aceEditor.getAceEditor().session.setUseWrapMode(evt.target.checked);
-                            }
-                        }
-                    }),
-                    this.inlineChildrenCheckBox = new Checkbox("Inline Children", false),
-                    this.layoutSelection = this.createLayoutSelection()
-                ]),
                 this.buttonBar = new ButtonBar(
                     [
                         this.saveNodeButton = new Button("Save", () => {
@@ -136,6 +133,29 @@ export class EditNodeDlg extends DialogBase {
                     ])
             ])
         ]);
+
+        let optionsBar = new Div("", null, [
+            this.preformattedCheckBox = new Checkbox("Plain Text", false, {
+                onChange: (evt: any) => {
+                    if (this.aceEditor && this.aceEditor.getAceEditor()) {
+                        this.aceEditor.getAceEditor().session.setMode(evt.target.checked ? "ace/mode/text" : "ace/mode/markdown");
+                    }
+                }
+            }),
+            this.wordWrapCheckBox = new Checkbox("Word Wrap", false, {
+                onChange: (evt: any) => {
+                    if (this.aceEditor && this.aceEditor.getAceEditor()) {
+                        this.aceEditor.getAceEditor().session.setUseWrapMode(evt.target.checked);
+                    }
+                }
+            }),
+            this.inlineChildrenCheckBox = new Checkbox("Inline Children", false)
+        ]);
+
+        let selectionsBar = new HorizontalLayout([
+            this.layoutSelection = this.createLayoutSelection(),
+            this.prioritySelection = this.createPrioritySelection()
+        ], "form-inline");
 
         /* clear this map to get rid of old properties */
         this.propEntries = new Array<I.PropEntry>();
@@ -212,6 +232,11 @@ export class EditNodeDlg extends DialogBase {
                     return;
                 }
 
+                if (prop.name == "priority") {
+                    this.prioritySelection.setSelection(prop.value);
+                    return;
+                }
+
                 if (prop.name == "inlineChildren") {
                     this.inlineChildrenCheckBox.setChecked(true);
                     return;
@@ -248,7 +273,10 @@ export class EditNodeDlg extends DialogBase {
                 this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
             ])
 
-        let collapsiblePanel = new CollapsiblePanel("Properties...", null, [collapsiblePropsTable, this.propsButtonBar]);
+        let collapsiblePanel = new CollapsiblePanel("More...", null, [optionsBar, selectionsBar, collapsiblePropsTable, this.propsButtonBar], false,
+            (state: boolean) => {
+                EditNodeDlg.morePanelExpanded = state;
+            }, EditNodeDlg.morePanelExpanded);
 
         this.propertyEditFieldContainer.setChildren([editPropsTable, collapsiblePanel]);
 
@@ -265,9 +293,9 @@ export class EditNodeDlg extends DialogBase {
     addProperty = (): void => {
         (async () => {
             /* always save existing node before opening new property dialog */
-            let dlg = new EditPropertyDlg({ 
-                editNode: this.node, 
-                propSavedFunc: this.propertySaved 
+            let dlg = new EditPropertyDlg({
+                editNode: this.node,
+                propSavedFunc: this.propertySaved
             });
             this.editPropertyDlgInst = dlg;
             await this.editPropertyDlgInst.open();
@@ -405,13 +433,31 @@ export class EditNodeDlg extends DialogBase {
 
                 /* Get state of the 'layout' dropdown */
                 let layout = this.layoutSelection.getSelection();
+
+                //vertical layout is the default, so if user selects that we can just delete the option and save space.
                 if (layout == "v") layout = "[delete-node-indicator]";
+
                 let changed = S.props.setNodePropertyVal("layout", this.node, layout);
                 if (changed) {
                     handled["layout"] = true;
                     saveList.push({
                         "name": "layout",
                         "value": layout
+                    });
+                }
+
+                /* Get state of the 'priority' dropdown */
+                let priority = this.prioritySelection.getSelection();
+
+                //vertical layout is the default, so if user selects that we can just delete the option and save space.
+                if (priority == "0") layout = "[delete-node-indicator]";
+
+                changed = S.props.setNodePropertyVal("priority", this.node, layout);
+                if (changed) {
+                    handled["priority"] = true;
+                    saveList.push({
+                        "name": "priority",
+                        "value": priority
                     });
                 }
 

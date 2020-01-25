@@ -12,9 +12,12 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Selection extends Comp {
 
-    constructor(attribs: any, public selectionOptions: Object[] = null) {
+    //todo-0: do I really want the 'label' passed in the 'attribs' here still? Same question for TextField and other fields?
+    constructor(attribs: any, public selectionOptions: Object[] = null, moreClasses: string="") {
         super(attribs || {});
-        this.attribs.className = "custom-select w-25 m-3";
+        //w-25 = width 25%
+        //https://hackerthemes.com/bootstrap-cheatsheet/#m-1 
+        this.attribs.className = "custom-select "+moreClasses; 
         selectionOptions.forEach((row: Object) => {
             if (row['selected']) {
                 this.attribs.selection = row['key'];
@@ -38,7 +41,6 @@ export class Selection extends Comp {
             this.children.forEach((row: SelectionOption) => {
                 idx++;
                 if (row.key == key) {
-                    //let elm: HTMLSelectElement = this.getElement() as HTMLSelectElement;
                     elm.selectedIndex = idx;
                 }
             });
@@ -46,6 +48,23 @@ export class Selection extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return this.tagRender('select', null, this.attribs);
+        let children = [];
+    
+        if (this.attribs.label) {
+            children.push(S.e('label', {
+                id: this.getId()+"_label",
+                key: this.getId()+"_label",
+                // className: 'textfield-label', 
+                htmlFor: this.getId()
+            }, this.attribs.label));
+        }
+
+        children.push(this.tagRender('select', null, this.attribs));
+
+        return S.e('div', {
+            id: this.getId()+"_sel",
+            key: this.getId()+"_sel",
+            className: "form-group" //mr-2"
+        }, children);
     }
 }

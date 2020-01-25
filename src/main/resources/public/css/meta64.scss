@@ -64,6 +64,18 @@ body {
     font-weight: bold;
 }
 
+.overlay {
+    z-index: 2147483647;
+    background-color: rgba(1, 1, 1, 0.1);
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    cursor: progress;
+    display: none;
+}
+
 /* The Modal (background) */
 
 .app-modal-title {
@@ -77,11 +89,12 @@ body {
     z-index: 16000000;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.4);
 }
+
 
 /* Modal Content/ Dialog Box. This is the outter frame of the dialog itself */
 
@@ -108,8 +121,12 @@ body {
 .app-modal-content-fullscreen {
     background-color: $modal-content-bg;
     padding: 15px;
-    width: 100%;
-    height: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    overflow: auto;
 }
 
 //We hav this 80% width version so that the main menu can use it because to close that without selecting an option
@@ -712,18 +729,6 @@ samp {
 
 .border-bottom {
     border-bottom: 1px solid #e5e5e5;
-}
-
-.overlay {
-    z-index: 2147483647;
-    background-color: rgba(1, 1, 1, 0.1);
-    bottom: 0;
-    left: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
-    cursor: progress;
-    display: none;
 }
 
 .rss-feed-listing {

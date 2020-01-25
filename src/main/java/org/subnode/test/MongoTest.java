@@ -18,6 +18,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -181,7 +182,7 @@ public class MongoTest {
 		log.debug("child count query successful.");
 
 		/* check that we can get all the children */
-		Iterable<SubNode> childrenIter = api.getChildren(session, node, true, null);
+		Iterable<SubNode> childrenIter = api.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null);
 		count = api.dump("Dumping ordered children", childrenIter);
 
 		// ----------Read all ordinals. We don't assume they are all perfectly numbered here. (might

@@ -49,7 +49,7 @@ export class TextField extends Comp {
             children.push(S.e('label', {
                 id: this.getId()+"_label",
                 key: this.getId()+"_label",
-                className: 'textfield-label',
+                className: 'textfield-label', //is this still needed ?
                 htmlFor: this.getId()
             }, this.attribs.label));
         }

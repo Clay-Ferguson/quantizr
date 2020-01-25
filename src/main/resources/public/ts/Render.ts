@@ -72,7 +72,10 @@ export class Render implements RenderIntf {
                 idOrName = "ID: " + node.id;
             }
 
-            pathDiv = new Div(idOrName + ordinalStr + " Type: " + node.type, {
+            let priority = S.props.getNodePropertyVal("priority", node);
+            priority = (priority && priority != "0") ? " P" + priority : "";
+
+            pathDiv = new Div(idOrName + ordinalStr + " Type: " + node.type + priority, {
                 className: "path-display"
             });
         }
@@ -834,7 +837,7 @@ export class Render implements RenderIntf {
                                 id: "prevPageButton",
                                 iconclass: "fa fa-angle-left fa-lg"
                             });
-                        output.push(new ButtonBar([firstButton, prevButton], "text-center")); 
+                        output.push(new ButtonBar([firstButton, prevButton], "text-center"));
                     }
 
                     if (data.node.children) {
@@ -858,7 +861,7 @@ export class Render implements RenderIntf {
 
                         //todo-1: last page button disabled pending refactoring
                         //let lastButton = this.makeButton("Last Page", "lastPageButton", this.lastPage);
-                        output.push(new ButtonBar([nextButton], "text-center")); 
+                        output.push(new ButtonBar([nextButton], "text-center"));
                     }
                 }
                 catch (err) {
@@ -879,7 +882,7 @@ export class Render implements RenderIntf {
                             el.setAttribute("target", "_blank");
                         });
 
-                        if (S.meta64.pendingLocationHash) { 
+                        if (S.meta64.pendingLocationHash) {
                             window.location.hash = S.meta64.pendingLocationHash;
                             //Note: the substring(1) trims the "#" character off.
                             await S.meta64.highlightRowById(S.meta64.pendingLocationHash.substring(1), true);

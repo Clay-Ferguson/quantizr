@@ -228,7 +228,7 @@ public class FileSyncService {
 		 * the children currently under the node that is being synced
 		 */
 		HashMap<String, SubNode> nodeMap = new HashMap<String, SubNode>();
-		Iterable<SubNode> iter = api.getChildren(session, node, false, 10000);
+		Iterable<SubNode> iter = api.getChildren(session, node, null, 10000);
 		List<SubNode> nodesToDelete = new LinkedList<SubNode>();
 		for (SubNode child : iter) {
 			String fullFileName = child.getStringProp(TYPES.FS_LINK);

@@ -482,7 +482,7 @@ public class MongoApi {
 	}
 
 	/*
-	 * Shifts all child ordinals down (increments them by rangeSize), what are >=
+	 * Shifts all child ordinals down (increments them by rangeSize), that are >=
 	 * 'ordinal' to make a slot for the new ordinal positions for some new nodes to
 	 * be inserted into this newly available range of unused sequential ordinal
 	 * values (range of 'ordinal+1' thru 'ordinal+1+rangeSize')
@@ -490,7 +490,9 @@ public class MongoApi {
 	public void insertOrdinal(MongoSession session, SubNode node, long ordinal, long rangeSize) {
 		long maxOrdinal = 0;
 
-		for (SubNode child : getChildren(session, node, false, null)) {
+		//todo-1: verify this is correct with getChildren querying unordered. It's probably fine, but also can we
+		//do a query here that selects only the ">= ordinal" ones to make this do the minimal size query?
+		for (SubNode child : getChildren(session, node, null, null)) {
 			Long childOrdinal = child.getOrdinal();
 			long childOrdinalInt = childOrdinal == null ? 0L : childOrdinal.longValue();
 
@@ -897,7 +899,7 @@ public class MongoApi {
 	}
 
 	public List<SubNode> getChildrenAsList(MongoSession session, SubNode node, boolean ordered, Integer limit) {
-		Iterable<SubNode> iter = getChildren(session, node, ordered, limit);
+		Iterable<SubNode> iter = getChildren(session, node, ordered ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, limit);
 		List<SubNode> list = new LinkedList<SubNode>();
 		iter.forEach(list::add);
 		return list;
@@ -942,7 +944,7 @@ public class MongoApi {
 	 * If node is null it's path is considered empty string, and it represents the
 	 * 'root' of the tree. There is no actual NODE that is root node
 	 */
-	public Iterable<SubNode> getChildren(MongoSession session, SubNode node, boolean ordered, Integer limit) {
+	public Iterable<SubNode> getChildren(MongoSession session, SubNode node, Sort sort, Integer limit) {
 		auth(session, node, PrivilegeType.READ);
 
 		Query query = new Query();
@@ -963,9 +965,11 @@ public class MongoApi {
 		 */
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
 				.regex(regexDirectChildrenOfPath(node == null ? "" : node.getPath()));
-		if (ordered) {
-			query.with(Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
+				
+		if (sort!=null) {
+			query.with(sort);
 		}
+
 		query.addCriteria(criteria);
 
 		return ops.find(query, SubNode.class);

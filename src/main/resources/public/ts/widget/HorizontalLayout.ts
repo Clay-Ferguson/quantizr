@@ -12,9 +12,9 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class HorizontalLayout extends Comp {
 
-    constructor(initialComps: Comp[] = null) {
+    constructor(initialComps: Comp[] = null, moreClasses: string="") {
         super(null);
-        this.attribs.className = "horizontalLayout"; 
+        this.attribs.className = "horizontalLayout "+moreClasses; 
         this.setChildren(initialComps);
     }
 

@@ -717,7 +717,7 @@ export class Meta64 implements Meta64Intf {
             this.isMobileOrTablet = this.mobileOrTabletCheck();
 
             // If you want to test out 'mobile' rendering, you can simply set isMobile to true here, and of course size your browser real small
-            //this.isMobile = true; 
+            //this.isMobile = true;
 
             // SystemFolder and File handling stuff is disabled for now (todo-1), but will eventually be brought
             // back as a plugin similar to rssPlugin, coreTypesPlugin, etc. Also the new way of doing this

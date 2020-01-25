@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 /**
@@ -142,7 +143,7 @@ public class ExportTxtService {
 		/* process the current node */
 		processNode(node);
 
-		for (SubNode n : api.getChildren(session, node, true, null)) {
+		for (SubNode n : api.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null)) {
 			recurseNode(n, level + 1);
 		}
 	}

@@ -15,6 +15,10 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export abstract class DialogBase extends Comp implements DialogBaseImpl {
 
+    //ref counter that allows multiple dialogs to be opened on top of each other and only
+    //when the final one closes out do we go back to enabling scrolling on body again.
+    static refCounter = 0;
+
     static backdropZIndex: number = 16000000;
     resolve: Function;
 
@@ -57,6 +61,10 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
             //this renders the dlgComp onto the screen (on the backdrop elm)
             this.domRender();
 
+            if (++DialogBase.refCounter == 1) {
+                document.body.style.overflow = 'hidden';
+            }
+
             this.resolve = resolve;
         });
     }
@@ -77,6 +85,10 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
     public close = () => {
         this.resolve(this);
         S.util.domElmRemove(this.getId());
+
+        if (--DialogBase.refCounter <= 0) {
+            document.body.style.overflow = 'auto';
+        }
     }
 
     /* Returns the single Component to go inside the dialog, which is the entire content of the dialog
@@ -91,8 +103,8 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
         content = content.concat(this.children);
 
         /* Display dialogs fullscreen on mobile devices */
-        let clazz = S.meta64.isMobile ? 
-            (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen") : 
+        let clazz = S.meta64.isMobile ?
+            (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen") :
             (this.overrideClass ? this.overrideClass : "app-modal-content");
 
         // Note this optionally uses overrideClass which can come from above
