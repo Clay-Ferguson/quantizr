@@ -31,8 +31,8 @@ export class EditPropertyDlg extends DialogBase {
 
         this.setChildren([
             new Div(null, null, [
-                this.propertyNameTextarea = new TextField(null, "Name"),
-                this.propertyValTextarea = new Textarea(null, "Value")
+                this.propertyNameTextarea = new TextField("Name"),
+                this.propertyValTextarea = new Textarea("Value")
             ]),
 
             new ButtonBar([

@@ -9,10 +9,9 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-//for textfield, adn textarea, the placleholder text should default to "", and not be required in attribs in constructor.
 export class TextField extends Comp {
 
-    constructor(attribs: any = null, public label: string=null, private prefillVal : string=null) {
+    constructor(public label: string=null, attribs: any = null, private prefillVal : string=null) {
         super(attribs);
         S.util.mergeProps(this.attribs, {
             "name": this.getId(),

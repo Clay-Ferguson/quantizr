@@ -25,14 +25,14 @@ export class SearchFileSystemDlg extends DialogBase {
         this.setChildren([
             new Form(null, [
                 new TextContent("Enter text to find. Only content text will be searched. All sub-nodes under the selected node are included in the search."),
-                this.searchTextField = new TextField({
+                this.searchTextField = new TextField("Search", {
                     onKeyPress: (e: KeyboardEvent) => { 
                         if (e.which == 13) { // 13==enter key code
                             this.searchNodes();
                             return false;
                         }
                     }
-                }, "Search", SearchFileSystemDlg.defaultSearchText),
+                }, SearchFileSystemDlg.defaultSearchText),
                 new ButtonBar([
                     new Button("Search", this.searchNodes),
                     new Button("Close", () => {

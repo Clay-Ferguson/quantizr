@@ -28,10 +28,7 @@ export class ChangePasswordDlg extends DialogBase {
         this.setChildren([
             new Form(null, [
                 new TextContent("Enter your new password below..."),
-                this.passwordField = new PasswordTextField({
-                    "placeholder": "",
-                    "label": "New Password"
-                }),
+                this.passwordField = new PasswordTextField("New Password"),
                 new ButtonBar([
                     new Button("Change Password", () => {
                         this.changePassword();

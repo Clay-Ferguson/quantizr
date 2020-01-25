@@ -21,7 +21,7 @@ export class ImportDlg extends DialogBase {
         super("Import from XML");
         
         this.setChildren([
-            this.importFromFileNameTextField = new TextField(null, "File Name to Import"),
+            this.importFromFileNameTextField = new TextField("File Name to Import"),
             new ButtonBar([
                 new Button("Import", this.importNodes, null, "primary"),
                 new Button("Close", () => {

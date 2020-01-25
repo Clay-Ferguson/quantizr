@@ -28,22 +28,22 @@ export class LoginDlg extends DialogBase {
             new Form(null, [
                 new FormGroup(null,
                     [
-                        this.userTextField = new TextField({
+                        this.userTextField = new TextField("User", {
                             onKeyPress: (e: KeyboardEvent) => {
                                 if (e.which == 13) { // 13==enter key code
                                     this.login();
                                     return false;
                                 }
                             }
-                        }, "User"),
-                        this.passwordTextField = new PasswordTextField({
+                        }),
+                        this.passwordTextField = new PasswordTextField("Password", {
                             onKeyPress: (e: KeyboardEvent) => {
                                 if (e.which == 13) { // 13==enter key code
                                     this.login();
                                     return false;
                                 }
                             }
-                        }, "Password"),
+                        }),
                     ]
                 ),
                 new ButtonBar(

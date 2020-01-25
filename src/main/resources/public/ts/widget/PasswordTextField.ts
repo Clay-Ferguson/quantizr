@@ -10,8 +10,8 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class PasswordTextField extends TextField {
 
-    constructor(public attribs: Object, label: string=null, noBrowserSave: boolean = false) {
-        super(attribs, label);
+    constructor(label: string=null, public attribs: Object=null, noBrowserSave: boolean = false) {
+        super(label, attribs);
 
         S.util.mergeProps(this.attribs, {
             type: "password",

@@ -205,7 +205,7 @@ export class EditNodeDlg extends DialogBase {
 
         //todo-1: does it make sense for FormGroup to contain single fields, or multiple fields? This seems wrong to have a group with one in it.
         let nodeNameFormGroup = new FormGroup();
-        this.nodeNameTextField = new TextField(null, "Node Name", this.node.name);
+        this.nodeNameTextField = new TextField("Node Name", null, this.node.name);
         nodeNameFormGroup.addChild(this.nodeNameTextField);
 
         editPropsTable.addChild(nodeNameFormGroup);
@@ -674,7 +674,7 @@ export class EditNodeDlg extends DialogBase {
             this.aceEditorMap[propName] = new AceEditorInfo(editorComp);
         }
         else {
-            editorComp = new TextField(null, prompt, value);
+            editorComp = new TextField(prompt, null, value);
         }
 
         formGroup.addChild(editorComp);
