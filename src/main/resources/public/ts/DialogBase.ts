@@ -107,15 +107,20 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
 
         let timesIcon: Comp;
         //Dialog Header with close button (x) right justified on it.
-        let content: CompIntf[] = [new Div(this.title, {
-            className: "app-modal-title"
-        },
-            [timesIcon = new Span("&times;", {
-                className: "float-right app-modal-title-close-icon",
-                onClick: this.close
-            })]
-        )];
-        timesIcon.renderRawHtml = true;
+        let content: CompIntf[] = [];
+
+        //NOTE: title will be null for the main menu, which is actually implemented as a dialog using this base class.
+        if (this.title) {
+            content.push(new Div(this.title, {
+                className: "app-modal-title"
+            },
+                [timesIcon = new Span("&times;", {
+                    className: "float-right app-modal-title-close-icon",
+                    onClick: this.close
+                })]
+            ));
+            timesIcon.renderRawHtml = true;
+        }
 
         content = content.concat(this.children);
 
