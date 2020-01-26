@@ -10,8 +10,8 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class EditPropTextarea extends Textarea {
-    constructor(public propEntry: I.PropEntry, public attribs: Object) {
-        super(attribs);
+    constructor(public propEntry: I.PropEntry, attribs: Object) {
+        super(null, attribs);
         propEntry.id = this.getId();
     }
 }

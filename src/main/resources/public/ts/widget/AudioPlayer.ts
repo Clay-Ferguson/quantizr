@@ -14,7 +14,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 //https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API
 export class AudioPlayer extends Comp {
 
-    constructor(public attribs: Object) {
+    constructor(attribs: Object) {
         super(attribs);
     }
 

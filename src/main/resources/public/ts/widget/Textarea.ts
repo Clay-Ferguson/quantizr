@@ -11,11 +11,9 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Textarea extends Comp {
 
-    constructor(public attribs: any, private label: string=null) {
+    constructor(private label: string, attribs: any=null) {
         super(attribs);
         S.util.mergeProps(this.attribs, {
-            //"name": this.getId(),
-            //"type": "text",
             className: "form-control pre-textarea"
         });
         if (!this.attribs.rows) {

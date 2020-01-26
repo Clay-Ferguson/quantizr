@@ -64,7 +64,11 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
             this.domRender();
 
             if (++DialogBase.refCounter == 1) {
-                document.body.style.overflow = 'hidden';
+                /* we only hide and reshow the scroll bar and disable scrolling when we're in mobile mode, because that's when 
+                full-screen dialogs are in use, which is when we need this. */
+                if (S.meta64.isMobile) {
+                    document.body.style.overflow = 'hidden';
+                }
             }
 
             this.resolve = resolve;
@@ -89,7 +93,9 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
         S.util.domElmRemove(this.getId());
 
         if (--DialogBase.refCounter <= 0) {
-            document.body.style.overflow = 'auto';
+            if (S.meta64.isMobile) {
+                document.body.style.overflow = 'auto';
+            }
         }
     }
 
