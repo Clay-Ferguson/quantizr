@@ -20,7 +20,9 @@ export class MainNavPanel extends NavTag {
 
     constructor(attribs: any) {
         super(attribs);
-        this.attribs.className = "navbar navbar-expand navbar-dark bg-dark fixed-top"; // navbar-expand-sm (adding this class makes it collapsable, but messes up top margin)
+
+        // navbar-expand-sm would makes it collapsable, but messes up top margin.
+        this.attribs.className = "navbar navbar-expand navbar-dark bg-dark fixed-top";
 
         let buttons = [];
 

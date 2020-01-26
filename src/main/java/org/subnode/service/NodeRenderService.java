@@ -7,7 +7,6 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 
 import org.subnode.config.AppProp;
-import org.subnode.config.NodeProp;
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.UserPreferences;
@@ -150,13 +149,8 @@ public class NodeRenderService {
 						log.trace("   upLevel to nodeid: " + node.getPath());
 						levelsUpRemaining--;
 					}
-					// if we fail to get the node above, that is ok we just render the best one we
-					// were able to get to. This can happen when user is rendering their User node
-					// and
-					// adding an attachment, before any children are ever created.
 					catch (Exception e) {
-						// scanToNode = false;
-						break;
+						throw new RuntimeException("Unable to access parent node.");
 					}
 				}
 			}
@@ -211,9 +205,8 @@ public class NodeRenderService {
 		String orderBy = node.getStringProp("orderBy");
 		Sort sort = null;
 		if ("priority asc".equalsIgnoreCase(orderBy)) {
-			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_PROPERTIES+".priority");
-		}
-		else {
+			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_PROPERTIES + ".priority");
+		} else {
 			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
 		}
 		Iterable<SubNode> nodeIter = api.getChildren(session, node, sort, queryLimit);
@@ -439,7 +432,7 @@ public class NodeRenderService {
 			renderNode(session, renderNodeReq, renderNodeRes);
 			res.setRenderNodeResponse(renderNodeRes);
 			res.setSuccess(true);
-		}  //
+		} //
 		else {
 			res.setContent("No content available.");
 			res.setSuccess(true);

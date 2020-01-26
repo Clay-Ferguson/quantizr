@@ -651,8 +651,7 @@ export class Render implements RenderIntf {
     }
 
     renderPageFromData = async (data?: I.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string): Promise<void> => {
-
-        //console.log("renderPageFromData()");
+        //console.log("renderPageFromData(): scrollToTop="+scrollToTop);
 
         let elm = S.util.domElm("mainTab");
         if (elm) {

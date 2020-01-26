@@ -76,11 +76,11 @@ export class Nav implements NavIntf {
         return !this.displayingHome();
     }
 
-    upLevelResponse = async (res: I.RenderNodeResponse, id: string): Promise<void> => {
+    upLevelResponse = async (res: I.RenderNodeResponse, id: string, scrollToTop: boolean=false): Promise<void> => {
         if (!res || !res.node) {
             S.util.showMessage("No data is visible to you above this node.");
         } else {
-            await S.render.renderPageFromData(res, false, id);
+            await S.render.renderPageFromData(res, scrollToTop, id);
         }
     }
 
@@ -92,13 +92,9 @@ export class Nav implements NavIntf {
 
     navToSibling = (siblingOffset: number): void => {
         if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node) return null;
-        if (!this.parentVisibleToUser()) {
-            // Already at root. Can't go up.
-            return;
-        }
 
         this.mainOffset = 0;
-        var ironRes = S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
+        let res = S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
             "nodeId": S.meta64.currentNodeData.node.id,
             "upLevel": null,
             "siblingOffset": siblingOffset,
@@ -108,7 +104,7 @@ export class Nav implements NavIntf {
         }, 
         //success callback
         (res: I.RenderNodeResponse) => {
-            this.upLevelResponse(res, S.meta64.currentNodeData.node.id);
+            this.upLevelResponse(res, null, true);
         }
         , 
         //fail callback
@@ -116,7 +112,6 @@ export class Nav implements NavIntf {
            this.navHome();
         });
     }
-
 
     navUpLevel = (): void => {
         if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node) return null;
@@ -126,7 +121,7 @@ export class Nav implements NavIntf {
         }
 
         this.mainOffset = 0;
-        var ironRes = S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
+        let res = S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
             "nodeId": S.meta64.currentNodeData.node.id,
             "upLevel": 1,
             "siblingOffset": 0,

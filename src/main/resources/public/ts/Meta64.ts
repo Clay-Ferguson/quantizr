@@ -451,6 +451,10 @@ export class Meta64 implements Meta64Intf {
                 //console.log("highlightRowById calling highlightNode");
                 await this.highlightNode(node, scroll);
             } else {
+                //if we can't find that node, best behvior is at least to scroll to top.
+                if (scroll) {
+                    S.view.scrollToTop();
+                }
                 console.log("highlightRowById failed to find id: " + id);
             }
             resolve();

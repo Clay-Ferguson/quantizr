@@ -42,6 +42,6 @@ export class Button extends Comp {
             });
         }
 
-        return S.e('button', {...this.attribs}, [icon, this.getState().text]);
+        return S.e('button', this.attribs, [icon, this.getState().text]);
     }
 }

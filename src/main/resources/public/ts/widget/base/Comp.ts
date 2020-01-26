@@ -304,23 +304,29 @@ export abstract class Comp implements CompIntf {
 
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
     tagRender = (tag: string, content: string, props: any) => {
-        let children: any[] = this.makeReactChildren();
-        if (children) {
-            if (content) {
-                children.unshift(content);
+        //console.log("Comp.tagRender: "+this.jsClassName+" id="+props.id);
+        try {
+            let children: any[] = this.makeReactChildren();
+            if (children) {
+                if (content) {
+                    children.unshift(content);
+                }
+            }
+            else {
+                children = content ? [content] : null;
+            }
+
+            if (children && children.length > 0) {
+                //console.log("Render Tag with children.");
+                return S.e(tag, props, children);
+            }
+            else {
+                //console.log("Render Tag no children.");
+                return S.e(tag, props);
             }
         }
-        else {
-            children = content ? [content] : null;
-        }
-
-        if (children && children.length > 0) {
-            //console.log("Render Tag with children.");
-            return S.e(tag, props, children);
-        }
-        else {
-            //console.log("Render Tag no children.");
-            return S.e(tag, props);
+        catch (e) {
+            console.error("Failed in Comp.tagRender" + this.jsClassName + " attribs=" + S.util.prettyPrint(this.attribs));
         }
     }
 

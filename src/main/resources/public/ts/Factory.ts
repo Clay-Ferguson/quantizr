@@ -77,7 +77,17 @@ export class Factory {
             passwordPlugin: new PasswordPlugin(),
             rssReader: new RSSReader(),
             localDB: new LocalDB(),
-            e: React.createElement,
+
+            //Use this version of the render method to help troubleshoot missing 'key' props
+            //todo-1: move this function into some other static location that is safe to import
+            //with zero risk of any circular references.
+            // e: (func: any, props: any, ...children: any): any => {
+            //     if (props && !props.key) {
+            //         throw new Error("PROPS missing key on createElement: "+props);
+            //     }
+            //     return React.createElement(func, props, ...children);
+            // }
+            e: React.createElement
         };
 
         PubSub.pub(Constants.PUBSUB_SingletonsReady, this.singletons);
