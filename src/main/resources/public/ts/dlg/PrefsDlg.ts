@@ -21,7 +21,6 @@ export class PrefsDlg extends DialogBase {
     simpleRadioButton: RadioButton;
     advancedRadioButton: RadioButton;
     showMetadataCheckBox: Checkbox;
-    showPathCheckBox: Checkbox;
 
     constructor() {
         super("Preferences");
@@ -38,8 +37,7 @@ export class PrefsDlg extends DialogBase {
                 ),
                 new FormGroup(null,
                     [
-                        this.showMetadataCheckBox = new Checkbox("Show Row Metadata", S.meta64.showMetaData),
-                        this.showPathCheckBox = new Checkbox("Show Path", S.meta64.showPath),
+                        this.showMetadataCheckBox = new Checkbox("Show Metadata", S.meta64.showMetaData),
                     ]
                 ),
                 new ButtonBar(
@@ -58,7 +56,6 @@ export class PrefsDlg extends DialogBase {
         S.meta64.editModeOption = this.simpleRadioButton.getChecked() ? S.meta64.MODE_SIMPLE
             : S.meta64.MODE_ADVANCED;
         S.meta64.showMetaData = this.showMetadataCheckBox.getChecked();
-        S.meta64.showPath = this.showPathCheckBox.getChecked();
 
         S.util.ajax<I.SaveUserPreferencesRequest, I.SaveUserPreferencesResponse>("saveUserPreferences", {
             //todo-2: both of these options should come from meta64.userPrefernces, and not be stored directly on meta64 scope.
@@ -67,8 +64,7 @@ export class PrefsDlg extends DialogBase {
                 "editMode": S.meta64.userPreferences.editMode,
                 "importAllowed": false,
                 "exportAllowed": false,
-                "showMetaData": S.meta64.showMetaData,
-                "showPath": S.meta64.showPath
+                "showMetaData": S.meta64.showMetaData
             }
         }, this.savePreferencesResponse);
         this.close();

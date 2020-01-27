@@ -49,7 +49,6 @@ public class NodeProp {
 	public static final String USER_PREF_PUBLIC_KEY = "sn:publicKey";
 	public static final String USER_PREF_EDIT_MODE = "sn:editMode";
 	public static final String USER_PREF_SHOW_METADATA = "sn:showMetaData";
-	public static final String USER_PREF_SHOW_PATH = "sn:showPath";
 	public static final String USER_PREF_IMPORT_ALLOWED = "sn:importAllowed";
 	public static final String USER_PREF_EXPORT_ALLOWED = "sn:exportAllowed";
 	public static final String USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth";

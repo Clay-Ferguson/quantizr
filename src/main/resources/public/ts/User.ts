@@ -86,12 +86,10 @@ export class User implements UserIntf {
         if (S.meta64.isAdminUser) {
             S.meta64.editModeOption = S.meta64.MODE_SIMPLE;
             S.meta64.showMetaData = false;
-            S.meta64.showPath = false;
         }
         else {
             S.meta64.editModeOption = res.userPreferences.advancedMode ? S.meta64.MODE_ADVANCED : S.meta64.MODE_SIMPLE;
             S.meta64.showMetaData = res.userPreferences.showMetaData;
-            S.meta64.showPath = res.userPreferences.showPath;
         }
     }
 

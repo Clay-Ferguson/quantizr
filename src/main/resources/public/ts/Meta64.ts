@@ -135,9 +135,6 @@ export class Meta64 implements Meta64Intf {
     /* Flag that indicates if we are rendering owner, modTime, etc. on each row */
     showMetaData: boolean = false;
 
-    /* Flag that indicates if we are rendering path on each row */
-    showPath: boolean = false;
-
     /*
      * List of node prefixes to flag nodes to not allow to be shown in the page in simple mode
      */
@@ -171,8 +168,7 @@ export class Meta64 implements Meta64Intf {
         "advancedMode": false,
         "importAllowed": false,
         "exportAllowed": false,
-        "showMetaData": false,
-        "showPath": false
+        "showMetaData": false
     };
 
     setNodeData = (uid: string, data: Object) => {

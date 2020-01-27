@@ -119,10 +119,8 @@ export class Render implements RenderIntf {
         }
 
         let children = [];
-        if (S.meta64.showPath) {
-            children.push(pathDiv);
-        }
         if (S.meta64.showMetaData) {
+            children.push(pathDiv);
             children.push(allSpansDiv, nodeNameSpan);
         }
 
@@ -148,7 +146,7 @@ export class Render implements RenderIntf {
         let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[node.type];
 
         /* todo-2: enable headerText when appropriate here */
-        if (S.meta64.showMetaData || S.meta64.showPath) {
+        if (S.meta64.showMetaData) {
             if (showHeader) {
                 ret.push(this.buildRowHeader(node, showPath, showName));
             }

@@ -6,7 +6,6 @@ package org.subnode.model;
 public class UserPreferences {
 	private boolean editMode;
 	private boolean showMetaData;
-	private boolean showPath;
 	private boolean advancedMode;
 	private boolean importAllowed;
 	private boolean exportAllowed;
@@ -49,13 +48,5 @@ public class UserPreferences {
 
 	public void setShowMetaData(boolean showMetaData) {
 		this.showMetaData = showMetaData;
-	}
-
-	public boolean isShowPath() {
-		return showPath;
-	}
-
-	public void setShowPath(boolean showPath) {
-		this.showPath = showPath;
 	}
 }

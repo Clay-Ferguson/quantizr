@@ -83,7 +83,6 @@ export interface UserPreferences {
     importAllowed: boolean;
     exportAllowed: boolean;
     showMetaData: boolean;
-    showPath: boolean;
 }
 
 export interface AddPrivilegeRequest {

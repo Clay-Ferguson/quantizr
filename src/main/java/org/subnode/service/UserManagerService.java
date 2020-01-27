@@ -348,9 +348,6 @@ public class UserManagerService {
 			boolean showMetaData = reqUserPrefs.isShowMetaData();
 			prefsNode.setProp(NodeProp.USER_PREF_SHOW_METADATA, showMetaData);
 
-			boolean showPath = reqUserPrefs.isShowPath();
-			prefsNode.setProp(NodeProp.USER_PREF_SHOW_PATH, showPath);
-
 			/*
 			 * Also update session-scope object, because server-side functions that need
 			 * preference information will get it from there instead of loading it from
@@ -380,7 +377,6 @@ public class UserManagerService {
 			userPrefs.setAdvancedMode(prefsNode.getBooleanProp(NodeProp.USER_PREF_ADV_MODE));
 			userPrefs.setEditMode(prefsNode.getBooleanProp(NodeProp.USER_PREF_EDIT_MODE));
 			userPrefs.setShowMetaData(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_METADATA));
-			userPrefs.setShowPath(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_PATH));
 			userPrefs.setImportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_IMPORT_ALLOWED));
 			userPrefs.setExportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_EXPORT_ALLOWED));
 		});
