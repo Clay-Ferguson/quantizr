@@ -33,10 +33,6 @@ export class Nav implements NavIntf {
     this MUST match RenderNodeService.ROWS_PER_PAGE in Java on server. */
     ROWS_PER_PAGE: number = 25;
 
-    search = (): void => {
-        new SearchContentDlg().open();
-    }
-
     editMode = (): void => {
         S.edit.editMode();
     }

@@ -14,25 +14,25 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class SearchContentDlg extends DialogBase {
+export class SearchByNameDlg extends DialogBase {
 
     static defaultSearchText: string = "";
     searchTextField: TextField;
   
     constructor() {
-        super("Search Content", "app-modal-content-medium-width");
+        super("Search by Node Name", "app-modal-content-medium-width");
         
         this.setChildren([
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                this.searchTextField = new TextField("Search", {
+                this.searchTextField = new TextField("Node Name", {
                     onKeyPress : (e: KeyboardEvent) => { 
                         if (e.which == 13) { // 13==enter key code
                             this.search();
                             return false;
                         }
                     }
-                }, SearchContentDlg.defaultSearchText),
+                }, SearchByNameDlg.defaultSearchText),
                 new ButtonBar([
                     new Button("Search", this.search, null, "primary"),
                     new Button("Close", () => {
@@ -62,14 +62,14 @@ export class SearchContentDlg extends DialogBase {
             return;
         }
 
-        SearchContentDlg.defaultSearchText = searchText;
+        SearchByNameDlg.defaultSearchText = searchText;
 
         S.util.ajax<I.NodeSearchRequest, I.NodeSearchResponse>("nodeSearch", {
             "nodeId": node.id,
             "searchText": searchText,
             "sortDir": "",
             "sortField": "",
-            "searchProp": ""
+            "searchProp": "node.name"
         }, this.searchNodesResponse);
     }
 

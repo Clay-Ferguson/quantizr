@@ -5,6 +5,9 @@ import { Div } from "./widget/Div";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants } from "./Constants";
+import { SearchContentDlg } from "./dlg/SearchContentDlg";
+import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
+import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -94,7 +97,10 @@ export class MenuPanel extends Div {
                 //new MenuItem("Find Shared Subnodes", share.findSharedNodes, () => { return  !S.meta64.isAnonUser && S.meta64.state.highlightNode != null })
             ]),
             new Menu("Search", [
-                new MenuItem("Content", S.nav.search, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
+                new MenuItem("All Content", () => {new SearchContentDlg().open();}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
+                new MenuItem("By Name", () => {new SearchByNameDlg().open();}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
+                new MenuItem("By ID", () => {new SearchByIDDlg().open();}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
+
                 //new MenuItem("Files", nav.searchFiles, () => { return  !S.meta64.isAnonUser && S.meta64.allowFileSystemSearch },
                 //    () => { return  !S.meta64.isAnonUser && S.meta64.allowFileSystemSearch })
             ]),

@@ -21,18 +21,21 @@ import org.subnode.util.DateUtil;
 import org.subnode.util.ThreadLocals;
 
 /**
- * Service for searching the repository. This searching is currently very basic, and just grabs the
- * first 100 results. Despite it being basic right now, it is however EXTREMELY high performance and
- * leverages the full and best search performance that can be gotten out of Lucene, which beats any
- * other technology in the world in it's power.
+ * Service for searching the repository. This searching is currently very basic,
+ * and just grabs the first 100 results. Despite it being basic right now, it is
+ * however EXTREMELY high performance and leverages the full and best search
+ * performance that can be gotten out of Lucene, which beats any other
+ * technology in the world in it's power.
  * 
- * NOTE: the Query class DOES have a 'skip' and 'limit' which I can take advantage of in all my searching
- * but I'm not fully doing so yet I don't believe.
+ * NOTE: the Query class DOES have a 'skip' and 'limit' which I can take
+ * advantage of in all my searching but I'm not fully doing so yet I don't
+ * believe.
  */
 @Component
 public class NodeSearchService {
 	private static final Logger log = LoggerFactory.getLogger(NodeSearchService.class);
-	private SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
+	private SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE,
+			DateUtil.DATE_FORMAT_LOCALE);
 
 	private static boolean searchAllProps = false;
 
@@ -50,7 +53,6 @@ public class NodeSearchService {
 			session = ThreadLocals.getMongoSession();
 		}
 		int MAX_NODES = 100;
-		SubNode searchRoot = api.getNode(session, req.getNodeId());
 
 		String searchText = req.getSearchText();
 		if (searchText != null && searchText.length() > 0) {
@@ -61,15 +63,41 @@ public class NodeSearchService {
 		res.setSearchResults(searchResults);
 		int counter = 0;
 
-		for (SubNode node : api.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(), MAX_NODES)) {
-			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter+1, false, false, false);
-			searchResults.add(info);
-			if (counter++ > MAX_NODES) {
-				break;
+		if ("node.id".equals(req.getSearchProp())) {
+			SubNode node = api.getNode(session, req.getSearchText(), true);
+			if (node != null) {
+				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter + 1,
+						false, false, false);
+				searchResults.add(info);
+			}
+		}
+		// node.name is a special indicator meaning we're doing a node name lookup. Not
+		// a fuzzy search but an exact lookup.
+		else if ("node.name".equals(req.getSearchProp())) {
+			// todo-0: need to disallow colons in node names since the prefix is used?
+			SubNode node = api.getNode(session, ":" + req.getSearchText(), true);
+			if (node != null) {
+				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter + 1,
+						false, false, false);
+				searchResults.add(info);
+			}
+		}
+		// othwerwise we're searching all node properties, only under the selected node.
+		else {
+			SubNode searchRoot = api.getNode(session, req.getNodeId());
+
+			for (SubNode node : api.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText,
+					req.getSortField(), MAX_NODES)) {
+				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter + 1,
+						false, false, false);
+				searchResults.add(info);
+				if (counter++ > MAX_NODES) {
+					break;
+				}
 			}
 		}
 		res.setSuccess(true);
 		log.debug("search results count: " + counter);
 	}
-	
+
 }

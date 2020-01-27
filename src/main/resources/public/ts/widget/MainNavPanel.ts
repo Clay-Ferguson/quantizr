@@ -10,6 +10,7 @@ import { Span } from "./Span";
 import { NavBarIconButton } from "./NavBarIconButton";
 import { Div } from "./Div";
 import { ReactNode } from "react";
+import { SearchContentDlg } from "../dlg/SearchContentDlg";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -136,7 +137,7 @@ export class MainNavPanel extends NavTag {
                 className: "nav-item"
             }, [
                 new NavBarIconButton("fa-search", null, {
-                    "onClick": e => { S.nav.search(); },
+                    "onClick": e => { new SearchContentDlg().open(); },
                     "title": "Search under selected node"
                 },
                     //isEnabled func

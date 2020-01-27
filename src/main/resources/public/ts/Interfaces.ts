@@ -242,7 +242,6 @@ export interface NodeSearchRequest {
     searchProp: string;
 }
 
-
 export interface GraphRequest {
     nodeId: string;
 }

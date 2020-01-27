@@ -13,7 +13,6 @@ export interface NavIntf {
 
     ROWS_PER_PAGE: number;
 
-    search(): void;
     editMode(): void;
     login(): void;
     logout(): void;
