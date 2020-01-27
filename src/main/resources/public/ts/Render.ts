@@ -54,39 +54,30 @@ export class Render implements RenderIntf {
     }
 
     buildRowHeader = (node: I.NodeInfo, showPath: boolean, showName: boolean): Div => {
-        let commentBy: string = S.props.getNodePropertyVal(cnst.COMMENT_BY, node);
         let pathDiv: Div = null;
         let commentSpan: Span = null;
         let createdBySpan: Span = null;
         let ownerDisplaySpan: Span = null;
         let lastModifiedSpan: Span = null;
 
-        if (cnst.SHOW_PATH_ON_ROWS) {
-            let ordinalStr = node.logicalOrdinal != -1 ? " [" + node.logicalOrdinal + "] " : " ";
+        let ordinalStr = node.logicalOrdinal != -1 ? " [" + node.logicalOrdinal + "] " : " ";
 
-            let idOrName;
-            if (node.name) {
-                idOrName = "Name: " + node.name;
-            }
-            else {
-                idOrName = "ID: " + node.id;
-            }
-
-            let priority = S.props.getNodePropertyVal("priority", node);
-            priority = (priority && priority != "0") ? " P" + priority : "";
-
-            pathDiv = new Div(idOrName + ordinalStr + " Type: " + node.type + priority, {
-                className: "path-display"
-            });
+        let idOrName;
+        if (node.name) {
+            idOrName = "Name: " + node.name;
+        }
+        else {
+            idOrName = "ID: " + node.id;
         }
 
-        if (commentBy) {
-            let clazz: string = (commentBy === S.meta64.userName) ? "created-by-me" : "created-by-other";
-            commentSpan = new Span("Comment By: " + commentBy, {
-                className: clazz
-            });
-        } //
-        else if (node.owner) {
+        let priority = S.props.getNodePropertyVal("priority", node);
+        priority = (priority && priority != "0") ? " P" + priority : "";
+
+        pathDiv = new Div(idOrName + ordinalStr + " Type: " + node.type + priority, {
+            className: "path-display"
+        });
+
+        if (node.owner) {
             let clazz: string = (node.owner === S.meta64.userName) ? "created-by-me" : "created-by-other";
             createdBySpan = new Span("Created By: " + node.owner, {
                 className: clazz
@@ -94,7 +85,6 @@ export class Render implements RenderIntf {
         }
 
         ownerDisplaySpan = new Span("");
-        S.meta64.setNodeData(node.uid, { "ownerDisplaySpan": ownerDisplaySpan });
 
         if (node.lastModified) {
             let lastModStr = S.util.formatDate(new Date(node.lastModified));

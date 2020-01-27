@@ -95,7 +95,7 @@ export class Meta64 implements Meta64Intf {
     /* NodeData is a 'client-state' only object that holds information per-node that is in an object
     that is never used on server but only on client
     */
-    uidToNodeDataMap: { [key: string]: Object } = {};
+    //uidToNodeDataMap: { [key: string]: Object } = {};
 
     /*
      * maps node.id values to NodeInfo.java objects
@@ -171,25 +171,25 @@ export class Meta64 implements Meta64Intf {
         "showMetaData": false
     };
 
-    setNodeData = (uid: string, data: Object) => {
-        /* lookup object by uid */
-        let foundObj = this.uidToNodeDataMap[uid];
+    // setNodeData = (uid: string, data: Object) => {
+    //     /* lookup object by uid */
+    //     let foundObj = this.uidToNodeDataMap[uid];
 
-        /* if no object found for uid, then create one and put it in map */
-        if (!foundObj) {
-            foundObj = {};
-            this.uidToNodeDataMap[uid] = foundObj;
-        }
+    //     /* if no object found for uid, then create one and put it in map */
+    //     if (!foundObj) {
+    //         foundObj = {};
+    //         this.uidToNodeDataMap[uid] = foundObj;
+    //     }
 
-        /* now we can add data properties onto foundObj */
-        S.util.mergeProps(foundObj, data);
-    }
+    //     /* now we can add data properties onto foundObj */
+    //     S.util.mergeProps(foundObj, data);
+    // }
 
-    /* gets the value associated with the given uid and property */
-    getNodeData = (uid: string, prop: string): any => {
-        let foundObj = this.uidToNodeDataMap[uid];
-        return foundObj != null ? foundObj[prop] : null;
-    }
+    // /* gets the value associated with the given uid and property */
+    // getNodeData = (uid: string, prop: string): any => {
+    //     let foundObj = this.uidToNodeDataMap[uid];
+    //     return foundObj != null ? foundObj[prop] : null;
+    // }
 
 
     inSimpleMode = (): boolean => {
@@ -360,61 +360,14 @@ export class Meta64 implements Meta64Intf {
         // });
     }
 
-    updateNodeInfoResponse = (res, node) => {
-        // I'm removing this whole implementation as part of the react refactor, the renderToDom it had is going away
-        // let ownerBuf: string = "";
-        // let mine: boolean = false;
-
-        // if (res.owners) {
-        //     res.owners.forEach( (owner, index) => {
-        //         if (ownerBuf.length > 0) {
-        //             ownerBuf += ",";
-        //         }
-
-        //         if (owner === this.userName) {
-        //             mine = true;
-        //         }
-
-        //         ownerBuf += owner;
-        //     });
-        // }
-
-        // if (ownerBuf.length > 0) {
-        //     node.owner = ownerBuf;
-        //     // let elmId = "#ownerDisplay" + node.uid;
-        //     // let elm = document.querySelector(elmId);
-        //     // if (elm) {
-        //     //     elm.innerHTML = " (Manager: " + ownerBuf + ")";
-        //     //     if (mine) {
-        //     //         util.changeOrAddClass(elmId, "created-by-other", "created-by-me");
-        //     //     } else {
-        //     //         util.changeOrAddClass(elmId, "created-by-me", "created-by-other");
-        //     //     }
-        //     // }
-        //     let elm = <Span>this.getNodeData(node.uid, "ownerDisplaySpan");
-        //     if (elm) {
-        //         elm.content = " (Manager: " + ownerBuf + ")";
-
-        //         /* this class may not persist after other updates, because class info is not currently persisted INSIDE the widget
-        //         properties, so this code needs work/testing, but i'll to ahead and leave as is for now, since this is basically
-        //         a nice-to-see background color chagne and not critical. (toto-1) */
-        //         if (mine) {
-        //             S.util.changeOrAddClass(elm.getId(), "created-by-other", "created-by-me");
-        //         } else {
-        //             S.util.changeOrAddClass(elm.getId(), "created-by-me", "created-by-other");
-        //         }
-        //         elm.render_To_Dom();
-        //     }
-        // }
-    }
-
     updateNodeInfo = (node: I.NodeInfo) => {
         S.util.ajax<I.GetNodePrivilegesRequest, I.GetNodePrivilegesResponse>("getNodePrivileges", {
             "nodeId": node.id,
             "includeAcl": false,
             "includeOwners": true
         }, (res: I.GetNodePrivilegesResponse) => {
-            this.updateNodeInfoResponse(res, node);
+            //todo-0: what goes here? Is this still used?
+            //this.updateNodeInfoResponse(res, node);
         });
     }
 

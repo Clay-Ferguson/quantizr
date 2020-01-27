@@ -1,7 +1,6 @@
 import * as I from "../Interfaces";
 import { TypeHandlerIntf } from "./TypeHandlerIntf";
 import { GraphPanel } from "../widget/GraphPanel";
-import { CompIntf } from "../widget/base/CompIntf";
 
 export interface Meta64Intf {
 
@@ -35,9 +34,6 @@ export interface Meta64Intf {
     treeDirty: boolean;
 
     uidToNodeMap: { [key: string]: I.NodeInfo };
-
-    uidToNodeDataMap: { [key: string]: Object };
-
     idToNodeMap: { [key: string]: I.NodeInfo };
 
     nextUid: number;
@@ -70,8 +66,6 @@ export interface Meta64Intf {
     graphPanel: GraphPanel;
 
     setOverlay(showOverlay: boolean): void;
-    setNodeData(uid: string, data: Object): any;
-    getNodeData(uid: string, prop: string): any;
     inSimpleMode(): boolean;
     refresh(): void;
     rebuildIndexes(): void;
@@ -86,7 +80,6 @@ export interface Meta64Intf {
     getSelectedNodesArray(): I.NodeInfo[];
     clearSelectedNodes();
     selectAllNodes(nodeIds : string[]);
-    updateNodeInfoResponse(res, node);
     updateNodeInfo(node: I.NodeInfo);
     getNodeFromId(id: string): I.NodeInfo;
     getPathOfUid(uid: string): string;
