@@ -32,7 +32,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         
         this.setChildren([
             new Form(null, [
-                Constants.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.attachment.uploadNode.id, "path-display-in-editor") : null,
+                Constants.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.attachment.uploadNode.id) : null,
                 this.dropzoneDiv = new Div("", {className: "dropzone"}),
                 this.hiddenInputContainer = new Div(null, { style: {display: "none"} }),
                 new ButtonBar([

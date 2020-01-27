@@ -54,64 +54,32 @@ export class Render implements RenderIntf {
     }
 
     buildRowHeader = (node: I.NodeInfo, showPath: boolean, showName: boolean): Div => {
-        let pathDiv: Div = null;
-        let commentSpan: Span = null;
-        let createdBySpan: Span = null;
-        let ownerDisplaySpan: Span = null;
-        let lastModifiedSpan: Span = null;
 
-        let ordinalStr = node.logicalOrdinal != -1 ? " [" + node.logicalOrdinal + "] " : " ";
-
-        let idOrName;
-        if (node.name) {
-            idOrName = "Name: " + node.name;
-        }
-        else {
-            idOrName = "ID: " + node.id;
-        }
+        let children = [];
 
         let priority = S.props.getNodePropertyVal("priority", node);
         priority = (priority && priority != "0") ? " P" + priority : "";
 
-        pathDiv = new Div(idOrName + ordinalStr + " Type: " + node.type + priority, {
-            className: "path-display"
-        });
-
-        if (node.owner) {
-            let clazz: string = (node.owner === S.meta64.userName) ? "created-by-me" : "created-by-other";
-            createdBySpan = new Span("Created By: " + node.owner, {
-                className: clazz
-            });
+        if (node.name) {
+            children.push(new Div("Name: " + node.name));
         }
 
-        ownerDisplaySpan = new Span("");
+        children.push(new Div(
+            "ID:" + node.id + " " + //
+            ((node.logicalOrdinal != -1) ? ("[" + node.logicalOrdinal + "] ") : "") + //
+            "Type:" + node.type + //
+            priority));
+
+        if (node.owner && node.owner != "?") {
+            let clazz: string = (node.owner === S.meta64.userName) ? "created-by-me" : "created-by-other";
+            children.push(new Span("Created By: " + node.owner, {
+                className: clazz
+            }));
+        }
 
         if (node.lastModified) {
             let lastModStr = S.util.formatDate(new Date(node.lastModified));
-            lastModifiedSpan = new Span(`  Mod: ${lastModStr}`);
-        }
-
-        let allSpansDiv = new Div(null, null, [commentSpan, createdBySpan, ownerDisplaySpan, lastModifiedSpan]);
-
-        let nodeNameSpan: Span = null;
-        /*
-         * on root node name will be empty string so don't show that
-         *
-         * commenting: I decided users will understand the path as a single long entity with less confusion than
-         * breaking out the name for them. They already unserstand internet URLs. This is the same concept. No need
-         * to baby them.
-         *
-         * The !showPath condition here is because if we are showing the path then the end of that is always the
-         * name, so we don't need to show the path AND the name. One is a substring of the other.
-         */
-        if (showName && !showPath && node.name) {
-            nodeNameSpan = new Span(`Name: ${node.name} [uid=${node.uid}]`);
-        }
-
-        let children = [];
-        if (S.meta64.showMetaData) {
-            children.push(pathDiv);
-            children.push(allSpansDiv, nodeNameSpan);
+            children.push(new Span(`Mod: ${lastModStr}`));
         }
 
         return new Div(null, {
