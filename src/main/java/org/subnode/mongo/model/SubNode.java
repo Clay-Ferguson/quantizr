@@ -59,9 +59,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({ SubNode.FIELD_PATH, SubNode.FIELD_PATH_HASH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME, SubNode.FIELD_ID,
-		SubNode.FIELD_MAX_CHILD_ORDINAL, SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
-		SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_ACL, SubNode.FIELD_PROPERTIES })
+@JsonPropertyOrder({ SubNode.FIELD_PATH, SubNode.FIELD_PATH_HASH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME,
+		SubNode.FIELD_ID, SubNode.FIELD_MAX_CHILD_ORDINAL, SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER,
+		SubNode.FIELD_CREATE_TIME, SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_ACL, SubNode.FIELD_PROPERTIES })
 public class SubNode {
 	public static final String FIELD_ID = "_id";
 	private boolean updateModTimeOnSave = true;
@@ -181,8 +181,9 @@ public class SubNode {
 		return XString.truncateAfterLast(getPath(), "/");
 	}
 
-	//todo-0: this should be renamed to 'getLastPathPart' probably, and also we probably
-	//won't need it after completing refactoring to new way of 'naming' nodes.
+	// todo-0: this should be renamed to 'getLastPathPart' probably, and also we
+	// probably
+	// won't need it after completing refactoring to new way of 'naming' nodes.
 	@Transient
 	@JsonIgnore
 	public String getNameOnPath() {
@@ -300,49 +301,81 @@ public class SubNode {
 	@JsonIgnore
 	public void setProp(String key, SubNodePropVal val) {
 		MongoThreadLocal.dirty(this);
-		properties().put(key, val);
+		if (val == null) {
+			properties().remove(key);
+		} else {
+			properties().put(key, val);
+		}
 	}
 
 	@JsonIgnore
 	public void setProp(String key, String val) {
 		MongoThreadLocal.dirty(this);
-		properties().put(key, new SubNodePropVal(val));
+		if (val == null) {
+			properties().remove(key);
+		} else {
+			properties().put(key, new SubNodePropVal(val));
+		}
 	}
 
 	@JsonIgnore
 	public void setProp(SubNodeProperty prop, String val) {
 		MongoThreadLocal.dirty(this);
-		properties().put(prop.getName(), new SubNodePropVal(val));
+		if (val == null) {
+			properties().remove(prop.getName());
+		} else {
+			properties().put(prop.getName(), new SubNodePropVal(val));
+		}
 	}
 
 	@JsonIgnore
 	public void setProp(String key, Date val) {
 		MongoThreadLocal.dirty(this);
-		properties().put(key, new SubNodePropVal(val));
+		if (val == null) {
+			properties().remove(key);
+		} else {
+			properties().put(key, new SubNodePropVal(val));
+		}
 	}
 
 	@JsonIgnore
 	public void setProp(String key, Double val) {
 		MongoThreadLocal.dirty(this);
-		properties().put(key, new SubNodePropVal(val));
+		if (val == null) {
+			properties().remove(key);
+		} else {
+			properties().put(key, new SubNodePropVal(val));
+		}
 	}
 
 	@JsonIgnore
 	public void setProp(String key, Boolean val) {
 		MongoThreadLocal.dirty(this);
-		properties().put(key, new SubNodePropVal(val));
+		if (val == null) {
+			properties().remove(key);
+		} else {
+			properties().put(key, new SubNodePropVal(val));
+		}
 	}
 
 	@JsonIgnore
 	public void setProp(String key, Long val) {
 		MongoThreadLocal.dirty(this);
-		properties().put(key, new SubNodePropVal(val));
+		if (val == null) {
+			properties().remove(key);
+		} else {
+			properties().put(key, new SubNodePropVal(val));
+		}
 	}
 
 	@JsonIgnore
 	public void setProp(String key, Integer val) {
 		MongoThreadLocal.dirty(this);
-		properties().put(key, new SubNodePropVal(val));
+		if (val == null) {
+			properties().remove(key);
+		} else {
+			properties().put(key, new SubNodePropVal(val));
+		}
 	}
 
 	@JsonIgnore

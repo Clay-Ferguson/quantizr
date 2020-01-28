@@ -44,7 +44,7 @@ export class Props implements PropsIntf {
         await S.render.renderPageFromData();
     }
 
-    deletePropertyFromLocalData = (node: I.NodeInfo, propertyName: string): void => {
+    deleteProperty = (node: I.NodeInfo, propertyName: string): void => {
         if (node.properties) {
             for (let i = 0; i < node.properties.length; i++) {
                 if (propertyName === node.properties[i].name) {
@@ -166,13 +166,11 @@ export class Props implements PropsIntf {
     /**
      * Sets property value and returns true only if the value has changed
      */
-    setNodePropertyVal = (propertyName: string, node: I.NodeInfo, val: string): boolean => {
+    setNodePropertyVal = (propertyName: string, node: I.NodeInfo, val: string): void => {
         let prop: I.PropertyInfo = this.getNodeProperty(propertyName, node);
-        let ret = true;
 
         /* If we found a property by propertyName, then set it's value */
         if (prop != null) {
-            ret = (prop.value !== val);
             prop.value = val;
         }
         /* Else this is a new property we must add (ret remains true here) */
@@ -186,7 +184,6 @@ export class Props implements PropsIntf {
             }
             node.properties.push(prop);
         }
-        return ret;
     }
 
     // /*

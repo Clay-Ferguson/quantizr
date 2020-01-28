@@ -25,7 +25,6 @@ import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { TextField } from "../widget/TextField";
 import { EncryptionDlg } from "./EncryptionDlg";
 import { EncryptionOptions } from "../EncryptionOptions";
-import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { FormInline } from "../widget/FormInline";
 
 let S: Singletons;
@@ -84,7 +83,7 @@ export class EditNodeDlg extends DialogBase {
 
     createLayoutSelection = (): Selection => {
         //todo-1: these columns need to auto-space and not go past allowed width of page display
-        let selection: Selection = new Selection(null,"Layout", [
+        let selection: Selection = new Selection(null, "Layout", [
             { key: "v", val: "Vertical", selected: true },
             { key: "c2", val: "2 Columns" },
             { key: "c3", val: "3 Columns" },
@@ -154,7 +153,7 @@ export class EditNodeDlg extends DialogBase {
         let selectionsBar = new FormInline(null, [
             this.layoutSelection = this.createLayoutSelection(),
             this.prioritySelection = this.createPrioritySelection()
-        ]); 
+        ]);
 
         /* clear this map to get rid of old properties */
         this.propEntries = new Array<I.PropEntry>();
@@ -270,8 +269,8 @@ export class EditNodeDlg extends DialogBase {
             ])
 
         this.pathDisplay = cnst.SHOW_PATH_IN_DLGS ? new Div(path, {
-                className: "alert alert-info small-padding"
-            }) : null;
+            className: "alert alert-info small-padding"
+        }) : null;
 
         let collapsiblePanel = new CollapsiblePanel("More...", null, [this.pathDisplay, optionsBar, selectionsBar, collapsiblePropsTable, this.propsButtonBar], false,
             (state: boolean) => {
@@ -334,7 +333,14 @@ export class EditNodeDlg extends DialogBase {
             await dlg.open();
             console.log("EncOptions after EncDlg: " + S.util.prettyPrint(this.encryptionOptions));
 
-            S.props.setNodePropertyVal(cnst.ENC, this.node, this.encryptionOptions.encryptForOwnerOnly ? "priv" : "[delete-node-indicator]");
+            if (this.encryptionOptions.encryptForOwnerOnly) {
+                //todo-0: think about having a strategy of setting to "null" indicating to DELETE, adn also making it
+                //not show up in the GUI if null. Blank string would be required to exist to save something empty.
+                S.props.setNodePropertyVal(cnst.ENC, this.node, "priv");
+            }
+            else {
+                S.props.deleteProperty(this.node, cnst.ENC);
+            }
 
             this.rebuildDlg(); //todo-1: this is overkill. Will do it with targeted react setState eventually
         })();
@@ -390,7 +396,7 @@ export class EditNodeDlg extends DialogBase {
              * remove deleted property from client side data, so we can re-render screen without making another call to
              * server
              */
-            S.props.deletePropertyFromLocalData(this.node, propertyToDelete);
+            S.props.deleteProperty(this.node, propertyToDelete);
 
             /* now just re-render screen from local variables */
             S.meta64.treeDirty = true;
@@ -408,16 +414,13 @@ export class EditNodeDlg extends DialogBase {
     }
 
     saveCheckboxVal = (checkbox: Checkbox, saveList: I.PropertyInfo[], handled: any, propName: string): void => {
-        //todo-1: delete-node-indicator was a quick ugly hack. Need to do something reasonable instead.
-        let val = checkbox.getChecked() ? "1" : "[delete-node-indicator]";
-        let changed = S.props.setNodePropertyVal(propName, this.node, val);
-        if (changed) {
-            handled[propName] = true;
-            saveList.push({
-                "name": propName,
-                "value": val
-            });
-        }
+        let val = checkbox.getChecked() ? "1" : null;
+        S.props.setNodePropertyVal(propName, this.node, val);
+        handled[propName] = true;
+        saveList.push({
+            "name": propName,
+            "value": val
+        });
     }
 
     saveExistingNode = async (callback: Function = null): Promise<void> => {
@@ -435,38 +438,32 @@ export class EditNodeDlg extends DialogBase {
                 let layout = this.layoutSelection.getSelection();
 
                 //vertical layout is the default, so if user selects that we can just delete the option and save space.
-                if (layout == "v") layout = "[delete-node-indicator]";
 
-                let changed = S.props.setNodePropertyVal("layout", this.node, layout);
-                if (changed) {
-                    handled["layout"] = true;
-                    saveList.push({
-                        "name": "layout",
-                        "value": layout
-                    });
-                }
+                S.props.setNodePropertyVal("layout", this.node, layout);
+                handled["layout"] = true;
+                saveList.push({
+                    "name": "layout",
+                    "value": layout == "v" ? null : layout
+                });
 
                 /* Get state of the 'priority' dropdown */
                 let priority = this.prioritySelection.getSelection();
 
-                //vertical layout is the default, so if user selects that we can just delete the option and save space.
-                if (priority == "0") layout = "[delete-node-indicator]";
+                //priority value 0 is default, so if user selects that we can just delete the option and save space.
 
-                changed = S.props.setNodePropertyVal("priority", this.node, layout);
-                if (changed) {
-                    handled["priority"] = true;
-                    saveList.push({
-                        "name": "priority",
-                        "value": priority
-                    });
-                }
+                S.props.setNodePropertyVal("priority", this.node, layout);
+                handled["priority"] = true;
+                saveList.push({
+                    "name": "priority",
+                    "value": priority == "0" ? null : priority
+                });
 
                 //handle encryption setting
+
                 handled[cnst.ENC] = true;
                 saveList.push({
                     "name": cnst.ENC,
-                    //save as 'priv' or else delete the property
-                    "value": this.encryptionOptions.encryptForOwnerOnly ? "priv" : "[delete-node-indicator]"
+                    "value": this.encryptionOptions.encryptForOwnerOnly ? "priv" : null
                 });
             }
 

@@ -198,10 +198,6 @@ public class NodeEditService {
 		res.setSuccess(true);
 	}
 
-	/*
-	 * Saves the node with new information based on whatever is specified in the
-	 * request.
-	 */
 	public void saveNode(MongoSession session, SaveNodeRequest req, SaveNodeResponse res) {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
@@ -217,13 +213,15 @@ public class NodeEditService {
 		}
 		node.setContent(req.getContent());
 
-		//if we're setting node name to a different node name
+		// if we're setting node name to a different node name
 		if (req.getName() != null && !req.getName().equals(node.getName())) {
 
-			//We don't use unique index on node name, because we want to save storage space on the server, so we have to
-			//do the uniqueness check ourselves here manually
+			/*
+			 * We don't use unique index on node name, because we want to save storage space
+			 * on the server, so we have to do the uniqueness check ourselves here manually
+			 */
 			SubNode nodeByName = api.getNodeByName(session, req.getName());
-			if (nodeByName!=null) {
+			if (nodeByName != null) {
 				throw new RuntimeException("Node name is already in use. Duplicates not allowed.");
 			}
 
@@ -240,11 +238,7 @@ public class NodeEditService {
 				 */
 				if (SubNodeUtil.isSavableProperty(property.getName())) {
 					log.debug("Property to save: " + property.getName() + "=" + property.getValue());
-					if (property.getValue().equalsIgnoreCase("[delete-node-indicator]")) {
-						node.deleteProp(property.getName());
-					} else {
-						node.setProp(property.getName(), property.getValue());
-					}
+					node.setProp(property.getName(), property.getValue());
 				} else {
 					/**
 					 * TODO: This case indicates that data was sent unnecessarily. fix! (i.e. make
