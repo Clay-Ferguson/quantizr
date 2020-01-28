@@ -332,15 +332,7 @@ export class EditNodeDlg extends DialogBase {
             let dlg = new EncryptionDlg(this.encryptionOptions);
             await dlg.open();
             console.log("EncOptions after EncDlg: " + S.util.prettyPrint(this.encryptionOptions));
-
-            if (this.encryptionOptions.encryptForOwnerOnly) {
-                //todo-0: think about having a strategy of setting to "null" indicating to DELETE, adn also making it
-                //not show up in the GUI if null. Blank string would be required to exist to save something empty.
-                S.props.setNodePropertyVal(cnst.ENC, this.node, "priv");
-            }
-            else {
-                S.props.deleteProperty(this.node, cnst.ENC);
-            }
+            S.props.setNodePropertyVal(cnst.ENC, this.node, this.encryptionOptions.encryptForOwnerOnly ? "priv" : null);
 
             this.rebuildDlg(); //todo-1: this is overkill. Will do it with targeted react setState eventually
         })();
