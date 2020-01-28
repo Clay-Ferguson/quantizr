@@ -360,13 +360,13 @@ export class Meta64 implements Meta64Intf {
         // });
     }
 
+    //note: this code is not currently in use
     updateNodeInfo = (node: I.NodeInfo) => {
         S.util.ajax<I.GetNodePrivilegesRequest, I.GetNodePrivilegesResponse>("getNodePrivileges", {
             "nodeId": node.id,
             "includeAcl": false,
             "includeOwners": true
         }, (res: I.GetNodePrivilegesResponse) => {
-            //todo-0: what goes here? Is this still used?
             //this.updateNodeInfoResponse(res, node);
         });
     }

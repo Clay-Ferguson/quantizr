@@ -175,16 +175,16 @@ export class Nav implements NavIntf {
 
         S.util.updateHistory(null, node);
 
-        if (S.meta64.userPreferences.editMode) {
-            /*
-             * if node.owner is currently null, that means we have not retrieved the owner from the server yet, but
-             * if non-null it's already displaying and we do nothing.
-             */
-            if (!node.owner) {
-                //console.log("calling updateNodeInfo");
-                S.meta64.updateNodeInfo(node);
-            }
-        }
+        // if (S.meta64.userPreferences.editMode) {
+        //     /*
+        //      * if node.owner is currently null, that means we have not retrieved the owner from the server yet, but
+        //      * if non-null it's already displaying and we do nothing.
+        //      */
+        //     if (!node.owner) {
+        //         //console.log("calling updateNodeInfo");
+        //         S.meta64.updateNodeInfo(node);
+        //     }
+        // }
         S.meta64.refreshAllGuiEnablement();
     }
 

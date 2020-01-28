@@ -116,9 +116,6 @@ export class EditNodeDlg extends DialogBase {
                     [
                         this.propertyEditFieldContainer = new Div("", {
                         }),
-                        this.pathDisplay = cnst.SHOW_PATH_IN_DLGS ? new Div(path, {
-                            className: "alert alert-info small-padding"
-                        }) : null,
                     ]
                 ),
                 this.buttonBar = new ButtonBar(
@@ -272,7 +269,11 @@ export class EditNodeDlg extends DialogBase {
                 this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
             ])
 
-        let collapsiblePanel = new CollapsiblePanel("More...", null, [optionsBar, selectionsBar, collapsiblePropsTable, this.propsButtonBar], false,
+        this.pathDisplay = cnst.SHOW_PATH_IN_DLGS ? new Div(path, {
+                className: "alert alert-info small-padding"
+            }) : null;
+
+        let collapsiblePanel = new CollapsiblePanel("More...", null, [this.pathDisplay, optionsBar, selectionsBar, collapsiblePropsTable, this.propsButtonBar], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
             }, EditNodeDlg.morePanelExpanded);

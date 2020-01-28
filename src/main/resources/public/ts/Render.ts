@@ -54,7 +54,6 @@ export class Render implements RenderIntf {
     }
 
     buildRowHeader = (node: I.NodeInfo, showPath: boolean, showName: boolean): Div => {
-
         let children = [];
 
         let priority = S.props.getNodePropertyVal("priority", node);
@@ -68,6 +67,7 @@ export class Render implements RenderIntf {
             "ID:" + node.id + " " + //
             ((node.logicalOrdinal != -1) ? ("[" + node.logicalOrdinal + "] ") : "") + //
             "Type:" + node.type + //
+            (node.lastModified ? " (Mod: " + S.util.formatDate(new Date(node.lastModified)) + ")" : "") + //
             priority));
 
         if (node.owner && node.owner != "?") {
@@ -75,11 +75,6 @@ export class Render implements RenderIntf {
             children.push(new Span("Created By: " + node.owner, {
                 className: clazz
             }));
-        }
-
-        if (node.lastModified) {
-            let lastModStr = S.util.formatDate(new Date(node.lastModified));
-            children.push(new Span(`Mod: ${lastModStr}`));
         }
 
         return new Div(null, {
