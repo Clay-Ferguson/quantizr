@@ -101,7 +101,6 @@ export abstract class Comp implements CompIntf {
         return ret;
     }
 
-
     /* Function refreshes all enablement and visibility based on current state of app */
     refreshState(): void {
         let enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
@@ -340,7 +339,6 @@ export abstract class Comp implements CompIntf {
     hookState = (newState: any) => {
         //console.log("hookState[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(newState));
         const [state, setStateFunc] = useState(newState);
-        //console.log("   hookState ok.");
         this.setStateFunc = setStateFunc;
         this.state = state;
         this.initialState = null;
@@ -419,6 +417,8 @@ export abstract class Comp implements CompIntf {
         let ret: ReactNode = null;
         try {
             this.hookState(this.initialState || this.state || {});
+
+            /* This 'useEffect' call makes react call 'domAddEvent' once the dom element comes into existence on the acutal DOM */
             useEffect(this.domAddEvent, []);
 
             // These two other effect hooks should work fine but just aren't needed yet.
@@ -426,13 +426,16 @@ export abstract class Comp implements CompIntf {
             //     console.log("$$$$ DOM UPDATE: " + this.jsClassName);
             // });
 
-            // (NOTE: Remember this won't run for DialogBase because it's done using pure DOM Javascript, which is the same reason
-            // whenElmEx has to still exist right now)
-            // useEffect(() => {
-            //     return () => {
-            //         console.log("$$$$ DOM REMOVE:" + this.jsClassName);
-            //     }
-            // }, []);
+            /* 
+            This 'useEffect' call makes react call 'domAddEvent' once the dom element is removed from the acutal DOM.
+            (NOTE: Remember this won't run for DialogBase because it's done using pure DOM Javascript, which is the same reason
+            whenElmEx has to still exist right now)
+            */
+            useEffect(() => {
+                return () => {
+                    this.domRemoveEvent();
+                }
+            }, []);
 
             ret = this.compRender();
         }
@@ -440,6 +443,12 @@ export abstract class Comp implements CompIntf {
             console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key);
         }
         return ret;
+    }
+
+    domRemoveEvent = (): void => {
+        //Clean up this map, or else this would just be a memory leak
+        delete Comp.idToCompMap[this.getId()];
+        //console.log("DOM REMOVE:" + this.jsClassName + " compMapSize=" + S.util.getPropertyCount(Comp.idToCompMap));
     }
 
     domAddEvent = (): void => {
