@@ -13,7 +13,7 @@ export class FormInline extends Comp {
 
     constructor(attribs: Object = null, initialChildren: Comp[] = null) {
         super(attribs);
-        this.attribs.className = "form-inline formGroupBordered";
+        this.attribs.className = "form-inline";
         this.setChildren(initialChildren);
     }
 

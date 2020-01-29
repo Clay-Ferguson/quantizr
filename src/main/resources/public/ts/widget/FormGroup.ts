@@ -13,7 +13,7 @@ export class FormGroup extends Comp {
 
     constructor(attribs: Object = null, initialChildren: Comp[] = null) {
         super(attribs);
-        this.attribs.className = "form-group formGroupBordered";
+        this.attribs.className = "form-group";
         this.setChildren(initialChildren);
     }
 

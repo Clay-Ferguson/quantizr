@@ -16,7 +16,6 @@ export class ButtonBar extends Comp {
         super(null);
         this.attribs.className = "btn-group";
         this.attribs.role = "group";
-        this.attribs.style = { margin: '10px' };
         this.setChildren(initialButtons);
     }
 
