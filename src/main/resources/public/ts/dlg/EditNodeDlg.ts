@@ -26,6 +26,7 @@ import { TextField } from "../widget/TextField";
 import { EncryptionDlg } from "./EncryptionDlg";
 import { EncryptionOptions } from "../EncryptionOptions";
 import { FormInline } from "../widget/FormInline";
+import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -262,17 +263,23 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
+        if (!collapsiblePropsTable.childrenExist()) {
+            collapsiblePropsTable.addChild(new TextContent("Node has no custom properties."));
+        }
+
         this.propsButtonBar = new ButtonBar(
             [
                 this.addPropertyButton = new Button("Add Property", this.addProperty),
                 this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
-            ])
+            ]);
+
+        collapsiblePropsTable.addChild(this.propsButtonBar);
 
         this.pathDisplay = cnst.SHOW_PATH_IN_DLGS ? new Div(path, {
             className: "alert alert-info small-padding"
         }) : null;
 
-        let collapsiblePanel = new CollapsiblePanel("More...", null, [this.pathDisplay, optionsBar, selectionsBar, collapsiblePropsTable, this.propsButtonBar], false,
+        let collapsiblePanel = new CollapsiblePanel("More...", null, [this.pathDisplay, optionsBar, selectionsBar, collapsiblePropsTable], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
             }, EditNodeDlg.morePanelExpanded);
@@ -298,10 +305,6 @@ export class EditNodeDlg extends DialogBase {
             });
             this.editPropertyDlgInst = dlg;
             await this.editPropertyDlgInst.open();
-
-            //the EditPropertyDlg already has a way of calling this itself, and probably would be ok ot pass a callback into the dialog
-            //rather than doing a bunch of confusing 'awaits' here
-            //this.rebuildDlg(); //todo-1: this is overkill. Will do it with targeted react setState eventually
         })();
     }
 
