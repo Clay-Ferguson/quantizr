@@ -57,7 +57,6 @@ export interface NodeInfo {
     binVer: number;
     width: number;
     height: number;
-    uid: string;
     lastModified: number;
     children: NodeInfo[];
 }

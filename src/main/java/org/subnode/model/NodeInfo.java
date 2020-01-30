@@ -15,7 +15,10 @@ public class NodeInfo {
 	private static final Logger log = LoggerFactory.getLogger(NodeInfo.class);
 
 	private String id;
+
+	//todo-0: this should no longer be needed at all on client! get rid of it.
 	private String path;
+	
 	private String name;
 	private String content;
 	private Date lastModified;
@@ -43,7 +46,6 @@ public class NodeInfo {
 	 * probably set them on server side instead or else completely generate
 	 * dynamically if based on properties.
 	 */
-	private String uid; 
 	private String imgId;
 	private String owner;
 
@@ -184,14 +186,6 @@ public class NodeInfo {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	public String getUid() {
-		return uid;
-	}
-
-	public void setUid(String uid) {
-		this.uid = uid;
 	}
 
 	public String getImgId() {

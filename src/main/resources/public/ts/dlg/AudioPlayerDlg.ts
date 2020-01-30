@@ -30,17 +30,9 @@ export class AudioPlayerDlg extends DialogBase {
 
     //DO NOT DELETE
     // private node: I.NodeInfo;
-    // private nodeUid: string;
 
     constructor(private sourceUrl: string, title: string) {
         super("Audio Player");
-
-        //DO NOT DELETE
-        // this.nodeUid = (<any>args).nodeUid;
-        // this.node = S.meta64.uidToNodeMap[this.nodeUid];
-        // if (!this.node) {
-        //     throw `unknown node uid: ${this.nodeUid}`;
-        // }
 
         this.setChildren([
             new Form(null, [

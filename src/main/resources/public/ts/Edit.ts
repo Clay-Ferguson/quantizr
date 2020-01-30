@@ -209,7 +209,7 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Insert node", res)) {
             S.meta64.initNode(res.newNode, true);
             S.meta64.highlightNode(res.newNode, true);
-            this.runEditNode(res.newNode.uid);
+            this.runEditNode(res.newNode.id);
         }
     }
 
@@ -220,7 +220,7 @@ export class Edit implements EditIntf {
             }
             else {
                 S.meta64.initNode(res.newNode, true);
-                this.runEditNode(res.newNode.uid);
+                this.runEditNode(res.newNode.id);
             }
         }
     }
@@ -244,69 +244,69 @@ export class Edit implements EditIntf {
         await S.render.renderPageFromData();
     }
 
-    moveNodeUp = (uid?: string): void => {
-        if (!uid) {
+    moveNodeUp = (id?: string): void => {
+        if (!id) {
             let selNode: I.NodeInfo = S.meta64.getHighlightedNode();
-            uid = selNode.uid;
+            id = selNode.id;
         }
 
-        let node: I.NodeInfo = S.meta64.uidToNodeMap[uid];
+        let node: I.NodeInfo = S.meta64.idToNodeMap[id];
         if (node) {
             S.util.ajax<I.SetNodePositionRequest, I.SetNodePositionResponse>("setNodePosition", {
                 "nodeId": node.id,
                 "targetName": "up"
             }, this.setNodePositionResponse);
         } else {
-            console.log("idToNodeMap does not contain " + uid);
+            console.log("idToNodeMap does not contain " + id);
         }
     }
 
-    moveNodeDown = (uid?: string): void => {
-        if (!uid) {
+    moveNodeDown = (id?: string): void => {
+        if (!id) {
             let selNode: I.NodeInfo = S.meta64.getHighlightedNode();
-            uid = selNode.uid;
+            id = selNode.id;
         }
 
-        let node: I.NodeInfo = S.meta64.uidToNodeMap[uid];
+        let node: I.NodeInfo = S.meta64.idToNodeMap[id];
         if (node) {
             S.util.ajax<I.SetNodePositionRequest, I.SetNodePositionResponse>("setNodePosition", {
                 "nodeId": node.id,
                 "targetName": "down"
             }, this.setNodePositionResponse);
         } else {
-            console.log("idToNodeMap does not contain " + uid);
+            console.log("idToNodeMap does not contain " + id);
         }
     }
 
-    moveNodeToTop = (uid?: string): void => {
-        if (!uid) {
+    moveNodeToTop = (id?: string): void => {
+        if (!id) {
             let selNode: I.NodeInfo = S.meta64.getHighlightedNode();
-            uid = selNode.uid;
+            id = selNode.id;
         }
-        let node: I.NodeInfo = S.meta64.uidToNodeMap[uid];
+        let node: I.NodeInfo = S.meta64.idToNodeMap[id];
         if (node) {
             S.util.ajax<I.SetNodePositionRequest, I.SetNodePositionResponse>("setNodePosition", {
                 "nodeId": node.id,
                 "targetName": "top"
             }, this.setNodePositionResponse);
         } else {
-            console.log("idToNodeMap does not contain " + uid);
+            console.log("idToNodeMap does not contain " + id);
         }
     }
 
-    moveNodeToBottom = (uid?: string): void => {
-        if (!uid) {
+    moveNodeToBottom = (id?: string): void => {
+        if (!id) {
             let selNode: I.NodeInfo = S.meta64.getHighlightedNode();
-            uid = selNode.uid;
+            id = selNode.id;
         }
-        let node: I.NodeInfo = S.meta64.uidToNodeMap[uid];
+        let node: I.NodeInfo = S.meta64.idToNodeMap[id];
         if (node) {
             S.util.ajax<I.SetNodePositionRequest, I.SetNodePositionResponse>("setNodePosition", {
                 "nodeId": node.id,
                 "targetName": "bottom"
             }, this.setNodePositionResponse);
         } else {
-            console.log("idToNodeMap does not contain " + uid);
+            console.log("idToNodeMap does not contain " + id);
         }
     }
 
@@ -339,17 +339,17 @@ export class Edit implements EditIntf {
         return S.meta64.currentNodeData.node.children[0];
     }
 
-    runEditNode = (uid: any): void => {
+    runEditNode = (id: any): void => {
         let node: I.NodeInfo = null;
-        if (!uid) {
+        if (!id) {
             node = S.meta64.getHighlightedNode();
         }
         else {
-            node = S.meta64.uidToNodeMap[uid];
+            node = S.meta64.idToNodeMap[id];
         }
 
         if (!node) {
-            S.util.showMessage("Unknown nodeId in editNodeClick: " + uid);
+            S.util.showMessage("Unknown nodeId in editNodeClick: " + id);
             return;
         }
 
@@ -358,7 +358,7 @@ export class Edit implements EditIntf {
         }, this.initNodeEditResponse);
     }
 
-    insertNode = (uid?: any, typeName?: string): void => {
+    insertNode = (id?: any, typeName?: string): void => {
         if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node.children) return;
         this.parentOfNewNode = S.meta64.currentNodeData.node;
         if (!this.parentOfNewNode) {
@@ -371,10 +371,10 @@ export class Edit implements EditIntf {
          * currently highlighted node if no uid was passed.
          */
         let node: I.NodeInfo = null;
-        if (!uid) {
+        if (!id) {
             node = S.meta64.getHighlightedNode();
         } else {
-            node = S.meta64.uidToNodeMap[uid];
+            node = S.meta64.idToNodeMap[id];
         }
 
         if (node) {
@@ -383,12 +383,12 @@ export class Edit implements EditIntf {
         }
     }
 
-    createSubNode = (uid?: any, typeName?: string, createAtTop?: boolean): void => {
+    createSubNode = (id?: any, typeName?: string, createAtTop?: boolean): void => {
         /*
          * If no uid provided we deafult to creating a node under the currently viewed node (parent of current page), or any selected
          * node if there is a selected node.
          */
-        if (!uid) {
+        if (!id) {
             let highlightNode: I.NodeInfo = S.meta64.getHighlightedNode();
             if (highlightNode) {
                 this.parentOfNewNode = highlightNode;
@@ -398,9 +398,9 @@ export class Edit implements EditIntf {
                 this.parentOfNewNode = S.meta64.currentNodeData.node;
             }
         } else {
-            this.parentOfNewNode = S.meta64.uidToNodeMap[uid];
+            this.parentOfNewNode = S.meta64.idToNodeMap[id];
             if (!this.parentOfNewNode) {
-                console.log("Unknown nodeId in createSubNode: " + uid);
+                console.log("Unknown nodeId in createSubNode: " + id);
                 return;
             }
         }
@@ -410,10 +410,6 @@ export class Edit implements EditIntf {
          */
         this.nodeInsertTarget = null;
         this.startEditingNewNode(typeName, createAtTop);
-    }
-
-    replyToComment = (uid: any): void => {
-        this.createSubNode(uid);
     }
 
     selectAllNodes = async (): Promise<void> => {

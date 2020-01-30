@@ -63,7 +63,6 @@ export interface UtilIntf {
     addAll(obj, a): void;
     addAll(obj, a): void;
     nullOrUndef(obj): boolean;
-    getUidForId(map: { [key: string]: string }, id): string;
     elementExists(id): boolean;
     getTextAreaValById(id): string;
     domElm(id: string): HTMLElement;

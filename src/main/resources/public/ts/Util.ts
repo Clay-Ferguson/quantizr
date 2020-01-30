@@ -552,22 +552,6 @@ export class Util implements UtilIntf {
         return obj === null || obj === undefined;
     }
 
-    /*
-     * We have to be able to map any identifier to a uid, that will be repeatable, so we have to use a local
-     * 'hashset-type' implementation
-     */
-    getUidForId = (map: { [key: string]: string }, id): string => {
-        /* look for uid in map */
-        let uid: string = map[id];
-
-        /* if not found, get next number, and add to map */
-        if (!uid) {
-            uid = "" + S.meta64.nextUid++;
-            map[id] = uid;
-        }
-        return uid;
-    }
-
     elementExists = (id: string): boolean => {
         if (this.startsWith(id, "#")) {
             id = id.substring(1);

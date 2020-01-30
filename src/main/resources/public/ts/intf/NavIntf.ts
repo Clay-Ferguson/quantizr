@@ -27,9 +27,9 @@ export interface NavIntf {
     navUpLevel(): void;
     navOpenSelectedNode(): void;
     getSelectedDomElement(): HTMLElement;
-    clickOnNodeRow(uid: string): void;
-    openNodeByUid(uid: string, scrollToFirstChild: boolean): void;
-    toggleNodeSel(selected: boolean, uid: string): void;
+    clickOnNodeRow(id: string): void;
+    openNodeById(id: string, scrollToFirstChild: boolean): void;
+    toggleNodeSel(selected: boolean, id: string): void;
     navPageNodeResponse(res: I.RenderNodeResponse): void;
     navHome(): void;
     navPublicHome(): void;

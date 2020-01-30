@@ -83,7 +83,7 @@ export class Nav implements NavIntf {
     navOpenSelectedNode = (): void => {
         let currentSelNode: I.NodeInfo = S.meta64.getHighlightedNode();
         if (!currentSelNode) return;
-        S.nav.openNodeByUid(currentSelNode.uid, true);
+        S.nav.openNodeById(currentSelNode.id, true);
     }
 
     navToSibling = (siblingOffset: number): void => {
@@ -144,13 +144,13 @@ export class Nav implements NavIntf {
         if (currentSelNode) {
 
             /* get node by node identifier */
-            let node: I.NodeInfo = S.meta64.uidToNodeMap[currentSelNode.uid];
+            let node: I.NodeInfo = S.meta64.idToNodeMap[currentSelNode.id];
 
             if (node) {
                 //console.log("found highlighted node.id=" + node.id);
 
                 /* now make CSS id from node */
-                let nodeId: string = this._UID_ROWID_PREFIX + node.uid;
+                let nodeId: string = this._UID_ROWID_PREFIX + node.id;
                 // console.log("looking up using element id: "+nodeId);
 
                 return S.util.domElm(nodeId);
@@ -160,9 +160,9 @@ export class Nav implements NavIntf {
         return null;
     }
 
-    clickOnNodeRow = (uid: string): void => {
+    clickOnNodeRow = (id: string): void => {
         //console.log("clickOnNodeRow: uid=" + uid);
-        let node: I.NodeInfo = S.meta64.uidToNodeMap[uid];
+        let node: I.NodeInfo = S.meta64.idToNodeMap[id];
         if (!node) {
             //console.log("clickOnNodeRow recieved uid that doesn't map to any node. uid=" + uid);
             return;
@@ -200,26 +200,22 @@ export class Nav implements NavIntf {
         }, this.navPageNodeResponse);
     }
 
-    /* UID is the 'client-only' id assigned for this node, and will not apply to any server-side data nor any other 'instance'
-    of the running application. All browser session javascript scoped */
-    openNodeByUid = (uid: string, scrollToFirstChild?: boolean): void => {
-        //todo-1: Need to rethink about how to keep uidToNodeMap clean (garbage collected), and look into whether
-        //something like this is mapping DOM id to Comp instances also, and if THAT is also needed and if it's garbage collected yet.
-        let node: I.NodeInfo = S.meta64.uidToNodeMap[uid];
+    openNodeById = (id: string, scrollToFirstChild?: boolean): void => {
+        let node: I.NodeInfo = S.meta64.idToNodeMap[id];
         S.meta64.highlightNode(node, false);
 
         if (!node) {
-            S.util.showMessage("Unknown nodeId in openNodeByUid: " + uid);
+            S.util.showMessage("Unknown nodeId in openNodeByUid: " + id);
         } else {
             S.view.refreshTree(node.id, true, null, false, false, scrollToFirstChild);
         }
     }
 
-    toggleNodeSel = (selected: boolean, uid: string): void => {
+    toggleNodeSel = (selected: boolean, id: string): void => {
         if (selected) {
-            S.meta64.selectedNodes[uid] = true;
+            S.meta64.selectedNodes[id] = true;
         } else {
-            delete S.meta64.selectedNodes[uid];
+            delete S.meta64.selectedNodes[id];
         }
 
         S.meta64.refreshAllGuiEnablement();

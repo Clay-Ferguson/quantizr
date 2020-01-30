@@ -351,7 +351,7 @@ export class Render implements RenderIntf {
      */
     renderNodeAsListItem = (node: I.NodeInfo, index: number, count: number, rowCount: number, level: number, layoutClass: string): Comp => {
 
-        let uid: string = node.uid;
+        let id: string = node.id;
         let prevPageExists: boolean = S.nav.mainOffset > 0;
         let nextPageExists: boolean = !S.nav.endReached;
 
@@ -379,26 +379,26 @@ export class Render implements RenderIntf {
         // console.log("test: [" + parentIdToFocusIdMap[currentNodeId]
         // +"]==["+ node.id + "]")
         let focusNode: I.NodeInfo = S.meta64.getHighlightedNode();
-        let selected: boolean = (focusNode && focusNode.uid === uid);
+        let selected: boolean = (focusNode && focusNode.id === id);
 
         let buttonBar: Comp = this.makeRowButtonBar(node, editingAllowed);
         //let bkgStyle: string = this.getNodeBkgImageStyle(node);
         let indentLevel = layoutClass === "node-grid-item" ? 0 : level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
-        let cssId: string = "row_" + uid;
+        let cssId: string = "row_" + id;
 
         let activeClass = "active-row";
         let inactiveClass = "inactive-row";
 
         return new Div(null, {
             className: layoutClass + (selected ? (" " + activeClass) : (" " + inactiveClass)),
-            onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(uid); }, //
+            onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(id); }, //
             id: cssId,
             style: style
         },
             [
                 buttonBar, new Div(null, {
-                    "id": uid + "_content"
+                    "id": id + "_content"
                 }, this.renderNodeContent(node, true, true, true, true, true))
             ]);
     }
@@ -463,9 +463,10 @@ export class Render implements RenderIntf {
          * Show Reply button if this is a publicly appendable node and not created by current user,
          * or having been added as comment by current user
          */
-        if (publicAppend && createdBy != S.meta64.userName && commentBy != S.meta64.userName) {
-            replyButton = new Button("Reply", () => { S.meta64.replyToComment(node.uid); });
-        }
+        //currently not being used
+        // if (publicAppend && createdBy != S.meta64.userName && commentBy != S.meta64.userName) {
+        //     replyButton = new Button("Reply", () => { S.meta64.replyToComment(node.uid); });
+        // }
 
         let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[node.type];
         if (typeHandler) {
@@ -486,10 +487,10 @@ export class Render implements RenderIntf {
         ONLY show when there ARE truly children fore sure would be to force a check of the file system for every folder type that is ever rendered
         on a page and we don't want to burn that much CPU just to prevent empty-folders from being explored. Empty folders are rare. */
         if (!isInlineChildren && //
-            (this.nodeHasChildren(node.uid) || node.type == "fs:folder" || node.type == "fs:lucene" || node.type == "ipfs:node")) {
+            (this.nodeHasChildren(node.id) || node.type == "fs:folder" || node.type == "fs:lucene" || node.type == "ipfs:node")) {
 
             /* convert this button to a className attribute for styles */
-            openButton = new Button("Open", () => { S.nav.openNodeByUid(node.uid, true) }, null, "primary");
+            openButton = new Button("Open", () => { S.nav.openNodeById(node.id, true) }, null, "primary");
         }
 
         /*
@@ -500,13 +501,13 @@ export class Render implements RenderIntf {
         if (S.meta64.userPreferences.editMode) {
             // console.log("Editing allowed: " + nodeId);
 
-            let selected: boolean = S.meta64.selectedNodes[node.uid] ? true : false;
+            let selected: boolean = S.meta64.selectedNodes[node.id] ? true : false;
 
             if (editingAllowed && this.allowAction(typeHandler, "edit")) {
                 selButton = new Checkbox(null, selected, {
                     style: { marginTop: '0px', marginLeft: '0px' },
                     onChange: () => {
-                        S.nav.toggleNodeSel(selButton.getChecked(), node.uid)
+                        S.nav.toggleNodeSel(selButton.getChecked(), node.id)
                     },
                 });
             }
@@ -518,21 +519,21 @@ export class Render implements RenderIntf {
 
             if (cnst.NEW_ON_TOOLBAR && !commentBy && !S.meta64.isAnonUser && insertAllowed && S.edit.isInsertAllowed(node)) {
                 /* Construct Create Subnode Button */
-                createSubNodeButton = new Button("New", () => { S.meta64.createSubNode(node.uid, null, true); }, {
+                createSubNodeButton = new Button("New", () => { S.edit.createSubNode(node.id, null, true); }, {
                     //"icon": "icons:picture-in-picture-alt", //"icons:more-vert",
                 });
             }
 
             if (cnst.INS_ON_TOOLBAR && !commentBy) {
                 /* Construct Create Subnode Button */
-                insertNodeButton = new Button("Ins", () => { S.meta64.insertNode(node.uid); }, {
+                insertNodeButton = new Button("Ins", () => { S.edit.insertNode(node.id); }, {
                     //"icon": "icons:picture-in-picture" //"icons:more-horiz",
                 });
             }
 
             if (editingAllowed) {
                 /* Construct Create Subnode Button */
-                editNodeButton = new Button(null, () => { S.meta64.runEditNode(node.uid); }, {
+                editNodeButton = new Button(null, () => { S.edit.runEditNode(node.id); }, {
                     "iconclass": "fa fa-edit fa-lg"
                 });
 
@@ -540,14 +541,14 @@ export class Render implements RenderIntf {
 
                     if (!node.firstChild) {
                         /* Construct Create Subnode Button */
-                        moveNodeUpButton = new Button(null, () => { S.meta64.moveNodeUp(node.uid); }, {
+                        moveNodeUpButton = new Button(null, () => { S.edit.moveNodeUp(node.id); }, {
                             "iconclass": "fa fa-arrow-up fa-lg"
                         });
                     }
 
                     if (!node.lastChild) {
                         /* Construct Create Subnode Button */
-                        moveNodeDownButton = new Button(null, () => { S.meta64.moveNodeDown(node.uid); }, {
+                        moveNodeDownButton = new Button(null, () => { S.edit.moveNodeDown(node.id); }, {
                             "iconclass": "fa fa-arrow-down fa-lg"
                         });
                     }
@@ -591,10 +592,10 @@ export class Render implements RenderIntf {
     /*
      * Returns true if the nodeId (see makeNodeId()) NodeInfo object has 'hasChildren' true
      */
-    nodeHasChildren = (uid: string): boolean => {
-        var node: I.NodeInfo = S.meta64.uidToNodeMap[uid];
+    nodeHasChildren = (id: string): boolean => {
+        var node: I.NodeInfo = S.meta64.idToNodeMap[id];
         if (!node) {
-            console.log("Unknown nodeId in nodeHasChildren: " + uid);
+            console.log("Unknown nodeId in nodeHasChildren: " + id);
             return false;
         } else {
             return node.hasChildren;
@@ -644,16 +645,16 @@ export class Render implements RenderIntf {
                     S.meta64.treeDirty = false;
 
                     if (newData) {
-                        S.meta64.uidToNodeMap = {};
                         S.meta64.idToNodeMap = {};
-                        S.meta64.identToUidMap = {};
 
                         /*
                          * I'm choosing to reset selected nodes when a new page loads, but this is not a requirement. I just
                          * don't have a "clear selections" feature which would be needed so user has a way to clear out.
                          */
                         S.meta64.selectedNodes = {};
-                        S.meta64.parentUidToFocusNodeMap = {};
+
+                        //todo-1: Isn't this map needed forever during the app lifetime? Is it better to not blow this away here?
+                        S.meta64.parentIdToFocusNodeMap = {}; 
 
                         S.meta64.initNode(data.node, true);
                         S.meta64.setCurrentNodeData(data);
@@ -676,8 +677,8 @@ export class Render implements RenderIntf {
                     //console.log("mainNodeContent: "+mainNodeContent);
 
                     if (mainNodeContent.length > 0) {
-                        let uid: string = data.node.uid;
-                        let cssId: string = "row_" + uid;
+                        let id: string = data.node.id;
+                        let cssId: string = "row_" + id;
 
                         //todo-1: lots of these buttons are replicated in both the 'page root node' and 'child node' renderings
                         //and to i need to consolidate it into a component?
@@ -695,11 +696,11 @@ export class Render implements RenderIntf {
                         /*
                          * Show Reply button if this is a publicly appendable node and not created by current user,
                          * or having been added as comment by current user
-                         */
-
-                        if (publicAppend && createdBy != S.meta64.userName && commentBy != S.meta64.userName) {
-                            replyButton = new Button("Reply", () => { S.meta64.replyToComment(data.node.uid); });
-                        }
+                         */ 
+                        //this is disabled for now.
+                        // if (publicAppend && createdBy != S.meta64.userName && commentBy != S.meta64.userName) {
+                        //     replyButton = new Button("Reply", () => { S.meta64.replyToComment(data.node.uid); });
+                        // }
 
                         let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[data.node.type];
                         var insertAllowed = true;
@@ -708,7 +709,7 @@ export class Render implements RenderIntf {
                         }
 
                         if (S.meta64.userPreferences.editMode && cnst.NEW_ON_TOOLBAR && !S.meta64.isAnonUser && insertAllowed && S.edit.isInsertAllowed(data.node)) {
-                            createSubNodeButton = new Button("New", () => { S.meta64.createSubNode(uid, null, true); });
+                            createSubNodeButton = new Button("New", () => { S.edit.createSubNode(id, null, true); });
                         }
 
                         var editAllowed = true;
@@ -720,7 +721,7 @@ export class Render implements RenderIntf {
                         if (editAllowed && S.edit.isEditAllowed(data.node)) {
 
                             /* Construct Create Subnode Button */
-                            editNodeButton = new Button(null, () => { S.meta64.runEditNode(uid); },
+                            editNodeButton = new Button(null, () => { S.edit.runEditNode(id); },
                                 { "iconclass": "fa fa-edit fa-lg" });
                         }
 
@@ -747,9 +748,9 @@ export class Render implements RenderIntf {
 
                         /* Construct Create Subnode Button */
                         let focusNode: I.NodeInfo = S.meta64.getHighlightedNode();
-                        let selected: boolean = focusNode && focusNode.uid === uid;
+                        let selected: boolean = focusNode && focusNode.id === id;
                         if (selected) {
-                            console.log("selected: focusNode.uid=" + focusNode.uid + " selected=" + selected);
+                            console.log("selected: focusNode.uid=" + focusNode.id + " selected=" + selected);
                         }
 
                         if (typeIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton) {
@@ -764,7 +765,7 @@ export class Render implements RenderIntf {
 
                         let contentDiv = new Div(null, {
                             className: (selected ? "mainNodeContentStyle active-row" : "mainNodeContentStyle inactive-row"),
-                            onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(uid); },
+                            onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(id); },
                             id: cssId
                         },//
                             children);

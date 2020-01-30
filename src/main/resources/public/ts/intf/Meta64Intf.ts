@@ -33,12 +33,10 @@ export interface Meta64Intf {
 
     treeDirty: boolean;
 
-    uidToNodeMap: { [key: string]: I.NodeInfo };
     idToNodeMap: { [key: string]: I.NodeInfo };
 
     nextUid: number;
-    identToUidMap: { [key: string]: string };
-    parentUidToFocusNodeMap: { [key: string]: I.NodeInfo };
+    parentIdToFocusNodeMap: { [key: string]: I.NodeInfo };
     MODE_ADVANCED: string;
     MODE_SIMPLE: string;
     editModeOption: string;
@@ -81,8 +79,6 @@ export interface Meta64Intf {
     clearSelectedNodes();
     selectAllNodes(nodeIds : string[]);
     updateNodeInfo(node: I.NodeInfo);
-    getNodeFromId(id: string): I.NodeInfo;
-    getPathOfUid(uid: string): string;
     getHighlightedNode(): I.NodeInfo;
     highlightRowById(id, scroll): Promise<void>;
     highlightNode(node: I.NodeInfo, scroll: boolean): Promise<void>;
@@ -93,7 +89,7 @@ export interface Meta64Intf {
     getNumChildNodes(): number;
     setCurrentNodeData(data: I.RenderNodeResponse): void;
     anonPageLoadResponse(res: I.AnonPageLoadResponse): void;
-    removeBinaryByUid(uid): void;
+    removeBinaryById(id: string): void;
     initNode(node: I.NodeInfo, updateMaps?: boolean): void;
     initConstants();
     initApp(): Promise<void>;
@@ -104,14 +100,6 @@ export interface Meta64Intf {
     loadAnonPageHome(): void;
     saveUserPreferences(): void;
     openSystemFile(fileName: string);
-    replyToComment(uid: any): void;
-    createSubNode(uid?: any, typeName?: string, createAtTop?: boolean): void;
-    insertNode(uid?: any, typeName?: string): void;
-    runEditNode(uid: any): void;
-    moveNodeUp(uid?: string): void;
-    moveNodeDown(uid?: string): void;
-    clickOnSearchResultRow(uid: string);
-    clickSearchNode(uid: string);
     onSignIn(googleUser);
     openManageKeysDlg();
 }

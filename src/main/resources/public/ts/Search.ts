@@ -38,20 +38,7 @@ export class Search implements SearchIntf {
      */
     highlightRowNode: I.NodeInfo = null;
 
-    /*
-     * maps node 'identifier' (assigned at server) to uid value which is a value based off local sequence, and uses
-     * nextUid as the counter.
-     */
-    identToUidMap: any = {};
-
-    /*
-     * maps node.uid values to the NodeInfo.java objects
-     *
-     * The only contract about uid values is that they are unique insofar as any one of them always maps to the same
-     * node. Limited lifetime however. The server is simply numbering nodes sequentially. Actually represents the
-     * 'instance' of a model object. Very similar to a 'hashCode' on Java objects.
-     */
-    uidToNodeMap: { [key: string]: I.NodeInfo } = {};
+    idToNodeMap: { [key: string]: I.NodeInfo } = {};
 
     numSearchResults = () => {
         return this.searchResults != null && //
@@ -110,8 +97,7 @@ export class Search implements SearchIntf {
     }
 
     initSearchNode = (node: I.NodeInfo) => {
-        node.uid = S.util.getUidForId(this.identToUidMap, node.id);
-        this.uidToNodeMap[node.uid] = node;
+        this.idToNodeMap[node.id] = node;
     }
 
     populateSearchResultsPage = (data: NodeSearchResponse, viewName) => {
@@ -147,52 +133,51 @@ export class Search implements SearchIntf {
      * node is a NodeInfo.java JSON
      */
     renderSearchResultAsListItem = (node: NodeInfo, index: number, count: number, rowCount: number): Comp => {
-        let uid = node.uid;
-        console.log("renderSearchResult: " + uid);
+        let id = node.id;
+        console.log("renderSearchResult: " + id);
 
-        let cssId = this._UID_ROWID_PREFIX + uid;
+        let cssId = this._UID_ROWID_PREFIX + id;
         // console.log("Rendering Node Row[" + index + "] with id: " +cssId)
 
-        let buttonBar = this.makeButtonBarHtml("" + uid);
+        let buttonBar = this.makeButtonBarHtml(id);
 
         let content: Comp[] = S.render.renderNodeContent(node, true, true, true, true, true);
-        let thiz = this;
 
         return new Div(null, {
             className: "node-table-row inactive-row",
             onClick: (elm: HTMLElement) => {
-                S.meta64.clickOnSearchResultRow(uid);
+                S.srch.clickOnSearchResultRow(id);
             }, //
             "id": cssId
         },//
             [
                 buttonBar//
                 , new Div(null, {
-                    "id": "srch_content_" + uid
+                    "id": "srch_content_" + id
                 }, content)
             ]);
     }
 
-    makeButtonBarHtml = (uid: string): Comp => {
+    makeButtonBarHtml = (id: string): Comp => {
         let gotoButton = new Button("Go to Node", () => {
-            S.meta64.clickSearchNode(uid);
-        }, { id: "go-to-" + uid });
+            S.srch.clickSearchNode(id);
+        }, { id: "go-to-" + id });
         return S.render.makeHorizontalFieldSet([gotoButton]);
     }
 
-    clickOnSearchResultRow = (uid: string) => {
+    clickOnSearchResultRow = (id: string) => {
         this.setRowHighlight(false);
-        this.highlightRowNode = this.uidToNodeMap[uid];
+        this.highlightRowNode = this.idToNodeMap[id];
         this.setRowHighlight(true);
     }
 
-    clickSearchNode = (uid: string) => {
+    clickSearchNode = (id: string) => {
         /*
          * update highlight node to point to the node clicked on, just to persist it for later
          */
-        this.highlightRowNode = this.uidToNodeMap[uid];
+        this.highlightRowNode = this.idToNodeMap[id];
         if (!this.highlightRowNode) {
-            throw "Unable to find uid in search results: " + uid;
+            throw "Unable to find uid in search results: " + id;
         }
 
         S.view.refreshTree(this.highlightRowNode.id, true, this.highlightRowNode.id);
@@ -209,7 +194,7 @@ export class Search implements SearchIntf {
         }
 
         /* now make CSS id from node */
-        let nodeId = this._UID_ROWID_PREFIX + this.highlightRowNode.uid;
+        let nodeId = this._UID_ROWID_PREFIX + this.highlightRowNode.id;
 
         let elm: HTMLElement = S.util.domElm(nodeId);
         if (elm) {

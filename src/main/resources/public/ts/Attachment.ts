@@ -59,16 +59,16 @@ export class Attachment implements AttachmentIntf {
                 () => {
                     S.util.ajax<I.DeleteAttachmentRequest, I.DeleteAttachmentResponse>("deleteAttachment", {
                         "nodeId": node.id
-                    }, (res: I.DeleteAttachmentResponse): void => { this.deleteAttachmentResponse(res, node.uid) });
+                    }, (res: I.DeleteAttachmentResponse): void => { this.deleteAttachmentResponse(res, node.id) });
                 }
             );
             dlg.open();
         }
     }
 
-    deleteAttachmentResponse = (res: I.DeleteAttachmentResponse, uid: string): void => {
+    deleteAttachmentResponse = (res: I.DeleteAttachmentResponse, id: string): void => {
         if (S.util.checkSuccess("Delete attachment", res)) {
-            S.meta64.removeBinaryByUid(uid);
+            S.meta64.removeBinaryById(id);
             // force re-render from local data.
             S.meta64.goToMainPage(true, true);
         }

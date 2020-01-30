@@ -83,15 +83,6 @@ export class Meta64 implements Meta64Intf {
      */
     treeDirty: boolean = false;
 
-    /*
-     * maps node.uid values to NodeInfo.java objects
-     *
-     * The only contract about uid values is that they are unique insofar as any one of them always maps to the same
-     * node. Limited lifetime however. The server is simply numbering nodes sequentially. Actually represents the
-     * 'instance' of a model object. Very similar to a 'hashCode' on Java objects.
-     */
-    uidToNodeMap: { [key: string]: I.NodeInfo } = {};
-
     /* NodeData is a 'client-state' only object that holds information per-node that is in an object
     that is never used on server but only on client
     */
@@ -106,19 +97,13 @@ export class Meta64 implements Meta64Intf {
     nextUid: number = 1;
 
     /*
-     * maps node 'identifier' (assigned at server) to uid value which is a value based off local sequence, and uses
-     * nextUid as the counter.
-     */
-    identToUidMap: { [key: string]: string } = {};
-
-    /*
      * Under any given node, there can be one active 'selected' node that has the highlighting, and will be scrolled
-     * to whenever the page with that child is visited, and parentUidToFocusNodeMap holds the map of "parent uid to
-     * selected node (NodeInfo object)", where the key is the parent node uid, and the value is the currently
+     * to whenever the page with that child is re-visited, and parentIdToFocusNodeMap holds the map of "parent id to
+     * selected node (NodeInfo object)", where the key is the parent node id, and the value is the currently
      * selected node within that parent. Note this 'selection state' is only significant on the client, and only for
      * being able to scroll to the node during navigating around on the tree.
      */
-    parentUidToFocusNodeMap: { [key: string]: I.NodeInfo } = {};
+    parentIdToFocusNodeMap: { [key: string]: I.NodeInfo } = {};
 
     /* User-selectable user-account options each user can set on his account */
     MODE_ADVANCED: string = "advanced";
@@ -283,8 +268,8 @@ export class Meta64 implements Meta64Intf {
 
     getSelectedNodeUidsArray = (): string[] => {
         let selArray: string[] = [];
-        S.util.forEachProp(this.selectedNodes, (uid, val): boolean => {
-            selArray.push(uid);
+        S.util.forEachProp(this.selectedNodes, (id, val): boolean => {
+            selArray.push(id);
             return true;
         });
         return selArray;
@@ -302,10 +287,10 @@ export class Meta64 implements Meta64Intf {
             console.log("selectedNode count: " + S.util.getPropertyCount(this.selectedNodes));
         }
 
-        S.util.forEachProp(this.selectedNodes, (uid, val): boolean => {
-            let node: I.NodeInfo = this.uidToNodeMap[uid];
+        S.util.forEachProp(this.selectedNodes, (id, val): boolean => {
+            let node: I.NodeInfo = this.idToNodeMap[id];
             if (!node) {
-                console.log("unable to find uidToNodeMap for uid=" + uid);
+                console.log("unable to find idToNodeMap for id=" + id);
             } else {
                 selArray.push(node.id);
             }
@@ -336,8 +321,8 @@ export class Meta64 implements Meta64Intf {
     /* Gets selected nodes as NodeInfo.java objects array */
     getSelectedNodesArray = (): I.NodeInfo[] => {
         let selArray: I.NodeInfo[] = [];
-        S.util.forEachProp(this.selectedNodes, (uid, val): boolean => {
-            let node = this.uidToNodeMap[uid];
+        S.util.forEachProp(this.selectedNodes, (id, val): boolean => {
+            let node = this.idToNodeMap[id];
             if (node) {
                 selArray.push(node);
             }
@@ -371,31 +356,15 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
-    /* Returns the node with the given node.id value */
-    getNodeFromId = (id: string): I.NodeInfo => {
-        return this.idToNodeMap[id];
-    }
-
-    //todo-1: research if we EVER need to even send the actual long 'node.path' back to browser now that we basically are
-    //never showing it to end users any longer?
-    getPathOfUid = (uid: string): string => {
-        let node: I.NodeInfo = this.uidToNodeMap[uid];
-        if (!node) {
-            return "[path error. invalid uid: " + uid + "]";
-        } else {
-            return node.path;
-        }
-    }
-
     getHighlightedNode = (): I.NodeInfo => {
         if (!this.currentNodeData || !this.currentNodeData.node) return null;
-        let ret: I.NodeInfo = this.parentUidToFocusNodeMap[this.currentNodeData.node.uid];
+        let ret: I.NodeInfo = this.parentIdToFocusNodeMap[this.currentNodeData.node.id];
         return ret;
     }
 
     highlightRowById = async (id: string, scroll: boolean): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            let node: I.NodeInfo = this.getNodeFromId(id);
+            let node: I.NodeInfo = this.idToNodeMap[id];
             if (node) {
                 //console.log("highlightRowById calling highlightNode");
                 await this.highlightNode(node, scroll);
@@ -411,7 +380,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     /*
-     * Important: We want this to be the only method that can set values on 'parentUidToFocusNodeMap', and always
+     * Important: We want this to be the only method that can set values on 'parentIdToFocusNodeMap', and always
      * setting that value should go thru this function.
      */
     highlightNode = async (node: I.NodeInfo, scroll: boolean): Promise<void> => {
@@ -425,30 +394,29 @@ export class Meta64 implements Meta64Intf {
 
             let activeClass = "active-row";
             let inactiveClass = "inactive-row";
+            let id = this.currentNodeData.node.id;
 
-            S.localDB.setVal(Constants.LOCALDB_LAST_PARENT_NODEID, S.meta64.currentNodeData.node.id);
+            S.localDB.setVal(Constants.LOCALDB_LAST_PARENT_NODEID, id);
             S.localDB.setVal(Constants.LOCALDB_LAST_CHILD_NODEID, node.id);
 
             let doneHighlighting: boolean = false;
 
             /* Unhighlight currently highlighted node if any */
-            let curHighlightedNode: I.NodeInfo = this.parentUidToFocusNodeMap[this.currentNodeData.node.uid];
+            let curHighlightedNode: I.NodeInfo = this.parentIdToFocusNodeMap[id];
             if (curHighlightedNode) {
                 //console.log("already had a highlighted node.");
-                if (curHighlightedNode.uid === node.uid) {
+                if (curHighlightedNode.id === node.id) {
                     //console.log("nodeid " + node.uid + " was already highlighted.");
                     doneHighlighting = true;
                 } else {
-                    //console.log("highlighting(1).");
-                    let rowElmId = "row_" + curHighlightedNode.uid;
+                    let rowElmId = "row_" + curHighlightedNode.id;
                     S.util.changeOrAddClass(rowElmId, activeClass, inactiveClass);
                 }
             }
 
             if (!doneHighlighting) {
-                this.parentUidToFocusNodeMap[this.currentNodeData.node.uid] = node;
-
-                let rowElmId: string = "row_" + node.uid;
+                this.parentIdToFocusNodeMap[id] = node;
+                let rowElmId: string = "row_" + node.id;
                 S.util.changeOrAddClass(rowElmId, inactiveClass, activeClass);
             }
 
@@ -507,9 +475,9 @@ export class Meta64 implements Meta64Intf {
     /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */
     getSingleSelectedNode = (): I.NodeInfo => {
         let ret = null;
-        S.util.forEachProp(this.selectedNodes, (uid, val): boolean => {
+        S.util.forEachProp(this.selectedNodes, (id, val): boolean => {
             // console.log("found a single Sel NodeID: " + nodeId);
-            ret = this.uidToNodeMap[uid];
+            ret = this.idToNodeMap[id];
             return false;
         });
         return ret;
@@ -571,10 +539,10 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
-    removeBinaryByUid = (uid): void => {
+    removeBinaryById = (id: string): void => {
         if (!this.currentNodeData || !this.currentNodeData.node) return;
         this.currentNodeData.node.children.forEach((node: I.NodeInfo) => {
-            if (node.uid === uid) {
+            if (node.id === id) {
                 node.hasBinary = false;
             }
         });
@@ -589,15 +557,10 @@ export class Meta64 implements Meta64Intf {
             console.log("initNode has null node");
             return;
         }
-        /*
-         * assign a property for detecting this node type, I'll do this instead of using some kind of custom JS
-         * prototype-related approach
-         */
-        node.uid = updateMaps ? S.util.getUidForId(this.identToUidMap, node.id) : this.identToUidMap[node.id];
+        
         node.properties = S.props.getPropertiesInEditingOrder(node, node.properties);
 
         if (updateMaps) {
-            this.uidToNodeMap[node.uid] = node;
             this.idToNodeMap[node.id] = node;
         }
     }
@@ -703,12 +666,12 @@ export class Meta64 implements Meta64Intf {
             NOTE: This works in conjunction with pushState, and is part of what it takes to make the back button (browser hisotry) work
             in the context of SPAs
             */
-            window.onpopstate = function (event) {
+            window.onpopstate = (event) => {
                 //console.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
 
                 if (event.state && event.state.nodeId) {
                     S.view.refreshTree(event.state.nodeId, true, event.state.highlightId, false);
-                    S.meta64.selectTab("mainTab");
+                    this.selectTab("mainTab");
                 }
             };
 
@@ -716,22 +679,22 @@ export class Meta64 implements Meta64Intf {
                 if (event.ctrlKey) {
                     switch (event.code) {
                         case "ArrowDown":
-                            S.meta64.selectTab("mainTab");
+                            this.selectTab("mainTab");
                             S.view.scrollRelativeToNode("down");
                             break;
 
                         case "ArrowUp":
-                            S.meta64.selectTab("mainTab");
+                            this.selectTab("mainTab");
                             S.view.scrollRelativeToNode("up");
                             break;
 
                         case "ArrowLeft":
-                            S.meta64.selectTab("mainTab");
+                            this.selectTab("mainTab");
                             S.nav.navUpLevel();
                             break;
 
                         case "ArrowRight":
-                            S.meta64.selectTab("mainTab");
+                            this.selectTab("mainTab");
                             S.nav.navOpenSelectedNode();
                             break;
 
@@ -957,38 +920,6 @@ export class Meta64 implements Meta64Intf {
     //         callback(mod);
     //     });
     // }
-
-    replyToComment = (uid: any): void => {
-        S.edit.replyToComment(uid);
-    }
-
-    createSubNode = (uid?: any, typeName?: string, createAtTop?: boolean): void => {
-        S.edit.createSubNode(uid, typeName, createAtTop);
-    }
-
-    insertNode = (uid?: any, typeName?: string): void => {
-        S.edit.insertNode(uid, typeName);
-    }
-
-    runEditNode = (uid: any): void => {
-        S.edit.runEditNode(uid);
-    }
-
-    moveNodeUp = (uid?: string): void => {
-        S.edit.moveNodeUp(uid);
-    }
-
-    moveNodeDown = (uid?: string): void => {
-        S.edit.moveNodeDown(uid);
-    }
-
-    clickOnSearchResultRow = (uid: string) => {
-        S.srch.clickOnSearchResultRow(uid);
-    }
-
-    clickSearchNode = (uid: string) => {
-        S.srch.clickSearchNode(uid);
-    }
 
     //google signon is a work in progress, not functional yet.
     onSignIn = (googleUser) => {

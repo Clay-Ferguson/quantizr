@@ -16,7 +16,7 @@ export interface RenderIntf {
     //centeredButtonBar(buttons: Comp[], classes?: string): Comp;
     makeRowButtonBar(node: I.NodeInfo, editingAllowed: boolean): Comp;
     makeHorizontalFieldSet(content: Comp[], extraClasses?: string): Comp;
-    nodeHasChildren(uid: string): boolean;
+    nodeHasChildren(id: string): boolean;
     renderPageFromData(data?: I.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string): Promise<void>;
     firstPage(): void;
     prevPage(): void;
