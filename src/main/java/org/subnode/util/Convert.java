@@ -73,9 +73,14 @@ public class Convert {
 		 * that (i think). depends on how much ownership info we need to show user.
 		 */
 		SubNode userNode = api.getNode(session, node.getOwner(), false);
-		String owner = userNode == null ? "?" : userNode.getStringProp(NodeProp.USER);
+		if (userNode==null) {
+			//todo-0: looks like import corrupcs the 'owner' (needs research)
+			log.debug("Unable to find userNode from nodeOwner: "+//
+				(node.getOwner()!=null ? node.getOwner().toHexString() : ("null owner on node: "+node.getId().toHexString())));
+		}
+		String owner = userNode == null ? "admin" : userNode.getStringProp(NodeProp.USER);
 
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), owner, node.getOrdinal(), //
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, node.getOrdinal(), //
 				node.getModifyTime(), propList, hasNodes, hasBinary, binaryIsImage, binVer, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //

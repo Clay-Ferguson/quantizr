@@ -129,9 +129,6 @@ export class Render implements RenderIntf {
             }
 
             if (!renderComplete) {
-                if (node.path.trim() == "/") {
-                    ret.push(new Heading(1, "Root Node"));
-                }
                 let properties = S.props.renderProperties(node.properties);
                 if (properties) {
                     ret.push(properties);
@@ -441,11 +438,6 @@ export class Render implements RenderIntf {
     }
 
     makeRowButtonBar = (node: I.NodeInfo, editingAllowed: boolean): Comp => {
-
-        let createdBy: string = node.owner;
-        let commentBy: string = S.props.getNodePropertyVal(cnst.COMMENT_BY, node);
-        let publicAppend: string = S.props.getNodePropertyVal(cnst.PUBLIC_APPEND, node);
-
         let typeIcon: Icon;
         let openButton: Button;
         let selButton: Checkbox;
@@ -458,15 +450,6 @@ export class Render implements RenderIntf {
         let deleteNodeButton: Button;
         let pasteInsideButton: Button;
         let pasteInlineButton: Button;
-
-        /*
-         * Show Reply button if this is a publicly appendable node and not created by current user,
-         * or having been added as comment by current user
-         */
-        //currently not being used
-        // if (publicAppend && createdBy != S.meta64.userName && commentBy != S.meta64.userName) {
-        //     replyButton = new Button("Reply", () => { S.meta64.replyToComment(node.uid); });
-        // }
 
         let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[node.type];
         if (typeHandler) {
@@ -517,37 +500,28 @@ export class Render implements RenderIntf {
                 insertAllowed = typeHandler.allowAction("insert");
             }
 
-            if (cnst.NEW_ON_TOOLBAR && !commentBy && !S.meta64.isAnonUser && insertAllowed && S.edit.isInsertAllowed(node)) {
-                /* Construct Create Subnode Button */
-                createSubNodeButton = new Button("New", () => { S.edit.createSubNode(node.id, null, true); }, {
-                    //"icon": "icons:picture-in-picture-alt", //"icons:more-vert",
-                });
+            if (cnst.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node)) {
+                createSubNodeButton = new Button("New", () => { S.edit.createSubNode(node.id, null, true); });
             }
 
-            if (cnst.INS_ON_TOOLBAR && !commentBy) {
-                /* Construct Create Subnode Button */
-                insertNodeButton = new Button("Ins", () => { S.edit.insertNode(node.id); }, {
-                    //"icon": "icons:picture-in-picture" //"icons:more-horiz",
-                });
+            if (cnst.INS_ON_TOOLBAR) {
+                insertNodeButton = new Button("Ins", () => { S.edit.insertNode(node.id); });
             }
 
             if (editingAllowed) {
-                /* Construct Create Subnode Button */
                 editNodeButton = new Button(null, () => { S.edit.runEditNode(node.id); }, {
                     "iconclass": "fa fa-edit fa-lg"
                 });
 
-                if (cnst.MOVE_UPDOWN_ON_TOOLBAR && !commentBy) {
+                if (cnst.MOVE_UPDOWN_ON_TOOLBAR) {
 
                     if (!node.firstChild) {
-                        /* Construct Create Subnode Button */
                         moveNodeUpButton = new Button(null, () => { S.edit.moveNodeUp(node.id); }, {
                             "iconclass": "fa fa-arrow-up fa-lg"
                         });
                     }
 
                     if (!node.lastChild) {
-                        /* Construct Create Subnode Button */
                         moveNodeDownButton = new Button(null, () => { S.edit.moveNodeDown(node.id); }, {
                             "iconclass": "fa fa-arrow-down fa-lg"
                         });
@@ -689,26 +663,13 @@ export class Render implements RenderIntf {
                         let pasteInsideButton: Button = null;
                         let pasteInlineButton: Button = null;
 
-                        let createdBy: string = data.node.owner;
-                        let commentBy: string = S.props.getNodePropertyVal(cnst.COMMENT_BY, data.node);
-                        let publicAppend: string = S.props.getNodePropertyVal(cnst.PUBLIC_APPEND, data.node);
-
-                        /*
-                         * Show Reply button if this is a publicly appendable node and not created by current user,
-                         * or having been added as comment by current user
-                         */ 
-                        //this is disabled for now.
-                        // if (publicAppend && createdBy != S.meta64.userName && commentBy != S.meta64.userName) {
-                        //     replyButton = new Button("Reply", () => { S.meta64.replyToComment(data.node.uid); });
-                        // }
-
                         let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[data.node.type];
                         var insertAllowed = true;
                         if (typeHandler) {
                             insertAllowed = typeHandler.allowAction("insert");
                         }
 
-                        if (S.meta64.userPreferences.editMode && cnst.NEW_ON_TOOLBAR && !S.meta64.isAnonUser && insertAllowed && S.edit.isInsertAllowed(data.node)) {
+                        if (S.meta64.userPreferences.editMode && cnst.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(data.node)) {
                             createSubNodeButton = new Button("New", () => { S.edit.createSubNode(id, null, true); });
                         }
 
@@ -794,14 +755,6 @@ export class Render implements RenderIntf {
                     if (data.node.children) {
                         output.push(this.renderChildren(data.node, newData, 1));
                     }
-
-                    // if (S.edit.isInsertAllowed(data.node)) {
-                    //     if (output.length == 0 && !S.meta64.isAnonUser) {
-                    //         output.push(new Div("End of content. Use 'Menu->Edit->Create' to add a node.", {
-                    //             style: { margin: "15px" }
-                    //         }));
-                    //     }
-                    // }
 
                     if (!data.endReached) {
                         let nextButton = new Button("Next Page", this.nextPage,
@@ -1007,7 +960,7 @@ export class Render implements RenderIntf {
 
     getUrlForNodeAttachment = (node: I.NodeInfo): string => {
         //todo-1: Change to node.id and then re-test this
-        return S.util.getRpcPath() + "bin/file-name" + node.binVer + "?nodeId=" + encodeURIComponent(node.path) + "&ver=" + node.binVer;
+        return S.util.getRpcPath() + "bin/file-name" + node.binVer + "?nodeId=" + encodeURIComponent(node.id) + "&ver=" + node.binVer;
     }
 
     makeImageTag = (node: I.NodeInfo): Img => {

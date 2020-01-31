@@ -28,6 +28,7 @@ import org.subnode.mongo.model.UserPreferencesNode;
 import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
+import org.subnode.util.NodeAuthFailedException;
 import org.subnode.util.NotLoggedInException;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ValContainer;
@@ -157,7 +158,8 @@ public class MongoApi {
 		// log.info("Unauthorized attempt at node id="+node.getId()+"
 		// path="+node.getPath());
 
-		throw new NotLoggedInException();
+		//throw new NotLoggedInException();
+		throw new NodeAuthFailedException();
 	}
 
 	/* NOTE: this should ONLY ever be called from 'auth()' method of this class */
@@ -726,38 +728,34 @@ public class MongoApi {
 	// ********* DO NOT DELETE *********
 	// (this is needed from time to time)
 	//
+	//todo-0: Commenting out entirely temporarily, but I need
+	//to finish the work on getting each 'path' part compressed which is done in the save event listener.
 	public void reSaveAll(MongoSession session) {
-		log.debug("Processing reSaveAll");
-		while (true) {
-			final ValContainer<Integer> numProcessed = new ValContainer<Integer>(0);
+		// log.debug("Processing reSaveAll");
+		// while (true) {
+		// 	final ValContainer<Integer> numProcessed = new ValContainer<Integer>(0);
 
-			Query query = new Query();
-			query.limit(100);
-			// Criteria criteria = Criteria.where(SubNode.FIELD_PATH_HASH).is(null);
-			// query.addCriteria(criteria);
+		// 	Query query = new Query();
+		// 	query.limit(100);
+		// 	// Criteria criteria = Criteria.where(SubNode.FIELD_PATH_HASH).is(null);
+		// 	// query.addCriteria(criteria);
 
-			Iterable<SubNode> iter = ops.find(query, SubNode.class);
+		// 	Iterable<SubNode> iter = ops.find(query, SubNode.class);
 
-			iter.forEach((node) -> {
-				numProcessed.setVal(numProcessed.getVal() + 1);
-				log.debug("reSave node: " + node.getId().toHexString());
+		// 	iter.forEach((node) -> {
+		// 		numProcessed.setVal(numProcessed.getVal() + 1);
+		// 		log.debug("reSave node: " + node.getId().toHexString());
 
-				// NOTE: MongoEventListener#onBeforeSave runs in here!
-				save(session, node);
-			});
+		// 		// NOTE: MongoEventListener#onBeforeSave runs in here!
+		// 		save(session, node);
+		// 	});
 
-			if (numProcessed.getVal() == 0) {
-				log.debug("Done processing all nodes.");
-				break;
-			}
-
-			// todo-0: warning: for the full WarAndPeace db this could run for a LONG time
-			// now that the SubNode object has chaged
-			// (by adding 'name' as a property)
-			if (true)
-				break; // <--- don't leave this here (todo-0)
-		}
-		log.debug("reSaveAll completed.");
+		// 	if (numProcessed.getVal() == 0) {
+		// 		log.debug("Done processing all nodes.");
+		// 		break;
+		// 	}
+		// }
+		// log.debug("reSaveAll completed.");
 	}
 
 	public UserPreferencesNode getUserPreference(MongoSession session, String path) {
@@ -874,6 +872,7 @@ public class MongoApi {
 	}
 
 	public SubNode getNode(MongoSession session, ObjectId objId, boolean allowAuth) {
+		if (objId==null) return null;
 		SubNode ret = ops.findById(objId, SubNode.class);
 		if (allowAuth) {
 			auth(session, ret, PrivilegeType.READ);
@@ -1386,7 +1385,7 @@ public class MongoApi {
 	// that I can remove the (.+) piece?
 	// I think i need to write some test cases just to text my regex functions!
 	//
-	// todo-0: Also what's the 'human readable' description of what's going on here?
+	// todo-1: Also what's the 'human readable' description of what's going on here?
 	// substring or prefix? For performance we DO want this to be
 	// finding all nodes that 'start with' the path as opposed to simply 'contain'
 	// the path right? To make best use of indexes etc?

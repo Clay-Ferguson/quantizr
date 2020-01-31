@@ -74,7 +74,6 @@ public class NodeSearchService {
 		// node.name is a special indicator meaning we're doing a node name lookup. Not
 		// a fuzzy search but an exact lookup.
 		else if ("node.name".equals(req.getSearchProp())) {
-			// todo-0: need to disallow colons in node names since the prefix is used?
 			SubNode node = api.getNode(session, ":" + req.getSearchText(), true);
 			if (node != null) {
 				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter + 1,

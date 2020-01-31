@@ -5,9 +5,9 @@ import java.util.Date;
 import org.subnode.config.NodeName;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.types.AllSubNodeTypes;
+import org.subnode.util.Util;
 import org.subnode.util.XString;
 
-import org.subnode.service.Sha256Service;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
-import org.springframework.util.StringUtils;
 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
@@ -64,8 +63,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			// log.debug("New Node ID generated: " + id);
 		}
 
-		// Because of uniqueness constraint any node that isn't named, will use the id hex as it's name.
-		// (Actually for now let's not waste the space doing this and cope with non-unique node names instead)
+		// DO NOT DELETE
+		// If we ever add a unique-index for "Name" (not currently the case), then we'd need something like this to be sure
+		// each node WOULD have a unique name. 
 		// if (StringUtils.isEmpty(node.getName())) {
 		// 	node.setName(id.toHexString())
 		// }
@@ -98,11 +98,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.setPath(path);
 		}
 
-		//todo-0
-		//work in progress here...gonna shorten path
-		//Sha256Service.compressPath(node.getPath());
-
-		String pathHash = Sha256Service.getHashOfString(node.getPath(), 14);
+		String pathHash = Util.getHashOfString(node.getPath(), 14);
 		//log.debug("CHECK PathHash=" + pathHash);
 		if (!pathHash.equals(node.getPathHash())) {
 			dbObj.put(SubNode.FIELD_PATH_HASH, pathHash);

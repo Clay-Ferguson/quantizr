@@ -272,6 +272,8 @@ export class EditNodeDlg extends DialogBase {
                 this.addPropertyButton = new Button("Add Property", this.addProperty),
                 this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
             ]);
+        //initially disabled.
+        this.deletePropButton.setEnabled(false);
 
         collapsiblePropsTable.addChild(this.propsButtonBar);
 
@@ -454,7 +456,6 @@ export class EditNodeDlg extends DialogBase {
                 });
 
                 //handle encryption setting
-
                 handled[cnst.ENC] = true;
                 saveList.push({
                     "name": cnst.ENC,
@@ -477,6 +478,8 @@ export class EditNodeDlg extends DialogBase {
             }
 
             let nodeName = this.nodeNameTextField.getValue();
+            //todo-1: for now if user puts a colon in a node name, we can just change it for them.
+            nodeName = nodeName.replace(":", "-");
 
             //convert any empty string to null here to be sure DB storage is least amount.
             if (!nodeName) {
@@ -575,7 +578,13 @@ export class EditNodeDlg extends DialogBase {
             formGroup.addChild(textarea);
         }
         else {
-            let checkbox = new Checkbox(label);
+            let checkbox = new Checkbox(label, false, {
+                onClick: (evt: any) => {
+                    //console.log("checkbox click: evt.target.checked: "+evt.target.checked);
+                    this.propertyCheckboxChanged();
+                }
+            });
+
             propEntry.checkboxId = checkbox.getId();
             formGroup.addChild(checkbox);
 
@@ -680,12 +689,45 @@ export class EditNodeDlg extends DialogBase {
         return formGroup;
     }
 
+    propertyCheckboxChanged = (): void => {
+        if (this.areAnyPropsChecked()) {
+            this.deletePropButton.setEnabled(true);
+        }
+        else {
+            this.deletePropButton.setEnabled(false);
+        }
+    }
+
+    areAnyPropsChecked = (): boolean => {
+        let ret = false;
+        if (this.propEntries) {
+            /* Iterate over all properties */
+            this.propEntries.forEach((propEntry: I.PropEntry) => {
+
+                /* Ignore this property if it's one that cannot be edited directly */
+                if (propEntry.readOnly || propEntry.binary)
+                    return;
+
+                //console.log("checking to delete prop=" + propEntry.property.name);
+
+                if (S.util.getCheckBoxStateById(propEntry.checkboxId)) {
+                    ret = true;
+
+                    //return false to stop iterating.
+                    return false;
+                }
+            });
+        }
+        return ret;
+    }
+
+    //todo-1 modify to support multiple delete of props.
     deletePropertyButtonClick = (): void => {
         if (this.propEntries) {
             /* Iterate over all properties */
             this.propEntries.forEach((propEntry: I.PropEntry) => {
 
-                /* Ignore this property if it's one that cannot be edited as text */
+                /* Ignore this property if it's one that cannot be edited directly */
                 if (propEntry.readOnly || propEntry.binary)
                     return;
 

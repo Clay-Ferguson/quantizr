@@ -14,11 +14,7 @@ import org.slf4j.LoggerFactory;
 public class NodeInfo {
 	private static final Logger log = LoggerFactory.getLogger(NodeInfo.class);
 
-	private String id;
-
-	//todo-0: this should no longer be needed at all on client! get rid of it.
-	private String path;
-	
+	private String id;	
 	private String name;
 	private String content;
 	private Date lastModified;
@@ -52,12 +48,11 @@ public class NodeInfo {
 	public NodeInfo() {
 	}
 
-	public NodeInfo(String id, String path, String name, String content, String owner, Long ordinal, Date lastModified,
+	public NodeInfo(String id, String name, String content, String owner, Long ordinal, Date lastModified,
 			List<PropertyInfo> properties, boolean hasChildren,
 			boolean hasBinary, boolean binaryIsImage, long binVer, int width, int height, String type, long logicalOrdinal,
 			boolean firstChild, boolean lastChild) {
 		this.id = id;
-		this.path = path;
 		this.name = name;
 		this.content = content;
 		this.lastModified = lastModified;
@@ -106,14 +101,6 @@ public class NodeInfo {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
 	}
 
 	public String getName() {

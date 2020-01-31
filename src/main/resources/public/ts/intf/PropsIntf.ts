@@ -11,5 +11,4 @@ export interface PropsIntf {
     getNodeProperty(propertyName: string, node: I.NodeInfo): I.PropertyInfo;
     getNodePropertyVal(propertyName : string, node: I.NodeInfo): string;
     setNodePropertyVal(propertyName : string, node: I.NodeInfo, val: string): void;
-    renderProperty(property : I.PropertyInfo): string;
 }

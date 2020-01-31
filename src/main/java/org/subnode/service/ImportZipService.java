@@ -19,6 +19,7 @@ import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.MimeUtil;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.SubNodeUtil;
+import org.subnode.util.Util;
 import org.subnode.util.XString;
 
 import org.apache.commons.io.IOUtils;
@@ -203,7 +204,7 @@ public class ImportZipService {
 			//todo-1: It would be better if we had a way to make the actual path parts match the hash of the node ID which is the normal
 			//standard because generating the hash here like this is *safe* but is kind of the equivalent of 'naming' the node, becasue the node
 			//can also have any name, and this is like naming it the hash we generate here.
-			String p = Sha256Service.getHashOfString(pathPart, SubNodeUtil.PATH_HASH_LEN);
+			String p = Util.getHashOfString(pathPart, SubNodeUtil.PATH_HASH_LEN);
 			sb.append("/" + p);
 		}
 		// log.info("HASHED PATH: " + sb.toString());

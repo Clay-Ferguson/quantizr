@@ -311,7 +311,9 @@ input[type="radio"] {
 
 //warning: this is altering a bootstrap style.
 .btn-group {
-    margin-left: 0px;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-right: 10px;
 }
 
 .small-padding {
@@ -325,6 +327,11 @@ input[type="radio"] {
 }
 
 /* Warning: setting any kind of left margin won't work becasue the btn-group? style of bootstrap overrides it in button groups */
+
+.btn[disabled] {
+    font-style: italic;
+    cursor: auto;
+}
 
 .basicButton {
     //margin-right: 7px;

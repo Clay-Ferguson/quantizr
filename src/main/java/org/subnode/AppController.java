@@ -944,44 +944,6 @@ public class AppController {
 		});
 	}
 
-	// @RequestMapping(value = API_PATH + "/generateNodeHash", method =
-	// RequestMethod.POST)
-	// public @ResponseBody GenerateNodeHashResponse generateNodeHash(@RequestBody
-	// GenerateNodeHashRequest req) {
-	//
-	// logRequest("generateNodeHash", req);
-	// checkJcr();
-	// GenerateNodeHashResponse res = new GenerateNodeHashResponse();
-	// if (!sessionContext.isAdmin()) {
-	// throw ExUtil.newEx("admin only function.");
-	// }
-	// Sha256Service sha256Service = (Sha256Service)
-	// SpringContextUtil.getBean(Sha256Service.class);
-	// sha256Service.generateNodeHash(null, req, res);
-	//
-	//
-	// return res;
-	// }
-	//
-	// @RequestMapping(value = API_PATH + "/compareSubGraphs", method =
-	// RequestMethod.POST)
-	// public @ResponseBody CompareSubGraphResponse generateNodeHash(@RequestBody
-	// CompareSubGraphRequest req) {
-	//
-	// logRequest("compareSubGraphs", req);
-	// checkJcr();
-	// CompareSubGraphResponse res = new CompareSubGraphResponse();
-	// if (!sessionContext.isAdmin()) {
-	// throw ExUtil.newEx("admin only function.");
-	// }
-	// CompareSubGraphService csgs = (CompareSubGraphService)
-	// SpringContextUtil.getBean(CompareSubGraphService.class);
-	// csgs.compare(null, req, res);
-	//
-	// return res;
-	// }
-	//
-
 	@RequestMapping(value = API_PATH + "/splitNode", method = RequestMethod.POST)
 	public @ResponseBody ResponseBase splitNode(@RequestBody SplitNodeRequest req, HttpSession session) {
 		return (ResponseBase) callProc.run("splitNode", req, session, ms -> {

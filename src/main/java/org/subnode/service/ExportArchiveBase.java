@@ -283,7 +283,7 @@ public abstract class ExportArchiveBase {
 		}
 
 		if (StringUtils.isEmpty(fileName)) {
-			fileName = node.getNameOnPath();
+			fileName = node.getLastPathPart();
 		}
 
 		fileName = cleanupFileName(fileName);

@@ -1,5 +1,6 @@
 package org.subnode.util;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
@@ -10,6 +11,15 @@ public class Util {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Returns only 'chars' characters of the hash, or the ebntire sha256 if chars
+	 * is -1
+	 */
+	public static String getHashOfString(String val, int chars) {
+		String pathHash = DigestUtils.sha256Hex(val.getBytes());
+		return chars == -1 ? pathHash : pathHash.substring(0, chars);
 	}
 
 	public static ClientHttpRequestFactory getClientHttpRequestFactory() {

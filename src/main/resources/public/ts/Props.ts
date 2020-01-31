@@ -3,7 +3,6 @@ import { PropTable } from "./widget/PropTable";
 import { PropTableRow } from "./widget/PropTableRow";
 import { PropTableCell } from "./widget/PropTableCell";
 
-import { Constants as cnst } from "./Constants";
 import { PropsIntf } from "./intf/PropsIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
@@ -57,8 +56,7 @@ export class Props implements PropsIntf {
     }
 
     /*
-     * Sorts props input array into the proper order to show for editing. Simple algorithm first grabs 'jcr:content'
-     * node and puts it on the top, and then does same for 'jctCnst.TAGS'
+     * Sorts props input array into the proper order to show for editing. 
      */
     getPropertiesInEditingOrder = (node: I.NodeInfo, _props: I.PropertyInfo[]): I.PropertyInfo[] => {
         let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[node.type];
@@ -200,36 +198,5 @@ export class Props implements PropsIntf {
 
     //     return owner != meta64.userName;
     // }
-
-    // not currently supporting the experimental 'comment nodes'
-    // /*
-    //  * Returns true if this is a comment node, that the current user doesn't own. Used to disable "edit", "delete",
-    //  * etc. on the GUI.
-    //  */
-    // isNonOwnedCommentNode = (node: I.NodeInfo): boolean => {
-    //     let commentBy: string = this.getNodePropertyVal(cnst.COMMENT_BY, node);
-    //     return commentBy != null && commentBy != meta64.userName;
-    // }
-
-    // isOwnedCommentNode = (node: I.NodeInfo): boolean => {
-    //     let commentBy: string = this.getNodePropertyVal(cnst.COMMENT_BY, node);
-    //     return commentBy != null && commentBy == meta64.userName;
-    // }
-
-    /*
-     * Returns Span representation of property value, even if multiple properties
-     */
-    renderProperty = (property: I.PropertyInfo): string => {
-        let ret: string = null;
-
-        /* if property is missing return empty string */
-        if (!property.value || property.value.length == 0) {
-            ret = "";
-        }
-        else {
-            ret = property.value;
-        }
-        return ret || "";
-    }
 }
 

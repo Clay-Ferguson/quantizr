@@ -569,6 +569,7 @@ export class Meta64 implements Meta64Intf {
         new ManageEncryptionKeysDlg().open();
     }
 
+    //here's the simple mode property hider!
     initConstants = () => {
         S.util.addAll(this.simpleModePropertyBlackList, [ //
             cnst.PRIMARY_TYPE, //
@@ -577,8 +578,7 @@ export class Meta64 implements Meta64Intf {
             cnst.BIN_VER, //
             cnst.BIN_DATA, //
             cnst.BIN_MIME, //
-            cnst.COMMENT_BY, //
-            cnst.PUBLIC_APPEND]);
+            ]);
 
         S.util.addAll(this.readOnlyPropertyList, [ //
             cnst.PRIMARY_TYPE, //
@@ -588,8 +588,7 @@ export class Meta64 implements Meta64Intf {
             cnst.BIN_VER, //
             cnst.BIN_DATA, //
             cnst.BIN_MIME, //
-            cnst.COMMENT_BY, //
-            cnst.PUBLIC_APPEND]);
+            ]);
 
         S.util.addAll(this.binaryPropertyList, [cnst.BIN_DATA]);
     }

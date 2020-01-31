@@ -423,7 +423,7 @@ export abstract class Comp implements CompIntf {
 
             // These two other effect hooks should work fine but just aren't needed yet.
             // useEffect(() => {
-            //     console.log("$$$$ DOM UPDATE: " + this.jsClassName);
+            //     console.log("DOM UPDATE: " + this.jsClassName);
             // });
 
             /* 

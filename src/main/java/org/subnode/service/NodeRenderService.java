@@ -397,22 +397,12 @@ public class NodeRenderService {
 		}
 
 		String id = null;
-
-		HttpSession httpSession = ThreadLocals.getHttpSession();
-		if (httpSession.getAttribute("uri") != null) {
-			// todo-0: is this code path obsolete?
-			id = (String) httpSession.getAttribute("uri");
-			httpSession.removeAttribute("uri");
-		} //
-		else if (sessionContext.getUrlId() != null) {
+		if (sessionContext.getUrlId() != null) {
 			id = sessionContext.getUrlId();
 			sessionContext.setUrlId(null);
 			log.debug("anonPageRedirected it's id to load to: " + id);
 		} //
 		else {
-			// todo-0: landing page in app props will now be need to be interpreted as
-			// 'name' (soon) will still work for now since nodes ARE named
-			// in the path itself from legacy code.
 			id = appProp.getUserLandingPageNode();
 		}
 

@@ -131,7 +131,7 @@ export class Edit implements EditIntf {
                  */
                 let editNode = res.nodeInfo;
 
-                let dlg = new EditNodeDlg({node: editNode});
+                let dlg = new EditNodeDlg({ node: editNode });
                 dlg.open();
             } else {
                 S.util.showMessage("You cannot edit nodes that you don't own.");
@@ -162,7 +162,7 @@ export class Edit implements EditIntf {
             owner = "admin";
         }
 
-        return S.meta64.userPreferences.editMode && node.path != "/" &&
+        return S.meta64.userPreferences.editMode &&
             (S.meta64.isAdminUser || S.meta64.userName == owner);
         // /*
         //  * Check that if we have a commentBy property we are the commenter, before allowing edit button also.
@@ -171,10 +171,14 @@ export class Edit implements EditIntf {
         // && !props.isNonOwnedNode(node);
     }
 
-
-    /* best we can do here is allow the disableInsert prop to be able to turn things off, node by node */
-    isInsertAllowed = (node: any): boolean => {
-        return !S.props.getNodePropertyVal(cnst.DISABLE_INSERT, node);
+    isInsertAllowed = (node: I.NodeInfo): boolean => {
+        //right now, for logged in users, we enable the 'new' button because the CPU load for determining it's enablement is too much, so
+        //we throw an exception if they cannot. todo-1: need to make this work better.
+        //however we CAN check if this node is an "admin" node and at least disallow any inserts under admin-owned nodess
+        if (S.meta64.isAdminUser) return true;
+        if (S.meta64.isAnonUser) return false;
+        //console.log("isInsertAllowed: node.owner="+node.owner+" nodeI="+node.id);
+        return node.owner != "admin";
     }
 
     startEditingNewNode = (typeName?: string, createAtTop?: boolean): void => {

@@ -196,9 +196,7 @@ public class NodeMoveService {
 				//and only it's ordinal will change.
 				if (nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
 					changePathOfSubGraph(session, node, parentPath);
-
-					//todo-0: during refactor to change how name on path is stored, this line of code came up as being 'suspicious'. need to relook at this.
-					node.setPath(parentPath + "/" + node.getNameOnPath());
+					node.setPath(parentPath + "/" + node.getLastPathPart());
 				}
 
 				node.setOrdinal(curTargetOrdinal);

@@ -152,15 +152,7 @@ public class UserManagerService {
 		log.debug(
 				"Processing Login: urlId=" + (sessionContext.getUrlId() != null ? sessionContext.getUrlId() : "null"));
 
-		HttpSession httpSession = ThreadLocals.getHttpSession();
-		if (httpSession.getAttribute("uri")!=null) {
-			//todo-0: is this path obsolete?
-			String uri = (String)httpSession.getAttribute("uri");
-			log.debug("setHomeNodeOverride (from uri attrib): "+uri);
-			res.setHomeNodeOverride(uri);
-			httpSession.removeAttribute("uri");
-		}
-		else if (sessionContext.getUrlId()!=null) {
+		if (sessionContext.getUrlId()!=null) {
 			log.debug("setHomeNodeOverride (from session urlId): "+sessionContext.getUrlId());
 			res.setHomeNodeOverride(sessionContext.getUrlId());
 		}

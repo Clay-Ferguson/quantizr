@@ -181,12 +181,9 @@ public class SubNode {
 		return XString.truncateAfterLast(getPath(), "/");
 	}
 
-	// todo-0: this should be renamed to 'getLastPathPart' probably, and also we
-	// probably
-	// won't need it after completing refactoring to new way of 'naming' nodes.
 	@Transient
 	@JsonIgnore
-	public String getNameOnPath() {
+	public String getLastPathPart() {
 		if (getPath() == null)
 			return null;
 		return XString.parseAfterLast(getPath(), "/");

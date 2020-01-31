@@ -40,7 +40,6 @@ export interface AccessControlEntryInfo {
 
 export interface NodeInfo {
     id: string;
-    path: string;
     name: string;
     content: string;
     tags: string;

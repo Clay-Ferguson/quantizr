@@ -27,9 +27,6 @@ export class Constants {
     static readonly SHOW_CLEAR_BUTTON_IN_EDITOR: boolean = false;
 
     static readonly ATT_MAX_WIDTH: string = "att-max-width";
-
-    static readonly COMMENT_BY: string = "sn:commentBy";
-    static readonly PUBLIC_APPEND: string = "sn:publicAppend";
     static readonly PRIMARY_TYPE: string = "sn:primaryType";
 
     static readonly EMAIL_CONTENT: string = "sn:content";
@@ -50,8 +47,6 @@ export class Constants {
     static readonly WRAP: string = "wrap";
     
     static readonly ENC: string = "enc";
-
-    static readonly DISABLE_INSERT: string = "sn:disableInsert";
 
     static readonly PWD: string = "sn:pwd";
     static readonly EMAIL: string = "sn:email";
