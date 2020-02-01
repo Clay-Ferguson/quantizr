@@ -298,7 +298,6 @@ public class UserManagerService {
 	}
 
 	public void setDefaultUserPreferences(SubNode prefsNode) {
-		prefsNode.setProp(NodeProp.USER_PREF_ADV_MODE, false);
 		prefsNode.setProp(NodeProp.USER_PREF_EDIT_MODE, false);
 	}
 
@@ -324,9 +323,6 @@ public class UserManagerService {
 			/*
 			 * Assign preferences as properties on this node,
 			 */
-			boolean advancedMode = reqUserPrefs.isAdvancedMode();
-			prefsNode.setProp(NodeProp.USER_PREF_ADV_MODE, advancedMode);
-
 			boolean editMode = reqUserPrefs.isEditMode();
 			prefsNode.setProp(NodeProp.USER_PREF_EDIT_MODE, editMode);
 
@@ -340,7 +336,6 @@ public class UserManagerService {
 			 * login when we can't get it from anywhere else at that time.
 			 */
 			UserPreferences userPreferences = sessionContext.getUserPreferences();
-			userPreferences.setAdvancedMode(advancedMode);
 			userPreferences.setEditMode(editMode);
 			userPreferences.setShowMetaData(showMetaData);
 
@@ -358,8 +353,6 @@ public class UserManagerService {
 
 		adminRunner.run(session -> {
 			SubNode prefsNode = api.getUserNodeByUserName(session, userName);
-
-			userPrefs.setAdvancedMode(prefsNode.getBooleanProp(NodeProp.USER_PREF_ADV_MODE));
 			userPrefs.setEditMode(prefsNode.getBooleanProp(NodeProp.USER_PREF_EDIT_MODE));
 			userPrefs.setShowMetaData(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_METADATA));
 			userPrefs.setImportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_IMPORT_ALLOWED));

@@ -77,7 +77,6 @@ export interface RefInfo {
 
 export interface UserPreferences {
     editMode: boolean;
-    advancedMode: boolean;
     importAllowed: boolean;
     exportAllowed: boolean;
     showMetaData: boolean;

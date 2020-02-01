@@ -941,9 +941,6 @@ export class Render implements RenderIntf {
     }
 
     generateRow = (i: number, node: I.NodeInfo, newData: boolean, childCount: number, rowCount: number, level: number, layoutClass: string): Comp => {
-        if (S.meta64.isNodeBlackListed(node))
-            return null;
-
         if (newData) {
             S.meta64.initNode(node, true);
 
@@ -1002,18 +999,12 @@ export class Render implements RenderIntf {
     }
 
     allowPropertyToDisplay = (propName: string): boolean => {
+        //if (S.meta64.isAdminUser) return true;
+        if (propName.startsWith("sn:")) return false;
 
-        if (!S.meta64.isAdminUser) {
-            if (propName == "sn:pwd" ||
-                propName == "sn:email" ||
-                propName == "sn:user") {
-                return false;
-            }
-        }
-
-        if (!S.meta64.inSimpleMode())
-            return true;
-        return S.meta64.simpleModePropertyBlackList[propName] == null;
+        let allow = !S.meta64.simpleModePropertyBlackList[propName];
+        console.log("######## Allow Prop "+propName+" = "+allow);
+        return allow;
     }
 
     isReadOnlyProperty = (propName: string): boolean => {
@@ -1022,14 +1013,6 @@ export class Render implements RenderIntf {
 
     isBinaryProperty = (propName: string): boolean => {
         return S.meta64.binaryPropertyList[propName];
-    }
-
-    sanitizePropertyName = (propName: string): string => {
-        if (S.meta64.editModeOption === "simple") {
-            return propName === "cont" ? "Content" : propName;
-        } else {
-            return propName;
-        }
     }
 }
 

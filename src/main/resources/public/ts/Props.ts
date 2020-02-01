@@ -108,7 +108,7 @@ export class Props implements PropsIntf {
                 if (S.render.allowPropertyToDisplay(property.name)) {
                     var isBinaryProp = S.render.isBinaryProperty(property.name);
 
-                    let propNameCell = new PropTableCell(S.render.sanitizePropertyName(property.name), {
+                    let propNameCell = new PropTableCell(property.name /*S.render.sanitizePropertyName(property.name) */, {
                         className: "prop-table-name-col"
                     });
 

@@ -46,7 +46,7 @@ export class Constants {
     static readonly PRE: string = "pre";
     static readonly WRAP: string = "wrap";
     
-    static readonly ENC: string = "enc";
+    static readonly ENC: string = "enc"; //todo-0: prefix this with "sn:"
 
     static readonly PWD: string = "sn:pwd";
     static readonly EMAIL: string = "sn:email";

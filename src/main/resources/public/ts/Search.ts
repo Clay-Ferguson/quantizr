@@ -113,9 +113,6 @@ export class Search implements SearchIntf {
         let i=-1;
         data.searchResults.forEach((node: NodeInfo) => {
             i++;
-            if (S.meta64.isNodeBlackListed(node))
-                return;
-
             this.initSearchNode(node);
 
             rowCount++;

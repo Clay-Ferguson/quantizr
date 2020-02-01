@@ -6,17 +6,8 @@ package org.subnode.model;
 public class UserPreferences {
 	private boolean editMode;
 	private boolean showMetaData;
-	private boolean advancedMode;
 	private boolean importAllowed;
 	private boolean exportAllowed;
-
-	public boolean isAdvancedMode() {
-		return advancedMode;
-	}
-
-	public void setAdvancedMode(boolean advancedMode) {
-		this.advancedMode = advancedMode;
-	}
 
 	public boolean isEditMode() {
 		return editMode;

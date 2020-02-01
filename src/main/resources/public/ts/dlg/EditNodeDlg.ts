@@ -559,7 +559,7 @@ export class EditNodeDlg extends DialogBase {
         if (isPassword && !S.meta64.isAdminUser) {
             return null;
         }
-        let label = S.render.sanitizePropertyName(propEntry.property.name);
+        let label = propEntry.property.name; //S.render.sanitizePropertyName(propEntry.property.name);
         let propValStr = propVal ? propVal : "";
         propValStr = S.util.escapeForAttrib(propValStr);
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value

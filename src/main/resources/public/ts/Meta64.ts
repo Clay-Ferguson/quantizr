@@ -105,13 +105,6 @@ export class Meta64 implements Meta64Intf {
      */
     parentIdToFocusNodeMap: { [key: string]: I.NodeInfo } = {};
 
-    /* User-selectable user-account options each user can set on his account */
-    MODE_ADVANCED: string = "advanced";
-    MODE_SIMPLE: string = "simple";
-
-    /* can be 'simple' or 'advanced' */
-    editModeOption: string = "simple";
-
     /*
      * toggled by button, and holds if we are going to show properties or not on each node in the main view
      */
@@ -119,13 +112,6 @@ export class Meta64 implements Meta64Intf {
 
     /* Flag that indicates if we are rendering owner, modTime, etc. on each row */
     showMetaData: boolean = false;
-
-    /*
-     * List of node prefixes to flag nodes to not allow to be shown in the page in simple mode
-     */
-    simpleModeNodePrefixBlackList: any = {
-        "rep:": true
-    };
 
     simpleModePropertyBlackList: any = {};
 
@@ -150,7 +136,6 @@ export class Meta64 implements Meta64Intf {
 
     userPreferences: I.UserPreferences = {
         "editMode": false,
-        "advancedMode": false,
         "importAllowed": false,
         "exportAllowed": false,
         "showMetaData": false
@@ -176,10 +161,6 @@ export class Meta64 implements Meta64Intf {
     //     return foundObj != null ? foundObj[prop] : null;
     // }
 
-
-    inSimpleMode = (): boolean => {
-        return this.editModeOption === this.MODE_SIMPLE;
-    }
 
     refresh = (): void => {
         this.goToMainPage(true, true);
@@ -246,24 +227,6 @@ export class Meta64 implements Meta64Intf {
         }
         /* The way to select a tab with no JQuery is to simply trigger a click on the tab */
         S.util.trigger(<HTMLElement>tabElm, "click");
-    }
-
-    isNodeBlackListed = (node): boolean => {
-        if (!this.inSimpleMode())
-            return false;
-
-        let ret = false;
-
-        S.util.forEachProp(this.simpleModeNodePrefixBlackList, (prop, val): boolean => {
-            if (S.util.startsWith(node.name, prop)) {
-                ret = true;
-                //teminate iteration with false return
-                return false;
-            }
-            return true;
-        });
-
-        return ret;
     }
 
     getSelectedNodeUidsArray = (): string[] => {
@@ -578,6 +541,7 @@ export class Meta64 implements Meta64Intf {
             cnst.BIN_VER, //
             cnst.BIN_DATA, //
             cnst.BIN_MIME, //
+            cnst.ENC, //
             ]);
 
         S.util.addAll(this.readOnlyPropertyList, [ //

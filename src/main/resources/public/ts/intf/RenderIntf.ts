@@ -28,6 +28,5 @@ export interface RenderIntf {
     allowPropertyToDisplay(propName: string): boolean;
     isReadOnlyProperty(propName: string): boolean;
     isBinaryProperty(propName: string): boolean;
-    sanitizePropertyName(propName: string): string;
     setImageMaxWidths(): void;
 }

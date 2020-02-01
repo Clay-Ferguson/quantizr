@@ -84,11 +84,9 @@ export class User implements UserIntf {
         //todo-1: admin user had bug where it wasn't loading this at login, so i did this hack for now to make admin logins
         //always set to what settings i prefer.
         if (S.meta64.isAdminUser) {
-            S.meta64.editModeOption = S.meta64.MODE_SIMPLE;
             S.meta64.showMetaData = false;
         }
         else {
-            S.meta64.editModeOption = res.userPreferences.advancedMode ? S.meta64.MODE_ADVANCED : S.meta64.MODE_SIMPLE;
             S.meta64.showMetaData = res.userPreferences.showMetaData;
         }
     }

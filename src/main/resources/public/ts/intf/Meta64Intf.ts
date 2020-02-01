@@ -37,13 +37,9 @@ export interface Meta64Intf {
 
     nextUid: number;
     parentIdToFocusNodeMap: { [key: string]: I.NodeInfo };
-    MODE_ADVANCED: string;
-    MODE_SIMPLE: string;
-    editModeOption: string;
+    
     showProperties: boolean;
     showMetaData: boolean;
-
-    simpleModeNodePrefixBlackList: any;
 
     simpleModePropertyBlackList: any;
 
@@ -64,14 +60,12 @@ export interface Meta64Intf {
     graphPanel: GraphPanel;
 
     setOverlay(showOverlay: boolean): void;
-    inSimpleMode(): boolean;
     refresh(): void;
     rebuildIndexes(): void;
     shutdownServerNode(string): void;
     sendTestEmail(string): void;
     goToMainPage(rerender?: boolean, forceServerRefresh?: boolean): void;
     selectTab(pageName): void;
-    isNodeBlackListed(node): boolean;
     getSelectedNodeUidsArray(): string[];
     getSelectedNodeIdsArray(): string[];
     getSelectedNodesAsMapById(): Object;

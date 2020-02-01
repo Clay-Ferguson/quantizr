@@ -18,8 +18,6 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class PrefsDlg extends DialogBase {
 
-    simpleRadioButton: RadioButton;
-    advancedRadioButton: RadioButton;
     showMetadataCheckBox: Checkbox;
 
     constructor() {
@@ -29,12 +27,6 @@ export class PrefsDlg extends DialogBase {
     init = (): void => {
         this.setChildren([
             new Form(null, [
-                new FormGroup(null,
-                    [
-                        this.simpleRadioButton = new RadioButton("Simple", S.meta64.editModeOption == S.meta64.MODE_SIMPLE, "exportRadioGroup"),
-                        this.advancedRadioButton = new RadioButton("Advanced", S.meta64.editModeOption == S.meta64.MODE_ADVANCED, "exportRadioGroup"),
-                    ]
-                ),
                 new FormGroup(null,
                     [
                         this.showMetadataCheckBox = new Checkbox("Show Metadata", S.meta64.showMetaData),
@@ -53,14 +45,11 @@ export class PrefsDlg extends DialogBase {
     }
 
     savePreferences = (): void => {
-        S.meta64.editModeOption = this.simpleRadioButton.getChecked() ? S.meta64.MODE_SIMPLE
-            : S.meta64.MODE_ADVANCED;
         S.meta64.showMetaData = this.showMetadataCheckBox.getChecked();
 
         S.util.ajax<I.SaveUserPreferencesRequest, I.SaveUserPreferencesResponse>("saveUserPreferences", {
             //todo-2: both of these options should come from meta64.userPrefernces, and not be stored directly on meta64 scope.
             "userPreferences": {
-                "advancedMode": S.meta64.editModeOption === S.meta64.MODE_ADVANCED,
                 "editMode": S.meta64.userPreferences.editMode,
                 "importAllowed": false,
                 "exportAllowed": false,

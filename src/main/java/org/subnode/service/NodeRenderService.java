@@ -87,10 +87,6 @@ public class NodeRenderService {
 			return;
 		}
 
-		log.debug("gotNode: " + node.getPath());
-
-		UserPreferences userPreferences = sessionContext.getUserPreferences();
-		boolean advancedMode = userPreferences != null ? userPreferences.isAdvancedMode() : false;
 		// boolean showMetaData = userPreferences != null ?
 		// userPreferences.isShowMetaData() : false;
 
@@ -104,7 +100,7 @@ public class NodeRenderService {
 		boolean scanToNode = false;
 		String scanToPath = node.getPath();
 
-		if (req.isRenderParentIfLeaf() && !subNodeUtil.hasDisplayableNodes(advancedMode, node)) {
+		if (req.isRenderParentIfLeaf() && !subNodeUtil.hasDisplayableNodes(false /* advanced_Mode */, node)) {
 			res.setDisplayedParent(true);
 			req.setUpLevel(1);
 		}

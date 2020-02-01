@@ -59,8 +59,6 @@ public class Convert {
 			}
 		}
 
-		//UserPreferences userPreferences = sessionContext.getUserPreferences();
-		//boolean advancedMode = userPreferences != null ? userPreferences.isAdvancedMode() : false;
 		boolean hasNodes = (api.getChildCount(node) > 0);
 		// log.trace("hasNodes=" + hasNodes + " path=" + node.getPath());
 

@@ -1424,7 +1424,6 @@ public class MongoApi {
 		userNode.setProp(NodeProp.USER, user);
 		userNode.setProp(NodeProp.EMAIL, email);
 		userNode.setProp(NodeProp.PASSWORD, password);
-		userNode.setProp(NodeProp.USER_PREF_ADV_MODE, false);
 		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE, false);
 
 		userNode.setContent("User Account: " + user);
@@ -1538,7 +1537,6 @@ public class MongoApi {
 			adminNode.setProp(NodeProp.USER, NodePrincipal.ADMIN);
 
 			// todo-1: need to store ONLY hash of the password
-			adminNode.setProp(NodeProp.USER_PREF_ADV_MODE, false);
 			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE, false);
 			save(session, adminNode);
 
