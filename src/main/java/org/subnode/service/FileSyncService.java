@@ -33,8 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * WARNING: after refactor involving moving content into SubNode as a direct property
- * this code was not yet updated to acount for that.
+ * WARNING: after refactor involving moving content into SubNode as a direct
+ * property this code was not yet updated to acount for that.
  * 
  * TODO: add live updating, we can add the JavaWatch service
  * https://www.baeldung.com/java-nio2-watchservice
@@ -50,10 +50,10 @@ import org.springframework.stereotype.Component;
  * filesystem content of that file back into subnode. That is, when there's a
  * difference between two files the filesystem wins.
  * 
- * As SubNode encounters files on the filesystem, it loads their content
- * into SubNode which then is essentially a 'cache' of all the filesystem data,
- * and can also be searched using the full power of the MongoDB-provided 
- * 'full text' search capability.
+ * As SubNode encounters files on the filesystem, it loads their content into
+ * SubNode which then is essentially a 'cache' of all the filesystem data, and
+ * can also be searched using the full power of the MongoDB-provided 'full text'
+ * search capability.
  */
 @Component
 public class FileSyncService {
@@ -179,7 +179,7 @@ public class FileSyncService {
 		if (metaDirInfo != null) {
 			metaDirNames = new LinkedHashMap<String, Object>();
 			for (String file : metaDirInfo.getFiles()) {
-				//log.debug("META: " + file);
+				// log.debug("META: " + file);
 				metaDirNames.put(file, "");
 			}
 		}
@@ -196,9 +196,8 @@ public class FileSyncService {
 
 				if (metaDirNames == null || metaDirNames.containsKey(fileName)) {
 					fileMap.put(fileName, file);
-				}
-				else {
-					log.debug("    fileMap Ignore: "+fileName);
+				} else {
+					log.debug("    fileMap Ignore: " + fileName);
 				}
 			}
 		}
@@ -603,8 +602,10 @@ public class FileSyncService {
 	 */
 	public SubNode createFileUnderParent(MongoSession session, SubNode node) {
 		String fullFileName = node.getStringProp(TYPES.FS_LINK);
-		// todo-p2: Need to check first if all files in the parent folder are numbered
-		// and only do this zero prefix if they are
+		/*
+		 * todo-p2: Need to check first if all files in the parent folder are numbered
+		 * and only do this zero prefix if they are
+		 */
 		String newFileName = fullFileName + "/00000-new-file-" + DateUtil.getFileNameCompatDate() + ".md";
 		FileTools.writeEntireFile(newFileName, "");
 		SubNode newNode = createNodeForFileSystemItem(session, node, new File(newFileName), 0, null);
@@ -623,4 +624,3 @@ public class FileSyncService {
 		return newNode;
 	}
 }
-

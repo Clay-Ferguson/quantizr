@@ -179,10 +179,12 @@ public class NodeEditService {
 		SubNode node = api.getNode(session, nodeId);
 		node.setType(req.getType());
 
-		// This is a hack for now, to ensure certain subproperties exist on nodes of
-		// those types, but there will eventually be
-		// a pluggable interface here for delegating this special type processing out to
-		// each type-specific code for this.
+		/*
+		 * This is a hack for now, to ensure certain subproperties exist on nodes of
+		 * those types, but there will eventually be a pluggable interface here for
+		 * delegating this special type processing out to each type-specific code for
+		 * this.
+		 */
 		if (req.getType().equals("sn:rssfeed")) {
 			node.setProp("sn:rssFeedSrc", "");
 		}
@@ -194,7 +196,6 @@ public class NodeEditService {
 		}
 
 		api.save(session, node);
-
 		res.setSuccess(true);
 	}
 
@@ -319,16 +320,19 @@ public class NodeEditService {
 		SubNode parentForNewNodes = null;
 		long firstOrdinal = 0;
 
-		// When inserting inline all nodes go in right where the original node is, in
-		// order below it as siblings
+		/*
+		 * When inserting inline all nodes go in right where the original node is, in
+		 * order below it as siblings
+		 */
 		if (req.getSplitType().equalsIgnoreCase("inline")) {
 			parentForNewNodes = parentNode;
 			firstOrdinal = node.getOrdinal();
 		}
-		// but for a 'child' insert all new nodes are inserted as children of the
-		// original node, starting at
-		// the top (ordinal), regardless of whether this node already has any children
-		// or not.
+		/*
+		 * but for a 'child' insert all new nodes are inserted as children of the
+		 * original node, starting at the top (ordinal), regardless of whether this node
+		 * already has any children or not.
+		 */
 		else {
 			parentForNewNodes = node;
 			firstOrdinal = 0L;

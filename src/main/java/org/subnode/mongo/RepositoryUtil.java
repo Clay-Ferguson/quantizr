@@ -18,7 +18,6 @@ import org.subnode.util.XString;
 
 /**
  * Utilities related to management of the JCR Repository
- *
  */
 @Component
 public class RepositoryUtil {

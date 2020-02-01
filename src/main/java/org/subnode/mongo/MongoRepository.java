@@ -1,7 +1,6 @@
 package org.subnode.mongo;
 
 import javax.annotation.PreDestroy;
-import javax.print.attribute.HashDocAttributeSet;
 
 import org.subnode.AppServer;
 import org.subnode.config.AppProp;

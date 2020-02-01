@@ -41,10 +41,11 @@ import org.springframework.stereotype.Component;
 public class ImportZipService {
 	private static final Logger log = LoggerFactory.getLogger(ImportZipService.class);
 
-	// This is used to detect if this 'prototype scope' object might have been
-	// autowired, and is getting called for
-	// a second time which is NOT supported. Each use of this object requires a new
-	// instance of it.
+	/*
+	 * This is used to detect if this 'prototype scope' object might have been
+	 * autowired, and is getting called for a second time which is NOT supported.
+	 * Each use of this object requires a new instance of it.
+	 */
 	private boolean used;
 
 	@Autowired
@@ -98,8 +99,9 @@ public class ImportZipService {
 	 */
 	private HashMap<String, SubNode> folderMap = new HashMap<String, SubNode>();
 
-	// imports the file directly from an internal resource file (classpath resource,
-	// built into WAR file itself)
+	/* imports the file directly from an internal resource file (classpath resource,
+	built into WAR file itself)
+	*/
 	public SubNode inputZipFileFromResource(MongoSession session, String resourceName, SubNode node, String nodeName) {
 
 		Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
@@ -164,7 +166,7 @@ public class ImportZipService {
 			}
 			// save last node (required, it won't get saved without this)
 			saveIfPending();
-			zis.close(); //todo-1: this close should be in a finally block
+			zis.close(); // todo-1: this close should be in a finally block
 		} catch (Exception ex) {
 			throw ExUtil.newEx(ex);
 		}
@@ -201,9 +203,13 @@ public class ImportZipService {
 		List<String> pathItems = XString.tokenize(path, "/", true);
 		StringBuilder sb = new StringBuilder();
 		for (String pathPart : pathItems) {
-			//todo-1: It would be better if we had a way to make the actual path parts match the hash of the node ID which is the normal
-			//standard because generating the hash here like this is *safe* but is kind of the equivalent of 'naming' the node, becasue the node
-			//can also have any name, and this is like naming it the hash we generate here.
+			/*
+			 * todo-1: It would be better if we had a way to make the actual path parts
+			 * match the hash of the node ID which is the normal standard because generating
+			 * the hash here like this is *safe* but is kind of the equivalent of 'naming'
+			 * the node, becasue the node can also have any name, and this is like naming it
+			 * the hash we generate here.
+			 */
 			String p = Util.getHashOfString(pathPart, SubNodeUtil.PATH_HASH_LEN);
 			sb.append("/" + p);
 		}
@@ -310,4 +316,3 @@ public class ImportZipService {
 		curNode = null;
 	}
 }
-

@@ -1,6 +1,5 @@
 package org.subnode.config;
 
-
 /**
  * Node Property Names (constants), node names, types...
  */
@@ -17,8 +16,8 @@ public class NodeProp {
 	public static final String RSS_FEED_IMAGE_URL = "sn:rssFeedImageUrl";
 
 	/*
-	 * this is the one entered by the admin which DEFINES the feed, and is not to be overwritten
-	 * ever by the code
+	 * this is the one entered by the admin which DEFINES the feed, and is not to be
+	 * overwritten ever by the code
 	 */
 	public static final String RSS_FEED_SRC = "sn:rssFeedSrc";
 
@@ -39,9 +38,10 @@ public class NodeProp {
 	public static final String PUBLIC_APPEND = "sn:publicAppend";
 
 	/*
-	 * comment nodes are always 'admin owned' in terms of the true credentials, but are flagged as
-	 * who the comment was actually posted by using the 'commentBy' property. This way that person
-	 * can be allowed to edit the content, but have no other privileges.
+	 * comment nodes are always 'admin owned' in terms of the true credentials, but
+	 * are flagged as who the comment was actually posted by using the 'commentBy'
+	 * property. This way that person can be allowed to edit the content, but have
+	 * no other privileges.
 	 */
 	public static final String COMMENT_BY = "sn:commentBy";
 
@@ -58,28 +58,32 @@ public class NodeProp {
 	public static final String EMAIL_RECIP = "sn:recip";
 	public static final String EMAIL_SUBJECT = "sn:subject";
 
-	// WARNING: Only the User Account Root nodes have this property of the actual user name. All
-	// other nodes reference
-	// their OWNER as an OwnerId that points to these nodes.
+	/*
+	 * WARNING: Only the User Account Root nodes have this property of the actual
+	 * user name. All other nodes reference their OWNER as an OwnerId that points to
+	 * these nodes.
+	 */
 	public static final String USER = "sn:user";
 
 	public static final String UUID = "sn:uuid";
 	public static final String PRIMARY_TYPE = "sn:primaryType";
 
-	//this pre-existed when i created FS_FILENAME (may be unused?)
+	// this pre-existed when i created FS_FILENAME (may be unused?)
 	public static final String FILENAME = "sn:fileName";
 
 	public static final String NAME = "sn:name";
 	public static final String JSON_FILE_SEARCH_RESULT = "sn:jsonFileSearchResult";
 	public static final String DISABLE_INSERT = "sn:disableInsert";
 
-	/* property used to indicate we should not query the IPFS network again for this conten becasue we
-	have already loaded it */
-	public static final String IPFS_OK = "ipfs:ok";
-	
 	/*
-	 * mime type expressed as a file extension. Invented so we can set 'txt' v.s. 'md' to turn off
-	 * metadata rendering
+	 * property used to indicate we should not query the IPFS network again for this
+	 * conten becasue we have already loaded it
+	 */
+	public static final String IPFS_OK = "ipfs:ok";
+
+	/*
+	 * mime type expressed as a file extension. Invented so we can set 'txt' v.s.
+	 * 'md' to turn off metadata rendering
 	 */
 	public static final String MIME_EXT = "sn:ext";
 

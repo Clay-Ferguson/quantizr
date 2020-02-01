@@ -71,8 +71,10 @@ public class NodeSearchService {
 				searchResults.add(info);
 			}
 		}
-		// node.name is a special indicator meaning we're doing a node name lookup. Not
-		// a fuzzy search but an exact lookup.
+		/*
+		 * node.name is a special indicator meaning we're doing a node name lookup. Not
+		 * a fuzzy search but an exact lookup.
+		 */
 		else if ("node.name".equals(req.getSearchProp())) {
 			SubNode node = api.getNode(session, ":" + req.getSearchText(), true);
 			if (node != null) {

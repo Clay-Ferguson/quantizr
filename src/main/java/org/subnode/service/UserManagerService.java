@@ -51,7 +51,6 @@ import org.springframework.ui.Model;
 /**
  * Service methods for processing user management functions. Login, logout,
  * signup, user preferences, and settings persisted per-user
- * 
  */
 @Component
 public class UserManagerService {
@@ -75,13 +74,7 @@ public class UserManagerService {
 	private RunAsMongoAdmin adminRunner;
 
 	@Autowired
-	private NodeSearchService nodeSearchService;
-
-	@Autowired
 	private ConstantsProvider constProvider;
-
-	@Autowired
-	private SubNodeUtil jcrUtil;
 
 	@Autowired
 	private AclService acu;

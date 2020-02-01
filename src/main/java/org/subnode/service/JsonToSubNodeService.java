@@ -52,8 +52,6 @@ public class JsonToSubNodeService {
 
 	/* There will be a better map-lookup implementation for this eventually */
 	public void setPropsFromMap(HashMap<String, ?> map, SubNode node) {
-		// log.debug("_____");
-
 		String type = (String) map.get("type");
 		if (type != null) {
 			node.setType(type);

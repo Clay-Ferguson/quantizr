@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
@@ -78,12 +76,12 @@ public class NodeRenderService {
 			session = ThreadLocals.getMongoSession();
 		}
 		res.setOffsetOfNodeFound(-1);
-		
+
 		String targetId = req.getNodeId();
 
 		log.debug("renderNode targetId:" + targetId);
 		SubNode node = api.getNode(session, targetId);
-		
+
 		if (node == null) {
 			res.setNoDataResponse("Node not found.");
 			return;
@@ -111,9 +109,11 @@ public class NodeRenderService {
 			req.setUpLevel(1);
 		}
 
-		// the 'siblingOffset' is for jumping forward or backward thru at the same level
-		// of the tree without
-		// having to first 'uplevel' and then click on the prev or next node.
+		/*
+		 * the 'siblingOffset' is for jumping forward or backward thru at the same level
+		 * of the tree without having to first 'uplevel' and then click on the prev or
+		 * next node.
+		 */
 		if (req.getSiblingOffset() != 0) {
 			SubNode parent = api.getParent(session, node);
 			if (req.getSiblingOffset() < 0) {
@@ -148,17 +148,17 @@ public class NodeRenderService {
 						}
 						log.trace("   upLevel to nodeid: " + node.getPath());
 						levelsUpRemaining--;
-					}
-					catch (Exception e) {
+					} catch (Exception e) {
 						throw new RuntimeException("Unable to access parent node.");
 					}
 				}
 			}
 		}
 
-		// For IPFS Proof-of-Concept work we just code the call right here, rather than
-		// having a plugin-based polymorphic
-		// interface we can call to fully decouple the IPFS from this rener service.
+		/* For IPFS Proof-of-Concept work we just code the call right here, rather than
+		having a plugin-based polymorphic
+		interface we can call to fully decouple the IPFS from this rener service.
+		*/
 		if (session.isAdmin()) {
 			if (node.isType(TYPES.FS_FOLDER)) {
 				fileSyncService.syncFolder(session, node, false, null);

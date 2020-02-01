@@ -164,13 +164,13 @@ public class FileIndexer {
 				iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
 			}
 
-			// Optional: for better indexing performance, if you
-			// are indexing many documents, increase the RAM
-			// buffer. But if you do this, increase the max heap
-			// size to the JVM (eg add -Xmx512m or -Xmx1g):
-			//
-			// iwc.setRAMBufferSizeMB(256.0);
-
+			/*
+			 * Optional: for better indexing performance, if you are indexing many
+			 * documents, increase the RAM buffer. But if you do this, increase the max heap
+			 * size to the JVM (eg add -Xmx512m or -Xmx1g):
+			 * 
+			 * iwc.setRAMBufferSizeMB(256.0);
+			 */
 			writer = new IndexWriter(fsDir, iwc);
 
 		} catch (IOException e) {
@@ -371,28 +371,32 @@ public class FileIndexer {
 		// InputStream stream = Files.newInputStream(file);
 		Document doc = new Document();
 
-		// Add the path of the file as a field named "path". Use a
-		// field that is indexed (i.e. searchable), but don't tokenize
-		// the field into separate words and don't index term frequency
-		// or positional information:
+		/*
+		 * Add the path of the file as a field named "path". Use a field that is indexed
+		 * (i.e. searchable), but don't tokenize the field into separate words and don't
+		 * index term frequency or positional information:
+		 */
 		Field pathField = new StringField("path", zipParent + "->" + absPath, Field.Store.YES);
 		doc.add(pathField);
 
-		// Add the last modified date of the file a field named "modified".
-		// Use a LongPoint that is indexed (i.e. efficiently filterable with
-		// PointRangeQuery). This indexes to milli-second resolution, which
-		// is often too fine. You could instead create a number based on
-		// year/month/day/hour/minutes/seconds, down the resolution you require.
-		// For example the long value 2011021714 would mean
-		// February 17, 2011, 2-3 PM.
+		/*
+		 * Add the last modified date of the file a field named "modified". Use a
+		 * LongPoint that is indexed (i.e. efficiently filterable with PointRangeQuery).
+		 * This indexes to milli-second resolution, which is often too fine. You could
+		 * instead create a number based on year/month/day/hour/minutes/seconds, down
+		 * the resolution you require. For example the long value 2011021714 would mean
+		 * February 17, 2011, 2-3 PM.
+		 */
 		doc.add(new LongPoint("modified", lastModified));
 
-		// Add the contents of the file to a field named "contents". Specify a Reader,
-		// so that the text of the file is tokenized and indexed, but not stored.
-		// Note that FileReader expects the file to be in UTF-8 encoding.
-		// If that's not the case searching for special characters will fail.
-		// doc.add(new TextField("contents", new BufferedReader(new
-		// InputStreamReader(stream, StandardCharsets.UTF_8))));
+		/*
+		 * Add the contents of the file to a field named "contents". Specify a Reader,
+		 * so that the text of the file is tokenized and indexed, but not stored. Note
+		 * that FileReader expects the file to be in UTF-8 encoding. If that's not the
+		 * case searching for special characters will fail. doc.add(new
+		 * TextField("contents", new BufferedReader(new InputStreamReader(stream,
+		 * StandardCharsets.UTF_8))));
+		 */
 		try {
 			doc.add(new TextField("contents", parseContent(zis), Store.NO));
 		} catch (Exception e) {
@@ -441,21 +445,24 @@ public class FileIndexer {
 		Field pathField = new StringField("path", zipParent + "->" + absPath, Field.Store.YES);
 		doc.add(pathField);
 
-		// Add the last modified date of the file a field named "modified".
-		// Use a LongPoint that is indexed (i.e. efficiently filterable with
-		// PointRangeQuery). This indexes to milli-second resolution, which
-		// is often too fine. You could instead create a number based on
-		// year/month/day/hour/minutes/seconds, down the resolution you require.
-		// For example the long value 2011021714 would mean
-		// February 17, 2011, 2-3 PM.
+		/*
+		 * Add the last modified date of the file a field named "modified". Use a
+		 * LongPoint that is indexed (i.e. efficiently filterable with PointRangeQuery).
+		 * This indexes to milli-second resolution, which is often too fine. You could
+		 * instead create a number based on year/month/day/hour/minutes/seconds, down
+		 * the resolution you require. For example the long value 2011021714 would mean
+		 * February 17, 2011, 2-3 PM.
+		 */
 		doc.add(new LongPoint("modified", lastModified));
 
-		// Add the contents of the file to a field named "contents". Specify a Reader,
-		// so that the text of the file is tokenized and indexed, but not stored.
-		// Note that FileReader expects the file to be in UTF-8 encoding.
-		// If that's not the case searching for special characters will fail.
-		// doc.add(new TextField("contents", new BufferedReader(new
-		// InputStreamReader(stream, StandardCharsets.UTF_8))));
+		/*
+		 * Add the contents of the file to a field named "contents". Specify a Reader,
+		 * so that the text of the file is tokenized and indexed, but not stored. Note
+		 * that FileReader expects the file to be in UTF-8 encoding. If that's not the
+		 * case searching for special characters will fail. doc.add(new
+		 * TextField("contents", new BufferedReader(new InputStreamReader(stream,
+		 * StandardCharsets.UTF_8))));
+		 */
 		try {
 			doc.add(new TextField("contents", parseContent(zis), Store.NO));
 		} catch (Exception e) {
@@ -469,9 +476,11 @@ public class FileIndexer {
 			writer.addDocument(doc);
 			filesAdded++;
 		} else {
-			// Existing index (an old copy of this document may have been indexed) so
-			// we use updateDocument instead to replace the old one matching the exact
-			// path, if present:
+			/*
+			 * Existing index (an old copy of this document may have been indexed) so we use
+			 * updateDocument instead to replace the old one matching the exact path, if
+			 * present:
+			 */
 			log.debug("updating");
 			writer.updateDocument(new Term("path", zipParent + "->" + absPath), doc);
 			filesUpdated++;

@@ -10,7 +10,6 @@ import java.util.StringTokenizer;
 
 import org.subnode.config.NodePrincipal;
 import org.subnode.config.NodeProp;
-import org.subnode.mail.OutboxMgr;
 import org.subnode.mongo.model.MongoPrincipal;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddPrivilegeRequest;
@@ -33,7 +32,6 @@ import org.springframework.stereotype.Component;
 /**
  * Service methods for (ACL): processing security, privileges, and Access
  * Control List information on nodes.
- * 
  */
 @Component
 public class AclService {
@@ -44,9 +42,6 @@ public class AclService {
 
 	@Autowired
 	private UserManagerService userManagerService;
-
-	@Autowired
-	private OutboxMgr outboxMgr;
 
 	/**
 	 * Returns the privileges that exist on the node identified in the request.
@@ -96,20 +91,21 @@ public class AclService {
 		boolean success = addPrivilege(session, node, req.getPrincipal(), req.getPrivileges(), res);
 
 		// if (req.getPublicAppend() != null) {
-		// 	// boolean publicAppend = req.getPublicAppend().booleanValue();
-		// 	// if (!publicAppend) {
-		// 	// JcrUtil.safeDeleteProperty(node, JcrProp.PUBLIC_APPEND);
-		// 	// }
-		// 	// else {
-		// 	// node.setProperty(JcrProp.PUBLIC_APPEND, true);
-		// 	// }
-		// 	// success = true;
+		// // boolean publicAppend = req.getPublicAppend().booleanValue();
+		// // if (!publicAppend) {
+		// // JcrUtil.safeDeleteProperty(node, JcrProp.PUBLIC_APPEND);
+		// // }
+		// // else {
+		// // node.setProperty(JcrProp.PUBLIC_APPEND, true);
+		// // }
+		// // success = true;
 		// }
 
 		res.setSuccess(success);
 	}
 
-	public boolean addPrivilege(MongoSession session, SubNode node, String principal, List<String> privileges, ResponseBase res) {
+	public boolean addPrivilege(MongoSession session, SubNode node, String principal, List<String> privileges,
+			ResponseBase res) {
 		boolean success = false;
 		if (principal != null) {
 			String mapKey = null;
@@ -132,8 +128,10 @@ public class AclService {
 				}
 				mapKey = principleNode.getId().toHexString();
 
-				//todo-1: send not just notification email, but send to people's INBOX node also.
-				//will require us to invent the INBOX for user. Doesn't yet exist.
+				/*
+				 * todo-1: send not just notification email, but send to people's INBOX node
+				 * also. will require us to invent the INBOX for user. Doesn't yet exist.
+				 */
 			}
 
 			HashMap<String, String> acl = node.getAcl();
@@ -252,13 +250,12 @@ public class AclService {
 			List<MongoPrincipal> principals = getNodePrincipals(session, node);
 			for (MongoPrincipal p : principals) {
 
-				// todo-3: this is a spot that can be optimized. We should be able to send just
-				// the
-				// userNodeId back to client, and the client
-				// should be able to deal with that (i think). depends on how much ownership
-				// info we
-				// need to show user.
-				// ownerSet.add(p.getUserNodeId());
+				/*
+				 * todo-3: this is a spot that can be optimized. We should be able to send just
+				 * the userNodeId back to client, and the client should be able to deal with
+				 * that (i think). depends on how much ownership info we need to show user.
+				 * ownerSet.add(p.getUserNodeId());
+				 */
 				SubNode userNode = api.getNode(session, p.getUserNodeId());
 				String userName = userNode.getStringProp(NodeProp.USER);
 				ownerSet.add(userName);

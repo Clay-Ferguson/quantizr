@@ -20,7 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 /**
  * Deamon for sending emails periodically.
- * <p>
+ * 
  * We need this daemon so that we can do email sending without blocking any of
  * the requests that require emails to be sent. That is, when some service
  * method requires an email to be sent it doesn't send the request or even spawn

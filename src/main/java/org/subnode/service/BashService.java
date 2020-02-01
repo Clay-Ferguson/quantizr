@@ -48,7 +48,7 @@ public class BashService {
 		if (true) {
 			throw ExUtil.newEx("disabled pending security review.");
 		}
-		
+
 		if (!sessionContext.isAdmin()) {
 			throw ExUtil.newEx("executeNode is an admin-only feature.");
 		}
@@ -57,13 +57,15 @@ public class BashService {
 		SubNode node = api.getNode(session, nodeId);
 		String script;
 
-		//if a filename is given we wrap it in a command string that will make it execute in a new terminal, and this is just a convenience
-		//which could have also been entered directly as the content.
+		/*
+		 * if a filename is given we wrap it in a command string that will make it
+		 * execute in a new terminal, and this is just a convenience which could have
+		 * also been entered directly as the content.
+		 */
 		String fileName = node.getStringProp(NodeProp.FILENAME);
-		if (fileName!=null) {
-			script = "gnome-terminal -- /bin/bash -c '"+fileName+"'";
-		}
-		else {
+		if (fileName != null) {
+			script = "gnome-terminal -- /bin/bash -c '" + fileName + "'";
+		} else {
 			script = node.getContent();
 		}
 
@@ -87,23 +89,31 @@ public class BashService {
 		FileTools.writeEntireFile(fullFileName, "#!/bin/bash\n\n" + script);
 
 		// String shortFileName = "bash-" + util.getGUID() + ".sh";
-		// String fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
-		// FileTools.writeEntireFile(fullFileName, "#!/bin/bash\n\ngnome-terminal -- /bin/bash -c '"+_fullFileName+"'");
+		// String fullFileName = appProp.getAdminDataFolder() + File.separator +
+		// shortFileName;
+		// FileTools.writeEntireFile(fullFileName, "#!/bin/bash\n\ngnome-terminal --
+		// /bin/bash -c '"+_fullFileName+"'");
 
 		try {
-			//We simply write the file and make it runnable, and the exec-deamon.sh (if running) will take over from 
-			//there and run the script on the host. It's actually the host that picks up the script and executes it, which gives it
-			//full power on the host beyond what could be done from inside a docker container.
-			//
-			//Of course if SubNode were being run OUTSIDE a docker container, or if we wanted these scripts to be run INSIDE the docker container,
-			//then the actual Executor code below that's commented out could be used, but for now that's not the architecture needed.
-			//
+			/*
+			 * We simply write the file and make it runnable, and the exec-deamon.sh (if
+			 * running) will take over from there and run the script on the host. It's
+			 * actually the host that picks up the script and executes it, which gives it
+			 * full power on the host beyond what could be done from inside a docker
+			 * container.
+			 * 
+			 * Of course if SubNode were being run OUTSIDE a docker container, or if we
+			 * wanted these scripts to be run INSIDE the docker container, then the actual
+			 * Executor code below that's commented out could be used, but for now that's
+			 * not the architecture needed.
+			 */
 			FileTools.makeFileRunnable(fullFileName);
-			log.debug("Wrote file: "+fullFileName);
-			
-			//The rest of this is commented becasue running in a Docker Container precludes the type of
-			//host manipulation i wanted to do EVEN if the folder itself is shared.
-			
+			log.debug("Wrote file: " + fullFileName);
+
+			// The rest of this is commented becasue running in a Docker Container precludes
+			// the type of
+			// host manipulation i wanted to do EVEN if the folder itself is shared.
+
 			// // ExecuteWatchdog watchdog = null;
 			// // PrintResultHandler resultHandler;
 
@@ -159,4 +169,3 @@ public class BashService {
 		}
 	}
 }
-

@@ -22,11 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Service for controlling the positions (ordinals) of nodes relative to their parents and/or moving
- * nodes to locate them under a different parent. This is similar type of functionality to
- * cut-and-paste in file systems. Currently there is no way to 'clone' or copy nodes, but user can
- * move any existing nodes they have to any new location they want, subject to security constraints
- * of course.
+ * Service for controlling the positions (ordinals) of nodes relative to their
+ * parents and/or moving nodes to locate them under a different parent. This is
+ * similar type of functionality to cut-and-paste in file systems. Currently
+ * there is no way to 'clone' or copy nodes, but user can move any existing
+ * nodes they have to any new location they want, subject to security
+ * constraints of course.
  */
 @Component
 public class NodeMoveService {
@@ -37,11 +38,12 @@ public class NodeMoveService {
 
 	@Autowired
 	private AllSubNodeTypes TYPES;
+
 	/*
 	 * Moves the the node to a new ordinal/position location (relative to parent)
 	 *
-	 * We allow the special case of req.siblingId="[topNode]" and that indicates move the node to be
-	 * the first node under its parent.
+	 * We allow the special case of req.siblingId="[topNode]" and that indicates
+	 * move the node to be the first node under its parent.
 	 */
 	public void setNodePosition(MongoSession session, SetNodePositionRequest req, SetNodePositionResponse res) {
 		if (session == null) {
@@ -97,8 +99,10 @@ public class NodeMoveService {
 		}
 		api.insertOrdinal(session, parentNode, 0L, 1L);
 
-		// todo-2: there is a slight ineffieiency here in that 'node' does end up getting saved
-		// both as part of the insertOrdinal, and also then with the setting of it to zero. Will be
+		// todo-2: there is a slight ineffieiency here in that 'node' does end up
+		// getting saved
+		// both as part of the insertOrdinal, and also then with the setting of it to
+		// zero. Will be
 		// easy to fix when I get to it, but is low priority for now.
 		api.saveSession(session);
 
@@ -136,18 +140,19 @@ public class NodeMoveService {
 
 	private void deleteNode(MongoSession session, String nodeId) {
 		SubNode node = api.getNode(session, nodeId);
-		
-		//DO NOT DELETE: this is the legacy delete. (switching to soft-deletes, below)
+
+		// DO NOT DELETE: this is the legacy delete. (switching to soft-deletes, below)
 		api.delete(session, node);
 
-		// todo-1: this code was completed, but failed my testing. doesn't work, but it's late so i'm stopping and re-enabling the above.
+		// todo-1: this code was completed, but failed my testing. doesn't work, but
+		// it's late so i'm stopping and re-enabling the above.
 		// api.softDelete(session, node);
 		// api.saveSession(session);
 	}
 
 	/*
-	 * Moves a set of nodes to a new location, underneath (i.e. children of) the target node
-	 * specified.
+	 * Moves a set of nodes to a new location, underneath (i.e. children of) the
+	 * target node specified.
 	 */
 	public void moveNodes(MongoSession session, MoveNodesRequest req, MoveNodesResponse res) {
 		if (session == null) {
@@ -159,11 +164,15 @@ public class NodeMoveService {
 
 	private void moveNodesInternal(MongoSession session, MoveNodesRequest req, MoveNodesResponse res) {
 
-		//If req.location==inside then the targetId is the parent node we will be inserting children into, but if
-		//req.location==inline the targetId represents the child who will become a sibling of what we are inserting,
-		//and the inserted nodes will be pasted in directly below that ordinal (i.e. new siblings posted in below it)
+		/*
+		 * If req.location==inside then the targetId is the parent node we will be
+		 * inserting children into, but if req.location==inline the targetId represents
+		 * the child who will become a sibling of what we are inserting, and the
+		 * inserted nodes will be pasted in directly below that ordinal (i.e. new
+		 * siblings posted in below it)
+		 */
 		String targetId = req.getTargetNodeId();
-		//log.debug("moveNodesInternal: targetId=" + targetId);
+		// log.debug("moveNodesInternal: targetId=" + targetId);
 		SubNode targetNode = api.getNode(session, targetId);
 
 		SubNode parentToPasteInto = req.getLocation().equalsIgnoreCase("inside") ? targetNode
@@ -171,29 +180,31 @@ public class NodeMoveService {
 
 		api.authRequireOwnerOfNode(session, parentToPasteInto);
 		String parentPath = parentToPasteInto.getPath();
-		//log.debug("targetPath: " + targetPath);
+		// log.debug("targetPath: " + targetPath);
 		Long curTargetOrdinal = null;
 
-		//location==inside
+		// location==inside
 		if (req.getLocation().equalsIgnoreCase("inside")) {
 			curTargetOrdinal = targetNode.getMaxChildOrdinal() == null ? 0 : targetNode.getMaxChildOrdinal();
-		} 
-		//location==inline
+		}
+		// location==inline
 		else {
-			curTargetOrdinal = targetNode.getOrdinal()+1;
+			curTargetOrdinal = targetNode.getOrdinal() + 1;
 			api.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, req.getNodeIds().size());
 		}
 
 		for (String nodeId : req.getNodeIds()) {
-			//log.debug("Moving ID: " + nodeId);
+			// log.debug("Moving ID: " + nodeId);
 			try {
 				SubNode node = api.getNode(session, nodeId);
 				api.authRequireOwnerOfNode(session, node);
 				SubNode nodeParent = api.getParent(session, node);
 
-				//If this 'node' will be changing parents (moving to new parent) we need to update its subgraph,
-				//of all children and also update its own path, otherwise it's staying under same parent
-				//and only it's ordinal will change.
+				/*
+				 * If this 'node' will be changing parents (moving to new parent) we need to
+				 * update its subgraph, of all children and also update its own path, otherwise
+				 * it's staying under same parent and only it's ordinal will change.
+				 */
 				if (nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
 					changePathOfSubGraph(session, node, parentPath);
 					node.setPath(parentPath + "/" + node.getLastPathPart());
@@ -242,4 +253,3 @@ public class NodeMoveService {
 		res.setSuccess(true);
 	}
 }
-

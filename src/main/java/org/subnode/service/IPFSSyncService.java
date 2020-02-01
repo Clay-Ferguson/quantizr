@@ -23,7 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * todo-1: after refactor how is node.getContent being exported? haven't done it yet.
+ * todo-1: after refactor how is node.getContent being exported? haven't done it
+ * yet.
  * 
  * Syncs content into SubNode (i.e. MongoDB) from an IPFS node (and it's
  * chilren, etc), so that SubNode can be used to browse, search, and sort
@@ -189,8 +190,11 @@ public class IPFSSyncService {
 			}
 		}
 
-		/* And now we delete all the nodes that we collected for deletion above. That is, since we are doing a sync, any child nodes under this node
-		that are not in the MerkleNode we got from the web will be deleted. */
+		/*
+		 * And now we delete all the nodes that we collected for deletion above. That
+		 * is, since we are doing a sync, any child nodes under this node that are not
+		 * in the MerkleNode we got from the web will be deleted.
+		 */
 		boolean nodesDeleted = false;
 		if (!nodesToDelete.isEmpty()) {
 			nodesDeleted = true;
@@ -217,8 +221,9 @@ public class IPFSSyncService {
 				}
 				/*
 				 * todo-2: Else if we have a node for this IPFS node, then verify the node is up
-				 * to date. I don't think this block of code will ever have any effect, but is here just
-				 * for correctness. That is, if the merkle data *did* somehow change we get the new data.
+				 * to date. I don't think this block of code will ever have any effect, but is
+				 * here just for correctness. That is, if the merkle data *did* somehow change
+				 * we get the new data.
 				 */
 				else {
 					sNode = nodeMap.get(mnode.getHash());
@@ -271,13 +276,13 @@ public class IPFSSyncService {
 			api.saveSession(session);
 		}
 
-		// Allowing this recursion here would be a true 'Web Crawl' which we aren't
-		// doing yet.
-		// Currently we only crawl
-		// one level at a time as the user expands in the gui using the "open" button to
-		// explore nodes. Enabling a fully-recursive crawl feature will ONLY require
-		// code like the
-		// following 10 lines to be uncommented.
+		/*
+		 * Allowing this recursion here would be a true 'Web Crawl' which we aren't
+		 * doing yet. Currently we only crawl one level at a time as the user expands in
+		 * the gui using the "open" button to explore nodes. Enabling a fully-recursive
+		 * crawl feature will ONLY require code like the following 10 lines to be
+		 * uncommented.
+		 */
 		//
 		// if (recursive && folders != null) {
 		// for (File folder : folders) {
@@ -304,25 +309,30 @@ public class IPFSSyncService {
 		String content = null;
 
 		if (fileUtils.isImageFile(merkleLink.getName())) {
-			//This query just returns an empty array as a 'links' property and then a json string representation of the image in the 'Data' property (not useful)
-			//MerkleNode merkNode = ipfs.getMerkleNode(merkleLink.getHash(), "json");
+			// This query just returns an empty array as a 'links' property and then a json
+			// string representation of the image in the 'Data' property (not useful)
+			// MerkleNode merkNode = ipfs.getMerkleNode(merkleLink.getHash(), "json");
 
-			//todo-1: put this host/port/and protocol in application.properties
-			//also this WILL be wrong right now. The name will be ipfs-dev, or ipfs-test, or ipfs-prod (based on docker-compose network naming)
+			// todo-1: put this host/port/and protocol in application.properties
+			// also this WILL be wrong right now. The name will be ipfs-dev, or ipfs-test,
+			// or ipfs-prod (based on docker-compose network naming)
 			String imageUrl = "http://ipfs:8080/ipfs/" + merkleLink.getHash();
 
-			// generating markdown that is nothing but a link to the image. Would be one approach we could use if we wanted to always query ipfs for the 
-			// image data live, but as a proof-of-concept, what I'm instead doing below is pulling in the actual image data from IPFS to save 
+			// generating markdown that is nothing but a link to the image. Would be one
+			// approach we could use if we wanted to always query ipfs for the
+			// image data live, but as a proof-of-concept, what I'm instead doing below is
+			// pulling in the actual image data from IPFS to save
 			// in our own SubNode database.
 			// content = "![img]("+ imageUrl + ")";
 
-			//Let's instead pull the image data into our MongoDb.
-			content = ""; //"IMAGE: "+merkleLink.getName();
+			// Let's instead pull the image data into our MongoDb.
+			content = ""; // "IMAGE: "+merkleLink.getName();
 			api.save(session, newNode);
-			
+
 			attachmentService.uploadFromUrl(session, imageUrl, newNode.getId().toHexString(), merkleLink.getName());
 
-			//this re-query of the node is kind of ugly, and I need to tweak the design so that this isn't required, but currently it is.
+			// this re-query of the node is kind of ugly, and I need to tweak the design so
+			// that this isn't required, but currently it is.
 			newNode = api.getNode(session, newNode.getId());
 		}
 		// For video support (tbd) it would be something similar to this i think:

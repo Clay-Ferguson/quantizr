@@ -48,8 +48,6 @@ public class ImportBookService {
 		/*
 		 * for now we don't check book name. Only one book exists: War and Peace
 		 */
-		// String name = req.getBookName();
-
 		ImportWarAndPeace iwap = SpringContextUtil.getApplicationContext().getBean(ImportWarAndPeace.class);
 		iwap.importBook(session, "classpath:war-and-peace.txt", node, VarUtil.safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE);
 

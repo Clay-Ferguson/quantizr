@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Assorted general utility functions related to SubNodes.
- * <p>
+ * 
  * todo-2: there's a lot of code calling these static methods, but need to
  * transition to singleton scope bean and non-static methods.
  */
@@ -26,8 +26,11 @@ import org.springframework.stereotype.Component;
 public class SubNodeUtil {
 	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
 
-	//number of hex digits to use from the SHA256 string, and in general needs to only guarantee
-	//uniquess inside a single node (sibling uniqueness) so this can be kinda short.
+	/*
+	 * number of hex digits to use from the SHA256 string, and in general needs to
+	 * only guarantee uniquess inside a single node (sibling uniqueness) so this can
+	 * be kinda short.
+	 */
 	public static final int PATH_HASH_LEN = 7;
 
 	@Autowired
@@ -45,7 +48,7 @@ public class SubNodeUtil {
 		nonSavableProperties.add(NodeProp.COMMENT_BY);
 		nonSavableProperties.add(NodeProp.PUBLIC_APPEND);
 		nonSavableProperties.add(NodeProp.BIN_VER);
-		nonSavableProperties.add(NodeProp.BIN_MIME);		
+		nonSavableProperties.add(NodeProp.BIN_MIME);
 		nonSavableProperties.add(NodeProp.IMG_HEIGHT);
 		nonSavableProperties.add(NodeProp.IMG_WIDTH);
 	}
@@ -101,7 +104,7 @@ public class SubNodeUtil {
 		for (String nameToken : nameTokens) {
 
 			String path = fixPath(parentPath + nameToken);
-			//log.debug("ensuring node exists: parentPath=" + path);
+			// log.debug("ensuring node exists: parentPath=" + path);
 			node = api.getNode(session, path);
 
 			/*
@@ -110,7 +113,7 @@ public class SubNodeUtil {
 			if (node != null) {
 				parent = node;
 			} else {
-				//log.debug("Creating " + nameToken + " node, which didn't exist.");
+				// log.debug("Creating " + nameToken + " node, which didn't exist.");
 
 				/* Note if parent PARAMETER here is null we are adding a root node */
 				parent = api.createNode(session, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST);
@@ -132,7 +135,7 @@ public class SubNodeUtil {
 			parent.setContent(defaultContent);
 		}
 
-		if (props!=null) {
+		if (props != null) {
 			parent.addProperties(props);
 		}
 
@@ -184,4 +187,3 @@ public class SubNodeUtil {
 		// return String.valueOf(prng.nextLong());
 	}
 }
-

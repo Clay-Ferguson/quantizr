@@ -8,14 +8,15 @@ import org.subnode.response.base.ResponseBase;
 
 /**
  * Thread Local Storage
- * <p>
+ * 
  * All thread locals are stored in this class.
- * <p>
- * Note: We opt for ThreadLocals instead of a Spring Bean with Request scope, so that we can
- * decouple from Web Requests, and have these variables available on a *any* thread even if it's a
- * worker or deamon thread that isn't an actual Web Request. I never use "Request Scoping" unless
- * the object being scoped as request is specifically and solely something that exists only in an
- * actual web request.
+ * 
+ * Note: We opt for ThreadLocals instead of a Spring Bean with Request scope, so
+ * that we can decouple from Web Requests, and have these variables available on
+ * a *any* thread even if it's a worker or deamon thread that isn't an actual
+ * Web Request. I never use "Request Scoping" unless the object being scoped as
+ * request is specifically and solely something that exists only in an actual
+ * web request.
  */
 public class ThreadLocals {
 	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<HttpServletResponse>();

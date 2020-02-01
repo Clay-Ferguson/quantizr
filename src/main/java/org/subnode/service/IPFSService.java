@@ -31,8 +31,10 @@ import org.subnode.util.Util;
 public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
-    // originally this was 'data-endcoding' (or at least i got that from somewhere),
-    // but now their example page seems to show 'encoding' is the name here.
+    /*
+    originally this was 'data-endcoding' (or at least i got that from somewhere),
+    but now their example page seems to show 'encoding' is the name here.
+    */
     public static String ENCODING_PARAM_NAME = "encoding";
 
     /*

@@ -50,7 +50,7 @@ public class DateUtil {
 		zoneMap.put("-7D", "PDT"); // PACIFIC DAYLIGHT TIME UTC - 7
 	}
 
-	/* I'm too lazy right not to code these. Will properly display as GMT-NNN */
+	/* Need to consider these. Will properly display as GMT-NNN */
 	// AKST ALASKA TIME UTC - 9
 	// AKDT ALASKA DAYLIGHT TIME UTC - 8
 	// HST HAWAII STANDARD TIME UTC - 10

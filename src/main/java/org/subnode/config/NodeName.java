@@ -15,6 +15,5 @@ public class NodeName {
 	public static final String HOME = "home";
 
 	public static final String FILE_SEARCH_RESULTS = "fileSearchResults";
-	//public static final String RSS = "rss";
 	public static final String FEEDS = "feeds";
 }

@@ -29,7 +29,6 @@ import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
 import org.subnode.util.NodeAuthFailedException;
-import org.subnode.util.NotLoggedInException;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
@@ -158,7 +157,7 @@ public class MongoApi {
 		// log.info("Unauthorized attempt at node id="+node.getId()+"
 		// path="+node.getPath());
 
-		//throw new NotLoggedInException();
+		// throw new NotLoggedInException();
 		throw new NodeAuthFailedException();
 	}
 
@@ -493,10 +492,11 @@ public class MongoApi {
 	public void insertOrdinal(MongoSession session, SubNode node, long ordinal, long rangeSize) {
 		long maxOrdinal = 0;
 
-		// todo-1: verify this is correct with getChildren querying unordered. It's
-		// probably fine, but also can we
-		// do a query here that selects only the ">= ordinal" ones to make this do the
-		// minimal size query?
+		/*
+		 * todo-1: verify this is correct with getChildren querying unordered. It's
+		 * probably fine, but also can we do a query here that selects only the
+		 * ">= ordinal" ones to make this do the minimal size query?
+		 */
 		for (SubNode child : getChildren(session, node, null, null)) {
 			Long childOrdinal = child.getOrdinal();
 			long childOrdinalInt = childOrdinal == null ? 0L : childOrdinal.longValue();
@@ -728,32 +728,33 @@ public class MongoApi {
 	// ********* DO NOT DELETE *********
 	// (this is needed from time to time)
 	//
-	//todo-0: Commenting out entirely temporarily, but I need
-	//to finish the work on getting each 'path' part compressed which is done in the save event listener.
+	// todo-0: Commenting out entirely temporarily, but I need
+	// to finish the work on getting each 'path' part compressed which is done in
+	// the save event listener.
 	public void reSaveAll(MongoSession session) {
 		// log.debug("Processing reSaveAll");
 		// while (true) {
-		// 	final ValContainer<Integer> numProcessed = new ValContainer<Integer>(0);
+		// final ValContainer<Integer> numProcessed = new ValContainer<Integer>(0);
 
-		// 	Query query = new Query();
-		// 	query.limit(100);
-		// 	// Criteria criteria = Criteria.where(SubNode.FIELD_PATH_HASH).is(null);
-		// 	// query.addCriteria(criteria);
+		// Query query = new Query();
+		// query.limit(100);
+		// // Criteria criteria = Criteria.where(SubNode.FIELD_PATH_HASH).is(null);
+		// // query.addCriteria(criteria);
 
-		// 	Iterable<SubNode> iter = ops.find(query, SubNode.class);
+		// Iterable<SubNode> iter = ops.find(query, SubNode.class);
 
-		// 	iter.forEach((node) -> {
-		// 		numProcessed.setVal(numProcessed.getVal() + 1);
-		// 		log.debug("reSave node: " + node.getId().toHexString());
+		// iter.forEach((node) -> {
+		// numProcessed.setVal(numProcessed.getVal() + 1);
+		// log.debug("reSave node: " + node.getId().toHexString());
 
-		// 		// NOTE: MongoEventListener#onBeforeSave runs in here!
-		// 		save(session, node);
-		// 	});
+		// // NOTE: MongoEventListener#onBeforeSave runs in here!
+		// save(session, node);
+		// });
 
-		// 	if (numProcessed.getVal() == 0) {
-		// 		log.debug("Done processing all nodes.");
-		// 		break;
-		// 	}
+		// if (numProcessed.getVal() == 0) {
+		// log.debug("Done processing all nodes.");
+		// break;
+		// }
 		// }
 		// log.debug("reSaveAll completed.");
 	}
@@ -872,7 +873,8 @@ public class MongoApi {
 	}
 
 	public SubNode getNode(MongoSession session, ObjectId objId, boolean allowAuth) {
-		if (objId==null) return null;
+		if (objId == null)
+			return null;
 		SubNode ret = ops.findById(objId, SubNode.class);
 		if (allowAuth) {
 			auth(session, ret, PrivilegeType.READ);
@@ -917,6 +919,7 @@ public class MongoApi {
 		if (limit != null) {
 			query.limit(limit.intValue());
 		}
+
 		/*
 		 * This regex finds all that START WITH "path/" and then end with some other
 		 * string that does NOT contain "/", so that we know it's not at a deeper level
@@ -1202,11 +1205,13 @@ public class MongoApi {
 		log.debug("creating all indexes.");
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
 
-		// todo-1: A future enhancement will probably be to use the event listener to
-		// make it so that when anyone other than admin tries
-		// to set the name on a node, their username (node ID) will automatically get
-		// prefixed onto the front of it so that each user will basically
-		// have their own namespace to use for node naming uniqueness constraint.
+		/*
+		 * todo-1: A future enhancement will probably be to use the event listener to
+		 * make it so that when anyone other than admin tries to set the name on a node,
+		 * their username (node ID) will automatically get prefixed onto the front of it
+		 * so that each user will basically have their own namespace to use for node
+		 * naming uniqueness constraint.
+		 */
 		createIndex(session, SubNode.class, SubNode.FIELD_NAME);
 
 		createIndex(session, SubNode.class, SubNode.FIELD_ORDINAL);
@@ -1354,7 +1359,6 @@ public class MongoApi {
 	}
 
 	public InputStream getStreamByNodeId(ObjectId nodeId) {
-
 		log.debug("getStreamByNodeId: " + nodeId.toString());
 
 		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid
@@ -1380,15 +1384,16 @@ public class MongoApi {
 		return "^" + Pattern.quote(path) + "\\/([^\\/])*$";
 	}
 
-	// todo-2:
-	// I think now that I'm including the trailing slash after path in this regex
-	// that I can remove the (.+) piece?
-	// I think i need to write some test cases just to text my regex functions!
-	//
-	// todo-1: Also what's the 'human readable' description of what's going on here?
-	// substring or prefix? For performance we DO want this to be
-	// finding all nodes that 'start with' the path as opposed to simply 'contain'
-	// the path right? To make best use of indexes etc?
+	/*
+	 * todo-2: I think now that I'm including the trailing slash after path in this
+	 * regex that I can remove the (.+) piece? I think i need to write some test
+	 * cases just to text my regex functions!
+	 * 
+	 * todo-1: Also what's the 'human readable' description of what's going on here?
+	 * substring or prefix? For performance we DO want this to be finding all nodes
+	 * that 'start with' the path as opposed to simply 'contain' the path right? To
+	 * make best use of indexes etc?
+	 */
 	public String regexRecursiveChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
 		return "^" + Pattern.quote(path) + "\\/(.+)$";
@@ -1486,9 +1491,10 @@ public class MongoApi {
 			boolean success = false;
 
 			if (userNode != null) {
-				// If logging in as ADMIN we don't expect the node to contain any password in
-				// the db, but just
-				// use the app property instead.
+				/*
+				 * If logging in as ADMIN we don't expect the node to contain any password in
+				 * the db, but just use the app property instead.
+				 */
 				if (NodePrincipal.ADMIN.equals(userName)) {
 					if (password.equals(appProp.getMongoAdminPassword())) {
 						success = true;

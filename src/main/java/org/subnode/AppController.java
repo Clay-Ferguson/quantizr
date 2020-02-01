@@ -138,12 +138,10 @@ import org.subnode.util.ValContainer;
  * connects directly to this controller which is the only controller.
  * Importantly the main SPA page is retrieved thru this controller, and the
  * binary attachments are also served up thru this interface.
- * <p>
  * 
  * Note, it's critical to understand the OakSession AOP code or else this class
  * will be confusing regarding how the OAK transactions are managed and how
  * logging in is done.
- * <p>
  * 
  * This class has no documentation on the methods because it's a wrapper around
  * the service methods which is where the documentation can be found for each
@@ -154,13 +152,11 @@ import org.subnode.util.ValContainer;
  * this controller and then all the services are pure and simple Spring
  * Singletons.
  * 
- * <p>
  * There's a lot of boiler-plate code in here, but it's just required. This is
  * probably the only code in the system that looks 'redundant' (non-DRY), but
  * this is because we want certain things in certain layers (abstraction related
  * and for loose-coupling).
  * 
- * <p>
  * TODO: need to get all "business logic" out of this layer (there is a tiny bit
  * of it in here), because it doesn't belong here. Should all be contained in
  * service layer, utilities classes, etc.

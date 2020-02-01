@@ -54,7 +54,6 @@ public class MimeTypeUtils {
 
         log.debug("ProbeMime: " + file.toString() + " = " + mimeType);
         return mimeType;
-
     }
 
     public static String getMimeType(File file) {

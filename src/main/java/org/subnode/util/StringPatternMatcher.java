@@ -1,8 +1,5 @@
 /**
  * Regular expression pattern matching helper class.
- * 
- * @author Clay Ferguson 
- * 
  */
 package org.subnode.util;
 
@@ -12,7 +9,6 @@ import java.util.regex.Pattern;
 
 /**
  * Some simple string pattern matching utilities.
- *
  */
 public class StringPatternMatcher {
 	private ArrayList<String> patternList = new ArrayList<String>();

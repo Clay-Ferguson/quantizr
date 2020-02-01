@@ -58,7 +58,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 /**
  * Service for managing node attachments.
- * <p>
+ * 
  * Node attachments are binary attachments that the user can opload onto a node.
  * Each node allows either zero or one attachments. Uploading a new attachment
  * wipes out and replaces the previous attachment. If the attachment is an
@@ -175,8 +175,10 @@ public class AttachmentService {
 				SubNode newNode = api.createNode(session, node, null, null, null, CreateNodeLocation.LAST);
 				newNode.setContent("### " + fileName);
 
-				// todo-1: saving multiple uploads isn't working right now. It's a work in
-				// progress. This isn't a bug, but just incomplete code.
+				/*
+				 * todo-1: saving multiple uploads isn't working right now. It's a work in
+				 * progress. This isn't a bug, but just incomplete code.
+				 */
 				api.save(session, newNode);
 				// api.saveSession(session);
 
@@ -229,8 +231,10 @@ public class AttachmentService {
 			version = 0L;
 		}
 
-		// NOTE: Setting this flag to false works just fine, and is more efficient, and
-		// will simply do everything EXCEPT calculate the image size
+		/*
+		 * NOTE: Setting this flag to false works just fine, and is more efficient, and
+		 * will simply do everything EXCEPT calculate the image size
+		 */
 		boolean calcImageSizes = true;
 
 		BufferedImage bufImg = null;
@@ -250,8 +254,10 @@ public class AttachmentService {
 					node.setProp(NodeProp.IMG_WIDTH, bufImg.getWidth());
 					node.setProp(NodeProp.IMG_HEIGHT, bufImg.getHeight());
 				} catch (Exception e) {
-					//reading files from IPFS caused this exception, and I didn't investigate why yet, because
-					//I don't think it's a bug in my code, but something in IPFS.
+					/*
+					 * reading files from IPFS caused this exception, and I didn't investigate why
+					 * yet, because I don't think it's a bug in my code, but something in IPFS.
+					 */
 					log.error("Failed to get image length.", e);
 				}
 			} catch (Exception e) {
@@ -508,10 +514,10 @@ public class AttachmentService {
 	}
 
 	/**
-	 * @param mimeHint  This is an additional string invented because IPFS urls
-	 *                  don't contain the file extension always and in that case we
-	 *                  need to get it from the IPFS filename itself and that's what
-	 *                  the hint is in that case. Normally however mimeHint is null
+	 * @param mimeHint This is an additional string invented because IPFS urls don't
+	 *                 contain the file extension always and in that case we need to
+	 *                 get it from the IPFS filename itself and that's what the hint
+	 *                 is in that case. Normally however mimeHint is null
 	 */
 	public void uploadFromUrl(MongoSession session, String sourceUrl, String nodeId, String mimeHint) {
 		if (session == null) {

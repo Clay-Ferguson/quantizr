@@ -62,7 +62,6 @@ public class ImportService {
 		}
 
 		api.saveSession(session);
-
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
