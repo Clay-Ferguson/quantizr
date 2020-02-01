@@ -136,7 +136,6 @@ export class User implements UserIntf {
                 console.log("refreshLogin with name: " + callUsr);
 
                 if (!callUsr) {
-                    //alert('loadAnonPageHome');
                     S.meta64.loadAnonPageHome();
                 } else {
                     //alert('calling login: currently at: '+location.href);

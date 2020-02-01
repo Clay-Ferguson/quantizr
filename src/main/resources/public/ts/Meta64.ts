@@ -621,7 +621,7 @@ export class Meta64 implements Meta64Intf {
                 }
             };
 
-            // Interesting function. not needed.
+            // leaving for future reference. Currently not needed.
             // window.onhashchange = function (e) {
             // }
 
@@ -695,8 +695,8 @@ export class Meta64 implements Meta64Intf {
             this.deviceWidth = window.innerWidth;
             this.deviceHeight = window.innerHeight;
 
-            let mainTabPanel = new TabPanel();
-            mainTabPanel.updateDOM("mainTabPanel");
+            S.nav.mainTabPanel = new TabPanel();
+            S.nav.mainTabPanel.updateDOM("mainTabPanel");
 
             S.nav.mainNavPanel = new MainNavPanel(null);
             S.nav.mainNavPanel.updateDOM("mainNavPanel");

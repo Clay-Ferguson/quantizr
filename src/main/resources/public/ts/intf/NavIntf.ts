@@ -7,6 +7,7 @@ export interface NavIntf {
 
     mainMenuPopupDlg: DialogBaseImpl;
     mainNavPanel: CompIntf;
+    mainTabPanel: CompIntf;
 
     mainOffset: number;
     endReached: boolean;

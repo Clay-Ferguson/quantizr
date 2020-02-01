@@ -24,6 +24,7 @@ export class Nav implements NavIntf {
     _UID_ROWID_PREFIX: string = "row_";
     mainMenuPopupDlg: DialogBaseImpl;
     mainNavPanel: CompIntf;
+    mainTabPanel: CompIntf;
 
     /* todo-2: eventually when we do paging for other lists, we will need a set of these variables for each list display (i.e. search, timeline, etc) */
     mainOffset: number = 0;

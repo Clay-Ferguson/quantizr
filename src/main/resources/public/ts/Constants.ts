@@ -33,8 +33,6 @@ export class Constants {
     static readonly EMAIL_RECIP: string = "sn:recip";
     static readonly EMAIL_SUBJECT: string = "sn:subject";
 
-    //static readonly CONTENT: string = "sn: content";
-
     static readonly IPFS_NODE: string = "sn:ipfsNode"; 
     
     //This is for bash script names to whow up when browing on the tree
@@ -46,8 +44,7 @@ export class Constants {
     static readonly PRE: string = "pre";
     static readonly WRAP: string = "wrap";
     
-    static readonly ENC: string = "enc"; //todo-0: prefix this with "sn:"
-
+    static readonly ENC: string = "sn:enc"; 
     static readonly PWD: string = "sn:pwd";
     static readonly EMAIL: string = "sn:email";
     static readonly CODE: string = "sn:code";

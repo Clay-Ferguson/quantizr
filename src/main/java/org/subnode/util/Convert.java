@@ -72,7 +72,8 @@ public class Convert {
 		 */
 		SubNode userNode = api.getNode(session, node.getOwner(), false);
 		if (userNode==null) {
-			//todo-0: looks like import corrupcs the 'owner' (needs research)
+			//todo-1: looks like import corrupts the 'owner' (needs research), but the code below sets to owner to 'admin' which will 
+			//be safe for now because the admin is the only user capable of import/export.
 			log.debug("Unable to find userNode from nodeOwner: "+//
 				(node.getOwner()!=null ? node.getOwner().toHexString() : ("null owner on node: "+node.getId().toHexString())));
 		}
