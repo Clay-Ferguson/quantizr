@@ -83,14 +83,7 @@ export class Meta64 implements Meta64Intf {
      */
     treeDirty: boolean = false;
 
-    /* NodeData is a 'client-state' only object that holds information per-node that is in an object
-    that is never used on server but only on client
-    */
-    //uidToNodeDataMap: { [key: string]: Object } = {};
-
-    /*
-     * maps node.id values to NodeInfo.java objects
-     */
+    /* maps node.id values to NodeInfo.java objects */
     idToNodeMap: { [key: string]: I.NodeInfo } = {};
 
     /* counter for local uids */
@@ -140,27 +133,6 @@ export class Meta64 implements Meta64Intf {
         "exportAllowed": false,
         "showMetaData": false
     };
-
-    // setNodeData = (uid: string, data: Object) => {
-    //     /* lookup object by uid */
-    //     let foundObj = this.uidToNodeDataMap[uid];
-
-    //     /* if no object found for uid, then create one and put it in map */
-    //     if (!foundObj) {
-    //         foundObj = {};
-    //         this.uidToNodeDataMap[uid] = foundObj;
-    //     }
-
-    //     /* now we can add data properties onto foundObj */
-    //     S.util.mergeProps(foundObj, data);
-    // }
-
-    // /* gets the value associated with the given uid and property */
-    // getNodeData = (uid: string, prop: string): any => {
-    //     let foundObj = this.uidToNodeDataMap[uid];
-    //     return foundObj != null ? foundObj[prop] : null;
-    // }
-
 
     refresh = (): void => {
         this.goToMainPage(true, true);
@@ -520,7 +492,7 @@ export class Meta64 implements Meta64Intf {
             console.log("initNode has null node");
             return;
         }
-        
+
         node.properties = S.props.getPropertiesInEditingOrder(node, node.properties);
 
         if (updateMaps) {
@@ -542,7 +514,7 @@ export class Meta64 implements Meta64Intf {
             cnst.BIN_DATA, //
             cnst.BIN_MIME, //
             cnst.ENC, //
-            ]);
+        ]);
 
         S.util.addAll(this.readOnlyPropertyList, [ //
             cnst.PRIMARY_TYPE, //
@@ -552,7 +524,7 @@ export class Meta64 implements Meta64Intf {
             cnst.BIN_VER, //
             cnst.BIN_DATA, //
             cnst.BIN_MIME, //
-            ]);
+        ]);
 
         S.util.addAll(this.binaryPropertyList, [cnst.BIN_DATA]);
     }
