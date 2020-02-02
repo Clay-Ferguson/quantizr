@@ -17,20 +17,22 @@ it might finally work now.
 */
 export class RadioButton extends Comp {
 
-    constructor(public label: string, public checked: boolean, groupName: string) {
-        super(null); 
+    constructor(public label: string, public checked: boolean, groupName: string, _attribs: any=null) {
+        super(_attribs); 
 
-        this.attribs.onChange = () => {
-            // if (!this.state.checked) {
-            //     delete this.state.checked;
-            // }
-            // else {
-            //     this.state.checked = "checked";
-            // }
-            // this.state = {checked: this.state.checked};
-            // this.setState(this.state);
-            //console.log("Change detected [id="+this.getId()+"]: checked="+this.state.checked);
-        };
+        //todo-0: for RadioButton and CheckBox we are not handling change
+        //internally, but externally. Is this good?
+        // this.attribs.onChange = () => {
+        //     // if (!this.state.checked) {
+        //     //     delete this.state.checked;
+        //     // }
+        //     // else {
+        //     //     this.state.checked = "checked";
+        //     // }
+        //     // this.state = {checked: this.state.checked};
+        //     // this.setState(this.state);
+        //     //console.log("Change detected [id="+this.getId()+"]: checked="+this.state.checked);
+        // };
 
         // this.attribs.onClick = () => {
         //     //this.state = {checked: this.state.checked};

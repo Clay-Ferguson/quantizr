@@ -36,9 +36,30 @@ export class SplitNodeDlg extends DialogBase {
             ], "form-group-border margin-bottom"),
 
             new RadioButtonGroup([
-                this.doubleSpacedRadioButton = new RadioButton("Double Spaced", true, "splitSpacingGroup"),
-                this.tripleSpacedRadioButton = new RadioButton("Triple Spaced", false, "splitSpacingGroup"),
-                this.customDelimRadioButton = new RadioButton("Custom Delimiter", false, "splitSpacingGroup"),
+                this.doubleSpacedRadioButton = new RadioButton("Double Spaced", true, "splitSpacingGroup",
+                    {
+                        onChange: (evt: any) => {
+                            if (evt.target.checked) {
+                                this.delimiterTextField.setVisible(false);
+                            }
+                        }
+                    }),
+                this.tripleSpacedRadioButton = new RadioButton("Triple Spaced", false, "splitSpacingGroup",
+                    {
+                        onChange: (evt: any) => {
+                            if (evt.target.checked) {
+                                this.delimiterTextField.setVisible(false);
+                            }
+                        }
+                    }),
+                this.customDelimRadioButton = new RadioButton("Custom Delimiter", false, "splitSpacingGroup",
+                    {
+                        onChange: (evt: any) => {
+                            if (evt.target.checked) {
+                                this.delimiterTextField.setVisible(true);
+                            }
+                        }
+                    }),
             ], "form-group-border margin-bottom"),
 
             this.delimiterTextField = new TextField("Delimiter"),
@@ -49,15 +70,27 @@ export class SplitNodeDlg extends DialogBase {
                 })
             ])
         ]);
+
+        this.delimiterTextField.setVisible(false);
     }
 
     splitNodes = (): void => {
         let highlightNode = S.meta64.getHighlightedNode();
         if (highlightNode) {
             let splitType = this.childrenRadioButton.getChecked() ? "children" : "inline";
-            //todo-0: finish the spacing option.
-            //console.log("delim=" + this.delimiterTextField.getValue());
-            S.edit.splitNode(splitType) 
+
+            let delim = "";
+            if (this.doubleSpacedRadioButton.getChecked()) {
+                delim = "\n\n\n";
+            }
+            else if (this.tripleSpacedRadioButton.getChecked()) {
+                delim = "\n\n\n\n";
+            }
+            else if (this.customDelimRadioButton.getChecked()) {
+                delim = this.delimiterTextField.getValue();
+            }
+
+            S.edit.splitNode(splitType, delim)
         }
         this.close();
     }

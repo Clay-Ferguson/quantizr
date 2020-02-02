@@ -14,9 +14,6 @@ export class Checkbox extends Comp {
     constructor(public label: string = null, checked: boolean = false, _attribs: Object = null) {
         super(_attribs); 
 
-        //this is done in base class now.
-        //this.attribs.key = this.attribs.id;
-
         if (checked) {
             this.attribs.defaultChecked = "checked";
             this.setChecked(true);

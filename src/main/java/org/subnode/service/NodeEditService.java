@@ -50,9 +50,6 @@ import org.springframework.stereotype.Component;
 public class NodeEditService {
 	private static final Logger log = LoggerFactory.getLogger(NodeEditService.class);
 
-	private static final String SPLIT_TAG1 = "{split}";
-	private static final String SPLIT_TAG2 = "\n\n\n"; // splits at double-spacing in the text.
-
 	@Autowired
 	private Convert convert;
 
@@ -292,31 +289,24 @@ public class NodeEditService {
 		}
 		String nodeId = req.getNodeId();
 
-		log.debug("Splitting node: " + nodeId);
+		//log.debug("Splitting node: " + nodeId);
 		SubNode node = api.getNode(session, nodeId);
 		SubNode parentNode = api.getParent(session, node);
 
 		api.authRequireOwnerOfNode(session, node);
 
 		String content = node.getContent();
-		boolean containsSplitTag1 = content.contains(SPLIT_TAG1);
-		boolean containsSplitTag2 = content.contains(SPLIT_TAG2);
+		boolean containsDelim = content.contains(req.getDelimiter());
 
 		/*
 		 * If split will have no effect, just return as if successful.
 		 */
-		if (!containsSplitTag1 && !containsSplitTag2) {
+		if (!containsDelim) {
 			res.setSuccess(true);
 			return;
 		}
 
-		String[] contentParts = null;
-		if (containsSplitTag1) {
-			contentParts = StringUtils.splitByWholeSeparator(content, SPLIT_TAG1);
-		} else if (containsSplitTag2) {
-			contentParts = StringUtils.splitByWholeSeparator(content, SPLIT_TAG2);
-		}
-
+		String[] contentParts = StringUtils.splitByWholeSeparator(content, req.getDelimiter());
 		SubNode parentForNewNodes = null;
 		long firstOrdinal = 0;
 

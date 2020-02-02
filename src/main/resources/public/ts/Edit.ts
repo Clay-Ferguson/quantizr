@@ -564,7 +564,7 @@ export class Edit implements EditIntf {
         ).open();
     }
 
-    splitNode = (splitType: string): void => {
+    splitNode = (splitType: string, delimiter: string): void => {
         let highlightNode = S.meta64.getHighlightedNode();
         if (!highlightNode) {
             S.util.showMessage("You didn't select a node to split.");
@@ -574,7 +574,7 @@ export class Edit implements EditIntf {
         S.util.ajax<I.SplitNodeRequest, I.SplitNodeResponse>("splitNode", {
             "splitType": splitType,
             "nodeId": highlightNode.id,
-            "delimiter": null
+            "delimiter": delimiter
         }, this.splitNodeResponse);
     }
 

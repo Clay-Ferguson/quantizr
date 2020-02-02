@@ -9,7 +9,7 @@ export interface EditIntf {
     nodeInsertTarget: any;
 
     createNode(): void;
-    splitNode(splitType: string): void;
+    splitNode(splitType: string, delimiter: string): void;
     openChangePasswordDlg(): void;
     openManageAccountDlg(): void;
     editPreferences(): void;

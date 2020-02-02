@@ -59,6 +59,12 @@ export class TextField extends Comp {
         return S.e('div', {
             id: this.getId()+"_text",
             key: this.getId()+"_text",
+            //todo-0: This logic for style 'could' be encapsulated into a
+            //fucntion on the base class if we make S.e be wrapped in a Cont-base 
+            //method.
+            style: {
+                display: this.getState().visible ? "block" : "none"
+            }
         }, children);
     }
 }
