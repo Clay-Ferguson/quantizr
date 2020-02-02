@@ -8,6 +8,7 @@ import { Constants } from "./Constants";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
+import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -124,8 +125,9 @@ export class MenuPanel extends Div {
                 new MenuItem("Show Node JSON", () => { S.view.runServerCommand("getJson") }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
             ]),
             new Menu("Transform", [
-                new MenuItem("Split Inline", () => { S.edit.splitNode('inline') }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
-                new MenuItem("Split to Children", () => { S.edit.splitNode('children') }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; })
+                new MenuItem("Split Node", () => { 
+                    new SplitNodeDlg().open();
+                }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
             ]),
             new Menu("Tools",
                 [

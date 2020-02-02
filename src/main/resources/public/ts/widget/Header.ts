@@ -17,6 +17,6 @@ export class Header extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return this.tagRender('div', null, this.attribs);
+        return this.tagRender('div', this.text, this.attribs);
     }
 }

@@ -160,7 +160,7 @@ export class EditNodeDlg extends DialogBase {
         this.propEntries = new Array<I.PropEntry>();
 
         let collapsiblePropsTable = new EditPropsTable({
-            className: "edit-props-table"
+            className: "edit-props-table form-group-border"
         });
         let editPropsTable = new EditPropsTable();
 
@@ -474,16 +474,19 @@ export class EditNodeDlg extends DialogBase {
                 if (content && this.encryptionOptions.encryptForOwnerOnly && !content.startsWith(cnst.ENC_TAG)) {
                     content = await S.encryption.symEncryptString(null, content);
                     content = cnst.ENC_TAG + content;
+                    //console.log("Encrypted: " + content);
                 }
             }
 
             let nodeName = this.nodeNameTextField.getValue();
-            //todo-1: for now if user puts a colon in a node name, we can just change it for them.
-            nodeName = nodeName.replace(":", "-");
 
             //convert any empty string to null here to be sure DB storage is least amount.
             if (!nodeName) {
                 nodeName = null;
+            }
+            else {
+                //todo-1: for now if user puts a colon in a node name, we can just change it for them.
+                nodeName = nodeName.replace(":", "-");
             }
 
             /* Now scan over all properties to build up what to save */

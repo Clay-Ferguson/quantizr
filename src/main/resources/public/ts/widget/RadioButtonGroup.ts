@@ -12,8 +12,9 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class RadioButtonGroup extends Comp {
 
-    constructor(initialButtons: RadioButton[] = null) {
+    constructor(initialButtons: RadioButton[] = null, moreClasses: string="") {
         super(null);
+        this.attribs.className = moreClasses; 
         this.setChildren(initialButtons);
 
         initialButtons.forEach((row: RadioButton) => {
