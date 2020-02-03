@@ -289,11 +289,11 @@ public class UserManagerService {
 		 */
 		log.debug("Signup URL: " + signupLink);
 
-		content = "Confirmation for new Quantizr account: " + userName + //
+		content = "Welcome to quantizr.com: " + userName + //
 				"<p>\nClick this link to complete signup: <br>\n" + signupLink;
 
 		if (!StringUtils.isEmpty(appProp.getMailHost())) {
-			outboxMgr.queueEmail(email, "quantizr.com - New Account Signup Confirmation", content);
+			outboxMgr.queueEmail(email, "quantizr.com - Account Verification", content);
 		}
 	}
 

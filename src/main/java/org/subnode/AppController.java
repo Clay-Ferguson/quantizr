@@ -933,8 +933,15 @@ public class AppController {
 			log.debug("SendEmailTest detected on server.");
 
 			String timeString = new Date().toString();
-			mailSender.sendMail("wclayf@gmail.com", null, "<h1>Hi Clay! Time=" + timeString + "</h1>", "Test Subject");
-
+			synchronized (MailSender.getLock()) {
+				try {
+					mailSender.init();
+					mailSender.sendMail("wclayf@gmail.com", null,
+							"<h1>Hello from Quantizr! Time=" + timeString + "</h1>", "Test Subject");
+				} finally {
+					mailSender.close();
+				}
+			}
 			res.setSuccess(true);
 			return res;
 		});

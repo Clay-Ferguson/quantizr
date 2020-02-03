@@ -90,16 +90,24 @@ public class NotificationDaemon {
 				return;
 			}
 
-			for (SubNode node : nodes) {
-				String email = node.getStringProp(NodeProp.EMAIL_RECIP);
-				String subject = node.getStringProp(NodeProp.EMAIL_SUBJECT);
-				String content = node.getStringProp(NodeProp.EMAIL_CONTENT);
+			synchronized (MailSender.getLock()) {
+				try {
+					mailSender.init();
+					for (SubNode node : nodes) {
+						String email = node.getStringProp(NodeProp.EMAIL_RECIP);
+						String subject = node.getStringProp(NodeProp.EMAIL_SUBJECT);
+						String content = node.getStringProp(NodeProp.EMAIL_CONTENT);
 
-				if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject) && !StringUtils.isEmpty(content)) {
+						if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject)
+								&& !StringUtils.isEmpty(content)) {
 
-					log.debug("Found mail to send to: " + email);
-					mailSender.sendMail(email, null, content, subject);
-					api.delete(session, node);
+							log.debug("Found mail to send to: " + email);
+							mailSender.sendMail(email, null, content, subject);
+							api.delete(session, node);
+						}
+					}
+				} finally {
+					mailSender.close();
 				}
 			}
 		}

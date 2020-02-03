@@ -85,7 +85,7 @@ export class SignupDlg extends DialogBase {
             this.close();
 
             S.util.showMessage(
-                "User Information Accepted.<p/>Check your email for signup confirmation."
+                "User Information Accepted.<p/><p/>Check your email for account verification."
             );
         }
     }
