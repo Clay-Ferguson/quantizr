@@ -29,6 +29,14 @@ body {
     padding-bottom: 1rem;
 }
 
+/* This is how the search terms get highlighted by wrapping them like this in 
+the markdown **_term_** */
+strong em { 
+    font-style: normal; 
+    font-weight: bold; 
+    background-color: green;
+} 
+
 .textfield-label {
     margin-bottom: 0px;
 }

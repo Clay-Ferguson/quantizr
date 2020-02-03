@@ -19,6 +19,7 @@ export class Search implements SearchIntf {
     _UID_ROWID_PREFIX: string = "srch_row_";
 
     searchNodes: any = null;
+    searchText: string = null;
 
     searchOffset = 0;
     timelineOffset = 0;
@@ -54,6 +55,7 @@ export class Search implements SearchIntf {
         this.searchResults = res;
         if (this.numSearchResults() == 0) {
             new MessageDlg("No search results found.", "Search").open();
+            S.srch.searchText = null;
             return;
         }
 
@@ -131,7 +133,7 @@ export class Search implements SearchIntf {
      */
     renderSearchResultAsListItem = (node: NodeInfo, index: number, count: number, rowCount: number): Comp => {
         let id = node.id;
-        console.log("renderSearchResult: " + id);
+        //console.log("renderSearchResult: " + id);
 
         let cssId = this._UID_ROWID_PREFIX + id;
         // console.log("Rendering Node Row[" + index + "] with id: " +cssId)

@@ -241,6 +241,11 @@ export class Render implements RenderIntf {
             this.initMarkdown();
 
             // Do the actual markdown rendering here.
+            if (S.srch.searchText) {
+                /* This results in a <strong><em> wrapping the text, which we have a special styling for with a green background for each
+                search term so it's easy to see them highlighted on the page */
+                content = content.replace(S.srch.searchText, "**_" + S.srch.searchText + "_**");
+            }
             val = marked(content);
 
             // the marked adds a 'p tag' wrapping we don't need so we remove it just to speed up DOM as much as possible
@@ -628,7 +633,7 @@ export class Render implements RenderIntf {
                         S.meta64.selectedNodes = {};
 
                         //todo-1: Isn't this map needed forever during the app lifetime? Is it better to not blow this away here?
-                        S.meta64.parentIdToFocusNodeMap = {}; 
+                        S.meta64.parentIdToFocusNodeMap = {};
 
                         S.meta64.initNode(data.node, true);
                         S.meta64.setCurrentNodeData(data);
@@ -1003,7 +1008,7 @@ export class Render implements RenderIntf {
         if (propName.startsWith("sn:")) return false;
 
         let allow = !S.meta64.simpleModePropertyBlackList[propName];
-        console.log("######## Allow Prop "+propName+" = "+allow);
+        console.log("######## Allow Prop " + propName + " = " + allow);
         return allow;
     }
 

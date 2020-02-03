@@ -22,6 +22,8 @@ export class SearchContentDlg extends DialogBase {
     constructor() {
         super("Search Content", "app-modal-content-medium-width");
         
+        S.srch.searchText = null;
+
         this.setChildren([
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
@@ -57,6 +59,7 @@ export class SearchContentDlg extends DialogBase {
 
         // until better validation, just check for empty
         let searchText = this.searchTextField.getValue();
+        S.srch.searchText = searchText;
         if (S.util.emptyString(searchText)) {
             S.util.showMessage("Enter search text.");
             return;

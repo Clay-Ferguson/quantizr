@@ -5,6 +5,7 @@ export interface SearchIntf {
     _UID_ROWID_PREFIX: string;
 
     searchNodes: any;
+    searchText: string;
 
     searchOffset: number;
     timelineOffset: number;
@@ -14,6 +15,7 @@ export interface SearchIntf {
     highlightRowNode: I.NodeInfo;
 
     idToNodeMap: { [key: string]: I.NodeInfo };
+
     numSearchResults(): any;
     searchTabActivated(): any;
     searchNodesResponse(res: I.NodeSearchResponse): any;
