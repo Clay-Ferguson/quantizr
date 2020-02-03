@@ -3,7 +3,6 @@ package org.subnode.mongo;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -30,6 +29,7 @@ import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
 import org.subnode.util.NodeAuthFailedException;
 import org.subnode.util.SubNodeUtil;
+import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 import com.mongodb.BasicDBObject;
@@ -259,11 +259,13 @@ public class MongoApi {
 	}
 
 	public void save(MongoSession session, SubNode node) {
-		save(session, node, true);
+		save(session, node, true, true);
 	}
 
-	public void save(MongoSession session, SubNode node, boolean updateThreadCache) {
-		auth(session, node, PrivilegeType.WRITE);
+	public void save(MongoSession session, SubNode node, boolean updateThreadCache, boolean allowAuth) {
+		if (allowAuth) {
+			auth(session, node, PrivilegeType.WRITE);
+		}
 		// log.debug("MongoApi.save: DATA: " + XString.prettyPrint(node));
 		node.setWriting(true);
 		ops.save(node);
@@ -384,7 +386,7 @@ public class MongoApi {
 			}
 
 			for (SubNode node : MongoThreadLocal.getDirtyNodes().values()) {
-				save(session, node, false);
+				save(session, node, false, false);
 			}
 			MongoThreadLocal.cleanAll();
 		}
@@ -653,42 +655,47 @@ public class MongoApi {
 		return ops.findAll(SubNode.class);
 	}
 
-	public String convertDb(MongoSession session) {
+	public void convertDb(MongoSession session) {
 		log.debug("convertDb() executing.");
 		try {
 			requireAdmin(session);
 			Iterable<SubNode> iter = ops.findAll(SubNode.class);
-			ValContainer<Integer> nodeCount = new ValContainer<Integer>(0);
+			int[] iterCount = new int[1];
+			iterCount[0] = 0;
 
 			iter.forEach((node) -> {
-				boolean save = false;
-
-				// Convert obj.prp.sn:content to just obj.sn:content
-				String contentProp = node.getStringProp("sn:content");
-				if (contentProp != null) {
-					node.setContent(contentProp);
-					node.deleteProp("sn:content");
-					save = true;
-				}
-
-				Date lastModifiedProp = node.getDateProp("sn:lastModified");
-				if (lastModifiedProp != null) {
-					node.deleteProp("sn:lastModified");
-					save = true;
-				}
-
+				boolean save = shortenPath(node);
 				if (save) {
-					nodeCount.setVal(nodeCount.getVal() + 1);
+					iterCount[0]++;
 					ops.save(node);
 				}
-				// log.debug("content: " + contentProp);
 			});
 
-			return String.valueOf(nodeCount.getVal()) + " Nodes Converted";
 		} catch (Exception e) {
 			ExUtil.error(log, "dbConvert failed", e);
-			return "dbConvert failed.";
 		}
+	}
+
+	/* Returns true if this path was shortened. */
+	public boolean shortenPath(SubNode node) {
+		boolean ret = false;
+		String path = node.getPath();
+		//log.debug("Pth: " + path);
+		StringBuilder newPath = new StringBuilder();
+		StringTokenizer t = new StringTokenizer(path, "/", true);
+		while (t.hasMoreTokens()) {
+			String part = t.nextToken();
+			if (part.length() >= 24) {
+				part = Util.getHashOfString(part, 10);
+				ret = true;
+			}
+			newPath.append(part);
+		}
+		if (ret) {
+			//log.debug("New: " + newPath.toString());
+			node.setPath(newPath.toString());
+		}
+		return ret;
 	}
 
 	public String getNodeReport() {
@@ -727,36 +734,45 @@ public class MongoApi {
 	 */
 	// ********* DO NOT DELETE *********
 	// (this is needed from time to time)
-	//
-	// todo-0: Commenting out entirely temporarily, but I need
-	// to finish the work on getting each 'path' part compressed which is done in
-	// the save event listener.
 	public void reSaveAll(MongoSession session) {
-		// log.debug("Processing reSaveAll");
-		// while (true) {
-		// final ValContainer<Integer> numProcessed = new ValContainer<Integer>(0);
+		log.debug("Processing reSaveAll");
+		updateFieldPathHashes(session);
+	}
 
-		// Query query = new Query();
-		// query.limit(100);
-		// // Criteria criteria = Criteria.where(SubNode.FIELD_PATH_HASH).is(null);
-		// // query.addCriteria(criteria);
+	public void updateFieldPathHashes(MongoSession session) {
+		long nodesProcessed = 0;
 
-		// Iterable<SubNode> iter = ops.find(query, SubNode.class);
+		while (true) {
+			final ValContainer<Integer> numProcessed = new ValContainer<Integer>(0);
 
-		// iter.forEach((node) -> {
-		// numProcessed.setVal(numProcessed.getVal() + 1);
-		// log.debug("reSave node: " + node.getId().toHexString());
+			Query query = new Query();
+			query.limit(100);
+			Criteria criteria = Criteria.where(SubNode.FIELD_PATH_HASH).is(null);
+			query.addCriteria(criteria);
 
-		// // NOTE: MongoEventListener#onBeforeSave runs in here!
-		// save(session, node);
-		// });
+			Iterable<SubNode> iter = ops.find(query, SubNode.class);
 
-		// if (numProcessed.getVal() == 0) {
-		// log.debug("Done processing all nodes.");
-		// break;
-		// }
-		// }
-		// log.debug("reSaveAll completed.");
+			iter.forEach((node) -> {
+				numProcessed.setVal(numProcessed.getVal() + 1);
+				log.debug("reSave node: " + node.getId().toHexString());
+
+				/*
+				 * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some of
+				 * the workload is done that pertains ot this reSave process
+				 */
+				// todo-0: investigate if we need to utilize the 'set dirty and save all at the
+				// end technique here?'
+				save(session, node, true, false);
+			});
+
+			nodesProcessed += numProcessed.getVal();
+
+			if (numProcessed.getVal() == 0) {
+				log.debug("Done processing all nodes.");
+				break;
+			}
+		}
+		log.debug("reSaveAll completed: " + String.valueOf(nodesProcessed) + " nodes processed.");
 	}
 
 	public UserPreferencesNode getUserPreference(MongoSession session, String path) {
@@ -1203,6 +1219,7 @@ public class MongoApi {
 			log.debug("no field name index found. ok. this is fine.");
 		}
 		log.debug("creating all indexes.");
+
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
 
 		/*

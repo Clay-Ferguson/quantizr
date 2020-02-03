@@ -2,6 +2,8 @@ package org.subnode.model;
 
 /**
  * Models a Referenceable node.
+ * 
+ * todo-0: think about if this class is still needed or not.
  */
 public class RefInfo {
 	private String id;

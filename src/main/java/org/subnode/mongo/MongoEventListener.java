@@ -54,14 +54,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		Document dbObj = event.getDocument();
 		ObjectId id = node.getId();
-		dbObj.put(SubNode.FIELD_ID, id);
 
 		if (id == null) {
 			id = new ObjectId();
-			dbObj.put(SubNode.FIELD_ID, id);
 			node.setId(id);
 			// log.debug("New Node ID generated: " + id);
 		}
+		dbObj.put(SubNode.FIELD_ID, id);
 
 		// DO NOT DELETE
 		// If we ever add a unique-index for "Name" (not currently the case), then we'd need something like this to be sure
@@ -93,13 +92,17 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		 * of the leaf 'name' part of the path
 		 */
 		if (node.getPath().endsWith("/?")) {
-			String path = XString.removeLastChar(node.getPath()) + id;
+			String shortId =  Util.getHashOfString(id.toHexString(), 10);
+			String path = XString.removeLastChar(node.getPath()) + shortId;
 			dbObj.put(SubNode.FIELD_PATH, path);
 			node.setPath(path);
 		}
 
+		/* todo-0: We should add the smarts so that whenever 'setPath()' is called it nullifies this path hash
+		in order to trigger this code to run again upon saving? */
 		String pathHash = Util.getHashOfString(node.getPath(), 14);
 		//log.debug("CHECK PathHash=" + pathHash);
+
 		if (!pathHash.equals(node.getPathHash())) {
 			dbObj.put(SubNode.FIELD_PATH_HASH, pathHash);
 			node.setPathHash(pathHash);

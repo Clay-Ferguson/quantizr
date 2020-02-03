@@ -103,12 +103,8 @@ public class MongoRepository {
 			// mongoTest.wipeDb(adminSession);
 			// }
 
-			// hard-coding this hack temporarily, after removal of the PATH_HASH
 			if (appProp.getForceIndexRebuild()) {
 				api.dropAllIndexes(adminSession);
-			}
-
-			if (appProp.getForceIndexRebuild()) {
 				api.convertDb(adminSession);
 			}
 

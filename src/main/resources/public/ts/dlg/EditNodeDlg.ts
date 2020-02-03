@@ -555,13 +555,6 @@ export class EditNodeDlg extends DialogBase {
         let formGroup = new FormGroup();
         let propVal = propEntry.binary ? "[binary]" : propEntry.property.value;
 
-        let isPassword = propEntry.property.name == "sn:pwd"
-            || propEntry.property.name == "sn:user"
-            || propEntry.property.name == "sn:email";
-
-        if (isPassword && !S.meta64.isAdminUser) {
-            return null;
-        }
         let label = propEntry.property.name; //S.render.sanitizePropertyName(propEntry.property.name);
         let propValStr = propVal ? propVal : "";
         propValStr = S.util.escapeForAttrib(propValStr);

@@ -14,7 +14,6 @@ import org.subnode.mongo.model.types.intf.SubNodeProperty;
 import org.subnode.mongo.model.types.intf.SubNodeType;
 import org.subnode.util.ExUtil;
 import org.subnode.util.XString;
-import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +83,13 @@ public class SubNode {
 	@Field(FIELD_PATH)
 	private String path;
 
+	/*
+	 * This property gets updated during the save event processing, and we store the
+	 * hash of the path in here, so that we can achieve the equivalent of a unique
+	 * key on the path (indirectly vis this hash) because the full path becomes to
+	 * long for MongoDb indexes to allow, but also becasue using the hash for
+	 * uniqueness is faster
+	 */
 	public static final String FIELD_PATH_HASH = "phash";
 	@Field(FIELD_PATH_HASH)
 	private String pathHash;
@@ -192,6 +198,12 @@ public class SubNode {
 	@JsonProperty(FIELD_PATH)
 	public void setPath(String path) {
 		MongoThreadLocal.dirty(this);
+
+		/* nullify path hash if the path is changing so that MongoEventListener will 
+		update the value when saving */
+		if (!path.equals(this.path)) {
+			this.pathHash = null;
+		}
 		this.path = path;
 	}
 
