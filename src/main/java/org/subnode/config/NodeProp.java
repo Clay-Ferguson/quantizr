@@ -63,6 +63,7 @@ public class NodeProp {
 	 * these nodes.
 	 */
 	public static final String USER = "sn:user";
+	public static final String PWD_HASH = "sn:pwdHash";
 
 	public static final String UUID = "sn:uuid";
 	public static final String PRIMARY_TYPE = "sn:primaryType";

@@ -407,7 +407,8 @@ public class UserManagerService {
 					throw new RuntimeException("changePassword should not be called fror admin user.");
 				}
 
-				userNode[0].setProp(NodeProp.PASSWORD, password); // encryptor.encrypt(password));
+				//userNode[0].setProp(NodeProp.PASSWORD, password); // encryptor.encrypt(password));
+				userNode[0].setProp(NodeProp.PWD_HASH, api.getHashOfPassword(password)); // encryptor.encrypt(password));
 				userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE);
 
 				//note: the adminRunner.run saves the session so we don't do that here.
@@ -426,7 +427,10 @@ public class UserManagerService {
 			String password = req.getNewPassword();
 			userName[0] = userNode[0].getStringProp(NodeProp.USER);
 
-			userNode[0].setProp(NodeProp.PASSWORD, password); // encryptor.encrypt(password));
+			//todo-0: before pushing current code to prod, reverify entire signup cycle, including using mailgun.
+
+			//userNode[0].setProp(NodeProp.PASSWORD, password); // encryptor.encrypt(password));
+			userNode[0].setProp(NodeProp.PWD_HASH, api.getHashOfPassword(password)); // encryptor.encrypt(password));
 			userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE);
 
 			api.save(session, userNode[0]);

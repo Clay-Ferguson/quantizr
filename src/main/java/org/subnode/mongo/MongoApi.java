@@ -657,6 +657,45 @@ public class MongoApi {
 
 	public void convertDb(MongoSession session) {
 		log.debug("convertDb() executing.");
+
+		// todo-0: uncomment before running this on prod. i.e. YES we DO WANT to run on
+		// prod.
+		//shortenPaths(session);
+
+		makePasswordHashes(session);
+	}
+
+	public String getHashOfPassword(String password) {
+		return Util.getHashOfString(password, 20);
+	}
+
+	public void makePasswordHashes(MongoSession session) {
+
+		Query query = new Query();
+		Criteria criteria = Criteria.where(//
+				SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath("/" + NodeName.ROOT + "/" + NodeName.USER)) //
+				.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.PWD_HASH + ".value").is(null);
+		query.addCriteria(criteria);
+
+		Iterable<SubNode> iter = ops.find(query, SubNode.class);
+
+		iter.forEach((node) -> {
+			String password = node.getStringProp(NodeProp.PASSWORD);
+			if (password != null) {
+				log.debug("pwdHash update. userNode node: name=" + node.getStringProp(NodeProp.USER));
+
+				node.setProp(NodeProp.PWD_HASH, getHashOfPassword(password));
+
+				/*
+				 * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some of
+				 * the workload is done that pertains ot this reSave process
+				 */
+				save(session, node, true, false);
+			}
+		});
+	}
+
+	public void shortenPaths(MongoSession session) {
 		try {
 			requireAdmin(session);
 			Iterable<SubNode> iter = ops.findAll(SubNode.class);
@@ -680,7 +719,7 @@ public class MongoApi {
 	public boolean shortenPath(SubNode node) {
 		boolean ret = false;
 		String path = node.getPath();
-		//log.debug("Pth: " + path);
+		// log.debug("Path: " + path);
 		StringBuilder newPath = new StringBuilder();
 		StringTokenizer t = new StringTokenizer(path, "/", true);
 		while (t.hasMoreTokens()) {
@@ -692,7 +731,7 @@ public class MongoApi {
 			newPath.append(part);
 		}
 		if (ret) {
-			//log.debug("New: " + newPath.toString());
+			// log.debug("New: " + newPath.toString());
 			node.setPath(newPath.toString());
 		}
 		return ret;
@@ -1440,7 +1479,8 @@ public class MongoApi {
 		SubNode userNode = createNode(session, newUserNodePath, null);
 		userNode.setProp(NodeProp.USER, user);
 		userNode.setProp(NodeProp.EMAIL, email);
-		userNode.setProp(NodeProp.PASSWORD, password);
+		// userNode.setProp(NodeProp.PASSWORD, password);
+		userNode.setProp(NodeProp.PWD_HASH, getHashOfPassword(password));
 		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE, false);
 
 		userNode.setContent("User Account: " + user);
@@ -1507,17 +1547,19 @@ public class MongoApi {
 			boolean success = false;
 
 			if (userNode != null) {
+
 				/*
 				 * If logging in as ADMIN we don't expect the node to contain any password in
 				 * the db, but just use the app property instead.
 				 */
-				if (NodePrincipal.ADMIN.equals(userName)) {
-					if (password.equals(appProp.getMongoAdminPassword())) {
-						success = true;
-					}
+				// if (NodePrincipal.ADMIN.equals(userName)) {
+				if (password.equals(appProp.getMongoAdminPassword())) {
+					success = true;
 				}
+				// }
 				// else it's an ordinary user so we check the password against their user node
-				else if (userNode.getStringProp(NodeProp.PASSWORD).equals(password)) {
+				// else if (userNode.getStringProp(NodeProp.PASSWORD).equals(password)) {
+				else if (userNode.getStringProp(NodeProp.PWD_HASH).equals(getHashOfPassword(password))) {
 					success = true;
 				}
 			}
