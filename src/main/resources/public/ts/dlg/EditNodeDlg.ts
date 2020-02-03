@@ -19,7 +19,6 @@ import { Singletons } from "../Singletons";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { AceEditPropTextarea } from "../widget/AceEditPropTextarea";
 import { EditPropTextarea } from "../widget/EditPropTextarea";
-import { AceEditorInfo } from "../widget/AceEditorInfo";
 import { EditPropTextField } from "../widget/EditPropTextField";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { TextField } from "../widget/TextField";
@@ -33,8 +32,6 @@ let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
-
-declare var ace;
 
 export class EditNodeDlg extends DialogBase {
     node: I.NodeInfo;
@@ -70,7 +67,7 @@ export class EditNodeDlg extends DialogBase {
 
     /* map that allows us to lookup ace editor info specific to any field/property that is being edited by one, 
     the keys are named relative to the SubNode.java object, so the ones that are 'prp' (properties) have a 'prp' prefix */
-    aceEditorMap: { [key: string]: AceEditorInfo } = {};
+    editorMap: { [key: string]: Comp } = {};
 
     encryptionOptions: EncryptionOptions = new EncryptionOptions();
 
@@ -317,9 +314,10 @@ export class EditNodeDlg extends DialogBase {
     }
 
     insertTime = (): void => {
-        let aceEditorInfo: AceEditorInfo = this.aceEditorMap["content"];
+        let aceEditorInfo: Comp = this.editorMap["content"];
         if (aceEditorInfo) {
-            aceEditorInfo.editor.insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
+            //todo-0: make sure to detect first if this IS ace.
+            (aceEditorInfo as AceEditPropTextarea).insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
         }
     }
 
@@ -466,11 +464,12 @@ export class EditNodeDlg extends DialogBase {
             }
 
             let content: string;
-            let aceEditorInfo: AceEditorInfo = this.aceEditorMap["content"];
+            let aceEditor: Comp = this.editorMap["content"];
+            //console.log("$$$$$$$$$$$$$$$$$$$$$ aceEditor.clazz=" + aceEditor.clazz);
 
             /* If we are editing with an ace editor get the value from it */
-            if (aceEditorInfo) {
-                content = aceEditorInfo.editor.getValue();
+            if (aceEditor) {
+                content = (aceEditor as AceEditPropTextarea).getValue();
 
                 // if we need to encrypt and the content is not currently encrypted.
                 if (content && this.encryptionOptions.encryptForOwnerOnly && !content.startsWith(cnst.ENC_TAG)) {
@@ -501,11 +500,11 @@ export class EditNodeDlg extends DialogBase {
                     //console.log("property field: " + JSON.stringify(prop));
 
                     let propVal: string;
-                    let aceEditorInfo: AceEditorInfo = this.aceEditorMap["prp." + prop.property.name];
+                    let aceEditor: Comp = this.editorMap["prp." + prop.property.name];
 
                     /* If we are editing with an ace editor get the value from it */
-                    if (aceEditorInfo) {
-                        propVal = aceEditorInfo.editor.getValue();
+                    if (aceEditor) {
+                        propVal = (aceEditor as AceEditPropTextarea).getValue();
                         //console.log("ACE propVal[" + prop.id + "]=" + propVal);
                     }
                     /* Else get from the plain text area we must be using (pre-ace design) */
@@ -613,7 +612,7 @@ export class EditNodeDlg extends DialogBase {
                     }, 250);
                 });
 
-                this.aceEditorMap["prp." + propEntry.property.name] = new AceEditorInfo((editorComp as AceEditPropTextarea));
+                this.editorMap["prp." + propEntry.property.name] = editorComp;
             }
             else {
                 //todo-p1: it's a bit inconsistent/ugly that we pass the value into this component so dramatically different than
@@ -673,7 +672,7 @@ export class EditNodeDlg extends DialogBase {
             });
 
             //NOTE: Not a 'prp.' property here.
-            this.aceEditorMap[propName] = new AceEditorInfo(editorComp);
+            this.editorMap[propName] = editorComp;
         }
         else {
             editorComp = new TextField(prompt, null, value);

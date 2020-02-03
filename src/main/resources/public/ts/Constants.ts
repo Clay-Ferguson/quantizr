@@ -53,6 +53,10 @@ export class Constants {
     static readonly BIN_DATA: string = "sn:jcrData";
     static readonly BIN_MIME: string = "sn::mimeType";
 
+    //todo-0: what is this? I forgot. I noticed it displaying what appears to be a hash.
+    static readonly BIN: string = "bin";
+
+
     static readonly IMG_WIDTH: string = "sn:imgWidth";
     static readonly IMG_HEIGHT: string = "sn:imgHeight";
 

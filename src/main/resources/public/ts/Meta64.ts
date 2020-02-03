@@ -514,6 +514,7 @@ export class Meta64 implements Meta64Intf {
             cnst.BIN_DATA, //
             cnst.BIN_MIME, //
             cnst.ENC, //
+            cnst.BIN, //
         ]);
 
         S.util.addAll(this.readOnlyPropertyList, [ //

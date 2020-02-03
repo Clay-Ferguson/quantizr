@@ -21,6 +21,9 @@ export class AceEditPropTextarea extends Div {
         //super(S.util.escapeHtml(propEntry.property.value), {});
         super(value, {});
 
+        /* for safety, I'm setting this here redundantly, just to protect against me renaming this class someday and inadvertently breaking code. */
+        this.clazz = "AceEditPropTextarea";
+
         S.util.mergeProps(this.attribs, {
             className: "my-ace-editor",
             style: { height: heightString }

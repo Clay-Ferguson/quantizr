@@ -45,6 +45,7 @@ export abstract class Comp implements CompIntf {
     isVisibleFunc: Function;
 
     jsClassName: string;
+    clazz: string;
 
     setStateFunc: Function;
 
@@ -75,6 +76,7 @@ export abstract class Comp implements CompIntf {
         this.attribs.id = id;
         this.attribs.key = id;
 
+        this.clazz = this.constructor.name;
         this.jsClassName = this.constructor.name + "[" + id + "]";
         //console.log("jsClassName: " + this.jsClassName);
 
