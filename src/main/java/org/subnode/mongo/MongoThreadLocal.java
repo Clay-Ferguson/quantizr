@@ -46,7 +46,7 @@ public class MongoThreadLocal {
 	}
 
 	/*
-	 * todo-0: Nice enhancement would be if a node is getting flagged as dirty make sure there isn't
+	 * todo-1: Nice enhancement would be if a node is getting flagged as dirty make sure there isn't
 	 * already a DIFFERENT instance of the same node ID flagged as dirty, because this would be a
 	 * BUG always. The last one written would overwrite, so this means if we are working on updating
 	 * two object instances of the same 'node id' at once that is a BUG for sure.

@@ -27,6 +27,7 @@ import { EncryptionDlg } from "./EncryptionDlg";
 import { EncryptionOptions } from "../EncryptionOptions";
 import { FormInline } from "../widget/FormInline";
 import { TextContent } from "../widget/TextContent";
+import { Comp } from "../widget/base/Comp";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -64,6 +65,7 @@ export class EditNodeDlg extends DialogBase {
     createAtTop: boolean;
 
     nodeNameTextField: TextField;
+    enableAceEditor: boolean = false;
     aceEditor: any;
 
     /* map that allows us to lookup ace editor info specific to any field/property that is being edited by one, 
@@ -584,17 +586,18 @@ export class EditNodeDlg extends DialogBase {
             propEntry.checkboxId = checkbox.getId();
             formGroup.addChild(checkbox);
 
-            let editorComp: any = null;
+            let editorComp: Comp = null;
             let multiLine = false;
 
             if (multiLine) {
                 editorComp = new AceEditPropTextarea(propEntry.property.value, "25em", isPre, isWordWrap);
+
                 propEntry.id = editorComp.getId();
                 this.aceEditor = editorComp;
 
                 editorComp.whenElm((elm: HTMLElement) => {
                     let timer = setInterval(() => {
-                        if (editorComp.getAceEditor()) {
+                        if ((editorComp as AceEditPropTextarea).getAceEditor()) {
                             clearInterval(timer);
                             if (!multiLine) {
                                 //todo-p1: this worked BUT the ace editor is doesn't do what i was hoping for here. It leaves the wrapping capability ENABLED.
@@ -603,14 +606,14 @@ export class EditNodeDlg extends DialogBase {
                                 //textarea.getAceEditor().setWrapBehavioursEnabled(false);
                             }
                             else {
-                                editorComp.getAceEditor().focus();
+                                (editorComp as AceEditPropTextarea).getAceEditor().focus();
                             }
                         }
 
                     }, 250);
                 });
 
-                this.aceEditorMap["prp." + propEntry.property.name] = new AceEditorInfo(editorComp);
+                this.aceEditorMap["prp." + propEntry.property.name] = new AceEditorInfo((editorComp as AceEditPropTextarea));
             }
             else {
                 //todo-p1: it's a bit inconsistent/ugly that we pass the value into this component so dramatically different than

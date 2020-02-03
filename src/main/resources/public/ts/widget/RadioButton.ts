@@ -20,7 +20,7 @@ export class RadioButton extends Comp {
     constructor(public label: string, public checked: boolean, groupName: string, _attribs: any=null) {
         super(_attribs); 
 
-        //todo-0: for RadioButton and CheckBox we are not handling change
+        //todo-1: for RadioButton and CheckBox we are not handling change
         //internally, but externally. Is this good?
         // this.attribs.onChange = () => {
         //     // if (!this.state.checked) {

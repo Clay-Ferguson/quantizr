@@ -98,8 +98,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.setPath(path);
 		}
 
-		/* todo-0: We should add the smarts so that whenever 'setPath()' is called it nullifies this path hash
-		in order to trigger this code to run again upon saving? */
 		String pathHash = Util.getHashOfString(node.getPath(), 14);
 		//log.debug("CHECK PathHash=" + pathHash);
 

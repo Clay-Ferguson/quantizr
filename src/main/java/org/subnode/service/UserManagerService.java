@@ -427,8 +427,6 @@ public class UserManagerService {
 			String password = req.getNewPassword();
 			userName[0] = userNode[0].getStringProp(NodeProp.USER);
 
-			//todo-0: before pushing current code to prod, reverify entire signup cycle, including using mailgun.
-
 			//userNode[0].setProp(NodeProp.PASSWORD, password); // encryptor.encrypt(password));
 			userNode[0].setProp(NodeProp.PWD_HASH, api.getHashOfPassword(password)); // encryptor.encrypt(password));
 			userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE);

@@ -658,11 +658,11 @@ public class MongoApi {
 	public void convertDb(MongoSession session) {
 		log.debug("convertDb() executing.");
 
-		// todo-0: uncomment before running this on prod. i.e. YES we DO WANT to run on
-		// prod.
+		// todo-0: this can be deleted once run on prod just once.
 		//shortenPaths(session);
 
-		makePasswordHashes(session);
+		//todo-0: ditto.
+		//makePasswordHashes(session);
 	}
 
 	public String getHashOfPassword(String password) {
@@ -799,7 +799,7 @@ public class MongoApi {
 				 * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some of
 				 * the workload is done that pertains ot this reSave process
 				 */
-				// todo-0: investigate if we need to utilize the 'set dirty and save all at the
+				// todo-1: investigate if we need to utilize the 'set dirty and save all at the
 				// end technique here?'
 				save(session, node, true, false);
 			});
