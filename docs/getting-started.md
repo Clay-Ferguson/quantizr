@@ -73,3 +73,18 @@ How to do a kind of "Hot Deploy" of client-side files, without a full build.
 
 When you set "MAVEN_PROFILE=dev" in the script it will automatically re-launch the docker image, when it runs. So if you are changing back-end code (meaning Java), you can run with the dev profile and it will rebuild and deploy. However if you have the app deployed already and have only just edited client side files (i.e. TS or SCSS namely) then the webpack profile (i.e.: mvn generate-resources -DskipTests -Pwebpack) is all you need to run,(to see the changes after a browser refresh) which builds MUCH faster and without restarting the app. NOTE: To be able to make that 'webpack' profile work, the other thing you're doing to need to do is to into dev-docker-run.sh and search for dev-resource-base (in two places) and understand that what's going on there is that it's making the webapp look into that folder "live" at runtime (instead of the build/deployed JAR in the docker image), which is how it enables the app to load those files without doing a full rebuild. This is similar to a 'hot deploy' type thing, but the WebApp is actually making the decision to read from there at runtime, when that property is set.
 
+# Before you run 'dev' Profile
+
+The following maven profile will need to be run in order to update the generated TypeScript. We use this plugin:
+
+    <plugin>
+        <groupId>cz.habarta.typescript-generator</groupId>
+        <artifactId>typescript-generator-maven-plugin</artifactId>
+    ...
+
+...to generate a single TypeScrypt type file named "JavaIntf.d.ts", and this file contains all the interfaces from the Java code so we
+don't have to manually create those for TypeScript, but they're generated instead. If you look in build-dev.sh you can see that
+builder is doing this also (i.e. running the TypeScript generator maven build right before running the 'real' build.)
+
+    mvn package -DskipTests -Pdev-vscode
+

@@ -453,15 +453,6 @@ export interface InsertNodeResponse extends ResponseBase {
 export interface AppDropResponse extends ResponseBase {
 }
 
-export interface LoginResponse extends ResponseBase {
-    rootNode: string;
-    userName: string;
-    anonUserLandingPageNode: string;
-    homeNodeOverride: string;
-    userPreferences: UserPreferences;
-    allowFileSystemSearch: boolean;
-}
-
 export interface LogoutResponse extends ResponseBase {
 }
 

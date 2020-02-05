@@ -29,8 +29,14 @@ cd $PRJROOT
 # mvn dependency:resolve -Dclassifier=javadoc
 # mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
 
+./pom-generate.sh
+
 # This build command creates the SpringBoot fat jar in the /target/ folder.
 if [ "$CLEAN" == "true" ]; then
+    # This run is required basically only to ensure TypeScript generated files are up to date.
+    mvn package -DskipTests -Pdev-vscode
+
+    # Then this is the actual full build.
     mvn clean package -Pdev -DskipTests=true
 else
     mvn package -Pdev -DskipTests=true

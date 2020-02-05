@@ -1,4 +1,5 @@
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { LoginDlg } from "./dlg/LoginDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
@@ -63,7 +64,7 @@ export class User implements UserIntf {
     }
 
     /* TODO-3: move this into meta64 module */
-    setStateVarsUsingLoginResponse = (res: I.LoginResponse): void => {
+    setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
         if (res.rootNode) {
             S.meta64.homeNodeId = res.rootNode;
         }
@@ -139,12 +140,12 @@ export class User implements UserIntf {
                     S.meta64.loadAnonPageHome();
                 } else {
                     //alert('calling login: currently at: '+location.href);
-                    S.util.ajax<I.LoginRequest, I.LoginResponse>("login", {
+                    S.util.ajax<I.LoginRequest, J.LoginResponse>("login", {
                         "userName": callUsr,
                         "password": callPwd,
                         "tzOffset": new Date().getTimezoneOffset(),
                         "dst": S.util.daylightSavingsTime
-                    }, (res: I.LoginResponse) => {
+                    }, (res: J.LoginResponse) => {
                         if (usingLocalDb) {
                             this.loginResponse(res, callUsr, callPwd, usingLocalDb);
                         } else {
@@ -183,12 +184,12 @@ export class User implements UserIntf {
     }
 
     login = (loginDlg: any, usr: string, pwd: string) => {
-        S.util.ajax<I.LoginRequest, I.LoginResponse>("login", {
+        S.util.ajax<I.LoginRequest, J.LoginResponse>("login", {
             "userName": usr,
             "password": pwd,
             "tzOffset": new Date().getTimezoneOffset(),
             "dst": S.util.daylightSavingsTime
-        }, (res: I.LoginResponse) => {
+        }, (res: J.LoginResponse) => {
             this.loginResponse(res, usr, pwd, null, loginDlg);
         });
     }
@@ -206,7 +207,7 @@ export class User implements UserIntf {
         });
     }
 
-    loginResponse = async (res?: I.LoginResponse, usr?: string, pwd?: string, usingLocalDb?: boolean, loginDlg?: LoginDlg): Promise<void> => {
+    loginResponse = async (res?: J.LoginResponse, usr?: string, pwd?: string, usingLocalDb?: boolean, loginDlg?: LoginDlg): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 if (S.util.checkSuccess("Login", res)) {
@@ -271,7 +272,7 @@ export class User implements UserIntf {
         });
     }
 
-    private refreshLoginResponse = (res: I.LoginResponse): void => {
+    private refreshLoginResponse = (res: J.LoginResponse): void => {
         console.log("refreshLoginResponse");
 
         if (res.success) {
