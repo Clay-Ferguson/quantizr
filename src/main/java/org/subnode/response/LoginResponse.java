@@ -1,12 +1,11 @@
 package org.subnode.response;
 
-import org.subnode.model.RefInfo;
 import org.subnode.model.UserPreferences;
 import org.subnode.response.base.ResponseBase;
 
 public class LoginResponse extends ResponseBase {
 
-	private RefInfo rootNode;
+	private String /* Ref Info */ rootNode;
 
 	/* will be username or 'anonymous' if server rejected login */
 	private String userName;
@@ -32,11 +31,11 @@ public class LoginResponse extends ResponseBase {
 		this.userName = userName;
 	}
 
-	public RefInfo getRootNode() {
+	public String getRootNode() {
 		return rootNode;
 	}
 
-	public void setRootNode(RefInfo rootNode) {
+	public void setRootNode(String rootNode) {
 		this.rootNode = rootNode;
 	}
 

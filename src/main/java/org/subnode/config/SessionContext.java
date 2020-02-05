@@ -7,7 +7,6 @@ import java.util.TimeZone;
 import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpSession;
 
-import org.subnode.model.RefInfo;
 import org.subnode.model.UserPreferences;
 import org.subnode.mongo.RepositoryUtil;
 import org.subnode.util.DateUtil;
@@ -36,7 +35,8 @@ public class SessionContext {
 	RepositoryUtil repoUtil;
 
 	/* Identification of user's account root node */
-	private RefInfo rootRefInfo;
+	//private Ref_Info rootRef_Info;
+	private String rootId;
 
 	private String userName;
 	private String password;
@@ -149,12 +149,12 @@ public class SessionContext {
 		this.timeZoneAbbrev = timeZoneAbbrev;
 	}
 
-	public RefInfo getRootRefInfo() {
-		return rootRefInfo;
+	public String getRootId() {
+		return rootId;
 	}
 
-	public void setRootRefInfo(RefInfo rootRefInfo) {
-		this.rootRefInfo = rootRefInfo;
+	public void setRootId(String rootId) {
+		this.rootId = rootId;
 	}
 
 	public UserPreferences getUserPreferences() {

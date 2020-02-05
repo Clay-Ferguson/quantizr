@@ -86,11 +86,6 @@ export interface PropertyInfo {
     abbreviated?: boolean;
 }
 
-export interface RefInfo {
-    id: string;
-    path: string;
-}
-
 export interface UserPreferences {
     editMode: boolean;
     importAllowed: boolean;
@@ -459,7 +454,7 @@ export interface AppDropResponse extends ResponseBase {
 }
 
 export interface LoginResponse extends ResponseBase {
-    rootNode: RefInfo;
+    rootNode: string;
     userName: string;
     anonUserLandingPageNode: string;
     homeNodeOverride: string;

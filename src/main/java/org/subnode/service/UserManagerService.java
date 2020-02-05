@@ -12,7 +12,6 @@ import org.subnode.config.NodePrincipal;
 import org.subnode.config.NodeProp;
 import org.subnode.config.SessionContext;
 import org.subnode.mail.OutboxMgr;
-import org.subnode.model.RefInfo;
 import org.subnode.model.UserPreferences;
 import org.subnode.mongo.AclService;
 import org.subnode.mongo.MongoApi;
@@ -129,9 +128,9 @@ public class UserManagerService {
 				throw new RuntimeException("User not found: " + userName);
 			}
 
-			RefInfo rootRefInfo = new RefInfo(userNode.getId().toHexString(), userNode.getPath());
-			sessionContext.setRootRefInfo(rootRefInfo);
-			res.setRootNode(rootRefInfo);
+			String id = userNode.getId().toHexString();
+			sessionContext.setRootId(id);
+			res.setRootNode(id);
 			res.setUserName(userName);
 			res.setAllowFileSystemSearch(appProp.isAllowFileSystemSearch());
 

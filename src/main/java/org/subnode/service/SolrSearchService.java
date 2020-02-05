@@ -61,9 +61,9 @@ public class SolrSearchService {
 	// SpringContextUtil.getBean(SessionContext.class);
 	// String userName = sessionContext.getUserName();
 	//
-	// RefInfo rootRefInfo = UserManagerUtil.getRootNodeRefInfoForUser(session, userName);
+	// Ref_Info rootRef_Info = UserManagerUtil.getRootNodeRef_InfoForUser(session, userName);
 	//
-	// Node parentNode = JcrUtil.ensureNodeExists(session, rootRefInfo.getPath() + "/",
+	// Node parentNode = JcrUtil.ensureNodeExists(session, rootRef_Info.getPath() + "/",
 	// JcrName.FILE_SEARCH_RESULTS, "Search Results");
 	// parentNode.setProperty(JcrProp.CREATED_BY, userName);
 	// Node newNode = parentNode.addNode(JcrUtil.getGUID(), JcrConstants.NT_UNSTRUCTURED);
