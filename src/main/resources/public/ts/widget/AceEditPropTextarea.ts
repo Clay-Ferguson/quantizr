@@ -1,3 +1,4 @@
+import * as I from "../Interfaces";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants } from "../Constants";
@@ -12,7 +13,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 declare var ace;
 
 /* FYI: Before switching to React we needed the 'escapeHtml' in here, but it appears after moving to ReactJS it was no longer necessary */
-export class AceEditPropTextarea extends Div {
+export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
 
     aceEditor: any;
     initialValue: string;
@@ -63,6 +64,18 @@ export class AceEditPropTextarea extends Div {
 
             this.aceEditor.session.setUseWrapMode(wordWrap);
         });
+    }
+
+    setWordWrap = (wordWrap: boolean): void => {
+        if (this.getAceEditor()) {
+            this.getAceEditor().session.setUseWrapMode(wordWrap);
+        }
+    }
+
+    setMode = (mode: string): void => {
+        if (this.getAceEditor()) {
+            this.getAceEditor().session.setMode(mode);
+        }
     }
 
     showKeyboardShortcuts = () => {

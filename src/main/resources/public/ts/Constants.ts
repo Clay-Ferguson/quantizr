@@ -41,8 +41,8 @@ export class Constants {
 
     static readonly UUID: string = "sn:uuid";
     static readonly JSON_FILE_SEARCH_RESULT: string = "sn:json";
-    static readonly PRE: string = "pre";
-    static readonly WRAP: string = "wrap";
+    static readonly PRE: string = "sn:pre";
+    static readonly NOWRAP: string = "sn:nowrap";
     
     static readonly ENC: string = "sn:enc"; 
     static readonly PWD: string = "sn:pwd";
@@ -53,9 +53,8 @@ export class Constants {
     static readonly BIN_DATA: string = "sn:jcrData";
     static readonly BIN_MIME: string = "sn::mimeType";
 
-    //todo-0: what is this? I forgot. I noticed it displaying what appears to be a hash.
+    //todo-0: should this be "sn:" prefixed?
     static readonly BIN: string = "bin";
-
 
     static readonly IMG_WIDTH: string = "sn:imgWidth";
     static readonly IMG_HEIGHT: string = "sn:imgHeight";

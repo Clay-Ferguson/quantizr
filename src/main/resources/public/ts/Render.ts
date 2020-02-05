@@ -218,8 +218,8 @@ export class Render implements RenderIntf {
         let preProp: I.PropertyInfo = S.props.getNodeProperty(cnst.PRE, node);
         if (preProp && preProp.value == "1") {
 
-            let wrapProp: I.PropertyInfo = S.props.getNodeProperty(cnst.WRAP, node);
-            let wordWrap = wrapProp && wrapProp.value == "1";
+            let nowrapProp: I.PropertyInfo = S.props.getNodeProperty(cnst.NOWRAP, node);
+            let wordWrap = !(nowrapProp && nowrapProp.value == "1");
 
             if (!!content) {
                 if (wordWrap) {
@@ -467,6 +467,7 @@ export class Render implements RenderIntf {
             }
         }
 
+        //todo-0: rename this to sn:inlineChildren
         let isInlineChildren = !!S.props.getNodePropertyVal("inlineChildren", node);
 
         /* Construct Open Button.

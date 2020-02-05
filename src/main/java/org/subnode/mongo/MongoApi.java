@@ -658,11 +658,8 @@ public class MongoApi {
 	public void convertDb(MongoSession session) {
 		log.debug("convertDb() executing.");
 
-		// todo-0: this can be deleted once run on prod just once.
-		//shortenPaths(session);
-
-		//todo-0: ditto.
-		//makePasswordHashes(session);
+		// shortenPaths(session);
+		// makePasswordHashes(session);
 	}
 
 	public String getHashOfPassword(String password) {

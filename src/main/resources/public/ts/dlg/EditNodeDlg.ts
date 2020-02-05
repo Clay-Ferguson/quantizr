@@ -1,4 +1,4 @@
-import * as I from "../Interfaces"
+import * as I from "../Interfaces";
 import { DialogBase } from "../DialogBase";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
@@ -18,8 +18,6 @@ import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { AceEditPropTextarea } from "../widget/AceEditPropTextarea";
-import { EditPropTextarea } from "../widget/EditPropTextarea";
-import { EditPropTextField } from "../widget/EditPropTextField";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { TextField } from "../widget/TextField";
 import { EncryptionDlg } from "./EncryptionDlg";
@@ -27,6 +25,7 @@ import { EncryptionOptions } from "../EncryptionOptions";
 import { FormInline } from "../widget/FormInline";
 import { TextContent } from "../widget/TextContent";
 import { Comp } from "../widget/base/Comp";
+import { Textarea } from "../widget/Textarea";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -40,7 +39,6 @@ export class EditNodeDlg extends DialogBase {
     propsButtonBar: ButtonBar;
     layoutSelection: Selection;
     prioritySelection: Selection;
-    pathDisplay: Div;
     //help: TextContent;
     propertyEditFieldContainer: Div;
 
@@ -55,19 +53,14 @@ export class EditNodeDlg extends DialogBase {
     deletePropButton: Button;
     cancelButton: Button;
 
-    focusId: string;
     propEntries: Array<I.PropEntry>;
     editPropertyDlgInst: any;
     typeName: string;
     createAtTop: boolean;
 
     nodeNameTextField: TextField;
-    enableAceEditor: boolean = false;
-    aceEditor: any;
-
-    /* map that allows us to lookup ace editor info specific to any field/property that is being edited by one, 
-    the keys are named relative to the SubNode.java object, so the ones that are 'prp' (properties) have a 'prp' prefix */
-    editorMap: { [key: string]: Comp } = {};
+    enableAce: boolean = false;
+    contentEditor: I.TextEditorIntf;
 
     encryptionOptions: EncryptionOptions = new EncryptionOptions();
 
@@ -105,8 +98,6 @@ export class EditNodeDlg extends DialogBase {
     }
 
     initChildren = (): void => {
-        let path: string = S.view.getPathDisplay(this.node, "<br>");
-
         this.setChildren([
             new Form(null, [
                 //this.help = new TextContent("Help content."),
@@ -135,15 +126,15 @@ export class EditNodeDlg extends DialogBase {
         let optionsBar = new Div("", null, [
             this.preformattedCheckBox = new Checkbox("Plain Text", false, {
                 onChange: (evt: any) => {
-                    if (this.aceEditor && this.aceEditor.getAceEditor()) {
-                        this.aceEditor.getAceEditor().session.setMode(evt.target.checked ? "ace/mode/text" : "ace/mode/markdown");
+                    if (this.contentEditor) {
+                        this.contentEditor.setMode(evt.target.checked ? "ace/mode/text" : "ace/mode/markdown");
                     }
                 }
             }),
-            this.wordWrapCheckBox = new Checkbox("Word Wrap", false, {
+            this.wordWrapCheckBox = new Checkbox("Word Wrap", true, {
                 onChange: (evt: any) => {
-                    if (this.aceEditor && this.aceEditor.getAceEditor()) {
-                        this.aceEditor.getAceEditor().session.setUseWrapMode(evt.target.checked);
+                    if (this.contentEditor) {
+                        this.contentEditor.setWordWrap(evt.target.checked);
                     }
                 }
             }),
@@ -155,7 +146,6 @@ export class EditNodeDlg extends DialogBase {
             this.prioritySelection = this.createPrioritySelection()
         ]);
 
-        /* clear this map to get rid of old properties */
         this.propEntries = new Array<I.PropEntry>();
 
         let collapsiblePropsTable = new EditPropsTable({
@@ -163,26 +153,23 @@ export class EditNodeDlg extends DialogBase {
         });
         let editPropsTable = new EditPropsTable();
 
-        console.log("Editing existing node.");
-
         let editOrderedProps: I.PropertyInfo[] = S.props.getPropertiesInEditingOrder(this.node, this.node.properties);
         //console.log("POPULATING PROPS: " + S.util.prettyPrint(editOrderedProps));
 
         let isPre = false;
-        let isWordWrap = false;
+        let isWordWrap = true;
 
         /* We have to scan properties in this loop before we do the loop below. So it is not redundant to have two loops
         scanning the properties. This is by design, and not a mistake */
         if (editOrderedProps) {
             editOrderedProps.forEach((prop: I.PropertyInfo) => {
-                if (prop.name == "pre") {
+                if (prop.name == cnst.PRE) {
                     isPre = true;
-                    this.preformattedCheckBox.setChecked(true);
                     return;
                 }
-                if (prop.name == "wrap") {
-                    isWordWrap = true;
-                    this.wordWrapCheckBox.setChecked(true);
+
+                if (prop.name == cnst.NOWRAP) {
+                    isWordWrap = false;
                     return;
                 }
 
@@ -194,10 +181,16 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
+        this.preformattedCheckBox.setChecked(isPre);
+        this.wordWrapCheckBox.setChecked(isWordWrap);
+
         /* If not preformatted text, then always turn on word-wrap because for now at least this means the content
         will be in markdown mode, and we definitely want wordwrap on for markdown editing */
-        if (!isPre) {
-            isWordWrap = true;
+        if (this.enableAce) {
+            //todo-0: this needs to be revisited with enableAce turned on.
+            if (!isPre) {
+                isWordWrap = true;
+            }
         }
 
         //todo-1: does it make sense for FormGroup to contain single fields, or multiple fields? This seems wrong to have a group with one in it.
@@ -216,8 +209,10 @@ export class EditNodeDlg extends DialogBase {
             encrypted = true;
         }
 
-        let contentTableRow = this.makeTextFieldEditor("content", "Content", content, true, isPre, isWordWrap, true, encrypted);
+        let contentTableRow = this.makeContentEditorFormGroup(content, isPre, isWordWrap, encrypted);
         editPropsTable.addChild(contentTableRow);
+
+        this.contentEditor.setWordWrap(isWordWrap);
 
         if (editOrderedProps) {
             editOrderedProps.forEach((prop: I.PropertyInfo) => {
@@ -250,13 +245,12 @@ export class EditNodeDlg extends DialogBase {
                 let isReadOnlyProp = S.render.isReadOnlyProperty(prop.name);
                 let isBinaryProp = S.render.isBinaryProperty(prop.name);
 
-                //todo-1: does PropEntry EVER need these first two arguments?
-                let propEntry: I.PropEntry = new I.PropEntry(/* fieldId */ null, /* checkboxId */ null, prop, isReadOnlyProp, isBinaryProp);
-
+                //warning: this is NEW for the propEntries to be containing the 'content'. It used to contain everythign BUT content.
+                let propEntry: I.PropEntry = new I.PropEntry(prop, isReadOnlyProp, isBinaryProp);
                 this.propEntries.push(propEntry);
 
                 if ((!isReadOnlyProp && !isBinaryProp) || S.edit.showReadOnlyProperties) {
-                    let tableRow = this.makePropEditor(propEntry, false, false);
+                    let tableRow = this.makePropEditor(propEntry);
                     collapsiblePropsTable.addChild(tableRow);
                 }
             });
@@ -276,11 +270,7 @@ export class EditNodeDlg extends DialogBase {
 
         collapsiblePropsTable.addChild(this.propsButtonBar);
 
-        this.pathDisplay = cnst.SHOW_PATH_IN_DLGS ? new Div(path, {
-            className: "alert alert-info small-padding"
-        }) : null;
-
-        let collapsiblePanel = new CollapsiblePanel("More...", null, [this.pathDisplay, optionsBar, selectionsBar, collapsiblePropsTable], false,
+        let collapsiblePanel = new CollapsiblePanel("More...", null, [optionsBar, selectionsBar, collapsiblePropsTable], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
             }, EditNodeDlg.morePanelExpanded);
@@ -292,7 +282,7 @@ export class EditNodeDlg extends DialogBase {
 
     toggleShowReadOnly = (): void => {
         // alert("not yet implemented.");
-        // see saveExistingNode for how to iterate all properties, although I wonder why I didn't just use a map/set of
+        // see saveNode for how to iterate all properties, although I wonder why I didn't just use a map/set of
         // properties elements
         // instead so I don't need to parse any DOM or domIds inorder to iterate over the list of them????
     }
@@ -314,10 +304,8 @@ export class EditNodeDlg extends DialogBase {
     }
 
     insertTime = (): void => {
-        let aceEditorInfo: Comp = this.editorMap["content"];
-        if (aceEditorInfo) {
-            //todo-0: make sure to detect first if this IS ace.
-            (aceEditorInfo as AceEditPropTextarea).insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
+        if (this.contentEditor) {
+            this.contentEditor.insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
         }
     }
 
@@ -365,11 +353,7 @@ export class EditNodeDlg extends DialogBase {
         this.rebuildDlg();
     }
 
-    /*
-     * Deletes the property of the specified name on the node being edited, but first gets confirmation from user
-     */
     deleteProperty(propName: string) {
-        //console.log("Asking to confirm delete property.");
         new ConfirmDlg("Delete the Property: " + propName, "Confirm Delete",
             () => {
                 this.deletePropertyImmediate(propName);
@@ -387,12 +371,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     deletePropertyResponse = (res: any, propertyToDelete: any) => {
-
         if (S.util.checkSuccess("Delete property", res)) {
-            /*
-             * remove deleted property from client side data, so we can re-render screen without making another call to
-             * server
-             */
             S.props.deleteProperty(this.node, propertyToDelete);
 
             /* now just re-render screen from local variables */
@@ -401,17 +380,11 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    /*
-     * for now just let server side choke on invalid things. It has enough security and validation to at least protect
-     * itself from any kind of damage.
-     */
-    saveNode = (): void => {
-        //due to refactoring these two functions can now be the same. todo-1
-        this.saveExistingNode();
-    }
-
-    saveCheckboxVal = (checkbox: Checkbox, saveList: I.PropertyInfo[], handled: any, propName: string): void => {
+    saveCheckboxVal = (checkbox: Checkbox, saveList: I.PropertyInfo[], handled: any, propName: string, invert: boolean = false): void => {
         let val = checkbox.getChecked() ? "1" : null;
+        if (invert) {
+            val = (val == "1" ? null : "1");
+        }
         S.props.setNodePropertyVal(propName, this.node, val);
         handled[propName] = true;
         saveList.push({
@@ -420,21 +393,18 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
-    saveExistingNode = async (callback: Function = null): Promise<void> => {
+    saveNode = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            /* holds list of properties to send to server. Each one having name+value properties */
             let saveList: I.PropertyInfo[] = [];
             let handled = {};
 
             if (this.node) {
-                this.saveCheckboxVal(this.preformattedCheckBox, saveList, handled, "pre");
+                this.saveCheckboxVal(this.preformattedCheckBox, saveList, handled, cnst.PRE);
                 this.saveCheckboxVal(this.inlineChildrenCheckBox, saveList, handled, "inlineChildren");
-                this.saveCheckboxVal(this.wordWrapCheckBox, saveList, handled, "wrap");
+                this.saveCheckboxVal(this.wordWrapCheckBox, saveList, handled, cnst.NOWRAP, true);
 
                 /* Get state of the 'layout' dropdown */
                 let layout = this.layoutSelection.getSelection();
-
-                //vertical layout is the default, so if user selects that we can just delete the option and save space.
 
                 S.props.setNodePropertyVal("layout", this.node, layout);
                 handled["layout"] = true;
@@ -447,7 +417,6 @@ export class EditNodeDlg extends DialogBase {
                 let priority = this.prioritySelection.getSelection();
 
                 //priority value 0 is default, so if user selects that we can just delete the option and save space.
-
                 S.props.setNodePropertyVal("priority", this.node, layout);
                 handled["priority"] = true;
                 saveList.push({
@@ -464,12 +433,8 @@ export class EditNodeDlg extends DialogBase {
             }
 
             let content: string;
-            let aceEditor: Comp = this.editorMap["content"];
-            //console.log("$$$$$$$$$$$$$$$$$$$$$ aceEditor.clazz=" + aceEditor.clazz);
-
-            /* If we are editing with an ace editor get the value from it */
-            if (aceEditor) {
-                content = (aceEditor as AceEditPropTextarea).getValue();
+            if (this.contentEditor) {
+                content = this.contentEditor.getValue();
 
                 // if we need to encrypt and the content is not currently encrypted.
                 if (content && this.encryptionOptions.encryptForOwnerOnly && !content.startsWith(cnst.ENC_TAG)) {
@@ -498,36 +463,22 @@ export class EditNodeDlg extends DialogBase {
                         return;
 
                     //console.log("property field: " + JSON.stringify(prop));
-
                     let propVal: string;
-                    let aceEditor: Comp = this.editorMap["prp." + prop.property.name];
+                    let editor: I.TextEditorIntf = prop.comp;
 
                     /* If we are editing with an ace editor get the value from it */
-                    if (aceEditor) {
-                        propVal = (aceEditor as AceEditPropTextarea).getValue();
+                    if (editor) {
+                        propVal = editor.getValue();
                         //console.log("ACE propVal[" + prop.id + "]=" + propVal);
                     }
-                    /* Else get from the plain text area we must be using (pre-ace design) */
-                    else {
-                        try {
-                            propVal = S.util.getTextAreaValById(prop.id);
-                            //console.log("TEXTAREA propVal[" + prop.id + "]=" + propVal);
-                        }
-                        catch (error) {
-                            //todo-1: this was seeing the obsolete "sn:lastModified" and blowing up here. Need to look into it.
-                            console.log("not able to get propVal for any prob with DOM ID " + prop.id);
-                            propVal = "[err]";
-                        }
-                    }
 
-                    if (propVal !== prop.property.value) {
+                    //todo-1: Is it ALWAYS true there's no way this can be different from checking the acual DB? the true content changed?
+                    //if (propVal !== prop.property.value) {
                         saveList.push({
                             name: prop.property.name,
                             value: propVal
                         });
-                    } else {
-                        console.log("Prop didn't change: " + prop.id);
-                    }
+                    //}
                 });
             }
 
@@ -548,7 +499,7 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
-    makePropEditor = (propEntry: I.PropEntry, isPre: boolean, isWordWrap: boolean): EditPropsTableRow => {
+    makePropEditor = (propEntry: I.PropEntry): EditPropsTableRow => {
         let tableRow = new EditPropsTableRow({
         });
         //console.log("Property single-type: " + propEntry.property.name);
@@ -562,91 +513,69 @@ export class EditNodeDlg extends DialogBase {
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
         //     + "] fieldId=" + propEntry.id);
 
-        //todo-p1: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
+        //todo-1: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
         //and be better with a Textfield based editor
         if (propEntry.readOnly || propEntry.binary) {
-            let textarea = new EditPropTextarea(propEntry, {
+            let textarea = new Textarea(label + " (read-only)", {
                 "readonly": "readonly",
                 "disabled": "disabled",
-                "label": label + " (read-only)",
                 "defaultValue": propValStr
             });
 
             formGroup.addChild(textarea);
         }
         else {
-            let checkbox = new Checkbox(label, false, {
+            let checkbox: Checkbox = new Checkbox(label, false, {
                 onClick: (evt: any) => {
                     //console.log("checkbox click: evt.target.checked: "+evt.target.checked);
                     this.propertyCheckboxChanged();
                 }
             });
 
-            propEntry.checkboxId = checkbox.getId();
+            propEntry.checkBox = checkbox;
             formGroup.addChild(checkbox);
 
-            let editorComp: Comp = null;
+            let editor: I.TextEditorIntf = null;
             let multiLine = false;
 
             if (multiLine) {
-                editorComp = new AceEditPropTextarea(propEntry.property.value, "25em", isPre, isWordWrap);
-
-                propEntry.id = editorComp.getId();
-                this.aceEditor = editorComp;
-
-                editorComp.whenElm((elm: HTMLElement) => {
-                    let timer = setInterval(() => {
-                        if ((editorComp as AceEditPropTextarea).getAceEditor()) {
-                            clearInterval(timer);
-                            if (!multiLine) {
-                                //todo-p1: this worked BUT the ace editor is doesn't do what i was hoping for here. It leaves the wrapping capability ENABLED.
-                                //I guess the ultimate solution will to just go back to using conventional edit field when i only want one line of text to be edited.
-                                console.log("Setting property to wrap disabled: " + propEntry.property.name);
-                                //textarea.getAceEditor().setWrapBehavioursEnabled(false);
-                            }
-                            else {
-                                (editorComp as AceEditPropTextarea).getAceEditor().focus();
-                            }
-                        }
-
-                    }, 250);
-                });
-
-                this.editorMap["prp." + propEntry.property.name] = editorComp;
+                if (this.enableAce) {
+                    editor = new AceEditPropTextarea(propEntry.property.value, "25em", false, false);
+                }
+                else {
+                    editor = new Textarea(null, {
+                        rows: "20",
+                        defaultValue: propEntry.property.value
+                    });
+                    editor.focus();
+                }
             }
             else {
-                //todo-p1: it's a bit inconsistent/ugly that we pass the value into this component so dramatically different than
-                //we do into the AceEditPropTextarea
-                editorComp = new EditPropTextField(propEntry, {
-                    //"readonly": "readonly",
-                    //"disabled": "disabled",
-                    //"label": label,
+                editor = new TextField(null, {
                     "defaultValue": propValStr
                 });
             }
 
-            formGroup.addChild(editorComp);
+            propEntry.comp = editor;
+            formGroup.addChild(editor as any as Comp);
         }
 
         tableRow.addChildren([formGroup]);
         return tableRow;
     }
 
-    makeTextFieldEditor = (propName: string, prompt: string, value: string, multiLine: boolean, isPre: boolean, isWordWrap: boolean, setFocus: boolean,
-        encrypted: boolean): FormGroup => {
+    makeContentEditorFormGroup = (value: string, isPre: boolean, isWordWrap: boolean, encrypted: boolean): FormGroup => {
         let formGroup = new FormGroup();
 
         value = S.util.escapeForAttrib(value);
         //console.log("making field editor for [" + propName + "] val[" + value + "]");
-        let editorComp: any = null;
 
-        if (multiLine) {
-            editorComp = new AceEditPropTextarea(encrypted ? "[encrypted]" : value, "25em", isPre, isWordWrap);
-            this.aceEditor = editorComp;
+        if (this.enableAce) {
+            this.contentEditor = new AceEditPropTextarea(encrypted ? "[encrypted]" : value, "25em", isPre, isWordWrap);
 
-            editorComp.whenElm((elm: HTMLElement) => {
+            this.contentEditor.whenElm((elm: HTMLElement) => {
                 let timer = setInterval(() => {
-                    if (editorComp.getAceEditor()) {
+                    if ((this.contentEditor as AceEditPropTextarea).getAceEditor()) {
 
                         if (encrypted) {
                             //console.log('decrypting: ' + value);
@@ -654,36 +583,38 @@ export class EditNodeDlg extends DialogBase {
                             (async () => {
                                 value = await S.encryption.symDecryptString(null, value);
                                 //console.log('decrypted to:' + value);
-                                editorComp.setValue(value);
+                                (this.contentEditor as AceEditPropTextarea).setValue(value);
                             })();
                         }
 
                         clearInterval(timer);
-                        if (!multiLine) {
-                            //todo-p1: this worked BUT the ace editor is doesn't do what i was hoping for here. It leaves the wrapping capability ENABLED.
-                            //I guess the ultimate solution will to just go back to using conventional edit field when i only want one line of text to be edited.
-                            //textarea.getAceEditor().setWrapBehavioursEnabled(false);
-                        }
-                        else {
-                            editorComp.getAceEditor().focus();
-                        }
+                        (this.contentEditor as AceEditPropTextarea).getAceEditor().focus();
                     }
                 }, 250);
             });
-
-            //NOTE: Not a 'prp.' property here.
-            this.editorMap[propName] = editorComp;
         }
         else {
-            editorComp = new TextField(prompt, null, value);
+            this.contentEditor = new Textarea(null, {
+                rows: "20",
+                defaultValue: encrypted ? "[encrypted]" : value
+            });
+
+            this.contentEditor.whenElm((elm: HTMLElement) => {
+                if (encrypted) {
+                    //console.log('decrypting: ' + value);
+                    value = value.substring(cnst.ENC_TAG.length);
+                    (async () => {
+                        value = await S.encryption.symDecryptString(null, value);
+                        //console.log('decrypted to:' + value);
+                        (this.contentEditor as Textarea).setValue(value);
+                    })();
+                }
+            });
+
+            this.contentEditor.focus();
         }
 
-        formGroup.addChild(editorComp);
-
-        if (setFocus) {
-            this.focusId = editorComp.getId();
-        }
-
+        formGroup.addChild(this.contentEditor as any as Comp);
         return formGroup;
     }
 
@@ -706,11 +637,8 @@ export class EditNodeDlg extends DialogBase {
                 if (propEntry.readOnly || propEntry.binary)
                     return;
 
-                //console.log("checking to delete prop=" + propEntry.property.name);
-
-                if (S.util.getCheckBoxStateById(propEntry.checkboxId)) {
+                if (propEntry.checkBox && propEntry.checkBox.getChecked()) {
                     ret = true;
-
                     //return false to stop iterating.
                     return false;
                 }
@@ -729,12 +657,8 @@ export class EditNodeDlg extends DialogBase {
                 if (propEntry.readOnly || propEntry.binary)
                     return;
 
-                //console.log("checking to delete prop=" + propEntry.property.name);
-
-                if (S.util.getCheckBoxStateById(propEntry.checkboxId)) {
-                    //console.log("prop IS CHECKED=" + propEntry.property.name);
+                if (propEntry.checkBox && propEntry.checkBox.getChecked()) {
                     this.deleteProperty(propEntry.property.name);
-
                     /* for now lets' just support deleting one property at a time, and so we can return once we found a
                     checked one to delete. Would be easy to extend to allow multiple-selects in the future.
                     Returning false stops iteration */
@@ -751,21 +675,6 @@ export class EditNodeDlg extends DialogBase {
     init = (): void => {
         console.log("EditNodeDlg.init");
         this.initChildren();
-
-        this.whenElm((elm: HTMLElement) => {
-            if (this.focusId) {
-                // Before trying to set focus to something who's display style we just changed, we need to wait for the browser
-                // to have it on the screen.
-                setTimeout(() => {
-                    if (this.aceEditor && this.aceEditor.getAceEditor()) {
-                        this.aceEditor.getAceEditor().focus();
-                    }
-                    else {
-                        S.util.delayedFocus(this.focusId);
-                    }
-                }, 300);
-            }
-        });
     }
 
     rebuildDlg = (): void => {
@@ -773,4 +682,3 @@ export class EditNodeDlg extends DialogBase {
         this.domRender();
     }
 }
-

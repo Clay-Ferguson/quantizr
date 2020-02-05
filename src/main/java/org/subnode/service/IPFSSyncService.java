@@ -347,7 +347,7 @@ public class IPFSSyncService {
 
 			// Set as 'preformatted' text, so the the Quantizr app doesn't try to render it
 			// as markdown.
-			newNode.setProp("pre", 1);
+			newNode.setProp("sn:pre", 1);
 		}
 
 		newNode.setContent(content);

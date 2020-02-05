@@ -73,7 +73,7 @@ services:
             httpProtocol: "http" 
             metaHost: "localhost" 
             reSaveAll: "false"
-            forceIndexRebuild: "true"
+            forceIndexRebuild: "false"
             allowFileSystemSearch: "false" 
             spring.http.multipart.max-file-size: "200MB" 
             spring.http.multipart.max-request-size: "200MB" 

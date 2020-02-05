@@ -4,6 +4,8 @@ export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[
 
 export interface CompIntf {
 
+    clazz: string;
+
     refreshState(): void;
 
     setDomAttr(attrName: string, attrVal: string);

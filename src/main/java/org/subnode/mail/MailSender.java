@@ -61,9 +61,6 @@ public class MailSender implements TransportListener {
 		String mailUser = appProp.getMailUser();
 		String mailPassword = appProp.getMailPassword();
 
-		// init mail session only once, if it's not yet initialized
-		// todo-0: I still need to investigate of these sessions time out ever? Is it best practice to create a new 
-		// one each time here or what ?
 		if (mailSession == null) {
 			props = new Properties();
 			props.put("mail.smtps.host", mailHost);

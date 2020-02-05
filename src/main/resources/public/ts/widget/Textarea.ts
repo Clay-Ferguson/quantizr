@@ -1,3 +1,4 @@
+import * as I from "../Interfaces";
 import { Comp } from "./base/Comp";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
@@ -9,7 +10,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class Textarea extends Comp {
+export class Textarea extends Comp implements I.TextEditorIntf {
 
     constructor(private label: string, attribs: any=null) {
         super(attribs);
@@ -19,6 +20,14 @@ export class Textarea extends Comp {
         if (!this.attribs.rows) {
             this.attribs.rows = "5";
         }
+        this.setWordWrap(true);
+    }
+
+    insertTextAtCursor = (text: string) => {
+        //should we implement this ? todo-1
+    }
+
+    setMode = (mode: string): void => {
     }
 
     getValue = (): string => {
@@ -43,6 +52,12 @@ export class Textarea extends Comp {
         }
     }
 
+    setWordWrap = (wordWrap: boolean): void => {
+        this.mergeState({
+            wordWrap
+        });
+    }
+
     compRender = (): ReactNode => {
         let children = [];
     
@@ -54,7 +69,15 @@ export class Textarea extends Comp {
             }, this.label));
         }
 
-        children.push(S.e('textarea', this.attribs, this.attribs.value));
+        let _attribs = {...this.attribs};
+        if (!this.getState().wordWrap) {
+            _attribs.style = {
+                whiteSpace: "nowrap",
+                overflow: "auto"
+            }
+        }
+
+        children.push(S.e('textarea', _attribs, _attribs.value));
         return S.e('div', {
             id: this.getId()+"_textfield",
             key: this.getId()+"_textfield",

@@ -303,6 +303,10 @@ export abstract class Comp implements CompIntf {
         return reChildren;
     }
 
+    focus = (): void => {
+        S.util.delayedFocus(this.getId());
+    }
+
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
     tagRender = (tag: string, content: string, props: any) => {
         //console.log("Comp.tagRender: "+this.jsClassName+" id="+props.id);

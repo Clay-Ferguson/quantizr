@@ -1,3 +1,4 @@
+import * as I from "../Interfaces";
 import { Comp } from "./base/Comp";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
@@ -9,7 +10,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class TextField extends Comp {
+export class TextField extends Comp implements I.TextEditorIntf {
 
     constructor(public label: string=null, attribs: any = null, private prefillVal : string=null) {
         super(attribs);
@@ -26,6 +27,16 @@ export class TextField extends Comp {
         }
     }
 
+    insertTextAtCursor = (text: string) => {
+        //should we implement this ? todo-1
+    }
+
+    setWordWrap = (wordWrap: boolean): void => {
+    }
+
+    setMode = (mode: string): void => {
+    }
+
     setValue = (val: string): void => {
         S.util.setInputVal(this.getId(), val || "");
     }
@@ -36,10 +47,6 @@ export class TextField extends Comp {
             return (<any>elm).value.trim();
         }
         return null;
-    }
-
-    focus = (): void => {
-        S.util.delayedFocus(this.getId());
     }
 
     compRender = (): ReactNode => {
