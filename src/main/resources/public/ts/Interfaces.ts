@@ -93,17 +93,6 @@ export interface UserPreferences {
     showMetaData: boolean;
 }
 
-export interface AddPrivilegeRequest {
-    nodeId: string;
-    privileges: string[];
-    principal: string;
-    publicAppend: boolean;
-}
-
-export interface SavePublicKeyRequest {
-    keyJson: string;
-}
-
 export interface AnonPageLoadRequest {
 }
 
@@ -295,10 +284,6 @@ export interface SetNodeTypeRequest {
 export interface SetNodeTypeResponse {
 }
 
-export interface SavePublicKeyResponse {
-    message: string;
-}
-
 export interface LuceneIndexResponse {
     message: string;
 }
@@ -345,9 +330,6 @@ export interface UploadFromUrlRequest {
 
 export interface BrowseFolderRequest {
     nodeId: string;
-}
-
-export interface AddPrivilegeResponse extends ResponseBase {
 }
 
 export interface AnonPageLoadResponse extends ResponseBase {

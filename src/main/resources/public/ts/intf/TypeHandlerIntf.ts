@@ -1,4 +1,5 @@
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { Comp } from "../widget/base/Comp";
 
 export interface TypeHandlerIntf {

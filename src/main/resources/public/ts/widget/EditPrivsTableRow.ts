@@ -1,7 +1,7 @@
 import { Comp } from "./base/Comp";
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { Div } from "./Div";
-import { SharingDlg } from "../dlg/SharingDlg";
 import { Button } from "./Button";
 import { TextContent } from "./TextContent";
 import { Singletons } from "../Singletons";

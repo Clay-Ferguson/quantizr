@@ -43,13 +43,7 @@
 			</properties>
 
 			<dependencies>
-				<!--javax.validation.xml-->
-<dependency>
-    <groupId>javax.validation</groupId>
-    <artifactId>validation-api</artifactId>
-    <version>2.0.1.Final</version>
-</dependency>
-				<!--org.springframework.boot.xml-->
+				<!--include:org.springframework.boot.xml-->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
@@ -167,8 +161,7 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-				<!--commons.xml-->
-<!-- todo-0: why isn't this groupId an 'org.apache' ??  Is this ok? -->
+				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
@@ -273,6 +266,13 @@ of the spring configs for security are also perfected.
     <artifactId>joda-time</artifactId>
     <version>2.10</version>
 </dependency>
+
+<dependency>
+    <groupId>javax.validation</groupId>
+    <artifactId>validation-api</artifactId>
+    <version>2.0.1.Final</version>
+</dependency>
+
 
 			</dependencies>
 
@@ -508,13 +508,7 @@ of the spring configs for security are also perfected.
 			</properties>
 
 			<dependencies>
-				<!--javax.validation.xml-->
-<dependency>
-    <groupId>javax.validation</groupId>
-    <artifactId>validation-api</artifactId>
-    <version>2.0.1.Final</version>
-</dependency>
-				<!--org.springframework.boot.xml-->
+				<!--include:org.springframework.boot.xml-->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
@@ -632,8 +626,7 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-				<!--commons.xml-->
-<!-- todo-0: why isn't this groupId an 'org.apache' ??  Is this ok? -->
+				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
@@ -738,6 +731,13 @@ of the spring configs for security are also perfected.
     <artifactId>joda-time</artifactId>
     <version>2.10</version>
 </dependency>
+
+<dependency>
+    <groupId>javax.validation</groupId>
+    <artifactId>validation-api</artifactId>
+    <version>2.0.1.Final</version>
+</dependency>
+
 
 			</dependencies>
 
@@ -966,13 +966,7 @@ of the spring configs for security are also perfected.
 			</properties>
 
 			<dependencies>
-				<!--javax.validation.xml-->
-<dependency>
-    <groupId>javax.validation</groupId>
-    <artifactId>validation-api</artifactId>
-    <version>2.0.1.Final</version>
-</dependency>
-				<!--org.springframework.boot.xml-->
+				<!--include:org.springframework.boot.xml-->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
@@ -1090,8 +1084,7 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-				<!--commons.xml-->
-<!-- todo-0: why isn't this groupId an 'org.apache' ??  Is this ok? -->
+				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
@@ -1196,6 +1189,13 @@ of the spring configs for security are also perfected.
     <artifactId>joda-time</artifactId>
     <version>2.10</version>
 </dependency>
+
+<dependency>
+    <groupId>javax.validation</groupId>
+    <artifactId>validation-api</artifactId>
+    <version>2.0.1.Final</version>
+</dependency>
+
 
 			</dependencies>
 

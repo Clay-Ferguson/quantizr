@@ -1,4 +1,5 @@
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { CompIntf } from "../widget/base/CompIntf";
 import { DialogBaseImpl } from "../DialogBaseImpl";
 

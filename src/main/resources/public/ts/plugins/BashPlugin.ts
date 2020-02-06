@@ -1,4 +1,5 @@
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { BashPluginIntf } from "../intf/BashPluginIntf";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";

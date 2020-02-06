@@ -1,9 +1,9 @@
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants } from "../Constants";
 import { Div } from "./Div";
-
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -11,7 +11,6 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 declare var ace;
-
 /* FYI: Before switching to React we needed the 'escapeHtml' in here, but it appears after moving to ReactJS it was no longer necessary */
 export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
 

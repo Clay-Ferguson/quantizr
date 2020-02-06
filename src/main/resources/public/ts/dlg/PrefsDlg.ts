@@ -1,5 +1,6 @@
 import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { RadioButton } from "../widget/RadioButton";

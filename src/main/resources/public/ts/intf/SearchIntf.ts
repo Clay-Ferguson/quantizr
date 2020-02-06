@@ -1,4 +1,5 @@
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { NodeSearchResponse } from "../Interfaces";
 
 export interface SearchIntf {

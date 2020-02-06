@@ -2,6 +2,7 @@ import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 import { MessageDlg } from "./MessageDlg";
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { PasswordTextField } from "../widget/PasswordTextField";
 import { TextContent } from "../widget/TextContent";
 import { ButtonBar } from "../widget/ButtonBar";

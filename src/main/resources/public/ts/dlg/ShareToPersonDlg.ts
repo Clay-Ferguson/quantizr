@@ -1,6 +1,6 @@
 import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
-import { SharingDlg } from "./SharingDlg";
+import * as J from "../JavaIntf";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
@@ -58,7 +58,7 @@ export class ShareToPersonDlg extends DialogBase {
         /* Trigger update from server at next main page refresh */
         S.meta64.treeDirty = true;
 
-        S.util.ajax<I.AddPrivilegeRequest, I.AddPrivilegeResponse>("addPrivilege", {
+        S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             "nodeId": S.share.sharingNode.id,
             "principal": targetUser,
             "privileges": ["rd", "wr"],
@@ -66,7 +66,7 @@ export class ShareToPersonDlg extends DialogBase {
         }, this.reloadFromShareWithPerson);
     }
 
-    reloadFromShareWithPerson = (res: I.AddPrivilegeResponse): void => {
+    reloadFromShareWithPerson = (res: J.AddPrivilegeResponse): void => {
         if (S.util.checkSuccess("Share Node with Person", res)) {
             this.sharedNodeFunc();
         }

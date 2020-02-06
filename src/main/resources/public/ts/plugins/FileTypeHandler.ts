@@ -1,8 +1,8 @@
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Constants as cnst } from "../Constants";
 import { Anchor } from "../widget/Anchor";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { Img } from "../widget/Img";

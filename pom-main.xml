@@ -43,9 +43,8 @@
 			</properties>
 
 			<dependencies>
-				<!--javax.validation.xml-->
-				<!--org.springframework.boot.xml-->
-				<!--commons.xml-->
+				<!--include:org.springframework.boot.xml-->
+				<!--include:common.xml-->
 			</dependencies>
 
 			<build>
@@ -280,9 +279,8 @@
 			</properties>
 
 			<dependencies>
-				<!--javax.validation.xml-->
-				<!--org.springframework.boot.xml-->
-				<!--commons.xml-->
+				<!--include:org.springframework.boot.xml-->
+				<!--include:common.xml-->
 			</dependencies>
 
 			<build>
@@ -510,9 +508,8 @@
 			</properties>
 
 			<dependencies>
-				<!--javax.validation.xml-->
-				<!--org.springframework.boot.xml-->
-				<!--commons.xml-->
+				<!--include:org.springframework.boot.xml-->
+				<!--include:common.xml-->
 			</dependencies>
 
 			<build>

@@ -1,4 +1,5 @@
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";

@@ -1,4 +1,5 @@
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { DialogBase } from "../DialogBase";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { ConfirmDlg } from "./ConfirmDlg";

@@ -1,4 +1,5 @@
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { TypeHandlerIntf } from "./TypeHandlerIntf";
 import { GraphPanel } from "../widget/GraphPanel";
 

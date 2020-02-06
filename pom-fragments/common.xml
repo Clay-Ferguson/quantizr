@@ -1,4 +1,3 @@
-<!-- todo-0: why isn't this groupId an 'org.apache' ??  Is this ok? -->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
@@ -103,4 +102,11 @@
     <artifactId>joda-time</artifactId>
     <version>2.10</version>
 </dependency>
+
+<dependency>
+    <groupId>javax.validation</groupId>
+    <artifactId>validation-api</artifactId>
+    <version>2.0.1.Final</version>
+</dependency>
+
 

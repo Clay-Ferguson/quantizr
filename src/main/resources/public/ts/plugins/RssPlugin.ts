@@ -1,4 +1,5 @@
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { RssPluginIntf } from "../intf/RssPluginIntf";
 import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";

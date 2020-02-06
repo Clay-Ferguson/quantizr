@@ -1,5 +1,6 @@
 import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { ShareToPersonDlg } from "./ShareToPersonDlg";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
@@ -94,7 +95,7 @@ export class SharingDlg extends DialogBase {
          *
          * TODO: this additional call can be avoided as an optimization
          */
-        S.util.ajax<I.AddPrivilegeRequest, I.AddPrivilegeResponse>("addPrivilege", {
+        S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             "nodeId": S.share.sharingNode.id,
             "principal": "public",
             "privileges": ["rd"],

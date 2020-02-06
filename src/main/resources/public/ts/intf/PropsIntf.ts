@@ -1,4 +1,5 @@
 import * as I from "../Interfaces";
+import * as J from "../JavaIntf";
 import { PropTable } from "../widget/PropTable";
 
 export interface PropsIntf {

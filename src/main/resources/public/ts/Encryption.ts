@@ -1,4 +1,5 @@
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { EncryptionKeyPair } from "./EncryptionKeyPair";
 import { EncryptionIntf } from "./intf/EncryptionIntf";
 import { Singletons } from "./Singletons";
@@ -199,7 +200,7 @@ export class Encryption implements EncryptionIntf {
                 let pubKeyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.publicKey);
                 let pubKeyStr = JSON.stringify(pubKeyDat);
 
-                S.util.ajax<I.SavePublicKeyRequest, I.SavePublicKeyResponse>("savePublicKey", {
+                S.util.ajax<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
                     "keyJson": pubKeyStr
                 }, this.savePublicKeyResponse);
 

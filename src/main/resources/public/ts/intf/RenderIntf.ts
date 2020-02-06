@@ -1,5 +1,5 @@
 import * as I from "../Interfaces";
-import { ButtonBar } from "../widget/ButtonBar";
+import * as J from "../JavaIntf";
 import { Div } from "../widget/Div";
 import { Img } from "../widget/Img";
 import { Comp } from "../widget/base/Comp";
