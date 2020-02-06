@@ -17,7 +17,7 @@ export class FolderTypeHandler implements TypeHandlerIntf {
     constructor(private plugin: CoreTypesPlugin) {
     }
 
-    render = (node: I.NodeInfo, rowStyling: boolean): Comp => {    
+    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {    
         let ret: Comp = null;
 
         let name = node.content;
@@ -39,11 +39,11 @@ export class FolderTypeHandler implements TypeHandlerIntf {
         return ret;
     }
 
-    orderProps(node: I.NodeInfo, _props: I.PropertyInfo[]): I.PropertyInfo[] {
+    orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
         return _props;
     }
 
-    getIconClass(node: I.NodeInfo): string {
+    getIconClass(node: J.NodeInfo): string {
         //https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
         return "fa fa-folder fa-lg";
     }

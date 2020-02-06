@@ -52,7 +52,7 @@ export class ChangePasswordDlg extends DialogBase {
         this.pwd = this.passwordField.getValue();
 
         if (this.pwd && this.pwd.length >= 4) {
-            S.util.ajax<I.ChangePasswordRequest, I.ChangePasswordResponse>("changePassword", {
+            S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {
                 "newPassword": this.pwd,
                 "passCode": this.passCode
             }, this.changePasswordResponse);
@@ -61,7 +61,7 @@ export class ChangePasswordDlg extends DialogBase {
         }
     }
 
-    changePasswordResponse = (res: I.ChangePasswordResponse) => {
+    changePasswordResponse = (res: J.ChangePasswordResponse) => {
         if (S.util.checkSuccess("Change password", res)) {
             let msg = "Password changed successfully.";
 

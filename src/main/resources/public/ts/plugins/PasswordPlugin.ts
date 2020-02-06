@@ -25,7 +25,7 @@ class PasswordTypeHandler implements TypeHandlerIntf {
         return null;
     }
 
-    // render = (node: I.NodeInfo, rowStyling: boolean): string => {
+    // render = (node: J.NodeInfo, rowStyling: boolean): string => {
     //     let content: string = S.props.getNodePropertyVal(Constants.CONTENT, node);
     //     let password = S.props.getNodePropertyVal(Constants.PASSWORD, node);
     //     console.log("Raw Encrypted PWD: "+password);
@@ -40,11 +40,11 @@ class PasswordTypeHandler implements TypeHandlerIntf {
     //     return vertLayout.render_Html();
     // }
 
-    orderProps(node: I.NodeInfo, _props: I.PropertyInfo[]): I.PropertyInfo[] {
+    orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
         return _props;
     }
 
-    getIconClass(node : I.NodeInfo): string {
+    getIconClass(node : J.NodeInfo): string {
         return null;
     }
 

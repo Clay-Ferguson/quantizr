@@ -1,4 +1,5 @@
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { CreateNodeDlg } from "./dlg/CreateNodeDlg";
@@ -34,7 +35,7 @@ export class Edit implements EditIntf {
     */
     nodesToMoveSet: Object = {};
 
-    parentOfNewNode: I.NodeInfo = null;
+    parentOfNewNode: J.NodeInfo = null;
 
     /*
      * type=NodeInfo.java
@@ -63,7 +64,7 @@ export class Edit implements EditIntf {
     }
 
     openImportDlg = (): void => {
-        let node: I.NodeInfo = S.meta64.getHighlightedNode();
+        let node: J.NodeInfo = S.meta64.getHighlightedNode();
         if (!node) {
             this.importTargetNode = null;
             S.util.showMessage("No node is selected.");
@@ -87,7 +88,7 @@ export class Edit implements EditIntf {
         new ExportDlg().open();
     }
 
-    private insertBookResponse = (res: I.InsertBookResponse): void => {
+    private insertBookResponse = (res: J.InsertBookResponse): void => {
         console.log("insertBookResponse running.");
         S.util.checkSuccess("Insert Book", res);
 
@@ -96,7 +97,7 @@ export class Edit implements EditIntf {
         S.view.scrollToSelectedNode();
     }
 
-    private deleteNodesResponse = (res: I.DeleteNodesResponse, payload: Object): void => {
+    private deleteNodesResponse = (res: J.DeleteNodesResponse, payload: Object): void => {
         if (S.util.checkSuccess("Delete node", res)) {
             S.meta64.clearSelectedNodes();
             let highlightId: string = null;
@@ -111,9 +112,9 @@ export class Edit implements EditIntf {
         }
     }
 
-    private initNodeEditResponse = (res: I.InitNodeEditResponse): void => {
+    private initNodeEditResponse = (res: J.InitNodeEditResponse): void => {
         if (S.util.checkSuccess("Editing node", res)) {
-            let node: I.NodeInfo = res.nodeInfo;
+            let node: J.NodeInfo = res.nodeInfo as any as J.NodeInfo;
 
             // /* if this is a comment node and we are the commenter */
             // let editingAllowed: boolean = props.isOwnedCommentNode(node);
@@ -139,7 +140,7 @@ export class Edit implements EditIntf {
         }
     }
 
-    private moveNodesResponse = (res: I.MoveNodesResponse): void => {
+    private moveNodesResponse = (res: J.MoveNodesResponse): void => {
         if (S.util.checkSuccess("Move nodes", res)) {
             this.nodesToMove = null; // reset
             this.nodesToMoveSet = {};
@@ -147,7 +148,7 @@ export class Edit implements EditIntf {
         }
     }
 
-    private setNodePositionResponse = (res: I.SetNodePositionResponse): void => {
+    private setNodePositionResponse = (res: J.SetNodePositionResponse): void => {
         if (S.util.checkSuccess("Change node position", res)) {
             S.meta64.refresh();
         }
@@ -171,7 +172,7 @@ export class Edit implements EditIntf {
         // && !props.isNonOwnedNode(node);
     }
 
-    isInsertAllowed = (node: I.NodeInfo): boolean => {
+    isInsertAllowed = (node: J.NodeInfo): boolean => {
         //right now, for logged in users, we enable the 'new' button because the CPU load for determining it's enablement is too much, so
         //we throw an exception if they cannot. todo-1: need to make this work better.
         //however we CAN check if this node is an "admin" node and at least disallow any inserts under admin-owned nodess
@@ -193,14 +194,14 @@ export class Edit implements EditIntf {
 
         S.meta64.treeDirty = true;
         if (S.edit.nodeInsertTarget) {
-            S.util.ajax<I.InsertNodeRequest, I.InsertNodeResponse>("insertNode", {
+            S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                 "parentId": S.edit.parentOfNewNode.id,
                 "targetOrdinal": S.edit.nodeInsertTarget.ordinal,
                 "newNodeName": "",
                 "typeName": typeName ? typeName : "u"
             }, S.edit.insertNodeResponse);
         } else {
-            S.util.ajax<I.CreateSubNodeRequest, I.CreateSubNodeResponse>("createSubNode", {
+            S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                 "nodeId": S.edit.parentOfNewNode.id,
                 "newNodeName": "",
                 "typeName": typeName ? typeName : "u",
@@ -209,27 +210,27 @@ export class Edit implements EditIntf {
         }
     }
 
-    insertNodeResponse = (res: I.InsertNodeResponse): void => {
+    insertNodeResponse = (res: J.InsertNodeResponse): void => {
         if (S.util.checkSuccess("Insert node", res)) {
-            S.meta64.initNode(res.newNode, true);
-            S.meta64.highlightNode(res.newNode, true);
+            S.meta64.initNode(res.newNode as any as J.NodeInfo, true);
+            S.meta64.highlightNode(res.newNode as any as J.NodeInfo, true);
             this.runEditNode(res.newNode.id);
         }
     }
 
-    createSubNodeResponse = (res: I.CreateSubNodeResponse): void => {
+    createSubNodeResponse = (res: J.CreateSubNodeResponse): void => {
         if (S.util.checkSuccess("Create subnode", res)) {
             if (!res.newNode) {
                 S.meta64.refresh();
             }
             else {
-                S.meta64.initNode(res.newNode, true);
+                S.meta64.initNode(res.newNode as any as J.NodeInfo, true);
                 this.runEditNode(res.newNode.id);
             }
         }
     }
 
-    saveNodeResponse = (res: I.SaveNodeResponse, payload: any): void => {
+    saveNodeResponse = (res: J.SaveNodeResponse, payload: any): void => {
         if (S.util.checkSuccess("Save node", res)) {
             S.view.refreshTree(null, false, payload.savedId);
             S.meta64.selectTab("mainTab");
@@ -250,13 +251,13 @@ export class Edit implements EditIntf {
 
     moveNodeUp = (id?: string): void => {
         if (!id) {
-            let selNode: I.NodeInfo = S.meta64.getHighlightedNode();
+            let selNode: J.NodeInfo = S.meta64.getHighlightedNode();
             id = selNode.id;
         }
 
-        let node: I.NodeInfo = S.meta64.idToNodeMap[id];
+        let node: J.NodeInfo = S.meta64.idToNodeMap[id];
         if (node) {
-            S.util.ajax<I.SetNodePositionRequest, I.SetNodePositionResponse>("setNodePosition", {
+            S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 "nodeId": node.id,
                 "targetName": "up"
             }, this.setNodePositionResponse);
@@ -267,13 +268,13 @@ export class Edit implements EditIntf {
 
     moveNodeDown = (id?: string): void => {
         if (!id) {
-            let selNode: I.NodeInfo = S.meta64.getHighlightedNode();
+            let selNode: J.NodeInfo = S.meta64.getHighlightedNode();
             id = selNode.id;
         }
 
-        let node: I.NodeInfo = S.meta64.idToNodeMap[id];
+        let node: J.NodeInfo = S.meta64.idToNodeMap[id];
         if (node) {
-            S.util.ajax<I.SetNodePositionRequest, I.SetNodePositionResponse>("setNodePosition", {
+            S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 "nodeId": node.id,
                 "targetName": "down"
             }, this.setNodePositionResponse);
@@ -284,12 +285,12 @@ export class Edit implements EditIntf {
 
     moveNodeToTop = (id?: string): void => {
         if (!id) {
-            let selNode: I.NodeInfo = S.meta64.getHighlightedNode();
+            let selNode: J.NodeInfo = S.meta64.getHighlightedNode();
             id = selNode.id;
         }
-        let node: I.NodeInfo = S.meta64.idToNodeMap[id];
+        let node: J.NodeInfo = S.meta64.idToNodeMap[id];
         if (node) {
-            S.util.ajax<I.SetNodePositionRequest, I.SetNodePositionResponse>("setNodePosition", {
+            S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 "nodeId": node.id,
                 "targetName": "top"
             }, this.setNodePositionResponse);
@@ -300,12 +301,12 @@ export class Edit implements EditIntf {
 
     moveNodeToBottom = (id?: string): void => {
         if (!id) {
-            let selNode: I.NodeInfo = S.meta64.getHighlightedNode();
+            let selNode: J.NodeInfo = S.meta64.getHighlightedNode();
             id = selNode.id;
         }
-        let node: I.NodeInfo = S.meta64.idToNodeMap[id];
+        let node: J.NodeInfo = S.meta64.idToNodeMap[id];
         if (node) {
-            S.util.ajax<I.SetNodePositionRequest, I.SetNodePositionResponse>("setNodePosition", {
+            S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 "nodeId": node.id,
                 "targetName": "bottom"
             }, this.setNodePositionResponse);
@@ -317,7 +318,7 @@ export class Edit implements EditIntf {
     /*
      * Returns the node above the specified node or null if node is itself the top node
      */
-    getNodeAbove = (node: I.NodeInfo): any => {
+    getNodeAbove = (node: J.NodeInfo): any => {
         if (!S.meta64.currentNodeData) return null;
         let ordinal: number = S.meta64.getOrdinalOfNode(node);
         if (ordinal <= 0)
@@ -328,7 +329,7 @@ export class Edit implements EditIntf {
     /*
      * Returns the node below the specified node or null if node is itself the bottom node
      */
-    getNodeBelow = (node: I.NodeInfo): I.NodeInfo => {
+    getNodeBelow = (node: J.NodeInfo): J.NodeInfo => {
         if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node.children) return null;
         let ordinal: number = S.meta64.getOrdinalOfNode(node);
         console.log("ordinal = " + ordinal);
@@ -344,7 +345,7 @@ export class Edit implements EditIntf {
     }
 
     runEditNode = (id: any): void => {
-        let node: I.NodeInfo = null;
+        let node: J.NodeInfo = null;
         if (!id) {
             node = S.meta64.getHighlightedNode();
         }
@@ -357,7 +358,7 @@ export class Edit implements EditIntf {
             return;
         }
 
-        S.util.ajax<I.InitNodeEditRequest, I.InitNodeEditResponse>("initNodeEdit", {
+        S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             "nodeId": node.id
         }, this.initNodeEditResponse);
     }
@@ -374,7 +375,7 @@ export class Edit implements EditIntf {
          * We get the node selected for the insert position by using the uid if one was passed in or using the
          * currently highlighted node if no uid was passed.
          */
-        let node: I.NodeInfo = null;
+        let node: J.NodeInfo = null;
         if (!id) {
             node = S.meta64.getHighlightedNode();
         } else {
@@ -393,7 +394,7 @@ export class Edit implements EditIntf {
          * node if there is a selected node.
          */
         if (!id) {
-            let highlightNode: I.NodeInfo = S.meta64.getHighlightedNode();
+            let highlightNode: J.NodeInfo = S.meta64.getHighlightedNode();
             if (highlightNode) {
                 this.parentOfNewNode = highlightNode;
             }
@@ -418,9 +419,9 @@ export class Edit implements EditIntf {
 
     selectAllNodes = async (): Promise<void> => {
         let highlightNode = S.meta64.getHighlightedNode();
-        S.util.ajax<I.SelectAllNodesRequest, I.SelectAllNodesResponse>("selectAllNodes", {
+        S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             "parentNodeId": highlightNode.id
-        }, async (res: I.SelectAllNodesResponse) => {
+        }, async (res: J.SelectAllNodesResponse) => {
             console.log("Node Sel Count: " + res.nodeIds.length);
             S.meta64.selectAllNodes(res.nodeIds);
 
@@ -456,11 +457,11 @@ export class Edit implements EditIntf {
 
         new ConfirmDlg("Delete " + selNodesArray.length + " node(s) ?", "Confirm Delete",
             () => {
-                let postDeleteSelNode: I.NodeInfo = this.getBestPostDeleteSelNode();
+                let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode();
 
-                S.util.ajax<I.DeleteNodesRequest, I.DeleteNodesResponse>("deleteNodes", {
+                S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                     "nodeIds": selNodesArray
-                }, (res: I.DeleteNodesResponse) => {
+                }, (res: J.DeleteNodesResponse) => {
                     this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode });
                 });
             }
@@ -468,10 +469,10 @@ export class Edit implements EditIntf {
     }
 
     /* Gets the node we want to scroll to after a delete */
-    getBestPostDeleteSelNode = (): I.NodeInfo => {
+    getBestPostDeleteSelNode = (): J.NodeInfo => {
         /* Use a hashmap-type approach to saving all selected nodes into a lookup map */
         let nodesMap: Object = S.meta64.getSelectedNodesAsMapById();
-        let bestNode: I.NodeInfo = null;
+        let bestNode: J.NodeInfo = null;
         let takeNextNode: boolean = false;
 
         if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node.children) return null;
@@ -479,7 +480,7 @@ export class Edit implements EditIntf {
         /* now we scan the children, and the last child we encounterd up until we find the rist one in nodesMap will be the
         node we will want to select and scroll the user to AFTER the deleting is done */
         for (let i = 0; i < S.meta64.currentNodeData.node.children.length; i++) {
-            let node: I.NodeInfo = S.meta64.currentNodeData.node.children[i];
+            let node: J.NodeInfo = S.meta64.currentNodeData.node.children[i];
 
             /* is this node one to be deleted */
             if (nodesMap[node.id]) {
@@ -537,7 +538,7 @@ export class Edit implements EditIntf {
          * page. Later on we can get more specific about allowing precise destination location for moved
          * nodes.
          */
-        S.util.ajax<I.MoveNodesRequest, I.MoveNodesResponse>("moveNodes", {
+        S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             "targetNodeId": highlightNode.id,
             "nodeIds": this.nodesToMove,
             "location": location
@@ -554,7 +555,7 @@ export class Edit implements EditIntf {
                 if (!node) {
                     S.util.showMessage("No node is selected.");
                 } else {
-                    S.util.ajax<I.InsertBookRequest, I.InsertBookResponse>("insertBook", {
+                    S.util.ajax<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
                         "nodeId": node.id,
                         "bookName": "War and Peace",
                         "truncated": S.user.isTestUserAccount()
@@ -571,14 +572,14 @@ export class Edit implements EditIntf {
             return;
         }
 
-        S.util.ajax<I.SplitNodeRequest, I.SplitNodeResponse>("splitNode", {
+        S.util.ajax<J.SplitNodeRequest, J.SplitNodeResponse>("splitNode", {
             "splitType": splitType,
             "nodeId": highlightNode.id,
             "delimiter": delimiter
         }, this.splitNodeResponse);
     }
 
-    splitNodeResponse = (res: I.SplitNodeResponse): void => {
+    splitNodeResponse = (res: J.SplitNodeResponse): void => {
         if (S.util.checkSuccess("Split content", res)) {
             S.view.refreshTree(null, false);
             S.meta64.selectTab("mainTab");

@@ -70,7 +70,7 @@ export class SignupDlg extends DialogBase {
             return;
         }
 
-        S.util.ajax<I.SignupRequest, I.SignupResponse>("signup", {
+        S.util.ajax<J.SignupRequest, J.SignupResponse>("signup", {
             "userName": userName,
             "password": password,
             "email": email
@@ -79,7 +79,7 @@ export class SignupDlg extends DialogBase {
         this.close();
     }
 
-    signupResponse = (res: I.SignupResponse): void => {
+    signupResponse = (res: J.SignupResponse): void => {
         if (S.util.checkSuccess("Signup new user", res)) {
 
             /* close the signup dialog */

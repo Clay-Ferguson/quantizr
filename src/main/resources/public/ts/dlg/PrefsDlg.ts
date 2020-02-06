@@ -48,7 +48,7 @@ export class PrefsDlg extends DialogBase {
     savePreferences = (): void => {
         S.meta64.showMetaData = this.showMetadataCheckBox.getChecked();
 
-        S.util.ajax<I.SaveUserPreferencesRequest, I.SaveUserPreferencesResponse>("saveUserPreferences", {
+        S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
             //todo-2: both of these options should come from meta64.userPrefernces, and not be stored directly on meta64 scope.
             "userPreferences": {
                 "editMode": S.meta64.userPreferences.editMode,
@@ -60,7 +60,7 @@ export class PrefsDlg extends DialogBase {
         this.close();
     }
 
-    savePreferencesResponse = (res: I.SaveUserPreferencesResponse): void => {
+    savePreferencesResponse = (res: J.SaveUserPreferencesResponse): void => {
         if (S.util.checkSuccess("Saving Preferences", res)) {
             S.meta64.selectTab("mainTab");
             S.meta64.refresh();

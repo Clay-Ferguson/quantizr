@@ -57,10 +57,10 @@ export class ExportDlg extends DialogBase {
 
             let format = this.getSelectedFormat();
 
-            S.util.ajax<I.ExportRequest, I.ExportResponse>("export", {
+            S.util.ajax<J.ExportRequest, J.ExportResponse>("export", {
                 "nodeId": highlightNode.id,
                 "exportExt": format
-            }, (res: I.ExportResponse) => {
+            }, (res: J.ExportResponse) => {
                 this.exportResponse(res);
             });
         }
@@ -91,7 +91,7 @@ export class ExportDlg extends DialogBase {
         return ret;
     }
 
-    exportResponse = (res: I.ExportResponse): void => {
+    exportResponse = (res: J.ExportResponse): void => {
         let hostAndPort: string = S.util.getHostAndPort();
         if (S.util.checkSuccess("Export", res)) {
             new MessageDlg(

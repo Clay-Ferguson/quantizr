@@ -1,8 +1,8 @@
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { NavIntf } from "./intf/NavIntf";
 import { LoginDlg } from "./dlg/LoginDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
-import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants } from "./Constants";
@@ -73,7 +73,7 @@ export class Nav implements NavIntf {
         return !this.displayingHome();
     }
 
-    upLevelResponse = async (res: I.RenderNodeResponse, id: string, scrollToTop: boolean=false): Promise<void> => {
+    upLevelResponse = async (res: J.RenderNodeResponse, id: string, scrollToTop: boolean=false): Promise<void> => {
         if (!res || !res.node) {
             S.util.showMessage("No data is visible to you above this node.");
         } else {
@@ -82,7 +82,7 @@ export class Nav implements NavIntf {
     }
 
     navOpenSelectedNode = (): void => {
-        let currentSelNode: I.NodeInfo = S.meta64.getHighlightedNode();
+        let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode();
         if (!currentSelNode) return;
         S.nav.openNodeById(currentSelNode.id, true);
     }
@@ -91,16 +91,17 @@ export class Nav implements NavIntf {
         if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node) return null;
 
         this.mainOffset = 0;
-        let res = S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
+        let res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             "nodeId": S.meta64.currentNodeData.node.id,
             "upLevel": null,
             "siblingOffset": siblingOffset,
             "renderParentIfLeaf": true,
             "offset": this.mainOffset,
-            "goToLastPage": false
+            "goToLastPage": false,
+            "forceIPFSRefresh": false
         }, 
         //success callback
-        (res: I.RenderNodeResponse) => {
+        (res: J.RenderNodeResponse) => {
             this.upLevelResponse(res, null, true);
         }
         , 
@@ -118,16 +119,17 @@ export class Nav implements NavIntf {
         }
 
         this.mainOffset = 0;
-        let res = S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
+        let res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             "nodeId": S.meta64.currentNodeData.node.id,
             "upLevel": 1,
             "siblingOffset": 0,
             "renderParentIfLeaf": false,
             "offset": this.mainOffset,
-            "goToLastPage": false
+            "goToLastPage": false,
+            "forceIPFSRefresh": false
         }, 
         //success callback
-        (res: I.RenderNodeResponse) => {
+        (res: J.RenderNodeResponse) => {
             this.upLevelResponse(res, S.meta64.currentNodeData.node.id);
         }
         , 
@@ -145,7 +147,7 @@ export class Nav implements NavIntf {
         if (currentSelNode) {
 
             /* get node by node identifier */
-            let node: I.NodeInfo = S.meta64.idToNodeMap[currentSelNode.id];
+            let node: J.NodeInfo = S.meta64.idToNodeMap[currentSelNode.id];
 
             if (node) {
                 //console.log("found highlighted node.id=" + node.id);
@@ -163,7 +165,7 @@ export class Nav implements NavIntf {
 
     clickOnNodeRow = (id: string): void => {
         //console.log("clickOnNodeRow: uid=" + uid);
-        let node: I.NodeInfo = S.meta64.idToNodeMap[id];
+        let node: J.NodeInfo = S.meta64.idToNodeMap[id];
         if (!node) {
             //console.log("clickOnNodeRow recieved uid that doesn't map to any node. uid=" + uid);
             return;
@@ -191,18 +193,19 @@ export class Nav implements NavIntf {
 
     openContentNode = (nodePathOrId: string): void => {
         this.mainOffset = 0;
-        S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
+        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             "nodeId": nodePathOrId,
             "upLevel": null,
             "siblingOffset": 0,
             "renderParentIfLeaf": null,
             "offset": this.mainOffset,
-            "goToLastPage": false
+            "goToLastPage": false,
+            "forceIPFSRefresh": false
         }, this.navPageNodeResponse);
     }
 
     openNodeById = (id: string, scrollToFirstChild?: boolean): void => {
-        let node: I.NodeInfo = S.meta64.idToNodeMap[id];
+        let node: J.NodeInfo = S.meta64.idToNodeMap[id];
         S.meta64.highlightNode(node, false);
 
         if (!node) {
@@ -222,7 +225,7 @@ export class Nav implements NavIntf {
         S.meta64.refreshAllGuiEnablement();
     }
 
-    navPageNodeResponse = async (res: I.RenderNodeResponse): Promise<void> => {
+    navPageNodeResponse = async (res: J.RenderNodeResponse): Promise<void> => {
         console.log("navPageNodeResponse.");
         S.meta64.clearSelectedNodes();
         await S.render.renderPageFromData(res, true);
@@ -260,13 +263,14 @@ export class Nav implements NavIntf {
             S.meta64.loadAnonPageHome();
         } else {
             this.mainOffset = 0;
-            S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
+            S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 "nodeId": S.meta64.homeNodeId,
                 "upLevel": null,
                 "siblingOffset": 0,
                 "renderParentIfLeaf": null,
                 "offset": this.mainOffset,
-                "goToLastPage": false
+                "goToLastPage": false,
+                "forceIPFSRefresh": false
             }, this.navPageNodeResponse);
         }
     }

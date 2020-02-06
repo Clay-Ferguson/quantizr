@@ -41,7 +41,7 @@ export class UploadFromUrlDlg extends DialogBase {
         let sourceUrl = this.uploadFromUrlTextField.getValue();
 
         if (sourceUrl) {
-            S.util.ajax<I.UploadFromUrlRequest, I.UploadFromUrlResponse>("uploadFromUrl", {
+            S.util.ajax<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
                 "nodeId": S.attachment.uploadNode.id,
                 "sourceUrl": sourceUrl
             }, this.uploadFromUrlResponse);
@@ -50,7 +50,7 @@ export class UploadFromUrlDlg extends DialogBase {
         }
     }
 
-    uploadFromUrlResponse = (res: I.UploadFromUrlResponse): void => {
+    uploadFromUrlResponse = (res: J.UploadFromUrlResponse): void => {
         if (S.util.checkSuccess("Upload from URL", res)) {
             this.close();
             S.meta64.refresh();

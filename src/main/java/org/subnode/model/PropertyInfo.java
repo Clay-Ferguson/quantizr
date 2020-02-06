@@ -14,15 +14,13 @@ public class PropertyInfo {
 	 */
 	private String value;
 
-	private boolean abbreviated;
-
 	public PropertyInfo() {
 	}
 
+	//todo-0: remove abbreviated
 	public PropertyInfo(String name, String value, boolean abbreviated) {
 		this.name = name;
 		this.value = value;
-		this.abbreviated = abbreviated;
 	}
 
 	public String getValue() {
@@ -39,13 +37,5 @@ public class PropertyInfo {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public boolean isAbbreviated() {
-		return abbreviated;
-	}
-
-	public void setAbbreviated(boolean abbreviated) {
-		this.abbreviated = abbreviated;
 	}
 }

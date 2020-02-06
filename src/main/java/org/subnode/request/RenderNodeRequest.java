@@ -32,12 +32,15 @@ public class RenderNodeRequest extends RequestBase {
 
 	private boolean goToLastPage;
 
+	@JsonProperty(required = false)
 	private boolean forceIPFSRefresh;
 
+	@JsonProperty(required = false)
 	public boolean isForceIPFSRefresh() {
 		return forceIPFSRefresh;
 	}
 
+	@JsonProperty(required = false)
 	public void setForceIPFSRefresh(boolean forceIPFSRefresh) {
 		this.forceIPFSRefresh = forceIPFSRefresh;
 	}

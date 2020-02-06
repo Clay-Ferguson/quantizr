@@ -433,7 +433,6 @@ export interface ResponseBase {
 export interface PropertyInfo {
     name: string;
     value: string;
-    abbreviated: boolean;
 }
 
 export interface UserPreferences {

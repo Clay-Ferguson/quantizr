@@ -42,7 +42,7 @@ export class ImportDlg extends DialogBase {
         }
 
         if (highlightNode) {
-            S.util.ajax<I.ImportRequest, I.ImportResponse>("import", {
+            S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
                 "nodeId": highlightNode.id,
                 "sourceFileName": sourceFileName
             }, this.importResponse);
@@ -50,7 +50,7 @@ export class ImportDlg extends DialogBase {
         this.close();
     }
 
-    importResponse = (res: I.ImportResponse): void => {
+    importResponse = (res: J.ImportResponse): void => {
         if (S.util.checkSuccess("Import", res)) {
             new MessageDlg("Import Successful", "Import").open();
 

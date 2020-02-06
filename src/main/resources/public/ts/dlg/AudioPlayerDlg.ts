@@ -29,7 +29,7 @@ export class AudioPlayerDlg extends DialogBase {
     playButton: Button;
 
     //DO NOT DELETE
-    // private node: I.NodeInfo;
+    // private node: J.NodeInfo;
 
     constructor(private sourceUrl: string, title: string) {
         super("Audio Player");

@@ -7,5 +7,5 @@ export interface AttachmentIntf {
     openUploadFromFileDlg(): void;
     openUploadFromUrlDlg(): void;
     deleteAttachment(): void;
-    deleteAttachmentResponse(res: I.DeleteAttachmentResponse, uid: string): void;
+    deleteAttachmentResponse(res: J.DeleteAttachmentResponse, uid: string): void;
 }

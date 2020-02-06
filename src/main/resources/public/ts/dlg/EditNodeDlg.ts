@@ -34,7 +34,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class EditNodeDlg extends DialogBase {
-    node: I.NodeInfo;
+    node: J.NodeInfo;
     header: Header;
     buttonBar: ButtonBar;
     propsButtonBar: ButtonBar;
@@ -154,7 +154,7 @@ export class EditNodeDlg extends DialogBase {
         });
         let editPropsTable = new EditPropsTable();
 
-        let editOrderedProps: I.PropertyInfo[] = S.props.getPropertiesInEditingOrder(this.node, this.node.properties);
+        let editOrderedProps: J.PropertyInfo[] = S.props.getPropertiesInEditingOrder(this.node, this.node.properties);
         //console.log("POPULATING PROPS: " + S.util.prettyPrint(editOrderedProps));
 
         let isPre = false;
@@ -163,7 +163,7 @@ export class EditNodeDlg extends DialogBase {
         /* We have to scan properties in this loop before we do the loop below. So it is not redundant to have two loops
         scanning the properties. This is by design, and not a mistake */
         if (editOrderedProps) {
-            editOrderedProps.forEach((prop: I.PropertyInfo) => {
+            editOrderedProps.forEach((prop: J.PropertyInfo) => {
                 if (prop.name == cnst.PRE) {
                     isPre = true;
                     return;
@@ -216,7 +216,7 @@ export class EditNodeDlg extends DialogBase {
         this.contentEditor.setWordWrap(isWordWrap);
 
         if (editOrderedProps) {
-            editOrderedProps.forEach((prop: I.PropertyInfo) => {
+            editOrderedProps.forEach((prop: J.PropertyInfo) => {
 
                 if (prop.name == "layout") {
                     this.layoutSelection.setSelection(prop.value);
@@ -337,7 +337,7 @@ export class EditNodeDlg extends DialogBase {
             nodeId: this.node.id,
             type: newType
         };
-        S.util.ajax<I.SetNodeTypeRequest, I.SetNodeTypeResponse>("setNodeType", postData, this.setNodeTypeResponse);
+        S.util.ajax<J.SetNodeTypeRequest, J.SetNodeTypeResponse>("setNodeType", postData, this.setNodeTypeResponse);
     }
 
     setNodeTypeResponse = (res: any): void => {
@@ -363,7 +363,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     deletePropertyImmediate = (propName: string) => {
-        S.util.ajax<I.DeletePropertyRequest, I.DeletePropertyResponse>("deleteProperty", {
+        S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperty", {
             "nodeId": this.node.id,
             "propName": propName
         }, (res) => {
@@ -381,7 +381,7 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    saveCheckboxVal = (checkbox: Checkbox, saveList: I.PropertyInfo[], handled: any, propName: string, invert: boolean = false): void => {
+    saveCheckboxVal = (checkbox: Checkbox, saveList: J.PropertyInfo[], handled: any, propName: string, invert: boolean = false): void => {
         let val = checkbox.getChecked() ? "1" : null;
         if (invert) {
             val = (val == "1" ? null : "1");
@@ -396,7 +396,7 @@ export class EditNodeDlg extends DialogBase {
 
     saveNode = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            let saveList: I.PropertyInfo[] = [];
+            let saveList: J.PropertyInfo[] = [];
             let handled = {};
 
             if (this.node) {
@@ -490,7 +490,7 @@ export class EditNodeDlg extends DialogBase {
                 name: nodeName
             };
             // console.log("calling saveNode(). PostData=" + S.util.toJson(postData));
-            S.util.ajax<I.SaveNodeRequest, I.SaveNodeResponse>("saveNode", postData, (res) => {
+            S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", postData, (res) => {
                 S.edit.saveNodeResponse(res, {
                     savedId: this.node.id
                 });

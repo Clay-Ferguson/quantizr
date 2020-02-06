@@ -1,4 +1,5 @@
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchIntf } from "./intf/SearchIntf";
 import { Singletons } from "./Singletons";
@@ -7,7 +8,6 @@ import { Constants } from "./Constants";
 import { Button } from "./widget/Button";
 import { Div } from "./widget/Div";
 import { Comp } from "./widget/base/Comp";
-import { NodeInfo, NodeSearchResponse } from "./Interfaces";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -37,9 +37,9 @@ export class Search implements SearchIntf {
     /*
      * Will be the last row clicked on (NodeInfo.java object) and having the red highlight bar
      */
-    highlightRowNode: I.NodeInfo = null;
+    highlightRowNode: J.NodeInfo = null;
 
-    idToNodeMap: { [key: string]: I.NodeInfo } = {};
+    idToNodeMap: { [key: string]: J.NodeInfo } = {};
 
     numSearchResults = () => {
         return this.searchResults != null && //
@@ -51,7 +51,7 @@ export class Search implements SearchIntf {
     searchTabActivated = () => {
     }
 
-    searchNodesResponse = (res: I.NodeSearchResponse) => {
+    searchNodesResponse = (res: J.NodeSearchResponse) => {
         this.searchResults = res;
         if (this.numSearchResults() == 0) {
             new MessageDlg("No search results found.", "Search").open();
@@ -63,21 +63,22 @@ export class Search implements SearchIntf {
         S.meta64.selectTab("searchTab");
     }
 
-    timelineResponse = (res: I.NodeSearchResponse) => {
+    timelineResponse = (res: J.NodeSearchResponse) => {
         this.timelineResults = res;
         S.srch.populateSearchResultsPage(S.srch.timelineResults, "timelineResultsPanel"); 
         S.meta64.selectTab("timelineTab");
     }
 
-    searchFilesResponse = (res: I.FileSearchResponse) => {
+    searchFilesResponse = (res: J.FileSearchResponse) => {
         S.nav.mainOffset = 0;
-        S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
+        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             "nodeId": res.searchResultNodeId,
             "upLevel": null,
             "siblingOffset": 0,
             "renderParentIfLeaf": null,
             "offset": 0,
-            "goToLastPage": false
+            "goToLastPage": false,
+            "forceIPFSRefresh": false
         }, S.nav.navPageNodeResponse);
     }
 
@@ -89,7 +90,7 @@ export class Search implements SearchIntf {
             return;
         }
 
-        S.util.ajax<I.NodeSearchRequest, I.NodeSearchResponse>("nodeSearch", {
+        S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             "nodeId": node.id,
             "searchText": "",
             "sortDir": "DESC",
@@ -98,11 +99,11 @@ export class Search implements SearchIntf {
         }, this.timelineResponse);
     }
 
-    initSearchNode = (node: I.NodeInfo) => {
+    initSearchNode = (node: J.NodeInfo) => {
         this.idToNodeMap[node.id] = node;
     }
 
-    populateSearchResultsPage = (data: NodeSearchResponse, viewName) => {
+    populateSearchResultsPage = (data: J.NodeSearchResponse, viewName) => {
         let childCount = data.searchResults.length;
 
         /*
@@ -113,7 +114,7 @@ export class Search implements SearchIntf {
 
         let output: Comp[] = [];
         let i=-1;
-        data.searchResults.forEach((node: NodeInfo) => {
+        data.searchResults.forEach((node: J.NodeInfo) => {
             i++;
             this.initSearchNode(node);
 
@@ -131,7 +132,7 @@ export class Search implements SearchIntf {
      *
      * node is a NodeInfo.java JSON
      */
-    renderSearchResultAsListItem = (node: NodeInfo, index: number, count: number, rowCount: number): Comp => {
+    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number): Comp => {
         let id = node.id;
         //console.log("renderSearchResult: " + id);
 

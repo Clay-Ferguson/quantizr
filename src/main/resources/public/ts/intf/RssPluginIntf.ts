@@ -3,5 +3,5 @@ import * as J from "../JavaIntf";
 
 export interface RssPluginIntf {
     init ();
-    renderFeedNode (node: I.NodeInfo, rowStyling: boolean): React.ReactNode ;
+    renderFeedNode (node: J.NodeInfo, rowStyling: boolean): React.ReactNode ;
 }

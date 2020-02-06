@@ -3,7 +3,7 @@ import * as J from "../JavaIntf";
 
 export interface ShareIntf {
 
-    sharingNode: I.NodeInfo;
+    sharingNode: J.NodeInfo;
     editNodeSharing(): void;
     findSharedNodes(): void;
 }

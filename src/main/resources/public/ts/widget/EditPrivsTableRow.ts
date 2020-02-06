@@ -17,7 +17,7 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class EditPrivsTableRow extends Comp {
 
-    constructor(public aclEntry: I.AccessControlEntryInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
+    constructor(public aclEntry: J.AccessControlEntryInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
         super(null);
         this.setClass("list-group-item list-group-item-action");
 
@@ -25,7 +25,7 @@ export class EditPrivsTableRow extends Comp {
         this.addChild(this.renderAclPrivileges(this.aclEntry));
     }
 
-    renderAclPrivileges = (aclEntry: I.AccessControlEntryInfo): Div => {
+    renderAclPrivileges = (aclEntry: J.AccessControlEntryInfo): Div => {
 
         let div = new Div();
         aclEntry.privileges.forEach((privilege, index) => {

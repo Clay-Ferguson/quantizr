@@ -46,7 +46,7 @@ export class ResetPasswordDlg extends DialogBase {
 
         /* Note: Admin check is done also on server, so no browser hacking can get around this */
         if (userName && emailAddress && userName.toLowerCase() != "admin") {
-            util.ajax<I.ResetPasswordRequest, I.ResetPasswordResponse>("resetPassword", {
+            util.ajax<J.ResetPasswordRequest, J.ResetPasswordResponse>("resetPassword", {
                 "user": userName,
                 "email": emailAddress
             }, this.resetPasswordResponse);
@@ -56,7 +56,7 @@ export class ResetPasswordDlg extends DialogBase {
         this.close();
     }
 
-    resetPasswordResponse = (res: I.ResetPasswordResponse): void => {
+    resetPasswordResponse = (res: J.ResetPasswordResponse): void => {
         if (util.checkSuccess("Reset password", res)) {
             util.showMessage("Password reset email was sent. Check your email.");
         }

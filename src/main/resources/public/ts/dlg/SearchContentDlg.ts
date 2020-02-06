@@ -68,7 +68,7 @@ export class SearchContentDlg extends DialogBase {
 
         SearchContentDlg.defaultSearchText = searchText;
 
-        S.util.ajax<I.NodeSearchRequest, I.NodeSearchResponse>("nodeSearch", {
+        S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             "nodeId": node.id,
             "searchText": searchText,
             "sortDir": "",
@@ -77,7 +77,7 @@ export class SearchContentDlg extends DialogBase {
         }, this.searchNodesResponse);
     }
 
-    searchNodesResponse = (res: I.NodeSearchResponse) => {
+    searchNodesResponse = (res: J.NodeSearchResponse) => {
         S.srch.searchNodesResponse(res);
         this.close();
     }

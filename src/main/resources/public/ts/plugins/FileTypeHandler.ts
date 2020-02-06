@@ -25,7 +25,7 @@ export class FileTypeHandler implements TypeHandlerIntf {
     constructor(private plugin: CoreTypesPlugin) {
     }
 
-    render = (node: I.NodeInfo, rowStyling: boolean): Comp => {
+    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
         let ret: Comp[] = [];
 
         let fsLink = S.props.getNodePropertyVal("fs:link", node);
@@ -97,11 +97,11 @@ export class FileTypeHandler implements TypeHandlerIntf {
         return new Div(null, null, ret);
     }
 
-    orderProps(node: I.NodeInfo, _props: I.PropertyInfo[]): I.PropertyInfo[] {
+    orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
         return _props;
     }
 
-    getIconClass(node: I.NodeInfo): string {
+    getIconClass(node: J.NodeInfo): string {
         //https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
         return "fa fa-file fa-lg";
     }

@@ -1,4 +1,5 @@
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { Menu } from "./widget/Menu";
 import { MenuItem } from "./widget/MenuItem";
 import { Div } from "./widget/Div";
@@ -146,8 +147,6 @@ export class MenuPanel extends Div {
                     //    () => { return S.meta64.isAdminUser }, //
                     //    true
                     //), //
-                    //new MenuItem("Generate Hashes", () => { view.processNodeHashes(false); }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
-                    //new MenuItem("Verify Hashes", () => { view.processNodeHashes(true); }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
                 ],
                 () => { return S.meta64.isAdminUser; },
                 () => { return S.meta64.isAdminUser; }),
@@ -178,7 +177,7 @@ export class MenuPanel extends Div {
                         () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && S.meta64.state.selNodeIsMine) }
                     ),
                     new MenuItem("Force Refresh", () => {
-                        let currentSelNode: I.NodeInfo = S.meta64.getHighlightedNode();
+                        let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode();
                         let nodeId: string = currentSelNode != null ? currentSelNode.id : null;
                         S.view.refreshTree(nodeId, false, nodeId, false, true);
                     },

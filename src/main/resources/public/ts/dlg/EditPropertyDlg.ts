@@ -23,7 +23,7 @@ export class EditPropertyDlg extends DialogBase {
     propertyNameTextarea: TextField;
     propertyValTextarea: Textarea;
     propSavedFunc: Function;
-    editNode: I.NodeInfo;
+    editNode: J.NodeInfo;
 
     constructor(args: any) {
         super("Edit Node Property");
@@ -54,10 +54,10 @@ export class EditPropertyDlg extends DialogBase {
             propertyName: name,
             propertyValue: val
         };
-        S.util.ajax<I.SavePropertyRequest, I.SavePropertyResponse>("saveProperty", postData, this.savePropertyResponse);
+        S.util.ajax<J.SavePropertyRequest, J.SavePropertyResponse>("saveProperty", postData, this.savePropertyResponse);
     }
 
-    savePropertyResponse = (res: I.SavePropertyResponse): void => {
+    savePropertyResponse = (res: J.SavePropertyResponse): void => {
         S.util.checkSuccess("Save properties", res);
         this.close();
 

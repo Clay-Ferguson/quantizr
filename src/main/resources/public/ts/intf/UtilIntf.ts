@@ -1,6 +1,5 @@
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
-import { NodeInfo } from "../Interfaces";
 
 export interface UtilIntf {
     logAjax: boolean;
@@ -101,6 +100,6 @@ export interface UtilIntf {
     triggerCustom(elm: HTMLElement, evt: string, obj: Object): void;
     trigger(elm: HTMLElement, evt: string): void;
     formatDate(date) : string;
-    updateHistory(node: NodeInfo, childNode?: NodeInfo): void;
+    updateHistory(node: J.NodeInfo, childNode?: J.NodeInfo): void;
     getElm(id: string, exResolve?: (elm: HTMLElement) => void): Promise<HTMLElement>;
 }

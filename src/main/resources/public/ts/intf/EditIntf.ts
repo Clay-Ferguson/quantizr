@@ -6,7 +6,7 @@ export interface EditIntf {
     showReadOnlyProperties: boolean;
     nodesToMove: any;
     nodesToMoveSet: Object;
-    parentOfNewNode: I.NodeInfo;
+    parentOfNewNode: J.NodeInfo;
     nodeInsertTarget: any;
 
     createNode(): void;
@@ -19,16 +19,16 @@ export interface EditIntf {
     isEditAllowed(node: any): boolean;
     isInsertAllowed(node: any): boolean;
     startEditingNewNode(typeName?: string, createAtTop?: boolean): void;
-    insertNodeResponse(res: I.InsertNodeResponse): void;
-    createSubNodeResponse(res: I.CreateSubNodeResponse): void;
-    saveNodeResponse(res: I.SaveNodeResponse, payload: any): void;
+    insertNodeResponse(res: J.InsertNodeResponse): void;
+    createSubNodeResponse(res: J.CreateSubNodeResponse): void;
+    saveNodeResponse(res: J.SaveNodeResponse, payload: any): void;
     editMode(modeVal?: boolean): void;
     moveNodeUp(id?: string): void;
     moveNodeDown(id?: string): void;
     moveNodeToTop(id?: string): void;
     moveNodeToBottom(id?: string): void;
-    getNodeAbove(node: I.NodeInfo): any;
-    getNodeBelow(node: I.NodeInfo): I.NodeInfo;
+    getNodeAbove(node: J.NodeInfo): any;
+    getNodeBelow(node: J.NodeInfo): J.NodeInfo;
     getFirstChildNode(): any;
     runEditNode(id: any): void;
     insertNode(id?: any, typeName?: string): void;
@@ -36,7 +36,7 @@ export interface EditIntf {
     clearSelections(): void;
     selectAllNodes() : void;
     deleteSelNodes(selNodesArray : string[]): void;
-    getBestPostDeleteSelNode(): I.NodeInfo;
+    getBestPostDeleteSelNode(): J.NodeInfo;
     cutSelNodes(): void;
     undoCutSelNodes(): void;
     pasteSelNodes(location: string): void;

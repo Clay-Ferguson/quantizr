@@ -3,6 +3,6 @@ import * as J from "../JavaIntf";
 
 export interface GraphIntf {
     graphTreeStructure(): any;
-    graphNodesResponse(res: I.GraphResponse): any;
+    graphNodesResponse(res: J.GraphResponse): any;
 }
 

@@ -1,6 +1,5 @@
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
-import { NodeSearchResponse } from "../Interfaces";
 
 export interface SearchIntf {
     _UID_ROWID_PREFIX: string;
@@ -13,18 +12,18 @@ export interface SearchIntf {
 
     searchResults: any;
     timelineResults: any;
-    highlightRowNode: I.NodeInfo;
+    highlightRowNode: J.NodeInfo;
 
-    idToNodeMap: { [key: string]: I.NodeInfo };
+    idToNodeMap: { [key: string]: J.NodeInfo };
 
     numSearchResults(): any;
     searchTabActivated(): any;
-    searchNodesResponse(res: I.NodeSearchResponse): any;
-    timelineResponse(res: I.NodeSearchResponse): any;
-    searchFilesResponse(res: I.FileSearchResponse): any;
+    searchNodesResponse(res: J.NodeSearchResponse): any;
+    timelineResponse(res: J.NodeSearchResponse): any;
+    searchFilesResponse(res: J.FileSearchResponse): any;
     timeline(prop: string): any;
-    initSearchNode(node: I.NodeInfo): any;
-    populateSearchResultsPage(data: NodeSearchResponse, viewName: string): any;
+    initSearchNode(node: J.NodeInfo): any;
+    populateSearchResultsPage(data: J.NodeSearchResponse, viewName: string): any;
     renderSearchResultAsListItem(node, index, count, rowCount): any;
     makeButtonBarHtml(id: string): any;
     clickOnSearchResultRow(id : string): any;

@@ -18,7 +18,7 @@ class BashTypeHandler implements TypeHandlerIntf {
     constructor(private bashPlugin : BashPlugin) {
     }
 
-    render = (node: I.NodeInfo, rowStyling: boolean): Comp => {
+    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
         //let content: string = S.props.getNodePropertyVal(Constants.CONTENT, node);
         let name = S.props.getNodePropertyVal(Constants.NAME, node);
         if (!name) {
@@ -42,11 +42,11 @@ class BashTypeHandler implements TypeHandlerIntf {
         return vertLayout;
     }
 
-    orderProps(node: I.NodeInfo, _props: I.PropertyInfo[]): I.PropertyInfo[] {
+    orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
         return _props;
     }
 
-    getIconClass(node : I.NodeInfo): string {
+    getIconClass(node : J.NodeInfo): string {
         return null;
     }
 
@@ -62,13 +62,13 @@ export class BashPlugin implements BashPluginIntf {
         S.meta64.addTypeHandler("bash", this.bashTypeHandler);
     }
 
-    executeNodeButton = (node: I.NodeInfo): void => {
-        S.util.ajax<I.ExecuteNodeRequest, I.ExecuteNodeResponse>("executeNode", {
+    executeNodeButton = (node: J.NodeInfo): void => {
+        S.util.ajax<J.ExecuteNodeRequest, J.ExecuteNodeResponse>("executeNode", {
             "nodeId": node.id,
         }, this.executeNodeResponse);
     }
 
-    private executeNodeResponse = (res: I.ExecuteNodeResponse): void => {
+    private executeNodeResponse = (res: J.ExecuteNodeResponse): void => {
         console.log("ExecuteNodeResponse running.");
 
         S.util.checkSuccess("Execute Node", res);

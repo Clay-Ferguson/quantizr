@@ -33,7 +33,7 @@ export class SharingDlg extends DialogBase {
      * Gets privileges from server and displays in GUI also. Assumes gui is already at correct page.
      */
     reload = (): void => {
-        S.util.ajax<I.GetNodePrivilegesRequest, I.GetNodePrivilegesResponse>("getNodePrivileges", {
+        S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             "nodeId": S.share.sharingNode.id,
             "includeAcl": true,
             "includeOwners": true
@@ -43,7 +43,7 @@ export class SharingDlg extends DialogBase {
     /*
      * Processes the response gotten back from the server containing ACL info so we can populate the sharing page in the gui
      */
-    populate = (res: I.GetNodePrivilegesResponse): void => {
+    populate = (res: J.GetNodePrivilegesResponse): void => {
         //console.log("populating with: res="+S.util.prettyPrint(res));
         this.privsTable.updateState(res);
         this.privsTable.updateDOM();
@@ -66,15 +66,15 @@ export class SharingDlg extends DialogBase {
 
     removePrivilege = (principalNodeId: string, privilege: string): void => {
         S.meta64.treeDirty = true;
-        S.util.ajax<I.RemovePrivilegeRequest, I.RemovePrivilegeResponse>("removePrivilege", {
+        S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             "nodeId": S.share.sharingNode.id,
             "principalNodeId": principalNodeId,
             "privilege": privilege
         }, this.removePrivilegeResponse);
     }
 
-    removePrivilegeResponse = (res: I.RemovePrivilegeResponse): void => {
-        S.util.ajax<I.GetNodePrivilegesRequest, I.GetNodePrivilegesResponse>("getNodePrivileges", {
+    removePrivilegeResponse = (res: J.RemovePrivilegeResponse): void => {
+        S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             "nodeId": S.share.sharingNode.id,
             "includeAcl": true,
             "includeOwners": true

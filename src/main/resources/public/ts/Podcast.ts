@@ -1,5 +1,6 @@
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { PodcastIntf } from "./intf/PodcastIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";

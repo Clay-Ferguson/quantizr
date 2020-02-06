@@ -209,7 +209,7 @@ export class Encryption implements EncryptionIntf {
         });
     }
 
-    savePublicKeyResponse = (res: I.SavePublicKeyResponse): void => {
+    savePublicKeyResponse = (res: J.SavePublicKeyResponse): void => {
        // alert(res.message);
     }
 

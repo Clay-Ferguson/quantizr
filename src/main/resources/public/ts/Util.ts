@@ -4,12 +4,12 @@ declare var ace;
 import { MessageDlg } from "./dlg/MessageDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { UtilIntf } from "./intf/UtilIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants } from "./Constants";
 import axios, { AxiosRequestConfig } from 'axios';
-import { NodeInfo } from "./Interfaces";
 
 let S: Singletons;
 PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -1034,7 +1034,7 @@ export class Util implements UtilIntf {
     NOTE: todo-1 We don't currently have a call to updateHistory for 1) initial page load 2) Search results click 3) timeline click, but those
     would be nice additions.
     */
-    updateHistory = (node: NodeInfo, childNode: NodeInfo = null): void => {
+    updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null): void => {
         if (!node) {
             node = S.meta64.currentNodeData.node;
         }

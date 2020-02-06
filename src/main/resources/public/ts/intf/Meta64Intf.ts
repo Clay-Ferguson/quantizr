@@ -34,10 +34,10 @@ export interface Meta64Intf {
 
     treeDirty: boolean;
 
-    idToNodeMap: { [key: string]: I.NodeInfo };
+    idToNodeMap: { [key: string]: J.NodeInfo };
 
     nextUid: number;
-    parentIdToFocusNodeMap: { [key: string]: I.NodeInfo };
+    parentIdToFocusNodeMap: { [key: string]: J.NodeInfo };
     
     showProperties: boolean;
     showMetaData: boolean;
@@ -51,11 +51,11 @@ export interface Meta64Intf {
 
     expandedAbbrevNodeIds: any;
 
-    currentNodeData: I.RenderNodeResponse;
+    currentNodeData: J.RenderNodeResponse;
 
     typeHandlers: { [key: string]: TypeHandlerIntf };
 
-    userPreferences: I.UserPreferences;
+    userPreferences: J.UserPreferences;
     navBarHeight: number;
 
     graphPanel: GraphPanel;
@@ -70,22 +70,22 @@ export interface Meta64Intf {
     getSelectedNodeUidsArray(): string[];
     getSelectedNodeIdsArray(): string[];
     getSelectedNodesAsMapById(): Object;
-    getSelectedNodesArray(): I.NodeInfo[];
+    getSelectedNodesArray(): J.NodeInfo[];
     clearSelectedNodes();
     selectAllNodes(nodeIds : string[]);
-    updateNodeInfo(node: I.NodeInfo);
-    getHighlightedNode(): I.NodeInfo;
+    updateNodeInfo(node: J.NodeInfo);
+    getHighlightedNode(): J.NodeInfo;
     highlightRowById(id, scroll): Promise<void>;
-    highlightNode(node: I.NodeInfo, scroll: boolean): Promise<void>;
+    highlightNode(node: J.NodeInfo, scroll: boolean): Promise<void>;
     updateState();
     refreshAllGuiEnablement();
-    getSingleSelectedNode(): I.NodeInfo;
-    getOrdinalOfNode(node: I.NodeInfo): number;
+    getSingleSelectedNode(): J.NodeInfo;
+    getOrdinalOfNode(node: J.NodeInfo): number;
     getNumChildNodes(): number;
-    setCurrentNodeData(data: I.RenderNodeResponse): void;
-    anonPageLoadResponse(res: I.AnonPageLoadResponse): void;
+    setCurrentNodeData(data: J.RenderNodeResponse): void;
+    anonPageLoadResponse(res: J.AnonPageLoadResponse): void;
     removeBinaryById(id: string): void;
-    initNode(node: I.NodeInfo, updateMaps?: boolean): void;
+    initNode(node: J.NodeInfo, updateMaps?: boolean): void;
     initConstants();
     initApp(): Promise<void>;
     addTypeHandler(typeName: string, typeHandler : TypeHandlerIntf): void;

@@ -56,7 +56,7 @@ export class CreateNodeDlg extends DialogBase {
     }
 
     init = (): void => {
-        let node: I.NodeInfo = S.meta64.getHighlightedNode();
+        let node: J.NodeInfo = S.meta64.getHighlightedNode();
         if (node) {
             let canInsertInline: boolean = S.meta64.homeNodeId != node.id;
             this.inlineButton.setVisible(canInsertInline);

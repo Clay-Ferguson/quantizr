@@ -25,14 +25,14 @@ export interface NavIntf {
     geoLocation(): void;
     displayingHome(): boolean;
     parentVisibleToUser(): boolean;
-    upLevelResponse(res: I.RenderNodeResponse, id): void;
+    upLevelResponse(res: J.RenderNodeResponse, id): void;
     navUpLevel(): void;
     navOpenSelectedNode(): void;
     getSelectedDomElement(): HTMLElement;
     clickOnNodeRow(id: string): void;
     openNodeById(id: string, scrollToFirstChild: boolean): void;
     toggleNodeSel(selected: boolean, id: string): void;
-    navPageNodeResponse(res: I.RenderNodeResponse): void;
+    navPageNodeResponse(res: J.RenderNodeResponse): void;
     navHome(): void;
     navPublicHome(): void;
     showMainMenu(): void;

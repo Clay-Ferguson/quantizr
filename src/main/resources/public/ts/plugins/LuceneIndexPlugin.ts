@@ -21,7 +21,7 @@ export class LuceneIndexTypeHandler implements TypeHandlerIntf {
     constructor(private luceneIndexPlugin: LuceneIndexPlugin) {
     }
 
-    render = (node: I.NodeInfo, rowStyling: boolean): Comp => {
+    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
         let name = node.content;
 
         let vertLayout = new VerticalLayout([
@@ -43,11 +43,11 @@ export class LuceneIndexTypeHandler implements TypeHandlerIntf {
         return vertLayout;
     }
 
-    orderProps(node: I.NodeInfo, _props: I.PropertyInfo[]): I.PropertyInfo[] {
+    orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
         return _props;
     }
 
-    getIconClass(node: I.NodeInfo): string {
+    getIconClass(node: J.NodeInfo): string {
         //https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
         return "fa fa-binoculars fa-lg";
     }
@@ -64,24 +64,24 @@ export class LuceneIndexPlugin implements LuceneIndexPluginIntf {
         S.meta64.addTypeHandler("luceneIndex", this.luceneIndexTypeHandler);
     }
 
-    reindexNodeButton = (node: I.NodeInfo): void => {
+    reindexNodeButton = (node: J.NodeInfo): void => {
         let searchDir = S.props.getNodePropertyVal("searchDir", node);
         if (!searchDir) {
             alert("no searchDir property specified.");
             return;
         }
 
-        S.util.ajax<I.LuceneIndexRequest, I.LuceneIndexResponse>("luceneIndex", {
+        S.util.ajax<J.LuceneIndexRequest, J.LuceneIndexResponse>("luceneIndex", {
             "nodeId": node.id,
             "path": searchDir
         }, this.executeNodeResponse);
     }
 
-    search = (node: I.NodeInfo): void => {
+    search = (node: J.NodeInfo): void => {
         new SearchFileSystemDlg().open();
     }
 
-    private executeNodeResponse = (res: I.LuceneIndexResponse): void => {
+    private executeNodeResponse = (res: J.LuceneIndexResponse): void => {
         console.log("ExecuteNodeResponse running.");
 
         S.util.checkSuccess("Execute Node", res);

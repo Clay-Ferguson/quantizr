@@ -1,4 +1,5 @@
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { Comp } from "./widget/base/Comp";
 import { Button } from "./widget/Button";
 import { ButtonBar } from "./widget/ButtonBar";
@@ -7,7 +8,6 @@ import { Div } from "./widget/Div";
 import { Span } from "./widget/Span";
 import { Img } from "./widget/Img";
 import { Anchor } from "./widget/Anchor";
-import { Heading } from "./widget/Heading";
 import { Constants as cnst } from "./Constants";
 import { RenderIntf } from "./intf/RenderIntf";
 import { Singletons } from "./Singletons";
@@ -35,7 +35,7 @@ export class Render implements RenderIntf {
     //is most likely never wanted, because it's insecure in screen-share context, or when someone can see your screen for any reason.
     private immediateDecrypting: boolean = false;
 
-    private renderBinary = (node: I.NodeInfo): Comp => {
+    private renderBinary = (node: J.NodeInfo): Comp => {
         /*
          * If this is an image render the image directly onto the page as a visible image
          */
@@ -53,7 +53,7 @@ export class Render implements RenderIntf {
         }
     }
 
-    buildRowHeader = (node: I.NodeInfo, showPath: boolean, showName: boolean): Div => {
+    buildRowHeader = (node: J.NodeInfo, showPath: boolean, showName: boolean): Div => {
         let children = [];
 
         let priority = S.props.getNodePropertyVal("priority", node);
@@ -90,7 +90,7 @@ export class Render implements RenderIntf {
      * This is the function that renders each node in the main window. The rendering in here is very central to the
      * app and is what the user sees covering 90% of the screen most of the time. The *content* nodes.
      */
-    renderNodeContent = (node: I.NodeInfo, showPath, showName, renderBin, rowStyling, showHeader): Comp[] => {
+    renderNodeContent = (node: J.NodeInfo, showPath, showName, renderBin, rowStyling, showHeader): Comp[] => {
         //todo-3; bring back top right image support. disabling for now to simplify refactoring
         //let topRightImgTag = null; //this.getTopRightImageTag(node);
         //let ret: string = topRightImgTag ? topRightImgTag.render_Html() : "";
@@ -158,7 +158,7 @@ export class Render implements RenderIntf {
 
     /* Renders 'content' property as markdown. Note: rowStyling arg is not currently being used
     but will eventually be used again to tweak clazz, the way it originally was used for. */
-    renderMarkdown = (rowStyling: boolean, node: I.NodeInfo, retState: any): Comp => {
+    renderMarkdown = (rowStyling: boolean, node: J.NodeInfo, retState: any): Comp => {
         let content = node.content || "";
         retState.renderComplete = true;
 
@@ -210,15 +210,15 @@ export class Render implements RenderIntf {
         return div;
     }
 
-    renderRawMarkdown = (node: I.NodeInfo): string => {
+    renderRawMarkdown = (node: J.NodeInfo): string => {
         let content = node.content || "";
         let val = "";
 
         // Special case of a PRE-formatted node, we inject backticks to make it render all the content as preformatted markdown */
-        let preProp: I.PropertyInfo = S.props.getNodeProperty(cnst.PRE, node);
+        let preProp: J.PropertyInfo = S.props.getNodeProperty(cnst.PRE, node);
         if (preProp && preProp.value == "1") {
 
-            let nowrapProp: I.PropertyInfo = S.props.getNodeProperty(cnst.NOWRAP, node);
+            let nowrapProp: J.PropertyInfo = S.props.getNodeProperty(cnst.NOWRAP, node);
             let wordWrap = !(nowrapProp && nowrapProp.value == "1");
 
             if (!!content) {
@@ -351,7 +351,7 @@ export class Render implements RenderIntf {
      *
      * node is a NodeInfo.java JSON
      */
-    renderNodeAsListItem = (node: I.NodeInfo, index: number, count: number, rowCount: number, level: number, layoutClass: string): Comp => {
+    renderNodeAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, level: number, layoutClass: string): Comp => {
 
         let id: string = node.id;
         let prevPageExists: boolean = S.nav.mainOffset > 0;
@@ -380,7 +380,7 @@ export class Render implements RenderIntf {
          */
         // console.log("test: [" + parentIdToFocusIdMap[currentNodeId]
         // +"]==["+ node.id + "]")
-        let focusNode: I.NodeInfo = S.meta64.getHighlightedNode();
+        let focusNode: J.NodeInfo = S.meta64.getHighlightedNode();
         let selected: boolean = (focusNode && focusNode.id === id);
 
         let buttonBar: Comp = this.makeRowButtonBar(node, editingAllowed);
@@ -406,7 +406,7 @@ export class Render implements RenderIntf {
     }
 
     showNodeUrl = (): void => {
-        let node: I.NodeInfo = S.meta64.getHighlightedNode();
+        let node: J.NodeInfo = S.meta64.getHighlightedNode();
         if (!node) {
             S.util.showMessage("You must first click on a node.");
             return;
@@ -421,7 +421,7 @@ export class Render implements RenderIntf {
         S.util.showMessage(message, true);
     }
 
-    getTopRightImageTag = (node: I.NodeInfo): Img => {
+    getTopRightImageTag = (node: J.NodeInfo): Img => {
         let topRightImg: string = S.props.getNodePropertyVal("img.top.right", node);
         let topRightImgTag: Img;
         if (topRightImg) {
@@ -433,7 +433,7 @@ export class Render implements RenderIntf {
         return topRightImgTag;
     }
 
-    getNodeBkgImageStyle = (node: I.NodeInfo): string => {
+    getNodeBkgImageStyle = (node: J.NodeInfo): string => {
         let bkgImg: string = S.props.getNodePropertyVal('img.node.bkg', node);
         let bkgImgStyle: string = "";
         if (bkgImg) {
@@ -442,7 +442,7 @@ export class Render implements RenderIntf {
         return bkgImgStyle;
     }
 
-    makeRowButtonBar = (node: I.NodeInfo, editingAllowed: boolean): Comp => {
+    makeRowButtonBar = (node: J.NodeInfo, editingAllowed: boolean): Comp => {
         let typeIcon: Icon;
         let openButton: Button;
         let selButton: Checkbox;
@@ -573,7 +573,7 @@ export class Render implements RenderIntf {
      * Returns true if the nodeId (see makeNodeId()) NodeInfo object has 'hasChildren' true
      */
     nodeHasChildren = (id: string): boolean => {
-        var node: I.NodeInfo = S.meta64.idToNodeMap[id];
+        var node: J.NodeInfo = S.meta64.idToNodeMap[id];
         if (!node) {
             console.log("Unknown nodeId in nodeHasChildren: " + id);
             return false;
@@ -582,7 +582,7 @@ export class Render implements RenderIntf {
         }
     }
 
-    renderPageFromData = async (data?: I.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string): Promise<void> => {
+    renderPageFromData = async (data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string): Promise<void> => {
         //console.log("renderPageFromData(): scrollToTop="+scrollToTop);
 
         let elm = S.util.domElm("mainTab");
@@ -714,7 +714,7 @@ export class Render implements RenderIntf {
                         }
 
                         /* Construct Create Subnode Button */
-                        let focusNode: I.NodeInfo = S.meta64.getHighlightedNode();
+                        let focusNode: J.NodeInfo = S.meta64.getHighlightedNode();
                         let selected: boolean = focusNode && focusNode.id === id;
                         if (selected) {
                             console.log("selected: focusNode.uid=" + focusNode.id + " selected=" + selected);
@@ -827,7 +827,7 @@ export class Render implements RenderIntf {
         return promise;
     }
 
-    private renderChildren = (node: I.NodeInfo, newData: boolean, level: number): Comp => {
+    private renderChildren = (node: J.NodeInfo, newData: boolean, level: number): Comp => {
         if (!node || !node.children) return null;
 
         let childCount: number = node.children.length;
@@ -850,7 +850,7 @@ export class Render implements RenderIntf {
     }
 
     //todo-2: check background colord on vertical layout option also? or is that handled already?
-    renderTableLayout = (node: I.NodeInfo, newData: boolean, level: number, layout: string): Comp => {
+    renderTableLayout = (node: J.NodeInfo, newData: boolean, level: number, layout: string): Comp => {
         let tableDiv = new Div(null, { style: { display: 'table', className: 'node-grid', width: '100%' } });
         let curRow = new Div(null, { style: { display: 'table-row', className: 'node-grid-cell' } });
 
@@ -872,7 +872,7 @@ export class Render implements RenderIntf {
         let curCols = 0;
         for (let i = 0; i < node.children.length; i++) {
             let comps: Comp[] = [];
-            let n: I.NodeInfo = node.children[i];
+            let n: J.NodeInfo = node.children[i];
 
             if (!S.edit.nodesToMoveSet[n.id]) {
                 let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass);
@@ -907,14 +907,14 @@ export class Render implements RenderIntf {
         return tableDiv;
     }
 
-    renderVerticalLayout = (node: I.NodeInfo, newData: boolean, level: number): Comp => {
+    renderVerticalLayout = (node: J.NodeInfo, newData: boolean, level: number): Comp => {
         let layoutClass = "node-table-row";
         let childCount: number = node.children.length;
         let rowCount: number = 0;
 
         let comps: Comp[] = [];
         for (let i = 0; i < node.children.length; i++) {
-            let n: I.NodeInfo = node.children[i];
+            let n: J.NodeInfo = node.children[i];
             if (!S.edit.nodesToMoveSet[n.id]) {
                 let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass);
                 if (row) {
@@ -946,7 +946,7 @@ export class Render implements RenderIntf {
         S.view.lastPage();
     }
 
-    generateRow = (i: number, node: I.NodeInfo, newData: boolean, childCount: number, rowCount: number, level: number, layoutClass: string): Comp => {
+    generateRow = (i: number, node: J.NodeInfo, newData: boolean, childCount: number, rowCount: number, level: number, layoutClass: string): Comp => {
         if (newData) {
             S.meta64.initNode(node, true);
 
@@ -961,12 +961,12 @@ export class Render implements RenderIntf {
         return row;
     }
 
-    getUrlForNodeAttachment = (node: I.NodeInfo): string => {
+    getUrlForNodeAttachment = (node: J.NodeInfo): string => {
         //todo-1: Change to node.id and then re-test this
         return S.util.getRpcPath() + "bin/file-name" + node.binVer + "?nodeId=" + encodeURIComponent(node.id) + "&ver=" + node.binVer;
     }
 
-    makeImageTag = (node: I.NodeInfo): Img => {
+    makeImageTag = (node: J.NodeInfo): Img => {
         let src: string = this.getUrlForNodeAttachment(node);
 
         //NOTE: This property not working yet becasue we style img tags dynamically after created.

@@ -1,4 +1,5 @@
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants } from "./Constants";
@@ -11,15 +12,15 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class ActivityPub implements ActivityPubIntf {
 
     postNode = (): void => {
-        let node: I.NodeInfo = S.meta64.getHighlightedNode();
+        let node: J.NodeInfo = S.meta64.getHighlightedNode();
         if (node) {
-            S.util.ajax<I.ActivityPubPostRequest, I.ActivityPubPostResponse>("activityPubPost", {
+            S.util.ajax<J.ActivityPubPostRequest, J.ActivityPubPostResponse>("activityPubPost", {
                 "nodeId": node.id,
             }, this.activityPubPostResponse);
         }
     }
 
-    private activityPubPostResponse = (res: I.ActivityPubPostResponse): void => {
+    private activityPubPostResponse = (res: J.ActivityPubPostResponse): void => {
         //console.log("ExecuteNodeResponse running.");
 
         // S.util.checkSuccess("Execute Node", res);

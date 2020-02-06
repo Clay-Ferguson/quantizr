@@ -1,4 +1,5 @@
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { Constants as cnst } from "./Constants";
 import { Meta64Intf } from "./intf/Meta64Intf";
@@ -84,7 +85,7 @@ export class Meta64 implements Meta64Intf {
     treeDirty: boolean = false;
 
     /* maps node.id values to NodeInfo.java objects */
-    idToNodeMap: { [key: string]: I.NodeInfo } = {};
+    idToNodeMap: { [key: string]: J.NodeInfo } = {};
 
     /* counter for local uids */
     nextUid: number = 1;
@@ -96,7 +97,7 @@ export class Meta64 implements Meta64Intf {
      * selected node within that parent. Note this 'selection state' is only significant on the client, and only for
      * being able to scroll to the node during navigating around on the tree.
      */
-    parentIdToFocusNodeMap: { [key: string]: I.NodeInfo } = {};
+    parentIdToFocusNodeMap: { [key: string]: J.NodeInfo } = {};
 
     /*
      * toggled by button, and holds if we are going to show properties or not on each node in the main view
@@ -121,13 +122,13 @@ export class Meta64 implements Meta64Intf {
     expandedAbbrevNodeIds: any = {};
 
     /* RenderNodeResponse.java object */
-    currentNodeData: I.RenderNodeResponse = null;
+    currentNodeData: J.RenderNodeResponse = null;
 
     typeHandlers: { [key: string]: TypeHandlerIntf } = {};
 
     graphPanel: GraphPanel;
 
-    userPreferences: I.UserPreferences = {
+    userPreferences: J.UserPreferences = {
         "editMode": false,
         "importAllowed": false,
         "exportAllowed": false,
@@ -139,19 +140,19 @@ export class Meta64 implements Meta64Intf {
     }
 
     rebuildIndexes = (): void => {
-        S.util.ajax<I.RebuildIndexesRequest, I.RebuildIndexesResponse>("rebuildIndexes", {}, function (res: I.RebuildIndexesResponse) {
+        S.util.ajax<J.RebuildIndexesRequest, J.RebuildIndexesResponse>("rebuildIndexes", {}, function (res: J.RebuildIndexesResponse) {
             S.util.showMessage("Index rebuild complete.");
         });
     }
 
     shutdownServerNode = (): void => {
-        S.util.ajax<I.ShutdownServerNodeRequest, I.ShutdownServerNodeResponse>("shutdownServerNode", {}, function (res: I.ShutdownServerNodeResponse) {
+        S.util.ajax<J.ShutdownServerNodeRequest, J.ShutdownServerNodeResponse>("shutdownServerNode", {}, function (res: J.ShutdownServerNodeResponse) {
             S.util.showMessage("Server Node Shutdown initiated.");
         });
     }
 
     sendTestEmail = (): void => {
-        S.util.ajax<I.SendTestEmailRequest, I.SendTestEmailResponse>("sendTestEmail", {}, function (res: I.SendTestEmailResponse) {
+        S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail", {}, function (res: J.SendTestEmailResponse) {
             S.util.showMessage("Send Test Email Initiated.");
         });
     }
@@ -223,7 +224,7 @@ export class Meta64 implements Meta64Intf {
         }
 
         S.util.forEachProp(this.selectedNodes, (id, val): boolean => {
-            let node: I.NodeInfo = this.idToNodeMap[id];
+            let node: J.NodeInfo = this.idToNodeMap[id];
             if (!node) {
                 console.log("unable to find idToNodeMap for id=" + id);
             } else {
@@ -237,7 +238,7 @@ export class Meta64 implements Meta64Intf {
     /* return an object with properties for each NodeInfo where the key is the id */
     getSelectedNodesAsMapById = (): Object => {
         let ret: Object = {};
-        let selArray: I.NodeInfo[] = this.getSelectedNodesArray();
+        let selArray: J.NodeInfo[] = this.getSelectedNodesArray();
         if (!selArray || selArray.length == 0) {
             let highlightNode = this.getHighlightedNode();
             if (highlightNode) {
@@ -254,8 +255,8 @@ export class Meta64 implements Meta64Intf {
     }
 
     /* Gets selected nodes as NodeInfo.java objects array */
-    getSelectedNodesArray = (): I.NodeInfo[] => {
-        let selArray: I.NodeInfo[] = [];
+    getSelectedNodesArray = (): J.NodeInfo[] => {
+        let selArray: J.NodeInfo[] = [];
         S.util.forEachProp(this.selectedNodes, (id, val): boolean => {
             let node = this.idToNodeMap[id];
             if (node) {
@@ -281,25 +282,25 @@ export class Meta64 implements Meta64Intf {
     }
 
     //note: this code is not currently in use
-    updateNodeInfo = (node: I.NodeInfo) => {
-        S.util.ajax<I.GetNodePrivilegesRequest, I.GetNodePrivilegesResponse>("getNodePrivileges", {
+    updateNodeInfo = (node: J.NodeInfo) => {
+        S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             "nodeId": node.id,
             "includeAcl": false,
             "includeOwners": true
-        }, (res: I.GetNodePrivilegesResponse) => {
+        }, (res: J.GetNodePrivilegesResponse) => {
             //this.updateNodeInfoResponse(res, node);
         });
     }
 
-    getHighlightedNode = (): I.NodeInfo => {
+    getHighlightedNode = (): J.NodeInfo => {
         if (!this.currentNodeData || !this.currentNodeData.node) return null;
-        let ret: I.NodeInfo = this.parentIdToFocusNodeMap[this.currentNodeData.node.id];
+        let ret: J.NodeInfo = this.parentIdToFocusNodeMap[this.currentNodeData.node.id];
         return ret;
     }
 
     highlightRowById = async (id: string, scroll: boolean): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            let node: I.NodeInfo = this.idToNodeMap[id];
+            let node: J.NodeInfo = this.idToNodeMap[id];
             if (node) {
                 //console.log("highlightRowById calling highlightNode");
                 await this.highlightNode(node, scroll);
@@ -318,7 +319,7 @@ export class Meta64 implements Meta64Intf {
      * Important: We want this to be the only method that can set values on 'parentIdToFocusNodeMap', and always
      * setting that value should go thru this function.
      */
-    highlightNode = async (node: I.NodeInfo, scroll: boolean): Promise<void> => {
+    highlightNode = async (node: J.NodeInfo, scroll: boolean): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             //console.log("highlight node: " + node.id);
             if (!node) {
@@ -337,7 +338,7 @@ export class Meta64 implements Meta64Intf {
             let doneHighlighting: boolean = false;
 
             /* Unhighlight currently highlighted node if any */
-            let curHighlightedNode: I.NodeInfo = this.parentIdToFocusNodeMap[id];
+            let curHighlightedNode: J.NodeInfo = this.parentIdToFocusNodeMap[id];
             if (curHighlightedNode) {
                 //console.log("already had a highlighted node.");
                 if (curHighlightedNode.id === node.id) {
@@ -408,7 +409,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */
-    getSingleSelectedNode = (): I.NodeInfo => {
+    getSingleSelectedNode = (): J.NodeInfo => {
         let ret = null;
         S.util.forEachProp(this.selectedNodes, (id, val): boolean => {
             // console.log("found a single Sel NodeID: " + nodeId);
@@ -418,7 +419,7 @@ export class Meta64 implements Meta64Intf {
         return ret;
     }
 
-    getOrdinalOfNode = (node: I.NodeInfo): number => {
+    getOrdinalOfNode = (node: J.NodeInfo): number => {
         let ret = -1;
 
         if (!node || !this.currentNodeData || !this.currentNodeData.node.children)
@@ -443,12 +444,12 @@ export class Meta64 implements Meta64Intf {
         return this.currentNodeData.node.children.length;
     }
 
-    setCurrentNodeData = (data: I.RenderNodeResponse): void => {
+    setCurrentNodeData = (data: J.RenderNodeResponse): void => {
         this.currentNodeData = data;
     }
 
     // go ahead and make this async
-    anonPageLoadResponse = (res: I.AnonPageLoadResponse): void => {
+    anonPageLoadResponse = (res: J.AnonPageLoadResponse): void => {
 
         S.util.getElm("listView", async (elm: HTMLElement) => {
             if (res.renderNodeResponse) {
@@ -476,7 +477,7 @@ export class Meta64 implements Meta64Intf {
 
     removeBinaryById = (id: string): void => {
         if (!this.currentNodeData || !this.currentNodeData.node) return;
-        this.currentNodeData.node.children.forEach((node: I.NodeInfo) => {
+        this.currentNodeData.node.children.forEach((node: J.NodeInfo) => {
             if (node.id === id) {
                 node.hasBinary = false;
             }
@@ -487,7 +488,7 @@ export class Meta64 implements Meta64Intf {
      * updates client side maps and client-side identifier for new node, so that this node is 'recognized' by client
      * side code
      */
-    initNode = (node: I.NodeInfo, updateMaps?: boolean): void => {
+    initNode = (node: J.NodeInfo, updateMaps?: boolean): void => {
         if (!node) {
             console.log("initNode has null node");
             return;
@@ -728,9 +729,9 @@ export class Meta64 implements Meta64Intf {
                 // let data = (<any>event).originalEvent.dataTransfer.getData("text");
 
                 // /* Notify the server of this drop event. Everything about a drop is handled on the server */
-                // S.util.ajax<I.AppDropRequest, I.AppDropResponse>("appDrop", {
+                // S.util.ajax<J.AppDropRequest, J.AppDropResponse>("appDrop", {
                 //     "data": data
-                // }, (res: I.AppDropResponse) => {
+                // }, (res: J.AppDropResponse) => {
                 //     console.log("AppDrop: " + data);
                 //     new MessageDlg({ "message": res.message }).open();
                 // });
@@ -784,8 +785,8 @@ export class Meta64 implements Meta64Intf {
     }
 
     pingServer = () => {
-        S.util.ajax<I.PingRequest, I.PingResponse>("ping", {},
-            (res: I.PingResponse) => {
+        S.util.ajax<J.PingRequest, J.PingResponse>("ping", {},
+            (res: J.PingResponse) => {
                 console.log("Server Info: " + res.serverInfo);
             });
     }
@@ -834,18 +835,18 @@ export class Meta64 implements Meta64Intf {
 
     loadAnonPageHome = (): void => {
         console.log("loadAnonPageHome()");
-        S.util.ajax<I.AnonPageLoadRequest, I.AnonPageLoadResponse>("anonPageLoad", {
+        S.util.ajax<J.AnonPageLoadRequest, J.AnonPageLoadResponse>("anonPageLoad", {
         }, this.anonPageLoadResponse);
     }
 
     saveUserPreferences = (): void => {
-        S.util.ajax<I.SaveUserPreferencesRequest, I.SaveUserPreferencesResponse>("saveUserPreferences", {
+        S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
             "userPreferences": this.userPreferences
         });
     }
 
     openSystemFile = (fileName: string) => {
-        S.util.ajax<I.OpenSystemFileRequest, I.OpenSystemFileResponse>("openSystemFile", {
+        S.util.ajax<J.OpenSystemFileRequest, J.OpenSystemFileResponse>("openSystemFile", {
             "fileName": fileName
         });
     }

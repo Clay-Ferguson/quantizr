@@ -1,4 +1,5 @@
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants } from "./Constants";
@@ -17,13 +18,12 @@ declare var PROFILE;
 export class View implements ViewIntf {
 
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
-    compareNodeA: I.NodeInfo;
 
     /*
      * newId is optional parameter which, if supplied, should be the id we scroll to when finally done with the
      * render.
      */
-    refreshTreeResponse = async (res?: I.RenderNodeResponse, targetId?: any, scrollToTop?: boolean): Promise<void> => {
+    refreshTreeResponse = async (res?: J.RenderNodeResponse, targetId?: any, scrollToTop?: boolean): Promise<void> => {
         //console.log("refreshTreeResponse: "+S.util.prettyPrint(res));
         await S.render.renderPageFromData(res, scrollToTop, targetId);
         S.util.delayedFocus("mainNodeContent");
@@ -43,7 +43,7 @@ export class View implements ViewIntf {
 
         console.log("Refreshing tree: nodeId=" + nodeId);
         if (!highlightId) {
-            let currentSelNode: I.NodeInfo = S.meta64.getHighlightedNode();
+            let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode();
             highlightId = currentSelNode != null ? currentSelNode.id : nodeId;
         }
 
@@ -52,7 +52,7 @@ export class View implements ViewIntf {
         as a hint for the future.
         nav.mainOffset = 0;
         */
-        S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
+        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             "nodeId": nodeId,
             "upLevel": null,
             "siblingOffset": 0,
@@ -60,7 +60,7 @@ export class View implements ViewIntf {
             "offset": S.nav.mainOffset,
             "goToLastPage": false,
             "forceIPFSRefresh": forceIPFSRefresh
-        }, (res: I.RenderNodeResponse) => {
+        }, (res: J.RenderNodeResponse) => {
             if (res.offsetOfNodeFound > -1) {
                 S.nav.mainOffset = res.offsetOfNodeFound;
             }
@@ -96,14 +96,15 @@ export class View implements ViewIntf {
     }
 
     private loadPage = (goToLastPage: boolean): void => {
-        S.util.ajax<I.RenderNodeRequest, I.RenderNodeResponse>("renderNode", {
+        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             "nodeId": S.meta64.currentNodeData.node.id,
             "upLevel": null,
             "siblingOffset": 0,
             "renderParentIfLeaf": true,
             "offset": S.nav.mainOffset,
-            "goToLastPage": goToLastPage
-        }, (res: I.RenderNodeResponse) => {
+            "goToLastPage": goToLastPage,
+            "forceIPFSRefresh": false
+        }, (res: J.RenderNodeResponse) => {
             if (goToLastPage) {
                 if (res.offsetOfNodeFound > -1) {
                     S.nav.mainOffset = res.offsetOfNodeFound;
@@ -115,7 +116,7 @@ export class View implements ViewIntf {
 
     //todo-1: need to add logic to detect if this is root node on the page, and if so, we consider the first child the target
     scrollRelativeToNode = (dir: string) => {
-        let currentSelNode: I.NodeInfo = S.meta64.getHighlightedNode();
+        let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode();
         if (!currentSelNode) return;
 
         //First detect if page root node is selected, before doing a child search
@@ -134,7 +135,7 @@ export class View implements ViewIntf {
             let prevChild = null;
             let nodeFound = false;
             let done = false;
-            S.meta64.currentNodeData.node.children.forEach((child: I.NodeInfo) => {
+            S.meta64.currentNodeData.node.children.forEach((child: J.NodeInfo) => {
                 if (done) return;
 
                 if (nodeFound && dir === "down") {
@@ -168,7 +169,7 @@ export class View implements ViewIntf {
                     /* Check to see if we are rendering the top node (page root), and if so
                     it is better looking to just scroll to zero index, because that will always
                     be what user wants to see */
-                    let currentSelNode: I.NodeInfo = S.meta64.getHighlightedNode();
+                    let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode();
                     if (currentSelNode && S.meta64.currentNodeData.node.id == currentSelNode.id) {
                         this.docElm.scrollTop = 0;
                         return;
@@ -207,7 +208,7 @@ export class View implements ViewIntf {
         });
     }
 
-    getPathDisplay = (node: I.NodeInfo): string => {
+    getPathDisplay = (node: J.NodeInfo): string => {
         if (node == null) return "";
 
         var path = "ID: " + node.id;
@@ -240,11 +241,11 @@ export class View implements ViewIntf {
     runServerCommand = (command: string) => {
         let node = S.meta64.getHighlightedNode();
 
-        S.util.ajax<I.GetServerInfoRequest, I.GetServerInfoResponse>("getServerInfo", {
+        S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
             "command": command,
             "nodeId": !!node ? node.id : null
         },
-            (res: I.GetServerInfoResponse) => {
+            (res: J.GetServerInfoResponse) => {
                 /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
                 there are other commands that exist also */
                 if (command == "getServerInfo") {
@@ -258,42 +259,14 @@ export class View implements ViewIntf {
     displayNotifications = (command: string) => {
         let node = S.meta64.getHighlightedNode();
 
-        S.util.ajax<I.GetServerInfoRequest, I.GetServerInfoResponse>("getNotifications", {
+        S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getNotifications", {
             "command": command,
             "nodeId": !!node ? node.id : null
         },
-            (res: I.GetServerInfoResponse) => {
+            (res: J.GetServerInfoResponse) => {
                 if (res.serverInfo) {
                     S.util.showMessage(res.serverInfo, false);
                 }
             });
-    }
-
-    setCompareNodeA = () => {
-        this.compareNodeA = S.meta64.getHighlightedNode();
-    }
-
-    compareAsBtoA = () => {
-        let nodeB = S.meta64.getHighlightedNode();
-        if (nodeB) {
-            if (this.compareNodeA.id && nodeB.id) {
-                S.util.ajax<I.CompareSubGraphRequest, I.CompareSubGraphResponse>("compareSubGraphs", //
-                    { "nodeIdA": this.compareNodeA.id, "nodeIdB": nodeB.id }, //
-                    (res: I.CompareSubGraphResponse) => {
-                        S.util.showMessage(res.compareInfo);
-                    });
-            }
-        }
-    }
-
-    processNodeHashes = (verify: boolean) => {
-        let node = S.meta64.getHighlightedNode();
-        if (node) {
-            let nodeId: string = node.id;
-            S.util.ajax<I.GenerateNodeHashRequest, I.GenerateNodeHashResponse>("generateNodeHash", { "nodeId": nodeId, "verify": verify },
-                (res: I.GenerateNodeHashResponse) => {
-                    S.util.showMessage(res.hashInfo);
-                });
-        }
     }
 }

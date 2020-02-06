@@ -65,13 +65,13 @@ export class SearchFileSystemDlg extends DialogBase {
 
         SearchFileSystemDlg.defaultSearchText = searchText;
 
-        S.util.ajax<I.LuceneSearchRequest, I.LuceneSearchResponse>("luceneSearch", {
+        S.util.ajax<J.LuceneSearchRequest, J.LuceneSearchResponse>("luceneSearch", {
             "nodeId": node.id,
             "text": searchText
         }, this.searchNodesResponse);
     }
 
-    searchNodesResponse = (res: I.NodeSearchResponse) => {
+    searchNodesResponse = (res: J.NodeSearchResponse) => {
         S.util.showMessage(res.message, true, "modal-lg");
         this.close();
     }

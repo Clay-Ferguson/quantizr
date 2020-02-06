@@ -3,13 +3,13 @@ import * as J from "../JavaIntf";
 import { PropTable } from "../widget/PropTable";
 
 export interface PropsIntf {
-    orderProps(propOrder: string[], _props: I.PropertyInfo[]): I.PropertyInfo[];
-    moveNodePosition(props: I.PropertyInfo[], idx: number, typeName: string): number;
+    orderProps(propOrder: string[], _props: J.PropertyInfo[]): J.PropertyInfo[];
+    moveNodePosition(props: J.PropertyInfo[], idx: number, typeName: string): number;
     propsToggle(): void;
-    deleteProperty(node: I.NodeInfo, propertyName : string): void;
-    getPropertiesInEditingOrder(node: I.NodeInfo, _props: I.PropertyInfo[]): I.PropertyInfo[];
-    renderProperties(properties : I.PropertyInfo[]): PropTable;
-    getNodeProperty(propertyName: string, node: I.NodeInfo): I.PropertyInfo;
-    getNodePropertyVal(propertyName : string, node: I.NodeInfo): string;
-    setNodePropertyVal(propertyName : string, node: I.NodeInfo, val: string): void;
+    deleteProperty(node: J.NodeInfo, propertyName : string): void;
+    getPropertiesInEditingOrder(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[];
+    renderProperties(properties : J.PropertyInfo[]): PropTable;
+    getNodeProperty(propertyName: string, node: J.NodeInfo): J.PropertyInfo;
+    getNodePropertyVal(propertyName : string, node: J.NodeInfo): string;
+    setNodePropertyVal(propertyName : string, node: J.NodeInfo, val: string): void;
 }

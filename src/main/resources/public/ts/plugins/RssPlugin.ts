@@ -28,15 +28,15 @@ class RssTypeHandler implements TypeHandlerIntf {
     constructor(private rssPlugin: RssPlugin) {
     }
 
-    render = (node: I.NodeInfo, rowStyling: boolean): Comp => {
+    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
         return this.rssPlugin.renderFeedNode(node, rowStyling);
     }
 
-    orderProps(node: I.NodeInfo, _props: I.PropertyInfo[]): I.PropertyInfo[] {
+    orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
         return _props;
     }
 
-    getIconClass(node: I.NodeInfo): string {
+    getIconClass(node: J.NodeInfo): string {
         return null;
     }
 
@@ -61,7 +61,7 @@ export class RssPlugin implements RssPluginIntf {
         S.meta64.addTypeHandler("sn:rssfeed", this.rssTypeHandler);
     }
 
-    renderFeedNode = (node: I.NodeInfo, rowStyling: boolean): Comp => {
+    renderFeedNode = (node: J.NodeInfo, rowStyling: boolean): Comp => {
 
         let feedSrc: string = S.props.getNodePropertyVal("sn:rssFeedSrc", node);
         if (!feedSrc) {

@@ -16,12 +16,12 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class User implements UserIntf {
 
-    private logoutResponse = (res: I.LogoutResponse): void => {
+    private logoutResponse = (res: J.LogoutResponse): void => {
         /* reloads browser with the query parameters stripped off the path */
         window.location.href = window.location.origin;
     }
 
-    closeAccountResponse = (res: I.CloseAccountResponse): void => {
+    closeAccountResponse = (res: J.CloseAccountResponse): void => {
         /* Remove warning dialog to ask user about leaving the page */
         window.onbeforeunload = null;
 
@@ -35,7 +35,7 @@ export class User implements UserIntf {
                 new ConfirmDlg("Your data will be deleted and can never be recovered.<p> Are you sure?", "Last Chance... One more Click",
                     () => {
                         this.deleteAllUserLocalDbEntries();
-                        S.util.ajax<I.CloseAccountRequest, I.CloseAccountResponse>("closeAccount", {}, this.closeAccountResponse);
+                        S.util.ajax<J.CloseAccountRequest, J.CloseAccountResponse>("closeAccount", {}, this.closeAccountResponse);
                     }
                 ).open();
             }
@@ -140,7 +140,7 @@ export class User implements UserIntf {
                     S.meta64.loadAnonPageHome();
                 } else {
                     //alert('calling login: currently at: '+location.href);
-                    S.util.ajax<I.LoginRequest, J.LoginResponse>("login", {
+                    S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
                         "userName": callUsr,
                         "password": callPwd,
                         "tzOffset": new Date().getTimezoneOffset(),
@@ -174,7 +174,7 @@ export class User implements UserIntf {
                     await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
                 }
 
-                S.util.ajax<I.LogoutRequest, I.LogoutResponse>("logout", {}, this.logoutResponse);
+                S.util.ajax<J.LogoutRequest, J.LogoutResponse>("logout", {}, this.logoutResponse);
             }
             //todo-1: everywhere in the app that I have a resolve() that isn't in a finally block needs to be checked for correctness.
             finally {
@@ -184,7 +184,7 @@ export class User implements UserIntf {
     }
 
     login = (loginDlg: any, usr: string, pwd: string) => {
-        S.util.ajax<I.LoginRequest, J.LoginResponse>("login", {
+        S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
             "userName": usr,
             "password": pwd,
             "tzOffset": new Date().getTimezoneOffset(),

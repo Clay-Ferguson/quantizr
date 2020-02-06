@@ -1,4 +1,5 @@
 import * as I from "./Interfaces";
+import * as J from "./JavaIntf";
 import { PropTable } from "./widget/PropTable";
 import { PropTableRow } from "./widget/PropTableRow";
 import { PropTableCell } from "./widget/PropTableCell";
@@ -16,8 +17,8 @@ PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class Props implements PropsIntf {
 
-    orderProps = (propOrder: string[], _props: I.PropertyInfo[]): I.PropertyInfo[] => {
-        let propsNew: I.PropertyInfo[] = S.util.arrayClone(_props);
+    orderProps = (propOrder: string[], _props: J.PropertyInfo[]): J.PropertyInfo[] => {
+        let propsNew: J.PropertyInfo[] = S.util.arrayClone(_props);
         let targetIdx: number = 0;
 
         for (let prop of propOrder) {
@@ -27,7 +28,7 @@ export class Props implements PropsIntf {
         return propsNew;
     }
 
-    moveNodePosition = (props: I.PropertyInfo[], idx: number, typeName: string): number => {
+    moveNodePosition = (props: J.PropertyInfo[], idx: number, typeName: string): number => {
         let tagIdx: number = S.util.arrayIndexOfItemByProp(props, "name", typeName);
         if (tagIdx != -1) {
             S.util.arrayMoveItem(props, tagIdx, idx++);
@@ -43,7 +44,7 @@ export class Props implements PropsIntf {
         await S.render.renderPageFromData();
     }
 
-    deleteProperty = (node: I.NodeInfo, propertyName: string): void => {
+    deleteProperty = (node: J.NodeInfo, propertyName: string): void => {
         if (node.properties) {
             for (let i = 0; i < node.properties.length; i++) {
                 if (propertyName === node.properties[i].name) {
@@ -58,13 +59,13 @@ export class Props implements PropsIntf {
     /*
      * Sorts props input array into the proper order to show for editing. 
      */
-    getPropertiesInEditingOrder = (node: I.NodeInfo, _props: I.PropertyInfo[]): I.PropertyInfo[] => {
+    getPropertiesInEditingOrder = (node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] => {
         let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[node.type];
         if (typeHandler) {
             return typeHandler.orderProps(node, _props);
         }
         else {
-            //let propsNew: I.PropertyInfo[] = S.util.arrayClone(_props);
+            //let propsNew: J.PropertyInfo[] = S.util.arrayClone(_props);
             //this.movePropsToTop([cnst.CONTENT, cnst.TAGS], propsNew);
             //this.movePropsToEnd([jcrCnst.CREATED, jcrCnst.OWNER, jcrCnst.LAST_MODIFIED], propsNew);
             //return propsNew;
@@ -73,7 +74,7 @@ export class Props implements PropsIntf {
     }
 
     /* Moves all the properties listed in propList array to the end of the list of properties and keeps them in the order specified */
-    private movePropsToTop = (propsList: string[], props: I.PropertyInfo[]) => {
+    private movePropsToTop = (propsList: string[], props: J.PropertyInfo[]) => {
         for (let prop of propsList) {
             let tagIdx = S.util.arrayIndexOfItemByProp(props, "name", prop);
             if (tagIdx != -1) {
@@ -83,7 +84,7 @@ export class Props implements PropsIntf {
     }
 
     /* Moves all the properties listed in propList array to the end of the list of properties and keeps them in the order specified */
-    private movePropsToEnd = (propsList: string[], props: I.PropertyInfo[]) => {
+    private movePropsToEnd = (propsList: string[], props: J.PropertyInfo[]) => {
         for (let prop of propsList) {
             let tagIdx = S.util.arrayIndexOfItemByProp(props, "name", prop);
             if (tagIdx != -1) {
@@ -95,7 +96,7 @@ export class Props implements PropsIntf {
     /*
      * properties will be null or a list of PropertyInfo objects.
      */
-    renderProperties = (properties: I.PropertyInfo[]): PropTable => {
+    renderProperties = (properties: J.PropertyInfo[]): PropTable => {
         if (properties) {
             let propTable = new PropTable({
                 "border": "1",
@@ -103,7 +104,7 @@ export class Props implements PropsIntf {
                 // "sourceClass" : "[propsTable]"
             });
 
-            properties.forEach((property: I.PropertyInfo) => {
+            properties.forEach((property: J.PropertyInfo) => {
                 //console.log("Render Prop: "+property.name);
                 if (S.render.allowPropertyToDisplay(property.name)) {
                     var isBinaryProp = S.render.isBinaryProperty(property.name);
@@ -143,12 +144,12 @@ export class Props implements PropsIntf {
      * brute force searches on node (NodeInfo.java) object properties list, and returns the first property
      * (PropertyInfo.java) with name matching propertyName, else null.
      */
-    getNodeProperty = (propertyName: string, node: I.NodeInfo): I.PropertyInfo => {
+    getNodeProperty = (propertyName: string, node: J.NodeInfo): J.PropertyInfo => {
         if (!node || !node.properties)
             return null;
 
         for (var i = 0; i < node.properties.length; i++) {
-            let prop: I.PropertyInfo = node.properties[i];
+            let prop: J.PropertyInfo = node.properties[i];
             if (prop.name === propertyName) {
                 return prop;
             }
@@ -156,16 +157,16 @@ export class Props implements PropsIntf {
         return null;
     }
 
-    getNodePropertyVal = (propertyName: string, node: I.NodeInfo): string => {
-        let prop: I.PropertyInfo = this.getNodeProperty(propertyName, node);
+    getNodePropertyVal = (propertyName: string, node: J.NodeInfo): string => {
+        let prop: J.PropertyInfo = this.getNodeProperty(propertyName, node);
         return prop ? prop.value : null;
     }
 
     /**
      * Sets property value and returns true only if the value has changed
      */
-    setNodePropertyVal = (propertyName: string, node: I.NodeInfo, val: string): void => {
-        let prop: I.PropertyInfo = this.getNodeProperty(propertyName, node);
+    setNodePropertyVal = (propertyName: string, node: J.NodeInfo, val: string): void => {
+        let prop: J.PropertyInfo = this.getNodeProperty(propertyName, node);
 
         /* If we found a property by propertyName, then set it's value */
         if (prop != null) {
@@ -188,7 +189,7 @@ export class Props implements PropsIntf {
     //  * Returns trus if this is a node the current user doesn't own. Used to disable "edit", "delete",
     //  * etc. on the GUI.
     //  */
-    // isNonOwnedNode = (node: I.NodeInfo): boolean => {
+    // isNonOwnedNode = (node: J.NodeInfo): boolean => {
     //     let owner: string = node.owner;
 
     //     // if we don't know who owns this node assume the admin owns it.
