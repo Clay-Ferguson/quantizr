@@ -6,12 +6,12 @@ import { Button } from "../widget/Button";
 import { Div } from "../widget/Div";
 import { Textarea } from "../widget/Textarea";
 import { PubSub } from "../PubSub";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { TextField } from "../widget/TextField";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 

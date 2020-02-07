@@ -10,11 +10,11 @@ import { RadioButtonGroup } from "../widget/RadioButtonGroup";
 import { Anchor } from "../widget/Anchor";
 import { VerticalLayout } from "../widget/VerticalLayout";
 import { PubSub } from "../PubSub";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 

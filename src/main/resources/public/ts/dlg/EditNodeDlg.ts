@@ -11,11 +11,10 @@ import { Div } from "../widget/Div";
 import { Checkbox } from "../widget/Checkbox";
 import { EditPropsTable } from "../widget/EditPropsTable";
 import { EditPropsTableRow } from "../widget/EditPropsTableRow";
-import { Constants as cnst } from "../Constants";
+import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
-import { Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { AceEditPropTextarea } from "../widget/AceEditPropTextarea";
@@ -29,7 +28,7 @@ import { Comp } from "../widget/base/Comp";
 import { Textarea } from "../widget/Textarea";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
@@ -60,7 +59,6 @@ export class EditNodeDlg extends DialogBase {
     createAtTop: boolean;
 
     nodeNameTextField: TextField;
-    enableAce: boolean = false;
     contentEditor: I.TextEditorIntf;
 
     encryptionOptions: EncryptionOptions = new EncryptionOptions();
@@ -164,12 +162,12 @@ export class EditNodeDlg extends DialogBase {
         scanning the properties. This is by design, and not a mistake */
         if (editOrderedProps) {
             editOrderedProps.forEach((prop: J.PropertyInfo) => {
-                if (prop.name == cnst.PRE) {
+                if (prop.name == C.PRE) {
                     isPre = true;
                     return;
                 }
 
-                if (prop.name == cnst.NOWRAP) {
+                if (prop.name == C.NOWRAP) {
                     isWordWrap = false;
                     return;
                 }
@@ -187,8 +185,7 @@ export class EditNodeDlg extends DialogBase {
 
         /* If not preformatted text, then always turn on word-wrap because for now at least this means the content
         will be in markdown mode, and we definitely want wordwrap on for markdown editing */
-        if (this.enableAce) {
-            //todo-0: this needs to be revisited with enableAce turned on.
+        if (C.ENABLE_ACE_EDITOR) {
             if (!isPre) {
                 isWordWrap = true;
             }
@@ -400,9 +397,9 @@ export class EditNodeDlg extends DialogBase {
             let handled = {};
 
             if (this.node) {
-                this.saveCheckboxVal(this.preformattedCheckBox, saveList, handled, cnst.PRE);
+                this.saveCheckboxVal(this.preformattedCheckBox, saveList, handled, C.PRE);
                 this.saveCheckboxVal(this.inlineChildrenCheckBox, saveList, handled, "inlineChildren");
-                this.saveCheckboxVal(this.wordWrapCheckBox, saveList, handled, cnst.NOWRAP, true);
+                this.saveCheckboxVal(this.wordWrapCheckBox, saveList, handled, C.NOWRAP, true);
 
                 /* Get state of the 'layout' dropdown */
                 let layout = this.layoutSelection.getSelection();
@@ -540,7 +537,7 @@ export class EditNodeDlg extends DialogBase {
             let multiLine = false;
 
             if (multiLine) {
-                if (this.enableAce) {
+                if (C.ENABLE_ACE_EDITOR) {
                     editor = new AceEditPropTextarea(propEntry.property.value, "25em", false, false);
                 }
                 else {
@@ -571,7 +568,7 @@ export class EditNodeDlg extends DialogBase {
         value = S.util.escapeForAttrib(value);
         //console.log("making field editor for [" + propName + "] val[" + value + "]");
 
-        if (this.enableAce) {
+        if (C.ENABLE_ACE_EDITOR) {
             this.contentEditor = new AceEditPropTextarea(encrypted ? "[encrypted]" : value, "25em", isPre, isWordWrap);
 
             this.contentEditor.whenElm((elm: HTMLElement) => {

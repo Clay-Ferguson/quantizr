@@ -17,8 +17,7 @@ public class PropertyInfo {
 	public PropertyInfo() {
 	}
 
-	//todo-0: remove abbreviated
-	public PropertyInfo(String name, String value, boolean abbreviated) {
+	public PropertyInfo(String name, String value) {
 		this.name = name;
 		this.value = value;
 	}

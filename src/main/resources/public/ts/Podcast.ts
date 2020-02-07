@@ -4,10 +4,10 @@ import * as J from "./JavaIntf";
 import { PodcastIntf } from "./intf/PodcastIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
+import { Constants as C} from "./Constants";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 

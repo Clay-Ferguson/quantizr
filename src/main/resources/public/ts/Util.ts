@@ -8,11 +8,11 @@ import * as J from "./JavaIntf";
 import { UtilIntf } from "./intf/UtilIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
+import { Constants as C} from "./Constants";
 import axios, { AxiosRequestConfig } from 'axios';
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 

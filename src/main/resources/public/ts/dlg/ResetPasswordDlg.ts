@@ -6,13 +6,13 @@ import { TextField } from "../widget/TextField";
 import { TextContent} from "../widget/TextContent";
 import { UtilIntf as Util } from "../intf/UtilIntf";
 import { PubSub } from "../PubSub";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { DialogBase } from "../DialogBase";
 
 let util: Util;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     util = ctx.util;
 });
 

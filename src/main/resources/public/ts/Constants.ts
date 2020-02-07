@@ -1,5 +1,20 @@
 export class Constants {
 
+    /* Feature Flags */
+    /* ======================================================================== */
+    static readonly ENABLE_ACE_EDITOR: boolean = false;
+    static readonly INSERT_ATTACHMENT: string = "{{insert-attachment}}";
+    static readonly NEW_ON_TOOLBAR: boolean = true;
+    static readonly INS_ON_TOOLBAR: boolean = false;
+    static readonly MOVE_UPDOWN_ON_TOOLBAR: boolean = true;
+
+    /* showing path on rows just wastes space for ordinary users. Not really needed */
+    static readonly SHOW_PATH_IN_DLGS: boolean = true;
+
+    static readonly SHOW_CLEAR_BUTTON_IN_EDITOR: boolean = false;
+
+    /* ======================================================================== */
+
     static readonly PUBSUB_SingletonsReady = "pubsub-singletons-ready";
 
     static readonly LOCALDB_LOGIN_USR: string = "loginUsr";
@@ -15,16 +30,6 @@ export class Constants {
     static readonly LOCALDB_LAST_PARENT_NODEID: string = "lastParentId";
     static readonly LOCALDB_LAST_CHILD_NODEID: string = "lastChildId";
 
-    static readonly INSERT_ATTACHMENT: string = "{{insert-attachment}}";
-    static readonly NEW_ON_TOOLBAR: boolean = true;
-    static readonly INS_ON_TOOLBAR: boolean = false;
-    static readonly MOVE_UPDOWN_ON_TOOLBAR: boolean = true;
-
-    /* showing path on rows just wastes space for ordinary users. Not really needed */
-    static readonly SHOW_PATH_IN_DLGS: boolean = true;
-
-    static readonly SHOW_CLEAR_BUTTON_IN_EDITOR: boolean = false;
-
     static readonly ATT_MAX_WIDTH: string = "att-max-width";
     static readonly PRIMARY_TYPE: string = "sn:primaryType";
 
@@ -32,8 +37,8 @@ export class Constants {
     static readonly EMAIL_RECIP: string = "sn:recip";
     static readonly EMAIL_SUBJECT: string = "sn:subject";
 
-    static readonly IPFS_NODE: string = "sn:ipfsNode"; 
-    
+    static readonly IPFS_NODE: string = "sn:ipfsNode";
+
     //This is for bash script names to whow up when browing on the tree
     static readonly NAME: string = "sn:name";
     static readonly FILE_NAME: string = "sn:fileName";
@@ -42,7 +47,7 @@ export class Constants {
     static readonly JSON_FILE_SEARCH_RESULT: string = "sn:json";
     static readonly PRE: string = "sn:pre";
     static readonly NOWRAP: string = "sn:nowrap";
-    
+
     static readonly EMAIL: string = "sn:email";
     static readonly CODE: string = "sn:code";
 
@@ -50,7 +55,7 @@ export class Constants {
     static readonly BIN_DATA: string = "sn:jcrData";
     static readonly BIN_MIME: string = "sn::mimeType";
 
-    //todo-0: should this be "sn:" prefixed?
+    //todo-1: should this be "sn:" prefixed?
     static readonly BIN: string = "bin";
 
     static readonly IMG_WIDTH: string = "sn:imgWidth";

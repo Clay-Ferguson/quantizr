@@ -1,15 +1,14 @@
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
-import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { AttachmentIntf } from "./intf/AttachmentIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
+import { Constants as C } from "./Constants";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 

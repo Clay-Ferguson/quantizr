@@ -5,12 +5,12 @@ import { Button } from "../widget/Button";
 import { TextContent } from "../widget/TextContent";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 
 let S : Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
@@ -32,7 +32,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         
         this.setChildren([
             new Form(null, [
-                Constants.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.attachment.uploadNode.id) : null,
+                C.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.attachment.uploadNode.id) : null,
                 this.dropzoneDiv = new Div("", {className: "dropzone"}),
                 this.hiddenInputContainer = new Div(null, { style: {display: "none"} }),
                 new ButtonBar([

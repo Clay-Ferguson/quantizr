@@ -3,7 +3,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
@@ -12,7 +12,7 @@ import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
 //      npm install vis-network
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 

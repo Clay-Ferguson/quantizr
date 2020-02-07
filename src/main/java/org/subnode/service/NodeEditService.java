@@ -163,7 +163,7 @@ public class NodeEditService {
 		node.setProp(req.getPropertyName(), req.getPropertyValue());
 		api.save(session, node);
 
-		PropertyInfo propertySaved = new PropertyInfo(req.getPropertyName(), req.getPropertyValue(), false);
+		PropertyInfo propertySaved = new PropertyInfo(req.getPropertyName(), req.getPropertyValue());
 		res.setPropertySaved(propertySaved);
 		res.setSuccess(true);
 	}

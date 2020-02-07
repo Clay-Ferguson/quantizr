@@ -1,4 +1,3 @@
-import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { Comp } from "./widget/base/Comp";
 import { Button } from "./widget/Button";
@@ -8,11 +7,10 @@ import { Div } from "./widget/Div";
 import { Span } from "./widget/Span";
 import { Img } from "./widget/Img";
 import { Anchor } from "./widget/Anchor";
-import { Constants as cnst } from "./Constants";
+import { Constants as C } from "./Constants";
 import { RenderIntf } from "./intf/RenderIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
 import * as marked from 'marked';
 import * as highlightjs from 'highlightjs';
 import { Icon } from "./widget/Icon";
@@ -21,7 +19,7 @@ import { MarkdownDiv } from "./widget/MarkdownDiv";
 import { HorizontalLayout } from "./widget/HorizontalLayout";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
@@ -215,10 +213,10 @@ export class Render implements RenderIntf {
         let val = "";
 
         // Special case of a PRE-formatted node, we inject backticks to make it render all the content as preformatted markdown */
-        let preProp: J.PropertyInfo = S.props.getNodeProperty(cnst.PRE, node);
+        let preProp: J.PropertyInfo = S.props.getNodeProperty(C.PRE, node);
         if (preProp && preProp.value == "1") {
 
-            let nowrapProp: J.PropertyInfo = S.props.getNodeProperty(cnst.NOWRAP, node);
+            let nowrapProp: J.PropertyInfo = S.props.getNodeProperty(C.NOWRAP, node);
             let wordWrap = !(nowrapProp && nowrapProp.value == "1");
 
             if (!!content) {
@@ -467,7 +465,7 @@ export class Render implements RenderIntf {
             }
         }
 
-        //todo-0: rename this to sn:inlineChildren
+        //todo-1: rename this to sn:inlineChildren
         let isInlineChildren = !!S.props.getNodePropertyVal("inlineChildren", node);
 
         /* Construct Open Button.
@@ -506,11 +504,11 @@ export class Render implements RenderIntf {
                 insertAllowed = typeHandler.allowAction("insert");
             }
 
-            if (cnst.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node)) {
+            if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node)) {
                 createSubNodeButton = new Button("New", () => { S.edit.createSubNode(node.id, null, true); });
             }
 
-            if (cnst.INS_ON_TOOLBAR) {
+            if (C.INS_ON_TOOLBAR) {
                 insertNodeButton = new Button("Ins", () => { S.edit.insertNode(node.id); });
             }
 
@@ -519,7 +517,7 @@ export class Render implements RenderIntf {
                     "iconclass": "fa fa-edit fa-lg"
                 });
 
-                if (cnst.MOVE_UPDOWN_ON_TOOLBAR) {
+                if (C.MOVE_UPDOWN_ON_TOOLBAR) {
 
                     if (!node.firstChild) {
                         moveNodeUpButton = new Button(null, () => { S.edit.moveNodeUp(node.id); }, {
@@ -599,8 +597,8 @@ export class Render implements RenderIntf {
                 try {
                     //console.log("Setting lastNode="+data.node.id);
                     if (data && data.node) {
-                        S.localDB.setVal(Constants.LOCALDB_LAST_PARENT_NODEID, data.node.id);
-                        S.localDB.setVal(Constants.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
+                        S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, data.node.id);
+                        S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
                     }
 
                     let newData: boolean = false;
@@ -675,7 +673,7 @@ export class Render implements RenderIntf {
                             insertAllowed = typeHandler.allowAction("insert");
                         }
 
-                        if (S.meta64.userPreferences.editMode && cnst.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(data.node)) {
+                        if (S.meta64.userPreferences.editMode && C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(data.node)) {
                             createSubNodeButton = new Button("New", () => { S.edit.createSubNode(id, null, true); });
                         }
 
@@ -970,7 +968,7 @@ export class Render implements RenderIntf {
         let src: string = this.getUrlForNodeAttachment(node);
 
         //NOTE: This property not working yet becasue we style img tags dynamically after created.
-        let maxWidth: string = S.props.getNodePropertyVal(cnst.ATT_MAX_WIDTH, node);
+        let maxWidth: string = S.props.getNodePropertyVal(C.ATT_MAX_WIDTH, node);
         if (!maxWidth) {
             maxWidth = "100%";
         }

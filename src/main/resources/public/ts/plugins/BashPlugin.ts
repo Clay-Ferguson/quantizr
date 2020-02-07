@@ -1,7 +1,6 @@
-import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { BashPluginIntf } from "../intf/BashPluginIntf";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Button } from "../widget/Button";
@@ -10,7 +9,7 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { Comp } from "../widget/base/Comp";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
@@ -20,7 +19,7 @@ class BashTypeHandler implements TypeHandlerIntf {
 
     render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
         //let content: string = S.props.getNodePropertyVal(Constants.CONTENT, node);
-        let name = S.props.getNodePropertyVal(Constants.NAME, node);
+        let name = S.props.getNodePropertyVal(C.NAME, node);
         if (!name) {
             name = "[no sn:name prop]";
         }

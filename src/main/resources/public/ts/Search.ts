@@ -4,13 +4,13 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchIntf } from "./intf/SearchIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
+import { Constants as C} from "./Constants";
 import { Button } from "./widget/Button";
 import { Div } from "./widget/Div";
 import { Comp } from "./widget/base/Comp";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 

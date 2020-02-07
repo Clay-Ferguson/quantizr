@@ -1,5 +1,5 @@
 import { Comp } from "./base/Comp";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Div } from "./Div";
@@ -9,7 +9,7 @@ import { Anchor } from "./Anchor";
 import { ReactNode } from "react";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 

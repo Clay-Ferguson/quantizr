@@ -1,7 +1,7 @@
 import { DialogBaseImpl } from "./DialogBaseImpl";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
+import { Constants as C} from "./Constants";
 import { Comp } from "./widget/base/Comp";
 import { Div } from "./widget/Div";
 import { Span } from "./widget/Span";
@@ -11,7 +11,7 @@ import { Icon } from "./widget/Icon";
 
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 

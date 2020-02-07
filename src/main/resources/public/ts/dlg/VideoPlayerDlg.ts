@@ -4,12 +4,12 @@ import { Button } from "../widget/Button";
 import { TextContent } from "../widget/TextContent";
 import { Form } from "../widget/Form";
 import { Singletons } from "../Singletons";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { PubSub } from "../PubSub";
 import { VideoPlayer } from "../widget/VideoPlayer";
 
 let S : Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 

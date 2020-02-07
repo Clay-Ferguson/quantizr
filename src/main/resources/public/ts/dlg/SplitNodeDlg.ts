@@ -4,13 +4,13 @@ import { Button } from "../widget/Button";
 import { RadioButton } from "../widget/RadioButton";
 import { RadioButtonGroup } from "../widget/RadioButtonGroup";
 import { PubSub } from "../PubSub";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { TextField } from "../widget/TextField";
 import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 

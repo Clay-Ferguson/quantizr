@@ -1,7 +1,7 @@
 import { RSSReaderIntf } from "./intf/RSSReaderIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
+import { Constants as C} from "./Constants";
 import axios from 'axios';
 
 /*
@@ -12,7 +12,7 @@ the preferred rss processor is failing for any reason.
 */
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 

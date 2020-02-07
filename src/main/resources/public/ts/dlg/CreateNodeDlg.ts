@@ -1,17 +1,16 @@
 import { DialogBase } from "../DialogBase";
-import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { Form } from "../widget/Form";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { NodeTypeListBox } from "../widget/NodeTypeListBox";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 
 let S : Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 

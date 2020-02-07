@@ -6,13 +6,13 @@ import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
 import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
@@ -66,8 +66,8 @@ export class LoginDlg extends DialogBase {
     populateFromLocalDb = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                this.userTextField.setValue(await S.localDB.getVal(Constants.LOCALDB_LOGIN_USR));
-                this.passwordTextField.setValue(await S.localDB.getVal(Constants.LOCALDB_LOGIN_PWD));
+                this.userTextField.setValue(await S.localDB.getVal(C.LOCALDB_LOGIN_USR));
+                this.passwordTextField.setValue(await S.localDB.getVal(C.LOCALDB_LOGIN_PWD));
             }
             finally {
                 resolve();

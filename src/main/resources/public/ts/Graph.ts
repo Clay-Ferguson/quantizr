@@ -2,12 +2,12 @@ import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
+import { Constants as C} from "./Constants";
 import { GraphIntf } from "./intf/GraphIntf";
 import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 

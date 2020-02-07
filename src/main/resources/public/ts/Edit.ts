@@ -1,4 +1,3 @@
-import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
@@ -8,14 +7,13 @@ import { PrefsDlg } from "./dlg/PrefsDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
 import { ImportFromFileDropzoneDlg } from "./dlg/ImportFromFileDropzoneDlg";
-import { Constants as cnst } from "./Constants";
 import { EditIntf } from "./intf/EditIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
+import { Constants as C} from "./Constants";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 

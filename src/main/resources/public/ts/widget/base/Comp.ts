@@ -2,16 +2,16 @@
 // https://reactjs.org/docs/hooks-reference.html#usestate
 // #RulesOfHooks: https://fb.me/rules-of-hooks
 
-import { CompIntf, ReactRenderFunc } from "./CompIntf";
+import { CompIntf } from "./CompIntf";
 import { PubSub } from "../../PubSub";
-import { Constants } from "../../Constants";
+import { Constants as C} from "../../Constants";
 import { Singletons } from "../../Singletons";
 import * as ReactDOM from "react-dom";
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { ReactNode, ReactElement, useState, useEffect } from "react";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 

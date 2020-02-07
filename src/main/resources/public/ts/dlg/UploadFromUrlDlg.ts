@@ -5,13 +5,13 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
 import { TextContent } from "../widget/TextContent";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Form } from "../widget/Form";
 
 let S : Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
@@ -25,7 +25,7 @@ export class UploadFromUrlDlg extends DialogBase {
        
         this.setChildren([
             new Form(null, [
-                Constants.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.attachment.uploadNode.id) : null,
+                C.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.attachment.uploadNode.id) : null,
                 this.uploadFromUrlTextField = new TextField("Upload from URL"),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "primary"),

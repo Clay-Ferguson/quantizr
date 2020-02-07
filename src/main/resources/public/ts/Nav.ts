@@ -5,7 +5,7 @@ import { LoginDlg } from "./dlg/LoginDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
+import { Constants as C} from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { VerticalLayout } from "./widget/VerticalLayout";
 import { Anchor } from "./widget/Anchor";
@@ -15,7 +15,7 @@ import { CompIntf } from "./widget/base/CompIntf";
 import { DialogBaseImpl } from "./DialogBaseImpl";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 

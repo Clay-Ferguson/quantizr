@@ -164,13 +164,10 @@ public class Convert {
 	public PropertyInfo convertToPropertyInfo(SessionContext sessionContext, SubNode node, String propName,
 			SubNodePropVal prop, boolean htmlOnly, boolean allowAbbreviated, boolean initNodeEdit) {
 		try {
-			String value = null;
-			boolean abbreviated = false;
-
-			value = formatValue(sessionContext, prop.getValue(), false, initNodeEdit);
+			String value = formatValue(sessionContext, prop.getValue(), false, initNodeEdit);
 			/* log.trace(String.format("prop[%s]=%s", prop.getName(), value)); */
 
-			PropertyInfo propInfo = new PropertyInfo(propName, value, abbreviated);
+			PropertyInfo propInfo = new PropertyInfo(propName, value);
 			return propInfo;
 		} catch (Exception ex) {
 			throw ExUtil.newEx(ex);

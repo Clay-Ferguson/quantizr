@@ -7,13 +7,13 @@ import { RadioButton } from "../widget/RadioButton";
 import { Checkbox } from "../widget/Checkbox";
 import { Div } from "../widget/Div";
 import { PubSub } from "../PubSub";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 

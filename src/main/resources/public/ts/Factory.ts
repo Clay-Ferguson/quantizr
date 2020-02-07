@@ -16,7 +16,7 @@ import { Meta64 } from "./Meta64";
 import { Attachment } from "./Attachment";
 import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
-import { Constants } from "./Constants";
+import { Constants as C} from "./Constants";
 import { Nav } from "./Nav";
 import { Podcast } from "./Podcast";
 import { Props } from "./Props";
@@ -90,7 +90,7 @@ export class Factory {
             e: React.createElement
         };
 
-        PubSub.pub(Constants.PUBSUB_SingletonsReady, this.singletons);
+        PubSub.pub(C.PUBSUB_SingletonsReady, this.singletons);
         console.log("Factory.constructAll complete.");
     }
 }

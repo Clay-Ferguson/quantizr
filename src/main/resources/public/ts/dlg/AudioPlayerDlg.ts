@@ -3,12 +3,12 @@ import { Button } from "../widget/Button";
 import { AudioPlayer } from "../widget/AudioPlayer";
 import { Form } from "../widget/Form";
 import { Singletons } from "../Singletons";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 

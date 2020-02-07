@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.19.577 on 2020-02-06 18:03:38.
+// Generated using typescript-generator version 2.19.577 on 2020-02-07 14:17:42.
 
 export interface ActivityPubPostRequest extends RequestBase {
     nodeId: string;
@@ -493,9 +493,4 @@ export interface PrivilegeInfo {
 export const enum NodeProp {
     ENC = "sn:enc",
     ENC_TAG = "<[ENC]>",
-}
-
-export const enum RPCCall {
-    login = "login",
-    renderNode = "renderNode",
 }

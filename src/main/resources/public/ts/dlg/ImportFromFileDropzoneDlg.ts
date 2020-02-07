@@ -4,13 +4,12 @@ import { Button } from "../widget/Button";
 import { TextContent } from "../widget/TextContent";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
-import { Constants as cnst } from "../Constants";
-import { Constants } from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
@@ -32,7 +31,7 @@ export class ImportFromFileDropzoneDlg extends DialogBase {
         super("Import File");
 
         this.setChildren([
-            cnst.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.edit.importTargetNode.id) : null,
+            C.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.edit.importTargetNode.id) : null,
             this.form = new Form({
                 action: S.util.getRpcPath() + "upload",
                 autoProcessQueue: false,

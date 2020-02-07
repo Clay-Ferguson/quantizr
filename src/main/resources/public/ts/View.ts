@@ -2,12 +2,12 @@ import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
+import { Constants as C} from "./Constants";
 import { ViewIntf } from "./intf/ViewIntf";
 import { GraphDisplayDlg } from "./dlg/GraphDisplayDlg";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 

@@ -5,7 +5,7 @@ import { Constants as cnst } from "./Constants";
 import { Meta64Intf } from "./intf/Meta64Intf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
+import { Constants as C} from "./Constants";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { TabPanel } from "./widget/TabPanel";
 import { MainNavPanel } from "./widget/MainNavPanel";
@@ -15,7 +15,7 @@ import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 declare var chrome;
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
@@ -332,8 +332,8 @@ export class Meta64 implements Meta64Intf {
             let inactiveClass = "inactive-row";
             let id = this.currentNodeData.node.id;
 
-            S.localDB.setVal(Constants.LOCALDB_LAST_PARENT_NODEID, id);
-            S.localDB.setVal(Constants.LOCALDB_LAST_CHILD_NODEID, node.id);
+            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, id);
+            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
 
             let doneHighlighting: boolean = false;
 

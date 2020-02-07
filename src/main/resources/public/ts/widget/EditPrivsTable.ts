@@ -1,5 +1,5 @@
 import { Comp } from "./base/Comp";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { ReactNode } from "react";
@@ -8,7 +8,7 @@ import * as J from "../JavaIntf";
 import { EditPrivsTableRow } from "./EditPrivsTableRow";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 

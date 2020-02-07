@@ -1,7 +1,7 @@
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { RssPluginIntf } from "../intf/RssPluginIntf";
-import { Constants } from "../Constants";
+import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import * as RssParser from 'rss-parser';
@@ -20,7 +20,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { MarkdownDiv } from "../widget/MarkdownDiv";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 

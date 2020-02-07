@@ -1,16 +1,14 @@
-import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { LoginDlg } from "./dlg/LoginDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
-import { Constants as cnst } from "./Constants";
 import { UserIntf } from "./intf/UserIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants } from "./Constants";
+import { Constants as C} from "./Constants";
 
 let S: Singletons;
-PubSub.sub(Constants.PUBSUB_SingletonsReady, (s: Singletons) => {
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
@@ -113,7 +111,7 @@ export class User implements UserIntf {
                 let callUsr: string;
                 let callPwd: string;
                 let usingLocalDb: boolean = false;
-                let loginState: string = await S.localDB.getVal(cnst.LOCALDB_LOGIN_STATE);
+                let loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
 
                 /* if we have known state as logged out, then do nothing here */
                 if (loginState === "0") {
@@ -122,8 +120,8 @@ export class User implements UserIntf {
                     return;
                 }
 
-                let usr = await S.localDB.getVal(cnst.LOCALDB_LOGIN_USR);
-                let pwd = await S.localDB.getVal(cnst.LOCALDB_LOGIN_PWD);
+                let usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
+                let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
 
                 usingLocalDb = !S.util.emptyString(usr) && !S.util.emptyString(pwd);
                 console.log("User=" + usr + " usingLocalDb = " + usingLocalDb);
@@ -171,7 +169,7 @@ export class User implements UserIntf {
                 window.onbeforeunload = null;
 
                 if (updateLocalDb) {
-                    await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
+                    await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
                 }
 
                 S.util.ajax<J.LogoutRequest, J.LogoutResponse>("logout", {}, this.logoutResponse);
@@ -197,9 +195,9 @@ export class User implements UserIntf {
     deleteAllUserLocalDbEntries = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                await S.localDB.setVal(cnst.LOCALDB_LOGIN_USR, null);
-                await S.localDB.setVal(cnst.LOCALDB_LOGIN_PWD, null);
-                await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, null);
+                await S.localDB.setVal(C.LOCALDB_LOGIN_USR, null);
+                await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null);
+                await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null);
             }
             finally {
                 resolve();
@@ -215,9 +213,9 @@ export class User implements UserIntf {
                     console.log("homeNodeOverride: " + res.homeNodeOverride);
 
                     if (usr !== "anonymous") {
-                        await S.localDB.setVal(cnst.LOCALDB_LOGIN_USR, usr);
-                        await S.localDB.setVal(cnst.LOCALDB_LOGIN_PWD, pwd);
-                        await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "1");
+                        await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
+                        await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
+                        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");
                     }
 
                     if (loginDlg) {
@@ -236,12 +234,12 @@ export class User implements UserIntf {
                         S.meta64.homeNodeOverride = id;
                     } //
                     else {
-                        let lastNode = await S.localDB.getVal(Constants.LOCALDB_LAST_PARENT_NODEID);
+                        let lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
 
                         if (lastNode) {
                             console.log("loading lastNode=" + lastNode);
                             id = lastNode;
-                            childId = await S.localDB.getVal(Constants.LOCALDB_LAST_CHILD_NODEID);
+                            childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
                         } else {
                             console.log("loading homeNodeId=" + S.meta64.homeNodeId);
                             id = S.meta64.homeNodeId;
@@ -258,9 +256,9 @@ export class User implements UserIntf {
                          * blow away failed credentials and reload page, should result in brand new page load as anon
                          * this.
                          */
-                        await S.localDB.setVal(cnst.LOCALDB_LOGIN_USR, null);
-                        await S.localDB.setVal(cnst.LOCALDB_LOGIN_PWD, null);
-                        await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
+                        await S.localDB.setVal(C.LOCALDB_LOGIN_USR, null);
+                        await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null);
+                        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
 
                         location.reload();
                     }
