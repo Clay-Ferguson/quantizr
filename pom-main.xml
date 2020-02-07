@@ -340,16 +340,16 @@
 						<configuration>
 							<jsonLibrary>jackson2</jsonLibrary>
 							<classPatterns>
+								<pattern>org.subnode.model.client.**</pattern>
 								<pattern>org.subnode.request.**</pattern>
 								<pattern>org.subnode.response.**</pattern>
 							</classPatterns>
-							<!--
-							<excludeClasses>
-                    			<class>cz.habarta.example.Application</class>
-               		 		</excludeClasses>
-							-->
 							<outputKind>module</outputKind>
 							<outputFile>src/main/resources/public/ts/JavaIntf.d.ts</outputFile>
+							<mapEnum>asEnum</mapEnum>
+    						<jackson2Configuration>
+        						<enumsUsingToString>true</enumsUsingToString>
+    						</jackson2Configuration>
 						</configuration>
 					</plugin>
 

@@ -514,7 +514,7 @@ export class Meta64 implements Meta64Intf {
             cnst.BIN_VER, //
             cnst.BIN_DATA, //
             cnst.BIN_MIME, //
-            cnst.ENC, //
+            J.NodeProp.ENC, //
             cnst.BIN, //
         ]);
 

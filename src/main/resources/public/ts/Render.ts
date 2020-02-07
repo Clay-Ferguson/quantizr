@@ -165,7 +165,7 @@ export class Render implements RenderIntf {
         let clazz = "markdown-content content-narrow";
 
         let val;
-        if (content.startsWith(cnst.ENC_TAG)) {
+        if (content.startsWith(J.NodeProp.ENC_TAG)) {
             val = "[Encrypted]";
         }
         else {
@@ -190,9 +190,9 @@ export class Render implements RenderIntf {
         div.whenElm((elm: HTMLElement) => {
             this.setImageMaxWidths();
 
-            if (this.immediateDecrypting && content.startsWith(cnst.ENC_TAG)) {
+            if (this.immediateDecrypting && content.startsWith(J.NodeProp.ENC_TAG)) {
                 setTimeout(async () => {
-                    content = content.substring(cnst.ENC_TAG.length);
+                    content = content.substring(J.NodeProp.ENC_TAG.length);
 
                     //todo-1: for performance we could create a map of the hash of the encrypted content (key) to the
                     //decrypted text (val), and hold that map so that once we decrypt a message we never use encryption again at least

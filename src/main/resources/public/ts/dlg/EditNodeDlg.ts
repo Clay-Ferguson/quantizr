@@ -174,7 +174,7 @@ export class EditNodeDlg extends DialogBase {
                     return;
                 }
 
-                if (prop.name == cnst.ENC && prop.value == "priv") {
+                if (prop.name == J.NodeProp.ENC && prop.value == "priv") {
                     this.encryptionOptions.encryptForOwnerOnly = true;
                 }
 
@@ -206,7 +206,7 @@ export class EditNodeDlg extends DialogBase {
 
         //new logic means when turning encryption option back off we will come thru here with PRIV property not set but
         //data still encrypted but we detect still and decrypt in this case too.
-        if (content.startsWith(cnst.ENC_TAG) /* && "priv" == S.props.getNodePropertyVal(cnst.ENC, this.node) */) {
+        if (content.startsWith(J.NodeProp.ENC_TAG) /* && "priv" == S.props.getNodePropertyVal(cnst.ENC, this.node) */) {
             encrypted = true;
         }
 
@@ -326,7 +326,7 @@ export class EditNodeDlg extends DialogBase {
             let dlg = new EncryptionDlg(this.encryptionOptions);
             await dlg.open();
             console.log("EncOptions after EncDlg: " + S.util.prettyPrint(this.encryptionOptions));
-            S.props.setNodePropertyVal(cnst.ENC, this.node, this.encryptionOptions.encryptForOwnerOnly ? "priv" : null);
+            S.props.setNodePropertyVal(J.NodeProp.ENC, this.node, this.encryptionOptions.encryptForOwnerOnly ? "priv" : null);
 
             this.rebuildDlg(); //todo-1: this is overkill. Will do it with targeted react setState eventually
         })();
@@ -426,9 +426,9 @@ export class EditNodeDlg extends DialogBase {
                 });
 
                 //handle encryption setting
-                handled[cnst.ENC] = true;
+                handled[J.NodeProp.ENC] = true;
                 saveList.push({
-                    "name": cnst.ENC,
+                    "name": J.NodeProp.ENC,
                     "value": this.encryptionOptions.encryptForOwnerOnly ? "priv" : null
                 });
             }
@@ -438,9 +438,9 @@ export class EditNodeDlg extends DialogBase {
                 content = this.contentEditor.getValue();
 
                 // if we need to encrypt and the content is not currently encrypted.
-                if (content && this.encryptionOptions.encryptForOwnerOnly && !content.startsWith(cnst.ENC_TAG)) {
+                if (content && this.encryptionOptions.encryptForOwnerOnly && !content.startsWith(J.NodeProp.ENC_TAG)) {
                     content = await S.encryption.symEncryptString(null, content);
-                    content = cnst.ENC_TAG + content;
+                    content = J.NodeProp.ENC_TAG + content;
                     //console.log("Encrypted: " + content);
                 }
             }
@@ -580,7 +580,7 @@ export class EditNodeDlg extends DialogBase {
 
                         if (encrypted) {
                             //console.log('decrypting: ' + value);
-                            value = value.substring(cnst.ENC_TAG.length);
+                            value = value.substring(J.NodeProp.ENC_TAG.length);
                             (async () => {
                                 value = await S.encryption.symDecryptString(null, value);
                                 //console.log('decrypted to:' + value);
@@ -603,7 +603,7 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditor.whenElm((elm: HTMLElement) => {
                 if (encrypted) {
                     //console.log('decrypting: ' + value);
-                    value = value.substring(cnst.ENC_TAG.length);
+                    value = value.substring(J.NodeProp.ENC_TAG.length);
                     (async () => {
                         value = await S.encryption.symDecryptString(null, value);
                         //console.log('decrypted to:' + value);
