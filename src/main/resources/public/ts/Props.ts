@@ -1,4 +1,3 @@
-import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { PropTable } from "./widget/PropTable";
 import { PropTableRow } from "./widget/PropTableRow";

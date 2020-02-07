@@ -2,7 +2,6 @@ import { Comp } from "./base/Comp";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Div } from "./Div";
 import { ReactNode } from "react";
 
 let S: Singletons;

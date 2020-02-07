@@ -1,4 +1,3 @@
-import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { EncryptionKeyPair } from "./EncryptionKeyPair";
 import { EncryptionIntf } from "./intf/EncryptionIntf";

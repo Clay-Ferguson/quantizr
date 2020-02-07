@@ -4,7 +4,6 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { ReactNode } from "react";
 import * as I from "../Interfaces";
-import * as J from "../JavaIntf";
 import { EditPrivsTableRow } from "./EditPrivsTableRow";
 
 let S: Singletons;

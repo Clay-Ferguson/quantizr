@@ -1,4 +1,3 @@
-import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";

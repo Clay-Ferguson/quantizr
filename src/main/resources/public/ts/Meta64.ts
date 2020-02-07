@@ -1,4 +1,3 @@
-import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { Constants as cnst } from "./Constants";

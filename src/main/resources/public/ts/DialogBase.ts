@@ -7,8 +7,6 @@ import { Div } from "./widget/Div";
 import { Span } from "./widget/Span";
 import * as ReactDOM from "react-dom";
 import { CompIntf } from "./widget/base/CompIntf";
-import { Icon } from "./widget/Icon";
-
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

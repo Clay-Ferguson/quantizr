@@ -1,4 +1,3 @@
-import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { NavIntf } from "./intf/NavIntf";
 import { LoginDlg } from "./dlg/LoginDlg";

@@ -1,4 +1,3 @@
-import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { Menu } from "./widget/Menu";
 import { MenuItem } from "./widget/MenuItem";

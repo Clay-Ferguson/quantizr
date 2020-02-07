@@ -1,4 +1,3 @@
-import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";

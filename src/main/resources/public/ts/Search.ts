@@ -1,4 +1,3 @@
-import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchIntf } from "./intf/SearchIntf";

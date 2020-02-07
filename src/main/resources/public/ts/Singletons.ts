@@ -20,7 +20,6 @@ import { PasswordPlugin } from "./plugins/PasswordPlugin";
 import { GraphIntf } from "./intf/GraphIntf";
 import { LuceneIndexPluginIntf } from "./intf/LuceneIndexPluginIntf";
 import { ServerPushIntf } from "./intf/ServerPushIntf";
-import { LocalDB } from "./LocalDB";
 import { LocalDBIntf } from "./intf/LocalDBIntf";
 
 /* NOTE: If this Singleton pattern looks countrary to good module design, keep in mind all module systems

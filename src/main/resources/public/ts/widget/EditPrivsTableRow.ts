@@ -1,5 +1,4 @@
 import { Comp } from "./base/Comp";
-import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { Div } from "./Div";
 import { Button } from "./Button";

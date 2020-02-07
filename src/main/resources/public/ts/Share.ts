@@ -1,4 +1,3 @@
-import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { SharingDlg } from "./dlg/SharingDlg";
 import { ShareIntf } from "./intf/ShareIntf";
