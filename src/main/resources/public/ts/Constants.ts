@@ -2,7 +2,6 @@ export class Constants {
 
     static readonly PUBSUB_SingletonsReady = "pubsub-singletons-ready";
 
-    static readonly ANON: string = "anonymous";
     static readonly LOCALDB_LOGIN_USR: string = "loginUsr";
     static readonly LOCALDB_LOGIN_PWD: string = "loginPwd";
 
@@ -44,8 +43,6 @@ export class Constants {
     static readonly PRE: string = "sn:pre";
     static readonly NOWRAP: string = "sn:nowrap";
     
-    //static readonly ENC: string = "sn:enc"; 
-    //static readonly PWD: string = "sn:pwd";
     static readonly EMAIL: string = "sn:email";
     static readonly CODE: string = "sn:code";
 
@@ -58,8 +55,6 @@ export class Constants {
 
     static readonly IMG_WIDTH: string = "sn:imgWidth";
     static readonly IMG_HEIGHT: string = "sn:imgHeight";
-
-    //static readonly ENC_TAG = "<[ENC]>";
 }
 
 
