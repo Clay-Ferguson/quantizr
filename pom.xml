@@ -190,7 +190,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-compress</artifactId>
-    <version>1.18</version>
+    <version>1.19</version>
 </dependency>
 
 <dependency>
@@ -655,7 +655,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-compress</artifactId>
-    <version>1.18</version>
+    <version>1.19</version>
 </dependency>
 
 <dependency>
@@ -1113,7 +1113,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-compress</artifactId>
-    <version>1.18</version>
+    <version>1.19</version>
 </dependency>
 
 <dependency>
