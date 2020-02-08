@@ -2,6 +2,8 @@ import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 
 export interface ViewIntf {
+    docElm: any;
+
     refreshTreeResponse(res?: J.RenderNodeResponse, targetId?: any, scrollToTop?: boolean): void;
     refreshTree(nodeId?: string, 
         renderParentIfLeaf?: boolean, 

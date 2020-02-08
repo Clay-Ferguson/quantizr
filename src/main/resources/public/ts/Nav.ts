@@ -112,6 +112,13 @@ export class Nav implements NavIntf {
 
     navUpLevel = (): void => {
         if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node) return null;
+
+        //Always just scroll to the top before doing an actual 'upLevel' to parent.
+        if (S.view.docElm.scrollTop > 100) {
+            S.view.docElm.scrollTop = 0;
+            return;
+        }
+
         if (!this.parentVisibleToUser()) {
             // Already at root. Can't go up.
             return;

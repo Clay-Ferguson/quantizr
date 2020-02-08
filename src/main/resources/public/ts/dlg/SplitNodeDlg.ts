@@ -81,10 +81,10 @@ export class SplitNodeDlg extends DialogBase {
 
             let delim = "";
             if (this.doubleSpacedRadioButton.getChecked()) {
-                delim = "\n\n\n";
+                delim = "\n\n";
             }
             else if (this.tripleSpacedRadioButton.getChecked()) {
-                delim = "\n\n\n\n";
+                delim = "\n\n\n";
             }
             else if (this.customDelimRadioButton.getChecked()) {
                 delim = this.delimiterTextField.getValue();

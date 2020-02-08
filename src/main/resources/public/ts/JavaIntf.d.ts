@@ -1,6 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.19.577 on 2020-02-07 14:46:33.
 
 export interface ActivityPubPostRequest extends RequestBase {
     nodeId: string;

@@ -350,6 +350,7 @@
     						<jackson2Configuration>
         						<enumsUsingToString>true</enumsUsingToString>
     						</jackson2Configuration>
+							<noFileComment>true</noFileComment>
 						</configuration>
 					</plugin>
 

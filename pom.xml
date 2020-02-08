@@ -808,6 +808,7 @@ of the spring configs for security are also perfected.
     						<jackson2Configuration>
         						<enumsUsingToString>true</enumsUsingToString>
     						</jackson2Configuration>
+							<noFileComment>true</noFileComment>
 						</configuration>
 					</plugin>
 
