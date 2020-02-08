@@ -152,16 +152,13 @@ export class EditNodeDlg extends DialogBase {
         });
         let editPropsTable = new EditPropsTable();
 
-        let editOrderedProps: J.PropertyInfo[] = S.props.getPropertiesInEditingOrder(this.node, this.node.properties);
-        //console.log("POPULATING PROPS: " + S.util.prettyPrint(editOrderedProps));
-
         let isPre = false;
         let isWordWrap = true;
 
         /* We have to scan properties in this loop before we do the loop below. So it is not redundant to have two loops
         scanning the properties. This is by design, and not a mistake */
-        if (editOrderedProps) {
-            editOrderedProps.forEach((prop: J.PropertyInfo) => {
+        if (this.node.properties) {
+            this.node.properties.forEach((prop: J.PropertyInfo) => {
                 if (prop.name == C.PRE) {
                     isPre = true;
                     return;
@@ -212,8 +209,8 @@ export class EditNodeDlg extends DialogBase {
 
         this.contentEditor.setWordWrap(isWordWrap);
 
-        if (editOrderedProps) {
-            editOrderedProps.forEach((prop: J.PropertyInfo) => {
+        if (this.node.properties) {
+            this.node.properties.forEach((prop: J.PropertyInfo) => {
 
                 if (prop.name == "layout") {
                     this.layoutSelection.setSelection(prop.value);
@@ -230,10 +227,7 @@ export class EditNodeDlg extends DialogBase {
                     return;
                 }
 
-                /*
-                 * if property not allowed to display return to bypass this property/iteration
-                 */
-                if (!S.render.allowPropertyToDisplay(prop.name)) {
+                if (!S.render.allowPropertyEdit(this.node, prop.name)) {
                     console.log("Hiding property: " + prop.name);
                     return;
                 }

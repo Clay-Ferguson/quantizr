@@ -13,7 +13,6 @@ export interface RenderIntf {
     showNodeUrl(): void;
     getTopRightImageTag(node: J.NodeInfo): Img;
     getNodeBkgImageStyle(node: J.NodeInfo): string;
-    //centeredButtonBar(buttons: Comp[], classes?: string): Comp;
     makeRowButtonBar(node: J.NodeInfo, editingAllowed: boolean): Comp;
     makeHorizontalFieldSet(content: Comp[], extraClasses?: string): Comp;
     nodeHasChildren(id: string): boolean;
@@ -26,6 +25,7 @@ export interface RenderIntf {
     getUrlForNodeAttachment(node: J.NodeInfo): string;
     makeImageTag(node: J.NodeInfo): Img;
     allowPropertyToDisplay(propName: string): boolean;
+    allowPropertyEdit(node: J.NodeInfo, propName: string): boolean;
     isReadOnlyProperty(propName: string): boolean;
     isBinaryProperty(propName: string): boolean;
     setImageMaxWidths(): void;

@@ -55,23 +55,6 @@ export class Props implements PropsIntf {
         }
     }
 
-    /*
-     * Sorts props input array into the proper order to show for editing. 
-     */
-    getPropertiesInEditingOrder = (node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] => {
-        let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[node.type];
-        if (typeHandler) {
-            return typeHandler.orderProps(node, _props);
-        }
-        else {
-            //let propsNew: J.PropertyInfo[] = S.util.arrayClone(_props);
-            //this.movePropsToTop([cnst.CONTENT, cnst.TAGS], propsNew);
-            //this.movePropsToEnd([jcrCnst.CREATED, jcrCnst.OWNER, jcrCnst.LAST_MODIFIED], propsNew);
-            //return propsNew;
-            return _props;
-        }
-    }
-
     /* Moves all the properties listed in propList array to the end of the list of properties and keeps them in the order specified */
     private movePropsToTop = (propsList: string[], props: J.PropertyInfo[]) => {
         for (let prop of propsList) {

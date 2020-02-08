@@ -1,6 +1,4 @@
-import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
-import { TypeHandlerIntf } from "./TypeHandlerIntf";
 import { GraphPanel } from "../widget/GraphPanel";
 
 export interface Meta64Intf {
@@ -53,8 +51,6 @@ export interface Meta64Intf {
 
     currentNodeData: J.RenderNodeResponse;
 
-    typeHandlers: { [key: string]: TypeHandlerIntf };
-
     userPreferences: J.UserPreferences;
     navBarHeight: number;
 
@@ -88,7 +84,6 @@ export interface Meta64Intf {
     initNode(node: J.NodeInfo, updateMaps?: boolean): void;
     initConstants();
     initApp(): Promise<void>;
-    addTypeHandler(typeName: string, typeHandler : TypeHandlerIntf): void;
     processUrlParams(): void;
     tabChangeEvent(tabName): void
     displaySignupMessage(): void

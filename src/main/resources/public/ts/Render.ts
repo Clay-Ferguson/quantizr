@@ -94,7 +94,7 @@ export class Render implements RenderIntf {
         //let ret: string = topRightImgTag ? topRightImgTag.render_Html() : "";
 
         let ret: Comp[] = [];
-        let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[node.type];
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
 
         /* todo-2: enable headerText when appropriate here */
         if (S.meta64.showMetaData) {
@@ -114,7 +114,7 @@ export class Render implements RenderIntf {
             /*
              * Special Rendering for Nodes that have a plugin-renderer
              */
-            if (!renderComplete && typeHandler) {
+            if (typeHandler) {
                 renderComplete = true;
                 ret.push(typeHandler.render(node, rowStyling));
             }
@@ -355,18 +355,14 @@ export class Render implements RenderIntf {
         let prevPageExists: boolean = S.nav.mainOffset > 0;
         let nextPageExists: boolean = !S.nav.endReached;
 
-        let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[node.type];
-        if (typeHandler) {
-            // canMoveUp = typeHandler.allowAction("moveUp");
-            // canMoveDown = typeHandler.allowAction("moveDown");
-        }
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
 
         // let editingAllowed: boolean = S.props.isOwnedCommentNode(node);
         // if (!editingAllowed) {
         //     editingAllowed = S.meta64.isAdminUser && !props.isNonOwnedCommentNode(node)
         //         && !props.isNonOwnedNode(node);
         // }
-        let editingAllowed = S.edit.isEditAllowed(node); //meta64.userPreferences.editMode && S.meta64.isAdminUser || S.meta64.userName==node.owner;
+        let editingAllowed = S.edit.isEditAllowed(node); 
         if (typeHandler) {
             editingAllowed = editingAllowed && typeHandler.allowAction("edit");
         }
@@ -454,7 +450,7 @@ export class Render implements RenderIntf {
         let pasteInsideButton: Button;
         let pasteInlineButton: Button;
 
-        let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[node.type];
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass(node);
             if (iconClass) {
@@ -667,7 +663,7 @@ export class Render implements RenderIntf {
                         let pasteInsideButton: Button = null;
                         let pasteInlineButton: Button = null;
 
-                        let typeHandler: TypeHandlerIntf = S.meta64.typeHandlers[data.node.type];
+                        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(data.node.type);
                         var insertAllowed = true;
                         if (typeHandler) {
                             insertAllowed = typeHandler.allowAction("insert");
@@ -1007,8 +1003,19 @@ export class Render implements RenderIntf {
         if (propName.startsWith("sn:")) return false;
 
         let allow = !S.meta64.simpleModePropertyBlackList[propName];
-        console.log("######## Allow Prop " + propName + " = " + allow);
+        console.log("Allow Prop " + propName + " = " + allow);
         return allow;
+    }
+
+    /* Returns true of the logged in user and the type of node allow the property to be edited by the user */
+    allowPropertyEdit = (node: J.NodeInfo, propName: string): boolean => {
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+        if (typeHandler) {
+            return typeHandler.allowPropertyEdit(propName);
+        }
+        else {
+            return this.allowPropertyToDisplay(propName); 
+        }
     }
 
     isReadOnlyProperty = (propName: string): boolean => {

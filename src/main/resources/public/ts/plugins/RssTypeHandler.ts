@@ -1,5 +1,4 @@
 import * as J from "../JavaIntf";
-import { RssPluginIntf } from "../intf/RssPluginIntf";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
@@ -23,16 +22,26 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-class RssTypeHandler implements TypeHandlerIntf {
-    constructor(private rssPlugin: RssPlugin) {
+export class RssTypeHandler implements TypeHandlerIntf {
+
+    //map of feeds by URL, so that we only read once until user forces browser refresh.
+    feedCache = {};
+
+    //another service like this is:
+    //XML Retrieve URL - https://cors.now.sh/https://example.com/rss-xml-link
+
+    //todo-0: need to understand and eliminate the need for this, or find some open-source of what this is doing.
+    CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+
+    getTypeName = (): string => {
+        return "sn:rssfeed";
     }
 
-    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
-        return this.rssPlugin.renderFeedNode(node, rowStyling);
-    }
-
-    orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
-        return _props;
+    allowPropertyEdit = (propName: string): boolean => {
+        if (propName == "sn:rssFeedSrc") {
+            return true;
+        }
+        return false;
     }
 
     getIconClass(node: J.NodeInfo): string {
@@ -42,25 +51,8 @@ class RssTypeHandler implements TypeHandlerIntf {
     allowAction(action: string): boolean {
         return true;
     }
-}
 
-export class RssPlugin implements RssPluginIntf {
-
-    //map of feeds by URL, so that we only read once until user forces browser refresh.
-    feedCache = {};
-
-    //another service like this is:
-    //XML Retrieve URL - https://cors.now.sh/https://example.com/rss-xml-link
-
-    CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
-
-    rssTypeHandler: TypeHandlerIntf = new RssTypeHandler(this);
-
-    init = () => {
-        S.meta64.addTypeHandler("sn:rssfeed", this.rssTypeHandler);
-    }
-
-    renderFeedNode = (node: J.NodeInfo, rowStyling: boolean): Comp => {
+    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
 
         let feedSrc: string = S.props.getNodePropertyVal("sn:rssFeedSrc", node);
         if (!feedSrc) {

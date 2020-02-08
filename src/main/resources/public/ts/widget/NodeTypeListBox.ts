@@ -12,9 +12,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class NodeTypeListBox extends ListBox {
     selType: string = "u";
     
+    //todo-0: make these list items polymorph loaded from 'S.plugin' call
     constructor(defaultSel: string, allowFileSysCreate : boolean) {
-    
-        super({ }, [
+        super(null, [
             new ListBoxRow("Text/Markdown", () => { this.selType = "u"; }, true),
 
             /* Note: the isAdminUser is a temporary hack, and there will be a better way to do this eventually (i.e. types themselves

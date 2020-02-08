@@ -13,10 +13,11 @@ but only the interface of it.
 */
 import { PubSub } from "./PubSub";
 import { Meta64 } from "./Meta64";
+import { PluginMgr } from "./PluginMgr";
 import { Attachment } from "./Attachment";
 import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 import { Nav } from "./Nav";
 import { Podcast } from "./Podcast";
 import { Props } from "./Props";
@@ -28,14 +29,9 @@ import { Share } from "./Share";
 import { User } from "./User";
 import { Util } from "./Util";
 import { View } from "./View";
-import { RssPlugin } from "./plugins/RssPlugin";
-import { CoreTypesPlugin } from "./plugins/CoreTypesPlugin";
-import { BashPlugin } from "./plugins/BashPlugin";
-import { PasswordPlugin } from "./plugins/PasswordPlugin";
 import { Singletons } from "./Singletons";
 import { ActivityPub } from "./ActivityPub";
 import * as React from "react";
-import { LuceneIndexPlugin } from "./plugins/LuceneIndexPlugin";
 import { ServerPush } from "./ServerPush";
 import { LocalDB } from "./LocalDB";
 
@@ -55,6 +51,7 @@ export class Factory {
     constructAll = (): void => {
         this.singletons = {
             meta64: new Meta64(),
+            plugin: new PluginMgr(),
             util: new Util(),
             push: new ServerPush(),
             edit: new Edit(),
@@ -70,11 +67,6 @@ export class Factory {
             user: new User(),
             view: new View(),
             podcast: new Podcast(),
-            rssPlugin: new RssPlugin(),
-            coreTypesPlugin: new CoreTypesPlugin(),
-            bashPlugin: new BashPlugin(),
-            luceneIndexPlugin: new LuceneIndexPlugin(),
-            passwordPlugin: new PasswordPlugin(),
             rssReader: new RSSReader(),
             localDB: new LocalDB(),
 

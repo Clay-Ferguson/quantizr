@@ -6,7 +6,6 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { Comp } from "../widget/base/Comp";
 import { VerticalLayout } from "../widget/VerticalLayout";
 import { Button } from "../widget/Button";
-import { LuceneIndexPluginIntf } from "../intf/LuceneIndexPluginIntf";
 import { Heading } from "../widget/Heading";
 import { SearchFileSystemDlg } from "../dlg/SearchFileSystemDlg";
 import { ButtonBar } from "../widget/ButtonBar";
@@ -16,79 +15,81 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class LuceneIndexTypeHandler implements TypeHandlerIntf {
-    constructor(private luceneIndexPlugin: LuceneIndexPlugin) {
-    }
+//todo-1: disabled for now.
 
-    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
-        let name = node.content;
+// export class LuceneIndexTypeHandler implements TypeHandlerIntf {
+//     constructor(private luceneIndexPlugin: LuceneIndexPlugin) {
+//     }
 
-        let vertLayout = new VerticalLayout([
-            new Heading(3, name, {
-                style:
-                {
-                    marginLeft: "15px",
-                    marginTop: "15px"
-                }
-            }),
-            new ButtonBar([
-                new Button("Reindex", () => { this.luceneIndexPlugin.reindexNodeButton(node) }, {
-                    className: "bash-exec-button"
-                }),
-                new Button("Search", () => { this.luceneIndexPlugin.search(node) }, {
-                    className: "bash-exec-button"
-                })])
-        ]);
-        return vertLayout;
-    }
+//     render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
+//         let name = node.content;
 
-    orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
-        return _props;
-    }
+//         let vertLayout = new VerticalLayout([
+//             new Heading(3, name, {
+//                 style:
+//                 {
+//                     marginLeft: "15px",
+//                     marginTop: "15px"
+//                 }
+//             }),
+//             new ButtonBar([
+//                 new Button("Reindex", () => { this.luceneIndexPlugin.reindexNodeButton(node) }, {
+//                     className: "bash-exec-button"
+//                 }),
+//                 new Button("Search", () => { this.luceneIndexPlugin.search(node) }, {
+//                     className: "bash-exec-button"
+//                 })])
+//         ]);
+//         return vertLayout;
+//     }
 
-    getIconClass(node: J.NodeInfo): string {
-        //https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
-        return "fa fa-binoculars fa-lg";
-    }
+//     orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
+//         return _props;
+//     }
 
-    allowAction(action: string): boolean {
-        return true;
-    }
-}
+//     getIconClass(node: J.NodeInfo): string {
+//         //https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
+//         return "fa fa-binoculars fa-lg";
+//     }
 
-export class LuceneIndexPlugin implements LuceneIndexPluginIntf {
-    luceneIndexTypeHandler: TypeHandlerIntf = new LuceneIndexTypeHandler(this);
+//     allowAction(action: string): boolean {
+//         return true;
+//     }
+// }
 
-    init = () => {
-        S.meta64.addTypeHandler("luceneIndex", this.luceneIndexTypeHandler);
-    }
+// export class LuceneIndexPlugin implements LuceneIndexPluginIntf {
+//     luceneIndexTypeHandler: TypeHandlerIntf = new LuceneIndexTypeHandler(this);
 
-    reindexNodeButton = (node: J.NodeInfo): void => {
-        let searchDir = S.props.getNodePropertyVal("searchDir", node);
-        if (!searchDir) {
-            alert("no searchDir property specified.");
-            return;
-        }
+//     init = () => {
+//         S.plugin.addTypeHandler("luceneIndex", this.luceneIndexTypeHandler);
+//     }
 
-        S.util.ajax<J.LuceneIndexRequest, J.LuceneIndexResponse>("luceneIndex", {
-            "nodeId": node.id,
-            "path": searchDir
-        }, this.executeNodeResponse);
-    }
+//     reindexNodeButton = (node: J.NodeInfo): void => {
+//         let searchDir = S.props.getNodePropertyVal("searchDir", node);
+//         if (!searchDir) {
+//             alert("no searchDir property specified.");
+//             return;
+//         }
 
-    search = (node: J.NodeInfo): void => {
-        new SearchFileSystemDlg().open();
-    }
+//         S.util.ajax<J.LuceneIndexRequest, J.LuceneIndexResponse>("luceneIndex", {
+//             "nodeId": node.id,
+//             "path": searchDir
+//         }, this.executeNodeResponse);
+//     }
 
-    private executeNodeResponse = (res: J.LuceneIndexResponse): void => {
-        console.log("ExecuteNodeResponse running.");
+//     search = (node: J.NodeInfo): void => {
+//         new SearchFileSystemDlg().open();
+//     }
 
-        S.util.checkSuccess("Execute Node", res);
-        S.util.showMessage(res.message, true, "modal-lg");
+//     private executeNodeResponse = (res: J.LuceneIndexResponse): void => {
+//         console.log("ExecuteNodeResponse running.");
 
-        // S.view.refreshTree(null, false);
-        // S.meta64.selectTab("mainTab");
-        // S.view.scrollToSelectedNode(null);
-    }
-}
+//         S.util.checkSuccess("Execute Node", res);
+//         S.util.showMessage(res.message, true, "modal-lg");
+
+//         // S.view.refreshTree(null, false);
+//         // S.meta64.selectTab("mainTab");
+//         // S.view.scrollToSelectedNode(null);
+//     }
+// }
 

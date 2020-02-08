@@ -3,7 +3,6 @@ import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { CoreTypesPlugin } from "./CoreTypesPlugin";
 import { Comp } from "../widget/base/Comp";
 import { Heading } from "../widget/Heading";
 
@@ -12,43 +11,44 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class FolderTypeHandler implements TypeHandlerIntf {
-    constructor(private plugin: CoreTypesPlugin) {
-    }
+//todo-1: disabled for now.
+// export class FolderTypeHandler implements TypeHandlerIntf {
+//     constructor(private plugin: CoreTypesPlugin) {
+//     }
 
-    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {    
-        let ret: Comp = null;
+//     render = (node: J.NodeInfo, rowStyling: boolean): Comp => {    
+//         let ret: Comp = null;
 
-        let name = node.content;
-        if (name) {
-            ret = S.render.renderMarkdown(rowStyling, node, {});
-        }
-        else {
-            let folderName = "";
-            let displayName = S.props.getNodePropertyVal("fs:link", node);
-            if (displayName) {
-                folderName = node.name;
-            }
+//         let name = node.content;
+//         if (name) {
+//             ret = S.render.renderMarkdown(rowStyling, node, {});
+//         }
+//         else {
+//             let folderName = "";
+//             let displayName = S.props.getNodePropertyVal("fs:link", node);
+//             if (displayName) {
+//                 folderName = node.name;
+//             }
 
-            ret = new Heading(4, folderName, {
-                className: "folder-link"
-            });
-        }
+//             ret = new Heading(4, folderName, {
+//                 className: "folder-link"
+//             });
+//         }
 
-        return ret;
-    }
+//         return ret;
+//     }
 
-    orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
-        return _props;
-    }
+//     orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
+//         return _props;
+//     }
 
-    getIconClass(node: J.NodeInfo): string {
-        //https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
-        return "fa fa-folder fa-lg";
-    }
+//     getIconClass(node: J.NodeInfo): string {
+//         //https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
+//         return "fa fa-folder fa-lg";
+//     }
 
-    allowAction(action: string): boolean {
-        return true;
-    }
-}
+//     allowAction(action: string): boolean {
+//         return true;
+//     }
+// }
 

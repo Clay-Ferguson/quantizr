@@ -1,11 +1,9 @@
 import * as J from "./JavaIntf";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
-import { Constants as cnst } from "./Constants";
 import { Meta64Intf } from "./intf/Meta64Intf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C} from "./Constants";
-import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { TabPanel } from "./widget/TabPanel";
 import { MainNavPanel } from "./widget/MainNavPanel";
 import { GraphPanel } from "./widget/GraphPanel";
@@ -122,8 +120,6 @@ export class Meta64 implements Meta64Intf {
 
     /* RenderNodeResponse.java object */
     currentNodeData: J.RenderNodeResponse = null;
-
-    typeHandlers: { [key: string]: TypeHandlerIntf } = {};
 
     graphPanel: GraphPanel;
 
@@ -493,8 +489,6 @@ export class Meta64 implements Meta64Intf {
             return;
         }
 
-        node.properties = S.props.getPropertiesInEditingOrder(node, node.properties);
-
         if (updateMaps) {
             this.idToNodeMap[node.id] = node;
         }
@@ -507,27 +501,27 @@ export class Meta64 implements Meta64Intf {
     //here's the simple mode property hider!
     initConstants = () => {
         S.util.addAll(this.simpleModePropertyBlackList, [ //
-            cnst.PRIMARY_TYPE, //
-            cnst.IMG_WIDTH,//
-            cnst.IMG_HEIGHT, //
-            cnst.BIN_VER, //
-            cnst.BIN_DATA, //
-            cnst.BIN_MIME, //
+            C.PRIMARY_TYPE, //
+            C.IMG_WIDTH,//
+            C.IMG_HEIGHT, //
+            C.BIN_VER, //
+            C.BIN_DATA, //
+            C.BIN_MIME, //
             J.NodeProp.ENC, //
-            cnst.BIN, //
+            C.BIN, //
         ]);
 
         S.util.addAll(this.readOnlyPropertyList, [ //
-            cnst.PRIMARY_TYPE, //
-            cnst.UUID, //
-            cnst.IMG_WIDTH, //
-            cnst.IMG_HEIGHT, //
-            cnst.BIN_VER, //
-            cnst.BIN_DATA, //
-            cnst.BIN_MIME, //
+            C.PRIMARY_TYPE, //
+            C.UUID, //
+            C.IMG_WIDTH, //
+            C.IMG_HEIGHT, //
+            C.BIN_VER, //
+            C.BIN_DATA, //
+            C.BIN_MIME, //
         ]);
 
-        S.util.addAll(this.binaryPropertyList, [cnst.BIN_DATA]);
+        S.util.addAll(this.binaryPropertyList, [C.BIN_DATA]);
     }
 
     /**
@@ -550,20 +544,12 @@ export class Meta64 implements Meta64Intf {
         return check;
     }
 
-    initPlugins = (): void => {
-        S.rssPlugin.init();
-        S.coreTypesPlugin.init();
-        S.bashPlugin.init();
-        S.luceneIndexPlugin.init();
-        S.passwordPlugin.init();
-    }
-
     initApp = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             console.log("initApp running.");
 
             this.pendingLocationHash = window.location.hash;
-            this.initPlugins();
+            S.plugin.initPlugins();
 
             this.isMobile = this.mobileCheck();
             this.isMobileOrTablet = this.mobileOrTabletCheck();
@@ -788,10 +774,6 @@ export class Meta64 implements Meta64Intf {
             (res: J.PingResponse) => {
                 console.log("Server Info: " + res.serverInfo);
             });
-    }
-
-    addTypeHandler = (typeName: string, typeHandler: TypeHandlerIntf): void => {
-        this.typeHandlers[typeName] = typeHandler;
     }
 
     processUrlParams = (): void => {

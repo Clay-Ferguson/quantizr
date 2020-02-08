@@ -7,7 +7,6 @@ export interface PropsIntf {
     moveNodePosition(props: J.PropertyInfo[], idx: number, typeName: string): number;
     propsToggle(): void;
     deleteProperty(node: J.NodeInfo, propertyName : string): void;
-    getPropertiesInEditingOrder(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[];
     renderProperties(properties : J.PropertyInfo[]): PropTable;
     getNodeProperty(propertyName: string, node: J.NodeInfo): J.PropertyInfo;
     getNodePropertyVal(propertyName : string, node: J.NodeInfo): string;
