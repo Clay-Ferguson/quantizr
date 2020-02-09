@@ -33,7 +33,7 @@ export class SplitNodeDlg extends DialogBase {
             new RadioButtonGroup([
                 this.childrenRadioButton = new RadioButton("Split into Children", true, "splitTypeGroup"),
                 this.inlineRadioButton = new RadioButton("Split Inline", false, "splitTypeGroup"),
-            ], "form-group-border margin-bottom"),
+            ], "form-group-border marginBottom"),
 
             new RadioButtonGroup([
                 this.doubleSpacedRadioButton = new RadioButton("Double Spaced", true, "splitSpacingGroup",
@@ -60,7 +60,7 @@ export class SplitNodeDlg extends DialogBase {
                             }
                         }
                     }),
-            ], "form-group-border margin-bottom"),
+            ], "form-group-border marginBottom"),
 
             this.delimiterTextField = new TextField("Delimiter"),
             new ButtonBar([

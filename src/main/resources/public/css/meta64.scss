@@ -15,6 +15,8 @@ $createdByMeTextColor: white;
 
 $listBackgroundColor: lightGray;
 
+$smallGap: 12px;
+
 html {
     // not supported by all browers.
     // scroll-behavior: smooth;
@@ -49,10 +51,6 @@ strong em {
     font-family: "Roboto", "Verdana", "Aria";
 }
 
-.margin-bottom {
-    margin-bottom: 10px;
-}
-
 .form-group-border {
     border: 1px solid $gray-600;
     border-radius: .6em;
@@ -61,7 +59,7 @@ strong em {
 .edit-props-table {
     margin-top: 5px;
     margin-bottom: 5px;
-    padding: 10px;
+    padding: $smallGap;
 }
 
 .fixedFont {
@@ -69,15 +67,15 @@ strong em {
 }
 
 .file-link {
-    margin-top: 15px;
-    margin-left: 15px;
+    margin-top: $smallGap;
+    margin-left: $smallGap;
     font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
 }
 
 .folder-link {
-    margin-top: 15px;
-    margin-left: 15px;
+    margin-top: $smallGap;
+    margin-left: $smallGap;
     font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
 }
@@ -97,7 +95,7 @@ strong em {
 /* The Modal (background) */
 
 .app-modal-title {
-    margin-bottom: 15px;
+    margin-bottom: $smallGap;
     font-size: 150%;
 }
 
@@ -127,8 +125,8 @@ strong em {
 .app-modal-content {
     background-color: $modal-content-bg;
     border: 2px solid $modal-content-border-color;
-    margin: 15px auto;
-    padding: 15px;
+    margin: $smallGap auto;
+    padding: $smallGap;
     width: 75%;
     border-radius: .7em;
     max-width: 800px;
@@ -146,7 +144,7 @@ strong em {
 
 .app-modal-content-fullscreen {
     background-color: $modal-content-bg;
-    padding: 15px;
+    padding: $smallGap;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -160,7 +158,7 @@ strong em {
 .app-modal-content-almost-fullscreen {
     border: 2px solid $modal-content-border-color;
     background-color: $modal-content-bg;
-    padding: 15px;
+    padding: $smallGap;
     width: 80%;
     height: 100%;
 }
@@ -174,16 +172,16 @@ strong em {
     padding: 0px;
     width: 20%;
     margin-top: 60px;
-    margin-left: 15px;
-    margin-right: 15px;
-    margin-bottom: 15px;
+    margin-left: $smallGap;
+    margin-right: $smallGap;
+    margin-bottom: $smallGap;
     max-width: 400px;
     min-width: 350px;
 }
 
 .my-tab-pane {
     width: 100%;
-    padding-top: 10px;
+    padding-top: $smallGap;
 }
 
 .tab-content {
@@ -192,7 +190,7 @@ strong em {
 }
 
 .ipfs-text {
-    margin: 10px;
+    margin: $smallGap;
     padding: 5px;
 }
 
@@ -311,6 +309,10 @@ input[type="radio"] {
     background-color: $menuItemHoverBackgroundColor;
 }
 
+.marginBottom {
+    margin-bottom: $smallGap;
+}
+
 .listBoxRow {
     cursor: pointer;
 }
@@ -326,9 +328,9 @@ input[type="radio"] {
 
 //warning: this is altering a bootstrap style.
 .btn-group {
-    margin-left: 10px;
-    margin-top: 10px;
-    margin-right: 10px;
+    // margin-left: 10px;
+    // margin-top: 10px;
+    margin-right: $smallGap;
 }
 
 .small-padding {
@@ -362,7 +364,7 @@ input[type="radio"] {
 }
 
 .textfield {
-    margin-bottom: 10px;
+    margin-bottom: $smallGap;
 }
 
 .pre-textfield {
@@ -443,7 +445,7 @@ samp {
 }
 
 .ace-edit-panel {
-    margin-top: 16px;
+    margin-top: $smallGap;
     position: absolute;
     top: 0;
     right: 0;
@@ -467,19 +469,19 @@ samp {
     // max-width: 750px;
     
     //I'd prefer to have NO margin, but the top margin is getting forced so I'll add a bottom margin for consistency for now
-    margin-bottom: 15px;
+    margin-bottom: $smallGap;
     //margin-top: 0px;
     width: 100%;
 }
 
 .searchResultsPanel {
-    padding: 15px;
-    margin: 15px;
+    padding: $smallGap;
+    margin: $smallGap;
 }
 
 .timelinePanel {
-    padding: 15px;
-    margin: 15px;
+    padding: $smallGap;
+    margin: $smallGap;
 }
 
 .mainNodeContentStyle {
@@ -489,14 +491,14 @@ samp {
 }
 
 .vertical-layout-row {
-    margin-bottom: 16px;
+    margin-bottom: $smallGap;
 }
 
 .dialog-header {
     font-weight: bold;
     font-size: large;
-    margin-top: 16px;
-    margin-bottom: 16px;
+    margin-top: $smallGap;
+    margin-bottom: $smallGap;
 }
 
 .created-by-me {
@@ -657,36 +659,6 @@ samp {
     }
 }
 
-// .App {
-//     text-align: center;
-// }
-
-// .App-logo {
-//     animation: App-logo-spin infinite 20s linear;
-//     height: 80px;
-// }
-
-// .App-header {
-//     background-color: #222;
-//     height: 150px;
-//     padding: 20px;
-//     color: white;
-// }
-
-// .App-title {
-//     font-size: 1.5em;
-// }
-
-// .App-intro {
-//     font-size: large;
-// }
-
-// .feather {
-//     width: 16px;
-//     height: 16px;
-//     vertical-align: text-bottom;
-// }
-
 /*
 * Sidebar
 */
@@ -755,8 +727,8 @@ samp {
 }
 
 .rss-feed-listing {
-    margin-top: 15px;
-    margin-left: 20px;
+    margin-top: $smallGap;
+    margin-left: $smallGap;
     max-width: 800px;
 }
 

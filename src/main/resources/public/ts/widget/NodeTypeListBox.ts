@@ -13,7 +13,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class NodeTypeListBox extends ListBox {
     selType: string = "u";
     
-    //todo-0: make these list items polymorph loaded from 'S.plugin' call
     constructor(defaultSel: string, allowFileSysCreate : boolean) {
         super();
 

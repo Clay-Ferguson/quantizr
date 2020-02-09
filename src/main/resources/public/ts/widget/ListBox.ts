@@ -15,7 +15,7 @@ export class ListBox extends Comp {
 
     constructor() {
         super(null);
-        this.setClass("list-group");
+        this.setClass("list-group marginBottom");
     }
 
     rowClickNotify = (row: ListBoxRow): void => {
