@@ -115,7 +115,13 @@ export class Nav implements NavIntf {
 
         //Always just scroll to the top before doing an actual 'upLevel' to parent.
         if (S.view.docElm.scrollTop > 100) {
-            S.view.docElm.scrollTop = 0;
+            //this would do an instant scroll...
+            //S.view.docElm.scrollTop = 0;
+
+            //but let's do an animated scroll instead!
+            S.util.scrollToTopEase();
+            
+            S.meta64.highlightNode(S.meta64.currentNodeData.node, false);
             return;
         }
 

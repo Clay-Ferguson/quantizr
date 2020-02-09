@@ -8,7 +8,7 @@ import * as J from "./JavaIntf";
 import { UtilIntf } from "./intf/UtilIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 import axios, { AxiosRequestConfig } from 'axios';
 
 let S: Singletons;
@@ -1065,6 +1065,69 @@ export class Util implements UtilIntf {
 
         //console.log("PUSHSTATE: url: " + url + ", state: " + JSON.stringify(state));
         history.pushState(state, title, url);
-
     }
+
+    // DO NOT DELETE: THIS CODE WORKS FINE
+    // //Linear Animated Scroll
+    // //https://stackoverflow.com/questions/21474678/scrolltop-animation-without-jquery
+    // scrollToTopLinear = () => {
+    //     let scrollDuration = 900;
+    //     var scrollStep = -window.scrollY / (scrollDuration / 15),
+    //         scrollInterval = setInterval(function () {
+    //             if (window.scrollY != 0) {
+    //                 window.scrollBy(0, scrollStep);
+    //             }
+    //             else clearInterval(scrollInterval);
+    //         }, 15);
+    // }
+
+    // DO NOT DELETE: THIS CODE WORKS FINE
+    // //Non-Linear Animated Scroll (ease in and out):
+    // //https://stackoverflow.com/questions/21474678/scrolltop-animation-without-jquery
+    // scrollToTopEase_v1 = () => {
+    //     let scrollDuration = 900;
+    //     const scrollHeight = window.scrollY,
+    //         scrollStep = Math.PI / (scrollDuration / 15),
+    //         cosParameter = scrollHeight / 2;
+    //     let scrollCount = 0, scrollMargin;
+    //     let scrollInterval = setInterval(() => {
+    //         if (window.scrollY != 0) {
+    //             scrollCount = scrollCount + 1;
+    //             scrollMargin = cosParameter - cosParameter * Math.cos(scrollCount * scrollStep);
+    //             window.scrollTo(0, (scrollHeight - scrollMargin));
+    //         }
+    //         else {
+    //             clearInterval(scrollInterval);
+    //         }
+    //     }, 15);
+    // }
+
+    /* NOTE: This is the version we're using, The two above also do work */
+    scrollToTopEase = () => {
+        let scrollDuration = 900, cosParameter = window.scrollY / 2,
+            scrollCount = 0,
+            oldTimestamp = performance.now();
+        let step = (newTimestamp: number) => {
+            scrollCount += Math.PI / (scrollDuration / (newTimestamp - oldTimestamp));
+            if (scrollCount >= Math.PI) window.scrollTo(0, 0);
+            if (window.scrollY === 0) return;
+            window.scrollTo(0, Math.round(cosParameter + cosParameter * Math.cos(scrollCount)));
+            oldTimestamp = newTimestamp;
+            window.requestAnimationFrame(step);
+        }
+        window.requestAnimationFrame(step);
+    }
+    /* 
+        Explanations:
+        - pi is the length/end point of the cosinus intervall (see above)
+        - newTimestamp indicates the current time when callbacks queued by requestAnimationFrame begin to fire.
+          (for more information see https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame)
+        - newTimestamp - oldTimestamp equals the duration
+    
+          a * cos (bx + c) + d                      | c translates along the x axis = 0
+        = a * cos (bx) + d                          | d translates along the y axis = 1 -> only positive y values
+        = a * cos (bx) + 1                          | a stretches along the y axis = cosParameter = window.scrollY / 2
+        = cosParameter + cosParameter * (cos bx)    | b stretches along the x axis = scrollCount = Math.PI / (scrollDuration / (newTimestamp - oldTimestamp))
+        = cosParameter + cosParameter * (cos scrollCount * x)
+    */
 }

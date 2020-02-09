@@ -24,8 +24,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Render implements RenderIntf {
-
-    private PRETTY_TAGS: boolean = true;
     private debug: boolean = false;
     private markedRenderer = null;
 
@@ -51,7 +49,7 @@ export class Render implements RenderIntf {
         }
     }
 
-    buildRowHeader = (node: J.NodeInfo, showPath: boolean, showName: boolean): Div => {
+    buildRowHeader = (node: J.NodeInfo): Div => {
         let children = [];
 
         let priority = S.props.getNodePropertyVal("priority", node);
@@ -88,8 +86,8 @@ export class Render implements RenderIntf {
      * This is the function that renders each node in the main window. The rendering in here is very central to the
      * app and is what the user sees covering 90% of the screen most of the time. The *content* nodes.
      */
-    renderNodeContent = (node: J.NodeInfo, showPath, showName, renderBin, rowStyling, showHeader): Comp[] => {
-        //todo-3; bring back top right image support. disabling for now to simplify refactoring
+    renderNodeContent = (node: J.NodeInfo, renderBin: boolean, rowStyling: boolean, showHeader: boolean): Comp[] => {
+        //todo-3: bring back top right image support. disabling for now to simplify refactoring
         //let topRightImgTag = null; //this.getTopRightImageTag(node);
         //let ret: string = topRightImgTag ? topRightImgTag.render_Html() : "";
 
@@ -99,7 +97,7 @@ export class Render implements RenderIntf {
         /* todo-2: enable headerText when appropriate here */
         if (S.meta64.showMetaData) {
             if (showHeader) {
-                ret.push(this.buildRowHeader(node, showPath, showName));
+                ret.push(this.buildRowHeader(node));
             }
         }
 
@@ -169,10 +167,6 @@ export class Render implements RenderIntf {
         else {
             val = this.renderRawMarkdown(node);
         }
-
-        //When doing server-side markdown we had this processing the HTML that was generated
-        //but I haven't looked into how to get this back now that we are doing markdown on client.
-        //jcrContent = injectSubstitutions(jcrContent);
 
         // NOTE: markdown-html doesn't apply any actual styling but instead is used in a JS dom lookup to find all the 
         // images under each markdown element to apply a styling update post-render.
@@ -395,7 +389,7 @@ export class Render implements RenderIntf {
             [
                 buttonBar, new Div(null, {
                     "id": id + "_content"
-                }, this.renderNodeContent(node, true, true, true, true, true))
+                }, this.renderNodeContent(node, true, true, true))
             ]);
     }
 
@@ -628,7 +622,7 @@ export class Render implements RenderIntf {
                         S.meta64.selectedNodes = {};
 
                         //todo-1: Isn't this map needed forever during the app lifetime? Is it better to not blow this away here?
-                        S.meta64.parentIdToFocusNodeMap = {};
+                        //S.meta64.parentIdToFocusNodeMap = {};
 
                         S.meta64.initNode(data.node, true);
                         S.meta64.setCurrentNodeData(data);
@@ -646,7 +640,7 @@ export class Render implements RenderIntf {
                      * NOTE: mainNodeContent is the parent node of the page content, and is always the node displayed at the top
                      * of the page above all the other nodes which are its child nodes.
                      */
-                    let mainNodeContent: Comp[] = this.renderNodeContent(data.node, true, true, true, false, true);
+                    let mainNodeContent: Comp[] = this.renderNodeContent(data.node, true, false, true);
 
                     //console.log("mainNodeContent: "+mainNodeContent);
 
