@@ -24,6 +24,10 @@ export class PluginMgr implements PluginMgrIntf {
         return this.typeHandlers[typeName];
     }
 
+    getAllTypeHandlers = (): { [key: string]: TypeHandlerIntf } => {
+        return this.typeHandlers;
+    }
+
     initPlugins = (): void => {
         this.addTypeHandler(new RssTypeHandler());
         // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());

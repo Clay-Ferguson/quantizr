@@ -3,6 +3,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 import { ListBox } from "./ListBox";
+import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -14,24 +15,18 @@ export class NodeTypeListBox extends ListBox {
     
     //todo-0: make these list items polymorph loaded from 'S.plugin' call
     constructor(defaultSel: string, allowFileSysCreate : boolean) {
-        super(null, [
-            new ListBoxRow("Text/Markdown", () => { this.selType = "u"; }, true),
+        super();
 
-            /* Note: the isAdminUser is a temporary hack, and there will be a better way to do this eventually (i.e. types themselves
-               probably will specify what roles of users they are available on or something like that) */
-            new ListBoxRow("RSS Feed", () => { this.selType = "sn:rssfeed"; }, false),
-            
-            //Experimental types currently disabled, by commenting out.
-            //S.meta64.allowBashScripting ? new ListBoxRow("Bash Script", () => { this.selType = "bash"; }, false) : null,
-            //new ListBoxRow("Password", () => { this.selType = "sn:passwordType"; }, false),
-            //!S.meta64.isAdminUser ? null : new ListBoxRow("FileSystem Folder", () => { this.selType = "fs:folder"; }, false),
-            //!S.meta64.isAdminUser ? null : new ListBoxRow("Lucene Index Folder", () => { this.selType = "luceneIndex"; }, false),
+        //First load the non-type (generic) type.
+        let children = [new ListBoxRow("Text/Markdown", () => { this.selType = "u"; }, true)];
 
-            //todo-1: need a limit on each account stopping people from using too much MongoDB disk space.
-            //       (so for now I'm removing IPFS as an option, for all but admin users)
-            !S.meta64.isAdminUser ? null : new ListBoxRow("IPFS Node", () => { this.selType = "ipfs:node"; }, false),
-            
-            //!meta64.isAdminUser ? null : new ListBoxRow("System Folder", () => { this.selType = "meta64:systemfolder"; }, false)
-        ]);
+        //Then load all the types from all the actual TypeHandlers.
+        let typeHandlers = S.plugin.getAllTypeHandlers();
+        S.util.forEachProp(typeHandlers, (k, typeHandler: TypeHandlerIntf): boolean => {
+            children.push(new ListBoxRow(typeHandler.getName(), () => { this.selType = typeHandler.getTypeName(); }, false));
+            return true;
+        });
+
+        this.setChildren(children);
     }
 }

@@ -13,20 +13,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ListBox extends Comp {
     selectedRow: ListBoxRow = null;
 
-    constructor(attribs: Object, initialRows: ListBoxRow[] = null) {
-        super(attribs);
+    constructor() {
+        super(null);
         this.setClass("list-group");
-        this.setChildren(initialRows);
-
-        /* For each of the ListBoxRows we need to tell them all who their parent is */
-        initialRows.forEach((row: ListBoxRow) => {
-            if (row) {
-                if (row.selected) {
-                    this.selectedRow = row;
-                }
-                row.setListBox(this);
-            }
-        });
     }
 
     rowClickNotify = (row: ListBoxRow): void => {
@@ -41,6 +30,16 @@ export class ListBox extends Comp {
     }
 
     compRender = (): ReactNode => {
+         /* For each of the ListBoxRows we need to tell them all who their parent is */
+         this.children.forEach((row: ListBoxRow) => {
+            if (row) {
+                if (row.selected) {
+                    this.selectedRow = row;
+                }
+                row.setListBox(this);
+            }
+        });
+
         return this.tagRender('div', null, this.attribs);
     }
 }

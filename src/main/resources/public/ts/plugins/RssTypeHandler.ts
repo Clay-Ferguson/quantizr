@@ -30,11 +30,15 @@ export class RssTypeHandler implements TypeHandlerIntf {
     //another service like this is:
     //XML Retrieve URL - https://cors.now.sh/https://example.com/rss-xml-link
 
-    //todo-0: need to understand and eliminate the need for this, or find some open-source of what this is doing.
-    CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+    //todo-1: can we remove this now?
+    //CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
     getTypeName = (): string => {
         return "sn:rssfeed";
+    }
+
+    getName = (): string => {
+        return "RSS Feed";
     }
 
     allowPropertyEdit = (propName: string): boolean => {
@@ -89,7 +93,7 @@ export class RssTypeHandler implements TypeHandlerIntf {
 
             //todo-1: to avoid performance issues i'll just allow only 100 items to load for now but this
             //should be somehow controlled by the user (they may want to wait for the full list)
-            parser.parseURL(this.CORS_PROXY + feedSrc, (err, feed) => {
+            parser.parseURL(/*this.CORS_PROXY +*/ feedSrc, (err, feed) => {
                 pgrsDlg.close();
                 if (!feed) {
                     if (err.message) {
