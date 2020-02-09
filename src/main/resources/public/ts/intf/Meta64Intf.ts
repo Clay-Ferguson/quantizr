@@ -91,6 +91,5 @@ export interface Meta64Intf {
     saveUserPreferences(): void;
     openSystemFile(fileName: string);
     onSignIn(googleUser);
-    openManageKeysDlg();
 }
 

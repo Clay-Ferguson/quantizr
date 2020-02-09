@@ -9,6 +9,7 @@ import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
+import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -161,9 +162,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Preferences", S.edit.editPreferences, () => { return !S.meta64.isAnonUser }), //
                 new MenuItem("Change Password", S.edit.openChangePasswordDlg, () => { return !S.meta64.isAnonUser }), //
                 new MenuItem("Manage Account", S.edit.openManageAccountDlg, () => { return !S.meta64.isAnonUser }), //
-
-                //This isn't mature enough yet to show to users
-                //new MenuItem("Encryption Keys", S.meta64.openManageKeysDlg, () => { return !S.meta64.isAnonUser }), //
+                new MenuItem("Encryption Keys", () => {new ManageEncryptionKeysDlg().open();}, () => { return !S.meta64.isAnonUser }), //
 
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //

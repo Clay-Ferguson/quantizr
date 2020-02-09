@@ -535,7 +535,8 @@ export class Render implements RenderIntf {
             }
         }
 
-        let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton]);
+        let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
+            moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton]);
 
         if (selButton || typeIcon) {
             return new HorizontalLayout([selButton, typeIcon, buttonBar]);
@@ -709,7 +710,8 @@ export class Render implements RenderIntf {
                         }
 
                         if (typeIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton) {
-                            buttonBar = new ButtonBar([typeIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton]);
+                            buttonBar = new ButtonBar([typeIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
+                                null, "marginLeft");
                         }
 
                         let children = [];
@@ -722,8 +724,7 @@ export class Render implements RenderIntf {
                             className: (selected ? "mainNodeContentStyle active-row" : "mainNodeContentStyle inactive-row"),
                             onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(id); },
                             id: cssId
-                        },//
-                            children);
+                        }, children);
 
                         S.util.setElmDisplayById("mainNodeContent", true);
                         contentDiv.updateDOM("mainNodeContent");

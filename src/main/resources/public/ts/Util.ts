@@ -1081,29 +1081,35 @@ export class Util implements UtilIntf {
     //         }, 15);
     // }
 
-    // DO NOT DELETE: THIS CODE WORKS FINE
     // //Non-Linear Animated Scroll (ease in and out):
     // //https://stackoverflow.com/questions/21474678/scrolltop-animation-without-jquery
-    // scrollToTopEase_v1 = () => {
-    //     let scrollDuration = 900;
-    //     const scrollHeight = window.scrollY,
-    //         scrollStep = Math.PI / (scrollDuration / 15),
-    //         cosParameter = scrollHeight / 2;
-    //     let scrollCount = 0, scrollMargin;
-    //     let scrollInterval = setInterval(() => {
-    //         if (window.scrollY != 0) {
-    //             scrollCount = scrollCount + 1;
-    //             scrollMargin = cosParameter - cosParameter * Math.cos(scrollCount * scrollStep);
-    //             window.scrollTo(0, (scrollHeight - scrollMargin));
-    //         }
-    //         else {
-    //             clearInterval(scrollInterval);
-    //         }
-    //     }, 15);
-    // }
+    scrollToTopEase_v1 = () => {
+        let scrollDuration = 900;
+        const scrollHeight = window.scrollY,
+            scrollStep = Math.PI / (scrollDuration / 15),
+            cosParameter = scrollHeight / 2;
+        let scrollCount = 0, scrollMargin;
+        let scrollInterval = setInterval(() => {
+            if (window.scrollY != 0) {
+                scrollCount = scrollCount + 1;
+                scrollMargin = cosParameter - cosParameter * Math.cos(scrollCount * scrollStep);
+                window.scrollTo(0, (scrollHeight - scrollMargin));
+            }
+            else {
+                clearInterval(scrollInterval);
+            }
+        }, 15);
+    }
 
     /* NOTE: This is the version we're using, The two above also do work */
     scrollToTopEase = () => {
+
+        //just to be careful we can fall back to simpler version of animation frames aren't supported.
+        if (!window.requestAnimationFrame) {
+            this.scrollToTopEase_v1();
+            return;
+        }
+
         let scrollDuration = 900, cosParameter = window.scrollY / 2,
             scrollCount = 0,
             oldTimestamp = performance.now();

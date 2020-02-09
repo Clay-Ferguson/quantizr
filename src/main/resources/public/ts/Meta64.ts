@@ -7,9 +7,6 @@ import { Constants as C} from "./Constants";
 import { TabPanel } from "./widget/TabPanel";
 import { MainNavPanel } from "./widget/MainNavPanel";
 import { GraphPanel } from "./widget/GraphPanel";
-import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
-
-declare var chrome;
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -41,7 +38,6 @@ export class Meta64 implements Meta64Intf {
     };
 
     appInitialized: boolean = false;
-
     isMobile: boolean;
     isMobileOrTablet: boolean;
 
@@ -105,9 +101,7 @@ export class Meta64 implements Meta64Intf {
     showMetaData: boolean = false;
 
     simpleModePropertyBlackList: any = {};
-
     readOnlyPropertyList: any = {};
-
     binaryPropertyList: any = {};
 
     /*
@@ -374,8 +368,8 @@ export class Meta64 implements Meta64Intf {
         this.state.homeNodeSelected = this.state.highlightNode != null && this.homeNodeId == this.state.highlightNode.id;
 
         //for now, allowing all users to import+export (todo-2)
-        this.state.importFeatureEnabled = true; //this.isAdminUser || this.userPreferences.importAllowed;
-        this.state.exportFeatureEnabled = true; //this.isAdminUser || this.userPreferences.exportAllowed;
+        this.state.importFeatureEnabled = this.isAdminUser || this.userPreferences.importAllowed;
+        this.state.exportFeatureEnabled = this.isAdminUser || this.userPreferences.exportAllowed;
 
         this.state.highlightOrdinal = this.getOrdinalOfNode(this.state.highlightNode);
 
@@ -492,10 +486,6 @@ export class Meta64 implements Meta64Intf {
         if (updateMaps) {
             this.idToNodeMap[node.id] = node;
         }
-    }
-
-    openManageKeysDlg = () => {
-        new ManageEncryptionKeysDlg().open();
     }
 
     //here's the simple mode property hider!

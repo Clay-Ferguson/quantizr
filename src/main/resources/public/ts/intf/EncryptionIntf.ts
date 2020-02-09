@@ -6,13 +6,13 @@ export interface EncryptionIntf {
     ASYM_ALGO: string;
     HASH_ALGO: string;
 
-    ALGO_OPERATIONS;
+    ALGO_OPERATIONS: string[];
     OP_ENCRYPT: string[];
     OP_DECRYPT: string[];
 
     vector: Uint8Array;
 
-    asymKeyTest(): Promise<string>;
+    asymTest(): Promise<string>;
     initKeys(forceUpdate?:boolean): any;
     exportKeys(): Promise<string>;
         
@@ -22,6 +22,6 @@ export interface EncryptionIntf {
     asymDecryptString(key: CryptoKey, encHex: string): Promise<string>;
     symDecryptString(key: CryptoKey, encHex: string): Promise<string>;
 
-    convertStringToByteArray(str);
-    convertByteArrayToString(buffer);
+    convertStringToByteArray(str): any;
+    convertByteArrayToString(buffer): any;
 }

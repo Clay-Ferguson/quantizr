@@ -3,7 +3,7 @@ import { EncryptionKeyPair } from "./EncryptionKeyPair";
 import { EncryptionIntf } from "./intf/EncryptionIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -14,17 +14,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 PUBLIC KEY ENCRYPTION
 ---------------------
 This class is for proof-of-concept work related to doing Public Key Encryption in the browser using the
-WebCryptoAPI, for a "Secure Messaging" feature of Quantizr. Currently the way this test is run is simply via
-a call to 'encryption.test()' from an admin option
+WebCryptoAPI, for a "Secure Messaging" feature of Quantizr. Currently the way this test/develop is run is by using
+'encryption.test()'
 
 We will be using LocalDB.ts implementation to store the keys in the browser, but we will also support
 allowing the user to cut-n-paste they Key JSON, so that if something goes wrong with the
-browser storage the user will not loose their keys because they wil be able
-to reimport the JSON key text back in at any time, or put keys in a different browser.
+browser storage the user will not loose their keys because they will be able
+to reimport the JSON key text back in at any time, or install the keys in a different browser.
 
-At no point in time does the users' Private Key ever leave their own machine. Is never sent down the wire, and
-not even any encrypted copy is ever sent down the wire either for the best-practices that are available for
-Secure Messaging, short of special-purpose hardware key-storage
+At no point in time does the users' Private Key ever leave their own browser storage.
+
 
 SYMMETRIC ENCRYPTION
 --------------------
@@ -65,7 +64,6 @@ export class Encryption implements EncryptionIntf {
     vector: Uint8Array = null;
 
     constructor() {
-
         /* WARNING: Crypto (or at least subtle) will not be available except on Secure Origin, which means a SSL (https) 
         web address plus also localhost */
 
@@ -74,7 +72,8 @@ export class Encryption implements EncryptionIntf {
             return;
         }
 
-        /* Note: This is not a mistake to have this vector publicly visible. It's not a security risk. This vector is merely required
+        /* 
+        Note: This vector is merely required
         to be large enough and random enough, but is not required to be secret. 16 randomly chosen prime numbers. 
         WARNING: If you change this you will NEVER be able to recover any data encrypted with it in effect, even with the correct password. So 
         beware if you change this you've basically lost ALL your passwords. So just don't change it.
@@ -85,11 +84,16 @@ export class Encryption implements EncryptionIntf {
         this.vector = new Uint8Array([71, 73, 79, 83, 89, 37, 41, 47, 53, 67, 97, 103, 107, 109, 127, 131]);
     }
 
-    asymKeyTest = async (): Promise<string> => {
+    /* Runs a full test of all the asymetric encryption code.
+    
+       Assumes that Encryption.initKeys() has at some point in the past been ran on this browser, which is 
+       safe to assume because we run it during app initialization.
+    */
+    asymTest = async (): Promise<string> => {
         return new Promise<string>(async (resolve, reject) => {
             let results = "";
 
-            // first test converters
+            // First test conversion of clear-text string to hex texct, and back.
             let clearText = "Encrypt this string.";
             let clearTextBytes: Uint8Array = this.convertStringToByteArray(clearText);
             let hexOfClearText: string = S.util.buf2hex(clearTextBytes);
@@ -101,27 +105,32 @@ export class Encryption implements EncryptionIntf {
             // test public key encryption
             let obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
             if (obj) {
+                //results += "STORE_ASYMKEY: \n"+S.util.prettyPrint(obj)+"\n\n";
+
                 // simple encrypt/decrypt
                 let encHex = await this.asymEncryptString(obj.val.publicKey, clearText);
                 let unencText = await this.asymDecryptString(obj.val.privateKey, encHex);
                 let encResults = clearText === unencText ? "Successful." : "Failed.";
                 results += "Public Key Encryption: " + encResults + "\n";
 
-                // test asymetric key export/import
-                let pubKeyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, obj.val.publicKey);
-                let privKeyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, obj.val.privateKey);
+                // Export keys to a string format
+                let publicKeyStr = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, obj.val.publicKey);
+                results += "EXPORTED PUBLIC KEY: " + S.util.toJson(publicKeyStr) + "\n";
+                let privateKeyStr = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, obj.val.privateKey);
+                results += "EXPORTED PRIVATE KEY: " + S.util.toJson(publicKeyStr) + "\n";
 
-                let pubKey2 = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, pubKeyDat, {
+                let publicKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, publicKeyStr, {
                     name: this.ASYM_ALGO,
                     hash: this.HASH_ALGO,
                 }, true, this.OP_ENCRYPT);
-                let privKey2 = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, privKeyDat, {
+
+                let privateKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, privateKeyStr, {
                     name: this.ASYM_ALGO,
                     hash: this.HASH_ALGO,
                 }, true, this.OP_DECRYPT);
 
-                let encHex2 = await this.asymEncryptString(pubKey2, clearText);
-                let unencText2 = await this.asymDecryptString(privKey2, encHex2);
+                let encHex2 = await this.asymEncryptString(publicKey, clearText);
+                let unencText2 = await this.asymDecryptString(privateKey, encHex2);
                 let encResults2 = clearText === unencText2 ? "Successful." : "Failed.";
                 results += "Public Key Encryption (imported key): " + encResults2 + "\n";
             }
@@ -209,7 +218,7 @@ export class Encryption implements EncryptionIntf {
     }
 
     savePublicKeyResponse = (res: J.SavePublicKeyResponse): void => {
-       // alert(res.message);
+        // alert(res.message);
     }
 
     /**
