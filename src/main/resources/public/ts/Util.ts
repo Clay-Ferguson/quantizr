@@ -1083,7 +1083,7 @@ export class Util implements UtilIntf {
 
     // //Non-Linear Animated Scroll (ease in and out):
     // //https://stackoverflow.com/questions/21474678/scrolltop-animation-without-jquery
-    scrollToTopEase_v1 = () => {
+    animateScrollToTop_v1 = () => {
         let scrollDuration = 900;
         const scrollHeight = window.scrollY,
             scrollStep = Math.PI / (scrollDuration / 15),
@@ -1101,12 +1101,11 @@ export class Util implements UtilIntf {
         }, 15);
     }
 
-    /* NOTE: This is the version we're using, The two above also do work */
-    scrollToTopEase = () => {
+    animateScrollToTop = () => {
 
         //just to be careful we can fall back to simpler version of animation frames aren't supported.
         if (!window.requestAnimationFrame) {
-            this.scrollToTopEase_v1();
+            this.animateScrollToTop_v1();
             return;
         }
 

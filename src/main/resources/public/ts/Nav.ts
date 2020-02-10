@@ -115,11 +115,11 @@ export class Nav implements NavIntf {
 
         //Always just scroll to the top before doing an actual 'upLevel' to parent.
         if (S.view.docElm.scrollTop > 100) {
-            //this would do an instant scroll...
-            //S.view.docElm.scrollTop = 0;
+            S.view.docElm.scrollTop = 0;
 
-            //but let's do an animated scroll instead!
-            S.util.scrollToTopEase();
+            /* This works fine but actually for me causes eye-strain. I might enable this for mobile some day, but for now
+            let's just comment it out. */
+            //S.util.animateScrollToTop();
             
             S.meta64.highlightNode(S.meta64.currentNodeData.node, false);
             return;

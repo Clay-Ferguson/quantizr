@@ -102,5 +102,5 @@ export interface UtilIntf {
     formatDate(date) : string;
     updateHistory(node: J.NodeInfo, childNode?: J.NodeInfo): void;
     getElm(id: string, exResolve?: (elm: HTMLElement) => void): Promise<HTMLElement>;
-    scrollToTopEase(): any;
+    animateScrollToTop(): any;
 }
