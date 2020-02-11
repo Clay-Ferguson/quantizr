@@ -12,7 +12,7 @@ export interface EncryptionIntf {
 
     vector: Uint8Array;
 
-    asymTest(): Promise<string>;
+    test(): Promise<string>;
     initKeys(forceUpdate?:boolean): any;
     exportKeys(): Promise<string>;
         

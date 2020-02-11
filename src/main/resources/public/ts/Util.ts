@@ -241,6 +241,12 @@ export class Util implements UtilIntf {
         return -1;
     }
 
+    assert = (check: boolean, op: string) => {
+        if (!check) {
+            throw new Error("OP FAILED: " + op);
+        }
+    }
+
     assertNotNull = (varName) => {
         if (typeof eval(varName) === 'undefined') {
             this.showMessage("Variable not found: " + varName);

@@ -25,10 +25,6 @@ export class ManageEncryptionKeysDlg extends DialogBase {
                     await S.encryption.initKeys(true);
                     this.refreshKeyInfo();
                 }),
-                new Button("Test Keys", async () => {
-                    let result = await S.encryption.asymTest();
-                    S.util.showMessage(result, true);
-                }),
                 new Button("Close", () => {
                     this.close();
                 })

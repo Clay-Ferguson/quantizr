@@ -84,23 +84,54 @@ export class Encryption implements EncryptionIntf {
         this.vector = new Uint8Array([71, 73, 79, 83, 89, 37, 41, 47, 53, 67, 97, 103, 107, 109, 127, 131]);
     }
 
-    /* Runs a full test of all the asymetric encryption code.
+    /* Runs a full test of all encryption code.
     
-       Assumes that Encryption.initKeys() has at some point in the past been ran on this browser, which is 
+       Assumes that Encryption.initKeys() has previously been called, which is 
        safe to assume because we run it during app initialization.
     */
-    asymTest = async (): Promise<string> => {
+    test = async (): Promise<string> => {
         return new Promise<string>(async (resolve, reject) => {
             let results = "";
 
-            // First test conversion of clear-text string to hex texct, and back.
+            this.runConversionTest();
+            await this.runPublicKeyTest();
+            await this.symetricEncryptionTest();
+
+            console.log("All Encryption Tests: OK");
+            resolve(results);
+        });
+    }
+
+    symetricEncryptionTest = async (): Promise<boolean> => {
+        return new Promise<boolean>(async (resolve, reject) => {
             let clearText = "Encrypt this string.";
-            let clearTextBytes: Uint8Array = this.convertStringToByteArray(clearText);
-            let hexOfClearText: string = S.util.buf2hex(clearTextBytes);
-            let verifyClearTextBytes: Uint8Array = S.util.hex2buf(hexOfClearText);
-            let verifyClearText: string = this.convertByteArrayToString(verifyClearTextBytes);
-            let encodingResults = clearText === verifyClearText ? "Successful." : "Failed.";
-            results += "Encoding: " + encodingResults + "\n";
+            
+            // test symetric encryption
+            let obj: any = await S.localDB.readObject(this.STORE_SYMKEY);
+            if (obj) {
+                // simple encrypt/decrypt
+                let key = obj.val;
+                let encHex = await this.symEncryptString(key, clearText);
+                let unencText = await this.symDecryptString(key, encHex);
+                S.util.assert(clearText === unencText, "Symmetric decrypt");
+
+                // test symetric key export/import
+                let keyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, key);
+                let key2 = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, keyDat, this.SYM_ALGO, true, this.ALGO_OPERATIONS);
+
+                let encHex2 = await this.symEncryptString(key2, clearText);
+                let unencText2 = await this.symDecryptString(key2, encHex2);
+                S.util.assert(clearText === unencText2, "Symetric decrypt, using imported key");
+                console.log("sym enc test: OK");
+            }
+
+            resolve(true);
+        });
+    }
+
+    runPublicKeyTest = async (): Promise<boolean> => {
+        return new Promise<boolean>(async (resolve, reject) => {
+            let clearText = "Encrypt this string.";
 
             // test public key encryption
             let obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
@@ -110,14 +141,13 @@ export class Encryption implements EncryptionIntf {
                 // simple encrypt/decrypt
                 let encHex = await this.asymEncryptString(obj.val.publicKey, clearText);
                 let unencText = await this.asymDecryptString(obj.val.privateKey, encHex);
-                let encResults = clearText === unencText ? "Successful." : "Failed.";
-                results += "Public Key Encryption: " + encResults + "\n";
+                S.util.assert(clearText === unencText, "Asym encryption");
 
                 // Export keys to a string format
                 let publicKeyStr = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, obj.val.publicKey);
-                results += "EXPORTED PUBLIC KEY: " + S.util.toJson(publicKeyStr) + "\n";
+                //console.log("EXPORTED PUBLIC KEY: " + S.util.toJson(publicKeyStr) + "\n");
                 let privateKeyStr = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, obj.val.privateKey);
-                results += "EXPORTED PRIVATE KEY: " + S.util.toJson(publicKeyStr) + "\n";
+                //console.log("EXPORTED PRIVATE KEY: " + S.util.toJson(publicKeyStr) + "\n");
 
                 let publicKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, publicKeyStr, {
                     name: this.ASYM_ALGO,
@@ -131,32 +161,23 @@ export class Encryption implements EncryptionIntf {
 
                 let encHex2 = await this.asymEncryptString(publicKey, clearText);
                 let unencText2 = await this.asymDecryptString(privateKey, encHex2);
-                let encResults2 = clearText === unencText2 ? "Successful." : "Failed.";
-                results += "Public Key Encryption (imported key): " + encResults2 + "\n";
+                S.util.assert(clearText === unencText2, "Asym encrypt test using imported keys.");
+                
+                console.log("publicKeyTest OK.");
+                resolve(true);
             }
-
-            // test symetric encryption
-            obj = await S.localDB.readObject(this.STORE_SYMKEY);
-            if (obj) {
-                // simple encrypt/decrypt
-                let key = obj.val;
-                let encHex = await this.symEncryptString(key, clearText);
-                let unencText = await this.symDecryptString(key, encHex);
-                let encResults = clearText === unencText ? "Successful." : "Failed.";
-                results += "Symmetric Encryption: " + encResults + "\n";
-
-                // test symetric key export/import
-                let keyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, key);
-                let key2 = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, keyDat, this.SYM_ALGO, true, this.ALGO_OPERATIONS);
-
-                let encHex2 = await this.symEncryptString(key2, clearText);
-                let unencText2 = await this.symDecryptString(key2, encHex2);
-                let encResults2 = clearText === unencText2 ? "Successful." : "Failed.";
-                results += "Symmetric Encryption (imported key): " + encResults2 + "\n";
-            }
-
-            resolve(results);
         });
+    }
+
+    runConversionTest = () => {
+        // First test conversion of clear-text string to hex texct, and back.
+        let clearText = "Encrypt this string.";
+        let clearTextBytes: Uint8Array = this.convertStringToByteArray(clearText);
+        let hexOfClearText: string = S.util.buf2hex(clearTextBytes);
+        let verifyClearTextBytes: Uint8Array = S.util.hex2buf(hexOfClearText);
+        let verifyClearText: string = this.convertByteArrayToString(verifyClearTextBytes);
+        S.util.assert(clearText === verifyClearText, "encryption encodings");
+        console.log("runConversionTest OK.");
     }
 
     initKeys = async (forceUpdate: boolean = false) => {

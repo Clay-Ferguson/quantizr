@@ -4,7 +4,7 @@ import { MenuItem } from "./widget/MenuItem";
 import { Div } from "./widget/Div";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
@@ -99,9 +99,9 @@ export class MenuPanel extends Div {
                 //new MenuItem("Find Shared Subnodes", share.findSharedNodes, () => { return  !S.meta64.isAnonUser && S.meta64.state.highlightNode != null })
             ]),
             new Menu("Search", [
-                new MenuItem("All Content", () => {new SearchContentDlg().open();}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
-                new MenuItem("By Name", () => {new SearchByNameDlg().open();}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
-                new MenuItem("By ID", () => {new SearchByIDDlg().open();}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
+                new MenuItem("All Content", () => { new SearchContentDlg().open(); }, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
+                new MenuItem("By Name", () => { new SearchByNameDlg().open(); }, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
+                new MenuItem("By ID", () => { new SearchByIDDlg().open(); }, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
 
                 //new MenuItem("Files", nav.searchFiles, () => { return  !S.meta64.isAnonUser && S.meta64.allowFileSystemSearch },
                 //    () => { return  !S.meta64.isAnonUser && S.meta64.allowFileSystemSearch })
@@ -126,7 +126,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Show Node JSON", () => { S.view.runServerCommand("getJson") }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
             ]),
             new Menu("Transform", [
-                new MenuItem("Split Node", () => { 
+                new MenuItem("Split Node", () => {
                     new SplitNodeDlg().open();
                 }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
             ]),
@@ -162,7 +162,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Preferences", S.edit.editPreferences, () => { return !S.meta64.isAnonUser }), //
                 new MenuItem("Change Password", S.edit.openChangePasswordDlg, () => { return !S.meta64.isAnonUser }), //
                 new MenuItem("Manage Account", S.edit.openManageAccountDlg, () => { return !S.meta64.isAnonUser }), //
-                new MenuItem("Encryption Keys", () => {new ManageEncryptionKeysDlg().open();}, () => { return !S.meta64.isAnonUser }), //
+                new MenuItem("Encryption Keys", () => { new ManageEncryptionKeysDlg().open(); }, () => { return !S.meta64.isAnonUser }), //
 
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //
@@ -215,7 +215,24 @@ export class MenuPanel extends Div {
 
                     new MenuItem("Rebuild Indexes", S.meta64.rebuildIndexes, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }),
                     new MenuItem("Shutdown Server Node", S.meta64.shutdownServerNode, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }),
-                    new MenuItem("Send Test Email", S.meta64.sendTestEmail, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser })
+                    new MenuItem("Send Test Email", S.meta64.sendTestEmail, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }),
+                    new MenuItem("Encryption Test", async () => {
+                        await S.encryption.test();
+                        S.util.showMessage("Encryption Test Complete. Check browser console for output.", true);
+                    }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }),
+                    new MenuItem("TTS Test", async () => {
+                        let tts = window.speechSynthesis;
+                        // let voices = tts.getVoices();
+                        // for (let i = 0; i < voices.length; i++) {
+                        //     let voice = voices[i];
+                        //     // Google UK English Female (en-GB)
+                        //     console.log("Voice: " + voice.name + " (" + voice.lang + ") " + (voice.default ? "<-- Default" : ""));
+                        // }
+
+                        var utterThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
+                        tts.speak(utterThis);
+
+                    }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }),
                 ],
                 () => { return S.meta64.isAdminUser; },
                 () => { return S.meta64.isAdminUser; })
