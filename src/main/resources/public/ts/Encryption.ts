@@ -63,6 +63,8 @@ export class Encryption implements EncryptionIntf {
 
     vector: Uint8Array = null;
 
+    logKeys: boolean = false;
+
     constructor() {
         /* WARNING: Crypto (or at least subtle) will not be available except on Secure Origin, which means a SSL (https) 
         web address plus also localhost */
@@ -92,20 +94,40 @@ export class Encryption implements EncryptionIntf {
     test = async (): Promise<string> => {
         return new Promise<string>(async (resolve, reject) => {
             let results = "";
+            try {
+                this.runConversionTest();
+                await this.runPublicKeyTest();
+                await this.symetricEncryptionTest();
+                await this.secureMessagingTest();
 
-            this.runConversionTest();
-            await this.runPublicKeyTest();
-            await this.symetricEncryptionTest();
+                console.log("All Encryption Tests: OK");
+            }
+            finally {
+                resolve(results);
+            }
+        });
+    }
 
-            console.log("All Encryption Tests: OK");
-            resolve(results);
+    secureMessagingTest = async (): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                console.log("running secureMessagingTest...");
+                let clearText = "This is cleartext";
+                let skdp: SymKeyDataPackage = await this.encryptSharableString(null, clearText);
+                let checkText = await this.decryptSharableString(null, skdp);
+                S.util.assert(checkText === clearText, "verifying cleartext");
+                console.log("secureMessagingTest: OK");
+            }
+            finally {
+                resolve();
+            }
         });
     }
 
     symetricEncryptionTest = async (): Promise<boolean> => {
         return new Promise<boolean>(async (resolve, reject) => {
             let clearText = "Encrypt this string.";
-            
+
             // test symetric encryption
             let obj: any = await S.localDB.readObject(this.STORE_SYMKEY);
             if (obj) {
@@ -117,6 +139,7 @@ export class Encryption implements EncryptionIntf {
 
                 // test symetric key export/import
                 let keyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, key);
+                debugger; //what kind of object is keyDat? string?
                 let key2 = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, keyDat, this.SYM_ALGO, true, this.ALGO_OPERATIONS);
 
                 let encHex2 = await this.symEncryptString(key2, clearText);
@@ -162,8 +185,8 @@ export class Encryption implements EncryptionIntf {
                 let encHex2 = await this.asymEncryptString(publicKey, clearText);
                 let unencText2 = await this.asymDecryptString(privateKey, encHex2);
                 S.util.assert(clearText === unencText2, "Asym encrypt test using imported keys.");
-                
-                console.log("publicKeyTest OK.");
+
+                console.log("publicKeyTest: OK");
                 resolve(true);
             }
         });
@@ -187,21 +210,22 @@ export class Encryption implements EncryptionIntf {
 
     initSymetricKey = async (forceUpdate: boolean = false): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            let val = await S.localDB.readObject(this.STORE_SYMKEY);
+            try {
+                let val: any = await S.localDB.readObject(this.STORE_SYMKEY);
 
-            if (val && !forceUpdate) {
-                console.log("symkey: " + S.util.toJson(val));
+                if (val && !forceUpdate) {
+                    if (this.logKeys) {
+                        let cryptoKey: CryptoKey = val.val;
+                        let symKeyStr = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, cryptoKey);
+                        console.log("symkey: " + S.util.toJson(symKeyStr));
+                    }
+                }
+                else {
+                    let key: CryptoKey = await this.genSymKey();
+                    S.localDB.writeObject({ name: this.STORE_SYMKEY, val: key });
+                }
             }
-            else {
-                /* NOTE: These parameters are all production-ready 
-                https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
-                */
-                let key: CryptoKey = await window.crypto.subtle.generateKey({
-                    name: this.SYM_ALGO,
-                    length: 256
-                }, true, this.ALGO_OPERATIONS);
-
-                S.localDB.writeObject({ name: this.STORE_SYMKEY, val: key });
+            finally {
                 resolve();
             }
         });
@@ -209,33 +233,47 @@ export class Encryption implements EncryptionIntf {
 
     initAsymetricKeys = async (forceUpdate: boolean = false): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            let val = await S.localDB.readObject(this.STORE_ASYMKEY);
+            try {
+                let val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
 
-            if (val && !forceUpdate) {
-                //console.log("AsymKey: " + S.util.toJson(val));
+                if (val && !forceUpdate) {
+                    if (this.logKeys) {
+                        let keyPair: EncryptionKeyPair = val.val;
+                        let privKeyStr = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.privateKey);
+                        console.log("asymPrivKey: " + S.util.toJson(privKeyStr));
+                        let publicKeyStr = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.publicKey);
+                        console.log("asymPubKey: " + S.util.toJson(publicKeyStr));
+                    }
+                }
+                else {
+                    let keyPair: EncryptionKeyPair = await crypto.subtle.generateKey({ //
+                        name: this.ASYM_ALGO, //
+                        modulusLength: 2048, //
+                        publicExponent: new Uint8Array([0x01, 0x00, 0x01]), //
+                        hash: { name: this.HASH_ALGO } //
+                    }, true, this.ALGO_OPERATIONS);
+
+                    S.localDB.writeObject({ name: this.STORE_ASYMKEY, val: keyPair });
+                    let pubKeyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.publicKey);
+                    let pubKeyStr = JSON.stringify(pubKeyDat);
+
+                    S.util.ajax<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
+                        "keyJson": pubKeyStr
+                    }, this.savePublicKeyResponse);
+                }
             }
-            else {
-                /* NOTE: These parameters are all production-ready 
-                https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
-                */
-                let keyPair: EncryptionKeyPair = await crypto.subtle.generateKey({ //
-                    name: this.ASYM_ALGO, //
-                    modulusLength: 2048, //
-                    publicExponent: new Uint8Array([0x01, 0x00, 0x01]), //
-                    hash: { name: this.HASH_ALGO } //
-                }, true, this.ALGO_OPERATIONS);
-
-                S.localDB.writeObject({ name: this.STORE_ASYMKEY, val: keyPair });
-                let pubKeyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.publicKey);
-                let pubKeyStr = JSON.stringify(pubKeyDat);
-
-                S.util.ajax<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
-                    "keyJson": pubKeyStr
-                }, this.savePublicKeyResponse);
-
+            finally {
                 resolve();
             }
         });
+    }
+
+    genSymKey = async (): Promise<CryptoKey> => {
+        let key: CryptoKey = await window.crypto.subtle.generateKey({
+            name: this.SYM_ALGO,
+            length: 256
+        }, true, this.ALGO_OPERATIONS);
+        return key;
     }
 
     savePublicKeyResponse = (res: J.SavePublicKeyResponse): void => {
@@ -249,29 +287,31 @@ export class Encryption implements EncryptionIntf {
         return new Promise<string>(async (resolve, reject) => {
             let ret = "";
 
-            let obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
-            if (obj) {
-                let keyPair: EncryptionKeyPair = obj.val;
-                let pubDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.publicKey);
-                //this.importKey(this.OP_ENCRYPT, "public", this.publicKeyJson);
-                let pubKey = S.util.toJson(pubDat);
-                ret += "Public Key Info:\n" + pubKey + "\n\n";
+            try {
+                let obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+                if (obj) {
+                    let keyPair: EncryptionKeyPair = obj.val;
+                    let pubDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.publicKey);
+                    //this.importKey(this.OP_ENCRYPT, "public", this.publicKeyJson);
+                    let pubKey = S.util.toJson(pubDat);
+                    ret += "Public Key Info:\n" + pubKey + "\n\n";
 
-                let privDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.privateKey);
-                //this.importKey(this.OP_DECRYPT, "private", this.privateKeyJson);
-                let privKey = S.util.toJson(privDat);
-                ret += "Private Key Info:\n" + privKey + "\n\n";
+                    let privDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.privateKey);
+                    //this.importKey(this.OP_DECRYPT, "private", this.privateKeyJson);
+                    let privKey = S.util.toJson(privDat);
+                    ret += "Private Key Info:\n" + privKey + "\n\n";
+                }
+
+                obj = await S.localDB.readObject(this.STORE_SYMKEY);
+                if (obj) {
+                    let key: CryptoKey = obj.val;
+                    let dat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, key);
+                    let keyStr = S.util.toJson(dat);
+                    ret += "Symmetric Key Info:\n" + keyStr + "\n\n";
+                }
+            } finally {
+                resolve(ret);
             }
-
-            obj = await S.localDB.readObject(this.STORE_SYMKEY);
-            if (obj) {
-                let key: CryptoKey = obj.val;
-                let dat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, key);
-                let keyStr = S.util.toJson(dat);
-                ret += "Symmetric Key Info:\n" + keyStr + "\n\n";
-            }
-
-            resolve(ret);
         });
     }
 
@@ -279,6 +319,10 @@ export class Encryption implements EncryptionIntf {
         return this.encryptString(key, this.ASYM_ALGO, data);
     }
 
+    /**
+     * Does a simplel symmetric encryption of the data using the given key, and if the key
+     * is not provided assumes the STORE_SYMKEY
+     */
     symEncryptString = async (key: CryptoKey, data: string): Promise<string> => {
         if (!key) {
             let obj: any = await S.localDB.readObject(this.STORE_SYMKEY);
@@ -289,15 +333,92 @@ export class Encryption implements EncryptionIntf {
         return this.encryptString(key, this.SYM_ALGO, data);
     }
 
-    /* Takes the input string, and encrypts it and then returns a hex representation of the data */
+    /**
+     * This is the primary way of encrypting data that uses a randomly generated symmetric key to
+     * do the encryption and then encrypts that symmetric key itself using the Public Key provided.
+     * 
+     * This is a very standard approach in the crypto world, and it allows the owner of the associated 
+     * keypair (i.e. private key) to be able to share the data securely with arbitrary other users by simply publishing
+     * this symmetric key (to the actual data) to individuals by encrypting said symmetric key with that 
+     * user's public key.
+     * 
+     * Of course, this means the process is that when a user wants to read data shared to them they just use 
+     * their private key to decrypt the symmetric key to the data, and use that key to get the data.
+     * 
+     * This function returns an object that contains two properties: cyphertext, cypherkey, whic is the encrypted data
+     * and the encrypted "JWK" formatted key to the data.
+     * 
+     * 'publicKey' argument should be the public key of the person doing the encryption (the person doing the encryption) 
+     * and if null, it's automatically retrieved from the localDB
+     */
+    encryptSharableString = async (publicKey: CryptoKey, data: string): Promise<SymKeyDataPackage> => {
+        return new Promise<SymKeyDataPackage>(async (resolve, reject) => {
+            let ret: SymKeyDataPackage = null;
+            try {
+                debugger;
+                if (!publicKey) {
+                    let val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+                    publicKey = val.val.publicKey;
+                }
+
+                //generate random symmetric key
+                let symKey: CryptoKey = await this.genSymKey();
+
+                //get JWK formatted key string
+                let symKeyJwk = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, symKey);
+                let symKeyStr = S.util.toJson(symKeyJwk);
+
+                //encrypt the symetric key
+                let cypherKey = await this.asymEncryptString(publicKey, symKeyStr);
+
+                //encrypt the data with the symetric key
+                let cypherText = await this.encryptString(symKey, this.SYM_ALGO, data);
+
+                ret = { cypherText, cypherKey };
+                debugger;
+            }
+            finally {
+                resolve(ret);
+            }
+        });
+    }
+
+    /* Inverse of  encryptSharableString() function */
+    decryptSharableString = async (privateKey: CryptoKey, skpd: SymKeyDataPackage): Promise<string> => {
+        return new Promise<string>(async (resolve, reject) => {
+            let ret: string = null;
+            try {
+                if (!privateKey) {
+                    let val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+                    privateKey = val.val.privateKey;
+                }
+
+                //Decrypt the symmetric key using out private key
+                let symKeyJsonStr: string = await this.asymDecryptString(privateKey, skpd.cypherKey);
+                let symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
+                let symKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, symKeyJsonObj, this.SYM_ALGO, true, this.ALGO_OPERATIONS);
+                ret = await this.symDecryptString(symKey, skpd.cypherText);
+            }
+            finally {
+                resolve(ret);
+            }
+        });
+    }
+
+    /* Encrypts 'data' string and returns a hex representation of the cyphertext */
     encryptString = async (key: CryptoKey, algo: string, data: string): Promise<string> => {
         return new Promise<string>(async (resolve, reject) => {
-            let result: ArrayBuffer = await crypto.subtle.encrypt({ name: algo, iv: this.vector }, //
-                key, this.convertStringToByteArray(data));
+            let encHex = null;
+            try {
+                let result: ArrayBuffer = await crypto.subtle.encrypt({ name: algo, iv: this.vector }, //
+                    key, this.convertStringToByteArray(data));
 
-            let encData = new Uint8Array(result);
-            let encHex = S.util.buf2hex(encData);
-            resolve(encHex);
+                let encData = new Uint8Array(result);
+                encHex = S.util.buf2hex(encData);
+            }
+            finally {
+                resolve(encHex);
+            }
         });
     }
 
@@ -318,12 +439,17 @@ export class Encryption implements EncryptionIntf {
     /* Takes the input as a hex string, and decrypts it into the original non-hex string */
     decryptString = async (key: CryptoKey, algo: string, encHex: string): Promise<string> => {
         return new Promise<string>(async (resolve, reject) => {
-            let encArray: Uint8Array = S.util.hex2buf(encHex);
-            let result: ArrayBuffer = await crypto.subtle.decrypt({ name: algo, iv: this.vector }, //
-                key, encArray);
-            let resArray = new Uint8Array(result);
-            let resStr = this.convertByteArrayToString(resArray);
-            resolve(resStr);
+            let resStr = null;
+            try {
+                let encArray: Uint8Array = S.util.hex2buf(encHex);
+                let result: ArrayBuffer = await crypto.subtle.decrypt({ name: algo, iv: this.vector }, //
+                    key, encArray);
+                let resArray = new Uint8Array(result);
+                resStr = this.convertByteArrayToString(resArray);
+            }
+            finally {
+                resolve(resStr);
+            }
         });
     }
 
@@ -357,4 +483,9 @@ export class Encryption implements EncryptionIntf {
     //     }
     //     return buf;
     // }
+}
+
+export interface SymKeyDataPackage {
+    cypherText: string;
+    cypherKey: string;
 }

@@ -34,6 +34,9 @@ export class LocalDB implements LocalDBIntf {
             let db: IDBDatabase = req.result;
             this.runTransWithDb(db, access, runner);
         }
+        req.onerror = () => {
+            console.warn("runTrans failed");
+        };
     }
 
     /* Runs a transaction on the database provided */
@@ -89,6 +92,10 @@ export class LocalDB implements LocalDBIntf {
 
                     promise.onsuccess = () => {
                         resolve(promise.result);
+                    };
+                    promise.onerror = () => {
+                        console.warn("readObject failed: name="+name);
+                        resolve(null);
                     };
                 });
         });
