@@ -1,4 +1,4 @@
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Ul } from "./Ul";
@@ -257,6 +257,43 @@ export class MainNavPanel extends NavTag {
                 //see also: clientHeight, offsetHeight, scrollHeight
                 S.meta64.navBarHeight = elm.offsetHeight;
             }, 750);
+
+            elm.addEventListener("dragenter", (event) => {
+                //console.log('DRAGENTER: ' + S.util.prettyPrint(event));
+                event.preventDefault();
+            });
+
+            elm.addEventListener("dragover", (event) => {
+                //console.log('DRAGOVER: ' + S.util.prettyPrint(event));
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
+            });
+
+            elm.addEventListener("drop", (ev) => {
+                let data = ev.dataTransfer.items;
+                for (let i = 0; i < data.length; i += 1) {
+                    if ((data[i].kind == 'string') &&
+                        (data[i].type.match('^text/plain'))) {
+                        data[i].getAsString((s) => {
+                            //This detects drops, successfully but I'm not using it yet.
+                        });
+                    }
+                    // else if ((data[i].kind == 'string') &&
+                    //     (data[i].type.match('^text/html'))) {
+                    //     // Drag data item is HTML
+                    //     console.log("... Drop: HTML");
+                    // } else if ((data[i].kind == 'string') &&
+                    //     (data[i].type.match('^text/uri-list'))) {
+                    //     // Drag data item is URI
+                    //     console.log("... Drop: URI");
+                    // } else if ((data[i].kind == 'file') &&
+                    //     (data[i].type.match('^image/'))) {
+                    //     // Drag data item is an image file
+                    //     var f = data[i].getAsFile();
+                    //     console.log("... Drop: File ");
+                    // }
+                }
+            });
         });
     }
 

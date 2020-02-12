@@ -3,7 +3,7 @@ import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { Meta64Intf } from "./intf/Meta64Intf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 import { TabPanel } from "./widget/TabPanel";
 import { MainNavPanel } from "./widget/MainNavPanel";
 import { GraphPanel } from "./widget/GraphPanel";
@@ -675,42 +675,8 @@ export class Meta64 implements Meta64Intf {
             // Initialize the 'ServerPush' client-side connection
             S.push.init();
 
-            //I think for now I'm gonna make it where only individual nodes are drop-targets.
-            //this.enableAppAsDropTarget();
             console.log("initApp complete.");
             resolve();
-        });
-    }
-
-    /**
-     * This app doesn't support drag-n-drop yet, but this code is the beginning of a proof-of-concept for that feature.
-     */
-    enableAppAsDropTarget = () => {
-        S.util.getElm("app", (elm: HTMLElement) => {
-            elm.addEventListener("dragover", function (event) {
-                console.log("dragover detected.");
-                // event.preventDefault();
-
-                // //(<any>event).dataTransfer.dropEffect = 'copy';
-                // (<any>event).originalEvent.dataTransfer.dropEffect = "copy";
-            });
-
-            elm.addEventListener("drop", function (event) {
-                console.log("drop detected.");
-                // event.preventDefault();
-
-                // //todo-1: I plan to make this able to create a node just for this link and store it under a 'links' path
-                // //of the root of the user's account (eventually will have an option to let user specify where to store these)
-                // let data = (<any>event).originalEvent.dataTransfer.getData("text");
-
-                // /* Notify the server of this drop event. Everything about a drop is handled on the server */
-                // S.util.ajax<J.AppDropRequest, J.AppDropResponse>("appDrop", {
-                //     "data": data
-                // }, (res: J.AppDropResponse) => {
-                //     console.log("AppDrop: " + data);
-                //     new MessageDlg({ "message": res.message }).open();
-                // });
-            });
         });
     }
 
