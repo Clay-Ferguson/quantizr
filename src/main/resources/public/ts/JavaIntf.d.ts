@@ -491,5 +491,6 @@ export interface PrivilegeInfo {
 
 export const enum NodeProp {
     ENC = "sn:enc",
+    ENC_KEY = "sn:encKey",
     ENC_TAG = "<[ENC]>",
 }

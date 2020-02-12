@@ -24,4 +24,13 @@ export interface EncryptionIntf {
 
     convertStringToByteArray(str): any;
     convertByteArrayToString(buffer): any;
+
+    encryptSharableString(publicKey: CryptoKey, data: string): Promise<SymKeyDataPackage>;
+    decryptSharableString(privateKey: CryptoKey, skpd: SymKeyDataPackage): Promise<string>;
 }
+
+export interface SymKeyDataPackage {
+    cypherText: string;
+    cypherKey: string;
+}
+

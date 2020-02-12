@@ -1,6 +1,6 @@
 import * as J from "./JavaIntf";
 import { EncryptionKeyPair } from "./EncryptionKeyPair";
-import { EncryptionIntf } from "./intf/EncryptionIntf";
+import { EncryptionIntf, SymKeyDataPackage } from "./intf/EncryptionIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
@@ -483,9 +483,4 @@ export class Encryption implements EncryptionIntf {
     //     }
     //     return buf;
     // }
-}
-
-export interface SymKeyDataPackage {
-    cypherText: string;
-    cypherKey: string;
 }

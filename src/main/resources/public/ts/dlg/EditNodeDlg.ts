@@ -26,6 +26,7 @@ import { FormInline } from "../widget/FormInline";
 import { TextContent } from "../widget/TextContent";
 import { Comp } from "../widget/base/Comp";
 import { Textarea } from "../widget/Textarea";
+import { SymKeyDataPackage } from "../intf/EncryptionIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -204,7 +205,7 @@ export class EditNodeDlg extends DialogBase {
             encrypted = true;
         }
 
-        let contentTableRow = this.makeContentEditorFormGroup(content, isPre, isWordWrap, encrypted);
+        let contentTableRow = this.makeContentEditorFormGroup(this.node, isPre, isWordWrap, encrypted);
         editPropsTable.addChild(contentTableRow);
 
         this.contentEditor.setWordWrap(isWordWrap);
@@ -430,8 +431,15 @@ export class EditNodeDlg extends DialogBase {
 
                 // if we need to encrypt and the content is not currently encrypted.
                 if (content && this.encryptionOptions.encryptForOwnerOnly && !content.startsWith(J.NodeProp.ENC_TAG)) {
-                    content = await S.encryption.symEncryptString(null, content);
-                    content = J.NodeProp.ENC_TAG + content;
+                    let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
+                    
+                    handled[J.NodeProp.ENC_KEY] = true;
+                    saveList.push({
+                        "name": J.NodeProp.ENC_KEY,
+                        "value": skdp.cypherKey
+                    });
+                    
+                    content = J.NodeProp.ENC_TAG + skdp.cypherText;
                     //console.log("Encrypted: " + content);
                 }
             }
@@ -556,7 +564,8 @@ export class EditNodeDlg extends DialogBase {
         return tableRow;
     }
 
-    makeContentEditorFormGroup = (value: string, isPre: boolean, isWordWrap: boolean, encrypted: boolean): FormGroup => {
+    makeContentEditorFormGroup = (node: J.NodeInfo, isPre: boolean, isWordWrap: boolean, encrypted: boolean): FormGroup => {
+        let value = node.content;
         let formGroup = new FormGroup();
 
         value = S.util.escapeForAttrib(value);
@@ -571,11 +580,13 @@ export class EditNodeDlg extends DialogBase {
 
                         if (encrypted) {
                             //console.log('decrypting: ' + value);
-                            value = value.substring(J.NodeProp.ENC_TAG.length);
+                            let cypherText = value.substring(J.NodeProp.ENC_TAG.length);
                             (async () => {
-                                value = await S.encryption.symDecryptString(null, value);
+                                let cypherKey = S.props.getNodePropertyVal(J.NodeProp.ENC_KEY, node);
+                                let clearText: string = await S.encryption.decryptSharableString(null, {cypherKey, cypherText});
+
                                 //console.log('decrypted to:' + value);
-                                (this.contentEditor as AceEditPropTextarea).setValue(value);
+                                (this.contentEditor as AceEditPropTextarea).setValue(clearText);
                             })();
                         }
 
@@ -594,11 +605,12 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditor.whenElm((elm: HTMLElement) => {
                 if (encrypted) {
                     //console.log('decrypting: ' + value);
-                    value = value.substring(J.NodeProp.ENC_TAG.length);
+                    let cypherText = value.substring(J.NodeProp.ENC_TAG.length);
                     (async () => {
-                        value = await S.encryption.symDecryptString(null, value);
+                        let cypherKey = S.props.getNodePropertyVal(J.NodeProp.ENC_KEY, node);
+                        let clearText: string = await S.encryption.decryptSharableString(null, {cypherKey, cypherText});
                         //console.log('decrypted to:' + value);
-                        (this.contentEditor as Textarea).setValue(value);
+                        (this.contentEditor as Textarea).setValue(clearText);
                     })();
                 }
             });
@@ -606,6 +618,7 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditor.focus();
         }
 
+        //todo-0: I can now get rid of any "as any as" occurrances now right?
         formGroup.addChild(this.contentEditor as any as Comp);
         return formGroup;
     }
