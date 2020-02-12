@@ -771,44 +771,31 @@ public class MongoApi {
 	// ********* DO NOT DELETE *********
 	// (this is needed from time to time)
 	public void reSaveAll(MongoSession session) {
-		log.debug("Processing reSaveAll");
-		updateFieldPathHashes(session);
+		log.debug("Processing reSaveAll: Beginning Node Report: " + getNodeReport());
+		processAllNodes(session);
 	}
 
-	public void updateFieldPathHashes(MongoSession session) {
-		long nodesProcessed = 0;
+	public void processAllNodes(MongoSession session) {
+		ValContainer<Long> nodesProcessed = new ValContainer<Long>(0L);
 
-		while (true) {
-			final ValContainer<Integer> numProcessed = new ValContainer<Integer>(0);
+		Query query = new Query();
+		Criteria criteria = Criteria.where(SubNode.FIELD_ACL).ne(null);
+		query.addCriteria(criteria);
 
-			Query query = new Query();
-			query.limit(100);
-			Criteria criteria = Criteria.where(SubNode.FIELD_PATH_HASH).is(null);
-			query.addCriteria(criteria);
+		Iterable<SubNode> iter = ops.find(query, SubNode.class);
 
-			Iterable<SubNode> iter = ops.find(query, SubNode.class);
-
-			iter.forEach((node) -> {
-				numProcessed.setVal(numProcessed.getVal() + 1);
-				log.debug("reSave node: " + node.getId().toHexString());
-
-				/*
-				 * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some of
-				 * the workload is done that pertains ot this reSave process
-				 */
-				// todo-1: investigate if we need to utilize the 'set dirty and save all at the
-				// end technique here?'
-				save(session, node, true, false);
-			});
-
-			nodesProcessed += numProcessed.getVal();
-
-			if (numProcessed.getVal() == 0) {
-				log.debug("Done processing all nodes.");
-				break;
+		iter.forEach((node) -> {
+			nodesProcessed.setVal(nodesProcessed.getVal()+1);
+			if (nodesProcessed.getVal() % 1000 == 0) {
+				log.debug("reSave count: " + nodesProcessed.getVal());
 			}
-		}
-		log.debug("reSaveAll completed: " + String.valueOf(nodesProcessed) + " nodes processed.");
+
+			// /*
+			//  * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some of
+			//  * the workload is done that pertains ot this reSave process
+			//  */
+			save(session, node, true, false);
+		});
 	}
 
 	public UserPreferencesNode getUserPreference(MongoSession session, String path) {

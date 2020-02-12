@@ -72,7 +72,7 @@ services:
             server.port: "8182" 
             httpProtocol: "http" 
             metaHost: "localhost" 
-            reSaveAll: "false"
+            reSaveAll: "true"
             forceIndexRebuild: "false"
             allowFileSystemSearch: "false" 
             spring.http.multipart.max-file-size: "200MB" 

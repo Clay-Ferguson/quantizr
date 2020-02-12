@@ -5,6 +5,8 @@ import org.subnode.util.ExUtil;
 
 import javax.annotation.PostConstruct;
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
@@ -12,6 +14,8 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,11 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDbFactory;
 import org.springframework.data.mongodb.core.WriteResultChecking;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+
+//Ref: http://mongodb.github.io/mongo-java-driver/3.7/driver/getting-started/quick-start-pojo/
 
 @Configuration
 @EnableMongoRepositories(basePackages = "org.subnode.mongo")
@@ -118,7 +127,17 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				String uri = "mongodb://" + mongoHost + ":" + String.valueOf(mongoPort);
 				log.info("Connecting to MongoDb: " + uri);
 
-				mongoClient = MongoClients.create(uri);
+				/* This codec registroy is what allows us to store objects that contain other POJOS, like for example
+				the way we're storing AccessControl objects in a map inside SubNode */
+				CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
+						fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+
+				MongoClientSettings settings = MongoClientSettings.builder() //
+						.applyConnectionString(new ConnectionString(uri)) //
+						.codecRegistry(pojoCodecRegistry) //
+						.build();
+				mongoClient = MongoClients.create(settings);
+
 				if (mongoClient != null) {
 
 					for (String db : mongoClient.listDatabaseNames()) {

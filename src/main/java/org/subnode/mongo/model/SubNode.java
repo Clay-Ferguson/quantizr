@@ -134,6 +134,10 @@ public class SubNode {
 	@Field(FIELD_ACL)
 	private HashMap<String, String> acl;
 
+	public static final String FIELD_AC = "ac";
+	@Field(FIELD_AC)
+	private HashMap<String, AccessControl> ac;
+
 	private boolean disableParentCheck;
 	private boolean writing;
 	private boolean deleted;
@@ -288,7 +292,7 @@ public class SubNode {
 		this.modifyTime = modifyTime;
 	}
 
-	// todo-0: need to create a acl2, that holds both privileges AND the cypherKey in an object
+	//todo-0: once refactoring complete on all instances, can remove this.
 	@JsonProperty(FIELD_ACL)
 	public HashMap<String, String> getAcl() {
 		return acl;
@@ -298,6 +302,17 @@ public class SubNode {
 	public void setAcl(HashMap<String, String> acl) {
 		MongoThreadLocal.dirty(this);
 		this.acl = acl;
+	}
+
+	@JsonProperty(FIELD_AC)
+	public HashMap<String, AccessControl> getAc() {
+		return ac;
+	}
+
+	@JsonProperty(FIELD_AC)
+	public void setAc(HashMap<String, AccessControl> ac) {
+		MongoThreadLocal.dirty(this);
+		this.ac = ac;
 	}
 
 	@JsonProperty(FIELD_PROPERTIES)

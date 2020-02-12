@@ -1,8 +1,10 @@
 package org.subnode.mongo;
 
 import java.util.Date;
+import java.util.HashMap;
 
 import org.subnode.config.NodeName;
+import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.util.Util;
@@ -34,7 +36,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	 * MAY be out of order so that the children of some nodes may appear in the JSON
 	 * being imported BEFORE their parents (which would cause the parent check to
 	 * fail, up until the full node graph has been imported), and so I'm creating
-	 * this hack to globally disable the check during the import only. 
+	 * this hack to globally disable the check during the import only.
 	 */
 	public static boolean parentCheckEnabled = false;
 
@@ -62,11 +64,14 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 		dbObj.put(SubNode.FIELD_ID, id);
 
+		log.debug("onBeforeSave: ID: " + node.getId().toHexString());
+
 		// DO NOT DELETE
-		// If we ever add a unique-index for "Name" (not currently the case), then we'd need something like this to be sure
-		// each node WOULD have a unique name. 
+		// If we ever add a unique-index for "Name" (not currently the case), then we'd
+		// need something like this to be sure
+		// each node WOULD have a unique name.
 		// if (StringUtils.isEmpty(node.getName())) {
-		// 	node.setName(id.toHexString())
+		// node.setName(id.toHexString())
 		// }
 
 		/* if no owner is assigned... */
@@ -92,14 +97,14 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		 * of the leaf 'name' part of the path
 		 */
 		if (node.getPath().endsWith("/?")) {
-			String shortId =  Util.getHashOfString(id.toHexString(), 10);
+			String shortId = Util.getHashOfString(id.toHexString(), 10);
 			String path = XString.removeLastChar(node.getPath()) + shortId;
 			dbObj.put(SubNode.FIELD_PATH, path);
 			node.setPath(path);
 		}
 
 		String pathHash = Util.getHashOfString(node.getPath(), 14);
-		//log.debug("CHECK PathHash=" + pathHash);
+		// log.debug("CHECK PathHash=" + pathHash);
 
 		if (!pathHash.equals(node.getPathHash())) {
 			dbObj.put(SubNode.FIELD_PATH_HASH, pathHash);
@@ -116,6 +121,22 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		if (node.isUpdateModTimeOnSave()) {
 			dbObj.put(SubNode.FIELD_MODIFY_TIME, now);
 			node.setModifyTime(now);
+		}
+
+		/* We are converting ACL into AC here 
+		
+		todo-0: remove this after the conversion is complete everywhere.
+		*/
+		if (node.getAcl() != null) {
+			HashMap<String, AccessControl> acMap = new HashMap<String, AccessControl>();
+			node.getAcl().forEach((k, v) -> {
+				AccessControl ac = new AccessControl();
+				// log.debug("Setting ac with k=" + k + " v=" + v + " for node: " + node.getId().toHexString());
+				ac.setPrvs(v);
+				acMap.put(k, ac);
+			});
+			dbObj.put(SubNode.FIELD_AC, acMap);
+			node.setAc(acMap);
 		}
 	}
 
