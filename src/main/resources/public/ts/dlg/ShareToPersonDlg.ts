@@ -16,12 +16,15 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ShareToPersonDlg extends DialogBase {
 
+    node: J.NodeInfo;
     shareToUserTextField: TextField;
     sharedNodeFunc: Function;
 
+    //pass actual args now wrappr arg here (todo-0)
     constructor(args: Object) {
         super("Share Node to Person", "app-modal-content-medium-width");
         this.sharedNodeFunc = (<any>args).sharedNodeFunc;
+        this.node = (<any>args).node;
         
         this.setChildren([
             new Form(null, [
@@ -54,11 +57,17 @@ export class ShareToPersonDlg extends DialogBase {
             return;
         }
 
+        // let encProp = S.props.getNodePropertyVal(J.NodeProp.ENC, this.node);
+        // if (encProp) {
+        // todo-0: add encryption key    
+        // can't add encryption key until the ACL map holds objects, instead of strings.
+        // }
+
         /* Trigger update from server at next main page refresh */
         S.meta64.treeDirty = true;
 
         S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
-            "nodeId": S.share.sharingNode.id,
+            "nodeId": this.node.id,
             "principal": targetUser,
             "privileges": ["rd", "wr"],
             "publicAppend": false

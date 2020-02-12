@@ -851,7 +851,7 @@ public class MongoApi {
 			String authType) {
 		String principalName = null;
 
-		/* If this is a share to public we don't need to looup a user name */
+		/* If this is a share to public we don't need to lookup a user name */
 		if (principalId.equalsIgnoreCase(NodePrincipal.PUBLIC)) {
 			principalName = NodePrincipal.PUBLIC;
 		}

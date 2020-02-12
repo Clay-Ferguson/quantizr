@@ -17,11 +17,15 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class SharingDlg extends DialogBase {
 
+    //node being operated on by this Dialog.
+    node: J.NodeInfo;
+
     privsTable: EditPrivsTable;
     nodePrivsInfo: I.NodePrivilegesInfo;
 
-    constructor() {
+    constructor(node: J.NodeInfo) {
         super("Node Sharing", "app-modal-content-medium-width");
+        this.node = node;
     }
 
     init = (): void => {
@@ -34,7 +38,7 @@ export class SharingDlg extends DialogBase {
      */
     reload = (): void => {
         S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            "nodeId": S.share.sharingNode.id,
+            "nodeId": this.node.id,
             "includeAcl": true,
             "includeOwners": true
         }, this.populate);
@@ -57,7 +61,7 @@ export class SharingDlg extends DialogBase {
     // save = (): void => {
     //     S.meta64.treeDirty = true;
     //     S.util.ajax<I.AddPrivilegeRequest, I.AddPrivilegeResponse>("addPrivilege", {
-    //         "nodeId": S.share.sharingNode.id,
+    //         "nodeId": this.node.id,
     //         "privileges": null,
     //         "principal": null,
     //         "publicAppend": false //this.publicCommentingCheckbox.getChecked()
@@ -67,7 +71,7 @@ export class SharingDlg extends DialogBase {
     removePrivilege = (principalNodeId: string, privilege: string): void => {
         S.meta64.treeDirty = true;
         S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
-            "nodeId": S.share.sharingNode.id,
+            "nodeId": this.node.id,
             "principalNodeId": principalNodeId,
             "privilege": privilege
         }, this.removePrivilegeResponse);
@@ -75,18 +79,29 @@ export class SharingDlg extends DialogBase {
 
     removePrivilegeResponse = (res: J.RemovePrivilegeResponse): void => {
         S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            "nodeId": S.share.sharingNode.id,
+            "nodeId": this.node.id,
             "includeAcl": true,
             "includeOwners": true
         }, this.populate);
     }
 
     shareToPersonDlg = (): void => {
-        let dlg = new ShareToPersonDlg({ sharedNodeFunc: this.reload });
+        let dlg = new ShareToPersonDlg({ 
+            node: this.node,
+            sharedNodeFunc: this.reload 
+        });
         dlg.open();
     }
 
+    //todo-0: need to also check when user tries to encrypt a node that it's not currently shared to public.
     shareNodeToPublic = (): void => {
+        //todo-0: verify after adding and then removing encryption that ALL encryption key stuff is gone from the node
+        let encProp = S.props.getNodePropertyVal(J.NodeProp.ENC, this.node);
+        if (encProp) {
+            S.util.showMessage("This node is encrypted, and therefore cannot be made public.");
+            return;
+        }
+
         console.log("Sharing node to public.");
         S.meta64.treeDirty = true;
 
@@ -96,7 +111,7 @@ export class SharingDlg extends DialogBase {
          * TODO: this additional call can be avoided as an optimization
          */
         S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
-            "nodeId": S.share.sharingNode.id,
+            "nodeId": this.node.id,
             "principal": "public",
             "privileges": ["rd"],
             "publicAppend": false

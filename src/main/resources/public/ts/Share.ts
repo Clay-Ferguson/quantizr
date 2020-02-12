@@ -16,8 +16,6 @@ export class Share implements ShareIntf {
         S.srch.searchNodesResponse(res);
     }
 
-    sharingNode: J.NodeInfo = null;
-
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
@@ -28,9 +26,7 @@ export class Share implements ShareIntf {
             S.util.showMessage("No node is selected.");
             return;
         }
-        this.sharingNode = node;
-
-        new SharingDlg().open();
+        new SharingDlg(node).open();
     }
 
     findSharedNodes = (): void => {
