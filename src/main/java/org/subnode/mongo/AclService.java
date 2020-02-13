@@ -89,18 +89,6 @@ public class AclService {
 		api.authRequireOwnerOfNode(session, node);
 
 		boolean success = addPrivilege(session, node, req.getPrincipal(), req.getPrivileges(), res);
-
-		// if (req.getPublicAppend() != null) {
-		// // boolean publicAppend = req.getPublicAppend().booleanValue();
-		// // if (!publicAppend) {
-		// // JcrUtil.safeDeleteProperty(node, JcrProp.PUBLIC_APPEND);
-		// // }
-		// // else {
-		// // node.setProperty(JcrProp.PUBLIC_APPEND, true);
-		// // }
-		// // success = true;
-		// }
-
 		res.setSuccess(success);
 	}
 

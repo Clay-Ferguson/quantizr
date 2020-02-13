@@ -491,7 +491,6 @@ export class Meta64 implements Meta64Intf {
     //here's the simple mode property hider!
     initConstants = () => {
         S.util.addAll(this.simpleModePropertyBlackList, [ //
-            C.PRIMARY_TYPE, //
             C.IMG_WIDTH,//
             C.IMG_HEIGHT, //
             C.BIN_VER, //
@@ -502,8 +501,6 @@ export class Meta64 implements Meta64Intf {
         ]);
 
         S.util.addAll(this.readOnlyPropertyList, [ //
-            C.PRIMARY_TYPE, //
-            C.UUID, //
             C.IMG_WIDTH, //
             C.IMG_HEIGHT, //
             C.BIN_VER, //

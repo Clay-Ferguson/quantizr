@@ -248,7 +248,6 @@ public class AppController {
 	 * Application) this is the request to load the page.
 	 * 
 	 * ID is optional url parameter that user can specify to access a specific node
-	 * in the repository by uuid.
 	 * 
 	 * passCode is an auth code for a password reset
 	 */

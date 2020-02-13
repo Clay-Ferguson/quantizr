@@ -1,5 +1,7 @@
 export class Constants {
 
+    //todo-0: there's some overlap between this class and the server->TS generated classes. Need to unify.
+
     /* Feature Flags */
     /* ======================================================================== */
     static readonly ENABLE_ACE_EDITOR: boolean = false;
@@ -31,7 +33,6 @@ export class Constants {
     static readonly LOCALDB_LAST_CHILD_NODEID: string = "lastChildId";
 
     static readonly ATT_MAX_WIDTH: string = "att-max-width";
-    static readonly PRIMARY_TYPE: string = "sn:primaryType";
 
     static readonly EMAIL_CONTENT: string = "sn:content";
     static readonly EMAIL_RECIP: string = "sn:recip";
@@ -43,7 +44,6 @@ export class Constants {
     static readonly NAME: string = "sn:name";
     static readonly FILE_NAME: string = "sn:fileName";
 
-    static readonly UUID: string = "sn:uuid";
     static readonly JSON_FILE_SEARCH_RESULT: string = "sn:json";
     static readonly PRE: string = "sn:pre";
     static readonly NOWRAP: string = "sn:nowrap";
