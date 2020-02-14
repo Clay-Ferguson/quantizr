@@ -86,10 +86,7 @@ export class SharingDlg extends DialogBase {
     }
 
     shareToPersonDlg = (): void => {
-        let dlg = new ShareToPersonDlg({ 
-            node: this.node,
-            sharedNodeFunc: this.reload 
-        });
+        let dlg = new ShareToPersonDlg(this.node, this.reload);
         dlg.open();
     }
 

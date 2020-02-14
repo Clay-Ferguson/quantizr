@@ -16,15 +16,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ShareToPersonDlg extends DialogBase {
 
-    node: J.NodeInfo;
     shareToUserTextField: TextField;
-    sharedNodeFunc: Function;
 
-    //pass actual args now wrappr arg here (todo-0)
-    constructor(args: Object) {
+    constructor(private node: J.NodeInfo, private sharedNodeFunc: Function) {
         super("Share Node to Person", "app-modal-content-medium-width");
-        this.sharedNodeFunc = (<any>args).sharedNodeFunc;
-        this.node = (<any>args).node;
         
         this.setChildren([
             new Form(null, [
