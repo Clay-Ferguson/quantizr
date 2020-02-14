@@ -9,6 +9,6 @@ export interface PropsIntf {
     deleteProperty(node: J.NodeInfo, propertyName : string): void;
     renderProperties(properties : J.PropertyInfo[]): PropTable;
     getNodeProperty(propertyName: string, node: J.NodeInfo): J.PropertyInfo;
-    getNodePropertyVal(propertyName : string, node: J.NodeInfo): string;
+    getNodePropVal(propertyName : string, node: J.NodeInfo): string;
     setNodePropertyVal(propertyName : string, node: J.NodeInfo, val: string): void;
 }

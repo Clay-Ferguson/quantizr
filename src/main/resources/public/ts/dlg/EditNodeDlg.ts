@@ -201,7 +201,7 @@ export class EditNodeDlg extends DialogBase {
 
         //new logic means when turning encryption option back off we will come thru here with PRIV property not set but
         //data still encrypted but we detect still and decrypt in this case too.
-        if (content.startsWith(J.NodeProp.ENC_TAG) /* && "priv" == S.props.getNodePropertyVal(cnst.ENC, this.node) */) {
+        if (content.startsWith(J.NodeProp.ENC_TAG) /* && "priv" == S.props.getNodePropVal(cnst.ENC, this.node) */) {
             encrypted = true;
         }
 
@@ -582,7 +582,7 @@ export class EditNodeDlg extends DialogBase {
                             //console.log('decrypting: ' + value);
                             let cypherText = value.substring(J.NodeProp.ENC_TAG.length);
                             (async () => {
-                                let cypherKey = S.props.getNodePropertyVal(J.NodeProp.ENC_KEY, node);
+                                let cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
                                 let clearText: string = await S.encryption.decryptSharableString(null, {cypherKey, cypherText});
 
                                 //console.log('decrypted to:' + value);
@@ -607,7 +607,7 @@ export class EditNodeDlg extends DialogBase {
                     //console.log('decrypting: ' + value);
                     let cypherText = value.substring(J.NodeProp.ENC_TAG.length);
                     (async () => {
-                        let cypherKey = S.props.getNodePropertyVal(J.NodeProp.ENC_KEY, node);
+                        let cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
                         let clearText: string = await S.encryption.decryptSharableString(null, {cypherKey, cypherText});
                         //console.log('decrypted to:' + value);
                         (this.contentEditor as Textarea).setValue(clearText);

@@ -52,7 +52,7 @@ export class ShareToPersonDlg extends DialogBase {
             return;
         }
 
-        // let encProp = S.props.getNodePropertyVal(J.NodeProp.ENC, this.node);
+        // let encProp = S.props.getNodePropVal(J.NodeProp.ENC, this.node);
         // if (encProp) {
         // todo-0: add encryption key    
         // can't add encryption key until the ACL map holds objects, instead of strings.

@@ -90,10 +90,10 @@ export class SharingDlg extends DialogBase {
         dlg.open();
     }
 
-    //todo-0: need to also check when user tries to encrypt a node that it's not currently shared to public.
+    //todo-0: need to also check when user tries to encrypt a node that it's currently shared to public.
     shareNodeToPublic = (): void => {
         //todo-0: verify after adding and then removing encryption that ALL encryption key stuff is gone from the node
-        let encProp = S.props.getNodePropertyVal(J.NodeProp.ENC, this.node);
+        let encProp = S.props.getNodePropVal(J.NodeProp.ENC, this.node);
         if (encProp) {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.");
             return;

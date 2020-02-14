@@ -65,7 +65,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 //     }
 
 //     reindexNodeButton = (node: J.NodeInfo): void => {
-//         let searchDir = S.props.getNodePropertyVal("searchDir", node);
+//         let searchDir = S.props.getNodePropVal("searchDir", node);
 //         if (!searchDir) {
 //             alert("no searchDir property specified.");
 //             return;

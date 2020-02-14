@@ -25,7 +25,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 //         }
 //         else {
 //             let folderName = "";
-//             let displayName = S.props.getNodePropertyVal("fs:link", node);
+//             let displayName = S.props.getNodePropVal("fs:link", node);
 //             if (displayName) {
 //                 folderName = node.name;
 //             }

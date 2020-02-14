@@ -23,21 +23,21 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 //         let name = node.content;
 //         if (name) {
-//             let linkName = S.props.getNodePropertyVal("ipfs:linkName", node);
+//             let linkName = S.props.getNodePropVal("ipfs:linkName", node);
 //             if (linkName) {
 //                 ret.push(new Heading(6, "Link Name: " + linkName, { className: "ipfs-text" }));
 //             }
 
-//             let link = S.props.getNodePropertyVal("ipfs:link", node);
+//             let link = S.props.getNodePropVal("ipfs:link", node);
 //             if (link) {
 //                 ret.push(new Heading(6, "Link: " + link, { className: "ipfs-text" }));
 //             }
 //             ret.push(S.render.renderMarkdown(rowStyling, node, {}));
 //         }
 //         else {
-//             let displayName = S.props.getNodePropertyVal("ipfs:link", node);
+//             let displayName = S.props.getNodePropVal("ipfs:link", node);
 //             // let folderName = "";
-//             // let displayName = S.props.getNodePropertyVal("ipfs:link", node);
+//             // let displayName = S.props.getNodePropVal("ipfs:link", node);
 //             // if (displayName) {
 //             //     folderName = S.util.getNameFromPath(displayName);
 //             // }

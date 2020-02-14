@@ -28,7 +28,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 //     render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
 //         let ret: Comp[] = [];
 
-//         let fsLink = S.props.getNodePropertyVal("fs:link", node);
+//         let fsLink = S.props.getNodePropVal("fs:link", node);
 //         console.log("fsLink=" + fsLink);
 //         if (fsLink) {
 //             let displayName = node.name;

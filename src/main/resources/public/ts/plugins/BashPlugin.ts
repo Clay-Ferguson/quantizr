@@ -18,8 +18,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 //     }
 
 //     render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
-//         //let content: string = S.props.getNodePropertyVal(Constants.CONTENT, node);
-//         let name = S.props.getNodePropertyVal(C.NAME, node);
+//         //let content: string = S.props.getNodePropVal(Constants.CONTENT, node);
+//         let name = S.props.getNodePropVal(C.NAME, node);
 //         if (!name) {
 //             name = "[no sn:name prop]";
 //         }

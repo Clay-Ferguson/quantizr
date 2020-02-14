@@ -52,7 +52,7 @@ export class Render implements RenderIntf {
     buildRowHeader = (node: J.NodeInfo): Div => {
         let children = [];
 
-        let priority = S.props.getNodePropertyVal("priority", node);
+        let priority = S.props.getNodePropVal("priority", node);
         priority = (priority && priority != "0") ? " P" + priority : "";
 
         if (node.name) {
@@ -188,7 +188,7 @@ export class Render implements RenderIntf {
                     //decrypted text (val), and hold that map so that once we decrypt a message we never use encryption again at least
                     //until of course browser refresh (would be Javascript hash)                    
                     let cypherText = content.substring(J.NodeProp.ENC_TAG.length);
-                    let cypherKey = S.props.getNodePropertyVal(J.NodeProp.ENC_KEY, node);
+                    let cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
                     let clearText: string = await S.encryption.decryptSharableString(null, {cypherKey, cypherText});
 
                     if (clearText) {
@@ -411,7 +411,7 @@ export class Render implements RenderIntf {
     }
 
     getTopRightImageTag = (node: J.NodeInfo): Img => {
-        let topRightImg: string = S.props.getNodePropertyVal("img.top.right", node);
+        let topRightImg: string = S.props.getNodePropVal("img.top.right", node);
         let topRightImgTag: Img;
         if (topRightImg) {
             topRightImgTag = new Img({
@@ -423,7 +423,7 @@ export class Render implements RenderIntf {
     }
 
     getNodeBkgImageStyle = (node: J.NodeInfo): string => {
-        let bkgImg: string = S.props.getNodePropertyVal('img.node.bkg', node);
+        let bkgImg: string = S.props.getNodePropVal('img.node.bkg', node);
         let bkgImgStyle: string = "";
         if (bkgImg) {
             bkgImgStyle = `background-image: url(${bkgImg});`;
@@ -457,7 +457,7 @@ export class Render implements RenderIntf {
         }
 
         //todo-1: rename this to sn:inlineChildren
-        let isInlineChildren = !!S.props.getNodePropertyVal("inlineChildren", node);
+        let isInlineChildren = !!S.props.getNodePropVal("inlineChildren", node);
 
         /* Construct Open Button.
         We always enable for fs:folder, to that by clicking to open a folder that will cause the server to re-check and see if there are
@@ -826,7 +826,7 @@ export class Render implements RenderIntf {
          * the client side for various reasons.
          */
 
-        let layout = S.props.getNodePropertyVal("layout", node);
+        let layout = S.props.getNodePropVal("layout", node);
         if (!layout || layout == "v") {
             return this.renderVerticalLayout(node, newData, level);
         }
@@ -959,7 +959,7 @@ export class Render implements RenderIntf {
         let src: string = this.getUrlForNodeAttachment(node);
 
         //NOTE: This property not working yet becasue we style img tags dynamically after created.
-        let maxWidth: string = S.props.getNodePropertyVal(C.ATT_MAX_WIDTH, node);
+        let maxWidth: string = S.props.getNodePropVal(C.ATT_MAX_WIDTH, node);
         if (!maxWidth) {
             maxWidth = "100%";
         }

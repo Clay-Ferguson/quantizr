@@ -139,7 +139,7 @@ export class Props implements PropsIntf {
         return null;
     }
 
-    getNodePropertyVal = (propertyName: string, node: J.NodeInfo): string => {
+    getNodePropVal = (propertyName: string, node: J.NodeInfo): string => {
         let prop: J.PropertyInfo = this.getNodeProperty(propertyName, node);
         return prop ? prop.value : null;
     }

@@ -490,7 +490,13 @@ export interface PrivilegeInfo {
 }
 
 export const enum NodeProp {
+    /* todo-0: this prop was used to indicated a node is encrypted, so really now that we have ENC_KEY it's not needed right ? Unless there's
+    various encryption 'options' that can be stored, bc now this will hold like 'priv'...but not sure if OTHER options will apply */
     ENC = "sn:enc",
+
+    /* ENC_KEY holds the encrypted symmetric key when a node is encrypted, and this key itself held in this property
+    is the one that can only be decrypted using the node-owner's private key */
     ENC_KEY = "sn:encKey",
+
     ENC_TAG = "<[ENC]>",
 }

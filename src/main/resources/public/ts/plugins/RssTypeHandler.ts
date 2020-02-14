@@ -58,7 +58,7 @@ export class RssTypeHandler implements TypeHandlerIntf {
 
     render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
 
-        let feedSrc: string = S.props.getNodePropertyVal("sn:rssFeedSrc", node);
+        let feedSrc: string = S.props.getNodePropVal("sn:rssFeedSrc", node);
         if (!feedSrc) {
             return (new TextContent("You need to set the 'sn:rssFeedSrc' property of this node to the url of the RSS feed."));
         }
