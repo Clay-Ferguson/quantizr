@@ -496,7 +496,7 @@ export class Meta64 implements Meta64Intf {
             C.BIN_VER, //
             C.BIN_DATA, //
             C.BIN_MIME, //
-            J.NodeProp.ENC, //
+            J.NodeProp.ENC_KEY, //
             C.BIN, //
         ]);
 

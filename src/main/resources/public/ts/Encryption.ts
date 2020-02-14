@@ -139,7 +139,6 @@ export class Encryption implements EncryptionIntf {
 
                 // test symetric key export/import
                 let keyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, key);
-                debugger; //what kind of object is keyDat? string?
                 let key2 = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, keyDat, this.SYM_ALGO, true, this.ALGO_OPERATIONS);
 
                 let encHex2 = await this.symEncryptString(key2, clearText);
@@ -355,7 +354,6 @@ export class Encryption implements EncryptionIntf {
         return new Promise<SymKeyDataPackage>(async (resolve, reject) => {
             let ret: SymKeyDataPackage = null;
             try {
-                debugger;
                 if (!publicKey) {
                     let val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
                     publicKey = val.val.publicKey;
@@ -375,7 +373,6 @@ export class Encryption implements EncryptionIntf {
                 let cypherText = await this.encryptString(symKey, this.SYM_ALGO, data);
 
                 ret = { cypherText, cypherKey };
-                debugger;
             }
             finally {
                 resolve(ret);

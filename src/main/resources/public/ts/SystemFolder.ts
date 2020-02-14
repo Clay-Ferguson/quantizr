@@ -2,7 +2,7 @@ export class SystemFolder {
     //
     // renderNode(node: NodeInfo, rowStyling: boolean): string {
     //     let ret: string = "";
-    //     let pathProp: PropertyInfo = props.getNodeProperty("meta64:path", node);
+    //     let pathProp: PropertyInfo = props.getNodeProp("meta64:path", node);
     //     let path: string = "";
     //
     //     if (pathProp) {
@@ -13,7 +13,7 @@ export class SystemFolder {
     //     /* This was an experiment to load a node property with the results of a directory listing, but I decided that
     //     really if I want to have a file browser, the right way to do that is to have a dedicated tab that can do it
     //     just like the other top-level tabs */
-    //     //let fileListingProp: PropertyInfo = props.getNodeProperty("meta64:json", node);
+    //     //let fileListingProp: PropertyInfo = props.getNodeProp("meta64:json", node);
     //     //let fileListing = fileListingProp ? render.renderJsonFileSearchResultProperty(fileListingProp.value) : "";
     //
     //     if (rowStyling) {
@@ -33,7 +33,7 @@ export class SystemFolder {
     // renderFileListNode(node: NodeInfo, rowStyling: boolean): string {
     //     let ret: string = "";
     //
-    //     let searchResultProp: PropertyInfo = props.getNodeProperty(jcrCnst.JSON_FILE_SEARCH_RESULT, node);
+    //     let searchResultProp: PropertyInfo = props.getNodeProp(jcrCnst.JSON_FILE_SEARCH_RESULT, node);
     //     if (searchResultProp) {
     //         let jcrContent = render.renderJsonFileSearchResultProperty(searchResultProp.value);
     //

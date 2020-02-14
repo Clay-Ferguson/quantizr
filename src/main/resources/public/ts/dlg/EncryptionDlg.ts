@@ -7,7 +7,6 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Checkbox } from "../widget/Checkbox";
 import { VerticalLayout } from "../widget/VerticalLayout";
-import { EncryptionOptions } from "../EncryptionOptions";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,13 +20,13 @@ export class EncryptionDlg extends DialogBase {
 
     encryptAsPrivate: Checkbox;
   
-    constructor(public encryptionOptions: EncryptionOptions) {
+    constructor(public encrypted: boolean) {
         super("Node Encryption", "app-modal-content-medium-width");
 
         this.setChildren([
             new Form(null, [
                 new VerticalLayout([
-                    this.encryptAsPrivate = new Checkbox("Encrypt as Private (only you can read)", this.encryptionOptions.encryptForOwnerOnly),
+                    this.encryptAsPrivate = new Checkbox("Encrypt Content", this.encrypted),
                 ]),
                 new ButtonBar([
                     new Button("Save", () => {
@@ -43,6 +42,6 @@ export class EncryptionDlg extends DialogBase {
     }
 
     save = (): void => {
-        this.encryptionOptions.encryptForOwnerOnly = this.encryptAsPrivate.getChecked();
+        this.encrypted = this.encryptAsPrivate.getChecked();
     }
 }

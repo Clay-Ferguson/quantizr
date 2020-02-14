@@ -21,7 +21,6 @@ import { AceEditPropTextarea } from "../widget/AceEditPropTextarea";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { TextField } from "../widget/TextField";
 import { EncryptionDlg } from "./EncryptionDlg";
-import { EncryptionOptions } from "../EncryptionOptions";
 import { FormInline } from "../widget/FormInline";
 import { TextContent } from "../widget/TextContent";
 import { Comp } from "../widget/base/Comp";
@@ -61,8 +60,6 @@ export class EditNodeDlg extends DialogBase {
 
     nodeNameTextField: TextField;
     contentEditor: I.TextEditorIntf;
-
-    encryptionOptions: EncryptionOptions = new EncryptionOptions();
 
     static morePanelExpanded: boolean = false;
 
@@ -153,30 +150,8 @@ export class EditNodeDlg extends DialogBase {
         });
         let editPropsTable = new EditPropsTable();
 
-        let isPre = false;
-        let isWordWrap = true;
-
-        /* We have to scan properties in this loop before we do the loop below. So it is not redundant to have two loops
-        scanning the properties. This is by design, and not a mistake */
-        if (this.node.properties) {
-            this.node.properties.forEach((prop: J.PropertyInfo) => {
-                if (prop.name == C.PRE) {
-                    isPre = true;
-                    return;
-                }
-
-                if (prop.name == C.NOWRAP) {
-                    isWordWrap = false;
-                    return;
-                }
-
-                if (prop.name == J.NodeProp.ENC && prop.value == "priv") {
-                    this.encryptionOptions.encryptForOwnerOnly = true;
-                }
-
-                //console.log("Populate Prop: " + prop.name + "=" + prop.value);
-            });
-        }
+        let isPre = !!S.props.getNodePropVal(C.PRE, this.node);
+        let isWordWrap = !S.props.getNodePropVal(C.NOWRAP, this.node);
 
         this.preformattedCheckBox.setChecked(isPre);
         this.wordWrapCheckBox.setChecked(isWordWrap);
@@ -197,15 +172,7 @@ export class EditNodeDlg extends DialogBase {
         editPropsTable.addChild(nodeNameFormGroup);
 
         let content = this.node.content;
-        let encrypted = false;
-
-        //new logic means when turning encryption option back off we will come thru here with PRIV property not set but
-        //data still encrypted but we detect still and decrypt in this case too.
-        if (content.startsWith(J.NodeProp.ENC_TAG) /* && "priv" == S.props.getNodePropVal(cnst.ENC, this.node) */) {
-            encrypted = true;
-        }
-
-        let contentTableRow = this.makeContentEditorFormGroup(this.node, isPre, isWordWrap, encrypted);
+        let contentTableRow = this.makeContentEditorFormGroup(this.node, isPre, isWordWrap);
         editPropsTable.addChild(contentTableRow);
 
         this.contentEditor.setWordWrap(isWordWrap);
@@ -315,12 +282,40 @@ export class EditNodeDlg extends DialogBase {
 
     openEncryptionDlg = (): void => {
         (async () => {
-            let dlg = new EncryptionDlg(this.encryptionOptions);
+            let encrypted: boolean = !!S.props.getNodePropVal(J.NodeProp.ENC_KEY, this.node);
+            let dlg = new EncryptionDlg(encrypted);
             await dlg.open();
-            console.log("EncOptions after EncDlg: " + S.util.prettyPrint(this.encryptionOptions));
-            S.props.setNodePropertyVal(J.NodeProp.ENC, this.node, this.encryptionOptions.encryptForOwnerOnly ? "priv" : null);
 
-            this.rebuildDlg(); //todo-1: this is overkill. Will do it with targeted react setState eventually
+            /* Detect if the dialog changed the setting */
+            if (encrypted != dlg.encrypted) {
+
+                /* get the latest text the user has edited, from the editor */
+                if (this.contentEditor) {
+                    this.node.content = this.contentEditor.getValue();
+                }
+        
+                /* if it was encrypted and now needs to have encryption removed */
+                if (!dlg.encrypted && this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
+                    let cypherText = this.node.content.substring(J.NodeProp.ENC_TAG.length);
+
+                    let cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, this.node);
+                    let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
+                    this.node.content = clearText;
+
+                    S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, null);
+                }
+                /* Else node was not encrypted and we will encrypt now */
+                else {
+                    // if we need to encrypt and the content is not currently encrypted.
+                    if (!this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
+                        let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, this.node.content);
+                        this.node.content = J.NodeProp.ENC_TAG + skdp.cypherText;
+                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, skdp.cypherKey);
+                    }
+                }
+                
+                this.rebuildDlg(); 
+            }
         })();
     }
 
@@ -365,7 +360,7 @@ export class EditNodeDlg extends DialogBase {
 
     deletePropertyResponse = (res: any, propertyToDelete: any) => {
         if (S.util.checkSuccess("Delete property", res)) {
-            S.props.deleteProperty(this.node, propertyToDelete);
+            S.props.deleteProp(this.node, propertyToDelete);
 
             /* now just re-render screen from local variables */
             S.meta64.treeDirty = true;
@@ -378,7 +373,7 @@ export class EditNodeDlg extends DialogBase {
         if (invert) {
             val = (val == "1" ? null : "1");
         }
-        S.props.setNodePropertyVal(propName, this.node, val);
+        S.props.setNodePropVal(propName, this.node, val);
         handled[propName] = true;
         saveList.push({
             "name": propName,
@@ -399,7 +394,7 @@ export class EditNodeDlg extends DialogBase {
                 /* Get state of the 'layout' dropdown */
                 let layout = this.layoutSelection.getSelection();
 
-                S.props.setNodePropertyVal("layout", this.node, layout);
+                S.props.setNodePropVal("layout", this.node, layout);
                 handled["layout"] = true;
                 saveList.push({
                     "name": "layout",
@@ -410,37 +405,40 @@ export class EditNodeDlg extends DialogBase {
                 let priority = this.prioritySelection.getSelection();
 
                 //priority value 0 is default, so if user selects that we can just delete the option and save space.
-                S.props.setNodePropertyVal("priority", this.node, layout);
+                S.props.setNodePropVal("priority", this.node, layout);
                 handled["priority"] = true;
                 saveList.push({
                     "name": "priority",
                     "value": priority == "0" ? null : priority
-                });
-
-                //handle encryption setting
-                handled[J.NodeProp.ENC] = true;
-                saveList.push({
-                    "name": J.NodeProp.ENC,
-                    "value": this.encryptionOptions.encryptForOwnerOnly ? "priv" : null
                 });
             }
 
             let content: string;
             if (this.contentEditor) {
                 content = this.contentEditor.getValue();
-
                 // if we need to encrypt and the content is not currently encrypted.
-                if (content && this.encryptionOptions.encryptForOwnerOnly && !content.startsWith(J.NodeProp.ENC_TAG)) {
+                let encrypted: boolean = !!S.props.getNodePropVal(J.NodeProp.ENC_KEY, this.node);
+
+                if (content && encrypted && !content.startsWith(J.NodeProp.ENC_TAG)) {
                     let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
-                    
+
                     handled[J.NodeProp.ENC_KEY] = true;
                     saveList.push({
                         "name": J.NodeProp.ENC_KEY,
                         "value": skdp.cypherKey
                     });
-                    
+
                     content = J.NodeProp.ENC_TAG + skdp.cypherText;
                     //console.log("Encrypted: " + content);
+                }
+
+                /* if not encrypted blow away the ENC_KEY */
+                if (!encrypted) {
+                    handled[J.NodeProp.ENC_KEY] = true;
+                    saveList.push({
+                        "name": J.NodeProp.ENC_KEY,
+                        "value": null
+                    });
                 }
             }
 
@@ -474,10 +472,10 @@ export class EditNodeDlg extends DialogBase {
 
                     //todo-1: Is it ALWAYS true there's no way this can be different from checking the acual DB? the true content changed?
                     //if (propVal !== prop.property.value) {
-                        saveList.push({
-                            name: prop.property.name,
-                            value: propVal
-                        });
+                    saveList.push({
+                        name: prop.property.name,
+                        value: propVal
+                    });
                     //}
                 });
             }
@@ -564,9 +562,10 @@ export class EditNodeDlg extends DialogBase {
         return tableRow;
     }
 
-    makeContentEditorFormGroup = (node: J.NodeInfo, isPre: boolean, isWordWrap: boolean, encrypted: boolean): FormGroup => {
+    makeContentEditorFormGroup = (node: J.NodeInfo, isPre: boolean, isWordWrap: boolean): FormGroup => {
         let value = node.content;
         let formGroup = new FormGroup();
+        let encrypted = value.startsWith(J.NodeProp.ENC_TAG);
 
         value = S.util.escapeForAttrib(value);
         //console.log("making field editor for [" + propName + "] val[" + value + "]");
@@ -583,7 +582,7 @@ export class EditNodeDlg extends DialogBase {
                             let cypherText = value.substring(J.NodeProp.ENC_TAG.length);
                             (async () => {
                                 let cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
-                                let clearText: string = await S.encryption.decryptSharableString(null, {cypherKey, cypherText});
+                                let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
 
                                 //console.log('decrypted to:' + value);
                                 (this.contentEditor as AceEditPropTextarea).setValue(clearText);
@@ -608,7 +607,7 @@ export class EditNodeDlg extends DialogBase {
                     let cypherText = value.substring(J.NodeProp.ENC_TAG.length);
                     (async () => {
                         let cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
-                        let clearText: string = await S.encryption.decryptSharableString(null, {cypherKey, cypherText});
+                        let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
                         //console.log('decrypted to:' + value);
                         (this.contentEditor as Textarea).setValue(clearText);
                     })();

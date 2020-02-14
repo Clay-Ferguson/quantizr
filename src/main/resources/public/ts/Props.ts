@@ -43,7 +43,7 @@ export class Props implements PropsIntf {
         await S.render.renderPageFromData();
     }
 
-    deleteProperty = (node: J.NodeInfo, propertyName: string): void => {
+    deleteProp = (node: J.NodeInfo, propertyName: string): void => {
         if (node.properties) {
             for (let i = 0; i < node.properties.length; i++) {
                 if (propertyName === node.properties[i].name) {
@@ -126,7 +126,7 @@ export class Props implements PropsIntf {
      * brute force searches on node (NodeInfo.java) object properties list, and returns the first property
      * (PropertyInfo.java) with name matching propertyName, else null.
      */
-    getNodeProperty = (propertyName: string, node: J.NodeInfo): J.PropertyInfo => {
+    getNodeProp = (propertyName: string, node: J.NodeInfo): J.PropertyInfo => {
         if (!node || !node.properties)
             return null;
 
@@ -140,15 +140,15 @@ export class Props implements PropsIntf {
     }
 
     getNodePropVal = (propertyName: string, node: J.NodeInfo): string => {
-        let prop: J.PropertyInfo = this.getNodeProperty(propertyName, node);
+        let prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
         return prop ? prop.value : null;
     }
 
     /**
      * Sets property value and returns true only if the value has changed
      */
-    setNodePropertyVal = (propertyName: string, node: J.NodeInfo, val: string): void => {
-        let prop: J.PropertyInfo = this.getNodeProperty(propertyName, node);
+    setNodePropVal = (propertyName: string, node: J.NodeInfo, val: string): void => {
+        let prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
 
         /* If we found a property by propertyName, then set it's value */
         if (prop != null) {

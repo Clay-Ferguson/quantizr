@@ -125,13 +125,11 @@ export class MenuPanel extends Div {
                 new MenuItem("Show URL", S.render.showNodeUrl, () => { return S.meta64.state.highlightNode != null }), //
                 new MenuItem("Show Node JSON", () => { S.view.runServerCommand("getJson") }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
             ]),
-            new Menu("Transform", [
-                new MenuItem("Split Node", () => {
-                    new SplitNodeDlg().open();
-                }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
-            ]),
             new Menu("Tools",
                 [
+                    new MenuItem("Split Node", () => {
+                        new SplitNodeDlg().open();
+                    }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
                     new MenuItem("Import", S.edit.openImportDlg, //
                         () => { return S.meta64.state.importFeatureEnabled && (S.meta64.state.selNodeIsMine || (S.meta64.state.highlightNode != null && S.meta64.homeNodeId == S.meta64.state.highlightNode.id)) },//
                         () => { return S.meta64.state.importFeatureEnabled }), //
