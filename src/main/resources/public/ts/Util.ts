@@ -395,14 +395,6 @@ export class Util implements UtilIntf {
                     this.progressInterval();
 
                     if (!response.data.success) {
-
-                        //todo-0: This is a temporary hack until I get it where this ajax call supports 'fail case' functions, and
-                        //can handle recovery better from various failures (including a simple privilege one). For now this temp hack
-                        //at least blows away the last node ID so we can't get stuck.
-                        setTimeout(() => {
-                            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, null);
-                        }, 1);
-
                         if (response.data.message) {
                             this.showMessage(response.data.message);
 

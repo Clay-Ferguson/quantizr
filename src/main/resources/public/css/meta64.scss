@@ -317,6 +317,10 @@ input[type="radio"] {
     margin-left: $smallGap;
 }
 
+.marginTop {
+    margin-top: $smallGap;
+}
+
 .listBoxRow {
     cursor: pointer;
 }
@@ -343,8 +347,8 @@ input[type="radio"] {
 }
 
 .horizontalLayout {
-    margin-top: 5px;
-    margin-left: 5px;
+    //margin-top: 5px;
+    //margin-left: 5px;
 }
 
 /* Warning: setting any kind of left margin won't work becasue the btn-group? style of bootstrap overrides it in button groups */

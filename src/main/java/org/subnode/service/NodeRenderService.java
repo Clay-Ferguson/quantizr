@@ -38,9 +38,6 @@ import org.springframework.stereotype.Component;
 public class NodeRenderService {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 
-	//todo-0: get rid of this and use log.trace() instead
-	private static final boolean trace = false;
-
 	@Autowired
 	private SubNodeUtil subNodeUtil;
 
@@ -74,9 +71,6 @@ public class NodeRenderService {
 	 * all the data for that page.
 	 */
 	public void renderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res) {
-		if (trace) {
-			log.debug("renderNode() req.id=" + req.getNodeId());
-		}
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}

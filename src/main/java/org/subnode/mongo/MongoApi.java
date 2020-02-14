@@ -70,11 +70,6 @@ import org.springframework.stereotype.Component;
 public class MongoApi {
 	private static final Logger log = LoggerFactory.getLogger(MongoApi.class);
 
-	/* use for turning on debugging messages for authorization logic 
-	todo-0: get rid of this and just use log.trace() instead
-	*/
-	private static final boolean traceAuth = false;
-
 	@Autowired
 	private MongoAppConfig mac;
 
@@ -141,44 +136,32 @@ public class MongoApi {
 			throw new RuntimeException("privileges not specified.");
 		}
 
-		if (traceAuth) {
-			log.debug("auth: id=" + node.getId().toHexString() + " Priv: " + XString.prettyPrint(priv));
-		}
-
 		// admin has full power over all nodes
 		if (node == null || session.isAdmin()) {
-			if (traceAuth) {
-				log.debug("    auth granted. you're admin.");
-			}
+			log.trace("auth granted. you're admin.");
 			return;
 		}
 
+		//log.trace("auth: id=" + node.getId().toHexString() + " Priv: " + XString.prettyPrint(priv));
+
 		if (node.getOwner() == null) {
-			if (traceAuth) {
-				log.debug("    auth fails. node had no owner: " + node.getPath());
-			}
+			log.trace("auth fails. node had no owner: " + node.getPath());
 			throw new RuntimeException("node had no owner: " + node.getPath());
 		}
 
 		// if this session user is the owner of this node, then they have full power
 		if (!session.isAnon() && session.getUserNode().getId().equals(node.getOwner())) {
-			log.debug("   allow bc user owns node. accountId: " + node.getOwner().toHexString());
+			log.debug("allow bc user owns node. accountId: " + node.getOwner().toHexString());
 			return;
 		}
 
 		// Find any ancestor that has priv shared to this user.
 		if (ancestorAuth(session, node, priv)) {
-			if (traceAuth) {
-				log.debug("    ancestor auth success.");
-			}
+			log.trace("ancestor auth success.");
 			return;
 		}
 
-		if (traceAuth) {
-			log.info("    Unauthorized attempt at node id=" + node.getId() + " path=" + node.getPath());
-		}
-
-		// throw new NotLoggedInException();
+		log.trace("    Unauthorized attempt at node id=" + node.getId() + " path=" + node.getPath());
 		throw new NodeAuthFailedException();
 	}
 
@@ -189,10 +172,7 @@ public class MongoApi {
 		String sessionUserNodeId = session.isAnon() ? null : session.getUserNode().getId().toHexString();
 
 		String path = node.getPath();
-
-		if (traceAuth) {
-			log.debug("ancestorAuth: path="+path);
-		}
+		log.trace("ancestorAuth: path=" + path);
 
 		StringBuilder fullPath = new StringBuilder();
 		StringTokenizer t = new StringTokenizer(path, "/", false);
@@ -217,9 +197,8 @@ public class MongoApi {
 			// fullPath,
 			// privs));
 
-			if (traceAuth) {
-				log.debug("Checking Auth of: " + fullPath.toString());
-			}
+			log.trace("Checking Auth of: " + fullPath.toString());
+			
 			SubNode tryNode = getNode(session, fullPath.toString(), false);
 			if (tryNode == null) {
 				throw new RuntimeException("Tree corrupt! path not found: " + fullPath.toString());
@@ -227,17 +206,13 @@ public class MongoApi {
 
 			// if this session user is the owner of this node, then they have full power
 			if (!session.isAnon() && session.getUserNode().getId().equals(tryNode.getOwner())) {
-				if (traceAuth) {
-					log.debug("Auth successful. Found node user OWNS.");
-				}
+				log.debug("Auth successful. Found node user OWNS.");
 				ret = true;
 				break;
 			}
 
 			if (nodeAuth(tryNode, sessionUserNodeId, privs)) {
-				if (traceAuth) {
-					log.debug("Auth successful.");
-				}
+				log.debug("Auth successful.");
 				ret = true;
 				break;
 			}
@@ -810,26 +785,26 @@ public class MongoApi {
 	}
 
 	public void processAllNodes(MongoSession session) {
-		ValContainer<Long> nodesProcessed = new ValContainer<Long>(0L);
+		// ValContainer<Long> nodesProcessed = new ValContainer<Long>(0L);
 
-		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.FIELD_ACL).ne(null);
-		query.addCriteria(criteria);
+		// Query query = new Query();
+		// Criteria criteria = Criteria.where(SubNode.FIELD_ACL).ne(null);
+		// query.addCriteria(criteria);
 
-		Iterable<SubNode> iter = ops.find(query, SubNode.class);
+		// Iterable<SubNode> iter = ops.find(query, SubNode.class);
 
-		iter.forEach((node) -> {
-			nodesProcessed.setVal(nodesProcessed.getVal() + 1);
-			if (nodesProcessed.getVal() % 1000 == 0) {
-				log.debug("reSave count: " + nodesProcessed.getVal());
-			}
+		// iter.forEach((node) -> {
+		// 	nodesProcessed.setVal(nodesProcessed.getVal() + 1);
+		// 	if (nodesProcessed.getVal() % 1000 == 0) {
+		// 		log.debug("reSave count: " + nodesProcessed.getVal());
+		// 	}
 
-			// /*
-			// * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some of
-			// * the workload is done that pertains ot this reSave process
-			// */
-			save(session, node, true, false);
-		});
+		// 	// /*
+		// 	// * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some of
+		// 	// * the workload is done that pertains ot this reSave process
+		// 	// */
+		// 	save(session, node, true, false);
+		// });
 	}
 
 	public UserPreferencesNode getUserPreference(MongoSession session, String path) {

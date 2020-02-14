@@ -31,7 +31,7 @@ cd $PRJROOT
 
 ./pom-generate.sh
 
- # This run is required basically only to ensure TypeScript generated files are up to date.
+# This run is required only to ensure TypeScript generated files are up to date.
 mvn package -DskipTests -Pdev-vscode
 
 # This build command creates the SpringBoot fat jar in the /target/ folder.

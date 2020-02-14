@@ -618,7 +618,6 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditor.focus();
         }
 
-        //todo-0: I can now get rid of any "as any as" occurrances now right?
         formGroup.addChild(this.contentEditor as any as Comp);
         return formGroup;
     }

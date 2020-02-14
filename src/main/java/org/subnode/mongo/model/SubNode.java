@@ -60,7 +60,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder({ SubNode.FIELD_PATH, SubNode.FIELD_PATH_HASH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME,
 		SubNode.FIELD_ID, SubNode.FIELD_MAX_CHILD_ORDINAL, SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER,
-		SubNode.FIELD_CREATE_TIME, SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_ACL, SubNode.FIELD_PROPERTIES })
+		SubNode.FIELD_CREATE_TIME, SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES })
 public class SubNode {
 	public static final String FIELD_ID = "_id";
 	private boolean updateModTimeOnSave = true;
@@ -130,10 +130,6 @@ public class SubNode {
 	 * identifying users the additional key of "public" is allowed as a key which
 	 * indicates privileges granted to everyone (the entire public)
 	 */
-	public static final String FIELD_ACL = "acl";
-	@Field(FIELD_ACL)
-	private HashMap<String, String> acl;
-
 	public static final String FIELD_AC = "ac";
 	@Field(FIELD_AC)
 	private HashMap<String, AccessControl> ac;
@@ -290,18 +286,6 @@ public class SubNode {
 	public void setModifyTime(Date modifyTime) {
 		MongoThreadLocal.dirty(this);
 		this.modifyTime = modifyTime;
-	}
-
-	//todo-0: once refactoring complete on all instances, can remove this.
-	@JsonProperty(FIELD_ACL)
-	public HashMap<String, String> getAcl() {
-		return acl;
-	}
-
-	@JsonProperty(FIELD_ACL)
-	public void setAcl(HashMap<String, String> acl) {
-		MongoThreadLocal.dirty(this);
-		this.acl = acl;
 	}
 
 	@JsonProperty(FIELD_AC)

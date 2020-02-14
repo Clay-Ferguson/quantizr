@@ -483,7 +483,6 @@ export class Render implements RenderIntf {
 
             if (editingAllowed && this.allowAction(typeHandler, "edit")) {
                 selButton = new Checkbox(null, selected, {
-                    style: { marginTop: '0px', marginLeft: '0px' },
                     onChange: () => {
                         S.nav.toggleNodeSel(selButton.getChecked(), node.id)
                     },
@@ -537,7 +536,7 @@ export class Render implements RenderIntf {
         }
 
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
-            moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton]);
+            moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton], null, "marginLeft marginTop");
 
         if (selButton || typeIcon) {
             return new HorizontalLayout([selButton, typeIcon, buttonBar]);
@@ -712,7 +711,7 @@ export class Render implements RenderIntf {
 
                         if (typeIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton) {
                             buttonBar = new ButtonBar([typeIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
-                                null, "marginLeft");
+                                null, "marginLeft marginTop");
                         }
 
                         let children = [];

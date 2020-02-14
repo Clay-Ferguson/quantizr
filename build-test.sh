@@ -3,7 +3,10 @@ clear
 source ./setenv.sh
 source ./define-functions.sh
 
-#cd ~/ferguson/subnode-run
+cd /home/clay/ferguson/subnode-run
+sudo ./stop.sh
+
+cd $PRJROOT
 docker-compose -f docker-compose-test.yaml down --remove-orphans
 verifySuccess "Docker Compose (test): down"
 
@@ -32,6 +35,11 @@ cd $PRJROOT
 # mvn dependency:sources
 # mvn dependency:resolve -Dclassifier=javadoc
 # mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
+
+./pom-generate.sh
+
+# This run is required only to ensure TypeScript generated files are up to date.
+mvn package -DskipTests -Pdev-vscode
 
 # This build command creates the SpringBoot fat jar in the /target/ folder.
 mvn clean package -Pprod -DskipTests=true
