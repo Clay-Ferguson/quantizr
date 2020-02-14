@@ -234,6 +234,8 @@ export class User implements UserIntf {
                         S.meta64.homeNodeOverride = id;
                     } //
                     else {
+                        //todo-0: when this is failing because of privileges we can ge stuck where it tries this again.
+                        //need to make it where any failure to access this RESETS it to null
                         let lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
 
                         if (lastNode) {

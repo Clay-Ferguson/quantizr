@@ -33,6 +33,7 @@ export class View implements ViewIntf {
      */
     refreshTree = (nodeId?: string, renderParentIfLeaf?: boolean, highlightId?: string, isInitialRender?: boolean, forceIPFSRefresh?: boolean,
         scrollToFirstChild?: boolean): void => {
+        console.log("refreshTree()");
 
         if (!nodeId) {
             if (S.meta64.currentNodeData && S.meta64.currentNodeData.node) {
@@ -95,6 +96,7 @@ export class View implements ViewIntf {
     }
 
     private loadPage = (goToLastPage: boolean): void => {
+        console.log("loadPage()");
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             "nodeId": S.meta64.currentNodeData.node.id,
             "upLevel": null,

@@ -205,6 +205,7 @@ export class Nav implements NavIntf {
 
     openContentNode = (nodePathOrId: string): void => {
         this.mainOffset = 0;
+        console.log("openContentNode()");
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             "nodeId": nodePathOrId,
             "upLevel": null,
@@ -271,6 +272,7 @@ export class Nav implements NavIntf {
     }
 
     navHome = (): void => {
+        console.log("navHome()");
         if (S.meta64.isAnonUser) {
             S.meta64.loadAnonPageHome();
         } else {

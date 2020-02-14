@@ -7,7 +7,6 @@ import java.util.List;
 import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
-import org.subnode.model.UserPreferences;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -38,6 +37,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class NodeRenderService {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
+
+	//todo-0: get rid of this and use log.trace() instead
+	private static final boolean trace = false;
 
 	@Autowired
 	private SubNodeUtil subNodeUtil;
@@ -72,6 +74,9 @@ public class NodeRenderService {
 	 * all the data for that page.
 	 */
 	public void renderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res) {
+		if (trace) {
+			log.debug("renderNode() req.id=" + req.getNodeId());
+		}
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -135,6 +140,7 @@ public class NodeRenderService {
 				scanToNode = true;
 
 				while (node != null && levelsUpRemaining > 0) {
+					//log.debug("upLevelsRemaining=" + levelsUpRemaining);
 					try {
 						SubNode parent = api.getParent(session, node);
 						if (parent != null) {
@@ -142,19 +148,23 @@ public class NodeRenderService {
 						} else {
 							break;
 						}
-						log.trace("   upLevel to nodeid: " + node.getPath());
+						//log.trace("   upLevel to nodeid: " + node.getPath());
 						levelsUpRemaining--;
 					} catch (Exception e) {
-						throw new RuntimeException("Unable to access parent node.");
+						/* UPDATE: It's never actually a render problem if we can't grab the parent in cases
+						where we tried to. Always just allow it to render 'node' itself. */
+						scanToNode = false;
+						break;
 					}
 				}
 			}
 		}
 
-		/* For IPFS Proof-of-Concept work we just code the call right here, rather than
-		having a plugin-based polymorphic
-		interface we can call to fully decouple the IPFS from this rener service.
-		*/
+		/*
+		 * For IPFS Proof-of-Concept work we just code the call right here, rather than
+		 * having a plugin-based polymorphic interface we can call to fully decouple the
+		 * IPFS from this rener service.
+		 */
 		if (session.isAdmin()) {
 			if (node.isType(TYPES.FS_FOLDER)) {
 				fileSyncService.syncFolder(session, node, false, null);

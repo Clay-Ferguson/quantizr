@@ -10,6 +10,7 @@ import java.util.StringTokenizer;
 
 import org.subnode.config.NodePrincipal;
 import org.subnode.config.NodeProp;
+import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.MongoPrincipal;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddPrivilegeRequest;
@@ -94,72 +95,89 @@ public class AclService {
 
 	public boolean addPrivilege(MongoSession session, SubNode node, String principal, List<String> privileges,
 			ResponseBase res) {
+
+		if (principal == null)
+			return false;
 		boolean success = false;
-		if (principal != null) {
-			String mapKey = null;
 
-			/* If we are sharing to public, then that's the map key */
-			if (principal.equalsIgnoreCase(NodePrincipal.PUBLIC)) {
-				mapKey = NodePrincipal.PUBLIC;
-			}
-			/*
-			 * otherwise sharing to a person so their userNodeId is the map key in this case
-			 */
-			else {
-				SubNode principleNode = api.getUserNodeByUserName(api.getAdminSession(), principal);
-				if (principleNode == null) {
-					if (res != null) {
-						res.setMessage("Unknown user name: " + principal);
-						res.setSuccess(false);
-					}
-					return false;
-				}
-				mapKey = principleNode.getId().toHexString();
+		String mapKey = null;
 
-				/*
-				 * todo-1: send not just notification email, but send to people's INBOX node
-				 * also. will require us to invent the INBOX for user. Doesn't yet exist.
-				 */
-			}
-
-			HashMap<String, String> acl = node.getAcl();
-			if (acl == null) {
-				acl = new HashMap<String, String>();
-			}
-			String authForPrinciple = acl.get(mapKey);
-			if (authForPrinciple == null) {
-				authForPrinciple = "";
-			}
-
-			boolean authAdded = false;
-			for (String priv : privileges) {
-				if (authForPrinciple.indexOf(priv) == -1) {
-					authAdded = true;
-					if (authForPrinciple.length() > 0) {
-						authForPrinciple += ",";
-					}
-					authForPrinciple += priv;
-				}
-			}
-
-			if (authAdded) {
-				acl.put(mapKey, authForPrinciple);
-				node.setAcl(acl);
-				api.save(session, node);
-			}
-
-			success = true;
+		/* If we are sharing to public, then that's the map key */
+		if (principal.equalsIgnoreCase(NodePrincipal.PUBLIC)) {
+			mapKey = NodePrincipal.PUBLIC;
 		}
+		/*
+		 * otherwise we're sharing to a person so we now get their userNodeId to use as
+		 * map key
+		 */
+		else {
+			SubNode principleNode = api.getUserNodeByUserName(api.getAdminSession(), principal);
+			if (principleNode == null) {
+				if (res != null) {
+					res.setMessage("Unknown user name: " + principal);
+					res.setSuccess(false);
+				}
+				return false;
+			}
+			mapKey = principleNode.getId().toHexString();
+
+			/*
+			 * todo-1: send not just notification email, but send to people's INBOX node
+			 * also. will require us to invent the INBOX for user. Doesn't yet exist.
+			 */
+		}
+
+		/* initialize acl to a map if it's null */
+		HashMap<String, AccessControl> acl = node.getAc();
+		if (acl == null) {
+			acl = new HashMap<String, AccessControl>();
+		}
+
+		/*
+		 * Get access control entry from map, but if one is not found, we can just
+		 * create one.
+		 */
+		AccessControl ac = acl.get(mapKey);
+		if (ac == null) {
+			ac = new AccessControl();
+		}
+
+		String prvs = ac.getPrvs();
+		if (prvs == null) {
+			prvs = "";
+		}
+
+		boolean authAdded = false;
+		for (String priv : privileges) {
+			if (prvs.indexOf(priv) == -1) {
+				authAdded = true;
+				if (prvs.length() > 0) {
+					prvs += ",";
+				}
+				prvs += priv;
+			}
+		}
+
+		if (authAdded) {
+			ac.setPrvs(prvs);
+			acl.put(mapKey, ac);
+			node.setAc(acl);
+			api.save(session, node);
+		}
+
+		success = true;
 		return success;
 	}
 
 	public void removeAclEntry(MongoSession session, SubNode node, String principleNodeId, String privToRemove) {
 		HashSet<String> setToRemove = XString.tokenizeToSet(privToRemove, ",", true);
 
-		HashMap<String, String> acl = node.getAcl();
+		HashMap<String, AccessControl> acl = node.getAc();
 		if (acl == null)
 			return;
-		String privs = acl.get(principleNodeId);
+
+		AccessControl ac = acl.get(principleNodeId);
+		String privs = ac.getPrvs();
 		if (privs == null) {
 			log.debug("ACL didn't contain principleNodeId " + principleNodeId + "\nACL DUMP: "
 					+ XString.prettyPrint(acl));
@@ -169,6 +187,10 @@ public class AclService {
 		String newPrivs = "";
 		boolean removed = false;
 
+		/*
+		 * build the new comma-delimited privs list by adding all that aren't in the
+		 * 'setToRemove
+		 */
 		while (t.hasMoreTokens()) {
 			String tok = t.nextToken().trim();
 			if (setToRemove.contains(tok)) {
@@ -189,7 +211,8 @@ public class AclService {
 			if (newPrivs.equals("")) {
 				acl.remove(principleNodeId);
 			} else {
-				acl.put(principleNodeId, newPrivs);
+				ac.setPrvs(newPrivs);
+				acl.put(principleNodeId, ac);
 			}
 
 			/*
@@ -197,9 +220,9 @@ public class AclService {
 			 * removed from the node
 			 */
 			if (acl.isEmpty()) {
-				node.setAcl(null);
+				node.setAc(null);
 			} else {
-				node.setAcl(acl);
+				node.setAc(acl);
 			}
 
 			api.save(session, node);

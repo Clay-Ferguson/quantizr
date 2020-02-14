@@ -395,11 +395,26 @@ export class Util implements UtilIntf {
                     this.progressInterval();
 
                     if (!response.data.success) {
+
+                        //todo-0: This is a temporary hack until I get it where this ajax call supports 'fail case' functions, and
+                        //can handle recovery better from various failures (including a simple privilege one). For now this temp hack
+                        //at least blows away the last node ID so we can't get stuck.
+                        setTimeout(() => {
+                            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, null);
+                        }, 1);
+
                         if (response.data.message) {
                             this.showMessage(response.data.message);
 
                             console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: "
                                 + this.prettyPrint(response));
+
+                            //if (typeof failCallback == "function") {
+                                //failCallback(null);
+                            //}
+                            //todo-0: not sure I like this tight coupling of the ajax and how to cleanup after a failed call at least
+                            //things that normally run. This refreshing enablement normally runs, so let's run it here.
+                            S.meta64.refreshAllGuiEnablement();
                             return;
                         }
                         // WARNING: this looks like the right place for a return but does NOT work. Be careful.

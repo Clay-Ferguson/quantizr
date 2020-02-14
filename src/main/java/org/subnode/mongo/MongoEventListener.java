@@ -124,20 +124,19 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		/* We are converting ACL into AC here 
-		
-		todo-0: remove this after the conversion is complete everywhere.
+		This code has been completed (ran on all instances already)
 		*/
-		if (node.getAcl() != null) {
-			HashMap<String, AccessControl> acMap = new HashMap<String, AccessControl>();
-			node.getAcl().forEach((k, v) -> {
-				AccessControl ac = new AccessControl();
-				// log.debug("Setting ac with k=" + k + " v=" + v + " for node: " + node.getId().toHexString());
-				ac.setPrvs(v);
-				acMap.put(k, ac);
-			});
-			dbObj.put(SubNode.FIELD_AC, acMap);
-			node.setAc(acMap);
-		}
+		// if (node.getAcl() != null) {
+		// 	HashMap<String, AccessControl> acMap = new HashMap<String, AccessControl>();
+		// 	node.getAcl().forEach((k, v) -> {
+		// 		AccessControl ac = new AccessControl();
+		// 		// log.debug("Setting ac with k=" + k + " v=" + v + " for node: " + node.getId().toHexString());
+		// 		ac.setPrvs(v);
+		// 		acMap.put(k, ac);
+		// 	});
+		// 	dbObj.put(SubNode.FIELD_AC, acMap);
+		// 	node.setAc(acMap);
+		// }
 	}
 
 	@Override

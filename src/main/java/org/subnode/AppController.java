@@ -265,7 +265,7 @@ public class AppController {
 			userManagerService.processSignupCode(signupCode, model);
 		}
 
-		// A 'name' param is handled exactly as an identifier with ":" prefix
+		// A 'name' param is handled just like an identifier with ":" prefix
 		if (!StringUtils.isEmpty(name)) {
 			id = ":" + name;
 		}
@@ -285,8 +285,10 @@ public class AppController {
 					log.debug("Node exists.");
 				}
 			});
-			// It's ok for id to be null here.
 			sessionContext.setUrlId(vcId.getVal());
+		}
+		else {
+			sessionContext.setUrlId(null);
 		}
 
 		if (passCode != null) {
