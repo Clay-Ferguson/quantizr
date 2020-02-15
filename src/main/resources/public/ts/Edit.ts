@@ -112,7 +112,7 @@ export class Edit implements EditIntf {
 
     private initNodeEditResponse = (res: J.InitNodeEditResponse): void => {
         if (S.util.checkSuccess("Editing node", res)) {
-            let node: J.NodeInfo = res.nodeInfo as any as J.NodeInfo;
+            let node: J.NodeInfo = res.nodeInfo;
 
             // /* if this is a comment node and we are the commenter */
             // let editingAllowed: boolean = props.isOwnedCommentNode(node);
@@ -210,8 +210,8 @@ export class Edit implements EditIntf {
 
     insertNodeResponse = (res: J.InsertNodeResponse): void => {
         if (S.util.checkSuccess("Insert node", res)) {
-            S.meta64.initNode(res.newNode as any as J.NodeInfo, true);
-            S.meta64.highlightNode(res.newNode as any as J.NodeInfo, true);
+            S.meta64.initNode(res.newNode, true);
+            S.meta64.highlightNode(res.newNode, true);
             this.runEditNode(res.newNode.id);
         }
     }
@@ -222,7 +222,7 @@ export class Edit implements EditIntf {
                 S.meta64.refresh();
             }
             else {
-                S.meta64.initNode(res.newNode as any as J.NodeInfo, true);
+                S.meta64.initNode(res.newNode, true);
                 this.runEditNode(res.newNode.id);
             }
         }

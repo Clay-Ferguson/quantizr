@@ -269,15 +269,29 @@ export class MainNavPanel extends NavTag {
                 event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
             });
 
+            /* This DnD is just tinkering now, but the eventual goal is to have
+            the app automatically create a subnode whenever you drop something */
             elm.addEventListener("drop", (ev) => {
+                ev.stopPropagation();
+                ev.preventDefault(); 
+
+                //var imageUrl = evt.dataTransfer.getData('URL');
+                //var imageUrl = evt.dataTransfer.getData('text/html');
+
                 let data = ev.dataTransfer.items;
-                for (let i = 0; i < data.length; i += 1) {
-                    if ((data[i].kind == 'string') &&
-                        (data[i].type.match('^text/plain'))) {
-                        data[i].getAsString((s) => {
-                            //This detects drops, successfully but I'm not using it yet.
-                        });
+                for (let i = 0; i < data.length; i++) {
+                    let d = data[i];
+                    console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
+
+                    if ((d.kind == 'string') &&
+                        (d.type.match('^text/plain'))) {
                     }
+
+                    d.getAsString((s) => {
+                        //This detects drops, successfully but I'm not using it yet.
+                        console.log("DROP STRING[" + i + "]: " + s);
+                    });
+
                     // else if ((data[i].kind == 'string') &&
                     //     (data[i].type.match('^text/html'))) {
                     //     // Drag data item is HTML
