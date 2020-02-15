@@ -282,7 +282,7 @@ export class EditNodeDlg extends DialogBase {
 
     openEncryptionDlg = (): void => {
         (async () => {
-            let encrypted: boolean = !!S.props.getNodePropVal(J.NodeProp.ENC_KEY, this.node);
+            let encrypted: boolean = S.props.isEncrypted(this.node);
             let dlg = new EncryptionDlg(encrypted);
             await dlg.open();
 
@@ -417,7 +417,7 @@ export class EditNodeDlg extends DialogBase {
             if (this.contentEditor) {
                 content = this.contentEditor.getValue();
                 // if we need to encrypt and the content is not currently encrypted.
-                let encrypted: boolean = !!S.props.getNodePropVal(J.NodeProp.ENC_KEY, this.node);
+                let encrypted: boolean = S.props.isEncrypted(this.node);
 
                 if (content && encrypted && !content.startsWith(J.NodeProp.ENC_TAG)) {
                     let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);

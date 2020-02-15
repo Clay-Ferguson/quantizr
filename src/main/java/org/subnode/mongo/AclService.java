@@ -90,6 +90,20 @@ public class AclService {
 		api.authRequireOwnerOfNode(session, node);
 
 		boolean success = addPrivilege(session, node, req.getPrincipal(), req.getPrivileges(), res);
+		if (success) {
+			String cypherKey = node.getStringProp(NodeProp.ENC_KEY);
+			if (cypherKey!=null) {
+
+				//todo-0:
+				//Next work: get the public key from the TARGET user (principal) account root node (user node)
+				//see: userManagerService.savePublicKey(req, res);
+				//... and then stuff it in to here....
+				//res.setPrincipalPublicKey();
+				//then the client will use that public key to encrypt a key for this user's access and then resave the 
+				//privilege back up, probably using a dedicated RPC call named like 'setNodeCypherKey', which is essentially
+				//the client granting back up a key to the node usable only by the user (principal)
+			}
+		}
 		res.setSuccess(success);
 	}
 

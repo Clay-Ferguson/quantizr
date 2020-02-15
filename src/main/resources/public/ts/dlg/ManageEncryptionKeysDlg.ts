@@ -4,7 +4,7 @@ import { TextContent } from "../widget/TextContent";
 import { DialogBase } from "../DialogBase";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -15,15 +15,18 @@ export class ManageEncryptionKeysDlg extends DialogBase {
 
     textContent: TextContent;
 
-    constructor() { 
+    constructor() {
         super("Encryption Keys");
 
         this.setChildren([
             this.textContent = new TextContent("Getting key info...", "tallTextContent", true),
             new ButtonBar([
-                new Button("Generate Keys", async () => {
+                new Button("Generate New Keys", async () => {
                     await S.encryption.initKeys(true);
                     this.refreshKeyInfo();
+                }),
+                new Button("Re-Publish Keys", async () => {
+                    await S.encryption.initKeys(false, true);
                 }),
                 new Button("Close", () => {
                     this.close();
@@ -31,13 +34,12 @@ export class ManageEncryptionKeysDlg extends DialogBase {
             ])
         ]);
 
-        this.refreshKeyInfo();   
+        this.refreshKeyInfo();
     }
 
-    refreshKeyInfo = () => {
-        this.textContent.whenElm(async (elm: any) => {
-            let keyJson: string = await S.encryption.exportKeys();
-            this.textContent.setText(keyJson);
-        });   
+    refreshKeyInfo = async () => {
+        let keyJson: string = await S.encryption.exportKeys();
+        this.textContent.setText(keyJson);
+
     }
 }

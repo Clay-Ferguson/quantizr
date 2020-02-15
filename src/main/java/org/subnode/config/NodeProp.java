@@ -23,6 +23,9 @@ public class NodeProp {
 	public static final String EMAIL_RECIP = "sn:recip";
 	public static final String EMAIL_SUBJECT = "sn:subject";
 
+	//replicating a copy of this to here for now.
+	public static final String ENC_KEY = "sn:encKey";
+
 	/*
 	 * WARNING: Only the User Account Root nodes have this property of the actual
 	 * user name. All other nodes reference their OWNER as an OwnerId that points to

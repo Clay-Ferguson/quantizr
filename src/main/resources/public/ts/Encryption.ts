@@ -202,8 +202,8 @@ export class Encryption implements EncryptionIntf {
         console.log("runConversionTest OK.");
     }
 
-    initKeys = async (forceUpdate: boolean = false) => {
-        await this.initAsymetricKeys(forceUpdate);
+    initKeys = async (forceUpdate: boolean = false, republish: boolean = false) => {
+        await this.initAsymetricKeys(forceUpdate, republish);
         await this.initSymetricKey(forceUpdate);
     }
 
@@ -230,21 +230,14 @@ export class Encryption implements EncryptionIntf {
         });
     }
 
-    initAsymetricKeys = async (forceUpdate: boolean = false): Promise<void> => {
+    /* Note: a 'forceUpdate' always triggers the 'republish' */
+    initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                let val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+                debugger;
+                let pubKeyStr;
 
-                if (val && !forceUpdate) {
-                    if (this.logKeys) {
-                        let keyPair: EncryptionKeyPair = val.val;
-                        let privKeyStr = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.privateKey);
-                        console.log("asymPrivKey: " + S.util.toJson(privKeyStr));
-                        let publicKeyStr = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.publicKey);
-                        console.log("asymPubKey: " + S.util.toJson(publicKeyStr));
-                    }
-                }
-                else {
+                if (forceUpdate) {
                     let keyPair: EncryptionKeyPair = await crypto.subtle.generateKey({ //
                         name: this.ASYM_ALGO, //
                         modulusLength: 2048, //
@@ -254,8 +247,22 @@ export class Encryption implements EncryptionIntf {
 
                     S.localDB.writeObject({ name: this.STORE_ASYMKEY, val: keyPair });
                     let pubKeyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.publicKey);
-                    let pubKeyStr = JSON.stringify(pubKeyDat);
+                    pubKeyStr = JSON.stringify(pubKeyDat);
+                    republish = true;
+                }
+                else {
+                    if (republish) {
+                        let val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+                        let keyPair: EncryptionKeyPair = val.val;
+                        //let privKeyStr = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.privateKey);
+                        //console.log("asymPrivKey: " + S.util.toJson(privKeyStr));
+                        let publicKeyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.publicKey);
+                        pubKeyStr = JSON.stringify(publicKeyDat);
+                        console.log("asymPubKey: " + pubKeyStr);
+                    }
+                }
 
+                if (republish) {
                     S.util.ajax<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
                         "keyJson": pubKeyStr
                     }, this.savePublicKeyResponse);

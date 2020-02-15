@@ -241,6 +241,7 @@ export interface ActivityPubPostResponse extends ResponseBase {
 }
 
 export interface AddPrivilegeResponse extends ResponseBase {
+    principalPublicKey: string;
 }
 
 export interface AnonPageLoadResponse extends ResponseBase {

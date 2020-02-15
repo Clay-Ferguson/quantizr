@@ -139,6 +139,10 @@ export class Props implements PropsIntf {
         return null;
     }
 
+    isEncrypted = (node: J.NodeInfo): boolean => {
+        return !!S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
+    }
+
     getNodePropVal = (propertyName: string, node: J.NodeInfo): string => {
         let prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
         return prop ? prop.value : null;

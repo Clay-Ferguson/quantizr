@@ -1,4 +1,3 @@
-import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { PropTable } from "../widget/PropTable";
 
@@ -12,4 +11,5 @@ export interface PropsIntf {
     getNodeProp(propertyName: string, node: J.NodeInfo): J.PropertyInfo;
     getNodePropVal(propertyName : string, node: J.NodeInfo): string;
     setNodePropVal(propertyName : string, node: J.NodeInfo, val: string): void;
+    isEncrypted(node: J.NodeInfo): boolean;
 }
