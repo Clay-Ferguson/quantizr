@@ -113,16 +113,17 @@ public class AclService {
 
 	public boolean setCipherKey(MongoSession session, SubNode node, String principleNodeId, String cipherKey,
 			SetCipherKeyResponse res) {
+		boolean ret = false;
 
-		// todo-0: this is all happy-path for now. add exceptional checks.
 		HashMap<String, AccessControl> acl = node.getAc();
 		AccessControl ac = acl.get(principleNodeId);
 		if (ac != null) {
 			ac.setKey(cipherKey);
 			node.setAc(acl);
 			api.save(session, node);
+			ret = true;
 		}
-		return true;
+		return ret;
 	}
 
 	public boolean addPrivilege(MongoSession session, SubNode node, String principal, List<String> privileges,

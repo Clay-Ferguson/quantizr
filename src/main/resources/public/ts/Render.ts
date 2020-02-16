@@ -202,9 +202,6 @@ export class Render implements RenderIntf {
                             div.setContent(val2);
                         }
                     }
-                    else {
-                        //todo-0: what here?
-                    }
                 }, 1);
             }
         });
@@ -442,6 +439,7 @@ export class Render implements RenderIntf {
 
     makeRowButtonBar = (node: J.NodeInfo, editingAllowed: boolean): Comp => {
         let typeIcon: Icon;
+        let encIcon: Icon;
         let openButton: Button;
         let selButton: Checkbox;
         let createSubNodeButton: Button;
@@ -454,15 +452,23 @@ export class Render implements RenderIntf {
         let pasteInsideButton: Button;
         let pasteInlineButton: Button;
 
+        //todo-1: need to DRY up places where this code block is repeated
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass(node);
             if (iconClass) {
                 typeIcon = new Icon("", null, {
-                    "style": { margin: '8px', verticalAlign: 'middle' },
+                    "style": { verticalAlign: 'middle' },
                     className: iconClass
                 });
             }
+        }
+
+        if (S.props.isEncrypted(node)) {
+            encIcon = new Icon("", null, {
+                "style": { verticalAlign: 'middle' },
+                className: "fa fa-lock fa-lg"
+            });
         }
 
         //todo-1: rename this to sn:inlineChildren
@@ -547,8 +553,8 @@ export class Render implements RenderIntf {
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
             moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton], null, "marginLeft marginTop");
 
-        if (selButton || typeIcon) {
-            return new HorizontalLayout([selButton, typeIcon, buttonBar]);
+        if (selButton || typeIcon || encIcon) {
+            return new HorizontalLayout([selButton, typeIcon, encIcon, buttonBar]);
         }
         else {
             return buttonBar;
@@ -697,18 +703,27 @@ export class Render implements RenderIntf {
                             });
                         }
 
-                        let typeIcon = null;
+                        let typeIcon: Icon = null;
                         if (typeHandler) {
                             /* For now let's only show type icons when we're in edit mode */
                             if (S.meta64.userPreferences.editMode) {
                                 let iconClass = typeHandler.getIconClass(data.node);
                                 if (iconClass) {
+                                    //todo-1: do all icons have the 'middle'? (if so embed it into class)
                                     typeIcon = new Icon("", null, {
-                                        style: { margin: '8px', verticalAlign: 'middle' },
+                                        style: { verticalAlign: 'middle' },
                                         className: iconClass
                                     });
                                 }
                             }
+                        }
+
+                        let encIcon: Icon = null;
+                        if (S.props.isEncrypted(data.node)) {
+                            encIcon = new Icon("", null, {
+                                "style": { verticalAlign: 'middle' },
+                                className: "fa fa-lock fa-lg"
+                            });
                         }
 
                         /* Construct Create Subnode Button */
@@ -718,8 +733,8 @@ export class Render implements RenderIntf {
                             console.log("selected: focusNode.uid=" + focusNode.id + " selected=" + selected);
                         }
 
-                        if (typeIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton) {
-                            buttonBar = new ButtonBar([typeIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
+                        if (typeIcon || encIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton) {
+                            buttonBar = new ButtonBar([typeIcon, encIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
                                 null, "marginLeft marginTop");
                         }
 

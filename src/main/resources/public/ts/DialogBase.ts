@@ -1,12 +1,13 @@
 import { DialogBaseImpl } from "./DialogBaseImpl";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 import { Comp } from "./widget/base/Comp";
 import { Div } from "./widget/Div";
 import { Span } from "./widget/Span";
 import * as ReactDOM from "react-dom";
 import { CompIntf } from "./widget/base/CompIntf";
+import { Icon } from "./widget/Icon";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -24,6 +25,8 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
 
     elm: HTMLElement;
     dlgComp: Comp;
+
+    extraHeaderComps: CompIntf[];
 
     constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: boolean = false,
         private initiallyInvisible: boolean = false) {
@@ -107,15 +110,18 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
         //Dialog Header with close button (x) right justified on it.
         let content: CompIntf[] = [];
 
+        let titleChildren = this.extraHeaderComps ? this.extraHeaderComps : [];
+        titleChildren = titleChildren.concat(timesIcon = new Span("&times;", {
+            className: "float-right app-modal-title-close-icon",
+            onClick: this.close
+        }));
+
         //NOTE: title will be null for the main menu, which is actually implemented as a dialog using this base class.
         if (this.title) {
             content.push(new Div(this.title, {
                 className: "app-modal-title"
             },
-                [timesIcon = new Span("&times;", {
-                    className: "float-right app-modal-title-close-icon",
-                    onClick: this.close
-                })]
+                titleChildren
             ));
             timesIcon.renderRawHtml = true;
         }

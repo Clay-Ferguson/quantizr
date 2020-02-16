@@ -49,7 +49,7 @@ export class RssTypeHandler implements TypeHandlerIntf {
     }
 
     getIconClass(node: J.NodeInfo): string {
-        return null;
+        return "fa fa-rss fa-lg";
     }
 
     allowAction(action: string): boolean {

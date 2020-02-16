@@ -26,6 +26,8 @@ import { TextContent } from "../widget/TextContent";
 import { Comp } from "../widget/base/Comp";
 import { Textarea } from "../widget/Textarea";
 import { SymKeyDataPackage } from "../intf/EncryptionIntf";
+import { Icon } from "../widget/Icon";
+import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -63,12 +65,34 @@ export class EditNodeDlg extends DialogBase {
 
     static morePanelExpanded: boolean = false;
 
+    //todo-1: pass the actual arguments, not 'args' as an object.
     constructor(args: Object) {
         super("Edit Node", "app-modal-content", false, true);
 
         this.typeName = (<any>args).typeName;
         this.createAtTop = (<any>args).createAtTop;
         this.node = (<any>args).node;
+
+        this.extraHeaderComps = [];
+
+        /* todo-0: save these icons into vars and update them as user makes chagnes that affect them */
+        if (S.props.isEncrypted(this.node)) {
+            this.extraHeaderComps.push(new Icon("", null, {
+                "style": { marginLeft: '12px', verticalAlign: 'middle' },
+                className: "fa fa-lock fa-lg"
+            }));
+        }
+
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
+        if (typeHandler) {
+            let iconClass = typeHandler.getIconClass(this.node);
+            if (iconClass) {
+                this.extraHeaderComps.push(new Icon("", null, {
+                    "style": { marginLeft: '12px', verticalAlign: 'middle' },
+                    className: iconClass
+                }));
+            }
+        }
     }
 
     createLayoutSelection = (): Selection => {
@@ -302,9 +326,6 @@ export class EditNodeDlg extends DialogBase {
                     if (cypherKey) {
                         let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
                         this.node.content = clearText;
-                    }
-                    else {
-                        //todo-0: what here?
                     }
 
                     S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, null);
@@ -593,9 +614,6 @@ export class EditNodeDlg extends DialogBase {
                                     //console.log('decrypted to:' + value);
                                     (this.contentEditor as AceEditPropTextarea).setValue(clearText);
                                 }
-                                else {
-                                    //todo-0: what here?
-                                }
                             })();
                         }
 
@@ -621,9 +639,6 @@ export class EditNodeDlg extends DialogBase {
                             let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
                             //console.log('decrypted to:' + value);
                             (this.contentEditor as Textarea).setValue(clearText);
-                        }
-                        else {
-                            //todo-0: what here?
                         }
                     })();
                 }
