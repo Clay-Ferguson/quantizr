@@ -24,6 +24,11 @@ public class NodeInfo {
 	private List<PropertyInfo> properties;
 	private boolean hasChildren;
 
+	/* For nodes that are encrypted but shared to the current user, we send back the ciperKey (an encrypted sym key) for this node which
+	is a key that can only be decrypted by the private key on the user's browser, but decrypted by them on their browser
+	it gives the symmetric key to the encrypted data so they can access the encrypted node content with it */
+	private String cipherKey;
+
 	// NOTE: These two booleans are hints for gui enablement (for moveUp, moveDown, etc) in the browser, 
 	// and are not necessarily reqired to be always even correct
 	private boolean firstChild;
@@ -51,7 +56,7 @@ public class NodeInfo {
 	public NodeInfo(String id, String name, String content, String owner, Long ordinal, Date lastModified,
 			List<PropertyInfo> properties, boolean hasChildren,
 			boolean hasBinary, boolean binaryIsImage, long binVer, int width, int height, String type, long logicalOrdinal,
-			boolean firstChild, boolean lastChild) {
+			boolean firstChild, boolean lastChild, String cipherKey) {
 		this.id = id;
 		this.name = name;
 		this.content = content;
@@ -69,6 +74,7 @@ public class NodeInfo {
 		this.height = height;
 		this.type = type;
 		this.logicalOrdinal = logicalOrdinal;
+		this.cipherKey = cipherKey;
 	}
 
 	public String getContent() {
@@ -77,6 +83,14 @@ public class NodeInfo {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public String getCipherKey() {
+		return cipherKey;
+	}
+
+	public void setCipherKey(String cipherKey) {
+		this.cipherKey = cipherKey;
 	}
 	
 	public Date getLastModified() {

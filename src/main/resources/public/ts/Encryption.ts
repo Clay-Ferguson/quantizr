@@ -5,6 +5,10 @@ import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 
+// todo-0: currently you have to add shares AFTER the node is encrypted, rather than before, because only the sharing currently is where
+// it generates the keys. Need to test all combinations of this kind of ordering, and also test the case of what if the user tries to REGENERATE
+// their keys....probably there needs to be a way for the server to auto-dissemenate new keys whenever a user changes (generates) their keys.
+
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
@@ -57,9 +61,9 @@ export class Encryption implements EncryptionIntf {
 
     HASH_ALGO = "SHA-256";
 
-    ALGO_OPERATIONS = ["encrypt", "decrypt"];
-    OP_ENCRYPT: string[] = ["encrypt"];
-    OP_DECRYPT: string[] = ["decrypt"];
+    OP_ENC_DEC = ["encrypt", "decrypt"];
+    OP_ENC: string[] = ["encrypt"];
+    OP_DEC: string[] = ["decrypt"];
 
     vector: Uint8Array = null;
 
@@ -139,7 +143,7 @@ export class Encryption implements EncryptionIntf {
 
                 // test symetric key export/import
                 let keyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, key);
-                let key2 = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, keyDat, this.SYM_ALGO, true, this.ALGO_OPERATIONS);
+                let key2 = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, keyDat, this.SYM_ALGO, true, this.OP_ENC_DEC);
 
                 let encHex2 = await this.symEncryptString(key2, clearText);
                 let unencText2 = await this.symDecryptString(key2, encHex2);
@@ -174,12 +178,12 @@ export class Encryption implements EncryptionIntf {
                 let publicKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, publicKeyStr, {
                     name: this.ASYM_ALGO,
                     hash: this.HASH_ALGO,
-                }, true, this.OP_ENCRYPT);
+                }, true, this.OP_ENC);
 
                 let privateKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, privateKeyStr, {
                     name: this.ASYM_ALGO,
                     hash: this.HASH_ALGO,
-                }, true, this.OP_DECRYPT);
+                }, true, this.OP_DEC);
 
                 let encHex2 = await this.asymEncryptString(publicKey, clearText);
                 let unencText2 = await this.asymDecryptString(privateKey, encHex2);
@@ -205,6 +209,20 @@ export class Encryption implements EncryptionIntf {
     initKeys = async (forceUpdate: boolean = false, republish: boolean = false) => {
         await this.initAsymetricKeys(forceUpdate, republish);
         await this.initSymetricKey(forceUpdate);
+    }
+
+    getPrivateKey = async (): Promise<CryptoKey> => {
+        return new Promise<CryptoKey>(async (resolve, reject) => {
+            let val: any = await S.localDB.readObject(S.encryption.STORE_ASYMKEY);
+            resolve(val.val.privateKey);
+        });
+    }
+
+    getPublicKey = async (): Promise<CryptoKey> => {
+        return new Promise<CryptoKey>(async (resolve, reject) => {
+            let val: any = await S.localDB.readObject(S.encryption.STORE_ASYMKEY);
+            resolve(val.val.publicKey);
+        });
     }
 
     initSymetricKey = async (forceUpdate: boolean = false): Promise<void> => {
@@ -234,7 +252,6 @@ export class Encryption implements EncryptionIntf {
     initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                debugger;
                 let pubKeyStr;
 
                 if (forceUpdate) {
@@ -243,7 +260,7 @@ export class Encryption implements EncryptionIntf {
                         modulusLength: 2048, //
                         publicExponent: new Uint8Array([0x01, 0x00, 0x01]), //
                         hash: { name: this.HASH_ALGO } //
-                    }, true, this.ALGO_OPERATIONS);
+                    }, true, this.OP_ENC_DEC);
 
                     S.localDB.writeObject({ name: this.STORE_ASYMKEY, val: keyPair });
                     let pubKeyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, keyPair.publicKey);
@@ -278,7 +295,7 @@ export class Encryption implements EncryptionIntf {
         let key: CryptoKey = await window.crypto.subtle.generateKey({
             name: this.SYM_ALGO,
             length: 256
-        }, true, this.ALGO_OPERATIONS);
+        }, true, this.OP_ENC_DEC);
         return key;
     }
 
@@ -341,7 +358,8 @@ export class Encryption implements EncryptionIntf {
 
     /**
      * This is the primary way of encrypting data that uses a randomly generated symmetric key to
-     * do the encryption and then encrypts that symmetric key itself using the Public Key provided.
+     * do the encryption and then encrypts that symmetric key itself using the Public Key provided, or
+     * public key of current user.
      * 
      * This is a very standard approach in the crypto world, and it allows the owner of the associated 
      * keypair (i.e. private key) to be able to share the data securely with arbitrary other users by simply publishing
@@ -351,8 +369,8 @@ export class Encryption implements EncryptionIntf {
      * Of course, this means the process is that when a user wants to read data shared to them they just use 
      * their private key to decrypt the symmetric key to the data, and use that key to get the data.
      * 
-     * This function returns an object that contains two properties: cyphertext, cypherkey, whic is the encrypted data
-     * and the encrypted "JWK" formatted key to the data.
+     * This function returns an object that contains two properties: cyphertext, cypherkey, which is the encrypted data
+     * and the encrypted "JWK" formatted key to the data, respectively
      * 
      * 'publicKey' argument should be the public key of the person doing the encryption (the person doing the encryption) 
      * and if null, it's automatically retrieved from the localDB
@@ -362,8 +380,7 @@ export class Encryption implements EncryptionIntf {
             let ret: SymKeyDataPackage = null;
             try {
                 if (!publicKey) {
-                    let val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
-                    publicKey = val.val.publicKey;
+                    publicKey = await this.getPublicKey();
                 }
 
                 //generate random symmetric key
@@ -377,7 +394,7 @@ export class Encryption implements EncryptionIntf {
                 let cypherKey = await this.asymEncryptString(publicKey, symKeyStr);
 
                 //encrypt the data with the symetric key
-                let cypherText = await this.encryptString(symKey, this.SYM_ALGO, data);
+                let cypherText = await this.symEncryptString(symKey, data);
 
                 ret = { cypherText, cypherKey };
             }
@@ -393,14 +410,15 @@ export class Encryption implements EncryptionIntf {
             let ret: string = null;
             try {
                 if (!privateKey) {
-                    let val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
-                    privateKey = val.val.privateKey;
+                    privateKey = await this.getPrivateKey();
                 }
 
-                //Decrypt the symmetric key using out private key
+                //Decrypt the symmetric key using our private key
                 let symKeyJsonStr: string = await this.asymDecryptString(privateKey, skpd.cypherKey);
+                //console.log("Decrypted cypherKey to: "+symKeyJsonStr);
                 let symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
-                let symKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, symKeyJsonObj, this.SYM_ALGO, true, this.ALGO_OPERATIONS);
+                let symKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, symKeyJsonObj, this.SYM_ALGO, true, this.OP_ENC_DEC);
+                //console.log("Key imported: "+symKeyJsonStr);
                 ret = await this.symDecryptString(symKey, skpd.cypherText);
             }
             finally {
@@ -450,6 +468,10 @@ export class Encryption implements EncryptionIntf {
                     key, encArray);
                 let resArray = new Uint8Array(result);
                 resStr = this.convertByteArrayToString(resArray);
+            }
+            catch (e) {
+                //todo-1: this is bad handling. fix it
+                console.log("decryption failed");
             }
             finally {
                 resolve(resStr);

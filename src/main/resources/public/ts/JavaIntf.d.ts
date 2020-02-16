@@ -9,7 +9,6 @@ export interface AddPrivilegeRequest extends RequestBase {
     nodeId: string;
     privileges: string[];
     principal: string;
-    publicAppend: boolean;
 }
 
 export interface AnonPageLoadRequest extends RequestBase {
@@ -204,6 +203,12 @@ export interface SelectAllNodesRequest extends RequestBase {
 export interface SendTestEmailRequest extends RequestBase {
 }
 
+export interface SetCipherKeyRequest extends RequestBase {
+    nodeId: string;
+    principalNodeId: string;
+    cipherKey: string;
+}
+
 export interface SetNodePositionRequest extends RequestBase {
     nodeId: string;
     targetName: string;
@@ -242,6 +247,7 @@ export interface ActivityPubPostResponse extends ResponseBase {
 
 export interface AddPrivilegeResponse extends ResponseBase {
     principalPublicKey: string;
+    principalNodeId: string;
 }
 
 export interface AnonPageLoadResponse extends ResponseBase {
@@ -296,7 +302,6 @@ export interface FileSystemReindexResponse extends ResponseBase {
 export interface GetNodePrivilegesResponse extends ResponseBase {
     aclEntries: AccessControlEntryInfo[];
     owners: string[];
-    publicAppend: boolean;
 }
 
 export interface GetPublicServerInfoResponse extends ResponseBase {
@@ -401,6 +406,9 @@ export interface SelectAllNodesResponse extends ResponseBase {
 export interface SendTestEmailResponse extends ResponseBase {
 }
 
+export interface SetCipherKeyResponse extends ResponseBase {
+}
+
 export interface SetNodePositionResponse extends ResponseBase {
 }
 
@@ -452,6 +460,7 @@ export interface NodeInfo {
     type: string;
     properties: PropertyInfo[];
     hasChildren: boolean;
+    cipherKey: string;
     firstChild: boolean;
     lastChild: boolean;
     hasBinary: boolean;
@@ -491,7 +500,6 @@ export interface PrivilegeInfo {
 }
 
 export const enum NodeProp {
-    ENC = "sn:enc",
     ENC_KEY = "sn:encKey",
     ENC_TAG = "<[ENC]>",
 }

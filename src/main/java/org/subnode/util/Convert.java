@@ -14,6 +14,7 @@ import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodePropertyMap;
@@ -65,30 +66,47 @@ public class Convert {
 		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly, allowAbbreviated,
 				initNodeEdit);
 
+		String rootId = node.getOwner().toHexString();
+
 		/*
 		 * todo-2: this is a spot that can be optimized. We should be able to send just
 		 * the userNodeId back to client, and the client should be able to deal with
 		 * that (i think). depends on how much ownership info we need to show user.
 		 */
 		SubNode userNode = api.getNode(session, node.getOwner(), false);
-		if (userNode==null) {
-			//todo-1: looks like import corrupts the 'owner' (needs research), but the code below sets to owner to 'admin' which will 
-			//be safe for now because the admin is the only user capable of import/export.
-			log.debug("Unable to find userNode from nodeOwner: "+//
-				(node.getOwner()!=null ? node.getOwner().toHexString() : ("null owner on node: "+node.getId().toHexString())));
+		if (userNode == null) {
+			// todo-1: looks like import corrupts the 'owner' (needs research), but the code
+			// below sets to owner to 'admin' which will
+			// be safe for now because the admin is the only user capable of import/export.
+			log.debug("Unable to find userNode from nodeOwner: " + //
+					(node.getOwner() != null ? rootId : ("null owner on node: " + node.getId().toHexString())));
 		}
 		String owner = userNode == null ? "admin" : userNode.getStringProp(NodeProp.USER);
+
+		log.debug("RENDER ID="+node.getId().toHexString()+" rootId="+rootId+" session.rootId="+sessionContext.getRootId()+" node.content="+node.getContent());
+
+		// If the node is not owned by the person doing the browsing we need to extract
+		// the key from ACL
+		// and put in cipherKey, so send back so the user can decrypte the node.
+		String cipherKey = null;
+		if (!rootId.equals(sessionContext.getRootId()) && node.getAc() != null) {
+			AccessControl ac = node.getAc().get(sessionContext.getRootId());
+			if (ac != null) {
+				cipherKey = ac.getKey();
+			}
+		}
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, node.getOrdinal(), //
 				node.getModifyTime(), propList, hasNodes, hasBinary, binaryIsImage, binVer, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
-				node.getType(), logicalOrdinal, firstChild, lastChild);
+				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey);
 
 		if (allowInlineChildren) {
 			boolean hasInlineChildren = node.getBooleanProp("inlineChildren");
 			if (hasInlineChildren) {
-				Iterable<SubNode> nodeIter = api.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100);
+				Iterable<SubNode> nodeIter = api.getChildren(session, node,
+						Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100);
 				Iterator<SubNode> iterator = nodeIter.iterator();
 
 				while (true) {
@@ -135,7 +153,7 @@ public class Convert {
 
 	public List<PropertyInfo> buildPropertyInfoList(SessionContext sessionContext, SubNode node, //
 			boolean htmlOnly, boolean allowAbbreviated, boolean initNodeEdit) {
-		
+
 		List<PropertyInfo> props = null;
 		SubNodePropertyMap propMap = node.getProperties();
 
@@ -257,4 +275,3 @@ public class Convert {
 		return val;
 	}
 }
-

@@ -28,7 +28,7 @@ public class AppFilter extends GenericFilterBean {
 	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
 	private static final HashMap<String, Integer> uniqueIpHits = new HashMap<String, Integer>();
 	private static int reqId = 0;
-	private static boolean logRequests = true;
+	private static boolean logRequests = false;
 	private static boolean logResponses = false;
 
 	@Override

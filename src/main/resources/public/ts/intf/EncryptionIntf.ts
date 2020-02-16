@@ -5,10 +5,11 @@ export interface EncryptionIntf {
     KEY_SAVE_FORMAT: string;
     ASYM_ALGO: string;
     HASH_ALGO: string;
+    STORE_ASYMKEY: string;
 
-    ALGO_OPERATIONS: string[];
-    OP_ENCRYPT: string[];
-    OP_DECRYPT: string[];
+    OP_ENC_DEC: string[];
+    OP_ENC: string[];
+    OP_DEC: string[];
 
     vector: Uint8Array;
 
@@ -27,6 +28,9 @@ export interface EncryptionIntf {
 
     encryptSharableString(publicKey: CryptoKey, data: string): Promise<SymKeyDataPackage>;
     decryptSharableString(privateKey: CryptoKey, skpd: SymKeyDataPackage): Promise<string>;
+
+    getPrivateKey(): Promise<CryptoKey>;
+    getPublicKey(): Promise<CryptoKey>;
 }
 
 export interface SymKeyDataPackage {

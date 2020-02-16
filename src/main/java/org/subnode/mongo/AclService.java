@@ -16,9 +16,11 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddPrivilegeRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.RemovePrivilegeRequest;
+import org.subnode.request.SetCipherKeyRequest;
 import org.subnode.response.AddPrivilegeResponse;
 import org.subnode.response.GetNodePrivilegesResponse;
 import org.subnode.response.RemovePrivilegeResponse;
+import org.subnode.response.SetCipherKeyResponse;
 import org.subnode.response.base.ResponseBase;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.ExUtil;
@@ -73,12 +75,7 @@ public class AclService {
 	}
 
 	/*
-	 * I made this privilege capable of doing either a 'publicAppend' update, or
-	 * actual privileges update. Only one at a time will be done, usually, if not
-	 * always.
-	 *
-	 * Adds a new privilege to a node using HTTP request param objects. Request
-	 * object is self explanatory.
+	 * Adds or updates a new privilege to a node
 	 */
 	public void addPrivilege(MongoSession session, AddPrivilegeRequest req, AddPrivilegeResponse res) {
 		if (session == null) {
@@ -90,34 +87,58 @@ public class AclService {
 		api.authRequireOwnerOfNode(session, node);
 
 		boolean success = addPrivilege(session, node, req.getPrincipal(), req.getPrivileges(), res);
-		if (success) {
-			String cypherKey = node.getStringProp(NodeProp.ENC_KEY);
-			if (cypherKey!=null) {
-
-				//todo-0:
-				//Next work: get the public key from the TARGET user (principal) account root node (user node)
-				//see: userManagerService.savePublicKey(req, res);
-				//... and then stuff it in to here....
-				//res.setPrincipalPublicKey();
-				//then the client will use that public key to encrypt a key for this user's access and then resave the 
-				//privilege back up, probably using a dedicated RPC call named like 'setNodeCypherKey', which is essentially
-				//the client granting back up a key to the node usable only by the user (principal)
-			}
-		}
 		res.setSuccess(success);
 	}
 
+	/*
+	 * Adds or updates a new privilege to a node
+	 */
+	public void setCipherKey(MongoSession session, SetCipherKeyRequest req, SetCipherKeyResponse res) {
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+
+		String nodeId = req.getNodeId();
+		SubNode node = api.getNode(session, nodeId);
+		api.authRequireOwnerOfNode(session, node);
+
+		String cypherKey = node.getStringProp(NodeProp.ENC_KEY);
+		if (cypherKey == null) {
+			throw new RuntimeException("Attempted to alter keys on a non-encrypted node.");
+		}
+
+		boolean success = setCipherKey(session, node, req.getPrincipalNodeId(), req.getCipherKey(), res);
+		res.setSuccess(success);
+	}
+
+	public boolean setCipherKey(MongoSession session, SubNode node, String principleNodeId, String cipherKey,
+			SetCipherKeyResponse res) {
+
+		// todo-0: this is all happy-path for now. add exceptional checks.
+		HashMap<String, AccessControl> acl = node.getAc();
+		AccessControl ac = acl.get(principleNodeId);
+		if (ac != null) {
+			ac.setKey(cipherKey);
+			node.setAc(acl);
+			api.save(session, node);
+		}
+		return true;
+	}
+
 	public boolean addPrivilege(MongoSession session, SubNode node, String principal, List<String> privileges,
-			ResponseBase res) {
+			AddPrivilegeResponse res) {
 
 		if (principal == null)
 			return false;
-		boolean success = false;
 
+		String cypherKey = node.getStringProp(NodeProp.ENC_KEY);
 		String mapKey = null;
 
 		/* If we are sharing to public, then that's the map key */
 		if (principal.equalsIgnoreCase(NodePrincipal.PUBLIC)) {
+			if (cypherKey != null) {
+				throw new RuntimeException("Cannot make an encrypted node public.");
+			}
 			mapKey = NodePrincipal.PUBLIC;
 		}
 		/*
@@ -134,6 +155,25 @@ public class AclService {
 				return false;
 			}
 			mapKey = principleNode.getId().toHexString();
+
+			/*
+			 * If this node is encrypted we get the public key of the user being shared with
+			 * to send back to the client, which will then use it to encrypt the symmetric
+			 * key to the data, and then send back up to the server to store in this sharing
+			 * entry
+			 */
+			if (cypherKey != null) {
+				String principalPubKey = principleNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY);
+				if (principalPubKey == null) {
+					if (res != null) {
+						res.setMessage("User doesn't have a PublicKey available: " + principal);
+						res.setSuccess(false);
+						return false;
+					}
+				}
+				res.setPrincipalPublicKey(principalPubKey);
+				res.setPrincipalNodeId(mapKey);
+			}
 
 			/*
 			 * todo-1: send not just notification email, but send to people's INBOX node
@@ -179,8 +219,7 @@ public class AclService {
 			api.save(session, node);
 		}
 
-		success = true;
-		return success;
+		return true;
 	}
 
 	public void removeAclEntry(MongoSession session, SubNode node, String principleNodeId, String privToRemove) {

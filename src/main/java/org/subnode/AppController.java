@@ -66,6 +66,7 @@ import org.subnode.request.SavePublicKeyRequest;
 import org.subnode.request.SaveUserPreferencesRequest;
 import org.subnode.request.SelectAllNodesRequest;
 import org.subnode.request.SendTestEmailRequest;
+import org.subnode.request.SetCipherKeyRequest;
 import org.subnode.request.SetNodePositionRequest;
 import org.subnode.request.SetNodeTypeRequest;
 import org.subnode.request.ShutdownServerNodeRequest;
@@ -106,6 +107,7 @@ import org.subnode.response.SavePublicKeyResponse;
 import org.subnode.response.SaveUserPreferencesResponse;
 import org.subnode.response.SelectAllNodesResponse;
 import org.subnode.response.SendTestEmailResponse;
+import org.subnode.response.SetCipherKeyResponse;
 import org.subnode.response.SetNodePositionResponse;
 import org.subnode.response.SetNodeTypeResponse;
 import org.subnode.response.ShutdownServerNodeResponse;
@@ -404,6 +406,15 @@ public class AppController {
 		return (ResponseBase) callProc.run("addPrivilege", req, session, ms -> {
 			SavePublicKeyResponse res = new SavePublicKeyResponse();
 			userManagerService.savePublicKey(req, res);
+			return res;
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/setCipherKey", method = RequestMethod.POST)
+	public @ResponseBody ResponseBase setCipherKey(@RequestBody SetCipherKeyRequest req, HttpSession session) {
+		return (ResponseBase) callProc.run("setCipherKey", req, session, ms -> {
+			SetCipherKeyResponse res = new SetCipherKeyResponse();
+			aclService.setCipherKey(ms, req, res);
 			return res;
 		});
 	}

@@ -6,8 +6,9 @@ import { PropTableCell } from "./widget/PropTableCell";
 import { PropsIntf } from "./intf/PropsIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
+import { useReducer } from "react";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -137,6 +138,24 @@ export class Props implements PropsIntf {
             }
         }
         return null;
+    }
+
+    /* Gets the crypto key from this node that will allow user to decrypt the node. If the user is the owner of the 
+    node this simply returns the ENC_KEY property but if not we look up in the ACL on the node a copy of the encrypted
+    key that goes with the current user (us, logged in user), which should decrypt using our private key.
+    */
+    getCryptoKey = (node: J.NodeInfo) => {
+        let cypherKey = null;
+
+        /* if we own try to encrypt using our own key */
+        if (S.meta64.userName == node.owner) {
+            cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
+        }
+        /* else if the server has provided the cipher key to us from the ACL (AccessControl) then use it. */
+        else {
+            cypherKey = node.cipherKey;
+        }
+        return cypherKey;
     }
 
     isEncrypted = (node: J.NodeInfo): boolean => {

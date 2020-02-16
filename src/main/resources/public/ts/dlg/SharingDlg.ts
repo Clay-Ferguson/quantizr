@@ -64,7 +64,6 @@ export class SharingDlg extends DialogBase {
     //         "nodeId": this.node.id,
     //         "privileges": null,
     //         "principal": null,
-    //         "publicAppend": false //this.publicCommentingCheckbox.getChecked()
     //     });
     // }
 
@@ -111,7 +110,6 @@ export class SharingDlg extends DialogBase {
             "nodeId": this.node.id,
             "principal": "public",
             "privileges": ["rd"],
-            "publicAppend": false
         }, this.reload);
     }
 

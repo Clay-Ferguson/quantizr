@@ -29,7 +29,10 @@ export class Render implements RenderIntf {
 
     //This flag makes the text ALWAYS decrypt and display onscreen if the person owning the content is viewing it, but this
     //is most likely never wanted, because it's insecure in screen-share context, or when someone can see your screen for any reason.
-    private immediateDecrypting: boolean = false;
+    //todo-1: We could make this a user preference so users in a secure location can just view all encrypted data.
+    //
+    //UPDATE: turning this ON for now, because for testing 'shared' nodes we don't have editing capability and thus need a way to decrypt
+    private immediateDecrypting: boolean = true;
 
     private renderBinary = (node: J.NodeInfo): Comp => {
         /*
@@ -188,13 +191,19 @@ export class Render implements RenderIntf {
                     //decrypted text (val), and hold that map so that once we decrypt a message we never use encryption again at least
                     //until of course browser refresh (would be Javascript hash)                    
                     let cypherText = content.substring(J.NodeProp.ENC_TAG.length);
-                    let cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
-                    let clearText: string = await S.encryption.decryptSharableString(null, {cypherKey, cypherText});
 
-                    if (clearText) {
-                        node.content = clearText;
-                        let val2 = this.renderRawMarkdown(node);
-                        div.setContent(val2);
+                    let cypherKey = S.props.getCryptoKey(node);
+                    if (cypherKey) {
+                        let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
+
+                        if (clearText) {
+                            node.content = clearText;
+                            let val2 = this.renderRawMarkdown(node);
+                            div.setContent(val2);
+                        }
+                    }
+                    else {
+                        //todo-0: what here?
                     }
                 }, 1);
             }
@@ -357,7 +366,7 @@ export class Render implements RenderIntf {
         //     editingAllowed = S.meta64.isAdminUser && !props.isNonOwnedCommentNode(node)
         //         && !props.isNonOwnedNode(node);
         // }
-        let editingAllowed = S.edit.isEditAllowed(node); 
+        let editingAllowed = S.edit.isEditAllowed(node);
         if (typeHandler) {
             editingAllowed = editingAllowed && typeHandler.allowAction("edit");
         }
@@ -1009,7 +1018,7 @@ export class Render implements RenderIntf {
             return typeHandler.allowPropertyEdit(propName);
         }
         else {
-            return this.allowPropertyToDisplay(propName); 
+            return this.allowPropertyToDisplay(propName);
         }
     }
 

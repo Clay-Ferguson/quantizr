@@ -21,6 +21,7 @@ export class ManageEncryptionKeysDlg extends DialogBase {
         this.setChildren([
             this.textContent = new TextContent("Getting key info...", "tallTextContent", true),
             new ButtonBar([
+                //both of these operations need some kind of confirmation dialog to come up after
                 new Button("Generate New Keys", async () => {
                     await S.encryption.initKeys(true);
                     this.refreshKeyInfo();

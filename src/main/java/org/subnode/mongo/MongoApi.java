@@ -116,6 +116,9 @@ public class MongoApi {
 	}
 
 	public void authRequireOwnerOfNode(MongoSession session, SubNode node) {
+		if (node == null) {
+			throw new RuntimeException("Auth Failed. Node did not exist.");
+		}
 		if (!session.isAdmin() && !session.getUserNode().getId().equals(node.getOwner())) {
 			throw new RuntimeException("Auth Failed. Node ownership required.");
 		}
@@ -142,7 +145,8 @@ public class MongoApi {
 			return;
 		}
 
-		//log.trace("auth: id=" + node.getId().toHexString() + " Priv: " + XString.prettyPrint(priv));
+		// log.trace("auth: id=" + node.getId().toHexString() + " Priv: " +
+		// XString.prettyPrint(priv));
 
 		if (node.getOwner() == null) {
 			log.trace("auth fails. node had no owner: " + node.getPath());
@@ -151,7 +155,7 @@ public class MongoApi {
 
 		// if this session user is the owner of this node, then they have full power
 		if (!session.isAnon() && session.getUserNode().getId().equals(node.getOwner())) {
-			log.debug("allow bc user owns node. accountId: " + node.getOwner().toHexString());
+			log.trace("allow bc user owns node. accountId: " + node.getOwner().toHexString());
 			return;
 		}
 
@@ -198,7 +202,7 @@ public class MongoApi {
 			// privs));
 
 			log.trace("Checking Auth of: " + fullPath.toString());
-			
+
 			SubNode tryNode = getNode(session, fullPath.toString(), false);
 			if (tryNode == null) {
 				throw new RuntimeException("Tree corrupt! path not found: " + fullPath.toString());
@@ -794,16 +798,17 @@ public class MongoApi {
 		// Iterable<SubNode> iter = ops.find(query, SubNode.class);
 
 		// iter.forEach((node) -> {
-		// 	nodesProcessed.setVal(nodesProcessed.getVal() + 1);
-		// 	if (nodesProcessed.getVal() % 1000 == 0) {
-		// 		log.debug("reSave count: " + nodesProcessed.getVal());
-		// 	}
+		// nodesProcessed.setVal(nodesProcessed.getVal() + 1);
+		// if (nodesProcessed.getVal() % 1000 == 0) {
+		// log.debug("reSave count: " + nodesProcessed.getVal());
+		// }
 
-		// 	// /*
-		// 	// * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some of
-		// 	// * the workload is done that pertains ot this reSave process
-		// 	// */
-		// 	save(session, node, true, false);
+		// // /*
+		// // * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some
+		// of
+		// // * the workload is done that pertains ot this reSave process
+		// // */
+		// save(session, node, true, false);
 		// });
 	}
 

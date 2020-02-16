@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 /* todo-0: Oops, we have TWO classes of this same name. fix */
 public enum NodeProp {
-    ENC("sn:enc"),
+
+    //This is the encrypted symetric key to the node data, that was encrypted using the private key of the owner of the node.
     ENC_KEY("sn:encKey"),
+    
     ENC_TAG("<[ENC]>");
 
     @JsonValue

@@ -286,36 +286,41 @@ export class EditNodeDlg extends DialogBase {
             let dlg = new EncryptionDlg(encrypted);
             await dlg.open();
 
-            /* Detect if the dialog changed the setting */
-            if (encrypted != dlg.encrypted) {
+            /* 
+            (actually this can probably be retested, unocmmented and will work now.)
+            */
+            // if (this.contentEditor) {
+            //     this.node.content = this.contentEditor.getValue();
+            // }
 
-                /* get the latest text the user has edited, from the editor */
-                if (this.contentEditor) {
-                    this.node.content = this.contentEditor.getValue();
-                }
-        
-                /* if it was encrypted and now needs to have encryption removed */
-                if (!dlg.encrypted && this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
+            if (!dlg.encrypted) {
+                /* if node is currently encrypted and now needs to have encryption removed */
+                if (encrypted && this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
                     let cypherText = this.node.content.substring(J.NodeProp.ENC_TAG.length);
 
-                    let cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, this.node);
-                    let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
-                    this.node.content = clearText;
+                    let cypherKey = S.props.getCryptoKey(this.node);
+                    if (cypherKey) {
+                        let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
+                        this.node.content = clearText;
+                    }
+                    else {
+                        //todo-0: what here?
+                    }
 
                     S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, null);
                 }
-                /* Else node was not encrypted and we will encrypt now */
-                else {
-                    // if we need to encrypt and the content is not currently encrypted.
-                    if (!this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
-                        let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, this.node.content);
-                        this.node.content = J.NodeProp.ENC_TAG + skdp.cypherText;
-                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, skdp.cypherKey);
-                    }
-                }
-                
-                this.rebuildDlg(); 
             }
+            /* Else need to ensure node is encrypted */
+            else {
+                // if we need to encrypt and the content is not currently encrypted.
+                if (!this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
+                    let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, this.node.content);
+                    this.node.content = J.NodeProp.ENC_TAG + skdp.cypherText;
+                    S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, skdp.cypherKey);
+                }
+            }
+
+            this.rebuildDlg();
         })();
     }
 
@@ -581,11 +586,16 @@ export class EditNodeDlg extends DialogBase {
                             //console.log('decrypting: ' + value);
                             let cypherText = value.substring(J.NodeProp.ENC_TAG.length);
                             (async () => {
-                                let cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
-                                let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
+                                let cypherKey = S.props.getCryptoKey(node);
+                                if (cypherKey) {
+                                    let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
 
-                                //console.log('decrypted to:' + value);
-                                (this.contentEditor as AceEditPropTextarea).setValue(clearText);
+                                    //console.log('decrypted to:' + value);
+                                    (this.contentEditor as AceEditPropTextarea).setValue(clearText);
+                                }
+                                else {
+                                    //todo-0: what here?
+                                }
                             })();
                         }
 
@@ -606,10 +616,15 @@ export class EditNodeDlg extends DialogBase {
                     //console.log('decrypting: ' + value);
                     let cypherText = value.substring(J.NodeProp.ENC_TAG.length);
                     (async () => {
-                        let cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
-                        let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
-                        //console.log('decrypted to:' + value);
-                        (this.contentEditor as Textarea).setValue(clearText);
+                        let cypherKey = S.props.getCryptoKey(node);
+                        if (cypherKey) {
+                            let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
+                            //console.log('decrypted to:' + value);
+                            (this.contentEditor as Textarea).setValue(clearText);
+                        }
+                        else {
+                            //todo-0: what here?
+                        }
                     })();
                 }
             });
