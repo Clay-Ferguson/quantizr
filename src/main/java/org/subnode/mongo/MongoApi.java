@@ -831,6 +831,24 @@ public class MongoApi {
 		return ret;
 	}
 
+	/* Returns true if there were actually some encryption keys removed */
+	public boolean removeAllEncryptionKeys(SubNode node) {
+		HashMap<String, AccessControl> aclMap = node.getAc();
+		if (aclMap == null) {
+			return false;
+		}
+
+		ValContainer<Boolean> keysRemoved = new ValContainer<Boolean>(false);
+		aclMap.forEach((String key, AccessControl ac) -> {
+			if (ac.getKey() != null) {
+				ac.setKey(null);
+				keysRemoved.setVal(true);
+			}
+		});
+
+		return keysRemoved.getVal();
+	}
+
 	public List<AccessControlEntryInfo> getAclEntries(MongoSession session, SubNode node) {
 		HashMap<String, AccessControl> aclMap = node.getAc();
 		if (aclMap == null) {

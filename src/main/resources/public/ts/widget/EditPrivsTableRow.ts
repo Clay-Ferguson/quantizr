@@ -5,9 +5,10 @@ import { Button } from "./Button";
 import { TextContent } from "./TextContent";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Heading } from "./Heading";
 import { ReactNode } from "react";
+import { ButtonBar } from "./ButtonBar";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -28,9 +29,10 @@ export class EditPrivsTableRow extends Comp {
 
         let div = new Div();
         aclEntry.privileges.forEach((privilege, index) => {
-            div.addChild(new Button("Remove", () => {
+            let buttons = new ButtonBar([new Button("Remove", () => {
                 this.removePrivilege(aclEntry.principalNodeId, privilege.privilegeName);
-            }));
+            })], null, "marginBottom");
+            div.addChild(buttons);
             div.addChild(new TextContent(aclEntry.principalName + " has privilege " + privilege.privilegeName + " on this node."));
         });
         return div;

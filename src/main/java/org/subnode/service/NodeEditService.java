@@ -3,6 +3,7 @@ package org.subnode.service;
 import java.util.Calendar;
 
 import org.subnode.config.NodeName;
+import org.subnode.config.NodeProp;
 import org.subnode.config.SessionContext;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.model.NodeInfo;
@@ -247,6 +248,20 @@ public class NodeEditService {
 				}
 			}
 
+			// If removing encryption, remove it from all the ACL entries too.
+			String encKey = node.getStringProp(NodeProp.ENC_KEY);
+			if (encKey == null) {
+				api.removeAllEncryptionKeys(node);
+			}
+
+			/*
+			 * todo-0: if ADDING encryption, we need to look for what all the users are that
+			 * the node is shared to and trigger for the client to set off a process of
+			 * generating all the encryption keys for all users. the basic code that will
+			 * run is what we already have for dissemenating a key when a 'share to user' is
+			 * executed.
+			 */
+
 			Calendar lastModified = Calendar.getInstance();
 			node.setModifyTime(lastModified.getTime());
 
@@ -289,7 +304,7 @@ public class NodeEditService {
 		}
 		String nodeId = req.getNodeId();
 
-		//log.debug("Splitting node: " + nodeId);
+		// log.debug("Splitting node: " + nodeId);
 		SubNode node = api.getNode(session, nodeId);
 		SubNode parentNode = api.getParent(session, node);
 

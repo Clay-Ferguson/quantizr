@@ -65,34 +65,13 @@ export class EditNodeDlg extends DialogBase {
 
     static morePanelExpanded: boolean = false;
 
-    //todo-1: pass the actual arguments, not 'args' as an object.
+    //todo-0: pass the actual arguments, not 'args' as an object.
     constructor(args: Object) {
         super("Edit Node", "app-modal-content", false, true);
 
         this.typeName = (<any>args).typeName;
         this.createAtTop = (<any>args).createAtTop;
         this.node = (<any>args).node;
-
-        this.extraHeaderComps = [];
-
-        /* todo-0: save these icons into vars and update them as user makes chagnes that affect them */
-        if (S.props.isEncrypted(this.node)) {
-            this.extraHeaderComps.push(new Icon("", null, {
-                "style": { marginLeft: '12px', verticalAlign: 'middle' },
-                className: "fa fa-lock fa-lg"
-            }));
-        }
-
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
-        if (typeHandler) {
-            let iconClass = typeHandler.getIconClass(this.node);
-            if (iconClass) {
-                this.extraHeaderComps.push(new Icon("", null, {
-                    "style": { marginLeft: '12px', verticalAlign: 'middle' },
-                    className: iconClass
-                }));
-            }
-        }
     }
 
     createLayoutSelection = (): Selection => {
@@ -118,7 +97,32 @@ export class EditNodeDlg extends DialogBase {
         return selection;
     }
 
+    initTitleBarComps = (): void => {
+        this.extraHeaderComps = [];
+
+        /* todo-0: save these icons into vars and update them as user makes chagnes that affect them */
+        if (S.props.isEncrypted(this.node)) {
+            this.extraHeaderComps.push(new Icon("", null, {
+                "style": { marginLeft: '12px', verticalAlign: 'middle' },
+                className: "fa fa-lock fa-lg"
+            }));
+        }
+
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
+        if (typeHandler) {
+            let iconClass = typeHandler.getIconClass(this.node);
+            if (iconClass) {
+                this.extraHeaderComps.push(new Icon("", null, {
+                    "style": { marginLeft: '12px', verticalAlign: 'middle' },
+                    className: iconClass
+                }));
+            }
+        }
+    }
+
     initChildren = (): void => {
+        this.initTitleBarComps();
+
         this.setChildren([
             new Form(null, [
                 //this.help = new TextContent("Help content."),
@@ -308,49 +312,59 @@ export class EditNodeDlg extends DialogBase {
         (async () => {
             let encrypted: boolean = S.props.isEncrypted(this.node);
             let dlg = new EncryptionDlg(encrypted);
+
+            /* awaits until dialog is closed */
             await dlg.open();
 
-            /* 
-            (actually this can probably be retested, unocmmented and will work now.)
-            */
-            // if (this.contentEditor) {
-            //     this.node.content = this.contentEditor.getValue();
-            // }
+            /* only if the encryption setting changed do we need to anything in here */
+            if (encrypted !== dlg.encrypted) {
+                if (!dlg.encrypted) {
 
-            if (!dlg.encrypted) {
-                /* if node is currently encrypted and now needs to have encryption removed */
-                if (encrypted && this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
-                    let cypherText = this.node.content.substring(J.NodeProp.ENC_TAG.length);
+                    /* if node is currently encrypted and now needs to have encryption removed */
 
-                    let cypherKey = S.props.getCryptoKey(this.node);
-                    if (cypherKey) {
-                        let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
-                        this.node.content = clearText;
-                    }
+                    // DO NOT DELETE THIS BLOCK (keep for future ref...for a while)
+                    // This block would be how you'd get the content directly off the node, and decrypt but we alread
+                    // have the editor content we need instead.
+                    // if (encrypted && this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
+                    //     let cypherText = this.node.content.substring(J.NodeProp.ENC_TAG.length);
+                    //     let cypherKey = S.props.getCryptoKey(this.node);
+                    //     if (cypherKey) {
+                    //         let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
+                    //         this.node.content = clearText;
+                    //     }
+                    // }
+                    //Instead of the above, actually when turning off encryption we can just take what's in the editor and stick
+                    //that into this.node.content, becasue it's the correct and only place the correct updated text is guaranteed to be
+                    //in the case where the user made some changes before disabling encryption.
+                    this.node.content = this.contentEditor.getValue();
 
                     S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, null);
                 }
-            }
-            /* Else need to ensure node is encrypted */
-            else {
-                // if we need to encrypt and the content is not currently encrypted.
-                if (!this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
-                    let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, this.node.content);
-                    this.node.content = J.NodeProp.ENC_TAG + skdp.cypherText;
-                    S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, skdp.cypherKey);
+                /* Else need to ensure node is encrypted */
+                else {
+                    // if we need to encrypt and the content is not currently encrypted.
+                    if (!this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
+                        let content = this.contentEditor.getValue();
+                        let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
+                        this.node.content = J.NodeProp.ENC_TAG + skdp.cypherText;
+                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, skdp.cypherKey);
+                    }
                 }
-            }
 
-            this.rebuildDlg();
+                this.rebuildDlg();
+            }
         })();
     }
 
     setNodeType = (newType: string): void => {
-        let postData = {
+        S.util.ajax<J.SetNodeTypeRequest, J.SetNodeTypeResponse>("setNodeType", {
             nodeId: this.node.id,
             type: newType
-        };
-        S.util.ajax<J.SetNodeTypeRequest, J.SetNodeTypeResponse>("setNodeType", postData, this.setNodeTypeResponse);
+        },
+            (res) => {
+                this.node.type = newType;
+                this.setNodeTypeResponse(res);
+            });
     }
 
     setNodeTypeResponse = (res: any): void => {

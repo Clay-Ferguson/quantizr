@@ -458,7 +458,7 @@ export class Render implements RenderIntf {
             let iconClass = typeHandler.getIconClass(node);
             if (iconClass) {
                 typeIcon = new Icon("", null, {
-                    "style": { verticalAlign: 'middle' },
+                    "style": { marginRight: '6px', verticalAlign: 'middle' },
                     className: iconClass
                 });
             }
@@ -466,7 +466,7 @@ export class Render implements RenderIntf {
 
         if (S.props.isEncrypted(node)) {
             encIcon = new Icon("", null, {
-                "style": { verticalAlign: 'middle' },
+                "style": {marginRight: '6px', verticalAlign: 'middle' },
                 className: "fa fa-lock fa-lg"
             });
         }
@@ -711,7 +711,7 @@ export class Render implements RenderIntf {
                                 if (iconClass) {
                                     //todo-1: do all icons have the 'middle'? (if so embed it into class)
                                     typeIcon = new Icon("", null, {
-                                        style: { verticalAlign: 'middle' },
+                                        style: { marginRight: '6px', verticalAlign: 'middle' },
                                         className: iconClass
                                     });
                                 }
@@ -721,7 +721,7 @@ export class Render implements RenderIntf {
                         let encIcon: Icon = null;
                         if (S.props.isEncrypted(data.node)) {
                             encIcon = new Icon("", null, {
-                                "style": { verticalAlign: 'middle' },
+                                "style": { marginRight: '6px', verticalAlign: 'middle' },
                                 className: "fa fa-lock fa-lg"
                             });
                         }
