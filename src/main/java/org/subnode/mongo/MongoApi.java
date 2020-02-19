@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.NodePrincipal;
-import org.subnode.config.NodeProp;
+import org.subnode.model.client.NodeProp;
 import org.subnode.image.ImageSize;
 import org.subnode.image.ImageUtil;
 import org.subnode.model.AccessControlEntryInfo;
@@ -293,7 +293,7 @@ public class MongoApi {
 			throw new RuntimeException("Node has null owner: " + XString.prettyPrint(node));
 		}
 		SubNode userNode = getNode(session, node.getOwner());
-		return userNode.getStringProp(NodeProp.USER);
+		return userNode.getStringProp(NodeProp.USER.name());
 	}
 
 	// This whole entire approach was a very bad idea...
@@ -687,11 +687,11 @@ public class MongoApi {
 		Iterable<SubNode> iter = ops.find(query, SubNode.class);
 
 		iter.forEach((node) -> {
-			String password = node.getStringProp(NodeProp.PASSWORD);
+			String password = node.getStringProp(NodeProp.PASSWORD.name());
 			if (password != null) {
-				log.debug("pwdHash update. userNode node: name=" + node.getStringProp(NodeProp.USER));
+				log.debug("pwdHash update. userNode node: name=" + node.getStringProp(NodeProp.USER.name()));
 
-				node.setProp(NodeProp.PWD_HASH, getHashOfPassword(password));
+				node.setProp(NodeProp.PWD_HASH.name(), getHashOfPassword(password));
 
 				/*
 				 * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some of
@@ -884,8 +884,8 @@ public class MongoApi {
 			if (principalNode == null) {
 				return null;
 			}
-			principalName = principalNode.getStringProp(NodeProp.USER);
-			publicKey = principalNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY);
+			principalName = principalNode.getStringProp(NodeProp.USER.name());
+			publicKey = principalNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY.name());
 		}
 
 		AccessControlEntryInfo info = new AccessControlEntryInfo(principalName, principalId, publicKey);
@@ -972,7 +972,7 @@ public class MongoApi {
 	}
 
 	public boolean isImageAttached(SubNode node) {
-		String mime = node.getStringProp(NodeProp.BIN_MIME);
+		String mime = node.getStringProp(NodeProp.BIN_MIME.name());
 		return ImageUtil.isImageMime(mime);
 	}
 
@@ -1498,16 +1498,16 @@ public class MongoApi {
 		 * that immediately all user root nodes are addressible as "/r/usr/myName".
 		 */
 		SubNode userNode = createNode(session, newUserNodePath, null);
-		userNode.setProp(NodeProp.USER, user);
-		userNode.setProp(NodeProp.EMAIL, email);
+		userNode.setProp(NodeProp.USER.name(), user);
+		userNode.setProp(NodeProp.EMAIL.name(), email);
 		// userNode.setProp(NodeProp.PASSWORD, password);
-		userNode.setProp(NodeProp.PWD_HASH, getHashOfPassword(password));
-		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE, false);
+		userNode.setProp(NodeProp.PWD_HASH.name(), getHashOfPassword(password));
+		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE.name(), false);
 
 		userNode.setContent("User Account: " + user);
 
 		if (!automated) {
-			userNode.setProp(NodeProp.SIGNUP_PENDING, true);
+			userNode.setProp(NodeProp.SIGNUP_PENDING.name(), true);
 		}
 
 		save(session, userNode);
@@ -1525,6 +1525,9 @@ public class MongoApi {
 		return userNode;
 	}
 
+	/*
+	todo-0: There's a bug where converting a path to short hash values is wiping out the 'name' here in the path! oops. 
+	*/
 	public SubNode getUserNodeByUserName(MongoSession session, String user) {
 		if (user == null)
 			return null;
@@ -1580,7 +1583,7 @@ public class MongoApi {
 				// }
 				// else it's an ordinary user so we check the password against their user node
 				// else if (userNode.getStringProp(NodeProp.PASSWORD).equals(password)) {
-				else if (userNode.getStringProp(NodeProp.PWD_HASH).equals(getHashOfPassword(password))) {
+				else if (userNode.getStringProp(NodeProp.PWD_HASH.name()).equals(getHashOfPassword(password))) {
 					success = true;
 				}
 			}
@@ -1614,10 +1617,10 @@ public class MongoApi {
 			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, "Repository Root", null, true, null,
 					null);
 
-			adminNode.setProp(NodeProp.USER, NodePrincipal.ADMIN);
+			adminNode.setProp(NodeProp.USER.name(), NodePrincipal.ADMIN);
 
 			// todo-1: need to store ONLY hash of the password
-			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE, false);
+			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.name(), false);
 			save(session, adminNode);
 
 			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, "Root of All Users", null, true, null,

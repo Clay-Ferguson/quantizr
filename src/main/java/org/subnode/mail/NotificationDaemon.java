@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.subnode.AppServer;
 import org.subnode.config.AppProp;
-import org.subnode.config.NodeProp;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
@@ -94,9 +94,9 @@ public class NotificationDaemon {
 				try {
 					mailSender.init();
 					for (SubNode node : nodes) {
-						String email = node.getStringProp(NodeProp.EMAIL_RECIP);
-						String subject = node.getStringProp(NodeProp.EMAIL_SUBJECT);
-						String content = node.getStringProp(NodeProp.EMAIL_CONTENT);
+						String email = node.getStringProp(NodeProp.EMAIL_RECIP.name());
+						String subject = node.getStringProp(NodeProp.EMAIL_SUBJECT.name());
+						String content = node.getStringProp(NodeProp.EMAIL_CONTENT.name());
 
 						if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject)
 								&& !StringUtils.isEmpty(content)) {

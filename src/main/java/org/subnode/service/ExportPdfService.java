@@ -20,7 +20,7 @@ package org.subnode.service;
 // import org.springframework.stereotype.Component;
 
 // import org.subnode.config.AppProp;
-// import org.subnode.config.NodeProp;
+// import org.subnode.model.client.NodeProp;
 // import org.subnode.config.SessionContext;
 // import org.subnode.model.ExportPropertyInfo;
 // import org.subnode.model.UserPreferences;

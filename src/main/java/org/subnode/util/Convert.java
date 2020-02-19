@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.subnode.config.NodeProp;
+import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
 import org.subnode.image.ImageSize;
 import org.subnode.model.NodeInfo;
@@ -49,8 +49,8 @@ public class Convert {
 		boolean binaryIsImage = false;
 		ImageSize imageSize = null;
 
-		long binVer = node.getIntProp(NodeProp.BIN_VER);
-		String mimeType = node.getStringProp(NodeProp.BIN_MIME);
+		long binVer = node.getIntProp(NodeProp.BIN_VER.name());
+		String mimeType = node.getStringProp(NodeProp.BIN_MIME.name());
 		if (mimeType != null) {
 			hasBinary = true;
 			binaryIsImage = api.isImageAttached(node);
@@ -81,7 +81,7 @@ public class Convert {
 			log.debug("Unable to find userNode from nodeOwner: " + //
 					(node.getOwner() != null ? rootId : ("null owner on node: " + node.getId().toHexString())));
 		}
-		String owner = userNode == null ? "admin" : userNode.getStringProp(NodeProp.USER);
+		String owner = userNode == null ? "admin" : userNode.getStringProp(NodeProp.USER.name());
 
 		log.debug("RENDER ID=" + node.getId().toHexString() + " rootId=" + rootId + " session.rootId="
 				+ sessionContext.getRootId() + " node.content=" + node.getContent());
@@ -142,12 +142,12 @@ public class Convert {
 		ImageSize imageSize = new ImageSize();
 
 		try {
-			Long width = node.getIntProp(NodeProp.IMG_WIDTH);
+			Long width = node.getIntProp(NodeProp.IMG_WIDTH.name());
 			if (width != null) {
 				imageSize.setWidth(width.intValue());
 			}
 
-			Long height = node.getIntProp(NodeProp.IMG_HEIGHT);
+			Long height = node.getIntProp(NodeProp.IMG_HEIGHT.name());
 			if (height != null) {
 				imageSize.setHeight(height.intValue());
 			}

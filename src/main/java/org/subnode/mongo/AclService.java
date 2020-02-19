@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.subnode.config.NodePrincipal;
-import org.subnode.config.NodeProp;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.MongoPrincipal;
 import org.subnode.mongo.model.SubNode;
@@ -21,7 +21,6 @@ import org.subnode.response.AddPrivilegeResponse;
 import org.subnode.response.GetNodePrivilegesResponse;
 import org.subnode.response.RemovePrivilegeResponse;
 import org.subnode.response.SetCipherKeyResponse;
-import org.subnode.response.base.ResponseBase;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
@@ -102,7 +101,7 @@ public class AclService {
 		SubNode node = api.getNode(session, nodeId);
 		api.authRequireOwnerOfNode(session, node);
 
-		String cypherKey = node.getStringProp(NodeProp.ENC_KEY);
+		String cypherKey = node.getStringProp(NodeProp.ENC_KEY.name());
 		if (cypherKey == null) {
 			throw new RuntimeException("Attempted to alter keys on a non-encrypted node.");
 		}
@@ -132,7 +131,7 @@ public class AclService {
 		if (principal == null)
 			return false;
 
-		String cypherKey = node.getStringProp(NodeProp.ENC_KEY);
+		String cypherKey = node.getStringProp(NodeProp.ENC_KEY.name());
 		String mapKey = null;
 
 		/* If we are sharing to public, then that's the map key */
@@ -164,7 +163,7 @@ public class AclService {
 			 * entry
 			 */
 			if (cypherKey != null) {
-				String principalPubKey = principleNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY);
+				String principalPubKey = principleNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY.name());
 				if (principalPubKey == null) {
 					if (res != null) {
 						res.setMessage("User doesn't have a PublicKey available: " + principal);
@@ -323,7 +322,7 @@ public class AclService {
 				 * ownerSet.add(p.getUserNodeId());
 				 */
 				SubNode userNode = api.getNode(session, p.getUserNodeId());
-				String userName = userNode.getStringProp(NodeProp.USER);
+				String userName = userNode.getStringProp(NodeProp.USER.name());
 				ownerSet.add(userName);
 			}
 

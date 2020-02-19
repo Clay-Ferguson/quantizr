@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.subnode.config.ConstantsProvider;
 import org.subnode.config.NodeName;
-import org.subnode.config.NodeProp;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
@@ -65,7 +65,7 @@ public class OutboxMgr {
 						log.warn("No userNode was found for parentNode.owner="+parentNode.getOwner());
 						return;
 					}
-					String email = userNode.getStringProp(NodeProp.EMAIL);
+					String email = userNode.getStringProp(NodeProp.EMAIL.name());
 					log.debug("sending email to: " + email + " because his node was appended under.");
 
 					String content = String.format("User '%s' replied to you.<p>\n\n" + //
@@ -90,9 +90,9 @@ public class OutboxMgr {
 		SubNode outboxNode = getSystemOutbox(session);
 		SubNode outboundEmailNode = api.createNode(session, outboxNode.getPath() + "/?", SubNodeTypes.UNSTRUCTURED);
 
-		outboundEmailNode.setProp(NodeProp.EMAIL_CONTENT, content);
-		outboundEmailNode.setProp(NodeProp.EMAIL_SUBJECT, subject);
-		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP, recipients);
+		outboundEmailNode.setProp(NodeProp.EMAIL_CONTENT.name(), content);
+		outboundEmailNode.setProp(NodeProp.EMAIL_SUBJECT.name(), subject);
+		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP.name(), recipients);
 
 		api.save(session, outboundEmailNode);
 	}

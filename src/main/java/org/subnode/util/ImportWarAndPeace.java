@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import org.subnode.config.NodeProp;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;

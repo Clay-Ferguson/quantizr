@@ -75,7 +75,7 @@ public class RepositoryUtil {
 
 		mongoAdminRunner.run((MongoSession session) -> {
 			for (String accountInfo : testUserAccountsList) {
-				log.debug("Verifying test Acount: " + accountInfo);
+				log.debug("Verifying test Account: " + accountInfo);
 
 				final List<String> accountInfoList = XString.tokenize(accountInfo, ":", true);
 				if (accountInfoList == null || accountInfoList.size() != 3) {
@@ -84,9 +84,10 @@ public class RepositoryUtil {
 				}
 
 				String userName = accountInfoList.get(0);
-
+				
 				SubNode ownerNode = api.getUserNodeByUserName(session, userName);
 				if (ownerNode == null) {
+					log.debug("userName not found: "+userName+". Account will be created.");
 					SignupRequest signupReq = new SignupRequest();
 					signupReq.setUserName(userName);
 					signupReq.setPassword(accountInfoList.get(1));
@@ -94,6 +95,9 @@ public class RepositoryUtil {
 
 					SignupResponse res = new SignupResponse();
 					userManagerService.signup(signupReq, res, true);
+				}
+				else {
+					log.debug("account exists: "+userName);
 				}
 
 				/*

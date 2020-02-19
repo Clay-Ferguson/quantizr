@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.subnode.config.AppProp;
-import org.subnode.config.NodeProp;
+import org.subnode.model.client.NodeProp;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoEventListener;
@@ -102,7 +102,7 @@ public class ExportJsonService {
 				final BufferedOutputStream _os = os;
 				iter.forEach((node) -> {
 
-					String binFileName = node.getStringProp(NodeProp.BIN_FILENAME);
+					String binFileName = node.getStringProp(NodeProp.BIN_FILENAME.name());
 					if (binFileName != null) {
 						if (saveBinaryToFileSystem(binFileName, targetFolder, node)) {
 							numBins.setVal(numBins.getVal() + 1);
@@ -139,7 +139,7 @@ public class ExportJsonService {
 	private boolean readBinaryFromResource(MongoSession session, SubNode node, String binFileName, String subFolder) {
 		boolean ret = false;
 
-		String binMime = node.getStringProp(NodeProp.BIN_MIME);
+		String binMime = node.getStringProp(NodeProp.BIN_MIME.name());
 		if (binMime != null) {
 			log.debug("Mime: " + binMime);
 		}
@@ -235,7 +235,7 @@ public class ExportJsonService {
 					SubNode node = objectMapper.readValue(json, SubNode.class);
 					api.save(session, node);
 
-					String binFileName = node.getStringProp(NodeProp.BIN_FILENAME);
+					String binFileName = node.getStringProp(NodeProp.BIN_FILENAME.name());
 					if (binFileName != null) {
 						ObjectId nodeId = node.getId();
 

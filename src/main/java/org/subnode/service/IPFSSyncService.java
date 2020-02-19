@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.subnode.config.NodePrincipal;
-import org.subnode.config.NodeProp;
+import org.subnode.model.client.NodeProp;
 import org.subnode.model.MerkleDAGSyncStats;
 import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
@@ -85,7 +85,7 @@ public class IPFSSyncService {
 		 * already up to date and we don't need to read again, because IPFS data is
 		 * content-addressed and therefore immutable
 		 */
-		if (!forceRefresh && node.getBooleanProp(NodeProp.IPFS_OK)) {
+		if (!forceRefresh && node.getBooleanProp(NodeProp.IPFS_OK.name())) {
 			log.debug("IPFS: node already loaded into mongo: " + node.getId());
 			return;
 		} else {
@@ -139,12 +139,12 @@ public class IPFSSyncService {
 			if (!merkContent.equals(content)) {
 				node.setContent(merkContent);
 				node.setProp("sn:contentType", merkNode.getContentType());
-				node.setProp(NodeProp.IPFS_OK, true);
+				node.setProp(NodeProp.IPFS_OK.name(), true);
 				api.save(session, node);
 			}
 		} else {
 			node.setContent("");
-			node.setProp(NodeProp.IPFS_OK, true);
+			node.setProp(NodeProp.IPFS_OK.name(), true);
 			api.save(session, node);
 		}
 
@@ -355,7 +355,7 @@ public class IPFSSyncService {
 		newNode.setProp(TYPES.IPFS_LINK_NAME, merkleLink.getName());
 
 		newNode.setOrdinal(ordinal);
-		newNode.setProp(NodeProp.IPFS_OK, true);
+		newNode.setProp(NodeProp.IPFS_OK.name(), true);
 		return newNode;
 	}
 

@@ -3,7 +3,7 @@ package org.subnode.service;
 import java.util.Calendar;
 
 import org.subnode.config.NodeName;
-import org.subnode.config.NodeProp;
+import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.model.NodeInfo;
@@ -249,7 +249,7 @@ public class NodeEditService {
 			}
 
 			// If removing encryption, remove it from all the ACL entries too.
-			String encKey = node.getStringProp(NodeProp.ENC_KEY);
+			String encKey = node.getStringProp(NodeProp.ENC_KEY.name());
 			if (encKey == null) {
 				api.removeAllEncryptionKeys(node);
 			}

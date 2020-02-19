@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.subnode.config.AppProp;
-import org.subnode.config.NodeProp;
+import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
 import org.subnode.model.ExportNodeInfo;
 import org.subnode.model.ExportPropertyInfo;

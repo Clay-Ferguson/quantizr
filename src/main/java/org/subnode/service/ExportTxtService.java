@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.subnode.config.AppProp;
-import org.subnode.config.NodeProp;
+import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
 import org.subnode.model.ExportOutputType;
 import org.subnode.model.ExportPropertyInfo;

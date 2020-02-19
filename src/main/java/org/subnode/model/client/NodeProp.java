@@ -2,19 +2,83 @@ package org.subnode.model.client;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-
-/* todo-0: Oops, we have TWO classes of this same name. fix */
+/* NOTE: This class is exported into typescript (using typescript-generator-maven-plugin), and this is currently still
+the only way to achieve "constants" in Java converted to Typescript. It would be nice of we could just hava a class with
+a bunch of "" values in it but there's no way to do that and then have it export to TypeScript also.
+ */
 public enum NodeProp {
 
-    //This is the encrypted symetric key to the node data, that was encrypted using the private key of the owner of the node.
+    // This is the encrypted symetric key to the node data, that was encrypted using
+    // the private key of the owner of the node.
     ENC_KEY("sn:encKey"),
-    
-    ENC_TAG("<[ENC]>");
+
+    ENC_TAG("<[ENC]>"),
+
+    /*
+     * this is the one entered by the admin which DEFINES the feed, and is not to be
+     * overwritten ever by the code
+     */
+    RSS_FEED_SRC("sn:rssFeedSrc"),
+
+    USER_PREF_PUBLIC_KEY("sn:publicKey"), //
+    USER_PREF_EDIT_MODE("sn:editMode"), //
+    USER_PREF_SHOW_METADATA("sn:showMetaData"), //
+    USER_PREF_IMPORT_ALLOWED("sn:importAllowed"), //
+    USER_PREF_EXPORT_ALLOWED("sn:exportAllowed"), //
+    USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth"), //
+    SIGNUP_PENDING("sn:signupPending"),//
+
+    EMAIL_CONTENT("sn:content"), //
+    EMAIL_RECIP("sn:recip"), //
+    EMAIL_SUBJECT("sn:subject"), //
+
+    /*
+     * WARNING: Only the User Account Root nodes have this property of the actual
+     * user name. All other nodes reference their OWNER as an OwnerId that points to
+     * these nodes.
+     */
+    USER("sn:user"), //
+    PWD_HASH("sn:pwdHash"), //
+
+    // this pre-existed when i created FS_FILENAME (may be unused?)
+    FILENAME("sn:fileName"), //
+    NAME("sn:name"), //
+
+    JSON_FILE_SEARCH_RESULT("sn:jsonFileSearchResult"), //
+
+    /*
+     * property used to indicate we should not query the IPFS network again for this
+     * conten becasue we have already loaded it
+     */
+    IPFS_OK("ipfs:ok"), //
+
+    /*
+     * mime type expressed as a file extension. Invented so we can set 'txt' v.s.
+     * 'md' to turn off metadata rendering
+     */
+    MIME_EXT("sn:ext"), //
+
+    PASSWORD("sn:pwd"), //
+    EMAIL("sn:email"), //
+    CODE("sn:code"), //
+
+    BIN_VER("sn:binVer"), //
+
+    BIN_MIME("sn:mimeType"), //
+    BIN_FILENAME("sn:fileName"), //
+    BIN_SIZE("sn:size"), //
+
+    IMG_WIDTH("sn:imgWidth"), //
+    IMG_HEIGHT("sn:imgHeight");
 
     @JsonValue
-    private final Object value;
+    private final String value;
 
-    private NodeProp(Object value) {
+    private NodeProp(String value) {
         this.value = value;
+    }
+
+    public String toString() {
+        return value;
     }
 }

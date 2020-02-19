@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
-import org.subnode.config.NodeProp;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
@@ -43,10 +43,10 @@ public class SubNodeUtil {
 	private static HashSet<String> nonSavableProperties = new HashSet<String>();
 
 	static {
-		nonSavableProperties.add(NodeProp.BIN_VER);
-		nonSavableProperties.add(NodeProp.BIN_MIME);
-		nonSavableProperties.add(NodeProp.IMG_HEIGHT);
-		nonSavableProperties.add(NodeProp.IMG_WIDTH);
+		nonSavableProperties.add(NodeProp.BIN_VER.name());
+		nonSavableProperties.add(NodeProp.BIN_MIME.name());
+		nonSavableProperties.add(NodeProp.IMG_HEIGHT.name());
+		nonSavableProperties.add(NodeProp.IMG_WIDTH.name());
 	}
 
 	/*

@@ -3,7 +3,7 @@ package org.subnode.service;
 import java.io.File;
 
 import org.subnode.config.AppProp;
-import org.subnode.config.NodeProp;
+import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
@@ -62,7 +62,7 @@ public class BashService {
 		 * execute in a new terminal, and this is just a convenience which could have
 		 * also been entered directly as the content.
 		 */
-		String fileName = node.getStringProp(NodeProp.FILENAME);
+		String fileName = node.getStringProp(NodeProp.FILENAME.name());
 		if (fileName != null) {
 			script = "gnome-terminal -- /bin/bash -c '" + fileName + "'";
 		} else {
