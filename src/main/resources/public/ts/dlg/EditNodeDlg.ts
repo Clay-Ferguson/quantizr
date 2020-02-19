@@ -35,7 +35,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class EditNodeDlg extends DialogBase {
-    node: J.NodeInfo;
     header: Header;
     buttonBar: ButtonBar;
     propsButtonBar: ButtonBar;
@@ -57,21 +56,14 @@ export class EditNodeDlg extends DialogBase {
 
     propEntries: Array<I.PropEntry>;
     editPropertyDlgInst: any;
-    typeName: string;
-    createAtTop: boolean;
-
+   
     nodeNameTextField: TextField;
     contentEditor: I.TextEditorIntf;
 
     static morePanelExpanded: boolean = false;
 
-    //todo-0: pass the actual arguments, not 'args' as an object.
-    constructor(args: Object) {
+    constructor(private node: J.NodeInfo) {
         super("Edit Node", "app-modal-content", false, true);
-
-        this.typeName = (<any>args).typeName;
-        this.createAtTop = (<any>args).createAtTop;
-        this.node = (<any>args).node;
     }
 
     createLayoutSelection = (): Selection => {
@@ -100,7 +92,6 @@ export class EditNodeDlg extends DialogBase {
     initTitleBarComps = (): void => {
         this.extraHeaderComps = [];
 
-        /* todo-0: save these icons into vars and update them as user makes chagnes that affect them */
         if (S.props.isEncrypted(this.node)) {
             this.extraHeaderComps.push(new Icon("", null, {
                 "style": { marginLeft: '12px', verticalAlign: 'middle' },
@@ -316,28 +307,22 @@ export class EditNodeDlg extends DialogBase {
             /* awaits until dialog is closed */
             await dlg.open();
 
+            //todo-0: psudo codo i need to implement, but will require always setting isPublic first, and also while I'm at it
+            //I will also add a flag 'isShared' so that an icon can be displayed for the node (at least for the owner of the node to see, if not everyone)
+            // if (dlg.encrypted && this.node.isPublic) {
+            //     alert("Cannot encrypt a node that is shared to public. Remove public share first.");
+            //     return;
+            // }
+
             /* only if the encryption setting changed do we need to anything in here */
             if (encrypted !== dlg.encrypted) {
+
+                /* If we're turning off encryption for the node */
                 if (!dlg.encrypted) {
-
-                    /* if node is currently encrypted and now needs to have encryption removed */
-
-                    // DO NOT DELETE THIS BLOCK (keep for future ref...for a while)
-                    // This block would be how you'd get the content directly off the node, and decrypt but we alread
-                    // have the editor content we need instead.
-                    // if (encrypted && this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
-                    //     let cypherText = this.node.content.substring(J.NodeProp.ENC_TAG.length);
-                    //     let cypherKey = S.props.getCryptoKey(this.node);
-                    //     if (cypherKey) {
-                    //         let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
-                    //         this.node.content = clearText;
-                    //     }
-                    // }
-                    //Instead of the above, actually when turning off encryption we can just take what's in the editor and stick
-                    //that into this.node.content, becasue it's the correct and only place the correct updated text is guaranteed to be
-                    //in the case where the user made some changes before disabling encryption.
+                    /* Take what's in the editor and put
+                    that into this.node.content, becasue it's the correct and only place the correct updated text is guaranteed to be
+                    in the case where the user made some changes before disabling encryption. */
                     this.node.content = this.contentEditor.getValue();
-
                     S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, null);
                 }
                 /* Else need to ensure node is encrypted */
@@ -456,31 +441,15 @@ export class EditNodeDlg extends DialogBase {
             let content: string;
             if (this.contentEditor) {
                 content = this.contentEditor.getValue();
-                // if we need to encrypt and the content is not currently encrypted.
-                let encrypted: boolean = S.props.isEncrypted(this.node);
-
-                if (content && encrypted && !content.startsWith(J.NodeProp.ENC_TAG)) {
-                    let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
-
-                    handled[J.NodeProp.ENC_KEY] = true;
-                    saveList.push({
-                        "name": J.NodeProp.ENC_KEY,
-                        "value": skdp.cypherKey
-                    });
-
-                    content = J.NodeProp.ENC_TAG + skdp.cypherText;
-                    //console.log("Encrypted: " + content);
-                }
-
-                /* if not encrypted blow away the ENC_KEY */
-                if (!encrypted) {
-                    handled[J.NodeProp.ENC_KEY] = true;
-                    saveList.push({
-                        "name": J.NodeProp.ENC_KEY,
-                        "value": null
-                    });
-                }
             }
+
+            //todo-0: take another look at why we need this here because propEntries apparently won't contain
+            //the props on node.properties.
+            handled[J.NodeProp.ENC_KEY] = true;
+            saveList.push({
+                "name": J.NodeProp.ENC_KEY,
+                "value": S.props.getNodePropVal(J.NodeProp.ENC_KEY, this.node)
+            });
 
             let nodeName = this.nodeNameTextField.getValue();
 
@@ -528,9 +497,7 @@ export class EditNodeDlg extends DialogBase {
             };
             // console.log("calling saveNode(). PostData=" + S.util.toJson(postData));
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", postData, (res) => {
-                S.edit.saveNodeResponse(res, {
-                    savedId: this.node.id
-                });
+                S.edit.saveNodeResponse(this.node, res);
             });
 
             resolve();

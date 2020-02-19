@@ -10,13 +10,15 @@ public class AccessControlEntryInfo {
 	private String principalName;
 	private String principalNodeId;
 	private List<PrivilegeInfo> privileges;
-	
+	private String publicKey;
+
 	public AccessControlEntryInfo() {
 	}
 
-	public AccessControlEntryInfo(String principalName, String principalNodeId) {
+	public AccessControlEntryInfo(String principalName, String principalNodeId, String publicKey) {
 		this.principalName = principalName;
 		this.principalNodeId = principalNodeId;
+		this.publicKey = publicKey;
 	}
 
 	public String getPrincipalName() {
@@ -48,5 +50,13 @@ public class AccessControlEntryInfo {
 
 	public void setPrincipalNodeId(String principalNodeId) {
 		this.principalNodeId = principalNodeId;
+	}
+
+	public String getPublicKey() {
+		return publicKey;
+	}
+
+	public void setPublicKey(String publicKey) {
+		this.publicKey = publicKey;
 	}
 }

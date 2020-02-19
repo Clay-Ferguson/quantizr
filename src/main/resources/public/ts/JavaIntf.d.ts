@@ -387,6 +387,7 @@ export interface ResetPasswordResponse extends ResponseBase {
 
 export interface SaveNodeResponse extends ResponseBase {
     node: NodeInfo;
+    aclEntries: AccessControlEntryInfo[];
 }
 
 export interface SavePropertyResponse extends ResponseBase {
@@ -477,6 +478,7 @@ export interface AccessControlEntryInfo {
     principalName: string;
     principalNodeId: string;
     privileges: PrivilegeInfo[];
+    publicKey: string;
 }
 
 export interface GraphNode {

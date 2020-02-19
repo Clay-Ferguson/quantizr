@@ -3,7 +3,8 @@ clear
 source ./setenv.sh
 source ./define-functions.sh
 
-CLEAN=false
+# IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
+CLEAN=true
 
 # Ensure output folder for out docier images exists
 mkdir -p ${ipfs_staging}
@@ -31,15 +32,15 @@ cd $PRJROOT
 
 ./pom-generate.sh
 
-# This run is required only to ensure TypeScript generated files are up to date.
-mvn package -DskipTests -Pdev-vscode
-
 # This build command creates the SpringBoot fat jar in the /target/ folder.
 if [ "$CLEAN" == "true" ]; then
+    # This run is required only to ensure TypeScript generated files are up to date.
+    mvn package -DskipTests=true -Pdev-vscode
+
     # Then this is the actual full build.
-    mvn clean package -Pdev -DskipTests=true
+    mvn clean package -DskipTests=true -Pdev
 else
-    mvn package -Pdev -DskipTests=true
+    mvn --offline package -DskipTests=true -Pdev 
 fi
 verifySuccess "Maven Build"
 

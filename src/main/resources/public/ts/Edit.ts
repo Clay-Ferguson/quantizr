@@ -10,7 +10,7 @@ import { ImportFromFileDropzoneDlg } from "./dlg/ImportFromFileDropzoneDlg";
 import { EditIntf } from "./intf/EditIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -130,7 +130,7 @@ export class Edit implements EditIntf {
                  */
                 let editNode = res.nodeInfo;
 
-                let dlg = new EditNodeDlg({ node: editNode });
+                let dlg = new EditNodeDlg(editNode);
                 dlg.open();
             } else {
                 S.util.showMessage("You cannot edit nodes that you don't own.");
@@ -228,11 +228,36 @@ export class Edit implements EditIntf {
         }
     }
 
-    saveNodeResponse = (res: J.SaveNodeResponse, payload: any): void => {
-        if (S.util.checkSuccess("Save node", res)) {
-            S.view.refreshTree(null, false, payload.savedId);
-            S.meta64.selectTab("mainTab");
-        }
+    saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            if (S.util.checkSuccess("Save node", res)) {
+                await this.distributeKeys(node, res.aclEntries);
+
+                S.view.refreshTree(null, false, node.id);
+                S.meta64.selectTab("mainTab");
+                resolve();
+            }
+        });
+    }
+
+    distributeKeys = async (node: J.NodeInfo, aclEntries: J.AccessControlEntryInfo[]): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            if (!aclEntries || !S.props.isEncrypted(node)) {
+                resolve();
+                return;
+            }
+
+            for (let i = 0; i < aclEntries.length; i++) {
+                let ac = aclEntries[i];
+
+                // console.log("Distribute Key to Principal: " + S.util.prettyPrint(ac));
+                await S.share.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
+            }
+
+            console.log("Key distribution complete.");
+
+            resolve();
+        });
     }
 
     editMode = async (modeVal?: boolean): Promise<void> => {

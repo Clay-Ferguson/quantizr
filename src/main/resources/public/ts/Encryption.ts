@@ -5,10 +5,6 @@ import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 
-// todo-0: currently you have to add shares AFTER the node is encrypted, rather than before, because only the sharing currently is where
-// it generates the keys. Need to test all combinations of this kind of ordering, and also test the case of what if the user tries to REGENERATE
-// their keys....probably there needs to be a way for the server to auto-dissemenate new keys whenever a user changes (generates) their keys.
-
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
@@ -253,7 +249,6 @@ export class Encryption implements EncryptionIntf {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 let pubKeyStr;
-
                 if (forceUpdate) {
                     let keyPair: EncryptionKeyPair = await crypto.subtle.generateKey({ //
                         name: this.ASYM_ALGO, //
@@ -409,17 +404,22 @@ export class Encryption implements EncryptionIntf {
         return new Promise<string>(async (resolve, reject) => {
             let ret: string = null;
             try {
+                console.log("decrypting with cypherKey: " + skpd.cypherKey);
                 if (!privateKey) {
                     privateKey = await this.getPrivateKey();
                 }
 
                 //Decrypt the symmetric key using our private key
                 let symKeyJsonStr: string = await this.asymDecryptString(privateKey, skpd.cypherKey);
-                //console.log("Decrypted cypherKey to: "+symKeyJsonStr);
+                //console.log("Decrypted cypherKey to (asym key to actual data): " + symKeyJsonStr);
                 let symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
                 let symKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, symKeyJsonObj, this.SYM_ALGO, true, this.OP_ENC_DEC);
-                //console.log("Key imported: "+symKeyJsonStr);
+                //console.log("DECRYPTING: cypherText: [" + skpd.cypherText + "]");   
                 ret = await this.symDecryptString(symKey, skpd.cypherText);
+                //console.log("            output: [" + ret + "]");
+            }
+            catch (ex) {
+                S.util.logAndReThrow("decryptSharableString failed", ex);
             }
             finally {
                 resolve(ret);
@@ -469,9 +469,8 @@ export class Encryption implements EncryptionIntf {
                 let resArray = new Uint8Array(result);
                 resStr = this.convertByteArrayToString(resArray);
             }
-            catch (e) {
-                //todo-1: this is bad handling. fix it
-                console.log("decryption failed");
+            catch (ex) {
+                S.util.logAndReThrow("decrypt FAILED.", ex);
             }
             finally {
                 resolve(resStr);

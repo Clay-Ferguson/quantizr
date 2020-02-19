@@ -123,7 +123,9 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Refresh", S.meta64.refresh), //
                 new MenuItem("Show URL", S.render.showNodeUrl, () => { return S.meta64.state.highlightNode != null }), //
-                new MenuItem("Show Node JSON", () => { S.view.runServerCommand("getJson") }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
+                new MenuItem("Show Node JSON", () => { S.view.runServerCommand("getJson") },
+                    () => { return S.meta64.isAdminUser },
+                    () => { return S.meta64.isAdminUser }), //
             ]),
             new Menu("Tools",
                 [

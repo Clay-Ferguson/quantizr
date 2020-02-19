@@ -83,16 +83,23 @@ public class Convert {
 		}
 		String owner = userNode == null ? "admin" : userNode.getStringProp(NodeProp.USER);
 
-		log.debug("RENDER ID="+node.getId().toHexString()+" rootId="+rootId+" session.rootId="+sessionContext.getRootId()+" node.content="+node.getContent());
+		log.debug("RENDER ID=" + node.getId().toHexString() + " rootId=" + rootId + " session.rootId="
+				+ sessionContext.getRootId() + " node.content=" + node.getContent());
 
-		// If the node is not owned by the person doing the browsing we need to extract
-		// the key from ACL
-		// and put in cipherKey, so send back so the user can decrypte the node.
+		/*
+		 * If the node is not owned by the person doing the browsing we need to extract
+		 * the key from ACL and put in cipherKey, so send back so the user can decrypt
+		 * the node.
+		 */
 		String cipherKey = null;
-		if (!rootId.equals(sessionContext.getRootId()) && node.getAc() != null) {
+		//todo-0: I'm pretty sure I can re-enable this commented snipped below.
+		if (/* !rootId.equals(sessionContext.getRootId()) && */ node.getAc() != null) {
 			AccessControl ac = node.getAc().get(sessionContext.getRootId());
 			if (ac != null) {
 				cipherKey = ac.getKey();
+				if (cipherKey != null) {
+					log.debug("Rendering Sent Back CipherKey: " + cipherKey);
+				}
 			}
 		}
 

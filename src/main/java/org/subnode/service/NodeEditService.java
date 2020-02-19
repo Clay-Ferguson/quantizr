@@ -253,6 +253,10 @@ public class NodeEditService {
 			if (encKey == null) {
 				api.removeAllEncryptionKeys(node);
 			}
+			/* if adding entryption to this node, and the node wasn't currently encrypted */
+			else {
+				res.setAclEntries(api.getAclEntries(session, node));
+			}
 
 			/*
 			 * todo-0: if ADDING encryption, we need to look for what all the users are that

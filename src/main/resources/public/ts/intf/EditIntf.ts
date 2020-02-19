@@ -21,7 +21,7 @@ export interface EditIntf {
     startEditingNewNode(typeName?: string, createAtTop?: boolean): void;
     insertNodeResponse(res: J.InsertNodeResponse): void;
     createSubNodeResponse(res: J.CreateSubNodeResponse): void;
-    saveNodeResponse(res: J.SaveNodeResponse, payload: any): void;
+    saveNodeResponse(node: J.NodeInfo, res: J.SaveNodeResponse): void;
     editMode(modeVal?: boolean): void;
     moveNodeUp(id?: string): void;
     moveNodeDown(id?: string): void;

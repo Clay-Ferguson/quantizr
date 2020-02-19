@@ -172,6 +172,7 @@ public class AclService {
 						return false;
 					}
 				}
+				log.debug("principalPublicKey: "+principalPubKey);
 				res.setPrincipalPublicKey(principalPubKey);
 				res.setPrincipalNodeId(mapKey);
 			}

@@ -402,7 +402,7 @@ export class Util implements UtilIntf {
                                 + this.prettyPrint(response));
 
                             //if (typeof failCallback == "function") {
-                                //failCallback(null);
+                            //failCallback(null);
                             //}
                             //todo-0: not sure I like this tight coupling of the ajax and how to cleanup after a failed call at least
                             //things that normally run. This refreshing enablement normally runs, so let's run it here.
@@ -495,7 +495,7 @@ export class Util implements UtilIntf {
             stack = (<any>new Error()).stack;
         }
         catch (e) { }
-        console.error(message + "\nSTACK: " + stack);
+        console.error(message + ": " + exception.message + "\nSTACK: " + stack);
         throw exception;
     }
 

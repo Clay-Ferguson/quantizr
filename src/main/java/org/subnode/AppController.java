@@ -803,6 +803,7 @@ public class AppController {
 	public @ResponseBody ResponseBase getServerInfo(@RequestBody GetServerInfoRequest req, HttpSession session) {
 		return (ResponseBase) callProc.run("getServerInfo", req, session, ms -> {
 			GetServerInfoResponse res = new GetServerInfoResponse();
+
 			if (!sessionContext.isAdmin()) {
 				throw ExUtil.newEx("admin only function.");
 			}

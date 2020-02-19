@@ -872,6 +872,7 @@ public class MongoApi {
 	public AccessControlEntryInfo createAccessControlEntryInfo(MongoSession session, String principalId,
 			String authType) {
 		String principalName = null;
+		String publicKey = null;
 
 		/* If this is a share to public we don't need to lookup a user name */
 		if (principalId.equalsIgnoreCase(NodePrincipal.PUBLIC)) {
@@ -884,9 +885,10 @@ public class MongoApi {
 				return null;
 			}
 			principalName = principalNode.getStringProp(NodeProp.USER);
+			publicKey = principalNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY);
 		}
 
-		AccessControlEntryInfo info = new AccessControlEntryInfo(principalName, principalId);
+		AccessControlEntryInfo info = new AccessControlEntryInfo(principalName, principalId, publicKey);
 		info.addPrivilege(new PrivilegeInfo(authType));
 		return info;
 	}

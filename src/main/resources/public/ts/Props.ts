@@ -147,13 +147,15 @@ export class Props implements PropsIntf {
     getCryptoKey = (node: J.NodeInfo) => {
         let cypherKey = null;
 
-        /* if we own try to encrypt using our own key */
+        /* if we own this node then this cypherKey for it will be ENC_KEY for us */
         if (S.meta64.userName == node.owner) {
             cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
+            console.log("getting cypherKey for node, from ENC_KEY: " + cypherKey);
         }
         /* else if the server has provided the cipher key to us from the ACL (AccessControl) then use it. */
         else {
             cypherKey = node.cipherKey;
+            console.log("getting cypherKey from node.cypherKey (not your node): " + cypherKey);
         }
         return cypherKey;
     }
