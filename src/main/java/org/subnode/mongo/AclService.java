@@ -101,8 +101,8 @@ public class AclService {
 		SubNode node = api.getNode(session, nodeId);
 		api.authRequireOwnerOfNode(session, node);
 
-		String cypherKey = node.getStringProp(NodeProp.ENC_KEY.toString());
-		if (cypherKey == null) {
+		String cipherKey = node.getStringProp(NodeProp.ENC_KEY.toString());
+		if (cipherKey == null) {
 			throw new RuntimeException("Attempted to alter keys on a non-encrypted node.");
 		}
 
@@ -110,12 +110,12 @@ public class AclService {
 		res.setSuccess(success);
 	}
 
-	public boolean setCipherKey(MongoSession session, SubNode node, String principleNodeId, String cipherKey,
+	public boolean setCipherKey(MongoSession session, SubNode node, String principalNodeId, String cipherKey,
 			SetCipherKeyResponse res) {
 		boolean ret = false;
 
 		HashMap<String, AccessControl> acl = node.getAc();
-		AccessControl ac = acl.get(principleNodeId);
+		AccessControl ac = acl.get(principalNodeId);
 		if (ac != null) {
 			ac.setKey(cipherKey);
 			node.setAc(acl);
@@ -131,12 +131,12 @@ public class AclService {
 		if (principal == null)
 			return false;
 
-		String cypherKey = node.getStringProp(NodeProp.ENC_KEY.toString());
+		String cipherKey = node.getStringProp(NodeProp.ENC_KEY.toString());
 		String mapKey = null;
 
 		/* If we are sharing to public, then that's the map key */
 		if (principal.equalsIgnoreCase(NodePrincipal.PUBLIC)) {
-			if (cypherKey != null) {
+			if (cipherKey != null) {
 				throw new RuntimeException("Cannot make an encrypted node public.");
 			}
 			mapKey = NodePrincipal.PUBLIC;
@@ -146,15 +146,15 @@ public class AclService {
 		 * map key
 		 */
 		else {
-			SubNode principleNode = api.getUserNodeByUserName(api.getAdminSession(), principal);
-			if (principleNode == null) {
+			SubNode principalNode = api.getUserNodeByUserName(api.getAdminSession(), principal);
+			if (principalNode == null) {
 				if (res != null) {
 					res.setMessage("Unknown user name: " + principal);
 					res.setSuccess(false);
 				}
 				return false;
 			}
-			mapKey = principleNode.getId().toHexString();
+			mapKey = principalNode.getId().toHexString();
 
 			/*
 			 * If this node is encrypted we get the public key of the user being shared with
@@ -162,8 +162,8 @@ public class AclService {
 			 * key to the data, and then send back up to the server to store in this sharing
 			 * entry
 			 */
-			if (cypherKey != null) {
-				String principalPubKey = principleNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY.toString());
+			if (cipherKey != null) {
+				String principalPubKey = principalNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY.toString());
 				if (principalPubKey == null) {
 					if (res != null) {
 						res.setMessage("User doesn't have a PublicKey available: " + principal);
@@ -223,17 +223,17 @@ public class AclService {
 		return true;
 	}
 
-	public void removeAclEntry(MongoSession session, SubNode node, String principleNodeId, String privToRemove) {
+	public void removeAclEntry(MongoSession session, SubNode node, String principalNodeId, String privToRemove) {
 		HashSet<String> setToRemove = XString.tokenizeToSet(privToRemove, ",", true);
 
 		HashMap<String, AccessControl> acl = node.getAc();
 		if (acl == null)
 			return;
 
-		AccessControl ac = acl.get(principleNodeId);
+		AccessControl ac = acl.get(principalNodeId);
 		String privs = ac.getPrvs();
 		if (privs == null) {
-			log.debug("ACL didn't contain principleNodeId " + principleNodeId + "\nACL DUMP: "
+			log.debug("ACL didn't contain principalNodeId " + principalNodeId + "\nACL DUMP: "
 					+ XString.prettyPrint(acl));
 			return;
 		}
@@ -259,14 +259,14 @@ public class AclService {
 
 		if (removed) {
 			/*
-			 * If there are no privileges left for this principle, then remove the principle
+			 * If there are no privileges left for this principal, then remove the principal
 			 * entry completely from the ACL. We don't store empty ones.
 			 */
 			if (newPrivs.equals("")) {
-				acl.remove(principleNodeId);
+				acl.remove(principalNodeId);
 			} else {
 				ac.setPrvs(newPrivs);
-				acl.put(principleNodeId, ac);
+				acl.put(principalNodeId, ac);
 			}
 
 			/*

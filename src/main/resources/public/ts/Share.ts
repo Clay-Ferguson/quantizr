@@ -42,41 +42,35 @@ export class Share implements ShareIntf {
     }
 
     /* Whenever an encrypted node is shared to a user, this is the final operation we run which
-    generates a key to the data, encrypted with the public key of the person (identified by principleNodeId) 
+    generates a key to the data, encrypted with the public key of the person (identified by principalNodeId) 
     the node is shared to, and then publishes that info into the DB 
-
-    todo-0: principle is misspelled. clean up all misspellings of principle and cypher.
     */
-    addCipherKeyToNode = async (node: J.NodeInfo, principlePublicKeyStr: string, principleNodeId: string): Promise<void> => {
+    addCipherKeyToNode = async (node: J.NodeInfo, principalPublicKeyStr: string, principalNodeId: string): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            if (principleNodeId=="public") {
+            if (principalNodeId=="public") {
                 console.warn("public node has encryption turned on. This is a bug.");
                 resolve();
             }
-            //console.log("PrinciplePublicKeyStr:" + principlePublicKeyStr + " principleNodeId:" + principleNodeId);
+            //console.log("PrincipalPublicKeyStr:" + principalPublicKeyStr + " principalNodeId:" + principalNodeId);
 
             //get the asym-encrypted sym Key to this node (decryptable by owner of node only, which is us)
-            let cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
-            //console.log("cypherKey on ENC_KEY: "+cypherKey);
+            let cipherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
+            //console.log("cipherKey on ENC_KEY: "+cipherKey);
 
             let privateKey: CryptoKey = await S.encryption.getPrivateKey();
 
             //so this is the decrypted symmetric key to the data
-            let clearTextKey = await S.encryption.asymDecryptString(privateKey, cypherKey);
+            let clearTextKey = await S.encryption.asymDecryptString(privateKey, cipherKey);
             if (!clearTextKey) {
                 throw new Error("Unable to access encryption key.");
             }
 
             //console.log("clear text key to re-encrypt: " + clearTextKey);
 
-            //first build up a usable key from principlePublicKey.
-            let principalSymKeyJsonObj: JsonWebKey = JSON.parse(principlePublicKeyStr);
+            //first build up a usable key from principalPublicKey.
+            let principalSymKeyJsonObj: JsonWebKey = JSON.parse(principalPublicKeyStr);
 
-            //todo-0: this is ugly and should be encapsulated into S.encryption
-            let principalPublicKey = await crypto.subtle.importKey(S.encryption.KEY_SAVE_FORMAT, principalSymKeyJsonObj, {
-                name: S.encryption.ASYM_ALGO,
-                hash: S.encryption.HASH_ALGO,
-            }, true, S.encryption.OP_ENC);
+            let principalPublicKey = await S.encryption.importKey(principalSymKeyJsonObj, S.encryption.ASYM_IMPORT_ALGO, true, S.encryption.OP_ENC);
 
             //now re-encrypt this clearTextKey using the public key (of the user being shared to).
             let userCipherKey = await S.encryption.asymEncryptString(principalPublicKey, clearTextKey);
@@ -84,11 +78,11 @@ export class Share implements ShareIntf {
 
             await S.util.ajax<J.SetCipherKeyRequest, J.SetCipherKeyResponse>("setCipherKey", {
                 "nodeId": node.id,
-                "principalNodeId": principleNodeId,
+                "principalNodeId": principalNodeId,
                 "cipherKey": userCipherKey,
             });
 
-            //console.log("Added cypher key: " + userCipherKey + " for principleNodeId: " + principleNodeId);
+            //console.log("Added cipher key: " + userCipherKey + " for principalNodeId: " + principalNodeId);
 
             resolve();
         });

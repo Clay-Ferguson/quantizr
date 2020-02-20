@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Represents a certain principle and a set of privileges the principle has.
+ * Represents a certain principal and a set of privileges the principal has.
  */
 public class AccessControlEntryInfo {
 	private String principalName;

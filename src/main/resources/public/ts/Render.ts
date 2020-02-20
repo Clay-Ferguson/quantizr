@@ -190,12 +190,12 @@ export class Render implements RenderIntf {
                     //todo-1: for performance we could create a map of the hash of the encrypted content (key) to the
                     //decrypted text (val), and hold that map so that once we decrypt a message we never use encryption again at least
                     //until of course browser refresh (would be Javascript hash)                    
-                    let cypherText = content.substring(J.NodeProp.ENC_TAG.length);
-                    //console.log("NODE DATA: CIPHERTEXT: "+cypherText);
+                    let cipherText = content.substring(J.NodeProp.ENC_TAG.length);
+                    //console.log("NODE DATA: CIPHERTEXT: "+cipherText);
 
-                    let cypherKey = S.props.getCryptoKey(node);
-                    if (cypherKey) {
-                        let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
+                    let cipherKey = S.props.getCryptoKey(node);
+                    if (cipherKey) {
+                        let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
                         if (clearText) {
                             node.content = clearText;

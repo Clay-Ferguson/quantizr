@@ -5,6 +5,7 @@ export interface EncryptionIntf {
     KEY_SAVE_FORMAT: string;
     ASYM_ALGO: string;
     HASH_ALGO: string;
+    ASYM_IMPORT_ALGO: any;
     STORE_ASYMKEY: string;
 
     OP_ENC_DEC: string[];
@@ -31,10 +32,12 @@ export interface EncryptionIntf {
 
     getPrivateKey(): Promise<CryptoKey>;
     getPublicKey(): Promise<CryptoKey>;
+
+    importKey(key: JsonWebKey, algos: any, extractable: boolean, keyUsages: string[]): Promise<CryptoKey>;
 }
 
 export interface SymKeyDataPackage {
-    cypherText: string;
-    cypherKey: string;
+    cipherText: string;
+    cipherKey: string;
 }
 

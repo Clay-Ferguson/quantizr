@@ -145,19 +145,19 @@ export class Props implements PropsIntf {
     key that goes with the current user (us, logged in user), which should decrypt using our private key.
     */
     getCryptoKey = (node: J.NodeInfo) => {
-        let cypherKey = null;
+        let cipherKey = null;
 
-        /* if we own this node then this cypherKey for it will be ENC_KEY for us */
+        /* if we own this node then this cipherKey for it will be ENC_KEY for us */
         if (S.meta64.userName == node.owner) {
-            cypherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
-            console.log("getting cypherKey for node, from ENC_KEY: " + cypherKey);
+            cipherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
+            console.log("getting cipherKey for node, from ENC_KEY: " + cipherKey);
         }
         /* else if the server has provided the cipher key to us from the ACL (AccessControl) then use it. */
         else {
-            cypherKey = node.cipherKey;
-            console.log("getting cypherKey from node.cypherKey (not your node): " + cypherKey);
+            cipherKey = node.cipherKey;
+            console.log("getting cipherKey from node.cipherKey (not your node): " + cipherKey);
         }
-        return cypherKey;
+        return cipherKey;
     }
 
     isEncrypted = (node: J.NodeInfo): boolean => {

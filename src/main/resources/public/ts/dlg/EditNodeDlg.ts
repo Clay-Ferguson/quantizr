@@ -331,8 +331,8 @@ export class EditNodeDlg extends DialogBase {
                     if (!this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
                         let content = this.contentEditor.getValue();
                         let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
-                        this.node.content = J.NodeProp.ENC_TAG + skdp.cypherText;
-                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, skdp.cypherKey);
+                        this.node.content = J.NodeProp.ENC_TAG + skdp.cipherText;
+                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, skdp.cipherKey);
                     }
                 }
 
@@ -586,11 +586,11 @@ export class EditNodeDlg extends DialogBase {
 
                         if (encrypted) {
                             //console.log('decrypting: ' + value);
-                            let cypherText = value.substring(J.NodeProp.ENC_TAG.length);
+                            let cipherText = value.substring(J.NodeProp.ENC_TAG.length);
                             (async () => {
-                                let cypherKey = S.props.getCryptoKey(node);
-                                if (cypherKey) {
-                                    let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
+                                let cipherKey = S.props.getCryptoKey(node);
+                                if (cipherKey) {
+                                    let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
                                     //console.log('decrypted to:' + value);
                                     (this.contentEditor as AceEditPropTextarea).setValue(clearText);
@@ -613,11 +613,11 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditor.whenElm((elm: HTMLElement) => {
                 if (encrypted) {
                     //console.log('decrypting: ' + value);
-                    let cypherText = value.substring(J.NodeProp.ENC_TAG.length);
+                    let cipherText = value.substring(J.NodeProp.ENC_TAG.length);
                     (async () => {
-                        let cypherKey = S.props.getCryptoKey(node);
-                        if (cypherKey) {
-                            let clearText: string = await S.encryption.decryptSharableString(null, { cypherKey, cypherText });
+                        let cipherKey = S.props.getCryptoKey(node);
+                        if (cipherKey) {
+                            let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
                             //console.log('decrypted to:' + value);
                             (this.contentEditor as Textarea).setValue(clearText);
                         }

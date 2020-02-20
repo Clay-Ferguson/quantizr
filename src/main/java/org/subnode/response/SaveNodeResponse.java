@@ -9,7 +9,7 @@ import org.subnode.response.base.ResponseBase;
 public class SaveNodeResponse extends ResponseBase {
 	private NodeInfo node;
 
-	/* In cases where the updated node is adding encryption we need to send back all the principleIds 
+	/* In cases where the updated node is adding encryption we need to send back all the principalIds 
 	(userNodeIds actually) so the client can generate keys for all of them to send back up to allow
 	access by these shared users */
 	private List<AccessControlEntryInfo> aclEntries;

@@ -57,6 +57,11 @@ export class Encryption implements EncryptionIntf {
 
     HASH_ALGO = "SHA-256";
 
+    ASYM_IMPORT_ALGO = {
+        name: "RSA-OAEP",
+        hash: "SHA-256",
+    };
+
     OP_ENC_DEC = ["encrypt", "decrypt"];
     OP_ENC: string[] = ["encrypt"];
     OP_DEC: string[] = ["decrypt"];
@@ -139,7 +144,7 @@ export class Encryption implements EncryptionIntf {
 
                 // test symetric key export/import
                 let keyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, key);
-                let key2 = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, keyDat, this.SYM_ALGO, true, this.OP_ENC_DEC);
+                let key2: CryptoKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, keyDat, this.SYM_ALGO, true, this.OP_ENC_DEC);
 
                 let encHex2 = await this.symEncryptString(key2, clearText);
                 let unencText2 = await this.symDecryptString(key2, encHex2);
@@ -200,6 +205,10 @@ export class Encryption implements EncryptionIntf {
         let verifyClearText: string = this.convertByteArrayToString(verifyClearTextBytes);
         S.util.assert(clearText === verifyClearText, "encryption encodings");
         console.log("runConversionTest OK.");
+    }
+
+    importKey = async (key: JsonWebKey, algos: any, extractable: boolean, keyUsages: string[]): Promise<CryptoKey> => {
+        return crypto.subtle.importKey(S.encryption.KEY_SAVE_FORMAT, key, algos, extractable, keyUsages);
     }
 
     initKeys = async (forceUpdate: boolean = false, republish: boolean = false) => {
@@ -364,7 +373,7 @@ export class Encryption implements EncryptionIntf {
      * Of course, this means the process is that when a user wants to read data shared to them they just use 
      * their private key to decrypt the symmetric key to the data, and use that key to get the data.
      * 
-     * This function returns an object that contains two properties: cyphertext, cypherkey, which is the encrypted data
+     * This function returns an object that contains two properties: ciphertext, cipherkey, which is the encrypted data
      * and the encrypted "JWK" formatted key to the data, respectively
      * 
      * 'publicKey' argument should be the public key of the person doing the encryption (the person doing the encryption) 
@@ -386,12 +395,12 @@ export class Encryption implements EncryptionIntf {
                 let symKeyStr = S.util.toJson(symKeyJwk);
 
                 //encrypt the symetric key
-                let cypherKey = await this.asymEncryptString(publicKey, symKeyStr);
+                let cipherKey = await this.asymEncryptString(publicKey, symKeyStr);
 
                 //encrypt the data with the symetric key
-                let cypherText = await this.symEncryptString(symKey, data);
+                let cipherText = await this.symEncryptString(symKey, data);
 
-                ret = { cypherText, cypherKey };
+                ret = { cipherText, cipherKey };
             }
             finally {
                 resolve(ret);
@@ -404,18 +413,18 @@ export class Encryption implements EncryptionIntf {
         return new Promise<string>(async (resolve, reject) => {
             let ret: string = null;
             try {
-                console.log("decrypting with cypherKey: " + skpd.cypherKey);
+                console.log("decrypting with cipherKey: " + skpd.cipherKey);
                 if (!privateKey) {
                     privateKey = await this.getPrivateKey();
                 }
 
                 //Decrypt the symmetric key using our private key
-                let symKeyJsonStr: string = await this.asymDecryptString(privateKey, skpd.cypherKey);
-                //console.log("Decrypted cypherKey to (asym key to actual data): " + symKeyJsonStr);
+                let symKeyJsonStr: string = await this.asymDecryptString(privateKey, skpd.cipherKey);
+                //console.log("Decrypted cipherKey to (asym key to actual data): " + symKeyJsonStr);
                 let symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
                 let symKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, symKeyJsonObj, this.SYM_ALGO, true, this.OP_ENC_DEC);
-                //console.log("DECRYPTING: cypherText: [" + skpd.cypherText + "]");   
-                ret = await this.symDecryptString(symKey, skpd.cypherText);
+                //console.log("DECRYPTING: cipherText: [" + skpd.cipherText + "]");   
+                ret = await this.symDecryptString(symKey, skpd.cipherText);
                 //console.log("            output: [" + ret + "]");
             }
             catch (ex) {
@@ -427,7 +436,7 @@ export class Encryption implements EncryptionIntf {
         });
     }
 
-    /* Encrypts 'data' string and returns a hex representation of the cyphertext */
+    /* Encrypts 'data' string and returns a hex representation of the ciphertext */
     encryptString = async (key: CryptoKey, algo: string, data: string): Promise<string> => {
         return new Promise<string>(async (resolve, reject) => {
             let encHex = null;
