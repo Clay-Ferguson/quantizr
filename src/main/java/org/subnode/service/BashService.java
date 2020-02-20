@@ -62,7 +62,7 @@ public class BashService {
 		 * execute in a new terminal, and this is just a convenience which could have
 		 * also been entered directly as the content.
 		 */
-		String fileName = node.getStringProp(NodeProp.FILENAME.name());
+		String fileName = node.getStringProp(NodeProp.FILENAME.toString());
 		if (fileName != null) {
 			script = "gnome-terminal -- /bin/bash -c '" + fileName + "'";
 		} else {

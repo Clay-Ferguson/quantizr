@@ -491,24 +491,24 @@ export class Meta64 implements Meta64Intf {
     //here's the simple mode property hider!
     initConstants = () => {
         S.util.addAll(this.simpleModePropertyBlackList, [ //
-            C.IMG_WIDTH,//
-            C.IMG_HEIGHT, //
-            C.BIN_VER, //
-            C.BIN_DATA, //
-            C.BIN_MIME, //
+            J.NodeProp.IMG_WIDTH,//
+            J.NodeProp.IMG_HEIGHT, //
+            J.NodeProp.BIN_VER, //
+            J.NodeProp.BIN_DATA, //
+            J.NodeProp.BIN_MIME, //
             J.NodeProp.ENC_KEY, //
-            C.BIN, //
+            J.NodeProp.BIN, //
         ]);
 
         S.util.addAll(this.readOnlyPropertyList, [ //
-            C.IMG_WIDTH, //
-            C.IMG_HEIGHT, //
-            C.BIN_VER, //
-            C.BIN_DATA, //
-            C.BIN_MIME, //
+            J.NodeProp.IMG_WIDTH, //
+            J.NodeProp.IMG_HEIGHT, //
+            J.NodeProp.BIN_VER, //
+            J.NodeProp.BIN_DATA, //
+            J.NodeProp.BIN_MIME, //
         ]);
 
-        S.util.addAll(this.binaryPropertyList, [C.BIN_DATA]);
+        S.util.addAll(this.binaryPropertyList, [J.NodeProp.BIN_DATA]);
     }
 
     /**

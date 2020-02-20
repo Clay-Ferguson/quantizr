@@ -65,7 +65,7 @@ public class OutboxMgr {
 						log.warn("No userNode was found for parentNode.owner="+parentNode.getOwner());
 						return;
 					}
-					String email = userNode.getStringProp(NodeProp.EMAIL.name());
+					String email = userNode.getStringProp(NodeProp.EMAIL.toString());
 					log.debug("sending email to: " + email + " because his node was appended under.");
 
 					String content = String.format("User '%s' replied to you.<p>\n\n" + //
@@ -90,9 +90,9 @@ public class OutboxMgr {
 		SubNode outboxNode = getSystemOutbox(session);
 		SubNode outboundEmailNode = api.createNode(session, outboxNode.getPath() + "/?", SubNodeTypes.UNSTRUCTURED);
 
-		outboundEmailNode.setProp(NodeProp.EMAIL_CONTENT.name(), content);
-		outboundEmailNode.setProp(NodeProp.EMAIL_SUBJECT.name(), subject);
-		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP.name(), recipients);
+		outboundEmailNode.setProp(NodeProp.EMAIL_CONTENT.toString(), content);
+		outboundEmailNode.setProp(NodeProp.EMAIL_SUBJECT.toString(), subject);
+		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP.toString(), recipients);
 
 		api.save(session, outboundEmailNode);
 	}

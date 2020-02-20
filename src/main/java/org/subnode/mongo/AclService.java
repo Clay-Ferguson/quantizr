@@ -101,7 +101,7 @@ public class AclService {
 		SubNode node = api.getNode(session, nodeId);
 		api.authRequireOwnerOfNode(session, node);
 
-		String cypherKey = node.getStringProp(NodeProp.ENC_KEY.name());
+		String cypherKey = node.getStringProp(NodeProp.ENC_KEY.toString());
 		if (cypherKey == null) {
 			throw new RuntimeException("Attempted to alter keys on a non-encrypted node.");
 		}
@@ -131,7 +131,7 @@ public class AclService {
 		if (principal == null)
 			return false;
 
-		String cypherKey = node.getStringProp(NodeProp.ENC_KEY.name());
+		String cypherKey = node.getStringProp(NodeProp.ENC_KEY.toString());
 		String mapKey = null;
 
 		/* If we are sharing to public, then that's the map key */
@@ -163,7 +163,7 @@ public class AclService {
 			 * entry
 			 */
 			if (cypherKey != null) {
-				String principalPubKey = principleNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY.name());
+				String principalPubKey = principleNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY.toString());
 				if (principalPubKey == null) {
 					if (res != null) {
 						res.setMessage("User doesn't have a PublicKey available: " + principal);
@@ -322,7 +322,7 @@ public class AclService {
 				 * ownerSet.add(p.getUserNodeId());
 				 */
 				SubNode userNode = api.getNode(session, p.getUserNodeId());
-				String userName = userNode.getStringProp(NodeProp.USER.name());
+				String userName = userNode.getStringProp(NodeProp.USER.toString());
 				ownerSet.add(userName);
 			}
 

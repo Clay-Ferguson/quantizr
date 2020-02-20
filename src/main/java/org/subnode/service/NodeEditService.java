@@ -249,7 +249,7 @@ public class NodeEditService {
 			}
 
 			// If removing encryption, remove it from all the ACL entries too.
-			String encKey = node.getStringProp(NodeProp.ENC_KEY.name());
+			String encKey = node.getStringProp(NodeProp.ENC_KEY.toString());
 			if (encKey == null) {
 				api.removeAllEncryptionKeys(node);
 			}
@@ -257,14 +257,6 @@ public class NodeEditService {
 			else {
 				res.setAclEntries(api.getAclEntries(session, node));
 			}
-
-			/*
-			 * todo-0: if ADDING encryption, we need to look for what all the users are that
-			 * the node is shared to and trigger for the client to set off a process of
-			 * generating all the encryption keys for all users. the basic code that will
-			 * run is what we already have for dissemenating a key when a 'share to user' is
-			 * executed.
-			 */
 
 			Calendar lastModified = Calendar.getInstance();
 			node.setModifyTime(lastModified.getTime());

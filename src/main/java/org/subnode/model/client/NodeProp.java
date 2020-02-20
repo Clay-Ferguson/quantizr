@@ -44,8 +44,6 @@ public enum NodeProp {
     FILENAME("sn:fileName"), //
     NAME("sn:name"), //
 
-    JSON_FILE_SEARCH_RESULT("sn:jsonFileSearchResult"), //
-
     /*
      * property used to indicate we should not query the IPFS network again for this
      * conten becasue we have already loaded it
@@ -67,6 +65,20 @@ public enum NodeProp {
     BIN_MIME("sn:mimeType"), //
     BIN_FILENAME("sn:fileName"), //
     BIN_SIZE("sn:size"), //
+
+    IPFS_NODE("sn:ipfsNode"),
+
+    //This is for bash script names to whow up when browing on the tree
+    FILE_NAME("sn:fileName"),
+
+    JSON_FILE_SEARCH_RESULT("sn:json"),
+    PRE("sn:pre"),
+    NOWRAP("sn:nowrap"),
+
+    BIN_DATA("sn:jcrData"),
+
+    //todo-1: should this be "sn:" prefixed?
+    BIN("bin"),
 
     IMG_WIDTH("sn:imgWidth"), //
     IMG_HEIGHT("sn:imgHeight");

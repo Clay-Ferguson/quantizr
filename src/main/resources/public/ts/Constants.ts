@@ -1,7 +1,5 @@
 export class Constants {
 
-    //todo-0: there's some overlap between this class and the server->TS generated classes. Need to unify.
-
     /* Feature Flags */
     /* ======================================================================== */
     static readonly ENABLE_ACE_EDITOR: boolean = false;
@@ -33,33 +31,6 @@ export class Constants {
     static readonly LOCALDB_LAST_CHILD_NODEID: string = "lastChildId";
 
     static readonly ATT_MAX_WIDTH: string = "att-max-width";
-
-    static readonly EMAIL_CONTENT: string = "sn:content";
-    static readonly EMAIL_RECIP: string = "sn:recip";
-    static readonly EMAIL_SUBJECT: string = "sn:subject";
-
-    static readonly IPFS_NODE: string = "sn:ipfsNode";
-
-    //This is for bash script names to whow up when browing on the tree
-    static readonly NAME: string = "sn:name";
-    static readonly FILE_NAME: string = "sn:fileName";
-
-    static readonly JSON_FILE_SEARCH_RESULT: string = "sn:json";
-    static readonly PRE: string = "sn:pre";
-    static readonly NOWRAP: string = "sn:nowrap";
-
-    static readonly EMAIL: string = "sn:email";
-    static readonly CODE: string = "sn:code";
-
-    static readonly BIN_VER: string = "sn:binVer";
-    static readonly BIN_DATA: string = "sn:jcrData";
-    static readonly BIN_MIME: string = "sn::mimeType";
-
-    //todo-1: should this be "sn:" prefixed?
-    static readonly BIN: string = "bin";
-
-    static readonly IMG_WIDTH: string = "sn:imgWidth";
-    static readonly IMG_HEIGHT: string = "sn:imgHeight";
 }
 
 

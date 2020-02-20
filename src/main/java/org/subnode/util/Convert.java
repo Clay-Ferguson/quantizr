@@ -49,8 +49,8 @@ public class Convert {
 		boolean binaryIsImage = false;
 		ImageSize imageSize = null;
 
-		long binVer = node.getIntProp(NodeProp.BIN_VER.name());
-		String mimeType = node.getStringProp(NodeProp.BIN_MIME.name());
+		long binVer = node.getIntProp(NodeProp.BIN_VER.toString());
+		String mimeType = node.getStringProp(NodeProp.BIN_MIME.toString());
 		if (mimeType != null) {
 			hasBinary = true;
 			binaryIsImage = api.isImageAttached(node);
@@ -73,18 +73,22 @@ public class Convert {
 		 * the userNodeId back to client, and the client should be able to deal with
 		 * that (i think). depends on how much ownership info we need to show user.
 		 */
+		String nameProp = null;
 		SubNode userNode = api.getNode(session, node.getOwner(), false);
+
 		if (userNode == null) {
 			// todo-1: looks like import corrupts the 'owner' (needs research), but the code
 			// below sets to owner to 'admin' which will
 			// be safe for now because the admin is the only user capable of import/export.
 			log.debug("Unable to find userNode from nodeOwner: " + //
 					(node.getOwner() != null ? rootId : ("null owner on node: " + node.getId().toHexString())));
+		} else {
+			nameProp = userNode.getStringProp(NodeProp.USER.toString());
 		}
-		String owner = userNode == null ? "admin" : userNode.getStringProp(NodeProp.USER.name());
+		String owner = userNode == null ? "admin" : nameProp;
 
 		log.debug("RENDER ID=" + node.getId().toHexString() + " rootId=" + rootId + " session.rootId="
-				+ sessionContext.getRootId() + " node.content=" + node.getContent());
+				+ sessionContext.getRootId() + " node.content=" + node.getContent() + " owner=" + owner);
 
 		/*
 		 * If the node is not owned by the person doing the browsing we need to extract
@@ -92,8 +96,7 @@ public class Convert {
 		 * the node.
 		 */
 		String cipherKey = null;
-		//todo-0: I'm pretty sure I can re-enable this commented snipped below.
-		if (/* !rootId.equals(sessionContext.getRootId()) && */ node.getAc() != null) {
+		if (!rootId.equals(sessionContext.getRootId()) && node.getAc() != null) {
 			AccessControl ac = node.getAc().get(sessionContext.getRootId());
 			if (ac != null) {
 				cipherKey = ac.getKey();
@@ -142,12 +145,12 @@ public class Convert {
 		ImageSize imageSize = new ImageSize();
 
 		try {
-			Long width = node.getIntProp(NodeProp.IMG_WIDTH.name());
+			Long width = node.getIntProp(NodeProp.IMG_WIDTH.toString());
 			if (width != null) {
 				imageSize.setWidth(width.intValue());
 			}
 
-			Long height = node.getIntProp(NodeProp.IMG_HEIGHT.name());
+			Long height = node.getIntProp(NodeProp.IMG_HEIGHT.toString());
 			if (height != null) {
 				imageSize.setHeight(height.intValue());
 			}

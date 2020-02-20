@@ -94,9 +94,9 @@ public class NotificationDaemon {
 				try {
 					mailSender.init();
 					for (SubNode node : nodes) {
-						String email = node.getStringProp(NodeProp.EMAIL_RECIP.name());
-						String subject = node.getStringProp(NodeProp.EMAIL_SUBJECT.name());
-						String content = node.getStringProp(NodeProp.EMAIL_CONTENT.name());
+						String email = node.getStringProp(NodeProp.EMAIL_RECIP.toString());
+						String subject = node.getStringProp(NodeProp.EMAIL_SUBJECT.toString());
+						String content = node.getStringProp(NodeProp.EMAIL_CONTENT.toString());
 
 						if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject)
 								&& !StringUtils.isEmpty(content)) {

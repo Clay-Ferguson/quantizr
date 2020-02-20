@@ -215,10 +215,10 @@ export class Render implements RenderIntf {
         let val = "";
 
         // Special case of a PRE-formatted node, we inject backticks to make it render all the content as preformatted markdown */
-        let preProp: J.PropertyInfo = S.props.getNodeProp(C.PRE, node);
+        let preProp: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.PRE, node);
         if (preProp && preProp.value == "1") {
 
-            let nowrapProp: J.PropertyInfo = S.props.getNodeProp(C.NOWRAP, node);
+            let nowrapProp: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.NOWRAP, node);
             let wordWrap = !(nowrapProp && nowrapProp.value == "1");
 
             if (!!content) {

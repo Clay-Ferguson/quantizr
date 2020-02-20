@@ -169,8 +169,8 @@ export class EditNodeDlg extends DialogBase {
         });
         let editPropsTable = new EditPropsTable();
 
-        let isPre = !!S.props.getNodePropVal(C.PRE, this.node);
-        let isWordWrap = !S.props.getNodePropVal(C.NOWRAP, this.node);
+        let isPre = !!S.props.getNodePropVal(J.NodeProp.PRE, this.node);
+        let isWordWrap = !S.props.getNodePropVal(J.NodeProp.NOWRAP, this.node);
 
         this.preformattedCheckBox.setChecked(isPre);
         this.wordWrapCheckBox.setChecked(isWordWrap);
@@ -412,9 +412,9 @@ export class EditNodeDlg extends DialogBase {
             let handled = {};
 
             if (this.node) {
-                this.saveCheckboxVal(this.preformattedCheckBox, saveList, handled, C.PRE);
+                this.saveCheckboxVal(this.preformattedCheckBox, saveList, handled, J.NodeProp.PRE);
                 this.saveCheckboxVal(this.inlineChildrenCheckBox, saveList, handled, "inlineChildren");
-                this.saveCheckboxVal(this.wordWrapCheckBox, saveList, handled, C.NOWRAP, true);
+                this.saveCheckboxVal(this.wordWrapCheckBox, saveList, handled, J.NodeProp.NOWRAP, true);
 
                 /* Get state of the 'layout' dropdown */
                 let layout = this.layoutSelection.getSelection();

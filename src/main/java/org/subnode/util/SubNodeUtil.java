@@ -43,10 +43,10 @@ public class SubNodeUtil {
 	private static HashSet<String> nonSavableProperties = new HashSet<String>();
 
 	static {
-		nonSavableProperties.add(NodeProp.BIN_VER.name());
-		nonSavableProperties.add(NodeProp.BIN_MIME.name());
-		nonSavableProperties.add(NodeProp.IMG_HEIGHT.name());
-		nonSavableProperties.add(NodeProp.IMG_WIDTH.name());
+		nonSavableProperties.add(NodeProp.BIN_VER.toString());
+		nonSavableProperties.add(NodeProp.BIN_MIME.toString());
+		nonSavableProperties.add(NodeProp.IMG_HEIGHT.toString());
+		nonSavableProperties.add(NodeProp.IMG_WIDTH.toString());
 	}
 
 	/*
