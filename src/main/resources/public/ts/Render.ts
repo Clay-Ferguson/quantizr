@@ -441,6 +441,7 @@ export class Render implements RenderIntf {
     makeRowButtonBar = (node: J.NodeInfo, editingAllowed: boolean): Comp => {
         let typeIcon: Icon;
         let encIcon: Icon;
+        let sharedIcon: Icon;
         let openButton: Button;
         let selButton: Checkbox;
         let createSubNodeButton: Button;
@@ -469,6 +470,13 @@ export class Render implements RenderIntf {
             encIcon = new Icon("", null, {
                 "style": {marginRight: '6px', verticalAlign: 'middle' },
                 className: "fa fa-lock fa-lg"
+            });
+        }
+
+        if (S.props.isShared(node)) {
+            sharedIcon = new Icon("", null, {
+                "style": {marginRight: '6px', verticalAlign: 'middle' },
+                className: "fa fa-share-alt fa-lg"
             });
         }
 
@@ -554,8 +562,8 @@ export class Render implements RenderIntf {
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
             moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton], null, "marginLeft marginTop");
 
-        if (selButton || typeIcon || encIcon) {
-            return new HorizontalLayout([selButton, typeIcon, encIcon, buttonBar]);
+        if (selButton || typeIcon || encIcon || sharedIcon) {
+            return new HorizontalLayout([selButton, typeIcon, encIcon, sharedIcon, buttonBar]);
         }
         else {
             return buttonBar;
@@ -727,6 +735,14 @@ export class Render implements RenderIntf {
                             });
                         }
 
+                        let sharedIcon: Icon = null;
+                        if (S.props.isShared(data.node)) {
+                            sharedIcon = new Icon("", null, {
+                                "style": {marginRight: '6px', verticalAlign: 'middle' },
+                                className: "fa fa-share-alt fa-lg"
+                            });
+                        }
+
                         /* Construct Create Subnode Button */
                         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode();
                         let selected: boolean = focusNode && focusNode.id === id;
@@ -734,8 +750,8 @@ export class Render implements RenderIntf {
                             console.log("selected: focusNode.uid=" + focusNode.id + " selected=" + selected);
                         }
 
-                        if (typeIcon || encIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton) {
-                            buttonBar = new ButtonBar([typeIcon, encIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
+                        if (typeIcon || encIcon || sharedIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton) {
+                            buttonBar = new ButtonBar([typeIcon, encIcon, sharedIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
                                 null, "marginLeft marginTop");
                         }
 

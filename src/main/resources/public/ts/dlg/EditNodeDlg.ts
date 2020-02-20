@@ -307,12 +307,10 @@ export class EditNodeDlg extends DialogBase {
             /* awaits until dialog is closed */
             await dlg.open();
 
-            //todo-0: psudo codo i need to implement, but will require always setting isPublic first, and also while I'm at it
-            //I will also add a flag 'isShared' so that an icon can be displayed for the node (at least for the owner of the node to see, if not everyone)
-            // if (dlg.encrypted && this.node.isPublic) {
-            //     alert("Cannot encrypt a node that is shared to public. Remove public share first.");
-            //     return;
-            // }
+            if (dlg.encrypted && S.props.isPublic(this.node)) {
+                S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.");
+                return;
+            }
 
             /* only if the encryption setting changed do we need to anything in here */
             if (encrypted !== dlg.encrypted) {

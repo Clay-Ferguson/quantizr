@@ -3,9 +3,13 @@ package org.subnode.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * Represents a certain principal and a set of privileges the principal has.
  */
+@JsonInclude(Include.NON_NULL)
 public class AccessControlInfo {
 	private String principalName;
 	private String principalNodeId;

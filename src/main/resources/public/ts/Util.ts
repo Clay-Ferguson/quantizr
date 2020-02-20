@@ -56,8 +56,8 @@ export class Util implements UtilIntf {
     pgrsDlg: ProgressDlg = null;
 
     // accepts letters, numbers, underscore, dash.
-    validUsername = (inputtxt: string): boolean => {
-        return !!inputtxt.match(/^[0-9a-zA-Z\-_]+$/);
+    validUsername = (v: string): boolean => {
+        return !!v.match(/^[0-9a-zA-Z\-_]+$/);
     }
 
     hashOfString = (s: string): number => {

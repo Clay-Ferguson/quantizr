@@ -2,6 +2,7 @@ package org.subnode.util;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Map;
 import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
 import org.subnode.image.ImageSize;
+import org.subnode.model.AccessControlInfo;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;
 import org.subnode.mongo.MongoApi;
@@ -66,6 +68,8 @@ public class Convert {
 		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly, allowAbbreviated,
 				initNodeEdit);
 
+		List<AccessControlInfo> acList = buildAccessControlList(sessionContext, node);
+
 		String rootId = node.getOwner().toHexString();
 
 		/*
@@ -107,7 +111,7 @@ public class Convert {
 		}
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, node.getOrdinal(), //
-				node.getModifyTime(), propList, hasNodes, hasBinary, binaryIsImage, binVer, //
+				node.getModifyTime(), propList, acList, hasNodes, hasBinary, binaryIsImage, binVer, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
 				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey);
@@ -187,6 +191,36 @@ public class Convert {
 			Collections.sort(props, propertyInfoComparator);
 		}
 		return props;
+	}
+
+	public List<AccessControlInfo> buildAccessControlList(SessionContext sessionContext, SubNode node) {
+		List<AccessControlInfo> ret = null;
+		HashMap<String, AccessControl> ac = node.getAc();
+		if (ac==null) return null;
+
+		for (Map.Entry<String, AccessControl> entry : ac.entrySet()) {
+			String principalId = entry.getKey();
+			AccessControl acval = entry.getValue();
+
+			/* lazy create list */
+			if (ret == null) {
+				ret = new LinkedList<AccessControlInfo>();
+			}
+
+			AccessControlInfo acInfo = convertToAccessControlInfo(sessionContext, node, principalId, acval);
+			ret.add(acInfo);
+		}
+
+		// if (props != null) {
+		// 	Collections.sort(props, propertyInfoComparator);
+		// }
+		return ret;
+	}
+
+	public AccessControlInfo convertToAccessControlInfo(SessionContext sessioContext, SubNode node, String principalId, AccessControl ac) {
+		AccessControlInfo acInfo = new AccessControlInfo();
+		acInfo.setPrincipalNodeId(principalId);
+		return acInfo;
 	}
 
 	public PropertyInfo convertToPropertyInfo(SessionContext sessionContext, SubNode node, String propName,

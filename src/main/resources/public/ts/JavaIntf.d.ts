@@ -460,6 +460,7 @@ export interface NodeInfo {
     ordinal: number;
     type: string;
     properties: PropertyInfo[];
+    ac: AccessControlInfo[];
     hasChildren: boolean;
     cipherKey: string;
     firstChild: boolean;

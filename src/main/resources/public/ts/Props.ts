@@ -160,6 +160,22 @@ export class Props implements PropsIntf {
         return cipherKey;
     }
 
+    isShared = (node: J.NodeInfo): boolean => {
+        return !!node.ac; 
+    }
+
+    isPublic = (node: J.NodeInfo): boolean => {
+        if (!node.ac) return false;
+        let ret = false;
+        node.ac.forEach((ace: J.AccessControlInfo) => {
+            if (ace.principalNodeId=='public') {
+                ret = true;
+                return false; //stop iteration.
+            }
+        });
+        return ret;
+    }
+
     isEncrypted = (node: J.NodeInfo): boolean => {
         return !!S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
     }

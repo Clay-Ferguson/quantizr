@@ -3,14 +3,17 @@ package org.subnode.model;
 import java.util.Date;
 import java.util.List;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * Primary object passed back to client to represent a 'node'. Client sees the JSON version of this,
  * in javascript.
  */
+@JsonInclude(Include.NON_NULL)
 public class NodeInfo {
 	private static final Logger log = LoggerFactory.getLogger(NodeInfo.class);
 
@@ -22,6 +25,7 @@ public class NodeInfo {
 	private Long ordinal;
 	private String type;
 	private List<PropertyInfo> properties;
+	private List<AccessControlInfo> ac;
 	private boolean hasChildren;
 
 	/* For nodes that are encrypted but shared to the current user, we send back the ciperKey (an encrypted sym key) for this node which
@@ -54,7 +58,7 @@ public class NodeInfo {
 	}
 
 	public NodeInfo(String id, String name, String content, String owner, Long ordinal, Date lastModified,
-			List<PropertyInfo> properties, boolean hasChildren,
+			List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
 			boolean hasBinary, boolean binaryIsImage, long binVer, int width, int height, String type, long logicalOrdinal,
 			boolean firstChild, boolean lastChild, String cipherKey) {
 		this.id = id;
@@ -64,6 +68,7 @@ public class NodeInfo {
 		this.owner = owner;
 		this.ordinal = ordinal;
 		this.properties = properties;
+		this.ac = ac;
 		this.hasChildren = hasChildren;
 		this.firstChild = firstChild;
 		this.lastChild = lastChild;
@@ -131,6 +136,14 @@ public class NodeInfo {
 
 	public void setProperties(List<PropertyInfo> properties) {
 		this.properties = properties;
+	}
+
+	public List<AccessControlInfo> getAc() {
+		return ac;
+	}
+
+	public void setAc(List<AccessControlInfo> ac) {
+		this.ac = ac;
 	}
 
 	public boolean isHasChildren() {
