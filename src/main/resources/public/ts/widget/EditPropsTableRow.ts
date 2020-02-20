@@ -1,5 +1,4 @@
 import { Comp } from "./base/Comp";
-import * as I from "../Interfaces";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
@@ -11,8 +10,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class EditPropsTableRow extends Comp {
-
-    propEntry: I.PropEntry;
 
     constructor(attribs : Object = {}) {
         super(attribs);

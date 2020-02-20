@@ -783,8 +783,6 @@ public class MongoApi {
 	public void reSaveAll(MongoSession session) {
 		log.debug("Processing reSaveAll: Beginning Node Report: " + getNodeReport());
 
-		// todo-0: the new AC shares are now complete on all instances, only
-		// remaining conversion is to delete the ACL field itself, eventually
 		// processAllNodes(session);
 	}
 

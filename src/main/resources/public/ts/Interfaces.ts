@@ -28,18 +28,6 @@ export interface CheckboxIntf {
     getChecked(): boolean;
 }
 
-export class PropEntry {
-    //The 'id' is of the EditPropTextarea element. We could theoretially make this hold the ACTUAL EditPropTextarea object reference itself
-    //and when doing so probably use an interface of EditPRopTextarea just to be safer against circular references since this interfeces
-    //module is imported into pretty much every other module.
-    constructor(public property: J.PropertyInfo, //
-        public readOnly: boolean, //
-        public binary: boolean,
-        public comp?: TextEditorIntf,
-        public checkBox?: CheckboxIntf) {
-    }
-}
-
 export interface PrivilegeInfo {
     privilegeName: string;
 }

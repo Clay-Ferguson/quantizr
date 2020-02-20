@@ -54,9 +54,16 @@ export class EditNodeDlg extends DialogBase {
     deletePropButton: Button;
     cancelButton: Button;
 
-    propEntries: Array<I.PropEntry>;
+    propEntries: Array<J.PropertyInfo>;
     editPropertyDlgInst: any;
-   
+
+    //Maps property names to the actual editor Comp (editor, checkbox, etc) that is currently editing it.
+    propNameToEditorCompMap: { [key: string]: Comp } = {}; //not needed ???
+
+    //maps the DOM ids of dom elements the property that DOM element is editing.
+    compIdToPropMap: { [key: string]: J.PropertyInfo } = {};
+    propCheckBoxes: Checkbox[];
+
     nodeNameTextField: TextField;
     contentEditor: I.TextEditorIntf;
 
@@ -162,7 +169,7 @@ export class EditNodeDlg extends DialogBase {
             this.prioritySelection = this.createPrioritySelection()
         ]);
 
-        this.propEntries = new Array<I.PropEntry>();
+        this.propEntries = new Array<J.PropertyInfo>();
 
         let collapsiblePropsTable = new EditPropsTable({
             className: "edit-props-table form-group-border"
@@ -196,6 +203,8 @@ export class EditNodeDlg extends DialogBase {
 
         this.contentEditor.setWordWrap(isWordWrap);
 
+        this.propCheckBoxes = [];
+
         if (this.node.properties) {
             this.node.properties.forEach((prop: J.PropertyInfo) => {
 
@@ -221,15 +230,11 @@ export class EditNodeDlg extends DialogBase {
 
                 //console.log("Creating edit field for property " + prop.name);
 
-                let isReadOnlyProp = S.render.isReadOnlyProperty(prop.name);
-                let isBinaryProp = S.render.isBinaryProperty(prop.name);
-
                 //warning: this is NEW for the propEntries to be containing the 'content'. It used to contain everythign BUT content.
-                let propEntry: I.PropEntry = new I.PropEntry(prop, isReadOnlyProp, isBinaryProp);
-                this.propEntries.push(propEntry);
+                this.propEntries.push(prop);
 
-                if ((!isReadOnlyProp && !isBinaryProp) || S.edit.showReadOnlyProperties) {
-                    let tableRow = this.makePropEditor(propEntry);
+                if ((!S.render.isReadOnlyProperty(prop.name) && !S.render.isBinaryProperty(prop.name)) || S.edit.showReadOnlyProperties) {
+                    let tableRow = this.makePropEditor(prop);
                     collapsiblePropsTable.addChild(tableRow);
                 }
             });
@@ -443,6 +448,9 @@ export class EditNodeDlg extends DialogBase {
 
             //todo-0: take another look at why we need this here because propEntries apparently won't contain
             //the props on node.properties.
+            //update: Acutally I think part of the solution to this will be to eliminate "I.PropEntry" wrapper around properties
+            //and then just update the node.properties in place rather than having the propEntries hold a copy of it that can become
+            //out of data (needs research)
             handled[J.NodeProp.ENC_KEY] = true;
             saveList.push({
                 "name": J.NodeProp.ENC_KEY,
@@ -462,25 +470,21 @@ export class EditNodeDlg extends DialogBase {
 
             /* Now scan over all properties to build up what to save */
             if (this.propEntries) {
-                this.propEntries.forEach((prop: I.PropEntry) => {
+                this.propEntries.forEach((prop: J.PropertyInfo) => {
+                    let isReadOnly = S.render.isReadOnlyProperty(prop.name);
+                    let isBinary = S.render.isBinaryProperty(prop.name);
+
                     /* Ignore this property if it's one that cannot be edited as text, or has already been handled/processed */
-                    if (prop.readOnly || prop.binary || handled[prop.property.name])
+                    if (isReadOnly || isBinary || handled[prop.name])
                         return;
 
                     //console.log("property field: " + JSON.stringify(prop));
                     let propVal: string;
-                    let editor: I.TextEditorIntf = prop.comp;
-
-                    /* If we are editing with an ace editor get the value from it */
-                    if (editor) {
-                        propVal = editor.getValue();
-                        //console.log("ACE propVal[" + prop.id + "]=" + propVal);
-                    }
 
                     //todo-1: Is it ALWAYS true there's no way this can be different from checking the acual DB? the true content changed?
                     //if (propVal !== prop.property.value) {
                     saveList.push({
-                        name: prop.property.name,
+                        name: prop.name,
                         value: propVal
                     });
                     //}
@@ -502,15 +506,18 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
-    makePropEditor = (propEntry: I.PropEntry): EditPropsTableRow => {
+    makePropEditor = (propEntry: J.PropertyInfo): EditPropsTableRow => {
         let tableRow = new EditPropsTableRow({
         });
         //console.log("Property single-type: " + propEntry.property.name);
 
-        let formGroup = new FormGroup();
-        let propVal = propEntry.binary ? "[binary]" : propEntry.property.value;
+        let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
+        let isBinary = S.render.isBinaryProperty(propEntry.name);
 
-        let label = propEntry.property.name; //S.render.sanitizePropertyName(propEntry.property.name);
+        let formGroup = new FormGroup();
+        let propVal = isBinary ? "[binary]" : propEntry.value;
+
+        let label = propEntry.name; //S.render.sanitizePropertyName(propEntry.property.name);
         let propValStr = propVal ? propVal : "";
         propValStr = S.util.escapeForAttrib(propValStr);
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
@@ -518,7 +525,7 @@ export class EditNodeDlg extends DialogBase {
 
         //todo-1: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
         //and be better with a Textfield based editor
-        if (propEntry.readOnly || propEntry.binary) {
+        if (isReadOnly || isBinary) {
             let textarea = new Textarea(label + " (read-only)", {
                 "readonly": "readonly",
                 "disabled": "disabled",
@@ -534,8 +541,10 @@ export class EditNodeDlg extends DialogBase {
                     this.propertyCheckboxChanged();
                 }
             });
+            this.propCheckBoxes.push(checkbox);
+            this.propNameToEditorCompMap[propEntry.name] = checkbox;
+            this.compIdToPropMap[checkbox.getId()] = propEntry;
 
-            propEntry.checkBox = checkbox;
             formGroup.addChild(checkbox);
 
             let editor: I.TextEditorIntf = null;
@@ -543,12 +552,12 @@ export class EditNodeDlg extends DialogBase {
 
             if (multiLine) {
                 if (C.ENABLE_ACE_EDITOR) {
-                    editor = new AceEditPropTextarea(propEntry.property.value, "25em", false, false);
+                    editor = new AceEditPropTextarea(propEntry.value, "25em", false, false);
                 }
                 else {
                     editor = new Textarea(null, {
                         rows: "20",
-                        defaultValue: propEntry.property.value
+                        defaultValue: propEntry.value
                     });
                     editor.focus();
                 }
@@ -559,7 +568,6 @@ export class EditNodeDlg extends DialogBase {
                 });
             }
 
-            propEntry.comp = editor;
             formGroup.addChild(editor as any as Comp);
         }
 
@@ -641,43 +649,29 @@ export class EditNodeDlg extends DialogBase {
 
     areAnyPropsChecked = (): boolean => {
         let ret = false;
-        if (this.propEntries) {
-            /* Iterate over all properties */
-            this.propEntries.forEach((propEntry: I.PropEntry) => {
 
-                /* Ignore this property if it's one that cannot be edited directly */
-                if (propEntry.readOnly || propEntry.binary)
-                    return;
+        /* Iterate over all property checkboxes */
+        this.propCheckBoxes.forEach((checkbox: Checkbox) => {
+            if (checkbox.getChecked()) {
+                ret = true;
+                //return false to stop iterating.
+                return false;
+            }
+        });
 
-                if (propEntry.checkBox && propEntry.checkBox.getChecked()) {
-                    ret = true;
-                    //return false to stop iterating.
-                    return false;
-                }
-            });
-        }
         return ret;
     }
 
     //todo-1 modify to support multiple delete of props.
     deletePropertyButtonClick = (): void => {
-        if (this.propEntries) {
-            /* Iterate over all properties */
-            this.propEntries.forEach((propEntry: I.PropEntry) => {
-
-                /* Ignore this property if it's one that cannot be edited directly */
-                if (propEntry.readOnly || propEntry.binary)
-                    return;
-
-                if (propEntry.checkBox && propEntry.checkBox.getChecked()) {
-                    this.deleteProperty(propEntry.property.name);
-                    /* for now lets' just support deleting one property at a time, and so we can return once we found a
-                    checked one to delete. Would be easy to extend to allow multiple-selects in the future.
-                    Returning false stops iteration */
-                    return false;
-                }
-            });
-        }
+       
+        /* Iterate over all property checkboxes */
+        this.propCheckBoxes.forEach((checkbox: Checkbox) => {
+            if (checkbox.getChecked()) {
+                let prop: J.PropertyInfo = this.compIdToPropMap[checkbox.getId()];
+                this.deleteProperty(prop.name);
+            }
+        });
     }
 
     cancelEdit = (): void => {
