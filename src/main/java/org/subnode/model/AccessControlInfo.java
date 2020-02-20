@@ -6,16 +6,16 @@ import java.util.List;
 /**
  * Represents a certain principal and a set of privileges the principal has.
  */
-public class AccessControlEntryInfo {
+public class AccessControlInfo {
 	private String principalName;
 	private String principalNodeId;
 	private List<PrivilegeInfo> privileges;
 	private String publicKey;
 
-	public AccessControlEntryInfo() {
+	public AccessControlInfo() {
 	}
 
-	public AccessControlEntryInfo(String principalName, String principalNodeId, String publicKey) {
+	public AccessControlInfo(String principalName, String principalNodeId, String publicKey) {
 		this.principalName = principalName;
 		this.principalNodeId = principalNodeId;
 		this.publicKey = publicKey;

@@ -2,7 +2,7 @@ package org.subnode.response;
 
 import java.util.List;
 
-import org.subnode.model.AccessControlEntryInfo;
+import org.subnode.model.AccessControlInfo;
 import org.subnode.model.NodeInfo;
 import org.subnode.response.base.ResponseBase;
 
@@ -12,13 +12,13 @@ public class SaveNodeResponse extends ResponseBase {
 	/* In cases where the updated node is adding encryption we need to send back all the principalIds 
 	(userNodeIds actually) so the client can generate keys for all of them to send back up to allow
 	access by these shared users */
-	private List<AccessControlEntryInfo> aclEntries;
+	private List<AccessControlInfo> aclEntries;
 
-	public List<AccessControlEntryInfo> getAclEntries() {
+	public List<AccessControlInfo> getAclEntries() {
 		return aclEntries;
 	}
 
-	public void setAclEntries(List<AccessControlEntryInfo> aclEntries) {
+	public void setAclEntries(List<AccessControlInfo> aclEntries) {
 		this.aclEntries = aclEntries;
 	}
 	

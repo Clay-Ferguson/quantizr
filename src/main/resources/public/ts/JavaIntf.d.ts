@@ -300,7 +300,7 @@ export interface FileSystemReindexResponse extends ResponseBase {
 }
 
 export interface GetNodePrivilegesResponse extends ResponseBase {
-    aclEntries: AccessControlEntryInfo[];
+    aclEntries: AccessControlInfo[];
     owners: string[];
 }
 
@@ -387,7 +387,7 @@ export interface ResetPasswordResponse extends ResponseBase {
 
 export interface SaveNodeResponse extends ResponseBase {
     node: NodeInfo;
-    aclEntries: AccessControlEntryInfo[];
+    aclEntries: AccessControlInfo[];
 }
 
 export interface SavePropertyResponse extends ResponseBase {
@@ -474,7 +474,7 @@ export interface NodeInfo {
     owner: string;
 }
 
-export interface AccessControlEntryInfo {
+export interface AccessControlInfo {
     principalName: string;
     principalNodeId: string;
     privileges: PrivilegeInfo[];

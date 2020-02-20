@@ -45,6 +45,6 @@ export interface PrivilegeInfo {
 }
 
 export interface NodePrivilegesInfo {
-    aclEntries: J.AccessControlEntryInfo[];
+    aclEntries: J.AccessControlInfo[];
     owners: string[];
 }

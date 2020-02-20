@@ -240,7 +240,7 @@ export class Edit implements EditIntf {
         });
     }
 
-    distributeKeys = async (node: J.NodeInfo, aclEntries: J.AccessControlEntryInfo[]): Promise<void> => {
+    distributeKeys = async (node: J.NodeInfo, aclEntries: J.AccessControlInfo[]): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             if (!aclEntries || !S.props.isEncrypted(node)) {
                 resolve();

@@ -2,18 +2,18 @@ package org.subnode.response;
 
 import java.util.List;
 
-import org.subnode.model.AccessControlEntryInfo;
+import org.subnode.model.AccessControlInfo;
 import org.subnode.response.base.ResponseBase;
 
 public class GetNodePrivilegesResponse extends ResponseBase {
-	private List<AccessControlEntryInfo> aclEntries;
+	private List<AccessControlInfo> aclEntries;
 	private List<String> owners;
 
-	public List<AccessControlEntryInfo> getAclEntries() {
+	public List<AccessControlInfo> getAclEntries() {
 		return aclEntries;
 	}
 
-	public void setAclEntries(List<AccessControlEntryInfo> aclEntries) {
+	public void setAclEntries(List<AccessControlInfo> aclEntries) {
 		this.aclEntries = aclEntries;
 	}
 

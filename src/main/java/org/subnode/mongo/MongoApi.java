@@ -17,7 +17,7 @@ import org.subnode.config.NodePrincipal;
 import org.subnode.model.client.NodeProp;
 import org.subnode.image.ImageSize;
 import org.subnode.image.ImageUtil;
-import org.subnode.model.AccessControlEntryInfo;
+import org.subnode.model.AccessControlInfo;
 import org.subnode.model.PrivilegeInfo;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.PrivilegeType;
@@ -849,7 +849,7 @@ public class MongoApi {
 		return keysRemoved.getVal();
 	}
 
-	public List<AccessControlEntryInfo> getAclEntries(MongoSession session, SubNode node) {
+	public List<AccessControlInfo> getAclEntries(MongoSession session, SubNode node) {
 		HashMap<String, AccessControl> aclMap = node.getAc();
 		if (aclMap == null) {
 			return null;
@@ -857,10 +857,10 @@ public class MongoApi {
 
 		// I'd like this to not be created unless needed but that pesky lambda below
 		// needs a 'final' thing to work with.
-		final List<AccessControlEntryInfo> ret = new LinkedList<AccessControlEntryInfo>();
+		final List<AccessControlInfo> ret = new LinkedList<AccessControlInfo>();
 
 		aclMap.forEach((k, v) -> {
-			AccessControlEntryInfo acei = createAccessControlEntryInfo(session, k, v.getPrvs());
+			AccessControlInfo acei = createAccessControlInfo(session, k, v.getPrvs());
 			if (acei != null) {
 				ret.add(acei);
 			}
@@ -869,7 +869,7 @@ public class MongoApi {
 		return ret.size() == 0 ? null : ret;
 	}
 
-	public AccessControlEntryInfo createAccessControlEntryInfo(MongoSession session, String principalId,
+	public AccessControlInfo createAccessControlInfo(MongoSession session, String principalId,
 			String authType) {
 		String principalName = null;
 		String publicKey = null;
@@ -888,7 +888,7 @@ public class MongoApi {
 			publicKey = principalNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY.toString());
 		}
 
-		AccessControlEntryInfo info = new AccessControlEntryInfo(principalName, principalId, publicKey);
+		AccessControlInfo info = new AccessControlInfo(principalName, principalId, publicKey);
 		info.addPrivilege(new PrivilegeInfo(authType));
 		return info;
 	}
