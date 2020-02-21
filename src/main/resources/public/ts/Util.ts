@@ -363,10 +363,14 @@ export class Util implements UtilIntf {
                 //new session and fails the login security. 
                 withCredentials: true
             });
-
         } catch (ex) {
             this.logAndReThrow("Failed starting request: " + postName, ex);
         }
+
+        // This seems to be just a duplicate of the the/error below so it's redundant.
+        // axiosRequest.catch((error) => {
+        //     console.error(error);
+        // });
 
         /**
          * Notes
@@ -435,7 +439,9 @@ export class Util implements UtilIntf {
                 try {
                     this._ajaxCounter--;
                     this.progressInterval();
-                    console.log("HTTP RESP [" + postName + "]: Error: " + error.response.status);
+                    let status = error.response ? error.response.status : "";
+                    let info = "Status: " + status + " message: " + error.message + " stack: " + error.stack
+                    console.log("HTTP RESP [" + postName + "]: Error: " + info);
 
                     if (error.response && error.response.status === 401) {
                         console.log("Not logged in detected.");
@@ -456,17 +462,19 @@ export class Util implements UtilIntf {
                     let msg: string = `Server request failed: \nPostName: ${postName}\n`;
                     msg += "PostData: " + this.prettyPrint(postData) + "\n";
 
-                    if (error.response && error.response.data) {
+                    if (error.response) {
                         msg += "Error Response: " + this.prettyPrint(error.response) + "\n";
                     }
 
+                    msg += info;
                     console.error("Request failed: msg=" + msg);
 
                     if (typeof failCallback == "function") {
                         failCallback(msg);
                     }
                     else {
-                        this.showMessage("Request failed: ERROR: " + error.response.status, true);
+                        let status = error.response ? error.response.status : "";
+                        this.showMessage("Request failed: ERROR: " + status + ": " + error.message, true);
                     }
                 } catch (ex) {
                     this.logAndReThrow("Failed processing: " + postName, ex);
