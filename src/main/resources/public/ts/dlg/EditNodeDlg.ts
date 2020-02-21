@@ -68,6 +68,8 @@ export class EditNodeDlg extends DialogBase {
 
     static morePanelExpanded: boolean = false;
 
+    skdp: SymKeyDataPackage;
+
     constructor(private node: J.NodeInfo) {
         super("Edit Node", "app-modal-content", false, true);
     }
@@ -327,9 +329,9 @@ export class EditNodeDlg extends DialogBase {
                     // if we need to encrypt and the content is not currently encrypted.
                     if (!this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
                         let content = this.contentEditor.getValue();
-                        let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
-                        this.node.content = J.NodeProp.ENC_TAG + skdp.cipherText;
-                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, skdp.cipherKey);
+                        this.skdp = await S.encryption.encryptSharableString(null, content);
+                        this.node.content = J.NodeProp.ENC_TAG + this.skdp.cipherText;
+                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, this.skdp.cipherKey);
                     }
                 }
 
@@ -437,7 +439,16 @@ export class EditNodeDlg extends DialogBase {
 
             let content: string;
             if (this.contentEditor) {
+
                 content = this.contentEditor.getValue();
+
+                //todo-1: an optimization can be done here such that if we just ENCRYPTED the node, we use this.skpd.symKey becuase that
+                //will already be available
+                let cipherKey = S.props.getCryptoKey(this.node);
+                if (cipherKey) {
+                    content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
+                    content = J.NodeProp.ENC_TAG + content;
+                }
             }
 
             handled[J.NodeProp.ENC_KEY] = true;

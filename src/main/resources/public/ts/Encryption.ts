@@ -360,6 +360,14 @@ export class Encryption implements EncryptionIntf {
         return this.encryptString(key, this.SYM_ALGO, data);
     }
 
+    symEncryptStringWithCipherKey = async (cipherKey: string, data: string): Promise<string> => {
+        let privateKey = await S.encryption.getPrivateKey();
+        let symKeyJsonStr: string = await S.encryption.asymDecryptString(privateKey, cipherKey);
+        let symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
+        let symKey = await S.encryption.importKey(symKeyJsonObj, S.encryption.SYM_ALGO, true, S.encryption.OP_ENC_DEC);
+        return await S.encryption.symEncryptString(symKey, data);
+    }
+
     /**
      * This is the primary way of encrypting data that uses a randomly generated symmetric key to
      * do the encryption and then encrypts that symmetric key itself using the Public Key provided, or
