@@ -404,7 +404,7 @@ export class Util implements UtilIntf {
                             //if (typeof failCallback == "function") {
                             //failCallback(null);
                             //}
-                            //todo-0: not sure I like this tight coupling of the ajax and how to cleanup after a failed call at least
+                            //todo-1: not sure I like this tight coupling of the ajax and how to cleanup after a failed call at least
                             //things that normally run. This refreshing enablement normally runs, so let's run it here.
                             S.meta64.refreshAllGuiEnablement();
                             return;

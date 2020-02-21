@@ -54,7 +54,6 @@ export class EditNodeDlg extends DialogBase {
     deletePropButton: Button;
     cancelButton: Button;
 
-    propEntries: Array<J.PropertyInfo>;
     editPropertyDlgInst: any;
 
     //Maps property names to the actual editor Comp (editor, checkbox, etc) that is currently editing it.
@@ -169,8 +168,6 @@ export class EditNodeDlg extends DialogBase {
             this.prioritySelection = this.createPrioritySelection()
         ]);
 
-        this.propEntries = new Array<J.PropertyInfo>();
-
         let collapsiblePropsTable = new EditPropsTable({
             className: "edit-props-table form-group-border"
         });
@@ -229,9 +226,6 @@ export class EditNodeDlg extends DialogBase {
                 }
 
                 //console.log("Creating edit field for property " + prop.name);
-
-                //warning: this is NEW for the propEntries to be containing the 'content'. It used to contain everythign BUT content.
-                this.propEntries.push(prop);
 
                 if ((!S.render.isReadOnlyProperty(prop.name) && !S.render.isBinaryProperty(prop.name)) || S.edit.showReadOnlyProperties) {
                     let tableRow = this.makePropEditor(prop);
@@ -386,9 +380,9 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
-    deletePropertyResponse = (res: any, propertyToDelete: any) => {
+    deletePropertyResponse = (res: any, prop: any) => {
         if (S.util.checkSuccess("Delete property", res)) {
-            S.props.deleteProp(this.node, propertyToDelete);
+            S.props.deleteProp(this.node, prop);
 
             /* now just re-render screen from local variables */
             S.meta64.treeDirty = true;
@@ -446,11 +440,6 @@ export class EditNodeDlg extends DialogBase {
                 content = this.contentEditor.getValue();
             }
 
-            //todo-0: take another look at why we need this here because propEntries apparently won't contain
-            //the props on node.properties.
-            //update: Acutally I think part of the solution to this will be to eliminate "I.PropEntry" wrapper around properties
-            //and then just update the node.properties in place rather than having the propEntries hold a copy of it that can become
-            //out of data (needs research)
             handled[J.NodeProp.ENC_KEY] = true;
             saveList.push({
                 "name": J.NodeProp.ENC_KEY,
@@ -469,36 +458,32 @@ export class EditNodeDlg extends DialogBase {
             }
 
             /* Now scan over all properties to build up what to save */
-            if (this.propEntries) {
-                this.propEntries.forEach((prop: J.PropertyInfo) => {
-                    let isReadOnly = S.render.isReadOnlyProperty(prop.name);
-                    let isBinary = S.render.isBinaryProperty(prop.name);
+            if (this.node.properties) {
+                this.node.properties.forEach((prop: J.PropertyInfo) => {
 
                     /* Ignore this property if it's one that cannot be edited as text, or has already been handled/processed */
-                    if (isReadOnly || isBinary || handled[prop.name])
+                    if (S.render.isReadOnlyProperty(prop.name) || //
+                        S.render.isBinaryProperty(prop.name) || //
+                        handled[prop.name])
                         return;
 
                     //console.log("property field: " + JSON.stringify(prop));
                     let propVal: string;
 
-                    //todo-1: Is it ALWAYS true there's no way this can be different from checking the acual DB? the true content changed?
-                    //if (propVal !== prop.property.value) {
                     saveList.push({
                         name: prop.name,
                         value: propVal
                     });
-                    //}
                 });
             }
 
-            let postData = {
+            // console.log("calling saveNode(). PostData=" + S.util.toJson(postData));
+            S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                 nodeId: this.node.id,
                 content: content,
                 properties: saveList,
                 name: nodeName
-            };
-            // console.log("calling saveNode(). PostData=" + S.util.toJson(postData));
-            S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", postData, (res) => {
+            }, (res) => {
                 S.edit.saveNodeResponse(this.node, res);
             });
 
@@ -507,8 +492,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makePropEditor = (propEntry: J.PropertyInfo): EditPropsTableRow => {
-        let tableRow = new EditPropsTableRow({
-        });
+        let tableRow = new EditPropsTableRow({});
         //console.log("Property single-type: " + propEntry.property.name);
 
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
@@ -664,7 +648,7 @@ export class EditNodeDlg extends DialogBase {
 
     //todo-1 modify to support multiple delete of props.
     deletePropertyButtonClick = (): void => {
-       
+
         /* Iterate over all property checkboxes */
         this.propCheckBoxes.forEach((checkbox: Checkbox) => {
             if (checkbox.getChecked()) {
