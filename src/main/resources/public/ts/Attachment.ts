@@ -70,7 +70,7 @@ export class Attachment implements AttachmentIntf {
         if (S.util.checkSuccess("Delete attachment", res)) {
             S.meta64.removeBinaryById(id);
             // force re-render from local data.
-            S.meta64.goToMainPage(true, true);
+            S.meta64.refresh();
         }
     }
 }

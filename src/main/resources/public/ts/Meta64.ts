@@ -71,12 +71,6 @@ export class Meta64 implements Meta64Intf {
     anonUserLandingPageNode: any = null;
     allowFileSystemSearch: boolean = false;
 
-    /*
-     * signals that data has changed and the next time we go to the main tree view window we need to refresh data
-     * from the server
-     */
-    treeDirty: boolean = false;
-
     /* maps node.id values to NodeInfo.java objects */
     idToNodeMap: { [key: string]: J.NodeInfo } = {};
 
@@ -124,10 +118,6 @@ export class Meta64 implements Meta64Intf {
         "showMetaData": false
     };
 
-    refresh = (): void => {
-        this.goToMainPage(true, true);
-    }
-
     rebuildIndexes = (): void => {
         S.util.ajax<J.RebuildIndexesRequest, J.RebuildIndexesResponse>("rebuildIndexes", {}, function (res: J.RebuildIndexesResponse) {
             S.util.showMessage("Index rebuild complete.");
@@ -146,27 +136,8 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
-    goToMainPage = async (rerender?: boolean, forceServerRefresh?: boolean): Promise<void> => {
-        if (forceServerRefresh) {
-            this.treeDirty = true;
-        }
-
-        if (rerender || this.treeDirty) {
-            if (this.treeDirty) {
-                S.view.refreshTree(null, true);
-            } else {
-                //console.log("goToMainPage.");
-                await S.render.renderPageFromData();
-            }
-        }
-        /*
-         * If not re-rendering page (either from server, or from local data, then we just need to litterally switch
-         * page into visible, and scroll to node)
-         */
-        else {
-            console.log("goToMainPage calling scrollToSelectedNode");
-            S.view.scrollToSelectedNode();
-        }
+    refresh = (): void => {
+        S.view.refreshTree(null, true);
     }
 
     selectTab = (tabName: string): void => {

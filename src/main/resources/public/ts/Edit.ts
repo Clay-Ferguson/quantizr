@@ -190,7 +190,7 @@ export class Edit implements EditIntf {
         //     S.edit.sendNotificationPendingSave = true;
         // }
 
-        S.meta64.treeDirty = true;
+
         if (S.edit.nodeInsertTarget) {
             S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                 "parentId": S.edit.parentOfNewNode.id,

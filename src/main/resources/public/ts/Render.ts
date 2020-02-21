@@ -635,8 +635,6 @@ export class Render implements RenderIntf {
                         }
                     });
 
-                    S.meta64.treeDirty = false;
-
                     if (newData) {
                         S.meta64.idToNodeMap = {};
 

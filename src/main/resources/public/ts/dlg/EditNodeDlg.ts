@@ -353,7 +353,6 @@ export class EditNodeDlg extends DialogBase {
 
     setNodeTypeResponse = (res: any): void => {
         S.util.checkSuccess("Save properties", res);
-        S.meta64.treeDirty = true;
         this.rebuildDlg();
     }
 
@@ -361,7 +360,6 @@ export class EditNodeDlg extends DialogBase {
         S.util.checkSuccess("Save properties", res);
 
         this.node.properties.push(res.propertySaved);
-        S.meta64.treeDirty = true;
         this.rebuildDlg();
     }
 
@@ -385,9 +383,6 @@ export class EditNodeDlg extends DialogBase {
     deletePropertyResponse = (res: any, prop: any) => {
         if (S.util.checkSuccess("Delete property", res)) {
             S.props.deleteProp(this.node, prop);
-
-            /* now just re-render screen from local variables */
-            S.meta64.treeDirty = true;
             this.rebuildDlg();
         }
     }

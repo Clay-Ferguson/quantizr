@@ -30,8 +30,6 @@ export interface Meta64Intf {
     anonUserLandingPageNode: any;
     allowFileSystemSearch: boolean;
 
-    treeDirty: boolean;
-
     idToNodeMap: { [key: string]: J.NodeInfo };
 
     nextUid: number;
@@ -57,11 +55,10 @@ export interface Meta64Intf {
     graphPanel: GraphPanel;
 
     setOverlay(showOverlay: boolean): void;
-    refresh(): void;
     rebuildIndexes(): void;
     shutdownServerNode(string): void;
     sendTestEmail(string): void;
-    goToMainPage(rerender?: boolean, forceServerRefresh?: boolean): void;
+    refresh(): void;
     selectTab(pageName): void;
     getSelectedNodeUidsArray(): string[];
     getSelectedNodeIdsArray(): string[];

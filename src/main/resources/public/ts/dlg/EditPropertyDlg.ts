@@ -65,7 +65,6 @@ export class EditPropertyDlg extends DialogBase {
         }
 
         this.editNode.properties.push(res.propertySaved);
-        S.meta64.treeDirty = true;
         this.propSavedFunc();
     }
 

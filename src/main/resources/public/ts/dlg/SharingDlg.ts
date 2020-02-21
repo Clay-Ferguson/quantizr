@@ -6,7 +6,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { EditPrivsTable } from "../widget/EditPrivsTable";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 
@@ -22,6 +22,7 @@ export class SharingDlg extends DialogBase {
 
     privsTable: EditPrivsTable;
     nodePrivsInfo: I.NodePrivilegesInfo;
+    dirty: boolean = false;
 
     constructor(node: J.NodeInfo) {
         super("Node Sharing", "app-modal-content-medium-width");
@@ -53,22 +54,7 @@ export class SharingDlg extends DialogBase {
         this.privsTable.updateDOM();
     }
 
-    /* Note: this really only saves the checkbox value because the other list modifications are made as soon as user does them 
-    
-    But to be consistent, i'm just removing, and when i re-add the public commenting checkbox (maybe), i'll revisit if we need
-    the save button at all, or just auto-save this dialog as it currently does
-    */
-    // save = (): void => {
-    //     S.meta64.treeDirty = true;
-    //     S.util.ajax<I.AddPrivilegeRequest, I.AddPrivilegeResponse>("addPrivilege", {
-    //         "nodeId": this.node.id,
-    //         "privileges": null,
-    //         "principal": null,
-    //     });
-    // }
-
     removePrivilege = (principalNodeId: string, privilege: string): void => {
-        S.meta64.treeDirty = true;
         S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             "nodeId": this.node.id,
             "principalNodeId": principalNodeId,
@@ -97,7 +83,6 @@ export class SharingDlg extends DialogBase {
         }
 
         console.log("Sharing node to public.");
-        S.meta64.treeDirty = true;
 
         /*
          * Add privilege and then reload share nodes dialog from scratch doing another callback to server
@@ -118,14 +103,9 @@ export class SharingDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Share with Person", this.shareToPersonDlg, null, "primary"),
                     new Button("Share to Public", this.shareNodeToPublic, null, "primary"),
-
-                    //NOTE: Currently this dialog just autosaves everything you change as you change it.
-                    // new Button("Save", () => {
-                    //     this.save();
-                    //     this.close();
-                    // }),
                     new Button("Close", () => {
                         this.close();
+                        S.meta64.refresh();
                     })
                 ])
             ])

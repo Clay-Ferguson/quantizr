@@ -52,9 +52,6 @@ export class ShareToPersonDlg extends DialogBase {
             return;
         }
 
-        /* Trigger update from server at next main page refresh */
-        S.meta64.treeDirty = true;
-
         S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             "nodeId": this.node.id,
             "principal": targetUser,
