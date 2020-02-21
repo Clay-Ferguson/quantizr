@@ -288,8 +288,7 @@ public class AppController {
 				}
 			});
 			sessionContext.setUrlId(vcId.getVal());
-		}
-		else {
+		} else {
 			sessionContext.setUrlId(null);
 		}
 
@@ -804,7 +803,9 @@ public class AppController {
 		return (ResponseBase) callProc.run("getServerInfo", req, session, ms -> {
 			GetServerInfoResponse res = new GetServerInfoResponse();
 
-			if (!sessionContext.isAdmin()) {
+			if (req.getCommand().equalsIgnoreCase("getJson")) {
+				// allow this one if user owns node.
+			} else if (!sessionContext.isAdmin()) {
 				throw ExUtil.newEx("admin only function.");
 			}
 

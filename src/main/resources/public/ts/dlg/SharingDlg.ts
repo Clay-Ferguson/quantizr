@@ -89,7 +89,6 @@ export class SharingDlg extends DialogBase {
         dlg.open();
     }
 
-    //todo-0: need to also check when user tries to encrypt a node that it's currently shared to public.
     shareNodeToPublic = (): void => {
         let encrypted = S.props.isEncrypted(this.node);
         if (encrypted) {
