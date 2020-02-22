@@ -5,7 +5,7 @@ import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { UserIntf } from "./intf/UserIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -110,7 +110,7 @@ export class User implements UserIntf {
 
                 let callUsr: string;
                 let callPwd: string;
-                let usingLocalDb: boolean = false;
+
                 let loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
 
                 /* if we have known state as logged out, then do nothing here */
@@ -123,8 +123,7 @@ export class User implements UserIntf {
                 let usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
                 let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
 
-                usingLocalDb = !S.util.emptyString(usr) && !S.util.emptyString(pwd);
-                console.log("User=" + usr + " usingLocalDb = " + usingLocalDb);
+                let usingCredentials: boolean = usr && pwd;
 
                 /*
                  * empyt credentials causes server to try to log in with any active session credentials.
@@ -144,8 +143,8 @@ export class User implements UserIntf {
                         "tzOffset": new Date().getTimezoneOffset(),
                         "dst": S.util.daylightSavingsTime
                     }, (res: J.LoginResponse) => {
-                        if (usingLocalDb) {
-                            this.loginResponse(res, callUsr, callPwd, usingLocalDb);
+                        if (usingCredentials) {
+                            this.loginResponse(res, callUsr, callPwd, usingCredentials);
                         } else {
                             this.refreshLoginResponse(res);
                         }
@@ -205,13 +204,14 @@ export class User implements UserIntf {
         });
     }
 
-    loginResponse = async (res?: J.LoginResponse, usr?: string, pwd?: string, usingLocalDb?: boolean, loginDlg?: LoginDlg): Promise<void> => {
+    loginResponse = async (res?: J.LoginResponse, usr?: string, pwd?: string, usingCredentials?: boolean, loginDlg?: LoginDlg): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 if (S.util.checkSuccess("Login", res)) {
                     console.log("loginResponse: usr=" + usr);
                     console.log("homeNodeOverride: " + res.homeNodeOverride);
 
+                    //todo-0: put "anonymous" in Constants!
                     if (usr !== "anonymous") {
                         await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
                         await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
@@ -227,8 +227,8 @@ export class User implements UserIntf {
                     /* set ID to be the page we want to show user right after login */
                     let id: string = null;
                     let childId: string = null;
-                
-                    if (!S.util.emptyString(res.homeNodeOverride)) {
+
+                    if (res.homeNodeOverride) {
                         console.log("loading homeNodeOverride=" + res.homeNodeOverride);
                         id = res.homeNodeOverride;
                         S.meta64.homeNodeOverride = id;
@@ -248,8 +248,13 @@ export class User implements UserIntf {
 
                     S.view.refreshTree(id, true, childId, true);
                     this.setTitleUsingLoginResponse(res);
+
+                    setTimeout(() => {
+                        S.encryption.initKeys();
+                    }, 500);
                 } else {
-                    if (usingLocalDb) {
+                    if (usingCredentials) {
+                        //todo-0: I'm not sure I like this flow path... need to retest a lot of this.
                         S.util.showMessage("LocalDb login failed.");
 
                         /*

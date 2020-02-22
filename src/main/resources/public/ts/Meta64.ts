@@ -636,10 +636,6 @@ export class Meta64 implements Meta64Intf {
                 S.view.displayNotifications(null);
             }, 1000);
 
-            setTimeout(() => {
-                S.encryption.initKeys();
-            }, 2000);
-
             // Initialize the 'ServerPush' client-side connection
             S.push.init();
 

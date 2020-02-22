@@ -116,7 +116,11 @@ public class CallProcessor {
 						/*
 						 * for now, we can just send back the actual exception message
 						 */
-						orb.setMessage("Request Failed: "+e.getMessage());
+						if (e.getMessage() != null) {
+							orb.setMessage("Request Failed: " + e.getMessage());
+						} else {
+							orb.setMessage("Request Failed.");
+						}
 					}
 
 					orb.setStackTrace(ExceptionUtils.getStackTrace(e));

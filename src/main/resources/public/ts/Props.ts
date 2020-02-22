@@ -161,19 +161,24 @@ export class Props implements PropsIntf {
     }
 
     isShared = (node: J.NodeInfo): boolean => {
-        return !!node.ac; 
+        return !!node.ac;
     }
 
     isPublic = (node: J.NodeInfo): boolean => {
         if (!node.ac) return false;
         let ret = false;
         node.ac.forEach((ace: J.AccessControlInfo) => {
-            if (ace.principalNodeId=='public') {
+            if (ace.principalNodeId == 'public') {
                 ret = true;
                 return false; //stop iteration.
             }
         });
         return ret;
+    }
+
+    isMine = (node: J.NodeInfo): boolean => {
+        if (!S.meta64.userName || S.meta64.userName == "anonymous") return false;
+        return S.meta64.userName == node.owner;
     }
 
     isEncrypted = (node: J.NodeInfo): boolean => {

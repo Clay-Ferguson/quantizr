@@ -234,6 +234,9 @@ export class Encryption implements EncryptionIntf {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 let val: any = await S.localDB.readObject(this.STORE_SYMKEY);
+                if (!val) {
+                    forceUpdate = true;
+                }
 
                 if (val && !forceUpdate) {
                     if (this.logKeys) {
@@ -257,6 +260,13 @@ export class Encryption implements EncryptionIntf {
     initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
+                /* Check to see if there is a key stored, and if not force it to be created */
+                let val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+                if (!val) {
+                    forceUpdate = true;
+                    republish = true;
+                }
+
                 let pubKeyStr;
                 if (forceUpdate) {
                     let keyPair: EncryptionKeyPair = await crypto.subtle.generateKey({ //

@@ -13,5 +13,6 @@ export interface PropsIntf {
     isEncrypted(node: J.NodeInfo): boolean;
     isShared(node: J.NodeInfo): boolean;
     isPublic(node: J.NodeInfo): boolean;
+    isMine(node: J.NodeInfo): boolean;
     getCryptoKey(node: J.NodeInfo): string;
 }

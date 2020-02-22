@@ -57,7 +57,7 @@ export class SearchByNameDlg extends DialogBase {
 
         // until better validation, just check for empty
         let searchText = this.searchTextField.getValue();
-        if (S.util.emptyString(searchText)) {
+        if (!searchText) {
             S.util.showMessage("Enter search text.");
             return;
         }

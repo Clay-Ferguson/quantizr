@@ -85,10 +85,10 @@ public class UserManagerService {
 	private Validator validator;
 
 	/*
-	 * Login mechanism is a bit tricky because the CallProcessor detects the LoginRequest and performs
-	 * authentication BEFORE this 'login' method even gets called, so by the time we
-	 * are in this method we can safely assume the userName and password resulted in
-	 * a successful login.
+	 * Login mechanism is a bit tricky because the CallProcessor detects the
+	 * LoginRequest and performs authentication BEFORE this 'login' method even gets
+	 * called, so by the time we are in this method we can safely assume the
+	 * userName and password resulted in a successful login.
 	 */
 	public void login(MongoSession session, LoginRequest req, LoginResponse res) {
 		if (session == null) {
@@ -144,8 +144,8 @@ public class UserManagerService {
 		log.debug(
 				"Processing Login: urlId=" + (sessionContext.getUrlId() != null ? sessionContext.getUrlId() : "null"));
 
-		if (sessionContext.getUrlId()!=null) {
-			log.debug("setHomeNodeOverride (from session urlId): "+sessionContext.getUrlId());
+		if (sessionContext.getUrlId() != null) {
+			log.debug("setHomeNodeOverride (from session urlId): " + sessionContext.getUrlId());
 			res.setHomeNodeOverride(sessionContext.getUrlId());
 		}
 
@@ -190,16 +190,19 @@ public class UserManagerService {
 
 				// String password = node.getStringProp(NodeProp.PASSWORD);
 
-				// // Currently we just store password on server in cleartext (security isn't a priority yet on the platform), 
-				// // and we will never go back to even encrypting the password. The modern best practice for this is to store 
-				// // a hash of the password only so that even the server itself doesn't know what the actual password is.
+				// // Currently we just store password on server in cleartext (security isn't a
+				// priority yet on the platform),
+				// // and we will never go back to even encrypting the password. The modern best
+				// practice for this is to store
+				// // a hash of the password only so that even the server itself doesn't know
+				// what the actual password is.
 				// // password = encryptor.decrypt(password);
 
 				// String email = node.getStringProp(NodeProp.EMAIL);
 
-				//I'm leaving this here commented, but it was the bug where two user nodes
-				//got created!
-				//initNewUser(session, userName, password, email, false);
+				// I'm leaving this here commented, but it was the bug where two user nodes
+				// got created!
+				// initNewUser(session, userName, password, email, false);
 
 				/*
 				 * allow JavaScript to detect all it needs to detect which is to display a
@@ -305,10 +308,18 @@ public class UserManagerService {
 
 		adminRunner.run(session -> {
 			SubNode userNode = api.getUserNodeByUserName(session, userName);
-			userNode.setProp(NodeProp.USER_PREF_PUBLIC_KEY.toString(), req.getKeyJson());
+
+			if (userNode != null) {
+				userNode.setProp(NodeProp.USER_PREF_PUBLIC_KEY.toString(), req.getKeyJson());
+			}
+			else {
+				log.debug("savePublicKey failed to find userName: "+userName);
+			}
 			res.setSuccess(true);
-			res.setMessage("Key Saved");
-		});	
+
+			//don't display a message unless this was a user-initiated save.
+			//res.setMessage("Key Saved");
+		});
 	}
 
 	public void saveUserPreferences(final SaveUserPreferencesRequest req, final SaveUserPreferencesResponse res) {
@@ -382,7 +393,7 @@ public class UserManagerService {
 			adminRunner.run(mongoSession -> {
 
 				String userNodeId = XString.truncateAfterFirst(passCode, "-");
-			
+
 				if (userNodeId == null) {
 					throw new RuntimeException("Unable to find userNodeId: " + userNodeId);
 				}
@@ -406,11 +417,12 @@ public class UserManagerService {
 					throw new RuntimeException("changePassword should not be called fror admin user.");
 				}
 
-				//userNode[0].setProp(NodeProp.PASSWORD, password); // encryptor.encrypt(password));
+				// userNode[0].setProp(NodeProp.PASSWORD, password); //
+				// encryptor.encrypt(password));
 				userNode[0].setProp(NodeProp.PWD_HASH.toString(), api.getHashOfPassword(password)); // encryptor.encrypt(password));
 				userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.toString());
 
-				//note: the adminRunner.run saves the session so we don't do that here.
+				// note: the adminRunner.run saves the session so we don't do that here.
 			});
 		} else {
 			userNode[0] = api.getUserNodeByUserName(session, session.getUser());
@@ -426,7 +438,8 @@ public class UserManagerService {
 			String password = req.getNewPassword();
 			userName[0] = userNode[0].getStringProp(NodeProp.USER.toString());
 
-			//userNode[0].setProp(NodeProp.PASSWORD, password); // encryptor.encrypt(password));
+			// userNode[0].setProp(NodeProp.PASSWORD, password); //
+			// encryptor.encrypt(password));
 			userNode[0].setProp(NodeProp.PWD_HASH.toString(), api.getHashOfPassword(password)); // encryptor.encrypt(password));
 			userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.toString());
 

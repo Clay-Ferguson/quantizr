@@ -35,7 +35,7 @@ export class ImportDlg extends DialogBase {
         var highlightNode = S.meta64.getHighlightedNode();
         var sourceFileName = this.importFromFileNameTextField.getValue();
 
-        if (S.util.emptyString(sourceFileName)) {
+        if (!sourceFileName) {
             new MessageDlg("Please enter a name for the import file.", "Import").open();
             return;
         }

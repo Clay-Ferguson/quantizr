@@ -700,10 +700,6 @@ export class Util implements UtilIntf {
         return new Date().getMilliseconds();
     }
 
-    emptyString = (val: string): boolean => {
-        return !val || val.length == 0;
-    }
-
     getInputVal = (id: string): any => {
         return (<any>this.domElm(id)).value;
     }

@@ -473,7 +473,7 @@ export class Render implements RenderIntf {
             });
         }
 
-        if (S.props.isShared(node)) {
+        if (S.props.isMine(node) && S.props.isShared(node)) {
             sharedIcon = new Icon("", null, {
                 "style": {marginRight: '6px', verticalAlign: 'middle' },
                 className: "fa fa-share-alt fa-lg"
@@ -734,7 +734,7 @@ export class Render implements RenderIntf {
                         }
 
                         let sharedIcon: Icon = null;
-                        if (S.props.isShared(data.node)) {
+                        if (S.props.isMine(data.node) && S.props.isShared(data.node)) {
                             sharedIcon = new Icon("", null, {
                                 "style": {marginRight: '6px', verticalAlign: 'middle' },
                                 className: "fa fa-share-alt fa-lg"

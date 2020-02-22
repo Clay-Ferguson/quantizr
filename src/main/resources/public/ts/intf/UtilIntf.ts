@@ -73,7 +73,6 @@ export interface UtilIntf {
     setInnerHTML(elm: HTMLElement, val: string): void;
     isObject(obj: any): boolean;
     currentTimeMillis(): number;
-    emptyString(val: string): boolean;
     getInputVal(id: string): any;
     setInputVal(id: string, val: string): boolean;
     verifyType(obj: any, type: any, msg: string);
