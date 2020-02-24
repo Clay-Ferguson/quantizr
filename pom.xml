@@ -736,7 +736,6 @@ of the spring configs for security are also perfected.
 							<layout>ZIP</layout>
 						</configuration> -->
 					</plugin>
-
 				</plugins>
 			</build>
 		</profile>

@@ -54,7 +54,9 @@ services:
             - '${SUBNODE_TMP_FOLDER}:/subnode-tmp'
             - '${SUBNODE_LOG_FOLDER}:/subnode-log'
             - '${SUBNODE_LUCENE_FOLDER}:/subnode-lucene'
-            - '${PRJROOT}/src/main/resources/public:/dev-resource-base'
+            # Now that 'loader-path' is here, we don't need /dev-resource-base !!
+            # (So I will be mothballing resourcesBaseFolder approach soon)
+            # - '${PRJROOT}/src/main/resources/public:/dev-resource-base'
             - '${PRJROOT}/target/classes:/loader-path'
         ports:
             # '[host]:[container]'
@@ -65,7 +67,7 @@ services:
         environment:
             mongoAdminPassword: "${subnodePassword}"
             testUserAccounts: "adam:password:${devEmail},bob:password:${devEmail},cory:password:${devEmail},dan:password:${devEmail}" 
-            resourcesBaseFolder: "file:///dev-resource-base/" 
+            # resourcesBaseFolder: "file:///dev-resource-base/" 
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "mongo-dev" 
             mongodb.port: "27016" 

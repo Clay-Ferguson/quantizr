@@ -125,6 +125,8 @@ public class AppConfiguration implements WebMvcConfigurer {
 		/*
 		 * I was using this property as a way to be able to load resources directly out
 		 * of
+		 * todo-1: the 'resourceBaseFolder' can actually be removed now, but just for a short time I want to 
+		 * leave it in place, before I comment out. I will not be deleting but commenting.
 		 */
 		if (!StringUtils.isEmpty(appProp.getResourcesBaseFolder())) {
 
