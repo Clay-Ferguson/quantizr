@@ -162,7 +162,7 @@ export class Util implements UtilIntf {
     }
 
     replaceAll = (s: string, find: string, replace: string): string => {
-        if (!s) return s;
+        if (!s || s.indexOf(find)==-1) return s;
         return s.replace(new RegExp(this.escapeRegExp(find), 'g'), replace);
     }
 

@@ -81,8 +81,13 @@ export class Render implements RenderIntf {
         }, children);
     }
 
-    injectSubstitutions = (content: string): string => {
-        return S.util.replaceAll(content, "{{locationOrigin}}", window.location.origin);
+    injectSubstitutions = (val: string): string => {
+        val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
+        
+        if (val.indexOf("{{paypal-button}}")!=-1) {
+            val = S.util.replaceAll(val, "{{paypal-button}}", C.PAY_PAL_BUTTON);
+        }
+        return val;
     }
 
     /*
@@ -170,6 +175,8 @@ export class Render implements RenderIntf {
         else {
             val = this.renderRawMarkdown(node);
         }
+
+        val = this.injectSubstitutions(val);
 
         // NOTE: markdown-html doesn't apply any actual styling but instead is used in a JS dom lookup to find all the 
         // images under each markdown element to apply a styling update post-render.

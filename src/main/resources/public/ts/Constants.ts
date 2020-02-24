@@ -31,6 +31,14 @@ export class Constants {
     static readonly LOCALDB_LAST_CHILD_NODEID: string = "lastChildId";
 
     static readonly ATT_MAX_WIDTH: string = "att-max-width";
+
+    static readonly PAY_PAL_BUTTON: string = `<form action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_blank'>
+    <input type='hidden' name='cmd' value='_donations' />
+    <input type='hidden' name='business' value='YD984BLHTSZYL' />
+    <input type='hidden' name='currency_code' value='USD' />
+    <input type='image' src='https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif' border='0' name='submit' title='PayPal - The safer, easier way to pay online!' alt='Donate with PayPal button' />
+    <img alt='' border='0' src='https://www.paypal.com/en_US/i/scr/pixel.gif' width='1' height='1' />
+    </form>`;
 }
 
 
