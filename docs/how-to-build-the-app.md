@@ -25,6 +25,18 @@ sudo apt install maven
 mvn -version
 ```
 
+Maven Note: If you use the build scripts (i.e. build-dev.sh, build-prod.sh, build-test.sh), beware those generate the 'pom.xml', so if you edit pom.xml directly your changes will be overwritten. So instead, edit pom-main.xml and also the files in the 'pom-fragements' folder.
+
+Why are we *generating* the pom.xml? Basically the reason is to make it where we can include dependencies from external files like this:
+I realize you can setup 'parent poms' and change the entire structuring of the pom architecure, but in my opinion it's nonsensical do jump thru those kinds of hoops and complexities just to overcome the lack of an 'include' statement in the POM file language. Since implementing this 'include' feature on my own took only 5 lines of Linux Bash script, that's what I did. The tradeoff is a tiny bit of added complexity, for a decent amount of added convenience.
+
+```
+    <dependencies>
+        <!--include:org.springframework.boot.xml-->
+        <!--include:common.xml-->
+    </dependencies>
+```
+
 ## Install Docker
 
 Docker install commands are all inside docker-install.sh (in this same folder), so you would need to just uncomment all the non-comments (i.e. all commands you see in that entire file), and then run them all in the order they appear in that file, to install docker. That script is not 'guaranteed' to work but should be complete however, and serves as a good hint at how to get things installed.
@@ -69,11 +81,17 @@ WARNING: Before you run 'build-dev.sh' (or 'build-test.sh') you will need to rea
 
 # Maven 'dev' Profile
 
-How to do a kind of "Hot Deploy" of client-side files, without a full build.
+How to do a kind of "Hot Deploy" of client-side files, without requiring a full build:
 
-When you set "MAVEN_PROFILE=dev" in the script it will automatically re-launch the docker image, when it runs. So if you are changing back-end code (meaning Java), you can run with the dev profile and it will rebuild and deploy. However if you have the app deployed already and have only just edited client side files (i.e. TS or SCSS namely) then the webpack profile (i.e.: mvn generate-resources -DskipTests -Pwebpack) is all you need to run,(to see the changes after a browser refresh) which builds MUCH faster and without restarting the app. NOTE: To be able to make that 'webpack' profile work, the other thing you're doing to need to do is to into dev-docker-run.sh and search for dev-resource-base (in two places) and understand that what's going on there is that it's making the webapp look into that folder "live" at runtime (instead of the build/deployed JAR in the docker image), which is how it enables the app to load those files without doing a full rebuild. This is similar to a 'hot deploy' type thing, but the WebApp is actually making the decision to read from there at runtime, when that property is set.
+When you set "MAVEN_PROFILE=dev" in the script it will automatically re-launch the docker image, when it runs. So if you are changing back-end code (meaning Java), you can run with the dev profile and it will rebuild and deploy. 
 
-# Before you run 'dev' Profile
+However if you have the app deployed already and have only just edited client side files (i.e. TS or SCSS namely) then the webpack profile (i.e.: mvn generate-resources -DskipTests -Pwebpack) is all you need to run,(to see the changes after a browser refresh) which builds MUCH faster and without restarting the app. NOTE: To be able to make that 'webpack' profile work, the other thing you're doing to need to do is to into dev-docker-run.sh and search for dev-resource-base (in two places) and understand that what's going on there is that it's making the webapp look into that folder "live" at runtime (instead of the build/deployed JAR in the docker image), which is how it enables the app to load those files without doing a full rebuild. This is similar to a 'hot deploy' type thing, but the WebApp is actually making the decision to read from there at runtime, when that property is set.
+
+# Rapid Redeploy of Java Classes
+
+The `dev` maven profile (see build-dev.sh) also is configured to deploy to docker in a way where the classpath is overridden to load classes directly from the `${PRJROOT}/target/classes` at runtime. For a full description of how this works, or how to stop doing that, see ./how-to-redeploy-java-classes.md
+
+# Before you run 'dev' Profile 
 
 The following maven profile will need to be run in order to update the generated TypeScript. We use this plugin:
 

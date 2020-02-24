@@ -39,10 +39,12 @@ sudo certbot --apache
 
 # Be sure to shutdown any server running on port 80 (because certbot needs it) and then
 # run the following command.
+#
 # WARNING WARNING: The following letsencrypt-auto command appears to be not needed for renewals at least,
 # because when i was renewing i discoved the above' certbot --apache' command seems to have 
 # taken care of EVERYTHING AUTOMATICALLY (except for the pkcs12 conversion below). However when setting up brand new
 # this command will be necessary???:
+#
 cd /etc/letsencrypt
 sudo -H ./letsencrypt-auto certonly --standalone -d quantizr.com -d www.quantizr.com
 
@@ -75,6 +77,9 @@ sudo netstat -tulpn | grep LISTEN
 
 # Renewal
 # Certbot certificates only last 3 months or so (I think) and here's how to renew
+
+# First shutdown the WebApp, because certbot needs to use the same ports, 
+# then run the rewnew command like this: 
 
    sudo certbot renew
    

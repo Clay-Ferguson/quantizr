@@ -143,6 +143,9 @@
 					<plugin>
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<layout>ZIP</layout>
+						</configuration>
 					</plugin>
 					<!-- 
 				WARNING: It appears that only ONE exec-maven-plugin runs. Having two of these plugins won't work, because it ends up 
@@ -237,6 +240,43 @@
 								</configuration>
 							</execution>
 						</executions>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
+	<!-- 
+		This profile is for the purpose of updating /target/classes only so we can do a rapid server reload/iteration
+	===========================================================================
+	JAVA-COMPILE PROFILE BEGIN 
+	===========================================================================	
+	-->
+	
+		<profile>
+			<id>java-compile</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+				<start-class>org.subnode.AppServer</start-class>
+				<java.version>11</java.version>
+			</properties>
+
+			<dependencies>
+				<!--include:org.springframework.boot.xml-->
+				<!--include:common.xml-->
+			</dependencies>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<!-- <configuration>
+							<layout>ZIP</layout>
+						</configuration> -->
 					</plugin>
 				</plugins>
 			</build>
