@@ -91,7 +91,7 @@ public class Convert {
 		}
 		String owner = userNode == null ? "admin" : nameProp;
 
-		log.debug("RENDER ID=" + node.getId().toHexString() + " rootId=" + rootId + " session.rootId="
+		log.trace("RENDER ID=" + node.getId().toHexString() + " rootId=" + rootId + " session.rootId="
 				+ sessionContext.getRootId() + " node.content=" + node.getContent() + " owner=" + owner);
 
 		/*

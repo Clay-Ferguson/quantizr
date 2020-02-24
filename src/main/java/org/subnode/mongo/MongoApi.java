@@ -210,13 +210,13 @@ public class MongoApi {
 
 			// if this session user is the owner of this node, then they have full power
 			if (!session.isAnon() && session.getUserNode().getId().equals(tryNode.getOwner())) {
-				log.debug("Auth successful. Found node user OWNS.");
+				log.trace("Auth successful. Found node user OWNS.");
 				ret = true;
 				break;
 			}
 
 			if (nodeAuth(tryNode, sessionUserNodeId, privs)) {
-				log.debug("Auth successful.");
+				log.trace("Auth successful.");
 				ret = true;
 				break;
 			}

@@ -156,16 +156,16 @@ public class MailSender implements TransportListener {
 
 	@Override
 	public void messageDelivered(TransportEvent arg) {
-		log.debug("messageDelivered.");
+		log.trace("messageDelivered.");
 	}
 
 	@Override
 	public void messageNotDelivered(TransportEvent arg) {
-		log.debug("messageNotDelivered.");
+		log.trace("messageNotDelivered.");
 	}
 
 	@Override
 	public void messagePartiallyDelivered(TransportEvent arg) {
-		log.debug("messagePartiallyDelivered.");
+		log.trace("messagePartiallyDelivered.");
 	}
 }
