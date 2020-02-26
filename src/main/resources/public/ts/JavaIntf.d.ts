@@ -234,6 +234,13 @@ export interface SplitNodeRequest extends RequestBase {
     delimiter: string;
 }
 
+export interface TransferNodeRequest extends RequestBase {
+    recursive: boolean;
+    nodeId: string;
+    fromUser: string;
+    toUser: string;
+}
+
 export interface UploadFromUrlRequest extends RequestBase {
     nodeId: string;
     sourceUrl: string;
@@ -423,6 +430,9 @@ export interface SignupResponse extends ResponseBase {
 }
 
 export interface SplitNodeResponse extends ResponseBase {
+}
+
+export interface TransferNodeResponse extends ResponseBase {
 }
 
 export interface UploadFromUrlResponse extends ResponseBase {

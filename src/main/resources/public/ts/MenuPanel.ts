@@ -10,6 +10,7 @@ import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
+import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -131,6 +132,9 @@ export class MenuPanel extends Div {
                 [
                     new MenuItem("Split Node", () => {
                         new SplitNodeDlg().open();
+                    }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
+                    new MenuItem("Transfer Node", () => {
+                        new TransferNodeDlg().open();
                     }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
                     new MenuItem("Import", S.edit.openImportDlg, //
                         () => { return S.meta64.state.importFeatureEnabled && (S.meta64.state.selNodeIsMine || (S.meta64.state.highlightNode != null && S.meta64.homeNodeId == S.meta64.state.highlightNode.id)) },//

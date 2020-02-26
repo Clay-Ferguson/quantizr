@@ -22,6 +22,7 @@ import org.subnode.request.SaveNodeRequest;
 import org.subnode.request.SavePropertyRequest;
 import org.subnode.request.SetNodeTypeRequest;
 import org.subnode.request.SplitNodeRequest;
+import org.subnode.request.TransferNodeRequest;
 import org.subnode.response.AppDropResponse;
 import org.subnode.response.CreateSubNodeResponse;
 import org.subnode.response.DeletePropertyResponse;
@@ -30,12 +31,14 @@ import org.subnode.response.SaveNodeResponse;
 import org.subnode.response.SavePropertyResponse;
 import org.subnode.response.SetNodeTypeResponse;
 import org.subnode.response.SplitNodeResponse;
+import org.subnode.response.TransferNodeResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -360,5 +363,61 @@ public class NodeEditService {
 		}
 
 		res.setSuccess(true);
+	}
+
+	public void transferNode(MongoSession session, TransferNodeRequest req, TransferNodeResponse res) {
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+		int transfers = 0;
+		String nodeId = req.getNodeId();
+
+		log.debug("Transfer node: " + nodeId);
+		SubNode node = api.getNode(session, nodeId);
+		api.authRequireOwnerOfNode(session, node);
+
+		SubNode toUserNode = api.getUserNodeByUserName(api.getAdminSession(), req.getToUser());
+		if (toUserNode == null) {
+			throw new RuntimeException("User not found: " + req.getToUser());
+		}
+
+		SubNode fromUserNode = api.getUserNodeByUserName(api.getAdminSession(), req.getFromUser());
+		if (fromUserNode == null) {
+			throw new RuntimeException("User not found: " + req.getFromUser());
+		}
+		if (transferNode(session, node, fromUserNode.getOwner(), toUserNode.getOwner())) {
+			transfers++;
+		}
+
+		if (req.isRecursive()) {
+			/*
+			 * todo-1: It would be more performant to build the
+			 * "fromUserObjId.equals(toUserObjId)" condition into the query itself and let
+			 * MongoDB to the filtering for us
+			 */
+			for (SubNode n : api.getSubGraph(session, node)) {
+				// log.debug("Node: path=" + path + " content=" + n.getContent());
+				if (transferNode(session, n, fromUserNode.getOwner(), toUserNode.getOwner())) {
+					transfers++;
+				}
+			}
+		}
+
+		if (transfers > 0) {
+			api.saveSession(session);
+		}
+
+		res.setMessage(String.valueOf(transfers) + " nodes were transferred.");
+		res.setSuccess(true);
+	}
+
+	/* Returns true if a transfer was done */
+	public boolean transferNode(MongoSession session, SubNode node, ObjectId fromUserObjId, ObjectId toUserObjId) {
+		/* is this a node we are transferring */
+		if (fromUserObjId.equals(node.getOwner())) {
+			node.setOwner(toUserObjId);
+			return true;
+		}
+		return false;
 	}
 }

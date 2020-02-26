@@ -72,6 +72,7 @@ import org.subnode.request.SetNodeTypeRequest;
 import org.subnode.request.ShutdownServerNodeRequest;
 import org.subnode.request.SignupRequest;
 import org.subnode.request.SplitNodeRequest;
+import org.subnode.request.TransferNodeRequest;
 import org.subnode.request.UploadFromUrlRequest;
 import org.subnode.response.AddPrivilegeResponse;
 import org.subnode.response.AnonPageLoadResponse;
@@ -113,6 +114,7 @@ import org.subnode.response.SetNodeTypeResponse;
 import org.subnode.response.ShutdownServerNodeResponse;
 import org.subnode.response.SignupResponse;
 import org.subnode.response.SplitNodeResponse;
+import org.subnode.response.TransferNodeResponse;
 import org.subnode.response.UploadFromUrlResponse;
 import org.subnode.response.base.ResponseBase;
 import org.subnode.service.AttachmentService;
@@ -448,6 +450,15 @@ public class AppController {
 			} else {
 				throw ExUtil.newEx("Unsupported file extension: " + req.getExportExt());
 			}
+			return res;
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/transferNode", method = RequestMethod.POST)
+	public @ResponseBody ResponseBase transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
+		return (ResponseBase) callProc.run("export", req, session, ms -> {
+			TransferNodeResponse res = new TransferNodeResponse();
+			nodeEditService.transferNode(ms, req, res);
 			return res;
 		});
 	}

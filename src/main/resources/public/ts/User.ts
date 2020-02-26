@@ -285,4 +285,16 @@ export class User implements UserIntf {
 
         S.meta64.loadAnonPageHome();
     }
+
+    transferNode = (recursive: boolean, nodeId: string, fromUser: string, toUser: string): void => {
+        S.util.ajax<J.TransferNodeRequest, J.TransferNodeResponse>("transferNode", {
+            recursive,
+            nodeId,
+            fromUser,
+            toUser,
+        }, (res: J.TransferNodeResponse) => {
+            S.view.refreshTree();
+            S.util.showMessage(res.message);
+        });
+    }
 }
