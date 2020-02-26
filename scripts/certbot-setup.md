@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # This is the script I ran on my linode instance of quantizr.com to setup HTTPS certificate using "Let's Encrypt" certbot.
 
 # show commands as they are run.
@@ -81,10 +79,18 @@ sudo netstat -tulpn | grep LISTEN
 # First shutdown the WebApp, because certbot needs to use the same ports, 
 # then run the rewnew command like this: 
 
-   sudo certbot renew
+Step 1:
+   certbot renew -v --force-renew --apache
+Step 2:
+   then after that run the openssl export command above, again!
+   Warning: If you export the key using the command above and go with the 'no password' option then you should 
+   also be sure that the 'secrets.sh' has this line 'export prodKeyStorePassword='
+Step 3:
+   and then reboot.
    
 # Tips:
 # If you have trouble getting into live folder do this:
 #    sudo chmod 755 /etc/letsencrypt/live/
 
 read -p "done. Press any key"
+
