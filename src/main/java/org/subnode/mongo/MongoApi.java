@@ -476,20 +476,20 @@ public class MongoApi {
 	private Long prepOrdinalForLocation(MongoSession session, CreateNodeLocation location, SubNode parent,
 			Long ordinal) {
 		switch (location) {
-		case FIRST:
-			ordinal = 0L;
-			insertOrdinal(session, parent, 0L, 1L);
-			saveSession(session);
-			break;
-		case LAST:
-			ordinal = getMaxChildOrdinal(session, parent) + 1;
-			parent.setMaxChildOrdinal(ordinal);
-			break;
-		case ORDINAL:
-			insertOrdinal(session, parent, ordinal, 1L);
-			saveSession(session);
-			// leave ordinal same and return it.
-			break;
+			case FIRST:
+				ordinal = 0L;
+				insertOrdinal(session, parent, 0L, 1L);
+				saveSession(session);
+				break;
+			case LAST:
+				ordinal = getMaxChildOrdinal(session, parent) + 1;
+				parent.setMaxChildOrdinal(ordinal);
+				break;
+			case ORDINAL:
+				insertOrdinal(session, parent, ordinal, 1L);
+				saveSession(session);
+				// leave ordinal same and return it.
+				break;
 		}
 
 		return ordinal;
@@ -867,8 +867,7 @@ public class MongoApi {
 		return ret.size() == 0 ? null : ret;
 	}
 
-	public AccessControlInfo createAccessControlInfo(MongoSession session, String principalId,
-			String authType) {
+	public AccessControlInfo createAccessControlInfo(MongoSession session, String principalId, String authType) {
 		String principalName = null;
 		String publicKey = null;
 
@@ -1385,7 +1384,9 @@ public class MongoApi {
 
 	public void writeStream(MongoSession session, SubNode node, InputStream stream, String fileName, String mimeType,
 			String propName) {
+
 		auth(session, node, PrivilegeType.WRITE);
+		
 		if (propName == null) {
 			propName = "bin";
 		}
@@ -1438,13 +1439,19 @@ public class MongoApi {
 
 		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid
 				.findOne(new Query(Criteria.where("metadata.nodeId").is(nodeId)));
-		if (gridFile == null)
+		if (gridFile == null) {
+			log.debug("gridfs ID not found");
 			return null;
+		}
 
 		GridFsResource gridFsResource = new GridFsResource(gridFile,
 				gridFsBucket.openDownloadStream(gridFile.getObjectId()));
 		try {
-			return gridFsResource.getInputStream();
+			InputStream is = gridFsResource.getInputStream();
+			if (is == null) {
+				throw new RuntimeException("Unable to get inputStream");
+			}
+			return is;
 		} catch (Exception e) {
 			throw new RuntimeException("unable to readStream", e);
 		}
