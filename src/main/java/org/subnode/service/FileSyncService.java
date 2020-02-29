@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.subnode.config.NodePrincipal;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.model.FileSyncStats;
 import org.subnode.model.MetaDirInfo;
 import org.subnode.mongo.MongoApi;
@@ -120,7 +120,7 @@ public class FileSyncService {
 
 		/* FS_LINK nodes must be owned by 'admin' in order to be allowed to function */
 		// todo-2: Don't we have a dedicated exception for this?
-		if (!NodePrincipal.ADMIN.equals(api.getNodeOwner(session, node))) {
+		if (!PrincipalName.ADMIN.s().equals(api.getNodeOwner(session, node))) {
 			throw new RuntimeException("unauthorized");
 		}
 

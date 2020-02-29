@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.subnode.config.NodePrincipal;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.MongoPrincipal;
@@ -135,11 +135,11 @@ public class AclService {
 		String mapKey = null;
 
 		/* If we are sharing to public, then that's the map key */
-		if (principal.equalsIgnoreCase(NodePrincipal.PUBLIC)) {
+		if (principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
 			if (cipherKey != null) {
 				throw new RuntimeException("Cannot make an encrypted node public.");
 			}
-			mapKey = NodePrincipal.PUBLIC;
+			mapKey = PrincipalName.PUBLIC.s();
 		}
 		/*
 		 * otherwise we're sharing to a person so we now get their userNodeId to use as

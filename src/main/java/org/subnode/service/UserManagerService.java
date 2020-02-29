@@ -8,7 +8,7 @@ import javax.servlet.http.HttpSession;
 
 import org.subnode.config.AppProp;
 import org.subnode.config.ConstantsProvider;
-import org.subnode.config.NodePrincipal;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
 import org.subnode.mail.OutboxMgr;
@@ -119,7 +119,7 @@ public class UserManagerService {
 			 * Note: This is not an error condition, this happens whenever the page loads
 			 * for the first time and the user has no session yet,
 			 */
-			res.setUserName(NodePrincipal.ANONYMOUS);
+			res.setUserName(PrincipalName.ANON.s());
 			res.setMessage("not logged in.");
 			res.setSuccess(false);
 		} else {
@@ -184,7 +184,7 @@ public class UserManagerService {
 
 				String userName = node.getStringProp(NodeProp.USER.toString());
 
-				if (NodePrincipal.ADMIN.equals(userName)) {
+				if (PrincipalName.ADMIN.s().equals(userName)) {
 					throw new RuntimeException("processSignupCode should not be called fror admin user.");
 				}
 
@@ -413,7 +413,7 @@ public class UserManagerService {
 				String password = req.getNewPassword();
 				userName[0] = userNode[0].getStringProp(NodeProp.USER.toString());
 
-				if (NodePrincipal.ADMIN.equals(userName[0])) {
+				if (PrincipalName.ADMIN.s().equals(userName[0])) {
 					throw new RuntimeException("changePassword should not be called fror admin user.");
 				}
 
@@ -431,7 +431,7 @@ public class UserManagerService {
 				throw ExUtil.newEx("changePassword cannot find user.");
 			}
 
-			if (NodePrincipal.ADMIN.equals(userName[0])) {
+			if (PrincipalName.ADMIN.s().equals(userName[0])) {
 				throw new RuntimeException("changePassword should not be called fror admin user.");
 			}
 
@@ -453,7 +453,7 @@ public class UserManagerService {
 
 	public boolean isNormalUserName(String userName) {
 		userName = userName.trim();
-		return !userName.equalsIgnoreCase(NodePrincipal.ADMIN) && !userName.equalsIgnoreCase(NodePrincipal.ANONYMOUS);
+		return !userName.equalsIgnoreCase(PrincipalName.ADMIN.s()) && !userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
 	public void resetPassword(final ResetPasswordRequest req, ResetPasswordResponse res) {

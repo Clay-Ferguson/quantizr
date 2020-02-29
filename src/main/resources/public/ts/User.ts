@@ -73,7 +73,7 @@ export class User implements UserIntf {
         //sure i'm keeping this feature.
         S.meta64.allowBashScripting = false; // res.userName === "admin";
 
-        S.meta64.isAnonUser = res.userName === "anonymous";
+        S.meta64.isAnonUser = res.userName === J.PrincipalName.ANON;
 
         S.meta64.anonUserLandingPageNode = res.anonUserLandingPageNode;
         S.meta64.allowFileSystemSearch = res.allowFileSystemSearch;
@@ -211,8 +211,7 @@ export class User implements UserIntf {
                     console.log("loginResponse: usr=" + usr);
                     console.log("homeNodeOverride: " + res.homeNodeOverride);
 
-                    //todo-0: put "anonymous" in Constants!
-                    if (usr !== "anonymous") {
+                    if (usr !== J.PrincipalName.ANON) {
                         await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
                         await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
                         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");

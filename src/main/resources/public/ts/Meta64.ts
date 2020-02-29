@@ -49,7 +49,7 @@ export class Meta64 implements Meta64Intf {
     nextGuid: number = 0;
 
     /* name of currently logged in user */
-    userName: string = "anonymous";
+    userName: string = J.PrincipalName.ANON;
 
     /* screen capabilities */
     deviceWidth: number = 0;

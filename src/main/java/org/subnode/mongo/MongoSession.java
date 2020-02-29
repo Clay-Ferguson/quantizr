@@ -1,6 +1,6 @@
 package org.subnode.mongo;
 
-import org.subnode.config.NodePrincipal;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.model.SubNode;
 
 import org.slf4j.Logger;
@@ -30,11 +30,11 @@ public class MongoSession {
 	}
 
 	public boolean isAdmin() {
-		return NodePrincipal.ADMIN.equals(user);
+		return PrincipalName.ADMIN.s().equals(user);
 	}
 
 	public boolean isAnon() {
-		return NodePrincipal.ANONYMOUS.equals(user);
+		return PrincipalName.ANON.s().equals(user);
 	}
 
 	public String getUser() {

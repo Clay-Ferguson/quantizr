@@ -1,6 +1,7 @@
 package org.subnode;
 
 import org.subnode.config.ConstantsProvider;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.util.ExUtil;
 
 import org.slf4j.Logger;

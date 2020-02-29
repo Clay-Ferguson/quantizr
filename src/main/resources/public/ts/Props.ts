@@ -2,13 +2,11 @@ import * as J from "./JavaIntf";
 import { PropTable } from "./widget/PropTable";
 import { PropTableRow } from "./widget/PropTableRow";
 import { PropTableCell } from "./widget/PropTableCell";
-
 import { PropsIntf } from "./intf/PropsIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
-import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
-import { useReducer } from "react";
+
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -177,7 +175,7 @@ export class Props implements PropsIntf {
     }
 
     isMine = (node: J.NodeInfo): boolean => {
-        if (!S.meta64.userName || S.meta64.userName == "anonymous") return false;
+        if (!S.meta64.userName || S.meta64.userName == J.PrincipalName.ANON) return false;
         return S.meta64.userName == node.owner;
     }
 

@@ -93,4 +93,8 @@ public enum NodeProp {
     public String toString() {
         return value;
     }
+
+    public String s() {
+        return value;
+    }
 }

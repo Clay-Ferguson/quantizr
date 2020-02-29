@@ -546,3 +546,9 @@ export const enum NodeProp {
     IMG_WIDTH = "sn:imgWidth",
     IMG_HEIGHT = "sn:imgHeight",
 }
+
+export const enum PrincipalName {
+    ANON = "anonymous",
+    ADMIN = "admin",
+    PUBLIC = "public",
+}

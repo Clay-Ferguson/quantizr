@@ -8,6 +8,7 @@ import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpSession;
 
 import org.subnode.model.UserPreferences;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.RepositoryUtil;
 import org.subnode.util.DateUtil;
 
@@ -67,11 +68,11 @@ public class SessionContext {
 	}
 
 	public boolean isAdmin() {
-		return NodePrincipal.ADMIN.equalsIgnoreCase(userName);
+		return PrincipalName.ADMIN.s().equalsIgnoreCase(userName);
 	}
 
 	public boolean isAnonUser() {
-		return NodePrincipal.ANONYMOUS.equalsIgnoreCase(userName);
+		return PrincipalName.ANON.s().equalsIgnoreCase(userName);
 	}
 
 	public boolean isTestAccount() {

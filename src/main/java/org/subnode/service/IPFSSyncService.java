@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.subnode.config.NodePrincipal;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.MerkleDAGSyncStats;
 import org.subnode.model.MerkleLink;
@@ -98,7 +98,7 @@ public class IPFSSyncService {
 		 * available to all users during it's early development
 		 */
 		// todo-2: Don't we have a dedicated exception for this?
-		if (!NodePrincipal.ADMIN.equals(api.getNodeOwner(session, node))) {
+		if (!PrincipalName.ADMIN.s().equals(api.getNodeOwner(session, node))) {
 			throw new RuntimeException("unauthorized");
 		}
 

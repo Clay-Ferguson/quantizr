@@ -3,8 +3,8 @@ package org.subnode;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.subnode.model.client.PrincipalName;
 import org.subnode.concurrency.LockEx;
-import org.subnode.config.NodePrincipal;
 import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.model.UserPreferences;
@@ -150,8 +150,8 @@ public class CallProcessor {
 	/* Creates a logged in session for any method call */
 	private MongoSession login(RequestBase req, SessionContext sessionContext) {
 
-		String userName = NodePrincipal.ANONYMOUS;
-		String password = NodePrincipal.ANONYMOUS;
+		String userName = PrincipalName.ANON.s();
+		String password = PrincipalName.ANON.s();
 
 		LoginResponse res = null;
 		if (req instanceof LoginRequest) {
@@ -184,10 +184,10 @@ public class CallProcessor {
 			password = sessionContext.getPassword();
 
 			if (userName == null) {
-				userName = NodePrincipal.ANONYMOUS;
+				userName = PrincipalName.ANON.s();
 			}
 			if (password == null) {
-				password = NodePrincipal.ANONYMOUS;
+				password = PrincipalName.ANON.s();
 			}
 		}
 

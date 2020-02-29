@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
-import org.subnode.config.NodePrincipal;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.image.ImageSize;
 import org.subnode.image.ImageUtil;
@@ -97,8 +97,8 @@ public class MongoApi {
 	@Autowired
 	private AppProp appProp;
 
-	private static final MongoSession adminSession = MongoSession.createFromUser(NodePrincipal.ADMIN);
-	private static final MongoSession anonSession = MongoSession.createFromUser(NodePrincipal.ANONYMOUS);
+	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
+	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
 
 	public MongoSession getAdminSession() {
 		return adminSession;
@@ -110,9 +110,9 @@ public class MongoApi {
 
 	public boolean isAllowedUserName(String userName) {
 		userName = userName.trim();
-		return !userName.equalsIgnoreCase(NodePrincipal.ADMIN) && //
-				!userName.equalsIgnoreCase(NodePrincipal.PUBLIC) && //
-				!userName.equalsIgnoreCase(NodePrincipal.ANONYMOUS);
+		return !userName.equalsIgnoreCase(PrincipalName.ADMIN.s()) && //
+				!userName.equalsIgnoreCase(PrincipalName.PUBLIC.s()) && //
+				!userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
 	public void authRequireOwnerOfNode(MongoSession session, SubNode node) {
@@ -246,7 +246,7 @@ public class MongoApi {
 		 * We always add on any privileges assigned to the PUBLIC when checking privs
 		 * for this user, becasue the auth equivalent is really the union of this set.
 		 */
-		AccessControl acPublic = acl.get(NodePrincipal.PUBLIC);
+		AccessControl acPublic = acl.get(PrincipalName.PUBLIC.s());
 		String privsForPublic = acPublic != null ? acPublic.getPrvs() : null;
 		if (privsForPublic != null) {
 			if (allPrivs.length() > 0) {
@@ -872,8 +872,8 @@ public class MongoApi {
 		String publicKey = null;
 
 		/* If this is a share to public we don't need to lookup a user name */
-		if (principalId.equalsIgnoreCase(NodePrincipal.PUBLIC)) {
-			principalName = NodePrincipal.PUBLIC;
+		if (principalId.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
+			principalName = PrincipalName.PUBLIC.s();
 		}
 		/* else we need the user name */
 		else {
@@ -1489,7 +1489,7 @@ public class MongoApi {
 	 * constratint index type capability for path of all user account nodes?
 	 */
 	public SubNode createUser(MongoSession session, String user, String email, String password, boolean automated) {
-		if (NodePrincipal.ADMIN.equals(user)) {
+		if (PrincipalName.ADMIN.s().equals(user)) {
 			throw new RuntimeException("createUser should not be called fror admin user.");
 		}
 
@@ -1537,7 +1537,7 @@ public class MongoApi {
 
 		// For the ADMIN user their root node is considered to be the entire root of the
 		// whole DB
-		if (NodePrincipal.ADMIN.equalsIgnoreCase(user)) {
+		if (PrincipalName.ADMIN.s().equalsIgnoreCase(user)) {
 			return getNode(session, "/" + NodeName.ROOT);
 		}
 
@@ -1561,13 +1561,13 @@ public class MongoApi {
 
 	public MongoSession login(String userName, String password) {
 		// log.debug("Mongo API login: user="+userName);
-		MongoSession session = MongoSession.createFromUser(NodePrincipal.ANONYMOUS);
+		MongoSession session = MongoSession.createFromUser(PrincipalName.ANON.s());
 
 		/*
 		 * If username is null or anonymous, we assume anonymous is acceptable and
 		 * return anonymous session or else we check the credentials.
 		 */
-		if (!NodePrincipal.ANONYMOUS.equals(userName)) {
+		if (!PrincipalName.ANON.s().equals(userName)) {
 			log.trace("looking up user node.");
 			SubNode userNode = getUserNodeByUserName(getAdminSession(), userName);
 			boolean success = false;
@@ -1578,7 +1578,7 @@ public class MongoApi {
 				 * If logging in as ADMIN we don't expect the node to contain any password in
 				 * the db, but just use the app property instead.
 				 */
-				// if (NodePrincipal.ADMIN.equals(userName)) {
+				// if (PrincipalName.ADMIN.s().equals(userName)) {
 				if (password.equals(appProp.getMongoAdminPassword())) {
 					success = true;
 				}
@@ -1610,7 +1610,7 @@ public class MongoApi {
 	 */
 	public void createAdminUser(MongoSession session) {
 		// todo-2: fix inconsistency: is admin name defined in properties file or in
-		// NodePrincipal.ADMIN const ? Need to decide.
+		// PrincipalName.ADMIN.s() const ? Need to decide.
 		String adminUser = appProp.getMongoAdminUserName();
 		// String adminPwd = appProp.getMongoAdminPassword();
 
@@ -1619,7 +1619,7 @@ public class MongoApi {
 			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, "Repository Root", null, true, null,
 					null);
 
-			adminNode.setProp(NodeProp.USER.toString(), NodePrincipal.ADMIN);
+			adminNode.setProp(NodeProp.USER.toString(), PrincipalName.ADMIN.s());
 
 			// todo-1: need to store ONLY hash of the password
 			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.toString(), false);
@@ -1644,7 +1644,7 @@ public class MongoApi {
 		if (created.getVal()) {
 			// todo-p0: need these types of strings ('rd') to be in an enum or constants
 			// file.
-			aclService.addPrivilege(session, publicNode, NodePrincipal.PUBLIC, Arrays.asList("rd"), null);
+			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList("rd"), null);
 		}
 
 		/* Ensure Content folder is created and synced to file system */
