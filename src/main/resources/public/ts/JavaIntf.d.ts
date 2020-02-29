@@ -176,10 +176,7 @@ export interface ResetPasswordRequest extends RequestBase {
 }
 
 export interface SaveNodeRequest extends RequestBase {
-    nodeId: string;
-    properties: PropertyInfo[];
-    content: string;
-    name: string;
+    node: NodeInfo;
 }
 
 export interface SavePropertyRequest extends RequestBase {
@@ -449,18 +446,6 @@ export interface ResponseBase {
     stackTrace: string;
 }
 
-export interface PropertyInfo {
-    name: string;
-    value: string;
-}
-
-export interface UserPreferences {
-    editMode: boolean;
-    showMetaData: boolean;
-    importAllowed: boolean;
-    exportAllowed: boolean;
-}
-
 export interface NodeInfo {
     id: string;
     name: string;
@@ -485,6 +470,13 @@ export interface NodeInfo {
     owner: string;
 }
 
+export interface UserPreferences {
+    editMode: boolean;
+    showMetaData: boolean;
+    importAllowed: boolean;
+    exportAllowed: boolean;
+}
+
 export interface AccessControlInfo {
     principalName: string;
     principalNodeId: string;
@@ -500,6 +492,11 @@ export interface GraphNode {
 export interface GraphEdge {
     to: string;
     from: string;
+}
+
+export interface PropertyInfo {
+    name: string;
+    value: string;
 }
 
 export interface WebFingerLink {

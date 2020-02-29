@@ -477,6 +477,7 @@ export class Meta64 implements Meta64Intf {
             J.NodeProp.BIN_VER, //
             J.NodeProp.BIN_DATA, //
             J.NodeProp.BIN_MIME, //
+            J.NodeProp.BIN_SIZE
         ]);
 
         S.util.addAll(this.binaryPropertyList, [J.NodeProp.BIN_DATA]);

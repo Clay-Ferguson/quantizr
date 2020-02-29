@@ -204,34 +204,35 @@ public class NodeEditService {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
-		String nodeId = req.getNodeId();
+		NodeInfo nodeInfo = req.getNode();
+		String nodeId = nodeInfo.getId();
 
-		log.debug("saveNode. nodeId=" + nodeId + " nodeName=" + req.getName());
+		//log.debug("saveNode. nodeId=" + nodeId + " nodeName=" + nodeInfo.getName());
 		SubNode node = api.getNode(session, nodeId);
 		api.authRequireOwnerOfNode(session, node);
 
 		if (node == null) {
 			throw new RuntimeException("Unable find node to save: nodeId=" + nodeId);
 		}
-		node.setContent(req.getContent());
+		node.setContent(nodeInfo.getContent());
 
 		// if we're setting node name to a different node name
-		if (req.getName() != null && !req.getName().equals(node.getName())) {
+		if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0 && !nodeInfo.getName().equals(node.getName())) {
 
 			/*
 			 * We don't use unique index on node name, because we want to save storage space
 			 * on the server, so we have to do the uniqueness check ourselves here manually
 			 */
-			SubNode nodeByName = api.getNodeByName(session, req.getName());
+			SubNode nodeByName = api.getNodeByName(session, nodeInfo.getName());
 			if (nodeByName != null) {
 				throw new RuntimeException("Node name is already in use. Duplicates not allowed.");
 			}
 
-			node.setName(req.getName());
+			node.setName(nodeInfo.getName());
 		}
 
-		if (req.getProperties() != null) {
-			for (PropertyInfo property : req.getProperties()) {
+		if (nodeInfo.getProperties() != null) {
+			for (PropertyInfo property : nodeInfo.getProperties()) {
 
 				/*
 				 * save only if server determines the property is savable. Just protection.
@@ -266,9 +267,9 @@ public class NodeEditService {
 
 			outboxMgr.sendNotificationForChildNodeCreate(node, sessionContext.getUserName());
 
-			NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, -1, false,
+			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, -1, false,
 					false, false);
-			res.setNode(nodeInfo);
+			res.setNode(newNodeInfo);
 			api.saveSession(session);
 		}
 

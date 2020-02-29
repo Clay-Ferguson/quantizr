@@ -222,12 +222,12 @@ export class EditNodeDlg extends DialogBase {
                     return;
                 }
 
+                //console.log("Creating edit field for property " + prop.name);
+
                 if (!S.render.allowPropertyEdit(this.node, prop.name)) {
                     console.log("Hiding property: " + prop.name);
                     return;
                 }
-
-                //console.log("Creating edit field for property " + prop.name);
 
                 if ((!S.render.isReadOnlyProperty(prop.name) && !S.render.isBinaryProperty(prop.name)) || S.edit.showReadOnlyProperties) {
                     let tableRow = this.makePropEditor(prop);
@@ -387,49 +387,34 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    saveCheckboxVal = (checkbox: Checkbox, saveList: J.PropertyInfo[], handled: any, propName: string, invert: boolean = false): void => {
+    saveCheckboxVal = (checkbox: Checkbox, propName: string, invert: boolean = false): void => {
         let val = checkbox.getChecked() ? "1" : null;
         if (invert) {
             val = (val == "1" ? null : "1");
         }
         S.props.setNodePropVal(propName, this.node, val);
-        handled[propName] = true;
-        saveList.push({
-            "name": propName,
-            "value": val
-        });
     }
 
     saveNode = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            let saveList: J.PropertyInfo[] = [];
-            let handled = {};
 
             if (this.node) {
-                this.saveCheckboxVal(this.preformattedCheckBox, saveList, handled, J.NodeProp.PRE);
-                this.saveCheckboxVal(this.inlineChildrenCheckBox, saveList, handled, "inlineChildren");
-                this.saveCheckboxVal(this.wordWrapCheckBox, saveList, handled, J.NodeProp.NOWRAP, true);
+                this.saveCheckboxVal(this.preformattedCheckBox, J.NodeProp.PRE);
+                this.saveCheckboxVal(this.inlineChildrenCheckBox, "inlineChildren");
+                this.saveCheckboxVal(this.wordWrapCheckBox, J.NodeProp.NOWRAP, true);
 
                 /* Get state of the 'layout' dropdown */
                 let layout = this.layoutSelection.getSelection();
 
+                //todo-0: legacy operation was: saveValue = layout == "v" ? null : layout
                 S.props.setNodePropVal("layout", this.node, layout);
-                handled["layout"] = true;
-                saveList.push({
-                    "name": "layout",
-                    "value": layout == "v" ? null : layout
-                });
 
                 /* Get state of the 'priority' dropdown */
                 let priority = this.prioritySelection.getSelection();
 
+                //todo-0: legacy operation was: saveValue = priority == "0" ? null : priority
                 //priority value 0 is default, so if user selects that we can just delete the option and save space.
-                S.props.setNodePropVal("priority", this.node, layout);
-                handled["priority"] = true;
-                saveList.push({
-                    "name": "priority",
-                    "value": priority == "0" ? null : priority
-                });
+                S.props.setNodePropVal("priority", this.node, priority);
             }
 
             let content: string;
@@ -446,49 +431,47 @@ export class EditNodeDlg extends DialogBase {
                 }
             }
 
-            handled[J.NodeProp.ENC_KEY] = true;
-            saveList.push({
-                "name": J.NodeProp.ENC_KEY,
-                "value": S.props.getNodePropVal(J.NodeProp.ENC_KEY, this.node)
-            });
-
             let nodeName = this.nodeNameTextField.getValue();
 
             //convert any empty string to null here to be sure DB storage is least amount.
             if (!nodeName) {
-                nodeName = null;
+                nodeName = "";
             }
             else {
-                //todo-1: for now if user puts a colon in a node name, we can just change it for them.
+                //todo-1: for now if user puts a colon in a node name, we can just change it for them. We don't allow it.
                 nodeName = nodeName.replace(":", "-");
             }
+
+            this.node.name = nodeName;
+            this.node.content = content;
+            let newProps: J.PropertyInfo[] = [];
 
             /* Now scan over all properties to build up what to save */
             if (this.node.properties) {
                 this.node.properties.forEach((prop: J.PropertyInfo) => {
 
+                    //console.log("prop to save?: "+prop.name);
+
                     /* Ignore this property if it's one that cannot be edited as text, or has already been handled/processed */
                     if (S.render.isReadOnlyProperty(prop.name) || //
-                        S.render.isBinaryProperty(prop.name) || //
-                        handled[prop.name])
+                        S.render.isBinaryProperty(prop.name)) {
                         return;
+                    }
 
-                    //console.log("property field: " + JSON.stringify(prop));
-                    let propVal: string;
+                    let comp = this.propNameToEditorCompMap[prop.name] as any as I.TextEditorIntf;
+                    if (comp) {
+                        prop.value = comp.getValue();
+                        //console.log("value from editor comp: "+prop.value);
+                    }
 
-                    saveList.push({
-                        name: prop.name,
-                        value: propVal
-                    });
+                    newProps.push(prop);
                 });
             }
+            this.node.properties = newProps;
 
-            // console.log("calling saveNode(). PostData=" + S.util.toJson(postData));
+            //console.log("calling saveNode(). PostData=" + S.util.toJson(this.node));
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-                nodeId: this.node.id,
-                content: content,
-                properties: saveList,
-                name: nodeName
+                node: this.node
             }, (res) => {
                 S.edit.saveNodeResponse(this.node, res);
             });
@@ -532,7 +515,6 @@ export class EditNodeDlg extends DialogBase {
                 }
             });
             this.propCheckBoxes.push(checkbox);
-            this.propNameToEditorCompMap[propEntry.name] = checkbox;
             this.compIdToPropMap[checkbox.getId()] = propEntry;
 
             formGroup.addChild(checkbox);
@@ -557,6 +539,7 @@ export class EditNodeDlg extends DialogBase {
                     "defaultValue": propValStr
                 });
             }
+            this.propNameToEditorCompMap[propEntry.name] = editor as any as Comp;
 
             formGroup.addChild(editor as any as Comp);
         }
