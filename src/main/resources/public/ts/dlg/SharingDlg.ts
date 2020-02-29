@@ -92,7 +92,7 @@ export class SharingDlg extends DialogBase {
         S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             "nodeId": this.node.id,
             "principal": "public",
-            "privileges": ["rd"],
+            "privileges": [J.PrivilegeType.READ],
         }, this.reload);
     }
 

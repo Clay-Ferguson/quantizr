@@ -552,3 +552,10 @@ export const enum PrincipalName {
     ADMIN = "admin",
     PUBLIC = "public",
 }
+
+export const enum PrivilegeType {
+    READ = "rd",
+    WRITE = "wr",
+    ADD_CHILDREN = "ac",
+    REMOVE_CHILDREN = "rc",
+}

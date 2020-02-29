@@ -20,7 +20,7 @@ import org.subnode.image.ImageUtil;
 import org.subnode.model.AccessControlInfo;
 import org.subnode.model.PrivilegeInfo;
 import org.subnode.mongo.model.AccessControl;
-import org.subnode.mongo.model.PrivilegeType;
+import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodeTypes;
@@ -1644,7 +1644,7 @@ public class MongoApi {
 		if (created.getVal()) {
 			// todo-p0: need these types of strings ('rd') to be in an enum or constants
 			// file.
-			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList("rd"), null);
+			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 
 		/* Ensure Content folder is created and synced to file system */

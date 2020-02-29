@@ -23,7 +23,7 @@ import org.subnode.image.ImageUtil;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.model.PrivilegeType;
+import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.request.DeleteAttachmentRequest;

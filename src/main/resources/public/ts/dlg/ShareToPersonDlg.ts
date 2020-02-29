@@ -55,7 +55,7 @@ export class ShareToPersonDlg extends DialogBase {
         S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             "nodeId": this.node.id,
             "principal": targetUser,
-            "privileges": ["rd", "wr"],
+            "privileges": [J.PrivilegeType.READ, J.PrivilegeType.WRITE],
         }, this.reloadFromShareWithPerson);
     }
 
