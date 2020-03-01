@@ -327,10 +327,10 @@ export class EditNodeDlg extends DialogBase {
                 /* Else need to ensure node is encrypted */
                 else {
                     // if we need to encrypt and the content is not currently encrypted.
-                    if (!this.node.content.startsWith(J.NodeProp.ENC_TAG)) {
+                    if (!this.node.content.startsWith(J.Constant.ENC_TAG)) {
                         let content = this.contentEditor.getValue();
                         this.skdp = await S.encryption.encryptSharableString(null, content);
-                        this.node.content = J.NodeProp.ENC_TAG + this.skdp.cipherText;
+                        this.node.content = J.Constant.ENC_TAG + this.skdp.cipherText;
                         S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, this.skdp.cipherKey);
                     }
                 }
@@ -427,7 +427,7 @@ export class EditNodeDlg extends DialogBase {
                 let cipherKey = S.props.getCryptoKey(this.node);
                 if (cipherKey) {
                     content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
-                    content = J.NodeProp.ENC_TAG + content;
+                    content = J.Constant.ENC_TAG + content;
                 }
             }
 
@@ -551,7 +551,7 @@ export class EditNodeDlg extends DialogBase {
     makeContentEditorFormGroup = (node: J.NodeInfo, isPre: boolean, isWordWrap: boolean): FormGroup => {
         let value = node.content;
         let formGroup = new FormGroup();
-        let encrypted = value.startsWith(J.NodeProp.ENC_TAG);
+        let encrypted = value.startsWith(J.Constant.ENC_TAG);
 
         value = S.util.escapeForAttrib(value);
         //console.log("making field editor for [" + propName + "] val[" + value + "]");
@@ -565,7 +565,7 @@ export class EditNodeDlg extends DialogBase {
 
                         if (encrypted) {
                             //console.log('decrypting: ' + value);
-                            let cipherText = value.substring(J.NodeProp.ENC_TAG.length);
+                            let cipherText = value.substring(J.Constant.ENC_TAG.length);
                             (async () => {
                                 let cipherKey = S.props.getCryptoKey(node);
                                 if (cipherKey) {
@@ -592,7 +592,7 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditor.whenElm((elm: HTMLElement) => {
                 if (encrypted) {
                     //console.log('decrypting: ' + value);
-                    let cipherText = value.substring(J.NodeProp.ENC_TAG.length);
+                    let cipherText = value.substring(J.Constant.ENC_TAG.length);
                     (async () => {
                         let cipherKey = S.props.getCryptoKey(node);
                         if (cipherKey) {

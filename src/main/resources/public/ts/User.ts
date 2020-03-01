@@ -253,8 +253,7 @@ export class User implements UserIntf {
                     }, 500);
                 } else {
                     if (usingCredentials) {
-                        //todo-0: I'm not sure I like this flow path... need to retest a lot of this.
-                        S.util.showMessage("LocalDb login failed.");
+                        console.log("LocalDb login failed.");
 
                         /*
                          * blow away failed credentials and reload page, should result in brand new page load as anon

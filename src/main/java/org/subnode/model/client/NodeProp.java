@@ -11,9 +11,7 @@ public enum NodeProp {
     // This is the encrypted symetric key to the node data, that was encrypted using
     // the private key of the owner of the node.
     ENC_KEY("sn:encKey"),
-
-    ENC_TAG("<[ENC]>"),
-
+    
     /*
      * this is the one entered by the admin which DEFINES the feed, and is not to be
      * overwritten ever by the code

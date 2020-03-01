@@ -509,9 +509,12 @@ export interface PrivilegeInfo {
     privilegeName: string;
 }
 
+export const enum Constant {
+    ENC_TAG = "<[ENC]>",
+}
+
 export const enum NodeProp {
     ENC_KEY = "sn:encKey",
-    ENC_TAG = "<[ENC]>",
     RSS_FEED_SRC = "sn:rssFeedSrc",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",
     USER_PREF_EDIT_MODE = "sn:editMode",
