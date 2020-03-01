@@ -2,10 +2,6 @@ package org.subnode.model.client;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-/* NOTE: This class is exported into typescript (using typescript-generator-maven-plugin), and this is currently still
-the only way to achieve "constants" in Java converted to Typescript. It would be nice of we could just hava a class with
-a bunch of "" values in it but there's no way to do that and then have it export to TypeScript also.
- */
 public enum NodeProp {
 
     // This is the encrypted symetric key to the node data, that was encrypted using

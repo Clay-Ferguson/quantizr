@@ -1,29 +1,24 @@
 package org.subnode.model.client;
 
-/* 
- * *************** WARNING: right now the these strings are also hardcoded into some TypeScript.
- */
 public enum PrivilegeType {
 	/* Can read the node and entire subgraph of nodes it contains */
-	READ(1, "rd"), //
+	READ("rd"), //
 
 	/* Can read and write this node. Write to subnodes is not granted by this */
-	WRITE(2, "wr"), //
+	WRITE("wr"), //
 
 	/* Can read and create children under this node and any nodes in the subgraph */
-	ADD_CHILDREN(3, "ac"), //
+	ADD_CHILDREN("ac"), //
 
 	/*
 	 * Can read and and delete children under this node and any nodes in the
 	 * subgraph
 	 */
-	REMOVE_CHILDREN(4, "rc");
+	REMOVE_CHILDREN("rc");
 
-	//public final int val;
 	public final String name;
 
-	private PrivilegeType(int val, String name) {
-		//this.val = val;
+	private PrivilegeType(String name) {
 		this.name = name;
 	}
 
