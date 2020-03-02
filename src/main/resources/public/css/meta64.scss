@@ -16,6 +16,7 @@ $createdByMeTextColor: white;
 $listBackgroundColor: lightGray;
 
 $smallGap: 12px;
+$tinyGap: 8px;
 
 html {
     // not supported by all browers.
@@ -27,8 +28,12 @@ html {
 body {
     /* This top-padding is how the bootstrap example keept the main content from being covered by the navbar */
     font-family: "Roboto", "Verdana", "Aria";
-    padding-top: 5rem;
+    padding-top: 4rem;
     padding-bottom: 1rem;
+}
+
+.main-navbar {
+    padding: $tinyGap;
 }
 
 /* This is how the search terms get highlighted by wrapping them like this in 
@@ -710,10 +715,6 @@ samp {
 .sidebar-heading {
     font-size: 0.75rem;
 }
-
-/*
-* Navbar
-*/
 
 .form-control-dark {
     color: #fff;
