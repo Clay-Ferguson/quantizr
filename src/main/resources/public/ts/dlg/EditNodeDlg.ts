@@ -364,14 +364,6 @@ export class EditNodeDlg extends DialogBase {
     }
 
     deleteProperty(propName: string) {
-        new ConfirmDlg("Delete the Property: " + propName, "Confirm Delete",
-            () => {
-                this.deletePropertyImmediate(propName);
-            }
-        ).open();
-    }
-
-    deletePropertyImmediate = (propName: string) => {
         S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperty", {
             "nodeId": this.node.id,
             "propName": propName
@@ -632,7 +624,14 @@ export class EditNodeDlg extends DialogBase {
 
     //todo-1 modify to support multiple delete of props.
     deletePropertyButtonClick = (): void => {
+        new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
+            () => {
+                this.deleteSelectedProperties();
+            }
+        ).open();
+    }
 
+    deleteSelectedProperties = (): void => {
         /* Iterate over all property checkboxes */
         this.propCheckBoxes.forEach((checkbox: Checkbox) => {
             if (checkbox.getChecked()) {
