@@ -117,7 +117,7 @@ public class Convert {
 				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey);
 
 		if (allowInlineChildren) {
-			boolean hasInlineChildren = node.getBooleanProp("inlineChildren");
+			boolean hasInlineChildren = node.getBooleanProp(NodeProp.INLINE_CHILDREN.s());
 			if (hasInlineChildren) {
 				Iterable<SubNode> nodeIter = api.getChildren(session, node,
 						Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100);

@@ -55,7 +55,7 @@ export class Render implements RenderIntf {
     buildRowHeader = (node: J.NodeInfo): Div => {
         let children = [];
 
-        let priority = S.props.getNodePropVal("priority", node);
+        let priority = S.props.getNodePropVal(J.NodeProp.PRIORITY, node);
         priority = (priority && priority != "0") ? " P" + priority : "";
 
         if (node.name) {
@@ -488,7 +488,7 @@ export class Render implements RenderIntf {
         }
 
         //todo-1: rename this to sn:inlineChildren
-        let isInlineChildren = !!S.props.getNodePropVal("inlineChildren", node);
+        let isInlineChildren = !!S.props.getNodePropVal(J.NodeProp.INLINE_CHILDREN, node);
 
         /* Construct Open Button.
         We always enable for fs:folder, to that by clicking to open a folder that will cause the server to re-check and see if there are
@@ -872,7 +872,7 @@ export class Render implements RenderIntf {
          * the client side for various reasons.
          */
 
-        let layout = S.props.getNodePropVal("layout", node);
+        let layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
         if (!layout || layout == "v") {
             return this.renderVerticalLayout(node, newData, level);
         }

@@ -75,7 +75,13 @@ public enum NodeProp {
     BIN("bin"),
 
     IMG_WIDTH("sn:imgWidth"), //
-    IMG_HEIGHT("sn:imgHeight");
+    IMG_HEIGHT("sn:imgHeight"),//
+    
+    
+    //todo-1: add sn:prefix
+    INLINE_CHILDREN("inlineChildren"),
+    PRIORITY("priority"),
+    LAYOUT("layout");
 
     @JsonValue
     private final String value;

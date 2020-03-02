@@ -1,10 +1,9 @@
 package org.subnode.mongo;
 
 import java.util.Date;
-import java.util.HashMap;
 
 import org.subnode.config.NodeName;
-import org.subnode.mongo.model.AccessControl;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.util.Util;
@@ -123,20 +122,29 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.setModifyTime(now);
 		}
 
-		/* We are converting ACL into AC here 
-		This code has been completed (ran on all instances already)
-		*/
-		// if (node.getAcl() != null) {
-		// 	HashMap<String, AccessControl> acMap = new HashMap<String, AccessControl>();
-		// 	node.getAcl().forEach((k, v) -> {
-		// 		AccessControl ac = new AccessControl();
-		// 		// log.debug("Setting ac with k=" + k + " v=" + v + " for node: " + node.getId().toHexString());
-		// 		ac.setPrvs(v);
-		// 		acMap.put(k, ac);
-		// 	});
-		// 	dbObj.put(SubNode.FIELD_AC, acMap);
-		// 	node.setAc(acMap);
-		// }
+		removeDefaultProps(node);
+	}
+
+	/*
+	 * For properties that are being set to their defalt behaviors as if the
+	 * property didn't exist (such as vertical layout is assumed if no layout
+	 * property is specified) we remove those properties when the client is passing
+	 * them in to be saved, or from any other source they are being passed to be
+	 * saved
+	 */
+	public void removeDefaultProps(SubNode node) {
+
+		/* If layout=="v" then remove the property */
+		String layout = node.getStringProp(NodeProp.LAYOUT.s());
+		if ("v".equals(layout)) {
+			node.deleteProp(NodeProp.LAYOUT.s());
+		}
+
+		/* If priority=="0" then remove the property */
+		String priority = node.getStringProp(NodeProp.PRIORITY.s());
+		if ("0".equals(priority)) {
+			node.deleteProp(NodeProp.PRIORITY.s());
+		}
 	}
 
 	@Override

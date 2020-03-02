@@ -548,6 +548,9 @@ export const enum NodeProp {
     BIN = "bin",
     IMG_WIDTH = "sn:imgWidth",
     IMG_HEIGHT = "sn:imgHeight",
+    INLINE_CHILDREN = "inlineChildren",
+    PRIORITY = "priority",
+    LAYOUT = "layout",
 }
 
 export const enum PrincipalName {

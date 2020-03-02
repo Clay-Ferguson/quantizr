@@ -207,17 +207,17 @@ export class EditNodeDlg extends DialogBase {
         if (this.node.properties) {
             this.node.properties.forEach((prop: J.PropertyInfo) => {
 
-                if (prop.name == "layout") {
+                if (prop.name == J.NodeProp.LAYOUT) {
                     this.layoutSelection.setSelection(prop.value);
                     return;
                 }
 
-                if (prop.name == "priority") {
+                if (prop.name == J.NodeProp.PRIORITY) {
                     this.prioritySelection.setSelection(prop.value);
                     return;
                 }
 
-                if (prop.name == "inlineChildren") {
+                if (prop.name == J.NodeProp.INLINE_CHILDREN) {
                     this.inlineChildrenCheckBox.setChecked(true);
                     return;
                 }
@@ -400,21 +400,16 @@ export class EditNodeDlg extends DialogBase {
 
             if (this.node) {
                 this.saveCheckboxVal(this.preformattedCheckBox, J.NodeProp.PRE);
-                this.saveCheckboxVal(this.inlineChildrenCheckBox, "inlineChildren");
+                this.saveCheckboxVal(this.inlineChildrenCheckBox, J.NodeProp.INLINE_CHILDREN);
                 this.saveCheckboxVal(this.wordWrapCheckBox, J.NodeProp.NOWRAP, true);
 
                 /* Get state of the 'layout' dropdown */
                 let layout = this.layoutSelection.getSelection();
-
-                //todo-0: legacy operation was: saveValue = layout == "v" ? null : layout
-                S.props.setNodePropVal("layout", this.node, layout);
+                S.props.setNodePropVal(J.NodeProp.LAYOUT, this.node, layout);
 
                 /* Get state of the 'priority' dropdown */
                 let priority = this.prioritySelection.getSelection();
-
-                //todo-0: legacy operation was: saveValue = priority == "0" ? null : priority
-                //priority value 0 is default, so if user selects that we can just delete the option and save space.
-                S.props.setNodePropVal("priority", this.node, priority);
+                S.props.setNodePropVal(J.NodeProp.PRIORITY, this.node, priority);
             }
 
             let content: string;
