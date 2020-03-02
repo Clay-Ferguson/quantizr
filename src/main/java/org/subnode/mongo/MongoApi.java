@@ -980,6 +980,9 @@ public class MongoApi {
 	public List<SubNode> getChildrenAsList(MongoSession session, SubNode node, boolean ordered, Integer limit) {
 		Iterable<SubNode> iter = getChildren(session, node,
 				ordered ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, limit);
+		if (!iter.iterator().hasNext()) {
+			return null;
+		}
 		List<SubNode> list = new LinkedList<SubNode>();
 		iter.forEach(list::add);
 		return list;
@@ -1008,7 +1011,6 @@ public class MongoApi {
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
 				.regex(regexDirectChildrenOfPath(node == null ? "" : node.getPath()));
 		if (ordered) {
-
 			query.with(Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
 		}
 		query.addCriteria(criteria);

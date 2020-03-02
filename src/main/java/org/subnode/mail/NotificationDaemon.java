@@ -63,8 +63,10 @@ public class NotificationDaemon {
 	 */
 	@Scheduled(fixedDelay = 30 * 1000)
 	public void run() {
-		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling())
+		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
+			log.debug("ignoring schedule cycle");
 			return;
+		}
 
 		runCounter++;
 
@@ -79,6 +81,7 @@ public class NotificationDaemon {
 		adminRunner.run((MongoSession session) -> {
 			List<SubNode> mailNodes = outboxMgr.getMailNodes(session);
 			if (mailNodes != null) {
+				log.debug("Found " + String.valueOf(mailNodes.size()) + " mailNodes to send.");
 				sendAllMail(session, mailNodes);
 			}
 		});
@@ -86,6 +89,8 @@ public class NotificationDaemon {
 
 	private void sendAllMail(MongoSession session, List<SubNode> nodes) {
 		synchronized (MailSender.getLock()) {
+			log.debug("MailSender lock obtained.");
+
 			if (CollectionUtils.isEmpty(nodes)) {
 				return;
 			}
@@ -94,9 +99,11 @@ public class NotificationDaemon {
 				try {
 					mailSender.init();
 					for (SubNode node : nodes) {
-						String email = node.getStringProp(NodeProp.EMAIL_RECIP.toString());
-						String subject = node.getStringProp(NodeProp.EMAIL_SUBJECT.toString());
-						String content = node.getStringProp(NodeProp.EMAIL_CONTENT.toString());
+						log.debug("Iterating node to email. nodeId:" + node.getId().toHexString());
+
+						String email = node.getStringProp(NodeProp.EMAIL_RECIP.s());
+						String subject = node.getStringProp(NodeProp.EMAIL_SUBJECT.s());
+						String content = node.getStringProp(NodeProp.EMAIL_CONTENT.s());
 
 						if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject)
 								&& !StringUtils.isEmpty(content)) {
@@ -104,6 +111,9 @@ public class NotificationDaemon {
 							log.debug("Found mail to send to: " + email);
 							mailSender.sendMail(email, null, content, subject);
 							api.delete(session, node);
+						}
+						else {
+							log.debug("not sending email. Missing some properties. email or subject or content");
 						}
 					}
 				} finally {

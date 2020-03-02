@@ -8,6 +8,7 @@ import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
+import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -27,6 +28,7 @@ export class SignupDlg extends DialogBase {
             new Form(null, [
                 this.userTextField = new TextField("User"),
                 this.passwordTextField = new PasswordTextField("Password"),
+                new TextContent("Note: Weak passwords may cause a warning (from Chrome Browser) if that password has ever been exposed in a data breach."),
                 this.emailTextField = new TextField("Email"),
                 new ButtonBar([
                     new Button("Create Account", this.signup, null, "primary"),

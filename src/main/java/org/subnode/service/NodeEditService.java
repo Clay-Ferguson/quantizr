@@ -37,6 +37,8 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 
+import opennlp.tools.util.StringUtil;
+
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -207,7 +209,7 @@ public class NodeEditService {
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
 
-		//log.debug("saveNode. nodeId=" + nodeId + " nodeName=" + nodeInfo.getName());
+		// log.debug("saveNode. nodeId=" + nodeId + " nodeName=" + nodeInfo.getName());
 		SubNode node = api.getNode(session, nodeId);
 		api.authRequireOwnerOfNode(session, node);
 
@@ -217,7 +219,8 @@ public class NodeEditService {
 		node.setContent(nodeInfo.getContent());
 
 		// if we're setting node name to a different node name
-		if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0 && !nodeInfo.getName().equals(node.getName())) {
+		if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0
+				&& !nodeInfo.getName().equals(node.getName())) {
 
 			/*
 			 * We don't use unique index on node name, because we want to save storage space
@@ -265,10 +268,12 @@ public class NodeEditService {
 			Calendar lastModified = Calendar.getInstance();
 			node.setModifyTime(lastModified.getTime());
 
-			outboxMgr.sendNotificationForChildNodeCreate(node, sessionContext.getUserName());
+			if (!StringUtil.isEmpty(node.getContent())) {
+				outboxMgr.sendNotificationForChildNodeCreate(node, sessionContext.getUserName());
+			}
 
-			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, -1, false,
-					false, false);
+			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, -1,
+					false, false, false);
 			res.setNode(newNodeInfo);
 			api.saveSession(session);
 		}

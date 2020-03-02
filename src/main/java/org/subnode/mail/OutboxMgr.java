@@ -90,9 +90,9 @@ public class OutboxMgr {
 		SubNode outboxNode = getSystemOutbox(session);
 		SubNode outboundEmailNode = api.createNode(session, outboxNode.getPath() + "/?", SubNodeTypes.UNSTRUCTURED);
 
-		outboundEmailNode.setProp(NodeProp.EMAIL_CONTENT.toString(), content);
-		outboundEmailNode.setProp(NodeProp.EMAIL_SUBJECT.toString(), subject);
-		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP.toString(), recipients);
+		outboundEmailNode.setProp(NodeProp.EMAIL_CONTENT.s(), content);
+		outboundEmailNode.setProp(NodeProp.EMAIL_SUBJECT.s(), subject);
+		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP.s(), recipients);
 
 		api.save(session, outboundEmailNode);
 	}
@@ -111,6 +111,6 @@ public class OutboxMgr {
 	 * Get node that contains all preferences for this user, as properties on it.
 	 */
 	public SubNode getSystemOutbox(MongoSession session) {
-		return apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.OUTBOX + "/", NodeName.SYSTEM, "System Messages", null,true, null, null);
+		return apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.OUTBOX + "/", NodeName.SYSTEM, "System Messages", null, true, null, null);
 	}
 }

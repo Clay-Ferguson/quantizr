@@ -295,7 +295,7 @@ public class UserManagerService {
 				"<p>\nClick this link to complete signup: <br>\n" + signupLink;
 
 		if (!StringUtils.isEmpty(appProp.getMailHost())) {
-			outboxMgr.queueEmail(email, "quantizr.com - Account Verification", content);
+			outboxMgr.queueEmail(email, "quantizr.com - Account Signup", content);
 		}
 	}
 

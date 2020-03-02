@@ -63,6 +63,8 @@ public class SubNodeUtil {
 		return (api.getChildCount(node) > 0);
 	}
 
+	//todo-1: everywhere this is called can we be sure the path is not actually used as a lookup, but instead the node name?
+	//The new design has path as a non-named hierarchy-only aspect.
 	public SubNode ensureNodeExists(MongoSession session, String parentPath, String name, String defaultContent,
 			String primaryTypeName, boolean saveImmediate, SubNodePropertyMap props, ValContainer<Boolean> created) {
 		if (!parentPath.endsWith("/")) {

@@ -1,7 +1,6 @@
 package org.subnode;
 
 import org.subnode.config.ConstantsProvider;
-import org.subnode.model.client.PrincipalName;
 import org.subnode.util.ExUtil;
 
 import org.slf4j.Logger;
@@ -33,8 +32,8 @@ public class AppServer {
 	private static boolean enableScheduling;
 
 	/* Java Main entry point for Quantizr application */
-
 	public static void main(String[] args) {
+		log.trace("main() trace log test.");
 		/*
 		 * If we are running AppServer then enableScheduling, otherwise we may be
 		 * running some command line service such as BackupUtil, in which case deamons

@@ -78,7 +78,8 @@ services:
             server.ssl.key-store-password: "${prodKeyStorePassword}" 
             server.ssl.keyStoreType: "PKCS12" 
             server.ssl.keyAlias: "tomcat" 
-                    
+
+            mail.port: ""
             mail.user: "postmaster@quantizr.com" 
             mail.password: "${emailPassword}" 
             mail.host: "smtp.mailgun.org" 
