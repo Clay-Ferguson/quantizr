@@ -13,7 +13,7 @@ export class CollapsiblePanel extends Comp {
 
     /* If textLink=true that means we show just a text link and not a button */
     constructor(private buttonText: string = "", attribs: Object = {}, initialChildren: Comp[] = null, private textLink: boolean = false,
-        private stateCallback: Function = null, expanded: boolean = false) {
+        private stateCallback: Function = null, expanded: boolean = false, private extraToggleButtonClass="") {
         super(attribs);
         this.setChildren(initialChildren);
         this.setExpanded(expanded)
@@ -36,13 +36,13 @@ export class CollapsiblePanel extends Comp {
         },//
             S.e('a', {
                 href: "#" + this.getId(),
-                className: style,
+                className: style+" "+this.extraToggleButtonClass,
                 "data-toggle": collapseClass,
                 id: "div_a_" + this.getId(),
                 key: "div_a_" + this.getId(),
                 onClick: this.onToggle
             }, //
-                S.e('div', {
+                S.e('span', {
                     className: innerStyle,
                     key: "div_a_div_" + this.getId()
                 }, this.buttonText),

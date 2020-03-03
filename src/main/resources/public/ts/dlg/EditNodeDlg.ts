@@ -253,7 +253,7 @@ export class EditNodeDlg extends DialogBase {
         let collapsiblePanel = new CollapsiblePanel("More...", null, [optionsBar, selectionsBar, collapsiblePropsTable], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
-            }, EditNodeDlg.morePanelExpanded);
+            }, EditNodeDlg.morePanelExpanded, "float-right");
 
         this.propertyEditFieldContainer.setChildren([editPropsTable, collapsiblePanel]);
 
