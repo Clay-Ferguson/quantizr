@@ -178,7 +178,11 @@ public class MongoApi {
 		throw new NodeAuthFailedException();
 	}
 
-	/* NOTE: this should ONLY ever be called from 'auth()' method of this class */
+	/* NOTE: this should ONLY ever be called from 'auth()' method of this class 
+	
+	todo-1: MongoThreadLocal class has a variable created to memoize these results per-request but that has not yet
+	been implemented.
+	*/
 	private boolean ancestorAuth(MongoSession session, SubNode node, List<PrivilegeType> privs) {
 
 		/* get the non-null sessionUserNodeId if not anonymous user */
@@ -407,7 +411,7 @@ public class MongoApi {
 			for (SubNode node : MongoThreadLocal.getDirtyNodes().values()) {
 				save(session, node, false, false);
 			}
-			MongoThreadLocal.cleanAll();
+			MongoThreadLocal.getDirtyNodes().clear();
 		}
 	}
 

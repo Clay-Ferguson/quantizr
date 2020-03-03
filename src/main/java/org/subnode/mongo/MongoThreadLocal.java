@@ -26,8 +26,8 @@ public class MongoThreadLocal {
 	private static final ThreadLocal<HashMap<String, Boolean>> aclResults = new ThreadLocal<HashMap<String, Boolean>>();
 
 	public static void removeAll() {
-		dirtyNodes.remove();
-		aclResults.remove();
+		getDirtyNodes().clear();
+		getAclResults().clear();
 	}
 
 	public static void setDirtyNodes(HashMap<String, SubNode> res) {
@@ -35,10 +35,6 @@ public class MongoThreadLocal {
 	}
 
 	public static HashMap<String, SubNode> getDirtyNodes() {
-		return dirtyNodes.get();
-	}
-	
-	public static HashMap<String, SubNode> dirtyNodes() {
 		if (dirtyNodes.get() == null) {
 			dirtyNodes.set(new HashMap<String, SubNode>());
 		}
@@ -55,7 +51,7 @@ public class MongoThreadLocal {
 		if (node.getId() == null || node.isWriting() || node.isDeleted()) {
 			return;
 		}
-		dirtyNodes().put(node.getId().toHexString(), node);
+		getDirtyNodes().put(node.getId().toHexString(), node);
 	}
 
 	public static void autoCleanup(MongoSession session) {
@@ -82,23 +78,14 @@ public class MongoThreadLocal {
 		}
 	}
 	
-	public static void cleanAll() {
-		dirtyNodes().clear();
-	}
-	
 	public static void setAclResults(HashMap<String, Boolean> res) {
 		aclResults.set(res);
 	}
 
 	public static HashMap<String, Boolean> getAclResults() {
-		return aclResults.get();
-	}
-	
-	public static HashMap<String, Boolean> aclResults() {
 		if (aclResults.get() == null) {
 			aclResults.set(new HashMap<String, Boolean>());
 		}
 		return aclResults.get();
 	}
-
 }
