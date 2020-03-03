@@ -342,7 +342,18 @@ public class AttachmentService {
 			if (session == null) {
 				session = ThreadLocals.getMongoSession();
 			}
-			SubNode node = api.getNode(session, nodeId);
+			
+			SubNode node = api.getNode(session, nodeId, false);
+
+			//Everyone's accont node can publish it's attachment and is assumed to be an avatar.
+			boolean allowAuth = true;
+			if (api.isAnAccountNode(session, node)) {
+				allowAuth = false;
+			}
+
+			if (allowAuth) {
+				api.auth(session, node, PrivilegeType.READ);
+			}
 
 			String mimeTypeProp = node.getStringProp(NodeProp.BIN_MIME.toString());
 			if (mimeTypeProp == null) {
@@ -364,7 +375,7 @@ public class AttachmentService {
 				fileName = "filename";
 			}
 
-			AutoCloseInputStream acis = api.getAutoClosingStream(session, node, null);
+			AutoCloseInputStream acis = api.getAutoClosingStream(session, node, null, allowAuth);
 			StreamingResponseBody stream = (os) -> {
 				IOUtils.copy(acis, os);
 				os.flush();

@@ -133,6 +133,15 @@ public class MongoApi {
 		auth(session, node, Arrays.asList(privs));
 	}
 
+	/*
+	 * The way know a node is an account node is that it is its id matches its'
+	 * owner. Self owned node. This is because the very definition of the 'owner' on
+	 * any given node is the ID of the user's root node of the user who owns it
+	 */
+	public boolean isAnAccountNode(MongoSession session, SubNode node) {
+		return node.getId().toHexString().equals(node.getOwner().toHexString());
+	}
+
 	/* Returns true if this user on this session has privType access to 'node' */
 	public void auth(MongoSession session, SubNode node, List<PrivilegeType> priv) {
 		if (priv == null || priv.size() == 0) {
@@ -935,6 +944,8 @@ public class MongoApi {
 			ret = ops.findOne(query, SubNode.class);
 		}
 
+		// todo-0: this allowAuth will be redundant sometimes. use threadlocal (or
+		// RequestScope bean) to hold which nodes are already authed
 		if (allowAuth) {
 			auth(session, ret, PrivilegeType.READ);
 		}
@@ -1388,7 +1399,7 @@ public class MongoApi {
 			String propName) {
 
 		auth(session, node, PrivilegeType.WRITE);
-		
+
 		if (propName == null) {
 			propName = "bin";
 		}
@@ -1427,8 +1438,14 @@ public class MongoApi {
 		grid.delete(new Query(Criteria.where("_id").is(id)));
 	}
 
-	public InputStream getStream(MongoSession session, SubNode node, String propName) {
-		auth(session, node, PrivilegeType.READ);
+	// todo-0: the auth param here is a hack for avatars, but also this auth is
+	// redundant. need to let the thread locals
+	// have ability to know already which node Ids have been 'authed' so we don't
+	// waste cycles doing it again.
+	public InputStream getStream(MongoSession session, SubNode node, String propName, boolean auth) {
+		if (auth) {
+			auth(session, node, PrivilegeType.READ);
+		}
 		if (propName == null) {
 			propName = "bin";
 		}
@@ -1459,8 +1476,9 @@ public class MongoApi {
 		}
 	}
 
-	public AutoCloseInputStream getAutoClosingStream(MongoSession session, SubNode node, String propName) {
-		return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, propName)));
+	public AutoCloseInputStream getAutoClosingStream(MongoSession session, SubNode node, String propName,
+			boolean auth) {
+		return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, propName, auth)));
 	}
 
 	public String regexDirectChildrenOfPath(String path) {
@@ -1644,9 +1662,8 @@ public class MongoApi {
 				true, null, created);
 
 		if (created.getVal()) {
-			// todo-p0: need these types of strings ('rd') to be in an enum or constants
-			// file.
-			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(),
+					Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 
 		/* Ensure Content folder is created and synced to file system */

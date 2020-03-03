@@ -222,8 +222,7 @@ public abstract class ExportArchiveBase {
 				String binFileNameStr = binFileNameProp.getVal() != null ? binFileNameProp.getVal() : "binary";
 				AutoCloseInputStream is = null;
 
-				is = api.getAutoClosingStream(session, node, null);
-				// long size = node.getIntProp(NodeProp.BIN_SIZE);
+				is = api.getAutoClosingStream(session, node, null, false);
 				addFileEntry(parentFolder + "/" + fileName + "/" + binFileNameStr, IOUtils.toByteArray(is));
 			}
 

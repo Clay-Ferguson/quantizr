@@ -34,6 +34,10 @@ export class Render implements RenderIntf {
     //UPDATE: turning this ON for now, because for testing 'shared' nodes we don't have editing capability and thus need a way to decrypt
     private immediateDecrypting: boolean = true;
 
+    /* Since js is singlethreaded we can have lastOwner get updated from any other function and use it to keep track
+    during the rendering, what the last owner was so we can keep from displaying the same avatars unnecessarily */
+    private lastOwner: string;
+
     private renderBinary = (node: J.NodeInfo): Comp => {
         /*
          * If this is an image render the image directly onto the page as a visible image
@@ -140,7 +144,11 @@ export class Render implements RenderIntf {
             }
         }
 
-        if (renderBin && node.hasBinary) {
+        /* if node owner matches node id this is someone's account root node, so what we're doing here is not
+        showing the normal attachment for this node, because that will the same as the avatar */
+        let isAnAccountNode = node.ownerId && node.id == node.ownerId;
+
+        if (renderBin && node.hasBinary && !isAnAccountNode) {
             let binary = this.renderBinary(node);
 
             /*
@@ -390,7 +398,8 @@ export class Render implements RenderIntf {
         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode();
         let selected: boolean = (focusNode && focusNode.id === id);
 
-        let buttonBar: Comp = this.makeRowButtonBar(node, editingAllowed);
+        let allowAvatar = node.owner != this.lastOwner;
+        let buttonBar: Comp = this.makeRowButtonBar(node, editingAllowed, allowAvatar);
         //let bkgStyle: string = this.getNodeBkgImageStyle(node);
         let indentLevel = layoutClass === "node-grid-item" ? 0 : level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
@@ -449,7 +458,7 @@ export class Render implements RenderIntf {
         return bkgImgStyle;
     }
 
-    makeRowButtonBar = (node: J.NodeInfo, editingAllowed: boolean): Comp => {
+    makeRowButtonBar = (node: J.NodeInfo, editingAllowed: boolean, allowAvatar: boolean): Comp => {
         let typeIcon: Icon;
         let encIcon: Icon;
         let sharedIcon: Icon;
@@ -571,7 +580,7 @@ export class Render implements RenderIntf {
         }
 
         let avatarImg: Img;
-        if (node.owner != J.PrincipalName.ADMIN && node.ownerId && node.id != node.ownerId) {
+        if (allowAvatar && node.owner != J.PrincipalName.ADMIN) {
             avatarImg = this.makeAvatarImage(node.ownerId, node.avatarBinVer);
         }
 
@@ -582,7 +591,7 @@ export class Render implements RenderIntf {
             return new HorizontalLayout([selButton, avatarImg, typeIcon, encIcon, sharedIcon, buttonBar]);
         }
         else {
-            return new HorizontalLayout([avatarImg, buttonBar]);;
+            return new HorizontalLayout([avatarImg, buttonBar]);
         }
     }
 
@@ -611,8 +620,10 @@ export class Render implements RenderIntf {
         }
     }
 
+    /* todo-1: this function is way to large. Break out a lot of this into functions */
     renderPageFromData = async (data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string): Promise<void> => {
         //console.log("renderPageFromData(): scrollToTop="+scrollToTop);
+        this.lastOwner = null;
 
         let elm = S.util.domElm("mainTab");
         if (elm) {
@@ -674,7 +685,6 @@ export class Render implements RenderIntf {
                     }
 
                     //let bkgStyle: string = this.getNodeBkgImageStyle(data.node);
-
                     /*
                      * NOTE: mainNodeContent is the parent node of the page content, and is always the node displayed at the top
                      * of the page above all the other nodes which are its child nodes.
@@ -683,6 +693,8 @@ export class Render implements RenderIntf {
 
                     //console.log("mainNodeContent: "+mainNodeContent);
 
+                    //todo-1: it's getting super ugly that all this code is different (replicated) from the normal rows, non-root, not sure if i 
+                    //want to keep this or consolidate.
                     if (mainNodeContent.length > 0) {
                         let id: string = data.node.id;
                         let cssId: string = "row_" + id;
@@ -764,6 +776,11 @@ export class Render implements RenderIntf {
                             console.log("selected: focusNode.uid=" + focusNode.id + " selected=" + selected);
                         }
 
+                        let avatarImg: Img;
+                        if (data.node.owner != J.PrincipalName.ADMIN) {
+                            avatarImg = this.makeAvatarImage(data.node.ownerId, data.node.avatarBinVer);
+                        }
+
                         if (typeIcon || encIcon || sharedIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton) {
                             buttonBar = new ButtonBar([typeIcon, encIcon, sharedIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
                                 null, "marginLeft marginTop");
@@ -771,7 +788,10 @@ export class Render implements RenderIntf {
 
                         let children = [];
                         if (buttonBar) {
-                            children.push(buttonBar);
+                            children.push(new HorizontalLayout([avatarImg, buttonBar]));
+                        }
+                        else {
+                            children.push(avatarImg);
                         }
                         children = children.concat(mainNodeContent);
 
@@ -802,6 +822,7 @@ export class Render implements RenderIntf {
                         output.push(new ButtonBar([firstButton, prevButton], "text-center"));
                     }
 
+                    this.lastOwner = data.node.owner;
                     if (data.node.children) {
                         output.push(this.renderChildren(data.node, newData, 1));
                     }
@@ -924,6 +945,7 @@ export class Render implements RenderIntf {
                     comps.push(row);
                     rowCount++;
                 }
+                this.lastOwner = n.owner;
 
                 if (n.children) {
                     comps.push(this.renderChildren(n, newData, level + 1));
@@ -970,6 +992,7 @@ export class Render implements RenderIntf {
                     comps.push(this.renderChildren(n, newData, level + 1));
                 }
             }
+            this.lastOwner = n.owner;
         }
         return new Div(null, null, comps);
     }
