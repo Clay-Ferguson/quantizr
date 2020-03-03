@@ -65,7 +65,7 @@ public class OutboxMgr {
 						log.warn("No userNode was found for parentNode.owner="+parentNode.getOwner());
 						return;
 					}
-					String email = userNode.getStringProp(NodeProp.EMAIL.toString());
+					String email = userNode.getStringProp(NodeProp.EMAIL.s());
 					log.debug("sending email to: " + email + " because his node was appended under.");
 
 					String content = String.format("User '%s' replied to you.<p>\n\n" + //

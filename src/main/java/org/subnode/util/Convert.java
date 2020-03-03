@@ -51,8 +51,8 @@ public class Convert {
 		boolean binaryIsImage = false;
 		ImageSize imageSize = null;
 
-		long binVer = node.getIntProp(NodeProp.BIN_VER.toString());
-		String mimeType = node.getStringProp(NodeProp.BIN_MIME.toString());
+		long binVer = node.getIntProp(NodeProp.BIN_VER.s());
+		String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 		if (mimeType != null) {
 			hasBinary = true;
 			binaryIsImage = api.isImageAttached(node);
@@ -89,8 +89,8 @@ public class Convert {
 					(node.getOwner() != null ? ownerId : ("null owner on node: " + node.getId().toHexString())));
 		} else {
 			//todo-0: need to search code globally for toString() that could be s() instead.
-			nameProp = userNode.getStringProp(NodeProp.USER.toString());
-			avatarBinVer = userNode.getIntProp(NodeProp.BIN_VER.toString());
+			nameProp = userNode.getStringProp(NodeProp.USER.s());
+			avatarBinVer = userNode.getIntProp(NodeProp.BIN_VER.s());
 		}
 		String owner = userNode == null ? "admin" : nameProp;
 
@@ -152,12 +152,12 @@ public class Convert {
 		ImageSize imageSize = new ImageSize();
 
 		try {
-			Long width = node.getIntProp(NodeProp.IMG_WIDTH.toString());
+			Long width = node.getIntProp(NodeProp.IMG_WIDTH.s());
 			if (width != null) {
 				imageSize.setWidth(width.intValue());
 			}
 
-			Long height = node.getIntProp(NodeProp.IMG_HEIGHT.toString());
+			Long height = node.getIntProp(NodeProp.IMG_HEIGHT.s());
 			if (height != null) {
 				imageSize.setHeight(height.intValue());
 			}

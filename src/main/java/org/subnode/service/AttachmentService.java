@@ -226,7 +226,7 @@ public class AttachmentService {
 	public void saveBinaryStreamToNode(MongoSession session, LimitedInputStreamEx inputStream, String mimeType,
 			String fileName, long size, int width, int height, SubNode node) {
 
-		Long version = node.getIntProp(NodeProp.BIN_VER.toString());
+		Long version = node.getIntProp(NodeProp.BIN_VER.s());
 		if (version == null) {
 			version = 0L;
 		}
@@ -251,8 +251,8 @@ public class AttachmentService {
 				bufImg = ImageIO.read(isTemp);
 
 				try {
-					node.setProp(NodeProp.IMG_WIDTH.toString(), bufImg.getWidth());
-					node.setProp(NodeProp.IMG_HEIGHT.toString(), bufImg.getHeight());
+					node.setProp(NodeProp.IMG_WIDTH.s(), bufImg.getWidth());
+					node.setProp(NodeProp.IMG_HEIGHT.s(), bufImg.getHeight());
 				} catch (Exception e) {
 					/*
 					 * reading files from IPFS caused this exception, and I didn't investigate why
@@ -267,21 +267,21 @@ public class AttachmentService {
 			}
 		}
 
-		node.setProp(NodeProp.BIN_MIME.toString(), mimeType);
+		node.setProp(NodeProp.BIN_MIME.s(), mimeType);
 		if (fileName != null) {
-			node.setProp(NodeProp.BIN_FILENAME.toString(), fileName);
+			node.setProp(NodeProp.BIN_FILENAME.s(), fileName);
 		}
 
 		log.debug("Uploading new BIN_VER: " + String.valueOf(version + 1));
-		node.setProp(NodeProp.BIN_VER.toString(), version + 1);
+		node.setProp(NodeProp.BIN_VER.s(), version + 1);
 
 		if (imageBytes == null) {
-			node.setProp(NodeProp.BIN_SIZE.toString(), size);
+			node.setProp(NodeProp.BIN_SIZE.s(), size);
 			api.writeStream(session, node, inputStream, null, mimeType, null);
 		} else {
 			LimitedInputStream is = null;
 			try {
-				node.setProp(NodeProp.BIN_SIZE.toString(), imageBytes.length);
+				node.setProp(NodeProp.BIN_SIZE.s(), imageBytes.length);
 				is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
 				api.writeStream(session, node, is, null, mimeType, null);
 			} finally {
@@ -311,11 +311,11 @@ public class AttachmentService {
 	 * Deletes all the binary-related properties from a node
 	 */
 	private void deleteAllBinaryProperties(SubNode node) {
-		node.deleteProp(NodeProp.IMG_WIDTH.toString());
-		node.deleteProp(NodeProp.IMG_HEIGHT.toString());
-		node.deleteProp(NodeProp.BIN_MIME.toString());
-		node.deleteProp(NodeProp.BIN_FILENAME.toString());
-		node.deleteProp(NodeProp.BIN_SIZE.toString());
+		node.deleteProp(NodeProp.IMG_WIDTH.s());
+		node.deleteProp(NodeProp.IMG_HEIGHT.s());
+		node.deleteProp(NodeProp.BIN_MIME.s());
+		node.deleteProp(NodeProp.BIN_FILENAME.s());
+		node.deleteProp(NodeProp.BIN_SIZE.s());
 
 		// NO! Do not delete binary version property. Browsers are allowed to cache
 		// based on the URL of this node and this version.
@@ -355,7 +355,7 @@ public class AttachmentService {
 				api.auth(session, node, PrivilegeType.READ);
 			}
 
-			String mimeTypeProp = node.getStringProp(NodeProp.BIN_MIME.toString());
+			String mimeTypeProp = node.getStringProp(NodeProp.BIN_MIME.s());
 			if (mimeTypeProp == null) {
 				throw ExUtil.newEx("unable to find mimeType property");
 			}
@@ -370,7 +370,7 @@ public class AttachmentService {
 			// Binary binary = dataProp.getBinary();
 			// log.debug("Retrieving binary bytes: " + binary.getSize());
 
-			String fileName = node.getStringProp(NodeProp.BIN_FILENAME.toString());
+			String fileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
 			if (fileName == null) {
 				fileName = "filename";
 			}
@@ -380,7 +380,7 @@ public class AttachmentService {
 				IOUtils.copy(acis, os);
 				os.flush();
 			};
-			long size = node.getIntProp(NodeProp.BIN_SIZE.toString());
+			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 
 			return ResponseEntity.ok()//
 					.contentLength(size)//

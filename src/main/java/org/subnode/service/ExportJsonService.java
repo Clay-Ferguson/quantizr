@@ -102,7 +102,7 @@ public class ExportJsonService {
 				final BufferedOutputStream _os = os;
 				iter.forEach((node) -> {
 
-					String binFileName = node.getStringProp(NodeProp.BIN_FILENAME.toString());
+					String binFileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
 					if (binFileName != null) {
 						if (saveBinaryToFileSystem(binFileName, targetFolder, node)) {
 							numBins.setVal(numBins.getVal() + 1);
@@ -139,7 +139,7 @@ public class ExportJsonService {
 	private boolean readBinaryFromResource(MongoSession session, SubNode node, String binFileName, String subFolder) {
 		boolean ret = false;
 
-		String binMime = node.getStringProp(NodeProp.BIN_MIME.toString());
+		String binMime = node.getStringProp(NodeProp.BIN_MIME.s());
 		if (binMime != null) {
 			log.debug("Mime: " + binMime);
 		}
@@ -235,7 +235,7 @@ public class ExportJsonService {
 					SubNode node = objectMapper.readValue(json, SubNode.class);
 					api.save(session, node);
 
-					String binFileName = node.getStringProp(NodeProp.BIN_FILENAME.toString());
+					String binFileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
 					if (binFileName != null) {
 						ObjectId nodeId = node.getId();
 

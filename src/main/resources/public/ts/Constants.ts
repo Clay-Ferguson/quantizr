@@ -40,7 +40,6 @@ export class Constants {
     // <img alt='' border='0' src='https://www.paypal.com/en_US/i/scr/pixel.gif' width='1' height='1' />
     // </form>`;
 
-    //todo-0: this button does get altered the same the other markdown links and images get tweaked by the async lookup and modify of it.
     static readonly PAY_PAL_BUTTON: string = `
     <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YD984BLHTSZYL&currency_code=USD&source=url" target="_blank">
     <img src='/images/btn_donateCC_LG.gif' 

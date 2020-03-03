@@ -178,11 +178,11 @@ public class UserManagerService {
 			SubNode node = api.getNode(session, signupCode);
 
 			if (node != null) {
-				if (!node.getBooleanProp(NodeProp.SIGNUP_PENDING.toString())) {
+				if (!node.getBooleanProp(NodeProp.SIGNUP_PENDING.s())) {
 					throw ExUtil.newEx("Signup was already completed.");
 				}
 
-				String userName = node.getStringProp(NodeProp.USER.toString());
+				String userName = node.getStringProp(NodeProp.USER.s());
 
 				if (PrincipalName.ADMIN.s().equals(userName)) {
 					throw new RuntimeException("processSignupCode should not be called fror admin user.");
@@ -210,7 +210,7 @@ public class UserManagerService {
 				 */
 				model.addAttribute("signupCode", "ok");
 
-				node.deleteProp(NodeProp.SIGNUP_PENDING.toString());
+				node.deleteProp(NodeProp.SIGNUP_PENDING.s());
 				api.save(session, node);
 
 				sessionContext.setSignupSuccessMessage("Signup Successful. You may login now.");
@@ -300,7 +300,7 @@ public class UserManagerService {
 	}
 
 	public void setDefaultUserPreferences(SubNode prefsNode) {
-		prefsNode.setProp(NodeProp.USER_PREF_EDIT_MODE.toString(), false);
+		prefsNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 	}
 
 	public void savePublicKey(final SavePublicKeyRequest req, final SavePublicKeyResponse res) {
@@ -310,7 +310,7 @@ public class UserManagerService {
 			SubNode userNode = api.getUserNodeByUserName(session, userName);
 
 			if (userNode != null) {
-				userNode.setProp(NodeProp.USER_PREF_PUBLIC_KEY.toString(), req.getKeyJson());
+				userNode.setProp(NodeProp.USER_PREF_PUBLIC_KEY.s(), req.getKeyJson());
 			}
 			else {
 				log.debug("savePublicKey failed to find userName: "+userName);
@@ -334,10 +334,10 @@ public class UserManagerService {
 			 * Assign preferences as properties on this node,
 			 */
 			boolean editMode = reqUserPrefs.isEditMode();
-			prefsNode.setProp(NodeProp.USER_PREF_EDIT_MODE.toString(), editMode);
+			prefsNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), editMode);
 
 			boolean showMetaData = reqUserPrefs.isShowMetaData();
-			prefsNode.setProp(NodeProp.USER_PREF_SHOW_METADATA.toString(), showMetaData);
+			prefsNode.setProp(NodeProp.USER_PREF_SHOW_METADATA.s(), showMetaData);
 
 			/*
 			 * Also update session-scope object, because server-side functions that need
@@ -363,10 +363,10 @@ public class UserManagerService {
 
 		adminRunner.run(session -> {
 			SubNode prefsNode = api.getUserNodeByUserName(session, userName);
-			userPrefs.setEditMode(prefsNode.getBooleanProp(NodeProp.USER_PREF_EDIT_MODE.toString()));
-			userPrefs.setShowMetaData(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_METADATA.toString()));
-			userPrefs.setImportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_IMPORT_ALLOWED.toString()));
-			userPrefs.setExportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_EXPORT_ALLOWED.toString()));
+			userPrefs.setEditMode(prefsNode.getBooleanProp(NodeProp.USER_PREF_EDIT_MODE.s()));
+			userPrefs.setShowMetaData(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_METADATA.s()));
+			userPrefs.setImportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_IMPORT_ALLOWED.s()));
+			userPrefs.setExportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_EXPORT_ALLOWED.s()));
 		});
 
 		return userPrefs;
@@ -405,13 +405,13 @@ public class UserManagerService {
 
 				String codePart = XString.parseAfterLast(passCode, "-");
 
-				String nodeCodePart = userNode[0].getStringProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.toString());
+				String nodeCodePart = userNode[0].getStringProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 				if (!codePart.equals(nodeCodePart)) {
 					throw ExUtil.newEx("Invald password reset code.");
 				}
 
 				String password = req.getNewPassword();
-				userName[0] = userNode[0].getStringProp(NodeProp.USER.toString());
+				userName[0] = userNode[0].getStringProp(NodeProp.USER.s());
 
 				if (PrincipalName.ADMIN.s().equals(userName[0])) {
 					throw new RuntimeException("changePassword should not be called fror admin user.");
@@ -419,8 +419,8 @@ public class UserManagerService {
 
 				// userNode[0].setProp(NodeProp.PASSWORD, password); //
 				// encryptor.encrypt(password));
-				userNode[0].setProp(NodeProp.PWD_HASH.toString(), api.getHashOfPassword(password)); // encryptor.encrypt(password));
-				userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.toString());
+				userNode[0].setProp(NodeProp.PWD_HASH.s(), api.getHashOfPassword(password)); // encryptor.encrypt(password));
+				userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 				// note: the adminRunner.run saves the session so we don't do that here.
 			});
@@ -436,12 +436,9 @@ public class UserManagerService {
 			}
 
 			String password = req.getNewPassword();
-			userName[0] = userNode[0].getStringProp(NodeProp.USER.toString());
-
-			// userNode[0].setProp(NodeProp.PASSWORD, password); //
-			// encryptor.encrypt(password));
-			userNode[0].setProp(NodeProp.PWD_HASH.toString(), api.getHashOfPassword(password)); // encryptor.encrypt(password));
-			userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.toString());
+			userName[0] = userNode[0].getStringProp(NodeProp.USER.s());
+			userNode[0].setProp(NodeProp.PWD_HASH.s(), api.getHashOfPassword(password)); 
+			userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 			api.save(session, userNode[0]);
 		}
@@ -484,7 +481,7 @@ public class UserManagerService {
 			 * able to completely hijack anyone else's account simply by issuing a password
 			 * change to that account!
 			 */
-			String nodeEmail = ownerNode.getStringProp(NodeProp.EMAIL.toString());
+			String nodeEmail = ownerNode.getStringProp(NodeProp.EMAIL.s());
 			if (nodeEmail == null || !nodeEmail.equals(email)) {
 				res.setMessage("Wrong user name and/or email.");
 				res.setSuccess(false);
@@ -504,7 +501,7 @@ public class UserManagerService {
 			int oneDayMillis = 60 * 60 * 1000;
 			long authCode = new Date().getTime() + oneDayMillis + rand.nextInt(oneDayMillis);
 
-			ownerNode.setProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.toString(), String.valueOf(authCode));
+			ownerNode.setProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s(), String.valueOf(authCode));
 			api.save(session, ownerNode);
 
 			String passCode = ownerNode.getId().toHexString() + "-" + String.valueOf(authCode);

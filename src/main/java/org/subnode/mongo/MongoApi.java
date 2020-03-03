@@ -306,7 +306,7 @@ public class MongoApi {
 			throw new RuntimeException("Node has null owner: " + XString.prettyPrint(node));
 		}
 		SubNode userNode = getNode(session, node.getOwner());
-		return userNode.getStringProp(NodeProp.USER.toString());
+		return userNode.getStringProp(NodeProp.USER.s());
 	}
 
 	// This whole entire approach was a very bad idea...
@@ -700,11 +700,11 @@ public class MongoApi {
 		Iterable<SubNode> iter = ops.find(query, SubNode.class);
 
 		iter.forEach((node) -> {
-			String password = node.getStringProp(NodeProp.PASSWORD.toString());
+			String password = node.getStringProp(NodeProp.PASSWORD.s());
 			if (password != null) {
-				log.debug("pwdHash update. userNode node: name=" + node.getStringProp(NodeProp.USER.toString()));
+				log.debug("pwdHash update. userNode node: name=" + node.getStringProp(NodeProp.USER.s()));
 
-				node.setProp(NodeProp.PWD_HASH.toString(), getHashOfPassword(password));
+				node.setProp(NodeProp.PWD_HASH.s(), getHashOfPassword(password));
 
 				/*
 				 * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some of
@@ -894,8 +894,8 @@ public class MongoApi {
 			if (principalNode == null) {
 				return null;
 			}
-			principalName = principalNode.getStringProp(NodeProp.USER.toString());
-			publicKey = principalNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY.toString());
+			principalName = principalNode.getStringProp(NodeProp.USER.s());
+			publicKey = principalNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY.s());
 		}
 
 		AccessControlInfo info = new AccessControlInfo(principalName, principalId, publicKey);
@@ -948,8 +948,6 @@ public class MongoApi {
 			ret = ops.findOne(query, SubNode.class);
 		}
 
-		// todo-0: this allowAuth will be redundant sometimes. use threadlocal (or
-		// RequestScope bean) to hold which nodes are already authed
 		if (allowAuth) {
 			auth(session, ret, PrivilegeType.READ);
 		}
@@ -984,7 +982,7 @@ public class MongoApi {
 	}
 
 	public boolean isImageAttached(SubNode node) {
-		String mime = node.getStringProp(NodeProp.BIN_MIME.toString());
+		String mime = node.getStringProp(NodeProp.BIN_MIME.s());
 		return ImageUtil.isImageMime(mime);
 	}
 
@@ -1442,10 +1440,6 @@ public class MongoApi {
 		grid.delete(new Query(Criteria.where("_id").is(id)));
 	}
 
-	// todo-0: the auth param here is a hack for avatars, but also this auth is
-	// redundant. need to let the thread locals
-	// have ability to know already which node Ids have been 'authed' so we don't
-	// waste cycles doing it again.
 	public InputStream getStream(MongoSession session, SubNode node, String propName, boolean auth) {
 		if (auth) {
 			auth(session, node, PrivilegeType.READ);
@@ -1527,16 +1521,16 @@ public class MongoApi {
 		 * that immediately all user root nodes are addressible as "/r/usr/myName".
 		 */
 		SubNode userNode = createNode(session, newUserNodePath, null);
-		userNode.setProp(NodeProp.USER.toString(), user);
-		userNode.setProp(NodeProp.EMAIL.toString(), email);
+		userNode.setProp(NodeProp.USER.s(), user);
+		userNode.setProp(NodeProp.EMAIL.s(), email);
 		// userNode.setProp(NodeProp.PASSWORD, password);
-		userNode.setProp(NodeProp.PWD_HASH.toString(), getHashOfPassword(password));
-		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE.toString(), false);
+		userNode.setProp(NodeProp.PWD_HASH.s(), getHashOfPassword(password));
+		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 
 		userNode.setContent("User Account: " + user);
 
 		if (!automated) {
-			userNode.setProp(NodeProp.SIGNUP_PENDING.toString(), true);
+			userNode.setProp(NodeProp.SIGNUP_PENDING.s(), true);
 		}
 
 		save(session, userNode);
@@ -1609,7 +1603,7 @@ public class MongoApi {
 				// }
 				// else it's an ordinary user so we check the password against their user node
 				// else if (userNode.getStringProp(NodeProp.PASSWORD).equals(password)) {
-				else if (userNode.getStringProp(NodeProp.PWD_HASH.toString()).equals(getHashOfPassword(password))) {
+				else if (userNode.getStringProp(NodeProp.PWD_HASH.s()).equals(getHashOfPassword(password))) {
 					success = true;
 				}
 			}
@@ -1643,10 +1637,10 @@ public class MongoApi {
 			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, "Repository Root", null, true, null,
 					null);
 
-			adminNode.setProp(NodeProp.USER.toString(), PrincipalName.ADMIN.s());
+			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
 
 			// todo-1: need to store ONLY hash of the password
-			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.toString(), false);
+			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 			save(session, adminNode);
 
 			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, "Root of All Users", null, true, null,

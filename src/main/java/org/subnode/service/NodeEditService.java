@@ -256,7 +256,7 @@ public class NodeEditService {
 			}
 
 			// If removing encryption, remove it from all the ACL entries too.
-			String encKey = node.getStringProp(NodeProp.ENC_KEY.toString());
+			String encKey = node.getStringProp(NodeProp.ENC_KEY.s());
 			if (encKey == null) {
 				api.removeAllEncryptionKeys(node);
 			}
