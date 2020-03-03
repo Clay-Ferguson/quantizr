@@ -83,8 +83,8 @@ export class Render implements RenderIntf {
 
     injectSubstitutions = (val: string): string => {
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
-        
-        if (val.indexOf("{{paypal-button}}")!=-1) {
+
+        if (val.indexOf("{{paypal-button}}") != -1) {
             val = S.util.replaceAll(val, "{{paypal-button}}", C.PAY_PAL_BUTTON);
         }
         return val;
@@ -270,7 +270,11 @@ export class Render implements RenderIntf {
     NOTE: I think there's a way to do this cleaner with react 'effects' hooks 
     */
     setImageMaxWidths = (): void => {
-        S.util.domSelExec([".markdown-html", "img"], (elm: HTMLElement) => {
+        // S.util.domSelExec([".markdown-html", "img"], (elm: HTMLElement) => {
+        //     elm.style.maxWidth = "100%";
+        // });
+
+        S.util.domSelExec([".attached-img"], (elm: HTMLElement) => {
             elm.style.maxWidth = "100%";
         });
     }
@@ -475,14 +479,14 @@ export class Render implements RenderIntf {
 
         if (S.props.isEncrypted(node)) {
             encIcon = new Icon("", null, {
-                "style": {marginRight: '6px', verticalAlign: 'middle' },
+                "style": { marginRight: '6px', verticalAlign: 'middle' },
                 className: "fa fa-lock fa-lg"
             });
         }
 
         if (S.props.isMine(node) && S.props.isShared(node)) {
             sharedIcon = new Icon("", null, {
-                "style": {marginRight: '6px', verticalAlign: 'middle' },
+                "style": { marginRight: '6px', verticalAlign: 'middle' },
                 className: "fa fa-share-alt fa-lg"
             });
         }
@@ -566,14 +570,19 @@ export class Render implements RenderIntf {
             }
         }
 
+        let avatarImg: Img;
+        if (node.owner != J.PrincipalName.ADMIN && node.ownerId && node.id != node.ownerId) {
+            avatarImg = this.makeAvatarImage(node.ownerId, node.avatarBinVer);
+        }
+
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
             moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton], null, "marginLeft marginTop");
 
         if (selButton || typeIcon || encIcon || sharedIcon) {
-            return new HorizontalLayout([selButton, typeIcon, encIcon, sharedIcon, buttonBar]);
+            return new HorizontalLayout([selButton, avatarImg, typeIcon, encIcon, sharedIcon, buttonBar]);
         }
         else {
-            return buttonBar;
+            return new HorizontalLayout([avatarImg, buttonBar]);;
         }
     }
 
@@ -743,7 +752,7 @@ export class Render implements RenderIntf {
                         let sharedIcon: Icon = null;
                         if (S.props.isMine(data.node) && S.props.isShared(data.node)) {
                             sharedIcon = new Icon("", null, {
-                                "style": {marginRight: '6px', verticalAlign: 'middle' },
+                                "style": { marginRight: '6px', verticalAlign: 'middle' },
                                 className: "fa fa-share-alt fa-lg"
                             });
                         }
@@ -1001,6 +1010,10 @@ export class Render implements RenderIntf {
         return S.util.getRpcPath() + "bin/file-name" + node.binVer + "?nodeId=" + encodeURIComponent(node.id) + "&ver=" + node.binVer;
     }
 
+    getAvatarImgUrl = (ownerId: string, binVer: number): string => {
+        return S.util.getRpcPath() + "bin/file-name" + binVer + "?nodeId=" + encodeURIComponent(ownerId) + "&ver=" + binVer;
+    }
+
     makeImageTag = (node: J.NodeInfo): Img => {
         let src: string = this.getUrlForNodeAttachment(node);
 
@@ -1013,6 +1026,7 @@ export class Render implements RenderIntf {
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
         let img: Img = new Img({
             "src": src,
+            className: "attached-img",
             style: {
                 maxWidth: maxWidth,
                 cursor: "pointer",
@@ -1020,18 +1034,44 @@ export class Render implements RenderIntf {
                 marginBottom: "15px",
                 paddingRight: "20px"
             },
-            "title": "Click image to enlarge"
+            "title": "Click image to enlarge/reduce"
         });
 
         img.whenElm((elm: HTMLElement) => {
             elm.addEventListener("click", () => {
                 if (elm.style.maxWidth == "100%") {
                     elm.style.maxWidth = "";
-                    elm.title = "Click image to reduce size";
                 }
                 else {
                     elm.style.maxWidth = "100%";
-                    elm.title = "Click image to enlarge";
+                }
+            });
+        });
+
+        return img;
+    }
+
+    makeAvatarImage = (nodeId: string, binVer: number): Img => {
+        let src: string = this.getAvatarImgUrl(nodeId, binVer);
+
+        //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+        let img: Img = new Img({
+            "src": src,
+            style: {
+                maxWidth: "80px",
+                cursor: "pointer",
+                marginTop: "8px",
+            },
+            "title": "Click image to enlarge/reduce"
+        });
+
+        img.whenElm((elm: HTMLElement) => {
+            elm.addEventListener("click", () => {
+                if (elm.style.maxWidth == "100%") {
+                    elm.style.maxWidth = "80px";
+                }
+                else {
+                    elm.style.maxWidth = "100%";
                 }
             });
         });

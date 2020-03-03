@@ -41,6 +41,7 @@ public class NodeInfo {
 	private boolean hasBinary;
 	private boolean binaryIsImage;
 	private long binVer;
+	private long avatarBinVer;
 	private int width;
 	private int height;
 
@@ -53,19 +54,21 @@ public class NodeInfo {
 	 */
 	private String imgId;
 	private String owner;
+	private String ownerId;
 
 	public NodeInfo() {
 	}
 
-	public NodeInfo(String id, String name, String content, String owner, Long ordinal, Date lastModified,
+	public NodeInfo(String id, String name, String content, String owner, String ownerId, Long ordinal, Date lastModified,
 			List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
-			boolean hasBinary, boolean binaryIsImage, long binVer, int width, int height, String type, long logicalOrdinal,
+			boolean hasBinary, boolean binaryIsImage, long binVer, long avatarBinVer, int width, int height, String type, long logicalOrdinal,
 			boolean firstChild, boolean lastChild, String cipherKey) {
 		this.id = id;
 		this.name = name;
 		this.content = content;
 		this.lastModified = lastModified;
 		this.owner = owner;
+		this.ownerId = ownerId;
 		this.ordinal = ordinal;
 		this.properties = properties;
 		this.ac = ac;
@@ -75,6 +78,7 @@ public class NodeInfo {
 		this.hasBinary = hasBinary;
 		this.binaryIsImage = binaryIsImage;
 		this.binVer = binVer;
+		this.avatarBinVer = avatarBinVer;
 		this.width = width;
 		this.height = height;
 		this.type = type;
@@ -178,6 +182,14 @@ public class NodeInfo {
 		this.binVer = binVer;
 	}
 
+	public long getAvatarBinVer() {
+		return avatarBinVer;
+	}
+
+	public void setAvatarBinVer(long avatarBinVer) {
+		this.avatarBinVer = avatarBinVer;
+	}
+
 	public int getWidth() {
 		return width;
 	}
@@ -217,6 +229,15 @@ public class NodeInfo {
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
+
+	public String getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
+	}
+
 
 	public Long getOrdinal() {
 		return ordinal;

@@ -162,7 +162,7 @@ export class Util implements UtilIntf {
     }
 
     replaceAll = (s: string, find: string, replace: string): string => {
-        if (!s || s.indexOf(find)==-1) return s;
+        if (!s || s.indexOf(find) == -1) return s;
         return s.replace(new RegExp(this.escapeRegExp(find), 'g'), replace);
     }
 
@@ -741,9 +741,10 @@ export class Util implements UtilIntf {
         elm.innerHTML = content;
     }
 
-    //Finds all elements that are under selectors[0], and then finds all under THOSE that are under selectors[1], etc, 
-    //and executes 'func' on the leaf nodes of that kind of search. There may be a way that querySelectorAll can do this all
-    //at once but i want to get in the chain here in case i need to do other processing along this chain of selections
+    /* Finds all elements that are under selectors[0], and then finds all under THOSE that are under selectors[1], etc, 
+    and executes 'func' on the leaf nodes of that kind of search. There may be a way that querySelectorAll can do this all
+    at once but i want to get in the chain here in case i need to do other processing along this chain of selections
+    */
     domSelExec = (selectors: string[], func: Function, level: number = 0) => {
         if (!selectors || selectors.length == 0) return;
 

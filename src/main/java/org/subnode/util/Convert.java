@@ -70,7 +70,7 @@ public class Convert {
 
 		List<AccessControlInfo> acList = buildAccessControlList(sessionContext, node);
 
-		String rootId = node.getOwner().toHexString();
+		String ownerId = node.getOwner().toHexString();
 
 		/*
 		 * todo-2: this is a spot that can be optimized. We should be able to send just
@@ -79,19 +79,22 @@ public class Convert {
 		 */
 		String nameProp = null;
 		SubNode userNode = api.getNode(session, node.getOwner(), false);
+		Long avatarBinVer = 0L;
 
 		if (userNode == null) {
 			// todo-1: looks like import corrupts the 'owner' (needs research), but the code
 			// below sets to owner to 'admin' which will
 			// be safe for now because the admin is the only user capable of import/export.
 			log.debug("Unable to find userNode from nodeOwner: " + //
-					(node.getOwner() != null ? rootId : ("null owner on node: " + node.getId().toHexString())));
+					(node.getOwner() != null ? ownerId : ("null owner on node: " + node.getId().toHexString())));
 		} else {
+			//todo-0: need to search code globally for toString() that could be s() instead.
 			nameProp = userNode.getStringProp(NodeProp.USER.toString());
+			avatarBinVer = userNode.getIntProp(NodeProp.BIN_VER.toString());
 		}
 		String owner = userNode == null ? "admin" : nameProp;
 
-		log.trace("RENDER ID=" + node.getId().toHexString() + " rootId=" + rootId + " session.rootId="
+		log.trace("RENDER ID=" + node.getId().toHexString() + " rootId=" + ownerId + " session.rootId="
 				+ sessionContext.getRootId() + " node.content=" + node.getContent() + " owner=" + owner);
 
 		/*
@@ -100,18 +103,18 @@ public class Convert {
 		 * the node.
 		 */
 		String cipherKey = null;
-		if (!rootId.equals(sessionContext.getRootId()) && node.getAc() != null) {
+		if (!ownerId.equals(sessionContext.getRootId()) && node.getAc() != null) {
 			AccessControl ac = node.getAc().get(sessionContext.getRootId());
 			if (ac != null) {
 				cipherKey = ac.getKey();
 				if (cipherKey != null) {
-					log.debug("Rendering Sent Back CipherKey: " + cipherKey);
+				log.debug("Rendering Sent Back CipherKey: " + cipherKey);
 				}
 			}
 		}
 
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, node.getOrdinal(), //
-				node.getModifyTime(), propList, acList, hasNodes, hasBinary, binaryIsImage, binVer, //
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, ownerId, node.getOrdinal(), //
+				node.getModifyTime(), propList, acList, hasNodes, hasBinary, binaryIsImage, binVer, avatarBinVer, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
 				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey);

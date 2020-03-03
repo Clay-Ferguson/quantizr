@@ -463,11 +463,13 @@ export interface NodeInfo {
     hasBinary: boolean;
     binaryIsImage: boolean;
     binVer: number;
+    avatarBinVer: number;
     width: number;
     height: number;
     children: NodeInfo[];
     imgId: string;
     owner: string;
+    ownerId: string;
 }
 
 export interface UserPreferences {
