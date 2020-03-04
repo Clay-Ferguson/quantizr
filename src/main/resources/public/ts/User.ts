@@ -28,7 +28,7 @@ export class User implements UserIntf {
     }
 
     closeAccount = (): void => {
-        new ConfirmDlg("Close your Account?<p> Are you sure?", "Oh No!",
+        new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
             () => {
                 new ConfirmDlg("Your data will be deleted and can never be recovered.<p> Are you sure?", "Last Chance... One more Click",
                     () => {
