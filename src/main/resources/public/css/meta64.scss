@@ -422,19 +422,19 @@ samp {
 
 .dz-message {
     font-size: large;
-    background-image: url("/js/dropzone/upload.png");
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
-    width: 500px;
-    height: 200px;
+
+    // todo-2: this background is dropzone-controled and it seems to have issues, so I'm just removing it for now.
+    // background-image: url("/js/dropzone/upload.png");
+    // background-repeat: no-repeat;
+    // background-attachment: fixed;
+    // background-position: center;
+    // height: 100%;
 }
 
 .dropzone {
     border: 4px dashed lightGray;
-    margin: 16px;
-    width: 600px;
-    height: 300px;
+    margin-bottom: 16px;
+    height: 420px;
     padding: 0;
     overflow-y: auto;
     /* min-height: 0px !important; */

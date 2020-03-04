@@ -88,7 +88,6 @@ public class Convert {
 			log.debug("Unable to find userNode from nodeOwner: " + //
 					(node.getOwner() != null ? ownerId : ("null owner on node: " + node.getId().toHexString())));
 		} else {
-			//todo-0: need to search code globally for toString() that could be s() instead.
 			nameProp = userNode.getStringProp(NodeProp.USER.s());
 			avatarBinVer = userNode.getIntProp(NodeProp.BIN_VER.s());
 		}

@@ -3,7 +3,6 @@ import * as J from "../JavaIntf";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
-import { TextContent } from "../widget/TextContent";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
@@ -24,7 +23,6 @@ export class UploadFromUrlDlg extends DialogBase {
        
         this.setChildren([
             new Form(null, [
-                C.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.attachment.uploadNode.id) : null,
                 this.uploadFromUrlTextField = new TextField("Upload from URL"),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "primary"),

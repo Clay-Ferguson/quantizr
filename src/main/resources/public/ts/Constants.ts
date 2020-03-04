@@ -7,10 +7,6 @@ export class Constants {
     static readonly NEW_ON_TOOLBAR: boolean = true;
     static readonly INS_ON_TOOLBAR: boolean = false;
     static readonly MOVE_UPDOWN_ON_TOOLBAR: boolean = true;
-
-    /* showing path on rows just wastes space for ordinary users. Not really needed */
-    static readonly SHOW_PATH_IN_DLGS: boolean = true;
-
     static readonly SHOW_CLEAR_BUTTON_IN_EDITOR: boolean = false;
 
     /* ======================================================================== */

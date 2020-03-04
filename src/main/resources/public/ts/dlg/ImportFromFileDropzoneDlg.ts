@@ -31,7 +31,6 @@ export class ImportFromFileDropzoneDlg extends DialogBase {
         super("Import File");
 
         this.setChildren([
-            C.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.edit.importTargetNode.id) : null,
             this.form = new Form({
                 action: S.util.getRpcPath() + "upload",
                 autoProcessQueue: false,

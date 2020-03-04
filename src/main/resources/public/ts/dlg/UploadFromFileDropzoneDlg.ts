@@ -2,7 +2,6 @@ import { DialogBase } from "../DialogBase";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
-import { TextContent } from "../widget/TextContent";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
 import { Constants as C} from "../Constants";
@@ -32,7 +31,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         
         this.setChildren([
             new Form(null, [
-                C.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.attachment.uploadNode.id) : null,
                 this.dropzoneDiv = new Div("", {className: "dropzone"}),
                 this.hiddenInputContainer = new Div(null, { style: {display: "none"} }),
                 new ButtonBar([
@@ -54,22 +52,22 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let dlg = this;
         let config: Object = {
             action: S.util.getRpcPath() + "upload",
-            width: 500,
-            height: 500,
+            width: "100%",
+            height: "100%", 
             progressBarWidth: '100%',
-            zIndex: 100,
+            //zIndex: 100,
             url: S.util.getRpcPath() + "upload",
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
             paramName: "files",
-            maxFilesize: 20, //<---- I assume this is in MB ?
+            maxFilesize: 20, 
             parallelUploads: 2,
 
             /* Not sure what's this is for, but the 'files' parameter on the server is always NULL, unless
             the uploadMultiple is false */
             uploadMultiple: false,
             addRemoveLinks: true,
-            dictDefaultMessage: "Drag & Drop files here, or Click",
+            dictDefaultMessage: "Click Here to Add Files (or Drag & Drop)",
             hiddenInputContainer: "#" + this.hiddenInputContainer.getId(),
 
             init: function () {

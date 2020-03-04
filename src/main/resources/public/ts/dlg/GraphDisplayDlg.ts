@@ -25,8 +25,6 @@ export class GraphDisplayDlg extends DialogBase {
 
         this.setChildren([
             new Form(null, [
-                // Constants.SHOW_PATH_IN_DLGS ? new TextContent("ID: " + S.attachment.uploadNode.id, "path-display-in-editor") : null,
-
                 this.graphDiv = new Div(null, {
                     id: "mynetwork",
                     style: { width: "100%", height: "500px", border: "1px solid red" }
