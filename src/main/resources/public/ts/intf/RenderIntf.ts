@@ -5,6 +5,7 @@ import { Img } from "../widget/Img";
 import { Comp } from "../widget/base/Comp";
 
 export interface RenderIntf {
+    updateHighlightNode(node: J.NodeInfo): void;
     buildRowHeader(node: J.NodeInfo, showPath: boolean, showName: boolean): Div;
     injectSubstitutions(content: string): string;
     renderNodeContent(node: J.NodeInfo, renderBin: boolean, rowStyling: boolean, showHeader: boolean): Comp[];

@@ -914,6 +914,20 @@ export class Render implements RenderIntf {
         }
     }
 
+    updateHighlightNode = (node: J.NodeInfo) => {
+        if (!node || !S.meta64.state.highlightNode) {
+            return;
+        }
+
+        if (S.meta64.state.highlightNode.id == node.id) {
+            S.meta64.state.highlightNode = node;
+
+            if (S.meta64.currentNodeData && S.meta64.currentNodeData.node) {
+                S.meta64.parentIdToFocusNodeMap[S.meta64.currentNodeData.node.id] = node;
+            }
+        }
+    }
+
     //todo-2: check background colord on vertical layout option also? or is that handled already?
     renderTableLayout = (node: J.NodeInfo, newData: boolean, level: number, layout: string): Comp => {
         let tableDiv = new Div(null, { style: { display: 'table', className: 'node-grid', width: '100%' } });
@@ -940,6 +954,8 @@ export class Render implements RenderIntf {
             let n: J.NodeInfo = node.children[i];
 
             if (!S.edit.nodesToMoveSet[n.id]) {
+                this.updateHighlightNode(n);
+
                 let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass);
                 if (row) {
                     comps.push(row);
@@ -982,6 +998,8 @@ export class Render implements RenderIntf {
         for (let i = 0; i < node.children.length; i++) {
             let n: J.NodeInfo = node.children[i];
             if (!S.edit.nodesToMoveSet[n.id]) {
+                this.updateHighlightNode(n);
+
                 let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass);
                 if (row) {
                     comps.push(row);

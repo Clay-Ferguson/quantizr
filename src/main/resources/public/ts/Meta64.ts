@@ -355,6 +355,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     refreshAllGuiEnablement = () => {
+        //console.log("refreshAllGuiEnablement");
         this.updateState();
 
         if (S.nav.mainNavPanel) {

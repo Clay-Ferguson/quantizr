@@ -1,7 +1,7 @@
 import * as J from "./JavaIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 import { ViewIntf } from "./intf/ViewIntf";
 import { GraphDisplayDlg } from "./dlg/GraphDisplayDlg";
 
@@ -39,6 +39,10 @@ export class View implements ViewIntf {
             if (S.meta64.currentNodeData && S.meta64.currentNodeData.node) {
                 nodeId = S.meta64.currentNodeData.node.id;
             }
+        }
+
+        if (S.meta64.currentNodeData) {
+            S.render.updateHighlightNode(S.meta64.currentNodeData.node);
         }
 
         console.log("Refreshing tree: nodeId=" + nodeId);
