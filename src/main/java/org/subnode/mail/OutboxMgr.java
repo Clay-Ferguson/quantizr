@@ -2,16 +2,21 @@ package org.subnode.mail;
 
 import java.util.List;
 
+import java.util.Date;
 import org.subnode.config.ConstantsProvider;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodeTypes;
 import org.subnode.util.SubNodeUtil;
-
+import org.subnode.util.XString;
+import org.joda.time.DateTime;
+import org.joda.time.Hours;
+import org.joda.time.Minutes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +25,8 @@ import org.springframework.stereotype.Component;
 /**
  * Manages the node where we store all emails that are queued up to be sent.
  * <p>
- * The system always sends emails out in a batch operation every 30seconds or so, by emptying out
- * this queue.
+ * The system always sends emails out in a batch operation every 30seconds or
+ * so, by emptying out this queue.
  * 
  */
 @Component
@@ -44,40 +49,87 @@ public class OutboxMgr {
 	private SubNodeUtil apiUtil;
 
 	/*
-	 * node=Node that was created. userName = username of person who just created node.
+	 * node=Node that was created. userName = username of person who just created
+	 * node.
 	 */
-	public void sendNotificationForChildNodeCreate(final SubNode node, final String userName) {
+	public void sendNotificationForNodeEdit(final SubNode node, final String userName) {
+		boolean sendEmail = false;
+		boolean addToInbox = true;
+
+		// Date modTime = node.getModifyTime();
+		// Date now = new Date();
+
+		// Minutes minutes = Minutes.minutesBetween(new DateTime(modTime), new
+		// DateTime(now));
+		// // log.debug("Minutes since last edit: " + minutes.getMinutes());
+		// if (minutes.getMinutes() < 60) {
+		// return;
+		// }
+
 		/*
-		 * put in a catch block, because nothing going wrong in here should be allowed to blow up
-		 * the save operation
+		 * put in a catch block, because nothing going wrong in here should be allowed
+		 * to blow up the save operation
 		 */
 		adminRunner.run(session -> {
 			try {
 				SubNode parentNode = api.getParent(session, node);
 
 				/*
-				 * Check first that we are not creating a node under one WE OWN, becasue we don't
-				 * need to send a notification to ourselves.
+				 * Check first that we are not creating a node under one WE OWN, becasue we
+				 * don't need to send a notification to ourselves.
 				 */
 				if (parentNode != null && !parentNode.getOwner().equals(node.getOwner())) {
 					SubNode userNode = api.getNode(session, parentNode.getOwner());
-					if (userNode==null) {
-						log.warn("No userNode was found for parentNode.owner="+parentNode.getOwner());
+					if (userNode == null) {
+						log.warn("No userNode was found for parentNode.owner=" + parentNode.getOwner());
 						return;
 					}
-					String email = userNode.getStringProp(NodeProp.EMAIL.s());
-					log.debug("sending email to: " + email + " because his node was appended under.");
 
-					String content = String.format("User '%s' replied to you.<p>\n\n" + //
-					"%s?id=%s", userName, constProvider.getHostAndPort(), node.getId().toHexString());
-
-					queueMailUsingAdminSession(session, email, "New SubNode Notification", content);
+					if (sendEmail) {
+						sendEmailNotification(session, userName, userNode, node);
+					} else if (addToInbox) {
+						addInboxNotification(session, userName, userNode, node);
+					}
 				}
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				log.debug("failed sending notification", e);
 			}
 		});
+	}
+
+	/* 
+	Puts an inbox notification into 'userName's inbox, telling them that the new 'node' has been added under
+	one of their nodes as a reply to it.
+	
+	todo-1: These inbox nodes need to have a 'type' so we can do special rendering like showing the avatar of the other person, 
+	or maybe a blurb from the first sentence of their post 
+	*/
+	public void addInboxNotification(MongoSession session, String userName, SubNode userNode, SubNode node) {
+		SubNode userInbox = api.getInboxOfUser(session, null, userNode);
+
+		if (userInbox != null) {
+			SubNode notifyNode = api.createNode(session, userInbox, null, SubNodeTypes.UNSTRUCTURED, 0L, CreateNodeLocation.FIRST);
+
+			//trim to 280 like twitter.
+			String shortContent = XString.trimToMaxLen(node.getContent(), 280)+"...";
+
+			String content = String.format("User '%s' replied to you.\n\n%s?id=%s\n\n%s", 
+				userName, constProvider.getHostAndPort(), node.getId().toHexString(), shortContent);
+
+			notifyNode.setOwner(userInbox.getOwner());
+			notifyNode.setContent(content);
+			api.save(session, notifyNode);
+		}
+	}
+
+	public void sendEmailNotification(MongoSession session, String userName, SubNode userNode, SubNode node) {
+		String email = userNode.getStringProp(NodeProp.EMAIL.s());
+		log.debug("sending email to: " + email + " because his node was appended under.");
+
+		String content = String.format("User '%s' replied to you.<p>\n\n" + //
+				"%s?id=%s", userName, constProvider.getHostAndPort(), node.getId().toHexString());
+
+		queueMailUsingAdminSession(session, email, "New SubNode Notification", content);
 	}
 
 	public void queueEmail(final String recipients, final String subject, final String content) {
@@ -86,7 +138,8 @@ public class OutboxMgr {
 		});
 	}
 
-	public void queueMailUsingAdminSession(MongoSession session, final String recipients, final String subject, final String content) {
+	public void queueMailUsingAdminSession(MongoSession session, final String recipients, final String subject,
+			final String content) {
 		SubNode outboxNode = getSystemOutbox(session);
 		SubNode outboundEmailNode = api.createNode(session, outboxNode.getPath() + "/?", SubNodeTypes.UNSTRUCTURED);
 
@@ -111,6 +164,7 @@ public class OutboxMgr {
 	 * Get node that contains all preferences for this user, as properties on it.
 	 */
 	public SubNode getSystemOutbox(MongoSession session) {
-		return apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.OUTBOX + "/", NodeName.SYSTEM, "System Messages", null, true, null, null);
+		return apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.OUTBOX + "/", NodeName.SYSTEM,
+				"System Messages", null, true, null, null);
 	}
 }

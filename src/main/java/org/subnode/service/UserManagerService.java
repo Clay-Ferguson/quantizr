@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import javax.servlet.http.HttpSession;
-
 import org.subnode.config.AppProp;
 import org.subnode.config.ConstantsProvider;
 import org.subnode.model.client.PrincipalName;
@@ -34,7 +32,6 @@ import org.subnode.response.SaveUserPreferencesResponse;
 import org.subnode.response.SignupResponse;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
-import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
 import org.subnode.util.Validator;
@@ -77,9 +74,6 @@ public class UserManagerService {
 
 	@Autowired
 	private AclService acu;
-
-	// @Autowired
-	// private Encryptor encryptor;
 
 	@Autowired
 	private Validator validator;
@@ -187,8 +181,6 @@ public class UserManagerService {
 				if (PrincipalName.ADMIN.s().equals(userName)) {
 					throw new RuntimeException("processSignupCode should not be called fror admin user.");
 				}
-
-				// String password = node.getStringProp(NodeProp.PASSWORD);
 
 				// // Currently we just store password on server in cleartext (security isn't a
 				// priority yet on the platform),
@@ -417,9 +409,7 @@ public class UserManagerService {
 					throw new RuntimeException("changePassword should not be called fror admin user.");
 				}
 
-				// userNode[0].setProp(NodeProp.PASSWORD, password); //
-				// encryptor.encrypt(password));
-				userNode[0].setProp(NodeProp.PWD_HASH.s(), api.getHashOfPassword(password)); // encryptor.encrypt(password));
+				userNode[0].setProp(NodeProp.PWD_HASH.s(), api.getHashOfPassword(password)); 
 				userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 				// note: the adminRunner.run saves the session so we don't do that here.

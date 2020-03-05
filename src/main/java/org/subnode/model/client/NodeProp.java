@@ -50,7 +50,7 @@ public enum NodeProp {
      */
     MIME_EXT("sn:ext"), //
 
-    PASSWORD("sn:pwd"), //
+    //PASSWORD("sn:pwd"), //
     EMAIL("sn:email"), //
     CODE("sn:code"), //
 

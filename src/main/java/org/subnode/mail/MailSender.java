@@ -19,18 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-//Example call pattern:
-// synchronized (MailSender.getLock()) {
-// 	try {
-// 		mailSender.init();
-// 		mailSender.sendMail("wclayf@gmail.com", null,
-// 				"<h1>Hello from Quantizr! Time=" + timeString + "</h1>", "Test Subject");
-//      call sendMail as may times as necessary before close();
-// 	} finally {
-// 		mailSender.close();
-// 	}
-// }
-
 @Component
 public class MailSender implements TransportListener {
 

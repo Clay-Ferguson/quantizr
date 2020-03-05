@@ -178,11 +178,12 @@ public class MongoApi {
 		throw new NodeAuthFailedException();
 	}
 
-	/* NOTE: this should ONLY ever be called from 'auth()' method of this class 
-	
-	todo-1: MongoThreadLocal class has a variable created to memoize these results per-request but that has not yet
-	been implemented.
-	*/
+	/*
+	 * NOTE: this should ONLY ever be called from 'auth()' method of this class
+	 * 
+	 * todo-1: MongoThreadLocal class has a variable created to memoize these
+	 * results per-request but that has not yet been implemented.
+	 */
 	private boolean ancestorAuth(MongoSession session, SubNode node, List<PrivilegeType> privs) {
 
 		/* get the non-null sessionUserNodeId if not anonymous user */
@@ -679,82 +680,11 @@ public class MongoApi {
 	}
 
 	public void convertDb(MongoSession session) {
-		log.debug("convertDb() executing.");
-
-		// shortenPaths(session);
-		// makePasswordHashes(session);
+		// log.debug("convertDb() executing.");
 	}
 
 	public String getHashOfPassword(String password) {
 		return Util.getHashOfString(password, 20);
-	}
-
-	public void makePasswordHashes(MongoSession session) {
-
-		Query query = new Query();
-		Criteria criteria = Criteria.where(//
-				SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath("/" + NodeName.ROOT + "/" + NodeName.USER)) //
-				.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.PWD_HASH + ".value").is(null);
-		query.addCriteria(criteria);
-
-		Iterable<SubNode> iter = ops.find(query, SubNode.class);
-
-		iter.forEach((node) -> {
-			String password = node.getStringProp(NodeProp.PASSWORD.s());
-			if (password != null) {
-				log.debug("pwdHash update. userNode node: name=" + node.getStringProp(NodeProp.USER.s()));
-
-				node.setProp(NodeProp.PWD_HASH.s(), getHashOfPassword(password));
-
-				/*
-				 * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some of
-				 * the workload is done that pertains ot this reSave process
-				 */
-				save(session, node, true, false);
-			}
-		});
-	}
-
-	public void shortenPaths(MongoSession session) {
-		try {
-			requireAdmin(session);
-			Iterable<SubNode> iter = ops.findAll(SubNode.class);
-			int[] iterCount = new int[1];
-			iterCount[0] = 0;
-
-			iter.forEach((node) -> {
-				boolean save = shortenPath(node);
-				if (save) {
-					iterCount[0]++;
-					ops.save(node);
-				}
-			});
-
-		} catch (Exception e) {
-			ExUtil.error(log, "dbConvert failed", e);
-		}
-	}
-
-	/* Returns true if this path was shortened. */
-	public boolean shortenPath(SubNode node) {
-		boolean ret = false;
-		String path = node.getPath();
-		// log.debug("Path: " + path);
-		StringBuilder newPath = new StringBuilder();
-		StringTokenizer t = new StringTokenizer(path, "/", true);
-		while (t.hasMoreTokens()) {
-			String part = t.nextToken();
-			if (part.length() >= 24) {
-				part = Util.getHashOfString(part, 10);
-				ret = true;
-			}
-			newPath.append(part);
-		}
-		if (ret) {
-			// log.debug("New: " + newPath.toString());
-			node.setPath(newPath.toString());
-		}
-		return ret;
 	}
 
 	public String getNodeReport() {
@@ -1516,17 +1446,14 @@ public class MongoApi {
 		// todo-1: is user validated here (no invalid characters, etc. and invalid
 		// flowpaths tested?)
 
-		/*
-		 * todo-p1: need to create this node as if it were also renamed to 'user', so
-		 * that immediately all user root nodes are addressible as "/r/usr/myName".
-		 */
 		SubNode userNode = createNode(session, newUserNodePath, null);
+		ObjectId id = new ObjectId();
+		userNode.setId(id);
+		userNode.setOwner(id);
 		userNode.setProp(NodeProp.USER.s(), user);
 		userNode.setProp(NodeProp.EMAIL.s(), email);
-		// userNode.setProp(NodeProp.PASSWORD, password);
 		userNode.setProp(NodeProp.PWD_HASH.s(), getHashOfPassword(password));
 		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
-
 		userNode.setContent("User Account: " + user);
 
 		if (!automated) {
@@ -1535,17 +1462,34 @@ public class MongoApi {
 
 		save(session, userNode);
 
-		/*
-		 * The user root nodes are the owners of themselves.
-		 * 
-		 * todo-1: is there a way to avoid doing two saves in this method?
-		 * 
-		 * Also remember there's a bug where TWO user root nodes are getting created.
-		 */
-		userNode.setOwner(userNode.getId());
-		save(session, userNode);
-
 		return userNode;
+	}
+
+	/*
+	 * Returns Inbox node for the specified user, and automatically creates it if
+	 * not already existing
+	 * 
+	 * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
+	 * userNode if you know it, to save cycles
+	 */
+	public SubNode getInboxOfUser(MongoSession session, String user, SubNode userNode) {
+		if (userNode == null) {
+			userNode = getUserNodeByUserName(session, user);
+		}
+		if (userNode == null) {
+			throw new RuntimeException("userNode not found.");
+		}
+
+		String inboxPath = userNode.getPath() + "/" + NodeName.INBOX;
+		SubNode inboxNode = getNode(session, inboxPath);
+		if (inboxNode == null) {
+			inboxNode = createNode(session, userNode, NodeName.INBOX, SubNodeTypes.UNSTRUCTURED, 0L,
+					CreateNodeLocation.LAST);
+			inboxNode.setOwner(userNode.getId());
+			inboxNode.setContent("Inbox");
+			save(session, inboxNode);
+		}
+		return inboxNode;
 	}
 
 	public SubNode getUserNodeByUserName(MongoSession session, String user) {
@@ -1596,13 +1540,10 @@ public class MongoApi {
 				 * If logging in as ADMIN we don't expect the node to contain any password in
 				 * the db, but just use the app property instead.
 				 */
-				// if (PrincipalName.ADMIN.s().equals(userName)) {
 				if (password.equals(appProp.getMongoAdminPassword())) {
 					success = true;
 				}
-				// }
 				// else it's an ordinary user so we check the password against their user node
-				// else if (userNode.getStringProp(NodeProp.PASSWORD).equals(password)) {
 				else if (userNode.getStringProp(NodeProp.PWD_HASH.s()).equals(getHashOfPassword(password))) {
 					success = true;
 				}

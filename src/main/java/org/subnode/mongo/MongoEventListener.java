@@ -56,6 +56,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		Document dbObj = event.getDocument();
 		ObjectId id = node.getId();
 
+		/* Note: There's a special case in MongoApi#createUser where the new User root node ID is assigned there,
+		along with setting that on the owner property so we can do one save and have both updated */
 		if (id == null) {
 			id = new ObjectId();
 			node.setId(id);

@@ -580,7 +580,7 @@ export class Render implements RenderIntf {
         }
 
         let avatarImg: Img;
-        if (allowAvatar && node.owner != J.PrincipalName.ADMIN) {
+        if (allowAvatar && node.owner != J.PrincipalName.ADMIN && node.avatarBinVer) {
             avatarImg = this.makeAvatarImage(node.ownerId, node.avatarBinVer);
         }
 
@@ -777,7 +777,7 @@ export class Render implements RenderIntf {
                         }
 
                         let avatarImg: Img;
-                        if (data.node.owner != J.PrincipalName.ADMIN) {
+                        if (data.node.owner != J.PrincipalName.ADMIN && data.node.avatarBinVer) {
                             avatarImg = this.makeAvatarImage(data.node.ownerId, data.node.avatarBinVer);
                         }
 
