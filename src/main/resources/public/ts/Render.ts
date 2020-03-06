@@ -1103,13 +1103,9 @@ export class Render implements RenderIntf {
 
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
         let img: Img = new Img({
-            "src": src,
-            style: {
-                maxWidth: "80px",
-                cursor: "pointer",
-                marginTop: "8px",
-            },
-            "title": "Click image to enlarge/reduce"
+            src: src,
+            className: "avatarImage",
+            title: "Click image to enlarge/reduce"
         });
 
         img.whenElm((elm: HTMLElement) => {

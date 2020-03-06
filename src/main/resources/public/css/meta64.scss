@@ -2,6 +2,8 @@
 @import "variables.scss";
 
 $border-radius: .3rem;
+$borderRadiusLarge: 1em;
+$borderRadiusMedium: .6em;
 
 @import "../node_modules/bootstrap/scss/bootstrap";
 
@@ -33,6 +35,14 @@ body {
     font-family: "Roboto", "Verdana", "Aria";
     padding-top: 4rem;
     padding-bottom: 1rem;
+}
+
+.avatarImage {
+    border-radius: $borderRadiusMedium;
+    max-width: 80px;
+    cursor: pointer;
+    margin-top: 8px;
+    margin-left: 8px;
 }
 
 .main-navbar {
@@ -503,7 +513,7 @@ samp {
 .mainNodeContentStyle {
     outline: none;
     border: $mediumBorderSize solid $nodeBorderBottomColor;
-    border-radius: 1em;
+    border-radius: $borderRadiusLarge;
     padding-right: 1em;
 }
 
