@@ -49,8 +49,10 @@ public class OutboxMgr {
 	private SubNodeUtil apiUtil;
 
 	/*
-	 * node=Node that was created. userName = username of person who just created
-	 * node.
+	 * node=Node that was created.
+	 * 
+	 * userName = username of person who just created node (also the owner of
+	 * 'node')
 	 */
 	public void sendNotificationForNodeEdit(final SubNode node, final String userName) {
 		boolean sendEmail = false;
@@ -79,6 +81,11 @@ public class OutboxMgr {
 				 * don't need to send a notification to ourselves.
 				 */
 				if (parentNode != null && !parentNode.getOwner().equals(node.getOwner())) {
+
+					/*
+					 * userNode here will be the root node of the person whose node has just been
+					 * replied to, and the person recieving a notification in their inbox
+					 */
 					SubNode userNode = api.getNode(session, parentNode.getOwner());
 					if (userNode == null) {
 						log.warn("No userNode was found for parentNode.owner=" + parentNode.getOwner());
@@ -88,7 +95,7 @@ public class OutboxMgr {
 					if (sendEmail) {
 						sendEmailNotification(session, userName, userNode, node);
 					} else if (addToInbox) {
-						addInboxNotification(session, userName, userNode, node);
+						addInboxNotification(session, userName, userNode, node, "replied to you.");
 					}
 				}
 			} catch (Exception e) {
@@ -97,11 +104,22 @@ public class OutboxMgr {
 		});
 	}
 
-	/*
-	 * Puts an inbox notification into 'userName's inbox, telling them that the new
+	/**
+	 * Puts an inbox notification into 'userNode's inbox, telling them that the new
 	 * 'node' has been added under one of their nodes as a reply to it.
+	 * 
+	 * In these parameters 'userName' is the owner of 'node' that the notification
+	 * is 'about'
+	 * 
+	 * Example sentence structure of notifyMessage:
+	 * 
+	 * <pre>
+	 * 		"shared a node with you." 
+	 * 		"replied to you."
+	 * </pre>
 	 */
-	public void addInboxNotification(MongoSession session, String userName, SubNode userNode, SubNode node) {
+	public void addInboxNotification(MongoSession session, String userName, SubNode userNode, SubNode node,
+			String notifyMessage) {
 		SubNode userInbox = api.getInboxOfUser(session, null, userNode);
 
 		if (userInbox != null) {
@@ -113,9 +131,9 @@ public class OutboxMgr {
 			SubNode notifyNode = api.findSubNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(),
 					node.getId().toHexString());
 			if (notifyNode != null) {
-				//log.debug("target existed: " + node.getId().toHexString());
+				// log.debug("target existed: " + node.getId().toHexString());
 				return;
-			} 
+			}
 
 			notifyNode = api.createNode(session, userInbox, null, SubNodeTypes.UNSTRUCTURED, 0L,
 					CreateNodeLocation.FIRST);
@@ -123,7 +141,7 @@ public class OutboxMgr {
 			// trim to 280 like twitter.
 			String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
 
-			String content = String.format("User '%s' replied to you.\n\n%s?id=%s\n\n%s", userName,
+			String content = String.format("#### **%s** " + notifyMessage + "\n\n%s?id=%s\n\n%s", userName,
 					constProvider.getHostAndPort(), node.getId().toHexString(), shortContent);
 
 			notifyNode.setOwner(userInbox.getOwner());

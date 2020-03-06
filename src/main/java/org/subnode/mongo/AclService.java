@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.subnode.model.client.PrincipalName;
+import org.subnode.mail.OutboxMgr;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.MongoPrincipal;
@@ -44,6 +45,12 @@ public class AclService {
 
 	@Autowired
 	private UserManagerService userManagerService;
+
+	@Autowired
+	private OutboxMgr outboxMgr;
+
+	@Autowired
+	private RunAsMongoAdmin adminRunner;
 
 	/**
 	 * Returns the privileges that exist on the node identified in the request.
@@ -134,6 +141,7 @@ public class AclService {
 		String cipherKey = node.getStringProp(NodeProp.ENC_KEY.s());
 		String mapKey = null;
 
+		SubNode principalNode = null;
 		/* If we are sharing to public, then that's the map key */
 		if (principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
 			if (cipherKey != null) {
@@ -146,7 +154,7 @@ public class AclService {
 		 * map key
 		 */
 		else {
-			SubNode principalNode = api.getUserNodeByUserName(api.getAdminSession(), principal);
+			principalNode = api.getUserNodeByUserName(api.getAdminSession(), principal);
 			if (principalNode == null) {
 				if (res != null) {
 					res.setMessage("Unknown user name: " + principal);
@@ -171,15 +179,10 @@ public class AclService {
 						return false;
 					}
 				}
-				log.debug("principalPublicKey: "+principalPubKey);
+				log.debug("principalPublicKey: " + principalPubKey);
 				res.setPrincipalPublicKey(principalPubKey);
 				res.setPrincipalNodeId(mapKey);
 			}
-
-			/*
-			 * todo-1: send not just notification email, but send to people's INBOX node
-			 * also. will require us to invent the INBOX for user. Doesn't yet exist.
-			 */
 		}
 
 		/* initialize acl to a map if it's null */
@@ -218,6 +221,18 @@ public class AclService {
 			acl.put(mapKey, ac);
 			node.setAc(acl);
 			api.save(session, node);
+
+			if (principalNode != null) {
+				final SubNode _principalNode = principalNode;
+				adminRunner.run(_session -> {
+					try {
+						outboxMgr.addInboxNotification(_session, _session.getUser(), _principalNode, node,
+						"shared a node with you.");
+					} catch (Exception e) {
+						log.debug("failed sending notification", e);
+					}
+				});
+			}
 		}
 
 		return true;
