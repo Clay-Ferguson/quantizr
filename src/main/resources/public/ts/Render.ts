@@ -408,6 +408,12 @@ export class Render implements RenderIntf {
         let activeClass = "active-row";
         let inactiveClass = "inactive-row";
 
+        //todo-0: change this to be doen without concatenations.it's ugly
+        if (node.id == S.meta64.currentNodeData.node.id) {
+            activeClass += "-main";
+            inactiveClass += "-main";
+        }
+
         return new Div(null, {
             className: layoutClass + (selected ? (" " + activeClass) : (" " + inactiveClass)),
             onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(id); }, //
@@ -796,7 +802,7 @@ export class Render implements RenderIntf {
                         children = children.concat(mainNodeContent);
 
                         let contentDiv = new Div(null, {
-                            className: (selected ? "mainNodeContentStyle active-row" : "mainNodeContentStyle inactive-row"),
+                            className: (selected ? "mainNodeContentStyle active-row-main" : "mainNodeContentStyle inactive-row-main"),
                             onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(id); },
                             id: cssId
                         }, children);

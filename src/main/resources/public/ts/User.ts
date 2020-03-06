@@ -65,6 +65,7 @@ export class User implements UserIntf {
     setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
         if (res.rootNode) {
             S.meta64.homeNodeId = res.rootNode;
+            S.meta64.homeNodePath = res.rootNodePath;
         }
         S.meta64.userName = res.userName;
         S.meta64.isAdminUser = res.userName === "admin";

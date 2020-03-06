@@ -34,6 +34,7 @@ export interface NavIntf {
     toggleNodeSel(selected: boolean, id: string): void;
     navPageNodeResponse(res: J.RenderNodeResponse): void;
     navHome(): void;
+    navInbox(): void;
     navPublicHome(): void;
     showMainMenu(): void;
     navToSibling(siblingOffset: number): void;

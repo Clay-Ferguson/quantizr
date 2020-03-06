@@ -28,7 +28,13 @@ export class MenuPanel extends Div {
         this.setChildren([
 
             new Menu("Navigate", [
-                new MenuItem("Your Node", S.nav.navHome,
+                new MenuItem("Home Node", S.nav.navHome,
+                    //enabled func
+                    () => {
+                        return !S.meta64.isAnonUser;
+                    }
+                ),
+                new MenuItem("Inbox", S.nav.navInbox,
                     //enabled func
                     () => {
                         return !S.meta64.isAnonUser;

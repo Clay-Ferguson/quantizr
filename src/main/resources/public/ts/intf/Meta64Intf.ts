@@ -22,6 +22,7 @@ export interface Meta64Intf {
     deviceHeight: number;
 
     homeNodeId: string;
+    homeNodePath: string;
 
     isAdminUser: boolean;
     allowBashScripting: boolean;

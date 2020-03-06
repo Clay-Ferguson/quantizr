@@ -18,6 +18,9 @@ $listBackgroundColor: lightGray;
 $smallGap: 12px;
 $tinyGap: 8px;
 
+$fatBorderSize: 9px;
+$mediumBorderSize: 6px;
+
 html {
     // not supported by all browers.
     // scroll-behavior: smooth;
@@ -499,7 +502,8 @@ samp {
 
 .mainNodeContentStyle {
     outline: none;
-    border-bottom: 10px solid $nodeBorderBottomColor;
+    border: $mediumBorderSize solid $nodeBorderBottomColor;
+    border-radius: 1em;
     padding-right: 1em;
 }
 
@@ -608,11 +612,19 @@ samp {
 }
 
 .active-row {
-    border-left: 10px solid $primary;
+    border-left: $fatBorderSize solid $primary;
 }
 
 .inactive-row {
-    border-left: 10px solid transparent;
+    border-left: $fatBorderSize solid transparent;
+}
+
+.active-row-main {
+    border: $mediumBorderSize solid $primary;
+}
+
+.inactive-row-main {
+    border: $mediumBorderSize solid $nodeBorderBottomColor;
 }
 
 .main {

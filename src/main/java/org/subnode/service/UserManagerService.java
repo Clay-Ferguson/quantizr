@@ -125,6 +125,7 @@ public class UserManagerService {
 			String id = userNode.getId().toHexString();
 			sessionContext.setRootId(id);
 			res.setRootNode(id);
+			res.setRootNodePath(userNode.getPath());
 			res.setUserName(userName);
 			res.setAllowFileSystemSearch(appProp.isAllowFileSystemSearch());
 

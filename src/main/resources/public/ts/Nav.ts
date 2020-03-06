@@ -4,7 +4,7 @@ import { LoginDlg } from "./dlg/LoginDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { VerticalLayout } from "./widget/VerticalLayout";
 import { Anchor } from "./widget/Anchor";
@@ -72,7 +72,7 @@ export class Nav implements NavIntf {
         return !this.displayingHome();
     }
 
-    upLevelResponse = async (res: J.RenderNodeResponse, id: string, scrollToTop: boolean=false): Promise<void> => {
+    upLevelResponse = async (res: J.RenderNodeResponse, id: string, scrollToTop: boolean = false): Promise<void> => {
         if (!res || !res.node) {
             S.util.showMessage("No data is visible to you above this node.");
         } else {
@@ -98,16 +98,16 @@ export class Nav implements NavIntf {
             "offset": this.mainOffset,
             "goToLastPage": false,
             "forceIPFSRefresh": false
-        }, 
-        //success callback
-        (res: J.RenderNodeResponse) => {
-            this.upLevelResponse(res, null, true);
-        }
-        , 
-        //fail callback
-        (res: string) => {
-           this.navHome();
-        });
+        },
+            //success callback
+            (res: J.RenderNodeResponse) => {
+                this.upLevelResponse(res, null, true);
+            }
+            ,
+            //fail callback
+            (res: string) => {
+                this.navHome();
+            });
     }
 
     navUpLevel = (): void => {
@@ -120,7 +120,7 @@ export class Nav implements NavIntf {
             /* This works fine but actually for me causes eye-strain. I might enable this for mobile some day, but for now
             let's just comment it out. */
             //S.util.animateScrollToTop();
-            
+
             S.meta64.highlightNode(S.meta64.currentNodeData.node, false);
             return;
         }
@@ -139,16 +139,16 @@ export class Nav implements NavIntf {
             "offset": this.mainOffset,
             "goToLastPage": false,
             "forceIPFSRefresh": false
-        }, 
-        //success callback
-        (res: J.RenderNodeResponse) => {
-            this.upLevelResponse(res, S.meta64.currentNodeData.node.id);
-        }
-        , 
-        //fail callback
-        (res: string) => {
-           this.navHome();
-        });
+        },
+            //success callback
+            (res: J.RenderNodeResponse) => {
+                this.upLevelResponse(res, S.meta64.currentNodeData.node.id);
+            }
+            ,
+            //fail callback
+            (res: string) => {
+                this.navHome();
+            });
     }
 
     /*
@@ -269,6 +269,10 @@ export class Nav implements NavIntf {
         //todo-1: Note: currently S.meta64.refreshAllGuiEnablement has a tight coupling to this for enablement.
         this.mainMenuPopupDlg = new MainMenuPopupDlg();
         this.mainMenuPopupDlg.open("inline-block");
+    }
+
+    navInbox = (): void => {
+        S.nav.openContentNode(S.meta64.homeNodePath + "/inbox");
     }
 
     navHome = (): void => {

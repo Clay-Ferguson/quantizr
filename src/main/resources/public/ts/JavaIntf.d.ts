@@ -342,6 +342,7 @@ export interface InsertNodeResponse extends ResponseBase {
 
 export interface LoginResponse extends ResponseBase {
     rootNode: string;
+    rootNodePath: string;
     userName: string;
     anonUserLandingPageNode: string;
     homeNodeOverride: string;
@@ -534,7 +535,6 @@ export const enum NodeProp {
     NAME = "sn:name",
     IPFS_OK = "ipfs:ok",
     MIME_EXT = "sn:ext",
-    PASSWORD = "sn:pwd",
     EMAIL = "sn:email",
     CODE = "sn:code",
     BIN_VER = "sn:binVer",

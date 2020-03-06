@@ -6,6 +6,7 @@ import org.subnode.response.base.ResponseBase;
 public class LoginResponse extends ResponseBase {
 
 	private String /* Ref Info */ rootNode;
+	private String rootNodePath;
 
 	/* will be username or 'anonymous' if server rejected login */
 	private String userName;
@@ -37,6 +38,14 @@ public class LoginResponse extends ResponseBase {
 
 	public void setRootNode(String rootNode) {
 		this.rootNode = rootNode;
+	}
+
+	public String getRootNodePath() {
+		return rootNodePath;
+	}
+
+	public void setRootNodePath(String rootNodePath) {
+		this.rootNodePath = rootNodePath;
 	}
 
 	public String getAnonUserLandingPageNode() {

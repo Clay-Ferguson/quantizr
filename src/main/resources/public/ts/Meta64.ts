@@ -59,6 +59,7 @@ export class Meta64 implements Meta64Intf {
      * User's root node. Top level of what logged in user is allowed to see.
      */
     homeNodeId: string = "";
+    homeNodePath: string = "";
 
     /*
      * specifies if this is admin user.
@@ -278,6 +279,10 @@ export class Meta64 implements Meta64Intf {
     /*
      * Important: We want this to be the only method that can set values on 'parentIdToFocusNodeMap', and always
      * setting that value should go thru this function.
+     * 
+     * This function is slightly ugly and against ReactJS principles, but we don't yet have
+     * the main display page rendering (of node content) using 'React State' so this 
+     * logic is fine for now, and acually faster than React or anything else could ever be anyway.
      */
     highlightNode = async (node: J.NodeInfo, scroll: boolean): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
@@ -306,14 +311,26 @@ export class Meta64 implements Meta64Intf {
                     doneHighlighting = true;
                 } else {
                     let rowElmId = "row_" + curHighlightedNode.id;
-                    S.util.changeOrAddClass(rowElmId, activeClass, inactiveClass);
+
+                    if (curHighlightedNode.id == S.meta64.currentNodeData.node.id) {
+                        S.util.changeOrAddClass(rowElmId, activeClass+"-main", inactiveClass+"-main");
+                    }
+                    else {
+                        S.util.changeOrAddClass(rowElmId, activeClass, inactiveClass);
+                    }
                 }
             }
 
             if (!doneHighlighting) {
                 this.parentIdToFocusNodeMap[id] = node;
                 let rowElmId: string = "row_" + node.id;
-                S.util.changeOrAddClass(rowElmId, inactiveClass, activeClass);
+            
+                if (node.id == S.meta64.currentNodeData.node.id) {
+                    S.util.changeOrAddClass(rowElmId, inactiveClass+"-main", activeClass+"-main");
+                }
+                else {
+                    S.util.changeOrAddClass(rowElmId, inactiveClass, activeClass);
+                }
             }
 
             if (scroll) {
