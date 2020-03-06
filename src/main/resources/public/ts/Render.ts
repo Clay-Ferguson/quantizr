@@ -405,13 +405,16 @@ export class Render implements RenderIntf {
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
         let cssId: string = "row_" + id;
 
-        let activeClass = "active-row";
-        let inactiveClass = "inactive-row";
+        let activeClass;
+        let inactiveClass;
 
-        //todo-0: change this to be doen without concatenations.it's ugly
         if (node.id == S.meta64.currentNodeData.node.id) {
-            activeClass += "-main";
-            inactiveClass += "-main";
+            activeClass = "active-row-main";
+            inactiveClass = "inactive-row-main";
+        }
+        else {
+            activeClass = "active-row";
+            inactiveClass = "inactive-row";
         }
 
         return new Div(null, {

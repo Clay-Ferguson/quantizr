@@ -86,7 +86,8 @@ public class Convert {
 			// below sets to owner to 'admin' which will
 			// be safe for now because the admin is the only user capable of import/export.
 			log.debug("Unable to find userNode from nodeOwner: " + //
-					(node.getOwner() != null ? ownerId : ("null owner on node: " + node.getId().toHexString())));
+					(node.getOwner() != null ? ownerId : ("null owner on node: " + node.getId().toHexString()))+ //
+					" tried to find owner="+node.getOwner().toHexString());
 		} else {
 			nameProp = userNode.getStringProp(NodeProp.USER.s());
 			avatarBinVer = userNode.getIntProp(NodeProp.BIN_VER.s());

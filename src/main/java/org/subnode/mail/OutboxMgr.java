@@ -97,27 +97,38 @@ public class OutboxMgr {
 		});
 	}
 
-	/* 
-	Puts an inbox notification into 'userName's inbox, telling them that the new 'node' has been added under
-	one of their nodes as a reply to it.
-	
-	todo-1: These inbox nodes need to have a 'type' so we can do special rendering like showing the avatar of the other person, 
-	or maybe a blurb from the first sentence of their post 
-	*/
+	/*
+	 * Puts an inbox notification into 'userName's inbox, telling them that the new
+	 * 'node' has been added under one of their nodes as a reply to it.
+	 */
 	public void addInboxNotification(MongoSession session, String userName, SubNode userNode, SubNode node) {
 		SubNode userInbox = api.getInboxOfUser(session, null, userNode);
 
 		if (userInbox != null) {
-			SubNode notifyNode = api.createNode(session, userInbox, null, SubNodeTypes.UNSTRUCTURED, 0L, CreateNodeLocation.FIRST);
 
-			//trim to 280 like twitter.
-			String shortContent = XString.trimToMaxLen(node.getContent(), 280)+"...";
+			/*
+			 * First look to see if there is a target node already existing in this persons
+			 * inbox that points to the node in question
+			 */
+			SubNode notifyNode = api.findSubNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(),
+					node.getId().toHexString());
+			if (notifyNode != null) {
+				//log.debug("target existed: " + node.getId().toHexString());
+				return;
+			} 
 
-			String content = String.format("User '%s' replied to you.\n\n%s?id=%s\n\n%s", 
-				userName, constProvider.getHostAndPort(), node.getId().toHexString(), shortContent);
+			notifyNode = api.createNode(session, userInbox, null, SubNodeTypes.UNSTRUCTURED, 0L,
+					CreateNodeLocation.FIRST);
+
+			// trim to 280 like twitter.
+			String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
+
+			String content = String.format("User '%s' replied to you.\n\n%s?id=%s\n\n%s", userName,
+					constProvider.getHostAndPort(), node.getId().toHexString(), shortContent);
 
 			notifyNode.setOwner(userInbox.getOwner());
 			notifyNode.setContent(content);
+			notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getId().toHexString());
 			api.save(session, notifyNode);
 		}
 	}

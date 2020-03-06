@@ -1509,11 +1509,20 @@ public class MongoApi {
 				SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath("/" + NodeName.ROOT + "/" + NodeName.USER))//
 				.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
 
-		// todo-1: once this is proven, need to rename the existing nodes to embed
-		// username in this new way
-		// Criteria criteria = Criteria.where(//
-		// SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath("/" + NodeName.ROOT + "/"
-		// + NodeName.USER + "/" + user));
+		query.addCriteria(criteria);
+		SubNode ret = ops.findOne(query, SubNode.class);
+		auth(session, ret, PrivilegeType.READ);
+		return ret;
+	}
+
+	/* Returns one (or first) node contained directly under path (non-recursively) that has a matching propName and propVal */
+	public SubNode findSubNodeByProp(MongoSession session, String path, String propName, String propVal) {
+
+		// Other wise for ordinary users root is based off their username
+		Query query = new Query();
+		Criteria criteria = Criteria.where(//
+				SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(path))//
+				.and(SubNode.FIELD_PROPERTIES + "." + propName + ".value").is(propVal);
 
 		query.addCriteria(criteria);
 		SubNode ret = ops.findOne(query, SubNode.class);

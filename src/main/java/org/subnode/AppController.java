@@ -272,6 +272,7 @@ public class AppController {
 		// A 'name' param is handled just like an identifier with ":" prefix
 		if (!StringUtils.isEmpty(name)) {
 			id = ":" + name;
+			log.debug("Looking up by name: "+name);
 		}
 
 		if (id != null) {

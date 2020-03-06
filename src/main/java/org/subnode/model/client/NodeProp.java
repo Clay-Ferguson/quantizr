@@ -26,6 +26,10 @@ public enum NodeProp {
     EMAIL_RECIP("sn:recip"), //
     EMAIL_SUBJECT("sn:subject"), //
 
+    /* when a node id pointing to some other node, we set it's target id to the node it points to. For now used only
+    for inbox to point to nodes */
+    TARGET_ID("sn:target_id"), //
+
     /*
      * WARNING: Only the User Account Root nodes have this property of the actual
      * user name. All other nodes reference their OWNER as an OwnerId that points to
