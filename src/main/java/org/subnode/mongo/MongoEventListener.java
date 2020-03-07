@@ -113,6 +113,20 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			log.debug("RESET PathHash=" + pathHash);
 		}
 
+		/* Node name not allowed to contain : or ~ */
+		String nodeName = node.getName();
+		if (nodeName.contains(":")) {
+			nodeName = nodeName.replaceAll(":", "-");
+			dbObj.put(SubNode.FIELD_NAME, nodeName);
+			node.setName(nodeName);
+		}
+
+		if (nodeName.contains("~")) {
+			nodeName = nodeName.replaceAll("~", "-");
+			dbObj.put(SubNode.FIELD_NAME, nodeName);
+			node.setName(nodeName);
+		}
+
 		Date now = new Date();
 		if (node.getCreateTime() == null) {
 			dbObj.put(SubNode.FIELD_CREATE_TIME, now);

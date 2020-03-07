@@ -424,10 +424,6 @@ export class EditNodeDlg extends DialogBase {
             if (!nodeName) {
                 nodeName = "";
             }
-            else {
-                //todo-1: for now if user puts a colon in a node name, we can just change it for them. We don't allow it.
-                nodeName = nodeName.replace(":", "-");
-            }
 
             this.node.name = nodeName;
             this.node.content = content;
