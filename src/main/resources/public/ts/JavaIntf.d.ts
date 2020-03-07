@@ -529,6 +529,7 @@ export const enum NodeProp {
     EMAIL_CONTENT = "sn:content",
     EMAIL_RECIP = "sn:recip",
     EMAIL_SUBJECT = "sn:subject",
+    TARGET_ID = "sn:target_id",
     USER = "sn:user",
     PWD_HASH = "sn:pwdHash",
     FILENAME = "sn:fileName",

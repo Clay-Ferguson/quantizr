@@ -302,6 +302,20 @@ public class AppController {
 		return "forward:/index.html";
 	}
 
+	/*
+	 * This is the actual app page loading request, for his SPA (Single Page
+	 * Application) this is the request to load the page.
+	 * 
+	 * ID is optional url parameter that user can specify to access a specific node
+	 * 
+	 * passCode is an auth code for a password reset
+	 */
+	@RequestMapping(value = "/inbox")
+	public String inbox(Model model) {
+		sessionContext.setUrlId("~inbox");
+		return "forward:/index.html";
+	}
+
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
 	public @ResponseBody ResponseBase signup(@RequestBody SignupRequest req, HttpSession session) {
 		return (ResponseBase) callProc.run("signup", req, session, ms -> {

@@ -850,12 +850,33 @@ public class MongoApi {
 		return ret;
 	}
 
+	/**
+	 * Locations are special enumerated locations: like 'inbox'
+	 */
+	public SubNode getNodeByLocation(MongoSession session, String name, boolean allowAuth) {
+		SubNode ret = null;
+
+		if (name.equals("inbox")) {
+			ret = getInboxOfUser(session, session.getUser(), null);
+		}
+
+		return ret;
+	}
+
 	public SubNode getNode(MongoSession session, String path) {
 		return getNode(session, path, true);
 	}
 
-	// Gets a node using any of the three naming types:
-	// ID, or path (starts with slash), or name (starts with colon)
+	/**
+	 * Gets a node using any of the three naming types:
+	 * 
+	 * <pre>
+	 * 1) ID (hex string, no special prefix)
+	 * 2) path (starts with slash), 
+	 * 3) name (starts with colon)
+	 * 4) special named location, like '~inbox' (starts with tilde) todo-0: stop users from entering tilde in a name (already done for colon)
+	 * </pre>
+	 */
 	public SubNode getNode(MongoSession session, String searchArg, boolean allowAuth) {
 		if (searchArg.equals("/")) {
 			throw new RuntimeException(
@@ -864,8 +885,11 @@ public class MongoApi {
 
 		SubNode ret = null;
 
+		if (searchArg.startsWith("~")) {
+			ret = getNodeByLocation(session, searchArg.substring(1), allowAuth);
+		}
 		// Node name lookups are done by prefixing the search with a colon (:)
-		if (searchArg.startsWith(":")) {
+		else if (searchArg.startsWith(":")) {
 			ret = getNodeByName(session, searchArg.substring(1), allowAuth);
 		}
 		// If search doesn't start with a slash then it's a nodeId and not a path
@@ -1515,7 +1539,10 @@ public class MongoApi {
 		return ret;
 	}
 
-	/* Returns one (or first) node contained directly under path (non-recursively) that has a matching propName and propVal */
+	/*
+	 * Returns one (or first) node contained directly under path (non-recursively)
+	 * that has a matching propName and propVal
+	 */
 	public SubNode findSubNodeByProp(MongoSession session, String path, String propName, String propVal) {
 
 		// Other wise for ordinary users root is based off their username
