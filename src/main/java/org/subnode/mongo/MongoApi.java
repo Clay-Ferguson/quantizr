@@ -1149,7 +1149,7 @@ public class MongoApi {
 	 * WARNING. "SubNode.prp" is a COLLECTION and therefore not searchable. Beware.
 	 */
 	public Iterable<SubNode> searchSubGraph(MongoSession session, SubNode node, String prop, String text,
-			String sortField, int limit) {
+			String sortField, int limit, boolean fuzzy, boolean caseSensitive) {
 		auth(session, node, PrivilegeType.READ);
 
 		Query query = new Query();
@@ -1163,30 +1163,37 @@ public class MongoApi {
 		query.addCriteria(criteria);
 
 		if (!StringUtils.isEmpty(text)) {
-			// // todo-1: need to do escaping. Currently only alpha text searches will work
-			// // here well, without manual escaping.
-			// // the 'i' means case insensitive (remove it for case sensitive)
-			// not sure which of these is best:
-			// query.addCriteria(Criteria.where(prop).regex(Pattern.compile(".*" + text +
-			// ".*")));
-			// query.addCriteria(Criteria.where(prop).regex(".*" + text + ".*"));
 
-			// /////
-			// Quer query = Query.query(
-			// Criteria.where("aBooleanProperty").is(true).
-			// and(anIntegerProperty).is(1)).
-			// addCriteria(TextCriteria.
-			// forLanguage("en"). // effectively the same as forDefaultLanguage() here
-			// matching("a text that is indexed for full text search")));
+			if (fuzzy) {
+				if (StringUtils.isEmpty(prop)) {
+					prop = SubNode.FIELD_CONTENT;
+				}
 
-			// List<YourDocumentType> result = mongoTemplate.findAll(query.
-			// YourDocumentType.class);
-			// /////
+				if (caseSensitive) {
+					query.addCriteria(Criteria.where(prop).regex(text));
+				}
+				else {
+					// i==insensitive (case)
+				 	query.addCriteria(Criteria.where(prop).regex(text, "i"));
+				}
+			} else {
+				// /////
+				// Query query = Query.query(
+				// Criteria.where("aBooleanProperty").is(true).
+				// and(anIntegerProperty).is(1)).
+				// addCriteria(TextCriteria.
+				// forLanguage("en"). // effectively the same as forDefaultLanguage() here
+				// matching("a text that is indexed for full text search")));
 
-			TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
-			populateTextCriteria(textCriteria, text);
-			textCriteria.caseSensitive(false);
-			query.addCriteria(textCriteria);
+				// List<YourDocumentType> result = mongoTemplate.findAll(query.
+				// YourDocumentType.class);
+				// /////
+
+				TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
+				populateTextCriteria(textCriteria, text);
+				textCriteria.caseSensitive(caseSensitive);
+				query.addCriteria(textCriteria);
+			}
 		}
 
 		if (!StringUtils.isEmpty(sortField)) {
@@ -1197,12 +1204,9 @@ public class MongoApi {
 	}
 
 	/*
-	 * Buildsl the 'criteria' object using the kind of searching Google does where
+	 * Builds the 'criteria' object using the kind of searching Google does where
 	 * anything in quotes is considered a phrase and anything else separated by
 	 * spaces are separate search terms.
-	 * 
-	 * TODO-1: Submit this to the Spring dev team for pull request. This should be
-	 * built into spring.
 	 */
 	public static void populateTextCriteria(TextCriteria criteria, String text) {
 		String regex = "\"([^\"]*)\"|(\\S+)";

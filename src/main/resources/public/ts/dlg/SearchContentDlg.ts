@@ -8,6 +8,9 @@ import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
+import { MessageDlg } from "./MessageDlg";
+import { Checkbox } from "../widget/Checkbox";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -18,6 +21,8 @@ export class SearchContentDlg extends DialogBase {
 
     static defaultSearchText: string = "";
     searchTextField: TextField;
+    fuzzyCheckbox: Checkbox;
+    caseSensitiveCheckbox: Checkbox;
   
     constructor() {
         super("Search Content", "app-modal-content-medium-width");
@@ -35,6 +40,10 @@ export class SearchContentDlg extends DialogBase {
                         }
                     }
                 }, SearchContentDlg.defaultSearchText),
+                new HorizontalLayout([
+                    this.fuzzyCheckbox = new Checkbox("Fuzzy Search (slower)"),
+                    this.caseSensitiveCheckbox = new Checkbox("Case Sensitive")
+                ], "marginBottom"),
                 new ButtonBar([
                     new Button("Search", this.search, null, "primary"),
                     new Button("Close", () => {
@@ -67,18 +76,28 @@ export class SearchContentDlg extends DialogBase {
 
         SearchContentDlg.defaultSearchText = searchText;
 
+        let fuzzy = this.fuzzyCheckbox.getChecked();
+        let caseSensitive = this.caseSensitiveCheckbox.getChecked();
+
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             "nodeId": node.id,
             "searchText": searchText,
             "sortDir": "",
             "sortField": "",
-            "searchProp": ""
+            "searchProp": "",
+            "fuzzy": fuzzy,
+            "caseSensitive": caseSensitive
         }, this.searchNodesResponse);
     }
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
-        S.srch.searchNodesResponse(res);
-        this.close();
+        if (S.srch.numSearchResults(res) > 0) {
+            S.srch.searchNodesResponse(res);
+            this.close();
+        }
+        else {
+            new MessageDlg("No search results found.", "Search").open();
+        }
     }
 
     init = (): void => {

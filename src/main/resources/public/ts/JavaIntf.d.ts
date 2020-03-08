@@ -142,6 +142,8 @@ export interface NodeSearchRequest extends RequestBase {
     nodeId: string;
     searchText: string;
     searchProp: string;
+    fuzzy: boolean;
+    caseSensitive: boolean;
 }
 
 export interface OpenSystemFileRequest extends RequestBase {

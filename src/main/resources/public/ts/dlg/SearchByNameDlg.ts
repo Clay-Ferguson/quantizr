@@ -8,6 +8,7 @@ import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
+import { MessageDlg } from "./MessageDlg";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -69,13 +70,20 @@ export class SearchByNameDlg extends DialogBase {
             "searchText": searchText,
             "sortDir": "",
             "sortField": "",
-            "searchProp": "node.name"
+            "searchProp": "node.name",
+            "fuzzy": false,
+            "caseSensitive": false
         }, this.searchNodesResponse);
     }
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
-        S.srch.searchNodesResponse(res);
-        this.close();
+        if (S.srch.numSearchResults(res) > 0) {
+            S.srch.searchNodesResponse(res);
+            this.close();
+        }
+        else {
+            new MessageDlg("No search results found.", "Search").open();
+        }
     }
 
     init = (): void => {

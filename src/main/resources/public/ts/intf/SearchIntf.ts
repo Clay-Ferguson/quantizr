@@ -16,7 +16,7 @@ export interface SearchIntf {
 
     idToNodeMap: { [key: string]: J.NodeInfo };
 
-    numSearchResults(): any;
+    numSearchResults(res: J.NodeSearchResponse): number;
     searchTabActivated(): any;
     searchNodesResponse(res: J.NodeSearchResponse): any;
     timelineResponse(res: J.NodeSearchResponse): any;

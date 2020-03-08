@@ -17,6 +17,11 @@ public class NodeSearchRequest extends RequestBase {
 
 	private String searchProp;
 
+	//fuzzy means you can get substring searches, where the substring is not on the FIRST characters of a term
+	private boolean fuzzy;
+
+	private boolean caseSensitive;
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -55,5 +60,21 @@ public class NodeSearchRequest extends RequestBase {
 
 	public void setSortField(String sortField) {
 		this.sortField = sortField;
+	}
+
+	public boolean getFuzzy() {
+		return fuzzy;
+	}
+
+	public void setFuzzy(boolean fuzzy) {
+		this.fuzzy = fuzzy;
+	}
+
+	public boolean getCaseSensitive() {
+		return caseSensitive;
+	}
+
+	public void setCaseSensitive(boolean caseSensitive) {
+		this.caseSensitive = caseSensitive;
 	}
 }

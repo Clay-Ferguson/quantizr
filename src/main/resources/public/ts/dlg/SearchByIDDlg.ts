@@ -5,11 +5,12 @@ import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
 import { TextContent } from "../widget/TextContent";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
+import { MessageDlg } from "./MessageDlg";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
@@ -18,15 +19,15 @@ export class SearchByIDDlg extends DialogBase {
 
     static defaultSearchText: string = "";
     searchTextField: TextField;
-  
+
     constructor() {
         super("Search by Node ID", "app-modal-content-medium-width");
-        
+
         this.setChildren([
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
                 this.searchTextField = new TextField("Node ID", {
-                    onKeyPress : (e: KeyboardEvent) => { 
+                    onKeyPress: (e: KeyboardEvent) => {
                         if (e.which == 13) { // 13==enter key code
                             this.search();
                             return false;
@@ -69,13 +70,20 @@ export class SearchByIDDlg extends DialogBase {
             "searchText": searchText,
             "sortDir": "",
             "sortField": "",
-            "searchProp": "node.id"
+            "searchProp": "node.id",
+            "fuzzy": false,
+            "caseSensitive": false
         }, this.searchNodesResponse);
     }
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
-        S.srch.searchNodesResponse(res);
-        this.close();
+        if (S.srch.numSearchResults(res) > 0) {
+            S.srch.searchNodesResponse(res);
+            this.close();
+        }
+        else {
+            new MessageDlg("No search results found.", "Search").open();
+        }
     }
 
     init = (): void => {

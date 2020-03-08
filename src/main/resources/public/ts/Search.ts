@@ -3,7 +3,7 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchIntf } from "./intf/SearchIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 import { Button } from "./widget/Button";
 import { Div } from "./widget/Div";
 import { Comp } from "./widget/base/Comp";
@@ -26,7 +26,7 @@ export class Search implements SearchIntf {
     /*
      * Holds the NodeSearchResponse.java JSON, or null if no search has been done.
      */
-    searchResults: any = null;
+    searchResults: J.NodeSearchResponse = null;
 
     /*
      * Holds the NodeSearchResponse.java JSON, or null if no timeline has been done.
@@ -40,11 +40,11 @@ export class Search implements SearchIntf {
 
     idToNodeMap: { [key: string]: J.NodeInfo } = {};
 
-    numSearchResults = () => {
-        return this.searchResults != null && //
-            this.searchResults.searchResults != null && //
-            this.searchResults.searchResults.length != null ? //
-            this.searchResults.searchResults.length : 0;
+    numSearchResults = (res: J.NodeSearchResponse): number => {
+        return res != null && //
+            res.searchResults != null && //
+            res.searchResults.length != null ? //
+            res.searchResults.length : 0;
     }
 
     searchTabActivated = () => {
@@ -52,19 +52,13 @@ export class Search implements SearchIntf {
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
         this.searchResults = res;
-        if (this.numSearchResults() == 0) {
-            new MessageDlg("No search results found.", "Search").open();
-            S.srch.searchText = null;
-            return;
-        }
-
-        S.srch.populateSearchResultsPage(S.srch.searchResults, "searchResultsPanel"); 
+        S.srch.populateSearchResultsPage(S.srch.searchResults, "searchResultsPanel");
         S.meta64.selectTab("searchTab");
     }
 
     timelineResponse = (res: J.NodeSearchResponse) => {
         this.timelineResults = res;
-        S.srch.populateSearchResultsPage(S.srch.timelineResults, "timelineResultsPanel"); 
+        S.srch.populateSearchResultsPage(S.srch.timelineResults, "timelineResultsPanel");
         S.meta64.selectTab("timelineTab");
     }
 
@@ -94,7 +88,9 @@ export class Search implements SearchIntf {
             "searchText": "",
             "sortDir": "DESC",
             "sortField": prop,
-            "searchProp": null
+            "searchProp": null,
+            "fuzzy": false,
+            "caseSensitive": false
         }, this.timelineResponse);
     }
 
@@ -112,7 +108,7 @@ export class Search implements SearchIntf {
         let rowCount = 0;
 
         let output: Comp[] = [];
-        let i=-1;
+        let i = -1;
         data.searchResults.forEach((node: J.NodeInfo) => {
             i++;
             this.initSearchNode(node);

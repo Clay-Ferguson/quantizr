@@ -56,8 +56,11 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		Document dbObj = event.getDocument();
 		ObjectId id = node.getId();
 
-		/* Note: There's a special case in MongoApi#createUser where the new User root node ID is assigned there,
-		along with setting that on the owner property so we can do one save and have both updated */
+		/*
+		 * Note: There's a special case in MongoApi#createUser where the new User root
+		 * node ID is assigned there, along with setting that on the owner property so
+		 * we can do one save and have both updated
+		 */
 		if (id == null) {
 			id = new ObjectId();
 			node.setId(id);
@@ -115,13 +118,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		/* Node name not allowed to contain : or ~ */
 		String nodeName = node.getName();
-		if (nodeName.contains(":")) {
+		if (nodeName != null && nodeName.contains(":")) {
 			nodeName = nodeName.replaceAll(":", "-");
 			dbObj.put(SubNode.FIELD_NAME, nodeName);
 			node.setName(nodeName);
 		}
 
-		if (nodeName.contains("~")) {
+		if (nodeName != null && nodeName.contains("~")) {
 			nodeName = nodeName.replaceAll("~", "-");
 			dbObj.put(SubNode.FIELD_NAME, nodeName);
 			node.setName(nodeName);

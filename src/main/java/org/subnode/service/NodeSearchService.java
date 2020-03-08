@@ -37,8 +37,6 @@ public class NodeSearchService {
 	private SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE,
 			DateUtil.DATE_FORMAT_LOCALE);
 
-	private static boolean searchAllProps = false;
-
 	@Autowired
 	private MongoApi api;
 
@@ -55,9 +53,6 @@ public class NodeSearchService {
 		int MAX_NODES = 100;
 
 		String searchText = req.getSearchText();
-		if (searchText != null && searchText.length() > 0) {
-			searchText = searchText.toLowerCase();
-		}
 
 		List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
 		res.setSearchResults(searchResults);
@@ -81,14 +76,14 @@ public class NodeSearchService {
 				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter + 1,
 						false, false, false);
 				searchResults.add(info);
-			}
+		}
 		}
 		// othwerwise we're searching all node properties, only under the selected node.
 		else {
 			SubNode searchRoot = api.getNode(session, req.getNodeId());
 
 			for (SubNode node : api.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText,
-					req.getSortField(), MAX_NODES)) {
+					req.getSortField(), MAX_NODES, req.getFuzzy(), req.getCaseSensitive())) {
 				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter + 1,
 						false, false, false);
 				searchResults.add(info);
