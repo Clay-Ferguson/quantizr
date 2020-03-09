@@ -857,7 +857,7 @@ public class MongoApi {
 		SubNode ret = null;
 
 		if (name.equals("inbox")) {
-			ret = getInboxOfUser(session, session.getUser(), null);
+			ret = getSpecialNode(session, session.getUser(), null, NodeName.INBOX, "Inbox");
 		}
 
 		return ret;
@@ -874,7 +874,7 @@ public class MongoApi {
 	 * 1) ID (hex string, no special prefix)
 	 * 2) path (starts with slash), 
 	 * 3) name (starts with colon)
-	 * 4) special named location, like '~inbox' (starts with tilde) todo-0: stop users from entering tilde in a name (already done for colon)
+	 * 4) special named location, like '~inbox' (starts with tilde)
 	 * </pre>
 	 */
 	public SubNode getNode(MongoSession session, String searchArg, boolean allowAuth) {
@@ -1457,17 +1457,10 @@ public class MongoApi {
 		return "^" + Pattern.quote(path) + "\\/(.+)$";
 	}
 
-	/*
-	 * For proof-of-concept i'm storing actual password, instead of a hash of it,
-	 * which is what will be done in final production code.
-	 * 
-	 * Also for cases as important as this we need to see if we can have a unique
-	 * constratint index type capability for path of all user account nodes?
-	 */
 	public SubNode createUser(MongoSession session, String user, String email, String password, boolean automated) {
-		if (PrincipalName.ADMIN.s().equals(user)) {
-			throw new RuntimeException("createUser should not be called fror admin user.");
-		}
+		// if (PrincipalName.ADMIN.s().equals(user)) {
+		// 	throw new RuntimeException("createUser should not be called fror admin user.");
+		// }
 
 		requireAdmin(session);
 		String newUserNodePath = "/" + NodeName.ROOT + "/" + NodeName.USER + "/?";
@@ -1500,7 +1493,7 @@ public class MongoApi {
 	 * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
 	 * userNode if you know it, to save cycles
 	 */
-	public SubNode getInboxOfUser(MongoSession session, String user, SubNode userNode) {
+	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode, String pathPart, String nodeName) {
 		if (userNode == null) {
 			userNode = getUserNodeByUserName(session, user);
 		}
@@ -1508,13 +1501,13 @@ public class MongoApi {
 			throw new RuntimeException("userNode not found.");
 		}
 
-		String inboxPath = userNode.getPath() + "/" + NodeName.INBOX;
+		String inboxPath = userNode.getPath() + "/" + pathPart;
 		SubNode inboxNode = getNode(session, inboxPath);
 		if (inboxNode == null) {
-			inboxNode = createNode(session, userNode, NodeName.INBOX, SubNodeTypes.UNSTRUCTURED, 0L,
+			inboxNode = createNode(session, userNode, pathPart, SubNodeTypes.UNSTRUCTURED, 0L,
 					CreateNodeLocation.LAST);
 			inboxNode.setOwner(userNode.getId());
-			inboxNode.setContent("Inbox");
+			inboxNode.setContent(nodeName);
 			save(session, inboxNode);
 		}
 		return inboxNode;
@@ -1613,6 +1606,7 @@ public class MongoApi {
 		String adminUser = appProp.getMongoAdminUserName();
 		// String adminPwd = appProp.getMongoAdminPassword();
 
+		//todo-0: this will change slightly if admin is allowed to have a normal user-like node.
 		SubNode adminNode = getUserNodeByUserName(getAdminSession(), adminUser);
 		if (adminNode == null) {
 			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, "Repository Root", null, true, null,

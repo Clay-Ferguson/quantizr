@@ -41,6 +41,25 @@ export class MainNavPanel extends NavTag {
             )
         ]));
 
+        /* Feature to read from clipboard might scare some users (as it should) so I'm turning this on only for admins
+        until we have a more specific User Preference allowing users to have to opt-in (not opt-out) to use this feature 
+        */
+        if (!S.meta64.isAdminUser) {
+            buttons.push(new Li(null, {
+                className: "nav-item"
+            }, [
+                new NavBarIconButton("fa-clipboard", null, {
+                    "onClick": e => { S.edit.saveClipboardToNode(); },
+                    "title": "Save Clipboard text to a Note"
+                },
+                    //isEnabled func
+                    () => { return !S.meta64.isAnonUser },
+                    //isVisible func
+                    () => { return !S.meta64.isAnonUser }
+                )
+            ]));
+        }
+
         if (!S.meta64.isMobile) {
             buttons.push(new Li(null, {
                 className: "nav-item"
@@ -273,7 +292,7 @@ export class MainNavPanel extends NavTag {
             the app automatically create a subnode whenever you drop something */
             elm.addEventListener("drop", (ev) => {
                 ev.stopPropagation();
-                ev.preventDefault(); 
+                ev.preventDefault();
 
                 //var imageUrl = evt.dataTransfer.getData('URL');
                 //var imageUrl = evt.dataTransfer.getData('text/html');

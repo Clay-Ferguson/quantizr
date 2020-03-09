@@ -179,7 +179,7 @@ public class UserManagerService {
 
 				String userName = node.getStringProp(NodeProp.USER.s());
 
-				if (PrincipalName.ADMIN.s().equals(userName)) {
+				if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName)) {
 					throw new RuntimeException("processSignupCode should not be called fror admin user.");
 				}
 

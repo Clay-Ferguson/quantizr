@@ -83,12 +83,17 @@ public class NodeEditService {
 		}
 
 		String nodeId = req.getNodeId();
-		SubNode node = api.getNode(session, nodeId);
+		SubNode node = null;
+		if (nodeId.startsWith("~")) {
+			node = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "Notes");
+		} else {
+			node = api.getNode(session, nodeId);
+		}
 		SubNode newNode = null;
 
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 		newNode = api.createNode(session, node, null, req.getTypeName(), 0L, createLoc);
-		newNode.setContent("");
+		newNode.setContent(req.getContent() != null ? req.getContent() : "");
 
 		api.save(session, newNode);
 		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false, false,
@@ -265,7 +270,10 @@ public class NodeEditService {
 				res.setAclEntries(api.getAclEntries(session, node));
 			}
 
-			/* Note: It's important to call this before we update the modifyTime (next couple lines down) */
+			/*
+			 * Note: It's important to call this before we update the modifyTime (next
+			 * couple lines down)
+			 */
 			if (!StringUtil.isEmpty(node.getContent())) {
 				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
 			}

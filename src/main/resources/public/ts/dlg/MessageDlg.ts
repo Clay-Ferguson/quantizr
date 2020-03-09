@@ -9,13 +9,14 @@ import { DialogBase } from "../DialogBase";
  */
 export class MessageDlg extends DialogBase {
 
-    constructor(private message: string, title: string, private callback : Function=null, customWidget: Comp=null, private preformatted: boolean = false) { 
+    constructor(private message: string, title: string, private callback : Function=null, customWidget: Comp=null, private preformatted: boolean = false,
+        flashTimeout: number=0) { 
         super(title);
 
         this.setChildren([
             new TextContent(this.message, null, this.preformatted),
             customWidget,
-            new ButtonBar([
+            flashTimeout == 0 ? new ButtonBar([
                 new Button("Ok", () => {
                     this.close();
 
@@ -23,7 +24,15 @@ export class MessageDlg extends DialogBase {
                         this.callback();
                     }
                 }, null, "primary")
-            ])
+            ]) : null
         ]);
+
+        if (flashTimeout > 0) {
+            setTimeout(() => {
+                this.whenElmEx((elm: HTMLElement) => {
+                    this.close();
+                });
+            }, flashTimeout);
+        }
     }
 }

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.config.SessionContext;
 import org.subnode.image.ImageSize;
 import org.subnode.model.AccessControlInfo;
@@ -92,7 +93,7 @@ public class Convert {
 			nameProp = userNode.getStringProp(NodeProp.USER.s());
 			avatarBinVer = userNode.getIntProp(NodeProp.BIN_VER.s());
 		}
-		String owner = userNode == null ? "admin" : nameProp;
+		String owner = userNode == null ? PrincipalName.ADMIN.s() : nameProp;
 
 		log.trace("RENDER ID=" + node.getId().toHexString() + " rootId=" + ownerId + " session.rootId="
 				+ sessionContext.getRootId() + " node.content=" + node.getContent() + " owner=" + owner);

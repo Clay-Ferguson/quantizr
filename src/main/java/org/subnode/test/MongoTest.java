@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -40,7 +41,7 @@ public class MongoTest {
 		long expectedCount = api.getNodeCount();
 		MongoSession adminSession = api.getAdminSession();
 
-		SubNode adminNode = api.getUserNodeByUserName(adminSession, "admin");
+		SubNode adminNode = api.getUserNodeByUserName(adminSession, PrincipalName.ADMIN.s());
 		if (adminNode == null) {
 			throw new RuntimeException("Unable to find admin user node.");
 		}

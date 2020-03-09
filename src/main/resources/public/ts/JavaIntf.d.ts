@@ -32,6 +32,7 @@ export interface CloseAccountRequest extends RequestBase {
 
 export interface CreateSubNodeRequest extends RequestBase {
     nodeId: string;
+    content: string;
     newNodeName: string;
     typeName: string;
     createAtTop: boolean;

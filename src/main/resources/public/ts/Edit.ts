@@ -203,7 +203,8 @@ export class Edit implements EditIntf {
                 "nodeId": S.edit.parentOfNewNode.id,
                 "newNodeName": "",
                 "typeName": typeName ? typeName : "u",
-                "createAtTop": createAtTop
+                "createAtTop": createAtTop,
+                "content": null
             }, S.edit.createSubNodeResponse);
         }
     }
@@ -586,6 +587,23 @@ export class Edit implements EditIntf {
                 }
             }
         ).open();
+    }
+
+    saveClipboardToNode = (): void => {
+        (navigator as any).clipboard.readText().then(
+            clipText => {
+                S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                    "nodeId": "~notes",
+                    "newNodeName": "",
+                    "typeName": "u",
+                    "createAtTop": true,
+                    "content": clipText
+                }, 
+                    () => {
+                        S.util.flashMessage("Clipboard content saved under your Notes node...\n\n"+clipText, true);
+                    }
+                );
+            });
     }
 
     splitNode = (splitType: string, delimiter: string): void => {

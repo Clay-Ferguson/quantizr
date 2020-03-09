@@ -172,6 +172,7 @@ export abstract class Comp implements CompIntf {
         S.util.getElm(this.getId(), func);
     }
 
+    //WARNING: Use whenElmEx for DialogBase derived components!
     whenElm = (func: (elm: HTMLElement) => void) => {
         if (this.domAddEventRan) {
             //console.log("ran whenElm event immediately. domAddEvent had already ran");
