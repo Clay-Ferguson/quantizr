@@ -69,10 +69,17 @@ public class IPFSSyncService {
 	@Autowired
 	private FileUtils fileUtils;
 
-	/*
+	/**
 	 * Main entry point to perform a sync of 'node' against IPFS. The forceRefresh
 	 * theoretically never needs to be true and the main point of it would be if we
-	 * for some reason do want to forcably re-read information from the IPFS Web.
+	 * for some reason do want to forcably re-read information from IPFS.
+	 * 
+	 * <pre>
+	 * Example: 
+	 *     ipfs:link= QmZpc3HvfjEXvLWGQPWbHk3AjD5j8NEN4gmFN8Jmrd5g83/cs 
+	 *     This example will render the children as a directory of images, which is a
+	 *     standard test node used by IPFS devs.
+	 * </pre>
 	 */
 	public void syncNode(MongoSession session, SubNode node, boolean recursive, MerkleDAGSyncStats stats,
 			boolean forceRefresh) {
@@ -80,9 +87,9 @@ public class IPFSSyncService {
 		Objects.requireNonNull(node);
 
 		/*
-		 * If this node has already been loaded from IPFS, return. Nothing to do here.
-		 * We know that once we have IPFS_OK property set on any give node, that it's
-		 * already up to date and we don't need to read again, because IPFS data is
+		 * If this node has already been loaded from IPFS, then return. Nothing to do
+		 * here. We know that once we have IPFS_OK property set on any give node, that
+		 * it's already up to date and we don't need to read again, because IPFS data is
 		 * content-addressed and therefore immutable
 		 */
 		if (!forceRefresh && node.getBooleanProp(NodeProp.IPFS_OK.s())) {

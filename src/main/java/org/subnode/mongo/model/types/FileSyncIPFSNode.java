@@ -5,11 +5,12 @@ import org.subnode.mongo.model.types.properties.FileSyncIPFSLink;
 
 import org.springframework.stereotype.Component;
 
+//todo-0: this value is replicated over in NodeProp.java and that's ugly
 @Component
 public class FileSyncIPFSNode implements SubNodeType {
     public static FileSyncIPFSLink LINK = new FileSyncIPFSLink();
 
     public String getName() {
-        return "ipfs:node";
+        return "sn:ipfsNode"; 
     }
 }

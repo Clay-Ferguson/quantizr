@@ -4,6 +4,7 @@ import org.subnode.mongo.model.types.intf.SubNodeProperty;
 
 import org.springframework.stereotype.Component;
 
+//todo-0: all classes like this one need to be an ENUM instead!
 @Component
 public class FileSyncIPFSLink implements SubNodeProperty {
 

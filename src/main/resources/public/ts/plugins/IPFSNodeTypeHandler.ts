@@ -12,54 +12,65 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-//todo-1: disabled for now
+export class IPFSNodeTypeHandler implements TypeHandlerIntf {
 
-// export class IPFSNodeTypeHandler implements TypeHandlerIntf {
-//     constructor(private plugin: CoreTypesPlugin) {
-//     }
+    getTypeName = (): string => {
+        return J.NodeProp.IPFS_NODE;
+    }
 
-//     render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
-//         let ret: Comp[] = [];
+    getName = (): string => {
+        return "IPFS Node";
+    }
 
-//         let name = node.content;
-//         if (name) {
-//             let linkName = S.props.getNodePropVal("ipfs:linkName", node);
-//             if (linkName) {
-//                 ret.push(new Heading(6, "Link Name: " + linkName, { className: "ipfs-text" }));
-//             }
+    allowPropertyEdit = (propName: string): boolean => {
+        if (propName == "sn:linkName" || propName == "ipfs:link") {
+            return true;
+        }
+        return false;
+    }
 
-//             let link = S.props.getNodePropVal("ipfs:link", node);
-//             if (link) {
-//                 ret.push(new Heading(6, "Link: " + link, { className: "ipfs-text" }));
-//             }
-//             ret.push(S.render.renderMarkdown(rowStyling, node, {}));
-//         }
-//         else {
-//             let displayName = S.props.getNodePropVal("ipfs:link", node);
-//             // let folderName = "";
-//             // let displayName = S.props.getNodePropVal("ipfs:link", node);
-//             // if (displayName) {
-//             //     folderName = S.util.getNameFromPath(displayName);
-//             // }
+    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
+        let ret: Comp[] = [];
 
-//             ret.push(new Heading(6, "Link: " + displayName, { className: "ipfs-text" }));
-//         }
+        let name = node.content;
+        if (name) {
+            let linkName = S.props.getNodePropVal("ipfs:linkName", node);
+            if (linkName) {
+                ret.push(new Heading(6, "Link Name: " + linkName, { className: "ipfs-text" }));
+            }
 
-//         return new Div(null, null, ret);
-//     }
+            let link = S.props.getNodePropVal("ipfs:link", node);
+            if (link) {
+                ret.push(new Heading(6, "Link: " + link, { className: "ipfs-text" }));
+            }
+            ret.push(S.render.renderMarkdown(rowStyling, node, {}));
+        }
+        else {
+            let displayName = S.props.getNodePropVal("ipfs:link", node);
+            // let folderName = "";
+            // let displayName = S.props.getNodePropVal("ipfs:link", node);
+            // if (displayName) {
+            //     folderName = S.util.getNameFromPath(displayName);
+            // }
 
-//     orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
-//         return _props;
-//     }
+            ret.push(new Heading(6, "Link: " + displayName, { className: "ipfs-text" }));
+        }
 
-//     getIconClass(node: J.NodeInfo): string {
-//         //https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
-//         return "fa fa-sitemap fa-lg";
-//     }
+        return new Div(null, null, ret);
+    }
 
-//     allowAction(action: string): boolean {
-//         return true;
-//     }
-// }
+    orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
+        return _props;
+    }
+
+    getIconClass(node: J.NodeInfo): string {
+        //https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
+        return "fa fa-sitemap fa-lg";
+    }
+
+    allowAction(action: string): boolean {
+        return true;
+    }
+}
 
 

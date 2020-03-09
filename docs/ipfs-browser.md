@@ -57,7 +57,6 @@ Video:
 Images:
     QmZpc3HvfjEXvLWGQPWbHk3AjD5j8NEN4gmFN8Jmrd5g83/cs
 
-
 # IPFS Links and Info
 
 https://ipfs.io/

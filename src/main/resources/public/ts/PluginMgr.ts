@@ -5,6 +5,7 @@ import { Constants as C } from "./Constants";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { PluginMgrIntf } from "./intf/PluginMgrIntf";
 import { RssTypeHandler } from "./plugins/RssTypeHandler";
+import { IPFSNodeTypeHandler } from "./plugins/IPFSNodeTypeHandler";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -30,9 +31,9 @@ export class PluginMgr implements PluginMgrIntf {
 
     initPlugins = (): void => {
         this.addTypeHandler(new RssTypeHandler());
+        this.addTypeHandler(new IPFSNodeTypeHandler());
         // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());
         // S.plugin.addTypeHandler("fs:folder", new FolderTypeHandler());
-        // S.plugin.addTypeHandler("ipfs:node", new IPFSNodeTypeHandler());
 
         //S.meta64.addTypeHandler("fs:lucene", this.luceneIndexTypeHandler);
     }

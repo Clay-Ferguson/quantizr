@@ -52,6 +52,10 @@ public class IPFSService {
     @Autowired
     private AppProp appProp;
 
+    /**
+     * Looks up quantizr node by 'nodeId', and gets the 'ipfs:link' property, which is used to
+     * retrieve the MerkleNode (as JSON), and then pretty prints it and returns it
+     */
     public final String getNodeInfo(MongoSession session, String nodeId) {
         String ret = "";
         SubNode node = api.getNode(session, nodeId);
