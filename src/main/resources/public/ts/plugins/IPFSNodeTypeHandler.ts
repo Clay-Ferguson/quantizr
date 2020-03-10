@@ -15,7 +15,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class IPFSNodeTypeHandler implements TypeHandlerIntf {
 
     getTypeName = (): string => {
-        return J.NodeProp.IPFS_NODE;
+        return J.NodeType.IPFS_NODE;
     }
 
     getName = (): string => {

@@ -11,13 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.FileSyncStats;
 import org.subnode.model.MetaDirInfo;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.request.FileSystemReindexRequest;
 import org.subnode.response.FileSystemReindexResponse;
 import org.subnode.util.DateUtil;
@@ -61,9 +62,6 @@ public class FileSyncService {
 
 	@Autowired
 	private MongoApi api;
-
-	@Autowired
-	private AllSubNodeTypes TYPES;
 
 	@Autowired
 	private FileUtils fileUtils;
@@ -148,7 +146,7 @@ public class FileSyncService {
 			stats.maxFolderDepth = level;
 		}
 
-		String folderToSync = node.getStringProp(TYPES.FS_LINK);
+		String folderToSync = node.getStringProp(NodeProp.FS_LINK);
 
 		log.debug("Syncing Folder[LEVEL=" + String.valueOf(level) + "]: " + node.getPath() + " to folder: "
 				+ folderToSync);
@@ -230,7 +228,7 @@ public class FileSyncService {
 		Iterable<SubNode> iter = api.getChildren(session, node, null, 10000);
 		List<SubNode> nodesToDelete = new LinkedList<SubNode>();
 		for (SubNode child : iter) {
-			String fullFileName = child.getStringProp(TYPES.FS_LINK);
+			String fullFileName = child.getStringProp(NodeProp.FS_LINK);
 
 			if (fullFileName != null) {
 				File obj = new File(fullFileName);
@@ -240,14 +238,14 @@ public class FileSyncService {
 				 * wrong type of thing (file v.s. folder)
 				 */
 				if (!obj.exists() || //
-						(obj.isFile() && !child.isType(TYPES.FS_FILE)) || //
-						(obj.isDirectory() && !child.isType(TYPES.FS_FOLDER))) {
+						(obj.isFile() && !child.isType(NodeType.FS_FILE)) || //
+						(obj.isDirectory() && !child.isType(NodeType.FS_FOLDER))) {
 					log.debug("Node at path " + child.getPath() + " will be deleted. Has wrong file system link: "
 							+ fullFileName);
 
-					if (child.isType(TYPES.FS_FOLDER)) {
+					if (child.isType(NodeType.FS_FOLDER)) {
 						stats.numDeletedFolderNodes++;
-					} else if (child.isType(TYPES.FS_FILE)) {
+					} else if (child.isType(NodeType.FS_FILE)) {
 						stats.numDeletedFileNodes++;
 					}
 
@@ -301,7 +299,7 @@ public class FileSyncService {
 					fileNode = nodeMap.get(fileName);
 					log.debug("Node existed for FS resource: " + fileName);
 
-					String curFsType = file.isDirectory() ? TYPES.FS_FOLDER.getName() : TYPES.FS_FILE.getName();
+					String curFsType = file.isDirectory() ? NodeType.FS_FOLDER.s() : NodeType.FS_FILE.s();
 
 					/*
 					 * it's possible for a name to be changing from file to folder, or vise versa.
@@ -317,16 +315,16 @@ public class FileSyncService {
 					 * we need to update the mod time and also read in the file if it's one we can
 					 * edit/display
 					 */
-					if (curFsType.equals(TYPES.FS_FILE.getName())) {
+					if (curFsType.equals(NodeType.FS_FILE.s())) {
 						if (readContentIfTimestampChanged(file, fileNode, stats)) {
 							save = true;
 						}
 					}
 
 					/* Set the link property if it's not exacty what it should be */
-					String curLink = fileNode.getStringProp(TYPES.FS_LINK);
+					String curLink = fileNode.getStringProp(NodeProp.FS_LINK);
 					if (!curLink.equals(file.getAbsolutePath())) {
-						fileNode.setProp(TYPES.FS_LINK, file.getAbsolutePath());
+						fileNode.setProp(NodeProp.FS_LINK.s(), file.getAbsolutePath());
 						save = true;
 					}
 
@@ -359,7 +357,7 @@ public class FileSyncService {
 			String name = entry.getKey();
 			SubNode fileNode = entry.getValue();
 
-			String fullFileName = fileNode.getStringProp(TYPES.FS_LINK);
+			String fullFileName = fileNode.getStringProp(NodeProp.FS_LINK);
 
 			/*
 			 * Technically this check for existence is not needed if the above code worked
@@ -371,9 +369,9 @@ public class FileSyncService {
 				// file/folder.");
 				api.delete(session, fileNode);
 
-				if (fileNode.isType(TYPES.FS_FOLDER)) {
+				if (fileNode.isType(NodeType.FS_FOLDER)) {
 					stats.numDeletedFolderNodes++;
-				} else if (fileNode.isType(TYPES.FS_FILE)) {
+				} else if (fileNode.isType(NodeType.FS_FILE)) {
 					stats.numDeletedFileNodes++;
 				}
 
@@ -474,7 +472,7 @@ public class FileSyncService {
 		log.debug("Creating node for FS resource: " + fileName);
 
 		boolean isDir = file.isDirectory();
-		String type = file.isDirectory() ? TYPES.FS_FOLDER.getName() : TYPES.FS_FILE.getName();
+		String type = file.isDirectory() ? NodeType.FS_FOLDER.s() : NodeType.FS_FILE.s();
 		SubNode fileNode = api.createNode(session, parentNode.getPath() + "/" + fileName, type);
 
 		if (stats != null) {
@@ -496,7 +494,7 @@ public class FileSyncService {
 			}
 		}
 
-		fileNode.setProp(TYPES.FS_LINK, file.getAbsolutePath());
+		fileNode.setProp(NodeProp.FS_LINK.s(), file.getAbsolutePath());
 
 		/*
 		 * Setting the ordinal, here controls order of display in the SubNode gui same
@@ -528,20 +526,20 @@ public class FileSyncService {
 	 * Returns true if this is a type of node that can be synced to the filesystem.
 	 */
 	public boolean isSyncableNode(MongoSession session, SubNode node) {
-		return node.isType(TYPES.FS_FOLDER);
+		return node.isType(NodeType.FS_FOLDER);
 	}
 
 	/**
 	 * i think this is a redundant method. need to consolidate
 	 */
 	public void updateFromFileSystem(MongoSession session, SubNode node) {
-		if (!node.isType(TYPES.FS_FILE)) {
+		if (!node.isType(NodeType.FS_FILE)) {
 			throw new RuntimeEx("Attempted to update non file type from file system.");
 		}
 
 		log.debug("Update From FileSystem: node.path=" + node.getPath());
 
-		String fullFileName = node.getStringProp(TYPES.FS_LINK.getName());
+		String fullFileName = node.getStringProp(NodeProp.FS_LINK);
 		File file = new File(fullFileName);
 
 		// todo-p1: There's code elswhere in this file which checks date and reads file
@@ -567,11 +565,11 @@ public class FileSyncService {
 	 * same name as folder and a '.md' extension.
 	 */
 	public void saveNodeEditing(MongoSession session, SubNode node) {
-		String fullFileName = node.getStringProp(TYPES.FS_LINK.getName());
+		String fullFileName = node.getStringProp(NodeProp.FS_LINK.s());
 		String content = node.getContent();
 		File file = new File(fullFileName);
 
-		if (node.isType(TYPES.FS_FILE)) {
+		if (node.isType(NodeType.FS_FILE)) {
 			// log.debug("Saving content to file: " + fullFileName + " content=" + content);
 			FileTools.writeEntireFile(fullFileName, content);
 			node.setModifyTime(new Date(file.lastModified()));
@@ -585,7 +583,7 @@ public class FileSyncService {
 	 * or else a folder.
 	 */
 	public boolean delete(MongoSession session, SubNode node) {
-		String fullFileName = node.getStringProp(TYPES.FS_LINK.getName());
+		String fullFileName = node.getStringProp(NodeProp.FS_LINK);
 		if (fullFileName == null) {
 			return true;
 		}
@@ -601,7 +599,7 @@ public class FileSyncService {
 	 * This is a user-initiated request to create a new filesystem file
 	 */
 	public SubNode createFileUnderParent(MongoSession session, SubNode node) {
-		String fullFileName = node.getStringProp(TYPES.FS_LINK);
+		String fullFileName = node.getStringProp(NodeProp.FS_LINK);
 		/*
 		 * todo-p2: Need to check first if all files in the parent folder are numbered
 		 * and only do this zero prefix if they are
@@ -616,7 +614,7 @@ public class FileSyncService {
 	 * User initiated function to create a new folder
 	 */
 	public SubNode createFolderUnderParent(MongoSession session, SubNode node) {
-		String fullFileName = node.getStringProp(TYPES.FS_LINK);
+		String fullFileName = node.getStringProp(NodeProp.FS_LINK);
 		String newFileName = fullFileName + "/new-folder-" + DateUtil.getFileNameCompatDate();
 		File newFolder = new File(newFileName);
 		newFolder.mkdirs();

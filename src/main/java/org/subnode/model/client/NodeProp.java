@@ -7,7 +7,7 @@ public enum NodeProp {
     // This is the encrypted symetric key to the node data, that was encrypted using
     // the private key of the owner of the node.
     ENC_KEY("sn:encKey"),
-    
+
     /*
      * this is the one entered by the admin which DEFINES the feed, and is not to be
      * overwritten ever by the code
@@ -20,14 +20,16 @@ public enum NodeProp {
     USER_PREF_IMPORT_ALLOWED("sn:importAllowed"), //
     USER_PREF_EXPORT_ALLOWED("sn:exportAllowed"), //
     USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth"), //
-    SIGNUP_PENDING("sn:signupPending"),//
+    SIGNUP_PENDING("sn:signupPending"), //
 
     EMAIL_CONTENT("sn:content"), //
     EMAIL_RECIP("sn:recip"), //
     EMAIL_SUBJECT("sn:subject"), //
 
-    /* when a node id pointing to some other node, we set it's target id to the node it points to. For now used only
-    for inbox to point to nodes */
+    /*
+     * when a node id pointing to some other node, we set it's target id to the node
+     * it points to. For now used only for inbox to point to nodes
+     */
     TARGET_ID("sn:target_id"), //
 
     /*
@@ -38,9 +40,20 @@ public enum NodeProp {
     USER("sn:user"), //
     PWD_HASH("sn:pwdHash"), //
 
+    FILE_SYNC_LINK("fs:link"), //
+
     // this pre-existed when i created FS_FILENAME (may be unused?)
     FILENAME("sn:fileName"), //
     NAME("sn:name"), //
+
+    // FS_FILE("fs:file"), //
+    // FS_FOLDER("fs:folder"), //
+    // FS_LUCENE("fs:lucene"), //
+
+    IPFS_LINK("ipfs:link"), //
+    IPFS_LINK_NAME("ipfs:linkName"), //
+
+    FS_LINK("fs:link"), //
 
     /*
      * property used to indicate we should not query the IPFS network again for this
@@ -54,7 +67,7 @@ public enum NodeProp {
      */
     MIME_EXT("sn:ext"), //
 
-    //PASSWORD("sn:pwd"), //
+    // PASSWORD("sn:pwd"), //
     EMAIL("sn:email"), //
     CODE("sn:code"), //
 
@@ -64,34 +77,35 @@ public enum NodeProp {
     BIN_FILENAME("sn:fileName"), //
     BIN_SIZE("sn:size"), //
 
-    IPFS_NODE("sn:ipfsNode"),
-
-    //This is for bash script names to whow up when browing on the tree
+    // This is for bash script names to whow up when browing on the tree
     FILE_NAME("sn:fileName"),
 
-    JSON_FILE_SEARCH_RESULT("sn:json"),
-    PRE("sn:pre"),
-    NOWRAP("sn:nowrap"),
+    JSON_FILE_SEARCH_RESULT("sn:json"), PRE("sn:pre"), NOWRAP("sn:nowrap"),
 
     BIN_DATA("sn:jcrData"),
 
-    //todo-1: should this be "sn:" prefixed?
+    // todo-1: should this be "sn:" prefixed?
     BIN("bin"),
 
     IMG_WIDTH("sn:imgWidth"), //
-    IMG_HEIGHT("sn:imgHeight"),//
-    
-    
-    //todo-1: add sn:prefix
-    INLINE_CHILDREN("inlineChildren"),
-    PRIORITY("priority"),
-    LAYOUT("layout");
+    IMG_HEIGHT("sn:imgHeight"), //
+
+    // todo-1: add sn:prefix
+    INLINE_CHILDREN("inlineChildren"), PRIORITY("priority"), LAYOUT("layout");
 
     @JsonValue
     private final String value;
 
+    @JsonValue
+    private final String type;
+
     private NodeProp(String value) {
+        this(value, "s");
+    }
+
+    private NodeProp(String value, String type) {
         this.value = value;
+        this.type = type;
     }
 
     public String toString() {
@@ -100,5 +114,9 @@ public enum NodeProp {
 
     public String s() {
         return value;
+    }
+
+    public String getType() {
+        return type;
     }
 }

@@ -13,7 +13,6 @@ import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodeTypes;
-import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.request.AppDropRequest;
 import org.subnode.request.CreateSubNodeRequest;
 import org.subnode.request.DeletePropertyRequest;
@@ -70,9 +69,6 @@ public class NodeEditService {
 
 	@Autowired
 	private OutboxMgr outboxMgr;
-
-	@Autowired
-	private AllSubNodeTypes TYPES;
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request.

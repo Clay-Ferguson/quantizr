@@ -9,9 +9,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.model.types.intf.SubNodeProperty;
-import org.subnode.mongo.model.types.intf.SubNodeType;
 import org.subnode.util.ExUtil;
 import org.subnode.util.XString;
 import org.bson.types.ObjectId;
@@ -398,8 +400,8 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
-	public String getStringProp(SubNodeProperty prop) {
-		return getStringProp(prop.getName());
+	public String getStringProp(NodeProp prop) {
+		return getStringProp(prop.s());
 	}
 
 	@JsonIgnore
@@ -494,8 +496,8 @@ public class SubNode {
 	}
 
 	@JsonIgnore
-	public boolean isType(SubNodeType type) {
-		return type.getName().equals(this.type);
+	public boolean isType(NodeType type) {
+		return type.s().equals(this.type);
 	}
 
 	@JsonProperty(FIELD_TYPE)

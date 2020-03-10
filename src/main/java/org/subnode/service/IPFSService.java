@@ -4,10 +4,10 @@ import java.net.URI;
 
 import org.subnode.config.AppProp;
 import org.subnode.model.MerkleNode;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.util.XString;
 
 import org.apache.commons.lang3.StringUtils;
@@ -47,9 +47,6 @@ public class IPFSService {
     private MongoApi api;
 
     @Autowired
-    private AllSubNodeTypes TYPES;
-
-    @Autowired
     private AppProp appProp;
 
     /**
@@ -60,9 +57,9 @@ public class IPFSService {
         String ret = "";
         SubNode node = api.getNode(session, nodeId);
         if (node != null) {
-            String hash = node.getStringProp(TYPES.IPFS_LINK);
+            String hash = node.getStringProp(NodeProp.IPFS_LINK);
             if (StringUtils.isEmpty(hash)) {
-                ret = "Node is missing IPFS link property: " + TYPES.IPFS_LINK.getType();
+                ret = "Node is missing IPFS link property: " + NodeProp.IPFS_LINK.s();
             } else {
                 MerkleNode mnode = getMerkleNode(hash, "json");
                 if (mnode != null) {

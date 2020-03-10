@@ -25,7 +25,6 @@ import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.request.DeleteAttachmentRequest;
 import org.subnode.request.UploadFromUrlRequest;
 import org.subnode.response.DeleteAttachmentResponse;
@@ -77,9 +76,6 @@ public class AttachmentService {
 
 	@Autowired
 	private MimeTypeUtils mimeTypeUtils;
-
-	@Autowired
-	private AllSubNodeTypes TYPES;
 
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file
@@ -453,7 +449,7 @@ public class AttachmentService {
 			if (node == null) {
 				throw new RuntimeException("node not found: " + nodeId);
 			}
-			String fullFileName = node.getStringProp(TYPES.FS_LINK);
+			String fullFileName = node.getStringProp(NodeProp.FS_LINK);
 			File file = new File(fullFileName);
 
 			if (!file.exists() || !file.isFile()) {
@@ -501,7 +497,7 @@ public class AttachmentService {
 
 			api.auth(session, node, PrivilegeType.READ);
 
-			String fullFileName = node.getStringProp(TYPES.FS_LINK);
+			String fullFileName = node.getStringProp(NodeProp.FS_LINK);
 			File file = new File(fullFileName);
 
 			if (!file.exists() || !file.isFile()) {

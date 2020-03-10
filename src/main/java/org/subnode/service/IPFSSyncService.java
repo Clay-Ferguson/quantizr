@@ -8,13 +8,13 @@ import java.util.Objects;
 
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
 import org.subnode.model.MerkleDAGSyncStats;
 import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.util.FileUtils;
 
 import org.slf4j.Logger;
@@ -59,9 +59,6 @@ public class IPFSSyncService {
 
 	@Autowired
 	private AttachmentService attachmentService;
-
-	@Autowired
-	private AllSubNodeTypes TYPES;
 
 	@Autowired
 	private IPFSService ipfs;
@@ -130,7 +127,7 @@ public class IPFSSyncService {
 			return;
 		}
 
-		String hash = node.getStringProp(TYPES.IPFS_LINK);
+		String hash = node.getStringProp(NodeProp.IPFS_LINK);
 
 		log.debug("Syncing IPFS Node [LEVEL=" + String.valueOf(level) + "]: " + node.getPath() + " to hash: " + hash);
 
@@ -183,7 +180,7 @@ public class IPFSSyncService {
 				nodesToDelete.add(child);
 				continue;
 			}
-			String childHash = child.getStringProp(TYPES.IPFS_LINK);
+			String childHash = child.getStringProp(NodeProp.IPFS_LINK);
 
 			if (childHash != null) {
 				nodeMap.put(childHash, child);
@@ -312,7 +309,7 @@ public class IPFSSyncService {
 
 		log.debug("IPFS resource: linkName=" + merkleLink.getName() + " hash=" + merkleLink.getHash());
 
-		SubNode newNode = api.createNode(session, parentNode.getPath() + "/?", TYPES.IPFS_NODE.getName());
+		SubNode newNode = api.createNode(session, parentNode.getPath() + "/?", NodeType.IPFS_NODE.s());
 		String content = null;
 
 		if (fileUtils.isImageFile(merkleLink.getName())) {
@@ -358,8 +355,8 @@ public class IPFSSyncService {
 		}
 
 		newNode.setContent(content);
-		newNode.setProp(TYPES.IPFS_LINK, merkleLink.getHash());
-		newNode.setProp(TYPES.IPFS_LINK_NAME, merkleLink.getName());
+		newNode.setProp(NodeProp.IPFS_LINK.s(), merkleLink.getHash());
+		newNode.setProp(NodeProp.IPFS_LINK_NAME.s(), merkleLink.getName());
 
 		newNode.setOrdinal(ordinal);
 		newNode.setProp(NodeProp.IPFS_OK.s(), true);
@@ -370,6 +367,6 @@ public class IPFSSyncService {
 	 * Returns true if this is a type of node that can be synced to IPFS
 	 */
 	public boolean isSyncableNode(MongoSession session, SubNode node) {
-		return node.isType(TYPES.IPFS_NODE);
+		return node.isType(NodeType.IPFS_NODE);
 	}
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.MoveNodesRequest;
 import org.subnode.request.SelectAllNodesRequest;
@@ -35,9 +34,6 @@ public class NodeMoveService {
 
 	@Autowired
 	private MongoApi api;
-
-	@Autowired
-	private AllSubNodeTypes TYPES;
 
 	/*
 	 * Moves the the node to a new ordinal/position location (relative to parent)

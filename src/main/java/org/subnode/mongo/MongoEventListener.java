@@ -5,7 +5,6 @@ import java.util.Date;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
 
@@ -24,9 +23,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Autowired
 	private MongoApi api;
-
-	@Autowired
-	private AllSubNodeTypes TYPES;
 
 	/*
 	 * todo-2: This is a temporary hack to allow our ExportJsonService.resetNode

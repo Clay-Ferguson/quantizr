@@ -7,10 +7,10 @@ import java.util.List;
 import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
+import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.request.AnonPageLoadRequest;
 import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.RenderNodeRequest;
@@ -52,9 +52,6 @@ public class NodeRenderService {
 
 	@Autowired
 	private SessionContext sessionContext;
-
-	@Autowired
-	private AllSubNodeTypes TYPES;
 
 	@Autowired
 	private FileSyncService fileSyncService;
@@ -160,9 +157,9 @@ public class NodeRenderService {
 		 * IPFS from this rener service.
 		 */
 		if (session.isAdmin()) {
-			if (node.isType(TYPES.FS_FOLDER)) {
+			if (node.isType(NodeType.FS_FOLDER)) {
 				fileSyncService.syncFolder(session, node, false, null);
-			} else if (node.isType(TYPES.IPFS_NODE)) {
+			} else if (node.isType(NodeType.IPFS_NODE)) {
 				ipfsSyncService.syncNode(session, node, false, null, req.isForceIPFSRefresh());
 			}
 		}

@@ -25,7 +25,6 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodeTypes;
 import org.subnode.mongo.model.UserPreferencesNode;
-import org.subnode.mongo.model.types.AllSubNodeTypes;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
 import org.subnode.util.NodeAuthFailedException;
@@ -87,9 +86,6 @@ public class MongoApi {
 
 	@Autowired
 	private AclService aclService;
-
-	@Autowired
-	private AllSubNodeTypes TYPES;
 
 	@Autowired
 	private SubNodeUtil util;
@@ -1601,12 +1597,8 @@ public class MongoApi {
 	 * by the definition of they way security is inheritive.
 	 */
 	public void createAdminUser(MongoSession session) {
-		// todo-2: fix inconsistency: is admin name defined in properties file or in
-		// PrincipalName.ADMIN.s() const ? Need to decide.
 		String adminUser = appProp.getMongoAdminUserName();
-		// String adminPwd = appProp.getMongoAdminPassword();
 
-		//todo-0: this will change slightly if admin is allowed to have a normal user-like node.
 		SubNode adminNode = getUserNodeByUserName(getAdminSession(), adminUser);
 		if (adminNode == null) {
 			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, "Repository Root", null, true, null,
