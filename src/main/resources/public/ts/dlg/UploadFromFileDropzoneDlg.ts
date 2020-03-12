@@ -26,8 +26,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     dropzone: any = null;
     dropzoneDiv: Div = null;
 
-    constructor() {
-        super("Upload File");
+    constructor(private toIpfs: boolean) {
+        super(toIpfs ? "Upload File to IPFS" : "Upload File");
         
         this.setChildren([
             new Form(null, [
@@ -50,12 +50,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     configureDropZone = (): void => {
         let dlg = this;
+        let endpoint = this.toIpfs ? "uploadToIpfs" : "upload"
         let config: Object = {
-            action: S.util.getRpcPath() + "upload",
+            action: S.util.getRpcPath() + endpoint,
             width: "100%",
             height: "100%", 
             progressBarWidth: '100%',
-            //zIndex: 100,
             url: S.util.getRpcPath() + "upload",
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
@@ -70,10 +70,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             dictDefaultMessage: "Click Here to Add Files (or Drag & Drop)",
             hiddenInputContainer: "#" + this.hiddenInputContainer.getId(),
 
+            // WARNING: Don't try to put arrow functions in here, these functions are called by Dropzone itself and the 
+            // 'this' that is in scope during each call must be left as is.
             init: function () {
-                let dropzone = this; // closure
-
-                this.on("addedfile", function () {
+                this.on("addedfile", function () { 
                     dlg.updateFileList(this);
                     dlg.runButtonEnablement(this);
                 });
@@ -86,6 +86,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.on("sending", function (file, xhr, formData) {
                     formData.append("nodeId", S.attachment.uploadNode.id);
                     formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
+                    formData.append("ipfs", dlg.toIpfs ? "true" : "false");
                     dlg.zipQuestionAnswered = false;
                 });
 

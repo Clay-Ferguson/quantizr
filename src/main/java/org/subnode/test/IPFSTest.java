@@ -26,7 +26,6 @@ public class IPFSTest implements TestIntf {
 
             log.debug("Querying for MerkleNode...");
             MerkleNode mnode = ipfs.getMerkleNode(hash, "json");
-
             log.debug("MerkleNode: "+XString.prettyPrint(mnode));
 
             //String merkContent = ipfs.objectCat(hash);

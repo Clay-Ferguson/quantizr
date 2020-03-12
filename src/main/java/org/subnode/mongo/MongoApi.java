@@ -25,6 +25,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodeTypes;
 import org.subnode.mongo.model.UserPreferencesNode;
+import org.subnode.service.IPFSService;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
 import org.subnode.util.NodeAuthFailedException;
@@ -92,6 +93,9 @@ public class MongoApi {
 
 	@Autowired
 	private AppProp appProp;
+
+	@Autowired
+	private IPFSService ipfsService;
 
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
@@ -1167,10 +1171,9 @@ public class MongoApi {
 
 				if (caseSensitive) {
 					query.addCriteria(Criteria.where(prop).regex(text));
-				}
-				else {
+				} else {
 					// i==insensitive (case)
-				 	query.addCriteria(Criteria.where(prop).regex(text, "i"));
+					query.addCriteria(Criteria.where(prop).regex(text, "i"));
 				}
 			} else {
 				// /////
@@ -1381,6 +1384,23 @@ public class MongoApi {
 		node.setProp(propName, new SubNodePropVal(id));
 	}
 
+	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream, String fileName,
+			String mimeType, String propName) {
+
+		auth(session, node, PrivilegeType.WRITE);
+
+		if (propName == null) {
+			propName = "bin";
+		}
+
+		if (fileName == null) {
+			fileName = "file";
+		}
+
+		String ipfsHash = ipfsService.addFromStream(stream, mimeType);
+		node.setProp(NodeProp.IPFS_LINK.s(), new SubNodePropVal(ipfsHash));
+	}
+
 	public void deleteBinary(MongoSession session, SubNode node, String propName) {
 		auth(session, node, PrivilegeType.WRITE);
 		if (propName == null) {
@@ -1394,7 +1414,7 @@ public class MongoApi {
 		grid.delete(new Query(Criteria.where("_id").is(id)));
 	}
 
-	public InputStream getStream(MongoSession session, SubNode node, String propName, boolean auth) {
+	public InputStream getStream(MongoSession session, SubNode node, String propName, boolean auth, boolean ipfs) {
 		if (auth) {
 			auth(session, node, PrivilegeType.READ);
 		}
@@ -1402,7 +1422,14 @@ public class MongoApi {
 			propName = "bin";
 		}
 
-		return getStreamByNodeId(node.getId());
+		InputStream is = null;
+		if (ipfs) {
+			String ipfsHash = node.getStringProp(NodeProp.IPFS_LINK.s());
+			is = ipfsService.getStream(session, ipfsHash);
+		} else {
+			is = getStreamByNodeId(node.getId());
+		}
+		return is;
 	}
 
 	public InputStream getStreamByNodeId(ObjectId nodeId) {
@@ -1429,8 +1456,8 @@ public class MongoApi {
 	}
 
 	public AutoCloseInputStream getAutoClosingStream(MongoSession session, SubNode node, String propName,
-			boolean auth) {
-		return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, propName, auth)));
+			boolean auth, boolean ipfs) {
+		return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, propName, auth, ipfs)));
 	}
 
 	public String regexDirectChildrenOfPath(String path) {
@@ -1455,7 +1482,8 @@ public class MongoApi {
 
 	public SubNode createUser(MongoSession session, String user, String email, String password, boolean automated) {
 		// if (PrincipalName.ADMIN.s().equals(user)) {
-		// 	throw new RuntimeException("createUser should not be called fror admin user.");
+		// throw new RuntimeException("createUser should not be called fror admin
+		// user.");
 		// }
 
 		requireAdmin(session);
@@ -1489,7 +1517,8 @@ public class MongoApi {
 	 * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
 	 * userNode if you know it, to save cycles
 	 */
-	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode, String pathPart, String nodeName) {
+	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode, String pathPart,
+			String nodeName) {
 		if (userNode == null) {
 			userNode = getUserNodeByUserName(session, user);
 		}
@@ -1500,8 +1529,7 @@ public class MongoApi {
 		String inboxPath = userNode.getPath() + "/" + pathPart;
 		SubNode inboxNode = getNode(session, inboxPath);
 		if (inboxNode == null) {
-			inboxNode = createNode(session, userNode, pathPart, SubNodeTypes.UNSTRUCTURED, 0L,
-					CreateNodeLocation.LAST);
+			inboxNode = createNode(session, userNode, pathPart, SubNodeTypes.UNSTRUCTURED, 0L, CreateNodeLocation.LAST);
 			inboxNode.setOwner(userNode.getId());
 			inboxNode.setContent(nodeName);
 			save(session, inboxNode);

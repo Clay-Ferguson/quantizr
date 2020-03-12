@@ -183,6 +183,15 @@ export class Props implements PropsIntf {
         return !!S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
     }
 
+    hasBinary = (node: J.NodeInfo): boolean => {
+        return !!S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+    }
+
+    hasImage = (node: J.NodeInfo): boolean => {
+        let target = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+        return (target && target.startsWith("image/"));
+    }
+
     getNodePropVal = (propertyName: string, node: J.NodeInfo): string => {
         let prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
         return prop ? prop.value : null;

@@ -1,5 +1,6 @@
 package org.subnode.service;
 
+import java.io.InputStream;
 import java.net.URI;
 
 import org.subnode.config.AppProp;
@@ -14,14 +15,23 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
 import org.subnode.util.Util;
+import org.subnode.util.ValContainer;
 
-// https://docs.ipfs.io/reference/api/http/
+import java.util.Map;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Right now exception handling in here is just temporary (not final) because
@@ -32,9 +42,9 @@ public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
     /*
-    originally this was 'data-endcoding' (or at least i got that from somewhere),
-    but now their example page seems to show 'encoding' is the name here.
-    */
+     * originally this was 'data-endcoding' (or at least i got that from somewhere),
+     * but now their example page seems to show 'encoding' is the name here.
+     */
     public static String ENCODING_PARAM_NAME = "encoding";
 
     /*
@@ -43,15 +53,21 @@ public class IPFSService {
      */
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
 
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     @Autowired
     private MongoApi api;
 
     @Autowired
     private AppProp appProp;
 
+    @Autowired
+    private AttachmentService attachmentService;
+
     /**
-     * Looks up quantizr node by 'nodeId', and gets the 'ipfs:link' property, which is used to
-     * retrieve the MerkleNode (as JSON), and then pretty prints it and returns it
+     * Looks up quantizr node by 'nodeId', and gets the 'ipfs:link' property, which
+     * is used to retrieve the MerkleNode (as JSON), and then pretty prints it and
+     * returns it.
      */
     public final String getNodeInfo(MongoSession session, String nodeId) {
         String ret = "";
@@ -75,6 +91,9 @@ public class IPFSService {
     }
 
     /**
+     * Reads the bytes from 'ipfs hash', expecting them to be UTF-8 and returns the
+     * string.
+     * 
      * NOTE: The hash is allowed to have a subpath here.
      */
     public final String objectCat(String hash) {
@@ -96,7 +115,8 @@ public class IPFSService {
     /**
      * @param hash
      * @param encoding text | json
-     * @return
+     * @return MerkleNode of the hash, as requested usingn the 'encoding=' url
+     *         argument specified.
      */
     public final MerkleNode getMerkleNode(String hash, String encoding) {
         MerkleNode ret = null;
@@ -125,6 +145,12 @@ public class IPFSService {
         return ret;
     }
 
+    /**
+     * @param hash
+     * @param encoding text | json
+     * @return Returns string of the the hash get, as requested usingn the
+     *         'encoding=' url argument specified.
+     */
     public final String getAsString(String hash, String encoding) {
         String ret = null;
         try {
@@ -143,5 +169,49 @@ public class IPFSService {
             log.error("Failed in restTemplate.exchange", e);
         }
         return ret;
+    }
+
+    public String addFromStream(InputStream stream, String mimeType) {
+        String hash = null;
+        try {
+            // https://docs-beta.ipfs.io/reference/http/api
+            // --stream-channels bool - Stream channel output.
+            String url = appProp.getIPFSHost() + "/api/v0/add?stream-channels=true";
+            HttpHeaders headers = new HttpHeaders();
+
+            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+            bodyMap.add("file", new InputStreamResource(stream));
+
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+            //todo-1: create dedicated return object for this (json marshalled)
+            Map<String, Object> respMap = mapper.readValue(response.getBody(),
+                    new TypeReference<Map<String, Object>>() {
+                    });
+
+            hash = (String) respMap.get("Hash");
+            // the following other values are supposedly in the return...
+            // {
+            // "Bytes": "<int64>",
+            // "Hash": "<string>",
+            // "Name": "<string>",
+            // "Size": "<string>"
+            // }
+
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.exchange", e);
+        }
+        return hash;
+    }
+
+    public InputStream getStream(MongoSession session, String hash) {
+        String sourceUrl = "http://ipfs:8080/ipfs/" + hash;
+
+        ValContainer<InputStream> inputStream = new ValContainer<InputStream>();
+        attachmentService.readFromUrl(session, sourceUrl, null, null, inputStream);
+        return inputStream.getVal();
     }
 }

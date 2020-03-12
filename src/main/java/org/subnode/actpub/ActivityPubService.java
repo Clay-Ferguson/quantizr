@@ -16,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+/** 
+ * This object just has some experimental work related to ActivityPub (not complete, just experimenting)
+ */
 @Component
 public class ActivityPubService {
     private static final Logger log = LoggerFactory.getLogger(ActivityPubService.class);

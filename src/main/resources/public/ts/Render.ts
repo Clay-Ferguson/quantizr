@@ -42,7 +42,7 @@ export class Render implements RenderIntf {
         /*
          * If this is an image render the image directly onto the page as a visible image
          */
-        if (node.binaryIsImage) {
+        if (S.props.hasImage(node)) {
             return this.makeImageTag(node);
         }
         /*
@@ -98,7 +98,7 @@ export class Render implements RenderIntf {
      * This is the function that renders each node in the main window. The rendering in here is very central to the
      * app and is what the user sees covering 90% of the screen most of the time. The *content* nodes.
      */
-    renderNodeContent = (node: J.NodeInfo, renderBin: boolean, rowStyling: boolean, showHeader: boolean): Comp[] => {
+    renderNodeContent = (node: J.NodeInfo, rowStyling: boolean, showHeader: boolean): Comp[] => {
         //todo-3: bring back top right image support. disabling for now to simplify refactoring
         //let topRightImgTag = null; //this.getTopRightImageTag(node);
         //let ret: string = topRightImgTag ? topRightImgTag.render_Html() : "";
@@ -148,7 +148,7 @@ export class Render implements RenderIntf {
         showing the normal attachment for this node, because that will the same as the avatar */
         let isAnAccountNode = node.ownerId && node.id == node.ownerId;
 
-        if (renderBin && node.hasBinary && !isAnAccountNode) {
+        if (S.props.hasBinary(node) && !isAnAccountNode) {
             let binary = this.renderBinary(node);
 
             /*
@@ -255,12 +255,15 @@ export class Render implements RenderIntf {
         else {
             this.initMarkdown();
 
+            // todo-0: put some more thought into this...
+            // turning this off because when it appears in a url, blows up the link. Need to find some better way.
+            // if (S.srch.searchText) {
+            //     /* This results in a <strong><em> wrapping the text, which we have a special styling for with a green background for each
+            //     search term so it's easy to see them highlighted on the page */
+            //     content = content.replace(S.srch.searchText, "**_" + S.srch.searchText + "_**");
+            // }
+
             // Do the actual markdown rendering here.
-            if (S.srch.searchText) {
-                /* This results in a <strong><em> wrapping the text, which we have a special styling for with a green background for each
-                search term so it's easy to see them highlighted on the page */
-                content = content.replace(S.srch.searchText, "**_" + S.srch.searchText + "_**");
-            }
             val = marked(content);
 
             // the marked adds a 'p tag' wrapping we don't need so we remove it just to speed up DOM as much as possible
@@ -426,7 +429,7 @@ export class Render implements RenderIntf {
             [
                 buttonBar, new Div(null, {
                     "id": id + "_content"
-                }, this.renderNodeContent(node, true, true, true))
+                }, this.renderNodeContent(node, true, true))
             ]);
     }
 
@@ -698,7 +701,7 @@ export class Render implements RenderIntf {
                      * NOTE: mainNodeContent is the parent node of the page content, and is always the node displayed at the top
                      * of the page above all the other nodes which are its child nodes.
                      */
-                    let mainNodeContent: Comp[] = this.renderNodeContent(data.node, true, false, true);
+                    let mainNodeContent: Comp[] = this.renderNodeContent(data.node, false, true);
 
                     //console.log("mainNodeContent: "+mainNodeContent);
 
@@ -1057,11 +1060,11 @@ export class Render implements RenderIntf {
 
     getUrlForNodeAttachment = (node: J.NodeInfo): string => {
         //todo-1: Change to node.id and then re-test this
-        return S.util.getRpcPath() + "bin/file-name" + node.binVer + "?nodeId=" + encodeURIComponent(node.id) + "&ver=" + node.binVer;
+        return S.util.getRpcPath() + "bin/f" + "-" + node.id + "-" + node.binVer + "?nodeId=" + encodeURIComponent(node.id) + "&ver=" + node.binVer;
     }
 
     getAvatarImgUrl = (ownerId: string, binVer: number): string => {
-        return S.util.getRpcPath() + "bin/file-name" + binVer + "?nodeId=" + encodeURIComponent(ownerId) + "&ver=" + binVer;
+        return S.util.getRpcPath() + "bin/avatar" + "-" + ownerId + "-" + binVer + "?nodeId=" + encodeURIComponent(ownerId) + "&ver=" + binVer;
     }
 
     makeImageTag = (node: J.NodeInfo): Img => {

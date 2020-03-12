@@ -136,7 +136,7 @@ export class Search implements SearchIntf {
 
         let buttonBar = this.makeButtonBarHtml(id);
 
-        let content: Comp[] = S.render.renderNodeContent(node, true, true, true);
+        let content: Comp[] = S.render.renderNodeContent(node, true, true);
 
         return new Div(null, {
             className: "node-table-row inactive-row",

@@ -457,7 +457,7 @@ export class Meta64 implements Meta64Intf {
         if (!this.currentNodeData || !this.currentNodeData.node) return;
         this.currentNodeData.node.children.forEach((node: J.NodeInfo) => {
             if (node.id === id) {
-                node.hasBinary = false;
+                S.props.deleteProp(node, J.NodeProp.BIN_MIME);
             }
         });
     }
@@ -495,7 +495,7 @@ export class Meta64 implements Meta64Intf {
             J.NodeProp.BIN_VER, //
             J.NodeProp.BIN_DATA, //
             J.NodeProp.BIN_MIME, //
-            J.NodeProp.BIN_SIZE
+            J.NodeProp.BIN_SIZE //
         ]);
 
         S.util.addAll(this.binaryPropertyList, [J.NodeProp.BIN_DATA]);

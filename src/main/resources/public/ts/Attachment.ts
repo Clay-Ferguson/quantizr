@@ -17,7 +17,7 @@ export class Attachment implements AttachmentIntf {
     /* Node being uploaded to */
     uploadNode: any = null;
 
-    openUploadFromFileDlg = (): void => {
+    openUploadFromFileDlg = (toIpfs: boolean): void => {
         let node: J.NodeInfo = S.meta64.getHighlightedNode();
         if (!node) {
             this.uploadNode = null;
@@ -27,7 +27,7 @@ export class Attachment implements AttachmentIntf {
 
         this.uploadNode = node;
 
-        let dlg = new UploadFromFileDropzoneDlg();
+        let dlg = new UploadFromFileDropzoneDlg(toIpfs);
         dlg.open();
 
         /* Note: To run legacy uploader just put this version of the dialog here, and

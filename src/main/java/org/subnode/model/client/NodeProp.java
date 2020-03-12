@@ -6,101 +6,100 @@ public enum NodeProp {
 
     // This is the encrypted symetric key to the node data, that was encrypted using
     // the private key of the owner of the node.
-    ENC_KEY("sn:encKey"),
+    ENC_KEY("sn:encKey", "s"),
 
     /*
      * this is the one entered by the admin which DEFINES the feed, and is not to be
      * overwritten ever by the code
      */
-    RSS_FEED_SRC("sn:rssFeedSrc"),
+    RSS_FEED_SRC("sn:rssFeedSrc", "s"),
 
-    USER_PREF_PUBLIC_KEY("sn:publicKey"), //
-    USER_PREF_EDIT_MODE("sn:editMode"), //
-    USER_PREF_SHOW_METADATA("sn:showMetaData"), //
-    USER_PREF_IMPORT_ALLOWED("sn:importAllowed"), //
-    USER_PREF_EXPORT_ALLOWED("sn:exportAllowed"), //
-    USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth"), //
-    SIGNUP_PENDING("sn:signupPending"), //
+    USER_PREF_PUBLIC_KEY("sn:publicKey", "s"), //
+    USER_PREF_EDIT_MODE("sn:editMode", "s"), //
+    USER_PREF_SHOW_METADATA("sn:showMetaData", "s"), //
+    USER_PREF_IMPORT_ALLOWED("sn:importAllowed", "s"), //
+    USER_PREF_EXPORT_ALLOWED("sn:exportAllowed", "s"), //
+    USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth", "s"), //
+    SIGNUP_PENDING("sn:signupPending", "s"), //
 
-    EMAIL_CONTENT("sn:content"), //
-    EMAIL_RECIP("sn:recip"), //
-    EMAIL_SUBJECT("sn:subject"), //
+    EMAIL_CONTENT("sn:content", "s"), //
+    EMAIL_RECIP("sn:recip", "s"), //
+    EMAIL_SUBJECT("sn:subject", "s"), //
 
     /*
      * when a node id pointing to some other node, we set it's target id to the node
      * it points to. For now used only for inbox to point to nodes
      */
-    TARGET_ID("sn:target_id"), //
+    TARGET_ID("sn:target_id", "s"), //
 
     /*
      * WARNING: Only the User Account Root nodes have this property of the actual
      * user name. All other nodes reference their OWNER as an OwnerId that points to
      * these nodes.
      */
-    USER("sn:user"), //
-    PWD_HASH("sn:pwdHash"), //
+    USER("sn:user", "s"), //
+    PWD_HASH("sn:pwdHash", "s"), //
 
-    FILE_SYNC_LINK("fs:link"), //
+    FILE_SYNC_LINK("fs:link", "s"), //
 
     // this pre-existed when i created FS_FILENAME (may be unused?)
-    FILENAME("sn:fileName"), //
-    NAME("sn:name"), //
+    FILENAME("sn:fileName", "s"), //
+    NAME("sn:name", "s"), //
 
     // FS_FILE("fs:file"), //
     // FS_FOLDER("fs:folder"), //
     // FS_LUCENE("fs:lucene"), //
 
-    IPFS_LINK("ipfs:link"), //
-    IPFS_LINK_NAME("ipfs:linkName"), //
+    IPFS_LINK("ipfs:link", "s"), //
+    IPFS_LINK_NAME("ipfs:linkName", "s"), //
 
-    FS_LINK("fs:link"), //
+    FS_LINK("fs:link", "s"), //
 
     /*
      * property used to indicate we should not query the IPFS network again for this
      * conten becasue we have already loaded it
      */
-    IPFS_OK("ipfs:ok"), //
+    IPFS_OK("ipfs:ok", "s"), //
 
     /*
      * mime type expressed as a file extension. Invented so we can set 'txt' v.s.
      * 'md' to turn off metadata rendering
      */
-    MIME_EXT("sn:ext"), //
+    MIME_EXT("sn:ext", "s"), //
 
-    EMAIL("sn:email"), //
-    CODE("sn:code"), //
+    EMAIL("sn:email", "s"), //
+    CODE("sn:code", "s"), //
 
-    BIN_VER("sn:binVer"), //
+    BIN_VER("sn:binVer", "s"), //
 
-    BIN_MIME("sn:mimeType"), //
-    BIN_FILENAME("sn:fileName"), //
-    BIN_SIZE("sn:size"), //
+    BIN_MIME("sn:mimeType", "s"), //
+    BIN_FILENAME("sn:fileName", "s"), //
+    BIN_SIZE("sn:size", "s"), //
 
     // This is for bash script names to whow up when browing on the tree
-    FILE_NAME("sn:fileName"),
+    FILE_NAME("sn:fileName", "s"),
 
-    JSON_FILE_SEARCH_RESULT("sn:json"), PRE("sn:pre"), NOWRAP("sn:nowrap"),
+    JSON_FILE_SEARCH_RESULT("sn:json", "s"), //
+    PRE("sn:pre", "s"), //
+    NOWRAP("sn:nowrap", "s"),
 
-    BIN_DATA("sn:jcrData"),
+    BIN_DATA("sn:jcrData", "s"),
 
     // todo-1: should this be "sn:" prefixed?
-    BIN("bin"),
+    BIN("bin", "s"),
 
-    IMG_WIDTH("sn:imgWidth"), //
-    IMG_HEIGHT("sn:imgHeight"), //
+    IMG_WIDTH("sn:imgWidth", "s"), //
+    IMG_HEIGHT("sn:imgHeight", "s"), //
 
     // todo-1: add sn:prefix
-    INLINE_CHILDREN("inlineChildren"), PRIORITY("priority"), LAYOUT("layout");
+    INLINE_CHILDREN("inlineChildren", "s"), //
+    PRIORITY("priority", "s"), //
+    LAYOUT("layout", "s");
 
     @JsonValue
     private final String value;
 
-    @JsonValue
     private final String type;
-
-    private NodeProp(String value) {
-        this(value, "s");
-    }
 
     private NodeProp(String value, String type) {
         this.value = value;

@@ -333,7 +333,7 @@ public class IPFSSyncService {
 			content = ""; // "IMAGE: "+merkleLink.getName();
 			api.save(session, newNode);
 
-			attachmentService.uploadFromUrl(session, imageUrl, newNode.getId().toHexString(), merkleLink.getName());
+			attachmentService.readFromUrl(session, imageUrl, newNode.getId().toHexString(), merkleLink.getName(), null);
 
 			// this re-query of the node is kind of ugly, and I need to tweak the design so
 			// that this isn't required, but currently it is.

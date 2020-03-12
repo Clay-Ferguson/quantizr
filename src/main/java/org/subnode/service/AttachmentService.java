@@ -1,6 +1,8 @@
 package org.subnode.service;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,17 +38,19 @@ import org.subnode.util.MimeTypeUtils;
 import org.subnode.util.MultipartFileSender;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
-
+import org.subnode.util.ValContainer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -82,7 +86,7 @@ public class AttachmentService {
 	 * from user machine
 	 */
 	public ResponseEntity<?> uploadMultipleFiles(MongoSession session, String nodeId, MultipartFile[] uploadFiles,
-			boolean explodeZips) {
+			boolean explodeZips, boolean toIpfs) {
 		try {
 			if (session == null) {
 				session = ThreadLocals.getMongoSession();
@@ -118,7 +122,7 @@ public class AttachmentService {
 					try {
 						limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
 						attachBinaryFromStream(session, node, nodeId, fileName, size, limitedIs, null, -1, -1,
-								addAsChildren, explodeZips);
+								addAsChildren, explodeZips, toIpfs);
 					} finally {
 						StreamUtil.close(limitedIs);
 					}
@@ -151,7 +155,8 @@ public class AttachmentService {
 	 * repository on the node specified in 'nodeId'
 	 */
 	public void attachBinaryFromStream(MongoSession session, SubNode node, String nodeId, String fileName, long size,
-			LimitedInputStreamEx is, String mimeType, int width, int height, boolean addAsChild, boolean explodeZips) {
+			LimitedInputStreamEx is, String mimeType, int width, int height, boolean addAsChild, boolean explodeZips,
+			boolean toIpfs) {
 
 		/*
 		 * If caller already has 'node' it can pass node, and avoid looking up node
@@ -215,12 +220,12 @@ public class AttachmentService {
 					.getBean(ImportZipService.class);
 			importZipStreamService.inputZipFileFromStream(session, is, node, false);
 		} else {
-			saveBinaryStreamToNode(session, is, mimeType, fileName, size, width, height, node);
+			saveBinaryStreamToNode(session, is, mimeType, fileName, size, width, height, node, toIpfs);
 		}
 	}
 
 	public void saveBinaryStreamToNode(MongoSession session, LimitedInputStreamEx inputStream, String mimeType,
-			String fileName, long size, int width, int height, SubNode node) {
+			String fileName, long size, int width, int height, SubNode node, boolean toIpfs) {
 
 		Long version = node.getIntProp(NodeProp.BIN_VER.s());
 		if (version == null) {
@@ -231,14 +236,14 @@ public class AttachmentService {
 		 * NOTE: Setting this flag to false works just fine, and is more efficient, and
 		 * will simply do everything EXCEPT calculate the image size
 		 */
-		boolean calcImageSizes = true;
+		boolean calcImageSize = true;
 
 		BufferedImage bufImg = null;
 		byte[] imageBytes = null;
 		InputStream isTemp = null;
 		int maxFileSize = 20 * 1024 * 1024;
 
-		if (calcImageSizes && ImageUtil.isImageMime(mimeType)) {
+		if (calcImageSize && ImageUtil.isImageMime(mimeType)) {
 			LimitedInputStream is = null;
 			try {
 				is = new LimitedInputStreamEx(inputStream, maxFileSize);
@@ -273,13 +278,21 @@ public class AttachmentService {
 
 		if (imageBytes == null) {
 			node.setProp(NodeProp.BIN_SIZE.s(), size);
-			api.writeStream(session, node, inputStream, null, mimeType, null);
+			if (toIpfs) {
+				api.writeStreamToIpfs(session, node, inputStream, null, mimeType, null);
+			} else {
+				api.writeStream(session, node, inputStream, null, mimeType, null);
+			}
 		} else {
 			LimitedInputStream is = null;
 			try {
 				node.setProp(NodeProp.BIN_SIZE.s(), imageBytes.length);
 				is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
-				api.writeStream(session, node, is, null, mimeType, null);
+				if (toIpfs) {
+					api.writeStreamToIpfs(session, node, is, null, mimeType, null);
+				} else {
+					api.writeStream(session, node, is, null, mimeType, null);
+				}
 			} finally {
 				StreamUtil.close(is);
 			}
@@ -327,21 +340,33 @@ public class AttachmentService {
 		// node.deleteProp(NodeProp.BIN_VER);
 	}
 
-	/*
+	/**
 	 * Returns data for an attachment (Could be an image request, or any type of
 	 * request for binary data from a node). This is the method that services all
 	 * calls from the browser to get the data for the attachment to download/display
 	 * the attachment.
+	 * 
+	 * the saga continues, after switching to InputStreamResouce images fail always
+	 * with this error in js console::
+	 * 
+	 * InputStream has already been read - do not use InputStreamResource if a
+	 * stream needs to be read multiple times
+	 * 
+	 * I stopped using this method (for now) because of this error, which is a
+	 * Spring problem and not in my code. I created the simpler getBinary() version
+	 * (below) which works find AND is simpler.
 	 */
-	public ResponseEntity<StreamingResponseBody> getBinary(MongoSession session, String nodeId) {
+	public ResponseEntity<InputStreamResource> getBinary_legacy(MongoSession session, String nodeId) {
 		try {
 			if (session == null) {
 				session = ThreadLocals.getMongoSession();
 			}
-			
-			SubNode node = api.getNode(session, nodeId, false);
 
-			//Everyone's accont node can publish it's attachment and is assumed to be an avatar.
+			SubNode node = api.getNode(session, nodeId, false);
+			boolean ipfs = StringUtils.isNotEmpty(node.getStringProp(NodeProp.IPFS_LINK.s()));
+
+			// Everyone's account node can publish it's attachment and is assumed to be an
+			// avatar.
 			boolean allowAuth = true;
 			if (api.isAnAccountNode(session, node)) {
 				allowAuth = false;
@@ -355,41 +380,108 @@ public class AttachmentService {
 			if (mimeTypeProp == null) {
 				throw ExUtil.newEx("unable to find mimeType property");
 			}
-			// log.debug("Retrieving mime: " +
-			// mimeTypeProp.getValue().getString());
-
-			// Property dataProp = node.getProperty(JcrProp.BIN_DATA);
-			// if (dataProp == null) {
-			// throw ExUtil.newEx("unable to find data property");
-			// }
-			//
-			// Binary binary = dataProp.getBinary();
-			// log.debug("Retrieving binary bytes: " + binary.getSize());
 
 			String fileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
 			if (fileName == null) {
 				fileName = "filename";
 			}
 
-			AutoCloseInputStream acis = api.getAutoClosingStream(session, node, null, allowAuth);
-			StreamingResponseBody stream = (os) -> {
-				IOUtils.copy(acis, os);
-				os.flush();
-			};
-			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
+			// I took out the autoClosing stream, and I'm not sure if it's needed based on current design, since when it
+			// was originally put here.
+			// AutoCloseInputStream acis = api.getAutoClosingStream(session, node, null,
+			// allowAuth, ipfs);
+			// StreamingResponseBody stream = (os) -> {
+			// int bytesCopied = IOUtils.copy(acis, os);
+			// log.debug("io copy complete: bytes="+bytesCopied);
+			// os.flush();
+			// log.debug("flush complete.");
+			// };
 
-			return ResponseEntity.ok()//
-					.contentLength(size)//
-					/*
-					 * To make, for example an image type of resource DISPLAY in the browser (rather
-					 * than a downloaded file), you'd need this to be omitted (or 'inline')
-					 */
-					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")//
-					.contentType(MediaType.parseMediaType(mimeTypeProp))//
-					.body(stream);
+			InputStream is = api.getStream(session, node, null, allowAuth, ipfs);
+			InputStreamResource isr = new InputStreamResource(is);
+
+			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
+			log.debug("Getting Binary for nodeId=" + nodeId + " size=" + size);
+
+			/*
+			 * To make, for example an image type of resource DISPLAY in the browser (rather
+			 * than a downloaded file), you'd need this to be omitted (or 'inline')
+			 */
+			ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
+			if (size > 0) {
+				/*
+				 * todo-1: I'm getting the "disappearing image" network problem
+				 * related to size (content length), but not calling 'contentLength()' below is
+				 * a workaround.
+				 * 
+				 * You get this error if you just wait about 30s to 1 minute, and maybe scroll
+				 * out of view and back into view the images.
+				 * 
+				 * Failed to load resource: net::ERR_CONTENT_LENGTH_MISMATCH
+				 */
+
+				builder = builder.contentLength(size);
+			}
+			builder = builder.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"");
+			builder = builder.contentType(MediaType.parseMediaType(mimeTypeProp));
+			return builder.body(isr);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	public void getBinary(MongoSession session, String nodeId, HttpServletResponse response) {
+		BufferedInputStream inStream = null;
+		BufferedOutputStream outStream = null;
+
+		try {
+			if (session == null) {
+				session = ThreadLocals.getMongoSession();
+			}
+
+			SubNode node = api.getNode(session, nodeId, false);
+			boolean ipfs = StringUtils.isNotEmpty(node.getStringProp(NodeProp.IPFS_LINK.s()));
+
+			// Everyone's account node can publish it's attachment and is assumed to be an
+			// avatar.
+			boolean allowAuth = true;
+			if (api.isAnAccountNode(session, node)) {
+				allowAuth = false;
+			}
+
+			if (allowAuth) {
+				api.auth(session, node, PrivilegeType.READ);
+			}
+
+			String mimeTypeProp = node.getStringProp(NodeProp.BIN_MIME.s());
+			if (mimeTypeProp == null) {
+				throw ExUtil.newEx("unable to find mimeType property");
+			}
+
+			String fileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
+			if (fileName == null) {
+				fileName = "filename";
+			}
+
+			InputStream is = api.getStream(session, node, null, allowAuth, ipfs);
+			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
+			log.debug("Getting Binary for nodeId=" + nodeId + " size=" + size);
+
+			response.setContentType(mimeTypeProp);
+			response.setContentLength((int) size);
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+			response.setHeader("Cache-Control", "public, max-age=31536000");
+
+			inStream = new BufferedInputStream(is);
+			outStream = new BufferedOutputStream(response.getOutputStream());
+
+			IOUtils.copy(inStream, outStream);
+			outStream.flush();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		} finally {
+			StreamUtil.close(inStream, outStream);
 		}
 	}
 
@@ -515,8 +607,8 @@ public class AttachmentService {
 	 * arbitrary internet URL they have provided, that could be pointing to an image
 	 * or any other kind of content actually.
 	 */
-	public void uploadFromUrl(MongoSession session, UploadFromUrlRequest req, UploadFromUrlResponse res) {
-		uploadFromUrl(session, req.getSourceUrl(), req.getNodeId(), null);
+	public void readFromUrl(MongoSession session, UploadFromUrlRequest req, UploadFromUrlResponse res) {
+		readFromUrl(session, req.getSourceUrl(), req.getNodeId(), null, null);
 		res.setSuccess(true);
 	}
 
@@ -525,8 +617,14 @@ public class AttachmentService {
 	 *                 contain the file extension always and in that case we need to
 	 *                 get it from the IPFS filename itself and that's what the hint
 	 *                 is in that case. Normally however mimeHint is null
+	 * 
+	 *                 'inputStream' is admittely a retrofit to this function for
+	 *                 when we want to just call this method and get an inputStream
+	 *                 handed back that can be read from. Normally the inputStream
+	 *                 ValContainer is null and not used.
 	 */
-	public void uploadFromUrl(MongoSession session, String sourceUrl, String nodeId, String mimeHint) {
+	public void readFromUrl(MongoSession session, String sourceUrl, String nodeId, String mimeHint,
+			ValContainer<InputStream> inputStream) {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -541,9 +639,14 @@ public class AttachmentService {
 
 		try {
 			URL url = new URL(sourceUrl);
+			int timeout = 20;
+			RequestConfig config = RequestConfig.custom()//
+					.setConnectTimeout(timeout * 1000) //
+					.setConnectionRequestTimeout(timeout * 1000) //
+					.setSocketTimeout(timeout * 1000).build();
 
 			String mimeType = URLConnection.guessContentTypeFromName(sourceUrl);
-			if (StringUtils.isEmpty(mimeType)) {
+			if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
 				mimeType = URLConnection.guessContentTypeFromName(mimeHint);
 			}
 
@@ -552,7 +655,6 @@ public class AttachmentService {
 			 * the width, height from it
 			 */
 			if (ImageUtil.isImageMime(mimeType)) {
-
 				/*
 				 * DO NOT DELETE
 				 *
@@ -560,8 +662,10 @@ public class AttachmentService {
 				 * because some sites don't want just any old stream reading from them. Leave
 				 * this note here as a warning and explanation
 				 */
-				HttpClient client = HttpClientBuilder.create().build();
+				// would restTemplate be better for this ?
+				HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 				HttpGet request = new HttpGet(sourceUrl);
+
 				request.addHeader("User-Agent", FAKE_USER_AGENT);
 				HttpResponse response = client.execute(request);
 				log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
@@ -570,8 +674,13 @@ public class AttachmentService {
 
 				limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
-				// insert 0L for size now, because we don't know it yet
-				attachBinaryFromStream(session, null, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false, false);
+				if (inputStream != null) {
+					inputStream.setVal(limitedIs);
+				} else {
+					// insert 0L for size now, because we don't know it yet
+					attachBinaryFromStream(session, null, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false,
+							false, false);
+				}
 			}
 			/*
 			 * if not an image extension, we can just stream directly into the database, but
@@ -579,8 +688,8 @@ public class AttachmentService {
 			 * if we do detect its an image we can handle it as one.
 			 */
 			else {
-				if (!detectAndSaveImage(session, nodeId, sourceUrl, url)) {
-					HttpClient client = HttpClientBuilder.create().build();
+				if (!detectAndSaveImage(session, nodeId, sourceUrl, url, inputStream)) {
+					HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 					HttpGet request = new HttpGet(sourceUrl);
 					request.addHeader("User-Agent", FAKE_USER_AGENT);
 					HttpResponse response = client.execute(request);
@@ -590,8 +699,13 @@ public class AttachmentService {
 
 					limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
-					// insert 0L for size now, because we don't know it yet
-					attachBinaryFromStream(session, null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false);
+					if (inputStream != null) {
+						inputStream.setVal(limitedIs);
+					} else {
+						// insert 0L for size now, because we don't know it yet
+						attachBinaryFromStream(session, null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false,
+								false, false);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -599,17 +713,22 @@ public class AttachmentService {
 		}
 		/* finally block just for extra safety */
 		finally {
-			StreamUtil.close(limitedIs);
+			if (inputStream == null) {
+				StreamUtil.close(limitedIs);
+			}
 		}
 
-		api.saveSession(session);
+		if (inputStream == null) {
+			api.saveSession(session);
+		}
 	}
 
 	// FYI: Warning: this way of getting content type doesn't work.
 	// String mimeType = URLConnection.guessContentTypeFromStream(inputStream);
 	//
 	/* returns true if it was detected AND saved as an image */
-	private boolean detectAndSaveImage(MongoSession session, String nodeId, String fileName, URL url) {
+	private boolean detectAndSaveImage(MongoSession session, String nodeId, String fileName, URL url,
+			ValContainer<InputStream> inputStream) {
 		ImageInputStream is = null;
 		LimitedInputStreamEx is2 = null;
 		ImageReader reader = null;
@@ -625,8 +744,7 @@ public class AttachmentService {
 
 				if (formatName != null) {
 					formatName = formatName.toLowerCase();
-					// log.debug("determined format name of image url: " +
-					// formatName);
+					//log.debug("determined format name of image url: " + formatName);
 					reader.setInput(is, true, false);
 					BufferedImage bufImg = reader.read(0);
 					String mimeType = "image/" + formatName;
@@ -636,15 +754,21 @@ public class AttachmentService {
 					byte[] bytes = os.toByteArray();
 					is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
 
-					attachBinaryFromStream(session, null, nodeId, fileName, bytes.length, is2, mimeType,
-							bufImg.getWidth(null), bufImg.getHeight(null), false, false);
+					if (inputStream != null) {
+						inputStream.setVal(is2);
+					} else {
+						attachBinaryFromStream(session, null, nodeId, fileName, bytes.length, is2, mimeType,
+								bufImg.getWidth(null), bufImg.getHeight(null), false, false, false);
+					}
 					return true;
 				}
 			}
 		} catch (Exception e) {
 			throw ExUtil.newEx(e);
 		} finally {
-			StreamUtil.close(is, is2, reader);
+			if (inputStream == null) {
+				StreamUtil.close(is, is2, reader);
+			}
 		}
 
 		return false;

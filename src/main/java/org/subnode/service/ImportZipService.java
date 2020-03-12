@@ -287,7 +287,7 @@ public class ImportZipService {
 
 				/* Note: bais stream IS closed inside this method, so we don't close it here */
 				attachmentService.attachBinaryFromStream(session, curNode, null, fileName, bytes.length, bais2,
-						mimeType, -1, -1, false, false);
+						mimeType, -1, -1, false, false, false);
 			}
 		} catch (Exception ex) {
 			throw ExUtil.newEx(ex);

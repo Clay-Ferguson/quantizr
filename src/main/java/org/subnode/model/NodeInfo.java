@@ -38,8 +38,6 @@ public class NodeInfo {
 	private boolean firstChild;
 	private boolean lastChild;
 	
-	private boolean hasBinary;
-	private boolean binaryIsImage;
 	private long binVer;
 	private long avatarBinVer;
 	private int width;
@@ -61,7 +59,7 @@ public class NodeInfo {
 
 	public NodeInfo(String id, String name, String content, String owner, String ownerId, Long ordinal, Date lastModified,
 			List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
-			boolean hasBinary, boolean binaryIsImage, long binVer, long avatarBinVer, int width, int height, String type, long logicalOrdinal,
+		 long binVer, long avatarBinVer, int width, int height, String type, long logicalOrdinal,
 			boolean firstChild, boolean lastChild, String cipherKey) {
 		this.id = id;
 		this.name = name;
@@ -75,8 +73,6 @@ public class NodeInfo {
 		this.hasChildren = hasChildren;
 		this.firstChild = firstChild;
 		this.lastChild = lastChild;
-		this.hasBinary = hasBinary;
-		this.binaryIsImage = binaryIsImage;
 		this.binVer = binVer;
 		this.avatarBinVer = avatarBinVer;
 		this.width = width;
@@ -156,22 +152,6 @@ public class NodeInfo {
 
 	public void setHasChildren(boolean hasChildren) {
 		this.hasChildren = hasChildren;
-	}
-
-	public boolean isHasBinary() {
-		return hasBinary;
-	}
-
-	public void setHasBinary(boolean hasBinary) {
-		this.hasBinary = hasBinary;
-	}
-
-	public boolean isBinaryIsImage() {
-		return binaryIsImage;
-	}
-
-	public void setBinaryIsImage(boolean binaryIsImage) {
-		this.binaryIsImage = binaryIsImage;
 	}
 
 	public long getBinVer() {

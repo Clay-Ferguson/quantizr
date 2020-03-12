@@ -14,5 +14,7 @@ export interface PropsIntf {
     isShared(node: J.NodeInfo): boolean;
     isPublic(node: J.NodeInfo): boolean;
     isMine(node: J.NodeInfo): boolean;
+    hasBinary(node: J.NodeInfo): boolean;
+    hasImage(node: J.NodeInfo): boolean;
     getCryptoKey(node: J.NodeInfo): string;
 }

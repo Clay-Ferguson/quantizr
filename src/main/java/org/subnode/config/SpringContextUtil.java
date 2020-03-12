@@ -28,7 +28,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 	@Override
 	public void setApplicationContext(ApplicationContext context) throws BeansException {
 		log.debug("SpringContextUtil initialized context.");
-		this.context = context;
+		SpringContextUtil.context = context;
 
 		try {
 			mongoRepo.init();

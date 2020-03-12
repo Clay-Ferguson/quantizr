@@ -8,7 +8,7 @@ export interface RenderIntf {
     updateHighlightNode(node: J.NodeInfo): void;
     buildRowHeader(node: J.NodeInfo, showPath: boolean, showName: boolean): Div;
     injectSubstitutions(content: string): string;
-    renderNodeContent(node: J.NodeInfo, renderBin: boolean, rowStyling: boolean, showHeader: boolean): Comp[];
+    renderNodeContent(node: J.NodeInfo, rowStyling: boolean, showHeader: boolean): Comp[];
     renderMarkdown(rowStyling: boolean, node: J.NodeInfo, retState: any): Comp;
     renderNodeAsListItem(node: J.NodeInfo, index: number, count: number, rowCount: number, level: number, layoutClass: string): Comp;
     showNodeUrl(): void;

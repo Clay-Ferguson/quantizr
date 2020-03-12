@@ -64,6 +64,9 @@ services:
         networks:
             - net-dev
         environment:
+            # Can be a comma-delimited list of TestIntf-derived tests to run
+            #runTests: "IPFSTest"
+            
             mongoAdminPassword: "${subnodePassword}"
             testUserAccounts: "adam:password:${devEmail},bob:password:${devEmail},cory:password:${devEmail},dan:password:${devEmail}" 
             # resourcesBaseFolder: "file:///dev-resource-base/" 

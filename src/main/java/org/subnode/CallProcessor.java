@@ -39,6 +39,7 @@ public class CallProcessor {
 	private MongoApi api;
 
 	private static final boolean logRequests = true;
+	//private static int mutexCounter = 0;
 
 	// Most but not all of the time this return value is ResponseBase type, or
 	// derived from that.
@@ -63,6 +64,8 @@ public class CallProcessor {
 			if (mutex != null) {
 				mutex.lockEx();
 			}
+			//mutexCounter++;
+			//log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
 
 			/*
 			 * If no Session originally existed AND this was not a login request, then we
@@ -130,6 +133,9 @@ public class CallProcessor {
 			if (mutex != null) {
 				mutex.unlockEx();
 			}
+
+			//mutexCounter--;
+			//log.debug("Exit: mutexCounter: "+String.valueOf(mutexCounter));
 
 			/* cleanup this thread, servers reuse threads */
 			ThreadLocals.setMongoSession(null);

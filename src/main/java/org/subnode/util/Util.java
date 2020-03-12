@@ -23,7 +23,7 @@ public class Util {
 	}
 
 	public static ClientHttpRequestFactory getClientHttpRequestFactory() {
-		int timeout = 5000;
+		int timeout = 20000;
 		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
 		clientHttpRequestFactory.setConnectTimeout(timeout);
 		return clientHttpRequestFactory;

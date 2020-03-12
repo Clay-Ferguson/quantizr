@@ -59,6 +59,33 @@ Images:
 
 # IPFS Links and Info
 
-https://ipfs.io/
-https://discuss.ipfs.io/
+https://ipfs.io
+https://discuss.ipfs.io
+https://docs.ipfs.io/reference/api/http
+https://www.reddit.com/r/ipfs
 
+# IPFS Tips, Terms, Cheatsheet
+
+Two main operations to retrieive data: 'get' or 'cat'
+
+# Where is Data Stored
+
+Data is stored at the IPFS_PATH environment variable location.
+
+From ipfs daemon --help:
+
+USAGE
+  ipfs daemon - Run a network-connected IPFS node.
+...
+  IPFS_PATH environment variable
+
+  ipfs uses a repository in the local file system. By default, the repo is
+  located at ~/.ipfs. To change the repo location, set the $IPFS_PATH
+  environment variable:
+
+      export IPFS_PATH=/path/to/ipfsrepo
+...
+
+# Cleaning up the IPFS Node
+
+You can run a GC to delete everything not pinned.

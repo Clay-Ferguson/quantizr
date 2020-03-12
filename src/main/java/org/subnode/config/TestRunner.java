@@ -23,17 +23,16 @@ public class TestRunner {
 
 	/*
 	 * I've removed JUnit (for now) so that we can alway test *only* in a full
-	 * environment and inside a docker container. on a *real* setup/instance. For
-	 * now also I am just hardcoding tests into here as needed without any real
-	 * better scaffolding for running tests
+	 * environment and inside a docker container. on a *real* setup/instance. 
 	 */
 	public void test() {
 		List<String> tests = appProp.getRunTests();
+		
 		if (!CollectionUtils.isEmpty(tests)) {
 			log.debug("====================================================================");
 			tests.forEach(testClass -> {
 				try {
-					log.debug("************** RUNNING TEST CLASS: " + testClass);
+					log.debug("RUNNING TEST CLASS: " + testClass);
 					TestIntf testInst = (TestIntf)context.getBean(testClass);
 					testInst.test();
 				} catch (Exception e) {

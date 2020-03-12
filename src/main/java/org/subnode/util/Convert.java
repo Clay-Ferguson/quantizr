@@ -21,7 +21,6 @@ import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodePropertyMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,17 +47,15 @@ public class Convert {
 	public NodeInfo convertToNodeInfo(SessionContext sessionContext, MongoSession session, SubNode node,
 			boolean htmlOnly, boolean allowAbbreviated, boolean initNodeEdit, long logicalOrdinal,
 			boolean allowInlineChildren, boolean firstChild, boolean lastChild) {
-		boolean hasBinary = false;
-		boolean binaryIsImage = false;
+
 		ImageSize imageSize = null;
 
 		long binVer = node.getIntProp(NodeProp.BIN_VER.s());
 		String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 		if (mimeType != null) {
-			hasBinary = true;
-			binaryIsImage = api.isImageAttached(node);
+			boolean isImage = api.isImageAttached(node);
 
-			if (binaryIsImage) {
+			if (isImage) {
 				imageSize = api.getImageSize(node);
 			}
 		}
@@ -115,7 +112,7 @@ public class Convert {
 		}
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, ownerId, node.getOrdinal(), //
-				node.getModifyTime(), propList, acList, hasNodes, hasBinary, binaryIsImage, binVer, avatarBinVer, //
+				node.getModifyTime(), propList, acList, hasNodes, binVer, avatarBinVer, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
 				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey);

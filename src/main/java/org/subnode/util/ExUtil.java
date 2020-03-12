@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -65,7 +66,12 @@ public class ExUtil {
 
 		long startTime = System.currentTimeMillis();
 		try {
-			HttpClient client = HttpClientBuilder.create().build();
+			int timeout = 20;
+			RequestConfig config = RequestConfig.custom()//
+						.setConnectTimeout(timeout * 1000) //
+						.setConnectionRequestTimeout(timeout * 1000) //
+						.setSocketTimeout(timeout * 1000).build();
+			HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 			HttpGet request = new HttpGet(url);
 			request.addHeader("User-Agent", FAKE_USER_AGENT);
 			HttpResponse response = client.execute(request);

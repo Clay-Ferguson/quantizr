@@ -70,6 +70,10 @@ export class EditNodeDlg extends DialogBase {
 
     skdp: SymKeyDataPackage;
 
+    //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
+    //to dangerously opt into this also without hacking the code with this var.
+    allowEditAllProps: boolean = false;
+
     constructor(private node: J.NodeInfo) {
         super("Edit Node", "app-modal-content", false, true);
     }
@@ -224,12 +228,14 @@ export class EditNodeDlg extends DialogBase {
 
                 //console.log("Creating edit field for property " + prop.name);
 
-                if (!S.render.allowPropertyEdit(this.node, prop.name)) {
+                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(this.node, prop.name)) {
                     console.log("Hiding property: " + prop.name);
                     return;
                 }
 
-                if ((!S.render.isReadOnlyProperty(prop.name) && !S.render.isBinaryProperty(prop.name)) || S.edit.showReadOnlyProperties) {
+                if (this.allowEditAllProps || (
+                    (!S.render.isReadOnlyProperty(prop.name) &&
+                        !S.render.isBinaryProperty(prop.name)) || S.edit.showReadOnlyProperties)) {
                     let tableRow = this.makePropEditor(prop);
                     collapsiblePropsTable.addChild(tableRow);
                 }
@@ -436,8 +442,8 @@ export class EditNodeDlg extends DialogBase {
                     //console.log("prop to save?: "+prop.name);
 
                     /* Ignore this property if it's one that cannot be edited as text, or has already been handled/processed */
-                    if (S.render.isReadOnlyProperty(prop.name) || //
-                        S.render.isBinaryProperty(prop.name)) {
+                    if (!this.allowEditAllProps && (S.render.isReadOnlyProperty(prop.name) || //
+                        S.render.isBinaryProperty(prop.name))) {
                         return;
                     }
 

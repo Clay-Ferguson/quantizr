@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -272,7 +273,6 @@ public class AppController {
 		// A 'name' param is handled just like an identifier with ":" prefix
 		if (!StringUtils.isEmpty(name)) {
 			id = ":" + name;
-			log.debug("Looking up by name: "+name);
 		}
 
 		if (id != null) {
@@ -635,12 +635,24 @@ public class AppController {
 	 * We could persist the real filename when uploaded, and then make the links
 	 * actually reference that filename on this type of path. Will have to add to
 	 * binary info property sent to client in JSON.
+	 * 
+	 * NOTE: Currently unused. We use 'getBinary' instead. See getBinary_legacy for
+	 * explanation.
 	 */
-	@RequestMapping(value = API_PATH + "/bin/{fileName}", method = RequestMethod.GET)
-	public ResponseEntity<StreamingResponseBody> getBinary(@PathVariable("fileName") String fileName,
+	@RequestMapping(value = API_PATH + "/bin_legacy/{fileName}", method = RequestMethod.GET)
+	public ResponseEntity<InputStreamResource> getBinaryLegacy(@PathVariable("fileName") String fileName,
 			@RequestParam("nodeId") String nodeId, HttpSession session) {
-		return (ResponseEntity<StreamingResponseBody>) callProc.run("bin", null, session, ms -> {
-			return attachmentService.getBinary(null, nodeId);
+		return (ResponseEntity<InputStreamResource>) callProc.run("bin", null, session, ms -> {
+			return attachmentService.getBinary_legacy(null, nodeId);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/bin/{fileName}", method = RequestMethod.GET)
+	public void getBinary(@PathVariable("fileName") String fileName, @RequestParam("nodeId") String nodeId,
+			HttpSession session, HttpServletResponse response) {
+		callProc.run("bin", null, session, ms -> {
+			attachmentService.getBinary(null, nodeId, response);
+			return null;
 		});
 	}
 
@@ -740,12 +752,15 @@ public class AppController {
 	public @ResponseBody ResponseEntity<?> upload(//
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
 			@RequestParam(value = "explodeZips", required = true) String explodeZips, //
-			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
+			@RequestParam(value = "ipfs", required = true) String ipfs, //
+			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
+			HttpSession session) {
 		return (ResponseEntity<?>) callProc.run("upload", null, session, ms -> {
 			if (nodeId == null) {
 				throw ExUtil.newEx("target nodeId not provided");
 			}
-			return attachmentService.uploadMultipleFiles(ms, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"));
+			return attachmentService.uploadMultipleFiles(ms, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
+					"true".equalsIgnoreCase(ipfs));
 		});
 	}
 
@@ -763,7 +778,7 @@ public class AppController {
 	public @ResponseBody ResponseBase uploadFromUrl(@RequestBody UploadFromUrlRequest req, HttpSession session) {
 		return (ResponseBase) callProc.run("uploadFromUrl", req, session, ms -> {
 			UploadFromUrlResponse res = new UploadFromUrlResponse();
-			attachmentService.uploadFromUrl(ms, req, res);
+			attachmentService.readFromUrl(ms, req, res);
 			return res;
 		});
 	}
