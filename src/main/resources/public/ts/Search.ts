@@ -8,6 +8,7 @@ import { Button } from "./widget/Button";
 import { Div } from "./widget/Div";
 import { Comp } from "./widget/base/Comp";
 import { HorizontalLayout } from "./widget/HorizontalLayout";
+import { Img } from "./widget/Img";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -129,35 +130,38 @@ export class Search implements SearchIntf {
      * node is a NodeInfo.java JSON
      */
     renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number): Comp => {
-        let id = node.id;
-        //console.log("renderSearchResult: " + id);
 
-        let cssId = this._UID_ROWID_PREFIX + id;
+        let cssId = this._UID_ROWID_PREFIX + node.id;
         // console.log("Rendering Node Row[" + index + "] with id: " +cssId)
 
-        let buttonBar = this.makeButtonBarHtml(id);
+        let buttonBar = this.makeButtonBarHtml(node);
 
         let content: Comp[] = S.render.renderNodeContent(node, true, true);
 
         return new Div(null, {
             className: "node-table-row inactive-row",
             onClick: (elm: HTMLElement) => {
-                S.srch.clickOnSearchResultRow(id);
+                S.srch.clickOnSearchResultRow(node.id);
             }, //
             "id": cssId
         },//
             [
                 buttonBar//
                 , new Div(null, {
-                    "id": "srch_content_" + id
+                    "id": "srch_content_" + node.id
                 }, content)
             ]);
     }
 
-    makeButtonBarHtml = (id: string): Comp => {
-        return new HorizontalLayout([new Button("Go to Node", () => {
-            S.srch.clickSearchNode(id);
-        }, { id: "go-" + id })], "marginTop marginLeft");
+    makeButtonBarHtml = (node: J.NodeInfo): Comp => {
+        let avatarImg: Img = null;
+        if (node.owner != J.PrincipalName.ADMIN && node.avatarBinVer) {
+            avatarImg = S.render.makeAvatarImage(node.ownerId, node.avatarBinVer);
+        }
+
+        return new HorizontalLayout([avatarImg, new Button("Go to Node", () => {
+            S.srch.clickSearchNode(node.id);
+        }, { id: "go-" + node.id }, "secondary", "marginLeft")], "marginTop marginLeft");
     }
 
     clickOnSearchResultRow = (id: string) => {

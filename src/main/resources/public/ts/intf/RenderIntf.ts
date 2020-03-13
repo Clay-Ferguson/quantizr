@@ -24,6 +24,7 @@ export interface RenderIntf {
     generateRow(i: number, node: J.NodeInfo, newData: boolean, childCount: number, rowCount: number, level: number, layoutClass: string): Comp;
     getUrlForNodeAttachment(node: J.NodeInfo): string;
     makeImageTag(node: J.NodeInfo): Img;
+    makeAvatarImage(nodeId: string, binVer: number): Img;
     allowPropertyToDisplay(propName: string): boolean;
     allowPropertyEdit(node: J.NodeInfo, propName: string): boolean;
     isReadOnlyProperty(propName: string): boolean;

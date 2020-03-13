@@ -25,7 +25,7 @@ export interface SearchIntf {
     initSearchNode(node: J.NodeInfo): any;
     populateSearchResultsPage(data: J.NodeSearchResponse, viewName: string): any;
     renderSearchResultAsListItem(node, index, count, rowCount): any;
-    makeButtonBarHtml(id: string): any;
+    makeButtonBarHtml(node: J.NodeInfo): any;
     clickOnSearchResultRow(id : string): any;
     clickSearchNode(id: string): any;
     setRowHighlight(state: boolean): any;
