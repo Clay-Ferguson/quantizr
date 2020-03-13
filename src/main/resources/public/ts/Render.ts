@@ -255,7 +255,7 @@ export class Render implements RenderIntf {
         else {
             this.initMarkdown();
 
-            // todo-0: put some more thought into this...
+            // todo-1: put some more thought into this...
             // turning this off because when it appears in a url, blows up the link. Need to find some better way.
             // if (S.srch.searchText) {
             //     /* This results in a <strong><em> wrapping the text, which we have a special styling for with a green background for each
@@ -611,14 +611,6 @@ export class Render implements RenderIntf {
         return typeHandler == null || typeHandler.allowAction(action);
     }
 
-    makeHorizontalFieldSet = (content: Comp[], extraClasses?: string): Comp => {
-        /* Now build entire control bar */
-        return new Div(null, //
-            {
-                className: "horizontal layout" + (extraClasses ? (" " + extraClasses) : "")
-            }, content);
-    }
-
     /*
      * Returns true if the nodeId (see makeNodeId()) NodeInfo object has 'hasChildren' true
      */
@@ -831,7 +823,7 @@ export class Render implements RenderIntf {
                                 id: "prevPageButton",
                                 iconclass: "fa fa-angle-left fa-lg"
                             });
-                        output.push(new ButtonBar([firstButton, prevButton], "text-center"));
+                        output.push(new ButtonBar([firstButton, prevButton], "text-center marginTop"));
                     }
 
                     this.lastOwner = data.node.owner;
@@ -848,7 +840,7 @@ export class Render implements RenderIntf {
 
                         //todo-1: last page button disabled pending refactoring
                         //let lastButton = this.makeButton("Last Page", "lastPageButton", this.lastPage);
-                        output.push(new ButtonBar([nextButton], "text-center"));
+                        output.push(new ButtonBar([nextButton], "text-center marginTop"));
                     }
                 }
                 catch (err) {

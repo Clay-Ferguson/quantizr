@@ -15,7 +15,6 @@ export interface RenderIntf {
     getTopRightImageTag(node: J.NodeInfo): Img;
     getNodeBkgImageStyle(node: J.NodeInfo): string;
     makeRowButtonBar(node: J.NodeInfo, editingAllowed: boolean, allowAvatar: boolean): Comp;
-    makeHorizontalFieldSet(content: Comp[], extraClasses?: string): Comp;
     nodeHasChildren(id: string): boolean;
     renderPageFromData(data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string): Promise<void>;
     firstPage(): void;

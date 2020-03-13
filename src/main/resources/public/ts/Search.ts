@@ -7,6 +7,7 @@ import { Constants as C } from "./Constants";
 import { Button } from "./widget/Button";
 import { Div } from "./widget/Div";
 import { Comp } from "./widget/base/Comp";
+import { HorizontalLayout } from "./widget/HorizontalLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -154,10 +155,9 @@ export class Search implements SearchIntf {
     }
 
     makeButtonBarHtml = (id: string): Comp => {
-        let gotoButton = new Button("Go to Node", () => {
+        return new HorizontalLayout([new Button("Go to Node", () => {
             S.srch.clickSearchNode(id);
-        }, { id: "go-to-" + id });
-        return S.render.makeHorizontalFieldSet([gotoButton]);
+        }, { id: "go-" + id })], "marginTop marginLeft");
     }
 
     clickOnSearchResultRow = (id: string) => {
