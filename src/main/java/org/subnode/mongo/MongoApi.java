@@ -913,6 +913,12 @@ public class MongoApi {
 		return ret;
 	}
 
+	public boolean nodeExists(ObjectId id) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where(SubNode.FIELD_ID).is(id));
+		return ops.exists(query, SubNode.class);
+	}
+
 	public SubNode getNode(MongoSession session, ObjectId objId) {
 		return getNode(session, objId, true);
 	}
@@ -1360,13 +1366,16 @@ public class MongoApi {
 	}
 
 	/**
-	 * Scans all the uploaded attachments, and finds any that aren't owned by some SubNode, and deletes them.
+	 * Scans all the uploaded attachments, and finds any that aren't owned by some
+	 * SubNode, and deletes them.
 	 * 
-	 * I probably can hook into some listener (or just my own delete code) to be sure to run the 'grid.delete' for the
-	 * attachments whenever someone deletes a node also. (todo-1: check into this, can't remember if I did that already)
+	 * I probably can hook into some listener (or just my own delete code) to be
+	 * sure to run the 'grid.delete' for the attachments whenever someone deletes a
+	 * node also. (todo-1: check into this, can't remember if I did that already)
 	 */
 	public void removeGridOrphans() {
 		adminRunner.run(session -> {
+			int delCount = 0;
 			GridFSFindIterable files = gridFsBucket.find();
 			if (files != null) {
 				for (GridFSFile file : files) {
@@ -1374,21 +1383,24 @@ public class MongoApi {
 					if (meta != null) {
 						ObjectId id = (ObjectId) meta.get("nodeId");
 						if (id != null) {
-							// todo-0: look for a more efficient existence check to use here rather than
-							// retrieving the entire node
-							SubNode node = this.getNode(session, id);
-							if (node == null) {
-								log.debug("Grid Orphan Delete" + id.toHexString());
+							boolean exists = this.nodeExists(id);
+							if (!exists) {
+								//log.debug("Grid Orphan Delete: " + id.toHexString());
 
-								// I assume it's ok to be deleting WHILE we're iterating here?
-								grid.delete(new Query(Criteria.where("_id").is(id)));
+								//I ran across this online (not sure why it's better than Criteria, and never researched it)
+								//Query query = new Query(GridFsCriteria.where("_id").is(id.toHexString()));
+
+								Query query = new Query(Criteria.where("metadata.nodeId").is(id));
+								grid.delete(query);
+								delCount++;
 							}
 						}
 					}
 				}
 			}
-		});
 
+			log.debug(String.valueOf(delCount)+" orphans found and deleted.");
+		});
 	}
 
 	public void writeStream(MongoSession session, SubNode node, InputStream stream, String fileName, String mimeType,
