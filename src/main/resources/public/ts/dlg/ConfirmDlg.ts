@@ -18,7 +18,7 @@ export class ConfirmDlg extends DialogBase {
                     yesButton = new Button("Yes", () => {
                         this.close();
                         this.yesCallback();
-                    }, null, "primary"),
+                    }, null, "btn-primary"),
                     new Button("No", this.noCallback ? () => {
                         this.noCallback();
                         this.close();

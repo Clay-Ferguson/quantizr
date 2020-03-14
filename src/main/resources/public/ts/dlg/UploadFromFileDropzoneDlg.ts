@@ -34,7 +34,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.dropzoneDiv = new Div("", {className: "dropzone"}),
                 this.hiddenInputContainer = new Div(null, { style: {display: "none"} }),
                 new ButtonBar([
-                    this.uploadButton = new Button("Upload", this.upload, null, "primary"),
+                    this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
                     })

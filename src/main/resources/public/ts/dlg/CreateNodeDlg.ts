@@ -28,8 +28,8 @@ export class CreateNodeDlg extends DialogBase {
             new Form(null, [
                 collapsiblePanel,
                 new ButtonBar([
-                    new Button("First", this.createFirstChild, null, "primary"),
-                    new Button("Last", this.createLastChild, null, "primary"),
+                    new Button("First", this.createFirstChild, null, "btn-primary"),
+                    new Button("Last", this.createLastChild, null, "btn-primary"),
                     this.inlineButton = new Button("Inline", this.createInline),
                     new Button("Cancel", () => {
                         this.close();

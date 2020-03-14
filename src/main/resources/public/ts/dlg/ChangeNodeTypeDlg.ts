@@ -31,7 +31,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
                     new Button("Set Type", () => {
                         this.setNodeType();
                         this.close();
-                    }, null, "primary"),
+                    }, null, "btn-primary"),
                     new Button("Cancel", () =>{
                         this.close();
                     })

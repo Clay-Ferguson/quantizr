@@ -561,6 +561,7 @@ export const enum NodeProp {
 }
 
 export const enum NodeType {
+    NONE = "u",
     FS_FILE = "fs:file",
     FS_FOLDER = "fs:folder",
     FS_LUCENE = "fs:lucene",

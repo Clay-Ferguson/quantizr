@@ -101,8 +101,8 @@ export class SharingDlg extends DialogBase {
             new Form(null, [
                 this.privsTable = new EditPrivsTable(this.nodePrivsInfo, this.removePrivilege),
                 new ButtonBar([
-                    new Button("Share with Person", this.shareToPersonDlg, null, "primary"),
-                    new Button("Share to Public", this.shareNodeToPublic, null, "primary"),
+                    new Button("Share with Person", this.shareToPersonDlg, null, "btn-primary"),
+                    new Button("Share to Public", this.shareNodeToPublic, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
                         S.meta64.refresh();

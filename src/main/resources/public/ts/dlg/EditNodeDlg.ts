@@ -141,7 +141,7 @@ export class EditNodeDlg extends DialogBase {
                         this.saveNodeButton = new Button("Save", () => {
                             this.saveNode();
                             this.close();
-                        }, null, "primary"),
+                        }, null, "btn-primary"),
                         this.setTypeButton = new Button("Set Type", this.openChangeNodeTypeDlg),
                         //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
 

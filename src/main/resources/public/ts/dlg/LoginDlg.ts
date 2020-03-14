@@ -48,7 +48,7 @@ export class LoginDlg extends DialogBase {
                 ),
                 new ButtonBar(
                     [
-                        new Button("Login", this.login, null, "primary"),
+                        new Button("Login", this.login, null, "btn-primary"),
                         new Button("Forgot Password", this.resetPassword),
                         new Button("Close", () => {
                             this.close();

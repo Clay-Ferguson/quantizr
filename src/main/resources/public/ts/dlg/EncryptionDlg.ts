@@ -32,7 +32,7 @@ export class EncryptionDlg extends DialogBase {
                     new Button("Save", () => {
                         this.save();
                         this.close();
-                    }, null, "primary"),
+                    }, null, "btn-primary"),
                     new Button("Cancel", () => {
                         this.close();
                     })

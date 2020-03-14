@@ -36,7 +36,7 @@ export class ShareToPersonDlg extends DialogBase {
                     new Button("Share", () => {
                         this.shareNodeToPerson();
                         this.close();
-                    }, null, "primary"),
+                    }, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
                     })

@@ -64,7 +64,7 @@ export class SplitNodeDlg extends DialogBase {
 
             this.delimiterTextField = new TextField("Delimiter"),
             new ButtonBar([
-                new Button("Ok", this.splitNodes, null, "primary"),
+                new Button("Ok", this.splitNodes, null, "btn-primary"),
                 new Button("Close", () => {
                     this.close();
                 })

@@ -161,7 +161,7 @@ export class Search implements SearchIntf {
 
         return new HorizontalLayout([avatarImg, new Button("Go to Node", () => {
             S.srch.clickSearchNode(node.id);
-        }, { id: "go-" + node.id }, "secondary", "marginLeft")], "marginTop marginLeft");
+        }, { id: "go-" + node.id }, "btn-secondary marginLeft")], "marginTop marginLeft");
     }
 
     clickOnSearchResultRow = (id: string) => {

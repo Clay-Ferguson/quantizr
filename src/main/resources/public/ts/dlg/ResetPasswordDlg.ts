@@ -30,7 +30,7 @@ export class ResetPasswordDlg extends DialogBase {
                 this.userTextField = new TextField("User Name"),
                 this.emailTextField = new TextField("Email Address"),
                 new ButtonBar([
-                    new Button("Reset my Password", this.resetPassword, null, "primary"),
+                    new Button("Reset my Password", this.resetPassword, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
                     })

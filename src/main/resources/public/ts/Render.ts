@@ -524,7 +524,7 @@ export class Render implements RenderIntf {
             (this.nodeHasChildren(node.id) || node.type == "fs:folder" || node.type == "fs:lucene" || node.type == "ipfs:node")) {
 
             /* convert this button to a className attribute for styles */
-            openButton = new Button("Open", () => { S.nav.openNodeById(node.id, true) }, null, "primary");
+            openButton = new Button("Open", () => { S.nav.openNodeById(node.id, true) }, null, "btn-primary");
         }
 
         /*

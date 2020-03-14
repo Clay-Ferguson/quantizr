@@ -35,7 +35,7 @@ export class SearchByIDDlg extends DialogBase {
                     }
                 }, SearchByIDDlg.defaultSearchText),
                 new ButtonBar([
-                    new Button("Search", this.search, null, "primary"),
+                    new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
                     })

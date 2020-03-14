@@ -40,7 +40,7 @@ export class TransferNodeDlg extends DialogBase {
                 ),
                 new ButtonBar(
                     [
-                        new Button("Transfer", this.transfer, null, "primary"),
+                        new Button("Transfer", this.transfer, null, "btn-primary"),
                         new Button("Close", () => {
                             this.close();
                         })

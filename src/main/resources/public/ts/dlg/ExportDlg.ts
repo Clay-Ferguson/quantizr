@@ -42,7 +42,7 @@ export class ExportDlg extends DialogBase {
                 // this.pdfRadioButton = new RadioButton("PDF", false),
             ]),
             new ButtonBar([
-                new Button("Export", this.exportNodes, null, "primary"),
+                new Button("Export", this.exportNodes, null, "btn-primary"),
                 new Button("Close", () => {
                     this.close();
                 })

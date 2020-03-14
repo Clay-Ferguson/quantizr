@@ -53,7 +53,7 @@ export class AudioPlayerDlg extends DialogBase {
                     preload: "auto"
                 }),
                 new ButtonBar([
-                    this.playButton = new Button("Play", this.playButtonFunction, null, "primary"),
+                    this.playButton = new Button("Play", this.playButtonFunction, null, "btn-primary"),
                     new Button("Close", this.closeBtn)
                 ]),
                 new ButtonBar([

@@ -45,7 +45,7 @@ export class SearchContentDlg extends DialogBase {
                     this.caseSensitiveCheckbox = new Checkbox("Case Sensitive")
                 ], "marginBottom"),
                 new ButtonBar([
-                    new Button("Search", this.search, null, "primary"),
+                    new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
                     })
