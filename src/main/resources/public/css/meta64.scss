@@ -327,6 +327,10 @@ input[type="radio"] {
     background-color: $menuItemHoverBackgroundColor;
 }
 
+.audioDownloadLink {
+    margin-left: $smallGap;
+}
+
 .marginBottom {
     margin-bottom: $smallGap;
 }
@@ -337,6 +341,14 @@ input[type="radio"] {
 
 .marginTop {
     margin-top: $smallGap;
+}
+
+.marginTop {
+    margin-top: $smallGap;
+}
+
+.marginAll {
+    margin: $smallGap;
 }
 
 .listBoxRow {
@@ -370,6 +382,10 @@ input[type="radio"] {
 }
 
 /* Warning: setting any kind of left margin won't work becasue the btn-group? style of bootstrap overrides it in button groups */
+
+.btn {
+    border-radius: 0 !important;
+}
 
 .btn[disabled] {
     font-style: italic;

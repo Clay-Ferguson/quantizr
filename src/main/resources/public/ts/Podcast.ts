@@ -46,7 +46,7 @@ export class Podcast implements PodcastIntf {
 
         //console.log("startTimePending = localStorage["+urlHash+"]="+localStorage[urlHash]);
 
-        new AudioPlayerDlg(mp3Url, rssTitle).open();
+        new AudioPlayerDlg(mp3Url).open();
     }
 
     /* convert from fomrat "minutes:seconds" to absolute number of seconds

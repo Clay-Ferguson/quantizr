@@ -17,6 +17,7 @@ import { Icon } from "./widget/Icon";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { MarkdownDiv } from "./widget/MarkdownDiv";
 import { HorizontalLayout } from "./widget/HorizontalLayout";
+import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -44,6 +45,16 @@ export class Render implements RenderIntf {
          */
         if (S.props.hasImage(node)) {
             return this.makeImageTag(node);
+        }
+        else if (S.props.hasAudio(node)) {
+            return new ButtonBar([
+                new Button("Play Audio", () => {
+                    new AudioPlayerDlg(this.getUrlForNodeAttachment(node)).open();
+                }),
+                new Div("", {
+                    className: "audioDownloadLink"
+                }, [new Anchor(this.getUrlForNodeAttachment(node), "[Download Audio]")])
+            ], "marginAll");
         }
         /*
          * If not an image we render a link to the attachment, so that it can be downloaded.

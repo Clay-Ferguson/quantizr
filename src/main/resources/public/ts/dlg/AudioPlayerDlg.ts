@@ -31,7 +31,7 @@ export class AudioPlayerDlg extends DialogBase {
     //DO NOT DELETE
     // private node: J.NodeInfo;
 
-    constructor(private sourceUrl: string, title: string) {
+    constructor(private sourceUrl: string) {
         super("Audio Player");
 
         this.setChildren([

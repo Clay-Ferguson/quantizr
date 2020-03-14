@@ -16,5 +16,6 @@ export interface PropsIntf {
     isMine(node: J.NodeInfo): boolean;
     hasBinary(node: J.NodeInfo): boolean;
     hasImage(node: J.NodeInfo): boolean;
+    hasAudio(node: J.NodeInfo): boolean;
     getCryptoKey(node: J.NodeInfo): string;
 }
