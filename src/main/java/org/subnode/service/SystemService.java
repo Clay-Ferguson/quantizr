@@ -80,6 +80,8 @@ public class SystemService {
 	}
 
 	public String compactDb() {
+		api.removeGridOrphans();
+
 		MongoDatabase database = mac.mongoClient().getDatabase(MongoAppConfig.databaseName);
 		Document result = database.runCommand(new Document("compact", "nodes"));
 

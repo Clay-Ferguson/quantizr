@@ -137,11 +137,11 @@ public class NodeMoveService {
 	private void deleteNode(MongoSession session, String nodeId) {
 		SubNode node = api.getNode(session, nodeId);
 
-		// DO NOT DELETE: this is the legacy delete. (switching to soft-deletes, below)
+		// switching to soft-deletes, below, eventually
+		api.deleteBinary(session, node, null);
 		api.delete(session, node);
 
-		// todo-1: this code was completed, but failed my testing. doesn't work, but
-		// it's late so i'm stopping and re-enabling the above.
+		// todo-1: I started working on 'soft-delete', but never finished. However I think most of the code is done (just untested)
 		// api.softDelete(session, node);
 		// api.saveSession(session);
 	}

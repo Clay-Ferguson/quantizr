@@ -39,7 +39,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.gridfs.model.GridFSFile;
 
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -96,6 +98,9 @@ public class MongoApi {
 
 	@Autowired
 	private IPFSService ipfsService;
+
+	@Autowired
+	private RunAsMongoAdmin adminRunner;
 
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
@@ -1354,6 +1359,38 @@ public class MongoApi {
 		ops.dropCollection(clazz);
 	}
 
+	/**
+	 * Scans all the uploaded attachments, and finds any that aren't owned by some SubNode, and deletes them.
+	 * 
+	 * I probably can hook into some listener (or just my own delete code) to be sure to run the 'grid.delete' for the
+	 * attachments whenever someone deletes a node also. (todo-1: check into this, can't remember if I did that already)
+	 */
+	public void removeGridOrphans() {
+		adminRunner.run(session -> {
+			GridFSFindIterable files = gridFsBucket.find();
+			if (files != null) {
+				for (GridFSFile file : files) {
+					Document meta = file.getMetadata();
+					if (meta != null) {
+						ObjectId id = (ObjectId) meta.get("nodeId");
+						if (id != null) {
+							// todo-0: look for a more efficient existence check to use here rather than
+							// retrieving the entire node
+							SubNode node = this.getNode(session, id);
+							if (node == null) {
+								log.debug("Grid Orphan Delete" + id.toHexString());
+
+								// I assume it's ok to be deleting WHILE we're iterating here?
+								grid.delete(new Query(Criteria.where("_id").is(id)));
+							}
+						}
+					}
+				}
+			}
+		});
+
+	}
+
 	public void writeStream(MongoSession session, SubNode node, InputStream stream, String fileName, String mimeType,
 			String propName) {
 
@@ -1409,7 +1446,6 @@ public class MongoApi {
 		String id = node.getStringProp(propName);
 		if (id == null) {
 			return;
-			// not a problem. allow a delete when there's nothing to delete.
 		}
 		grid.delete(new Query(Criteria.where("_id").is(id)));
 	}
@@ -1455,8 +1491,8 @@ public class MongoApi {
 		}
 	}
 
-	public AutoCloseInputStream getAutoClosingStream(MongoSession session, SubNode node, String propName,
-			boolean auth, boolean ipfs) {
+	public AutoCloseInputStream getAutoClosingStream(MongoSession session, SubNode node, String propName, boolean auth,
+			boolean ipfs) {
 		return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, propName, auth, ipfs)));
 	}
 

@@ -11,7 +11,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Button extends Comp {
 
-    constructor(text: string, public callback: Function, _attribs: Object = null, moreClasses: string="") {
+    constructor(text: string, public callback: Function, _attribs: Object = null, moreClasses: string="btn-secondary") {
         super(_attribs);
         S.util.mergeAndMixProps(this.attribs, {
             className: "btn "+moreClasses, /* also: secondary, info, success, danger, warning */
