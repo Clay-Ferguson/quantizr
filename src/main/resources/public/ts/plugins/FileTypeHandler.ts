@@ -43,9 +43,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 //             }
 //             else if (S.util.isVideoFileName(displayName)) {
 //                 let playButton = new Button("Play Video", () => {
-//                     new VideoPlayerDlg({
-//                         "sourceUrl": dataUrl,
-//                     }).open();
+//                     new VideoPlayerDlg(dataUrl).open();
 //                 });
 //                 ret.push(new Heading(3, displayName));
 

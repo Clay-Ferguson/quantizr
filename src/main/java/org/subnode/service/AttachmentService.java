@@ -386,7 +386,8 @@ public class AttachmentService {
 				fileName = "filename";
 			}
 
-			// I took out the autoClosing stream, and I'm not sure if it's needed based on current design, since when it
+			// I took out the autoClosing stream, and I'm not sure if it's needed based on
+			// current design, since when it
 			// was originally put here.
 			// AutoCloseInputStream acis = api.getAutoClosingStream(session, node, null,
 			// allowAuth, ipfs);
@@ -410,9 +411,8 @@ public class AttachmentService {
 			ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
 			if (size > 0) {
 				/*
-				 * todo-1: I'm getting the "disappearing image" network problem
-				 * related to size (content length), but not calling 'contentLength()' below is
-				 * a workaround.
+				 * todo-1: I'm getting the "disappearing image" network problem related to size
+				 * (content length), but not calling 'contentLength()' below is a workaround.
 				 * 
 				 * You get this error if you just wait about 30s to 1 minute, and maybe scroll
 				 * out of view and back into view the images.
@@ -596,9 +596,57 @@ public class AttachmentService {
 				throw new RuntimeException("File not found: " + fullFileName);
 			}
 
-			MultipartFileSender.fromPath(file.toPath()).with(request).with(response).with(disposition).serveResource();
+			MultipartFileSender.fromPath(file.toPath()).with(request).with(response).withDisposition(disposition)
+					.serveResource();
 		} catch (Exception ex) {
 			throw ExUtil.newEx(ex);
+		}
+	}
+
+	/**
+	 * Returns the seekable stream of the attachment data (assuming it's a
+	 * streamable media type, like audio or video)
+	 */
+	public void getStreamMultiPart(MongoSession session, String nodeId, String disposition, HttpServletRequest request,
+			HttpServletResponse response) {
+		BufferedInputStream inStream = null;
+
+		try {
+			if (session == null) {
+				session = ThreadLocals.getMongoSession();
+			}
+
+			SubNode node = api.getNode(session, nodeId, false);
+			boolean ipfs = StringUtils.isNotEmpty(node.getStringProp(NodeProp.IPFS_LINK.s()));
+
+			api.auth(session, node, PrivilegeType.READ);
+
+			String mimeTypeProp = node.getStringProp(NodeProp.BIN_MIME.s());
+			if (mimeTypeProp == null) {
+				throw ExUtil.newEx("unable to find mimeType property");
+			}
+
+			String fileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
+			if (fileName == null) {
+				fileName = "filename";
+			}
+
+			InputStream is = api.getStream(session, node, null, true, ipfs);
+			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
+			inStream = new BufferedInputStream(is);
+
+			MultipartFileSender.fromInputStream(inStream)//
+					.with(request).with(response)//
+					.withDisposition(disposition)//
+					.withFileName("file-" + node.getId().toHexString())//
+					.withLength(size)//
+					//.withContentType(mimeTypeProp)//todo-0 removing this was a WAG, see if it works with thsi back in
+					.withLastModified(node.getModifyTime().getTime())//
+					.serveResource();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		} finally {
+			// StreamUtil.close(inStream);
 		}
 	}
 
@@ -744,7 +792,7 @@ public class AttachmentService {
 
 				if (formatName != null) {
 					formatName = formatName.toLowerCase();
-					//log.debug("determined format name of image url: " + formatName);
+					// log.debug("determined format name of image url: " + formatName);
 					reader.setInput(is, true, false);
 					BufferedImage bufImg = reader.read(0);
 					String mimeType = "image/" + formatName;

@@ -197,6 +197,11 @@ export class Props implements PropsIntf {
         return (target && target.startsWith("audio/"));
     }
 
+    hasVideo = (node: J.NodeInfo): boolean => {
+        let target = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+        return (target && target.startsWith("video/"));
+    }
+
     getNodePropVal = (propertyName: string, node: J.NodeInfo): string => {
         let prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
         return prop ? prop.value : null;

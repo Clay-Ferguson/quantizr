@@ -20,13 +20,8 @@ export class VideoPlayerDlg extends DialogBase {
 
     videoPlayer: VideoPlayer;
 
-    private mediaTitle: string;
-    private sourceUrl: string;
-
-    constructor(args: Object) {
-        super("Video");
-        this.sourceUrl = (<any>args).sourceUrl;
-        this.mediaTitle = (<any>args).rssTitle;
+    constructor(private sourceUrl: string, private mediaTitle: string=null) {
+        super(mediaTitle ? mediaTitle : "Video");
 
         this.setChildren([
             new Form(null, [
@@ -45,7 +40,7 @@ export class VideoPlayerDlg extends DialogBase {
                     //"ontimeupdate": () => { S.podcast.onTimeUpdate(this); },
                     //"oncanplay": () => { S.podcast.onCanPlay(this); },
                     "controls": "controls",
-                    "autoplay": "autoplay",
+                    "autoPlay": "autoplay",
                     //"muted" : "false",
                     //"volume": "0.9",
                     //"preload": "auto"

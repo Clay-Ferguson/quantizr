@@ -17,5 +17,6 @@ export interface PropsIntf {
     hasBinary(node: J.NodeInfo): boolean;
     hasImage(node: J.NodeInfo): boolean;
     hasAudio(node: J.NodeInfo): boolean;
+    hasVideo(node: J.NodeInfo): boolean;
     getCryptoKey(node: J.NodeInfo): string;
 }

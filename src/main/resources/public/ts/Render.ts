@@ -18,6 +18,7 @@ import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { MarkdownDiv } from "./widget/MarkdownDiv";
 import { HorizontalLayout } from "./widget/HorizontalLayout";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
+import { VideoPlayerDlg } from "./dlg/VideoPlayerDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -46,10 +47,20 @@ export class Render implements RenderIntf {
         if (S.props.hasImage(node)) {
             return this.makeImageTag(node);
         }
+        else if (S.props.hasVideo(node)) {
+            return new ButtonBar([
+                new Button("Play Video", () => {
+                    new VideoPlayerDlg(this.getStreamUrlForNodeAttachment(node)).open();
+                }),
+                new Div("", {
+                    className: "videoDownloadLink"
+                }, [new Anchor(this.getUrlForNodeAttachment(node), "[Download Video]")])
+            ], "marginAll");
+        }
         else if (S.props.hasAudio(node)) {
             return new ButtonBar([
                 new Button("Play Audio", () => {
-                    new AudioPlayerDlg(this.getUrlForNodeAttachment(node)).open();
+                    new AudioPlayerDlg(this.getStreamUrlForNodeAttachment(node)).open();
                 }),
                 new Div("", {
                     className: "audioDownloadLink"
@@ -1064,6 +1075,12 @@ export class Render implements RenderIntf {
     getUrlForNodeAttachment = (node: J.NodeInfo): string => {
         //todo-1: Change to node.id and then re-test this
         return S.util.getRpcPath() + "bin/f" + "-" + node.id + "-" + node.binVer + "?nodeId=" + encodeURIComponent(node.id) + "&ver=" + node.binVer;
+    }
+
+    getStreamUrlForNodeAttachment = (node: J.NodeInfo): string => {
+        //todo-1: Change to node.id and then re-test this
+        //do I need the versioning args here? or does the protocol time values take care of it?
+        return S.util.getRpcPath() + "stream/" +node.id /* + "-" + node.binVer + "?nodeId=" + encodeURIComponent(node.id) */ + "?x=1&ver=" + node.binVer;
     }
 
     getAvatarImgUrl = (ownerId: string, binVer: number): string => {

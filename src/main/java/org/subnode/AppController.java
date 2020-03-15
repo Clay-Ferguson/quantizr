@@ -664,6 +664,7 @@ public class AppController {
 	 * https://stackoverflow.com/questions/16332092/spring-mvc-pathvariable-with-dot
 	 * -is-getting- truncated
 	 */
+	@SuppressWarnings("unchecked") // <--- todo-0: do this everywhere
 	@RequestMapping(value = "/file/{fileName:.+}", method = RequestMethod.GET)
 	public ResponseEntity<StreamingResponseBody> getFile(//
 			@PathVariable("fileName") String fileName, //
@@ -720,14 +721,29 @@ public class AppController {
 	 * This endpoint serves up large media files efficiently and supports seeking,
 	 * so that the fast-foward, rewind, seeking in video players works!!!
 	 */
-	@RequestMapping(value = "/filesys/{nodeId}", method = RequestMethod.GET)
+	@RequestMapping(value = API_PATH + "/filesys/{nodeId}", method = RequestMethod.GET)
 	public void getFileSystemResourceStreamMultiPart(//
 			@PathVariable("nodeId") String nodeId, //
 			@RequestParam(name = "disp", required = false) String disposition, //
 			HttpServletRequest request, HttpServletResponse response, //
 			HttpSession session) {
 		callProc.run("filesys", null, session, ms -> {
-			attachmentService.getFileSystemResourceStreamMultiPart(ms, nodeId, disposition, request, response);
+			// disabling file reading for now.
+			// attachmentService.getFileSystemResourceStreamMultiPart(ms, nodeId,
+			// disposition, request, response);
+			return null;
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/stream/{nodeId}", method = RequestMethod.GET)
+	public void streamMultiPart(//
+			@PathVariable("nodeId") String nodeId, //
+			@RequestParam(name = "disp", required = false) final String disp, //
+			HttpServletRequest request, HttpServletResponse response, //
+			HttpSession session) {
+		callProc.run("stream", null, session, ms -> {
+			log.debug("streaming nodeId: "+nodeId);
+			attachmentService.getStreamMultiPart(ms, nodeId, disp != null ? disp : "inline", request, response);
 			return null;
 		});
 	}

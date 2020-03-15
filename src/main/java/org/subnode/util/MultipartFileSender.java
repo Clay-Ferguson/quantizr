@@ -1,4 +1,5 @@
 package org.subnode.util;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -24,29 +25,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class was taken from: 
+ * This class was taken from:
  * https://github.com/davinkevin/Podcast-Server/blob/d927d9b8cb9ea1268af74316cd20b7192ca92da7/src/main/java/lan/dk/podcastserver/utils/multipart/MultipartFileSender.java
  */
 public class MultipartFileSender {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-    
-    private static final int DEFAULT_BUFFER_SIZE = 20480; // ..bytes = 20KB.
+
+    private static final int DEFAULT_BUFFER_SIZE = 4096; //20480; // ..bytes = 20KB.
     private static final long DEFAULT_EXPIRE_TIME = 604800000L; // ..ms = 1 week.
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
-    
+
+    /*
+     * We can read either from an 'inputStream' (as long as length, and contentType,
+     * and lastModified are all also configured), or we can read from a 'Path' (in
+     * which case length, contentType, and lastModified need not be specified and
+     * will be gotten on the fly), but only one of filepath or inuptStream should be
+     * non-null depending on which is the input
+     */
     private Path filepath;
+
+    private InputStream inputStream;
+    private Long length;
+    private String contentType;
+    private String fileName;
+    private long lastModified;
+
     private HttpServletRequest request;
     private HttpServletResponse response;
     private String disposition;
-    
+
     public MultipartFileSender() {
     }
 
     public static MultipartFileSender fromPath(Path path) {
         return new MultipartFileSender().setFilepath(path);
     }
-    
+
     public static MultipartFileSender fromFile(File file) {
         return new MultipartFileSender().setFilepath(file.toPath());
     }
@@ -55,50 +70,94 @@ public class MultipartFileSender {
         return new MultipartFileSender().setFilepath(Paths.get(uri));
     }
 
-    //** internal setter **//
+    public static MultipartFileSender fromInputStream(InputStream stream) {
+        return new MultipartFileSender().setInputStream(stream);
+    }
+
+    private MultipartFileSender setInputStream(InputStream stream) {
+        this.inputStream = stream;
+        return this;
+    }
+
     private MultipartFileSender setFilepath(Path filepath) {
         this.filepath = filepath;
         return this;
     }
-    
+
+    public MultipartFileSender withContentType(String contentType) {
+        this.contentType = contentType;
+        return this;
+    }
+
     public MultipartFileSender with(HttpServletRequest httpRequest) {
         request = httpRequest;
         return this;
     }
 
-    public MultipartFileSender with(String disposition) {
+    public MultipartFileSender withDisposition(String disposition) {
         this.disposition = disposition;
         return this;
     }
-    
+
     public MultipartFileSender with(HttpServletResponse httpResponse) {
         response = httpResponse;
         return this;
     }
-    
+
+    public MultipartFileSender withLength(Long length) {
+        this.length = length;
+        return this;
+    }
+
+    public MultipartFileSender withFileName(String fileName) {
+        this.fileName = fileName;
+        return this;
+    }
+
+    public MultipartFileSender withLastModified(Long lastModified) {
+        this.lastModified = lastModified;
+        return this;
+    }
+
+    /*
+     * Need to doublecheck if we should be flushing the output and then closing the
+     * streams ? todo-0
+     */
     public void serveResource() throws Exception {
         if (response == null || request == null) {
             return;
         }
 
-        if (!Files.exists(filepath)) {
-            logger.error("File doesn't exist at URI : {}", filepath.toAbsolutePath().toString());
+        if (filepath != null) {
+            if (!Files.exists(filepath)) {
+                logger.error("File doesn't exist at URI : {}", filepath.toAbsolutePath().toString());
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            length = Files.size(filepath);
+            fileName = filepath.getFileName().toString();
+
+            FileTime lastModifiedObj = Files.getLastModifiedTime(filepath);
+            if (StringUtils.isEmpty(fileName) || lastModifiedObj == null) {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+            lastModified = LocalDateTime
+                    .ofInstant(lastModifiedObj.toInstant(), ZoneId.of(ZoneOffset.systemDefault().getId()))
+                    .toEpochSecond(ZoneOffset.UTC);
+
+            contentType = MimeTypeUtils.probeContentType(filepath);
+        }
+
+        if (length == null || fileName == null || lastModified == 0) {
+            logger.error("Request missingn some args"); // todo-1: we could do more robust reporting here.
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        Long length = Files.size(filepath);
-        String fileName = filepath.getFileName().toString();
-        FileTime lastModifiedObj = Files.getLastModifiedTime(filepath);
-
-        if (StringUtils.isEmpty(fileName) || lastModifiedObj == null) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }
-        long lastModified = LocalDateTime.ofInstant(lastModifiedObj.toInstant(), ZoneId.of(ZoneOffset.systemDefault().getId())).toEpochSecond(ZoneOffset.UTC);
-        String contentType = MimeTypeUtils.probeContentType(filepath);
-
-        // Validate request headers for caching ---------------------------------------------------
+        // Validate request headers for caching
+        // ---------------------------------------------------
 
         // If-None-Match header should contain "*" or ETag. If so, then return 304.
         String ifNoneMatch = request.getHeader("If-None-Match");
@@ -108,7 +167,8 @@ public class MultipartFileSender {
             return;
         }
 
-        // If-Modified-Since header should be greater than LastModified. If so, then return 304.
+        // If-Modified-Since header should be greater than LastModified. If so, then
+        // return 304.
         // This header is ignored if any If-None-Match header is specified.
         long ifModifiedSince = request.getDateHeader("If-Modified-Since");
         if (ifNoneMatch == null && ifModifiedSince != -1 && ifModifiedSince + 1000 > lastModified) {
@@ -117,7 +177,8 @@ public class MultipartFileSender {
             return;
         }
 
-        // Validate request headers for resume ----------------------------------------------------
+        // Validate request headers for resume
+        // ----------------------------------------------------
 
         // If-Match header should contain "*" or ETag. If not, then return 412.
         String ifMatch = request.getHeader("If-Match");
@@ -126,14 +187,16 @@ public class MultipartFileSender {
             return;
         }
 
-        // If-Unmodified-Since header should be greater than LastModified. If not, then return 412.
+        // If-Unmodified-Since header should be greater than LastModified. If not, then
+        // return 412.
         long ifUnmodifiedSince = request.getDateHeader("If-Unmodified-Since");
         if (ifUnmodifiedSince != -1 && ifUnmodifiedSince + 1000 <= lastModified) {
             response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
             return;
         }
 
-        // Validate and process range -------------------------------------------------------------
+        // Validate and process range
+        // -------------------------------------------------------------
 
         // Prepare some variables. The full Range represents the complete file.
         Range full = new Range(0, length - 1, length);
@@ -143,7 +206,8 @@ public class MultipartFileSender {
         String range = request.getHeader("Range");
         if (range != null) {
 
-            // Range header should match format "bytes=n-n,n-n,n-n...". If not, then return 416.
+            // Range header should match format "bytes=n-n,n-n,n-n...". If not, then return
+            // 416.
             if (!range.matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) {
                 response.setHeader("Content-Range", "bytes */" + length); // Required in 416.
                 response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
@@ -184,30 +248,40 @@ public class MultipartFileSender {
                         return;
                     }
 
-                    // Add range.                    
+                    // Add range.
                     ranges.add(new Range(start, end, length));
                 }
             }
         }
 
-        // Prepare and initialize response --------------------------------------------------------
+        // Prepare and initialize response
+        // --------------------------------------------------------
 
         // Get content type by file name and set content disposition.
-        //WCF: changing to a 'with(disposition)'
-        //String disposition = "inline";
+        // WCF: changing to a 'with(disposition)'
+        // String disposition = "inline";
 
         // If content type is unknown, then set the default value.
         // For all content types, see: http://www.w3schools.com/media/media_mimeref.asp
         // To add new content types, add new mime-mapping entry in web.xml.
+
+        // what was I doing in here? it works with just octet-stream... but maybe if the
+        // user is just downloading is breaks???
+        // so this just needs to be re-investigated soon: todo-0
         if (contentType == null) {
+            // I'm not sure when streaming if we need to set this as the content or not?
+            // todo-0
             contentType = "application/octet-stream";
         } else if (!contentType.startsWith("image")) {
-            // Else, expect for images, determine content disposition. If content type is supported by
-            // the browser, then set to inline, else attachment which will pop a 'save as' dialogue.
+            // Else, expect for images, determine content disposition. If content type is
+            // supported by
+            // the browser, then set to inline, else attachment which will pop a 'save as'
+            // dialogue.
             String accept = request.getHeader("Accept");
             disposition = accept != null && HttpUtils.accepts(accept, contentType) ? "inline" : "attachment";
         }
-        logger.debug("Content-Type : {}", contentType);
+        //logger.debug("Content-Type : {}", contentType);
+
         // Initialize response.
         response.reset();
         response.setBufferSize(DEFAULT_BUFFER_SIZE);
@@ -219,11 +293,20 @@ public class MultipartFileSender {
         response.setDateHeader("Last-Modified", lastModified);
         response.setDateHeader("Expires", System.currentTimeMillis() + DEFAULT_EXPIRE_TIME);
 
-        // Send requested file (part(s)) to client ------------------------------------------------
+        // Send requested file (part(s)) to client
+        // ------------------------------------------------
 
         // Prepare streams.
-        try (InputStream input = new BufferedInputStream(Files.newInputStream(filepath));
-             OutputStream output = response.getOutputStream()) {
+        InputStream input=null;
+        try {
+            //If inputStream is null then expect filepath to exist to read a stream from
+            if (inputStream == null && filepath != null) {
+                input = new BufferedInputStream(Files.newInputStream(filepath));
+            } else {
+                input = inputStream;
+            }
+
+            OutputStream output = response.getOutputStream();
 
             if (ranges.isEmpty() || ranges.get(0) == full) {
 
@@ -273,6 +356,8 @@ public class MultipartFileSender {
                 sos.println();
                 sos.println("--" + MULTIPART_BOUNDARY + "--");
             }
+        } finally {
+            StreamUtil.close(input);
         }
     }
 
@@ -284,8 +369,9 @@ public class MultipartFileSender {
 
         /**
          * Construct a byte range.
+         * 
          * @param start Start of the byte range.
-         * @param end End of the byte range.
+         * @param end   End of the byte range.
          * @param total Total length of the byte source.
          */
         public Range(long start, long end, long total) {
@@ -300,7 +386,13 @@ public class MultipartFileSender {
             return (substring.length() > 0) ? Long.parseLong(substring) : -1;
         }
 
-        private static void copy(InputStream input, OutputStream output, long inputSize, long start, long length) throws IOException {
+        /**
+         * WCF: I got this implementation from github, and I never researched whether
+         * this stream copy is correct and efficient yet. For example, does it need to
+         * flush in each loop?
+         */
+        private static void copy(InputStream input, OutputStream output, long inputSize, long start, long length)
+                throws IOException {
             byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
             int read;
 
@@ -327,12 +419,14 @@ public class MultipartFileSender {
             }
         }
     }
+
     private static class HttpUtils {
 
         /**
          * Returns true if the given accept header accepts the given value.
+         * 
          * @param acceptHeader The accept header.
-         * @param toAccept The value to be accepted.
+         * @param toAccept     The value to be accepted.
          * @return True if the given accept header accepts the given value.
          */
         public static boolean accepts(String acceptHeader, String toAccept) {
@@ -346,15 +440,15 @@ public class MultipartFileSender {
 
         /**
          * Returns true if the given match header matches the given value.
+         * 
          * @param matchHeader The match header.
-         * @param toMatch The value to be matched.
+         * @param toMatch     The value to be matched.
          * @return True if the given match header matches the given value.
          */
         public static boolean matches(String matchHeader, String toMatch) {
             String[] matchValues = matchHeader.split("\\s*,\\s*");
             Arrays.sort(matchValues);
-            return Arrays.binarySearch(matchValues, toMatch) > -1
-                    || Arrays.binarySearch(matchValues, "*") > -1;
+            return Arrays.binarySearch(matchValues, toMatch) > -1 || Arrays.binarySearch(matchValues, "*") > -1;
         }
     }
 }
