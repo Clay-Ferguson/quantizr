@@ -33,7 +33,8 @@ public class ImportBookService {
 	@Autowired
 	private SessionContext sessionContext;
 
-	public void insertBook(MongoSession session, InsertBookRequest req, InsertBookResponse res) {
+	public InsertBookResponse insertBook(MongoSession session, InsertBookRequest req) {
+		InsertBookResponse res = new InsertBookResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -53,5 +54,6 @@ public class ImportBookService {
 
 		api.saveSession(session);
 		res.setSuccess(true);
+		return res;
 	}
 }

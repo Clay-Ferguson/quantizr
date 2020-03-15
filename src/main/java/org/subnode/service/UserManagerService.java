@@ -84,7 +84,8 @@ public class UserManagerService {
 	 * called, so by the time we are in this method we can safely assume the
 	 * userName and password resulted in a successful login.
 	 */
-	public void login(MongoSession session, LoginRequest req, LoginResponse res) {
+	public LoginResponse login(MongoSession session, LoginRequest req) {
+		LoginResponse res = new LoginResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -147,9 +148,11 @@ public class UserManagerService {
 		if (res.getUserPreferences() == null) {
 			res.setUserPreferences(getDefaultUserPreferences());
 		}
+		return res;
 	}
 
-	public void closeAccount(CloseAccountRequest req, CloseAccountResponse res) {
+	public CloseAccountResponse closeAccount(CloseAccountRequest req) {
+		CloseAccountResponse res = new CloseAccountResponse();
 		log.debug("Closing Account: " + sessionContext.getUserName());
 		adminRunner.run(session -> {
 			String userName = sessionContext.getUserName();
@@ -159,6 +162,7 @@ public class UserManagerService {
 				api.delete(session, ownerNode);
 			}
 		});
+		return res;
 	}
 
 	/*
@@ -233,8 +237,9 @@ public class UserManagerService {
 	 * pending state, and like all other user accounts all information specific to
 	 * that user that we currently know is held in that node (i.e. preferences)
 	 */
-	public void signup(SignupRequest req, SignupResponse res, boolean automated) {
+	public SignupResponse signup(SignupRequest req, boolean automated) {
 		MongoSession session = api.getAdminSession();
+		SignupResponse res = new SignupResponse();
 
 		final String userName = req.getUserName().trim();
 		final String password = req.getPassword().trim();
@@ -255,6 +260,7 @@ public class UserManagerService {
 
 		res.setMessage("success: " + String.valueOf(++sessionContext.counter));
 		res.setSuccess(true);
+		return res;
 	}
 
 	/*
@@ -296,7 +302,8 @@ public class UserManagerService {
 		prefsNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 	}
 
-	public void savePublicKey(final SavePublicKeyRequest req, final SavePublicKeyResponse res) {
+	public SavePublicKeyResponse savePublicKey(final SavePublicKeyRequest req) {
+		SavePublicKeyResponse res = new SavePublicKeyResponse();
 		final String userName = sessionContext.getUserName();
 
 		adminRunner.run(session -> {
@@ -313,9 +320,11 @@ public class UserManagerService {
 			//don't display a message unless this was a user-initiated save.
 			//res.setMessage("Key Saved");
 		});
+		return res;
 	}
 
-	public void saveUserPreferences(final SaveUserPreferencesRequest req, final SaveUserPreferencesResponse res) {
+	public SaveUserPreferencesResponse saveUserPreferences(final SaveUserPreferencesRequest req) {
+		SaveUserPreferencesResponse res = new SaveUserPreferencesResponse();
 		final String userName = sessionContext.getUserName();
 
 		adminRunner.run(session -> {
@@ -344,6 +353,7 @@ public class UserManagerService {
 
 			res.setSuccess(true);
 		});
+		return res;
 	}
 
 	public UserPreferences getDefaultUserPreferences() {
@@ -368,7 +378,8 @@ public class UserManagerService {
 	/*
 	 * Runs when user is doing the 'change password' or 'reset password'
 	 */
-	public void changePassword(MongoSession session, final ChangePasswordRequest req, ChangePasswordResponse res) {
+	public ChangePasswordResponse changePassword(MongoSession session, final ChangePasswordRequest req) {
+		ChangePasswordResponse res = new ChangePasswordResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -437,6 +448,7 @@ public class UserManagerService {
 		res.setUser(userName[0]);
 		sessionContext.setPassword(req.getNewPassword());
 		res.setSuccess(true);
+		return res;
 	}
 
 	public boolean isNormalUserName(String userName) {
@@ -444,7 +456,8 @@ public class UserManagerService {
 		return !userName.equalsIgnoreCase(PrincipalName.ADMIN.s()) && !userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
-	public void resetPassword(final ResetPasswordRequest req, ResetPasswordResponse res) {
+	public ResetPasswordResponse resetPassword(final ResetPasswordRequest req) {
+		ResetPasswordResponse res = new ResetPasswordResponse();
 		adminRunner.run(session -> {
 
 			String user = req.getUser();
@@ -506,5 +519,6 @@ public class UserManagerService {
 			res.setMessage("A password reset link has been sent to your email. Check your email in a minute or so.");
 			res.setSuccess(true);
 		});
+		return res;
 	}
 }

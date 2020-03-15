@@ -67,7 +67,8 @@ public class NodeRenderService {
 	 * browsing to a new page, this method gets called once per page and retrieves
 	 * all the data for that page.
 	 */
-	public void renderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res) {
+	public RenderNodeResponse renderNode(MongoSession session, RenderNodeRequest req) {
+		RenderNodeResponse res = new RenderNodeResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -80,7 +81,7 @@ public class NodeRenderService {
 
 		if (node == null) {
 			res.setNoDataResponse("Node not found.");
-			return;
+			return res;
 		}
 
 		// boolean showMetaData = userPreferences != null ?
@@ -166,6 +167,7 @@ public class NodeRenderService {
 
 		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, scanToPath, 0, 0);
 		res.setNode(nodeInfo);
+		return res;
 	}
 
 	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res,
@@ -363,7 +365,8 @@ public class NodeRenderService {
 		return nodeInfo;
 	}
 
-	public void initNodeEdit(MongoSession session, InitNodeEditRequest req, InitNodeEditResponse res) {
+	public InitNodeEditResponse initNodeEdit(MongoSession session, InitNodeEditRequest req) {
+		InitNodeEditResponse res = new InitNodeEditResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -374,13 +377,14 @@ public class NodeRenderService {
 		if (node == null) {
 			res.setMessage("Node not found.");
 			res.setSuccess(false);
-			return;
+			return res;
 		}
 
 		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, false, false, true, -1, false,
 				false, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
+		return res;
 	}
 
 	/*
@@ -388,7 +392,8 @@ public class NodeRenderService {
 	 * displayed in the browser when a non-logged in user (i.e. anonymouse user) is
 	 * browsing the site, and this method retrieves that page data.
 	 */
-	public void anonPageLoad(MongoSession session, AnonPageLoadRequest req, AnonPageLoadResponse res) {
+	public AnonPageLoadResponse anonPageLoad(MongoSession session, AnonPageLoadRequest req) {
+		AnonPageLoadResponse res = new AnonPageLoadResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -404,7 +409,6 @@ public class NodeRenderService {
 		}
 
 		if (!StringUtils.isEmpty(id)) {
-			RenderNodeResponse renderNodeRes = new RenderNodeResponse();
 			RenderNodeRequest renderNodeReq = new RenderNodeRequest();
 
 			/*
@@ -416,7 +420,7 @@ public class NodeRenderService {
 			log.debug("Render Node ID: " + id);
 			renderNodeReq.setNodeId(id);
 
-			renderNode(session, renderNodeReq, renderNodeRes);
+			RenderNodeResponse renderNodeRes = renderNode(session, renderNodeReq);
 			res.setRenderNodeResponse(renderNodeRes);
 			res.setSuccess(true);
 		} //
@@ -424,5 +428,6 @@ public class NodeRenderService {
 			res.setContent("No content available.");
 			res.setSuccess(true);
 		}
+		return res;
 	}
 }

@@ -62,7 +62,8 @@ public class GraphNodesService {
 		}
 	}
 
-	public void graphNodes(MongoSession session, GraphRequest req, GraphResponse res) {
+	public GraphResponse graphNodes(MongoSession session, GraphRequest req) {
+		GraphResponse res = new GraphResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -81,6 +82,7 @@ public class GraphNodesService {
 		}
 
 		res.setSuccess(true);
+		return res;
 	}
 
 	// private void graphTags(MongoSession session, SubNode node) {

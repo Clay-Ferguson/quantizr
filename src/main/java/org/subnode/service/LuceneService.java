@@ -13,6 +13,8 @@ import org.subnode.lucene.FileSearcher;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.response.LuceneIndexResponse;
+import org.subnode.response.LuceneSearchResponse;
 
 /**
  * Service for processing Lucene-related functions.
@@ -30,7 +32,8 @@ public class LuceneService {
 	@Autowired
 	private FileSearcher searcher;
 
-	public String reindex(MongoSession session, String nodeId, String searchFolder) {
+	public LuceneIndexResponse reindex(MongoSession session, String nodeId, String searchFolder) {
+		LuceneIndexResponse res = new LuceneIndexResponse();
 		String ret = null;
 		SubNode node = api.getNode(session, nodeId, true);
 		if (node != null) {
@@ -49,15 +52,22 @@ public class LuceneService {
 			ret = fileIndexer.getSummaryReport();
 			fileIndexer.close();
 		}
-		return ret;
+
+		res.setSuccess(true);
+		res.setMessage(ret);
+		return res;
 	}
 
-	public String search(MongoSession session, String nodeId, String searchText) {
+	public LuceneSearchResponse search(MongoSession session, String nodeId, String searchText) {
+		LuceneSearchResponse res = new LuceneSearchResponse();
 		String ret = null;
 		SubNode node = api.getNode(session, nodeId, true);
 		if (node != null) {
 			ret = searcher.search(nodeId, searchText);
 		}
-		return ret;
+
+		res.setSuccess(true);
+		res.setMessage(ret);
+		return res;
 	}
 }

@@ -10,8 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.mail.MailSender;
@@ -75,49 +72,15 @@ import org.subnode.request.SignupRequest;
 import org.subnode.request.SplitNodeRequest;
 import org.subnode.request.TransferNodeRequest;
 import org.subnode.request.UploadFromUrlRequest;
-import org.subnode.response.AddPrivilegeResponse;
-import org.subnode.response.AnonPageLoadResponse;
-import org.subnode.response.AppDropResponse;
-import org.subnode.response.ChangePasswordResponse;
 import org.subnode.response.CloseAccountResponse;
-import org.subnode.response.CreateSubNodeResponse;
-import org.subnode.response.DeleteAttachmentResponse;
-import org.subnode.response.DeleteNodesResponse;
-import org.subnode.response.DeletePropertyResponse;
 import org.subnode.response.ExecuteNodeResponse;
 import org.subnode.response.ExportResponse;
-import org.subnode.response.GetNodePrivilegesResponse;
 import org.subnode.response.GetServerInfoResponse;
-import org.subnode.response.GraphResponse;
-import org.subnode.response.InitNodeEditResponse;
-import org.subnode.response.InsertBookResponse;
-import org.subnode.response.InsertNodeResponse;
-import org.subnode.response.LoginResponse;
 import org.subnode.response.LogoutResponse;
-import org.subnode.response.LuceneIndexResponse;
-import org.subnode.response.LuceneSearchResponse;
-import org.subnode.response.MoveNodesResponse;
-import org.subnode.response.NodeSearchResponse;
 import org.subnode.response.PingResponse;
 import org.subnode.response.RebuildIndexesResponse;
-import org.subnode.response.RemovePrivilegeResponse;
-import org.subnode.response.RenderNodeResponse;
-import org.subnode.response.ResetPasswordResponse;
-import org.subnode.response.SaveNodeResponse;
-import org.subnode.response.SavePropertyResponse;
-import org.subnode.response.SavePublicKeyResponse;
-import org.subnode.response.SaveUserPreferencesResponse;
-import org.subnode.response.SelectAllNodesResponse;
 import org.subnode.response.SendTestEmailResponse;
-import org.subnode.response.SetCipherKeyResponse;
-import org.subnode.response.SetNodePositionResponse;
-import org.subnode.response.SetNodeTypeResponse;
 import org.subnode.response.ShutdownServerNodeResponse;
-import org.subnode.response.SignupResponse;
-import org.subnode.response.SplitNodeResponse;
-import org.subnode.response.TransferNodeResponse;
-import org.subnode.response.UploadFromUrlResponse;
-import org.subnode.response.base.ResponseBase;
 import org.subnode.service.AttachmentService;
 import org.subnode.service.BashService;
 import org.subnode.service.ExportTarService;
@@ -317,31 +280,24 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase signup(@RequestBody SignupRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("signup", req, session, ms -> {
-			SignupResponse res = new SignupResponse();
-			userManagerService.signup(req, res, false);
-			return res;
+	public @ResponseBody Object signup(@RequestBody SignupRequest req, HttpSession session) {
+		return callProc.run("signup", req, session, ms -> {
+			return userManagerService.signup(req, false);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase login(@RequestBody LoginRequest req, HttpSession session) {
-		log.debug("AppController.login");
-		return (ResponseBase) callProc.run("login", req, session, ms -> {
-			LoginResponse res = new LoginResponse();
-			res.setMessage("success: " + String.valueOf(++sessionContext.counter));
-			userManagerService.login(null, req, res);
-			return res;
+	public @ResponseBody Object login(@RequestBody LoginRequest req, HttpSession session) {
+		return callProc.run("login", req, session, ms -> {
+			++sessionContext.counter; //todo-0: this counter is not a goog place to count. Should rely on actual session counting (session listener) ?
+			return userManagerService.login(null, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/closeAccount", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase closeAccount(@RequestBody CloseAccountRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("closeAccount", req, session, ms -> {
-			CloseAccountResponse res = new CloseAccountResponse();
-
-			userManagerService.closeAccount(req, res);
+	public @ResponseBody Object closeAccount(@RequestBody CloseAccountRequest req, HttpSession session) {
+		return callProc.run("closeAccount", req, session, ms -> {
+			CloseAccountResponse res = userManagerService.closeAccount(req);
 			SessionContext sessionContext = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
 			if (sessionContext != null) {
 				sessionContext.setHttpSessionToInvalidate(session);
@@ -351,8 +307,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/logout", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase logout(@RequestBody LogoutRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("logout", req, session, ms -> {
+	public @ResponseBody Object logout(@RequestBody LogoutRequest req, HttpSession session) {
+		return callProc.run("logout", req, session, ms -> {
 			session.invalidate();
 			LogoutResponse res = new LogoutResponse();
 			res.setSuccess(true);
@@ -361,83 +317,67 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/renderNode", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase renderNode(@RequestBody RenderNodeRequest req, //
+	public @ResponseBody Object renderNode(@RequestBody RenderNodeRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
-		return (ResponseBase) callProc.run("renderNode", req, session, ms -> {
-			RenderNodeResponse res = new RenderNodeResponse();
-			nodeRenderService.renderNode(ms, req, res);
-			return res;
+		return callProc.run("renderNode", req, session, ms -> {
+			return nodeRenderService.renderNode(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/initNodeEdit", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase initNodeEdit(@RequestBody InitNodeEditRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("initNodeEdit", req, session, ms -> {
-			InitNodeEditResponse res = new InitNodeEditResponse();
-			nodeRenderService.initNodeEdit(ms, req, res);
-			return res;
+	public @ResponseBody Object initNodeEdit(@RequestBody InitNodeEditRequest req, HttpSession session) {
+		return callProc.run("initNodeEdit", req, session, ms -> {
+			return nodeRenderService.initNodeEdit(ms, req);
 		});
 	}
 
 	/* Called when user does drag-n-drop onto the application window */
 	@RequestMapping(value = API_PATH + "/appDrop", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase appDrop(@RequestBody AppDropRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("appDrop", req, session, ms -> {
-			AppDropResponse res = new AppDropResponse();
-			nodeEditService.appDrop(ms, req, res);
-			return res;
+	public @ResponseBody Object appDrop(@RequestBody AppDropRequest req, HttpSession session) {
+		return callProc.run("appDrop", req, session, ms -> {
+			return nodeEditService.appDrop(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getNodePrivileges", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase getNodePrivileges(@RequestBody GetNodePrivilegesRequest req,
+	public @ResponseBody Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req,
 			HttpSession session) {
-		return (ResponseBase) callProc.run("getNodePrivileges", req, session, ms -> {
-			GetNodePrivilegesResponse res = new GetNodePrivilegesResponse();
-			aclService.getNodePrivileges(ms, req, res);
-			return res;
+		return callProc.run("getNodePrivileges", req, session, ms -> {
+			return aclService.getNodePrivileges(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/addPrivilege", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase addPrivilege(@RequestBody AddPrivilegeRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("addPrivilege", req, session, ms -> {
-			AddPrivilegeResponse res = new AddPrivilegeResponse();
-			aclService.addPrivilege(ms, req, res);
-			return res;
+	public @ResponseBody Object addPrivilege(@RequestBody AddPrivilegeRequest req, HttpSession session) {
+		return callProc.run("addPrivilege", req, session, ms -> {
+			return aclService.addPrivilege(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/removePrivilege", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase removePrivilege(@RequestBody RemovePrivilegeRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("removePrivilege", req, session, ms -> {
-			RemovePrivilegeResponse res = new RemovePrivilegeResponse();
-			aclService.removePrivilege(ms, req, res);
-			return res;
+	public @ResponseBody Object removePrivilege(@RequestBody RemovePrivilegeRequest req, HttpSession session) {
+		return callProc.run("removePrivilege", req, session, ms -> {
+			return aclService.removePrivilege(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/savePublicKey", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase savePublicKey(@RequestBody SavePublicKeyRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("addPrivilege", req, session, ms -> {
-			SavePublicKeyResponse res = new SavePublicKeyResponse();
-			userManagerService.savePublicKey(req, res);
-			return res;
+	public @ResponseBody Object savePublicKey(@RequestBody SavePublicKeyRequest req, HttpSession session) {
+		return callProc.run("addPrivilege", req, session, ms -> {
+			return userManagerService.savePublicKey(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/setCipherKey", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase setCipherKey(@RequestBody SetCipherKeyRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("setCipherKey", req, session, ms -> {
-			SetCipherKeyResponse res = new SetCipherKeyResponse();
-			aclService.setCipherKey(ms, req, res);
-			return res;
+	public @ResponseBody Object setCipherKey(@RequestBody SetCipherKeyRequest req, HttpSession session) {
+		return callProc.run("setCipherKey", req, session, ms -> {
+			return aclService.setCipherKey(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/export", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase export(@RequestBody ExportRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("export", req, session, ms -> {
+	public @ResponseBody Object export(@RequestBody ExportRequest req, HttpSession session) {
+		return callProc.run("export", req, session, ms -> {
 			ExportResponse res = new ExportResponse();
 
 			if ("md".equalsIgnoreCase(req.getExportExt())) {
@@ -470,42 +410,32 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/transferNode", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("export", req, session, ms -> {
-			TransferNodeResponse res = new TransferNodeResponse();
-			nodeEditService.transferNode(ms, req, res);
-			return res;
+	public @ResponseBody Object transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
+		return callProc.run("export", req, session, ms -> {
+			return nodeEditService.transferNode(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/streamImport", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> streamImport(//
+	public @ResponseBody Object streamImport(//
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
-		return (ResponseEntity<?>) callProc.run("upload", null, session, ms -> {
-			if (nodeId == null) {
-				throw ExUtil.newEx("target nodeId not provided");
-			}
+		return callProc.run("upload", null, session, ms -> {
 			return importService.streamImport(ms, nodeId, uploadFiles);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/setNodePosition", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase setNodePosition(@RequestBody SetNodePositionRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("setNodePosition", req, session, ms -> {
-			SetNodePositionResponse res = new SetNodePositionResponse();
-
-			nodeMoveService.setNodePosition(ms, req, res);
-			return res;
+	public @ResponseBody Object setNodePosition(@RequestBody SetNodePositionRequest req, HttpSession session) {
+		return callProc.run("setNodePosition", req, session, ms -> {
+			return nodeMoveService.setNodePosition(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/createSubNode", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase createSubNode(@RequestBody CreateSubNodeRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("createSubNode", req, session, ms -> {
-			CreateSubNodeResponse res = new CreateSubNodeResponse();
-			nodeEditService.createSubNode(ms, req, res);
-			return res;
+	public @ResponseBody Object createSubNode(@RequestBody CreateSubNodeRequest req, HttpSession session) {
+		return callProc.run("createSubNode", req, session, ms -> {
+			return nodeEditService.createSubNode(ms, req);
 		});
 	}
 
@@ -514,30 +444,26 @@ public class AppController {
 	 * InsertNodeRequest.targetName
 	 */
 	@RequestMapping(value = API_PATH + "/insertNode", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase insertNode(@RequestBody InsertNodeRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("insertNode", req, session, ms -> {
-			InsertNodeResponse res = new InsertNodeResponse();
-			nodeEditService.insertNode(ms, req, res);
-			return res;
+	public @ResponseBody Object insertNode(@RequestBody InsertNodeRequest req, HttpSession session) {
+		return callProc.run("insertNode", req, session, ms -> {
+			return nodeEditService.insertNode(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/insertBook", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase insertBook(@RequestBody InsertBookRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("insertBook", req, session, ms -> {
-			InsertBookResponse res = new InsertBookResponse();
+	public @ResponseBody Object insertBook(@RequestBody InsertBookRequest req, HttpSession session) {
+		return callProc.run("insertBook", req, session, ms -> {
 			if (!sessionContext.isAdmin()) {
 				throw ExUtil.newEx("admin only function.");
 			}
 
-			importBookService.insertBook(ms, req, res);
-			return res;
+			return importBookService.insertBook(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/executeNode", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase executeNode(@RequestBody ExecuteNodeRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("executeNode", req, session, ms -> {
+	public @ResponseBody Object executeNode(@RequestBody ExecuteNodeRequest req, HttpSession session) {
+		return callProc.run("executeNode", req, session, ms -> {
 			ExecuteNodeResponse res = new ExecuteNodeResponse();
 
 			if (!sessionContext.isAdmin()) {
@@ -551,83 +477,65 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/deleteNodes", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase deleteNodes(@RequestBody DeleteNodesRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("deleteNodes", req, session, ms -> {
-			DeleteNodesResponse res = new DeleteNodesResponse();
-			nodeMoveService.deleteNodes(ms, req, res);
-			return res;
+	public @ResponseBody Object deleteNodes(@RequestBody DeleteNodesRequest req, HttpSession session) {
+		return callProc.run("deleteNodes", req, session, ms -> {
+			return nodeMoveService.deleteNodes(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/selectAllNodes", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase selectAllNodes(@RequestBody SelectAllNodesRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("selectAllNodes", req, session, ms -> {
-			SelectAllNodesResponse res = new SelectAllNodesResponse();
-			nodeMoveService.selectAllNodes(ms, req, res);
-			return res;
+	public @ResponseBody Object selectAllNodes(@RequestBody SelectAllNodesRequest req, HttpSession session) {
+		return callProc.run("selectAllNodes", req, session, ms -> {
+			return nodeMoveService.selectAllNodes(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/moveNodes", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase moveNodes(@RequestBody MoveNodesRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("moveNodes", req, session, ms -> {
-			MoveNodesResponse res = new MoveNodesResponse();
-			nodeMoveService.moveNodes(ms, req, res);
-			return res;
+	public @ResponseBody Object moveNodes(@RequestBody MoveNodesRequest req, HttpSession session) {
+		return callProc.run("moveNodes", req, session, ms -> {
+			return nodeMoveService.moveNodes(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/deleteProperty", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase deleteProperty(@RequestBody DeletePropertyRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("deleteProperty", req, session, ms -> {
-			DeletePropertyResponse res = new DeletePropertyResponse();
-			nodeEditService.deleteProperty(ms, req, res);
-			return res;
+	public @ResponseBody Object deleteProperty(@RequestBody DeletePropertyRequest req, HttpSession session) {
+		return callProc.run("deleteProperty", req, session, ms -> {
+			return nodeEditService.deleteProperty(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/saveNode", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("saveNode", req, session, ms -> {
-			SaveNodeResponse res = new SaveNodeResponse();
-			nodeEditService.saveNode(ms, req, res);
-			return res;
+	public @ResponseBody Object saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
+		return callProc.run("saveNode", req, session, ms -> {
+			return nodeEditService.saveNode(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/saveProperty", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase saveProperty(@RequestBody SavePropertyRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("saveProperty", req, session, ms -> {
-			SavePropertyResponse res = new SavePropertyResponse();
-			nodeEditService.saveProperty(ms, req, res);
-			return res;
+	public @ResponseBody Object saveProperty(@RequestBody SavePropertyRequest req, HttpSession session) {
+		return callProc.run("saveProperty", req, session, ms -> {
+			return nodeEditService.saveProperty(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/setNodeType", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase setNodeType(@RequestBody SetNodeTypeRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("setNodeType", req, session, ms -> {
-			SetNodeTypeResponse res = new SetNodeTypeResponse();
-			nodeEditService.setNodeType(ms, req, res);
-			return res;
+	public @ResponseBody Object setNodeType(@RequestBody SetNodeTypeRequest req, HttpSession session) {
+		return callProc.run("setNodeType", req, session, ms -> {
+			return nodeEditService.setNodeType(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/changePassword", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase changePassword(@RequestBody ChangePasswordRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("changePassword", req, session, ms -> {
-			ChangePasswordResponse res = new ChangePasswordResponse();
-			userManagerService.changePassword(ms, req, res);
-			return res;
+	public @ResponseBody Object changePassword(@RequestBody ChangePasswordRequest req, HttpSession session) {
+		return callProc.run("changePassword", req, session, ms -> {
+			return userManagerService.changePassword(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/resetPassword", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase resetPassword(@RequestBody ResetPasswordRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("resetPassword", req, session, ms -> {
-			ResetPasswordResponse res = new ResetPasswordResponse();
-			userManagerService.resetPassword(req, res);
-			return res;
+	public @ResponseBody Object resetPassword(@RequestBody ResetPasswordRequest req, HttpSession session) {
+		return callProc.run("resetPassword", req, session, ms -> {
+			return userManagerService.resetPassword(req);
 		});
 	}
 
@@ -640,9 +548,9 @@ public class AppController {
 	 * explanation.
 	 */
 	@RequestMapping(value = API_PATH + "/bin_legacy/{fileName}", method = RequestMethod.GET)
-	public ResponseEntity<InputStreamResource> getBinaryLegacy(@PathVariable("fileName") String fileName,
+	public Object getBinaryLegacy(@PathVariable("fileName") String fileName,
 			@RequestParam("nodeId") String nodeId, HttpSession session) {
-		return (ResponseEntity<InputStreamResource>) callProc.run("bin", null, session, ms -> {
+		return callProc.run("bin", null, session, ms -> {
 			return attachmentService.getBinary_legacy(null, nodeId);
 		});
 	}
@@ -664,13 +572,13 @@ public class AppController {
 	 * https://stackoverflow.com/questions/16332092/spring-mvc-pathvariable-with-dot
 	 * -is-getting- truncated
 	 */
-	@SuppressWarnings("unchecked") // <--- todo-0: do this everywhere
 	@RequestMapping(value = "/file/{fileName:.+}", method = RequestMethod.GET)
-	public ResponseEntity<StreamingResponseBody> getFile(//
+	public Object getFile(//
 			@PathVariable("fileName") String fileName, //
 			@RequestParam(name = "disp", required = false) String disposition, //
 			@RequestParam(name = "format", required = false) String formatted, HttpSession session) {
-		return (ResponseEntity<StreamingResponseBody>) callProc.run("file", null, session, ms -> {
+		return callProc.run("file", null, session, ms -> {
+			//todo-0: move this implementation stuff into the 'getFile'
 			boolean bFormatted = false;
 			if (formatted != null) {
 				String formattedLc = formatted.toLowerCase();
@@ -705,14 +613,11 @@ public class AppController {
 	 * -return-chunked-file </pre>
 	 */
 	@RequestMapping(value = "/filesys-xxx/{nodeId}", method = RequestMethod.GET)
-	public ResponseEntity<StreamingResponseBody> getFileSystemResourceStream(//
+	public Object getFileSystemResourceStream(//
 			@PathVariable("nodeId") String nodeId, //
 			@RequestParam(name = "disp", required = false) String disposition, //
 			HttpSession session) {
-		return (ResponseEntity<StreamingResponseBody>) callProc.run("filesys", null, session, ms -> {
-			if (!ms.isAdmin()) {
-				throw new RuntimeException("unauthorized");
-			}
+		return callProc.run("filesys", null, session, ms -> {
 			return attachmentService.getFileSystemResourceStream(ms, nodeId, disposition);
 		});
 	}
@@ -742,7 +647,6 @@ public class AppController {
 			HttpServletRequest request, HttpServletResponse response, //
 			HttpSession session) {
 		callProc.run("stream", null, session, ms -> {
-			log.debug("streaming nodeId: "+nodeId);
 			attachmentService.getStreamMultiPart(ms, nodeId, disp != null ? disp : "inline", request, response);
 			return null;
 		});
@@ -765,65 +669,50 @@ public class AppController {
 	//
 
 	@RequestMapping(value = API_PATH + "/upload", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> upload(//
+	public @ResponseBody Object upload(//
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
 			@RequestParam(value = "explodeZips", required = true) String explodeZips, //
 			@RequestParam(value = "ipfs", required = true) String ipfs, //
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
 			HttpSession session) {
-		return (ResponseEntity<?>) callProc.run("upload", null, session, ms -> {
-			if (nodeId == null) {
-				throw ExUtil.newEx("target nodeId not provided");
-			}
+		return callProc.run("upload", null, session, ms -> {
 			return attachmentService.uploadMultipleFiles(ms, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
 					"true".equalsIgnoreCase(ipfs));
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/deleteAttachment", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase deleteAttachment(@RequestBody DeleteAttachmentRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("deleteAttachment", req, session, ms -> {
-			DeleteAttachmentResponse res = new DeleteAttachmentResponse();
-
-			attachmentService.deleteAttachment(ms, req, res);
-			return res;
+	public @ResponseBody Object deleteAttachment(@RequestBody DeleteAttachmentRequest req, HttpSession session) {
+		return callProc.run("deleteAttachment", req, session, ms -> {
+			return attachmentService.deleteAttachment(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/uploadFromUrl", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase uploadFromUrl(@RequestBody UploadFromUrlRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("uploadFromUrl", req, session, ms -> {
-			UploadFromUrlResponse res = new UploadFromUrlResponse();
-			attachmentService.readFromUrl(ms, req, res);
-			return res;
+	public @ResponseBody Object uploadFromUrl(@RequestBody UploadFromUrlRequest req, HttpSession session) {
+		return callProc.run("uploadFromUrl", req, session, ms -> {
+			return attachmentService.readFromUrl(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/anonPageLoad", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase anonPageLoad(@RequestBody AnonPageLoadRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("anonPageLoad", req, session, ms -> {
-			AnonPageLoadResponse res = new AnonPageLoadResponse();
-			nodeRenderService.anonPageLoad(null, req, res);
-			return res;
+	public @ResponseBody Object anonPageLoad(@RequestBody AnonPageLoadRequest req, HttpSession session) {
+		return callProc.run("anonPageLoad", req, session, ms -> {
+			return nodeRenderService.anonPageLoad(null, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/nodeSearch", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase nodeSearch(@RequestBody NodeSearchRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("nodeSearch", req, session, ms -> {
-			NodeSearchResponse res = new NodeSearchResponse();
-			nodeSearchService.search(ms, req, res);
-			return res;
+	public @ResponseBody Object nodeSearch(@RequestBody NodeSearchRequest req, HttpSession session) {
+		return callProc.run("nodeSearch", req, session, ms -> {
+			return nodeSearchService.search(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/graphNodes", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase graphNodes(@RequestBody GraphRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("nodeSearch", req, session, ms -> {
-			GraphResponse res = new GraphResponse();
-			graphNodesService.graphNodes(ms, req, res);
-			log.debug("graphNodes ran on server.");
-			return res;
+	public @ResponseBody Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
+		return callProc.run("nodeSearch", req, session, ms -> {
+			return graphNodesService.graphNodes(ms, req);
 		});
 	}
 
@@ -846,18 +735,16 @@ public class AppController {
 	// }
 
 	@RequestMapping(value = API_PATH + "/saveUserPreferences", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase saveUserPreferences(@RequestBody SaveUserPreferencesRequest req,
+	public @ResponseBody Object saveUserPreferences(@RequestBody SaveUserPreferencesRequest req,
 			HttpSession session) {
-		return (ResponseBase) callProc.run("saveUserPreferences", req, session, ms -> {
-			SaveUserPreferencesResponse res = new SaveUserPreferencesResponse();
-			userManagerService.saveUserPreferences(req, res);
-			return res;
+		return callProc.run("saveUserPreferences", req, session, ms -> {
+			return userManagerService.saveUserPreferences(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getServerInfo", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase getServerInfo(@RequestBody GetServerInfoRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("getServerInfo", req, session, ms -> {
+	public @ResponseBody Object getServerInfo(@RequestBody GetServerInfoRequest req, HttpSession session) {
+		return callProc.run("getServerInfo", req, session, ms -> {
 			GetServerInfoResponse res = new GetServerInfoResponse();
 
 			if (req.getCommand().equalsIgnoreCase("getJson")) {
@@ -890,9 +777,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/luceneIndex", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase luceneIndex(@RequestBody LuceneIndexRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("luceneIndex", req, session, ms -> {
-			LuceneIndexResponse res = new LuceneIndexResponse();
+	public @ResponseBody Object luceneIndex(@RequestBody LuceneIndexRequest req, HttpSession session) {
+		return callProc.run("luceneIndex", req, session, ms -> {
 			if (!sessionContext.isAdmin()) {
 				throw ExUtil.newEx("admin only function.");
 			}
@@ -906,27 +792,20 @@ public class AppController {
 			 * at it or not, as they please, but it would be updating in near-realtime using
 			 * server push.
 			 */
-			String message = luceneService.reindex(ms, req.getNodeId(), req.getPath());
-			res.setSuccess(true);
-			res.setMessage(message);
-			return res;
+			return luceneService.reindex(ms, req.getNodeId(), req.getPath());
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/luceneSearch", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase luceneSearch(@RequestBody LuceneSearchRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("luceneSearch", req, session, ms -> {
-			LuceneSearchResponse res = new LuceneSearchResponse();
-			String message = luceneService.search(ms, req.getNodeId(), req.getText());
-			res.setSuccess(true);
-			res.setMessage(message);
-			return res;
+	public @ResponseBody Object luceneSearch(@RequestBody LuceneSearchRequest req, HttpSession session) {
+		return callProc.run("luceneSearch", req, session, ms -> {
+			return luceneService.search(ms, req.getNodeId(), req.getText());
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getNotifications", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase getNotifications(@RequestBody GetServerInfoRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("getNotifications", req, session, ms -> {
+	public @ResponseBody Object getNotifications(@RequestBody GetServerInfoRequest req, HttpSession session) {
+		return callProc.run("getNotifications", req, session, ms -> {
 			GetServerInfoResponse res = new GetServerInfoResponse();
 
 			if (sessionContext.getSignupSuccessMessage() != null) {
@@ -940,8 +819,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/ping", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase ping(@RequestBody PingRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("ping", req, session, ms -> {
+	public @ResponseBody Object ping(@RequestBody PingRequest req, HttpSession session) {
+		return callProc.run("ping", req, session, ms -> {
 			PingResponse res = new PingResponse();
 			res.setServerInfo("Server: t=" + System.currentTimeMillis());
 			res.setSuccess(true);
@@ -950,8 +829,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/rebuildIndexes", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase rebuildIndexes(@RequestBody RebuildIndexesRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("rebuildIndexes", req, session, ms -> {
+	public @ResponseBody Object rebuildIndexes(@RequestBody RebuildIndexesRequest req, HttpSession session) {
+		return callProc.run("rebuildIndexes", req, session, ms -> {
 			RebuildIndexesResponse res = new RebuildIndexesResponse();
 			if (!sessionContext.isAdmin()) {
 				throw ExUtil.newEx("admin only function.");
@@ -962,15 +841,14 @@ public class AppController {
 			});
 
 			res.setSuccess(true);
-
 			return res;
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/shutdownServerNode", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase shutdownServerNode(@RequestBody ShutdownServerNodeRequest req,
+	public @ResponseBody Object shutdownServerNode(@RequestBody ShutdownServerNodeRequest req,
 			HttpSession session) {
-		return (ResponseBase) callProc.run("shutdownServerNode", req, session, ms -> {
+		return callProc.run("shutdownServerNode", req, session, ms -> {
 			ShutdownServerNodeResponse res = new ShutdownServerNodeResponse();
 			if (!sessionContext.isAdmin()) {
 				throw ExUtil.newEx("admin only function.");
@@ -995,8 +873,8 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/sendTestEmail", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase sendTestEmail(@RequestBody SendTestEmailRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("sendTestEmail", req, session, ms -> {
+	public @ResponseBody Object sendTestEmail(@RequestBody SendTestEmailRequest req, HttpSession session) {
+		return callProc.run("sendTestEmail", req, session, ms -> {
 			SendTestEmailResponse res = new SendTestEmailResponse();
 			if (!sessionContext.isAdmin()) {
 				throw ExUtil.newEx("admin only function.");
@@ -1019,11 +897,9 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/splitNode", method = RequestMethod.POST)
-	public @ResponseBody ResponseBase splitNode(@RequestBody SplitNodeRequest req, HttpSession session) {
-		return (ResponseBase) callProc.run("splitNode", req, session, ms -> {
-			SplitNodeResponse res = new SplitNodeResponse();
-			nodeEditService.splitNode(ms, req, res);
-			return res;
+	public @ResponseBody Object splitNode(@RequestBody SplitNodeRequest req, HttpSession session) {
+		return callProc.run("splitNode", req, session, ms -> {
+			return nodeEditService.splitNode(ms, req);
 		});
 	}
 

@@ -87,6 +87,10 @@ public class AttachmentService {
 	 */
 	public ResponseEntity<?> uploadMultipleFiles(MongoSession session, String nodeId, MultipartFile[] uploadFiles,
 			boolean explodeZips, boolean toIpfs) {
+		if (nodeId == null) {
+			throw ExUtil.newEx("target nodeId not provided");
+		}
+
 		try {
 			if (session == null) {
 				session = ThreadLocals.getMongoSession();
@@ -304,7 +308,8 @@ public class AttachmentService {
 	/*
 	 * Removes the attachment from the node specified in the request.
 	 */
-	public void deleteAttachment(MongoSession session, DeleteAttachmentRequest req, DeleteAttachmentResponse res) {
+	public DeleteAttachmentResponse deleteAttachment(MongoSession session, DeleteAttachmentRequest req) {
+		DeleteAttachmentResponse res = new DeleteAttachmentResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -314,6 +319,7 @@ public class AttachmentService {
 		deleteAllBinaryProperties(node);
 		api.saveSession(session);
 		res.setSuccess(true);
+		return res;
 	}
 
 	/*
@@ -536,6 +542,10 @@ public class AttachmentService {
 
 	public ResponseEntity<StreamingResponseBody> getFileSystemResourceStream(MongoSession session, String nodeId,
 			String disposition) {
+		if (!session.isAdmin()) {
+			throw new RuntimeException("unauthorized");
+		}
+
 		try {
 			SubNode node = api.getNode(session, nodeId, false);
 			if (node == null) {
@@ -640,7 +650,8 @@ public class AttachmentService {
 					.withDisposition(disposition)//
 					.withFileName("file-" + node.getId().toHexString())//
 					.withLength(size)//
-					//.withContentType(mimeTypeProp)//todo-0 removing this was a WAG, see if it works with thsi back in
+					// .withContentType(mimeTypeProp)//todo-0 removing this was a WAG, see if it
+					// works with thsi back in
 					.withLastModified(node.getModifyTime().getTime())//
 					.serveResource();
 		} catch (Exception e) {
@@ -655,9 +666,11 @@ public class AttachmentService {
 	 * arbitrary internet URL they have provided, that could be pointing to an image
 	 * or any other kind of content actually.
 	 */
-	public void readFromUrl(MongoSession session, UploadFromUrlRequest req, UploadFromUrlResponse res) {
+	public UploadFromUrlResponse readFromUrl(MongoSession session, UploadFromUrlRequest req) {
+		UploadFromUrlResponse res = new UploadFromUrlResponse();
 		readFromUrl(session, req.getSourceUrl(), req.getNodeId(), null, null);
 		res.setSuccess(true);
+		return res;
 	}
 
 	/**

@@ -73,7 +73,8 @@ public class NodeEditService {
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request.
 	 */
-	public void createSubNode(MongoSession session, CreateSubNodeRequest req, CreateSubNodeResponse res) {
+	public CreateSubNodeResponse createSubNode(MongoSession session, CreateSubNodeRequest req) {
+		CreateSubNodeResponse res = new CreateSubNodeResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -95,9 +96,11 @@ public class NodeEditService {
 		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false, false,
 				false));
 		res.setSuccess(true);
+		return res;
 	}
 
-	public void appDrop(MongoSession session, AppDropRequest req, AppDropResponse res) {
+	public AppDropResponse appDrop(MongoSession session, AppDropRequest req) {
+		AppDropResponse res = new AppDropResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -110,7 +113,7 @@ public class NodeEditService {
 		if (!lcData.startsWith("http://") && !lcData.startsWith("https://") && !lcData.startsWith("file://")) {
 			log.info("Drop even ignored: " + data);
 			res.setMessage("Sorry, can't drop that there.");
-			return;
+			return res;
 		}
 
 		String userNodeHexId = session.getUserNode().getId().toHexString();
@@ -129,13 +132,15 @@ public class NodeEditService {
 		api.save(session, newNode);
 
 		res.setMessage("Drop Accepted: Created link to: " + data);
+		return res;
 	}
 
 	/*
 	 * Creates a new node that is a sibling (same parent) of and at the same ordinal
 	 * position as the node specified in the request.
 	 */
-	public void insertNode(MongoSession session, InsertNodeRequest req, InsertNodeResponse res) {
+	public InsertNodeResponse insertNode(MongoSession session, InsertNodeRequest req) {
+		InsertNodeResponse res = new InsertNodeResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -156,12 +161,14 @@ public class NodeEditService {
 				false));
 		// }
 		res.setSuccess(true);
+		return res;
 	}
 
 	/*
 	 * Saves the value(s) of properties on the node specified in the request.
 	 */
-	public void saveProperty(MongoSession session, SavePropertyRequest req, SavePropertyResponse res) {
+	public SavePropertyResponse saveProperty(MongoSession session, SavePropertyRequest req) {
+		SavePropertyResponse res = new SavePropertyResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -173,9 +180,11 @@ public class NodeEditService {
 		PropertyInfo propertySaved = new PropertyInfo(req.getPropertyName(), req.getPropertyValue());
 		res.setPropertySaved(propertySaved);
 		res.setSuccess(true);
+		return res;
 	}
 
-	public void setNodeType(MongoSession session, SetNodeTypeRequest req, SetNodeTypeResponse res) {
+	public SetNodeTypeResponse setNodeType(MongoSession session, SetNodeTypeRequest req) {
+		SetNodeTypeResponse res = new SetNodeTypeResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -201,9 +210,11 @@ public class NodeEditService {
 
 		api.save(session, node);
 		res.setSuccess(true);
+		return res;
 	}
 
-	public void saveNode(MongoSession session, SaveNodeRequest req, SaveNodeResponse res) {
+	public SaveNodeResponse saveNode(MongoSession session, SaveNodeRequest req) {
+		SaveNodeResponse res = new SaveNodeResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -284,13 +295,15 @@ public class NodeEditService {
 		}
 
 		res.setSuccess(true);
+		return res;
 	}
 
 	/*
 	 * Removes the property specified in the request from the node specified in the
 	 * request
 	 */
-	public void deleteProperty(MongoSession session, DeletePropertyRequest req, DeletePropertyResponse res) {
+	public DeletePropertyResponse deleteProperty(MongoSession session, DeletePropertyRequest req) {
+		DeletePropertyResponse res = new DeletePropertyResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -300,6 +313,7 @@ public class NodeEditService {
 		node.deleteProp(propertyName);
 		api.save(session, node);
 		res.setSuccess(true);
+		return res;
 	}
 
 	/*
@@ -308,7 +322,8 @@ public class NodeEditService {
 	 * splitpoints, and this splitNode method will break it all up into individual
 	 * nodes.
 	 */
-	public void splitNode(MongoSession session, SplitNodeRequest req, SplitNodeResponse res) {
+	public SplitNodeResponse splitNode(MongoSession session, SplitNodeRequest req) {
+		SplitNodeResponse res = new SplitNodeResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -328,7 +343,7 @@ public class NodeEditService {
 		 */
 		if (!containsDelim) {
 			res.setSuccess(true);
-			return;
+			return res;
 		}
 
 		String[] contentParts = StringUtils.splitByWholeSeparator(content, req.getDelimiter());
@@ -374,9 +389,11 @@ public class NodeEditService {
 		}
 
 		res.setSuccess(true);
+		return res;
 	}
 
-	public void transferNode(MongoSession session, TransferNodeRequest req, TransferNodeResponse res) {
+	public TransferNodeResponse transferNode(MongoSession session, TransferNodeRequest req) {
+		TransferNodeResponse res = new TransferNodeResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -420,6 +437,7 @@ public class NodeEditService {
 
 		res.setMessage(String.valueOf(transfers) + " nodes were transferred.");
 		res.setSuccess(true);
+		return res;
 	}
 
 	/* Returns true if a transfer was done */

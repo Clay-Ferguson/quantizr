@@ -29,6 +29,9 @@ public class ImportService {
 	private MongoApi api;
 
 	public ResponseEntity<?> streamImport(MongoSession session, String nodeId, MultipartFile[] uploadFiles) {
+		if (nodeId == null) {
+			throw ExUtil.newEx("target nodeId not provided");
+		}
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}

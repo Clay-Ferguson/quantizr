@@ -55,7 +55,8 @@ public class AclService {
 	/**
 	 * Returns the privileges that exist on the node identified in the request.
 	 */
-	public void getNodePrivileges(MongoSession session, GetNodePrivilegesRequest req, GetNodePrivilegesResponse res) {
+	public GetNodePrivilegesResponse getNodePrivileges(MongoSession session, GetNodePrivilegesRequest req) {
+		GetNodePrivilegesResponse res = new GetNodePrivilegesResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -78,12 +79,14 @@ public class AclService {
 		}
 
 		res.setSuccess(true);
+		return res;
 	}
 
 	/*
 	 * Adds or updates a new privilege to a node
 	 */
-	public void addPrivilege(MongoSession session, AddPrivilegeRequest req, AddPrivilegeResponse res) {
+	public AddPrivilegeResponse addPrivilege(MongoSession session, AddPrivilegeRequest req) {
+		AddPrivilegeResponse res = new AddPrivilegeResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -94,12 +97,14 @@ public class AclService {
 
 		boolean success = addPrivilege(session, node, req.getPrincipal(), req.getPrivileges(), res);
 		res.setSuccess(success);
+		return res;
 	}
 
 	/*
 	 * Adds or updates a new privilege to a node
 	 */
-	public void setCipherKey(MongoSession session, SetCipherKeyRequest req, SetCipherKeyResponse res) {
+	public SetCipherKeyResponse setCipherKey(MongoSession session, SetCipherKeyRequest req) {
+		SetCipherKeyResponse res = new SetCipherKeyResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -115,6 +120,7 @@ public class AclService {
 
 		boolean success = setCipherKey(session, node, req.getPrincipalNodeId(), req.getCipherKey(), res);
 		res.setSuccess(success);
+		return res;
 	}
 
 	public boolean setCipherKey(MongoSession session, SubNode node, String principalNodeId, String cipherKey,
@@ -302,7 +308,8 @@ public class AclService {
 	 * Removes the privilege specified in the request from the node specified in the
 	 * request
 	 */
-	public void removePrivilege(MongoSession session, RemovePrivilegeRequest req, RemovePrivilegeResponse res) {
+	public RemovePrivilegeResponse removePrivilege(MongoSession session, RemovePrivilegeRequest req) {
+		RemovePrivilegeResponse res = new RemovePrivilegeResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -316,6 +323,7 @@ public class AclService {
 
 		removeAclEntry(session, node, principalNodeId, privilege);
 		res.setSuccess(true);
+		return res;
 	}
 
 	public List<String> getOwnerNames(MongoSession session, SubNode node) {

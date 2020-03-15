@@ -41,7 +41,8 @@ public class NodeMoveService {
 	 * We allow the special case of req.siblingId="[topNode]" and that indicates
 	 * move the node to be the first node under its parent.
 	 */
-	public void setNodePosition(MongoSession session, SetNodePositionRequest req, SetNodePositionResponse res) {
+	public SetNodePositionResponse setNodePosition(MongoSession session, SetNodePositionRequest req) {
+		SetNodePositionResponse res = new SetNodePositionResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -66,6 +67,7 @@ public class NodeMoveService {
 		}
 
 		res.setSuccess(true);
+		return res;
 	}
 
 	public void moveNodeUp(MongoSession session, SubNode node) {
@@ -120,7 +122,8 @@ public class NodeMoveService {
 	/*
 	 * Deletes the set of nodes specified in the request
 	 */
-	public void deleteNodes(MongoSession session, DeleteNodesRequest req, DeleteNodesResponse res) {
+	public DeleteNodesResponse deleteNodes(MongoSession session, DeleteNodesRequest req) {
+		DeleteNodesResponse res = new DeleteNodesResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -132,6 +135,7 @@ public class NodeMoveService {
 		// no need to save session after deletes.
 		// api.saveSession(session);
 		res.setSuccess(true);
+		return res;
 	}
 
 	private void deleteNode(MongoSession session, String nodeId) {
@@ -150,12 +154,14 @@ public class NodeMoveService {
 	 * Moves a set of nodes to a new location, underneath (i.e. children of) the
 	 * target node specified.
 	 */
-	public void moveNodes(MongoSession session, MoveNodesRequest req, MoveNodesResponse res) {
+	public MoveNodesResponse moveNodes(MongoSession session, MoveNodesRequest req) {
+		MoveNodesResponse res = new MoveNodesResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
 
 		moveNodesInternal(session, req, res);
+		return res;
 	}
 
 	private void moveNodesInternal(MongoSession session, MoveNodesRequest req, MoveNodesResponse res) {
@@ -237,7 +243,8 @@ public class NodeMoveService {
 		}
 	}
 
-	public void selectAllNodes(MongoSession session, SelectAllNodesRequest req, SelectAllNodesResponse res) {
+	public SelectAllNodesResponse selectAllNodes(MongoSession session, SelectAllNodesRequest req) {
+		SelectAllNodesResponse res = new SelectAllNodesResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -247,5 +254,6 @@ public class NodeMoveService {
 		List<String> nodeIds = api.getChildrenIds(session, node, false, null);
 		res.setNodeIds(nodeIds);
 		res.setSuccess(true);
+		return res;
 	}
 }

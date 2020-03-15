@@ -93,8 +93,7 @@ public class RepositoryUtil {
 					signupReq.setPassword(accountInfoList.get(1));
 					signupReq.setEmail(accountInfoList.get(2));
 
-					SignupResponse res = new SignupResponse();
-					userManagerService.signup(signupReq, res, true);
+					userManagerService.signup(signupReq, true);
 				}
 				else {
 					log.debug("account exists: "+userName);

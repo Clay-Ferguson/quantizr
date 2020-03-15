@@ -46,7 +46,8 @@ public class NodeSearchService {
 	@Autowired
 	private SessionContext sessionContext;
 
-	public void search(MongoSession session, NodeSearchRequest req, NodeSearchResponse res) {
+	public NodeSearchResponse search(MongoSession session, NodeSearchRequest req) {
+		NodeSearchResponse res = new NodeSearchResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -94,6 +95,7 @@ public class NodeSearchService {
 		}
 		res.setSuccess(true);
 		log.debug("search results count: " + counter);
+		return res;
 	}
 
 }
