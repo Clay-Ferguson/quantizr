@@ -491,15 +491,11 @@ public class AttachmentService {
 		}
 	}
 
-	/*
-	 * formatted==true indicates we will be sending back actually an HTML response
-	 * that does the bare minimum to load the markdown into the google marked
-	 * component and render it.
-	 * 
+	/**
 	 * Downloads a file by name that is expected to be in the Admin Data Folder
 	 */
-	public ResponseEntity<StreamingResponseBody> getFile(MongoSession session, String fileName, String disposition,
-			boolean formatted) {
+	public ResponseEntity<StreamingResponseBody> getFile(MongoSession session, String fileName, String disposition) {
+
 		if (fileName.contains(".."))
 			throw ExUtil.newEx("bad request.");
 

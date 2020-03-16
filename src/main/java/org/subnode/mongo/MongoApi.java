@@ -1415,15 +1415,12 @@ public class MongoApi {
 							// if (!exists) {
 							SubNode subNode = getNode(session, id);
 							if (subNode == null) {
-								// log.debug("Grid Orphan Delete: " + id.toHexString());
+								log.debug("Grid Orphan Delete: " + id.toHexString());
 
 								// I ran across this online (not sure why it's better than Criteria, and never
 								// researched it)
-								// Query query = new Query(GridFsCriteria.where("_id").is(id.toHexString()));
-
-								// todo-0: it would be better here to just delete by using the 'file.id' rather
-								// than a metadata query.
-								Query query = new Query(Criteria.where("metadata.nodeId").is(id));
+								// Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
+								Query query = new Query(Criteria.where("_id").is(file.getId()));
 								grid.delete(query);
 								delCount++;
 							} else {

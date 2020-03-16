@@ -289,7 +289,7 @@ public class AppController {
 	@RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
 	public @ResponseBody Object login(@RequestBody LoginRequest req, HttpSession session) {
 		return callProc.run("login", req, session, ms -> {
-			++sessionContext.counter; //todo-0: this counter is not a goog place to count. Should rely on actual session counting (session listener) ?
+			++sessionContext.counter; //todo-0: this counter is not a good place to count. Should rely on actual session counting (session listener) ?
 			return userManagerService.login(null, req);
 		});
 	}
@@ -576,15 +576,9 @@ public class AppController {
 	public Object getFile(//
 			@PathVariable("fileName") String fileName, //
 			@RequestParam(name = "disp", required = false) String disposition, //
-			@RequestParam(name = "format", required = false) String formatted, HttpSession session) {
+			HttpSession session) {
 		return callProc.run("file", null, session, ms -> {
-			//todo-0: move this implementation stuff into the 'getFile'
-			boolean bFormatted = false;
-			if (formatted != null) {
-				String formattedLc = formatted.toLowerCase();
-				bFormatted = formattedLc.startsWith("t") || formattedLc.startsWith("y");
-			}
-			return attachmentService.getFile(ms, fileName, disposition, bFormatted);
+			return attachmentService.getFile(ms, fileName, disposition);
 		});
 	}
 
