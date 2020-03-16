@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
  */
 public class MultipartFileSender {
 
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private static final int DEFAULT_BUFFER_SIZE = 4096; //20480; // ..bytes = 20KB.
+    private static final int DEFAULT_BUFFER_SIZE = 4096;
     private static final long DEFAULT_EXPIRE_TIME = 604800000L; // ..ms = 1 week.
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
 
@@ -119,10 +119,6 @@ public class MultipartFileSender {
         return this;
     }
 
-    /*
-     * Need to doublecheck if we should be flushing the output and then closing the
-     * streams ? todo-0
-     */
     public void serveResource() throws Exception {
         if (response == null || request == null) {
             return;
@@ -130,7 +126,7 @@ public class MultipartFileSender {
 
         if (filepath != null) {
             if (!Files.exists(filepath)) {
-                logger.error("File doesn't exist at URI : {}", filepath.toAbsolutePath().toString());
+                log.error("File doesn't exist at URI : {}", filepath.toAbsolutePath().toString());
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
@@ -151,7 +147,7 @@ public class MultipartFileSender {
         }
 
         if (length == null || fileName == null || lastModified == 0) {
-            logger.error("Request missingn some args"); // todo-1: we could do more robust reporting here.
+            log.error("Request missingn some args"); // todo-1: we could do more robust reporting here.
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -257,37 +253,25 @@ public class MultipartFileSender {
         // Prepare and initialize response
         // --------------------------------------------------------
 
-        // Get content type by file name and set content disposition.
-        // WCF: changing to a 'with(disposition)'
-        // String disposition = "inline";
-
         // If content type is unknown, then set the default value.
         // For all content types, see: http://www.w3schools.com/media/media_mimeref.asp
         // To add new content types, add new mime-mapping entry in web.xml.
-
-        // what was I doing in here? it works with just octet-stream... but maybe if the
-        // user is just downloading is breaks???
-        // so this just needs to be re-investigated soon: todo-0
         if (contentType == null) {
-            // I'm not sure when streaming if we need to set this as the content or not?
-            // todo-0
             contentType = "application/octet-stream";
-        } else if (!contentType.startsWith("image")) {
-            // Else, expect for images, determine content disposition. If content type is
-            // supported by
-            // the browser, then set to inline, else attachment which will pop a 'save as'
-            // dialogue.
+        } else if (!contentType.startsWith("image") && disposition == null) {
+            /*
+             * Else, except for images, determine content disposition. If content type is
+             * supported by the browser, then set to inline, else attachment which will pop
+             * a 'save as' dialogue.
+             */
             String accept = request.getHeader("Accept");
             disposition = accept != null && HttpUtils.accepts(accept, contentType) ? "inline" : "attachment";
         }
-        //logger.debug("Content-Type : {}", contentType);
 
-        // Initialize response.
         response.reset();
         response.setBufferSize(DEFAULT_BUFFER_SIZE);
         response.setHeader("Content-Type", contentType);
         response.setHeader("Content-Disposition", disposition + ";filename=\"" + fileName + "\"");
-        logger.debug("Content-Disposition : {}", disposition);
         response.setHeader("Accept-Ranges", "bytes");
         response.setHeader("ETag", fileName);
         response.setDateHeader("Last-Modified", lastModified);
@@ -297,9 +281,9 @@ public class MultipartFileSender {
         // ------------------------------------------------
 
         // Prepare streams.
-        InputStream input=null;
+        InputStream input = null;
         try {
-            //If inputStream is null then expect filepath to exist to read a stream from
+            // If inputStream is null then expect filepath to exist to read a stream from
             if (inputStream == null && filepath != null) {
                 input = new BufferedInputStream(Files.newInputStream(filepath));
             } else {
@@ -311,7 +295,7 @@ public class MultipartFileSender {
             if (ranges.isEmpty() || ranges.get(0) == full) {
 
                 // Return full file.
-                logger.info("Return full file");
+                //log.info("Return full file");
                 response.setContentType(contentType);
                 response.setHeader("Content-Range", "bytes " + full.start + "-" + full.end + "/" + full.total);
                 response.setHeader("Content-Length", String.valueOf(full.length));
@@ -321,7 +305,7 @@ public class MultipartFileSender {
 
                 // Return single part of file.
                 Range r = ranges.get(0);
-                logger.info("Return 1 part of file : from ({}) to ({})", r.start, r.end);
+                log.info("Return 1 part of file : from ({}) to ({})", r.start, r.end);
                 response.setContentType(contentType);
                 response.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
                 response.setHeader("Content-Length", String.valueOf(r.length));
@@ -341,7 +325,7 @@ public class MultipartFileSender {
 
                 // Copy multi part range.
                 for (Range r : ranges) {
-                    logger.info("Return multi part of file : from ({}) to ({})", r.start, r.end);
+                    log.info("Return multi part of file : from ({}) to ({})", r.start, r.end);
                     // Add multipart boundary and header fields for every range.
                     sos.println();
                     sos.println("--" + MULTIPART_BOUNDARY);
@@ -367,13 +351,6 @@ public class MultipartFileSender {
         long length;
         long total;
 
-        /**
-         * Construct a byte range.
-         * 
-         * @param start Start of the byte range.
-         * @param end   End of the byte range.
-         * @param total Total length of the byte source.
-         */
         public Range(long start, long end, long total) {
             this.start = start;
             this.end = end;
@@ -395,6 +372,8 @@ public class MultipartFileSender {
                 throws IOException {
             byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
             int read;
+
+            //todo-0: try putting a single flush at end, instead of flushing each buffer.
 
             if (inputSize == length) {
                 // Write full range.

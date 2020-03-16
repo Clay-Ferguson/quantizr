@@ -289,7 +289,6 @@ public class AppController {
 	@RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
 	public @ResponseBody Object login(@RequestBody LoginRequest req, HttpSession session) {
 		return callProc.run("login", req, session, ms -> {
-			++sessionContext.counter; //todo-0: this counter is not a good place to count. Should rely on actual session counting (session listener) ?
 			return userManagerService.login(null, req);
 		});
 	}

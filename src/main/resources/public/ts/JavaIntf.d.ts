@@ -526,6 +526,10 @@ export const enum NodeProp {
     USER_PREF_IMPORT_ALLOWED = "sn:importAllowed",
     USER_PREF_EXPORT_ALLOWED = "sn:exportAllowed",
     USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth",
+
+    /* amount of storage space user is allow to upload into attachments */
+    USER_BIN_QUOTA = "sn:binQuota",
+    
     SIGNUP_PENDING = "sn:signupPending",
     EMAIL_CONTENT = "sn:content",
     EMAIL_RECIP = "sn:recip",

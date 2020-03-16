@@ -168,21 +168,16 @@ public class UserManagerService {
 		return res;
 	}
 
+	/** 
+	 * @param session
+	 * @param userStats Holds a map of User Root Node (account node) IDs as key mapped to the UserStats for that user.
+	 */
 	public void writeUserStats(final MongoSession session, HashMap<ObjectId, UserStats> userStats) {
 		userStats.forEach((final ObjectId key, final UserStats stat) -> {
 			SubNode node = api.getNode(session, key);
 			if (node != null) {
 				node.setProp(NodeProp.BIN_TOTAL.s(), stat.binUsage);
-			} else {
-				/*
-				 * this case will indicate an indirectly, that there are nodes in the 'tree'
-				 * that currently have no ultimate user root node (account node), so this means
-				 * out orphan cleanup also needs to do the 'tree' in addition to just the
-				 * 'grid'/binaries
-				 * 
-				 * todo-0: address this issue.
-				 */
-			}
+			} 
 		});
 	}
 
@@ -279,7 +274,7 @@ public class UserManagerService {
 			initNewUser(session, userName, password, email, automated);
 		}
 
-		res.setMessage("success: " + String.valueOf(++sessionContext.counter));
+		res.setMessage("success");
 		res.setSuccess(true);
 		return res;
 	}

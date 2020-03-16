@@ -296,8 +296,7 @@ public class MongoApi {
 		save(session, node, true, true);
 	}
 
-	public void save(MongoSession session, SubNode node, boolean updateThreadCache,
-			boolean allowAuth) {
+	public void save(MongoSession session, SubNode node, boolean updateThreadCache, boolean allowAuth) {
 		if (allowAuth) {
 			auth(session, node, PrivilegeType.WRITE);
 		}
@@ -469,8 +468,8 @@ public class MongoApi {
 	 * 
 	 * relPath can be null if no path is known
 	 */
-	public SubNode createNode(MongoSession session, SubNode parent, String relPath, String type,
-			Long ordinal, CreateNodeLocation location) {
+	public SubNode createNode(MongoSession session, SubNode parent, String relPath, String type, Long ordinal,
+			CreateNodeLocation location) {
 		if (relPath == null) {
 			/*
 			 * Adding a node ending in '?' will trigger for the system to generate a leaf
@@ -498,8 +497,8 @@ public class MongoApi {
 		return node;
 	}
 
-	private Long prepOrdinalForLocation(MongoSession session, CreateNodeLocation location,
-			SubNode parent, Long ordinal) {
+	private Long prepOrdinalForLocation(MongoSession session, CreateNodeLocation location, SubNode parent,
+			Long ordinal) {
 		switch (location) {
 			case FIRST:
 				ordinal = 0L;
@@ -526,8 +525,7 @@ public class MongoApi {
 	 * be inserted into this newly available range of unused sequential ordinal
 	 * values (range of 'ordinal+1' thru 'ordinal+1+rangeSize')
 	 */
-	public void insertOrdinal(MongoSession session, SubNode node, long ordinal,
-			long rangeSize) {
+	public void insertOrdinal(MongoSession session, SubNode node, long ordinal, long rangeSize) {
 		long maxOrdinal = 0;
 
 		/*
@@ -822,8 +820,7 @@ public class MongoApi {
 		return ret.size() == 0 ? null : ret;
 	}
 
-	public AccessControlInfo createAccessControlInfo(MongoSession session, String principalId,
-			String authType) {
+	public AccessControlInfo createAccessControlInfo(MongoSession session, String principalId, String authType) {
 		String principalName = null;
 		String publicKey = null;
 
@@ -963,8 +960,7 @@ public class MongoApi {
 		return Convert.getImageSize(node);
 	}
 
-	public List<SubNode> getChildrenAsList(MongoSession session, SubNode node, boolean ordered,
-			Integer limit) {
+	public List<SubNode> getChildrenAsList(MongoSession session, SubNode node, boolean ordered, Integer limit) {
 		Iterable<SubNode> iter = getChildren(session, node,
 				ordered ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, limit);
 		if (!iter.iterator().hasNext()) {
@@ -975,8 +971,7 @@ public class MongoApi {
 		return list;
 	}
 
-	public List<String> getChildrenIds(MongoSession session, SubNode node, boolean ordered,
-			Integer limit) {
+	public List<String> getChildrenIds(MongoSession session, SubNode node, boolean ordered, Integer limit) {
 		auth(session, node, PrivilegeType.READ);
 
 		Query query = new Query();
@@ -1015,8 +1010,7 @@ public class MongoApi {
 	 * If node is null it's path is considered empty string, and it represents the
 	 * 'root' of the tree. There is no actual NODE that is root node
 	 */
-	public Iterable<SubNode> getChildren(MongoSession session, SubNode node, Sort sort,
-			Integer limit) {
+	public Iterable<SubNode> getChildren(MongoSession session, SubNode node, Sort sort, Integer limit) {
 		auth(session, node, PrivilegeType.READ);
 
 		Query query = new Query();
@@ -1099,8 +1093,7 @@ public class MongoApi {
 		// todo-2: research if there's a way to query for just one, rather than simply
 		// calling findOne at the end? What's best practice here?
 		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-				.regex(regexDirectChildrenOfPath(node.getParentPath()));
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(node.getParentPath()));
 		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
 		query.addCriteria(criteria);
 
@@ -1121,8 +1114,7 @@ public class MongoApi {
 		// todo-2: research if there's a way to query for just one, rather than simply
 		// calling findOne at the end? What's best practice here?
 		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-				.regex(regexDirectChildrenOfPath(node.getParentPath()));
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(node.getParentPath()));
 		query.with(Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
 		query.addCriteria(criteria);
 
@@ -1161,8 +1153,7 @@ public class MongoApi {
 		 * before the end of the string. Without the trailing (.+)$ we would be
 		 * including the node itself in addition to all its children.
 		 */
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-				.regex(regexRecursiveChildrenOfPath(node.getPath()));
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexRecursiveChildrenOfPath(node.getPath()));
 		query.addCriteria(criteria);
 
 		return ops.find(query, SubNode.class);
@@ -1173,9 +1164,8 @@ public class MongoApi {
 	 * 
 	 * WARNING. "SubNode.prp" is a COLLECTION and therefore not searchable. Beware.
 	 */
-	public Iterable<SubNode> searchSubGraph(MongoSession session, SubNode node, String prop,
-			String text, String sortField, int limit, boolean fuzzy,
-			boolean caseSensitive) {
+	public Iterable<SubNode> searchSubGraph(MongoSession session, SubNode node, String prop, String text,
+			String sortField, int limit, boolean fuzzy, boolean caseSensitive) {
 		auth(session, node, PrivilegeType.READ);
 
 		Query query = new Query();
@@ -1185,8 +1175,7 @@ public class MongoApi {
 		 * before the end of the string. Without the trailing (.+)$ we would be
 		 * including the node itself in addition to all its children.
 		 */
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-				.regex(regexRecursiveChildrenOfPath(node.getPath()));
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexRecursiveChildrenOfPath(node.getPath()));
 		query.addCriteria(criteria);
 
 		if (!StringUtils.isEmpty(text)) {
@@ -1329,8 +1318,7 @@ public class MongoApi {
 		ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC));
 	}
 
-	public void createIndex(MongoSession session, Class<?> clazz, String property,
-			Direction dir) {
+	public void createIndex(MongoSession session, Class<?> clazz, String property, Direction dir) {
 		requireAdmin(session);
 		ops.indexOps(clazz).ensureIndex(new Index().on(property, dir));
 	}
@@ -1396,6 +1384,11 @@ public class MongoApi {
 	 * 
 	 * Also keeps totals by each user account, in a hashmap to be written all out at
 	 * the end to all the nodes.
+	 * 
+	 * todo-1: There's another type of background procesing that is potentially
+	 * slow/challenging which is to remove all nodes that don't have a parent. How
+	 * to do that effeciently will take some thought. These are just ordinary tree nodes
+	 * that are orphans
 	 */
 	public void gridMaintenanceScan() {
 		HashMap<ObjectId, UserStats> statsMap = new HashMap<ObjectId, UserStats>();
@@ -1443,8 +1436,8 @@ public class MongoApi {
 		});
 	}
 
-	public void writeStream(MongoSession session, SubNode node, InputStream stream, String fileName,
-			String mimeType, String propName) {
+	public void writeStream(MongoSession session, SubNode node, InputStream stream, String fileName, String mimeType,
+			String propName) {
 
 		auth(session, node, PrivilegeType.WRITE);
 
@@ -1473,8 +1466,8 @@ public class MongoApi {
 		node.setProp(propName, new SubNodePropVal(id));
 	}
 
-	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream,
-			String fileName, String mimeType, String propName) {
+	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream, String fileName,
+			String mimeType, String propName) {
 
 		auth(session, node, PrivilegeType.WRITE);
 
@@ -1502,8 +1495,7 @@ public class MongoApi {
 		grid.delete(new Query(Criteria.where("_id").is(id)));
 	}
 
-	public InputStream getStream(MongoSession session, SubNode node, String propName, boolean auth,
-			boolean ipfs) {
+	public InputStream getStream(MongoSession session, SubNode node, String propName, boolean auth, boolean ipfs) {
 		if (auth) {
 			auth(session, node, PrivilegeType.READ);
 		}
@@ -1544,8 +1536,8 @@ public class MongoApi {
 		}
 	}
 
-	public AutoCloseInputStream getAutoClosingStream(MongoSession session, SubNode node,
-			String propName, boolean auth, boolean ipfs) {
+	public AutoCloseInputStream getAutoClosingStream(MongoSession session, SubNode node, String propName, boolean auth,
+			boolean ipfs) {
 		return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, propName, auth, ipfs)));
 	}
 
@@ -1569,8 +1561,7 @@ public class MongoApi {
 		return "^" + Pattern.quote(path) + "\\/(.+)$";
 	}
 
-	public SubNode createUser(MongoSession session, String user, String email, String password,
-			boolean automated) {
+	public SubNode createUser(MongoSession session, String user, String email, String password, boolean automated) {
 		// if (PrincipalName.ADMIN.s().equals(user)) {
 		// throw new RuntimeException("createUser should not be called fror admin
 		// user.");
@@ -1607,8 +1598,8 @@ public class MongoApi {
 	 * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
 	 * userNode if you know it, to save cycles
 	 */
-	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode,
-			String pathPart, String nodeName) {
+	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode, String pathPart,
+			String nodeName) {
 		if (userNode == null) {
 			userNode = getUserNodeByUserName(session, user);
 		}
@@ -1654,8 +1645,7 @@ public class MongoApi {
 	 * Returns one (or first) node contained directly under path (non-recursively)
 	 * that has a matching propName and propVal
 	 */
-	public SubNode findSubNodeByProp(MongoSession session, String path, String propName,
-			String propVal) {
+	public SubNode findSubNodeByProp(MongoSession session, String path, String propName, String propVal) {
 
 		// Other wise for ordinary users root is based off their username
 		Query query = new Query();
@@ -1742,8 +1732,7 @@ public class MongoApi {
 
 	public void createPublicNodes(MongoSession session) {
 		ValContainer<Boolean> created = new ValContainer<>();
-		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, "Public",
-				null,
+		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, "Public", null,
 				true, null, created);
 
 		if (created.getVal()) {

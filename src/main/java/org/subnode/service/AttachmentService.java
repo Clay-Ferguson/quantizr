@@ -646,8 +646,7 @@ public class AttachmentService {
 					.withDisposition(disposition)//
 					.withFileName("file-" + node.getId().toHexString())//
 					.withLength(size)//
-					// .withContentType(mimeTypeProp)//todo-0 removing this was a WAG, see if it
-					// works with thsi back in
+					.withContentType(mimeTypeProp) //
 					.withLastModified(node.getModifyTime().getTime())//
 					.serveResource();
 		} catch (Exception e) {
