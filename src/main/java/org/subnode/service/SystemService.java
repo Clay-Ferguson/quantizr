@@ -41,11 +41,6 @@ public class SystemService {
 	@Autowired
 	private ExportJsonService exportJsonService;
 
-	@Autowired
-	private IPFSService ipfsService;
-
-	@Autowired
-	private AppProp appProp;
 
 	public String backupDb() {
 		ValContainer<String> ret = new ValContainer<String>("");
@@ -80,7 +75,7 @@ public class SystemService {
 	}
 
 	public String compactDb() {
-		api.removeGridOrphans();
+		api.gridMaintenanceScan();
 
 		MongoDatabase database = mac.mongoClient().getDatabase(MongoAppConfig.databaseName);
 		Document result = database.runCommand(new Document("compact", "nodes"));

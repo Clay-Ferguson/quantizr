@@ -91,6 +91,8 @@ public enum NodeProp {
     IMG_WIDTH("sn:imgWidth", "s"), //
     IMG_HEIGHT("sn:imgHeight", "s"), //
 
+    BIN_TOTAL("sn:binTot", "s"),//
+
     // todo-1: add sn:prefix
     INLINE_CHILDREN("inlineChildren", "s"), //
     PRIORITY("priority", "s"), //

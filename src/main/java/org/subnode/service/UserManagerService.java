@@ -1,6 +1,7 @@
 package org.subnode.service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -11,6 +12,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.model.UserPreferences;
+import org.subnode.model.UserStats;
 import org.subnode.mongo.AclService;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
@@ -38,6 +40,7 @@ import org.subnode.util.Validator;
 import org.subnode.util.XString;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,6 +166,24 @@ public class UserManagerService {
 			}
 		});
 		return res;
+	}
+
+	public void writeUserStats(final MongoSession session, HashMap<ObjectId, UserStats> userStats) {
+		userStats.forEach((final ObjectId key, final UserStats stat) -> {
+			SubNode node = api.getNode(session, key);
+			if (node != null) {
+				node.setProp(NodeProp.BIN_TOTAL.s(), stat.binUsage);
+			} else {
+				/*
+				 * this case will indicate an indirectly, that there are nodes in the 'tree'
+				 * that currently have no ultimate user root node (account node), so this means
+				 * out orphan cleanup also needs to do the 'tree' in addition to just the
+				 * 'grid'/binaries
+				 * 
+				 * todo-0: address this issue.
+				 */
+			}
+		});
 	}
 
 	/*
@@ -311,14 +332,13 @@ public class UserManagerService {
 
 			if (userNode != null) {
 				userNode.setProp(NodeProp.USER_PREF_PUBLIC_KEY.s(), req.getKeyJson());
-			}
-			else {
-				log.debug("savePublicKey failed to find userName: "+userName);
+			} else {
+				log.debug("savePublicKey failed to find userName: " + userName);
 			}
 			res.setSuccess(true);
 
-			//don't display a message unless this was a user-initiated save.
-			//res.setMessage("Key Saved");
+			// don't display a message unless this was a user-initiated save.
+			// res.setMessage("Key Saved");
 		});
 		return res;
 	}
@@ -421,7 +441,7 @@ public class UserManagerService {
 					throw new RuntimeException("changePassword should not be called fror admin user.");
 				}
 
-				userNode[0].setProp(NodeProp.PWD_HASH.s(), api.getHashOfPassword(password)); 
+				userNode[0].setProp(NodeProp.PWD_HASH.s(), api.getHashOfPassword(password));
 				userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 				// note: the adminRunner.run saves the session so we don't do that here.
@@ -439,7 +459,7 @@ public class UserManagerService {
 
 			String password = req.getNewPassword();
 			userName[0] = userNode[0].getStringProp(NodeProp.USER.s());
-			userNode[0].setProp(NodeProp.PWD_HASH.s(), api.getHashOfPassword(password)); 
+			userNode[0].setProp(NodeProp.PWD_HASH.s(), api.getHashOfPassword(password));
 			userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 			api.save(session, userNode[0]);
@@ -453,7 +473,8 @@ public class UserManagerService {
 
 	public boolean isNormalUserName(String userName) {
 		userName = userName.trim();
-		return !userName.equalsIgnoreCase(PrincipalName.ADMIN.s()) && !userName.equalsIgnoreCase(PrincipalName.ANON.s());
+		return !userName.equalsIgnoreCase(PrincipalName.ADMIN.s())
+				&& !userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
 	public ResetPasswordResponse resetPassword(final ResetPasswordRequest req) {
