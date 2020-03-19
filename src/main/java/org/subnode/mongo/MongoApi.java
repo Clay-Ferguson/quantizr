@@ -1702,10 +1702,8 @@ public class MongoApi {
 	public SubNode findOne(Query query) {
 		SubNode ret = ops.findOne(query, SubNode.class);
 		if (ret != null) {
-			String hexId = ret.getId().toHexString();
-			SubNode foundInCache = MongoThreadLocal.getDirtyNodes().get(hexId);
+			SubNode foundInCache = MongoThreadLocal.getDirtyNodes().get(ret.getId());
 			if (foundInCache != null) {
-				//log.debug("Using cached version: " + hexId);
 				ret = foundInCache;
 			}
 		}

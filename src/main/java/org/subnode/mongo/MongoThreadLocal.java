@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.subnode.mongo.model.SubNode;
 
 public class MongoThreadLocal {
@@ -15,7 +16,7 @@ public class MongoThreadLocal {
 	 * in a finally block somewhere and use that to make sure all work ever done (Node property
 	 * updates, etc) gets 'committed'
 	 */
-	private static final ThreadLocal<HashMap<String, SubNode>> dirtyNodes = new ThreadLocal<HashMap<String, SubNode>>();
+	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<HashMap<ObjectId, SubNode>>();
 
 	/*
 	 * Because ACL checking is an expensive operation, we cache the results of any ACL computations,
@@ -30,14 +31,13 @@ public class MongoThreadLocal {
 		getAclResults().clear();
 	}
 
-	public static void setDirtyNodes(HashMap<String, SubNode> res) {
+	public static void setDirtyNodes(HashMap<ObjectId, SubNode> res) {
 		dirtyNodes.set(res);
 	}
 
-	//todo-0: make this use the actual ObjectId as the key, not the hexs tring
-	public static HashMap<String, SubNode> getDirtyNodes() {
+	public static HashMap<ObjectId, SubNode> getDirtyNodes() {
 		if (dirtyNodes.get() == null) {
-			dirtyNodes.set(new HashMap<String, SubNode>());
+			dirtyNodes.set(new HashMap<ObjectId, SubNode>());
 		}
 		return dirtyNodes.get();
 	}
@@ -52,12 +52,11 @@ public class MongoThreadLocal {
 		if (node.getId() == null || node.isWriting() || node.isDeleted()) {
 			return;
 		}
-		getDirtyNodes().put(node.getId().toHexString(), node);
+		getDirtyNodes().put(node.getId(), node);
 	}
 
 	public static void autoCleanup(MongoSession session) {
 		if (getDirtyNodes() == null || getDirtyNodes().values() == null) return;
-
 		List<SubNode> nodesToClean = null;
 
 		/*
@@ -75,7 +74,7 @@ public class MongoThreadLocal {
 		if (nodesToClean == null) return;
 
 		for (SubNode node : nodesToClean) {
-			MongoThreadLocal.getDirtyNodes().remove(node.getId().toHexString());
+			MongoThreadLocal.getDirtyNodes().remove(node.getId());
 		}
 	}
 	

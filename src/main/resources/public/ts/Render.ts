@@ -956,8 +956,8 @@ export class Render implements RenderIntf {
 
     //todo-2: check background colord on vertical layout option also? or is that handled already?
     renderTableLayout = (node: J.NodeInfo, newData: boolean, level: number, layout: string): Comp => {
-        let tableDiv = new Div(null, { style: { display: 'table', className: 'node-grid', width: '100%' } });
-        let curRow = new Div(null, { style: { display: 'table-row', className: 'node-grid-cell' } });
+        let tableDiv = new Div(null, { className: 'node-grid-table' });
+        let curRow = new Div(null, { className: 'node-grid-row' });
 
         let layoutClass = "node-grid-item";
         let childCount: number = node.children.length;
@@ -968,6 +968,7 @@ export class Render implements RenderIntf {
         }
         if (layout == "c3") {
             maxCols = 3;
+            //layoutClass += " node-grid-item-3";
         }
         if (layout == "c4") {
             maxCols = 4;
@@ -995,7 +996,10 @@ export class Render implements RenderIntf {
 
                 let curCol = new Div(null, {
                     className: 'node-grid-cell',
-                    style: { display: 'table-cell', width: cellWidth + '%' }
+                    style: { 
+                        width: cellWidth + '%',
+                        maxWidth: cellWidth + '%'
+                    }
                 }, comps);
                 curRow.children.push(curCol);
 

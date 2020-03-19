@@ -617,22 +617,33 @@ samp {
     outline: none;
 }
 
-.node-grid {
-    //background-color:$mainContentBackground; 
+.node-grid-table {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    margin-top: 10px;
+
+    // if you ever need rounded cells, these two are needed with that.
+    // border-collapse: separate;
+    // border-spacing: 10px;
 }
 
 .node-grid-item {
     padding-right: 1.5em;
     outline: none;
-    margin-left: 0px;
-    padding-left: 0px;
+}
+
+.node-grid-row {
+    display: table-row;
 }
 
 .node-grid-cell {
-    border-bottom: 2px solid lightGray;
-    border-right: 2px solid lightGray;
-    margin-bottom: 0px;
-    padding-bottom: 0px;
+    border: 1px dotted gray;
+    overflow-x: auto;
+    display: table-cell;
+
+    //not doing rounded cells because the selector (selected node) marker in them is asthetically ugly
+    //border-radius: $borderRadiusMedium;
 }
 
 .node-table-row .top-right-image {

@@ -66,7 +66,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 		dbObj.put(SubNode.FIELD_ID, id);
 
-		log.debug("onBeforeSave: ID: " + node.getId().toHexString());
+		//log.debug("onBeforeSave: ID: " + node.getId().toHexString());
 
 		// DO NOT DELETE
 		// If we ever add a unique-index for "Name" (not currently the case), then we'd
@@ -187,10 +187,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Override
 	public void onAfterConvert(AfterConvertEvent<SubNode> event) {
 		Document dbObj = event.getDocument();
-		String id = dbObj.getObjectId(SubNode.FIELD_ID).toHexString();
-		//log.debug("onAfterConvert: id=" + id);
+		ObjectId id = dbObj.getObjectId(SubNode.FIELD_ID);
 		if (MongoThreadLocal.getDirtyNodes().get(id) != null) {
-			//throw new RuntimeException("Dirty Read: " + id);
 			log.debug("dirty read.");
 		}
 	}

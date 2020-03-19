@@ -60,7 +60,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
             paramName: "files",
-            maxFilesize: 20, 
+            maxFilesize: 20, //<---put in a variable
             parallelUploads: 2,
 
             /* Not sure what's this is for, but the 'files' parameter on the server is always NULL, unless
@@ -73,24 +73,38 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             // WARNING: Don't try to put arrow functions in here, these functions are called by Dropzone itself and the 
             // 'this' that is in scope during each call must be left as is.
             init: function () {
-                this.on("addedfile", function () { 
+                this.on("addedfile", function (file) { 
+                    if (file.size > 20 * 1024 * 1024) { //put number in variable (todo-0)
+                        S.util.showMessage("File is too large. Max Size=20MB");
+                        return;
+                    }
                     dlg.updateFileList(this);
                     dlg.runButtonEnablement(this);
                 });
 
+                this.on("maxfilesexceeded", function(arg) {
+                    debugger;
+                    S.util.showMessage("File is too large. Max Size=20MB");
+                });
+
                 this.on("removedfile", function () {
+                    debugger;
                     dlg.updateFileList(this);
                     dlg.runButtonEnablement(this);
                 });
 
                 this.on("sending", function (file, xhr, formData) {
+                    debugger;
                     formData.append("nodeId", S.attachment.uploadNode.id);
                     formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
                     formData.append("ipfs", dlg.toIpfs ? "true" : "false");
                     dlg.zipQuestionAnswered = false;
                 });
 
-                this.on("queuecomplete", function (file) {
+                //todo-0: finish testing the case where user adds file that's too large
+
+                this.on("queuecomplete", function (arg) {
+                    debugger;
                     dlg.close();
                     S.meta64.refresh();
                 });
@@ -103,6 +117,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     updateFileList = (dropzoneEvt: any): void => {
+        debugger;
         this.fileList = dropzoneEvt.getAddedFiles();
         this.fileList = this.fileList.concat(dropzoneEvt.getQueuedFiles());
 
