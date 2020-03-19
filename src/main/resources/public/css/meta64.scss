@@ -473,6 +473,12 @@ samp {
     /* min-height: 0px !important; */
 }
 
+/* This tweak keeps the dropzone error message from covering up the 'remove file' link under the preview image
+which it will do by default. */
+.dropzone .dz-preview .dz-error-message {
+    top: 150px!important;
+}
+
 .systemFileRow {
     margin-botom: 16px;
 }

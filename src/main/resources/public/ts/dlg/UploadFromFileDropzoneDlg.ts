@@ -4,11 +4,11 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
@@ -20,7 +20,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     hiddenInputContainer: Div;
     uploadButton: Button;
 
-    fileList: Object[] = null;
+    fileList: any[] = null;
     zipQuestionAnswered: boolean = false;
     explodeZips: boolean = false;
     dropzone: any = null;
@@ -28,11 +28,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     constructor(private toIpfs: boolean) {
         super(toIpfs ? "Upload File to IPFS" : "Upload File");
-        
+
         this.setChildren([
             new Form(null, [
-                this.dropzoneDiv = new Div("", {className: "dropzone"}),
-                this.hiddenInputContainer = new Div(null, { style: {display: "none"} }),
+                this.dropzoneDiv = new Div("", { className: "dropzone" }),
+                this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Close", () => {
@@ -41,11 +41,15 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 ])
             ])
         ]);
+
+        this.uploadButton.setVisible(false);
     }
 
     upload = (): void => {
-        this.dropzone.processQueue();
-        this.close();
+        if (this.filesAreValid()) {
+            this.dropzone.processQueue();
+            this.close();
+        }
     }
 
     configureDropZone = (): void => {
@@ -54,7 +58,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let config: Object = {
             action: S.util.getRpcPath() + endpoint,
             width: "100%",
-            height: "100%", 
+            height: "100%",
             progressBarWidth: '100%',
             url: S.util.getRpcPath() + "upload",
             // Prevents Dropzone from uploading dropped files immediately
@@ -70,43 +74,43 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             dictDefaultMessage: "Click Here to Add Files (or Drag & Drop)",
             hiddenInputContainer: "#" + this.hiddenInputContainer.getId(),
 
+            //ref: https://www.dropzonejs.com/#event-list
+
             // WARNING: Don't try to put arrow functions in here, these functions are called by Dropzone itself and the 
             // 'this' that is in scope during each call must be left as is.
             init: function () {
-                this.on("addedfile", function (file) { 
+                this.on("addedfile", function (file) {
                     if (file.size > 20 * 1024 * 1024) { //put number in variable (todo-0)
                         S.util.showMessage("File is too large. Max Size=20MB");
                         return;
                     }
                     dlg.updateFileList(this);
-                    dlg.runButtonEnablement(this);
+                    dlg.runButtonEnablement();
                 });
 
-                this.on("maxfilesexceeded", function(arg) {
-                    debugger;
-                    S.util.showMessage("File is too large. Max Size=20MB");
+                this.on("maxfilesexceeded", function (arg) {
+                    S.util.showMessage("Too many files.");
                 });
 
                 this.on("removedfile", function () {
-                    debugger;
                     dlg.updateFileList(this);
-                    dlg.runButtonEnablement(this);
+                    dlg.runButtonEnablement();
                 });
 
                 this.on("sending", function (file, xhr, formData) {
-                    debugger;
                     formData.append("nodeId", S.attachment.uploadNode.id);
                     formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
                     formData.append("ipfs", dlg.toIpfs ? "true" : "false");
                     dlg.zipQuestionAnswered = false;
                 });
 
-                //todo-0: finish testing the case where user adds file that's too large
-
                 this.on("queuecomplete", function (arg) {
-                    debugger;
-                    dlg.close();
-                    S.meta64.refresh();
+                    //this event gets fired even when the user had attemped to upload a file that was too large, so
+                    //we check if there WERE any files actually in the list before we decide an upload has been completed.
+                    if (this.fileList && this.fileList.length > 0) {
+                        dlg.close();
+                        S.meta64.refresh();
+                    }
                 });
             }
         };
@@ -117,7 +121,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     updateFileList = (dropzoneEvt: any): void => {
-        debugger;
         this.fileList = dropzoneEvt.getAddedFiles();
         this.fileList = this.fileList.concat(dropzoneEvt.getQueuedFiles());
 
@@ -140,6 +143,20 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         }
     }
 
+    filesAreValid = (): boolean => {
+        if (!this.fileList || this.fileList.length == 0) {
+            return false;
+        }
+
+        for (let file of this.fileList) {
+            //todo-0: put this max in a const file.
+            if (file.size > 20 * 1024 * 1024) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     hasAnyZipFiles = (): boolean => {
         let ret: boolean = false;
         for (let file of this.fileList) {
@@ -150,13 +167,15 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         return ret;
     }
 
-    runButtonEnablement = (dropzoneEvt: any): void => {
-        let filesSelected = dropzoneEvt.getAddedFiles().length > 0 ||
-            dropzoneEvt.getQueuedFiles().length > 0;
-        this.uploadButton.setVisible(filesSelected);
+    runButtonEnablement = (): void => {
+        let valid = this.filesAreValid();
+
+        //todo-0: why does setEnabled work just fine but setVisible doesn't work?
+        this.uploadButton.setEnabled(valid);
     }
 
     init = (): void => {
         this.configureDropZone();
+        this.runButtonEnablement();
     }
 }
