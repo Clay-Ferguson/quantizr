@@ -127,12 +127,12 @@ public class ExportTxtService {
 
 	private String getFileExtension() {
 		switch (outputType) {
-		case MD:
-			return "md";
-		case JSON:
-			return "json";
-		default:
-			throw new RuntimeException("unknown export type.");
+			case MD:
+				return "md";
+			case JSON:
+				return "json";
+			default:
+				throw new RuntimeException("unknown export type.");
 		}
 	}
 
@@ -150,14 +150,14 @@ public class ExportTxtService {
 
 	private void processNode(SubNode node) {
 		switch (outputType) {
-		case MD:
-			exportNodeAsMarkdown(node);
-			break;
-		case JSON:
-			exportNodeAsJSON(node);
-			break;
-		default:
-			throw new RuntimeException("unkwnown output type");
+			case MD:
+				exportNodeAsMarkdown(node);
+				break;
+			case JSON:
+				exportNodeAsJSON(node);
+				break;
+			default:
+				throw new RuntimeException("unkwnown output type");
 		}
 	}
 
@@ -178,13 +178,10 @@ public class ExportTxtService {
 					if (propName.equals(NodeProp.BIN_FILENAME)) {
 					}
 
-					if (propName.equals(NodeProp.BIN_VER)) {
-					} else {
-						ExportPropertyInfo propInfo = new ExportPropertyInfo();
-						propInfo.setName(propName);
-						propInfo.setVal(propVal.getValue());
-						// need option to print these or not
-					}
+					ExportPropertyInfo propInfo = new ExportPropertyInfo();
+					propInfo.setName(propName);
+					propInfo.setVal(propVal.getValue());
+					// need option to print these or not
 				});
 			}
 			print("\n----");
@@ -204,4 +201,3 @@ public class ExportTxtService {
 		}
 	}
 }
-

@@ -104,4 +104,5 @@ export interface UtilIntf {
     getElm(id: string, exResolve?: (elm: HTMLElement) => void): Promise<HTMLElement>;
     animateScrollToTop(): any;
     assert(check: boolean, op: string): void;
+    formatMemory(val: number): string;
 }

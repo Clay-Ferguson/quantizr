@@ -26,7 +26,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SystemService {
-	private static final long ONE_MB = 1024 * 1024;
+	private static final long ONE_MB = 1024 * 1024; //todo-0: use Const.java
+
 	private static final Logger log = LoggerFactory.getLogger(SystemService.class);
 
 	@Autowired

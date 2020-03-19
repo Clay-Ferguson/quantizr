@@ -25,6 +25,7 @@ import org.subnode.image.ImageUtil;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.DeleteAttachmentRequest;
@@ -107,6 +108,10 @@ public class AttachmentService {
 			 * just upload UNDERNEATH this current node.
 			 */
 			SubNode node = api.getNode(session, nodeId);
+
+			//load into cache immediately so the dirty-read interim solution works
+			MongoThreadLocal.dirty(node);
+
 			if (node == null) {
 				throw ExUtil.newEx("Node not found.");
 			}
@@ -140,19 +145,6 @@ public class AttachmentService {
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-
-	//
-	// private int countFileUploads(MultipartFile[] uploadFiles) {
-	// int count = 0;
-	// for (MultipartFile uploadFile : uploadFiles) {
-	// String fileName = uploadFile.getOriginalFilename();
-	// if (!StringUtils.isEmpty(fileName)) {
-	// count++;
-	// }
-	// }
-	// return count;
-	// }
-	//
 
 	/*
 	 * Gets the binary attachment from a supplied stream and loads it into the
@@ -230,18 +222,11 @@ public class AttachmentService {
 
 	public void saveBinaryStreamToNode(MongoSession session, LimitedInputStreamEx inputStream, String mimeType,
 			String fileName, long size, int width, int height, SubNode node, boolean toIpfs) {
-
-		Long version = node.getIntProp(NodeProp.BIN_VER.s());
-		if (version == null) {
-			version = 0L;
-		}
-
 		/*
 		 * NOTE: Setting this flag to false works just fine, and is more efficient, and
 		 * will simply do everything EXCEPT calculate the image size
 		 */
 		boolean calcImageSize = true;
-
 		BufferedImage bufImg = null;
 		byte[] imageBytes = null;
 		InputStream isTemp = null;
@@ -276,9 +261,6 @@ public class AttachmentService {
 		if (fileName != null) {
 			node.setProp(NodeProp.BIN_FILENAME.s(), fileName);
 		}
-
-		log.debug("Uploading new BIN_VER: " + String.valueOf(version + 1));
-		node.setProp(NodeProp.BIN_VER.s(), version + 1);
 
 		if (imageBytes == null) {
 			node.setProp(NodeProp.BIN_SIZE.s(), size);
@@ -315,6 +297,7 @@ public class AttachmentService {
 		}
 		String nodeId = req.getNodeId();
 		SubNode node = api.getNode(session, nodeId);
+		MongoThreadLocal.dirty(node);
 		api.deleteBinary(session, node, null);
 		deleteAllBinaryProperties(node);
 		api.saveSession(session);
@@ -325,25 +308,13 @@ public class AttachmentService {
 	/*
 	 * Deletes all the binary-related properties from a node
 	 */
-	private void deleteAllBinaryProperties(SubNode node) {
+	public void deleteAllBinaryProperties(SubNode node) {
 		node.deleteProp(NodeProp.IMG_WIDTH.s());
 		node.deleteProp(NodeProp.IMG_HEIGHT.s());
 		node.deleteProp(NodeProp.BIN_MIME.s());
 		node.deleteProp(NodeProp.BIN_FILENAME.s());
 		node.deleteProp(NodeProp.BIN_SIZE.s());
-
-		// NO! Do not delete binary version property. Browsers are allowed to cache
-		// based on the URL of this node and this version.
-		// What can happen if you ever delete BIN_VER is that it will reset the version
-		// back to '1', and then when the user's browser
-		// finds the URL with 'ver=1' it will display the OLD IMAGE (assuming it's an
-		// image attachment). The way this would happen is a user uploads an image, then
-		// deletes it
-		// and then uploads another image. So really the places in the code where we
-		// check for BIN_VER
-		// to see if there's an attachment or not should be changed to look for BIN_MIME
-		// instead.
-		// node.deleteProp(NodeProp.BIN_VER);
+		node.deleteProp(NodeProp.BIN.s());
 	}
 
 	/**

@@ -43,7 +43,6 @@ export interface Meta64Intf {
 
     readOnlyPropertyList: any;
 
-    binaryPropertyList: any;
     selectedNodes: any;
 
     expandedAbbrevNodeIds: any;

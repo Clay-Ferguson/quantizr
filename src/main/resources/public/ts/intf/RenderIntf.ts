@@ -25,10 +25,9 @@ export interface RenderIntf {
     getUrlForNodeAttachment(node: J.NodeInfo): string;
     getStreamUrlForNodeAttachment(node: J.NodeInfo): string;
     makeImageTag(node: J.NodeInfo): Img;
-    makeAvatarImage(nodeId: string, binVer: number): Img;
+    makeAvatarImage(node: J.NodeInfo): Img;
     allowPropertyToDisplay(propName: string): boolean;
     allowPropertyEdit(node: J.NodeInfo, propName: string): boolean;
     isReadOnlyProperty(propName: string): boolean;
-    isBinaryProperty(propName: string): boolean;
     setImageMaxWidths(): void;
 }

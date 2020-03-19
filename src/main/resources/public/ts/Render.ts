@@ -614,8 +614,8 @@ export class Render implements RenderIntf {
         }
 
         let avatarImg: Img;
-        if (allowAvatar && node.owner != J.PrincipalName.ADMIN && node.avatarBinVer) {
-            avatarImg = this.makeAvatarImage(node.ownerId, node.avatarBinVer);
+        if (allowAvatar && node.owner != J.PrincipalName.ADMIN && S.props.getNodePropVal(J.NodeProp.BIN, node)) {
+            avatarImg = this.makeAvatarImage(node); 
         }
 
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
@@ -803,8 +803,8 @@ export class Render implements RenderIntf {
                         }
 
                         let avatarImg: Img;
-                        if (data.node.owner != J.PrincipalName.ADMIN && data.node.avatarBinVer) {
-                            avatarImg = this.makeAvatarImage(data.node.ownerId, data.node.avatarBinVer);
+                        if (data.node.owner != J.PrincipalName.ADMIN && S.props.getNodePropVal(J.NodeProp.BIN, data.node)) {
+                            avatarImg = this.makeAvatarImage(data.node);
                         }
 
                         if (typeIcon || encIcon || sharedIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton) {
@@ -1074,17 +1074,21 @@ export class Render implements RenderIntf {
 
     getUrlForNodeAttachment = (node: J.NodeInfo): string => {
         //todo-1: Change to node.id and then re-test this
-        return S.util.getRpcPath() + "bin/f" + "-" + node.id + "-" + node.binVer + "?nodeId=" + encodeURIComponent(node.id) + "&ver=" + node.binVer;
+        //todo-0: after removing bin_Ver we need to do security by accepting the nodeId and verifying IT's ownership and also that IT has the 'bin' on it, 
+        //and also making sure the user cannot directly enter/save 'bin' on any node even if they own the node.
+        //todo-0: or is it simpler to put the 'ownerId' in the metadata of teh node itself??? That might even make the compactDB maintenance faster?
+        let ret = S.util.getRpcPath() + "bin/"+S.props.getNodePropVal(J.NodeProp.BIN, node) + "?nodeId=" + encodeURIComponent(node.id);
+        //console.log("Attachment id=" + node.id + " URL=" + ret);
+        return ret;
     }
 
+    //todo-0: need to be more consistent aboutu how binary urls are formatted 
     getStreamUrlForNodeAttachment = (node: J.NodeInfo): string => {
-        //todo-1: Change to node.id and then re-test this
-        //do I need the versioning args here? or does the protocol time values take care of it?
-        return S.util.getRpcPath() + "stream/" +node.id /* + "-" + node.binVer + "?nodeId=" + encodeURIComponent(node.id) */ + "?x=1&ver=" + node.binVer;
+        return S.util.getRpcPath() + "stream/" + node.id + "?bin=" + S.props.getNodePropVal(J.NodeProp.BIN, node);
     }
 
-    getAvatarImgUrl = (ownerId: string, binVer: number): string => {
-        return S.util.getRpcPath() + "bin/avatar" + "-" + ownerId + "-" + binVer + "?nodeId=" + encodeURIComponent(ownerId) + "&ver=" + binVer;
+    getAvatarImgUrl = (node: J.NodeInfo) => { 
+        return S.util.getRpcPath() + "bin/" + S.props.getNodePropVal(J.NodeProp.BIN, node) + "?nodeId=" + encodeURIComponent(node.ownerId);
     }
 
     makeImageTag = (node: J.NodeInfo): Img => {
@@ -1124,8 +1128,9 @@ export class Render implements RenderIntf {
         return img;
     }
 
-    makeAvatarImage = (nodeId: string, binVer: number): Img => {
-        let src: string = this.getAvatarImgUrl(nodeId, binVer);
+    makeAvatarImage = (node: J.NodeInfo) => { 
+        let src: string = this.getAvatarImgUrl(node); 
+        //console.log("avatarImage src=" + src);
 
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
         let img: Img = new Img({
@@ -1170,10 +1175,6 @@ export class Render implements RenderIntf {
 
     isReadOnlyProperty = (propName: string): boolean => {
         return S.meta64.readOnlyPropertyList[propName];
-    }
-
-    isBinaryProperty = (propName: string): boolean => {
-        return S.meta64.binaryPropertyList[propName];
     }
 }
 

@@ -85,6 +85,9 @@ export interface GetSharedNodesRequest extends RequestBase {
     nodeId: string;
 }
 
+export interface GetUserAccountInfoRequest extends RequestBase {
+}
+
 export interface GraphRequest extends RequestBase {
     nodeId: string;
 }
@@ -323,6 +326,11 @@ export interface GetSharedNodesResponse extends ResponseBase {
     searchResults: NodeInfo[];
 }
 
+export interface GetUserAccountInfoResponse extends ResponseBase {
+    binTotal: number;
+    binQuota: number;
+}
+
 export interface GraphResponse extends ResponseBase {
     nodes: GraphNode[];
     edges: GraphEdge[];
@@ -464,8 +472,6 @@ export interface NodeInfo {
     cipherKey: string;
     firstChild: boolean;
     lastChild: boolean;
-    binVer: number;
-    avatarBinVer: number;
     width: number;
     height: number;
     children: NodeInfo[];
@@ -526,10 +532,6 @@ export const enum NodeProp {
     USER_PREF_IMPORT_ALLOWED = "sn:importAllowed",
     USER_PREF_EXPORT_ALLOWED = "sn:exportAllowed",
     USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth",
-
-    /* amount of storage space user is allow to upload into attachments */
-    USER_BIN_QUOTA = "sn:binQuota",
-    
     SIGNUP_PENDING = "sn:signupPending",
     EMAIL_CONTENT = "sn:content",
     EMAIL_RECIP = "sn:recip",
@@ -547,7 +549,6 @@ export const enum NodeProp {
     MIME_EXT = "sn:ext",
     EMAIL = "sn:email",
     CODE = "sn:code",
-    BIN_VER = "sn:binVer",
     BIN_MIME = "sn:mimeType",
     BIN_FILENAME = "sn:fileName",
     BIN_SIZE = "sn:size",
@@ -560,6 +561,7 @@ export const enum NodeProp {
     IMG_WIDTH = "sn:imgWidth",
     IMG_HEIGHT = "sn:imgHeight",
     BIN_TOTAL = "sn:binTot",
+    BIN_QUOTA = "sn:binQuota",
     INLINE_CHILDREN = "inlineChildren",
     PRIORITY = "priority",
     LAYOUT = "layout",

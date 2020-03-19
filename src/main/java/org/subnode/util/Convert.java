@@ -50,7 +50,7 @@ public class Convert {
 
 		ImageSize imageSize = null;
 
-		long binVer = node.getIntProp(NodeProp.BIN_VER.s());
+		String bin = node.getStringProp(NodeProp.BIN.s());
 		String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 		if (mimeType != null) {
 			boolean isImage = api.isImageAttached(node);
@@ -77,7 +77,6 @@ public class Convert {
 		 */
 		String nameProp = null;
 		SubNode userNode = api.getNode(session, node.getOwner(), false);
-		Long avatarBinVer = 0L;
 
 		if (userNode == null) {
 			// todo-1: looks like import corrupts the 'owner' (needs research), but the code
@@ -88,7 +87,6 @@ public class Convert {
 					" tried to find owner="+node.getOwner().toHexString());
 		} else {
 			nameProp = userNode.getStringProp(NodeProp.USER.s());
-			avatarBinVer = userNode.getIntProp(NodeProp.BIN_VER.s());
 		}
 		String owner = userNode == null ? PrincipalName.ADMIN.s() : nameProp;
 
@@ -112,7 +110,7 @@ public class Convert {
 		}
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, ownerId, node.getOrdinal(), //
-				node.getModifyTime(), propList, acList, hasNodes, binVer, avatarBinVer, //
+				node.getModifyTime(), propList, acList, hasNodes, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
 				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey);

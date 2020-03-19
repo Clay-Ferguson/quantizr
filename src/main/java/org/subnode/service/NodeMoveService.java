@@ -2,8 +2,10 @@ package org.subnode.service;
 
 import java.util.List;
 
+import org.subnode.config.SessionContext;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.MoveNodesRequest;
@@ -14,7 +16,6 @@ import org.subnode.response.MoveNodesResponse;
 import org.subnode.response.SelectAllNodesResponse;
 import org.subnode.response.SetNodePositionResponse;
 import org.subnode.util.ThreadLocals;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ public class NodeMoveService {
 
 	@Autowired
 	private MongoApi api;
+
+	@Autowired
+	private UserManagerService userManagerService;
 
 	/*
 	 * Moves the the node to a new ordinal/position location (relative to parent)
@@ -128,24 +132,34 @@ public class NodeMoveService {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		for (String nodeId : req.getNodeIds()) {
-			deleteNode(session, nodeId);
+		SubNode userNode = api.getUserNodeByUserName(null, null); // adminSession, userName);
+		if (userNode == null) {
+			throw new RuntimeException("User not found.");
 		}
 
-		// no need to save session after deletes.
-		// api.saveSession(session);
+		for (String nodeId : req.getNodeIds()) {
+			// lookup the node we're going to delete
+			SubNode node = api.getNode(session, nodeId);
+
+			// back out the number of bytes it was using
+			userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
+
+			deleteNode(session, node);
+		}
+
+		api.saveSession(session);
+
 		res.setSuccess(true);
 		return res;
 	}
 
-	private void deleteNode(MongoSession session, String nodeId) {
-		SubNode node = api.getNode(session, nodeId);
-
+	private void deleteNode(MongoSession session, SubNode node) {
 		// switching to soft-deletes, below, eventually
 		api.deleteBinary(session, node, null);
 		api.delete(session, node);
 
-		// todo-1: I started working on 'soft-delete', but never finished. However I think most of the code is done (just untested)
+		// todo-1: I started working on 'soft-delete', but never finished. However I
+		// think most of the code is done (just untested)
 		// api.softDelete(session, node);
 		// api.saveSession(session);
 	}

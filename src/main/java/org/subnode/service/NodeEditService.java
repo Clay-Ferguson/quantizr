@@ -118,7 +118,7 @@ public class NodeEditService {
 
 		String userNodeHexId = session.getUserNode().getId().toHexString();
 		SubNode linksNode = apiUtil.ensureNodeExists(session,
-				"/" + NodeName.ROOT + "/" + NodeName.USER + "/" + userNodeHexId + "/", NodeName.LINKS, "### Links",
+				NodeName.ROOT_OF_ALL_USERS + "/" + userNodeHexId + "/", NodeName.LINKS, "### Links",
 				null, true, null, null);
 
 		SubNode newNode = api.createNode(session, linksNode, null, SubNodeTypes.UNSTRUCTURED, 0L,
@@ -248,13 +248,12 @@ public class NodeEditService {
 
 		if (nodeInfo.getProperties() != null) {
 			for (PropertyInfo property : nodeInfo.getProperties()) {
-
 				/*
 				 * save only if server determines the property is savable. Just protection.
 				 * Client shouldn't be trying to save stuff that is illegal to save, but we have
 				 * to assume the worst behavior from client code, for security and robustness.
 				 */
-				if (SubNodeUtil.isSavableProperty(property.getName())) {
+				if (session.isAdmin() || SubNodeUtil.isSavableProperty(property.getName())) {
 					log.debug("Property to save: " + property.getName() + "=" + property.getValue());
 					node.setProp(property.getName(), property.getValue());
 				} else {

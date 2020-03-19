@@ -97,7 +97,6 @@ export class Meta64 implements Meta64Intf {
 
     simpleModePropertyBlackList: any = {};
     readOnlyPropertyList: any = {};
-    binaryPropertyList: any = {};
 
     /*
      * maps all node uids to true if selected, otherwise the property should be deleted (not existing)
@@ -482,8 +481,6 @@ export class Meta64 implements Meta64Intf {
         S.util.addAll(this.simpleModePropertyBlackList, [ //
             J.NodeProp.IMG_WIDTH,//
             J.NodeProp.IMG_HEIGHT, //
-            J.NodeProp.BIN_VER, //
-            J.NodeProp.BIN_DATA, //
             J.NodeProp.BIN_MIME, //
             J.NodeProp.ENC_KEY, //
             J.NodeProp.BIN, //
@@ -492,13 +489,10 @@ export class Meta64 implements Meta64Intf {
         S.util.addAll(this.readOnlyPropertyList, [ //
             J.NodeProp.IMG_WIDTH, //
             J.NodeProp.IMG_HEIGHT, //
-            J.NodeProp.BIN_VER, //
-            J.NodeProp.BIN_DATA, //
+            J.NodeProp.BIN, //
             J.NodeProp.BIN_MIME, //
             J.NodeProp.BIN_SIZE //
         ]);
-
-        S.util.addAll(this.binaryPropertyList, [J.NodeProp.BIN_DATA]);
     }
 
     /**

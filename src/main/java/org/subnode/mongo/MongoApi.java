@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
+import org.subnode.config.SessionContext;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.image.ImageSize;
@@ -26,10 +27,13 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodeTypes;
 import org.subnode.mongo.model.UserPreferencesNode;
+import org.subnode.service.AttachmentService;
 import org.subnode.service.IPFSService;
 import org.subnode.service.UserManagerService;
+import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
+import org.subnode.util.LimitedInputStream;
 import org.subnode.util.NodeAuthFailedException;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
@@ -106,6 +110,9 @@ public class MongoApi {
 
 	@Autowired
 	private UserManagerService userManagerService;
+
+	@Autowired
+	private SessionContext sessionContext;
 
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
@@ -214,7 +221,7 @@ public class MongoApi {
 			// paths.
 			if (pathPart.equals("/" + NodeName.ROOT))
 				continue;
-			if (pathPart.equals("/" + NodeName.ROOT + "/" + NodeName.USER))
+			if (pathPart.equals(NodeName.ROOT_OF_ALL_USERS))
 				continue;
 
 			// I'm putting the caching of ACL results on hold, because this is only a
@@ -426,6 +433,7 @@ public class MongoApi {
 		}
 	}
 
+	// todo-0: User preference as a NODE is a totally obsolete thing now right?
 	public UserPreferencesNode createUserPreferencesNode(MongoSession session, String path) {
 		ObjectId ownerId = getOwnerNodeIdFromSession(session);
 		return new UserPreferencesNode(ownerId, path, SubNodeTypes.UNSTRUCTURED);
@@ -618,7 +626,7 @@ public class MongoApi {
 				.and(SubNode.FIELD_ORDINAL).is(idx);
 		query.addCriteria(criteria);
 
-		SubNode ret = ops.findOne(query, SubNode.class);
+		SubNode ret = findOne(query);
 		return ret;
 	}
 
@@ -852,7 +860,7 @@ public class MongoApi {
 
 		Query query = new Query();
 		query.addCriteria(Criteria.where(SubNode.FIELD_NAME).is(name));
-		ret = ops.findOne(query, SubNode.class);
+		ret = findOne(query);
 
 		if (allowAuth) {
 			auth(session, ret, PrivilegeType.READ);
@@ -909,7 +917,7 @@ public class MongoApi {
 			searchArg = XString.stripIfEndsWith(searchArg, "/");
 			Query query = new Query();
 			query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(searchArg));
-			ret = ops.findOne(query, SubNode.class);
+			ret = findOne(query);
 		}
 
 		if (allowAuth) {
@@ -946,7 +954,7 @@ public class MongoApi {
 		String parentPath = XString.truncateAfterLast(path, "/");
 		Query query = new Query();
 		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
-		SubNode ret = ops.findOne(query, SubNode.class);
+		SubNode ret = findOne(query);
 		auth(session, ret, PrivilegeType.READ);
 		return ret;
 	}
@@ -1010,8 +1018,7 @@ public class MongoApi {
 	 * If node is null it's path is considered empty string, and it represents the
 	 * 'root' of the tree. There is no actual NODE that is root node
 	 */
-	public Iterable<SubNode> getChildren(MongoSession session, SubNode node, Sort sort, Integer limit) {
-		auth(session, node, PrivilegeType.READ);
+	public Iterable<SubNode> getChildrenUnderParentPath(MongoSession session, String path, Sort sort, Integer limit) {
 
 		Query query = new Query();
 		if (limit != null) {
@@ -1029,16 +1036,23 @@ public class MongoApi {
 		 * below...)
 		 * 
 		 */
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-				.regex(regexDirectChildrenOfPath(node == null ? "" : node.getPath()));
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(path));
 
 		if (sort != null) {
 			query.with(sort);
 		}
 
 		query.addCriteria(criteria);
-
 		return ops.find(query, SubNode.class);
+	}
+
+	/*
+	 * If node is null it's path is considered empty string, and it represents the
+	 * 'root' of the tree. There is no actual NODE that is root node
+	 */
+	public Iterable<SubNode> getChildren(MongoSession session, SubNode node, Sort sort, Integer limit) {
+		auth(session, node, PrivilegeType.READ);
+		return getChildrenUnderParentPath(session, node.getPath(), sort, limit);
 	}
 
 	/*
@@ -1076,7 +1090,7 @@ public class MongoApi {
 		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
 		query.addCriteria(criteria);
 
-		SubNode nodeFound = ops.findOne(query, SubNode.class);
+		SubNode nodeFound = findOne(query);
 		if (nodeFound == null) {
 			return 0L;
 		}
@@ -1101,7 +1115,7 @@ public class MongoApi {
 		// query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(50).gt(20));
 		query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(node.getOrdinal()));
 
-		SubNode nodeFound = ops.findOne(query, SubNode.class);
+		SubNode nodeFound = findOne(query);
 		return nodeFound;
 	}
 
@@ -1122,7 +1136,7 @@ public class MongoApi {
 		// query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(50).gt(20));
 		query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).gt(node.getOrdinal()));
 
-		SubNode nodeFound = ops.findOne(query, SubNode.class);
+		SubNode nodeFound = findOne(query);
 		return nodeFound;
 	}
 
@@ -1387,13 +1401,14 @@ public class MongoApi {
 	 * 
 	 * todo-1: There's another type of background procesing that is potentially
 	 * slow/challenging which is to remove all nodes that don't have a parent. How
-	 * to do that effeciently will take some thought. These are just ordinary tree nodes
-	 * that are orphans
+	 * to do that effeciently will take some thought. These are just ordinary tree
+	 * nodes that are orphans
 	 */
 	public void gridMaintenanceScan() {
 		HashMap<ObjectId, UserStats> statsMap = new HashMap<ObjectId, UserStats>();
 
 		adminRunner.run(session -> {
+
 			int delCount = 0;
 			GridFSFindIterable files = gridFsBucket.find();
 			if (files != null) {
@@ -1402,16 +1417,10 @@ public class MongoApi {
 					if (meta != null) {
 						ObjectId id = (ObjectId) meta.get("nodeId");
 						if (id != null) {
-							// this exists query works but regardless, we're gonna NEED the node always if
-							// it DOES exist.
-							// boolean exists = this.nodeExists(id);
-							// if (!exists) {
 							SubNode subNode = getNode(session, id);
 							if (subNode == null) {
 								log.debug("Grid Orphan Delete: " + id.toHexString());
 
-								// I ran across this online (not sure why it's better than Criteria, and never
-								// researched it)
 								// Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
 								Query query = new Query(Criteria.where("_id").is(file.getId()));
 								grid.delete(query);
@@ -1431,13 +1440,30 @@ public class MongoApi {
 				}
 			}
 
+			Iterable<SubNode> accountNodes = getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
+					null);
+
+			// scan all userAccountNodes, and set a zero amount for those not found (which
+			// will be the correct amount).
+			for (SubNode accountNode : accountNodes) {
+				log.debug("Processing Account Node: id=" + accountNode.getId().toHexString());
+				// todo-0: to save cycles, we should first check if the current amount IS ZERO
+				// so we don't unnecessarily save the node.
+				UserStats stats = statsMap.get(accountNode.getOwner());
+				if (stats == null) {
+					stats = new UserStats();
+					stats.binUsage = 0L;
+					statsMap.put(accountNode.getOwner(), stats);
+				}
+			}
+
 			log.debug(String.valueOf(delCount) + " orphans found and deleted.");
 			userManagerService.writeUserStats(session, statsMap);
 		});
 	}
 
-	public void writeStream(MongoSession session, SubNode node, InputStream stream, String fileName, String mimeType,
-			String propName) {
+	public void writeStream(MongoSession session, SubNode node, LimitedInputStream stream, String fileName,
+			String mimeType, String propName) {
 
 		auth(session, node, PrivilegeType.WRITE);
 
@@ -1452,6 +1478,11 @@ public class MongoApi {
 		DBObject metaData = new BasicDBObject();
 		metaData.put("nodeId", node.getId());
 
+		SubNode userNode = getUserNodeByUserName(null, null);
+
+		// back out the current bytes in use by this node.
+		userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
+
 		/*
 		 * Delete any existing grid data stored under this node, before saving new
 		 * attachment
@@ -1459,6 +1490,14 @@ public class MongoApi {
 		deleteBinary(session, node, null);
 
 		String id = grid.store(stream, fileName, mimeType, metaData).toString();
+
+		long streamCount = stream.getCount();
+		//log.debug("upload streamCount=" + streamCount);
+		userManagerService.addBytesToUserNodeBytes(streamCount, userNode, 1);
+
+		if (userNode == null) {
+			throw new RuntimeException("User not found.");
+		}
 
 		/*
 		 * Now save the node also since the property on it needs to point to GridFS id
@@ -1483,6 +1522,7 @@ public class MongoApi {
 		node.setProp(NodeProp.IPFS_LINK.s(), new SubNodePropVal(ipfsHash));
 	}
 
+	// todo-0: move this (and similar functions) into AttachmentService
 	public void deleteBinary(MongoSession session, SubNode node, String propName) {
 		auth(session, node, PrivilegeType.WRITE);
 		if (propName == null) {
@@ -1492,6 +1532,10 @@ public class MongoApi {
 		if (id == null) {
 			return;
 		}
+		// back out the number of bytes it was using (todo-0) need to hunt down ALL grid
+		// ops and make sure they all are updating storage quotas.
+		userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
+
 		grid.delete(new Query(Criteria.where("_id").is(id)));
 	}
 
@@ -1568,7 +1612,7 @@ public class MongoApi {
 		// }
 
 		requireAdmin(session);
-		String newUserNodePath = "/" + NodeName.ROOT + "/" + NodeName.USER + "/?";
+		String newUserNodePath = NodeName.ROOT_OF_ALL_USERS + "/?";
 		// todo-1: is user validated here (no invalid characters, etc. and invalid
 		// flowpaths tested?)
 
@@ -1580,7 +1624,11 @@ public class MongoApi {
 		userNode.setProp(NodeProp.EMAIL.s(), email);
 		userNode.setProp(NodeProp.PWD_HASH.s(), getHashOfPassword(password));
 		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
-		userNode.setContent("User Account: " + user);
+		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
+		userNode.setProp(NodeProp.BIN_TOTAL.s(), 0);
+		userNode.setProp(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA);
+
+		userNode.setContent("### Account: " + user);
 
 		if (!automated) {
 			userNode.setProp(NodeProp.SIGNUP_PENDING.s(), true);
@@ -1619,8 +1667,12 @@ public class MongoApi {
 	}
 
 	public SubNode getUserNodeByUserName(MongoSession session, String user) {
-		if (user == null)
-			return null;
+		if (session == null) {
+			session = getAdminSession();
+		}
+		if (user == null) {
+			user = sessionContext.getUserName();
+		}
 		user = user.trim();
 
 		// For the ADMIN user their root node is considered to be the entire root of the
@@ -1632,12 +1684,31 @@ public class MongoApi {
 		// Other wise for ordinary users root is based off their username
 		Query query = new Query();
 		Criteria criteria = Criteria.where(//
-				SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath("/" + NodeName.ROOT + "/" + NodeName.USER))//
+				SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(NodeName.ROOT_OF_ALL_USERS))//
 				.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
 
 		query.addCriteria(criteria);
-		SubNode ret = ops.findOne(query, SubNode.class);
+		SubNode ret = findOne(query);
 		auth(session, ret, PrivilegeType.READ);
+		return ret;
+	}
+
+	/**
+	 * Looks at the object we just read, and returns the one from the cache instead
+	 * of there is one, otherwise, we would have a dirty read probelm.
+	 * 
+	 * This is an interim solution to dirty-reads at least for the findOne case.
+	 */
+	public SubNode findOne(Query query) {
+		SubNode ret = ops.findOne(query, SubNode.class);
+		if (ret != null) {
+			String hexId = ret.getId().toHexString();
+			SubNode foundInCache = MongoThreadLocal.getDirtyNodes().get(hexId);
+			if (foundInCache != null) {
+				//log.debug("Using cached version: " + hexId);
+				ret = foundInCache;
+			}
+		}
 		return ret;
 	}
 
@@ -1654,7 +1725,7 @@ public class MongoApi {
 				.and(SubNode.FIELD_PROPERTIES + "." + propName + ".value").is(propVal);
 
 		query.addCriteria(criteria);
-		SubNode ret = ops.findOne(query, SubNode.class);
+		SubNode ret = findOne(query);
 		auth(session, ret, PrivilegeType.READ);
 		return ret;
 	}

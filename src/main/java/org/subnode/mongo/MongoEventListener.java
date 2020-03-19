@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
+import org.springframework.data.mongodb.core.mapping.event.AfterConvertEvent;
+import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 
@@ -137,6 +139,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.setModifyTime(now);
 		}
 
+		// Long binTot = node.getIntProp(NodeProp.BIN_TOTAL.s());
+		// if (binTot != null) {
+		// 	log.debug("hashCode=" + node.hashCode() + " binTot=" + binTot);
+		// } else {
+		// 	log.debug("no binTot prop.");
+		// }
+
 		removeDefaultProps(node);
 	}
 
@@ -166,6 +175,24 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void onAfterSave(AfterSaveEvent<SubNode> event) {
 		SubNode node = event.getSource();
 		node.setWriting(false);
+	}
+
+	@Override
+	public void onAfterLoad(AfterLoadEvent<SubNode> event) {
+		// Document dbObj = event.getDocument();
+		// log.debug("onAfterLoad:
+		// id="+dbObj.getObjectId(SubNode.FIELD_ID).toHexString());
+	}
+
+	@Override
+	public void onAfterConvert(AfterConvertEvent<SubNode> event) {
+		Document dbObj = event.getDocument();
+		String id = dbObj.getObjectId(SubNode.FIELD_ID).toHexString();
+		//log.debug("onAfterConvert: id=" + id);
+		if (MongoThreadLocal.getDirtyNodes().get(id) != null) {
+			//throw new RuntimeException("Dirty Read: " + id);
+			log.debug("dirty read.");
+		}
 	}
 
 	// @Override

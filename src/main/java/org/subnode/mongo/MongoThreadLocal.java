@@ -34,6 +34,7 @@ public class MongoThreadLocal {
 		dirtyNodes.set(res);
 	}
 
+	//todo-0: make this use the actual ObjectId as the key, not the hexs tring
 	public static HashMap<String, SubNode> getDirtyNodes() {
 		if (dirtyNodes.get() == null) {
 			dirtyNodes.set(new HashMap<String, SubNode>());

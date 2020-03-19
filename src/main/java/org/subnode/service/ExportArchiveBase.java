@@ -159,31 +159,30 @@ public abstract class ExportArchiveBase {
 			 */
 			List<ExportPropertyInfo> allProps = new LinkedList<ExportPropertyInfo>();
 			ValContainer<String> contentText = new ValContainer<String>();
-			ValContainer<String> binVerProp = new ValContainer<String>();
 			ValContainer<String> binFileNameProp = new ValContainer<String>();
+			ValContainer<String> binProp = new ValContainer<String>();
 
 			if (node.getProperties() != null) {
 				node.getProperties().forEach((propName, propVal) -> {
 
 					// log.debug(" PROP: "+propName);
 
-					if (propName.equals(NodeProp.BIN_FILENAME)) {
+					if (propName.equals(NodeProp.BIN_FILENAME.s())) {
 						binFileNameProp.setVal(propVal.getValue().toString());
 					}
-
-					if (propName.equals(NodeProp.BIN_VER)) {
-						binVerProp.setVal(propVal.getValue().toString());
-					} else {
-						ExportPropertyInfo propInfo = new ExportPropertyInfo();
-						propInfo.setName(propName);
-						propInfo.setVal(propVal.getValue());
-
-						// I decided we should just infer the type from the property name and not
-						// store it in the file.
-						// propInfo.setType(NodePropertyTypes.getTypeOfObject(propVal.getValue()));
-
-						allProps.add(propInfo);
+					else if (propName.equals(NodeProp.BIN.s())) {
+						binProp.setVal(propVal.getValue().toString());
 					}
+
+					ExportPropertyInfo propInfo = new ExportPropertyInfo();
+					propInfo.setName(propName);
+					propInfo.setVal(propVal.getValue());
+
+					// I decided we should just infer the type from the property name and not
+					// store it in the file.
+					// propInfo.setType(NodePropertyTypes.getTypeOfObject(propVal.getValue()));
+
+					allProps.add(propInfo);
 				});
 			}
 
@@ -218,7 +217,7 @@ public abstract class ExportArchiveBase {
 			 * If we had a binary property on this node we write the binary file into a
 			 * separate file
 			 */
-			if (binVerProp.getVal() != null) {
+			if (binProp.getVal() != null) {
 				String binFileNameStr = binFileNameProp.getVal() != null ? binFileNameProp.getVal() : "binary";
 				AutoCloseInputStream is = null;
 

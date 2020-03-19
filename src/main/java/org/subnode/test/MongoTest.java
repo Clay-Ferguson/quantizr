@@ -12,6 +12,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.UserPreferencesNode;
+import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.XString;
 
 import org.apache.commons.io.FileUtils;
@@ -231,7 +232,8 @@ public class MongoTest {
 		try {
 			SubNode node = api.createNode(session, "/binaries");
 			api.save(session, node);
-			api.writeStream(session, node, new FileInputStream("/home/clay/test-image.png"), null, "image/png", null);
+			int maxFileSize = 20 * 1024 * 1024; //put at least the MB part in Const.java (todo-0)
+			api.writeStream(session, node, new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png", null);
 			api.save(session, node);
 
 			log.debug("inserted root for binary testing.", null, "image/png", null);

@@ -70,8 +70,6 @@ public enum NodeProp {
     EMAIL("sn:email", "s"), //
     CODE("sn:code", "s"), //
 
-    BIN_VER("sn:binVer", "s"), //
-
     BIN_MIME("sn:mimeType", "s"), //
     BIN_FILENAME("sn:fileName", "s"), //
     BIN_SIZE("sn:size", "s"), //
@@ -92,6 +90,9 @@ public enum NodeProp {
     IMG_HEIGHT("sn:imgHeight", "s"), //
 
     BIN_TOTAL("sn:binTot", "s"),//
+
+    //amount of bytes the user is ALLOWED to save.
+    BIN_QUOTA("sn:binQuota", "s"),//
 
     // todo-1: add sn:prefix
     INLINE_CHILDREN("inlineChildren", "s"), //

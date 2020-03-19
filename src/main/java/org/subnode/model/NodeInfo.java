@@ -38,8 +38,6 @@ public class NodeInfo {
 	private boolean firstChild;
 	private boolean lastChild;
 	
-	private long binVer;
-	private long avatarBinVer;
 	private int width;
 	private int height;
 
@@ -59,7 +57,7 @@ public class NodeInfo {
 
 	public NodeInfo(String id, String name, String content, String owner, String ownerId, Long ordinal, Date lastModified,
 			List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
-		 long binVer, long avatarBinVer, int width, int height, String type, long logicalOrdinal,
+		 int width, int height, String type, long logicalOrdinal,
 			boolean firstChild, boolean lastChild, String cipherKey) {
 		this.id = id;
 		this.name = name;
@@ -73,8 +71,6 @@ public class NodeInfo {
 		this.hasChildren = hasChildren;
 		this.firstChild = firstChild;
 		this.lastChild = lastChild;
-		this.binVer = binVer;
-		this.avatarBinVer = avatarBinVer;
 		this.width = width;
 		this.height = height;
 		this.type = type;
@@ -152,22 +148,6 @@ public class NodeInfo {
 
 	public void setHasChildren(boolean hasChildren) {
 		this.hasChildren = hasChildren;
-	}
-
-	public long getBinVer() {
-		return binVer;
-	}
-
-	public void setBinVer(long binVer) {
-		this.binVer = binVer;
-	}
-
-	public long getAvatarBinVer() {
-		return avatarBinVer;
-	}
-
-	public void setAvatarBinVer(long avatarBinVer) {
-		this.avatarBinVer = avatarBinVer;
 	}
 
 	public int getWidth() {

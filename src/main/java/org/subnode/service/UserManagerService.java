@@ -20,6 +20,7 @@ import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.CloseAccountRequest;
+import org.subnode.request.GetUserAccountInfoRequest;
 import org.subnode.request.LoginRequest;
 import org.subnode.request.ResetPasswordRequest;
 import org.subnode.request.SavePublicKeyRequest;
@@ -27,11 +28,13 @@ import org.subnode.request.SaveUserPreferencesRequest;
 import org.subnode.request.SignupRequest;
 import org.subnode.response.ChangePasswordResponse;
 import org.subnode.response.CloseAccountResponse;
+import org.subnode.response.GetUserAccountInfoResponse;
 import org.subnode.response.LoginResponse;
 import org.subnode.response.ResetPasswordResponse;
 import org.subnode.response.SavePublicKeyResponse;
 import org.subnode.response.SaveUserPreferencesResponse;
 import org.subnode.response.SignupResponse;
+import org.subnode.util.Const;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
@@ -168,17 +171,67 @@ public class UserManagerService {
 		return res;
 	}
 
-	/** 
+	/**
 	 * @param session
-	 * @param userStats Holds a map of User Root Node (account node) IDs as key mapped to the UserStats for that user.
+	 * @param userStats Holds a map of User Root Node (account node) IDs as key
+	 *                  mapped to the UserStats for that user.
 	 */
 	public void writeUserStats(final MongoSession session, HashMap<ObjectId, UserStats> userStats) {
 		userStats.forEach((final ObjectId key, final UserStats stat) -> {
 			SubNode node = api.getNode(session, key);
 			if (node != null) {
+				//log.debug("Setting stat.binUsage=" + stat.binUsage);
 				node.setProp(NodeProp.BIN_TOTAL.s(), stat.binUsage);
-			} 
+				node.setProp(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA); 
+			} else {
+				log.debug("Node not found by key: " + key);
+			}
 		});
+	}
+
+	/**
+	 * increments the userNode usasage bytes by adding the bytes the attachment uses
+	 * on 'node'
+	 * 
+	 * @param node
+	 * @param userNode
+	 * @param sign     Controls if this is a subtract or an add (should be always 1
+	 *                 or -1)
+	 */
+	public void addNodeBytesToUserNodeBytes(SubNode node, SubNode userNode, int sign) {
+		if (node == null) {
+			throw new RuntimeException("node was null.");
+		}
+
+		// get the size of the attachment on this node
+		long binSize = node.getIntProp(NodeProp.BIN_SIZE.s());
+		if (binSize > 0L) {
+			//log.debug("Will +/- amt: " + binSize);
+
+			if (userNode == null) {
+				userNode = api.getUserNodeByUserName(null, null);
+			}
+
+			addBytesToUserNodeBytes(binSize, userNode, sign);
+		}
+	}
+
+	public void addBytesToUserNodeBytes(long binSize, SubNode userNode, int sign) {
+		if (userNode == null) {
+			userNode = api.getUserNodeByUserName(null, null);
+		}
+		// get the current binTotal on the user account
+		Long binTotal = userNode.getIntProp(NodeProp.BIN_TOTAL.s());
+		if (binTotal == null) {
+			binTotal = 0L;
+		}
+		//log.debug("before binTotal=" + binTotal);
+		binTotal += sign * binSize;
+		if (binTotal < 0) {
+			binTotal = 0L;
+		}
+		//log.debug("after binTotal=" + binTotal);
+		userNode.setProp(NodeProp.BIN_TOTAL.s(), binTotal);
 	}
 
 	/*
@@ -334,6 +387,28 @@ public class UserManagerService {
 
 			// don't display a message unless this was a user-initiated save.
 			// res.setMessage("Key Saved");
+		});
+		return res;
+	}
+
+	public GetUserAccountInfoResponse getUserAccountInfo(final GetUserAccountInfoRequest req) {
+		GetUserAccountInfoResponse res = new GetUserAccountInfoResponse();
+		final String userName = sessionContext.getUserName();
+
+		adminRunner.run(session -> {
+			SubNode userNode = api.getUserNodeByUserName(session, userName);
+			if (userNode == null) {
+				res.setMessage("unknown user.");
+				res.setSuccess(false);
+			}
+
+			Long binQuota = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
+			Long binTotal = userNode.getIntProp(NodeProp.BIN_TOTAL.s());
+
+			// I really need to convert these props to Integers not Strings
+			res.setBinQuota(binQuota == null ? -1 : binQuota.intValue());
+			res.setBinTotal(binTotal == null ? -1 : binTotal.intValue());
+			res.setSuccess(true);
 		});
 		return res;
 	}

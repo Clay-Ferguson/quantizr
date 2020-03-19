@@ -60,6 +60,22 @@ export class Util implements UtilIntf {
         return !!v.match(/^[0-9a-zA-Z\-_]+$/);
     }
 
+    formatMemory = (val: number): string => {
+        //put these vals in const file KB,MB,GB
+        if (val < 1024) {
+            if (val < 1) {
+                return "0 bytes";
+            }
+            return `${(val).toFixed(1)} bytes`;
+        }
+        else if (val < 1024 * 1024) {
+            return `${(val / 1024).toFixed(1)} KB`;
+        }
+        else if (val < 1024 * 1024 * 1024) {
+            return `${(val / (1024 * 1024)).toFixed(1)} MB`;
+        }
+    }
+
     hashOfString = (s: string): number => {
         let hash = 0, i, chr;
         if (s.length === 0) return hash;
@@ -277,6 +293,7 @@ export class Util implements UtilIntf {
 
     /* I'm duplicating toJson for now, because i always expect "prettyPrint", so i need to refactor to be all prettyPrint */
     prettyPrint = (obj: Object) => {
+        if (!obj) return "null";
         return JSON.stringify(obj, null, 4);
     }
 
@@ -348,6 +365,7 @@ export class Util implements UtilIntf {
     ajax = <RequestType, ResponseType>(postName: string, postData: RequestType, //
         callback?: (response: ResponseType) => void, //
         failCallback?: (info: string) => void) => {
+        postData = postData || {} as RequestType;
         let axiosRequest;
 
         try {

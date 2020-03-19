@@ -88,7 +88,6 @@ export class Props implements PropsIntf {
             properties.forEach((property: J.PropertyInfo) => {
                 //console.log("Render Prop: "+property.name);
                 if (S.render.allowPropertyToDisplay(property.name)) {
-                    var isBinaryProp = S.render.isBinaryProperty(property.name);
 
                     let propNameCell = new PropTableCell(property.name /*S.render.sanitizePropertyName(property.name) */, {
                         className: "prop-table-name-col"
@@ -98,14 +97,8 @@ export class Props implements PropsIntf {
                         className: "prop-table-val-col"
                     };
                     let propValCell: PropTableCell;
-
-                    if (isBinaryProp) {
-                        propValCell = new PropTableCell("[binary]", valCellAttrs);
-                    }
-                    else {
-                        propValCell = new PropTableCell(property.value, valCellAttrs);
-                    }
-
+                    propValCell = new PropTableCell(property.value, valCellAttrs);
+                    
                     let propTableRow = new PropTableRow({
                         className: "prop-table-row"
                     }, [propNameCell, propValCell])
@@ -184,7 +177,7 @@ export class Props implements PropsIntf {
     }
 
     hasBinary = (node: J.NodeInfo): boolean => {
-        return !!S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+        return !!S.props.getNodePropVal(J.NodeProp.BIN, node);
     }
 
     hasImage = (node: J.NodeInfo): boolean => {

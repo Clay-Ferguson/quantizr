@@ -72,7 +72,8 @@ export class EditNodeDlg extends DialogBase {
 
     //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
     //to dangerously opt into this also without hacking the code with this var.
-    allowEditAllProps: boolean = false;
+    //For admin user we need a checkbox for this (todo-0)
+    allowEditAllProps: boolean = true;
 
     constructor(private node: J.NodeInfo) {
         super("Edit Node", "app-modal-content", false, true);
@@ -234,8 +235,7 @@ export class EditNodeDlg extends DialogBase {
                 }
 
                 if (this.allowEditAllProps || (
-                    (!S.render.isReadOnlyProperty(prop.name) &&
-                        !S.render.isBinaryProperty(prop.name)) || S.edit.showReadOnlyProperties)) {
+                    !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
                     let tableRow = this.makePropEditor(prop);
                     collapsiblePropsTable.addChild(tableRow);
                 }
@@ -442,8 +442,7 @@ export class EditNodeDlg extends DialogBase {
                     //console.log("prop to save?: "+prop.name);
 
                     /* Ignore this property if it's one that cannot be edited as text, or has already been handled/processed */
-                    if (!this.allowEditAllProps && (S.render.isReadOnlyProperty(prop.name) || //
-                        S.render.isBinaryProperty(prop.name))) {
+                    if (!this.allowEditAllProps && S.render.isReadOnlyProperty(prop.name)) {
                         return;
                     }
 
@@ -474,10 +473,9 @@ export class EditNodeDlg extends DialogBase {
         //console.log("Property single-type: " + propEntry.property.name);
 
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
-        let isBinary = S.render.isBinaryProperty(propEntry.name);
 
         let formGroup = new FormGroup();
-        let propVal = isBinary ? "[binary]" : propEntry.value;
+        let propVal = propEntry.value;
 
         let label = propEntry.name; //S.render.sanitizePropertyName(propEntry.property.name);
         let propValStr = propVal ? propVal : "";
@@ -487,9 +485,9 @@ export class EditNodeDlg extends DialogBase {
 
         //todo-1: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
         //and be better with a Textfield based editor
-        if (isReadOnly || isBinary) {
+        if (!this.allowEditAllProps && isReadOnly) {
             let textarea = new Textarea(label + " (read-only)", {
-                "readonly": "readonly",
+                "readOnly": "readOnly",
                 "disabled": "disabled",
                 "defaultValue": propValStr
             });

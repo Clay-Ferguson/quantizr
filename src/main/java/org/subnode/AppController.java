@@ -43,6 +43,7 @@ import org.subnode.request.ExecuteNodeRequest;
 import org.subnode.request.ExportRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.GetServerInfoRequest;
+import org.subnode.request.GetUserAccountInfoRequest;
 import org.subnode.request.GraphRequest;
 import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.InsertBookRequest;
@@ -669,6 +670,7 @@ public class AppController {
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
 			HttpSession session) {
 		return callProc.run("upload", null, session, ms -> {
+			//log.debug("Uploading as user: "+ms.getUser());
 			return attachmentService.uploadMultipleFiles(ms, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
 					"true".equalsIgnoreCase(ipfs));
 		});
@@ -732,6 +734,14 @@ public class AppController {
 			HttpSession session) {
 		return callProc.run("saveUserPreferences", req, session, ms -> {
 			return userManagerService.saveUserPreferences(req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/getUserAccountInfo", method = RequestMethod.POST)
+	public @ResponseBody Object getUserAccountInfo(@RequestBody GetUserAccountInfoRequest req,
+			HttpSession session) {
+		return callProc.run("getUserAcccountInfo", req, session, ms -> {
+			return userManagerService.getUserAccountInfo(req);
 		});
 	}
 
