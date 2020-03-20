@@ -204,7 +204,8 @@ public class NodeRenderService {
 		String orderBy = node.getStringProp("orderBy");
 		Sort sort = null;
 		if ("priority asc".equalsIgnoreCase(orderBy)) {
-			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_PROPERTIES + ".priority");
+			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_PROPERTIES + ".priority").and(
+				Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
 		} else {
 			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
 		}
