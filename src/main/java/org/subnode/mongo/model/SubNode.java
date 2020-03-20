@@ -410,6 +410,14 @@ public class SubNode {
 			SubNodePropVal v = properties().get(key);
 			if (v == null)
 				return null;
+
+			if (v.getValue() instanceof Integer) {
+				return String.valueOf((Integer)v.getValue());
+			}
+			if (v.getValue() instanceof Long) {
+				return String.valueOf((Long)v.getValue());
+			}
+			
 			return (String) v.getValue();
 		} catch (Exception e) {
 			ExUtil.error(log, "failed to get String from key: " + key, e);
@@ -425,9 +433,13 @@ public class SubNode {
 				return 0L;
 			Object val = v.getValue();
 
-			// automatically coerce Integer values to Longs.
 			if (val instanceof Integer) {
-				return new Long((Integer) val);
+				return Long.valueOf((Integer)val); 
+			}
+
+			//todo-0: When saving from client the values are always sent as strings, and this is a workaround until that changes.
+			if (val instanceof String) {
+				return Long.parseLong((String)val);
 			}
 			return (Long) v.getValue();
 		} catch (Exception e) {

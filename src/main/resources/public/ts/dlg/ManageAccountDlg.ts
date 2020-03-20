@@ -46,7 +46,7 @@ export class ManageAccountDlg extends DialogBase {
                         used = "0%";
                     }
                     else {
-                        used = (res.binTotal / res.binQuota).toFixed(2) + "%";
+                        used = (res.binTotal * 100 / res.binQuota).toFixed(1) + "%";
                     }
                 }
 
