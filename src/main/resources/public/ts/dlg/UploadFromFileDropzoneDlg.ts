@@ -25,6 +25,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     explodeZips: boolean = false;
     dropzone: any = null;
     dropzoneDiv: Div = null;
+    sent: boolean = false;
 
     constructor(private toIpfs: boolean) {
         super(toIpfs ? "Upload File to IPFS" : "Upload File");
@@ -98,6 +99,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("sending", function (file, xhr, formData) {
+                    this.sent = true;
                     formData.append("nodeId", S.attachment.uploadNode.id);
                     formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
                     formData.append("ipfs", dlg.toIpfs ? "true" : "false");
@@ -105,9 +107,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("queuecomplete", function (arg) {
-                    //this event gets fired even when the user had attemped to upload a file that was too large, so
-                    //we check if there WERE any files actually in the list before we decide an upload has been completed.
-                    if (this.fileList && this.fileList.length > 0) {
+                    if (this.sent) {
                         dlg.close();
                         S.meta64.refresh();
                     }
