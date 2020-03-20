@@ -49,8 +49,6 @@ public class Convert {
 			boolean allowInlineChildren, boolean firstChild, boolean lastChild) {
 
 		ImageSize imageSize = null;
-
-		String bin = node.getStringProp(NodeProp.BIN.s());
 		String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 		if (mimeType != null) {
 			boolean isImage = api.isImageAttached(node);

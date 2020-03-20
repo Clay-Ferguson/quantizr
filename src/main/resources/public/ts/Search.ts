@@ -155,7 +155,7 @@ export class Search implements SearchIntf {
 
     makeButtonBarHtml = (node: J.NodeInfo): Comp => {
         let avatarImg: Img = null;
-        if (node.owner != J.PrincipalName.ADMIN && S.props.getNodePropVal(J.NodeProp.BIN, node)) {
+        if (node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, node) */) {
             avatarImg = S.render.makeAvatarImage(node);
         }
 

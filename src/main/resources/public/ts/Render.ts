@@ -614,7 +614,7 @@ export class Render implements RenderIntf {
         }
 
         let avatarImg: Img;
-        if (allowAvatar && node.owner != J.PrincipalName.ADMIN && S.props.getNodePropVal(J.NodeProp.BIN, node)) {
+        if (allowAvatar && node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, node) */) {
             avatarImg = this.makeAvatarImage(node); 
         }
 
@@ -803,7 +803,7 @@ export class Render implements RenderIntf {
                         }
 
                         let avatarImg: Img;
-                        if (data.node.owner != J.PrincipalName.ADMIN && S.props.getNodePropVal(J.NodeProp.BIN, data.node)) {
+                        if (data.node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, data.node) */) {
                             avatarImg = this.makeAvatarImage(data.node);
                         }
 
@@ -1092,7 +1092,7 @@ export class Render implements RenderIntf {
     }
 
     getAvatarImgUrl = (node: J.NodeInfo) => { 
-        return S.util.getRpcPath() + "bin/" + S.props.getNodePropVal(J.NodeProp.BIN, node) + "?nodeId=" + encodeURIComponent(node.ownerId);
+        return S.util.getRpcPath() + "bin/" + node.id /* S.props.getNodePropVal(J.NodeProp.BIN, node) */ + "?nodeId=" + encodeURIComponent(node.ownerId);
     }
 
     makeImageTag = (node: J.NodeInfo): Img => {

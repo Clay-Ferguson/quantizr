@@ -627,13 +627,16 @@ which it will do by default. */
 With "Display: table", the only way to get the internal 'node-grid-item' cell content to render with the SAME
 height as the actual cell (i.e. fill up the entire cell) is to use "height: 100%" on the table, and the table-row, 
 and the table-cell (all three)
+
+update: oops, that 100% is causing vertical scrollbar to ALWAYS show up because something's off by a few pixels, so
+i'm backing out for now
 */
 .node-grid-table {
     display: table;
     width: 100%;
     table-layout: fixed;
     margin-top: 10px;
-    height: 100%;
+    //height: 100%;
 
     // if you ever need rounded cells, these two are needed with that.
     // border-collapse: separate;
@@ -643,7 +646,7 @@ and the table-cell (all three)
 .node-grid-item {
     padding-right: 1.5em;
     outline: none;
-    height: 100%;
+    //height: 100%;
 }
 
 .node-grid-row {
@@ -654,7 +657,7 @@ and the table-cell (all three)
     border: 1px dotted gray;
     overflow-x: auto;
     display: table-cell;
-    height: 100%;
+    //height: 100%;
 
     //not doing rounded cells because the selector (selected node) marker in them is asthetically ugly
     //border-radius: $borderRadiusMedium;
