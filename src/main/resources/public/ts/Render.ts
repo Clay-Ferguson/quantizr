@@ -534,7 +534,6 @@ export class Render implements RenderIntf {
             });
         }
 
-        //todo-1: rename this to sn:inlineChildren
         let isInlineChildren = !!S.props.getNodePropVal(J.NodeProp.INLINE_CHILDREN, node);
 
         /* Construct Open Button.
@@ -615,7 +614,7 @@ export class Render implements RenderIntf {
 
         let avatarImg: Img;
         if (allowAvatar && node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, node) */) {
-            avatarImg = this.makeAvatarImage(node); 
+            avatarImg = this.makeAvatarImage(node);
         }
 
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
@@ -929,6 +928,7 @@ export class Render implements RenderIntf {
          */
 
         let layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
+        this.lastOwner = node.owner;
         if (!layout || layout == "v") {
             return this.renderVerticalLayout(node, newData, level);
         }
@@ -936,7 +936,8 @@ export class Render implements RenderIntf {
             return this.renderTableLayout(node, newData, level, layout);
         }
         else {
-            throw new Error("Invalid layout");
+            //of no layout is valid, fall back on vertical.
+            return this.renderVerticalLayout(node, newData, level);
         }
     }
 
@@ -996,7 +997,7 @@ export class Render implements RenderIntf {
 
                 let curCol = new Div(null, {
                     className: 'node-grid-cell',
-                    style: { 
+                    style: {
                         width: cellWidth + '%',
                         maxWidth: cellWidth + '%'
                     }
@@ -1081,7 +1082,7 @@ export class Render implements RenderIntf {
         //todo-0: after removing bin_Ver we need to do security by accepting the nodeId and verifying IT's ownership and also that IT has the 'bin' on it, 
         //and also making sure the user cannot directly enter/save 'bin' on any node even if they own the node.
         //todo-0: or is it simpler to put the 'ownerId' in the metadata of teh node itself??? That might even make the compactDB maintenance faster?
-        let ret = S.util.getRpcPath() + "bin/"+S.props.getNodePropVal(J.NodeProp.BIN, node) + "?nodeId=" + encodeURIComponent(node.id);
+        let ret = S.util.getRpcPath() + "bin/" + S.props.getNodePropVal(J.NodeProp.BIN, node) + "?nodeId=" + encodeURIComponent(node.id);
         //console.log("Attachment id=" + node.id + " URL=" + ret);
         return ret;
     }
@@ -1091,7 +1092,7 @@ export class Render implements RenderIntf {
         return S.util.getRpcPath() + "stream/" + node.id + "?bin=" + S.props.getNodePropVal(J.NodeProp.BIN, node);
     }
 
-    getAvatarImgUrl = (node: J.NodeInfo) => { 
+    getAvatarImgUrl = (node: J.NodeInfo) => {
         return S.util.getRpcPath() + "bin/" + node.id /* S.props.getNodePropVal(J.NodeProp.BIN, node) */ + "?nodeId=" + encodeURIComponent(node.ownerId);
     }
 
@@ -1132,8 +1133,8 @@ export class Render implements RenderIntf {
         return img;
     }
 
-    makeAvatarImage = (node: J.NodeInfo) => { 
-        let src: string = this.getAvatarImgUrl(node); 
+    makeAvatarImage = (node: J.NodeInfo) => {
+        let src: string = this.getAvatarImgUrl(node);
         //console.log("avatarImage src=" + src);
 
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
