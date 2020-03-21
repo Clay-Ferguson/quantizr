@@ -36,7 +36,7 @@ public class SessionContext {
 	RepositoryUtil repoUtil;
 
 	/* Identification of user's account root node */
-	//private Ref_Info rootRef_Info;
+	// private Ref_Info rootRef_Info;
 	private String rootId;
 
 	private String userName;

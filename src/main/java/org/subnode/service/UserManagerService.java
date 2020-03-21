@@ -230,6 +230,12 @@ public class UserManagerService {
 		if (binTotal < 0) {
 			binTotal = 0L;
 		}
+
+		Long userQuota = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
+		if (binTotal > userQuota) {
+			throw new RuntimeException("You are out of storage space.");
+		}
+
 		//log.debug("after binTotal=" + binTotal);
 		userNode.setProp(NodeProp.BIN_TOTAL.s(), binTotal);
 	}
