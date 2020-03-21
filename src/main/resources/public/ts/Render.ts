@@ -1077,23 +1077,29 @@ export class Render implements RenderIntf {
         return row;
     }
 
+    getMediaIdNode = (node: J.NodeInfo): string => {
+        let mediaId = S.props.getNodePropVal(J.NodeProp.BIN, node);
+        if (!mediaId) {
+            mediaId = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+        }
+        return mediaId;
+    }
+
     getUrlForNodeAttachment = (node: J.NodeInfo): string => {
-        //todo-1: Change to node.id and then re-test this
-        //todo-0: after removing bin_Ver we need to do security by accepting the nodeId and verifying IT's ownership and also that IT has the 'bin' on it, 
-        //and also making sure the user cannot directly enter/save 'bin' on any node even if they own the node.
-        //todo-0: or is it simpler to put the 'ownerId' in the metadata of teh node itself??? That might even make the compactDB maintenance faster?
-        let ret = S.util.getRpcPath() + "bin/" + S.props.getNodePropVal(J.NodeProp.BIN, node) + "?nodeId=" + encodeURIComponent(node.id);
+        let filePart = this.getMediaIdNode(node);
+        let ret = S.util.getRpcPath() + "bin/" + filePart + "?nodeId=" + encodeURIComponent(node.id);
         //console.log("Attachment id=" + node.id + " URL=" + ret);
         return ret;
     }
 
-    //todo-0: need to be more consistent aboutu how binary urls are formatted 
     getStreamUrlForNodeAttachment = (node: J.NodeInfo): string => {
-        return S.util.getRpcPath() + "stream/" + node.id + "?bin=" + S.props.getNodePropVal(J.NodeProp.BIN, node);
+        let filePart = this.getMediaIdNode(node);
+        return S.util.getRpcPath() + "stream/" + filePart + "?nodeId=" + node.id;
     }
 
     getAvatarImgUrl = (node: J.NodeInfo) => {
-        return S.util.getRpcPath() + "bin/" + node.id /* S.props.getNodePropVal(J.NodeProp.BIN, node) */ + "?nodeId=" + encodeURIComponent(node.ownerId);
+        let filePart = this.getMediaIdNode(node);
+        return S.util.getRpcPath() + "bin/" + filePart + "?nodeId=" + encodeURIComponent(node.ownerId);
     }
 
     makeImageTag = (node: J.NodeInfo): Img => {
@@ -1111,10 +1117,6 @@ export class Render implements RenderIntf {
             className: "attached-img",
             style: {
                 maxWidth: maxWidth,
-                cursor: "pointer",
-                marginLeft: "20px",
-                marginBottom: "15px",
-                paddingRight: "20px"
             },
             "title": "Click image to enlarge/reduce"
         });

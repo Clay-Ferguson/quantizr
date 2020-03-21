@@ -109,7 +109,7 @@ public class AttachmentService {
 			 */
 			SubNode node = api.getNode(session, nodeId);
 
-			//load into cache immediately so the dirty-read interim solution works
+			// load into cache immediately so the dirty-read interim solution works
 			MongoThreadLocal.dirty(node);
 
 			if (node == null) {
@@ -446,7 +446,12 @@ public class AttachmentService {
 			log.debug("Getting Binary for nodeId=" + nodeId + " size=" + size);
 
 			response.setContentType(mimeTypeProp);
-			response.setContentLength((int) size);
+
+			//we gracefully tolerate the case where no size is available but normally it will be there.
+			//todo-0: when we detect this and then stream back some data shuold be just go ahead and SET the correct 'size' at that point?
+			if (size > 0) {
+				response.setContentLength((int) size);
+			}
 			response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
 			response.setHeader("Cache-Control", "public, max-age=31536000");
 

@@ -72,8 +72,7 @@ export class EditNodeDlg extends DialogBase {
 
     //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
     //to dangerously opt into this also without hacking the code with this var.
-    //For admin user we need a checkbox for this (todo-0)
-    allowEditAllProps: boolean = true;
+    allowEditAllProps: boolean = S.meta64.isAdminUser;
 
     constructor(private node: J.NodeInfo) {
         super("Edit Node", "app-modal-content", false, true);

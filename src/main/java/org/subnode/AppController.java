@@ -634,9 +634,10 @@ public class AppController {
 		});
 	}
 
-	@RequestMapping(value = API_PATH + "/stream/{nodeId}", method = RequestMethod.GET)
+	@RequestMapping(value = API_PATH + "/stream/{fileName}", method = RequestMethod.GET)
 	public void streamMultiPart(//
-			@PathVariable("nodeId") String nodeId, //
+			@PathVariable("fileName") String fileName, //
+			@RequestParam("nodeId") String nodeId,
 			@RequestParam(name = "disp", required = false) final String disp, //
 			HttpServletRequest request, HttpServletResponse response, //
 			HttpSession session) {

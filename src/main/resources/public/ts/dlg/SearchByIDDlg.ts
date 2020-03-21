@@ -72,7 +72,8 @@ export class SearchByIDDlg extends DialogBase {
             "sortField": "",
             "searchProp": "node.id",
             "fuzzy": false,
-            "caseSensitive": false
+            "caseSensitive": false,
+            "searchDefinition": ""
         }, this.searchNodesResponse);
     }
 

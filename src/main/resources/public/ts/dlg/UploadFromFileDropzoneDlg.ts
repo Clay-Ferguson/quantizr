@@ -4,7 +4,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
-import { Constants as C } from "../Constants";
+import { Constants as C, Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 
@@ -65,7 +65,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
             paramName: "files",
-            maxFilesize: 20, //<---put in a variable
+            maxFilesize: Constants.MAX_UPLOAD_MB,
             parallelUploads: 2,
 
             /* Not sure what's this is for, but the 'files' parameter on the server is always NULL, unless
@@ -81,8 +81,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             // 'this' that is in scope during each call must be left as is.
             init: function () {
                 this.on("addedfile", function (file) {
-                    if (file.size > 20 * 1024 * 1024) { //put number in variable (todo-0)
-                        S.util.showMessage("File is too large. Max Size=20MB");
+                    if (file.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB) {
+                        S.util.showMessage("File is too large. Max Size=" + Constants.MAX_UPLOAD_MB + "MB");
                         return;
                     }
                     dlg.updateFileList(this);
@@ -149,8 +149,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         }
 
         for (let file of this.fileList) {
-            //todo-0: put this max in a const file.
-            if (file.size > 20 * 1024 * 1024) {
+            if (file.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB) {
                 return false;
             }
         }
@@ -170,7 +169,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     runButtonEnablement = (): void => {
         let valid = this.filesAreValid();
 
-        //todo-0: why does setEnabled work just fine but setVisible doesn't work?
+        //todo-1: why does setEnabled work just fine but setVisible doesn't work?
         this.uploadButton.setEnabled(valid);
     }
 

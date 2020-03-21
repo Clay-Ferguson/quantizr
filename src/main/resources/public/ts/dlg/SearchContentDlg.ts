@@ -86,7 +86,8 @@ export class SearchContentDlg extends DialogBase {
             "sortField": "",
             "searchProp": "",
             "fuzzy": fuzzy,
-            "caseSensitive": caseSensitive
+            "caseSensitive": caseSensitive,
+            "searchDefinition": ""
         }, this.searchNodesResponse);
     }
 

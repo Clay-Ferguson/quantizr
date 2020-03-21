@@ -92,7 +92,8 @@ export class Search implements SearchIntf {
             "sortField": prop,
             "searchProp": null,
             "fuzzy": false,
-            "caseSensitive": false
+            "caseSensitive": false,
+            "searchDefinition": ""
         }, this.timelineResponse);
     }
 

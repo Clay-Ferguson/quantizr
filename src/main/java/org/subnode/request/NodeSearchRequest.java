@@ -22,6 +22,9 @@ public class NodeSearchRequest extends RequestBase {
 
 	private boolean caseSensitive;
 
+	//special definition name for pre-defined searches like "AllUserSharedNodes", or "AllPublicNodes"
+	private String searchDefinition;
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -76,5 +79,13 @@ public class NodeSearchRequest extends RequestBase {
 
 	public void setCaseSensitive(boolean caseSensitive) {
 		this.caseSensitive = caseSensitive;
+	}
+
+	public String getSearchDefinition() {
+		return searchDefinition;
+	}
+
+	public void setSearchDefinition(String searchDefinition) {
+		this.searchDefinition = searchDefinition;
 	}
 }

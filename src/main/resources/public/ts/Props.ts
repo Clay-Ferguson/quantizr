@@ -98,7 +98,7 @@ export class Props implements PropsIntf {
                     };
                     let propValCell: PropTableCell;
                     propValCell = new PropTableCell(property.value, valCellAttrs);
-                    
+
                     let propTableRow = new PropTableRow({
                         className: "prop-table-row"
                     }, [propNameCell, propValCell])
@@ -177,7 +177,8 @@ export class Props implements PropsIntf {
     }
 
     hasBinary = (node: J.NodeInfo): boolean => {
-        return !!S.props.getNodePropVal(J.NodeProp.BIN, node);
+        return !!S.props.getNodePropVal(J.NodeProp.BIN, node) ||
+            !!S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
     }
 
     hasImage = (node: J.NodeInfo): boolean => {

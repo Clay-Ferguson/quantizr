@@ -72,7 +72,8 @@ export class SearchByNameDlg extends DialogBase {
             "sortField": "",
             "searchProp": "node.name",
             "fuzzy": false,
-            "caseSensitive": false
+            "caseSensitive": false,
+            "searchDefinition": ""
         }, this.searchNodesResponse);
     }
 
