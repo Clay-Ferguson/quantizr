@@ -28,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -171,7 +172,115 @@ public class IPFSService {
         return ret;
     }
 
-    public String addFromStream(InputStream stream, String mimeType) {
+    public String addFromStream(InputStream stream, String mimeType, boolean saveToTemporal) {
+        if (saveToTemporal) {
+            return addToTemporalFromStream(stream, mimeType);
+        } else {
+            return addFromStream(stream, mimeType);
+        }
+    }
+
+    /**
+     * Logs into temporal and gets token. This code is tested and DOES work ok, however the design changed and for now all
+     * Temporal uploading is done purely on the client so this method is currently not ever called.
+     * 
+     * https://gateway.temporal.cloud/ipns/docs.api.temporal.cloud/account.html#account-management
+     */
+    private String temporalLogin() {
+        String token = null;
+        try {
+            String url = "https://api.temporal.cloud/v2/auth/login";
+            HttpHeaders headers = new HttpHeaders();
+
+            // MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+            // bodyMap.add("file", new InputStreamResource(stream));
+
+            HashMap<String, String> bodyMap = new HashMap<>();
+
+            bodyMap.put("username", "WClayFerguson");
+            bodyMap.put("password", "<fake password> Tested with real password and this code does work.");
+            String bodyStr = XString.prettyPrint(bodyMap);
+
+            headers.setContentType(MediaType.TEXT_PLAIN);
+            HttpEntity<String> requestEntity = new HttpEntity<>(bodyStr, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+            // todo-1: create dedicated return object for this (json marshalled)
+            Map<String, Object> respMap = mapper.readValue(response.getBody(),
+                    new TypeReference<Map<String, Object>>() {
+                    });
+
+            token = (String) respMap.get("token");
+            // the following other values are supposedly in the return...
+            // {
+            // "Bytes": "<int64>",
+            // "Hash": "<string>",
+            // "Name": "<string>",
+            // "Size": "<string>"
+            // }
+
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.exchange", e);
+            throw new RuntimeException("failed to get temporal login token.");
+        }
+        return token;
+    }
+
+    /**
+     * WARNING: Although I know this code is likely 100% correct it still doesn't
+     * work on "Temporal.cloud" and I'm tentatively blaming them for the failure,
+     * because my IPFS code to upload to local IPFS works fine (just below)
+     * 
+     * However I decided it's ok for now to let users signup on "Temporal.cloud" and
+     * get their storage paid for thru that site and I can then make it where we
+     * never even get their Temporal credentials nor upload thru Quantizr server
+     * either, which means for now this Java Server Side upload capability to
+     * Temporal is no longer needed.
+     * 
+     * Will circle back and troubleshoot this code more if ever needed.
+     */
+    private String addToTemporalFromStream(InputStream stream, String mimeType) {
+        String token = temporalLogin();
+
+        String hash = null;
+        try {
+            /*
+             * https://docs-beta.ipfs.io/reference/http/api --stream-channels bool - Stream
+             * channel output.
+             */
+            String url = "https://api.temporal.cloud/v2/ipfs/public/file/add"; // ?stream-channels=true";
+            HttpHeaders headers = new HttpHeaders();
+
+            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+            bodyMap.add("file", new InputStreamResource(stream));
+            bodyMap.add("hold_time", Integer.valueOf(1));
+
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            headers.set("Authorization", "Bearer " + token);
+            headers.set("cache-control", "no-cache"); // not needed?
+            // headers.set("Accept", "*/*"); //not needed?
+            // headers.set("Host", "api.temporal.cloud"); //not needed?
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+
+            // This results in: Bad Request: [{"code":400,"response":"http: no such file"}
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+            // todo-1: create dedicated return object for this (json marshalled)
+            Map<String, Object> respMap = mapper.readValue(response.getBody(),
+                    new TypeReference<Map<String, Object>>() {
+                    });
+
+            hash = (String) respMap.get("response");
+
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.exchange", e);
+            throw new RuntimeException("failed to save to IPFS using temporal.");
+        }
+        return hash;
+    }
+
+    private String addFromStream(InputStream stream, String mimeType) {
         String hash = null;
         try {
             // https://docs-beta.ipfs.io/reference/http/api
@@ -187,7 +296,7 @@ public class IPFSService {
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
-            //todo-1: create dedicated return object for this (json marshalled)
+            // todo-1: create dedicated return object for this (json marshalled)
             Map<String, Object> respMap = mapper.readValue(response.getBody(),
                     new TypeReference<Map<String, Object>>() {
                     });

@@ -19,6 +19,10 @@ export class Constants {
     static readonly LOCALDB_LOGIN_USR: string = "loginUsr";
     static readonly LOCALDB_LOGIN_PWD: string = "loginPwd";
 
+    /* Credentials for accessing https://Temporal.cloud */
+    static readonly LOCALDB_TEMPORAL_USR: string = "temporalUsr";
+    static readonly LOCALDB_TEMPORAL_PWD: string = "temporalPwd";
+
     /*
      * loginState="0" if user logged out intentionally. loginState="1" if last known state of user was 'logged in'
      */

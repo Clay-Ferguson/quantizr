@@ -86,7 +86,6 @@ export class LoginDlg extends DialogBase {
         let usr = this.userTextField.getValue();
 
         new ConfirmDlg("Reset your password ?",
-
             "Confirm",
             () => {
                 this.close();

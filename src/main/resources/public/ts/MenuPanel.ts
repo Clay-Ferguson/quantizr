@@ -88,8 +88,7 @@ export class MenuPanel extends Div {
             new Menu("Attach", [
                 new MenuItem("Upload from File", () => {S.attachment.openUploadFromFileDlg(false);}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //
                 new MenuItem("Upload from URL", S.attachment.openUploadFromUrlDlg, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //
-                //todo-0: need to update yaml before this is ready for prod
-                //new MenuItem("Upload to IPFS", () => {S.attachment.openUploadFromFileDlg(true)}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //
+                new MenuItem("Upload to IPFS", () => {S.attachment.openUploadFromFileDlg(true)}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //
                 new MenuItem("Delete Attachment", S.attachment.deleteAttachment, () => {
                     return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null
                         && S.props.hasBinary(S.meta64.state.highlightNode) && S.meta64.state.selNodeIsMine

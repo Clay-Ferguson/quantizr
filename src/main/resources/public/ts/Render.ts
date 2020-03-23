@@ -1077,29 +1077,39 @@ export class Render implements RenderIntf {
         return row;
     }
 
-    getMediaIdNode = (node: J.NodeInfo): string => {
-        let mediaId = S.props.getNodePropVal(J.NodeProp.BIN, node);
-        if (!mediaId) {
-            mediaId = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
-        }
-        return mediaId;
-    }
+    getAttachmentUrl = (urlPart: string, node: J.NodeInfo): string => {
+        let filePart = S.props.getNodePropVal(J.NodeProp.BIN, node);
+        let ipfs = false;
 
-    getUrlForNodeAttachment = (node: J.NodeInfo): string => {
-        let filePart = this.getMediaIdNode(node);
-        let ret = S.util.getRpcPath() + "bin/" + filePart + "?nodeId=" + encodeURIComponent(node.id);
-        //console.log("Attachment id=" + node.id + " URL=" + ret);
+        if (!filePart) {
+            filePart = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+            if (filePart) {
+                ipfs = true;
+            }
+        }
+
+        let ret = null;
+        /* Let's just use bandwith from "ipfs.io/ipfs" as long as they are allowing it, for images, and they may even support
+        streaming audio/video from their site, but I haven't tried that yet. */
+        if (ipfs && S.props.hasImage(node)) {
+            ret = "https://ipfs.io/ipfs/" + filePart;
+        }
+        else {
+            ret = S.util.getRpcPath() + urlPart + "/" + filePart + "?nodeId=" + node.id;
+        }
         return ret;
     }
 
+    getUrlForNodeAttachment = (node: J.NodeInfo): string => {
+        return this.getAttachmentUrl("bin", node);
+    }
+
     getStreamUrlForNodeAttachment = (node: J.NodeInfo): string => {
-        let filePart = this.getMediaIdNode(node);
-        return S.util.getRpcPath() + "stream/" + filePart + "?nodeId=" + node.id;
+        return this.getAttachmentUrl("stream", node);
     }
 
     getAvatarImgUrl = (node: J.NodeInfo) => {
-        let filePart = this.getMediaIdNode(node);
-        return S.util.getRpcPath() + "bin/" + filePart + "?nodeId=" + encodeURIComponent(node.ownerId);
+        return this.getAttachmentUrl("bin", node);
     }
 
     makeImageTag = (node: J.NodeInfo): Img => {

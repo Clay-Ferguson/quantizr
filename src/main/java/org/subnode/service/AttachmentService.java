@@ -230,7 +230,7 @@ public class AttachmentService {
 		BufferedImage bufImg = null;
 		byte[] imageBytes = null;
 		InputStream isTemp = null;
-		int maxFileSize = 20 * 1024 * 1024;
+		int maxFileSize = 20 * 1024 * 1024; // get this from constants file
 
 		if (calcImageSize && ImageUtil.isImageMime(mimeType)) {
 			LimitedInputStream is = null;
@@ -396,7 +396,6 @@ public class AttachmentService {
 				 * 
 				 * Failed to load resource: net::ERR_CONTENT_LENGTH_MISMATCH
 				 */
-
 				builder = builder.contentLength(size);
 			}
 			builder = builder.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"");
@@ -447,10 +446,31 @@ public class AttachmentService {
 
 			response.setContentType(mimeTypeProp);
 
-			//we gracefully tolerate the case where no size is available but normally it will be there.
-			//todo-0: when we detect this and then stream back some data shuold be just go ahead and SET the correct 'size' at that point?
+			// we gracefully tolerate the case where no size is available but normally it
+			// will be there.
+			// todo-0: when we detect this and then stream back some data shuld be just go
+			// ahead and SET the correct 'size' at that point?
 			if (size > 0) {
-				response.setContentLength((int) size);
+				/*
+				 * todo-1: I'm getting the "disappearing image" network problem related to size
+				 * (content length), but not calling 'contentLength()' below is a workaround.
+				 * 
+				 * You get this error if you just wait about 30s to 1 minute, and maybe scroll
+				 * out of view and back into view the images. What happens is the image loads
+				 * just fine but then some background thread in Chrome looks at content lengths
+				 * and finds some thing off somehoe and decides to make the image just disappear
+				 * and show a broken link icon instead.
+				 * 
+				 * SO... I keep having to come back and remove the setContentLength every time I
+				 * think this problem is resolved and then later find out it isn't. Somehow this
+				 * is *currently* only happening for images that are served up from IPFS
+				 * storage.
+				 * 
+				 * Chrome shows this: Failed to load resource: net::ERR_CONTENT_LENGTH_MISMATCH
+				 */
+				if (!ipfs) {
+					response.setContentLength((int) size);
+				}
 			}
 			response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
 			response.setHeader("Cache-Control", "public, max-age=31536000");

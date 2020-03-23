@@ -27,7 +27,6 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodeTypes;
 import org.subnode.mongo.model.UserPreferencesNode;
-import org.subnode.service.AttachmentService;
 import org.subnode.service.IPFSService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.Const;
@@ -116,6 +115,12 @@ public class MongoApi {
 
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
+
+	/**
+     * This is experimental flag to upload into "Temporal Cloud" IPFS Pinning service to let them host the files for us!
+     * When this flag is false it resorts to storing data into our own server's IPFS cache.
+     */
+    private static final boolean saveToTemporal = false;
 
 	public MongoSession getAdminSession() {
 		return adminSession;
@@ -1518,7 +1523,7 @@ public class MongoApi {
 			fileName = "file";
 		}
 
-		String ipfsHash = ipfsService.addFromStream(stream, mimeType);
+		String ipfsHash = ipfsService.addFromStream(stream, mimeType, saveToTemporal);
 		node.setProp(NodeProp.IPFS_LINK.s(), new SubNodePropVal(ipfsHash));
 	}
 

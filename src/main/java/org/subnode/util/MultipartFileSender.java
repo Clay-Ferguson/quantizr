@@ -373,7 +373,7 @@ public class MultipartFileSender {
             byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
             int read;
 
-            //todo-0: try putting a single flush at end, instead of flushing each buffer.
+            //todo-0: try putting a single flush at end, instead of flushing each buffer read?
 
             if (inputSize == length) {
                 // Write full range.
