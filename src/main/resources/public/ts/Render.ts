@@ -1109,7 +1109,8 @@ export class Render implements RenderIntf {
     }
 
     getAvatarImgUrl = (node: J.NodeInfo) => {
-        return this.getAttachmentUrl("bin", node);
+        let filePart = S.props.getNodePropVal(J.NodeProp.BIN, node);
+        return S.util.getRpcPath() + "bin/" + filePart + "?nodeId=" + node.ownerId;
     }
 
     makeImageTag = (node: J.NodeInfo): Img => {

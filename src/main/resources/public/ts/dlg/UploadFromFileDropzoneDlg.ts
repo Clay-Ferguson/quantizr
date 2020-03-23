@@ -49,7 +49,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
-                    new Button("IPFS Credentials", () => {this.getTemporalCredentials(true);}, null, "btn-primary"),
+                    new Button("IPFS Credentials", () => { this.getTemporalCredentials(true); }, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
                     })
@@ -105,7 +105,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     upload = async (): Promise<boolean> => {
         return new Promise<boolean>(async (resolve, reject) => {
             if (this.filesAreValid()) {
-                
+
                 let allowUpload = true;
 
                 if (this.toTemporal) {
@@ -189,7 +189,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             url,
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
-            paramName: this.toTemporal ? "file" : "files", //this was a WAG, trying to get Dropzone working with Temporal
+            paramName: dlg.toTemporal ? "file" : "files", //this was a WAG, trying to get Dropzone working with Temporal
             maxFilesize: maxFileSize,
             parallelUploads: 2,
 
@@ -207,7 +207,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             // 'this' that is in scope during each call must be left as is.
             init: function () {
                 this.on("addedfile", function (file) {
-                    if (!this.toTemporal && (file.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB)) {
+                    if (!dlg.toTemporal && (file.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB)) {
                         S.util.showMessage("File is too large. Max Size=" + Constants.MAX_UPLOAD_MB + "MB");
                         return;
                     }
@@ -229,7 +229,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                     /* If Uploading DIRECTLY to Temporal.cloud */
                     if (dlg.toTemporal) {
-                        this.ipfsFile = file;
+                        dlg.ipfsFile = file;
                         formData.append("file", file);
                         formData.append("hold_time", "1");
 
@@ -264,10 +264,14 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     //todo-0: For ordinary non-ipfs uploads, am I already taking advantage of the fact that the MIME will be available to be sent
                     //directly from the client like this, and doing that rather then trying to 'guess' mime type on server?
                     //https://developer.mozilla.org/en-US/docs/Web/API/File
-                    S.props.setNodePropVal(J.NodeProp.BIN_MIME, S.attachment.uploadNode, this.ipfsFile.type);
-                    S.props.setNodePropVal(J.NodeProp.BIN_SIZE, S.attachment.uploadNode, this.ipfsFile.size);
-                    S.props.setNodePropVal(J.NodeProp.BIN_FILENAME, S.attachment.uploadNode, this.ipfsFile.name);
-
+                    if (dlg.ipfsFile) {
+                        S.props.setNodePropVal(J.NodeProp.BIN_MIME, S.attachment.uploadNode, dlg.ipfsFile.type);
+                        S.props.setNodePropVal(J.NodeProp.BIN_SIZE, S.attachment.uploadNode, `${dlg.ipfsFile.size}`);
+                        S.props.setNodePropVal(J.NodeProp.BIN_FILENAME, S.attachment.uploadNode, dlg.ipfsFile.name);
+                    }
+                    else {
+                        console.log("ipfsFile null!");
+                    }
                     S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                         node: S.attachment.uploadNode
                     }, (res) => {
@@ -317,8 +321,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             return false;
         }
 
+        let maxFileSizeMb = this.toTemporal ? Constants.MAX_UPLOAD_MB * 1024 : Constants.MAX_UPLOAD_MB;
+
         for (let file of this.fileList) {
-            if (file.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB) {
+            if (file.size > maxFileSizeMb * Constants.ONE_MB) {
                 return false;
             }
         }

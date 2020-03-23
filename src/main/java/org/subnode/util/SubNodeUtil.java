@@ -44,9 +44,9 @@ public class SubNodeUtil {
 
 	static {
 		nonSavableProperties.add(NodeProp.BIN.s());
-		nonSavableProperties.add(NodeProp.BIN_MIME.s());
-		nonSavableProperties.add(NodeProp.IMG_HEIGHT.s());
-		nonSavableProperties.add(NodeProp.IMG_WIDTH.s());
+		//nonSavableProperties.add(NodeProp.BIN_MIME.s());
+		//nonSavableProperties.add(NodeProp.IMG_HEIGHT.s());
+		//nonSavableProperties.add(NodeProp.IMG_WIDTH.s());
 		nonSavableProperties.add(NodeProp.BIN_TOTAL.s());
 		nonSavableProperties.add(NodeProp.BIN_QUOTA.s());
 	}
