@@ -2,10 +2,8 @@ package org.subnode.service;
 
 import java.util.List;
 
-import org.subnode.config.SessionContext;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.MoveNodesRequest;
@@ -38,6 +36,9 @@ public class NodeMoveService {
 
 	@Autowired
 	private UserManagerService userManagerService;
+
+	@Autowired
+	private AttachmentService attachmentService;
 
 	/*
 	 * Moves the the node to a new ordinal/position location (relative to parent)
@@ -155,7 +156,7 @@ public class NodeMoveService {
 
 	private void deleteNode(MongoSession session, SubNode node) {
 		// switching to soft-deletes, below, eventually
-		api.deleteBinary(session, node, null);
+		attachmentService.deleteBinary(session, node, null);
 		api.delete(session, node);
 
 		// todo-1: I started working on 'soft-delete', but never finished. However I

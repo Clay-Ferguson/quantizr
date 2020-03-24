@@ -373,6 +373,8 @@ public class SubNode {
 	}
 
 	@JsonIgnore
+	//todo-1: all these 'setProp' functions should be smart enough to detect if the property set
+	//will have no effect (value not changing), and in that case then NOT add to the list of dirty nodes.
 	public void setProp(String key, Long val) {
 		MongoThreadLocal.dirty(this);
 		if (val == null) {

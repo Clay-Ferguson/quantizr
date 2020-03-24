@@ -11,6 +11,7 @@ import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
+import org.subnode.service.AttachmentService;
 import org.subnode.util.LimitedInputStreamEx;
 
 import org.apache.commons.io.FileUtils;
@@ -27,6 +28,9 @@ public class MongoTest {
 
 	@Autowired
 	private MongoApi api;
+
+	@Autowired
+	private AttachmentService attachmentService;
 
 	public void wipeDb(MongoSession session) {
 		api.dropAllIndexes(session);
@@ -231,12 +235,12 @@ public class MongoTest {
 			SubNode node = api.createNode(session, "/binaries");
 			api.save(session, node);
 			int maxFileSize = 20 * 1024 * 1024; //put at least the MB part in Const.java (todo-0)
-			api.writeStream(session, node, new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png", null);
+			attachmentService.writeStream(session, node, new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png", null);
 			api.save(session, node);
 
 			log.debug("inserted root for binary testing.", null, "image/png", null);
 
-			InputStream inStream = api.getStream(session, node, null, true, false);
+			InputStream inStream = attachmentService.getStream(session, node, null, true, false);
 			FileUtils.copyInputStreamToFile(inStream, new File("/home/clay/test-image2.png"));
 			log.debug("completed reading back the file, and writing out a copy.");
 		}

@@ -18,6 +18,9 @@ import javax.imageio.stream.ImageInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
 import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
 import org.subnode.config.SpringContextUtil;
@@ -28,10 +31,12 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.request.DeleteAttachmentRequest;
 import org.subnode.request.UploadFromUrlRequest;
 import org.subnode.response.DeleteAttachmentResponse;
 import org.subnode.response.UploadFromUrlResponse;
+import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStream;
 import org.subnode.util.LimitedInputStreamEx;
@@ -48,10 +53,13 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -59,6 +67,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+
+import com.mongodb.client.gridfs.GridFSBucket;
+
+
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 /**
  * Service for managing node attachments.
@@ -81,6 +95,18 @@ public class AttachmentService {
 
 	@Autowired
 	private MimeTypeUtils mimeTypeUtils;
+
+	@Autowired
+	private UserManagerService userManagerService;
+
+	@Autowired
+	private GridFsTemplate grid;
+
+	@Autowired
+	private GridFSBucket gridFsBucket;
+
+	@Autowired
+	private IPFSService ipfsService;
 
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file
@@ -265,9 +291,9 @@ public class AttachmentService {
 		if (imageBytes == null) {
 			node.setProp(NodeProp.BIN_SIZE.s(), size);
 			if (toIpfs) {
-				api.writeStreamToIpfs(session, node, inputStream, null, mimeType, null);
+				writeStreamToIpfs(session, node, inputStream, null, mimeType, null);
 			} else {
-				api.writeStream(session, node, inputStream, null, mimeType, null);
+				writeStream(session, node, inputStream, null, mimeType, null);
 			}
 		} else {
 			LimitedInputStream is = null;
@@ -275,9 +301,9 @@ public class AttachmentService {
 				node.setProp(NodeProp.BIN_SIZE.s(), imageBytes.length);
 				is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
 				if (toIpfs) {
-					api.writeStreamToIpfs(session, node, is, null, mimeType, null);
+					writeStreamToIpfs(session, node, is, null, mimeType, null);
 				} else {
-					api.writeStream(session, node, is, null, mimeType, null);
+					writeStream(session, node, is, null, mimeType, null);
 				}
 			} finally {
 				StreamUtil.close(is);
@@ -298,7 +324,7 @@ public class AttachmentService {
 		String nodeId = req.getNodeId();
 		SubNode node = api.getNode(session, nodeId);
 		MongoThreadLocal.dirty(node);
-		api.deleteBinary(session, node, null);
+		deleteBinary(session, node, null);
 		deleteAllBinaryProperties(node);
 		api.saveSession(session);
 		res.setSuccess(true);
@@ -375,7 +401,7 @@ public class AttachmentService {
 			// log.debug("flush complete.");
 			// };
 
-			InputStream is = api.getStream(session, node, null, allowAuth, ipfs);
+			InputStream is = getStream(session, node, null, allowAuth, ipfs);
 			InputStreamResource isr = new InputStreamResource(is);
 
 			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
@@ -440,7 +466,7 @@ public class AttachmentService {
 				fileName = "filename";
 			}
 
-			InputStream is = api.getStream(session, node, null, allowAuth, ipfs);
+			InputStream is = getStream(session, node, null, allowAuth, ipfs);
 			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 			log.debug("Getting Binary for nodeId=" + nodeId + " size=" + size);
 
@@ -633,7 +659,7 @@ public class AttachmentService {
 				fileName = "filename";
 			}
 
-			InputStream is = api.getStream(session, node, null, true, ipfs);
+			InputStream is = getStream(session, node, null, true, ipfs);
 			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 			inStream = new BufferedInputStream(is);
 
@@ -825,4 +851,127 @@ public class AttachmentService {
 
 		return false;
 	}
+
+	public void writeStream(MongoSession session, SubNode node, LimitedInputStream stream, String fileName,
+			String mimeType, String propName) {
+
+		api.auth(session, node, PrivilegeType.WRITE);
+
+		if (propName == null) {
+			propName = "bin";
+		}
+
+		if (fileName == null) {
+			fileName = "file";
+		}
+
+		DBObject metaData = new BasicDBObject();
+		metaData.put("nodeId", node.getId());
+
+		SubNode userNode = api.getUserNodeByUserName(null, null);
+
+		// back out the current bytes in use by this node.
+		userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
+
+		/*
+		 * Delete any existing grid data stored under this node, before saving new
+		 * attachment
+		 */
+		deleteBinary(session, node, null);
+
+		String id = grid.store(stream, fileName, mimeType, metaData).toString();
+
+		long streamCount = stream.getCount();
+		// log.debug("upload streamCount=" + streamCount);
+		userManagerService.addBytesToUserNodeBytes(streamCount, userNode, 1);
+
+		if (userNode == null) {
+			throw new RuntimeException("User not found.");
+		}
+
+		/*
+		 * Now save the node also since the property on it needs to point to GridFS id
+		 */
+		node.setProp(propName, new SubNodePropVal(id));
+	}
+
+	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream, String fileName,
+			String mimeType, String propName) {
+
+		api.auth(session, node, PrivilegeType.WRITE);
+
+		if (propName == null) {
+			propName = "bin";
+		}
+
+		if (fileName == null) {
+			fileName = "file";
+		}
+
+		String ipfsHash = ipfsService.addFromStream(stream, mimeType, Const.saveToTemporal);
+		node.setProp(NodeProp.IPFS_LINK.s(), new SubNodePropVal(ipfsHash));
+	}
+
+	public void deleteBinary(MongoSession session, SubNode node, String propName) {
+		api.auth(session, node, PrivilegeType.WRITE);
+		if (propName == null) {
+			propName = "bin";
+		}
+		String id = node.getStringProp(propName);
+		if (id == null) {
+			return;
+		}
+		// back out the number of bytes it was using (todo-0) need to hunt down ALL grid
+		// ops and make sure they all are updating storage quotas.
+		userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
+
+		grid.delete(new Query(Criteria.where("_id").is(id)));
+	}
+
+	public InputStream getStream(MongoSession session, SubNode node, String propName, boolean auth, boolean ipfs) {
+		if (auth) {
+			api.auth(session, node, PrivilegeType.READ);
+		}
+		if (propName == null) {
+			propName = "bin";
+		}
+
+		InputStream is = null;
+		if (ipfs) {
+			String ipfsHash = node.getStringProp(NodeProp.IPFS_LINK.s());
+			is = ipfsService.getStream(session, ipfsHash);
+		} else {
+			is = getStreamByNodeId(node.getId());
+		}
+		return is;
+	}
+
+	public InputStream getStreamByNodeId(ObjectId nodeId) {
+		log.debug("getStreamByNodeId: " + nodeId.toString());
+
+		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid
+				.findOne(new Query(Criteria.where("metadata.nodeId").is(nodeId)));
+		if (gridFile == null) {
+			log.debug("gridfs ID not found");
+			return null;
+		}
+
+		GridFsResource gridFsResource = new GridFsResource(gridFile,
+				gridFsBucket.openDownloadStream(gridFile.getObjectId()));
+		try {
+			InputStream is = gridFsResource.getInputStream();
+			if (is == null) {
+				throw new RuntimeException("Unable to get inputStream");
+			}
+			return is;
+		} catch (Exception e) {
+			throw new RuntimeException("unable to readStream", e);
+		}
+	}
+
+	public AutoCloseInputStream getAutoClosingStream(MongoSession session, SubNode node, String propName, boolean auth,
+			boolean ipfs) {
+		return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, propName, auth, ipfs)));
+	}
+
 }

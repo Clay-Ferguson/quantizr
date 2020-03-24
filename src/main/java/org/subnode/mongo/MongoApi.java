@@ -1,7 +1,5 @@
 package org.subnode.mongo;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,21 +22,16 @@ import org.subnode.model.UserStats;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodeTypes;
-import org.subnode.service.IPFSService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
-import org.subnode.util.LimitedInputStream;
 import org.subnode.util.NodeAuthFailedException;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -47,7 +40,6 @@ import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.gridfs.model.GridFSFile;
 
-import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -65,7 +57,6 @@ import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndex
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
-import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Component;
 
@@ -95,13 +86,7 @@ public class MongoApi {
 	private AclService aclService;
 
 	@Autowired
-	private SubNodeUtil util;
-
-	@Autowired
 	private AppProp appProp;
-
-	@Autowired
-	private IPFSService ipfsService;
 
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
@@ -114,13 +99,6 @@ public class MongoApi {
 
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
-
-	/**
-	 * This is experimental flag to upload into "Temporal Cloud" IPFS Pinning
-	 * service to let them host the files for us! When this flag is false it resorts
-	 * to storing data into our own server's IPFS cache.
-	 */
-	private static final boolean saveToTemporal = false;
 
 	public MongoSession getAdminSession() {
 		return adminSession;
@@ -1429,8 +1407,6 @@ public class MongoApi {
 			 */
 			for (SubNode accountNode : accountNodes) {
 				log.debug("Processing Account Node: id=" + accountNode.getId().toHexString());
-				// todo-0: to save cycles, we should first check if the current amount IS ZERO
-				// so we don't unnecessarily save the node.
 				UserStats stats = statsMap.get(accountNode.getOwner());
 				if (stats == null) {
 					stats = new UserStats();
@@ -1444,129 +1420,6 @@ public class MongoApi {
 		});
 	}
 
-	public void writeStream(MongoSession session, SubNode node, LimitedInputStream stream, String fileName,
-			String mimeType, String propName) {
-
-		auth(session, node, PrivilegeType.WRITE);
-
-		if (propName == null) {
-			propName = "bin";
-		}
-
-		if (fileName == null) {
-			fileName = "file";
-		}
-
-		DBObject metaData = new BasicDBObject();
-		metaData.put("nodeId", node.getId());
-
-		SubNode userNode = getUserNodeByUserName(null, null);
-
-		// back out the current bytes in use by this node.
-		userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
-
-		/*
-		 * Delete any existing grid data stored under this node, before saving new
-		 * attachment
-		 */
-		deleteBinary(session, node, null);
-
-		String id = grid.store(stream, fileName, mimeType, metaData).toString();
-
-		long streamCount = stream.getCount();
-		// log.debug("upload streamCount=" + streamCount);
-		userManagerService.addBytesToUserNodeBytes(streamCount, userNode, 1);
-
-		if (userNode == null) {
-			throw new RuntimeException("User not found.");
-		}
-
-		/*
-		 * Now save the node also since the property on it needs to point to GridFS id
-		 */
-		node.setProp(propName, new SubNodePropVal(id));
-	}
-
-	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream, String fileName,
-			String mimeType, String propName) {
-
-		auth(session, node, PrivilegeType.WRITE);
-
-		if (propName == null) {
-			propName = "bin";
-		}
-
-		if (fileName == null) {
-			fileName = "file";
-		}
-
-		String ipfsHash = ipfsService.addFromStream(stream, mimeType, saveToTemporal);
-		node.setProp(NodeProp.IPFS_LINK.s(), new SubNodePropVal(ipfsHash));
-	}
-
-	// todo-0: move this (and similar functions) into AttachmentService
-	public void deleteBinary(MongoSession session, SubNode node, String propName) {
-		auth(session, node, PrivilegeType.WRITE);
-		if (propName == null) {
-			propName = "bin";
-		}
-		String id = node.getStringProp(propName);
-		if (id == null) {
-			return;
-		}
-		// back out the number of bytes it was using (todo-0) need to hunt down ALL grid
-		// ops and make sure they all are updating storage quotas.
-		userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
-
-		grid.delete(new Query(Criteria.where("_id").is(id)));
-	}
-
-	public InputStream getStream(MongoSession session, SubNode node, String propName, boolean auth, boolean ipfs) {
-		if (auth) {
-			auth(session, node, PrivilegeType.READ);
-		}
-		if (propName == null) {
-			propName = "bin";
-		}
-
-		InputStream is = null;
-		if (ipfs) {
-			String ipfsHash = node.getStringProp(NodeProp.IPFS_LINK.s());
-			is = ipfsService.getStream(session, ipfsHash);
-		} else {
-			is = getStreamByNodeId(node.getId());
-		}
-		return is;
-	}
-
-	public InputStream getStreamByNodeId(ObjectId nodeId) {
-		log.debug("getStreamByNodeId: " + nodeId.toString());
-
-		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid
-				.findOne(new Query(Criteria.where("metadata.nodeId").is(nodeId)));
-		if (gridFile == null) {
-			log.debug("gridfs ID not found");
-			return null;
-		}
-
-		GridFsResource gridFsResource = new GridFsResource(gridFile,
-				gridFsBucket.openDownloadStream(gridFile.getObjectId()));
-		try {
-			InputStream is = gridFsResource.getInputStream();
-			if (is == null) {
-				throw new RuntimeException("Unable to get inputStream");
-			}
-			return is;
-		} catch (Exception e) {
-			throw new RuntimeException("unable to readStream", e);
-		}
-	}
-
-	public AutoCloseInputStream getAutoClosingStream(MongoSession session, SubNode node, String propName, boolean auth,
-			boolean ipfs) {
-		return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, propName, auth, ipfs)));
-	}
-
 	public String regexDirectChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
 		return "^" + Pattern.quote(path) + "\\/([^\\/])*$";
@@ -1575,7 +1428,7 @@ public class MongoApi {
 	/*
 	 * todo-2: I think now that I'm including the trailing slash after path in this
 	 * regex that I can remove the (.+) piece? I think i need to write some test
-	 * cases just to text my regex functions!
+	 * cases just to test my regex functions!
 	 * 
 	 * todo-1: Also what's the 'human readable' description of what's going on here?
 	 * substring or prefix? For performance we DO want this to be finding all nodes

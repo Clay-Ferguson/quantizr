@@ -50,6 +50,9 @@ public abstract class ExportArchiveBase {
 	@Autowired
 	private SubNodeUtil util;
 
+	@Autowired 
+	private AttachmentService attachmentService;
+
 	// private ZipOutputStream zos;
 	private String shortFileName;
 	private String fullFileName;
@@ -221,7 +224,7 @@ public abstract class ExportArchiveBase {
 				String binFileNameStr = binFileNameProp.getVal() != null ? binFileNameProp.getVal() : "binary";
 				AutoCloseInputStream is = null;
 
-				is = api.getAutoClosingStream(session, node, null, false, false);
+				is = attachmentService.getAutoClosingStream(session, node, null, false, false);
 				addFileEntry(parentFolder + "/" + fileName + "/" + binFileNameStr, IOUtils.toByteArray(is));
 			}
 

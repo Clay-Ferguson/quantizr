@@ -59,6 +59,9 @@ public class ExportJsonService {
 	@Autowired
 	private AppProp appProp;
 
+	@Autowired
+	private AttachmentService attachmentService;
+
 	/* This object is Threadsafe so this is the correct usage 'static final' */
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 	static {
@@ -181,7 +184,7 @@ public class ExportJsonService {
 		ObjectId oid = node.getId();
 		if (oid != null) {
 			// log.debug("oid=" + oid.toString());
-			InputStream is = api.getStreamByNodeId(oid);
+			InputStream is = attachmentService.getStreamByNodeId(oid);
 			if (is != null) {
 				try {
 					String targetFileName = targetFolder + File.separator + oid.toHexString() + "-" + binFileName;

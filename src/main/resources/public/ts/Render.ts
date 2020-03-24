@@ -1088,15 +1088,7 @@ export class Render implements RenderIntf {
             }
         }
 
-        let ret = null;
-        /* Let's just use bandwith from "ipfs.io/ipfs" as long as they are allowing it, for images, and they may even support
-        streaming audio/video from their site, but I haven't tried that yet. */
-        if (ipfs && S.props.hasImage(node)) {
-            ret = "https://ipfs.io/ipfs/" + filePart;
-        }
-        else {
-            ret = S.util.getRpcPath() + urlPart + "/" + filePart + "?nodeId=" + node.id;
-        }
+        let ret = S.util.getRpcPath() + urlPart + "/" + filePart + "?nodeId=" + node.id;
         return ret;
     }
 

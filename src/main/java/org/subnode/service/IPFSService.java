@@ -42,6 +42,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
+    private static final String TEMPORAL_HOST = "https://api.temporal.cloud";
+
     /*
      * originally this was 'data-endcoding' (or at least i got that from somewhere),
      * but now their example page seems to show 'encoding' is the name here.
@@ -189,7 +191,7 @@ public class IPFSService {
     private String temporalLogin() {
         String token = null;
         try {
-            String url = "https://api.temporal.cloud/v2/auth/login";
+            String url = TEMPORAL_HOST+"/v2/auth/login";
             HttpHeaders headers = new HttpHeaders();
 
             // MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -249,7 +251,7 @@ public class IPFSService {
              * https://docs-beta.ipfs.io/reference/http/api --stream-channels bool - Stream
              * channel output.
              */
-            String url = "https://api.temporal.cloud/v2/ipfs/public/file/add"; // ?stream-channels=true";
+            String url = TEMPORAL_HOST+"/v2/ipfs/public/file/add"; // ?stream-channels=true";
             HttpHeaders headers = new HttpHeaders();
 
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
