@@ -11,9 +11,7 @@ import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
-import org.subnode.mongo.model.UserPreferencesNode;
 import org.subnode.util.LimitedInputStreamEx;
-import org.subnode.util.XString;
 
 import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
@@ -84,28 +82,28 @@ public class MongoTest {
 		log.debug("inserted stuff node.");
 
 		// ----------Save a node that uses inheritance (SubNode base class)
-		UserPreferencesNode userPrefsNode = api.createUserPreferencesNode(adminSession, "/stuffroot/userPrefs");
-		userPrefsNode.setUserPrefString("my test pref value");
-		api.save(adminSession, userPrefsNode);
-		expectedCount++;
-		log.debug("inserted userPrefs node: " + XString.prettyPrint(userPrefsNode));
+		// UserPreferencesNode userPrefsNode = api.createUserPreferencesNode(adminSession, "/stuffroot/userPrefs");
+		// userPrefsNode.setUserPrefString("my test pref value");
+		// api.save(adminSession, userPrefsNode);
+		// expectedCount++;
+		// log.debug("inserted userPrefs node: " + XString.prettyPrint(userPrefsNode));
 
 		Iterable<SubNode> nodesIter = api.findAllNodes(adminSession);
 		api.dump("Dump check", nodesIter);
 
-		UserPreferencesNode userPrefsNode2 = api.getUserPreference(adminSession, userPrefsNode.getPath());
-		if (userPrefsNode2 == null || !userPrefsNode.getUserPrefString().equals(userPrefsNode2.getUserPrefString())) {
-			throw new RuntimeException("unable to read UserPrefence test object by path");
-		}
+		// UserPreferencesNode userPrefsNode2 = api.getUserPreference(adminSession, userPrefsNode.getPath());
+		// if (userPrefsNode2 == null || !userPrefsNode.getUserPrefString().equals(userPrefsNode2.getUserPrefString())) {
+		// 	throw new RuntimeException("unable to read UserPrefence test object by path");
+		// }
 
-		UserPreferencesNode userPrefsNode3 = api.getUserPreference(adminSession, userPrefsNode.getId());
-		if (userPrefsNode3 == null) {
-			throw new RuntimeException("unable to read UserPrefence test object by ID: " + userPrefsNode.getId());
-		}
+		// UserPreferencesNode userPrefsNode3 = api.getUserPreference(adminSession, userPrefsNode.getId());
+		// if (userPrefsNode3 == null) {
+		// 	throw new RuntimeException("unable to read UserPrefence test object by ID: " + userPrefsNode.getId());
+		// }
 
-		if (!userPrefsNode.getUserPrefString().equals(userPrefsNode3.getUserPrefString())) {
-			throw new RuntimeException("unable to read UserPrefence test object by ID. Value is not correct.");
-		}
+		// if (!userPrefsNode.getUserPrefString().equals(userPrefsNode3.getUserPrefString())) {
+		// 	throw new RuntimeException("unable to read UserPrefence test object by ID. Value is not correct.");
+		// }
 
 		// ----------Dump current data
 		nodesIter = api.findAllNodes(adminSession);

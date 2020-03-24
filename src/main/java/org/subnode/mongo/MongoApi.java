@@ -26,7 +26,6 @@ import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodeTypes;
-import org.subnode.mongo.model.UserPreferencesNode;
 import org.subnode.service.IPFSService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.Const;
@@ -117,10 +116,11 @@ public class MongoApi {
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
 
 	/**
-     * This is experimental flag to upload into "Temporal Cloud" IPFS Pinning service to let them host the files for us!
-     * When this flag is false it resorts to storing data into our own server's IPFS cache.
-     */
-    private static final boolean saveToTemporal = false;
+	 * This is experimental flag to upload into "Temporal Cloud" IPFS Pinning
+	 * service to let them host the files for us! When this flag is false it resorts
+	 * to storing data into our own server's IPFS cache.
+	 */
+	private static final boolean saveToTemporal = false;
 
 	public MongoSession getAdminSession() {
 		return adminSession;
@@ -436,12 +436,6 @@ public class MongoApi {
 			}
 			MongoThreadLocal.getDirtyNodes().clear();
 		}
-	}
-
-	// todo-0: User preference as a NODE is a totally obsolete thing now right?
-	public UserPreferencesNode createUserPreferencesNode(MongoSession session, String path) {
-		ObjectId ownerId = getOwnerNodeIdFromSession(session);
-		return new UserPreferencesNode(ownerId, path, SubNodeTypes.UNSTRUCTURED);
 	}
 
 	public SubNode createNode(MongoSession session, SubNode parent, String type, Long ordinal,
@@ -774,25 +768,6 @@ public class MongoApi {
 		// // */
 		// save(session, node, true, false);
 		// });
-	}
-
-	public UserPreferencesNode getUserPreference(MongoSession session, String path) {
-		if (path.equals("/")) {
-			throw new RuntimeException(
-					"SubNode doesn't implement the root node. Root is implicit and never needs an actual node to represent it.");
-		}
-
-		Query query = new Query();
-		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(path));
-		UserPreferencesNode ret = ops.findOne(query, UserPreferencesNode.class);
-		auth(session, ret, PrivilegeType.READ);
-		return ret;
-	}
-
-	public UserPreferencesNode getUserPreference(MongoSession session, ObjectId objId) {
-		UserPreferencesNode ret = ops.findById(objId, UserPreferencesNode.class);
-		auth(session, ret, PrivilegeType.READ);
-		return ret;
 	}
 
 	/* Returns true if there were actually some encryption keys removed */
@@ -1448,8 +1423,10 @@ public class MongoApi {
 			Iterable<SubNode> accountNodes = getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
 					null);
 
-			// scan all userAccountNodes, and set a zero amount for those not found (which
-			// will be the correct amount).
+			/*
+			 * scan all userAccountNodes, and set a zero amount for those not found (which
+			 * will be the correct amount).
+			 */
 			for (SubNode accountNode : accountNodes) {
 				log.debug("Processing Account Node: id=" + accountNode.getId().toHexString());
 				// todo-0: to save cycles, we should first check if the current amount IS ZERO
@@ -1497,7 +1474,7 @@ public class MongoApi {
 		String id = grid.store(stream, fileName, mimeType, metaData).toString();
 
 		long streamCount = stream.getCount();
-		//log.debug("upload streamCount=" + streamCount);
+		// log.debug("upload streamCount=" + streamCount);
 		userManagerService.addBytesToUserNodeBytes(streamCount, userNode, 1);
 
 		if (userNode == null) {
