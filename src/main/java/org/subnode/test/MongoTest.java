@@ -12,6 +12,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.service.AttachmentService;
+import org.subnode.util.Const;
 import org.subnode.util.LimitedInputStreamEx;
 
 import org.apache.commons.io.FileUtils;
@@ -234,7 +235,7 @@ public class MongoTest {
 		try {
 			SubNode node = api.createNode(session, "/binaries");
 			api.save(session, node);
-			int maxFileSize = 20 * 1024 * 1024; //put at least the MB part in Const.java (todo-0)
+			int maxFileSize = 20 * Const.ONE_MB; 
 			attachmentService.writeStream(session, node, new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png", null);
 			api.save(session, node);
 

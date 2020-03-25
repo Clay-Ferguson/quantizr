@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -22,6 +23,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 import org.subnode.config.AppProp;
+import org.subnode.config.NodeName;
+import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.image.ImageUtil;
@@ -29,6 +32,7 @@ import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoThreadLocal;
+import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
@@ -53,6 +57,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +65,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
+
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSFindIterable;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -67,9 +76,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-
-import com.mongodb.client.gridfs.GridFSBucket;
-
 
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -107,6 +113,9 @@ public class AttachmentService {
 
 	@Autowired
 	private IPFSService ipfsService;
+
+	@Autowired
+	private RunAsMongoAdmin adminRunner;
 
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file
@@ -472,10 +481,13 @@ public class AttachmentService {
 
 			response.setContentType(mimeTypeProp);
 
-			// we gracefully tolerate the case where no size is available but normally it
-			// will be there.
-			// todo-0: when we detect this and then stream back some data shuld be just go
-			// ahead and SET the correct 'size' at that point?
+			/*
+			 * we gracefully tolerate the case where no size is available but normally it
+			 * will be there. 
+			 * 
+			 * todo-1: when we detect this and then stream back some data
+			 * shuld be just go ahead and SET the correct 'size' on the node at that point?
+			 */
 			if (size > 0) {
 				/*
 				 * todo-1: I'm getting the "disappearing image" network problem related to size
@@ -921,7 +933,7 @@ public class AttachmentService {
 		if (id == null) {
 			return;
 		}
-		// back out the number of bytes it was using (todo-0) need to hunt down ALL grid
+		// back out the number of bytes it was using (todo-0) need to locate ALL grid
 		// ops and make sure they all are updating storage quotas.
 		userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
 
@@ -974,4 +986,81 @@ public class AttachmentService {
 		return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, propName, auth, ipfs)));
 	}
 
+		/**
+	 * This method makes a single pass over all grid items doing all the daily
+	 * maintenance on each one as necessary to maintain the system health and
+	 * statistics.
+	 * 
+	 * Scans all the uploaded attachments, and finds any that aren't owned by some
+	 * SubNode, and deletes them.
+	 * 
+	 * I probably can hook into some listener (or just my own delete code) to be
+	 * sure to run the 'grid.delete' for the attachments whenever someone deletes a
+	 * node also. (todo-1: check into this, can't remember if I did that already)
+	 * 
+	 * Also keeps totals by each user account, in a hashmap to be written all out at
+	 * the end to all the nodes.
+	 * 
+	 * todo-1: There's another type of background procesing that is potentially
+	 * slow/challenging which is to remove all nodes that don't have a parent. How
+	 * to do that effeciently will take some thought. These are just ordinary tree
+	 * nodes that are orphans
+	 */
+	public void gridMaintenanceScan() {
+		HashMap<ObjectId, UserStats> statsMap = new HashMap<ObjectId, UserStats>();
+
+		adminRunner.run(session -> {
+
+			int delCount = 0;
+			GridFSFindIterable files = gridFsBucket.find();
+			if (files != null) {
+				for (GridFSFile file : files) {
+					Document meta = file.getMetadata();
+					if (meta != null) {
+						ObjectId id = (ObjectId) meta.get("nodeId");
+						if (id != null) {
+							SubNode subNode = api.getNode(session, id);
+							if (subNode == null) {
+								log.debug("Grid Orphan Delete: " + id.toHexString());
+
+								// Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
+								Query query = new Query(Criteria.where("_id").is(file.getId()));
+								grid.delete(query);
+								delCount++;
+							} else {
+								UserStats stats = statsMap.get(subNode.getOwner());
+								if (stats == null) {
+									stats = new UserStats();
+									stats.binUsage = file.getLength();
+									statsMap.put(subNode.getOwner(), stats);
+								} else {
+									stats.binUsage = stats.binUsage.longValue() + file.getLength();
+								}
+							}
+						}
+					}
+				}
+			}
+
+			Iterable<SubNode> accountNodes = api.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
+					null);
+
+			/*
+			 * scan all userAccountNodes, and set a zero amount for those not found (which
+			 * will be the correct amount).
+			 */
+			for (SubNode accountNode : accountNodes) {
+				log.debug("Processing Account Node: id=" + accountNode.getId().toHexString());
+				UserStats stats = statsMap.get(accountNode.getOwner());
+				if (stats == null) {
+					stats = new UserStats();
+					stats.binUsage = 0L;
+					statsMap.put(accountNode.getOwner(), stats);
+				}
+			}
+
+			log.debug(String.valueOf(delCount) + " orphans found and deleted.");
+			userManagerService.writeUserStats(session, statsMap);
+		});
+	}
 }

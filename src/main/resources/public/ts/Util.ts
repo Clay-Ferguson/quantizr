@@ -49,7 +49,7 @@ export class Util implements UtilIntf {
     };
 
     rhost: string;
-    logAjax: boolean = true;
+    logAjax: boolean = false;
     timeoutMessageShown: boolean = false;
 
     waitCounter: number = 0;

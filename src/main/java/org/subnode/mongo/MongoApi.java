@@ -18,12 +18,10 @@ import org.subnode.image.ImageSize;
 import org.subnode.image.ImageUtil;
 import org.subnode.model.AccessControlInfo;
 import org.subnode.model.PrivilegeInfo;
-import org.subnode.model.UserStats;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodeTypes;
-import org.subnode.service.UserManagerService;
 import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
@@ -35,10 +33,7 @@ import org.subnode.util.XString;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.gridfs.GridFSBucket;
-import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.result.DeleteResult;
-import com.mongodb.client.gridfs.model.GridFSFile;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -57,7 +52,6 @@ import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndex
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -74,12 +68,6 @@ public class MongoApi {
 	private MongoTemplate ops;
 
 	@Autowired
-	private GridFSBucket gridFsBucket;
-
-	@Autowired
-	private GridFsTemplate grid;
-
-	@Autowired
 	private SubNodeUtil apiUtil;
 
 	@Autowired
@@ -87,12 +75,6 @@ public class MongoApi {
 
 	@Autowired
 	private AppProp appProp;
-
-	@Autowired
-	private RunAsMongoAdmin adminRunner;
-
-	@Autowired
-	private UserManagerService userManagerService;
 
 	@Autowired
 	private SessionContext sessionContext;
@@ -1340,84 +1322,6 @@ public class MongoApi {
 	public void dropCollection(MongoSession session, Class<?> clazz) {
 		requireAdmin(session);
 		ops.dropCollection(clazz);
-	}
-
-	/**
-	 * This method makes a single pass over all grid items doing all the daily
-	 * maintenance on each one as necessary to maintain the system health and
-	 * statistics.
-	 * 
-	 * Scans all the uploaded attachments, and finds any that aren't owned by some
-	 * SubNode, and deletes them.
-	 * 
-	 * I probably can hook into some listener (or just my own delete code) to be
-	 * sure to run the 'grid.delete' for the attachments whenever someone deletes a
-	 * node also. (todo-1: check into this, can't remember if I did that already)
-	 * 
-	 * Also keeps totals by each user account, in a hashmap to be written all out at
-	 * the end to all the nodes.
-	 * 
-	 * todo-1: There's another type of background procesing that is potentially
-	 * slow/challenging which is to remove all nodes that don't have a parent. How
-	 * to do that effeciently will take some thought. These are just ordinary tree
-	 * nodes that are orphans
-	 */
-	public void gridMaintenanceScan() {
-		HashMap<ObjectId, UserStats> statsMap = new HashMap<ObjectId, UserStats>();
-
-		adminRunner.run(session -> {
-
-			int delCount = 0;
-			GridFSFindIterable files = gridFsBucket.find();
-			if (files != null) {
-				for (GridFSFile file : files) {
-					Document meta = file.getMetadata();
-					if (meta != null) {
-						ObjectId id = (ObjectId) meta.get("nodeId");
-						if (id != null) {
-							SubNode subNode = getNode(session, id);
-							if (subNode == null) {
-								log.debug("Grid Orphan Delete: " + id.toHexString());
-
-								// Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
-								Query query = new Query(Criteria.where("_id").is(file.getId()));
-								grid.delete(query);
-								delCount++;
-							} else {
-								UserStats stats = statsMap.get(subNode.getOwner());
-								if (stats == null) {
-									stats = new UserStats();
-									stats.binUsage = file.getLength();
-									statsMap.put(subNode.getOwner(), stats);
-								} else {
-									stats.binUsage = stats.binUsage.longValue() + file.getLength();
-								}
-							}
-						}
-					}
-				}
-			}
-
-			Iterable<SubNode> accountNodes = getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
-					null);
-
-			/*
-			 * scan all userAccountNodes, and set a zero amount for those not found (which
-			 * will be the correct amount).
-			 */
-			for (SubNode accountNode : accountNodes) {
-				log.debug("Processing Account Node: id=" + accountNode.getId().toHexString());
-				UserStats stats = statsMap.get(accountNode.getOwner());
-				if (stats == null) {
-					stats = new UserStats();
-					stats.binUsage = 0L;
-					statsMap.put(accountNode.getOwner(), stats);
-				}
-			}
-
-			log.debug(String.valueOf(delCount) + " orphans found and deleted.");
-			userManagerService.writeUserStats(session, statsMap);
-		});
 	}
 
 	public String regexDirectChildrenOfPath(String path) {

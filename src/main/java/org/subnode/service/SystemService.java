@@ -3,13 +3,13 @@ package org.subnode.service;
 import java.util.Map;
 
 import org.subnode.config.AppFilter;
-import org.subnode.config.AppProp;
 import org.subnode.config.AppSessionListener;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoAppConfig;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.util.Const;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
@@ -26,8 +26,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SystemService {
-	private static final long ONE_MB = 1024 * 1024; //todo-0: use Const.java
-
 	private static final Logger log = LoggerFactory.getLogger(SystemService.class);
 
 	@Autowired
@@ -42,6 +40,8 @@ public class SystemService {
 	@Autowired
 	private ExportJsonService exportJsonService;
 
+	@Autowired
+	private AttachmentService attachmentService;
 
 	public String backupDb() {
 		ValContainer<String> ret = new ValContainer<String>("");
@@ -76,7 +76,7 @@ public class SystemService {
 	}
 
 	public String compactDb() {
-		api.gridMaintenanceScan();
+		attachmentService.gridMaintenanceScan();
 
 		MongoDatabase database = mac.mongoClient().getDatabase(MongoAppConfig.databaseName);
 		Document result = database.runCommand(new Document("compact", "nodes"));
@@ -110,7 +110,7 @@ public class SystemService {
 		StringBuilder sb = new StringBuilder();
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
-		long freeMem = runtime.freeMemory() / ONE_MB;
+		long freeMem = runtime.freeMemory() / Const.ONE_MB;
 		sb.append(String.format("Free Memory: %dMB<br>", freeMem));
 		sb.append(String.format("Session Count: %d<br>", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());

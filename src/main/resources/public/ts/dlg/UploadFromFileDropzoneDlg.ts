@@ -20,6 +20,8 @@ declare var Dropzone;
 
 export class UploadFromFileDropzoneDlg extends DialogBase {
 
+    TEMPORAL_HOST: string = "https://api.temporal.cloud";
+
     hiddenInputContainer: Div;
     uploadButton: Button;
 
@@ -68,7 +70,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 return;
             }
 
-            fetch('https://api.temporal.cloud/v2/auth/login', {
+            fetch(this.TEMPORAL_HOST+'/v2/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'text/plain'
@@ -105,10 +107,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     upload = async (): Promise<boolean> => {
         return new Promise<boolean>(async (resolve, reject) => {
             if (this.filesAreValid()) {
-
                 let allowUpload = true;
 
-                if (this.toTemporal) {
+                if (this.toIpfs && this.toTemporal) {
                     let credsOk = await this.getTemporalCredentials(false);
                     if (!credsOk) {
                         resolve(false);
@@ -141,7 +142,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             console.error("Temporal login never completed.");
         }
         //todo-0: for now there's no warning to the user that only ONE file will be saved. Need to make multiple files work
-        //for IPFS uploads.
+        //for IPFS uploads, or something reasonable here.
         let file = this.fileList[0];
         let data = new FormData();
         data.append("file", file);
@@ -174,9 +175,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     configureDropZone = (): void => {
 
         /* Allow 20MB for Quantizr uploads or 20GB for IPFS */
-        let maxFileSize = this.toTemporal ? Constants.MAX_UPLOAD_MB * 1024 : Constants.MAX_UPLOAD_MB;
+        let maxFileSize = (this.toIpfs && this.toTemporal) ? Constants.MAX_UPLOAD_MB * 1024 : Constants.MAX_UPLOAD_MB;
 
-        let action = this.toTemporal ? "https://api.temporal.cloud/v2/ipfs/public/file/add" :
+        let action = (this.toIpfs && this.toTemporal) ? "https://api.temporal.cloud/v2/ipfs/public/file/add" :
             S.util.getRpcPath() + "upload";
         let url = action;
 
@@ -189,7 +190,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             url,
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
-            paramName: dlg.toTemporal ? "file" : "files", //this was a WAG, trying to get Dropzone working with Temporal
+            paramName: (dlg.toIpfs && dlg.toTemporal) ? "file" : "files", //this was a WAG, trying to get Dropzone working with Temporal
             maxFilesize: maxFileSize,
             parallelUploads: 2,
 
@@ -228,7 +229,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     dlg.sent = true;
 
                     /* If Uploading DIRECTLY to Temporal.cloud */
-                    if (dlg.toTemporal) {
+                    if (dlg.toIpfs && dlg.toTemporal) {
                         dlg.ipfsFile = file;
                         formData.append("file", file);
                         formData.append("hold_time", "1");
@@ -247,7 +248,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("error", function (param1, param2, param3) {
-                    //todo-0: add some handling here.
                     //todo-0: This can fail if the data is already saved and has a hash, but we need to ask Temporal.cloud
                     //team to see if they might send back the hash along with the error, because in real-world scenarios this 
                     //is most likely always going to be needed.
@@ -256,27 +256,25 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("success", function (param1, param2, param3) {
-                    let ipfsHash = param2.response;
                     //console.log("Uploaded to Hash: " + ipfsHash);
-
-                    S.props.setNodePropVal(J.NodeProp.IPFS_LINK, S.attachment.uploadNode, ipfsHash);
 
                     //todo-0: For ordinary non-ipfs uploads, am I already taking advantage of the fact that the MIME will be available to be sent
                     //directly from the client like this, and doing that rather then trying to 'guess' mime type on server?
                     //https://developer.mozilla.org/en-US/docs/Web/API/File
                     if (dlg.ipfsFile) {
+                        let ipfsHash = param2.response;
+
+                        S.props.setNodePropVal(J.NodeProp.IPFS_LINK, S.attachment.uploadNode, ipfsHash);
                         S.props.setNodePropVal(J.NodeProp.BIN_MIME, S.attachment.uploadNode, dlg.ipfsFile.type);
                         S.props.setNodePropVal(J.NodeProp.BIN_SIZE, S.attachment.uploadNode, `${dlg.ipfsFile.size}`);
                         S.props.setNodePropVal(J.NodeProp.BIN_FILENAME, S.attachment.uploadNode, dlg.ipfsFile.name);
+
+                        S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
+                            node: S.attachment.uploadNode
+                        }, (res) => {
+                            S.edit.saveNodeResponse(S.attachment.uploadNode, res);
+                        });
                     }
-                    else {
-                        console.log("ipfsFile null!");
-                    }
-                    S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-                        node: S.attachment.uploadNode
-                    }, (res) => {
-                        S.edit.saveNodeResponse(S.attachment.uploadNode, res);
-                    });
                 });
 
                 this.on("queuecomplete", function (arg) {
@@ -321,7 +319,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             return false;
         }
 
-        let maxFileSizeMb = this.toTemporal ? Constants.MAX_UPLOAD_MB * 1024 : Constants.MAX_UPLOAD_MB;
+        let maxFileSizeMb = (this.toIpfs && this.toTemporal) ? Constants.MAX_UPLOAD_MB * 1024 : Constants.MAX_UPLOAD_MB;
 
         for (let file of this.fileList) {
             if (file.size > maxFileSizeMb * Constants.ONE_MB) {
