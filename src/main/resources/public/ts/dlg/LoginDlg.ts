@@ -1,12 +1,11 @@
 import { ConfirmDlg } from "./ConfirmDlg";
 import { ResetPasswordDlg } from "./ResetPasswordDlg";
-import { PasswordTextField } from "../widget/PasswordTextField";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
 import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
@@ -19,7 +18,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class LoginDlg extends DialogBase {
 
     userTextField: TextField;
-    passwordTextField: PasswordTextField;
+    passwordTextField: TextField;
 
     constructor(paramsTest: Object) {
         super("Login", "app-modal-content-narrow-width");
@@ -36,14 +35,14 @@ export class LoginDlg extends DialogBase {
                                 }
                             }
                         }),
-                        this.passwordTextField = new PasswordTextField("Password", {
+                        this.passwordTextField = new TextField("Password", {
                             onKeyPress: (e: KeyboardEvent) => {
                                 if (e.which == 13) { // 13==enter key code
                                     this.login();
                                     return false;
                                 }
-                            }
-                        }),
+                            },
+                        }, null, true),
                     ]
                 ),
                 new ButtonBar(

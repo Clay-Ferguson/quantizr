@@ -2,7 +2,7 @@ import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 import { MessageDlg } from "./MessageDlg";
 import * as J from "../JavaIntf";
-import { PasswordTextField } from "../widget/PasswordTextField";
+import { TextField } from "../widget/TextField";
 import { TextContent } from "../widget/TextContent";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
@@ -17,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ChangePasswordDlg extends DialogBase {
 
-    passwordField: PasswordTextField;
+    passwordField: TextField;
     pwd: string;
     private passCode: string;
 
@@ -28,7 +28,7 @@ export class ChangePasswordDlg extends DialogBase {
         this.setChildren([
             new Form(null, [
                 new TextContent("Enter your new password below..."),
-                this.passwordField = new PasswordTextField("New Password"),
+                this.passwordField = new TextField("New Password", null, null, true),
                 new ButtonBar([
                     new Button("Change Password", () => {
                         this.changePassword();

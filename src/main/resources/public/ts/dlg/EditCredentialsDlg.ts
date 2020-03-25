@@ -1,4 +1,3 @@
-import { PasswordTextField } from "../widget/PasswordTextField";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
@@ -18,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class EditCredentialsDlg extends DialogBase {
 
     userTextField: TextField;
-    passwordTextField: PasswordTextField;
+    passwordTextField: TextField;
 
     usr: string;
     pwd: string;
@@ -27,13 +26,13 @@ export class EditCredentialsDlg extends DialogBase {
         super(title2, "app-modal-content-narrow-width");
 
         this.setChildren([
-            new TextContent("Quantizr currently uses Temporal (https://temporal.cloud) as the storage provider for IPFS content, so you can enter your Temporal"+
+            new TextContent("Quantizr uses Temporal (https://temporal.cloud) as the storage provider for IPFS content, so you can enter your Temporal"+
             " credentials here to enable saving files permanently to IPFS."),
             new Form(null, [
                 new FormGroup(null,
                     [
                         this.userTextField = new TextField("User"),
-                        this.passwordTextField = new PasswordTextField("Password"),
+                        this.passwordTextField = new TextField("Password", null, null, true),
                     ]
                 ),
                 new ButtonBar(

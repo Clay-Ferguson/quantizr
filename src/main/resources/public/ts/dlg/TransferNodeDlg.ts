@@ -1,5 +1,4 @@
 import * as J from "../JavaIntf";
-import { PasswordTextField } from "../widget/PasswordTextField";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
@@ -20,7 +19,7 @@ export class TransferNodeDlg extends DialogBase {
 
     recursiveCheckBox: Checkbox;
     fromTextField: TextField;
-    toTextField: PasswordTextField;
+    toTextField: TextField;
 
     constructor() {
         super("Transfer Node", "app-modal-content-narrow-width");

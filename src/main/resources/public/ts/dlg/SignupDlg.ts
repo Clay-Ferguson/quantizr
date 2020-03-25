@@ -3,7 +3,6 @@ import * as J from "../JavaIntf";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
-import { PasswordTextField } from "../widget/PasswordTextField";
 import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
@@ -18,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class SignupDlg extends DialogBase {
 
     userTextField: TextField;
-    passwordTextField: PasswordTextField;
+    passwordTextField: TextField;
     emailTextField: TextField;
 
     constructor() {
@@ -27,7 +26,7 @@ export class SignupDlg extends DialogBase {
         this.setChildren([
             new Form(null, [
                 this.userTextField = new TextField("User"),
-                this.passwordTextField = new PasswordTextField("Password"),
+                this.passwordTextField = new TextField("Password", null, null, true),
                 new TextContent("Note: Weak passwords may cause a warning (from Chrome Browser) if that password has ever been exposed in a data breach."),
                 this.emailTextField = new TextField("Email"),
                 new ButtonBar([
