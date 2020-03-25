@@ -41,6 +41,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     //storing this in a var was a quick convenient hack, but I need to get it probably from parmaeters closer to the fucntions using the value.
     ipfsFile: File;
 
+    maxFiles: number = 1;
+
     constructor(private toIpfs: boolean) {
         super(toIpfs ? "Upload File to IPFS" : "Upload File");
 
@@ -70,7 +72,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 return;
             }
 
-            fetch(this.TEMPORAL_HOST+'/v2/auth/login', {
+            fetch(this.TEMPORAL_HOST + '/v2/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'text/plain'
@@ -141,8 +143,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         if (this.temporalToken) {
             console.error("Temporal login never completed.");
         }
-        //todo-0: for now there's no warning to the user that only ONE file will be saved. Need to make multiple files work
-        //for IPFS uploads, or something reasonable here.
+
         let file = this.fileList[0];
         let data = new FormData();
         data.append("file", file);
@@ -166,7 +167,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             }
         }.bind(this));
 
-        xhr.open("POST", "https://api.temporal.cloud/v2/ipfs/public/file/add");
+        xhr.open("POST", this.TEMPORAL_HOST + "/v2/ipfs/public/file/add");
         xhr.setRequestHeader("Cache-Control", "no-cache");
         xhr.setRequestHeader("Authorization", "Bearer " + this.temporalToken);
         xhr.send(data);
@@ -177,7 +178,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         /* Allow 20MB for Quantizr uploads or 20GB for IPFS */
         let maxFileSize = (this.toIpfs && this.toTemporal) ? Constants.MAX_UPLOAD_MB * 1024 : Constants.MAX_UPLOAD_MB;
 
-        let action = (this.toIpfs && this.toTemporal) ? "https://api.temporal.cloud/v2/ipfs/public/file/add" :
+        let action = (this.toIpfs && this.toTemporal) ? (this.TEMPORAL_HOST + "/v2/ipfs/public/file/add") :
             S.util.getRpcPath() + "upload";
         let url = action;
 
@@ -198,6 +199,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             the uploadMultiple is false */
             uploadMultiple: false,
 
+            maxFiles: this.maxFiles,
+
             addRemoveLinks: true,
             dictDefaultMessage: "Click Here to Add Files (or Drag & Drop)",
             hiddenInputContainer: "#" + this.hiddenInputContainer.getId(),
@@ -217,7 +220,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("maxfilesexceeded", function (arg) {
-                    S.util.showMessage("Too many files.");
+                    S.util.showMessage("Only " + dlg.maxFiles + " file can be uploaded to a node.");
                 });
 
                 this.on("removedfile", function () {
@@ -248,9 +251,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("error", function (param1, param2, param3) {
-                    //todo-0: This can fail if the data is already saved and has a hash, but we need to ask Temporal.cloud
-                    //team to see if they might send back the hash along with the error, because in real-world scenarios this 
-                    //is most likely always going to be needed.
+                    if (dlg.sent) {
+                        S.util.showMessage("Upload failed.");
+                    }
+                    //todo-1: This can fail if the data is already saved and has a hash.
                     //UPDATE: There was already an issue filed for this. need to doublecheck that the hash isn't actually being sent back
                     //already and maybe I just wasning seeing it for some reason.
                 });
@@ -258,8 +262,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.on("success", function (param1, param2, param3) {
                     //console.log("Uploaded to Hash: " + ipfsHash);
 
-                    //todo-0: For ordinary non-ipfs uploads, am I already taking advantage of the fact that the MIME will be available to be sent
-                    //directly from the client like this, and doing that rather then trying to 'guess' mime type on server?
                     //https://developer.mozilla.org/en-US/docs/Web/API/File
                     if (dlg.ipfsFile) {
                         let ipfsHash = param2.response;
@@ -315,7 +317,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     filesAreValid = (): boolean => {
-        if (!this.fileList || this.fileList.length == 0) {
+        if (!this.fileList || this.fileList.length == 0 || this.fileList.length > this.maxFiles) {
             return false;
         }
 

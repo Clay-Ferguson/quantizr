@@ -158,14 +158,16 @@ public class AttachmentService {
 
 			for (MultipartFile uploadFile : uploadFiles) {
 				String fileName = uploadFile.getOriginalFilename();
+				String contentType = uploadFile.getContentType();
+
 				long size = uploadFile.getSize();
 				if (!StringUtils.isEmpty(fileName)) {
-					log.debug("Uploading file: " + fileName);
+					//log.debug("Uploading file: " + fileName + " contentType=" + contentType);
 
 					LimitedInputStreamEx limitedIs = null;
 					try {
 						limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
-						attachBinaryFromStream(session, node, nodeId, fileName, size, limitedIs, null, -1, -1,
+						attachBinaryFromStream(session, node, nodeId, fileName, size, limitedIs, contentType, -1, -1,
 								addAsChildren, explodeZips, toIpfs);
 					} finally {
 						StreamUtil.close(limitedIs);
@@ -483,10 +485,10 @@ public class AttachmentService {
 
 			/*
 			 * we gracefully tolerate the case where no size is available but normally it
-			 * will be there. 
+			 * will be there.
 			 * 
-			 * todo-1: when we detect this and then stream back some data
-			 * shuld be just go ahead and SET the correct 'size' on the node at that point?
+			 * todo-1: when we detect this and then stream back some data shuld be just go
+			 * ahead and SET the correct 'size' on the node at that point?
 			 */
 			if (size > 0) {
 				/*
@@ -986,7 +988,7 @@ public class AttachmentService {
 		return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, propName, auth, ipfs)));
 	}
 
-		/**
+	/**
 	 * This method makes a single pass over all grid items doing all the daily
 	 * maintenance on each one as necessary to maintain the system health and
 	 * statistics.
