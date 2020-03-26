@@ -26,13 +26,18 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.util.Util;
-import org.subnode.util.ValContainer;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 /**
  * Right now exception handling in here is just temporary (not final) because
@@ -183,15 +188,16 @@ public class IPFSService {
     }
 
     /**
-     * Logs into temporal and gets token. This code is tested and DOES work ok, however the design changed and for now all
-     * Temporal uploading is done purely on the client so this method is currently not ever called.
+     * Logs into temporal and gets token. This code is tested and DOES work ok,
+     * however the design changed and for now all Temporal uploading is done purely
+     * on the client so this method is currently not ever called.
      * 
      * https://gateway.temporal.cloud/ipns/docs.api.temporal.cloud/account.html#account-management
      */
     private String temporalLogin() {
         String token = null;
         try {
-            String url = TEMPORAL_HOST+"/v2/auth/login";
+            String url = TEMPORAL_HOST + "/v2/auth/login";
             HttpHeaders headers = new HttpHeaders();
 
             // MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -251,7 +257,7 @@ public class IPFSService {
              * https://docs-beta.ipfs.io/reference/http/api --stream-channels bool - Stream
              * channel output.
              */
-            String url = TEMPORAL_HOST+"/v2/ipfs/public/file/add"; // ?stream-channels=true";
+            String url = TEMPORAL_HOST + "/v2/ipfs/public/file/add"; // ?stream-channels=true";
             HttpHeaders headers = new HttpHeaders();
 
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -318,11 +324,29 @@ public class IPFSService {
         return hash;
     }
 
-    public InputStream getStream(MongoSession session, String hash) {
+    public InputStream getStream(MongoSession session, String hash, String mimeType) {
         String sourceUrl = "http://ipfs:8080/ipfs/" + hash;
 
-        ValContainer<InputStream> inputStream = new ValContainer<InputStream>();
-        attachmentService.readFromUrl(session, sourceUrl, null, null, inputStream);
-        return inputStream.getVal();
+        String FAKE_USER_AGENT = "Mozilla/5.0"; // put in constants (it's in other files too) todo-0
+
+        try {
+            int timeout = 20;
+            RequestConfig config = RequestConfig.custom()//
+                    .setConnectTimeout(timeout * 1000) //
+                    .setConnectionRequestTimeout(timeout * 1000) //
+                    .setSocketTimeout(timeout * 1000).build();
+
+            HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+            HttpGet request = new HttpGet(sourceUrl);
+
+            request.addHeader("User-Agent", FAKE_USER_AGENT);
+            HttpResponse response = client.execute(request);
+            //log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
+            //        + response.getStatusLine().getReasonPhrase());
+            InputStream is = response.getEntity().getContent();
+            return is;
+        } catch (Exception e) {
+            throw new RuntimeException("Streaming failed.", e);
+        }
     }
 }

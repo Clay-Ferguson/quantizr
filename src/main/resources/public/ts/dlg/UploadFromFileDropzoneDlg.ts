@@ -191,7 +191,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             url,
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
-            paramName: (dlg.toIpfs && dlg.toTemporal) ? "file" : "files", //this was a WAG, trying to get Dropzone working with Temporal
+            paramName: (dlg.toIpfs && dlg.toTemporal) ? "file" : "files", 
             maxFilesize: maxFileSize,
             parallelUploads: 2,
 
@@ -230,7 +230,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("sending", function (file: File, xhr, formData) {
                     dlg.sent = true;
-
                     /* If Uploading DIRECTLY to Temporal.cloud */
                     if (dlg.toIpfs && dlg.toTemporal) {
                         dlg.ipfsFile = file;

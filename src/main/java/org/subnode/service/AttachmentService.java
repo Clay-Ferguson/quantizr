@@ -267,7 +267,7 @@ public class AttachmentService {
 		BufferedImage bufImg = null;
 		byte[] imageBytes = null;
 		InputStream isTemp = null;
-		int maxFileSize = 20 * 1024 * 1024; // get this from constants file
+		int maxFileSize = 20 * Const.ONE_MB;
 
 		if (calcImageSize && ImageUtil.isImageMime(mimeType)) {
 			LimitedInputStream is = null;
@@ -675,6 +675,11 @@ public class AttachmentService {
 
 			InputStream is = getStream(session, node, null, true, ipfs);
 			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
+
+			if (size==0) {
+				throw new RuntimeException("Can't stream video without the file size. sn:size property missing");
+			}
+
 			inStream = new BufferedInputStream(is);
 
 			MultipartFileSender.fromInputStream(inStream)//
@@ -699,7 +704,7 @@ public class AttachmentService {
 	 */
 	public UploadFromUrlResponse readFromUrl(MongoSession session, UploadFromUrlRequest req) {
 		UploadFromUrlResponse res = new UploadFromUrlResponse();
-		readFromUrl(session, req.getSourceUrl(), req.getNodeId(), null, null);
+		readFromUrl(session, req.getSourceUrl(), req.getNodeId(), null, null, 0);
 		res.setSuccess(true);
 		return res;
 	}
@@ -714,19 +719,23 @@ public class AttachmentService {
 	 *                 when we want to just call this method and get an inputStream
 	 *                 handed back that can be read from. Normally the inputStream
 	 *                 ValContainer is null and not used.
+	 * 
+	 * Adding 'inputStream' out parameter here was a monstrosity clusterfuck remove this (todo-0)
+	 * 
+	 * Also need to take a hard look at ALL mime handling in here.
 	 */
 	public void readFromUrl(MongoSession session, String sourceUrl, String nodeId, String mimeHint,
-			ValContainer<InputStream> inputStream) {
+			ValContainer<InputStream> inputStream, int maxFileSize) {
+
+		if (maxFileSize == 0) {
+			maxFileSize = 20 * Const.ONE_MB; // put in constants file
+		}
+
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
 		String FAKE_USER_AGENT = "Mozilla/5.0";
 
-		/*
-		 * todo-2: This value exists in properties file, and also in TypeScript
-		 * variable. Need to have better way to define this ONLY in properties file.
-		 */
-		int maxFileSize = 20 * 1024 * 1024;
 		LimitedInputStreamEx limitedIs = null;
 
 		try {
@@ -754,6 +763,7 @@ public class AttachmentService {
 				 * because some sites don't want just any old stream reading from them. Leave
 				 * this note here as a warning and explanation
 				 */
+
 				// would restTemplate be better for this ?
 				HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 				HttpGet request = new HttpGet(sourceUrl);
@@ -951,7 +961,8 @@ public class AttachmentService {
 		InputStream is = null;
 		if (ipfs) {
 			String ipfsHash = node.getStringProp(NodeProp.IPFS_LINK.s());
-			is = ipfsService.getStream(session, ipfsHash);
+			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
+			is = ipfsService.getStream(session, ipfsHash, mimeType);
 		} else {
 			is = getStreamByNodeId(node.getId());
 		}
@@ -1025,7 +1036,9 @@ public class AttachmentService {
 							/* Find the node */
 							SubNode subNode = api.getNode(session, id);
 
-							/* If the node doesn't exist then this grid file is an orphan and should go away */
+							/*
+							 * If the node doesn't exist then this grid file is an orphan and should go away
+							 */
 							if (subNode == null) {
 								log.debug("Grid Orphan Delete: " + id.toHexString());
 
@@ -1033,8 +1046,11 @@ public class AttachmentService {
 								Query query = new Query(Criteria.where("_id").is(file.getId()));
 								grid.delete(query);
 								delCount++;
-							} 
-							/* else update the UserStats by adding the file length to the total for this user */
+							}
+							/*
+							 * else update the UserStats by adding the file length to the total for this
+							 * user
+							 */
 							else {
 								UserStats stats = statsMap.get(subNode.getOwner());
 								if (stats == null) {

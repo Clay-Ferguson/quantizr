@@ -88,7 +88,7 @@ export class TextField extends Comp implements I.TextEditorIntf {
                 onClick: () => {
                     this.setFieldType(this.attribs.type == "text" ? "password" : "text");
                 }
-            }, [icon, "Show"]);
+            }, [icon, "Show Password"]);
 
             children.push(button);
         }
