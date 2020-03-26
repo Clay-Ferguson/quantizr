@@ -676,7 +676,7 @@ public class AttachmentService {
 			InputStream is = getStream(session, node, null, true, ipfs);
 			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 
-			if (size==0) {
+			if (size == 0) {
 				throw new RuntimeException("Can't stream video without the file size. sn:size property missing");
 			}
 
@@ -704,7 +704,7 @@ public class AttachmentService {
 	 */
 	public UploadFromUrlResponse readFromUrl(MongoSession session, UploadFromUrlRequest req) {
 		UploadFromUrlResponse res = new UploadFromUrlResponse();
-		readFromUrl(session, req.getSourceUrl(), req.getNodeId(), null, null, 0);
+		readFromUrl(session, req.getSourceUrl(), req.getNodeId(), null, 0);
 		res.setSuccess(true);
 		return res;
 	}
@@ -719,13 +719,8 @@ public class AttachmentService {
 	 *                 when we want to just call this method and get an inputStream
 	 *                 handed back that can be read from. Normally the inputStream
 	 *                 ValContainer is null and not used.
-	 * 
-	 * Adding 'inputStream' out parameter here was a monstrosity clusterfuck remove this (todo-0)
-	 * 
-	 * Also need to take a hard look at ALL mime handling in here.
 	 */
-	public void readFromUrl(MongoSession session, String sourceUrl, String nodeId, String mimeHint,
-			ValContainer<InputStream> inputStream, int maxFileSize) {
+	public void readFromUrl(MongoSession session, String sourceUrl, String nodeId, String mimeHint, int maxFileSize) {
 
 		if (maxFileSize == 0) {
 			maxFileSize = 20 * Const.ONE_MB; // put in constants file
@@ -776,13 +771,9 @@ public class AttachmentService {
 
 				limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
-				if (inputStream != null) {
-					inputStream.setVal(limitedIs);
-				} else {
-					// insert 0L for size now, because we don't know it yet
-					attachBinaryFromStream(session, null, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false,
-							false, false);
-				}
+				// insert 0L for size now, because we don't know it yet
+				attachBinaryFromStream(session, null, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false, false,
+						false);
 			}
 			/*
 			 * if not an image extension, we can just stream directly into the database, but
@@ -790,24 +781,20 @@ public class AttachmentService {
 			 * if we do detect its an image we can handle it as one.
 			 */
 			else {
-				if (!detectAndSaveImage(session, nodeId, sourceUrl, url, inputStream)) {
+				if (!detectAndSaveImage(session, nodeId, sourceUrl, url)) {
 					HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 					HttpGet request = new HttpGet(sourceUrl);
 					request.addHeader("User-Agent", FAKE_USER_AGENT);
 					HttpResponse response = client.execute(request);
-					log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
-							+ response.getStatusLine().getReasonPhrase());
+					// log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
+					// 		+ response.getStatusLine().getReasonPhrase());
 					InputStream is = response.getEntity().getContent();
 
 					limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
-					if (inputStream != null) {
-						inputStream.setVal(limitedIs);
-					} else {
-						// insert 0L for size now, because we don't know it yet
-						attachBinaryFromStream(session, null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false,
-								false, false);
-					}
+					// insert 0L for size now, because we don't know it yet
+					attachBinaryFromStream(session, null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false,
+							false);
 				}
 			}
 		} catch (Exception e) {
@@ -815,22 +802,17 @@ public class AttachmentService {
 		}
 		/* finally block just for extra safety */
 		finally {
-			if (inputStream == null) {
-				StreamUtil.close(limitedIs);
-			}
+			StreamUtil.close(limitedIs);
 		}
 
-		if (inputStream == null) {
-			api.saveSession(session);
-		}
+		api.saveSession(session);
 	}
 
 	// FYI: Warning: this way of getting content type doesn't work.
 	// String mimeType = URLConnection.guessContentTypeFromStream(inputStream);
 	//
 	/* returns true if it was detected AND saved as an image */
-	private boolean detectAndSaveImage(MongoSession session, String nodeId, String fileName, URL url,
-			ValContainer<InputStream> inputStream) {
+	private boolean detectAndSaveImage(MongoSession session, String nodeId, String fileName, URL url) {
 		ImageInputStream is = null;
 		LimitedInputStreamEx is2 = null;
 		ImageReader reader = null;
@@ -856,21 +838,16 @@ public class AttachmentService {
 					byte[] bytes = os.toByteArray();
 					is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
 
-					if (inputStream != null) {
-						inputStream.setVal(is2);
-					} else {
-						attachBinaryFromStream(session, null, nodeId, fileName, bytes.length, is2, mimeType,
-								bufImg.getWidth(null), bufImg.getHeight(null), false, false, false);
-					}
+					attachBinaryFromStream(session, null, nodeId, fileName, bytes.length, is2, mimeType,
+							bufImg.getWidth(null), bufImg.getHeight(null), false, false, false);
+
 					return true;
 				}
 			}
 		} catch (Exception e) {
 			throw ExUtil.newEx(e);
 		} finally {
-			if (inputStream == null) {
-				StreamUtil.close(is, is2, reader);
-			}
+			StreamUtil.close(is, is2, reader);
 		}
 
 		return false;
