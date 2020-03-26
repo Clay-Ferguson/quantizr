@@ -162,7 +162,7 @@ public class AttachmentService {
 
 				long size = uploadFile.getSize();
 				if (!StringUtils.isEmpty(fileName)) {
-					//log.debug("Uploading file: " + fileName + " contentType=" + contentType);
+					// log.debug("Uploading file: " + fileName + " contentType=" + contentType);
 
 					LimitedInputStreamEx limitedIs = null;
 					try {
@@ -935,10 +935,8 @@ public class AttachmentService {
 		if (id == null) {
 			return;
 		}
-		// back out the number of bytes it was using (todo-0) need to locate ALL grid
-		// ops and make sure they all are updating storage quotas.
-		userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
 
+		userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
 		grid.delete(new Query(Criteria.where("_id").is(id)));
 	}
 
@@ -1015,13 +1013,19 @@ public class AttachmentService {
 
 			int delCount = 0;
 			GridFSFindIterable files = gridFsBucket.find();
+
+			/* Scan all files in the grid */
 			if (files != null) {
 				for (GridFSFile file : files) {
 					Document meta = file.getMetadata();
 					if (meta != null) {
+						/* Get which nodeId owns this grid file */
 						ObjectId id = (ObjectId) meta.get("nodeId");
 						if (id != null) {
+							/* Find the node */
 							SubNode subNode = api.getNode(session, id);
+
+							/* If the node doesn't exist then this grid file is an orphan and should go away */
 							if (subNode == null) {
 								log.debug("Grid Orphan Delete: " + id.toHexString());
 
@@ -1029,7 +1033,9 @@ public class AttachmentService {
 								Query query = new Query(Criteria.where("_id").is(file.getId()));
 								grid.delete(query);
 								delCount++;
-							} else {
+							} 
+							/* else update the UserStats by adding the file length to the total for this user */
+							else {
 								UserStats stats = statsMap.get(subNode.getOwner());
 								if (stats == null) {
 									stats = new UserStats();

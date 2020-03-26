@@ -143,10 +143,6 @@ public class ExportJsonService {
 		boolean ret = false;
 
 		String binMime = node.getStringProp(NodeProp.BIN_MIME.s());
-		if (binMime != null) {
-			log.debug("Mime: " + binMime);
-		}
-
 		ObjectId oid = node.getId();
 		if (oid != null) {
 
@@ -159,6 +155,7 @@ public class ExportJsonService {
 				DBObject metaData = new BasicDBObject();
 				metaData.put("nodeId", oid);
 
+				//todo-0: this isn't updating the quota on the user root node.
 				String id = grid.store(is, binFileName, binMime, metaData).toString();
 
 				node.setProp("bin", new SubNodePropVal(id));

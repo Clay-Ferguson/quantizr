@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MultipartFileSender {
 
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    private static final Logger log = LoggerFactory.getLogger(MultipartFileSender.class);
 
     private static final int DEFAULT_BUFFER_SIZE = 4096;
     private static final long DEFAULT_EXPIRE_TIME = 604800000L; // ..ms = 1 week.
@@ -315,7 +315,6 @@ public class MultipartFileSender {
                 Range.copy(input, output, length, r.start, r.length);
 
             } else {
-
                 // Return multiple parts of file.
                 response.setContentType("multipart/byteranges; boundary=" + MULTIPART_BOUNDARY);
                 response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
@@ -365,8 +364,7 @@ public class MultipartFileSender {
 
         /**
          * WCF: I got this implementation from github, and I never researched whether
-         * this stream copy is correct and efficient yet. For example, does it need to
-         * flush in each loop?
+         * this stream copy is correct and efficient yet. Need to replace with various "Commons IO" functions that can do this
          */
         private static void copy(InputStream input, OutputStream output, long inputSize, long start, long length)
                 throws IOException {
@@ -377,12 +375,14 @@ public class MultipartFileSender {
             //Also use commons io everywhere possible inhere.
 
             if (inputSize == length) {
+                log.debug("stream-copy full");
                 // Write full range.
                 while ((read = input.read(buffer)) > 0) {
                     output.write(buffer, 0, read);
                     output.flush();
                 }
             } else {
+                log.debug("stream-copy: start at: "+start);
                 input.skip(start);
                 long toRead = length;
 
