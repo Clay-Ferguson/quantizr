@@ -21,8 +21,7 @@ import org.slf4j.LoggerFactory;
  * done to begin with.
  */
 public class ExUtil {
-	private static final Logger log = LoggerFactory.getLogger(ExUtil.class);
-	private static final String FAKE_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)Chrome/53.0.2785.143Safari/537.36";
+	private static final Logger log = LoggerFactory.getLogger(ExUtil.class);86_64) AppleWebKit/537.36 (KHTML, like Gecko)Chrome/53.0.2785.143Safari/537.36";
 
 	public static RuntimeEx newEx(Throwable ex) {
 
@@ -73,7 +72,7 @@ public class ExUtil {
 						.setSocketTimeout(timeout * 1000).build();
 			HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 			HttpGet request = new HttpGet(url);
-			request.addHeader("User-Agent", FAKE_USER_AGENT);
+			request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
 			HttpResponse response = client.execute(request);
 
 			log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="

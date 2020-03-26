@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.subnode.util.Const;
 import org.subnode.util.Util;
 
 import java.util.HashMap;
@@ -327,8 +328,6 @@ public class IPFSService {
     public InputStream getStream(MongoSession session, String hash, String mimeType) {
         String sourceUrl = "http://ipfs:8080/ipfs/" + hash;
 
-        String FAKE_USER_AGENT = "Mozilla/5.0"; // put in constants (it's in other files too) todo-0
-
         try {
             int timeout = 20;
             RequestConfig config = RequestConfig.custom()//
@@ -339,7 +338,7 @@ public class IPFSService {
             HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
             HttpGet request = new HttpGet(sourceUrl);
 
-            request.addHeader("User-Agent", FAKE_USER_AGENT);
+            request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
             HttpResponse response = client.execute(request);
             //log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
             //        + response.getStatusLine().getReasonPhrase());

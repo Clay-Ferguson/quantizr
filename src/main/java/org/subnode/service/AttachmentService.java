@@ -729,7 +729,6 @@ public class AttachmentService {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
-		String FAKE_USER_AGENT = "Mozilla/5.0";
 
 		LimitedInputStreamEx limitedIs = null;
 
@@ -763,7 +762,7 @@ public class AttachmentService {
 				HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 				HttpGet request = new HttpGet(sourceUrl);
 
-				request.addHeader("User-Agent", FAKE_USER_AGENT);
+				request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
 				HttpResponse response = client.execute(request);
 				log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
 						+ response.getStatusLine().getReasonPhrase());
@@ -784,7 +783,7 @@ public class AttachmentService {
 				if (!detectAndSaveImage(session, nodeId, sourceUrl, url)) {
 					HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 					HttpGet request = new HttpGet(sourceUrl);
-					request.addHeader("User-Agent", FAKE_USER_AGENT);
+					request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
 					HttpResponse response = client.execute(request);
 					// log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
 					// 		+ response.getStatusLine().getReasonPhrase());
