@@ -20,6 +20,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -295,7 +296,7 @@ public class MultipartFileSender {
             if (ranges.isEmpty() || ranges.get(0) == full) {
 
                 // Return full file.
-                //log.info("Return full file");
+                // log.info("Return full file");
                 response.setContentType(contentType);
                 response.setHeader("Content-Range", "bytes " + full.start + "-" + full.end + "/" + full.total);
                 response.setHeader("Content-Length", String.valueOf(full.length));
@@ -362,41 +363,16 @@ public class MultipartFileSender {
             return (substring.length() > 0) ? Long.parseLong(substring) : -1;
         }
 
-        /**
-         * WCF: I got this implementation from github, and I never researched whether
-         * this stream copy is correct and efficient yet. Need to replace with various "Commons IO" functions that can do this
-         */
         private static void copy(InputStream input, OutputStream output, long inputSize, long start, long length)
                 throws IOException {
-            byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-            int read;
-
-            //todo-0: try putting a single flush at end, instead of flushing each buffer read?
-            //Also use commons io everywhere possible inhere.
-
             if (inputSize == length) {
                 log.debug("stream-copy full");
-                // Write full range.
-                while ((read = input.read(buffer)) > 0) {
-                    output.write(buffer, 0, read);
-                    output.flush();
-                }
+                IOUtils.copy(input, output);
             } else {
-                log.debug("stream-copy: start at: "+start);
-                input.skip(start);
-                long toRead = length;
-
-                while ((read = input.read(buffer)) > 0) {
-                    if ((toRead -= read) > 0) {
-                        output.write(buffer, 0, read);
-                        output.flush();
-                    } else {
-                        output.write(buffer, 0, (int) toRead + read);
-                        output.flush();
-                        break;
-                    }
-                }
+                log.debug("stream-copy: start at: " + start);
+                IOUtils.copyLarge(input, output, start, length);
             }
+            output.flush();
         }
     }
 
