@@ -9,9 +9,8 @@ import java.io.InputStream;
  * An input stream, which limits its data size. This stream is used, if the content length is
  * unknown.
  * 
- * NOTE: Apache Commons has this same class. Why did I steal it and make my own?
- *
- * @version $Id: LimitedInputStream.java 1565292 2014-02-06 14:51:59Z ggregory $
+ * NOTE: We cannot use the Apache Commons version of this class because it has private members that we need access to,
+ * like 'count' for example.
  */
 public abstract class LimitedInputStream extends FilterInputStream implements Closeable {
 

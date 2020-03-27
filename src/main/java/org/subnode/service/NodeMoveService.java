@@ -156,7 +156,7 @@ public class NodeMoveService {
 
 	private void deleteNode(MongoSession session, SubNode node) {
 		// switching to soft-deletes, below, eventually
-		attachmentService.deleteBinary(session, node, null);
+		attachmentService.deleteBinary(session, node);
 		api.delete(session, node);
 
 		// todo-1: I started working on 'soft-delete', but never finished. However I

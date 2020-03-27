@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 public class StreamUtil {
 	private static final Logger log = LoggerFactory.getLogger(StreamUtil.class);
 
-	/* todo-0: There's a Commons IO that does this we shold use instead */
 	public static void close(Object... objects) {
 		for (Object obj : objects) {
 			if (obj instanceof Closeable) {

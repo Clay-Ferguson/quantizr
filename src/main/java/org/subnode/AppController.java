@@ -766,7 +766,8 @@ public class AppController {
 			} else if (req.getCommand().equalsIgnoreCase("backupDb")) {
 				res.setServerInfo(systemService.backupDb());
 			} else if (req.getCommand().equalsIgnoreCase("initializeAppContent")) {
-				res.setServerInfo(systemService.initializeAppContent());
+				log.error("initializeAppContent is obsolet, and was also refactored without being retested");
+				//res.setServerInfo(systemService.initializeAppContent());
 			} else if (req.getCommand().equalsIgnoreCase("getServerInfo")) {
 				res.setServerInfo(systemService.getSystemInfo());
 			} else if (req.getCommand().equalsIgnoreCase("getJson")) {

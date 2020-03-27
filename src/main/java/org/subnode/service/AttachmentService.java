@@ -302,19 +302,19 @@ public class AttachmentService {
 		if (imageBytes == null) {
 			node.setProp(NodeProp.BIN_SIZE.s(), size);
 			if (toIpfs) {
-				writeStreamToIpfs(session, node, inputStream, null, mimeType, null);
+				writeStreamToIpfs(session, node, inputStream, mimeType);
 			} else {
-				writeStream(session, node, inputStream, null, mimeType, null);
+				writeStream(session, node, inputStream, null, mimeType);
 			}
 		} else {
-			LimitedInputStream is = null;
+			LimitedInputStreamEx is = null;
 			try {
 				node.setProp(NodeProp.BIN_SIZE.s(), imageBytes.length);
 				is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
 				if (toIpfs) {
-					writeStreamToIpfs(session, node, is, null, mimeType, null);
+					writeStreamToIpfs(session, node, is, mimeType);
 				} else {
-					writeStream(session, node, is, null, mimeType, null);
+					writeStream(session, node, is, null, mimeType);
 				}
 			} finally {
 				StreamUtil.close(is);
@@ -335,7 +335,7 @@ public class AttachmentService {
 		String nodeId = req.getNodeId();
 		SubNode node = api.getNode(session, nodeId);
 		MongoThreadLocal.dirty(node);
-		deleteBinary(session, node, null);
+		deleteBinary(session, node);
 		deleteAllBinaryProperties(node);
 		api.saveSession(session);
 		res.setSuccess(true);
@@ -785,8 +785,9 @@ public class AttachmentService {
 					HttpGet request = new HttpGet(sourceUrl);
 					request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
 					HttpResponse response = client.execute(request);
-					// log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
-					// 		+ response.getStatusLine().getReasonPhrase());
+					// log.debug("Response Code: " + response.getStatusLine().getStatusCode() + "
+					// reason="
+					// + response.getStatusLine().getReasonPhrase());
 					InputStream is = response.getEntity().getContent();
 
 					limitedIs = new LimitedInputStreamEx(is, maxFileSize);
@@ -852,32 +853,21 @@ public class AttachmentService {
 		return false;
 	}
 
-	public void writeStream(MongoSession session, SubNode node, LimitedInputStream stream, String fileName,
-			String mimeType, String propName) {
+	public void writeStream(MongoSession session, SubNode node, LimitedInputStreamEx stream, String fileName,
+			String mimeType) {
 
 		api.auth(session, node, PrivilegeType.WRITE);
-
-		if (propName == null) {
-			propName = "bin";
-		}
-
-		if (fileName == null) {
-			fileName = "file";
-		}
 
 		DBObject metaData = new BasicDBObject();
 		metaData.put("nodeId", node.getId());
 
 		SubNode userNode = api.getUserNodeByUserName(null, null);
 
-		// back out the current bytes in use by this node.
-		userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
-
 		/*
 		 * Delete any existing grid data stored under this node, before saving new
 		 * attachment
 		 */
-		deleteBinary(session, node, null);
+		deleteBinary(session, node);
 
 		String id = grid.store(stream, fileName, mimeType, metaData).toString();
 
@@ -892,32 +882,18 @@ public class AttachmentService {
 		/*
 		 * Now save the node also since the property on it needs to point to GridFS id
 		 */
-		node.setProp(propName, new SubNodePropVal(id));
+		node.setProp("bin", new SubNodePropVal(id));
 	}
 
-	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream, String fileName,
-			String mimeType, String propName) {
-
+	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream, String mimeType) {
 		api.auth(session, node, PrivilegeType.WRITE);
-
-		if (propName == null) {
-			propName = "bin";
-		}
-
-		if (fileName == null) {
-			fileName = "file";
-		}
-
 		String ipfsHash = ipfsService.addFromStream(stream, mimeType, Const.saveToTemporal);
 		node.setProp(NodeProp.IPFS_LINK.s(), new SubNodePropVal(ipfsHash));
 	}
 
-	public void deleteBinary(MongoSession session, SubNode node, String propName) {
+	public void deleteBinary(MongoSession session, SubNode node) {
 		api.auth(session, node, PrivilegeType.WRITE);
-		if (propName == null) {
-			propName = "bin";
-		}
-		String id = node.getStringProp(propName);
+		String id = node.getStringProp("bin");
 		if (id == null) {
 			return;
 		}
@@ -1020,6 +996,10 @@ public class AttachmentService {
 
 								// Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
 								Query query = new Query(Criteria.where("_id").is(file.getId()));
+
+								//Note: It's not a bug that we don't call this here:
+								//userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
+								//Because all the userstats are updated at the end of this scan.
 								grid.delete(query);
 								delCount++;
 							}

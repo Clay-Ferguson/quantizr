@@ -18,13 +18,12 @@ import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoEventListener;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.SubNodePropVal;
+import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileTools;
+import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ValContainer;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
@@ -147,24 +146,19 @@ public class ExportJsonService {
 		if (oid != null) {
 
 			InputStream is = null;
+			LimitedInputStreamEx lis = null;
 			try {
 				String resourceName = "classpath:/nodes/" + subFolder + "/" + oid.toHexString() + "-" + binFileName;
 				Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 				is = resource.getInputStream();
-
-				DBObject metaData = new BasicDBObject();
-				metaData.put("nodeId", oid);
-
-				//todo-0: this isn't updating the quota on the user root node.
-				String id = grid.store(is, binFileName, binMime, metaData).toString();
-
-				node.setProp("bin", new SubNodePropVal(id));
+				lis = new LimitedInputStreamEx(is, 20 * Const.ONE_MB); 
+				attachmentService.writeStream(session, node, lis, binFileName, binMime);
 				api.save(session, node);
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				StreamUtil.close(is);
+				StreamUtil.close(lis);
 			}
 		} else {
 			log.debug("unable to get oid");
@@ -237,14 +231,7 @@ public class ExportJsonService {
 
 					String binFileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
 					if (binFileName != null) {
-						ObjectId nodeId = node.getId();
-
-						/*
-						grid.delete(new Query(Criteria.where("_id").is(id)));
-						todo-2: Is this the fastest way to find a grid id (using metadata.nodeID
-						query) instead of some more 'core' ID, native to grid maybe ?
-						*/
-						grid.delete(new Query(Criteria.where("metadata.nodeId").is(nodeId)));
+						attachmentService.deleteBinary(session, node);
 						readBinaryFromResource(session, node, binFileName, subFolder);
 					}
 				}
