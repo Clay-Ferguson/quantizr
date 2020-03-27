@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
  * done to begin with.
  */
 public class ExUtil {
-	private static final Logger log = LoggerFactory.getLogger(ExUtil.class);86_64) AppleWebKit/537.36 (KHTML, like Gecko)Chrome/53.0.2785.143Safari/537.36";
-
+	private static final Logger log = LoggerFactory.getLogger(ExUtil.class);
+	
 	public static RuntimeEx newEx(Throwable ex) {
 
 		// removing logging, because some exception throwing is intentional (not error)
