@@ -41,24 +41,22 @@ export class MainNavPanel extends NavTag {
             )
         ]));
 
-        if (S.meta64.isAdminUser) {
-            /* Feature to read from clipboard might scare some users (as it should) so I'm turning this on only for admins
-            until we have a more specific User Preference allowing users to have to opt-in (not opt-out) to use this feature 
-            */
-            buttons.push(new Li(null, {
-                className: "nav-item"
-            }, [
-                new NavBarIconButton("fa-clipboard", null, {
-                    "onClick": e => { S.edit.saveClipboardToNode(); },
-                    "title": "Save Clipboard text to a Note"
-                },
-                    //isEnabled func
-                    () => { return S.meta64.isAdminUser /* !S.meta64.isAnonUser */ },
-                    //isVisible func
-                    () => { return S.meta64.isAdminUser /* !S.meta64.isAnonUser */ }
-                )
-            ]));
-        }
+        /* Feature to read from clipboard might scare some users (as it should) so I'm turning this on only for admins
+        until we have a more specific User Preference allowing users to have to opt-in (not opt-out) to use this feature 
+        */
+        buttons.push(new Li(null, {
+            className: "nav-item"
+        }, [
+            new NavBarIconButton("fa-clipboard", null, {
+                "onClick": e => { S.edit.saveClipboardToNode(); },
+                "title": "Save Clipboard text to a Note"
+            },
+                //isEnabled func
+                () => { return S.meta64.isAdminUser /* !S.meta64.isAnonUser */ },
+                //isVisible func
+                () => { return S.meta64.isAdminUser /* !S.meta64.isAnonUser */ }
+            )
+        ]));
 
         if (!S.meta64.isMobile) {
             buttons.push(new Li(null, {

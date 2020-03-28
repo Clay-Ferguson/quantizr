@@ -439,7 +439,7 @@ public class SubNode {
 				return Long.valueOf((Integer)val); 
 			}
 
-			//todo-0: When saving from client the values are always sent as strings, and this is a workaround until that changes.
+			//todo-1: When saving from client the values are always sent as strings, and this is a workaround until that changes.
 			if (val instanceof String) {
 				return Long.parseLong((String)val);
 			}
