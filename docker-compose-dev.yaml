@@ -7,13 +7,18 @@ services:
     # Theoretically it should have been possible to let mongo run internally on 27017 (it's default) and then expose it
     # to the outside as 27016, but I never could get that to work, so I'm just setting it up to run at 27016 both
     # internaly and externally
+    #
+    # NOTE: Minimal requirements for the mongod.conf is to have the port set as 27016, and the data db set
     mongo-dev: 
         container_name: mongo-dev 
         volumes:
             - '${hostMongoDbPath}:/data/db'
             - '/home/clay/ferguson/mongo-dumps-dev:/mongo-dumps'
+            - '/home/clay/ferguson/mongo-scripts-dev:/mongo-scripts'
+            - '/home/clay/ferguson/mongo-conf-dev/mongod.conf:/etc/mongod.conf'
         #NOTE: This 'command' property is only needed when we want to start mongod on a port other than 27017    
-        command: mongod --port 27016
+        command: mongod --config /etc/mongod.conf
+        #entrypoint: ["mongod","--config","/etc/mongod.conf"]
         ports:
             - '27016:27016'
         networks:
