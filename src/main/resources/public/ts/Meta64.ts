@@ -95,15 +95,6 @@ export class Meta64 implements Meta64Intf {
     /* Flag that indicates if we are rendering owner, modTime, etc. on each row */
     showMetaData: boolean = false;
 
-    //todo-0: These property lists need to be moved into 'props.ts' along with any utility functions that access them.
-    simpleModePropertyBlackList: any = {};
-
-    readOnlyPropertyList: any = {};
-
-    /* Holds the list of properties that are edited using something like a checkbox, or dropdown menu, or whatever, such
-    that it would never make sense to display an edit field for editing their value in the editor */
-    controlBasedPropertyList: any = {};
-
     /*
      * maps all node uids to true if selected, otherwise the property should be deleted (not existing)
     todo-1: Javascript has a Set object we can use in cases like this!
@@ -486,33 +477,6 @@ export class Meta64 implements Meta64Intf {
         }
     }
 
-    //here's the simple mode property hider!
-    initConstants = () => {
-        S.util.addAll(this.simpleModePropertyBlackList, [ //
-            J.NodeProp.IMG_WIDTH,//
-            J.NodeProp.IMG_HEIGHT, //
-            J.NodeProp.BIN_MIME, //
-            J.NodeProp.ENC_KEY, //
-            J.NodeProp.BIN, //
-        ]);
-
-        S.util.addAll(this.readOnlyPropertyList, [ //
-            J.NodeProp.IMG_WIDTH, //
-            J.NodeProp.IMG_HEIGHT, //
-            J.NodeProp.BIN, //
-            J.NodeProp.BIN_MIME, //
-            J.NodeProp.BIN_SIZE //
-        ]);
-
-        S.util.addAll(this.controlBasedPropertyList, [ //
-            J.NodeProp.PRE, //
-            J.NodeProp.INLINE_CHILDREN, //
-            J.NodeProp.NOWRAP, //
-            J.NodeProp.LAYOUT, //
-            J.NodeProp.PRIORITY
-        ]);
-    }
-
     /**
     * Detect if browser is a mobile (something smaller than tabled)
     * 
@@ -619,7 +583,7 @@ export class Meta64 implements Meta64Intf {
 
             this.appInitialized = true;
 
-            this.initConstants();
+            S.props.initConstants();
             this.displaySignupMessage();
 
             /*

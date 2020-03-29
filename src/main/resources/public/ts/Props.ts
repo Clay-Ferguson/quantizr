@@ -14,6 +14,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Props implements PropsIntf {
+    simpleModePropertyBlackList: any = {};
+
+    readOnlyPropertyList: any = {};
+
+    /* Holds the list of properties that are edited using something like a checkbox, or dropdown menu, or whatever, such
+    that it would never make sense to display an edit field for editing their value in the editor */
+    controlBasedPropertyList: any = {};
 
     orderProps = (propOrder: string[], _props: J.PropertyInfo[]): J.PropertyInfo[] => {
         let propsNew: J.PropertyInfo[] = S.util.arrayClone(_props);
@@ -223,6 +230,34 @@ export class Props implements PropsIntf {
             node.properties.push(prop);
         }
     }
+
+    //here's the simple mode property hider!
+    initConstants = () => {
+        S.util.addAll(this.simpleModePropertyBlackList, [ //
+            J.NodeProp.IMG_WIDTH,//
+            J.NodeProp.IMG_HEIGHT, //
+            J.NodeProp.BIN_MIME, //
+            J.NodeProp.ENC_KEY, //
+            J.NodeProp.BIN, //
+        ]);
+
+        S.util.addAll(this.readOnlyPropertyList, [ //
+            J.NodeProp.IMG_WIDTH, //
+            J.NodeProp.IMG_HEIGHT, //
+            J.NodeProp.BIN, //
+            J.NodeProp.BIN_MIME, //
+            J.NodeProp.BIN_SIZE //
+        ]);
+
+        S.util.addAll(this.controlBasedPropertyList, [ //
+            J.NodeProp.PRE, //
+            J.NodeProp.INLINE_CHILDREN, //
+            J.NodeProp.NOWRAP, //
+            J.NodeProp.LAYOUT, //
+            J.NodeProp.PRIORITY
+        ]);
+    }
+
 
     // /*
     //  * Returns trus if this is a node the current user doesn't own. Used to disable "edit", "delete",

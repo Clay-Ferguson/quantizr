@@ -269,7 +269,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     isGuiControlBasedProp = (prop: J.PropertyInfo): boolean => {
-        return !!S.meta64.controlBasedPropertyList[prop.name];
+        return !!S.props.controlBasedPropertyList[prop.name];
     }
 
     toggleShowReadOnly = (): void => {

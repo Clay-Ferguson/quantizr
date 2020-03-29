@@ -39,12 +39,6 @@ export interface Meta64Intf {
     showProperties: boolean;
     showMetaData: boolean;
 
-    simpleModePropertyBlackList: any;
-
-    readOnlyPropertyList: any;
-
-    controlBasedPropertyList: any;
-
     selectedNodes: any;
 
     expandedAbbrevNodeIds: any;
@@ -81,7 +75,6 @@ export interface Meta64Intf {
     anonPageLoadResponse(res: J.AnonPageLoadResponse): void;
     removeBinaryById(id: string): void;
     initNode(node: J.NodeInfo, updateMaps?: boolean): void;
-    initConstants();
     initApp(): Promise<void>;
     processUrlParams(): void;
     tabChangeEvent(tabName): void

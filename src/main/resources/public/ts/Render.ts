@@ -1167,7 +1167,7 @@ export class Render implements RenderIntf {
         //if (S.meta64.isAdminUser) return true;
         if (propName.startsWith("sn:")) return false;
 
-        let allow = !S.meta64.simpleModePropertyBlackList[propName];
+        let allow = !S.props.simpleModePropertyBlackList[propName];
         console.log("Allow Prop " + propName + " = " + allow);
         return allow;
     }
@@ -1184,7 +1184,7 @@ export class Render implements RenderIntf {
     }
 
     isReadOnlyProperty = (propName: string): boolean => {
-        return S.meta64.readOnlyPropertyList[propName];
+        return S.props.readOnlyPropertyList[propName];
     }
 }
 

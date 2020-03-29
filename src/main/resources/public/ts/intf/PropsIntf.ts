@@ -2,6 +2,11 @@ import * as J from "../JavaIntf";
 import { PropTable } from "../widget/PropTable";
 
 export interface PropsIntf {
+    simpleModePropertyBlackList: any;
+    readOnlyPropertyList: any;
+    controlBasedPropertyList: any;
+
+    initConstants(): void;
     orderProps(propOrder: string[], _props: J.PropertyInfo[]): J.PropertyInfo[];
     moveNodePosition(props: J.PropertyInfo[], idx: number, typeName: string): number;
     propsToggle(): void;
