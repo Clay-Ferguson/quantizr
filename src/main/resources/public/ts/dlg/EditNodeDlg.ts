@@ -57,7 +57,7 @@ export class EditNodeDlg extends DialogBase {
     editPropertyDlgInst: any;
 
     //Maps property names to the actual editor Comp (editor, checkbox, etc) that is currently editing it.
-    propNameToEditorCompMap: { [key: string]: Comp } = {}; //not needed ???
+    propNameToEditorCompMap: { [key: string]: Comp } = {};
 
     //maps the DOM ids of dom elements the property that DOM element is editing.
     compIdToPropMap: { [key: string]: J.PropertyInfo } = {};
@@ -235,8 +235,11 @@ export class EditNodeDlg extends DialogBase {
 
                 if (this.allowEditAllProps || (
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
-                    let tableRow = this.makePropEditor(prop);
-                    collapsiblePropsTable.addChild(tableRow);
+
+                    if (!this.isGuiControlBasedProp(prop)) {
+                        let tableRow = this.makePropEditor(prop);
+                        collapsiblePropsTable.addChild(tableRow);
+                    }
                 }
             });
         }
@@ -263,6 +266,10 @@ export class EditNodeDlg extends DialogBase {
         this.propertyEditFieldContainer.setChildren([editPropsTable, collapsiblePanel]);
 
         //this.addPropertyButton.setVisible(!S.edit.editingUnsavedNode);
+    }
+
+    isGuiControlBasedProp = (prop: J.PropertyInfo): boolean => {
+        return !!S.meta64.controlBasedPropertyList[prop.name];
     }
 
     toggleShowReadOnly = (): void => {
@@ -394,7 +401,6 @@ export class EditNodeDlg extends DialogBase {
 
     saveNode = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-
             if (this.node) {
                 this.saveCheckboxVal(this.preformattedCheckBox, J.NodeProp.PRE);
                 this.saveCheckboxVal(this.inlineChildrenCheckBox, J.NodeProp.INLINE_CHILDREN);
