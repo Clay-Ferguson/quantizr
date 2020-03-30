@@ -1109,6 +1109,7 @@ export class Render implements RenderIntf {
         let src: string = this.getUrlForNodeAttachment(node);
 
         let imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
+        //console.log("imgSize for nodeId=" + node.id + " is " + imgSize + " during render.");
         let style: any = {};
         let normalWidth = "";
         if (!imgSize) {

@@ -154,7 +154,7 @@ public class AttachmentService {
 			api.auth(session, node, PrivilegeType.WRITE);
 
 			boolean addAsChildren = uploadFiles.length > 1;
-			int maxFileSize = 20 * 1024 * 1024;
+			int maxFileSize = 20 * 1024 * 1024; //todo-0: const var here.
 
 			for (MultipartFile uploadFile : uploadFiles) {
 				String fileName = uploadFile.getOriginalFilename();
@@ -304,7 +304,7 @@ public class AttachmentService {
 			if (toIpfs) {
 				writeStreamToIpfs(session, node, inputStream, mimeType);
 			} else {
-				writeStream(session, node, inputStream, null, mimeType);
+				writeStream(session, node, inputStream, fileName, mimeType);
 			}
 		} else {
 			LimitedInputStreamEx is = null;
@@ -314,7 +314,7 @@ public class AttachmentService {
 				if (toIpfs) {
 					writeStreamToIpfs(session, node, is, mimeType);
 				} else {
-					writeStream(session, node, is, null, mimeType);
+					writeStream(session, node, is, fileName, mimeType);
 				}
 			} finally {
 				StreamUtil.close(is);

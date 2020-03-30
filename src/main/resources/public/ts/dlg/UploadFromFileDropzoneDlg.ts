@@ -54,7 +54,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
-                    new Button("IPFS Credentials", () => { this.getTemporalCredentials(true); }, null, "btn-primary"),
+                    this.toIpfs ? new Button("IPFS Credentials", () => { this.getTemporalCredentials(true); }, null, "btn-primary") : null,
                     new Button("Close", () => {
                         this.close();
                     })

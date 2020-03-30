@@ -88,6 +88,7 @@ public enum NodeProp {
 
     IMG_WIDTH("sn:imgWidth", "s"), //
     IMG_HEIGHT("sn:imgHeight", "s"), //
+    IMG_SIZE("sn:imgSize", "s"),//
 
     BIN_TOTAL("sn:binTot", "s"),//
 

@@ -104,12 +104,11 @@ export class EditNodeDlg extends DialogBase {
 
     createImgSizeSelection = (): Selection => {
         let selection: Selection = new Selection(null, "Img. Size", [
-            //{ key: "Full", val: "Full Size", selected: true },
+            { key: "100", val: "100%", selected: true }, //todo-0: actually 'selected' only works as FIRST item (ie. not working)
             { key: "10", val: "10%" },
             { key: "20", val: "20%" },
             { key: "40", val: "40%" },
             { key: "80", val: "80%" },
-            { key: "100", val: "100%" },
 
         ], "m-2"); // "w-25 m-2");
         return selection;
@@ -237,6 +236,9 @@ export class EditNodeDlg extends DialogBase {
                 }
 
                 if (prop.name == J.NodeProp.IMG_SIZE) {
+                    // if (!prop.value) {
+                    //     prop.value = "100";
+                    // }
                     this.imgSizeSelection.setSelection(prop.value);
                     return;
                 }
