@@ -5,6 +5,10 @@ $border-radius: .3rem;
 $borderRadiusLarge: 1em;
 $borderRadiusMedium: .6em;
 
+$input-bg: $gray-700;
+$input-color: white;
+$input-color-placeholder: #999;
+
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 @import "bootswatch.scss";
