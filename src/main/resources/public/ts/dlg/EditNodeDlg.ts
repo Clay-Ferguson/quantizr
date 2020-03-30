@@ -40,6 +40,7 @@ export class EditNodeDlg extends DialogBase {
     propsButtonBar: ButtonBar;
     layoutSelection: Selection;
     prioritySelection: Selection;
+    imgSizeSelection: Selection;
     //help: TextContent;
     propertyEditFieldContainer: Div;
 
@@ -97,6 +98,19 @@ export class EditNodeDlg extends DialogBase {
             { key: "3", val: "Medium" },
             { key: "4", val: "Low" },
             { key: "5", val: "Backlog" }
+        ], "m-2"); // "w-25 m-2");
+        return selection;
+    }
+
+    createImgSizeSelection = (): Selection => {
+        let selection: Selection = new Selection(null, "Img. Size", [
+            //{ key: "Full", val: "Full Size", selected: true },
+            { key: "10", val: "10%" },
+            { key: "20", val: "20%" },
+            { key: "40", val: "40%" },
+            { key: "80", val: "80%" },
+            { key: "100", val: "100%" },
+
         ], "m-2"); // "w-25 m-2");
         return selection;
     }
@@ -171,7 +185,8 @@ export class EditNodeDlg extends DialogBase {
 
         let selectionsBar = new FormInline(null, [
             this.layoutSelection = this.createLayoutSelection(),
-            this.prioritySelection = this.createPrioritySelection()
+            this.prioritySelection = this.createPrioritySelection(),
+            this.imgSizeSelection = this.createImgSizeSelection()
         ]);
 
         let collapsiblePropsTable = new EditPropsTable({
@@ -218,6 +233,11 @@ export class EditNodeDlg extends DialogBase {
 
                 if (prop.name == J.NodeProp.PRIORITY) {
                     this.prioritySelection.setSelection(prop.value);
+                    return;
+                }
+
+                if (prop.name == J.NodeProp.IMG_SIZE) {
+                    this.imgSizeSelection.setSelection(prop.value);
                     return;
                 }
 
@@ -413,6 +433,9 @@ export class EditNodeDlg extends DialogBase {
                 /* Get state of the 'priority' dropdown */
                 let priority = this.prioritySelection.getSelection();
                 S.props.setNodePropVal(J.NodeProp.PRIORITY, this.node, priority);
+
+                let imgSize = this.imgSizeSelection.getSelection();
+                S.props.setNodePropVal(J.NodeProp.IMG_SIZE, this.node, imgSize);
             }
 
             let content: string;

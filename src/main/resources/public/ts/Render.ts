@@ -1108,29 +1108,37 @@ export class Render implements RenderIntf {
     makeImageTag = (node: J.NodeInfo): Img => {
         let src: string = this.getUrlForNodeAttachment(node);
 
-        //NOTE: This property not working yet becasue we style img tags dynamically after created.
-        let maxWidth: string = S.props.getNodePropVal(C.ATT_MAX_WIDTH, node);
-        if (!maxWidth) {
-            maxWidth = "100%";
+        let imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
+        let style: any = {};
+        let normalWidth = "";
+        if (!imgSize) {
+            style.maxWidth = "100%";
+            style.width = "100%";
+            normalWidth = "100%";
+        }
+        else {
+            style.maxWidth = imgSize + "%";
+            style.width = imgSize + "%";
+            normalWidth = imgSize + "%";
         }
 
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
         let img: Img = new Img({
             "src": src,
             className: "attached-img",
-            style: {
-                maxWidth: maxWidth,
-            },
+            style,
             "title": "Click image to enlarge/reduce"
         });
 
         img.whenElm((elm: HTMLElement) => {
             elm.addEventListener("click", () => {
-                if (elm.style.maxWidth == "100%") {
+                if (elm.style.maxWidth) {
                     elm.style.maxWidth = "";
+                    elm.style.width = "";
                 }
                 else {
-                    elm.style.maxWidth = "100%";
+                    elm.style.maxWidth = normalWidth;
+                    elm.style.width = normalWidth;
                 }
             });
         });

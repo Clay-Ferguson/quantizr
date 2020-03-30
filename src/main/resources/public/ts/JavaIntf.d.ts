@@ -565,6 +565,7 @@ export const enum NodeProp {
     BIN_QUOTA = "sn:binQuota",
     INLINE_CHILDREN = "inlineChildren",
     PRIORITY = "priority",
+    IMG_SIZE = "sn:imgSize",
     LAYOUT = "layout",
 }
 
