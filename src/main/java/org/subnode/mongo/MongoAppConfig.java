@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
@@ -106,11 +107,9 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 			return null;
 
 		if (mongoClient == null) {
-			// Set credentials
-			// MongoCredential credential = MongoCredential.createCredential(mongoUser,
-			// databaseName, mongoPass.toCharArray());
-			// ServerAddress serverAddress = new ServerAddress(mongoHost, mongoPort);
-			// mongoClient = new MongoClient(serverAddress, Arrays.asList(credential));
+			//todo-0: allow credentials to be blank, and in that case don't call ".credential()" below.
+			String password = appProp.getMongoAdminPassword();
+			MongoCredential credential = MongoCredential.createCredential("root", "admin", password.toCharArray());
 
 			try {
 				String mongoHost = appProp.getMongoDbHost();
@@ -133,6 +132,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 						fromProviders(PojoCodecProvider.builder().automatic(true).build()));
 
 				MongoClientSettings settings = MongoClientSettings.builder() //
+						.credential(credential) //
 						.applyConnectionString(new ConnectionString(uri)) //
 						.codecRegistry(pojoCodecRegistry) //
 						.build();
