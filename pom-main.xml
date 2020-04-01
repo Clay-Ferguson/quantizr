@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <!-- There are 5 profiles: DEV,PROD,DEV-VSCODE,Webpack -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.subnode</groupId>
 	<artifactId>org.subnode</artifactId>
@@ -246,13 +245,13 @@
 			</build>
 		</profile>
 
-	<!-- 
+		<!-- 
 		This profile is for the purpose of updating /target/classes only so we can do a rapid server reload/iteration
 	===========================================================================
 	JAVA-COMPILE PROFILE BEGIN 
 	===========================================================================	
 	-->
-	
+
 		<profile>
 			<id>java-compile</id>
 			<activation>
@@ -282,12 +281,12 @@
 			</build>
 		</profile>
 
-	<!-- 
+		<!-- 
 	===========================================================================
 	DEV-VSCODE PROFILE BEGIN 
 	===========================================================================	
-	-->		
-	<!-- This profile 'dev-vscode' is the one we activate by default so that when opening in VSCode we don't run into the
+	-->
+		<!-- This profile 'dev-vscode' is the one we activate by default so that when opening in VSCode we don't run into the
 		bug that exists where 'node' process will HANG forever with maxed out CPU usage. This profile is identical to the 'dev' 
 		profile except for omitting the webpack part which causes this bug/hang. All profiles work just fine with or without
 		webpack when run on the command line, but it seems VSCode is not able to run any webpack without this bug happening, so the 
@@ -387,9 +386,9 @@
 							<outputKind>module</outputKind>
 							<outputFile>src/main/resources/public/ts/JavaIntf.d.ts</outputFile>
 							<mapEnum>asEnum</mapEnum>
-    						<jackson2Configuration>
-        						<enumsUsingToString>true</enumsUsingToString>
-    						</jackson2Configuration>
+							<jackson2Configuration>
+								<enumsUsingToString>true</enumsUsingToString>
+							</jackson2Configuration>
 							<noFileComment>true</noFileComment>
 						</configuration>
 					</plugin>
@@ -527,14 +526,14 @@
 									<arguments>install</arguments>
 								</configuration>
 							</execution>
-							
+
 						</executions>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
 
-	<!-- 
+		<!-- 
 	===========================================================================
 	PROD PROFILE BEGIN 
 	===========================================================================	
@@ -736,7 +735,7 @@
 
 		</profile>
 
-	<!-- 
+		<!-- 
 	===========================================================================
 	WEBPACK PROFILE BEGIN 
 	===========================================================================	
@@ -753,8 +752,7 @@
 				<java.version>11</java.version>
 			</properties>
 
-			<dependencies>
-			</dependencies>
+			<dependencies></dependencies>
 
 			<build>
 				<filters>

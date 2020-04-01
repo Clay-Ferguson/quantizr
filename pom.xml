@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <!-- There are 5 profiles: DEV,PROD,DEV-VSCODE,Webpack -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.subnode</groupId>
 	<artifactId>org.subnode</artifactId>
@@ -54,7 +53,6 @@
         </exclusion>
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
@@ -76,7 +74,6 @@
         -->
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-mail</artifactId>
@@ -88,7 +85,6 @@
 
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
@@ -103,7 +99,6 @@
         </exclusion>
     </exclusions>
 </dependency>
-
 <!-- WARNING: adding this will totally disable the app, until ALL
 of the spring configs for security are also perfected. 
 (but our custom security is better than Spring for now at least)
@@ -138,7 +133,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-test</artifactId>
@@ -150,7 +144,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
@@ -160,74 +153,62 @@ of the spring configs for security are also perfected.
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
     </exclusions>
-</dependency>
-				<!--include:common.xml-->
+</dependency>				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
     <version>1.3.3</version>
 </dependency>
-
 <dependency>
     <groupId>commons-codec</groupId>
     <artifactId>commons-codec</artifactId>
     <version>1.11</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-lang3</artifactId>
     <version>3.0</version>
 </dependency>
-
 <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-exec -->
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-exec</artifactId>
     <version>1.3</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-compress</artifactId>
     <version>1.19</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.httpcomponents</groupId>
     <artifactId>httpclient</artifactId>
     <version>4.5.9</version>
 </dependency>
-
-<dependency>        
-    <groupId>org.apache.lucene</groupId>          
+<dependency>
+    <groupId>org.apache.lucene</groupId>
     <artifactId>lucene-core</artifactId>
     <version>8.2.0</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.lucene</groupId>
     <artifactId>lucene-queryparser</artifactId>
     <version>8.2.0</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.tika</groupId>
     <artifactId>tika-core</artifactId>
     <version>1.22</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.tika</groupId>
     <artifactId>tika-parsers</artifactId>
     <version>1.22</version>
 </dependency>
-
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-log4j12</artifactId>
 </dependency>
-
 <!--
 <dependency>
     <groupId>org.apache.solr</groupId>
@@ -252,7 +233,6 @@ of the spring configs for security are also perfected.
     <artifactId>rome</artifactId>
     <version>1.0.0</version>
 </dependency>
-
 <!--
 <dependency>
     <groupId>org.apache.pdfbox</groupId>
@@ -266,13 +246,11 @@ of the spring configs for security are also perfected.
     <artifactId>joda-time</artifactId>
     <version>2.10</version>
 </dependency>
-
 <dependency>
     <groupId>javax.validation</groupId>
     <artifactId>validation-api</artifactId>
     <version>2.0.1.Final</version>
 </dependency>
-
 
 			</dependencies>
 
@@ -475,13 +453,13 @@ of the spring configs for security are also perfected.
 			</build>
 		</profile>
 
-	<!-- 
+		<!-- 
 		This profile is for the purpose of updating /target/classes only so we can do a rapid server reload/iteration
 	===========================================================================
 	JAVA-COMPILE PROFILE BEGIN 
 	===========================================================================	
 	-->
-	
+
 		<profile>
 			<id>java-compile</id>
 			<activation>
@@ -505,7 +483,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
@@ -527,7 +504,6 @@ of the spring configs for security are also perfected.
         -->
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-mail</artifactId>
@@ -539,7 +515,6 @@ of the spring configs for security are also perfected.
 
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
@@ -554,7 +529,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <!-- WARNING: adding this will totally disable the app, until ALL
 of the spring configs for security are also perfected. 
 (but our custom security is better than Spring for now at least)
@@ -589,7 +563,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-test</artifactId>
@@ -601,7 +574,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
@@ -611,74 +583,62 @@ of the spring configs for security are also perfected.
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
     </exclusions>
-</dependency>
-				<!--include:common.xml-->
+</dependency>				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
     <version>1.3.3</version>
 </dependency>
-
 <dependency>
     <groupId>commons-codec</groupId>
     <artifactId>commons-codec</artifactId>
     <version>1.11</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-lang3</artifactId>
     <version>3.0</version>
 </dependency>
-
 <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-exec -->
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-exec</artifactId>
     <version>1.3</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-compress</artifactId>
     <version>1.19</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.httpcomponents</groupId>
     <artifactId>httpclient</artifactId>
     <version>4.5.9</version>
 </dependency>
-
-<dependency>        
-    <groupId>org.apache.lucene</groupId>          
+<dependency>
+    <groupId>org.apache.lucene</groupId>
     <artifactId>lucene-core</artifactId>
     <version>8.2.0</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.lucene</groupId>
     <artifactId>lucene-queryparser</artifactId>
     <version>8.2.0</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.tika</groupId>
     <artifactId>tika-core</artifactId>
     <version>1.22</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.tika</groupId>
     <artifactId>tika-parsers</artifactId>
     <version>1.22</version>
 </dependency>
-
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-log4j12</artifactId>
 </dependency>
-
 <!--
 <dependency>
     <groupId>org.apache.solr</groupId>
@@ -703,7 +663,6 @@ of the spring configs for security are also perfected.
     <artifactId>rome</artifactId>
     <version>1.0.0</version>
 </dependency>
-
 <!--
 <dependency>
     <groupId>org.apache.pdfbox</groupId>
@@ -717,13 +676,11 @@ of the spring configs for security are also perfected.
     <artifactId>joda-time</artifactId>
     <version>2.10</version>
 </dependency>
-
 <dependency>
     <groupId>javax.validation</groupId>
     <artifactId>validation-api</artifactId>
     <version>2.0.1.Final</version>
 </dependency>
-
 
 			</dependencies>
 
@@ -740,12 +697,12 @@ of the spring configs for security are also perfected.
 			</build>
 		</profile>
 
-	<!-- 
+		<!-- 
 	===========================================================================
 	DEV-VSCODE PROFILE BEGIN 
 	===========================================================================	
-	-->		
-	<!-- This profile 'dev-vscode' is the one we activate by default so that when opening in VSCode we don't run into the
+	-->
+		<!-- This profile 'dev-vscode' is the one we activate by default so that when opening in VSCode we don't run into the
 		bug that exists where 'node' process will HANG forever with maxed out CPU usage. This profile is identical to the 'dev' 
 		profile except for omitting the webpack part which causes this bug/hang. All profiles work just fine with or without
 		webpack when run on the command line, but it seems VSCode is not able to run any webpack without this bug happening, so the 
@@ -788,7 +745,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
@@ -810,7 +766,6 @@ of the spring configs for security are also perfected.
         -->
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-mail</artifactId>
@@ -822,7 +777,6 @@ of the spring configs for security are also perfected.
 
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
@@ -837,7 +791,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <!-- WARNING: adding this will totally disable the app, until ALL
 of the spring configs for security are also perfected. 
 (but our custom security is better than Spring for now at least)
@@ -872,7 +825,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-test</artifactId>
@@ -884,7 +836,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
@@ -894,74 +845,62 @@ of the spring configs for security are also perfected.
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
     </exclusions>
-</dependency>
-				<!--include:common.xml-->
+</dependency>				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
     <version>1.3.3</version>
 </dependency>
-
 <dependency>
     <groupId>commons-codec</groupId>
     <artifactId>commons-codec</artifactId>
     <version>1.11</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-lang3</artifactId>
     <version>3.0</version>
 </dependency>
-
 <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-exec -->
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-exec</artifactId>
     <version>1.3</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-compress</artifactId>
     <version>1.19</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.httpcomponents</groupId>
     <artifactId>httpclient</artifactId>
     <version>4.5.9</version>
 </dependency>
-
-<dependency>        
-    <groupId>org.apache.lucene</groupId>          
+<dependency>
+    <groupId>org.apache.lucene</groupId>
     <artifactId>lucene-core</artifactId>
     <version>8.2.0</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.lucene</groupId>
     <artifactId>lucene-queryparser</artifactId>
     <version>8.2.0</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.tika</groupId>
     <artifactId>tika-core</artifactId>
     <version>1.22</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.tika</groupId>
     <artifactId>tika-parsers</artifactId>
     <version>1.22</version>
 </dependency>
-
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-log4j12</artifactId>
 </dependency>
-
 <!--
 <dependency>
     <groupId>org.apache.solr</groupId>
@@ -986,7 +925,6 @@ of the spring configs for security are also perfected.
     <artifactId>rome</artifactId>
     <version>1.0.0</version>
 </dependency>
-
 <!--
 <dependency>
     <groupId>org.apache.pdfbox</groupId>
@@ -1000,13 +938,11 @@ of the spring configs for security are also perfected.
     <artifactId>joda-time</artifactId>
     <version>2.10</version>
 </dependency>
-
 <dependency>
     <groupId>javax.validation</groupId>
     <artifactId>validation-api</artifactId>
     <version>2.0.1.Final</version>
 </dependency>
-
 
 			</dependencies>
 
@@ -1074,9 +1010,9 @@ of the spring configs for security are also perfected.
 							<outputKind>module</outputKind>
 							<outputFile>src/main/resources/public/ts/JavaIntf.d.ts</outputFile>
 							<mapEnum>asEnum</mapEnum>
-    						<jackson2Configuration>
-        						<enumsUsingToString>true</enumsUsingToString>
-    						</jackson2Configuration>
+							<jackson2Configuration>
+								<enumsUsingToString>true</enumsUsingToString>
+							</jackson2Configuration>
 							<noFileComment>true</noFileComment>
 						</configuration>
 					</plugin>
@@ -1214,14 +1150,14 @@ of the spring configs for security are also perfected.
 									<arguments>install</arguments>
 								</configuration>
 							</execution>
-							
+
 						</executions>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
 
-	<!-- 
+		<!-- 
 	===========================================================================
 	PROD PROFILE BEGIN 
 	===========================================================================	
@@ -1247,7 +1183,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
@@ -1269,7 +1204,6 @@ of the spring configs for security are also perfected.
         -->
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-mail</artifactId>
@@ -1281,7 +1215,6 @@ of the spring configs for security are also perfected.
 
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
@@ -1296,7 +1229,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <!-- WARNING: adding this will totally disable the app, until ALL
 of the spring configs for security are also perfected. 
 (but our custom security is better than Spring for now at least)
@@ -1331,7 +1263,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-test</artifactId>
@@ -1343,7 +1274,6 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
@@ -1353,74 +1283,62 @@ of the spring configs for security are also perfected.
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
     </exclusions>
-</dependency>
-				<!--include:common.xml-->
+</dependency>				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
     <version>1.3.3</version>
 </dependency>
-
 <dependency>
     <groupId>commons-codec</groupId>
     <artifactId>commons-codec</artifactId>
     <version>1.11</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-lang3</artifactId>
     <version>3.0</version>
 </dependency>
-
 <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-exec -->
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-exec</artifactId>
     <version>1.3</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-compress</artifactId>
     <version>1.19</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.httpcomponents</groupId>
     <artifactId>httpclient</artifactId>
     <version>4.5.9</version>
 </dependency>
-
-<dependency>        
-    <groupId>org.apache.lucene</groupId>          
+<dependency>
+    <groupId>org.apache.lucene</groupId>
     <artifactId>lucene-core</artifactId>
     <version>8.2.0</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.lucene</groupId>
     <artifactId>lucene-queryparser</artifactId>
     <version>8.2.0</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.tika</groupId>
     <artifactId>tika-core</artifactId>
     <version>1.22</version>
 </dependency>
-
 <dependency>
     <groupId>org.apache.tika</groupId>
     <artifactId>tika-parsers</artifactId>
     <version>1.22</version>
 </dependency>
-
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-log4j12</artifactId>
 </dependency>
-
 <!--
 <dependency>
     <groupId>org.apache.solr</groupId>
@@ -1445,7 +1363,6 @@ of the spring configs for security are also perfected.
     <artifactId>rome</artifactId>
     <version>1.0.0</version>
 </dependency>
-
 <!--
 <dependency>
     <groupId>org.apache.pdfbox</groupId>
@@ -1459,13 +1376,11 @@ of the spring configs for security are also perfected.
     <artifactId>joda-time</artifactId>
     <version>2.10</version>
 </dependency>
-
 <dependency>
     <groupId>javax.validation</groupId>
     <artifactId>validation-api</artifactId>
     <version>2.0.1.Final</version>
 </dependency>
-
 
 			</dependencies>
 
@@ -1652,7 +1567,7 @@ of the spring configs for security are also perfected.
 
 		</profile>
 
-	<!-- 
+		<!-- 
 	===========================================================================
 	WEBPACK PROFILE BEGIN 
 	===========================================================================	
@@ -1669,8 +1584,7 @@ of the spring configs for security are also perfected.
 				<java.version>11</java.version>
 			</properties>
 
-			<dependencies>
-			</dependencies>
+			<dependencies></dependencies>
 
 			<build>
 				<filters>
