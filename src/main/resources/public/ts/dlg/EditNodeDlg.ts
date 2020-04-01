@@ -102,7 +102,6 @@ export class EditNodeDlg extends DialogBase {
         return selection;
     }
 
-    //todo-0: Make this dropdown only show up if there's an 'image/' mime property on the node.
     createImgSizeSelection = (): Selection => {
         let selection: Selection = new Selection(null, "Img. Size", [
             { key: "0", val: "Actual", selected: true },

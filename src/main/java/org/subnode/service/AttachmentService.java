@@ -154,7 +154,7 @@ public class AttachmentService {
 			api.auth(session, node, PrivilegeType.WRITE);
 
 			boolean addAsChildren = uploadFiles.length > 1;
-			int maxFileSize = 20 * 1024 * 1024; //todo-0: const var here.
+			int maxFileSize = 20 * Const.ONE_MB;
 
 			for (MultipartFile uploadFile : uploadFiles) {
 				String fileName = uploadFile.getOriginalFilename();

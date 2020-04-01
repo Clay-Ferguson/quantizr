@@ -107,7 +107,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 			return null;
 
 		if (mongoClient == null) {
-			//todo-0: allow credentials to be blank, and in that case don't call ".credential()" below.
 			String password = appProp.getMongoAdminPassword();
 			MongoCredential credential = MongoCredential.createCredential("root", "admin", password.toCharArray());
 
@@ -126,12 +125,19 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				String uri = "mongodb://" + mongoHost + ":" + String.valueOf(mongoPort);
 				log.info("Connecting to MongoDb: " + uri);
 
-				/* This codec registroy is what allows us to store objects that contain other POJOS, like for example
-				the way we're storing AccessControl objects in a map inside SubNode */
+				/*
+				 * This codec registroy is what allows us to store objects that contain other
+				 * POJOS, like for example the way we're storing AccessControl objects in a map
+				 * inside SubNode
+				 */
 				CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
 						fromProviders(PojoCodecProvider.builder().automatic(true).build()));
 
 				MongoClientSettings settings = MongoClientSettings.builder() //
+						/*
+						 * Note: If authetication is disabled in the 'conf' file this credential call
+						 * can be here harmlessly and simply be ignored.
+						 */
 						.credential(credential) //
 						.applyConnectionString(new ConnectionString(uri)) //
 						.codecRegistry(pojoCodecRegistry) //
