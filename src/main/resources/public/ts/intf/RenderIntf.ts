@@ -29,5 +29,4 @@ export interface RenderIntf {
     allowPropertyToDisplay(propName: string): boolean;
     allowPropertyEdit(node: J.NodeInfo, propName: string): boolean;
     isReadOnlyProperty(propName: string): boolean;
-    setImageMaxWidths(): void;
 }

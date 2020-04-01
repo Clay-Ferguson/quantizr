@@ -220,7 +220,6 @@ export class Render implements RenderIntf {
         //the correct style we want, which is the 100% display across the 'document' area (not full browser, but the full 
         //width across the same area the text is rendered inside). 
         div.whenElm(async (elm: HTMLElement) => {
-            this.setImageMaxWidths();
 
             if (this.immediateDecrypting && content.startsWith(J.Constant.ENC_TAG)) {
                 setTimeout(async () => {
@@ -295,22 +294,6 @@ export class Render implements RenderIntf {
             //console.log("MARKDOWN OUT: " + mc);
         }
         return val;
-    }
-
-    /* todo-1: This is pretty ugly because images can render extremely large, and then noticably shrink, 
-    and the user can see this and it's ugly. 
-    
-    NOTE: I think there's a way to do this cleaner with react 'effects' hooks 
-    */
-    setImageMaxWidths = (): void => {
-        // S.util.domSelExec([".markdown-html", "img"], (elm: HTMLElement) => {
-        //     elm.style.maxWidth = "100%";
-        // });
-
-        //todo-0: i will deletel this soon. not quite yet.
-        // S.util.domSelExec([".attached-img"], (elm: HTMLElement) => {
-        //     elm.style.maxWidth = "100%";
-        // });
     }
 
     /**
