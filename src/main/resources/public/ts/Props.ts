@@ -258,7 +258,6 @@ export class Props implements PropsIntf {
         ]);
     }
 
-
     // /*
     //  * Returns trus if this is a node the current user doesn't own. Used to disable "edit", "delete",
     //  * etc. on the GUI.

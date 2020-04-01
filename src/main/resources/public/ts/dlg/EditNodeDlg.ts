@@ -180,11 +180,11 @@ export class EditNodeDlg extends DialogBase {
                     }
                 }
             }),
-            this.inlineChildrenCheckBox = new Checkbox("Inline Children", false)
+            this.inlineChildrenCheckBox = this.node.hasChildren ? new Checkbox("Inline Children", false) : null
         ]);
 
         let selectionsBar = new FormInline(null, [
-            this.layoutSelection = this.createLayoutSelection(),
+            this.layoutSelection = this.node.hasChildren ? this.createLayoutSelection() : null,
             this.prioritySelection = this.createPrioritySelection(),
             this.imgSizeSelection = S.props.hasImage(this.node) ? this.createImgSizeSelection() : null
         ]);
@@ -227,7 +227,9 @@ export class EditNodeDlg extends DialogBase {
             this.node.properties.forEach((prop: J.PropertyInfo) => {
 
                 if (prop.name == J.NodeProp.LAYOUT) {
-                    this.layoutSelection.setSelection(prop.value);
+                    if (this.layoutSelection) {
+                        this.layoutSelection.setSelection(prop.value);
+                    }
                     return;
                 }
 
@@ -244,7 +246,9 @@ export class EditNodeDlg extends DialogBase {
                 }
 
                 if (prop.name == J.NodeProp.INLINE_CHILDREN) {
-                    this.inlineChildrenCheckBox.setChecked(true);
+                    if (this.inlineChildrenCheckBox) {
+                        this.inlineChildrenCheckBox.setChecked(true);
+                    }
                     return;
                 }
 
@@ -425,12 +429,16 @@ export class EditNodeDlg extends DialogBase {
         return new Promise<void>(async (resolve, reject) => {
             if (this.node) {
                 this.saveCheckboxVal(this.preformattedCheckBox, J.NodeProp.PRE);
-                this.saveCheckboxVal(this.inlineChildrenCheckBox, J.NodeProp.INLINE_CHILDREN);
+                if (this.inlineChildrenCheckBox) {
+                    this.saveCheckboxVal(this.inlineChildrenCheckBox, J.NodeProp.INLINE_CHILDREN);
+                }
                 this.saveCheckboxVal(this.wordWrapCheckBox, J.NodeProp.NOWRAP, true);
 
                 /* Get state of the 'layout' dropdown */
-                let layout = this.layoutSelection.getSelection();
-                S.props.setNodePropVal(J.NodeProp.LAYOUT, this.node, layout);
+                if (this.layoutSelection) {
+                    let layout = this.layoutSelection.getSelection();
+                    S.props.setNodePropVal(J.NodeProp.LAYOUT, this.node, layout);
+                }
 
                 /* Get state of the 'priority' dropdown */
                 let priority = this.prioritySelection.getSelection();

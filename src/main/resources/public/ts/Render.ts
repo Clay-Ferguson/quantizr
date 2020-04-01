@@ -526,7 +526,7 @@ export class Render implements RenderIntf {
         ONLY show when there ARE truly children fore sure would be to force a check of the file system for every folder type that is ever rendered
         on a page and we don't want to burn that much CPU just to prevent empty-folders from being explored. Empty folders are rare. */
         if (!isInlineChildren && //
-            (this.nodeHasChildren(node.id) || node.type == "fs:folder" || node.type == "fs:lucene" || node.type == "ipfs:node")) {
+            (node.hasChildren || node.type == "fs:folder" || node.type == "fs:lucene" || node.type == "ipfs:node")) {
 
             /* convert this button to a className attribute for styles */
             openButton = new Button("Open", () => { S.nav.openNodeById(node.id, true) }, null, "btn-primary");
@@ -614,19 +614,6 @@ export class Render implements RenderIntf {
 
     allowAction = (typeHandler: TypeHandlerIntf, action: string): boolean => {
         return typeHandler == null || typeHandler.allowAction(action);
-    }
-
-    /*
-     * Returns true if the nodeId (see makeNodeId()) NodeInfo object has 'hasChildren' true
-     */
-    nodeHasChildren = (id: string): boolean => {
-        var node: J.NodeInfo = S.meta64.idToNodeMap[id];
-        if (!node) {
-            console.log("Unknown nodeId in nodeHasChildren: " + id);
-            return false;
-        } else {
-            return node.hasChildren;
-        }
     }
 
     /* todo-1: this function is way to large. Break out a lot of this into functions */
