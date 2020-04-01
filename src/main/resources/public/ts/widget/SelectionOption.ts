@@ -10,9 +10,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class SelectionOption extends Comp {
-    constructor(public key: string, public val : string) {
+    constructor(public key: string, public val : string, public selected: boolean=false) {
         super(null);
         this.attribs.value = this.key;
+        if (selected) {
+            this.attribs.selected = "selected";
+        }
     }
 
     compRender = (): ReactNode => {

@@ -307,9 +307,10 @@ export class Render implements RenderIntf {
         //     elm.style.maxWidth = "100%";
         // });
 
-        S.util.domSelExec([".attached-img"], (elm: HTMLElement) => {
-            elm.style.maxWidth = "100%";
-        });
+        //todo-0: i will deletel this soon. not quite yet.
+        // S.util.domSelExec([".attached-img"], (elm: HTMLElement) => {
+        //     elm.style.maxWidth = "100%";
+        // });
     }
 
     /**
@@ -1112,10 +1113,11 @@ export class Render implements RenderIntf {
         //console.log("imgSize for nodeId=" + node.id + " is " + imgSize + " during render.");
         let style: any = {};
         let normalWidth = "";
-        if (!imgSize) {
-            style.maxWidth = "100%";
-            style.width = "100%";
-            normalWidth = "100%";
+
+        if (!imgSize || imgSize=="0") {
+            style.maxWidth = "";
+            style.width = "";
+            normalWidth = "";
         }
         else {
             style.maxWidth = imgSize + "%";
@@ -1138,8 +1140,8 @@ export class Render implements RenderIntf {
                     elm.style.width = "";
                 }
                 else {
-                    elm.style.maxWidth = normalWidth;
-                    elm.style.width = normalWidth;
+                    elm.style.maxWidth = normalWidth || "100%";
+                    elm.style.width = normalWidth || "100%";
                 }
             });
         });

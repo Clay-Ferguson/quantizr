@@ -102,13 +102,15 @@ export class EditNodeDlg extends DialogBase {
         return selection;
     }
 
+    //todo-0: Make this dropdown only show up if there's an 'image/' mime property on the node.
     createImgSizeSelection = (): Selection => {
         let selection: Selection = new Selection(null, "Img. Size", [
-            { key: "100", val: "100%", selected: true }, //todo-0: actually 'selected' only works as FIRST item (ie. not working)
-            { key: "10", val: "10%" },
-            { key: "20", val: "20%" },
-            { key: "40", val: "40%" },
+            { key: "0", val: "Actual", selected: true },
+            { key: "15", val: "15%" },
+            { key: "25", val: "25%" },
+            { key: "50", val: "50%" },
             { key: "80", val: "80%" },
+            { key: "100", val: "100%" },
 
         ], "m-2"); // "w-25 m-2");
         return selection;
@@ -185,7 +187,7 @@ export class EditNodeDlg extends DialogBase {
         let selectionsBar = new FormInline(null, [
             this.layoutSelection = this.createLayoutSelection(),
             this.prioritySelection = this.createPrioritySelection(),
-            this.imgSizeSelection = this.createImgSizeSelection()
+            this.imgSizeSelection = S.props.hasImage(this.node) ? this.createImgSizeSelection() : null
         ]);
 
         let collapsiblePropsTable = new EditPropsTable({
@@ -236,10 +238,9 @@ export class EditNodeDlg extends DialogBase {
                 }
 
                 if (prop.name == J.NodeProp.IMG_SIZE) {
-                    // if (!prop.value) {
-                    //     prop.value = "100";
-                    // }
-                    this.imgSizeSelection.setSelection(prop.value);
+                    if (this.imgSizeSelection) {
+                        this.imgSizeSelection.setSelection(prop.value);
+                    }
                     return;
                 }
 
@@ -436,8 +437,10 @@ export class EditNodeDlg extends DialogBase {
                 let priority = this.prioritySelection.getSelection();
                 S.props.setNodePropVal(J.NodeProp.PRIORITY, this.node, priority);
 
-                let imgSize = this.imgSizeSelection.getSelection();
-                S.props.setNodePropVal(J.NodeProp.IMG_SIZE, this.node, imgSize);
+                if (this.imgSizeSelection) {
+                    let imgSize = this.imgSizeSelection.getSelection();
+                    S.props.setNodePropVal(J.NodeProp.IMG_SIZE, this.node, imgSize);
+                }
             }
 
             let content: string;
