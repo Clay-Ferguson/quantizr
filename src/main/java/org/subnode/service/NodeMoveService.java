@@ -143,7 +143,9 @@ public class NodeMoveService {
 			SubNode node = api.getNode(session, nodeId);
 
 			// back out the number of bytes it was using
-			userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
+			if (!session.isAdmin()) {
+				userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
+			}
 
 			deleteNode(session, node);
 		}
@@ -179,15 +181,15 @@ public class NodeMoveService {
 		return res;
 	}
 
+	/*
+	 * If req.location==inside then the targetId is the parent node we will be
+	 * inserting children into, but if req.location==inline the targetId represents
+	 * the child who will become a sibling of what we are inserting, and the
+	 * inserted nodes will be pasted in directly below that ordinal (i.e. new
+	 * siblings posted in below it)
+	 */
 	private void moveNodesInternal(MongoSession session, MoveNodesRequest req, MoveNodesResponse res) {
 
-		/*
-		 * If req.location==inside then the targetId is the parent node we will be
-		 * inserting children into, but if req.location==inline the targetId represents
-		 * the child who will become a sibling of what we are inserting, and the
-		 * inserted nodes will be pasted in directly below that ordinal (i.e. new
-		 * siblings posted in below it)
-		 */
 		String targetId = req.getTargetNodeId();
 		// log.debug("moveNodesInternal: targetId=" + targetId);
 		SubNode targetNode = api.getNode(session, targetId);

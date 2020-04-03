@@ -4,7 +4,7 @@
 
 import { CompIntf } from "./CompIntf";
 import { PubSub } from "../../PubSub";
-import { Constants as C} from "../../Constants";
+import { Constants as C } from "../../Constants";
 import { Singletons } from "../../Singletons";
 import * as ReactDOM from "react-dom";
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
@@ -483,5 +483,27 @@ export abstract class Comp implements CompIntf {
         if (true) {
             throw new Error("compRender should be overridden by the derived class.");
         }
+    }
+
+    setDropHandler = (func: (elm: any) => void): void => {
+        this.whenElm((elm: HTMLElement) => {
+
+            elm.addEventListener("dragenter", (event) => {
+                //console.log('DRAGENTER: ' + S.util.prettyPrint(event));
+                event.preventDefault();
+            });
+
+            elm.addEventListener("dragover", (event) => {
+                //console.log('DRAGOVER: ' + S.util.prettyPrint(event));
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
+            });
+
+            elm.addEventListener("drop", (ev) => {
+                ev.stopPropagation();
+                ev.preventDefault();
+                func(ev);
+            });
+        });
     }
 }

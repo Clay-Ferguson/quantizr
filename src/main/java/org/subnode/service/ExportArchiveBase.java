@@ -212,8 +212,12 @@ public abstract class ExportArchiveBase {
 				}
 			}
 
-			String escapedContent = StringEscapeUtils.escapeHtml4(node.getContent());
+			String content = node.getContent() != null ? node.getContent() : "";
+			content = content.trim();
+
+			String escapedContent = StringEscapeUtils.escapeHtml4(content);
 			html.append("\n<pre>" + escapedContent + "\n</pre>");
+
 			String binFileNameProp = node.getStringProp(NodeProp.BIN_FILENAME.s());
 			String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
 
@@ -226,16 +230,17 @@ public abstract class ExportArchiveBase {
 			if (writeFile) {
 				fileNameCont.setVal(parentFolder + "/" + fileName + "/" + fileName);
 
-				//todo-0: Reseach if MongoDb itself can render to JSON which might be 'better' json to use? Like the native export format?
+				// todo-0: Reseach if MongoDb itself can render to JSON which might be 'better'
+				// json to use? Like the native export format?
 				String json = XString.prettyPrint(node);
 
 				addFileEntry(parentFolder + "/" + fileName + "/" + fileName + ".json",
 						json.getBytes(StandardCharsets.UTF_8));
 
 				/* If content property was found write it into separate file */
-				if (node.getContent() != null) {
+				if (StringUtils.isNotEmpty(content)) {
 					addFileEntry(parentFolder + "/" + fileName + "/" + fileName + ".md",
-							node.getContent().getBytes(StandardCharsets.UTF_8));
+							content.getBytes(StandardCharsets.UTF_8));
 				}
 
 				/*

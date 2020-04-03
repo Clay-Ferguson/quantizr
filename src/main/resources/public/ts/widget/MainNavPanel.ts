@@ -286,9 +286,8 @@ export class MainNavPanel extends NavTag {
                 event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
             });
 
-            /* This DnD is just tinkering now, but the eventual goal is to have
-            the app automatically create a subnode whenever you drop something */
             elm.addEventListener("drop", (ev) => {
+                debugger;
                 ev.stopPropagation();
                 ev.preventDefault();
 

@@ -876,7 +876,9 @@ public class AttachmentService {
 
 		long streamCount = stream.getCount();
 		// log.debug("upload streamCount=" + streamCount);
-		userManagerService.addBytesToUserNodeBytes(streamCount, userNode, 1);
+		if (!session.isAdmin()) {
+			userManagerService.addBytesToUserNodeBytes(streamCount, userNode, 1);
+		}
 
 		if (userNode == null) {
 			throw new RuntimeException("User not found.");
@@ -901,7 +903,9 @@ public class AttachmentService {
 			return;
 		}
 
-		userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
+		if (!session.isAdmin()) {
+			userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
+		}
 		grid.delete(new Query(Criteria.where("_id").is(id)));
 	}
 

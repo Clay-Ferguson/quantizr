@@ -426,7 +426,7 @@ export class Render implements RenderIntf {
             inactiveClass = "inactive-row";
         }
 
-        return new Div(null, {
+        let rowDiv = new Div(null, {
             className: layoutClass + (selected ? (" " + activeClass) : (" " + inactiveClass)),
             onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(id); }, //
             id: cssId,
@@ -437,6 +437,28 @@ export class Render implements RenderIntf {
                     "id": id + "_content"
                 }, this.renderNodeContent(node, true, true))
             ]);
+
+        rowDiv.setDropHandler((evt: DragEvent) => {
+            let data = evt.dataTransfer.items;
+            for (let i = 0; i < data.length; i++) {
+                let d = data[i];
+                console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
+
+                if (d.kind == 'string' && d.type.match('^text/uri-list')) {
+                    d.getAsString((s) => {
+                        S.attachment.openUploadFromUrlDlg(node, s);
+                    });
+                }
+                else if (d.kind == 'string' && d.type.match('^text/html')) {
+
+                }
+                else if (d.kind == 'file' && d.type.match('^image/')) {
+                    //todo-0: I think this will allow local files to be dragged onto the browser for upload!
+                    var f = data[i].getAsFile();
+                }
+            }
+        });
+        return rowDiv;
     }
 
     showNodeUrl = (): void => {
@@ -1084,7 +1106,7 @@ export class Render implements RenderIntf {
         let style: any = {};
         let normalWidth = "";
 
-        if (!imgSize || imgSize=="0") {
+        if (!imgSize || imgSize == "0") {
             style.maxWidth = "";
             style.width = "";
             normalWidth = "";

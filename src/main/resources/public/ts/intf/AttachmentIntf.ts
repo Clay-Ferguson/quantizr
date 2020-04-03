@@ -5,7 +5,7 @@ export interface AttachmentIntf {
     uploadNode: any;
 
     openUploadFromFileDlg(toIpfs: boolean): void;
-    openUploadFromUrlDlg(): void;
+    openUploadFromUrlDlg(node: J.NodeInfo, defaultUrl: string): void;
     deleteAttachment(): void;
     deleteAttachmentResponse(res: J.DeleteAttachmentResponse, uid: string): void;
 }

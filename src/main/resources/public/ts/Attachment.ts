@@ -36,8 +36,10 @@ export class Attachment implements AttachmentIntf {
         */
     }
 
-    openUploadFromUrlDlg = (): void => {
-        let node: J.NodeInfo = S.meta64.getHighlightedNode();
+    openUploadFromUrlDlg = (node: J.NodeInfo = null, defaultUrl: string=null): void => {
+        if (!node) {
+            node = S.meta64.getHighlightedNode();
+        }
 
         if (!node) {
             this.uploadNode = null;
@@ -47,7 +49,7 @@ export class Attachment implements AttachmentIntf {
 
         this.uploadNode = node;
 
-        let dlg = new UploadFromUrlDlg();
+        let dlg = new UploadFromUrlDlg(defaultUrl);
         dlg.open();
     }
 

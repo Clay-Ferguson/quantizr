@@ -254,7 +254,7 @@ public class NodeEditService {
 				 * to assume the worst behavior from client code, for security and robustness.
 				 */
 				if (session.isAdmin() || SubNodeUtil.isSavableProperty(property.getName())) {
-					log.debug("Property to save: " + property.getName() + "=" + property.getValue());
+					//log.debug("Property to save: " + property.getName() + "=" + property.getValue());
 					node.setProp(property.getName(), property.getValue());
 				} else {
 					/**

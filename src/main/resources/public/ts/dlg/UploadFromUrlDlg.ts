@@ -18,12 +18,12 @@ export class UploadFromUrlDlg extends DialogBase {
     uploadFromUrlTextField: TextField;
     uploadButton: Button;
 
-    constructor() {
+    constructor(private defaultUrl: string=null) {
         super("Upload File");
        
         this.setChildren([
             new Form(null, [
-                this.uploadFromUrlTextField = new TextField("Upload from URL"),
+                this.uploadFromUrlTextField = new TextField("Upload from URL", null, defaultUrl),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Close", () => {

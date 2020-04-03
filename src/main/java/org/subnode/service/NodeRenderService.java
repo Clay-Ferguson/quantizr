@@ -76,7 +76,7 @@ public class NodeRenderService {
 
 		String targetId = req.getNodeId();
 
-		log.debug("renderNode targetId:" + targetId);
+		//log.debug("renderNode targetId:" + targetId);
 		SubNode node = api.getNode(session, targetId);
 
 		if (node == null) {
