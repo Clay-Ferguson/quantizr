@@ -9,7 +9,7 @@ import { RadioButtonGroup } from "../widget/RadioButtonGroup";
 import { Anchor } from "../widget/Anchor";
 import { VerticalLayout } from "../widget/VerticalLayout";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 
 let S: Singletons;
@@ -22,21 +22,18 @@ export class ExportDlg extends DialogBase {
     zipRadioButton: RadioButton;
     tarRadioButton: RadioButton;
     tarGzRadioButton: RadioButton;
-    mdRadioButton: RadioButton;
-    jsonRadioButton: RadioButton;
     pdfRadioButton: RadioButton;
 
     constructor() {
         super("Export");
-       
+
         this.setChildren([
             new Header("Export node content to file..."),
             new RadioButtonGroup([
                 this.zipRadioButton = new RadioButton("ZIP", false, "exportTypeGroup"),
                 this.tarRadioButton = new RadioButton("TAR", false, "exportTypeGroup"),
                 this.tarGzRadioButton = new RadioButton("TAR.GZ", false, "exportTypeGroup"),
-                this.mdRadioButton = new RadioButton("MD (Markdown)", false, "exportTypeGroup"),
-                this.jsonRadioButton = new RadioButton("JSON", false, "exportTypesGroup"),
+
                 // had to disable PDF, because PDFBox hangs in Java, and until they fix that bug
                 // there's nothing i can do other than ditch PDF box completely, which i'm not ready to do yet.
                 // this.pdfRadioButton = new RadioButton("PDF", false),
@@ -78,12 +75,6 @@ export class ExportDlg extends DialogBase {
         else if (this.tarGzRadioButton.getChecked()) {
             ret = "tar.gz";
         }
-        else if (this.mdRadioButton.getChecked()) {
-            ret = "md";
-        }
-        else if (this.jsonRadioButton.getChecked()) {
-            ret = "json";
-        }
         else if (this.pdfRadioButton.getChecked()) {
             ret = "pdf";
         }
@@ -92,15 +83,16 @@ export class ExportDlg extends DialogBase {
 
     exportResponse = (res: J.ExportResponse): void => {
         let hostAndPort: string = S.util.getHostAndPort();
+        let downloadLink = hostAndPort + "/file/" + res.fileName + "?disp=attachment";
         if (S.util.checkSuccess("Export", res)) {
             new MessageDlg(
-                "Export successful.",
+                "Export successful.<p>Use the download link below now, to get the file.",
                 "Export",
                 null,
                 new VerticalLayout([
-                    new Anchor(hostAndPort + "/file/" + res.fileName + "?disp=inline", "Raw View", { "target": "_blank" }),
+                    //new Anchor(hostAndPort + "/file/" + res.fileName + "?disp=inline", "Raw View", { "target": "_blank" }),
                     //new Anchor(hostAndPort + "/view/" + res.fileName, "Formatted View", { "target": "_blank" }),
-                    new Anchor(hostAndPort + "/file/" + res.fileName + "?disp=attachment", "Download", null)
+                    new Anchor(downloadLink, "Download: " + downloadLink, null)
                 ])
             ).open();
 

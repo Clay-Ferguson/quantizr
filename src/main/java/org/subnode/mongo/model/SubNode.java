@@ -268,6 +268,8 @@ public class SubNode {
 		return owner != null ? owner.toHexString() : null;
 	}
 
+	/* todo-1: All dates need to be stored as UTC/GMC so that the timezone offset is zero, because there's no timezone information stored anywhere,
+	and the only place any timezones ever come into play is when displaying the time to a user. */
 	@JsonProperty(FIELD_CREATE_TIME)
 	public Date getCreateTime() {
 		return createTime;

@@ -530,10 +530,13 @@ public class AttachmentService {
 	/**
 	 * Downloads a file by name that is expected to be in the Admin Data Folder
 	 */
-	public ResponseEntity<StreamingResponseBody> getFile(MongoSession session, String fileName, String disposition) {
+	public void getFile(MongoSession session, String fileName, String disposition, HttpServletResponse response) {
 
 		if (fileName.contains(".."))
 			throw ExUtil.newEx("bad request.");
+
+		BufferedInputStream inStream = null;
+		BufferedOutputStream outStream = null;
 
 		try {
 			String fullFileName = appProp.getAdminDataFolder() + File.separator + fileName;
@@ -554,21 +557,21 @@ public class AttachmentService {
 				disposition = "inline";
 			}
 
-			// I think we could be using the MultipartFileSender here, eventually but not
-			// until we decople it from reading directly from filesystem
-			AutoCloseInputStream acis = new AutoCloseInputStream(new FileInputStream(fullFileName));
-			StreamingResponseBody stream = (os) -> {
-				IOUtils.copy(acis, os);
-				os.flush();
-			};
+			response.setContentType(mimeType);
+			response.setContentLength((int) file.length());
+			response.setHeader("Content-Disposition", disposition + "; filename=\"" + fileName + "\"");
+			response.setHeader("Cache-Control", "public, max-age=31536000");
 
-			return ResponseEntity.ok()//
-					.contentLength(file.length())//
-					.header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + fileName + "\"")//
-					.contentType(MediaType.parseMediaType(mimeType))//
-					.body(stream);
+			FileInputStream is = new FileInputStream(fullFileName);
+			inStream = new BufferedInputStream(is);
+			outStream = new BufferedOutputStream(response.getOutputStream());
+
+			IOUtils.copy(inStream, outStream);
+			outStream.flush();
 		} catch (Exception ex) {
 			throw ExUtil.newEx(ex);
+		} finally {
+			StreamUtil.close(inStream, outStream);
 		}
 	}
 
@@ -997,9 +1000,9 @@ public class AttachmentService {
 								// Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
 								Query query = new Query(Criteria.where("_id").is(file.getId()));
 
-								//Note: It's not a bug that we don't call this here:
-								//userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
-								//Because all the userstats are updated at the end of this scan.
+								// Note: It's not a bug that we don't call this here:
+								// userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
+								// Because all the userstats are updated at the end of this scan.
 								grid.delete(query);
 								delCount++;
 							}

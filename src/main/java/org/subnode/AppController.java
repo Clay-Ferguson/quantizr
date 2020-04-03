@@ -85,7 +85,6 @@ import org.subnode.response.ShutdownServerNodeResponse;
 import org.subnode.service.AttachmentService;
 import org.subnode.service.BashService;
 import org.subnode.service.ExportTarService;
-import org.subnode.service.ExportTxtService;
 import org.subnode.service.ExportZipService;
 import org.subnode.service.GraphNodesService;
 import org.subnode.service.IPFSService;
@@ -380,19 +379,12 @@ public class AppController {
 		return callProc.run("export", req, session, ms -> {
 			ExportResponse res = new ExportResponse();
 
-			if ("md".equalsIgnoreCase(req.getExportExt())) {
-				ExportTxtService svc = (ExportTxtService) SpringContextUtil.getBean(ExportTxtService.class);
-				svc.export(ms, ExportOutputType.MD, req, res);
-			} else if ("json".equalsIgnoreCase(req.getExportExt())) {
-				ExportTxtService svc = (ExportTxtService) SpringContextUtil.getBean(ExportTxtService.class);
-				svc.export(ms, ExportOutputType.JSON, req, res);
-			}
 			// else if ("pdf".equalsIgnoreCase(req.getExportExt())) {
 			// ExportPdfService svc = (ExportPdfService)
 			// SpringContextUtil.getBean(ExportPdfService.class);
 			// svc.export(null, req, res);
 			// }
-			else if ("zip".equalsIgnoreCase(req.getExportExt())) {
+			if ("zip".equalsIgnoreCase(req.getExportExt())) {
 				ExportZipService svc = (ExportZipService) SpringContextUtil.getBean(ExportZipService.class);
 				svc.export(ms, req, res);
 			} else if ("tar".equalsIgnoreCase(req.getExportExt())) {
@@ -573,12 +565,13 @@ public class AppController {
 	 * -is-getting- truncated
 	 */
 	@RequestMapping(value = "/file/{fileName:.+}", method = RequestMethod.GET)
-	public Object getFile(//
+	public void getFile(//
 			@PathVariable("fileName") String fileName, //
 			@RequestParam(name = "disp", required = false) String disposition, //
-			HttpSession session) {
-		return callProc.run("file", null, session, ms -> {
-			return attachmentService.getFile(ms, fileName, disposition);
+			HttpSession session, HttpServletResponse response) {
+		callProc.run("file", null, session, ms -> {
+			attachmentService.getFile(ms, fileName, disposition, response);
+			return null;
 		});
 	}
 

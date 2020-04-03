@@ -66,7 +66,9 @@ public class FileUtils {
 	}
 
 	/**
-	 * input: /home/clay/path/file.txt output: file.txt
+	 * input: /home/clay/path/file.txt 
+	 * 
+	 * output: file.txt
 	 */
 	public final String getShortFileName(String fileName) {
 		if (fileName == null)

@@ -911,6 +911,10 @@ public class MongoApi {
 	public List<SubNode> getChildrenAsList(MongoSession session, SubNode node, boolean ordered, Integer limit) {
 		Iterable<SubNode> iter = getChildren(session, node,
 				ordered ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, limit);
+		return iterateToList(iter);
+	}
+
+	public List<SubNode> iterateToList(Iterable<SubNode> iter) {
 		if (!iter.iterator().hasNext()) {
 			return null;
 		}
@@ -1004,7 +1008,7 @@ public class MongoApi {
 	 * knows. MongoDb is stil the wild wild west of databases.
 	 */
 	public Long getMaxChildOrdinal(MongoSession session, SubNode node) {
-		// Do not delete this commented garbage. Can be helpful to get aggregates
+		// Do not delete this commented stuff. Can be helpful to get aggregates
 		// working.
 		// MatchOperation match = new
 		// MatchOperation(Criteria.where("quantity").gt(quantity));

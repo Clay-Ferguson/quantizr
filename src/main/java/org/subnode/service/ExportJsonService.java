@@ -35,7 +35,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,9 +50,6 @@ public class ExportJsonService {
 
 	@Autowired
 	private MongoApi api;
-
-	@Autowired
-	private GridFsTemplate grid;
 
 	@Autowired
 	private AppProp appProp;

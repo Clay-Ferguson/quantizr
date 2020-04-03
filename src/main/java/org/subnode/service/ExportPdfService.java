@@ -22,7 +22,6 @@ package org.subnode.service;
 // import org.subnode.config.AppProp;
 // import org.subnode.model.client.NodeProp;
 // import org.subnode.config.SessionContext;
-// import org.subnode.model.ExportPropertyInfo;
 // import org.subnode.model.UserPreferences;
 // import org.subnode.mongo.MongoApi;
 // import org.subnode.mongo.MongoSession;
@@ -183,22 +182,6 @@ public class ExportPdfService {
 	// 		if (node.getProperties() != null) {
 	// 			node.getProperties().forEach((propName, propVal) -> {
 	// 				// log.debug(" PROP: "+propName);
-
-	// 				if (propName.equals(NodeProp.BIN_FILENAME)) {
-	// 				}
-
-	// 				if (propName.equals(NodeProp.CONTENT)) {
-	// 					print(propVal.getValue().toString());
-	// 				}
-	// 				else if (propName.equals(NodeProp.BIN_VER)) {
-	// 				}
-	// 				else {
-	// 					ExportPropertyInfo propInfo = new ExportPropertyInfo();
-	// 					propInfo.setName(propName);
-	// 					propInfo.setVal(propVal.getValue());
-
-	// 				}
-	// 			});
 	// 		}
 	// 		print("\n----");
 	// 	}
