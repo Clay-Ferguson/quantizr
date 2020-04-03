@@ -44,7 +44,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     maxFiles: number = 1;
 
-    constructor(private toIpfs: boolean) {
+    constructor(private toIpfs: boolean, private autoAddFile: File) {
         super(toIpfs ? "Upload File to IPFS" : "Upload File");
 
         this.setChildren([
@@ -192,7 +192,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             url,
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
-            paramName: (dlg.toIpfs && dlg.toTemporal) ? "file" : "files", 
+            paramName: (dlg.toIpfs && dlg.toTemporal) ? "file" : "files",
             maxFilesize: maxFileSize,
             parallelUploads: 2,
 
@@ -290,6 +290,17 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
         S.util.getElm(this.dropzoneDiv.getId(), (elm: HTMLElement) => {
             this.dropzone = new Dropzone("#" + this.dropzoneDiv.getId(), config);
+
+            if (this.autoAddFile) {
+                if (!dlg.toTemporal && (this.autoAddFile.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB)) {
+                    S.util.showMessage("File is too large. Max Size=" + Constants.MAX_UPLOAD_MB + "MB");
+                    return;
+                }
+
+                /* It took me forever to figure out that 'addFile' can do this here, I'm not sure if it's undocumented or
+                could be taken away some day. Hopefully not. */
+                this.dropzone.addFile(this.autoAddFile);
+            }
         });
     }
 

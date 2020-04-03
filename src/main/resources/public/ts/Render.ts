@@ -453,8 +453,9 @@ export class Render implements RenderIntf {
 
                 }
                 else if (d.kind == 'file' && d.type.match('^image/')) {
-                    //todo-0: I think this will allow local files to be dragged onto the browser for upload!
                     var f = data[i].getAsFile();
+                    //todo-0: I'm thinking the 'toIpfs' flag might be better as a checkbox on the upload dialog?
+                    S.attachment.openUploadFromFileDlg(false, node, f);
                 }
             }
         });

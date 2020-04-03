@@ -4,7 +4,7 @@ import * as J from "../JavaIntf";
 export interface AttachmentIntf {
     uploadNode: any;
 
-    openUploadFromFileDlg(toIpfs: boolean): void;
+    openUploadFromFileDlg(toIpfs: boolean, node?: J.NodeInfo, autoAddFile?: File): void;
     openUploadFromUrlDlg(node: J.NodeInfo, defaultUrl: string): void;
     deleteAttachment(): void;
     deleteAttachmentResponse(res: J.DeleteAttachmentResponse, uid: string): void;

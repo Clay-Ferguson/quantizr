@@ -17,8 +17,10 @@ export class Attachment implements AttachmentIntf {
     /* Node being uploaded to */
     uploadNode: any = null;
 
-    openUploadFromFileDlg = (toIpfs: boolean): void => {
-        let node: J.NodeInfo = S.meta64.getHighlightedNode();
+    openUploadFromFileDlg = (toIpfs: boolean = false, node: J.NodeInfo=null, autoAddFile: File = null): void => {
+        if (node == null) {
+            node = S.meta64.getHighlightedNode();
+        }
         if (!node) {
             this.uploadNode = null;
             S.util.showMessage("No node is selected.");
@@ -27,7 +29,7 @@ export class Attachment implements AttachmentIntf {
 
         this.uploadNode = node;
 
-        let dlg = new UploadFromFileDropzoneDlg(toIpfs);
+        let dlg = new UploadFromFileDropzoneDlg(toIpfs, autoAddFile);
         dlg.open();
 
         /* Note: To run legacy uploader just put this version of the dialog here, and
@@ -36,7 +38,7 @@ export class Attachment implements AttachmentIntf {
         */
     }
 
-    openUploadFromUrlDlg = (node: J.NodeInfo = null, defaultUrl: string=null): void => {
+    openUploadFromUrlDlg = (node: J.NodeInfo = null, defaultUrl: string = null): void => {
         if (!node) {
             node = S.meta64.getHighlightedNode();
         }
