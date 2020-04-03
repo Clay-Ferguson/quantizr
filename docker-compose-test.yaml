@@ -49,6 +49,7 @@ services:
             - net-test
         environment:
             mongoAdminPassword: "${subnodePassword}"
+            mongoSecurity: "false"
             testUserAccounts: "adam:password:${devEmail},bob:password:${devEmail},cory:password:${devEmail},dan:password:${devEmail}" 
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "mongo-test" 

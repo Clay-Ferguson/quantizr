@@ -72,6 +72,7 @@ services:
             #runTests: "IPFSTest"
             
             mongoAdminPassword: "${subnodePassword}"
+            mongoSecurity: "true"
             testUserAccounts: "adam:password:${devEmail},bob:password:${devEmail},cory:password:${devEmail},dan:password:${devEmail}" 
             # resourcesBaseFolder: "file:///dev-resource-base/" 
             spring.config.location: "classpath:/application.properties" 

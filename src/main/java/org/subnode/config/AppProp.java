@@ -104,6 +104,11 @@ public class AppProp /* implements EnvironmentAware */ {
 		return "true".equals(env.getProperty("mongoTest"));
 	}
 
+	/* Should be set to true if mongo security is turned on requiring credentials */
+	public boolean getMongoSecurity() {
+		return "true".equals(env.getProperty("mongoSecurity"));
+	}
+
 	public String getMongoAdminPassword() {
 		return env.getProperty("mongoAdminPassword");
 	}

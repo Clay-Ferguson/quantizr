@@ -107,8 +107,16 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 			return null;
 
 		if (mongoClient == null) {
-			String password = appProp.getMongoAdminPassword();
-			MongoCredential credential = MongoCredential.createCredential("root", "admin", password.toCharArray());
+			MongoCredential credential = null;
+
+			if (appProp.getMongoSecurity()) {
+				log.debug("MongoSecurity enabled.");
+				String password = appProp.getMongoAdminPassword();
+				credential = MongoCredential.createCredential("root", "admin", password.toCharArray());
+			}
+			else {
+				log.debug("MongoSecurity disabled.");
+			}
 
 			try {
 				String mongoHost = appProp.getMongoDbHost();
@@ -133,15 +141,13 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
 						fromProviders(PojoCodecProvider.builder().automatic(true).build()));
 
-				MongoClientSettings settings = MongoClientSettings.builder() //
-						/*
-						 * Note: If authetication is disabled in the 'conf' file this credential call
-						 * can be here harmlessly and simply be ignored.
-						 */
-						.credential(credential) //
-						.applyConnectionString(new ConnectionString(uri)) //
-						.codecRegistry(pojoCodecRegistry) //
-						.build();
+				MongoClientSettings.Builder builder = MongoClientSettings.builder();
+				if (credential != null) {
+					builder = builder.credential(credential);
+				}
+				builder = builder.applyConnectionString(new ConnectionString(uri)); //
+				builder = builder.codecRegistry(pojoCodecRegistry); //
+				MongoClientSettings settings = builder.build();
 				mongoClient = MongoClients.create(settings);
 
 				if (mongoClient != null) {
