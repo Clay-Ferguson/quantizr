@@ -231,9 +231,6 @@ public abstract class ExportArchiveBase {
 
 			if (writeFile) {
 				fileNameCont.setVal(parentFolder + "/" + fileName + "/" + fileName);
-
-				// todo-0: Reseach if MongoDb itself can render to JSON which might be 'better'
-				// json to use? Like the native export format?
 				String json = XString.prettyPrint(node);
 
 				addFileEntry(parentFolder + "/" + fileName + "/" + fileName + ".json",
@@ -250,8 +247,6 @@ public abstract class ExportArchiveBase {
 				 * separate file
 				 */
 				if (mimeType != null) {
-					// AutoCloseInputStream is = attachmentService.getAutoClosingStream(session,
-					// node, null, false, false);
 					boolean ipfs = StringUtils.isNotEmpty(node.getStringProp(NodeProp.IPFS_LINK.s()));
 
 					InputStream is = null;

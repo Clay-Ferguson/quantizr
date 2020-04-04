@@ -440,6 +440,8 @@ export class Render implements RenderIntf {
 
         rowDiv.setDropHandler((evt: DragEvent) => {
             let data = evt.dataTransfer.items;
+
+            //todo-1: right now we only actually support one file being dragged. Would be nice to support multiples
             for (let i = 0; i < data.length; i++) {
                 let d = data[i];
                 console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
@@ -448,14 +450,15 @@ export class Render implements RenderIntf {
                     d.getAsString((s) => {
                         S.attachment.openUploadFromUrlDlg(node, s);
                     });
+                    return;
                 }
                 else if (d.kind == 'string' && d.type.match('^text/html')) {
 
                 }
                 else if (d.kind == 'file' && d.type.match('^image/')) {
                     var f = data[i].getAsFile();
-                    //todo-0: I'm thinking the 'toIpfs' flag might be better as a checkbox on the upload dialog?
                     S.attachment.openUploadFromFileDlg(false, node, f);
+                    return;
                 }
             }
         });

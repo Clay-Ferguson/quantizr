@@ -20,8 +20,8 @@ declare var Dropzone;
 
 export class UploadFromFileDropzoneDlg extends DialogBase {
 
-    //todo-0: change back to 'prod' soon.
-    TEMPORAL_HOST: string = "https://dev.api.temporal.cloud";
+    //TEMPORAL_HOST: string = "https://dev.api.temporal.cloud";
+    TEMPORAL_HOST: string = "https://api.temporal.cloud";
 
     hiddenInputContainer: Div;
     uploadButton: Button;

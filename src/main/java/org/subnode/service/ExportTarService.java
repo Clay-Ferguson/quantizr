@@ -50,8 +50,7 @@ public class ExportTarService extends ExportArchiveBase {
             throw ExUtil.newEx(ex);
         }
     }
-
-    //todo-0: investigate if all the 'addEntry' calls like this can take an inputstream instead of byte array for memory efficiency
+    
     @Override
     public void addEntry(String fileName, byte[] bytes) {
         log.debug("Add Entry: " + fileName + " bytes.length=" + bytes.length);
