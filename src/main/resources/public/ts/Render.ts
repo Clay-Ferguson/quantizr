@@ -7,7 +7,7 @@ import { Div } from "./widget/Div";
 import { Span } from "./widget/Span";
 import { Img } from "./widget/Img";
 import { Anchor } from "./widget/Anchor";
-import { Constants as C } from "./Constants";
+import { Constants as C, Constants } from "./Constants";
 import { RenderIntf } from "./intf/RenderIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
@@ -1080,12 +1080,11 @@ export class Render implements RenderIntf {
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo): string => {
         let filePart = S.props.getNodePropVal(J.NodeProp.BIN, node);
-        let ipfs = false;
 
         if (!filePart) {
             filePart = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
             if (filePart) {
-                ipfs = true;
+                return Constants.IPFS_GATEWAY + filePart; 
             }
         }
 

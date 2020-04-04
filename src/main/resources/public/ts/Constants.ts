@@ -3,6 +3,8 @@ export class Constants {
     static readonly ONE_MB = 1048576; // 1024 * 1024;
     static readonly MAX_UPLOAD_MB = 20;
 
+    static readonly IPFS_GATEWAY = "https://gateway.temporal.cloud/ipfs/";
+
     /* Feature Flags */
     /* ======================================================================== */
     static readonly ENABLE_ACE_EDITOR: boolean = false;
