@@ -124,6 +124,8 @@ public abstract class ExportArchiveBase {
 
 	public abstract void addEntry(String fileName, byte[] bytes);
 
+	public abstract void addEntry(String fileName, InputStream stream, long length);
+
 	private void recurseNode(String parentFolder, SubNode node, int level, String parentHtmlFile) {
 		if (node == null)
 			return;
@@ -256,8 +258,21 @@ public abstract class ExportArchiveBase {
 					try {
 						is = attachmentService.getStream(session, node, null, false, ipfs);
 						BufferedInputStream bis = new BufferedInputStream(is);
+						long length = node.getIntProp(NodeProp.BIN_SIZE.s());
 
-						addFileEntry(parentFolder + "/" + fileName + "/" + binFileNameStr, IOUtils.toByteArray(bis));
+						if (length > 0) {
+							/* NOTE: the archive WILL fail if no length exists in this codepath */
+							addFileEntry(parentFolder + "/" + fileName + "/" + binFileNameStr, bis, length);
+						} else {
+							/*
+							 * This *should* never happen that we fall back to writing as an array from the
+							 * input stream because normally we will always have the length saved on the
+							 * node. But re are trying to be as resilient as possible here falling back to
+							 * this rather than failing the entire export
+							 */
+							addFileEntry(parentFolder + "/" + fileName + "/" + binFileNameStr,
+									IOUtils.toByteArray(bis));
+						}
 					} finally {
 						StreamUtil.close(is);
 					}
@@ -297,6 +312,28 @@ public abstract class ExportArchiveBase {
 		fileNameSet.add(fileName);
 
 		addEntry(fileName, bytes);
+	}
+
+	private void addFileEntry(String fileName, InputStream is, long length) {
+		if (length <= 0) {
+			throw new RuntimeException("length is required");
+		}
+		/*
+		 * If we have duplicated a filename, number it sequentially to create a unique
+		 * file
+		 */
+		if (fileNameSet.contains(fileName)) {
+			int idx = 1;
+			String numberedFileName = fileName + String.valueOf(idx);
+			while (fileNameSet.contains(numberedFileName)) {
+				numberedFileName = fileName + String.valueOf(++idx);
+			}
+			fileName = numberedFileName;
+		}
+
+		fileNameSet.add(fileName);
+
+		addEntry(fileName, is, length);
 	}
 
 	private String generateFileNameFromNode(SubNode node) {

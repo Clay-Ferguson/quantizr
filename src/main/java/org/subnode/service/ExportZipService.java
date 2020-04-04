@@ -2,6 +2,7 @@ package org.subnode.service;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.subnode.util.ExUtil;
 
 import java.io.FileOutputStream;
+import java.io.InputStream;
 
 @Component
 @Scope("prototype")
@@ -39,13 +41,13 @@ public class ExportZipService extends ExportArchiveBase {
             // JDK Version (do not delete)
             //StreamUtil.close(zos);
 
+            out.finish(); 
             out.close();
         } catch (Exception ex) {
             throw ExUtil.newEx(ex);
         }
     }
 
-    
     @Override
     public void addEntry(String fileName, byte[] bytes) {
         log.debug("Add Entry: " + fileName + " bytes.length=" + bytes.length);
@@ -60,6 +62,31 @@ public class ExportZipService extends ExportArchiveBase {
             entry.setSize(bytes.length);
             out.putArchiveEntry(entry);
             out.write(bytes);
+            out.closeArchiveEntry();
+
+            // JDK Version (do not delete)
+            // ZipEntry zi = new ZipEntry(fileName);
+            // try {
+            //     zos.putNextEntry(zi);
+            //     zos.write(bytes);
+            //     zos.closeEntry();
+            // } catch (Exception ex) {
+            //     throw ExUtil.newEx(ex);
+            // }
+        } catch (Exception ex) {
+            throw ExUtil.newEx(ex);
+        }
+    }
+
+    @Override
+    public void addEntry(String fileName, InputStream stream, long length) {
+        log.debug("Add Entry: " + fileName);
+        try {
+            ZipArchiveEntry entry = new ZipArchiveEntry(fileName);
+
+            entry.setSize(length);
+            out.putArchiveEntry(entry);
+            IOUtils.copy(stream, out);
             out.closeArchiveEntry();
 
             // JDK Version (do not delete)

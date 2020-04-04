@@ -10,7 +10,8 @@ import org.subnode.util.ExUtil;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 import java.io.FileOutputStream;
-
+import java.io.InputStream;
+import org.apache.commons.io.IOUtils;
 
 @Component
 @Scope("prototype")
@@ -43,6 +44,7 @@ public class ExportTarService extends ExportArchiveBase {
     @Override
     public void closeOutputStream() {
         try {
+            out.finish(); 
             out.close();
         } catch (Exception ex) {
             throw ExUtil.newEx(ex);
@@ -60,6 +62,28 @@ public class ExportTarService extends ExportArchiveBase {
         try {
             out.putArchiveEntry(tarArchiveEntry);
             out.write(bytes);
+            out.closeArchiveEntry();
+        } catch (Exception ex) {
+            throw ExUtil.newEx(ex);
+        }
+    }
+
+    @Override
+    public void addEntry(String fileName, InputStream stream, long length) {
+        log.debug("Add Entry: " + fileName);
+
+        TarArchiveEntry entry = new TarArchiveEntry(fileName);
+
+        // entry.setMode ( mode );
+        // entry.setUserName ( "root" );
+        // entry.setGroupName ( "root" );
+        // entry.setSize ( content.getSize () );
+        // entry.setModTime ( this.getTimestampProvider ().getModTime () );
+        entry.setSize(length);
+
+        try {
+            out.putArchiveEntry(entry);
+            IOUtils.copy(stream, out);
             out.closeArchiveEntry();
         } catch (Exception ex) {
             throw ExUtil.newEx(ex);
