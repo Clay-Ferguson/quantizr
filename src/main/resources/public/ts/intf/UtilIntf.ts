@@ -46,6 +46,7 @@ export interface UtilIntf {
     progressInterval(): void;
     getHostAndPort(): string;
     getRpcPath(): string;
+    getRemoteHost(): string;
 
     //todo-1: need to make all calls to these functions use promises (be careful about failure case)
     ajax<RequestType, ResponseType>(postName: string, postData: RequestType,

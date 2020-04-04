@@ -60,6 +60,9 @@ export abstract class Comp implements CompIntf {
 
     renderRawHtml: boolean = false;
 
+    /* Used to restore the border style after a drag event ends */
+    nonDragBorder: string = null;
+
     /**
      * 'react' should be true only if this component and all its decendants are true React components that are rendered and
      * controlled by ReactJS (rather than our own innerHTML)
@@ -485,24 +488,34 @@ export abstract class Comp implements CompIntf {
         }
     }
 
+    //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
+
     setDropHandler = (func: (elm: any) => void): void => {
+    
         this.whenElm((elm: HTMLElement) => {
 
+            this.nonDragBorder = elm.style.border;
+
             elm.addEventListener("dragenter", (event) => {
-                //console.log('DRAGENTER: ' + S.util.prettyPrint(event));
                 event.preventDefault();
             });
 
             elm.addEventListener("dragover", (event) => {
-                //console.log('DRAGOVER: ' + S.util.prettyPrint(event));
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
+                elm.style.border = "3px dotted red";
             });
 
-            elm.addEventListener("drop", (ev) => {
-                ev.stopPropagation();
-                ev.preventDefault();
-                func(ev);
+            elm.addEventListener("dragleave", (event) => {
+                event.preventDefault();
+                elm.style.border = this.nonDragBorder;
+            });
+
+            elm.addEventListener("drop", (event) => {
+                event.stopPropagation();
+                event.preventDefault();
+                elm.style.border = this.nonDragBorder;
+                func(event);
             });
         });
     }

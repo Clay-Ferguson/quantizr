@@ -448,6 +448,10 @@ export class Render implements RenderIntf {
 
                 if (d.kind == 'string' && d.type.match('^text/uri-list')) {
                     d.getAsString((s) => {
+                        /* Disallow dropping from our app onto our app */
+                        if (s.startsWith(location.protocol + '//' + location.hostname)) {
+                            return;
+                        }
                         S.attachment.openUploadFromUrlDlg(node, s);
                     });
                     return;
