@@ -479,6 +479,7 @@ export interface NodeInfo {
     imgId: string;
     owner: string;
     ownerId: string;
+    dataUrl: string;
 }
 
 export interface UserPreferences {
@@ -553,6 +554,7 @@ export const enum NodeProp {
     BIN_MIME = "sn:mimeType",
     BIN_FILENAME = "sn:fileName",
     BIN_SIZE = "sn:size",
+    BIN_DATA_URL = "sn:dataUrl",
     FILE_NAME = "sn:fileName",
     JSON_FILE_SEARCH_RESULT = "sn:json",
     PRE = "sn:pre",

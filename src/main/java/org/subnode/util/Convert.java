@@ -21,6 +21,7 @@ import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodePropertyMap;
+import org.subnode.service.AttachmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ import org.springframework.stereotype.Component;
 public class Convert {
 	@Autowired
 	private MongoApi api;
+
+	@Autowired
+	private AttachmentService attachmentService;
 
 	public static final PropertyInfoComparator propertyInfoComparator = new PropertyInfoComparator();
 
@@ -49,12 +53,14 @@ public class Convert {
 			boolean allowInlineChildren, boolean firstChild, boolean lastChild) {
 
 		ImageSize imageSize = null;
+		String dataUrl = null;
 		String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 		if (mimeType != null) {
 			boolean isImage = api.isImageAttached(node);
 
 			if (isImage) {
 				imageSize = api.getImageSize(node);
+				dataUrl = attachmentService.getStringByNode(session, node);
 			}
 		}
 
@@ -81,8 +87,8 @@ public class Convert {
 			// below sets to owner to 'admin' which will
 			// be safe for now because the admin is the only user capable of import/export.
 			log.debug("Unable to find userNode from nodeOwner: " + //
-					(node.getOwner() != null ? ownerId : ("null owner on node: " + node.getId().toHexString()))+ //
-					" tried to find owner="+node.getOwner().toHexString());
+					(node.getOwner() != null ? ownerId : ("null owner on node: " + node.getId().toHexString())) + //
+					" tried to find owner=" + node.getOwner().toHexString());
 		} else {
 			nameProp = userNode.getStringProp(NodeProp.USER.s());
 		}
@@ -102,16 +108,17 @@ public class Convert {
 			if (ac != null) {
 				cipherKey = ac.getKey();
 				if (cipherKey != null) {
-				log.debug("Rendering Sent Back CipherKey: " + cipherKey);
+					log.debug("Rendering Sent Back CipherKey: " + cipherKey);
 				}
 			}
 		}
 
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, ownerId, node.getOrdinal(), //
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, ownerId,
+				node.getOrdinal(), //
 				node.getModifyTime(), propList, acList, hasNodes, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
-				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey);
+				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey, dataUrl);
 
 		if (allowInlineChildren) {
 			boolean hasInlineChildren = node.getBooleanProp(NodeProp.INLINE_CHILDREN.s());
@@ -193,7 +200,8 @@ public class Convert {
 	public List<AccessControlInfo> buildAccessControlList(SessionContext sessionContext, SubNode node) {
 		List<AccessControlInfo> ret = null;
 		HashMap<String, AccessControl> ac = node.getAc();
-		if (ac==null) return null;
+		if (ac == null)
+			return null;
 
 		for (Map.Entry<String, AccessControl> entry : ac.entrySet()) {
 			String principalId = entry.getKey();
@@ -209,12 +217,13 @@ public class Convert {
 		}
 
 		// if (props != null) {
-		// 	Collections.sort(props, propertyInfoComparator);
+		// Collections.sort(props, propertyInfoComparator);
 		// }
 		return ret;
 	}
 
-	public AccessControlInfo convertToAccessControlInfo(SessionContext sessioContext, SubNode node, String principalId, AccessControl ac) {
+	public AccessControlInfo convertToAccessControlInfo(SessionContext sessioContext, SubNode node, String principalId,
+			AccessControl ac) {
 		AccessControlInfo acInfo = new AccessControlInfo();
 		acInfo.setPrincipalNodeId(principalId);
 		return acInfo;

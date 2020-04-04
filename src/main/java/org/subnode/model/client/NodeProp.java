@@ -74,6 +74,9 @@ public enum NodeProp {
     BIN_FILENAME("sn:fileName", "s"), //
     BIN_SIZE("sn:size", "s"), //
 
+    //if this is present it indicates we have a "data:" url stored here which means we hava an image (for example) with data encoded inline.
+    BIN_DATA_URL("sn:dataUrl", "s"), //
+
     // This is for bash script names to whow up when browing on the tree
     FILE_NAME("sn:fileName", "s"),
 

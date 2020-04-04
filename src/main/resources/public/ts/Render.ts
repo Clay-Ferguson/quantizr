@@ -1094,7 +1094,12 @@ export class Render implements RenderIntf {
     }
 
     getUrlForNodeAttachment = (node: J.NodeInfo): string => {
-        return this.getAttachmentUrl("bin", node);
+        if (node.dataUrl) {
+            return node.dataUrl;
+        }
+        else {
+            return this.getAttachmentUrl("bin", node);
+        }
     }
 
     getStreamUrlForNodeAttachment = (node: J.NodeInfo): string => {

@@ -13,6 +13,14 @@ public class Util {
 		}
 	}
 
+	//extracts mime from this type of url: data:image/png;base64,[data...]
+	public static String getMimeFromDataUrl(String url) {
+		int colonIdx = url.indexOf(":");
+		int semiColonIdx = url.indexOf(";");
+		String mime = url.substring(colonIdx+1, semiColonIdx);
+		return mime; 
+	}
+
 	/**
 	 * Returns only 'chars' characters of the hash, or the ebntire sha256 if chars
 	 * is -1
@@ -31,16 +39,16 @@ public class Util {
 
 	// //other example from Baeldung
 	// private ClientHttpRequestFactory getClientHttpRequestFactory() {
-	// 	int timeout = 5000;
-	// 	RequestConfig config = RequestConfig.custom()
-	// 	  .setConnectTimeout(timeout)
-	// 	  .setConnectionRequestTimeout(timeout)
-	// 	  .setSocketTimeout(timeout)
-	// 	  .build();
-	// 	CloseableHttpClient client = HttpClientBuilder
-	// 	  .create()
-	// 	  .setDefaultRequestConfig(config)
-	// 	  .build();
-	// 	return new HttpComponentsClientHttpRequestFactory(client);
+	// int timeout = 5000;
+	// RequestConfig config = RequestConfig.custom()
+	// .setConnectTimeout(timeout)
+	// .setConnectionRequestTimeout(timeout)
+	// .setSocketTimeout(timeout)
+	// .build();
+	// CloseableHttpClient client = HttpClientBuilder
+	// .create()
+	// .setDefaultRequestConfig(config)
+	// .build();
+	// return new HttpComponentsClientHttpRequestFactory(client);
 	// }
 }

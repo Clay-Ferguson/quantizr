@@ -52,13 +52,15 @@ public class NodeInfo {
 	private String owner;
 	private String ownerId;
 
+	private String dataUrl;
+
 	public NodeInfo() {
 	}
 
 	public NodeInfo(String id, String name, String content, String owner, String ownerId, Long ordinal, Date lastModified,
 			List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
 		 int width, int height, String type, long logicalOrdinal,
-			boolean firstChild, boolean lastChild, String cipherKey) {
+			boolean firstChild, boolean lastChild, String cipherKey, String dataUrl) {
 		this.id = id;
 		this.name = name;
 		this.content = content;
@@ -76,6 +78,7 @@ public class NodeInfo {
 		this.type = type;
 		this.logicalOrdinal = logicalOrdinal;
 		this.cipherKey = cipherKey;
+		this.dataUrl = dataUrl;
 	}
 
 	public String getContent() {
@@ -229,5 +232,13 @@ public class NodeInfo {
 
 	public void setLastChild(boolean lastChild) {
 		this.lastChild = lastChild;
+	}
+
+	public String getDataUrl() {
+		return dataUrl;
+	}
+
+	public void setDataUrl(String dataUrl) {
+		this.dataUrl = dataUrl;
 	}
 }
