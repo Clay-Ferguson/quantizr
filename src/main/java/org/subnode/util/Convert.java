@@ -60,7 +60,16 @@ public class Convert {
 
 			if (isImage) {
 				imageSize = api.getImageSize(node);
-				dataUrl = attachmentService.getStringByNode(session, node);
+
+				String dataUrlProp = node.getStringProp(NodeProp.BIN_DATA_URL.s());
+				if (dataUrlProp != null) {
+					dataUrl = attachmentService.getStringByNode(session, node);
+
+					// sanity check here.
+					if (!dataUrl.startsWith("data:")) {
+						dataUrl = null;
+					}
+				}
 			}
 		}
 
