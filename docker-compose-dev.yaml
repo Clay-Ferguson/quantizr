@@ -73,7 +73,7 @@ services:
             
             mongoAdminPassword: "${subnodePassword}"
             mongoSecurity: "true"
-            testUserAccounts: "adam:password:${devEmail},bob:password:${devEmail},cory:password:${devEmail},dan:password:${devEmail}" 
+            testUserAccounts: "adam:${testPassword}:${devEmail},bob:${testPassword}:${devEmail},cory:${testPassword}:${devEmail},dan:${testPassword}:${devEmail}" 
             # resourcesBaseFolder: "file:///dev-resource-base/" 
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "mongo-dev" 
