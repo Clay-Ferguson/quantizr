@@ -53,7 +53,7 @@ public class ImportService {
 
 			//throw error if not a zip file
 			if (!fileName.toLowerCase().endsWith(".zip")) {
-				throw ExUtil.newEx("Only ZIP files are currently supported for importing via upload stream.");
+				throw ExUtil.newEx("Only ZIP files are currently supported for importing.");
 			}
 
 			try {

@@ -14,6 +14,7 @@ import org.subnode.model.UserPreferences;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.MimeUtil;
@@ -244,12 +245,15 @@ public class ImportZipService {
 		 * todo-2: This value exists in properties file, and also in TypeScript
 		 * variable. Need to have better way to define this ONLY in properties file.
 		 */
-		int maxFileSize = 20 * 1024 * 1024;
+		int maxFileSize = 20 * Const.ONE_MB;
 		LimitedInputStreamEx bais2 = null;
 
 		try {
 			// JSON FILE
-			if (mimeUtil.isJsonFileType(fileName)) {
+			if (mimeUtil.isHtmlTypeFileName(fileName)) {
+				//we ignore the html files during import. Data will be in JSON files
+			}
+			else if (mimeUtil.isJsonFileType(fileName)) {
 				log.debug("  isJSON: " + fileName);
 				curFileName = fileName;
 				String json = IOUtils.toString(zis, "UTF-8");

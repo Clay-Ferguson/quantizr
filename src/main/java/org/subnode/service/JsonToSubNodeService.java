@@ -14,6 +14,8 @@ import org.subnode.mongo.model.SubNode;
 
 /**
  * Utility to read JSON and store into SubNode automatically.
+ * 
+ * todo-0: Isn't there a cleaner way to parse JSON in Java than using a Map? Research this.
  */
 @Component
 public class JsonToSubNodeService {

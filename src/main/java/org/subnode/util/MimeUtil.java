@@ -22,6 +22,19 @@ public class MimeUtil {
 		return false;
 	}
 
+	public boolean isHtmlTypeFileName(String fileName) {
+		if (!fileName.contains(".")) return false;
+
+		String ext = XString.parseAfterLast(fileName, ".");
+
+		// todo-2: will be getting these from a properties file eventually
+		if (ext.equalsIgnoreCase("htm") || //
+				ext.equalsIgnoreCase("html")) {
+			return true;
+		}
+		return false;
+	}
+
 	public boolean isJsonFileType(String fileName) {
 		if (!fileName.contains(".")) return false;
 		if (fileName.toLowerCase().endsWith(".json.txt")) return true;
