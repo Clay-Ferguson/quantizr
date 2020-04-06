@@ -17,10 +17,11 @@ export class Selection extends Comp {
         //w-25 = width 25%
         //https://hackerthemes.com/bootstrap-cheatsheet/#m-1 
         this.attribs.className = "custom-select "+moreClasses; 
+
         selectionOptions.forEach((row: Object) => {
             //NOTE: for default selection we do it this way rather than the 'elm.selectedIndex' which is used to
             //to set selected item after rendered.
-            this.children.push(new SelectionOption(row['key'], row['val'], !!row['selected']));
+            this.children.push(new SelectionOption(row['key'], row['val']));
         });
     }
 

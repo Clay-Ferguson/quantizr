@@ -457,7 +457,7 @@ input[type="radio"] {
     border: 1px dotted gray;
     */
     
-    width: 800px; //this is too narrow with 'content-narrow'
+    width: 800px; 
     border: 1px dotted green;
 }
 
@@ -465,7 +465,10 @@ input[type="radio"] {
     cursor: pointer;
     margin-left: 15px;
     margin-bottom: 15px;
+
+    /* be careful with these margins. Be sure to retest a 'top-of-page' node when you alter these */
     margin-right: 15px;
+    padding-right: 15px;
     border-radius: .6em;
 }
 

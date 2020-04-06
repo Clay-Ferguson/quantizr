@@ -81,8 +81,10 @@ export class EditNodeDlg extends DialogBase {
 
     createLayoutSelection = (): Selection => {
         //todo-1: these columns need to auto-space and not go past allowed width of page display
-        let selection: Selection = new Selection(null, "Layout", [
-            { key: "v", val: "Vertical", selected: true },
+        let selection: Selection = new Selection({
+            defaultValue: "v"
+        }, "Layout", [
+            { key: "v", val: "Vertical" },
             { key: "c2", val: "2 Columns" },
             { key: "c3", val: "3 Columns" },
             { key: "c4", val: "4 Columns" }
@@ -91,8 +93,10 @@ export class EditNodeDlg extends DialogBase {
     }
 
     createPrioritySelection = (): Selection => {
-        let selection: Selection = new Selection(null, "Priority", [
-            { key: "0", val: "none", selected: true },
+        let selection: Selection = new Selection({
+            defaultValue: "0"
+        }, "Priority", [
+            { key: "0", val: "none"},
             { key: "1", val: "Top" },
             { key: "2", val: "High" },
             { key: "3", val: "Medium" },
@@ -103,12 +107,15 @@ export class EditNodeDlg extends DialogBase {
     }
 
     createImgSizeSelection = (): Selection => {
-        let selection: Selection = new Selection(null, "Img. Size", [
-            { key: "0", val: "Actual", selected: true },
+        let selection: Selection = new Selection({
+            defaultValue: "0"
+        }, "Img. Size", [
+            { key: "0", val: "Actual"},
             { key: "15", val: "15%" },
             { key: "25", val: "25%" },
             { key: "50", val: "50%" },
             { key: "80", val: "80%" },
+            { key: "90", val: "90%" },
             { key: "100", val: "100%" },
 
         ], "m-2"); // "w-25 m-2");

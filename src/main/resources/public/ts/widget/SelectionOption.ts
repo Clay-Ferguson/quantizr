@@ -10,12 +10,15 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class SelectionOption extends Comp {
-    constructor(public key: string, public val : string, public selected: boolean=false) {
+    constructor(public key: string, public val : string) {
         super(null);
         this.attribs.value = this.key;
-        if (selected) {
-            this.attribs.selected = "selected";
-        }
+
+        // React prints this warning if you use 'selected' on an option
+        // Use the `defaultValue` or `value` props on <select> instead of setting `selected` on <option> in option
+        // if (selected) {
+        //     this.attribs.selected = "selected";
+        // }
     }
 
     compRender = (): ReactNode => {
