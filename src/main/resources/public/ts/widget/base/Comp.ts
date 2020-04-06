@@ -494,7 +494,7 @@ export abstract class Comp implements CompIntf {
     
         this.whenElm((elm: HTMLElement) => {
 
-            this.nonDragBorder = elm.style.border;
+            this.nonDragBorder = elm.style.borderLeft;
 
             elm.addEventListener("dragenter", (event) => {
                 event.preventDefault();
@@ -503,18 +503,20 @@ export abstract class Comp implements CompIntf {
             elm.addEventListener("dragover", (event) => {
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
-                elm.style.border = "3px dotted red";
+
+                /* warning: this 9px should match the $fatBorderSize in the scss file */
+                elm.style.borderLeft = "9px dotted green";
             });
 
             elm.addEventListener("dragleave", (event) => {
                 event.preventDefault();
-                elm.style.border = this.nonDragBorder;
+                elm.style.borderLeft = this.nonDragBorder;
             });
 
             elm.addEventListener("drop", (event) => {
                 event.stopPropagation();
                 event.preventDefault();
-                elm.style.border = this.nonDragBorder;
+                elm.style.borderLeft = this.nonDragBorder;
                 func(event);
             });
         });

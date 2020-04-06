@@ -438,6 +438,11 @@ export class Render implements RenderIntf {
                 }, this.renderNodeContent(node, true, true))
             ]);
 
+        this.setNodeDropHandler(rowDiv, node);
+        return rowDiv;
+    }
+
+    setNodeDropHandler = (rowDiv: Comp, node: J.NodeInfo): void => {
         rowDiv.setDropHandler((evt: DragEvent) => {
             let data = evt.dataTransfer.items;
 
@@ -466,7 +471,6 @@ export class Render implements RenderIntf {
                 }
             }
         });
-        return rowDiv;
     }
 
     showNodeUrl = (): void => {
@@ -827,6 +831,8 @@ export class Render implements RenderIntf {
                             id: cssId
                         }, children);
 
+                        this.setNodeDropHandler(contentDiv, data.node);
+
                         S.util.setElmDisplayById("mainNodeContent", true);
                         contentDiv.updateDOM("mainNodeContent");
 
@@ -1084,7 +1090,7 @@ export class Render implements RenderIntf {
         if (!filePart) {
             filePart = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
             if (filePart) {
-                return Constants.IPFS_GATEWAY + filePart; 
+                return Constants.IPFS_GATEWAY + filePart;
             }
         }
 
