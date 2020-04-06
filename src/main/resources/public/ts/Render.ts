@@ -1107,6 +1107,14 @@ export class Render implements RenderIntf {
 
     getAvatarImgUrl = (node: J.NodeInfo) => {
         let filePart = S.props.getNodePropVal(J.NodeProp.BIN, node);
+        if (!filePart) {
+            return null;
+        }
+
+        if (!S.props.getNodePropVal(J.NodeProp.BIN_MIME, node)) {
+            return null;
+        }
+
         return S.util.getRpcPath() + "bin/" + filePart + "?nodeId=" + node.ownerId;
     }
 
@@ -1155,6 +1163,9 @@ export class Render implements RenderIntf {
 
     makeAvatarImage = (node: J.NodeInfo) => {
         let src: string = this.getAvatarImgUrl(node);
+        if (!src) {
+            return null;
+        }
         //console.log("avatarImage src=" + src);
 
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
