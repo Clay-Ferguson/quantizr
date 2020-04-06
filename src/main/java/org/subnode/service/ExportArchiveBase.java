@@ -226,7 +226,8 @@ public abstract class ExportArchiveBase {
 			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 			if (mimeType != null && mimeType.startsWith("image/")) {
 				String relImgPath = writeFile ? "" : (fileName + "/");
-				html.append("<br><img src='./" + relImgPath + binFileNameStr + "'/>");
+				/* embeds an image that's 300px wide until you click it which makes it go fullsize */
+				html.append("<br><img id='img_"+node.getId().toHexString()+"' style='width:300px' onclick='document.getElementById(\"img_"+node.getId().toHexString()+"\").style.width=\"\"' src='./" + relImgPath + binFileNameStr + "'/>");
 			}
 
 			if (writeFile) {
