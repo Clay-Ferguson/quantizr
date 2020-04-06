@@ -14,7 +14,7 @@ $input-color-placeholder: #999;
 @import "bootswatch.scss";
 
 $menuItemHoverBackgroundColor: $primary;
-$nodeBorderBottomColor: $gray-600;
+$nodeBorderBottomColor: $gray-700;
 
 $createdByMeBackgroundColor: green;
 $createdByMeTextColor: white;
@@ -40,6 +40,12 @@ body {
     font-family: "Roboto", "Verdana", "Aria";
     padding-top: 4rem;
     padding-bottom: 1rem;
+}
+
+.binary-link {
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
+    font-weight: bold; 
 }
 
 .avatarImage {
@@ -445,11 +451,13 @@ samp {
     font-family: monospace;
     white-space: pre;
     */
-    font-size: 110%;
+    //font-size: 10%;
     /* overflow: auto; 
     max-height: 15em;
     border: 1px dotted gray;
     */
+    width: 800px; //this is too narrow with 'content-narrow'
+    border: 1px dotted green;
 }
 
 .attached-img {

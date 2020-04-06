@@ -71,7 +71,7 @@ export class Render implements RenderIntf {
          * If not an image we render a link to the attachment, so that it can be downloaded.
          */
         else {
-            let anchor = new Anchor(this.getUrlForNodeAttachment(node), "[Download Attachment]");
+            let anchor = new Anchor(this.getUrlForNodeAttachment(node), "[Download File]");
             return new Div("", {
                 className: "binary-link"
             }, [anchor]);
