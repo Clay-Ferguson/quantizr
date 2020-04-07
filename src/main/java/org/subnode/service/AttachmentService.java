@@ -155,7 +155,7 @@ public class AttachmentService {
 			api.auth(session, node, PrivilegeType.WRITE);
 
 			boolean addAsChildren = uploadFiles.length > 1;
-			int maxFileSize = 20 * Const.ONE_MB;
+			int maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
 
 			for (MultipartFile uploadFile : uploadFiles) {
 				String fileName = uploadFile.getOriginalFilename();
@@ -165,14 +165,12 @@ public class AttachmentService {
 				if (!StringUtils.isEmpty(fileName)) {
 					// log.debug("Uploading file: " + fileName + " contentType=" + contentType);
 
-					LimitedInputStreamEx limitedIs = null;
-					try {
-						limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
-						attachBinaryFromStream(session, node, nodeId, fileName, size, limitedIs, contentType, -1, -1,
-								addAsChildren, explodeZips, toIpfs, true, false);
-					} finally {
-						StreamUtil.close(limitedIs);
-					}
+					LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
+
+					// attaches AND closes the stream.
+					attachBinaryFromStream(session, node, nodeId, fileName, size, limitedIs, contentType, -1, -1,
+							addAsChildren, explodeZips, toIpfs, true, false, true);
+
 				}
 			}
 			api.saveSession(session);
@@ -190,7 +188,7 @@ public class AttachmentService {
 	 */
 	public void attachBinaryFromStream(MongoSession session, SubNode node, String nodeId, String fileName, long size,
 			LimitedInputStreamEx is, String mimeType, int width, int height, boolean addAsChild, boolean explodeZips,
-			boolean toIpfs, boolean calcImageSize, boolean dataUrl) {
+			boolean toIpfs, boolean calcImageSize, boolean dataUrl, boolean closeStream) {
 
 		/*
 		 * If caller already has 'node' it can pass node, and avoid looking up node
@@ -255,13 +253,13 @@ public class AttachmentService {
 			importZipStreamService.inputZipFileFromStream(session, is, node, false);
 		} else {
 			saveBinaryStreamToNode(session, is, mimeType, fileName, size, width, height, node, toIpfs, calcImageSize,
-					dataUrl);
+					dataUrl, closeStream);
 		}
 	}
 
 	public void saveBinaryStreamToNode(MongoSession session, LimitedInputStreamEx inputStream, String mimeType,
 			String fileName, long size, int width, int height, SubNode node, boolean toIpfs, boolean calcImageSize,
-			boolean dataUrl) {
+			boolean dataUrl, boolean closeStream) {
 		/*
 		 * NOTE: Setting this flag to false works just fine, and is more efficient, and
 		 * will simply do everything EXCEPT calculate the image size
@@ -269,7 +267,8 @@ public class AttachmentService {
 		BufferedImage bufImg = null;
 		byte[] imageBytes = null;
 		InputStream isTemp = null;
-		int maxFileSize = 20 * Const.ONE_MB;
+
+		int maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
 
 		if (calcImageSize && ImageUtil.isImageMime(mimeType)) {
 			LimitedInputStream is = null;
@@ -292,7 +291,9 @@ public class AttachmentService {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			} finally {
-				StreamUtil.close(is, isTemp);
+				if (closeStream) {
+					StreamUtil.close(is, isTemp);
+				}
 			}
 		}
 
@@ -306,11 +307,17 @@ public class AttachmentService {
 		}
 
 		if (imageBytes == null) {
-			node.setProp(NodeProp.BIN_SIZE.s(), size);
-			if (toIpfs) {
-				writeStreamToIpfs(session, node, inputStream, mimeType);
-			} else {
-				writeStream(session, node, inputStream, fileName, mimeType);
+			try {
+				node.setProp(NodeProp.BIN_SIZE.s(), size);
+				if (toIpfs) {
+					writeStreamToIpfs(session, node, inputStream, mimeType);
+				} else {
+					writeStream(session, node, inputStream, fileName, mimeType);
+				}
+			} finally {
+				if (closeStream) {
+					StreamUtil.close(inputStream);
+				}
 			}
 		} else {
 			LimitedInputStreamEx is = null;
@@ -742,7 +749,7 @@ public class AttachmentService {
 	public void readFromDataUrl(MongoSession session, String sourceUrl, String nodeId, String mimeHint,
 			int maxFileSize) {
 		if (maxFileSize == 0) {
-			maxFileSize = 20 * Const.ONE_MB;
+			maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
 		}
 
 		if (session == null) {
@@ -757,7 +764,7 @@ public class AttachmentService {
 
 			// insert 0L for size now, because we don't know it yet
 			attachBinaryFromStream(session, null, nodeId, "data-url", 0L, limitedIs, mimeType, -1, -1, false, false,
-					false, false, true);
+					false, false, true, true);
 		} else {
 			throw new RuntimeException("Unsupported inline data type.");
 		}
@@ -767,7 +774,7 @@ public class AttachmentService {
 	public void readFromStandardUrl(MongoSession session, String sourceUrl, String nodeId, String mimeHint,
 			int maxFileSize) {
 		if (maxFileSize == 0) {
-			maxFileSize = 20 * Const.ONE_MB;
+			maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
 		}
 
 		if (session == null) {
@@ -816,7 +823,7 @@ public class AttachmentService {
 
 				// insert 0L for size now, because we don't know it yet
 				attachBinaryFromStream(session, null, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false, false,
-						false, true, false);
+						false, true, false, true);
 			}
 			/*
 			 * if not an image extension, we can just stream directly into the database, but
@@ -838,7 +845,7 @@ public class AttachmentService {
 
 					// insert 0L for size now, because we don't know it yet
 					attachBinaryFromStream(session, null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false,
-							false, true, false);
+							false, true, false, true);
 				}
 			}
 		} catch (Exception e) {
@@ -846,6 +853,7 @@ public class AttachmentService {
 		}
 		/* finally block just for extra safety */
 		finally {
+			// this stream will have been closed by 'attachBinaryFromStream' but we close here too anyway.
 			StreamUtil.close(limitedIs);
 		}
 
@@ -883,7 +891,7 @@ public class AttachmentService {
 					is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
 
 					attachBinaryFromStream(session, null, nodeId, fileName, bytes.length, is2, mimeType,
-							bufImg.getWidth(null), bufImg.getHeight(null), false, false, false, true, false);
+							bufImg.getWidth(null), bufImg.getHeight(null), false, false, false, true, false, true);
 
 					return true;
 				}

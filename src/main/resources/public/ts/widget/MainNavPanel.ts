@@ -287,7 +287,6 @@ export class MainNavPanel extends NavTag {
             });
 
             elm.addEventListener("drop", (ev) => {
-                debugger;
                 ev.stopPropagation();
                 ev.preventDefault();
 

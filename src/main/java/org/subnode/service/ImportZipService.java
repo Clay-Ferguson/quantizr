@@ -1,16 +1,18 @@
 package org.subnode.service;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.model.UserPreferences;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -42,6 +44,8 @@ import org.springframework.stereotype.Component;
 public class ImportZipService {
 	private static final Logger log = LoggerFactory.getLogger(ImportZipService.class);
 
+	private static final ObjectMapper jsonMapper = new ObjectMapper();
+
 	/*
 	 * This is used to detect if this 'prototype scope' object might have been
 	 * autowired, and is getting called for a second time which is NOT supported.
@@ -59,12 +63,6 @@ public class ImportZipService {
 	private MimeUtil mimeUtil;
 
 	@Autowired
-	private SubNodeUtil apiUtil;
-
-	@Autowired
-	private JsonToSubNodeService jsonToNodeService;
-
-	@Autowired
 	private SessionContext sessionContext;
 
 	private String targetPath;
@@ -72,37 +70,15 @@ public class ImportZipService {
 	private ZipInputStream zis = null;
 	private MongoSession session;
 
-	/*
-	 * Since the TXT file could be encountered BEFORE the JSON file, we have to use
-	 * this variable to hold the content because we cannot create the actual node we
-	 * will write to UNTIL we see the JSON file so we can get the correct path
-	 * constructed from that. If this is null, it means there was no content file or
-	 * else it has already been written out.
-	 */
-	private String curContent = null;
-	private String curFileName = null;
-	private SubNode curNode = null;
-
 	private SubNode importRootNode;
 
-	/*
-	 * Since Zip files don't in all cases support Directories (only Files) we have
-	 * to check the path on each file, and whenever we see a new path part of any
-	 * file then THAT is the only reliable tway to determine that a new folder is
-	 * being processed, so this curPath is how we do this.
-	 */
-	private String curPath = null;
+	/* Maps the 'bin' properties of nodes to the associates SubNode */
+	private HashMap<String, SubNode> binToNodeMap = new HashMap<String, SubNode>();
 
 	/*
-	 * for performance we create a map of folders (relative names, directly from the
-	 * zip file, as the key), and only the PARTIAL path (paths from Zip) rather than
-	 * full path which would include targetPath prefix.
+	 * imports the file directly from an internal resource file (classpath resource,
+	 * built into WAR file itself)
 	 */
-	private HashMap<String, SubNode> folderMap = new HashMap<String, SubNode>();
-
-	/* imports the file directly from an internal resource file (classpath resource,
-	built into WAR file itself)
-	*/
 	public SubNode inputZipFileFromResource(MongoSession session, String resourceName, SubNode node, String nodeName) {
 
 		Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
@@ -119,14 +95,6 @@ public class ImportZipService {
 
 		log.debug("Finished Input From Zip file.");
 		api.saveSession(session);
-
-		if (nodeName != null) {
-			rootNode.setName(nodeName);
-			api.save(session, rootNode);
-			log.debug("CurNode Saved (renamed): " + rootNode.getPath());
-			api.saveSession(session);
-		}
-
 		return rootNode;
 	}
 
@@ -165,11 +133,11 @@ public class ImportZipService {
 				}
 				zis.closeEntry();
 			}
-			// save last node (required, it won't get saved without this)
-			saveIfPending();
-			zis.close(); // todo-1: this close should be in a finally block
 		} catch (Exception ex) {
 			throw ExUtil.newEx(ex);
+		}
+		finally {
+			StreamUtil.close(zis);	
 		}
 		return importRootNode;
 	}
@@ -179,25 +147,6 @@ public class ImportZipService {
 	 * required to have callbacks for folders usually DON'T!
 	 */
 	private void processDirectory(ZipEntry entry) {
-	}
-
-	private SubNode ensureNodeExists(String path) {
-		SubNode folderNode = folderMap.get(path);
-		if (folderNode == null) {
-			folderNode = apiUtil.ensureNodeExists(session, targetPath, path, null, null, true, null, null);
-		}
-
-		if (importRootNode == null) {
-			importRootNode = folderNode;
-		}
-
-		if (folderNode == null) {
-			throw ExUtil.newEx("Unable to create node: " + path);
-		}
-
-		// log.debug("Path Node created: " + path);
-		folderMap.put(path, folderNode);
-		return folderNode;
 	}
 
 	private String hashizePath(String path) {
@@ -225,98 +174,73 @@ public class ImportZipService {
 		String path = name.substring(0, lastSlashIdx);
 		path = hashizePath(path);
 
-		/*
-		 * If the path is changing, that means we're on a new node and need to reset
-		 * state variables
-		 */
-		if (curPath == null || !curPath.equals(path)) {
-			saveIfPending();
-			curNode = null;
-			curContent = null;
-			curFileName = null;
-		}
-
-		curPath = path;
-		log.trace("Import FILE Entry: " + entry.getName() + " curPath=" + curPath);
-
-		ByteArrayInputStream bais = null;
-
-		/*
-		 * todo-2: This value exists in properties file, and also in TypeScript
-		 * variable. Need to have better way to define this ONLY in properties file.
-		 */
-		int maxFileSize = 20 * Const.ONE_MB;
-		LimitedInputStreamEx bais2 = null;
-
+		log.trace("Import FILE Entry: " + entry.getName());
 		try {
 			// JSON FILE
 			if (mimeUtil.isHtmlTypeFileName(fileName)) {
-				//we ignore the html files during import. Data will be in JSON files
-			}
-			else if (mimeUtil.isJsonFileType(fileName)) {
+				// log.debug(" isHTML: " + fileName);
+				// we ignore the html files during import. Data will be in JSON files
+			} else if (mimeUtil.isJsonFileType(fileName)) {
 				log.debug("  isJSON: " + fileName);
-				curFileName = fileName;
 				String json = IOUtils.toString(zis, "UTF-8");
-				curNode = ensureNodeExists(path);
-				jsonToNodeService.importJsonContent(json, curNode);
-				// if (curNode.getContent()!=null) {
-				// curContent = curNode.getContent();
-				// }
+				SubNode node = jsonMapper.readValue(json, SubNode.class);
+
+				node.setPath(targetPath + node.getPath());
+
+				String bin = node.getStringProp(NodeProp.BIN.s());
+				if (bin != null) {
+					binToNodeMap.put(bin, node);
+				}
 			}
 			// Any other TEXT file
 			else if (mimeUtil.isTextTypeFileName(fileName)) {
-				log.debug("  isTXT: " + fileName);
-				curContent = IOUtils.toString(zis, "UTF-8");
+				// log.debug(" isTXT: " + fileName);
+				// curContent = IOUtils.toString(zis, "UTF-8");
 			}
 			// Or else treat as binary attachment
 			else {
 				log.debug("  isBIN: " + fileName);
-				curNode = ensureNodeExists(path);
-				if (curContent == null) {
-					curContent = fileName;
-				}
-
-				String mimeType = URLConnection.guessContentTypeFromName(fileName);
-				log.debug("  mimeGuessed=" + mimeType);
-
-				/*
-				 * todo-p1: this will blow up on large video files for example. Better to use
-				 * streaming and not all-in-memory buffer, but i'm not sure if simply the fact
-				 * we are unzipping a zip means avoiding holding in memory is doable.
-				 */
-				byte[] bytes = IOUtils.toByteArray(zis);
-				bais = new ByteArrayInputStream(bytes);
-
-				bais2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
-
-				/* Note: bais stream IS closed inside this method, so we don't close it here */
-				attachmentService.attachBinaryFromStream(session, curNode, null, fileName, bytes.length, bais2,
-						mimeType, -1, -1, false, false, false, true, false);
+				storeBinary(entry);
 			}
 		} catch (Exception ex) {
 			throw ExUtil.newEx(ex);
-		} finally {
-			StreamUtil.close(bais, bais2);
 		}
 	}
 
-	/* Saves the current node along with whatver curContent we currently have */
-	private void saveIfPending() {
-		/*
-		 * If we never encountered a metadata content file in the folder, then default
-		 * to using the filename we encoutered as the content
-		 */
-		if (curContent == null && curFileName != null && !(curNode != null && curNode.getContent() != null)) {
-			curContent = curFileName;
+	/*
+	 * Note the fileame will be either 'ipfs-[ipfsHash]-filename.ext' or
+	 * '[gridId]-filename.ext' , depending on if the binary is an IPFS-persisted
+	 * data file or not
+	 */
+	private void storeBinary(ZipEntry entry) {
+		String name = entry.getName();
+		int lastSlashIdx = name.lastIndexOf("/");
+		String fileName = name.substring(lastSlashIdx + 1);
+		StringTokenizer t = new StringTokenizer(fileName, "-", false);
+		SubNode node = null;
+
+		while (t.hasMoreTokens()) {
+			String tok = t.nextToken().trim();
+			if (tok.equals("ipfs")) {
+				return;
+			} else {
+				node = binToNodeMap.get(tok);
+				if (node != null) {
+					// log.debug("Found owner for binary as id=" + node.getId().toHexString());
+					break;
+				}
+				break;
+			}
 		}
 
-		if (curNode != null) {
-			if (curNode.getContent() == null) {
-				curNode.setContent(curContent);
-			}
-			api.save(session, curNode);
-			log.debug("CurNode Saved: " + curNode.getPath());
+		if (node != null) {
+			Long length = node.getIntProp(NodeProp.BIN_SIZE.s());
+			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
+
+			int maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
+			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, maxFileSize);
+			attachmentService.attachBinaryFromStream(session, node, null, fileName, length, lzis, mimeType, -1, -1,
+					false, false, false, true, false, false);
 		}
-		curNode = null;
 	}
 }

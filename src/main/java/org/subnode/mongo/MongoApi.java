@@ -392,6 +392,7 @@ public class MongoApi {
 			}
 
 			for (SubNode node : MongoThreadLocal.getDirtyNodes().values()) {
+				log.debug("Saving Dirty Node: "+node.getId().toHexString());
 				save(session, node, false, false);
 			}
 			MongoThreadLocal.getDirtyNodes().clear();

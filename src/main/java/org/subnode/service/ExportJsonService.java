@@ -147,7 +147,7 @@ public class ExportJsonService {
 				String resourceName = "classpath:/nodes/" + subFolder + "/" + oid.toHexString() + "-" + binFileName;
 				Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 				is = resource.getInputStream();
-				lis = new LimitedInputStreamEx(is, 20 * Const.ONE_MB); 
+				lis = new LimitedInputStreamEx(is, Const.DEFAULT_MAX_FILE_SIZE); 
 				attachmentService.writeStream(session, node, lis, binFileName, binMime);
 				api.save(session, node);
 

@@ -18,7 +18,7 @@ export class UploadFromUrlDlg extends DialogBase {
     uploadFromUrlTextField: TextField;
     uploadButton: Button;
 
-    constructor(private defaultUrl: string=null) {
+    constructor(private node: J.NodeInfo, private defaultUrl: string=null) {
         super("Upload File");
        
         this.setChildren([
@@ -39,7 +39,7 @@ export class UploadFromUrlDlg extends DialogBase {
 
         if (sourceUrl) {
             S.util.ajax<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
-                "nodeId": S.attachment.uploadNode.id,
+                "nodeId": this.node.id,
                 "sourceUrl": sourceUrl
             }, this.uploadFromUrlResponse);
 

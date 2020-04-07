@@ -16,6 +16,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
+import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileTools;
 import org.subnode.util.FileUtils;
@@ -39,6 +40,9 @@ import org.springframework.data.domain.Sort;
  * 1) Zip Export
  * 
  * 2) TAR export
+ * 
+ * NOTE: Derived classes are expected to be 'prototype' scope so we can keep
+ * state in this object on a per-export basis.
  */
 public abstract class ExportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
@@ -57,6 +61,8 @@ public abstract class ExportArchiveBase {
 
 	private String shortFileName;
 	private String fullFileName;
+
+	private String rootPathParent;
 
 	/*
 	 * It's possible that nodes recursively contained under a given node can have
@@ -99,6 +105,7 @@ public abstract class ExportArchiveBase {
 			openOutputStream(fullFileName);
 
 			SubNode node = api.getNode(session, nodeId);
+			rootPathParent = node.getParentPath();
 			api.authRequireOwnerOfNode(session, node);
 			recurseNode("", node, 0, null);
 			res.setFileName(shortFileName);
@@ -223,16 +230,35 @@ public abstract class ExportArchiveBase {
 			String binFileNameProp = node.getStringProp(NodeProp.BIN_FILENAME.s());
 			String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
 
+			String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK.s());
+
 			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 			if (mimeType != null && mimeType.startsWith("image/")) {
 				String relImgPath = writeFile ? "" : (fileName + "/");
-				/* embeds an image that's 300px wide until you click it which makes it go fullsize */
-				html.append("<br><img id='img_"+node.getId().toHexString()+"' style='width:300px' onclick='document.getElementById(\"img_"+node.getId().toHexString()+"\").style.width=\"\"' src='./" + relImgPath + binFileNameStr + "'/>");
+				/*
+				 * embeds an image that's 400px wide until you click it which makes it go
+				 * fullsize
+				 */
+				String imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + binFileNameStr)
+						: (Const.IPFS_GATEWAY + ipfsLink);
+
+				html.append("<br><img id='img_" + node.getId().toHexString()
+						+ "' style='width:400px' onclick='document.getElementById(\"img_" + node.getId().toHexString()
+						+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
 			}
 
 			if (writeFile) {
 				fileNameCont.setVal(parentFolder + "/" + fileName + "/" + fileName);
+
+				/*
+				 * Pretty print the node having the relative path, and then restore the node to
+				 * the full path
+				 */
+				String fullPath = node.getPath();
+				String relPath = fullPath.substring(rootPathParent.length());
+				node.setPath(relPath);
 				String json = XString.prettyPrint(node);
+				node.setPath(fullPath);
 
 				addFileEntry(parentFolder + "/" + fileName + "/" + fileName + ".json",
 						json.getBytes(StandardCharsets.UTF_8));
@@ -245,14 +271,13 @@ public abstract class ExportArchiveBase {
 
 				/*
 				 * If we had a binary property on this node we write the binary file into a
-				 * separate file
+				 * separate file, but for ipfs links we do NOT do this
 				 */
-				if (mimeType != null) {
-					boolean ipfs = StringUtils.isNotEmpty(node.getStringProp(NodeProp.IPFS_LINK.s()));
+				if (mimeType != null && StringUtils.isEmpty(ipfsLink)) {
 
 					InputStream is = null;
 					try {
-						is = attachmentService.getStream(session, node, null, false, ipfs);
+						is = attachmentService.getStream(session, node, null, false, false);
 						BufferedInputStream bis = new BufferedInputStream(is);
 						long length = node.getIntProp(NodeProp.BIN_SIZE.s());
 

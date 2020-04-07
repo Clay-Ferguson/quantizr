@@ -44,8 +44,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     maxFiles: number = 1;
 
-    constructor(private toIpfs: boolean, private autoAddFile: File) {
-        super(toIpfs ? "Upload File to IPFS" : "Upload File");
+    constructor(private node: J.NodeInfo, private toIpfs: boolean, private autoAddFile: File, private importMode: boolean) {
+        super(importMode ? "Import File" : (toIpfs ? "Upload File to IPFS" : "Upload File"));
 
         this.setChildren([
             new Form(null, [
@@ -179,8 +179,14 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         /* Allow 20MB for Quantizr uploads or 20GB for IPFS */
         let maxFileSize = (this.toIpfs && this.toTemporal) ? Constants.MAX_UPLOAD_MB * 1024 : Constants.MAX_UPLOAD_MB;
 
-        let action = (this.toIpfs && this.toTemporal) ? (this.TEMPORAL_HOST + "/v2/ipfs/public/file/add") :
-            S.util.getRpcPath() + "upload";
+        let action;
+        if (this.importMode) {
+            action = S.util.getRpcPath() + "streamImport";
+        }
+        else {
+            action = (this.toIpfs && this.toTemporal) ? (this.TEMPORAL_HOST + "/v2/ipfs/public/file/add") :
+                S.util.getRpcPath() + "upload";
+        }
         let url = action;
 
         let dlg = this;
@@ -243,7 +249,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }
                     /* Else we'll be uploading onto Quantizr and saving to ipfs based on the 'ipfs' flag */
                     else {
-                        formData.append("nodeId", S.attachment.uploadNode.id);
+                        formData.append("nodeId", dlg.node.id);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
                         formData.append("ipfs", dlg.toIpfs ? "true" : "false");
                     }
@@ -266,15 +272,15 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     if (dlg.ipfsFile) {
                         let ipfsHash = param2.response;
 
-                        S.props.setNodePropVal(J.NodeProp.IPFS_LINK, S.attachment.uploadNode, ipfsHash);
-                        S.props.setNodePropVal(J.NodeProp.BIN_MIME, S.attachment.uploadNode, dlg.ipfsFile.type);
-                        S.props.setNodePropVal(J.NodeProp.BIN_SIZE, S.attachment.uploadNode, `${dlg.ipfsFile.size}`);
-                        S.props.setNodePropVal(J.NodeProp.BIN_FILENAME, S.attachment.uploadNode, dlg.ipfsFile.name);
+                        S.props.setNodePropVal(J.NodeProp.IPFS_LINK, dlg.node, ipfsHash);
+                        S.props.setNodePropVal(J.NodeProp.BIN_MIME, dlg.node, dlg.ipfsFile.type);
+                        S.props.setNodePropVal(J.NodeProp.BIN_SIZE, dlg.node, `${dlg.ipfsFile.size}`);
+                        S.props.setNodePropVal(J.NodeProp.BIN_FILENAME, dlg.node, dlg.ipfsFile.name);
 
                         S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-                            node: S.attachment.uploadNode
+                            node: dlg.node
                         }, (res) => {
-                            S.edit.saveNodeResponse(S.attachment.uploadNode, res);
+                            S.edit.saveNodeResponse(dlg.node, res);
                         });
                     }
                 });
@@ -311,7 +317,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         /* Detect if any ZIP files are currently selected, and ask user the question about whether they
         should be extracted automatically during the upload, and uploaded as individual nodes
         for each file */
-        if (!this.zipQuestionAnswered && this.hasAnyZipFiles()) {
+        if (!this.importMode && !this.zipQuestionAnswered && this.hasAnyZipFiles()) {
             this.zipQuestionAnswered = true;
             new ConfirmDlg("Do you want Zip files exploded onto the tree when uploaded?",
                 "Explode Zips?", //

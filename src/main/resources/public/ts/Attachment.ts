@@ -14,22 +14,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class Attachment implements AttachmentIntf {
 
-    /* Node being uploaded to */
-    uploadNode: any = null;
-
     openUploadFromFileDlg = (toIpfs: boolean = false, node: J.NodeInfo=null, autoAddFile: File = null): void => {
         if (node == null) {
             node = S.meta64.getHighlightedNode();
         }
         if (!node) {
-            this.uploadNode = null;
             S.util.showMessage("No node is selected.");
             return;
         }
 
-        this.uploadNode = node;
-
-        let dlg = new UploadFromFileDropzoneDlg(toIpfs, autoAddFile);
+        let dlg = new UploadFromFileDropzoneDlg(node, toIpfs, autoAddFile, false);
         dlg.open();
 
         /* Note: To run legacy uploader just put this version of the dialog here, and
@@ -44,14 +38,11 @@ export class Attachment implements AttachmentIntf {
         }
 
         if (!node) {
-            this.uploadNode = null;
             S.util.showMessage("No node is selected.");
             return;
         }
 
-        this.uploadNode = node;
-
-        let dlg = new UploadFromUrlDlg(defaultUrl);
+        let dlg = new UploadFromUrlDlg(node, defaultUrl);
         dlg.open();
     }
 

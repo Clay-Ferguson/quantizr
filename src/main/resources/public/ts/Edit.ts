@@ -6,11 +6,11 @@ import { ExportDlg } from "./dlg/ExportDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
-import { ImportFromFileDropzoneDlg } from "./dlg/ImportFromFileDropzoneDlg";
 import { EditIntf } from "./intf/EditIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
+import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -18,9 +18,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Edit implements EditIntf {
-
-    /* Node being uploaded to */
-    importTargetNode: any = null;
 
     showReadOnlyProperties: boolean = true;
     /*
@@ -64,14 +61,12 @@ export class Edit implements EditIntf {
     openImportDlg = (): void => {
         let node: J.NodeInfo = S.meta64.getHighlightedNode();
         if (!node) {
-            this.importTargetNode = null;
             S.util.showMessage("No node is selected.");
             return;
         }
 
-        this.importTargetNode = node;
-
-        new ImportFromFileDropzoneDlg().open();
+        let dlg = new UploadFromFileDropzoneDlg(node, false, null, true);
+        dlg.open();
 
         /* This dialog is no longer needed, now that we support uploading from a stream. This older dialog imports a file
         as specified by the admin by filename, but has the limitation of requiring that file to already exist
