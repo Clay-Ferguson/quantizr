@@ -98,6 +98,7 @@ public enum NodeProp {
 
     //amount of bytes the user is ALLOWED to save.
     BIN_QUOTA("sn:binQuota", "s"),//
+    BIN_MAX_UPLOAD_SIZE("sn:maxUploadSize", "s"),//
 
     // todo-1: add sn:prefix
     INLINE_CHILDREN("inlineChildren", "s"), //

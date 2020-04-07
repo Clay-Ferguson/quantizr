@@ -11,6 +11,8 @@ public class Const {
 	 * todo-0: need to make this a per-user setting (not the default that this is
 	 * but the operative value), and also that raises question? How are we stopping
 	 * users from editing protected nodes in their root node?
+	 * 
+	 * see: BIN_MAX_UPLOAD_SIZE
 	 */
 	public static final int DEFAULT_MAX_FILE_SIZE = 5 * ONE_MB;
 
