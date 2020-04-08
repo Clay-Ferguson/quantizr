@@ -202,6 +202,7 @@ public abstract class ExportArchiveBase {
 			// log.debug("Processing Node: " + node.getPath());
 
 			String fileName = generateFileNameFromNode(node);
+			String nodeId = node.getId().toHexString();
 
 			/*
 			 * If we aren't writing the file we know we need the text appended to include a
@@ -239,12 +240,12 @@ public abstract class ExportArchiveBase {
 				 * embeds an image that's 400px wide until you click it which makes it go
 				 * fullsize
 				 */
-				String imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + binFileNameStr)
+				String imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + nodeId + "-" + binFileNameStr)
 						: (Const.IPFS_GATEWAY + ipfsLink);
 
-				html.append("<br><img id='img_" + node.getId().toHexString()
-						+ "' style='width:400px' onclick='document.getElementById(\"img_" + node.getId().toHexString()
-						+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
+				html.append(
+						"<br><img id='img_" + nodeId + "' style='width:400px' onclick='document.getElementById(\"img_"
+								+ nodeId + "\").style.width=\"\"' src='" + imgUrl + "'/>");
 			}
 
 			if (writeFile) {
@@ -283,7 +284,8 @@ public abstract class ExportArchiveBase {
 
 						if (length > 0) {
 							/* NOTE: the archive WILL fail if no length exists in this codepath */
-							addFileEntry(parentFolder + "/" + fileName + "/" + binFileNameStr, bis, length);
+							addFileEntry(parentFolder + "/" + fileName + "/" + nodeId + "-" + binFileNameStr, bis,
+									length);
 						} else {
 							/*
 							 * This *should* never happen that we fall back to writing as an array from the
@@ -291,7 +293,7 @@ public abstract class ExportArchiveBase {
 							 * node. But re are trying to be as resilient as possible here falling back to
 							 * this rather than failing the entire export
 							 */
-							addFileEntry(parentFolder + "/" + fileName + "/" + binFileNameStr,
+							addFileEntry(parentFolder + "/" + fileName + "/" + nodeId + "-" + binFileNameStr,
 									IOUtils.toByteArray(bis));
 						}
 					} finally {

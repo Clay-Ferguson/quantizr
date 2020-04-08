@@ -250,7 +250,7 @@ public class AttachmentService {
 			 */
 			ImportZipService importZipStreamService = (ImportZipService) SpringContextUtil
 					.getBean(ImportZipService.class);
-			importZipStreamService.importZipFileFromStream(session, is, node, false);
+			importZipStreamService.importFromStream(session, is, node, false);
 		} else {
 			saveBinaryStreamToNode(session, is, mimeType, fileName, size, width, height, node, toIpfs, calcImageSize,
 					dataUrl, closeStream);

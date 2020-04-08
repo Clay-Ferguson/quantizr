@@ -48,6 +48,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	 */
 	@Override
 	public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
+		//log.debug("MONGO SAVE EVENT.");
 		SubNode node = event.getSource();
 		node.setWriting(true);
 
@@ -62,11 +63,11 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		if (id == null) {
 			id = new ObjectId();
 			node.setId(id);
-			// log.debug("New Node ID generated: " + id);
+			//log.debug("New Node ID generated: " + id);
 		}
 		dbObj.put(SubNode.FIELD_ID, id);
 
-		//log.debug("onBeforeSave: ID: " + node.getId().toHexString());
+		// log.debug("onBeforeSave: ID: " + node.getId().toHexString());
 
 		// DO NOT DELETE
 		// If we ever add a unique-index for "Name" (not currently the case), then we'd
@@ -138,13 +139,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			dbObj.put(SubNode.FIELD_MODIFY_TIME, now);
 			node.setModifyTime(now);
 		}
-
-		// Long binTot = node.getIntProp(NodeProp.BIN_TOTAL.s());
-		// if (binTot != null) {
-		// 	log.debug("hashCode=" + node.hashCode() + " binTot=" + binTot);
-		// } else {
-		// 	log.debug("no binTot prop.");
-		// }
 
 		removeDefaultProps(node);
 	}

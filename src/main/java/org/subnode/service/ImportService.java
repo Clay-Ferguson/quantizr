@@ -51,57 +51,35 @@ public class ImportService {
 		if (!StringUtils.isEmpty(fileName)) {
 			log.debug("Uploading file: " + fileName);
 
+			BufferedInputStream in = null;
 			try {
 				if (fileName.toLowerCase().endsWith(".zip")) {
-					importZipStream(session, uploadFile.getInputStream(), node);
+					log.debug("Import ZIP to Node: " + node.getPath());
+					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
+
+					ImportZipService importZipService = (ImportZipService) SpringContextUtil
+							.getBean(ImportZipService.class);
+					importZipService.importFromStream(session, in, node, false);
+					api.saveSession(session);
 				}
-				if (fileName.toLowerCase().endsWith(".tar")) {
-					importTarStream(session, uploadFile.getInputStream(), node);
-				}
-				else {
-					throw ExUtil.newEx("Only ZIP files are currently supported for importing.");
+				else if (fileName.toLowerCase().endsWith(".tar")) {
+					log.debug("Import TAR to Node: " + node.getPath());
+					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
+
+					ImportTarService importTarService = (ImportTarService)
+					SpringContextUtil.getBean(ImportTarService.class);
+					importTarService.importFromStream(session, in, node, false);
+					api.saveSession(session);
+				} else {
+					throw ExUtil.newEx("Only ZIP or TAR files are supported for importing.");
 				}
 			} catch (Exception ex) {
 				throw ExUtil.newEx(ex);
+			} finally {
+				StreamUtil.close(in);
 			}
 		}
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-
-	private void importZipStream(MongoSession session, InputStream inputStream, SubNode targetNode) {
-		BufferedInputStream in = null;
-		try {
-			log.debug("Import ZIP to Node: " + targetNode.getPath());
-			in = new BufferedInputStream(new AutoCloseInputStream(inputStream));
-
-			ImportZipService importZipService = (ImportZipService) SpringContextUtil.getBean(ImportZipService.class);
-			importZipService.importZipFileFromStream(session, inputStream, targetNode, false);
-			api.saveSession(session);
-		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
-		} finally {
-			/* The importXML should have already closed, but we add here just to be sure */
-			StreamUtil.close(in);
-		}
-	}
-
-	private void importTarStream(MongoSession session, InputStream inputStream, SubNode targetNode) {
-		BufferedInputStream in = null;
-		try {
-			throw new RuntimeException("TAR import not yet implemented");
-			// log.debug("Import TAR to Node: " + targetNode.getPath());
-			// in = new BufferedInputStream(new AutoCloseInputStream(inputStream));
-
-			// ImportTarService importTarService = (ImportTarService) SpringContextUtil.getBean(ImportTarService.class);
-			// importTarService.importZipFileFromStream(session, inputStream, targetNode, false);
-			// api.saveSession(session);
-		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
-		} finally {
-			/* The importXML should have already closed, but we add here just to be sure */
-			StreamUtil.close(in);
-		}
-	}
-
 }
