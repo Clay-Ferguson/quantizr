@@ -566,6 +566,7 @@ export const enum NodeProp {
     IMG_SIZE = "sn:imgSize",
     BIN_TOTAL = "sn:binTot",
     BIN_QUOTA = "sn:binQuota",
+    BIN_MAX_UPLOAD_SIZE = "sn:maxUploadSize",
     INLINE_CHILDREN = "inlineChildren",
     PRIORITY = "priority",
     LAYOUT = "layout",
