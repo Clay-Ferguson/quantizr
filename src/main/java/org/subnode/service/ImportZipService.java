@@ -4,8 +4,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,7 +22,8 @@ import org.subnode.util.StreamUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
-
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +66,7 @@ public class ImportZipService {
 
 	private String targetPath;
 
-	private ZipInputStream zis = null;
+	private ZipArchiveInputStream zis;
 	private MongoSession session;
 
 	private SubNode importRootNode;
@@ -86,7 +85,7 @@ public class ImportZipService {
 		SubNode rootNode = null;
 		try {
 			is = resource.getInputStream();
-			rootNode = inputZipFileFromStream(session, is, node, true);
+			rootNode = importZipFileFromStream(session, is, node, true);
 		} catch (Exception e) {
 			throw ExUtil.newEx(e);
 		} finally {
@@ -99,7 +98,7 @@ public class ImportZipService {
 	}
 
 	/* Returns the first node created which is always the root of the import */
-	public SubNode inputZipFileFromStream(MongoSession session, InputStream is, SubNode node,
+	public SubNode importZipFileFromStream(MongoSession session, InputStream is, SubNode node,
 			boolean isNonRequestThread) {
 		if (used) {
 			throw new RuntimeException("Prototype bean used multiple times is not allowed.");
@@ -118,35 +117,20 @@ public class ImportZipService {
 			targetPath = node.getPath();
 			this.session = session;
 
-			zis = new ZipInputStream(is);
-			ZipEntry entry;
-			while ((entry = zis.getNextEntry()) != null) {
-				if (entry.isDirectory()) {
-					/*
-					 * WARNING: This method is here for clarity but usually will NOT BE CALLED. The
-					 * Zip file format doesn't require folders to be stored but only FILES, and
-					 * actually the full path on each file is what determines the hierarchy.
-					 */
-					processDirectory(entry);
-				} else {
+			zis = new ZipArchiveInputStream(is);
+			ZipArchiveEntry entry;
+			while ((entry = zis.getNextZipEntry()) != null) {
+				if (!entry.isDirectory()) {
 					processFile(entry);
 				}
-				zis.closeEntry();
 			}
+
 		} catch (Exception ex) {
 			throw ExUtil.newEx(ex);
-		}
-		finally {
-			StreamUtil.close(zis);	
+		} finally {
+			StreamUtil.close(zis);
 		}
 		return importRootNode;
-	}
-
-	/*
-	 * WARNING: This NEVER GETS CALLED, and it's by design. Zip Files aren't
-	 * required to have callbacks for folders usually DON'T!
-	 */
-	private void processDirectory(ZipEntry entry) {
 	}
 
 	private String hashizePath(String path) {
@@ -167,7 +151,7 @@ public class ImportZipService {
 		return sb.toString();
 	}
 
-	private void processFile(ZipEntry entry) {
+	private void processFile(ZipArchiveEntry entry) {
 		String name = entry.getName();
 		int lastSlashIdx = name.lastIndexOf("/");
 		String fileName = name.substring(lastSlashIdx + 1);
@@ -212,7 +196,7 @@ public class ImportZipService {
 	 * '[gridId]-filename.ext' , depending on if the binary is an IPFS-persisted
 	 * data file or not
 	 */
-	private void storeBinary(ZipEntry entry) {
+	private void storeBinary(ZipArchiveEntry entry) {
 		String name = entry.getName();
 		int lastSlashIdx = name.lastIndexOf("/");
 		String fileName = name.substring(lastSlashIdx + 1);
