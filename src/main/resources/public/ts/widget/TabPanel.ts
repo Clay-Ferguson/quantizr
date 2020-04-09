@@ -1,5 +1,5 @@
 import { Comp } from "./base/Comp";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Div } from "./Div";
@@ -15,11 +15,37 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class TabPanel extends Comp {
 
+    tabVisibility: { [key: string]: boolean } = {};
+
     constructor() {
         super(null);
+
+        //todo-0: make tabVis a const var 
+        let obj = {};
+        obj["tabVis-main"] = true;
+        obj["tabVis-search"] = false;
+        obj["tabVis-timeline"] = false;
+
+        this.mergeState(obj);
+    }
+
+    setTabVisibility = (tabName: string, visible: boolean) : void => {
+
+        let obj = {};
+        obj["tabVis-" + tabName] = visible;
+
+        this.mergeState(obj);
     }
 
     compRender = (): ReactNode => {
+        let state = this.getState();
+        let mainDisplay = state["tabVis-main"] ? "inline" : "none";
+        let searchDisplay = state["tabVis-search"] ? "inline" : "none";
+        let timelineDisplay = state["tabVis-timeline"] ? "inline" : "none";
+
+        if (searchDisplay == "none" && timelineDisplay == "none") {
+            mainDisplay = "none";
+        }
 
         //the row of buttons that ARE the tabs where you click to change tabs.
         let tabButtons = new Div(null, {
@@ -33,6 +59,7 @@ export class TabPanel extends Comp {
                 /* These 'li' (list item) elements hold the tab bar that goes across the top of every page */
                 [new Li(null, {
                     className: "nav-item",
+                    style: { display: mainDisplay }
                 }, [
                     new Anchor("#mainTab", "Main", {
                         "data-toggle": "tab",
@@ -41,6 +68,7 @@ export class TabPanel extends Comp {
                 ),
                 new Li(null, {
                     className: "nav-item",
+                    style: { display: searchDisplay }
                 },
                     [new Anchor("#searchTab", "Search", {
                         "data-toggle": "tab",
@@ -49,6 +77,7 @@ export class TabPanel extends Comp {
                 ),
                 new Li(null, {
                     className: "nav-item",
+                    style: { display: timelineDisplay }
                 },
                     [new Anchor("#timelineTab", "Timeline", {
                         "data-toggle": "tab",
@@ -128,8 +157,8 @@ export class TabPanel extends Comp {
         );
 
         return new Div(null, this.attribs
-        , [
-            tabButtons, tabContent
-        ]).compRender();
+            , [
+                tabButtons, tabContent
+            ]).compRender();
     }
 }

@@ -702,12 +702,6 @@ export class Meta64 implements Meta64Intf {
         this.urlCmd = S.util.getParameterByName("cmd");
     }
 
-    tabChangeEvent = (tabName): void => {
-        if (tabName == "searchTabName") {
-            S.srch.searchTabActivated();
-        }
-    }
-
     displaySignupMessage = (): void => {
         let signupElm = S.util.domElm("signupCodeResponse");
         if (signupElm) {

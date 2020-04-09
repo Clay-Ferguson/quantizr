@@ -49,17 +49,20 @@ export class Search implements SearchIntf {
             res.searchResults.length : 0;
     }
 
-    searchTabActivated = () => {
-    }
-
     searchNodesResponse = (res: J.NodeSearchResponse) => {
         this.searchResults = res;
+        if (this.searchResults) {
+            S.nav.mainTabPanel.setTabVisibility("search", true);
+        }
         S.srch.populateSearchResultsPage(S.srch.searchResults, "searchResultsPanel");
         S.meta64.selectTab("searchTab");
     }
 
     timelineResponse = (res: J.NodeSearchResponse) => {
         this.timelineResults = res;
+        if (this.timelineResults) {
+            S.nav.mainTabPanel.setTabVisibility("timeline", true);
+        }
         S.srch.populateSearchResultsPage(S.srch.timelineResults, "timelineResultsPanel");
         S.meta64.selectTab("timelineTab");
     }

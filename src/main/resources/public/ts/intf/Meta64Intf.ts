@@ -77,7 +77,6 @@ export interface Meta64Intf {
     initNode(node: J.NodeInfo, updateMaps?: boolean): void;
     initApp(): Promise<void>;
     processUrlParams(): void;
-    tabChangeEvent(tabName): void
     displaySignupMessage(): void
     loadAnonPageHome(): void;
     saveUserPreferences(): void;
