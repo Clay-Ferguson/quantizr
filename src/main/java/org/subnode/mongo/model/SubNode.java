@@ -137,8 +137,6 @@ public class SubNode {
 	private HashMap<String, AccessControl> ac;
 
 	private boolean disableParentCheck;
-	private boolean writing;
-	private boolean deleted;
 
 	@PersistenceConstructor
 	public SubNode() {
@@ -559,31 +557,6 @@ public class SubNode {
 		this.disableParentCheck = disableParentCheck;
 	}
 
-	/* todo-0: why do we have a state 'isWriting' this is super ugly right ? */
-	@Transient
-	@JsonIgnore
-	public boolean isWriting() {
-		return writing;
-	}
-
-	@Transient
-	@JsonIgnore
-	public void setWriting(boolean writing) {
-		this.writing = writing;
-	}
-
-	/* todo-0: we aren't using this are we ? */
-	@Transient
-	@JsonIgnore
-	public boolean isDeleted() {
-		return deleted;
-	}
-
-	@Transient
-	@JsonIgnore
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
 
 	@JsonIgnore
 	public boolean isUpdateModTimeOnSave() {

@@ -49,7 +49,7 @@ public class MongoThreadLocal {
 	 * two object instances of the same 'node id' at once that is a BUG for sure.
 	 */
 	public static void dirty(SubNode node) {
-		if (node.getId() == null || node.isWriting() || node.isDeleted()) {
+		if (node.getId() == null) {
 			return;
 		}
 		getDirtyNodes().put(node.getId(), node);

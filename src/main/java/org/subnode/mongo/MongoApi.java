@@ -273,7 +273,6 @@ public class MongoApi {
 			auth(session, node, PrivilegeType.WRITE);
 		}
 		// log.debug("MongoApi.save: DATA: " + XString.prettyPrint(node));
-		node.setWriting(true);
 		ops.save(node);
 		MongoThreadLocal.clean(node);
 	}
@@ -356,10 +355,7 @@ public class MongoApi {
 		}
 	}
 
-	// todo-0: This can be speeded up: google "spring mongodb bulk update" (or batch
-	// update)
-	// But first I want to get the dirty flag handling cleaned up. It's brittle and can cause failures to save the correct data
-	// when the same thread/request updates the same node multiple times.
+	// todo-1: need to look into bulk-ops for doing this saveSession updating 
 	// tips:
 	// https://stackoverflow.com/questions/26657055/spring-data-mongodb-and-bulk-update
 	// BulkOperations ops = template.bulkOps(BulkMode.UNORDERED, Match.class);
@@ -628,6 +624,13 @@ public class MongoApi {
 
 		log.debug("Deleting under path: " + node.getPath());
 
+		/* we save the session to be sure there's no conflicting between what cached changes might be flagged as dirty
+		that might be about to be deleted.
+		
+		todo-1: potential optimization: just clear from the cache any nodes that have a path starting with 'node.getPath()', and
+		leave the rest in teh cache. But this will be rare that it has any performance impact.
+		*/
+		saveSession(session);
 		/*
 		 * First delete all the children of the node by using the path, knowing all
 		 * their paths 'start with' (as substring) this path. Note how efficient it is
@@ -637,8 +640,6 @@ public class MongoApi {
 		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).regex(regexRecursiveChildrenOfPath(node.getPath())));
 
 		DeleteResult res = ops.remove(query, SubNode.class);
-		MongoThreadLocal.clean(node);
-
 		log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
 
 		/*
@@ -649,12 +650,7 @@ public class MongoApi {
 		 * have our recursive delete identify deleting "/ab" as starting with "/ab/"
 		 */
 
-		// we call clean to be sure we don't end up writing the node BACK out AFTER we
-		// delete it.
-		// MongoThreadLocal.cleanAll();
-		node.setDeleted(true);
 		ops.remove(node);
-		MongoThreadLocal.clean(node);
 	}
 
 	public Iterable<SubNode> findAllNodes(MongoSession session) {

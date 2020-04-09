@@ -50,7 +50,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
 		//log.debug("MONGO SAVE EVENT.");
 		SubNode node = event.getSource();
-		node.setWriting(true);
 
 		Document dbObj = event.getDocument();
 		ObjectId id = node.getId();
@@ -168,7 +167,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Override
 	public void onAfterSave(AfterSaveEvent<SubNode> event) {
 		SubNode node = event.getSource();
-		node.setWriting(false);
 	}
 
 	@Override
