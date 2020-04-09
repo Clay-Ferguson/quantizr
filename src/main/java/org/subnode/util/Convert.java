@@ -73,7 +73,7 @@ public class Convert {
 			}
 		}
 
-		boolean hasNodes = (api.getChildCount(node) > 0);
+		boolean hasNodes = (api.getChildCount(session, node) > 0);
 		// log.trace("hasNodes=" + hasNodes + " path=" + node.getPath());
 
 		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly, allowAbbreviated,

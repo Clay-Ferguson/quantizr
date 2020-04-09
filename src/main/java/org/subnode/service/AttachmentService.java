@@ -145,9 +145,6 @@ public class AttachmentService {
 			 */
 			SubNode node = api.getNode(session, nodeId);
 
-			// load into cache immediately so the dirty-read interim solution works
-			MongoThreadLocal.dirty(node);
-
 			if (node == null) {
 				throw ExUtil.newEx("Node not found.");
 			}
@@ -347,7 +344,6 @@ public class AttachmentService {
 		}
 		String nodeId = req.getNodeId();
 		SubNode node = api.getNode(session, nodeId);
-		MongoThreadLocal.dirty(node);
 		deleteBinary(session, node);
 		deleteAllBinaryProperties(node);
 		api.saveSession(session);

@@ -48,7 +48,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
  * to see if it is genuinely CHANGING the value as opposed to keeping same
  * value, and in that case avoid the call to MongoSession.dirty(this);
  * 
- * todo-2: Also similar to above node, a 'dirty' flag right inside this object
+ * todo-2: Also similar to above note, a 'dirty' flag right inside this object
  * would be good, to set so that even direct calls to api.save(node) would
  * bypass any actual saving if the object is known to not be dirty. (Don't
  * forget to default to 'dirty==true' for all new objects created, but not ones
@@ -142,11 +142,9 @@ public class SubNode {
 
 	@PersistenceConstructor
 	public SubNode() {
-		MongoThreadLocal.dirty(this);
 	}
 
 	public SubNode(ObjectId owner, String path, String type, Long ordinal) {
-		MongoThreadLocal.dirty(this);
 		this.owner = owner;
 		this.type = type;
 		this.ordinal = ordinal;
@@ -561,6 +559,7 @@ public class SubNode {
 		this.disableParentCheck = disableParentCheck;
 	}
 
+	/* todo-0: why do we have a state 'isWriting' this is super ugly right ? */
 	@Transient
 	@JsonIgnore
 	public boolean isWriting() {
@@ -573,6 +572,7 @@ public class SubNode {
 		this.writing = writing;
 	}
 
+	/* todo-0: we aren't using this are we ? */
 	@Transient
 	@JsonIgnore
 	public boolean isDeleted() {

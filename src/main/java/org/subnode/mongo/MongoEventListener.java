@@ -92,7 +92,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		if (parentCheckEnabled) {
-			api.checkParentExists(node);
+			api.checkParentExists(null, node);
 		}
 
 		/*
@@ -180,10 +180,10 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Override
 	public void onAfterConvert(AfterConvertEvent<SubNode> event) {
-		Document dbObj = event.getDocument();
-		ObjectId id = dbObj.getObjectId(SubNode.FIELD_ID);
-		if (MongoThreadLocal.getDirtyNodes().get(id) != null) {
-			log.debug("dirty read.");
+		//Document dbObj = event.getDocument();
+		//ObjectId id = dbObj.getObjectId(SubNode.FIELD_ID);
+		if (MongoThreadLocal.getDirtyNodes().size() > 0) {
+			throw new RuntimeException("dirty read.");
 		}
 	}
 

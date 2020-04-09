@@ -153,7 +153,7 @@ public abstract class ExportArchiveBase {
 				null);
 		List<SubNode> children = api.iterateToList(iter);
 
-		String folder = processNodeExport(parentFolder, node, html, true, fileName);
+		String folder = processNodeExport(session, parentFolder, node, html, true, fileName);
 
 		if (children != null) {
 			int childCount = 0;
@@ -168,7 +168,7 @@ public abstract class ExportArchiveBase {
 				} else {
 					html.append("<hr style='height:3px; background-color: lightGray;'/>");
 				}
-				processNodeExport(parentFolder, n, html, false, null);
+				processNodeExport(session, parentFolder, n, html, false, null);
 				childCount++;
 			}
 		}
@@ -196,7 +196,7 @@ public abstract class ExportArchiveBase {
 	 * fileNameCont is an output parameter that has the complete filename minus the
 	 * period and extension.
 	 */
-	private String processNodeExport(String parentFolder, SubNode node, StringBuilder html, boolean writeFile,
+	private String processNodeExport(MongoSession session, String parentFolder, SubNode node, StringBuilder html, boolean writeFile,
 			ValContainer<String> fileNameCont) {
 		try {
 			// log.debug("Processing Node: " + node.getPath());
@@ -215,7 +215,7 @@ public abstract class ExportArchiveBase {
 				 * so this will be redundant, but I don't want to refactor now to solve this
 				 * yet. That's almost an optimization that should come later
 				 */
-				long childCount = api.getChildCount(node);
+				long childCount = api.getChildCount(session, node);
 				if (childCount > 0) {
 					String htmlFile = "./" + fileName + "/" + fileName + ".html";
 					html.append("<a href='" + htmlFile + "'><button>Open</button></a><br>");

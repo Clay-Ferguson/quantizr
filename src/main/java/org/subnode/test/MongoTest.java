@@ -42,8 +42,9 @@ public class MongoTest {
 
 		log.debug("*****************************************************************************************");
 		log.debug("MongoTest Running!");
-		long expectedCount = api.getNodeCount();
+
 		MongoSession adminSession = api.getAdminSession();
+		long expectedCount = api.getNodeCount(adminSession);
 
 		SubNode adminNode = api.getUserNodeByUserName(adminSession, PrincipalName.ADMIN.s());
 		if (adminNode == null) {
@@ -180,7 +181,7 @@ public class MongoTest {
 		List<String> pathList = new LinkedList<String>();
 
 		/* Make sure we can read the child count from a query */
-		long count = api.getChildCount(node);
+		long count = api.getChildCount(session, node);
 		if (count != assertCount) {
 			throw new RuntimeException("Child count query failed.");
 		}

@@ -94,6 +94,7 @@ public class CallProcessor {
 			}
 
 			ret = runner.run(mongoSession);
+			api.saveSession(mongoSession);
 
 		} catch (NotLoggedInException e1) {
 			HttpServletResponse res = ThreadLocals.getServletResponse();

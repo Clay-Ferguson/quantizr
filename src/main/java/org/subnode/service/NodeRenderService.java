@@ -97,7 +97,7 @@ public class NodeRenderService {
 		boolean scanToNode = false;
 		String scanToPath = node.getPath();
 
-		if (req.isRenderParentIfLeaf() && !subNodeUtil.hasDisplayableNodes(false /* advanced_Mode */, node)) {
+		if (req.isRenderParentIfLeaf() && !subNodeUtil.hasDisplayableNodes(session, false /* advanced_Mode */, node)) {
 			res.setDisplayedParent(true);
 			req.setUpLevel(1);
 		}

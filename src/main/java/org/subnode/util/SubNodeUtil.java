@@ -59,8 +59,8 @@ public class SubNodeUtil {
 		return !nonSavableProperties.contains(propertyName);
 	}
 
-	public boolean hasDisplayableNodes(boolean isAdvancedEditingMode, SubNode node) {
-		return (api.getChildCount(node) > 0);
+	public boolean hasDisplayableNodes(MongoSession session, boolean isAdvancedEditingMode, SubNode node) {
+		return (api.getChildCount(session, node) > 0);
 	}
 
 	//todo-1: everywhere this is called can we be sure the path is not actually used as a lookup, but instead the node name?

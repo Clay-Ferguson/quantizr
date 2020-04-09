@@ -31,15 +31,15 @@ public class MongoThreadLocal {
 		getAclResults().clear();
 	}
 
-	public static void setDirtyNodes(HashMap<ObjectId, SubNode> res) {
-		dirtyNodes.set(res);
-	}
-
 	public static HashMap<ObjectId, SubNode> getDirtyNodes() {
 		if (dirtyNodes.get() == null) {
 			dirtyNodes.set(new HashMap<ObjectId, SubNode>());
 		}
 		return dirtyNodes.get();
+	}
+
+	public static boolean hasDirtyNodes() {
+		return getDirtyNodes().size() > 0;
 	}
 
 	/*
@@ -55,27 +55,9 @@ public class MongoThreadLocal {
 		getDirtyNodes().put(node.getId(), node);
 	}
 
-	public static void autoCleanup(MongoSession session) {
-		if (getDirtyNodes() == null || getDirtyNodes().values() == null) return;
-		List<SubNode> nodesToClean = null;
-
-		/*
-		 * to avoid ConcurrentModification we scan and build up all the nodes that need to be
-		 * cleaned out and hold them in nodesToClean
-		 */
-		for (SubNode node : MongoThreadLocal.getDirtyNodes().values()) {
-			if (node.isWriting() || node.isDeleted()) {
-				if (nodesToClean == null) {
-					nodesToClean = new LinkedList<SubNode>();
-				}
-				nodesToClean.add(node);
-			}
-		}
-		if (nodesToClean == null) return;
-
-		for (SubNode node : nodesToClean) {
-			MongoThreadLocal.getDirtyNodes().remove(node.getId());
-		}
+	/* Opposite of dirty */
+	public static void clean(SubNode node) {
+		getDirtyNodes().remove(node.getId());
 	}
 	
 	public static void setAclResults(HashMap<String, Boolean> res) {

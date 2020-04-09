@@ -265,20 +265,17 @@ public class MongoApi {
 	}
 
 	public void save(MongoSession session, SubNode node) {
-		save(session, node, true, true);
+		save(session, node, true);
 	}
 
-	public void save(MongoSession session, SubNode node, boolean updateThreadCache, boolean allowAuth) {
+	public void save(MongoSession session, SubNode node, boolean allowAuth) {
 		if (allowAuth) {
 			auth(session, node, PrivilegeType.WRITE);
 		}
 		// log.debug("MongoApi.save: DATA: " + XString.prettyPrint(node));
 		node.setWriting(true);
 		ops.save(node);
-
-		if (updateThreadCache) {
-			MongoThreadLocal.autoCleanup(session);
-		}
+		MongoThreadLocal.clean(node);
 	}
 
 	/**
@@ -359,43 +356,47 @@ public class MongoApi {
 		}
 	}
 
+	// todo-0: This can be speeded up: google "spring mongodb bulk update" (or batch
+	// update)
+	// But first I want to get the dirty flag handling cleaned up. It's brittle and can cause failures to save the correct data
+	// when the same thread/request updates the same node multiple times.
+	// tips:
+	// https://stackoverflow.com/questions/26657055/spring-data-mongodb-and-bulk-update
+	// BulkOperations ops = template.bulkOps(BulkMode.UNORDERED, Match.class);
+	// for (User user : users) {
+	// Update update = new Update();
+	// ...
+	// ops.updateOne(query(where("id").is(user.getId())), update);
+	// }
+	// ops.execute();
+	//
 	/*
-	 * todo-2: We could theoretically achieve a level of transactionality here if we
-	 * were to setup a try/catch/finally block here and detect if any 'save' call
-	 * fails, and if so, proceed to attempt to set all the nodes BACK to their
-	 * original values. But before i start getting that 'creative' i need to
-	 * research what the rest of the mongodb community thinks about this kind of
-	 * thing, and research if there is a way to let Spring api, batch these.
 	 * Actually this is probably already solved in some sort of BATCHING API already
 	 * written.
-	 * 
-	 * UPDATE: I have a full and complete design for a Two-Phase commit, that
-	 * actually offers rollback to any prior point in time also, which will be what
-	 * i do regarding the above notes...
-	 * 
-	 * An enhancement here would be to have 'values' maintain the order in which the
-	 * first modification was made so that there is no risk of errors like it saying
-	 * you can't create a node before the parent node exists, because you created
-	 * some new subgraph all in on 'commit'
 	 */
 	public void saveSession(MongoSession session) {
+		if (session==null) return;
 		synchronized (session) {
-			if (MongoThreadLocal.getDirtyNodes() == null || MongoThreadLocal.getDirtyNodes().values() == null) {
+			if (!MongoThreadLocal.hasDirtyNodes()) {
 				return;
 			}
+
+			/* We use 'nodes' list to avoid a concurrent modification excption in the loop below that deletes nodes, 
+			because each time we delete a node we remove it from the 'dirtyNodes' on the threadlocals */
+			List<SubNode> nodes = new LinkedList<SubNode>();
+
 			/*
-			 * check that we are allowed to write all, before we start writing any, to be
-			 * more efficient 'transactionally'
+			 * check that we are allowed to write all, before we start writing any
 			 */
 			for (SubNode node : MongoThreadLocal.getDirtyNodes().values()) {
 				auth(session, node, PrivilegeType.WRITE);
+				nodes.add(node);
 			}
 
-			for (SubNode node : MongoThreadLocal.getDirtyNodes().values()) {
-				log.debug("Saving Dirty Node: "+node.getId().toHexString());
-				save(session, node, false, false);
+			for (SubNode node : nodes) {
+				log.debug("Saving Dirty Node: " + node.getId().toHexString());
+				save(session, node, false);
 			}
-			MongoThreadLocal.getDirtyNodes().clear();
 		}
 	}
 
@@ -555,13 +556,13 @@ public class MongoApi {
 		return XString.truncateAfterLast(node.getPath(), "/");
 	}
 
-	public long getChildCount(SubNode node) {
+	public long getChildCount(MongoSession session, SubNode node) {
 		// log.debug("MongoApi.getChildCount");
 
 		Query query = new Query();
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(node.getPath()));
 		query.addCriteria(criteria);
-
+		saveSession(session);
 		return ops.count(query, SubNode.class);
 	}
 
@@ -569,12 +570,12 @@ public class MongoApi {
 	 * I find it odd that MongoTemplate no count for the whole collection. A query
 	 * is always required? Strange oversight on their part.
 	 */
-	public long getNodeCount() {
+	public long getNodeCount(MongoSession session) {
 		Query query = new Query();
 		// Criteria criteria =
 		// Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(node.getPath()));
 		// query.addCriteria(criteria);
-
+		saveSession(session);
 		return ops.count(query, SubNode.class);
 	}
 
@@ -585,12 +586,12 @@ public class MongoApi {
 				SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(node.getPath()))//
 				.and(SubNode.FIELD_ORDINAL).is(idx);
 		query.addCriteria(criteria);
-
-		SubNode ret = findOne(query);
+		saveSession(session);
+		SubNode ret = ops.findOne(query, SubNode.class);
 		return ret;
 	}
 
-	public void checkParentExists(SubNode node) {
+	public void checkParentExists(MongoSession session, SubNode node) {
 		boolean isRootPath = isRootPath(node.getPath());
 		if (node.isDisableParentCheck() || isRootPath)
 			return;
@@ -603,6 +604,7 @@ public class MongoApi {
 		Query query = new Query();
 		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
 
+		saveSession(session);
 		if (!ops.exists(query, SubNode.class)) {
 			throw new RuntimeException("Attempted to add a node before its parent exists:" + parentPath);
 		}
@@ -635,6 +637,8 @@ public class MongoApi {
 		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).regex(regexRecursiveChildrenOfPath(node.getPath())));
 
 		DeleteResult res = ops.remove(query, SubNode.class);
+		MongoThreadLocal.clean(node);
+
 		log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
 
 		/*
@@ -650,10 +654,12 @@ public class MongoApi {
 		// MongoThreadLocal.cleanAll();
 		node.setDeleted(true);
 		ops.remove(node);
+		MongoThreadLocal.clean(node);
 	}
 
 	public Iterable<SubNode> findAllNodes(MongoSession session) {
 		requireAdmin(session);
+		saveSession(session);
 		return ops.findAll(SubNode.class);
 	}
 
@@ -714,6 +720,7 @@ public class MongoApi {
 		// Criteria criteria = Criteria.where(SubNode.FIELD_ACL).ne(null);
 		// query.addCriteria(criteria);
 
+		//saveSession(session);
 		// Iterable<SubNode> iter = ops.find(query, SubNode.class);
 
 		// iter.forEach((node) -> {
@@ -797,11 +804,10 @@ public class MongoApi {
 	}
 
 	public SubNode getNodeByName(MongoSession session, String name, boolean allowAuth) {
-		SubNode ret = null;
-
 		Query query = new Query();
 		query.addCriteria(Criteria.where(SubNode.FIELD_NAME).is(name));
-		ret = findOne(query);
+		saveSession(session);
+		SubNode ret = ops.findOne(query, SubNode.class);
 
 		if (allowAuth) {
 			auth(session, ret, PrivilegeType.READ);
@@ -858,7 +864,8 @@ public class MongoApi {
 			searchArg = XString.stripIfEndsWith(searchArg, "/");
 			Query query = new Query();
 			query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(searchArg));
-			ret = findOne(query);
+			saveSession(session);
+			ret = ops.findOne(query, SubNode.class);
 		}
 
 		if (allowAuth) {
@@ -867,9 +874,10 @@ public class MongoApi {
 		return ret;
 	}
 
-	public boolean nodeExists(ObjectId id) {
+	public boolean nodeExists(MongoSession session, ObjectId id) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where(SubNode.FIELD_ID).is(id));
+		saveSession(session);
 		return ops.exists(query, SubNode.class);
 	}
 
@@ -880,6 +888,7 @@ public class MongoApi {
 	public SubNode getNode(MongoSession session, ObjectId objId, boolean allowAuth) {
 		if (objId == null)
 			return null;
+		saveSession(session);
 		SubNode ret = ops.findById(objId, SubNode.class);
 		if (allowAuth) {
 			auth(session, ret, PrivilegeType.READ);
@@ -895,7 +904,8 @@ public class MongoApi {
 		String parentPath = XString.truncateAfterLast(path, "/");
 		Query query = new Query();
 		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
-		SubNode ret = findOne(query);
+		saveSession(session);
+		SubNode ret = ops.findOne(query, SubNode.class);
 		auth(session, ret, PrivilegeType.READ);
 		return ret;
 	}
@@ -951,6 +961,7 @@ public class MongoApi {
 		}
 		query.addCriteria(criteria);
 
+		saveSession(session);
 		Iterable<SubNode> iter = ops.find(query, SubNode.class);
 		List<String> nodeIds = new LinkedList<String>();
 		for (SubNode n : iter) {
@@ -988,6 +999,7 @@ public class MongoApi {
 		}
 
 		query.addCriteria(criteria);
+		saveSession(session);
 		return ops.find(query, SubNode.class);
 	}
 
@@ -1035,7 +1047,8 @@ public class MongoApi {
 		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
 		query.addCriteria(criteria);
 
-		SubNode nodeFound = findOne(query);
+		saveSession(session);
+		SubNode nodeFound = ops.findOne(query, SubNode.class);
 		if (nodeFound == null) {
 			return 0L;
 		}
@@ -1060,7 +1073,8 @@ public class MongoApi {
 		// query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(50).gt(20));
 		query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(node.getOrdinal()));
 
-		SubNode nodeFound = findOne(query);
+		saveSession(session);
+		SubNode nodeFound = ops.findOne(query, SubNode.class);
 		return nodeFound;
 	}
 
@@ -1081,7 +1095,8 @@ public class MongoApi {
 		// query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(50).gt(20));
 		query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).gt(node.getOrdinal()));
 
-		SubNode nodeFound = findOne(query);
+		saveSession(session);
+		SubNode nodeFound = ops.findOne(query, SubNode.class);
 		return nodeFound;
 	}
 
@@ -1114,7 +1129,7 @@ public class MongoApi {
 		 */
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexRecursiveChildrenOfPath(node.getPath()));
 		query.addCriteria(criteria);
-
+		saveSession(session);
 		return ops.find(query, SubNode.class);
 	}
 
@@ -1174,6 +1189,7 @@ public class MongoApi {
 			query.with(Sort.by(Sort.Direction.DESC, sortField));
 		}
 
+		saveSession(session);
 		return ops.find(query, SubNode.class);
 	}
 
@@ -1245,17 +1261,20 @@ public class MongoApi {
 
 	public void dropAllIndexes(MongoSession session) {
 		requireAdmin(session);
+		saveSession(session);
 		ops.indexOps(SubNode.class).dropAllIndexes();
 	}
 
 	public void dropIndex(MongoSession session, Class<?> clazz, String indexName) {
 		requireAdmin(session);
 		log.debug("Dropping index: " + indexName);
+		saveSession(session);
 		ops.indexOps(clazz).dropIndex(indexName);
 	}
 
 	public void logIndexes(MongoSession session, Class<?> clazz) {
 		StringBuilder sb = new StringBuilder();
+		saveSession(session);
 		List<IndexInfo> indexes = ops.indexOps(clazz).getIndexInfo();
 		for (IndexInfo idx : indexes) {
 			List<IndexField> indexFields = idx.getIndexFields();
@@ -1269,16 +1288,19 @@ public class MongoApi {
 
 	public void createUniqueIndex(MongoSession session, Class<?> clazz, String property) {
 		requireAdmin(session);
+		saveSession(session);
 		ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC).unique());
 	}
 
 	public void createIndex(MongoSession session, Class<?> clazz, String property) {
 		requireAdmin(session);
+		saveSession(session);
 		ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC));
 	}
 
 	public void createIndex(MongoSession session, Class<?> clazz, String property, Direction dir) {
 		requireAdmin(session);
+		saveSession(session);
 		ops.indexOps(clazz).ensureIndex(new Index().on(property, dir));
 	}
 
@@ -1321,6 +1343,7 @@ public class MongoApi {
 				// .onField(SubNode.FIELD_PROPERTIES+"."+NodeProp.CONTENT)
 				.build();
 
+		saveSession(session);
 		ops.indexOps(clazz).ensureIndex(textIndex);
 	}
 
@@ -1432,25 +1455,9 @@ public class MongoApi {
 				.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
 
 		query.addCriteria(criteria);
-		SubNode ret = findOne(query);
-		auth(session, ret, PrivilegeType.READ);
-		return ret;
-	}
-
-	/**
-	 * Looks at the object we just read, and returns the one from the cache instead
-	 * of there is one, otherwise, we would have a dirty read probelm.
-	 * 
-	 * This is an interim solution to dirty-reads at least for the findOne case.
-	 */
-	public SubNode findOne(Query query) {
+		saveSession(session);
 		SubNode ret = ops.findOne(query, SubNode.class);
-		if (ret != null) {
-			SubNode foundInCache = MongoThreadLocal.getDirtyNodes().get(ret.getId());
-			if (foundInCache != null) {
-				ret = foundInCache;
-			}
-		}
+		auth(session, ret, PrivilegeType.READ);
 		return ret;
 	}
 
@@ -1467,7 +1474,8 @@ public class MongoApi {
 				.and(SubNode.FIELD_PROPERTIES + "." + propName + ".value").is(propVal);
 
 		query.addCriteria(criteria);
-		SubNode ret = findOne(query);
+		saveSession(session);
+		SubNode ret = ops.findOne(query, SubNode.class);
 		auth(session, ret, PrivilegeType.READ);
 		return ret;
 	}

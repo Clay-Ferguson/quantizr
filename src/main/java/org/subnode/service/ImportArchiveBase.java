@@ -89,7 +89,6 @@ public abstract class ImportArchiveBase {
 				// we must nullify the node ID so that it creates a new node when saved.
 				node.setId(null);
 				api.save(session, node);
-				//MongoThreadLocal.getDirtyNodes().remove(node.getId());// todo-0; hack, guess (didn't wrok)
 
 				oldIdToNewIdMap.put(oldId, node.getId().toHexString());
 			}
@@ -106,10 +105,6 @@ public abstract class ImportArchiveBase {
 		} catch (Exception ex) {
 			throw ExUtil.newEx(ex);
 		}
-
-		log.debug("Clearing Dirty Nodes.");
-		//todo-0: this fixed the import, but I need to totally retest and rethink my dirty nodes concept. It's very fragile.
-		MongoThreadLocal.getDirtyNodes().clear();
 	}
 
 	/*
@@ -156,8 +151,6 @@ public abstract class ImportArchiveBase {
 			log.debug("Attaching binary to nodeId: "+node.getId().toHexString());
 			attachmentService.attachBinaryFromStream(session, node, null, fileName, length, lzis, mimeType, -1, -1,
 					false, false, false, true, false, false);
-			//MongoThreadLocal.getDirtyNodes().remove(node.getId());// todo-0; hack, guess (didn't wrok)
-
 		} else {
 			// this is normal to get here and indicates this file is NOT an attachment file.
 		}
