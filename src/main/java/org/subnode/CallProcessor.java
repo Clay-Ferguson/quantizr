@@ -39,13 +39,17 @@ public class CallProcessor {
 	private MongoApi api;
 
 	private static final boolean logRequests = true;
-	//private static int mutexCounter = 0;
+	// private static int mutexCounter = 0;
 
 	// Most but not all of the time this return value is ResponseBase type, or
 	// derived from that.
 	public Object run(String command, RequestBase req, HttpSession httpSession, MongoRunnableEx runner) {
 		ThreadLocals.setHttpSession(httpSession);
 		logRequest(command, req, httpSession);
+
+		/* Instantiating this, runs its constructor and ensures our threadlocal at least has an object, but most (not all) implenentations of methods end up instantiating
+		their own which overwrites this */
+		new ResponseBase();
 
 		if (AppServer.isShuttingDown()) {
 			throw ExUtil.newEx("Server is shutting down.");
@@ -64,8 +68,8 @@ public class CallProcessor {
 			if (mutex != null) {
 				mutex.lockEx();
 			}
-			//mutexCounter++;
-			//log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
+			// mutexCounter++;
+			// log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
 
 			/*
 			 * If no Session originally existed AND this was not a login request, then we
@@ -112,31 +116,31 @@ public class CallProcessor {
 
 			if (ret instanceof ResponseBase) {
 				ResponseBase orb = (ResponseBase) ret;
-				if (orb != null) {
-					orb.setSuccess(false);
 
-					/* only set a message if one is not already set */
-					if (StringUtils.isEmpty(orb.getMessage())) {
-						/*
-						 * for now, we can just send back the actual exception message
-						 */
-						if (e.getMessage() != null) {
-							orb.setMessage("Request Failed: " + e.getMessage());
-						} else {
-							orb.setMessage("Request Failed.");
-						}
+				orb.setSuccess(false);
+				orb.setExceptionClass(e.getClass().getName());
+
+				/* only set a message if one is not already set */
+				if (StringUtils.isEmpty(orb.getMessage())) {
+					/*
+					 * for now, we can just send back the actual exception message
+					 */
+					if (e.getMessage() != null) {
+						orb.setMessage("Request Failed: " + e.getMessage());
+					} else {
+						orb.setMessage("Request Failed.");
 					}
-
-					orb.setStackTrace(ExceptionUtils.getStackTrace(e));
 				}
+
+				orb.setStackTrace(ExceptionUtils.getStackTrace(e));
 			}
 		} finally {
 			if (mutex != null) {
 				mutex.unlockEx();
 			}
 
-			//mutexCounter--;
-			//log.debug("Exit: mutexCounter: "+String.valueOf(mutexCounter));
+			// mutexCounter--;
+			// log.debug("Exit: mutexCounter: "+String.valueOf(mutexCounter));
 
 			/* cleanup this thread, servers reuse threads */
 			ThreadLocals.setMongoSession(null);

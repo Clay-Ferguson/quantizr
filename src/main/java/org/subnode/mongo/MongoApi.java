@@ -197,8 +197,6 @@ public class MongoApi {
 			// fullPath,
 			// privs));
 
-			log.trace("Checking Auth of: " + fullPath.toString());
-
 			SubNode tryNode = getNode(session, fullPath.toString(), false);
 			if (tryNode == null) {
 				throw new RuntimeException("Tree corrupt! path not found: " + fullPath.toString());
@@ -206,13 +204,11 @@ public class MongoApi {
 
 			// if this session user is the owner of this node, then they have full power
 			if (!session.isAnon() && session.getUserNode().getId().equals(tryNode.getOwner())) {
-				log.trace("Auth successful. Found node user OWNS.");
 				ret = true;
 				break;
 			}
 
 			if (nodeAuth(tryNode, sessionUserNodeId, privs)) {
-				log.trace("Auth successful.");
 				ret = true;
 				break;
 			}
@@ -355,7 +351,7 @@ public class MongoApi {
 		}
 	}
 
-	// todo-1: need to look into bulk-ops for doing this saveSession updating 
+	// todo-1: need to look into bulk-ops for doing this saveSession updating
 	// tips:
 	// https://stackoverflow.com/questions/26657055/spring-data-mongodb-and-bulk-update
 	// BulkOperations ops = template.bulkOps(BulkMode.UNORDERED, Match.class);
@@ -371,28 +367,39 @@ public class MongoApi {
 	 * written.
 	 */
 	public void saveSession(MongoSession session) {
-		if (session==null) return;
-		synchronized (session) {
-			if (!MongoThreadLocal.hasDirtyNodes()) {
-				return;
-			}
+		if (session == null || session.saving)
+			return;
 
-			/* We use 'nodes' list to avoid a concurrent modification excption in the loop below that deletes nodes, 
-			because each time we delete a node we remove it from the 'dirtyNodes' on the threadlocals */
-			List<SubNode> nodes = new LinkedList<SubNode>();
+		try {
+			//we check the saving flag to ensure we don't go into circular recursion here.
+			session.saving = true;
 
-			/*
-			 * check that we are allowed to write all, before we start writing any
-			 */
-			for (SubNode node : MongoThreadLocal.getDirtyNodes().values()) {
-				auth(session, node, PrivilegeType.WRITE);
-				nodes.add(node);
-			}
+			synchronized (session) {
+				if (!MongoThreadLocal.hasDirtyNodes()) {
+					return;
+				}
 
-			for (SubNode node : nodes) {
-				log.debug("Saving Dirty Node: " + node.getId().toHexString());
-				save(session, node, false);
+				/*
+				 * We use 'nodes' list to avoid a concurrent modification excption in the loop
+				 * below that deletes nodes, because each time we delete a node we remove it
+				 * from the 'dirtyNodes' on the threadlocals
+				 */
+				List<SubNode> nodes = new LinkedList<SubNode>();
+
+				/*
+				 * check that we are allowed to write all, before we start writing any
+				 */
+				for (SubNode node : MongoThreadLocal.getDirtyNodes().values()) {
+					auth(session, node, PrivilegeType.WRITE);
+					nodes.add(node);
+				}
+
+				for (SubNode node : nodes) {
+					save(session, node, false);
+				}
 			}
+		} finally {
+			session.saving = false;
 		}
 	}
 
@@ -624,12 +631,14 @@ public class MongoApi {
 
 		log.debug("Deleting under path: " + node.getPath());
 
-		/* we save the session to be sure there's no conflicting between what cached changes might be flagged as dirty
-		that might be about to be deleted.
-		
-		todo-1: potential optimization: just clear from the cache any nodes that have a path starting with 'node.getPath()', and
-		leave the rest in teh cache. But this will be rare that it has any performance impact.
-		*/
+		/*
+		 * we save the session to be sure there's no conflicting between what cached
+		 * changes might be flagged as dirty that might be about to be deleted.
+		 * 
+		 * todo-1: potential optimization: just clear from the cache any nodes that have
+		 * a path starting with 'node.getPath()', and leave the rest in teh cache. But
+		 * this will be rare that it has any performance impact.
+		 */
 		saveSession(session);
 		/*
 		 * First delete all the children of the node by using the path, knowing all
@@ -716,7 +725,7 @@ public class MongoApi {
 		// Criteria criteria = Criteria.where(SubNode.FIELD_ACL).ne(null);
 		// query.addCriteria(criteria);
 
-		//saveSession(session);
+		// saveSession(session);
 		// Iterable<SubNode> iter = ops.find(query, SubNode.class);
 
 		// iter.forEach((node) -> {
@@ -884,6 +893,7 @@ public class MongoApi {
 	public SubNode getNode(MongoSession session, ObjectId objId, boolean allowAuth) {
 		if (objId == null)
 			return null;
+
 		saveSession(session);
 		SubNode ret = ops.findById(objId, SubNode.class);
 		if (allowAuth) {

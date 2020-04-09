@@ -37,6 +37,7 @@ import org.subnode.response.SignupResponse;
 import org.subnode.util.Const;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
+import org.subnode.util.OutOfSpaceException;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
 import org.subnode.util.Validator;
@@ -233,7 +234,7 @@ public class UserManagerService {
 
 		Long userQuota = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
 		if (binTotal > userQuota) {
-			throw new RuntimeException("You are out of storage space.");
+			throw new OutOfSpaceException();
 		}
 
 		//log.debug("after binTotal=" + binTotal);

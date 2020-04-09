@@ -260,17 +260,18 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     if (dlg.sent) {
                         S.util.showMessage("Upload failed.");
                     }
-                    //todo-1: This can fail if the data is already saved and has a hash.
-                    //UPDATE: There was already an issue filed for this. need to doublecheck that the hash isn't actually being sent back
-                    //already and maybe I just wasning seeing it for some reason.
                 });
 
-                this.on("success", function (param1, param2, param3) {
+                this.on("success", function (param1, resp, param3) {
+                    if (!resp.succese && resp.exceptionClass && resp.exceptionClass.endsWith(".OutOfSpaceException")) {
+                        S.util.showMessage("Upload failed. You're out of storage space on the server. Consider uploading to IPFS using Temporal (https://temporal.cloud)");
+                        return;
+                    }
                     //console.log("Uploaded to Hash: " + ipfsHash);
 
                     //https://developer.mozilla.org/en-US/docs/Web/API/File
                     if (dlg.ipfsFile) {
-                        let ipfsHash = param2.response;
+                        let ipfsHash = resp.response;
 
                         S.props.setNodePropVal(J.NodeProp.IPFS_LINK, dlg.node, ipfsHash);
                         S.props.setNodePropVal(J.NodeProp.BIN_MIME, dlg.node, dlg.ipfsFile.type);

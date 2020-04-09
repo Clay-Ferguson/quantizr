@@ -457,6 +457,7 @@ export interface ResponseBase {
     success: boolean;
     message: string;
     stackTrace: string;
+    exceptionClass: string;
 }
 
 export interface NodeInfo {

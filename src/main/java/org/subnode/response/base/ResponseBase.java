@@ -6,6 +6,7 @@ public class ResponseBase {
 	private boolean success;
 	private String message;
 	private String stackTrace;
+	private String exceptionClass;
 
 	public ResponseBase() {
 		ThreadLocals.setResponse(this);
@@ -33,5 +34,13 @@ public class ResponseBase {
 
 	public void setStackTrace(String stackTrace) {
 		this.stackTrace = stackTrace;
+	}
+
+	public String getExceptionClass() {
+		return exceptionClass;
+	}
+
+	public void setExceptionClass(String exceptionClass) {
+		this.exceptionClass = exceptionClass;
 	}
 }

@@ -32,7 +32,6 @@ import org.subnode.image.ImageUtil;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
@@ -47,6 +46,7 @@ import org.subnode.util.LimitedInputStream;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.MimeTypeUtils;
 import org.subnode.util.MultipartFileSender;
+import org.subnode.util.RuntimeEx;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
@@ -171,9 +171,11 @@ public class AttachmentService {
 				}
 			}
 			api.saveSession(session);
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} 
+		catch (Exception e) {
+			//I need a universl pattern for this kind of handling everywhere in the code. todo-0
+			if (e instanceof RuntimeEx) throw (RuntimeEx)e;
+			throw new RuntimeEx(e);
 		}
 
 		return new ResponseEntity<>(HttpStatus.OK);

@@ -180,9 +180,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void onAfterConvert(AfterConvertEvent<SubNode> event) {
 		//Document dbObj = event.getDocument();
 		//ObjectId id = dbObj.getObjectId(SubNode.FIELD_ID);
-		if (MongoThreadLocal.getDirtyNodes().size() > 0) {
-			throw new RuntimeException("dirty read.");
-		}
 	}
 
 	// @Override
