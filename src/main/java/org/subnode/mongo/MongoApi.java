@@ -22,6 +22,7 @@ import org.subnode.mongo.model.AccessControl;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodeTypes;
+import org.subnode.service.AttachmentService;
 import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
@@ -78,6 +79,9 @@ public class MongoApi {
 
 	@Autowired
 	private SessionContext sessionContext;
+
+	@Autowired
+	private AttachmentService attachmentService;
 
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
@@ -319,82 +323,11 @@ public class MongoApi {
 	// node.setPath(newPathPrefix);
 	// }
 
-	// Basically renames all nodes that don't start with '/r/d/' to start with that.
-	// Work in progress. Not yet functional.
-
-	public void softDelete(MongoSession session, SubNode node) {
-		auth(session, node, PrivilegeType.WRITE);
-
-		SubNode trashNode = getSpecialNode(session, null, null, NodeName.TRASH, "### Trash");
-		if (trashNode == null) {
-			throw new RuntimeException("Unable to access trash node.");
-		}
-
-		log.debug("Soft Deleting node: " + node.getId().toHexString());
-
-		/*
-		 * change all paths of all children (recursively) to start with the new path
-		 * 
-		 * Note this for loop runs BEFORE the code below, because we need to run it
-		 * BEFORE we alter the path on the node object in memory.
-		 */
-		for (SubNode n : getSubGraph(session, node)) {
-			String newPath = convertPathToGarbageBin(n.getPath());
-			if (newPath != null) {
-				n.setPath(newPath);
-				n.setDisableParentCheck(true);
-			}
-		}
-
-		String newPath = convertPathToGarbageBin(node.getPath());
-		if (newPath != null) {
-			node.setPath(newPath);
-			node.setDisableParentCheck(true);
-		}
-	}
-
-	public String convertPathToGarbageBin(String path) {
-		StringTokenizer t = new StringTokenizer(path, "/", false);
-		boolean rFound = false, usrFound = false, usrNodeFound = false, morePaths = false;
-		StringBuilder sb = new StringBuilder();
-
-		while (t.hasMoreTokens()) {
-			String tok = t.nextToken().trim();
-			// todo-0: use constants for r and usr
-			if (tok.equals("r")) {
-				rFound = true;
-				if (t.hasMoreTokens()) {
-					String usr = t.nextToken().trim();
-					if (usr.equals("usr")) {
-						usrFound = true;
-						if (t.hasMoreTokens()) {
-							String usrNode = t.nextToken().trim();
-							usrNodeFound = true;
-							sb.append("/r/usr/");
-							sb.append(usrNode);
-							sb.append("/d");
-							continue;
-						}
-					}
-				}
-			}
-
-			if (!rFound || !usrFound || !usrNodeFound) {
-				return null;
-			}
-
-			morePaths = true;
-			sb.append("/");
-			sb.append(tok);
-		}
-
-		// more paths is to indicate we aren't just AT the user node itself, but inside
-		// user node.
-		if (!morePaths) {
-			return null;
-		}
-
-		return sb.toString();
+	// todo-0: final work on soft deletes: Say to user on front end "Move Node to
+	// Trash" or "Permanently Delete Node" based on '/d/' in path.
+	public void deleteNode(MongoSession session, SubNode node) {
+		attachmentService.deleteBinary(session, node);
+		delete(session, node);
 	}
 
 	// todo-1: need to look into bulk-ops for doing this saveSession updating

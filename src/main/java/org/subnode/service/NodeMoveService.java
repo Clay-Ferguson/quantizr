@@ -2,6 +2,7 @@ package org.subnode.service;
 
 import java.util.List;
 
+import org.subnode.config.NodeName;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -126,14 +127,35 @@ public class NodeMoveService {
 
 	/*
 	 * Deletes the set of nodes specified in the request
+	 * 
+	 * todo-0: make an option for end user to click 'permanent delete' from teh menu
+	 * an pass a flag in to hard delete.
 	 */
 	public DeleteNodesResponse deleteNodes(MongoSession session, DeleteNodesRequest req) {
+
+		// sample the first node to see if this is a garbage bin delete or not
+		SubNode firstNode = api.getNode(session, req.getNodeIds().get(0));
+		if (firstNode.getPath().contains("/d/")) {
+			return hardDeleteNodes(session, req);
+		} else {
+			DeleteNodesResponse res = new DeleteNodesResponse();
+			if (session == null) {
+				session = ThreadLocals.getMongoSession();
+			}
+			SubNode trashNode = api.getSpecialNode(session, session.getUser(), null, NodeName.TRASH, "### Trash");
+			moveNodesInternal(session, "inside", trashNode.getId().toHexString(), req.getNodeIds());
+			res.setSuccess(true);
+			return res;
+		}
+	}
+
+	private DeleteNodesResponse hardDeleteNodes(MongoSession session, DeleteNodesRequest req) {
 		DeleteNodesResponse res = new DeleteNodesResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		SubNode userNode = api.getUserNodeByUserName(null, null); // adminSession, userName);
+		SubNode userNode = api.getUserNodeByUserName(null, null);
 		if (userNode == null) {
 			throw new RuntimeException("User not found.");
 		}
@@ -147,31 +169,12 @@ public class NodeMoveService {
 				userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
 			}
 
-			deleteNode(session, node);
+			api.deleteNode(session, node);
 		}
 
 		api.saveSession(session);
 		res.setSuccess(true);
 		return res;
-	}
-
-	// todo-0: What's the state of node 'transfer'. this logic to put something in the trash could easily be 
-	// altered to transfer a branch into some other person's account (minus the part about setting the owner on all the nodes)
-	//
-	// todo-0: final work on soft deletes: Say to user on front end "Move Node to Trash" or "Permanently Delete Node" based on '/d/' in path.
-	// todo-0: need to think thru the 'orphan' node (i.e. per paths) aspect of restoring nodes. The 'restore node' should just show an error
-	// if the immediate parent doesn't exist (as non-deleted), but use can still 'move' the node out of the trash
-	private void deleteNode(MongoSession session, SubNode node) {
-		/* If user is deletig a node that we can tell is already in the trash do a permanent hard delete of it */
-		if (node.getPath().contains("/d/")) {
-			attachmentService.deleteBinary(session, node);
-			api.delete(session, node);
-		} 
-		/* Otherwise this node is not in the trash so softDelete it to make it go into the trash */
-		else {
-			api.softDelete(session, node);
-		}
-		api.saveSession(session);
 	}
 
 	/*
@@ -184,7 +187,8 @@ public class NodeMoveService {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		moveNodesInternal(session, req, res);
+		moveNodesInternal(session, req.getLocation(), req.getTargetNodeId(), req.getNodeIds());
+		res.setSuccess(true);
 		return res;
 	}
 
@@ -195,13 +199,12 @@ public class NodeMoveService {
 	 * inserted nodes will be pasted in directly below that ordinal (i.e. new
 	 * siblings posted in below it)
 	 */
-	private void moveNodesInternal(MongoSession session, MoveNodesRequest req, MoveNodesResponse res) {
+	private void moveNodesInternal(MongoSession session, String location, String targetId, List<String> nodeIds) {
 
-		String targetId = req.getTargetNodeId();
 		// log.debug("moveNodesInternal: targetId=" + targetId);
 		SubNode targetNode = api.getNode(session, targetId);
 
-		SubNode parentToPasteInto = req.getLocation().equalsIgnoreCase("inside") ? targetNode
+		SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode
 				: api.getParent(session, targetNode);
 
 		api.authRequireOwnerOfNode(session, parentToPasteInto);
@@ -210,42 +213,38 @@ public class NodeMoveService {
 		Long curTargetOrdinal = null;
 
 		// location==inside
-		if (req.getLocation().equalsIgnoreCase("inside")) {
+		if (location.equalsIgnoreCase("inside")) {
 			curTargetOrdinal = targetNode.getMaxChildOrdinal() == null ? 0 : targetNode.getMaxChildOrdinal();
 		}
 		// location==inline
 		else {
 			curTargetOrdinal = targetNode.getOrdinal() + 1;
-			api.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, req.getNodeIds().size());
+			api.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, nodeIds.size());
 		}
 
-		for (String nodeId : req.getNodeIds()) {
+		for (String nodeId : nodeIds) {
 			// log.debug("Moving ID: " + nodeId);
-			try {
-				SubNode node = api.getNode(session, nodeId);
-				api.authRequireOwnerOfNode(session, node);
-				SubNode nodeParent = api.getParent(session, node);
 
-				/*
-				 * If this 'node' will be changing parents (moving to new parent) we need to
-				 * update its subgraph, of all children and also update its own path, otherwise
-				 * it's staying under same parent and only it's ordinal will change.
-				 */
-				if (nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
-					changePathOfSubGraph(session, node, parentPath);
-					node.setPath(parentPath + "/" + node.getLastPathPart());
-				}
+			SubNode node = api.getNode(session, nodeId);
+			api.authRequireOwnerOfNode(session, node);
+			SubNode nodeParent = api.getParent(session, node);
 
-				node.setOrdinal(curTargetOrdinal);
-				node.setDisableParentCheck(true);
-
-				curTargetOrdinal++;
-			} catch (Exception e) {
-				// silently ignore if node cannot be found.
+			/*
+			 * If this 'node' will be changing parents (moving to new parent) we need to
+			 * update its subgraph, of all children and also update its own path, otherwise
+			 * it's staying under same parent and only it's ordinal will change.
+			 */
+			if (nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
+				changePathOfSubGraph(session, node, parentPath);
+				node.setPath(parentPath + "/" + node.getLastPathPart());
 			}
+
+			node.setOrdinal(curTargetOrdinal);
+			node.setDisableParentCheck(true);
+
+			curTargetOrdinal++;
 		}
 		api.saveSession(session);
-		res.setSuccess(true);
 	}
 
 	private void changePathOfSubGraph(MongoSession session, SubNode graphRoot, String newPathPrefix) {
