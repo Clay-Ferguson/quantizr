@@ -132,7 +132,9 @@ public class NodeMoveService {
 
 		// sample the first node to see if this is a garbage bin delete or not
 		SubNode firstNode = api.getNode(session, req.getNodeIds().get(0));
-		if (req.isHardDelete() || firstNode.getPath().contains("/d/")) {
+
+		//Note: the 'endsWith("/d")' condition is checking if this is the actual trash node itself being deleted
+		if (req.isHardDelete() || firstNode.getPath().contains("/d/") || firstNode.getPath().endsWith("/d")) {
 			return hardDeleteNodes(session, req);
 		} else {
 			DeleteNodesResponse res = new DeleteNodesResponse();
