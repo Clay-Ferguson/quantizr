@@ -321,34 +321,80 @@ public class MongoApi {
 
 	// Basically renames all nodes that don't start with '/r/d/' to start with that.
 	// Work in progress. Not yet functional.
+
 	public void softDelete(MongoSession session, SubNode node) {
 		auth(session, node, PrivilegeType.WRITE);
 
-		log.debug(
-				"Soft Deleting node: " + node.getId().toHexString() + " New Path: /r/d/" + node.getPath().substring(3));
+		SubNode trashNode = getSpecialNode(session, null, null, NodeName.TRASH, "### Trash");
+		if (trashNode == null) {
+			throw new RuntimeException("Unable to access trash node.");
+		}
 
-		String npath = node.getPath();
-		// log.debug("DEL PATH?" + npath.substring(3));
-		if (!npath.startsWith("/r/d/")) {
-			if (npath.startsWith("/r/")) {
-				// log.debug("New Path: /r/d/" + npath.substring(3));
-				node.setPath("/r/d/" + npath.substring(3));
-				node.setDisableParentCheck(true);
+		log.debug("Soft Deleting node: " + node.getId().toHexString());
+
+		/*
+		 * change all paths of all children (recursively) to start with the new path
+		 * 
+		 * Note this for loop runs BEFORE the code below, because we need to run it
+		 * BEFORE we alter the path on the node object in memory.
+		 */
+		for (SubNode n : getSubGraph(session, node)) {
+			String newPath = convertPathToGarbageBin(n.getPath());
+			if (newPath != null) {
+				n.setPath(newPath);
+				n.setDisableParentCheck(true);
 			}
 		}
 
-		// change all paths of all children (recursively) to start with the new path
-		for (SubNode n : getSubGraph(session, node)) {
-			String path = n.getPath();
-			// log.debug("DEL PATH?" + path.substring(3));
-			if (!path.startsWith("/r/d/")) {
-				if (path.startsWith("/r/")) {
-					// log.debug("New Path: /r/d/" + path.substring(3));
-					n.setPath("/r/d/" + path.substring(3));
-					n.setDisableParentCheck(true);
+		String newPath = convertPathToGarbageBin(node.getPath());
+		if (newPath != null) {
+			node.setPath(newPath);
+			node.setDisableParentCheck(true);
+		}
+	}
+
+	public String convertPathToGarbageBin(String path) {
+		StringTokenizer t = new StringTokenizer(path, "/", false);
+		boolean rFound = false, usrFound = false, usrNodeFound = false, morePaths = false;
+		StringBuilder sb = new StringBuilder();
+
+		while (t.hasMoreTokens()) {
+			String tok = t.nextToken().trim();
+			// todo-0: use constants for r and usr
+			if (tok.equals("r")) {
+				rFound = true;
+				if (t.hasMoreTokens()) {
+					String usr = t.nextToken().trim();
+					if (usr.equals("usr")) {
+						usrFound = true;
+						if (t.hasMoreTokens()) {
+							String usrNode = t.nextToken().trim();
+							usrNodeFound = true;
+							sb.append("/r/usr/");
+							sb.append(usrNode);
+							sb.append("/d");
+							continue;
+						}
+					}
 				}
 			}
+
+			if (!rFound || !usrFound || !usrNodeFound) {
+				return null;
+			}
+
+			morePaths = true;
+			sb.append("/");
+			sb.append(tok);
 		}
+
+		// more paths is to indicate we aren't just AT the user node itself, but inside
+		// user node.
+		if (!morePaths) {
+			return null;
+		}
+
+		return sb.toString();
 	}
 
 	// todo-1: need to look into bulk-ops for doing this saveSession updating
@@ -371,7 +417,7 @@ public class MongoApi {
 			return;
 
 		try {
-			//we check the saving flag to ensure we don't go into circular recursion here.
+			// we check the saving flag to ensure we don't go into circular recursion here.
 			session.saving = true;
 
 			synchronized (session) {
@@ -1428,15 +1474,15 @@ public class MongoApi {
 			throw new RuntimeException("userNode not found.");
 		}
 
-		String inboxPath = userNode.getPath() + "/" + pathPart;
-		SubNode inboxNode = getNode(session, inboxPath);
-		if (inboxNode == null) {
-			inboxNode = createNode(session, userNode, pathPart, SubNodeTypes.UNSTRUCTURED, 0L, CreateNodeLocation.LAST);
-			inboxNode.setOwner(userNode.getId());
-			inboxNode.setContent(nodeName);
-			save(session, inboxNode);
+		String path = userNode.getPath() + "/" + pathPart;
+		SubNode node = getNode(session, path);
+		if (node == null) {
+			node = createNode(session, userNode, pathPart, SubNodeTypes.UNSTRUCTURED, 0L, CreateNodeLocation.LAST);
+			node.setOwner(userNode.getId());
+			node.setContent(nodeName);
+			save(session, node);
 		}
-		return inboxNode;
+		return node;
 	}
 
 	public SubNode getUserNodeByUserName(MongoSession session, String user) {
@@ -1551,8 +1597,6 @@ public class MongoApi {
 			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.OUTBOX, "System Email Outbox", null, true,
 					null, null);
 		}
-
-		apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, "d", "Garbage Bin", null, true, null, null);
 
 		createPublicNodes(session);
 	}

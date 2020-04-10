@@ -11,6 +11,7 @@ public class NodeName {
 	public static final String INBOX = "inbox";
 	public static final String NOTES = "notes";
 	public static final String LINKS = "links";	
+	public static final String TRASH = "d";
 
 	public static final String PUBLIC = "public";
 

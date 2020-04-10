@@ -151,20 +151,27 @@ public class NodeMoveService {
 		}
 
 		api.saveSession(session);
-
 		res.setSuccess(true);
 		return res;
 	}
 
+	// todo-0: What's the state of node 'transfer'. this logic to put something in the trash could easily be 
+	// altered to transfer a branch into some other person's account (minus the part about setting the owner on all the nodes)
+	//
+	// todo-0: final work on soft deletes: Say to user on front end "Move Node to Trash" or "Permanently Delete Node" based on '/d/' in path.
+	// todo-0: need to think thru the 'orphan' node (i.e. per paths) aspect of restoring nodes. The 'restore node' should just show an error
+	// if the immediate parent doesn't exist (as non-deleted), but use can still 'move' the node out of the trash
 	private void deleteNode(MongoSession session, SubNode node) {
-		// switching to soft-deletes, below, eventually
-		attachmentService.deleteBinary(session, node);
-		api.delete(session, node);
-
-		// todo-1: I started working on 'soft-delete', but never finished. However I
-		// think most of the code is done (just untested)
-		// api.softDelete(session, node);
-		// api.saveSession(session);
+		/* If user is deletig a node that we can tell is already in the trash do a permanent hard delete of it */
+		if (node.getPath().contains("/d/")) {
+			attachmentService.deleteBinary(session, node);
+			api.delete(session, node);
+		} 
+		/* Otherwise this node is not in the trash so softDelete it to make it go into the trash */
+		else {
+			api.softDelete(session, node);
+		}
+		api.saveSession(session);
 	}
 
 	/*
