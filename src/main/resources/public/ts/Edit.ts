@@ -466,7 +466,7 @@ export class Edit implements EditIntf {
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
      * has currenly selected (via checkboxes)
      */
-    deleteSelNodes = (selNodesArray: string[]): void => {
+    deleteSelNodes = (selNodesArray: string[], hardDelete: boolean): void => {
         selNodesArray = selNodesArray || S.meta64.getSelectedNodeIdsArray();
 
         if (!selNodesArray || selNodesArray.length == 0) {
@@ -479,7 +479,8 @@ export class Edit implements EditIntf {
                 let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode();
 
                 S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
-                    "nodeIds": selNodesArray
+                    nodeIds: selNodesArray,
+                    hardDelete
                 }, (res: J.DeleteNodesResponse) => {
                     this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode });
                 });

@@ -127,15 +127,12 @@ public class NodeMoveService {
 
 	/*
 	 * Deletes the set of nodes specified in the request
-	 * 
-	 * todo-0: make an option for end user to click 'permanent delete' from teh menu
-	 * an pass a flag in to hard delete.
 	 */
 	public DeleteNodesResponse deleteNodes(MongoSession session, DeleteNodesRequest req) {
 
 		// sample the first node to see if this is a garbage bin delete or not
 		SubNode firstNode = api.getNode(session, req.getNodeIds().get(0));
-		if (firstNode.getPath().contains("/d/")) {
+		if (req.isHardDelete() || firstNode.getPath().contains("/d/")) {
 			return hardDeleteNodes(session, req);
 		} else {
 			DeleteNodesResponse res = new DeleteNodesResponse();
