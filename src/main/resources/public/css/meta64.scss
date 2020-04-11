@@ -1,6 +1,8 @@
 
 @import "variables.scss";
 
+$rootNodeBorder: true;
+
 $border-radius: .3rem;
 $borderRadiusLarge: 1em;
 $borderRadiusMedium: .6em;
@@ -223,6 +225,10 @@ strong em {
     padding: 5px;
 }
 
+.navbar-brand {
+    margin-left: $smallGap;
+}
+
 .nav-tabs {
     border: none;
 }
@@ -379,13 +385,6 @@ input[type="radio"] {
     background-color: $secondary;
 }
 
-//warning: this is altering a bootstrap style.
-.btn-group {
-    // margin-left: 10px;
-    // margin-top: 10px;
-    margin-right: $smallGap;
-}
-
 .small-padding {
     margin-top: 7px;
     padding: 4px;
@@ -438,6 +437,36 @@ input[type="radio"] {
     margin-top: 1em;
 }
 
+// These borders make the hash-created titles (like '### Title') look really attractive, but it looks ugly 
+// when there's a single line title in the root node which itself has a border (and must for clarity as the root node)
+// so for now let's now do these unless/until we find a better way to indicate to user clearly that the root node
+// is a very special one relative to the page.
+//
+// .markdown-content h1 {
+//     border-bottom: 4px solid $gray-700;
+// }
+
+// .markdown-content h2 {
+//     border-bottom: 3px solid $gray-700;
+// }
+
+// .markdown-content h3 {
+//     border-bottom: 2px solid $gray-700;
+// }
+
+// .markdown-content h4 {
+//     border-bottom: 1px solid $gray-700;
+// }
+
+// .markdown-content h5 {
+//     // border-bottom: 1px solid $gray-700;
+// }
+
+// .markdown-content h6 {
+//     // border-bottom: 1px solid $gray-700;
+// }
+
+
 .markdown-content .code, //todo-0: is this a typeo ".code" v.s. "code"
 .markdown-content kbd,
 .markdown-content pre,
@@ -463,13 +492,10 @@ input[type="radio"] {
 
 .attached-img {
     cursor: pointer;
-    margin-left: 15px;
-    margin-bottom: 15px;
-
-    /* be careful with these margins. Be sure to retest a 'top-of-page' node when you alter these */
-    margin-right: 15px;
-    padding-right: 15px;
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
     border-radius: .6em;
+    border: 1px solid $gray-700
 }
 
 .meta64-input {
@@ -563,8 +589,15 @@ which it will do by default. */
 
 .mainNodeContentStyle {
     outline: none;
-    border: $mediumBorderSize solid $nodeBorderBottomColor;
-    border-radius: $borderRadiusLarge;
+
+    @if $rootNodeBorder {
+        border: $mediumBorderSize solid $nodeBorderBottomColor; 
+        border-radius: $borderRadiusLarge; 
+    } 
+    @else {
+        border-left: $fatBorderSize solid $nodeBorderBottomColor; 
+    }
+    
     padding-right: 1em;
 }
 
@@ -643,10 +676,14 @@ which it will do by default. */
 
 .node-table-row {
     position: relative;
-    border-bottom: 2px dotted lightslategray;
     padding-right: 1em;
     outline: none;
 }
+
+.editing-border {
+    border-bottom: 2px dotted lightslategray;
+}
+
 
 /*
 With "Display: table", the only way to get the internal 'node-grid-item' cell content to render with the SAME
@@ -703,11 +740,21 @@ i'm backing out for now
 }
 
 .active-row-main {
-    border: $mediumBorderSize solid $primary;
+    @if $rootNodeBorder {
+        border: $mediumBorderSize solid $primary;
+    } 
+    @else {
+        border-left: $fatBorderSize solid $primary; 
+    }
 }
 
 .inactive-row-main {
-    border: $mediumBorderSize solid $nodeBorderBottomColor;
+    @if $rootNodeBorder {
+        border: $mediumBorderSize solid $nodeBorderBottomColor; 
+    }
+    @else {
+        border-left: $fatBorderSize solid $nodeBorderBottomColor; 
+    }
 }
 
 .main {

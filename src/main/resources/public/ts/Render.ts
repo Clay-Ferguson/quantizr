@@ -19,6 +19,7 @@ import { MarkdownDiv } from "./widget/MarkdownDiv";
 import { HorizontalLayout } from "./widget/HorizontalLayout";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { VideoPlayerDlg } from "./dlg/VideoPlayerDlg";
+import { NavBarIconButton } from "./widget/NavBarIconButton";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -732,11 +733,32 @@ export class Render implements RenderIntf {
                         //todo-1: lots of these buttons are replicated in both the 'page root node' and 'child node' renderings
                         //and to i need to consolidate it into a component?
                         let buttonBar: ButtonBar = null;
+                        let navButtonBar: ButtonBar = null;
                         let editNodeButton: Button = null;
                         let createSubNodeButton: Button = null;
                         let replyButton: Button = null;
                         let pasteInsideButton: Button = null;
                         let pasteInlineButton: Button = null;
+                        let upLevelButton: NavBarIconButton = null;
+                        let prevButton: NavBarIconButton = null;
+                        let nextButton: NavBarIconButton = null;
+
+                        if (S.nav.parentVisibleToUser()) {
+                            upLevelButton = new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
+                                "onClick": e => { S.nav.navUpLevel(); },
+                                "title": "Go to Parent SubNode"
+                            }, null, null, "");
+                        }
+
+                        prevButton = new NavBarIconButton("fa-chevron-circle-left", null, {
+                            "onClick": e => { S.nav.navToSibling(-1); },
+                            "title": "Go to Previous SubNode"
+                        }, null, null, "");
+
+                        nextButton = new NavBarIconButton("fa-chevron-circle-right", null, {
+                            "onClick": e => { S.nav.navToSibling(1); },
+                            "title": "Go to Next SubNode"
+                        }, null, null, "");
 
                         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(data.node.type);
                         var insertAllowed = true;
@@ -811,14 +833,19 @@ export class Render implements RenderIntf {
                             avatarImg = this.makeAvatarImage(data.node);
                         }
 
-                        if (typeIcon || encIcon || sharedIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton) {
+                        if (upLevelButton || prevButton || nextButton) {
+                            navButtonBar = new ButtonBar([upLevelButton, prevButton, nextButton],
+                                null, "float-right marginLeft marginTop");
+                        }
+
+                        if (typeIcon || encIcon || sharedIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton || upLevelButton) {
                             buttonBar = new ButtonBar([typeIcon, encIcon, sharedIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
                                 null, "marginLeft marginTop");
                         }
 
                         let children = [];
                         if (buttonBar) {
-                            children.push(new HorizontalLayout([avatarImg, buttonBar]));
+                            children.push(new HorizontalLayout([avatarImg, buttonBar, navButtonBar]));
                         }
                         else {
                             children.push(avatarImg);
@@ -1029,6 +1056,10 @@ export class Render implements RenderIntf {
 
     renderVerticalLayout = (node: J.NodeInfo, newData: boolean, level: number): Comp => {
         let layoutClass = "node-table-row";
+        if (S.meta64.userPreferences.editMode) {
+            layoutClass += " editing-border";
+        }
+
         let childCount: number = node.children.length;
         let rowCount: number = 0;
 
@@ -1138,9 +1169,9 @@ export class Render implements RenderIntf {
             normalWidth = "";
         }
         else {
-            style.maxWidth = imgSize + "%";
-            style.width = imgSize + "%";
-            normalWidth = imgSize + "%";
+            style.maxWidth = "calc(" + imgSize + "% - 12px)";
+            style.width = "calc(" + imgSize + "% - 12px)";
+            normalWidth = "calc(" + imgSize + "% - 12px)";
         }
 
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
@@ -1158,8 +1189,8 @@ export class Render implements RenderIntf {
                     elm.style.width = "";
                 }
                 else {
-                    elm.style.maxWidth = normalWidth || "100%";
-                    elm.style.width = normalWidth || "100%";
+                    elm.style.maxWidth = normalWidth || "100% - 12px";
+                    elm.style.width = normalWidth || "100% - 12px";
                 }
             });
         });

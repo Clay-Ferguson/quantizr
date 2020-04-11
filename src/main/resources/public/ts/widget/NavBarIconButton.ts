@@ -1,5 +1,5 @@
 import { Comp } from "./base/Comp";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { ReactNode } from "react";
@@ -11,10 +11,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class NavBarIconButton extends Comp {
 
-    constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private _isEnabledFunc: Function = null, private _isVisibleFunc: Function = null) {
+    constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private _isEnabledFunc: Function = null, private _isVisibleFunc: Function = null, private specialClasses: string = "nav-link" /* small-margin-right */) {
         super(attribs);
         this.attribs.type = "button";
-        this.attribs.className = "btn nav-link align-middle btn-primary small-margin-right";
+        this.attribs.className = "btn " + specialClasses + " align-middle btn-primary";
         this.setIsEnabledFunc(_isEnabledFunc);
         this.setIsVisibleFunc(_isVisibleFunc);
     }

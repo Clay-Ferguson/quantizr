@@ -27,20 +27,6 @@ export class MainNavPanel extends NavTag {
 
         let buttons = [];
 
-        buttons.push(new Li(null, {
-            className: "nav-item"
-        }, [
-            new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
-                "onClick": e => { S.nav.navUpLevel(); },
-                "title": "Go to Parent SubNode"
-            },
-                //isEnabled func
-                () => { return S.meta64.currentNodeData && S.meta64.currentNodeData.node && S.nav.parentVisibleToUser(); },
-                //isVisible func
-                () => { return S.meta64.currentNodeData && S.meta64.currentNodeData.node && S.nav.parentVisibleToUser(); }
-            )
-        ]));
-
         /* Feature to read from clipboard might scare some users (as it should) so I'm turning this on only for admins
         until we have a more specific User Preference allowing users to have to opt-in (not opt-out) to use this feature 
         */
@@ -59,34 +45,6 @@ export class MainNavPanel extends NavTag {
         ]));
 
         if (!S.meta64.isMobile) {
-            buttons.push(new Li(null, {
-                className: "nav-item"
-            }, [
-                new NavBarIconButton("fa-chevron-circle-left", null, {
-                    "onClick": e => { S.nav.navToSibling(-1); },
-                    "title": "Go to Previous SubNode"
-                },
-                    //isEnabled func
-                    () => { return true; },
-                    //isVisible func
-                    () => { return true; }
-                )
-            ]));
-
-            buttons.push(new Li(null, {
-                className: "nav-item"
-            }, [
-                new NavBarIconButton("fa-chevron-circle-right", null, {
-                    "onClick": e => { S.nav.navToSibling(1); },
-                    "title": "Go to Next SubNode"
-                },
-                    //isEnabled func
-                    () => { return true; },
-                    //isVisible func
-                    () => { return true; }
-                )
-            ]));
-
             buttons.push(new Li(null, {
                 className: "nav-item"
             }, [

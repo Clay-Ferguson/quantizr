@@ -142,8 +142,13 @@ export class Search implements SearchIntf {
 
         let content: Comp[] = S.render.renderNodeContent(node, true, true);
 
+        let clazz = "node-table-row";
+        if (S.meta64.userPreferences.editMode) {
+            clazz += " editing-border";
+        }
+
         return new Div(null, {
-            className: "node-table-row inactive-row",
+            className: clazz + " inactive-row",
             onClick: (elm: HTMLElement) => {
                 S.srch.clickOnSearchResultRow(node.id);
             }, //

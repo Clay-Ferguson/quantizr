@@ -44,6 +44,7 @@ export interface DeleteAttachmentRequest extends RequestBase {
 
 export interface DeleteNodesRequest extends RequestBase {
     nodeIds: string[];
+    hardDelete: boolean;
 }
 
 export interface DeletePropertyRequest extends RequestBase {
