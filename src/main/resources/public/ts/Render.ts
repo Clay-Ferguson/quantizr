@@ -835,7 +835,7 @@ export class Render implements RenderIntf {
 
                         if (upLevelButton || prevButton || nextButton) {
                             navButtonBar = new ButtonBar([upLevelButton, prevButton, nextButton],
-                                null, "float-right marginLeft marginTop");
+                                null, "float-right marginTop marginBottom");
                         }
 
                         if (typeIcon || encIcon || sharedIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton || upLevelButton) {
@@ -1058,6 +1058,9 @@ export class Render implements RenderIntf {
         let layoutClass = "node-table-row";
         if (S.meta64.userPreferences.editMode) {
             layoutClass += " editing-border";
+        } 
+        else {
+            layoutClass += " non-editing-border"
         }
 
         let childCount: number = node.children.length;

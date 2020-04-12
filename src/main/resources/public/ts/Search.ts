@@ -146,6 +146,9 @@ export class Search implements SearchIntf {
         if (S.meta64.userPreferences.editMode) {
             clazz += " editing-border";
         }
+        else {
+            clazz += " non-editing-border"
+        }
 
         return new Div(null, {
             className: clazz + " inactive-row",

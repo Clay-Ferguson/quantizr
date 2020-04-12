@@ -681,7 +681,11 @@ which it will do by default. */
 }
 
 .editing-border {
-    border-bottom: 2px dotted lightslategray;
+    border-bottom: 3px dotted lightslategray;
+}
+
+.non-editing-border {
+    border-bottom: 1px dotted lightslategray;
 }
 
 
