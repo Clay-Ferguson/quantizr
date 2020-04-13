@@ -31,7 +31,7 @@ export class RssTypeHandler implements TypeHandlerIntf {
     //XML Retrieve URL - https://cors.now.sh/https://example.com/rss-xml-link
 
     //todo-1: can we remove this now?
-    //CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+    CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
     getTypeName = (): string => {
         return "sn:rssfeed";
@@ -88,12 +88,13 @@ export class RssTypeHandler implements TypeHandlerIntf {
         }
         //otherwise read from the internet
         else {
+
             let pgrsDlg = new ProgressDlg();
             pgrsDlg.open();
 
             //todo-1: to avoid performance issues i'll just allow only 100 items to load for now but this
             //should be somehow controlled by the user (they may want to wait for the full list)
-            parser.parseURL(/*this.CORS_PROXY +*/ feedSrc, (err, feed) => {
+            parser.parseURL(this.CORS_PROXY + feedSrc, (err, feed) => {
                 pgrsDlg.close();
                 if (!feed) {
                     if (err.message) {

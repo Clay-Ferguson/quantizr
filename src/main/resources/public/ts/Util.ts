@@ -573,7 +573,7 @@ export class Util implements UtilIntf {
     }
 
     flashMessage = (message: string, preformatted: boolean = false, sizeStyle: string = null): void => {
-        new MessageDlg(message, "Message", null, null, preformatted, 2500).open();
+        new MessageDlg(message, "Message", null, null, preformatted, 3500).open();
     }
 
     showMessage = (message: string, preformatted: boolean = false, sizeStyle: string = null): void => {

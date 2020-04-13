@@ -588,6 +588,14 @@ export class Edit implements EditIntf {
     saveClipboardToNode = (): void => {
         (navigator as any).clipboard.readText().then(
             clipText => {
+                if (clipText) {
+                    clipText = clipText.trim();
+                }
+                if (!clipText) {
+                    S.util.flashMessage("Nothing saved clipboard is empty!", true);
+                    return;
+                }
+
                 S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     "nodeId": "~notes",
                     "newNodeName": "",

@@ -25,6 +25,7 @@ export interface NavIntf {
     openContentNode(nodePathOrId: string): void;
     geoLocation(): void;
     displayingHome(): boolean;
+    displayingRepositoryRoot(): boolean;
     parentVisibleToUser(): boolean;
     upLevelResponse(res: J.RenderNodeResponse, id): void;
     navUpLevel(): void;

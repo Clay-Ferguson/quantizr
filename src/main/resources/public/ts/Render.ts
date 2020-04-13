@@ -750,15 +750,17 @@ export class Render implements RenderIntf {
                             }, null, null, "");
                         }
 
-                        prevButton = new NavBarIconButton("fa-chevron-circle-left", null, {
-                            "onClick": e => { S.nav.navToSibling(-1); },
-                            "title": "Go to Previous SubNode"
-                        }, null, null, "");
+                        if (!S.nav.displayingRepositoryRoot()) {
+                            prevButton = new NavBarIconButton("fa-chevron-circle-left", null, {
+                                "onClick": e => { S.nav.navToSibling(-1); },
+                                "title": "Go to Previous SubNode"
+                            }, null, null, "");
 
-                        nextButton = new NavBarIconButton("fa-chevron-circle-right", null, {
-                            "onClick": e => { S.nav.navToSibling(1); },
-                            "title": "Go to Next SubNode"
-                        }, null, null, "");
+                            nextButton = new NavBarIconButton("fa-chevron-circle-right", null, {
+                                "onClick": e => { S.nav.navToSibling(1); },
+                                "title": "Go to Next SubNode"
+                            }, null, null, "");
+                        }
 
                         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(data.node.type);
                         var insertAllowed = true;
@@ -1058,7 +1060,7 @@ export class Render implements RenderIntf {
         let layoutClass = "node-table-row";
         if (S.meta64.userPreferences.editMode) {
             layoutClass += " editing-border";
-        } 
+        }
         else {
             layoutClass += " non-editing-border"
         }

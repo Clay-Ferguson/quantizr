@@ -136,14 +136,27 @@ export class MenuPanel extends Div {
                     () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; },
                     () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
             ]),
+
             new Menu("Tools",
+            [
+                new MenuItem("Split Node", () => {
+                    new SplitNodeDlg().open();
+                }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
+                new MenuItem("Transfer Node", () => {
+                    new TransferNodeDlg().open();
+                }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
+                //todo-1: disabled during mongo conversion
+                //new MenuItem("Set Node A", view.setCompareNodeA, () => { return S.meta64.isAdminUser && S.meta64.state.highlightNode != null }, () => { return S.meta64.isAdminUser }), //
+                //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
+                //    () => { return S.meta64.isAdminUser && S.meta64.state.highlightNode != null }, //
+                //    () => { return S.meta64.isAdminUser }, //
+                //    true
+                //), //
+            ]),
+
+            //need to make export safe for end users to use (recarding file sizes)
+            new Menu("Admin Tools",
                 [
-                    new MenuItem("Split Node", () => {
-                        new SplitNodeDlg().open();
-                    }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
-                    new MenuItem("Transfer Node", () => {
-                        new TransferNodeDlg().open();
-                    }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
                     new MenuItem("Import", S.edit.openImportDlg, //
                         () => { return S.meta64.state.importFeatureEnabled && (S.meta64.state.selNodeIsMine || (S.meta64.state.highlightNode != null && S.meta64.homeNodeId == S.meta64.state.highlightNode.id)) },//
                         () => { return S.meta64.state.importFeatureEnabled }), //
