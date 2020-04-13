@@ -219,14 +219,24 @@ export class Encryption implements EncryptionIntf {
     getPrivateKey = async (): Promise<CryptoKey> => {
         return new Promise<CryptoKey>(async (resolve, reject) => {
             let val: any = await S.localDB.readObject(S.encryption.STORE_ASYMKEY);
-            resolve(val.val.privateKey);
+            if (!val) {
+                reject();
+            }
+            else {
+                resolve(val.val.privateKey);
+            }
         });
     }
 
     getPublicKey = async (): Promise<CryptoKey> => {
         return new Promise<CryptoKey>(async (resolve, reject) => {
             let val: any = await S.localDB.readObject(S.encryption.STORE_ASYMKEY);
-            resolve(val.val.publicKey);
+            if (!val) {
+                reject();
+            }
+            else {
+                resolve(val.val.publicKey);
+            }
         });
     }
 
@@ -435,7 +445,10 @@ export class Encryption implements EncryptionIntf {
                 if (!privateKey) {
                     privateKey = await this.getPrivateKey();
                 }
-
+                if (!privateKey) {
+                    reject();
+                    return;
+                }
                 //Decrypt the symmetric key using our private key
                 let symKeyJsonStr: string = await this.asymDecryptString(privateKey, skpd.cipherKey);
                 //console.log("Decrypted cipherKey to (asym key to actual data): " + symKeyJsonStr);
@@ -446,7 +459,9 @@ export class Encryption implements EncryptionIntf {
                 //console.log("            output: [" + ret + "]");
             }
             catch (ex) {
-                S.util.logAndReThrow("decryptSharableString failed", ex);
+                // todo-0: this was happening when 'importKey' failed for admin user, but I think admin user may not store keys? Need to just
+                // retest encryption 
+                // S.util.logAndReThrow("decryptSharableString failed", ex);
             }
             finally {
                 resolve(ret);

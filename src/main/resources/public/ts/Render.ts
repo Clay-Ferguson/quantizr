@@ -20,6 +20,7 @@ import { HorizontalLayout } from "./widget/HorizontalLayout";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { VideoPlayerDlg } from "./dlg/VideoPlayerDlg";
 import { NavBarIconButton } from "./widget/NavBarIconButton";
+import { TextContent } from "./widget/TextContent";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -72,10 +73,23 @@ export class Render implements RenderIntf {
          * If not an image we render a link to the attachment, so that it can be downloaded.
          */
         else {
-            let anchor = new Anchor(this.getUrlForNodeAttachment(node), "[Download File]");
+            let fileName: string = S.props.getNodePropVal(J.NodeProp.BIN_FILENAME, node);
+            let fileSize: string = S.props.getNodePropVal(J.NodeProp.BIN_SIZE, node);
+            let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+
             return new Div("", {
-                className: "binary-link"
-            }, [anchor]);
+                className: "binary-link",
+                title: "File Size:" + fileSize + " Type:" + fileType
+            }, [
+                new Icon("", null, {
+                    "style": { marginRight: '12px', verticalAlign: 'middle' },
+                    className: "fa fa-file fa-lg"
+                }),
+                new Anchor(this.getUrlForNodeAttachment(node), "[Download File]"),
+                new Span(fileName, {
+                    className: "normalText marginLeft"
+                })
+            ]);
         }
     }
 
@@ -465,9 +479,15 @@ export class Render implements RenderIntf {
                 else if (d.kind == 'string' && d.type.match('^text/html')) {
 
                 }
-                else if (d.kind == 'file' && d.type.match('^image/')) {
-                    var f = data[i].getAsFile();
-                    S.attachment.openUploadFromFileDlg(false, node, f);
+                else if (d.kind == 'file' /* && d.type.match('^image/') */) {
+                    let file: File = data[i].getAsFile();
+
+                    // if (file.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB) {
+                    //     S.util.showMessage("That file is too large to upload. Max file size is "+Constants.MAX_UPLOAD_MB+" MB");
+                    //     return;
+                    // }
+
+                    S.attachment.openUploadFromFileDlg(false, node, file);
                     return;
                 }
             }
