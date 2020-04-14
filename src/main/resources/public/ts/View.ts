@@ -254,6 +254,7 @@ export class View implements ViewIntf {
                 /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
                 there are other commands that exist also */
                 if (command == "getServerInfo") {
+                    res.serverInfo += "<br>Browser Memory: "+S.util.getBrowserMemoryInfo();
                     res.serverInfo += "<br>Build Time: " + BUILDTIME;
                     res.serverInfo += "<br>Profile: " + PROFILE;
                 }

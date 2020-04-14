@@ -13,8 +13,9 @@ public class Const {
 	 * users from editing protected nodes in their root node?
 	 * 
 	 * see: BIN_MAX_UPLOAD_SIZE
+	 * NOTE: This must match Constants.MAX_UPLOAD_MB in TypeScript file.
 	 */
-	public static final int DEFAULT_MAX_FILE_SIZE = 5 * ONE_MB;
+	public static final int DEFAULT_MAX_FILE_SIZE = 20 * ONE_MB;
 
 	public static final String FAKE_USER_AGENT = "Mozilla/5.0";
 

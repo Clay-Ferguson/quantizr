@@ -106,4 +106,5 @@ export interface UtilIntf {
     animateScrollToTop(): any;
     assert(check: boolean, op: string): void;
     formatMemory(val: number): string;
+    getBrowserMemoryInfo(): string;
 }

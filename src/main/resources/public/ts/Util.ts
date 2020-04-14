@@ -74,6 +74,12 @@ export class Util implements UtilIntf {
         else if (val < 1024 * 1024 * 1024) {
             return `${(val / (1024 * 1024)).toFixed(1)} MB`;
         }
+        else if (val < 1024 * 1024 * 1024 * 1024) {
+            return `${(val / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+        }
+        else {
+            return `${(val).toFixed(1)} bytes`;
+        }
     }
 
     hashOfString = (s: string): number => {
@@ -1175,4 +1181,15 @@ export class Util implements UtilIntf {
         = cosParameter + cosParameter * (cos bx)    | b stretches along the x axis = scrollCount = Math.PI / (scrollDuration / (newTimestamp - oldTimestamp))
         = cosParameter + cosParameter * (cos scrollCount * x)
     */
+
+    getBrowserMemoryInfo = (): string => {
+        let ret = "";
+        let p: any = performance as any;
+        if (p.memory) {
+            ret += "<br>HeapSizeLimit: " + this.formatMemory(p.memory.jsHeapSizeLimit);
+            ret += "<br>TotalHeapSize: " + this.formatMemory(p.memory.totalJSHeapSize);
+            ret += "<br>UsedHeapSize: " + this.formatMemory(p.memory.usedJSHeapSize);
+        }
+        return ret;
+    }
 }

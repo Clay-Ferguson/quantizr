@@ -77,6 +77,14 @@ export class Render implements RenderIntf {
             let fileSize: string = S.props.getNodePropVal(J.NodeProp.BIN_SIZE, node);
             let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
 
+            let viewFileLink: Anchor = null;
+            if (fileType=="application/pdf" || fileType.startsWith("text/")) {
+                viewFileLink = new Anchor(this.getUrlForNodeAttachment(node), "[View]", {
+                    target: "_blank",
+                    className: "marginLeft"
+                });
+            }
+
             return new Div("", {
                 className: "binary-link",
                 title: "File Size:" + fileSize + " Type:" + fileType
@@ -85,10 +93,11 @@ export class Render implements RenderIntf {
                     "style": { marginRight: '12px', verticalAlign: 'middle' },
                     className: "fa fa-file fa-lg"
                 }),
-                new Anchor(this.getUrlForNodeAttachment(node), "[Download File]"),
                 new Span(fileName, {
-                    className: "normalText marginLeft"
-                })
+                    className: "normalText marginRight"
+                }),
+                new Anchor(this.getUrlForNodeAttachment(node), "[Download]"),
+                viewFileLink
             ]);
         }
     }

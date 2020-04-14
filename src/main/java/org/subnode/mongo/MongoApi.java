@@ -672,6 +672,7 @@ public class MongoApi {
 			throw ExUtil.newEx(ex);
 		}
 
+		//todo-1: I have a 'formatMemory' written in javascript, and need to do same here or see if there's an apachie string function for it.
 		float kb = totalJsonBytes / 1024f;
 		return "Node Count: " + numDocs + "<br>Total JSON Size: " + kb + " KB";
 	}
