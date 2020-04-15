@@ -15,16 +15,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class TabPanel extends Comp {
 
+    static TAB_PREFIX: string = "tabVis";
     tabVisibility: { [key: string]: boolean } = {};
 
     constructor() {
         super(null);
-
-        //todo-0: make tabVis a const var 
+ 
         let obj = {};
-        obj["tabVis-main"] = true;
-        obj["tabVis-search"] = false;
-        obj["tabVis-timeline"] = false;
+        obj[TabPanel.TAB_PREFIX+"-main"] = true;
+        obj[TabPanel.TAB_PREFIX+"-search"] = false;
+        obj[TabPanel.TAB_PREFIX+"-timeline"] = false;
 
         this.mergeState(obj);
     }
@@ -32,16 +32,16 @@ export class TabPanel extends Comp {
     setTabVisibility = (tabName: string, visible: boolean) : void => {
 
         let obj = {};
-        obj["tabVis-" + tabName] = visible;
+        obj[TabPanel.TAB_PREFIX+"-" + tabName] = visible;
 
         this.mergeState(obj);
     }
 
     compRender = (): ReactNode => {
         let state = this.getState();
-        let mainDisplay = state["tabVis-main"] ? "inline" : "none";
-        let searchDisplay = state["tabVis-search"] ? "inline" : "none";
-        let timelineDisplay = state["tabVis-timeline"] ? "inline" : "none";
+        let mainDisplay = state[TabPanel.TAB_PREFIX+"-main"] ? "inline" : "none";
+        let searchDisplay = state[TabPanel.TAB_PREFIX+"-search"] ? "inline" : "none";
+        let timelineDisplay = state[TabPanel.TAB_PREFIX+"-timeline"] ? "inline" : "none";
 
         if (searchDisplay == "none" && timelineDisplay == "none") {
             mainDisplay = "none";

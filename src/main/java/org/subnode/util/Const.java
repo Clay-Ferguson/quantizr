@@ -9,8 +9,7 @@ public class Const {
 
 	/*
 	 * todo-0: need to make this a per-user setting (not the default that this is
-	 * but the operative value), and also that raises question? How are we stopping
-	 * users from editing protected nodes in their root node?
+	 * but the operative value), and add to the nodes the user isn't allowed to edit.
 	 * 
 	 * see: BIN_MAX_UPLOAD_SIZE
 	 * NOTE: This must match Constants.MAX_UPLOAD_MB in TypeScript file.
@@ -25,7 +24,7 @@ public class Const {
 	 * to storing data into our own server's IPFS cache.
 	 * 
 	 * After this server code for uploding to Temporal was attempted I realized it's
-	 * better to just upload straigt from browser to Temporal, and simply never have
+	 * better to just upload straight from browser to Temporal, and simply never have
 	 * the data routed thru Quantizr server at all.
 	 */
 	public static final boolean saveToTemporal = false;

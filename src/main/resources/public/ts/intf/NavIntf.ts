@@ -21,7 +21,6 @@ export interface NavIntf {
     logout(): void;
     signup(): void;
     preferences(): void;
-    openGitHubSite(): void;
     openContentNode(nodePathOrId: string): void;
     geoLocation(): void;
     displayingHome(): boolean;

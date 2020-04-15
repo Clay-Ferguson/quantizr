@@ -56,12 +56,6 @@ export class Nav implements NavIntf {
         new PrefsDlg().open();
     }
 
-    openGitHubSite = (): void => {
-        //todo-0: make this string and any similar strings come from a properties file, ultimately but 
-        //put at least in constants file in java that has the ts enum
-        window.open("https://github.com/Clay-Ferguson/quantizr.com", "_blank");
-    }
-
     displayingRepositoryRoot = (): boolean => {
         if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node) return false;
         //one way to detect repository root (without path, since we don't send paths back to client) is as the only node that owns itself.
