@@ -113,8 +113,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				log.debug("MongoSecurity enabled.");
 				String password = appProp.getMongoAdminPassword();
 				credential = MongoCredential.createCredential("root", "admin", password.toCharArray());
-			}
-			else {
+			} else {
 				log.debug("MongoSecurity disabled.");
 			}
 
@@ -152,8 +151,10 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 				if (mongoClient != null) {
 
-					for (String db : mongoClient.listDatabaseNames()) {
-						log.debug("MONGO DB NAME: " + db);
+					if (credential!=null) {
+						for (String db : mongoClient.listDatabaseNames()) {
+							log.debug("MONGO DB NAME: " + db);
+						}
 					}
 
 					log.info("Connected to Mongo OK.");
