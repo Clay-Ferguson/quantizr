@@ -196,8 +196,8 @@ public abstract class ExportArchiveBase {
 	 * fileNameCont is an output parameter that has the complete filename minus the
 	 * period and extension.
 	 */
-	private String processNodeExport(MongoSession session, String parentFolder, SubNode node, StringBuilder html, boolean writeFile,
-			ValContainer<String> fileNameCont) {
+	private String processNodeExport(MongoSession session, String parentFolder, SubNode node, StringBuilder html,
+			boolean writeFile, ValContainer<String> fileNameCont) {
 		try {
 			// log.debug("Processing Node: " + node.getPath());
 
@@ -234,15 +234,31 @@ public abstract class ExportArchiveBase {
 			String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK.s());
 
 			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
-			if (mimeType != null && mimeType.startsWith("image/")) {
+
+			String imgUrl = null;
+
+			/* if this is a 'data:' encoded image read it from binary storage and put that directly in url src */
+			String dataUrl = node.getStringProp(NodeProp.BIN_DATA_URL.s());
+			if ("t".equals(dataUrl)) {
+				imgUrl = attachmentService.getStringByNode(session, node);
+
+				// sanity check here.
+				if (!imgUrl.startsWith("data:")) {
+					imgUrl = null;
+				}
+			} 
+			//Otherwise if this is an ordinary binary image, encode the link to it.
+			else if (mimeType != null && mimeType.startsWith("image/")) {
 				String relImgPath = writeFile ? "" : (fileName + "/");
 				/*
 				 * embeds an image that's 400px wide until you click it which makes it go
 				 * fullsize
 				 */
-				String imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + nodeId + "-" + binFileNameStr)
+				imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + nodeId + "-" + binFileNameStr)
 						: (Const.IPFS_GATEWAY + ipfsLink);
+			}
 
+			if (imgUrl != null) {
 				html.append(
 						"<br><img id='img_" + nodeId + "' style='width:400px' onclick='document.getElementById(\"img_"
 								+ nodeId + "\").style.width=\"\"' src='" + imgUrl + "'/>");

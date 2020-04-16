@@ -26,7 +26,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.util.Const;
+import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.Util;
+import org.subnode.util.ValContainer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -180,11 +182,11 @@ public class IPFSService {
         return ret;
     }
 
-    public String addFromStream(InputStream stream, String mimeType, boolean saveToTemporal) {
+    public String addFromStream(InputStream stream, String mimeType, boolean saveToTemporal, ValContainer<Integer> streamSize) {
         if (saveToTemporal) {
             return addToTemporalFromStream(stream, mimeType);
         } else {
-            return addFromStream(stream, mimeType);
+            return addFromStream(stream, mimeType, streamSize);
         }
     }
 
@@ -237,6 +239,8 @@ public class IPFSService {
     }
 
     /**
+     * todo-0: all of the temporal writing code can be mothballed, because we do all that in pure JS now.
+     * 
      * WARNING: Although I know this code is likely 100% correct it still doesn't
      * work on "Temporal.cloud" and I'm tentatively blaming them for the failure,
      * because my IPFS code to upload to local IPFS works fine (just below)
@@ -289,7 +293,7 @@ public class IPFSService {
         return hash;
     }
 
-    private String addFromStream(InputStream stream, String mimeType) {
+    private String addFromStream(InputStream stream, String mimeType, ValContainer<Integer> streamSize) {
         String hash = null;
         try {
             // https://docs-beta.ipfs.io/reference/http/api
@@ -298,7 +302,8 @@ public class IPFSService {
             HttpHeaders headers = new HttpHeaders();
 
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            bodyMap.add("file", new InputStreamResource(stream));
+            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, Const.DEFAULT_MAX_FILE_SIZE);
+            bodyMap.add("file", new InputStreamResource(lis));
 
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
@@ -311,6 +316,7 @@ public class IPFSService {
                     });
 
             hash = (String) respMap.get("Hash");
+            streamSize.setVal((int)lis.getCount());
             // the following other values are supposedly in the return...
             // {
             // "Bytes": "<int64>",

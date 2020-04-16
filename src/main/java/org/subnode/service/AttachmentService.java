@@ -50,6 +50,7 @@ import org.subnode.util.RuntimeEx;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
+import org.subnode.util.ValContainer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -173,7 +174,7 @@ public class AttachmentService {
 			api.saveSession(session);
 		} 
 		catch (Exception e) {
-			//I need a universl pattern for this kind of handling everywhere in the code. todo-0
+			//I need a universal pattern for this kind of handling everywhere in the code. todo-0
 			if (e instanceof RuntimeEx) throw (RuntimeEx)e;
 			throw new RuntimeEx(e);
 		}
@@ -302,7 +303,7 @@ public class AttachmentService {
 		}
 
 		if (dataUrl) {
-			node.setProp(NodeProp.BIN_DATA_URL.s(), "t");
+			node.setProp(NodeProp.BIN_DATA_URL.s(), "t"); //t=true
 		}
 
 		if (imageBytes == null) {
@@ -934,13 +935,16 @@ public class AttachmentService {
 		/*
 		 * Now save the node also since the property on it needs to point to GridFS id
 		 */
-		node.setProp("bin", new SubNodePropVal(id));
+		node.setProp(NodeProp.BIN.s(), new SubNodePropVal(id));
+		node.setProp(NodeProp.BIN_SIZE.s(), streamCount);
 	}
 
 	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream, String mimeType) {
 		api.auth(session, node, PrivilegeType.WRITE);
-		String ipfsHash = ipfsService.addFromStream(stream, mimeType, Const.saveToTemporal);
+		ValContainer<Integer> streamSize = new ValContainer<Integer>();
+		String ipfsHash = ipfsService.addFromStream(stream, mimeType, Const.saveToTemporal, streamSize);
 		node.setProp(NodeProp.IPFS_LINK.s(), new SubNodePropVal(ipfsHash));
+		node.setProp(NodeProp.BIN_SIZE.s(), streamSize.getVal());
 	}
 
 	public void deleteBinary(MongoSession session, SubNode node) {
