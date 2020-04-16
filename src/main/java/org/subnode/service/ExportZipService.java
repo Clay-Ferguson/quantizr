@@ -50,6 +50,9 @@ public class ExportZipService extends ExportArchiveBase {
 
     @Override
     public void addEntry(String fileName, byte[] bytes) {
+        while (fileName.startsWith("/")) {
+            fileName = fileName.substring(1);
+        }
         log.debug("Add Entry: " + fileName + " bytes.length=" + bytes.length);
         try {
             ZipArchiveEntry entry = new ZipArchiveEntry(fileName);
@@ -80,13 +83,16 @@ public class ExportZipService extends ExportArchiveBase {
 
     @Override
     public void addEntry(String fileName, InputStream stream, long length) {
+        while (fileName.startsWith("/")) {
+            fileName = fileName.substring(1);
+        }
         log.debug("Add Entry: " + fileName);
         try {
             ZipArchiveEntry entry = new ZipArchiveEntry(fileName);
 
             entry.setSize(length);
             out.putArchiveEntry(entry);
-            IOUtils.copy(stream, out);
+            IOUtils.copyLarge(stream, out, 0, length);
             out.closeArchiveEntry();
 
             // JDK Version (do not delete)

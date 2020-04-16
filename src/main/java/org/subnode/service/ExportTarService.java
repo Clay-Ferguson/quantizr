@@ -53,6 +53,9 @@ public class ExportTarService extends ExportArchiveBase {
     
     @Override
     public void addEntry(String fileName, byte[] bytes) {
+        while (fileName.startsWith("/")) {
+            fileName = fileName.substring(1);
+        }
         log.debug("Add Entry: " + fileName + " bytes.length=" + bytes.length);
 
         TarArchiveEntry tarArchiveEntry = new TarArchiveEntry(fileName);
@@ -69,6 +72,9 @@ public class ExportTarService extends ExportArchiveBase {
 
     @Override
     public void addEntry(String fileName, InputStream stream, long length) {
+        while (fileName.startsWith("/")) {
+            fileName = fileName.substring(1);
+        }
         log.debug("Add Entry: " + fileName);
 
         TarArchiveEntry entry = new TarArchiveEntry(fileName);
@@ -82,7 +88,7 @@ public class ExportTarService extends ExportArchiveBase {
 
         try {
             out.putArchiveEntry(entry);
-            IOUtils.copy(stream, out);
+            IOUtils.copyLarge(stream, out, 0, length);
             out.closeArchiveEntry();
         } catch (Exception ex) {
             throw ExUtil.newEx(ex);
