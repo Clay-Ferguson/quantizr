@@ -942,7 +942,7 @@ public class AttachmentService {
 	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream, String mimeType) {
 		api.auth(session, node, PrivilegeType.WRITE);
 		ValContainer<Integer> streamSize = new ValContainer<Integer>();
-		String ipfsHash = ipfsService.addFromStream(stream, mimeType, Const.saveToTemporal, streamSize);
+		String ipfsHash = ipfsService.addFromStream(stream, mimeType, streamSize);
 		node.setProp(NodeProp.IPFS_LINK.s(), new SubNodePropVal(ipfsHash));
 		node.setProp(NodeProp.BIN_SIZE.s(), streamSize.getVal());
 	}
