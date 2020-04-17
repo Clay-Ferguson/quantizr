@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
+import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.image.ImageSize;
 import org.subnode.model.AccessControlInfo;
@@ -73,7 +74,7 @@ public class Convert {
 			}
 		}
 
-		boolean hasNodes = (api.getChildCount(session, node) > 0);
+		boolean hasChildren = (api.getChildCount(session, node) > 0);
 		// log.trace("hasNodes=" + hasNodes + " path=" + node.getPath());
 
 		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly, allowAbbreviated,
@@ -122,12 +123,14 @@ public class Convert {
 			}
 		}
 
+		boolean deleted = node.getPath().contains("/"+NodeName.TRASH+"/");
+
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, ownerId,
 				node.getOrdinal(), //
-				node.getModifyTime(), propList, acList, hasNodes, //
+				node.getModifyTime(), propList, acList, hasChildren, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
-				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey, dataUrl);
+				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey, dataUrl, deleted);
 
 		if (allowInlineChildren) {
 			boolean hasInlineChildren = node.getBooleanProp(NodeProp.INLINE_CHILDREN.s());

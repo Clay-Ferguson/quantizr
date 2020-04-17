@@ -474,7 +474,17 @@ export class Edit implements EditIntf {
             return;
         }
 
-        new ConfirmDlg("Delete " + selNodesArray.length + " node(s) ?", "Confirm Delete",
+        let firstNodeId: string = selNodesArray[0];
+        let node: J.NodeInfo = S.meta64.idToNodeMap[firstNodeId];
+        let confirmMsg = null;
+        if (node.deleted) {
+            confirmMsg = "Permanently Delete " + selNodesArray.length + " node(s) ?"
+        }
+        else {
+            confirmMsg = "Move " + selNodesArray.length + " node(s) to the trash bin ?";
+        }
+
+        new ConfirmDlg(confirmMsg, "Confirm Delete",
             () => {
                 let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode();
 
@@ -484,7 +494,10 @@ export class Edit implements EditIntf {
                 }, (res: J.DeleteNodesResponse) => {
                     this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode });
                 });
-            }
+            },
+            null, //no callback
+            node.deleted ? "btn-danger": null,
+            node.deleted ? "alert alert-danger": null
         ).open();
     }
 

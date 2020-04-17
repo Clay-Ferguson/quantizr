@@ -27,6 +27,7 @@ public class NodeInfo {
 	private List<PropertyInfo> properties;
 	private List<AccessControlInfo> ac;
 	private boolean hasChildren;
+	private boolean deleted;
 
 	/* For nodes that are encrypted but shared to the current user, we send back the ciperKey (an encrypted sym key) for this node which
 	is a key that can only be decrypted by the private key on the user's browser, but decrypted by them on their browser
@@ -60,7 +61,7 @@ public class NodeInfo {
 	public NodeInfo(String id, String name, String content, String owner, String ownerId, Long ordinal, Date lastModified,
 			List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
 		 int width, int height, String type, long logicalOrdinal,
-			boolean firstChild, boolean lastChild, String cipherKey, String dataUrl) {
+			boolean firstChild, boolean lastChild, String cipherKey, String dataUrl, boolean deleted) {
 		this.id = id;
 		this.name = name;
 		this.content = content;
@@ -79,6 +80,7 @@ public class NodeInfo {
 		this.logicalOrdinal = logicalOrdinal;
 		this.cipherKey = cipherKey;
 		this.dataUrl = dataUrl;
+		this.deleted = deleted;
 	}
 
 	public String getContent() {
@@ -240,5 +242,13 @@ public class NodeInfo {
 
 	public void setDataUrl(String dataUrl) {
 		this.dataUrl = dataUrl;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 }

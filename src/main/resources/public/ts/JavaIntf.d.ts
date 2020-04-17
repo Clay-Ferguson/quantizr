@@ -472,6 +472,7 @@ export interface NodeInfo {
     properties: PropertyInfo[];
     ac: AccessControlInfo[];
     hasChildren: boolean;
+    deleted: boolean;
     cipherKey: string;
     firstChild: boolean;
     lastChild: boolean;

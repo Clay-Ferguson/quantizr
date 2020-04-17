@@ -14,7 +14,6 @@ export class TextContent extends Comp {
     constructor(text: string, classes: string = null, public preformatted: boolean = false) {
         super(null);
         this.attribs.className = classes || "alert alert-info";
-        //this.attribs.role = "alert";
         this.setText(text);
     }
 
