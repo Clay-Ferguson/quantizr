@@ -1,10 +1,23 @@
 package org.subnode.util;
 
+import java.io.InputStream;
+import java.util.Scanner;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
 public class Util {
+	private static final Logger log = LoggerFactory.getLogger(Util.class);
+
 	public static void sleep(long millis) {
 		try {
 			Thread.sleep(millis);
@@ -51,4 +64,59 @@ public class Util {
 	// .build();
 	// return new HttpComponentsClientHttpRequestFactory(client);
 	// }
+
+	public static String extractTitleFromUrl(String url) {
+		String title = null;
+		InputStream is = null;
+		Scanner scanner = null;
+
+		long startTime = System.currentTimeMillis();
+		try {
+			int timeout = 20;
+			RequestConfig config = RequestConfig.custom()//
+						.setConnectTimeout(timeout * 1000) //
+						.setConnectionRequestTimeout(timeout * 1000) //
+						.setSocketTimeout(timeout * 1000).build();
+			HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+			HttpGet request = new HttpGet(url);
+			request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
+			HttpResponse response = client.execute(request);
+
+			log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
+					+ response.getStatusLine().getReasonPhrase());
+
+			scanner = new Scanner(response.getEntity().getContent());
+			String responseBody = scanner.useDelimiter("\\A").next();
+			title = responseBody.substring(responseBody.indexOf("<title>") + 7, responseBody.indexOf("</title>"));
+		} catch (Exception e) {
+			log.error("*** ERROR reading url: " + url, e);
+			return null;
+		} finally {
+			StreamUtil.close(scanner, is);
+			log.info("Stream read took: " + (System.currentTimeMillis() - startTime) + "ms");
+		}
+
+		return title;
+
+		// InputStream response = null;
+		// try {
+		// 	String url = "http://www.google.com";
+		// 	response = new URL(url).openStream();
+
+		// 	Scanner scanner = new Scanner(response);
+		// 	String responseBody = scanner.useDelimiter("\\A").next();
+		// 	System.out.println(
+		// 			responseBody.substring(responseBody.indexOf("<title>") + 7, responseBody.indexOf("</title>")));
+
+		// } catch (IOException ex) {
+		// 	ex.printStackTrace();
+		// } finally {
+		// 	try {
+		// 		response.close();
+		// 	} catch (IOException ex) {
+		// 		ex.printStackTrace();
+		// 	}
+		// }
+	}
+
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoThreadLocal;
@@ -141,7 +142,7 @@ public abstract class ImportArchiveBase {
 		if (nodeId != null) {
 			SubNode node = api.getNode(session, nodeId);
 			if (node == null) {
-				throw new RuntimeException("Unable to find node by id: " + nodeId);
+				throw new RuntimeEx("Unable to find node by id: " + nodeId);
 			}
 			Long length = node.getIntProp(NodeProp.BIN_SIZE.s());
 			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());

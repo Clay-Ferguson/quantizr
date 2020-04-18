@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.URI;
 
 import org.subnode.config.AppProp;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.MerkleNode;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoApi;
@@ -237,7 +238,7 @@ public class IPFSService {
             InputStream is = response.getEntity().getContent();
             return is;
         } catch (Exception e) {
-            throw new RuntimeException("Streaming failed.", e);
+            throw new RuntimeEx("Streaming failed.", e);
         }
     }
 }

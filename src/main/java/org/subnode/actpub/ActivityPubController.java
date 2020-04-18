@@ -11,6 +11,7 @@ import org.subnode.actpub.model.ActPubCreate;
 import org.subnode.actpub.model.ActPubPublicKey;
 import org.subnode.config.AppProp;
 import org.subnode.config.ConstantsProvider;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.response.GetPublicServerInfoResponse;
 import org.subnode.response.base.ResponseBase;
 import org.subnode.util.FileUtils;
@@ -83,7 +84,7 @@ public class ActivityPubController {
 			String publicKeyPEM = FileUtils.readFile(publicKeyFile);
 			publicKey.setPublicKeyPem(publicKeyPEM);
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to read public.pem file.", e);
+			throw new RuntimeEx("Failed to read public.pem file.", e);
 		}
 		actor.setPublickey(publicKey);
 		return actor;

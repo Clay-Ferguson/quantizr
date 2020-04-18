@@ -5,6 +5,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.subnode.exception.base.RuntimeEx;
 
 public class LockEx extends ReentrantLock {
 	private static final Logger log = LoggerFactory.getLogger(LockEx.class);
@@ -60,7 +61,7 @@ public class LockEx extends ReentrantLock {
 			}
 		} catch (Exception e) {
 			if (!allowRetries) {
-				throw new RuntimeException("FAILED to obtain the lock during the allowed timeout. Lock: " + lockName,
+				throw new RuntimeEx("FAILED to obtain the lock during the allowed timeout. Lock: " + lockName,
 						e);
 			}
 			success = false;
@@ -79,7 +80,7 @@ public class LockEx extends ReentrantLock {
 					logDeadlockWarning();
 					warningShown = true;
 					if (abortWhenDeadlockSuspected) {
-						throw new RuntimeException(
+						throw new RuntimeEx(
 								"Aborting. Thread " + Thread.currentThread().getName() + " was hung waiting for lock "
 										+ lockName + " which was held by thread " + getOwner().getName());
 					}
@@ -133,7 +134,7 @@ public class LockEx extends ReentrantLock {
 
 		} catch (Exception e) {
 			log.trace("unlock failed: " + getStackTrace(null));
-			throw new RuntimeException("LockEx.unlock failed.");
+			throw new RuntimeEx("LockEx.unlock failed.");
 		}
 	}
 

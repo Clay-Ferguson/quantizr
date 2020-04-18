@@ -5,6 +5,7 @@ import java.io.File;
 import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -165,7 +166,7 @@ public class BashService {
 			// }
 		} catch (Exception e) {
 			log.error("Failed running Script.", e);
-			throw new RuntimeException(e);
+			throw new RuntimeEx(e);
 		}
 	}
 }

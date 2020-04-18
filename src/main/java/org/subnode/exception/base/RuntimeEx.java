@@ -1,4 +1,4 @@
-package org.subnode.util;
+package org.subnode.exception.base;
 
 public class RuntimeEx extends RuntimeException {
 
@@ -8,6 +8,10 @@ public class RuntimeEx extends RuntimeException {
 
 	public RuntimeEx(String msg) {
 		super(msg);
+	}
+
+	public RuntimeEx(String msg, Throwable ex) {
+		super(msg, ex);
 	}
 
 	public RuntimeEx(Throwable ex) {

@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.MailSender;
 import org.subnode.mongo.AclService;
 import org.subnode.mongo.MongoApi;
@@ -765,7 +766,7 @@ public class AppController {
 			} else if (req.getCommand().equalsIgnoreCase("getJson")) {
 				res.setServerInfo(systemService.getJson(ms, req.getNodeId()));
 			} else {
-				throw new RuntimeException("Invalid command: " + req.getCommand());
+				throw new RuntimeEx("Invalid command: " + req.getCommand());
 			}
 			res.setSuccess(true);
 

@@ -10,6 +10,8 @@ import org.subnode.config.ConstantsProvider;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
+import org.subnode.exception.OutOfSpaceException;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.model.UserPreferences;
 import org.subnode.model.UserStats;
@@ -37,7 +39,6 @@ import org.subnode.response.SignupResponse;
 import org.subnode.util.Const;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
-import org.subnode.util.OutOfSpaceException;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
 import org.subnode.util.Validator;
@@ -127,7 +128,7 @@ public class UserManagerService {
 		} else {
 			SubNode userNode = api.getUserNodeByUserName(session, userName);
 			if (userNode == null) {
-				throw new RuntimeException("User not found: " + userName);
+				throw new RuntimeEx("User not found: " + userName);
 			}
 
 			String id = userNode.getId().toHexString();
@@ -201,7 +202,7 @@ public class UserManagerService {
 	 */
 	public void addNodeBytesToUserNodeBytes(SubNode node, SubNode userNode, int sign) {
 		if (node == null) {
-			throw new RuntimeException("node was null.");
+			throw new RuntimeEx("node was null.");
 		}
 
 		// get the size of the attachment on this node
@@ -260,7 +261,7 @@ public class UserManagerService {
 				String userName = node.getStringProp(NodeProp.USER.s());
 
 				if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName)) {
-					throw new RuntimeException("processSignupCode should not be called fror admin user.");
+					throw new RuntimeEx("processSignupCode should not be called fror admin user.");
 				}
 
 				// // Currently we just store password on server in cleartext (security isn't a
@@ -347,7 +348,7 @@ public class UserManagerService {
 
 		SubNode ownerNode = api.getUserNodeByUserName(session, userName);
 		if (ownerNode != null) {
-			throw new RuntimeException("User already exists.");
+			throw new RuntimeEx("User already exists.");
 		}
 
 		SubNode newUserNode = api.createUser(session, userName, email, password, false);
@@ -496,7 +497,7 @@ public class UserManagerService {
 				String userNodeId = XString.truncateAfterFirst(passCode, "-");
 
 				if (userNodeId == null) {
-					throw new RuntimeException("Unable to find userNodeId: " + userNodeId);
+					throw new RuntimeEx("Unable to find userNodeId: " + userNodeId);
 				}
 				userNode[0] = api.getNode(mongoSession, userNodeId);
 
@@ -515,7 +516,7 @@ public class UserManagerService {
 				userName[0] = userNode[0].getStringProp(NodeProp.USER.s());
 
 				if (PrincipalName.ADMIN.s().equals(userName[0])) {
-					throw new RuntimeException("changePassword should not be called fror admin user.");
+					throw new RuntimeEx("changePassword should not be called fror admin user.");
 				}
 
 				userNode[0].setProp(NodeProp.PWD_HASH.s(), api.getHashOfPassword(password));
@@ -531,7 +532,7 @@ public class UserManagerService {
 			}
 
 			if (PrincipalName.ADMIN.s().equals(userName[0])) {
-				throw new RuntimeException("changePassword should not be called fror admin user.");
+				throw new RuntimeEx("changePassword should not be called fror admin user.");
 			}
 
 			String password = req.getNewPassword();

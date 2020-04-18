@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
+import org.subnode.exception.base.RuntimeEx;
+
 /**
  * Date-related functions
  */
@@ -120,10 +122,10 @@ public class DateUtil {
 					return dateFormatNoTime.parse(time);
 				}
 				catch (ParseException e1) {
-					throw new RuntimeException(e);
+					throw new RuntimeEx(e);
 				}
 			}
-			throw new RuntimeException(e);
+			throw new RuntimeEx(e);
 		}
 	}
 }

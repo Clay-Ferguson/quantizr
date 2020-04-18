@@ -1,23 +1,16 @@
 package org.subnode.util;
 
-import java.io.InputStream;
-import java.util.Scanner;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.subnode.exception.base.RuntimeEx;
 
 /**
- * SubNode uses RuntimeExceptions primarily for all exception handling, throughout the app because
+ * Quantizr uses RuntimeExceptions primarily for all exception handling, throughout the app because
  * of the cleanness of the API when it doesn't have to declare checked exceptions everywhere, and
- * this utility encapsulates the convertion of most checked exceptions to RuntimeExceptions.
+ * this utility encapsulates the conversion of most checked exceptions to RuntimeExceptions.
  * 
  * Note: This code doesn't ignore exceptions or alter our ability to properly handle ALL exceptions
- * of both types, but it just makes the code cleaner, by doing what he Java-language SHOULD have
+ * of both types, but it just makes the code cleaner, by doing what the Java-language SHOULD have
  * done to begin with.
  */
 public class ExUtil {
@@ -25,8 +18,6 @@ public class ExUtil {
 	
 	public static RuntimeEx newEx(Throwable ex) {
 
-		// removing logging, because some exception throwing is intentional (not error)
-		// log.error("logAndRethrow", ex);
 		if (ex instanceof RuntimeEx) {
 			return (RuntimeEx) ex;
 		}
@@ -35,8 +26,6 @@ public class ExUtil {
 
 	public static RuntimeEx newEx(String msg) {
 		RuntimeEx ex = new RuntimeEx(msg);
-		// removing logging, because some exception throwing is intentional (not error)
-		// log.error("logThrow", ex);
 		return ex;
 	}
 
@@ -56,59 +45,5 @@ public class ExUtil {
 		if (e.getCause() != null) {
 			logger.error("cause:", e);
 		}
-	}
-
-	public static String extractTitleFromUrl(String url) {
-		String title = null;
-		InputStream is = null;
-		Scanner scanner = null;
-
-		long startTime = System.currentTimeMillis();
-		try {
-			int timeout = 20;
-			RequestConfig config = RequestConfig.custom()//
-						.setConnectTimeout(timeout * 1000) //
-						.setConnectionRequestTimeout(timeout * 1000) //
-						.setSocketTimeout(timeout * 1000).build();
-			HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-			HttpGet request = new HttpGet(url);
-			request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
-			HttpResponse response = client.execute(request);
-
-			log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
-					+ response.getStatusLine().getReasonPhrase());
-
-			scanner = new Scanner(response.getEntity().getContent());
-			String responseBody = scanner.useDelimiter("\\A").next();
-			title = responseBody.substring(responseBody.indexOf("<title>") + 7, responseBody.indexOf("</title>"));
-		} catch (Exception e) {
-			log.error("*** ERROR reading url: " + url, e);
-			return null;
-		} finally {
-			StreamUtil.close(scanner, is);
-			log.info("Stream read took: " + (System.currentTimeMillis() - startTime) + "ms");
-		}
-
-		return title;
-
-		// InputStream response = null;
-		// try {
-		// 	String url = "http://www.google.com";
-		// 	response = new URL(url).openStream();
-
-		// 	Scanner scanner = new Scanner(response);
-		// 	String responseBody = scanner.useDelimiter("\\A").next();
-		// 	System.out.println(
-		// 			responseBody.substring(responseBody.indexOf("<title>") + 7, responseBody.indexOf("</title>")));
-
-		// } catch (IOException ex) {
-		// 	ex.printStackTrace();
-		// } finally {
-		// 	try {
-		// 		response.close();
-		// 	} catch (IOException ex) {
-		// 		ex.printStackTrace();
-		// 	}
-		// }
 	}
 }

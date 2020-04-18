@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * the deadlock and then allowes the JUnit test to complete:
  * 
  *    if (abortWhenDeadlockSuspected) {
- *		throw new RuntimeException("Aborting. Thread "+Thread.currentThread().getName()+" was hung waiting for lock "+lockName+" which was held by thread "+getOwner().getName());
+ *		throw new RuntimeEx("Aborting. Thread "+Thread.currentThread().getName()+" was hung waiting for lock "+lockName+" which was held by thread "+getOwner().getName());
  *	}
  */
 public class DeadlockDetectorTest {

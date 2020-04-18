@@ -24,7 +24,7 @@ import org.subnode.response.FileSystemReindexResponse;
 import org.subnode.util.DateUtil;
 import org.subnode.util.FileTools;
 import org.subnode.util.FileUtils;
-import org.subnode.util.RuntimeEx;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.util.XString;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -119,11 +119,11 @@ public class FileSyncService {
 		/* FS_LINK nodes must be owned by 'admin' in order to be allowed to function */
 		// todo-2: Don't we have a dedicated exception for this?
 		if (!PrincipalName.ADMIN.s().equals(api.getNodeOwner(session, node))) {
-			throw new RuntimeException("unauthorized");
+			throw new RuntimeEx("unauthorized");
 		}
 
 		if (!isSyncableNode(session, node)) {
-			throw new RuntimeException("Not a syncable node.");
+			throw new RuntimeEx("Not a syncable node.");
 		}
 
 		if (stats == null) {
@@ -212,7 +212,7 @@ public class FileSyncService {
 			metaDirNames.keySet().forEach(name -> {
 				File file = fileMap.get(name);
 				if (file == null) {
-					throw new RuntimeException("Failed to find name: " + name);
+					throw new RuntimeEx("Failed to find name: " + name);
 				}
 				_filteredFilesAndFolders[idx[0]++] = file;
 			});
@@ -398,7 +398,7 @@ public class FileSyncService {
 			for (File folder : folders) {
 				SubNode folderNode = nodeMap.get(folder.getName());
 				if (folderNode == null) {
-					throw new RuntimeException("folder.getName " + folder.getName() + " wasn't found in nodeMap");
+					throw new RuntimeEx("folder.getName " + folder.getName() + " wasn't found in nodeMap");
 				}
 				processSync(session, folderNode, recursive, level + 1, stats);
 			}
@@ -588,7 +588,7 @@ public class FileSyncService {
 			return true;
 		}
 		if (fullFileName.length() < 10) {
-			throw new RuntimeException("filename " + fullFileName + " is suspiciously too short to delete.");
+			throw new RuntimeEx("filename " + fullFileName + " is suspiciously too short to delete.");
 		}
 		File file = new File(fullFileName);
 		boolean result = org.springframework.util.FileSystemUtils.deleteRecursively(file);

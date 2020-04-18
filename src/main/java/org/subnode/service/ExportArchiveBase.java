@@ -10,6 +10,7 @@ import java.util.List;
 import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.UserPreferences;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
@@ -355,7 +356,7 @@ public abstract class ExportArchiveBase {
 
 	private void addFileEntry(String fileName, InputStream is, long length) {
 		if (length <= 0) {
-			throw new RuntimeException("length is required");
+			throw new RuntimeEx("length is required");
 		}
 		/*
 		 * If we have duplicated a filename, number it sequentially to create a unique

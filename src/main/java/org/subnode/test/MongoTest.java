@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
@@ -48,7 +49,7 @@ public class MongoTest {
 
 		SubNode adminNode = api.getUserNodeByUserName(adminSession, PrincipalName.ADMIN.s());
 		if (adminNode == null) {
-			throw new RuntimeException("Unable to find admin user node.");
+			throw new RuntimeEx("Unable to find admin user node.");
 		}
 
 		// ----------Insert a test node
@@ -60,12 +61,12 @@ public class MongoTest {
 
 		SubNode nodeFoundById = api.getNode(adminSession, node.getId());
 		if (nodeFoundById == null) {
-			throw new RuntimeException("Unable to find node by id.");
+			throw new RuntimeEx("Unable to find node by id.");
 		}
 
 		SubNode nodeFoundByStrId = api.getNode(adminSession, node.getId().toHexString());
 		if (nodeFoundByStrId == null) {
-			throw new RuntimeException("Unable to find node by id: " + node.getId().toHexString());
+			throw new RuntimeEx("Unable to find node by id: " + node.getId().toHexString());
 		}
 
 		node.setProp("testKeyA", new SubNodePropVal("tesetValA"));
@@ -99,29 +100,29 @@ public class MongoTest {
 
 		// UserPreferencesNode userPrefsNode2 = api.getUserPreference(adminSession, userPrefsNode.getPath());
 		// if (userPrefsNode2 == null || !userPrefsNode.getUserPrefString().equals(userPrefsNode2.getUserPrefString())) {
-		// 	throw new RuntimeException("unable to read UserPrefence test object by path");
+		// 	throw new RuntimeEx("unable to read UserPrefence test object by path");
 		// }
 
 		// UserPreferencesNode userPrefsNode3 = api.getUserPreference(adminSession, userPrefsNode.getId());
 		// if (userPrefsNode3 == null) {
-		// 	throw new RuntimeException("unable to read UserPrefence test object by ID: " + userPrefsNode.getId());
+		// 	throw new RuntimeEx("unable to read UserPrefence test object by ID: " + userPrefsNode.getId());
 		// }
 
 		// if (!userPrefsNode.getUserPrefString().equals(userPrefsNode3.getUserPrefString())) {
-		// 	throw new RuntimeException("unable to read UserPrefence test object by ID. Value is not correct.");
+		// 	throw new RuntimeEx("unable to read UserPrefence test object by ID. Value is not correct.");
 		// }
 
 		// ----------Dump current data
 		nodesIter = api.findAllNodes(adminSession);
 		int count1 = api.dump("Dump after first inserts", nodesIter);
 		if (count1 != expectedCount) {
-			throw new RuntimeException("unable to add first records.");
+			throw new RuntimeEx("unable to add first records.");
 		}
 
 		// ----------Verify getParent works
 		SubNode parent = api.getParent(adminSession, stuffNode);
 		if (!parent.getPath().equals("/stuffroot")) {
-			throw new RuntimeException("getParent failed.");
+			throw new RuntimeEx("getParent failed.");
 		}
 
 		// ----------Verify an attempt to write a duplicate 'path' fails
@@ -135,7 +136,7 @@ public class MongoTest {
 		}
 
 		if (!uniqueViolationCaught) {
-			throw new RuntimeException("Failed to catch unique constraint violation.");
+			throw new RuntimeEx("Failed to catch unique constraint violation.");
 		}
 
 		// ----------Insert a sub-node under the existing node
@@ -148,7 +149,7 @@ public class MongoTest {
 		Iterable<SubNode> nodesIter1 = api.findAllNodes(adminSession);
 		int count = api.dump("Dumping before any deletes", nodesIter1);
 		if (count != expectedCount) {
-			throw new RuntimeException("unable to add child record.");
+			throw new RuntimeEx("unable to add child record.");
 		}
 
 		readAllChildrenOneByOne(adminSession, node, childCount);
@@ -163,7 +164,7 @@ public class MongoTest {
 		Iterable<SubNode> nodesIter2 = api.findAllNodes(adminSession);
 		count = api.dump("Dump after deletes", nodesIter2);
 		if (count != expectedCount) {
-			throw new RuntimeException("unable to delete record, or count is off");
+			throw new RuntimeEx("unable to delete record, or count is off");
 		}
 
 		runBinaryTests(adminSession);
@@ -183,7 +184,7 @@ public class MongoTest {
 		/* Make sure we can read the child count from a query */
 		long count = api.getChildCount(session, node);
 		if (count != assertCount) {
-			throw new RuntimeException("Child count query failed.");
+			throw new RuntimeEx("Child count query failed.");
 		}
 		log.debug("child count query successful.");
 
@@ -201,10 +202,10 @@ public class MongoTest {
 		for (long i : ordinalList) {
 			SubNode n = api.getChildAt(session, node, i);
 			if (n == null) {
-				throw new RuntimeException("getChildAt " + i + " failed and returned null.");
+				throw new RuntimeEx("getChildAt " + i + " failed and returned null.");
 			}
 			if (n.getOrdinal() != i) {
-				throw new RuntimeException("Ordinal " + n.getOrdinal() + " found when " + i + " was expected.");
+				throw new RuntimeEx("Ordinal " + n.getOrdinal() + " found when " + i + " was expected.");
 			}
 			idList.add(n.getId());
 			pathList.add(n.getPath());
@@ -215,7 +216,7 @@ public class MongoTest {
 		for (ObjectId id : idList) {
 			SubNode n = api.getNode(session, id);
 			if (!n.getId().equals(id)) {
-				throw new RuntimeException("ID " + n.getId() + " found when " + id + " was expected.");
+				throw new RuntimeEx("ID " + n.getId() + " found when " + id + " was expected.");
 			}
 		}
 		log.debug("random access by ids successful.");
@@ -224,7 +225,7 @@ public class MongoTest {
 		for (String path : pathList) {
 			SubNode n = api.getNode(session, path);
 			if (!n.getPath().equals(path)) {
-				throw new RuntimeException("Path " + n.getPath() + " found when " + path + " was expected.");
+				throw new RuntimeEx("Path " + n.getPath() + " found when " + path + " was expected.");
 			}
 		}
 		log.debug("random access by paths successful.");
@@ -247,7 +248,7 @@ public class MongoTest {
 			log.debug("completed reading back the file, and writing out a copy.");
 		}
 		catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new RuntimeEx(e);
 		}
 	}
 
@@ -267,7 +268,7 @@ public class MongoTest {
 
 		Long maxOrdinal = api.getMaxChildOrdinal(session, node);
 		if (maxOrdinal == null || maxOrdinal.longValue() != count - 1) {
-			throw new RuntimeException("Expected max ordinal of " + (count - 1) + " but found " + maxOrdinal);
+			throw new RuntimeEx("Expected max ordinal of " + (count - 1) + " but found " + maxOrdinal);
 		}
 	}
 }

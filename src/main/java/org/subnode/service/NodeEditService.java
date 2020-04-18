@@ -5,6 +5,7 @@ import java.util.Calendar;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;
@@ -33,6 +34,7 @@ import org.subnode.response.SplitNodeResponse;
 import org.subnode.response.TransferNodeResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
+import org.subnode.util.Util;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 
@@ -124,7 +126,7 @@ public class NodeEditService {
 		SubNode newNode = api.createNode(session, linksNode, null, SubNodeTypes.UNSTRUCTURED, 0L,
 				CreateNodeLocation.LAST);
 
-		String title = lcData.startsWith("http") ? ExUtil.extractTitleFromUrl(data) : null;
+		String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
 		String content = title != null ? "#### " + title + "\n" : "";
 		content += data;
 		newNode.setContent(content);
@@ -226,7 +228,7 @@ public class NodeEditService {
 		api.authRequireOwnerOfNode(session, node);
 
 		if (node == null) {
-			throw new RuntimeException("Unable find node to save: nodeId=" + nodeId);
+			throw new RuntimeEx("Unable find node to save: nodeId=" + nodeId);
 		}
 		node.setContent(nodeInfo.getContent());
 
@@ -240,7 +242,7 @@ public class NodeEditService {
 			 */
 			SubNode nodeByName = api.getNodeByName(session, nodeInfo.getName());
 			if (nodeByName != null) {
-				throw new RuntimeException("Node name is already in use. Duplicates not allowed.");
+				throw new RuntimeEx("Node name is already in use. Duplicates not allowed.");
 			}
 
 			node.setName(nodeInfo.getName());
@@ -405,12 +407,12 @@ public class NodeEditService {
 
 		SubNode toUserNode = api.getUserNodeByUserName(api.getAdminSession(), req.getToUser());
 		if (toUserNode == null) {
-			throw new RuntimeException("User not found: " + req.getToUser());
+			throw new RuntimeEx("User not found: " + req.getToUser());
 		}
 
 		SubNode fromUserNode = api.getUserNodeByUserName(api.getAdminSession(), req.getFromUser());
 		if (fromUserNode == null) {
-			throw new RuntimeException("User not found: " + req.getFromUser());
+			throw new RuntimeEx("User not found: " + req.getFromUser());
 		}
 		if (transferNode(session, node, fromUserNode.getOwner(), toUserNode.getOwner())) {
 			transfers++;

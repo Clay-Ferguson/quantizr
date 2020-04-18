@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.subnode.model.client.PrincipalName;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.AccessControl;
@@ -115,7 +116,7 @@ public class AclService {
 
 		String cipherKey = node.getStringProp(NodeProp.ENC_KEY.s());
 		if (cipherKey == null) {
-			throw new RuntimeException("Attempted to alter keys on a non-encrypted node.");
+			throw new RuntimeEx("Attempted to alter keys on a non-encrypted node.");
 		}
 
 		boolean success = setCipherKey(session, node, req.getPrincipalNodeId(), req.getCipherKey(), res);
@@ -151,7 +152,7 @@ public class AclService {
 		/* If we are sharing to public, then that's the map key */
 		if (principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
 			if (cipherKey != null) {
-				throw new RuntimeException("Cannot make an encrypted node public.");
+				throw new RuntimeEx("Cannot make an encrypted node public.");
 			}
 			mapKey = PrincipalName.PUBLIC.s();
 		}

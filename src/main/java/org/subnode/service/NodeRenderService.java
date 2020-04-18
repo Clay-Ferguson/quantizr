@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoApi;
@@ -217,7 +218,7 @@ public class NodeRenderService {
 
 		if (req.isGoToLastPage()) {
 			// todo-1: fix
-			throw new RuntimeException("No ability to go to last page yet in new mongo api.");
+			throw new RuntimeEx("No ability to go to last page yet in new mongo api.");
 			// offset = (int) nodeIter.getSize() - ROWS_PER_PAGE;
 			// if (offset < 0) {
 			// offset = 0;

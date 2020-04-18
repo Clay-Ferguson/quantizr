@@ -1,6 +1,7 @@
 package org.subnode.mongo;
 
 import org.subnode.config.AppProp;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.util.ExUtil;
 
 import javax.annotation.PostConstruct;
@@ -122,11 +123,11 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				Integer mongoPort = appProp.getMongoDbPort();
 
 				if (mongoHost == null) {
-					throw new RuntimeException("mongodb.host property is missing");
+					throw new RuntimeEx("mongodb.host property is missing");
 				}
 
 				if (mongoPort == null) {
-					throw new RuntimeException("mongodb.port property is missing");
+					throw new RuntimeEx("mongodb.port property is missing");
 				}
 
 				String uri = "mongodb://" + mongoHost + ":" + String.valueOf(mongoPort);

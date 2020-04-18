@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
+import org.subnode.exception.NodeAuthFailedException;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.image.ImageSize;
@@ -26,7 +28,6 @@ import org.subnode.service.AttachmentService;
 import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
-import org.subnode.util.NodeAuthFailedException;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
@@ -103,16 +104,16 @@ public class MongoApi {
 
 	public void authRequireOwnerOfNode(MongoSession session, SubNode node) {
 		if (node == null) {
-			throw new RuntimeException("Auth Failed. Node did not exist.");
+			throw new RuntimeEx("Auth Failed. Node did not exist.");
 		}
 		if (!session.isAdmin() && !session.getUserNode().getId().equals(node.getOwner())) {
-			throw new RuntimeException("Auth Failed. Node ownership required.");
+			throw new RuntimeEx("Auth Failed. Node ownership required.");
 		}
 	}
 
 	public void requireAdmin(MongoSession session) {
 		if (!session.isAdmin())
-			throw new RuntimeException("auth fail");
+			throw new RuntimeEx("auth fail");
 	}
 
 	public void auth(MongoSession session, SubNode node, PrivilegeType... privs) {
@@ -131,7 +132,7 @@ public class MongoApi {
 	/* Returns true if this user on this session has privType access to 'node' */
 	public void auth(MongoSession session, SubNode node, List<PrivilegeType> priv) {
 		if (priv == null || priv.size() == 0) {
-			throw new RuntimeException("privileges not specified.");
+			throw new RuntimeEx("privileges not specified.");
 		}
 
 		// admin has full power over all nodes
@@ -145,7 +146,7 @@ public class MongoApi {
 
 		if (node.getOwner() == null) {
 			log.trace("auth fails. node had no owner: " + node.getPath());
-			throw new RuntimeException("node had no owner: " + node.getPath());
+			throw new RuntimeEx("node had no owner: " + node.getPath());
 		}
 
 		// if this session user is the owner of this node, then they have full power
@@ -203,7 +204,7 @@ public class MongoApi {
 
 			SubNode tryNode = getNode(session, fullPath.toString(), false);
 			if (tryNode == null) {
-				throw new RuntimeException("Tree corrupt! path not found: " + fullPath.toString());
+				throw new RuntimeEx("Tree corrupt! path not found: " + fullPath.toString());
 			}
 
 			// if this session user is the owner of this node, then they have full power
@@ -282,7 +283,7 @@ public class MongoApi {
 	 */
 	public String getNodeOwner(MongoSession session, SubNode node) {
 		if (node.getOwner() == null) {
-			throw new RuntimeException("Node has null owner: " + XString.prettyPrint(node));
+			throw new RuntimeEx("Node has null owner: " + XString.prettyPrint(node));
 		}
 		SubNode userNode = getNode(session, node.getOwner());
 		return userNode.getStringProp(NodeProp.USER.s());
@@ -323,8 +324,6 @@ public class MongoApi {
 	// node.setPath(newPathPrefix);
 	// }
 
-	// todo-0: final work on soft deletes: Say to user on front end "Move Node to
-	// Trash" or "Permanently Delete Node" based on '/d/' in path.
 	public void deleteNode(MongoSession session, SubNode node) {
 		attachmentService.deleteBinary(session, node);
 		delete(session, node);
@@ -518,7 +517,7 @@ public class MongoApi {
 				 * ownernode until created
 				 */
 				if (!session.isAdmin()) {
-					throw new RuntimeException("No user node found for user: " + session.getUser());
+					throw new RuntimeEx("No user node found for user: " + session.getUser());
 				} else
 					return null;
 			} else {
@@ -527,7 +526,7 @@ public class MongoApi {
 		}
 
 		if (ownerId == null) {
-			throw new RuntimeException("Unable to get ownerId from the session.");
+			throw new RuntimeEx("Unable to get ownerId from the session.");
 		}
 
 		// if we return null, it indicates the owner is Admin.
@@ -588,7 +587,7 @@ public class MongoApi {
 
 		saveSession(session);
 		if (!ops.exists(query, SubNode.class)) {
-			throw new RuntimeException("Attempted to add a node before its parent exists:" + parentPath);
+			throw new RuntimeEx("Attempted to add a node before its parent exists:" + parentPath);
 		}
 	}
 
@@ -829,7 +828,7 @@ public class MongoApi {
 	 */
 	public SubNode getNode(MongoSession session, String searchArg, boolean allowAuth) {
 		if (searchArg.equals("/")) {
-			throw new RuntimeException(
+			throw new RuntimeEx(
 					"SubNode doesn't implement the root node. Root is implicit and never needs an actual node to represent it.");
 		}
 
@@ -1045,7 +1044,7 @@ public class MongoApi {
 		auth(session, node, PrivilegeType.READ);
 
 		if (node.getOrdinal() == null) {
-			throw new RuntimeException("can't get node above node with null ordinal.");
+			throw new RuntimeEx("can't get node above node with null ordinal.");
 		}
 
 		// todo-2: research if there's a way to query for just one, rather than simply
@@ -1067,7 +1066,7 @@ public class MongoApi {
 	public SubNode getSiblingBelow(MongoSession session, SubNode node) {
 		auth(session, node, PrivilegeType.READ);
 		if (node.getOrdinal() == null) {
-			throw new RuntimeException("can't get node above node with null ordinal.");
+			throw new RuntimeEx("can't get node above node with null ordinal.");
 		}
 
 		// todo-2: research if there's a way to query for just one, rather than simply
@@ -1360,7 +1359,7 @@ public class MongoApi {
 
 	public SubNode createUser(MongoSession session, String user, String email, String password, boolean automated) {
 		// if (PrincipalName.ADMIN.s().equals(user)) {
-		// throw new RuntimeException("createUser should not be called fror admin
+		// throw new RuntimeEx("createUser should not be called fror admin
 		// user.");
 		// }
 
@@ -1405,7 +1404,7 @@ public class MongoApi {
 			userNode = getUserNodeByUserName(session, user);
 		}
 		if (userNode == null) {
-			throw new RuntimeException("userNode not found.");
+			throw new RuntimeEx("userNode not found.");
 		}
 
 		String path = userNode.getPath() + "/" + pathPart;
@@ -1498,7 +1497,7 @@ public class MongoApi {
 				session.setUser(userName);
 				session.setUserNode(userNode);
 			} else {
-				throw new RuntimeException("Login failed.");
+				throw new RuntimeEx("Login failed.");
 			}
 		}
 		return session;

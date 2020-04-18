@@ -15,6 +15,7 @@ import org.apache.commons.io.comparator.NameFileComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.subnode.exception.base.RuntimeEx;
 
 @Component
 public class FileUtils {
@@ -109,7 +110,7 @@ public class FileUtils {
 		try {
 			return readFile(file.getCanonicalPath());
 		} catch (Exception e) {
-			throw new RuntimeException("unable to read fil.", e);
+			throw new RuntimeEx("unable to read fil.", e);
 		}
 	}
 
@@ -118,14 +119,14 @@ public class FileUtils {
 			byte[] encoded = Files.readAllBytes(Paths.get(path));
 			return new String(encoded, StandardCharsets.UTF_8);
 		} catch (Exception e) {
-			throw new RuntimeException("unable to read file: " + path, e);
+			throw new RuntimeEx("unable to read file: " + path, e);
 		}
 	}
 
 	public File[] getSortedListOfFolders(String folder, Set<String> exclusions) {
 		File directory = new File(folder);
 		if (!directory.isDirectory()) {
-			throw new RuntimeException("Folder doesn't exist: " + folder);
+			throw new RuntimeEx("Folder doesn't exist: " + folder);
 		}
 
 		/* First read folders and sort them */
@@ -149,7 +150,7 @@ public class FileUtils {
 	public File[] getSortedListOfFiles(String folder, Set<String> exclusions) {
 		File directory = new File(folder);
 		if (!directory.isDirectory()) {
-			throw new RuntimeException("Folder doesn't exist: " + folder);
+			throw new RuntimeEx("Folder doesn't exist: " + folder);
 		}
 		/* Then read files and sort them */
 		File[] files = directory.listFiles(new FileFilter() {

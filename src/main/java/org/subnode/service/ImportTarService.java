@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.UserPreferences;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -26,7 +27,7 @@ public class ImportTarService extends ImportArchiveBase {
 	public SubNode importFromStream(MongoSession session, InputStream is, SubNode node,
 			boolean isNonRequestThread) {
 		if (used) {
-			throw new RuntimeException("Prototype bean used multiple times is not allowed.");
+			throw new RuntimeEx("Prototype bean used multiple times is not allowed.");
 		}
 		used = true;
 

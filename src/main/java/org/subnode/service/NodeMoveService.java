@@ -3,6 +3,7 @@ package org.subnode.service;
 import java.util.List;
 
 import org.subnode.config.NodeName;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -57,7 +58,7 @@ public class NodeMoveService {
 
 		SubNode node = api.getNode(session, nodeId);
 		if (node == null) {
-			throw new RuntimeException("Node not found: " + nodeId);
+			throw new RuntimeEx("Node not found: " + nodeId);
 		}
 
 		if ("up".equals(req.getTargetName())) {
@@ -69,7 +70,7 @@ public class NodeMoveService {
 		} else if ("bottom".equals(req.getTargetName())) {
 			moveNodeToBottom(session, node);
 		} else {
-			throw new RuntimeException("Invalid target type: " + req.getTargetName());
+			throw new RuntimeEx("Invalid target type: " + req.getTargetName());
 		}
 
 		res.setSuccess(true);
@@ -156,7 +157,7 @@ public class NodeMoveService {
 
 		SubNode userNode = api.getUserNodeByUserName(null, null);
 		if (userNode == null) {
-			throw new RuntimeException("User not found.");
+			throw new RuntimeEx("User not found.");
 		}
 
 		for (String nodeId : req.getNodeIds()) {
@@ -253,7 +254,7 @@ public class NodeMoveService {
 
 		for (SubNode node : api.getSubGraph(session, graphRoot)) {
 			if (!node.getPath().startsWith(originalPath)) {
-				throw new RuntimeException(
+				throw new RuntimeEx(
 						"Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
 			}
 			log.debug("PROCESSING MOVE: oldPath: " + node.getPath());

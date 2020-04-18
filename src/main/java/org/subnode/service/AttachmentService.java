@@ -28,6 +28,7 @@ import org.subnode.config.NodeName;
 import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
 import org.subnode.config.SpringContextUtil;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.image.ImageUtil;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
@@ -46,7 +47,6 @@ import org.subnode.util.LimitedInputStream;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.MimeTypeUtils;
 import org.subnode.util.MultipartFileSender;
-import org.subnode.util.RuntimeEx;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
@@ -168,15 +168,12 @@ public class AttachmentService {
 					// attaches AND closes the stream.
 					attachBinaryFromStream(session, node, nodeId, fileName, size, limitedIs, contentType, -1, -1,
 							addAsChildren, explodeZips, toIpfs, true, false, true);
-
 				}
 			}
 			api.saveSession(session);
 		} 
 		catch (Exception e) {
-			//I need a universal pattern for this kind of handling everywhere in the code. todo-0
-			if (e instanceof RuntimeEx) throw (RuntimeEx)e;
-			throw new RuntimeEx(e);
+			throw ExUtil.newEx(e);
 		}
 
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -289,7 +286,7 @@ public class AttachmentService {
 					log.error("Failed to get image length.", e);
 				}
 			} catch (Exception e) {
-				throw new RuntimeException(e);
+				throw new RuntimeEx(e);
 			} finally {
 				if (closeStream) {
 					StreamUtil.close(is, isTemp);
@@ -592,19 +589,19 @@ public class AttachmentService {
 	public ResponseEntity<StreamingResponseBody> getFileSystemResourceStream(MongoSession session, String nodeId,
 			String disposition) {
 		if (!session.isAdmin()) {
-			throw new RuntimeException("unauthorized");
+			throw new RuntimeEx("unauthorized");
 		}
 
 		try {
 			SubNode node = api.getNode(session, nodeId, false);
 			if (node == null) {
-				throw new RuntimeException("node not found: " + nodeId);
+				throw new RuntimeEx("node not found: " + nodeId);
 			}
 			String fullFileName = node.getStringProp(NodeProp.FS_LINK);
 			File file = new File(fullFileName);
 
 			if (!file.exists() || !file.isFile()) {
-				throw new RuntimeException("File not found: " + fullFileName);
+				throw new RuntimeEx("File not found: " + fullFileName);
 			}
 
 			String mimeType = mimeTypeUtils.getMimeType(file);
@@ -643,7 +640,7 @@ public class AttachmentService {
 		try {
 			SubNode node = api.getNode(session, nodeId, false);
 			if (node == null) {
-				throw new RuntimeException("node not found: " + nodeId);
+				throw new RuntimeEx("node not found: " + nodeId);
 			}
 
 			api.auth(session, node, PrivilegeType.READ);
@@ -652,7 +649,7 @@ public class AttachmentService {
 			File file = new File(fullFileName);
 
 			if (!file.exists() || !file.isFile()) {
-				throw new RuntimeException("File not found: " + fullFileName);
+				throw new RuntimeEx("File not found: " + fullFileName);
 			}
 
 			MultipartFileSender.fromPath(file.toPath()).with(request).with(response).withDisposition(disposition)
@@ -694,7 +691,7 @@ public class AttachmentService {
 			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 
 			if (size == 0) {
-				throw new RuntimeException("Can't stream video without the file size. sn:size property missing");
+				throw new RuntimeEx("Can't stream video without the file size. sn:size property missing");
 			}
 
 			inStream = new BufferedInputStream(is);
@@ -765,7 +762,7 @@ public class AttachmentService {
 			attachBinaryFromStream(session, null, nodeId, "data-url", 0L, limitedIs, mimeType, -1, -1, false, false,
 					false, false, true, true);
 		} else {
-			throw new RuntimeException("Unsupported inline data type.");
+			throw new RuntimeEx("Unsupported inline data type.");
 		}
 	}
 
@@ -929,7 +926,7 @@ public class AttachmentService {
 		}
 
 		if (userNode == null) {
-			throw new RuntimeException("User not found.");
+			throw new RuntimeEx("User not found.");
 		}
 
 		/*
@@ -994,11 +991,11 @@ public class AttachmentService {
 		try {
 			InputStream is = gridFsResource.getInputStream();
 			if (is == null) {
-				throw new RuntimeException("Unable to get inputStream");
+				throw new RuntimeEx("Unable to get inputStream");
 			}
 			return is;
 		} catch (Exception e) {
-			throw new RuntimeException("unable to readStream", e);
+			throw new RuntimeEx("unable to readStream", e);
 		}
 	}
 
@@ -1036,12 +1033,12 @@ public class AttachmentService {
 		try {
 			InputStream is = gridFsResource.getInputStream();
 			if (is == null) {
-				throw new RuntimeException("Unable to get inputStream");
+				throw new RuntimeEx("Unable to get inputStream");
 			}
 			String result = IOUtils.toString(is, StandardCharsets.UTF_8.name());
 			return result;
 		} catch (Exception e) {
-			throw new RuntimeException("unable to readStream", e);
+			throw new RuntimeEx("unable to readStream", e);
 		}
 	}
 

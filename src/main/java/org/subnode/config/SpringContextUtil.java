@@ -1,5 +1,6 @@
 package org.subnode.config;
 
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mongo.MongoRepository;
 
 import org.slf4j.Logger;
@@ -30,12 +31,13 @@ public class SpringContextUtil implements ApplicationContextAware {
 		log.debug("SpringContextUtil initialized context.");
 		SpringContextUtil.context = context;
 
+		//todo-0: is it good or awkward to have a Lambda function that does nothing but wrap an exception?
 		try {
 			mongoRepo.init();
 		}
 		catch (Exception e) {
 			log.error("application startup failed.");
-			throw new RuntimeException(e);
+			throw new RuntimeEx(e);
 		}
 
 		testRunner.test();
@@ -47,7 +49,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 
 	public static Object getBean(Class clazz) {
 		if (context == null) {
-			throw new RuntimeException("SpringContextUtil accessed before spring initialized.");
+			throw new RuntimeEx("SpringContextUtil accessed before spring initialized.");
 		}
 
 		return context.getBean(clazz);
@@ -55,7 +57,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 
 	public static Object getBean(String name) {
 		if (context == null) {
-			throw new RuntimeException("SpringContextUtil accessed before spring initialized.");
+			throw new RuntimeEx("SpringContextUtil accessed before spring initialized.");
 		}
 
 		return context.getBean(name);

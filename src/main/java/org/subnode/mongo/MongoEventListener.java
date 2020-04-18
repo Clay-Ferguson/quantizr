@@ -3,6 +3,7 @@ package org.subnode.mongo;
 import java.util.Date;
 
 import org.subnode.config.NodeName;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Util;
@@ -86,7 +87,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 			/* otherwise we have a problem, because we require an owner always */
 			else {
-				throw new RuntimeException("Attempted to save node with no owner: " + XString.prettyPrint(node));
+				throw new RuntimeEx("Attempted to save node with no owner: " + XString.prettyPrint(node));
 			}
 		}
 

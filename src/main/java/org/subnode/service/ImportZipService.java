@@ -3,6 +3,7 @@ package org.subnode.service;
 import java.io.InputStream;
 
 import org.subnode.config.SpringContextUtil;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.UserPreferences;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -56,7 +57,7 @@ public class ImportZipService extends ImportArchiveBase {
 	public SubNode importFromStream(MongoSession session, InputStream is, SubNode node,
 			boolean isNonRequestThread) {
 		if (used) {
-			throw new RuntimeException("Prototype bean used multiple times is not allowed.");
+			throw new RuntimeEx("Prototype bean used multiple times is not allowed.");
 		}
 		used = true;
 

@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.MerkleDAGSyncStats;
 import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
@@ -103,11 +104,11 @@ public class IPFSSyncService {
 		 */
 		// todo-2: Don't we have a dedicated exception for this?
 		if (!PrincipalName.ADMIN.s().equals(api.getNodeOwner(session, node))) {
-			throw new RuntimeException("unauthorized");
+			throw new RuntimeEx("unauthorized");
 		}
 
 		if (!isSyncableNode(session, node)) {
-			throw new RuntimeException("Not a syncable node.");
+			throw new RuntimeEx("Not a syncable node.");
 		}
 
 		if (stats == null) {
@@ -292,7 +293,7 @@ public class IPFSSyncService {
 		// for (File folder : folders) {
 		// SubNode folderNode = nodeMap.get(folder.getName());
 		// if (folderNode == null) {
-		// throw new RuntimeException("folder.getName " + folder.getName() + " wasn't
+		// throw new RuntimeEx("folder.getName " + folder.getName() + " wasn't
 		// found in nodeMap");
 		// }
 		// processSync(session, folderNode, recursive, level + 1, stats);

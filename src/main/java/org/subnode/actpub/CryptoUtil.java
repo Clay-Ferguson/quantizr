@@ -10,6 +10,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 import org.subnode.config.AppProp;
+import org.subnode.exception.base.RuntimeEx;
 import org.subnode.util.FileUtils;
 
 import org.slf4j.Logger;
@@ -72,7 +73,7 @@ public class CryptoUtil {
 
             return encodedString;
         } catch (Exception e) {
-            throw new RuntimeException("signer failed.", e);
+            throw new RuntimeEx("signer failed.", e);
         }
     }
 
