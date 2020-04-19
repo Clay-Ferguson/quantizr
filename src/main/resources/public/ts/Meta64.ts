@@ -116,7 +116,10 @@ export class Meta64 implements Meta64Intf {
         "editMode": false,
         "importAllowed": false,
         "exportAllowed": false,
-        "showMetaData": false
+        "showMetaData": false,
+
+        //todo-0: how to make this optional (by annotation in the java)?
+        "maxUploadFileSize": 0
     };
 
     rebuildIndexes = (): void => {

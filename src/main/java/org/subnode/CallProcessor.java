@@ -47,12 +47,13 @@ public class CallProcessor {
 		ThreadLocals.setHttpSession(httpSession);
 		logRequest(command, req, httpSession);
 
+		
 		/* Instantiating this, runs its constructor and ensures our threadlocal at least has an object, but most (not all) implenentations of methods end up instantiating
 		their own which overwrites this */
 		new ResponseBase();
 
 		if (AppServer.isShuttingDown()) {
-			throw ExUtil.newEx("Server is shutting down.");
+			throw ExUtil.wrapEx("Server is shutting down.");
 		}
 
 		Object ret = null;
@@ -210,7 +211,7 @@ public class CallProcessor {
 				res.setSuccess(false);
 				res.setMessage("Wrong username/password.");
 			}
-			throw ExUtil.newEx(e);
+			throw ExUtil.wrapEx(e);
 		}
 	}
 

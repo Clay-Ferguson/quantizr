@@ -39,7 +39,7 @@ public class ImportBookService {
 			session = ThreadLocals.getMongoSession();
 		}
 		if (!sessionContext.isAdmin() && !sessionContext.isTestAccount()) {
-			throw ExUtil.newEx("insertBook is an admin-only feature.");
+			throw ExUtil.wrapEx("insertBook is an admin-only feature.");
 		}
 
 		String nodeId = req.getNodeId();

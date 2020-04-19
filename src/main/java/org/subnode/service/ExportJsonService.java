@@ -74,7 +74,7 @@ public class ExportJsonService {
 	public String dumpAllNodes(MongoSession session, String pathPrefix, String fileName) {
 		try {
 			if (!FileTools.dirExists(appProp.getAdminDataFolder())) {
-				throw ExUtil.newEx("adminDataFolder does not exist");
+				throw ExUtil.wrapEx("adminDataFolder does not exist");
 			}
 
 			String targetFolder = appProp.getAdminDataFolder() + File.separator + fileName;
@@ -122,7 +122,7 @@ public class ExportJsonService {
 				});
 				os.flush();
 			} catch (Exception ex) {
-				throw ExUtil.newEx(ex);
+				throw ExUtil.wrapEx(ex);
 			} finally {
 				StreamUtil.close(os);
 			}
@@ -147,7 +147,7 @@ public class ExportJsonService {
 				String resourceName = "classpath:/nodes/" + subFolder + "/" + oid.toHexString() + "-" + binFileName;
 				Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 				is = resource.getInputStream();
-				lis = new LimitedInputStreamEx(is, Const.DEFAULT_MAX_FILE_SIZE); 
+				lis = new LimitedInputStreamEx(is, session.getMaxUploadSize()); 
 				attachmentService.writeStream(session, node, lis, binFileName, binMime);
 				api.save(session, node);
 

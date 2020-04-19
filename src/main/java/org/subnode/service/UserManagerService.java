@@ -255,7 +255,7 @@ public class UserManagerService {
 
 			if (node != null) {
 				if (!node.getBooleanProp(NodeProp.SIGNUP_PENDING.s())) {
-					throw ExUtil.newEx("Signup was already completed.");
+					throw ExUtil.wrapEx("Signup was already completed.");
 				}
 
 				String userName = node.getStringProp(NodeProp.USER.s());
@@ -289,7 +289,7 @@ public class UserManagerService {
 
 				sessionContext.setSignupSuccessMessage("Signup Successful. You may login now.");
 			} else {
-				throw ExUtil.newEx("Signup Code is invalid.");
+				throw ExUtil.wrapEx("Signup Code is invalid.");
 			}
 		});
 	}
@@ -468,6 +468,7 @@ public class UserManagerService {
 			userPrefs.setShowMetaData(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_METADATA.s()));
 			userPrefs.setImportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_IMPORT_ALLOWED.s()));
 			userPrefs.setExportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_EXPORT_ALLOWED.s()));
+			userPrefs.setMaxUploadFileSize(prefsNode.getIntProp(NodeProp.BIN_MAX_UPLOAD_SIZE.s()));
 		});
 
 		return userPrefs;
@@ -502,14 +503,14 @@ public class UserManagerService {
 				userNode[0] = api.getNode(mongoSession, userNodeId);
 
 				if (userNode[0] == null) {
-					throw ExUtil.newEx("Invald password reset code.");
+					throw ExUtil.wrapEx("Invald password reset code.");
 				}
 
 				String codePart = XString.parseAfterLast(passCode, "-");
 
 				String nodeCodePart = userNode[0].getStringProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 				if (!codePart.equals(nodeCodePart)) {
-					throw ExUtil.newEx("Invald password reset code.");
+					throw ExUtil.wrapEx("Invald password reset code.");
 				}
 
 				String password = req.getNewPassword();
@@ -528,7 +529,7 @@ public class UserManagerService {
 			userNode[0] = api.getUserNodeByUserName(session, session.getUser());
 
 			if (userNode[0] == null) {
-				throw ExUtil.newEx("changePassword cannot find user.");
+				throw ExUtil.wrapEx("changePassword cannot find user.");
 			}
 
 			if (PrincipalName.ADMIN.s().equals(userName[0])) {

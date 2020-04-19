@@ -89,11 +89,11 @@ public abstract class ExportArchiveBase {
 		UserPreferences userPreferences = sessionContext.getUserPreferences();
 		boolean exportAllowed = userPreferences != null ? userPreferences.isExportAllowed() : false;
 		if (!exportAllowed && !sessionContext.isAdmin()) {
-			throw ExUtil.newEx("You are not authorized to export.");
+			throw ExUtil.wrapEx("You are not authorized to export.");
 		}
 
 		if (!FileTools.dirExists(appProp.getAdminDataFolder())) {
-			throw ExUtil.newEx("adminDataFolder does not exist: " + appProp.getAdminDataFolder());
+			throw ExUtil.wrapEx("adminDataFolder does not exist: " + appProp.getAdminDataFolder());
 		}
 
 		String nodeId = req.getNodeId();
@@ -112,7 +112,7 @@ public abstract class ExportArchiveBase {
 			res.setFileName(shortFileName);
 			success = true;
 		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
+			throw ExUtil.wrapEx(ex);
 		} finally {
 			closeOutputStream();
 
@@ -323,7 +323,7 @@ public abstract class ExportArchiveBase {
 				return null;
 			}
 		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
+			throw ExUtil.wrapEx(ex);
 		}
 	}
 

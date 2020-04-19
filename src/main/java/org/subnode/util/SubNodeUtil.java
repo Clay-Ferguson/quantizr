@@ -94,7 +94,7 @@ public class SubNodeUtil {
 		if (!parentPath.equals("/")) {
 			parent = api.getNode(session, parentPath);
 			if (parent == null) {
-				throw ExUtil.newEx("Expected parent not found: " + parentPath);
+				throw ExUtil.wrapEx("Expected parent not found: " + parentPath);
 			}
 		}
 
@@ -117,7 +117,7 @@ public class SubNodeUtil {
 				parent = api.createNode(session, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST);
 
 				if (parent == null) {
-					throw ExUtil.newEx("unable to create " + nameToken);
+					throw ExUtil.wrapEx("unable to create " + nameToken);
 				}
 				nodesCreated = true;
 

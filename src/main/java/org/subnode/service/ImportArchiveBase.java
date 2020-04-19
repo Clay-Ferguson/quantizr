@@ -104,7 +104,7 @@ public abstract class ImportArchiveBase {
 				storeBinary(entry, zis);
 			}
 		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
+			throw ExUtil.wrapEx(ex);
 		}
 	}
 
@@ -147,7 +147,7 @@ public abstract class ImportArchiveBase {
 			Long length = node.getIntProp(NodeProp.BIN_SIZE.s());
 			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 
-			int maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
+			int maxFileSize = session.getMaxUploadSize();
 			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, maxFileSize);
 			log.debug("Attaching binary to nodeId: "+node.getId().toHexString());
 			attachmentService.attachBinaryFromStream(session, node, null, fileName, length, lzis, mimeType, -1, -1,

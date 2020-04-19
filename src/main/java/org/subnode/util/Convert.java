@@ -251,7 +251,7 @@ public class Convert {
 			PropertyInfo propInfo = new PropertyInfo(propName, value);
 			return propInfo;
 		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
+			throw ExUtil.wrapEx(ex);
 		}
 	}
 

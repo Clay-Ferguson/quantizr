@@ -78,7 +78,7 @@ public class GraphNodesService {
 			GenerateContext ctx = new GenerateContext();
 			recurseNode(ctx, res, session, null, node, 0);
 		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
+			throw ExUtil.wrapEx(ex);
 		}
 
 		res.setSuccess(true);

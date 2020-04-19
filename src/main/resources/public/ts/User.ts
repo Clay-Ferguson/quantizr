@@ -52,17 +52,15 @@ export class User implements UserIntf {
             S.meta64.userName.toLowerCase() === "dan";
     }
 
-    setTitleUsingLoginResponse = (res): void => {
+    /* todo-0: move this into meta64 module */
+    setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
+
         var title = "";
         if (!S.meta64.isAnonUser) {
             title += "User: " + res.userName;
         }
-
         S.util.setInnerHTMLById("headerAppName", title);
-    }
 
-    /* TODO-3: move this into meta64 module */
-    setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
         if (res.rootNode) {
             S.meta64.homeNodeId = res.rootNode;
             S.meta64.homeNodePath = res.rootNodePath;
@@ -247,7 +245,6 @@ export class User implements UserIntf {
                     }
 
                     S.view.refreshTree(id, true, childId, true);
-                    this.setTitleUsingLoginResponse(res);
 
                     setTimeout(() => {
                         S.encryption.initKeys();
@@ -279,7 +276,6 @@ export class User implements UserIntf {
 
         if (res.success) {
             this.setStateVarsUsingLoginResponse(res);
-            this.setTitleUsingLoginResponse(res);
         }
 
         S.meta64.loadAnonPageHome();

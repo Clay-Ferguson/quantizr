@@ -47,11 +47,11 @@ public class BashService {
 		}
 
 		if (true) {
-			throw ExUtil.newEx("disabled pending security review.");
+			throw ExUtil.wrapEx("disabled pending security review.");
 		}
 
 		if (!sessionContext.isAdmin()) {
-			throw ExUtil.newEx("executeNode is an admin-only feature.");
+			throw ExUtil.wrapEx("executeNode is an admin-only feature.");
 		}
 
 		String nodeId = req.getNodeId();
@@ -82,7 +82,7 @@ public class BashService {
 
 	public void runBashScript(String script, ExecuteNodeResponse res) {
 		if (!FileTools.dirExists(appProp.getAdminDataFolder())) {
-			throw ExUtil.newEx("adminDataFolder does not exist");
+			throw ExUtil.wrapEx("adminDataFolder does not exist");
 		}
 
 		String shortFileName = "bash-" + util.getGUID() + ".sh";

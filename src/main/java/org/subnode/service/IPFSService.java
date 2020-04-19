@@ -180,7 +180,7 @@ public class IPFSService {
         return ret;
     }
 
-    public String addFromStream(InputStream stream, String mimeType, ValContainer<Integer> streamSize) {
+    public String addFromStream(MongoSession session, InputStream stream, String mimeType, ValContainer<Integer> streamSize) {
         String hash = null;
         try {
             // https://docs-beta.ipfs.io/reference/http/api
@@ -189,7 +189,7 @@ public class IPFSService {
             HttpHeaders headers = new HttpHeaders();
 
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, Const.DEFAULT_MAX_FILE_SIZE);
+            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, session.getMaxUploadSize());
             bodyMap.add("file", new InputStreamResource(lis));
 
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);

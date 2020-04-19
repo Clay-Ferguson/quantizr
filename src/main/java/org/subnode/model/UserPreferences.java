@@ -8,6 +8,7 @@ public class UserPreferences {
 	private boolean showMetaData;
 	private boolean importAllowed;
 	private boolean exportAllowed;
+	private long maxUploadFileSize;
 
 	public boolean isEditMode() {
 		return editMode;
@@ -39,5 +40,13 @@ public class UserPreferences {
 
 	public void setShowMetaData(boolean showMetaData) {
 		this.showMetaData = showMetaData;
+	}
+
+	public long getMaxUploadFileSize() {
+		return maxUploadFileSize;
+	}
+
+	public void setMaxUploadFileSize(long maxUploadFileSize) {
+		this.maxUploadFileSize = maxUploadFileSize;
 	}
 }

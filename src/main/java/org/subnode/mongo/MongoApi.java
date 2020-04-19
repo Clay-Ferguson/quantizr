@@ -668,7 +668,7 @@ public class MongoApi {
 				numDocs++;
 			}
 		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
+			throw ExUtil.wrapEx(ex);
 		}
 
 		//todo-1: I have a 'formatMemory' written in javascript, and need to do same here or see if there's an apachie string function for it.

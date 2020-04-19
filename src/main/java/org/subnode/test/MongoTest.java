@@ -237,7 +237,7 @@ public class MongoTest {
 		try {
 			SubNode node = api.createNode(session, "/binaries");
 			api.save(session, node);
-			int maxFileSize = Const.DEFAULT_MAX_FILE_SIZE; 
+			int maxFileSize = session.getMaxUploadSize(); 
 			attachmentService.writeStream(session, node, new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png");
 			api.save(session, node);
 

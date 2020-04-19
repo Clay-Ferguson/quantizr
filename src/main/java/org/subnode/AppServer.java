@@ -58,7 +58,7 @@ public class AppServer {
 
 	public static void shutdownCheck() {
 		if (shuttingDown)
-			throw ExUtil.newEx("Server is shutting down.");
+			throw ExUtil.wrapEx("Server is shutting down.");
 	}
 
 	public static boolean isShuttingDown() {

@@ -147,7 +147,7 @@ public class FileIndexer {
 			return;
 		initialized = true;
 		if (StringUtils.isEmpty(appProp.getLuceneDir())) {
-			throw ExUtil.newEx("Lucend Data Dir is not configured.");
+			throw ExUtil.wrapEx("Lucend Data Dir is not configured.");
 		}
 
 		try {
@@ -174,7 +174,7 @@ public class FileIndexer {
 			writer = new IndexWriter(fsDir, iwc);
 
 		} catch (IOException e) {
-			throw ExUtil.newEx(e);
+			throw ExUtil.wrapEx(e);
 		}
 	}
 

@@ -66,7 +66,7 @@ public class AclService {
 		SubNode node = api.getNode(session, nodeId);
 
 		if (!req.isIncludeAcl() && !req.isIncludeOwners()) {
-			throw ExUtil.newEx("no specific information requested for getNodePrivileges");
+			throw ExUtil.wrapEx("no specific information requested for getNodePrivileges");
 		}
 
 		if (req.isIncludeAcl()) {

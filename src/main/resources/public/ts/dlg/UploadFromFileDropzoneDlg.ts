@@ -175,9 +175,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     configureDropZone = (): void => {
+        let maxUploadSize = S.meta64.userPreferences.maxUploadFileSize;
 
         /* Allow 20MB for Quantizr uploads or 20GB for IPFS */
-        let maxFileSize = (this.toIpfs && this.toTemporal) ? Constants.MAX_UPLOAD_MB * 1024 : Constants.MAX_UPLOAD_MB;
+        let maxFileSize = (this.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
 
         let action;
         if (this.importMode) {
@@ -218,8 +219,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             // 'this' that is in scope during each call must be left as is.
             init: function () {
                 this.on("addedfile", function (file) {
-                    if (!dlg.toTemporal && (file.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB)) {
-                        S.util.showMessage("File is too large. Max Size=" + Constants.MAX_UPLOAD_MB + "MB");
+                    if (!dlg.toTemporal && (file.size > maxUploadSize * Constants.ONE_MB)) {
+                        S.util.showMessage("File is too large. Max Size=" + maxUploadSize + "MB");
                         return;
                     }
                     dlg.updateFileList(this);
@@ -297,10 +298,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
         S.util.getElm(this.dropzoneDiv.getId(), (elm: HTMLElement) => {
             this.dropzone = new Dropzone("#" + this.dropzoneDiv.getId(), config);
+            let maxUploadSize = S.meta64.userPreferences.maxUploadFileSize;
 
             if (this.autoAddFile) {
-                if (!dlg.toTemporal && (this.autoAddFile.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB)) {
-                    S.util.showMessage("File is too large. Max Size=" + Constants.MAX_UPLOAD_MB + "MB");
+                if (!dlg.toTemporal && (this.autoAddFile.size > maxUploadSize * Constants.ONE_MB)) {
+                    S.util.showMessage("File is too large. Max Size=" + maxUploadSize + "MB");
                     return;
                 }
 
@@ -339,7 +341,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             return false;
         }
 
-        let maxFileSizeMb = (this.toIpfs && this.toTemporal) ? Constants.MAX_UPLOAD_MB * 1024 : Constants.MAX_UPLOAD_MB;
+        let maxUploadSize = S.meta64.userPreferences.maxUploadFileSize;
+        let maxFileSizeMb = (this.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
 
         for (let file of this.fileList) {
             if (file.size > maxFileSizeMb * Constants.ONE_MB) {

@@ -75,7 +75,7 @@ public class FileTools {
 				StreamUtil.close(out);
 			}
 		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
+			throw ExUtil.wrapEx(ex);
 		}
 	}
 

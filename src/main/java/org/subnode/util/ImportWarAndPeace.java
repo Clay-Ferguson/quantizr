@@ -109,7 +109,7 @@ public class ImportWarAndPeace {
 			log.debug("book import successful.");
 		}
 		catch (Exception ex) {
-			throw ExUtil.newEx(ex);
+			throw ExUtil.wrapEx(ex);
 		}
 	}
 
@@ -117,7 +117,7 @@ public class ImportWarAndPeace {
 		if (line.startsWith("CHAPTER ")) {
 			globalChapter++;
 			log.debug("Processing Chapter: " + line);
-			if (curBook == null) throw ExUtil.newEx("book is null.");
+			if (curBook == null) throw ExUtil.wrapEx("book is null.");
 
 			addParagraph();
 

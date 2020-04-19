@@ -37,7 +37,7 @@ public class ExportTarService extends ExportArchiveBase {
 
             out.setAddPaxHeadersForNonAsciiNames(true);
         } catch (Exception ex) {
-            throw ExUtil.newEx(ex);
+            throw ExUtil.wrapEx(ex);
         }
     }
 
@@ -47,7 +47,7 @@ public class ExportTarService extends ExportArchiveBase {
             out.finish(); 
             out.close();
         } catch (Exception ex) {
-            throw ExUtil.newEx(ex);
+            throw ExUtil.wrapEx(ex);
         }
     }
     
@@ -66,7 +66,7 @@ public class ExportTarService extends ExportArchiveBase {
             out.write(bytes);
             out.closeArchiveEntry();
         } catch (Exception ex) {
-            throw ExUtil.newEx(ex);
+            throw ExUtil.wrapEx(ex);
         }
     }
 
@@ -91,7 +91,7 @@ public class ExportTarService extends ExportArchiveBase {
             IOUtils.copyLarge(stream, out, 0, length);
             out.closeArchiveEntry();
         } catch (Exception ex) {
-            throw ExUtil.newEx(ex);
+            throw ExUtil.wrapEx(ex);
         }
     }
 

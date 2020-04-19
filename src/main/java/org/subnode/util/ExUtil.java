@@ -16,15 +16,23 @@ import org.subnode.exception.base.RuntimeEx;
 public class ExUtil {
 	private static final Logger log = LoggerFactory.getLogger(ExUtil.class);
 	
-	public static RuntimeEx newEx(Throwable ex) {
-
+	public static void run(Runnable runnable) {
+		try {
+			runnable.run();
+		}
+		catch (Exception e) {
+			//log.error("oops.");
+			throw wrapEx(e);
+		}
+	}
+	public static RuntimeEx wrapEx(Throwable ex) {
 		if (ex instanceof RuntimeEx) {
 			return (RuntimeEx) ex;
 		}
 		return new RuntimeEx(ex);
 	}
 
-	public static RuntimeEx newEx(String msg) {
+	public static RuntimeEx wrapEx(String msg) {
 		RuntimeEx ex = new RuntimeEx(msg);
 		return ex;
 	}

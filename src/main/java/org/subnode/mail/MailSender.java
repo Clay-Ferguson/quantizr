@@ -74,7 +74,7 @@ public class MailSender implements TransportListener {
 			log.trace("connected");
 
 		} catch (Exception e) {
-			throw ExUtil.newEx(e);
+			throw ExUtil.wrapEx(e);
 		}
 	}
 
@@ -87,7 +87,7 @@ public class MailSender implements TransportListener {
 			try {
 				transport.close();
 			} catch (Exception e) {
-				throw ExUtil.newEx(e);
+				throw ExUtil.wrapEx(e);
 			} finally {
 				transport = null;
 			}
@@ -100,7 +100,7 @@ public class MailSender implements TransportListener {
 		}
 
 		if (transport == null) {
-			throw ExUtil.newEx("Tried to use MailSender after close() call or without initializing.");
+			throw ExUtil.wrapEx("Tried to use MailSender after close() call or without initializing.");
 		}
 
 		MimeMessage message = new MimeMessage(mailSession);
@@ -138,7 +138,7 @@ public class MailSender implements TransportListener {
 			// log.debug("Response: " + transport.getLastServerResponse() + " Code: " +
 			// transport.getLastReturnCode());
 		} catch (Exception e) {
-			throw ExUtil.newEx(e);
+			throw ExUtil.wrapEx(e);
 		}
 	}
 

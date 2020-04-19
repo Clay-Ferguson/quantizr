@@ -491,6 +491,7 @@ export interface UserPreferences {
     showMetaData: boolean;
     importAllowed: boolean;
     exportAllowed: boolean;
+    maxUploadFileSize: number;
 }
 
 export interface AccessControlInfo {

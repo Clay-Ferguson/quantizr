@@ -6,7 +6,6 @@ export interface UserIntf {
     closeAccountResponse(res: J.CloseAccountResponse): void;
     closeAccount(): void;
     isTestUserAccount(): boolean;
-    setTitleUsingLoginResponse(res): void;
     setStateVarsUsingLoginResponse(res: J.LoginResponse): void;
     openSignupPg(): void;
     openLoginPg(): void;

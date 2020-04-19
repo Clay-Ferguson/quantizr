@@ -43,7 +43,7 @@ public class ImportZipService extends ImportArchiveBase {
 			is = resource.getInputStream();
 			rootNode = importFromStream(session, is, node, true);
 		} catch (Exception e) {
-			throw ExUtil.newEx(e);
+			throw ExUtil.wrapEx(e);
 		} finally {
 			StreamUtil.close(is);
 		}
@@ -65,7 +65,7 @@ public class ImportZipService extends ImportArchiveBase {
 			UserPreferences userPreferences = sessionContext.getUserPreferences();
 			boolean importAllowed = userPreferences != null ? userPreferences.isImportAllowed() : false;
 			if (!importAllowed && !sessionContext.isAdmin()) {
-				throw ExUtil.newEx("You are not authorized to import.");
+				throw ExUtil.wrapEx("You are not authorized to import.");
 			}
 		}
 
@@ -82,7 +82,7 @@ public class ImportZipService extends ImportArchiveBase {
 			}
 
 		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
+			throw ExUtil.wrapEx(ex);
 		} finally {
 			StreamUtil.close(zis);
 		}

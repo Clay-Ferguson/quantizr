@@ -31,7 +31,6 @@ public class SpringContextUtil implements ApplicationContextAware {
 		log.debug("SpringContextUtil initialized context.");
 		SpringContextUtil.context = context;
 
-		//todo-0: is it good or awkward to have a Lambda function that does nothing but wrap an exception?
 		try {
 			mongoRepo.init();
 		}

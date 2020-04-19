@@ -67,7 +67,7 @@ public class MimeTypeUtils {
                 ret = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(file);
             }
         } catch (Exception ex) {
-            throw ExUtil.newEx(ex);
+            throw ExUtil.wrapEx(ex);
         }
         return ret;
     }

@@ -126,7 +126,7 @@ public class AttachmentService {
 	public ResponseEntity<?> uploadMultipleFiles(MongoSession session, String nodeId, MultipartFile[] uploadFiles,
 			boolean explodeZips, boolean toIpfs) {
 		if (nodeId == null) {
-			throw ExUtil.newEx("target nodeId not provided");
+			throw ExUtil.wrapEx("target nodeId not provided");
 		}
 
 		try {
@@ -147,13 +147,13 @@ public class AttachmentService {
 			SubNode node = api.getNode(session, nodeId);
 
 			if (node == null) {
-				throw ExUtil.newEx("Node not found.");
+				throw ExUtil.wrapEx("Node not found.");
 			}
 
 			api.auth(session, node, PrivilegeType.WRITE);
 
 			boolean addAsChildren = uploadFiles.length > 1;
-			int maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
+			int maxFileSize = session.getMaxUploadSize();
 
 			for (MultipartFile uploadFile : uploadFiles) {
 				String fileName = uploadFile.getOriginalFilename();
@@ -173,7 +173,7 @@ public class AttachmentService {
 			api.saveSession(session);
 		} 
 		catch (Exception e) {
-			throw ExUtil.newEx(e);
+			throw ExUtil.wrapEx(e);
 		}
 
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -214,7 +214,7 @@ public class AttachmentService {
 
 				node = newNode;
 			} catch (Exception ex) {
-				throw ExUtil.newEx(ex);
+				throw ExUtil.wrapEx(ex);
 			}
 		}
 
@@ -265,7 +265,7 @@ public class AttachmentService {
 		byte[] imageBytes = null;
 		InputStream isTemp = null;
 
-		int maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
+		int maxFileSize = session.getMaxUploadSize();
 
 		if (calcImageSize && ImageUtil.isImageMime(mimeType)) {
 			LimitedInputStream is = null;
@@ -403,7 +403,7 @@ public class AttachmentService {
 
 			String mimeTypeProp = node.getStringProp(NodeProp.BIN_MIME.s());
 			if (mimeTypeProp == null) {
-				throw ExUtil.newEx("unable to find mimeType property");
+				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
 			String fileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
@@ -480,7 +480,7 @@ public class AttachmentService {
 
 			String mimeTypeProp = node.getStringProp(NodeProp.BIN_MIME.s());
 			if (mimeTypeProp == null) {
-				throw ExUtil.newEx("unable to find mimeType property");
+				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
 			String fileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
@@ -544,7 +544,7 @@ public class AttachmentService {
 	public void getFile(MongoSession session, String fileName, String disposition, HttpServletResponse response) {
 
 		if (fileName.contains(".."))
-			throw ExUtil.newEx("bad request.");
+			throw ExUtil.wrapEx("bad request.");
 
 		BufferedInputStream inStream = null;
 		BufferedOutputStream outStream = null;
@@ -558,10 +558,10 @@ public class AttachmentService {
 			 * and assert that the file is in there directly
 			 */
 			if (!checkPath.startsWith(appProp.getAdminDataFolder()))
-				throw ExUtil.newEx("bad request.");
+				throw ExUtil.wrapEx("bad request.");
 
 			if (!file.isFile())
-				throw ExUtil.newEx("file not found.");
+				throw ExUtil.wrapEx("file not found.");
 
 			String mimeType = mimeTypeUtils.getMimeType(file);
 			if (disposition == null) {
@@ -580,7 +580,7 @@ public class AttachmentService {
 			IOUtils.copy(inStream, outStream);
 			outStream.flush();
 		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
+			throw ExUtil.wrapEx(ex);
 		} finally {
 			StreamUtil.close(inStream, outStream);
 		}
@@ -631,7 +631,7 @@ public class AttachmentService {
 					.contentType(MediaType.parseMediaType(mimeType))//
 					.body(stream);
 		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
+			throw ExUtil.wrapEx(ex);
 		}
 	}
 
@@ -655,7 +655,7 @@ public class AttachmentService {
 			MultipartFileSender.fromPath(file.toPath()).with(request).with(response).withDisposition(disposition)
 					.serveResource();
 		} catch (Exception ex) {
-			throw ExUtil.newEx(ex);
+			throw ExUtil.wrapEx(ex);
 		}
 	}
 
@@ -679,7 +679,7 @@ public class AttachmentService {
 
 			String mimeTypeProp = node.getStringProp(NodeProp.BIN_MIME.s());
 			if (mimeTypeProp == null) {
-				throw ExUtil.newEx("unable to find mimeType property");
+				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
 			String fileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
@@ -745,7 +745,7 @@ public class AttachmentService {
 	public void readFromDataUrl(MongoSession session, String sourceUrl, String nodeId, String mimeHint,
 			int maxFileSize) {
 		if (maxFileSize == 0) {
-			maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
+			maxFileSize = session.getMaxUploadSize();
 		}
 
 		if (session == null) {
@@ -770,7 +770,7 @@ public class AttachmentService {
 	public void readFromStandardUrl(MongoSession session, String sourceUrl, String nodeId, String mimeHint,
 			int maxFileSize) {
 		if (maxFileSize == 0) {
-			maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
+			maxFileSize = session.getMaxUploadSize();
 		}
 
 		if (session == null) {
@@ -845,7 +845,7 @@ public class AttachmentService {
 				}
 			}
 		} catch (Exception e) {
-			throw ExUtil.newEx(e);
+			throw ExUtil.wrapEx(e);
 		}
 		/* finally block just for extra safety */
 		finally {
@@ -893,7 +893,7 @@ public class AttachmentService {
 				}
 			}
 		} catch (Exception e) {
-			throw ExUtil.newEx(e);
+			throw ExUtil.wrapEx(e);
 		} finally {
 			StreamUtil.close(is, is2, reader);
 		}
@@ -939,7 +939,7 @@ public class AttachmentService {
 	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream, String mimeType) {
 		api.auth(session, node, PrivilegeType.WRITE);
 		ValContainer<Integer> streamSize = new ValContainer<Integer>();
-		String ipfsHash = ipfsService.addFromStream(stream, mimeType, streamSize);
+		String ipfsHash = ipfsService.addFromStream(session, stream, mimeType, streamSize);
 		node.setProp(NodeProp.IPFS_LINK.s(), new SubNodePropVal(ipfsHash));
 		node.setProp(NodeProp.BIN_SIZE.s(), streamSize.getVal());
 	}

@@ -395,7 +395,7 @@ public class AppController {
 				svc.setUseGZip(true);
 				svc.export(ms, req, res);
 			} else {
-				throw ExUtil.newEx("Unsupported file extension: " + req.getExportExt());
+				throw ExUtil.wrapEx("Unsupported file extension: " + req.getExportExt());
 			}
 			return res;
 		});
@@ -446,7 +446,7 @@ public class AppController {
 	public @ResponseBody Object insertBook(@RequestBody InsertBookRequest req, HttpSession session) {
 		return callProc.run("insertBook", req, session, ms -> {
 			if (!sessionContext.isAdmin()) {
-				throw ExUtil.newEx("admin only function.");
+				throw ExUtil.wrapEx("admin only function.");
 			}
 
 			return importBookService.insertBook(ms, req);
@@ -459,7 +459,7 @@ public class AppController {
 			ExecuteNodeResponse res = new ExecuteNodeResponse();
 
 			if (!sessionContext.isAdmin()) {
-				throw ExUtil.newEx("admin only function.");
+				throw ExUtil.wrapEx("admin only function.");
 			}
 
 			// todo-1: disabling pending security audit.
@@ -747,7 +747,7 @@ public class AppController {
 			if (req.getCommand().equalsIgnoreCase("getJson")) {
 				// allow this one if user owns node.
 			} else if (!sessionContext.isAdmin()) {
-				throw ExUtil.newEx("admin only function.");
+				throw ExUtil.wrapEx("admin only function.");
 			}
 
 			log.debug("Command: " + req.getCommand());
@@ -778,7 +778,7 @@ public class AppController {
 	public @ResponseBody Object luceneIndex(@RequestBody LuceneIndexRequest req, HttpSession session) {
 		return callProc.run("luceneIndex", req, session, ms -> {
 			if (!sessionContext.isAdmin()) {
-				throw ExUtil.newEx("admin only function.");
+				throw ExUtil.wrapEx("admin only function.");
 			}
 
 			/*
@@ -831,7 +831,7 @@ public class AppController {
 		return callProc.run("rebuildIndexes", req, session, ms -> {
 			RebuildIndexesResponse res = new RebuildIndexesResponse();
 			if (!sessionContext.isAdmin()) {
-				throw ExUtil.newEx("admin only function.");
+				throw ExUtil.wrapEx("admin only function.");
 			}
 
 			adminRunner.run(mongoSession -> {
@@ -849,7 +849,7 @@ public class AppController {
 		return callProc.run("shutdownServerNode", req, session, ms -> {
 			ShutdownServerNodeResponse res = new ShutdownServerNodeResponse();
 			if (!sessionContext.isAdmin()) {
-				throw ExUtil.newEx("admin only function.");
+				throw ExUtil.wrapEx("admin only function.");
 			}
 
 			Runnable runnable = () -> {
@@ -875,7 +875,7 @@ public class AppController {
 		return callProc.run("sendTestEmail", req, session, ms -> {
 			SendTestEmailResponse res = new SendTestEmailResponse();
 			if (!sessionContext.isAdmin()) {
-				throw ExUtil.newEx("admin only function.");
+				throw ExUtil.wrapEx("admin only function.");
 			}
 			log.debug("SendEmailTest detected on server.");
 

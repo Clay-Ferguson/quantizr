@@ -31,7 +31,7 @@ public class ExportZipService extends ExportArchiveBase {
 
             out = new ZipArchiveOutputStream(new FileOutputStream(fileName));
         } catch (Exception ex) {
-            throw ExUtil.newEx(ex);
+            throw ExUtil.wrapEx(ex);
         }
     }
 
@@ -44,7 +44,7 @@ public class ExportZipService extends ExportArchiveBase {
             out.finish(); 
             out.close();
         } catch (Exception ex) {
-            throw ExUtil.newEx(ex);
+            throw ExUtil.wrapEx(ex);
         }
     }
 
@@ -77,7 +77,7 @@ public class ExportZipService extends ExportArchiveBase {
             //     throw ExUtil.newEx(ex);
             // }
         } catch (Exception ex) {
-            throw ExUtil.newEx(ex);
+            throw ExUtil.wrapEx(ex);
         }
     }
 
@@ -105,7 +105,7 @@ public class ExportZipService extends ExportArchiveBase {
             //     throw ExUtil.newEx(ex);
             // }
         } catch (Exception ex) {
-            throw ExUtil.newEx(ex);
+            throw ExUtil.wrapEx(ex);
         }
     }
 

@@ -30,7 +30,7 @@ public class ImportService {
 
 	public ResponseEntity<?> streamImport(MongoSession session, String nodeId, MultipartFile[] uploadFiles) {
 		if (nodeId == null) {
-			throw ExUtil.newEx("target nodeId not provided");
+			throw ExUtil.wrapEx("target nodeId not provided");
 		}
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
@@ -38,11 +38,11 @@ public class ImportService {
 
 		SubNode node = api.getNode(session, nodeId);
 		if (node == null) {
-			throw ExUtil.newEx("Node not found.");
+			throw ExUtil.wrapEx("Node not found.");
 		}
 
 		if (uploadFiles.length != 1) {
-			throw ExUtil.newEx("Multiple file import not allowed");
+			throw ExUtil.wrapEx("Multiple file import not allowed");
 		}
 
 		MultipartFile uploadFile = uploadFiles[0];
@@ -71,10 +71,10 @@ public class ImportService {
 					importTarService.importFromStream(session, in, node, false);
 					api.saveSession(session);
 				} else {
-					throw ExUtil.newEx("Only ZIP or TAR files are supported for importing.");
+					throw ExUtil.wrapEx("Only ZIP or TAR files are supported for importing.");
 				}
 			} catch (Exception ex) {
-				throw ExUtil.newEx(ex);
+				throw ExUtil.wrapEx(ex);
 			} finally {
 				StreamUtil.close(in);
 			}

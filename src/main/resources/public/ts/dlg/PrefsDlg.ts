@@ -53,7 +53,10 @@ export class PrefsDlg extends DialogBase {
                 "editMode": S.meta64.userPreferences.editMode,
                 "importAllowed": false,
                 "exportAllowed": false,
-                "showMetaData": S.meta64.showMetaData
+                "showMetaData": S.meta64.showMetaData,
+
+                //todo-0: how to make this optional (by annotation in the java)?
+                "maxUploadFileSize": -1,
             }
         }, this.savePreferencesResponse);
         this.close();
