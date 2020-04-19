@@ -78,7 +78,7 @@ export class Render implements RenderIntf {
             let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
 
             let viewFileLink: Anchor = null;
-            if (fileType=="application/pdf" || fileType.startsWith("text/")) {
+            if (fileType == "application/pdf" || fileType.startsWith("text/")) {
                 viewFileLink = new Anchor(this.getUrlForNodeAttachment(node), "[View]", {
                     target: "_blank",
                     className: "marginLeft"
@@ -431,6 +431,7 @@ export class Render implements RenderIntf {
         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode();
         let selected: boolean = (focusNode && focusNode.id === id);
 
+        //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
         let allowAvatar = node.owner != this.lastOwner;
         let buttonBar: Comp = this.makeRowButtonBar(node, editingAllowed, allowAvatar);
         //let bkgStyle: string = this.getNodeBkgImageStyle(node);
@@ -661,6 +662,7 @@ export class Render implements RenderIntf {
         }
 
         let avatarImg: Img;
+        //console.log("node.owner[" + node.id + "]=" + node.owner + " ownerId=" + node.ownerId + " allowAvatar=" + allowAvatar);
         if (allowAvatar && node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, node) */) {
             avatarImg = this.makeAvatarImage(node);
         }
@@ -860,6 +862,7 @@ export class Render implements RenderIntf {
                         }
 
                         let avatarImg: Img;
+                        //console.log("Root render: data.node.owner=" + data.node.owner);
                         if (data.node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, data.node) */) {
                             avatarImg = this.makeAvatarImage(data.node);
                         }
@@ -913,6 +916,7 @@ export class Render implements RenderIntf {
                     }
 
                     this.lastOwner = data.node.owner;
+                    //console.log("lastOwner (root)=" + data.node.owner);
                     if (data.node.children) {
                         output.push(this.renderChildren(data.node, newData, 1));
                     }
@@ -985,7 +989,7 @@ export class Render implements RenderIntf {
     private renderChildren = (node: J.NodeInfo, newData: boolean, level: number): Comp => {
         if (!node || !node.children) return null;
 
-        let childCount: number = node.children.length;
+        //let childCount: number = node.children.length;
         // console.log("childCount: " + childCount);
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on
@@ -993,7 +997,6 @@ export class Render implements RenderIntf {
          */
 
         let layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
-        this.lastOwner = node.owner;
         if (!layout || layout == "v") {
             return this.renderVerticalLayout(node, newData, level);
         }
@@ -1054,6 +1057,7 @@ export class Render implements RenderIntf {
                     comps.push(row);
                     rowCount++;
                 }
+                //console.log("lastOwner (child level " + level + ")=" + n.owner);
                 this.lastOwner = n.owner;
 
                 if (n.children) {
@@ -1106,6 +1110,8 @@ export class Render implements RenderIntf {
                 let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass);
                 if (row) {
                     comps.push(row);
+                    this.lastOwner = node.owner;
+                    //console.log("lastOwner (root)=" + node.owner);
                     rowCount++;
                 }
 
@@ -1113,7 +1119,6 @@ export class Render implements RenderIntf {
                     comps.push(this.renderChildren(n, newData, level + 1));
                 }
             }
-            this.lastOwner = n.owner;
         }
         return new Div(null, null, comps);
     }
@@ -1177,16 +1182,7 @@ export class Render implements RenderIntf {
     }
 
     getAvatarImgUrl = (node: J.NodeInfo) => {
-        let filePart = S.props.getNodePropVal(J.NodeProp.BIN, node);
-        if (!filePart) {
-            return null;
-        }
-
-        if (!S.props.getNodePropVal(J.NodeProp.BIN_MIME, node)) {
-            return null;
-        }
-
-        return S.util.getRpcPath() + "bin/" + filePart + "?nodeId=" + node.ownerId;
+        return S.util.getRpcPath() + "bin/avatar" + "?nodeId=" + node.ownerId + "&v=" + node.avatarVer;
     }
 
     makeImageTag = (node: J.NodeInfo): Img => {
@@ -1237,7 +1233,6 @@ export class Render implements RenderIntf {
         if (!src) {
             return null;
         }
-        //console.log("avatarImage src=" + src);
 
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
         let img: Img = new Img({

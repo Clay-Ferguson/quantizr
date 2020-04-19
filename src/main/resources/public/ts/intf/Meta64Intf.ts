@@ -2,7 +2,6 @@ import * as J from "../JavaIntf";
 import { GraphPanel } from "../widget/GraphPanel";
 
 export interface Meta64Intf {
-
     state: any; //todo-1: create an interface for State properties
     appInitialized: boolean;
     pendingLocationHash: string;

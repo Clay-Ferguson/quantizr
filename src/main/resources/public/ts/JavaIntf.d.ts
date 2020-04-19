@@ -483,6 +483,7 @@ export interface NodeInfo {
     owner: string;
     ownerId: string;
     dataUrl: string;
+    avatarVer: string;
 }
 
 export interface UserPreferences {

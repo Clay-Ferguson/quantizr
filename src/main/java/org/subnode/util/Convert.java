@@ -83,7 +83,7 @@ public class Convert {
 		List<AccessControlInfo> acList = buildAccessControlList(sessionContext, node);
 
 		String ownerId = node.getOwner().toHexString();
-
+		String avatarVer = null;
 		/*
 		 * todo-2: this is a spot that can be optimized. We should be able to send just
 		 * the userNodeId back to client, and the client should be able to deal with
@@ -101,6 +101,7 @@ public class Convert {
 					" tried to find owner=" + node.getOwner().toHexString());
 		} else {
 			nameProp = userNode.getStringProp(NodeProp.USER.s());
+			avatarVer = userNode.getStringProp(NodeProp.BIN.s());
 		}
 		String owner = userNode == null ? PrincipalName.ADMIN.s() : nameProp;
 
@@ -130,7 +131,7 @@ public class Convert {
 				node.getModifyTime(), propList, acList, hasChildren, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
-				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey, dataUrl, deleted);
+				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey, dataUrl, deleted, avatarVer);
 
 		if (allowInlineChildren) {
 			boolean hasInlineChildren = node.getBooleanProp(NodeProp.INLINE_CHILDREN.s());
