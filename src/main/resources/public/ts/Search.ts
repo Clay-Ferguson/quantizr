@@ -183,6 +183,8 @@ export class Search implements SearchIntf {
     }
 
     clickSearchNode = (id: string) => {
+        S.util.setElmDisplayById("listView", false);
+        S.util.setElmDisplayById("mainNodeContent", false);
         /*
          * update highlight node to point to the node clicked on, just to persist it for later
          */

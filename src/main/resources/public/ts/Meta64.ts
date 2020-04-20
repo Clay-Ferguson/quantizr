@@ -142,8 +142,21 @@ export class Meta64 implements Meta64Intf {
         S.view.refreshTree(null, true);
     }
 
+    /* This is an ugly function here, but it will vanish once the tab content area is rendered fully by a react state change */
+    rebuildTab = (tabName: string): void => {
+        if (tabName == "mainTab") {
+            S.render.resetTreeDom();
+        }
+        else if (tabName == "searchTab") {
+            S.srch.populateSearchResultsPage(S.srch.searchResults, "searchResultsPanel");
+        }
+        else if (tabName == "timelineTab") {
+            S.srch.populateSearchResultsPage(S.srch.timelineResults, "timelineResultsPanel");
+        }
+    }
+
     selectTab = (tabName: string): void => {
-        //console.log("selectTab: " + tabName);
+        //console.log("selectTab (sends click event): " + tabName);
         let tabElm = document.querySelector("[href='#" + tabName + "']");
         if (!tabElm) {
             //console.error("unable to find tab: " + tabName + " modify this code to use something like whenElm");
@@ -152,6 +165,7 @@ export class Meta64 implements Meta64Intf {
             setTimeout(() => {
                 let tabElm = document.querySelector("[href='#" + tabName + "']");
                 if (tabElm) {
+                    //console.log("click tab(1): " + tabName);
                     S.util.trigger(<HTMLElement>tabElm, "click");
                 }
                 else {
@@ -160,6 +174,8 @@ export class Meta64 implements Meta64Intf {
             }, 1000);
             return;
         }
+
+        //console.log("click tab(2): " + tabName);
         /* The way to select a tab with no JQuery is to simply trigger a click on the tab */
         S.util.trigger(<HTMLElement>tabElm, "click");
     }
@@ -314,7 +330,7 @@ export class Meta64 implements Meta64Intf {
                     let rowElmId = "row_" + curHighlightedNode.id;
 
                     if (curHighlightedNode.id == this.currentNodeData.node.id) {
-                        S.util.changeOrAddClass(rowElmId, activeClass+"-main", inactiveClass+"-main");
+                        S.util.changeOrAddClass(rowElmId, activeClass + "-main", inactiveClass + "-main");
                     }
                     else {
                         S.util.changeOrAddClass(rowElmId, activeClass, inactiveClass);
@@ -325,9 +341,9 @@ export class Meta64 implements Meta64Intf {
             if (!doneHighlighting) {
                 this.parentIdToFocusNodeMap[id] = node;
                 let rowElmId: string = "row_" + node.id;
-            
+
                 if (node.id == this.currentNodeData.node.id) {
-                    S.util.changeOrAddClass(rowElmId, inactiveClass+"-main", activeClass+"-main");
+                    S.util.changeOrAddClass(rowElmId, inactiveClass + "-main", activeClass + "-main");
                 }
                 else {
                     S.util.changeOrAddClass(rowElmId, inactiveClass, activeClass);
@@ -759,12 +775,6 @@ export class Meta64 implements Meta64Intf {
     }
 
     setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
-        var title = "";
-        if (!this.isAnonUser) {
-            title += "User: " + res.userName;
-        }
-        S.util.setInnerHTMLById("headerAppName", title);
-
         if (res.rootNode) {
             this.homeNodeId = res.rootNode;
             this.homeNodePath = res.rootNodePath;
@@ -791,6 +801,12 @@ export class Meta64 implements Meta64Intf {
         else {
             this.showMetaData = res.userPreferences.showMetaData;
         }
+
+        var title = "";
+        if (!this.isAnonUser) {
+            title += "User: " + res.userName;
+        }
+        S.util.setInnerHTMLById("headerAppName", title);
     }
 }
 

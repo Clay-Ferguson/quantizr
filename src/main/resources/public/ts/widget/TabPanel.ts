@@ -17,31 +17,30 @@ export class TabPanel extends Comp {
 
     static TAB_PREFIX: string = "tabVis";
     tabVisibility: { [key: string]: boolean } = {};
+    activeTab: string = null;
 
     constructor() {
         super(null);
- 
+
         let obj = {};
-        obj[TabPanel.TAB_PREFIX+"-main"] = true;
-        obj[TabPanel.TAB_PREFIX+"-search"] = false;
-        obj[TabPanel.TAB_PREFIX+"-timeline"] = false;
+        obj[TabPanel.TAB_PREFIX + "-main"] = true;
+        obj[TabPanel.TAB_PREFIX + "-search"] = false;
+        obj[TabPanel.TAB_PREFIX + "-timeline"] = false;
 
         this.mergeState(obj);
     }
 
-    setTabVisibility = (tabName: string, visible: boolean) : void => {
-
+    setTabVisibility = (tabName: string, visible: boolean): void => {
         let obj = {};
-        obj[TabPanel.TAB_PREFIX+"-" + tabName] = visible;
-
+        obj[TabPanel.TAB_PREFIX + "-" + tabName] = visible;
         this.mergeState(obj);
     }
 
     compRender = (): ReactNode => {
         let state = this.getState();
-        let mainDisplay = state[TabPanel.TAB_PREFIX+"-main"] ? "inline" : "none";
-        let searchDisplay = state[TabPanel.TAB_PREFIX+"-search"] ? "inline" : "none";
-        let timelineDisplay = state[TabPanel.TAB_PREFIX+"-timeline"] ? "inline" : "none";
+        let mainDisplay = state[TabPanel.TAB_PREFIX + "-main"] ? "inline" : "none";
+        let searchDisplay = state[TabPanel.TAB_PREFIX + "-search"] ? "inline" : "none";
+        let timelineDisplay = state[TabPanel.TAB_PREFIX + "-timeline"] ? "inline" : "none";
 
         if (searchDisplay == "none" && timelineDisplay == "none") {
             mainDisplay = "none";
@@ -63,7 +62,13 @@ export class TabPanel extends Comp {
                 }, [
                     new Anchor("#mainTab", "Main", {
                         "data-toggle": "tab",
-                        className: "nav-link"
+                        className: "nav-link",
+                        onClick: () => {
+                            if (this.activeTab != "mainTab") {
+                                S.meta64.rebuildTab("mainTab");
+                            }
+                            this.activeTab = "mainTab";
+                        }
                     })]
                 ),
                 new Li(null, {
@@ -72,7 +77,13 @@ export class TabPanel extends Comp {
                 },
                     [new Anchor("#searchTab", "Search", {
                         "data-toggle": "tab",
-                        className: "nav-link"
+                        className: "nav-link",
+                        onClick: () => {
+                            if (this.activeTab != "searchTab") {
+                                S.meta64.rebuildTab("searchTab");
+                            }
+                            this.activeTab = "searchTab";
+                        }
                     })]
                 ),
                 new Li(null, {
@@ -81,7 +92,13 @@ export class TabPanel extends Comp {
                 },
                     [new Anchor("#timelineTab", "Timeline", {
                         "data-toggle": "tab",
-                        className: "nav-link"
+                        className: "nav-link",
+                        onClick: () => {
+                            if (this.activeTab != "timelineTab") {
+                                S.meta64.rebuildTab("timelineTab");
+                            }
+                            this.activeTab = "timelineTab"
+                        }
                     })]
                 ),
 
@@ -91,7 +108,8 @@ export class TabPanel extends Comp {
                     // },
                     //     [new Anchor("#graphTab", "Graph", {
                     //         "data-toggle": "tab",
-                    //         className: "nav-link"
+                    //         className: "nav-link",
+                    //         onClick: () => S.meta64.rebuildTab("graphTab")
                     //     })]
                     // )
                 ]

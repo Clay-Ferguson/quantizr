@@ -5,6 +5,7 @@ import { Img } from "../widget/Img";
 import { Comp } from "../widget/base/Comp";
 
 export interface RenderIntf {
+    resetTreeDom(): void;
     updateHighlightNode(node: J.NodeInfo): void;
     buildRowHeader(node: J.NodeInfo, showPath: boolean, showName: boolean): Div;
     injectSubstitutions(content: string): string;
@@ -15,7 +16,7 @@ export interface RenderIntf {
     getTopRightImageTag(node: J.NodeInfo): Img;
     getNodeBkgImageStyle(node: J.NodeInfo): string;
     makeRowButtonBar(node: J.NodeInfo, editingAllowed: boolean, allowAvatar: boolean): Comp;
-    renderPageFromData(data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string): Promise<void>;
+    renderPageFromData(data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string, clickTab?: boolean): Promise<void>;
     firstPage(): void;
     prevPage(): void;
     nextPage(): void;

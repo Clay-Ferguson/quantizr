@@ -20,7 +20,6 @@ import { HorizontalLayout } from "./widget/HorizontalLayout";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { VideoPlayerDlg } from "./dlg/VideoPlayerDlg";
 import { NavBarIconButton } from "./widget/NavBarIconButton";
-import { TextContent } from "./widget/TextContent";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -28,6 +27,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Render implements RenderIntf {
+
+    listViewComp: Comp = null;
+    mainNodeComp: Comp = null;
+
     private debug: boolean = false;
     private markedRenderer = null;
 
@@ -683,7 +686,7 @@ export class Render implements RenderIntf {
     }
 
     /* todo-1: this function is way to large. Break out a lot of this into functions */
-    renderPageFromData = async (data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string): Promise<void> => {
+    renderPageFromData = async (data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string, clickTab: boolean=true): Promise<void> => {
         //console.log("renderPageFromData(): scrollToTop="+scrollToTop);
         this.lastOwner = null;
 
@@ -717,8 +720,10 @@ export class Render implements RenderIntf {
                     S.util.getElm("listView", (elm: HTMLElement) => {
                         if (!data || !data.node) {
                             S.util.setElmDisplayById("listView", false);
+                            this.setListViewComp(null);
                             let contentDiv = new Div("No content available");
-                            contentDiv.updateDOM("mainNodeContent");
+                            //contentDiv.updateDOM("mainNodeContent");
+                            this.setMainNodeComp(contentDiv);
                         } else {
                             S.util.setElmDisplayById("listView", true);
                         }
@@ -895,10 +900,11 @@ export class Render implements RenderIntf {
                         this.setNodeDropHandler(contentDiv, data.node);
 
                         S.util.setElmDisplayById("mainNodeContent", true);
-                        contentDiv.updateDOM("mainNodeContent");
+                        this.setMainNodeComp(contentDiv);
 
                     } else {
                         S.util.setElmDisplayById("mainNodeContent", false);
+                        this.setMainNodeComp(null);
                     }
 
                     if (S.nav.mainOffset > 0) {
@@ -944,8 +950,11 @@ export class Render implements RenderIntf {
                     try {
                         //console.log("listView found.");
                         let outputDiv = new Div(null, null, output);
-                        outputDiv.updateDOM("listView");
-                        S.meta64.selectTab("mainTab");
+                        this.setListViewComp(outputDiv);
+
+                        if (clickTab) {
+                            S.meta64.selectTab("mainTab");
+                        }
 
                         S.util.forEachElmBySel("a", (el, i) => {
                             el.setAttribute("target", "_blank");
@@ -984,6 +993,34 @@ export class Render implements RenderIntf {
         });
 
         return promise;
+    }
+
+    setListViewComp = (comp: Comp): void => {
+        this.listViewComp = comp;
+        comp.updateDOM("listView");
+    }
+
+    setMainNodeComp = (comp: Comp): void => {
+        this.mainNodeComp = comp;
+        comp.updateDOM("mainNodeContent");
+    }
+
+    resetTreeDom = (): void => {
+        if (this.listViewComp) {
+            this.listViewComp.updateDOM("listView");
+            S.util.setElmDisplayById("listView", true);
+        }
+        else {
+            S.util.setElmDisplayById("listView", false);
+        }
+
+        if (this.mainNodeComp) {
+            this.mainNodeComp.updateDOM("mainNodeContent");
+            S.util.setElmDisplayById("mainNodeContent", true);
+        }
+        else {
+            S.util.setElmDisplayById("mainNodeContent", false);
+        }
     }
 
     private renderChildren = (node: J.NodeInfo, newData: boolean, level: number): Comp => {

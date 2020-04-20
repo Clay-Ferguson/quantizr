@@ -54,7 +54,8 @@ export interface Meta64Intf {
     shutdownServerNode(string): void;
     sendTestEmail(string): void;
     refresh(): void;
-    selectTab(pageName): void;
+    rebuildTab(tabName: string): void;
+    selectTab(pageName: string, clickEvent?: boolean): void;
     getSelectedNodeUidsArray(): string[];
     getSelectedNodeIdsArray(): string[];
     getSelectedNodesAsMapById(): Object;
