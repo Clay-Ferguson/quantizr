@@ -52,43 +52,6 @@ export class User implements UserIntf {
             S.meta64.userName.toLowerCase() === "dan";
     }
 
-    /* todo-0: move this into meta64 module */
-    setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
-
-        var title = "";
-        if (!S.meta64.isAnonUser) {
-            title += "User: " + res.userName;
-        }
-        S.util.setInnerHTMLById("headerAppName", title);
-
-        if (res.rootNode) {
-            S.meta64.homeNodeId = res.rootNode;
-            S.meta64.homeNodePath = res.rootNodePath;
-        }
-        S.meta64.userName = res.userName;
-        S.meta64.isAdminUser = res.userName === "admin";
-
-        //bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
-        //sure i'm keeping this feature.
-        S.meta64.allowBashScripting = false; // res.userName === "admin";
-
-        S.meta64.isAnonUser = res.userName === J.PrincipalName.ANON;
-
-        S.meta64.anonUserLandingPageNode = res.anonUserLandingPageNode;
-        S.meta64.allowFileSystemSearch = res.allowFileSystemSearch;
-
-        S.meta64.userPreferences = res.userPreferences;
-
-        //todo-1: admin user had bug where it wasn't loading this at login, so i did this hack for now to make admin logins
-        //always set to what settings i prefer.
-        if (S.meta64.isAdminUser) {
-            S.meta64.showMetaData = false;
-        }
-        else {
-            S.meta64.showMetaData = res.userPreferences.showMetaData;
-        }
-    }
-
     openSignupPg = (): void => {
         new SignupDlg().open();
     }
@@ -220,7 +183,7 @@ export class User implements UserIntf {
                         loginDlg.close();
                     }
 
-                    this.setStateVarsUsingLoginResponse(res);
+                    S.meta64.setStateVarsUsingLoginResponse(res);
 
                     /* set ID to be the page we want to show user right after login */
                     let id: string = null;
@@ -275,7 +238,7 @@ export class User implements UserIntf {
         console.log("refreshLoginResponse");
 
         if (res.success) {
-            this.setStateVarsUsingLoginResponse(res);
+            S.meta64.setStateVarsUsingLoginResponse(res);
         }
 
         S.meta64.loadAnonPageHome();

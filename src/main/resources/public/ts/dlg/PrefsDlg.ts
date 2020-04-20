@@ -50,13 +50,11 @@ export class PrefsDlg extends DialogBase {
         S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
             //todo-2: both of these options should come from meta64.userPrefernces, and not be stored directly on meta64 scope.
             "userPreferences": {
-                "editMode": S.meta64.userPreferences.editMode,
-                "importAllowed": false,
-                "exportAllowed": false,
-                "showMetaData": S.meta64.showMetaData,
-
-                //todo-0: how to make this optional (by annotation in the java)?
-                "maxUploadFileSize": -1,
+                editMode: S.meta64.userPreferences.editMode,
+                importAllowed: false,
+                exportAllowed: false,
+                showMetaData: S.meta64.showMetaData,
+                maxUploadFileSize: -1,
             }
         }, this.savePreferencesResponse);
         this.close();

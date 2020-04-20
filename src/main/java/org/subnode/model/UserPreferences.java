@@ -1,5 +1,7 @@
 package org.subnode.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Models UserPreferences
  */
@@ -8,6 +10,8 @@ public class UserPreferences {
 	private boolean showMetaData;
 	private boolean importAllowed;
 	private boolean exportAllowed;
+
+	@JsonProperty(required = false)
 	private long maxUploadFileSize;
 
 	public boolean isEditMode() {
@@ -42,10 +46,12 @@ public class UserPreferences {
 		this.showMetaData = showMetaData;
 	}
 
+	@JsonProperty(required = false)
 	public long getMaxUploadFileSize() {
 		return maxUploadFileSize;
 	}
 
+	@JsonProperty(required = false)
 	public void setMaxUploadFileSize(long maxUploadFileSize) {
 		this.maxUploadFileSize = maxUploadFileSize;
 	}

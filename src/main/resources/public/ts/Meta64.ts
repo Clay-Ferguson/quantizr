@@ -113,13 +113,11 @@ export class Meta64 implements Meta64Intf {
     graphPanel: GraphPanel;
 
     userPreferences: J.UserPreferences = {
-        "editMode": false,
-        "importAllowed": false,
-        "exportAllowed": false,
-        "showMetaData": false,
-
-        //todo-0: how to make this optional (by annotation in the java)?
-        "maxUploadFileSize": 0
+        editMode: false,
+        importAllowed: false,
+        exportAllowed: false,
+        showMetaData: false,
+        maxUploadFileSize: 0
     };
 
     rebuildIndexes = (): void => {
@@ -315,7 +313,7 @@ export class Meta64 implements Meta64Intf {
                 } else {
                     let rowElmId = "row_" + curHighlightedNode.id;
 
-                    if (curHighlightedNode.id == S.meta64.currentNodeData.node.id) {
+                    if (curHighlightedNode.id == this.currentNodeData.node.id) {
                         S.util.changeOrAddClass(rowElmId, activeClass+"-main", inactiveClass+"-main");
                     }
                     else {
@@ -328,7 +326,7 @@ export class Meta64 implements Meta64Intf {
                 this.parentIdToFocusNodeMap[id] = node;
                 let rowElmId: string = "row_" + node.id;
             
-                if (node.id == S.meta64.currentNodeData.node.id) {
+                if (node.id == this.currentNodeData.node.id) {
                     S.util.changeOrAddClass(rowElmId, inactiveClass+"-main", activeClass+"-main");
                 }
                 else {
@@ -758,6 +756,41 @@ export class Meta64 implements Meta64Intf {
         console.log('Name: ' + profile.getName());
         console.log('Image URL: ' + profile.getImageUrl());
         console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    }
+
+    setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
+        var title = "";
+        if (!this.isAnonUser) {
+            title += "User: " + res.userName;
+        }
+        S.util.setInnerHTMLById("headerAppName", title);
+
+        if (res.rootNode) {
+            this.homeNodeId = res.rootNode;
+            this.homeNodePath = res.rootNodePath;
+        }
+        this.userName = res.userName;
+        this.isAdminUser = res.userName === "admin";
+
+        //bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
+        //sure i'm keeping this feature.
+        this.allowBashScripting = false; // res.userName === "admin";
+
+        this.isAnonUser = res.userName === J.PrincipalName.ANON;
+
+        this.anonUserLandingPageNode = res.anonUserLandingPageNode;
+        this.allowFileSystemSearch = res.allowFileSystemSearch;
+
+        this.userPreferences = res.userPreferences;
+
+        //todo-1: admin user had bug where it wasn't loading this at login, so i did this hack for now to make admin logins
+        //always set to what settings i prefer.
+        if (this.isAdminUser) {
+            this.showMetaData = false;
+        }
+        else {
+            this.showMetaData = res.userPreferences.showMetaData;
+        }
     }
 }
 
