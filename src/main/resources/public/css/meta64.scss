@@ -237,30 +237,28 @@ strong em {
     border: none;
 }
 
-/* NOTE: border sizes (thickness itself) of all nav-tabs should be same everywhere */
-// .tab-buttons-container {
-//     //background-color: $tabButtonBackground;
-//     margin-bottom: 0px;
-//     margin-left: 0px;
-//     margin-right: 0px;
-//     padding: 0px;
-// }
+.nav-tabs>.nav-item>.nav-link {
+    border: $mediumBorderSize solid transparent; 
+    border-radius: $borderRadiusLarge; 
+    cursor: pointer;
+    font-weight: bold;
+}
 
-// .nav-tabs>.nav-item>.nav-link {
-//     //border: none;
-//     //color: black;
-// }
+.nav-tabs>.nav-item>.nav-link:hover {
+    border: $mediumBorderSize solid transparent; 
+    border-radius: $borderRadiusLarge; 
+    cursor: pointer;
+    font-weight: bold;
+}
 
-// .nav-tabs>.nav-item>.nav-link:hover {
-//     //border-bottom: 4px solid lightslategray;
-// }
-
-// .nav-tabs>.nav-item>.nav-link.active,
-// .nav-tabs>.nav-item>.nav-link.active:hover,
-// .nav-tabs>.nav-item>.nav-link.active:focus {
-//     //background-color: $mainContentBackground;
-//     //color: black;
-// }
+.nav-tabs>.nav-item>.nav-link.active,
+.nav-tabs>.nav-item>.nav-link.active:hover,
+.nav-tabs>.nav-item>.nav-link.active:focus {
+    border: $mediumBorderSize solid $nodeBorderBottomColor; 
+    border-radius: $borderRadiusLarge; 
+    cursor: pointer;
+    font-weight: bold;
+}
 
 .small-margin-right {
     margin-right: 8px;

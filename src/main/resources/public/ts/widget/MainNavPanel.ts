@@ -107,34 +107,6 @@ export class MainNavPanel extends NavTag {
                     () => { return S.meta64.isAnonUser; }
                 )
             ]));
-
-            buttons.push(new Li(null, {
-                className: "nav-item"
-            }, [
-                new NavBarIconButton("fa-search", null, {
-                    "onClick": e => { new SearchContentDlg().open(); },
-                    "title": "Search under selected node"
-                },
-                    //isEnabled func
-                    () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null; },
-                    //isVisible func
-                    () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null; }
-                ),
-            ]));
-
-            buttons.push(new Li(null, {
-                className: "nav-item"
-            }, [
-                new NavBarIconButton("fa-clock-o", null, {
-                    "onClick": e => { S.srch.timeline("mtm"); },
-                    "title": "View Timeline of selected node (by Mod Time)"
-                },
-                    //isEnabled func
-                    () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null; },
-                    //isVisible func
-                    () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null; }
-                ),
-            ]));
         }
 
         buttons.push(new Li(null, {

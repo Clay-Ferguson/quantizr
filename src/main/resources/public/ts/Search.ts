@@ -171,9 +171,12 @@ export class Search implements SearchIntf {
             avatarImg = S.render.makeAvatarImage(node);
         }
 
-        return new HorizontalLayout([avatarImg, new Button("Go to Node", () => {
+        return new HorizontalLayout([avatarImg, new Button("Jump", () => {
             S.srch.clickSearchNode(node.id);
-        }, { id: "go-" + node.id }, "btn-secondary marginLeft")], "marginTop marginLeft");
+        }, {
+            title: "Jump to this Node in the Main Tab",
+            id: "go-" + node.id
+        }, "btn-secondary marginLeft")], "marginTop marginLeft");
     }
 
     clickOnSearchResultRow = (id: string) => {

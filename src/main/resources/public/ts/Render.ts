@@ -20,6 +20,7 @@ import { HorizontalLayout } from "./widget/HorizontalLayout";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { VideoPlayerDlg } from "./dlg/VideoPlayerDlg";
 import { NavBarIconButton } from "./widget/NavBarIconButton";
+import { SearchContentDlg } from "./dlg/SearchContentDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -666,7 +667,7 @@ export class Render implements RenderIntf {
 
         let avatarImg: Img;
         //console.log("node.owner[" + node.id + "]=" + node.owner + " ownerId=" + node.ownerId + " allowAvatar=" + allowAvatar);
-        if (allowAvatar && node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, node) */) {
+        if (allowAvatar && node.owner != J.PrincipalName.ADMIN) {
             avatarImg = this.makeAvatarImage(node);
         }
 
@@ -686,7 +687,7 @@ export class Render implements RenderIntf {
     }
 
     /* todo-1: this function is way to large. Break out a lot of this into functions */
-    renderPageFromData = async (data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string, clickTab: boolean=true): Promise<void> => {
+    renderPageFromData = async (data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string, clickTab: boolean = true): Promise<void> => {
         //console.log("renderPageFromData(): scrollToTop="+scrollToTop);
         this.lastOwner = null;
 
@@ -778,6 +779,27 @@ export class Render implements RenderIntf {
                         let upLevelButton: NavBarIconButton = null;
                         let prevButton: NavBarIconButton = null;
                         let nextButton: NavBarIconButton = null;
+                        let searchButton: NavBarIconButton = null;
+                        let timelineButton: NavBarIconButton = null;
+
+                        if (!S.meta64.isAnonUser) {
+                            searchButton = new NavBarIconButton("fa-search", null, {
+                                "onClick": e => { 
+                                    S.nav.clickOnNodeRow(data.node.id);
+                                    new SearchContentDlg().open(); 
+                                },
+                                "title": "Search under this node"
+                            }, null, null, "");
+
+
+                            timelineButton = new NavBarIconButton("fa-clock-o", null, {
+                                "onClick": e => { 
+                                    S.nav.clickOnNodeRow(data.node.id);
+                                    S.srch.timeline("mtm"); 
+                                },
+                                "title": "View Timeline under this node (by Mod Time)"
+                            }, null, null, "");
+                        }
 
                         if (S.nav.parentVisibleToUser()) {
                             upLevelButton = new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
@@ -868,12 +890,12 @@ export class Render implements RenderIntf {
 
                         let avatarImg: Img;
                         //console.log("Root render: data.node.owner=" + data.node.owner);
-                        if (data.node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, data.node) */) {
+                        if (data.node.owner != J.PrincipalName.ADMIN) {
                             avatarImg = this.makeAvatarImage(data.node);
                         }
 
-                        if (upLevelButton || prevButton || nextButton) {
-                            navButtonBar = new ButtonBar([upLevelButton, prevButton, nextButton],
+                        if (searchButton || timelineButton || upLevelButton || prevButton || nextButton) {
+                            navButtonBar = new ButtonBar([searchButton, timelineButton, upLevelButton, prevButton, nextButton],
                                 null, "float-right marginTop marginBottom");
                         }
 
@@ -1219,6 +1241,7 @@ export class Render implements RenderIntf {
     }
 
     getAvatarImgUrl = (node: J.NodeInfo) => {
+        if (!node.avatarVer) return null;
         return S.util.getRpcPath() + "bin/avatar" + "?nodeId=" + node.ownerId + "&v=" + node.avatarVer;
     }
 
