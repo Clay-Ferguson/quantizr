@@ -969,8 +969,10 @@ export class Util implements UtilIntf {
 
     //todo-1: is this still used ? eliminate it.
     removeClassFromElm = (el: HTMLElement, clazz: string): void => {
-        if (el.classList)
+        if (el.classList) {
+            //console.log("remove to classList " + clazz);
             el.classList.remove(clazz);
+        }
         else if (el.className) {
             //WCF: I think this came from here: http://youmightnotneedjquery.com/
             //I personally would have never written this mess of RegExp and found some other way. I hate RegExp!

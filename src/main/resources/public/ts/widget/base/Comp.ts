@@ -491,7 +491,7 @@ export abstract class Comp implements CompIntf {
     //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
 
     setDropHandler = (func: (elm: any) => void): void => {
-    
+
         this.whenElm((elm: HTMLElement) => {
 
             this.nonDragBorder = elm.style.borderLeft;

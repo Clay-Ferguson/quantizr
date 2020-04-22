@@ -201,6 +201,7 @@ export class Render implements RenderIntf {
         if (S.props.hasBinary(node) && !isAnAccountNode) {
             let binary = this.renderBinary(node);
 
+            //todo-0: bring this back. I already needed it again.
             /*
              * We append the binary image or resource link either at the end of the text or at the location where
              * the user has put {{insert-attachment}} if they are using that to make the image appear in a specific
@@ -457,7 +458,7 @@ export class Render implements RenderIntf {
 
         let rowDiv = new Div(null, {
             className: layoutClass + (selected ? (" " + activeClass) : (" " + inactiveClass)),
-            onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(id); }, //
+            onClick: (evt) => { S.nav.clickOnNodeRow(id); }, //
             id: cssId,
             style: style
         },
@@ -784,18 +785,18 @@ export class Render implements RenderIntf {
 
                         if (!S.meta64.isAnonUser) {
                             searchButton = new NavBarIconButton("fa-search", null, {
-                                "onClick": e => { 
+                                "onClick": e => {
                                     S.nav.clickOnNodeRow(data.node.id);
-                                    new SearchContentDlg().open(); 
+                                    new SearchContentDlg().open();
                                 },
                                 "title": "Search under this node"
                             }, null, null, "");
 
 
                             timelineButton = new NavBarIconButton("fa-clock-o", null, {
-                                "onClick": e => { 
+                                "onClick": e => {
                                     S.nav.clickOnNodeRow(data.node.id);
-                                    S.srch.timeline("mtm"); 
+                                    S.srch.timeline("mtm");
                                 },
                                 "title": "View Timeline under this node (by Mod Time)"
                             }, null, null, "");
