@@ -36,7 +36,7 @@ export interface EditIntf {
     selectAllNodes() : void;
     deleteSelNodes(selNodesArray : string[], hardDelete: boolean): void;
     getBestPostDeleteSelNode(): J.NodeInfo;
-    cutSelNodes(): void;
+    cutSelNodes(node: J.NodeInfo): void;
     undoCutSelNodes(): void;
     pasteSelNodes(node: J.NodeInfo, location: string): void;
     insertBookWarAndPeace(): void;

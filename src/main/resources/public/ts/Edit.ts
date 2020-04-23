@@ -533,12 +533,11 @@ export class Edit implements EditIntf {
         await S.render.renderPageFromData();
     }
 
-    cutSelNodes = (): void => {
+    cutSelNodes = (node: J.NodeInfo): void => {
+         //the same pattern here to allow delete icon to do multideletes is needed todo-0
+         S.nav.toggleNodeSel(true, node.id);
+         
         let selNodesArray = S.meta64.getSelectedNodeIdsArray();
-        if (!selNodesArray || selNodesArray.length == 0) {
-            S.util.showMessage("You have not selected any nodes. Select nodes first.");
-            return;
-        }
 
         new ConfirmDlg("Cut " + selNodesArray.length + " node(s), to paste/move to new location ?", "Confirm Cut",
             async () => {

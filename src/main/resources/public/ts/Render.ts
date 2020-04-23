@@ -556,6 +556,7 @@ export class Render implements RenderIntf {
         let selButton: Checkbox;
         let createSubNodeButton: Button;
         let editNodeButton: Button;
+        let cutNodeButton: Button;
         let moveNodeUpButton: Button;
         let moveNodeDownButton: Button;
         let insertNodeButton: Button;
@@ -639,6 +640,11 @@ export class Render implements RenderIntf {
                     "iconclass": "fa fa-edit fa-lg"
                 });
 
+                //todo-0: get enablement correct for this (or visibility)
+                cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(node); }, {
+                    "iconclass": "fa fa-cut fa-lg"
+                });
+                
                 if (C.MOVE_UPDOWN_ON_TOOLBAR) {
 
                     if (!node.firstChild) {
@@ -672,7 +678,7 @@ export class Render implements RenderIntf {
         }
 
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
-            moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton], null, "marginLeft marginTop");
+            moveNodeDownButton, deleteNodeButton, cutNodeButton, replyButton, pasteInsideButton], null, "marginLeft marginTop");
 
         if (selButton || typeIcon || encIcon || sharedIcon) {
             return new HorizontalLayout([selButton, avatarImg, typeIcon, encIcon, sharedIcon, buttonBar]);
@@ -772,6 +778,7 @@ export class Render implements RenderIntf {
                         let buttonBar: ButtonBar = null;
                         let navButtonBar: ButtonBar = null;
                         let editNodeButton: Button = null;
+                        let cutNodeButton: Button = null;
                         let createSubNodeButton: Button = null;
                         let replyButton: Button = null;
                         let pasteInsideButton: Button = null;
@@ -840,6 +847,11 @@ export class Render implements RenderIntf {
                             /* Construct Create Subnode Button */
                             editNodeButton = new Button(null, () => { S.edit.runEditNode(id); },
                                 { "iconclass": "fa fa-edit fa-lg" });
+
+                            //todo-0: get enablement correct for this (or visibility)
+                            cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(data.node); }, {
+                                "iconclass": "fa fa-cut fa-lg"
+                            });
                         }
 
                         if (editAllowed && !S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
@@ -897,7 +909,7 @@ export class Render implements RenderIntf {
                         }
 
                         if (typeIcon || encIcon || sharedIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || upLevelButton) {
-                            buttonBar = new ButtonBar([typeIcon, encIcon, sharedIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton],
+                            buttonBar = new ButtonBar([typeIcon, encIcon, sharedIcon, createSubNodeButton, editNodeButton, cutNodeButton, replyButton, pasteInsideButton],
                                 null, "marginLeft marginTop");
                         }
 
