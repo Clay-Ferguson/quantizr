@@ -463,7 +463,9 @@ export class Render implements RenderIntf {
             style: style
         },
             [
-                buttonBar, new Div(null, {
+                buttonBar, 
+                new Div(null, { className: "clearfix" }),
+                new Div(null, {
                     "id": id + "_content"
                 }, this.renderNodeContent(node, true, true))
             ]);
@@ -912,6 +914,7 @@ export class Render implements RenderIntf {
                         else {
                             children.push(avatarImg);
                         }
+                        children.push(new Div(null, { className: "clearfix" }));
                         children = children.concat(mainNodeContent);
 
                         let contentDiv = new Div(null, {
@@ -943,6 +946,8 @@ export class Render implements RenderIntf {
                             });
                         output.push(new ButtonBar([firstButton, prevButton], "text-center marginTop"));
                     }
+
+                    output.push(new Div(null, { className: "clearfix" }));
 
                     this.lastOwner = data.node.owner;
                     //console.log("lastOwner (root)=" + data.node.owner);
@@ -1161,7 +1166,9 @@ export class Render implements RenderIntf {
         let childCount: number = node.children.length;
         let rowCount: number = 0;
 
+        let isMovingNodes = S.util.getPropertyCount(S.edit.nodesToMoveSet) != 0;
         let comps: Comp[] = [];
+
         for (let i = 0; i < node.children.length; i++) {
             let n: J.NodeInfo = node.children[i];
             if (!S.edit.nodesToMoveSet[n.id]) {
@@ -1169,10 +1176,23 @@ export class Render implements RenderIntf {
 
                 let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass);
                 if (row) {
+                    if (rowCount == 0 && S.meta64.userPreferences.editMode && !isMovingNodes) {
+                        comps.push(this.createBetweenNodeButtonBar(n, true, false));
+
+                        //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                        comps.push(new Div(null, { className: "clearfix" }));
+                    }
                     comps.push(row);
                     this.lastOwner = node.owner;
                     //console.log("lastOwner (root)=" + node.owner);
                     rowCount++;
+
+                    if (S.meta64.userPreferences.editMode && !isMovingNodes) {
+                        comps.push(this.createBetweenNodeButtonBar(n, false, rowCount == node.children.length));
+
+                        //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                        comps.push(new Div(null, { className: "clearfix" }));
+                    }
                 }
 
                 if (n.children) {
@@ -1181,6 +1201,23 @@ export class Render implements RenderIntf {
             }
         }
         return new Div(null, null, comps);
+    }
+
+    /* This is the button bar displayed between all nodes to let nodes be inserted at specific locations 
+    
+    The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
+    */
+    createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLast: boolean): Comp => {
+
+        let newNodeButton = new NavBarIconButton("fa-plus", null, {
+            "onClick": e => {
+                S.edit.insertNode(node.id, "u", isFirst ? 0 : 1);
+            },
+            "title": "Insert new node here"
+        }, null, null, "btn-sm");
+        let buttonBar = new ButtonBar([newNodeButton],
+            null, "float-right " + (isFirst ? "marginTop" : ""));
+        return buttonBar;
     }
 
     firstPage = (): void => {

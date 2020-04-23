@@ -56,9 +56,7 @@ export class MenuPanel extends Div {
                 //I decided ALL information will be stored native right in mongo, and no filesystem stuff.
                 //new MenuItem("Documentation", () => { S.nav.openContentNode("/r/public/subnode-docs"); }),
             ]),
-            new Menu("Edit", [
-                new MenuItem("Edit Mode", S.nav.editMode, () => { return S.meta64.state.allowEditMode }), //  
-                new MenuItem("Create", S.edit.createNode, () => { return S.meta64.state.canCreateNode }), //                
+            new Menu("Edit", [              
                 new MenuItem("Cut", S.edit.cutSelNodes, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 && S.meta64.state.selNodeIsMine }), //
                 new MenuItem("Undo Cut", S.edit.undoCutSelNodes, () => { return !S.meta64.isAnonUser && S.edit.nodesToMove != null }), //
 
@@ -76,14 +74,10 @@ export class MenuPanel extends Div {
                 new MenuItem("Clear Selections", S.edit.clearSelections, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 }), //
                 new MenuItem("Delete", () => {S.edit.deleteSelNodes(null, false);}, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 && S.meta64.state.selNodeIsMine; }), //
                 new MenuItem("Permanent Delete", () => {S.edit.deleteSelNodes(null, true);}, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 && S.meta64.state.selNodeIsMine; }), //
-            ]),
-            new Menu("Move", [
-                new MenuItem("Move Up", () => { S.edit.moveNodeUp(); }, () => { return S.meta64.state.canMoveUp; }), //
-                new MenuItem("Move Down", () => { S.edit.moveNodeDown(); }, () => { return S.meta64.state.canMoveDown; }, () => { return true; }, true), //
                 new MenuItem("Move to Top", () => { S.edit.moveNodeToTop(); }, () => { return S.meta64.state.canMoveUp; }), //
                 new MenuItem("Move to Bottom", () => { S.edit.moveNodeToBottom(); }, () => { return S.meta64.state.canMoveDown; })//
             ]),
-            new Menu("Attach", [
+            new Menu("Uploads", [
                 new MenuItem("Upload from File", () => {S.attachment.openUploadFromFileDlg(false);}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //
                 new MenuItem("Upload from URL", S.attachment.openUploadFromUrlDlg, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //
                 new MenuItem("Upload to IPFS", () => {S.attachment.openUploadFromFileDlg(true)}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //
@@ -121,6 +115,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Created", () => { S.srch.timeline('ctm') }, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
                 new MenuItem("Modified", () => { S.srch.timeline('mtm') }, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
             ]),
+            
             new Menu("View", [
                 //todo-1: properties toggle really should be a preferences setting i think, and not a menu option here.
 

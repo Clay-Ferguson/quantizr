@@ -807,6 +807,7 @@ export class Util implements UtilIntf {
     }
 
     getPropertyCount = (obj: Object): number => {
+        if (!obj) return 0;
         let count = 0;
         let prop;
 

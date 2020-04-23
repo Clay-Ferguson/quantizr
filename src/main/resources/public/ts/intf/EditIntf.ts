@@ -8,7 +8,6 @@ export interface EditIntf {
     parentOfNewNode: J.NodeInfo;
     nodeInsertTarget: any;
 
-    createNode(): void;
     saveClipboardToNode(): void;
     splitNode(splitType: string, delimiter: string): void;
     openChangePasswordDlg(): void;
@@ -31,7 +30,7 @@ export interface EditIntf {
     getNodeBelow(node: J.NodeInfo): J.NodeInfo;
     getFirstChildNode(): any;
     runEditNode(id: any): void;
-    insertNode(id?: any, typeName?: string): void;
+    insertNode(id?: any, typeName?: string, ordinalOffset?: number): void;
     createSubNode(id?: any, typeName?: string, createAtTop?: boolean): void;
     clearSelections(): void;
     selectAllNodes() : void;

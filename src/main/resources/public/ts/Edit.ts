@@ -1,7 +1,6 @@
 import * as J from "./JavaIntf";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
-import { CreateNodeDlg } from "./dlg/CreateNodeDlg";
 import { ExportDlg } from "./dlg/ExportDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
@@ -41,10 +40,7 @@ export class Edit implements EditIntf {
      *
      */
     nodeInsertTarget: any = null;
-
-    createNode = (): void => {
-        new CreateNodeDlg().open();
-    }
+    nodeInsertTargetOrdinalOffset: number = 0;
 
     openChangePasswordDlg = (): void => {
         new ChangePasswordDlg({}).open();
@@ -185,11 +181,10 @@ export class Edit implements EditIntf {
         //     S.edit.sendNotificationPendingSave = true;
         // }
 
-
         if (S.edit.nodeInsertTarget) {
             S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                 "parentId": S.edit.parentOfNewNode.id,
-                "targetOrdinal": S.edit.nodeInsertTarget.ordinal,
+                "targetOrdinal": S.edit.nodeInsertTarget.ordinal + this.nodeInsertTargetOrdinalOffset,
                 "newNodeName": "",
                 "typeName": typeName ? typeName : "u"
             }, S.edit.insertNodeResponse);
@@ -382,7 +377,7 @@ export class Edit implements EditIntf {
         }, this.initNodeEditResponse);
     }
 
-    insertNode = (id?: any, typeName?: string): void => {
+    insertNode = (id?: any, typeName?: string, ordinalOffset: number=0): void => {
         if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node.children) return;
         this.parentOfNewNode = S.meta64.currentNodeData.node;
         if (!this.parentOfNewNode) {
@@ -403,6 +398,7 @@ export class Edit implements EditIntf {
 
         if (node) {
             this.nodeInsertTarget = node;
+            this.nodeInsertTargetOrdinalOffset = ordinalOffset;
             this.startEditingNewNode(typeName);
         }
     }
