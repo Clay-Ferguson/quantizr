@@ -559,16 +559,15 @@ export class Edit implements EditIntf {
         }
     }
 
-    //location=inside | inline
-    pasteSelNodes = (location: string): void => {
-        let highlightNode = S.meta64.getHighlightedNode();
+    //location=inside | inline | inline-above (todo-1: put in java-aware enum)
+    pasteSelNodes = (node: J.NodeInfo, location: string): void => {
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently selected
          * page. Later on we can get more specific about allowing precise destination location for moved
          * nodes.
          */
         S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
-            "targetNodeId": highlightNode.id,
+            "targetNodeId": node.id,
             "nodeIds": this.nodesToMove,
             "location": location
         }, this.moveNodesResponse);

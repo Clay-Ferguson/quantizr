@@ -134,7 +134,8 @@ public class NodeMoveService {
 		// sample the first node to see if this is a garbage bin delete or not
 		SubNode firstNode = api.getNode(session, req.getNodeIds().get(0));
 
-		//Note: the 'endsWith("/d")' condition is checking if this is the actual trash node itself being deleted
+		// Note: the 'endsWith("/d")' condition is checking if this is the actual trash
+		// node itself being deleted
 		if (req.isHardDelete() || firstNode.getPath().contains("/d/") || firstNode.getPath().endsWith("/d")) {
 			return hardDeleteNodes(session, req);
 		} else {
@@ -216,10 +217,20 @@ public class NodeMoveService {
 		if (location.equalsIgnoreCase("inside")) {
 			curTargetOrdinal = targetNode.getMaxChildOrdinal() == null ? 0 : targetNode.getMaxChildOrdinal();
 		}
-		// location==inline
-		else {
+		// location==inline (todo-0: rename this to inline-below)
+		else if (location.equalsIgnoreCase("inline")) {
 			curTargetOrdinal = targetNode.getOrdinal() + 1;
 			api.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, nodeIds.size());
+		}
+		// location==inline-above
+		else if (location.equalsIgnoreCase("inline-above")) {
+			curTargetOrdinal = targetNode.getOrdinal();
+			api.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, nodeIds.size());
+		}
+		// location==inline-end
+		else if (location.equalsIgnoreCase("inline-end")) {
+			curTargetOrdinal = api.getMaxChildOrdinal(session, parentToPasteInto) + 1L;
+			parentToPasteInto.setMaxChildOrdinal(curTargetOrdinal + nodeIds.size());
 		}
 
 		for (String nodeId : nodeIds) {

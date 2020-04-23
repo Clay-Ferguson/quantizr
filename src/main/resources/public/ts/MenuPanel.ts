@@ -60,10 +60,6 @@ export class MenuPanel extends Div {
                 new MenuItem("Cut", S.edit.cutSelNodes, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 && S.meta64.state.selNodeIsMine }), //
                 new MenuItem("Undo Cut", S.edit.undoCutSelNodes, () => { return !S.meta64.isAnonUser && S.edit.nodesToMove != null }), //
 
-                //I moved these to buttons above each row, where they show up only of there is a pending paste.
-                //new MenuItem("Paste Inside", () => { S.edit.pasteSelNodes('inside'); }, () => { return !S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected) }), //
-                //new MenuItem("Paste Inline", () => { S.edit.pasteSelNodes('inline'); }, () => { return !S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected) }), //
-
                 /*
                 I have this feature 90% complete but near the end i realized i have a problem with id v.s. uid, because uid
                 is only a client-side assigned thing, so i will need to convert my entire 'selectedNodes' over to store

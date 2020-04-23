@@ -38,7 +38,7 @@ export interface EditIntf {
     getBestPostDeleteSelNode(): J.NodeInfo;
     cutSelNodes(): void;
     undoCutSelNodes(): void;
-    pasteSelNodes(location: string): void;
+    pasteSelNodes(node: J.NodeInfo, location: string): void;
     insertBookWarAndPeace(): void;
 }
 

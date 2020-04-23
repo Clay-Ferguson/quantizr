@@ -124,7 +124,7 @@ public class Convert {
 			}
 		}
 
-		boolean deleted = node.getPath().contains("/"+NodeName.TRASH+"/");
+		boolean deleted = node.getPath().contains("/"+NodeName.TRASH+"/") ||  node.getPath().endsWith("/"+NodeName.TRASH);
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, ownerId,
 				node.getOrdinal(), //

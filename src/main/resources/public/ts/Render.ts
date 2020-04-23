@@ -463,7 +463,7 @@ export class Render implements RenderIntf {
             style: style
         },
             [
-                buttonBar, 
+                buttonBar,
                 new Div(null, { className: "clearfix" }),
                 new Div(null, {
                     "id": id + "_content"
@@ -562,7 +562,6 @@ export class Render implements RenderIntf {
         let replyButton: Button;
         let deleteNodeButton: Button;
         let pasteInsideButton: Button;
-        let pasteInlineButton: Button;
 
         //todo-1: need to DRY up places where this code block is repeated
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
@@ -660,9 +659,7 @@ export class Render implements RenderIntf {
                 });
 
                 if (!S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
-                    pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes('inside'); }, {
-                    });
-                    pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes('inline'); }, {
+                    pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(node, 'inside'); }, {
                     });
                 }
             }
@@ -675,7 +672,7 @@ export class Render implements RenderIntf {
         }
 
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
-            moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton, pasteInlineButton], null, "marginLeft marginTop");
+            moveNodeDownButton, deleteNodeButton, replyButton, pasteInsideButton], null, "marginLeft marginTop");
 
         if (selButton || typeIcon || encIcon || sharedIcon) {
             return new HorizontalLayout([selButton, avatarImg, typeIcon, encIcon, sharedIcon, buttonBar]);
@@ -778,7 +775,6 @@ export class Render implements RenderIntf {
                         let createSubNodeButton: Button = null;
                         let replyButton: Button = null;
                         let pasteInsideButton: Button = null;
-                        let pasteInlineButton: Button = null;
                         let upLevelButton: NavBarIconButton = null;
                         let prevButton: NavBarIconButton = null;
                         let nextButton: NavBarIconButton = null;
@@ -847,9 +843,7 @@ export class Render implements RenderIntf {
                         }
 
                         if (editAllowed && !S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
-                            pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes('inside'); }, {
-                            });
-                            pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes('inline'); }, {
+                            pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(data.node, 'inside'); }, {
                             });
                         }
 
@@ -902,8 +896,8 @@ export class Render implements RenderIntf {
                                 null, "float-right marginTop marginBottom");
                         }
 
-                        if (typeIcon || encIcon || sharedIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || pasteInlineButton || upLevelButton) {
-                            buttonBar = new ButtonBar([typeIcon, encIcon, sharedIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton, pasteInlineButton],
+                        if (typeIcon || encIcon || sharedIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || upLevelButton) {
+                            buttonBar = new ButtonBar([typeIcon, encIcon, sharedIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton],
                                 null, "marginLeft marginTop");
                         }
 
@@ -1166,8 +1160,18 @@ export class Render implements RenderIntf {
         let childCount: number = node.children.length;
         let rowCount: number = 0;
 
-        let isMovingNodes = S.util.getPropertyCount(S.edit.nodesToMoveSet) != 0;
+        //let isMovingNodes = S.util.getPropertyCount(S.edit.nodesToMoveSet) != 0;
         let comps: Comp[] = [];
+
+        let countToDisplay = 0;
+        //we have to make a pass over children before main loop below, because we need the countToDisplay
+        //to ber correct before the second loop stats.
+        for (let i = 0; i < node.children.length; i++) {
+            let n: J.NodeInfo = node.children[i];
+            if (!S.edit.nodesToMoveSet[n.id]) {
+                countToDisplay++;
+            }
+        }
 
         for (let i = 0; i < node.children.length; i++) {
             let n: J.NodeInfo = node.children[i];
@@ -1176,7 +1180,7 @@ export class Render implements RenderIntf {
 
                 let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass);
                 if (row) {
-                    if (rowCount == 0 && S.meta64.userPreferences.editMode && !isMovingNodes) {
+                    if (rowCount == 0 && S.meta64.userPreferences.editMode) {
                         comps.push(this.createBetweenNodeButtonBar(n, true, false));
 
                         //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
@@ -1187,8 +1191,8 @@ export class Render implements RenderIntf {
                     //console.log("lastOwner (root)=" + node.owner);
                     rowCount++;
 
-                    if (S.meta64.userPreferences.editMode && !isMovingNodes) {
-                        comps.push(this.createBetweenNodeButtonBar(n, false, rowCount == node.children.length));
+                    if (S.meta64.userPreferences.editMode) {
+                        comps.push(this.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay));
 
                         //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                         comps.push(new Div(null, { className: "clearfix" }));
@@ -1207,7 +1211,25 @@ export class Render implements RenderIntf {
     
     The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
     */
-    createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLast: boolean): Comp => {
+    createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean): Comp => {
+
+        let pasteInlineButton: Button = null;
+        if (!S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
+
+            let target = null;
+            if (S.nav.endReached) {
+                target = "inline-end";
+            }
+            else if (isFirst) {
+                target = "inline-above";
+            }
+            else {
+                target = "inline";
+            }
+
+            pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes(node, target); }, {
+            });
+        }
 
         let newNodeButton = new NavBarIconButton("fa-plus", null, {
             "onClick": e => {
@@ -1215,7 +1237,7 @@ export class Render implements RenderIntf {
             },
             "title": "Insert new node here"
         }, null, null, "btn-sm");
-        let buttonBar = new ButtonBar([newNodeButton],
+        let buttonBar = new ButtonBar([pasteInlineButton, newNodeButton],
             null, "float-right " + (isFirst ? "marginTop" : ""));
         return buttonBar;
     }
