@@ -10,7 +10,10 @@ $borderRadiusMedium: .6em;
 $input-bg: $gray-700;
 $input-color: white;
 $input-color-placeholder: #999;
-$body-color: rgb(32, 34, 36);
+
+//rgb(21,32,43); twitter background
+$body-bg: rgb(32, 34, 36);
+$body-color: white;
 
 @import "../node_modules/bootstrap/scss/bootstrap";
 
@@ -27,7 +30,7 @@ $listBackgroundColor: lightGray;
 $smallGap: 12px;
 $tinyGap: 8px;
 
-$lightenRowFactor: 1;
+$lightenRowFactor: 1.75;
 
 /* warning: this 9px should match the 9px highlight border in Comp.ts */
 $fatBorderSize: 9px;
@@ -743,7 +746,7 @@ i'm backing out for now
 }
 
 .active-row:hover {
-    background-color: lighten($body-color, $lightenRowFactor);
+    background-color: lighten($body-bg, $lightenRowFactor);
 }
 
 .inactive-row {
@@ -751,7 +754,7 @@ i'm backing out for now
 }
 
 .inactive-row:hover {
-    background-color: lighten($body-color, $lightenRowFactor);
+    background-color: lighten($body-bg, $lightenRowFactor);
 }
 
 .active-row-main {
@@ -764,7 +767,7 @@ i'm backing out for now
 }
 
 .active-row-main:hover {
-    background-color: lighten($body-color, $lightenRowFactor);
+    background-color: lighten($body-bg, $lightenRowFactor);
 }
 
 .inactive-row-main {
@@ -777,7 +780,7 @@ i'm backing out for now
 }
 
 .inactive-row-main:hover {
-    background-color: lighten($body-color, $lightenRowFactor);
+    background-color: lighten($body-bg, $lightenRowFactor);
 }
 
 .main {
