@@ -575,6 +575,7 @@ export const enum NodeProp {
     INLINE_CHILDREN = "inlineChildren",
     PRIORITY = "priority",
     LAYOUT = "layout",
+    ORDER_BY = "orderBy",
 }
 
 export const enum NodeType {

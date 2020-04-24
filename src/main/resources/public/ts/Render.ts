@@ -408,7 +408,7 @@ export class Render implements RenderIntf {
      *
      * node is a NodeInfo.java JSON
      */
-    renderNodeAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, level: number, layoutClass: string): Comp => {
+    renderNodeAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, level: number, layoutClass: string, allowNodeMove: boolean): Comp => {
 
         let id: string = node.id;
         let prevPageExists: boolean = S.nav.mainOffset > 0;
@@ -438,7 +438,7 @@ export class Render implements RenderIntf {
 
         //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
         let allowAvatar = node.owner != this.lastOwner;
-        let buttonBar: Comp = this.makeRowButtonBar(node, editingAllowed, allowAvatar);
+        let buttonBar: Comp = this.makeRowButtonBar(node, editingAllowed, allowAvatar, allowNodeMove);
         //let bkgStyle: string = this.getNodeBkgImageStyle(node);
         let indentLevel = layoutClass === "node-grid-item" ? 0 : level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
@@ -548,7 +548,7 @@ export class Render implements RenderIntf {
         return bkgImgStyle;
     }
 
-    makeRowButtonBar = (node: J.NodeInfo, editingAllowed: boolean, allowAvatar: boolean): Comp => {
+    makeRowButtonBar = (node: J.NodeInfo, editingAllowed: boolean, allowAvatar: boolean, allowNodeMove: boolean): Comp => {
         let typeIcon: Icon;
         let encIcon: Icon;
         let sharedIcon: Icon;
@@ -644,8 +644,8 @@ export class Render implements RenderIntf {
                 cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(node); }, {
                     "iconclass": "fa fa-cut fa-lg"
                 });
-                
-                if (C.MOVE_UPDOWN_ON_TOOLBAR) {
+
+                if (C.MOVE_UPDOWN_ON_TOOLBAR && allowNodeMove) {
 
                     if (!node.firstChild) {
                         moveNodeUpButton = new Button(null, () => { S.edit.moveNodeUp(node.id); }, {
@@ -729,7 +729,6 @@ export class Render implements RenderIntf {
                             S.util.setElmDisplayById("listView", false);
                             this.setListViewComp(null);
                             let contentDiv = new Div("No content available");
-                            //contentDiv.updateDOM("mainNodeContent");
                             this.setMainNodeComp(contentDiv);
                         } else {
                             S.util.setElmDisplayById("listView", true);
@@ -958,7 +957,9 @@ export class Render implements RenderIntf {
                     this.lastOwner = data.node.owner;
                     //console.log("lastOwner (root)=" + data.node.owner);
                     if (data.node.children) {
-                        output.push(this.renderChildren(data.node, newData, 1));
+                        let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, data.node);
+                        let allowNodeMove: boolean = !orderByProp;
+                        output.push(this.renderChildren(data.node, newData, 1, allowNodeMove));
                     }
 
                     if (!data.endReached) {
@@ -1057,7 +1058,7 @@ export class Render implements RenderIntf {
         }
     }
 
-    private renderChildren = (node: J.NodeInfo, newData: boolean, level: number): Comp => {
+    private renderChildren = (node: J.NodeInfo, newData: boolean, level: number, allowNodeMove: boolean): Comp => {
         if (!node || !node.children) return null;
 
         //let childCount: number = node.children.length;
@@ -1069,14 +1070,14 @@ export class Render implements RenderIntf {
 
         let layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
         if (!layout || layout == "v") {
-            return this.renderVerticalLayout(node, newData, level);
+            return this.renderVerticalLayout(node, newData, level, allowNodeMove);
         }
         else if (layout.indexOf("c") == 0) {
-            return this.renderTableLayout(node, newData, level, layout);
+            return this.renderTableLayout(node, newData, level, layout, allowNodeMove);
         }
         else {
             //of no layout is valid, fall back on vertical.
-            return this.renderVerticalLayout(node, newData, level);
+            return this.renderVerticalLayout(node, newData, level, allowNodeMove);
         }
     }
 
@@ -1095,7 +1096,7 @@ export class Render implements RenderIntf {
     }
 
     //todo-2: check background colord on vertical layout option also? or is that handled already?
-    renderTableLayout = (node: J.NodeInfo, newData: boolean, level: number, layout: string): Comp => {
+    renderTableLayout = (node: J.NodeInfo, newData: boolean, level: number, layout: string, allowNodeMove: boolean): Comp => {
         let tableDiv = new Div(null, { className: 'node-grid-table' });
         let curRow = new Div(null, { className: 'node-grid-row' });
 
@@ -1123,7 +1124,7 @@ export class Render implements RenderIntf {
             if (!S.edit.nodesToMoveSet[n.id]) {
                 this.updateHighlightNode(n);
 
-                let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass);
+                let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass, allowNodeMove);
                 if (row) {
                     comps.push(row);
                     rowCount++;
@@ -1132,7 +1133,7 @@ export class Render implements RenderIntf {
                 this.lastOwner = n.owner;
 
                 if (n.children) {
-                    comps.push(this.renderChildren(n, newData, level + 1));
+                    comps.push(this.renderChildren(n, newData, level + 1, allowNodeMove));
                 }
 
                 let curCol = new Div(null, {
@@ -1160,7 +1161,7 @@ export class Render implements RenderIntf {
         return tableDiv;
     }
 
-    renderVerticalLayout = (node: J.NodeInfo, newData: boolean, level: number): Comp => {
+    renderVerticalLayout = (node: J.NodeInfo, newData: boolean, level: number, allowNodeMove: boolean): Comp => {
         let layoutClass = "node-table-row";
         if (S.meta64.userPreferences.editMode) {
             layoutClass += " editing-border";
@@ -1190,7 +1191,7 @@ export class Render implements RenderIntf {
             if (!S.edit.nodesToMoveSet[n.id]) {
                 this.updateHighlightNode(n);
 
-                let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass);
+                let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass, allowNodeMove);
                 if (row) {
                     if (rowCount == 0 && S.meta64.userPreferences.editMode) {
                         comps.push(this.createBetweenNodeButtonBar(n, true, false));
@@ -1212,7 +1213,7 @@ export class Render implements RenderIntf {
                 }
 
                 if (n.children) {
-                    comps.push(this.renderChildren(n, newData, level + 1));
+                    comps.push(this.renderChildren(n, newData, level + 1, allowNodeMove));
                 }
             }
         }
@@ -1270,7 +1271,7 @@ export class Render implements RenderIntf {
         S.view.lastPage();
     }
 
-    generateRow = (i: number, node: J.NodeInfo, newData: boolean, childCount: number, rowCount: number, level: number, layoutClass: string): Comp => {
+    generateRow = (i: number, node: J.NodeInfo, newData: boolean, childCount: number, rowCount: number, level: number, layoutClass: string, allowNodeMove: boolean): Comp => {
         if (newData) {
             S.meta64.initNode(node, true);
 
@@ -1280,7 +1281,7 @@ export class Render implements RenderIntf {
         }
 
         rowCount++; // warning: this is the local variable/parameter
-        let row: Comp = this.renderNodeAsListItem(node, i, childCount, rowCount, level, layoutClass);
+        let row: Comp = this.renderNodeAsListItem(node, i, childCount, rowCount, level, layoutClass, allowNodeMove);
         // console.log("row[" + rowCount + "]=" + row);
         return row;
     }
