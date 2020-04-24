@@ -681,10 +681,10 @@ export class Render implements RenderIntf {
             moveNodeDownButton, deleteNodeButton, cutNodeButton, replyButton, pasteInsideButton], null, "marginLeft marginTop");
 
         if (selButton || typeIcon || encIcon || sharedIcon) {
-            return new HorizontalLayout([selButton, avatarImg, typeIcon, encIcon, sharedIcon, buttonBar]);
+            return new HorizontalLayout([selButton, avatarImg, typeIcon, encIcon, sharedIcon, buttonBar], "marginLeft");
         }
         else {
-            return new HorizontalLayout([avatarImg, buttonBar]);
+            return new HorizontalLayout([avatarImg, buttonBar], "marginLeft");
         }
     }
 
