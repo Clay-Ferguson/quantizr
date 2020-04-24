@@ -68,7 +68,6 @@ export class MenuPanel extends Div {
                 //new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !S.meta64.isAnonUser }), //
 
                 new MenuItem("Clear Selections", S.edit.clearSelections, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 }), //
-                new MenuItem("Delete", () => {S.edit.deleteSelNodes(null, false);}, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 && S.meta64.state.selNodeIsMine; }), //
                 new MenuItem("Permanent Delete", () => {S.edit.deleteSelNodes(null, true);}, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 && S.meta64.state.selNodeIsMine; }), //
                 new MenuItem("Move to Top", () => { S.edit.moveNodeToTop(); }, () => { return S.meta64.state.canMoveUp; }), //
                 new MenuItem("Move to Bottom", () => { S.edit.moveNodeToBottom(); }, () => { return S.meta64.state.canMoveDown; })//

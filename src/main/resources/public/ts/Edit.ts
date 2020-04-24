@@ -377,7 +377,7 @@ export class Edit implements EditIntf {
         }, this.initNodeEditResponse);
     }
 
-    insertNode = (id?: any, typeName?: string, ordinalOffset: number=0): void => {
+    insertNode = (id?: any, typeName?: string, ordinalOffset: number = 0): void => {
         if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node.children) return;
         this.parentOfNewNode = S.meta64.currentNodeData.node;
         if (!this.parentOfNewNode) {
@@ -462,25 +462,31 @@ export class Edit implements EditIntf {
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
      * has currenly selected (via checkboxes)
      */
-    deleteSelNodes = (selNodesArray: string[], hardDelete: boolean): void => {
-        selNodesArray = selNodesArray || S.meta64.getSelectedNodeIdsArray();
+    deleteSelNodes = (node: J.NodeInfo, hardDelete: boolean): void => {
+        
+        if (node != null) {
+            S.nav.toggleNodeSel(true, node.id);
+        }
+        let selNodesArray = S.meta64.getSelectedNodeIdsArray();
 
         if (!selNodesArray || selNodesArray.length == 0) {
-            S.util.showMessage("You have not selected any nodes. Select nodes to delete first.");
+            S.util.showMessage("You have not selected any nodes to delete.");
             return;
         }
 
         let firstNodeId: string = selNodesArray[0];
-        let node: J.NodeInfo = S.meta64.idToNodeMap[firstNodeId];
+
+        /* todo-0: this was a lazy hack, need to check if ANY of the nodes are deleted not just arbitary first one */
+        let nodeCheck: J.NodeInfo = S.meta64.idToNodeMap[firstNodeId];
         let confirmMsg = null;
-        if (node.deleted) {
+        if (nodeCheck.deleted) {
             confirmMsg = "Permanently Delete " + selNodesArray.length + " node(s) ?"
         }
         else {
             confirmMsg = "Move " + selNodesArray.length + " node(s) to the trash bin ?";
         }
 
-        new ConfirmDlg(confirmMsg, "Confirm Delete",
+        new ConfirmDlg(confirmMsg, "Confirm Delete "+selNodesArray.length,
             () => {
                 let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode();
 
@@ -492,8 +498,8 @@ export class Edit implements EditIntf {
                 });
             },
             null, //no callback
-            node.deleted ? "btn-danger": null,
-            node.deleted ? "alert alert-danger": null
+            node.deleted ? "btn-danger" : null,
+            node.deleted ? "alert alert-danger" : null
         ).open();
     }
 
@@ -534,9 +540,8 @@ export class Edit implements EditIntf {
     }
 
     cutSelNodes = (node: J.NodeInfo): void => {
-         //the same pattern here to allow delete icon to do multideletes is needed todo-0
-         S.nav.toggleNodeSel(true, node.id);
-         
+        S.nav.toggleNodeSel(true, node.id);
+
         let selNodesArray = S.meta64.getSelectedNodeIdsArray();
 
         new ConfirmDlg("Cut " + selNodesArray.length + " node(s), to paste/move to new location ?", "Confirm Cut",
@@ -609,9 +614,9 @@ export class Edit implements EditIntf {
                     "typeName": "u",
                     "createAtTop": true,
                     "content": clipText
-                }, 
+                },
                     () => {
-                        S.util.flashMessage("Clipboard content saved under your Notes node...\n\n"+clipText, true);
+                        S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, true);
                     }
                 );
             });

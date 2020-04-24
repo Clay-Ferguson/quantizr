@@ -34,7 +34,7 @@ export interface EditIntf {
     createSubNode(id?: any, typeName?: string, createAtTop?: boolean): void;
     clearSelections(): void;
     selectAllNodes() : void;
-    deleteSelNodes(selNodesArray : string[], hardDelete: boolean): void;
+    deleteSelNodes(node: J.NodeInfo, hardDelete: boolean): void;
     getBestPostDeleteSelNode(): J.NodeInfo;
     cutSelNodes(node: J.NodeInfo): void;
     undoCutSelNodes(): void;

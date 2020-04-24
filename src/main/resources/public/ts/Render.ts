@@ -660,7 +660,7 @@ export class Render implements RenderIntf {
                     }
                 }
 
-                deleteNodeButton = new Button(null, () => { S.edit.deleteSelNodes([node.id], false); }, {
+                deleteNodeButton = new Button(null, () => { S.edit.deleteSelNodes(node, false); }, {
                     "iconclass": "fa fa-trash fa-lg"
                 });
 
