@@ -34,7 +34,7 @@ export class MenuPanel extends Div {
                         return !S.meta64.isAnonUser;
                     }
                 ),
-                new MenuItem("Inbox", S.nav.navInbox,
+                new MenuItem("Inbox", () => S.nav.openContentNode(S.meta64.homeNodePath + "/inbox"),
                     //enabled func
                     () => {
                         return !S.meta64.isAnonUser;
@@ -70,7 +70,20 @@ export class MenuPanel extends Div {
                 new MenuItem("Clear Selections", S.edit.clearSelections, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 }), //
                 new MenuItem("Permanent Delete", () => {S.edit.deleteSelNodes(null, true);}, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 && S.meta64.state.selNodeIsMine; }), //
                 new MenuItem("Move to Top", () => { S.edit.moveNodeToTop(); }, () => { return S.meta64.state.canMoveUp; }), //
-                new MenuItem("Move to Bottom", () => { S.edit.moveNodeToBottom(); }, () => { return S.meta64.state.canMoveDown; })//
+                new MenuItem("Move to Bottom", () => { S.edit.moveNodeToBottom(); }, () => { return S.meta64.state.canMoveDown; }),//
+                new MenuItem("Trash Bin", () => S.nav.openContentNode(S.meta64.homeNodePath + "/d"),
+                    //enabled func
+                    () => {
+                        return !S.meta64.isAnonUser;
+                    }
+                ),
+                new MenuItem("Empty Trash", () => S.edit.emptyTrash(),
+                //enabled func
+                () => {
+                    return !S.meta64.isAnonUser;
+                }
+            ),
+                
             ]),
             new Menu("Uploads", [
                 new MenuItem("Upload from File", () => {S.attachment.openUploadFromFileDlg(false);}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //

@@ -275,10 +275,6 @@ export class Nav implements NavIntf {
         this.mainMenuPopupDlg.open("inline-block");
     }
 
-    navInbox = (): void => {
-        S.nav.openContentNode(S.meta64.homeNodePath + "/inbox");
-    }
-
     navHome = (): void => {
         console.log("navHome()");
         if (S.meta64.isAnonUser) {

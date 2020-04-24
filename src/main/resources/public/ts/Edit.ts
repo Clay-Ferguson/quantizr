@@ -458,6 +458,27 @@ export class Edit implements EditIntf {
         await S.render.renderPageFromData();
     }
 
+    emptyTrash = (): void => {
+        S.meta64.clearSelectedNodes();
+
+        new ConfirmDlg("Empty Trash", "Permanently delete your entire Trash Bin",
+        () => {
+            let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode();
+
+            S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+                nodeIds: [S.meta64.homeNodePath + "/d"],
+                hardDelete: true 
+            }, (res: J.DeleteNodesResponse) => {
+                //if user was viewing trash when the deleted it that's a proble, so for now the short term
+                //solution is send user to their root now.
+                S.nav.openContentNode(S.meta64.homeNodePath);
+                
+                //this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode });
+            });
+        }, null, "btn-danger", "alert alert-danger"
+    ).open();
+    }
+
     /*
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
      * has currenly selected (via checkboxes)

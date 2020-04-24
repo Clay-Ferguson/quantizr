@@ -1032,12 +1032,22 @@ export class Render implements RenderIntf {
 
     setListViewComp = (comp: Comp): void => {
         this.listViewComp = comp;
-        comp.updateDOM("listView");
+        if (!!comp) {
+            comp.updateDOM("listView");
+        }
+        else {
+            S.util.setElmDisplayById("listView", false);
+        }
     }
 
     setMainNodeComp = (comp: Comp): void => {
         this.mainNodeComp = comp;
-        comp.updateDOM("mainNodeContent");
+        if (!!comp) {
+            comp.updateDOM("mainNodeContent");
+        }
+        else {
+            S.util.setElmDisplayById("mainNodeContent", false);
+        }
     }
 
     resetTreeDom = (): void => {

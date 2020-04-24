@@ -383,8 +383,8 @@ export class Meta64 implements Meta64Intf {
         let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, this.state.highlightNode);
         let allowNodeMove: boolean = !orderByProp;
 
-        this.state.canMoveUp = allowNodeMove && !this.state.highlightNode.firstChild;
-        this.state.canMoveDown = allowNodeMove && !this.state.highlightNode.lastChild;
+        this.state.canMoveUp = allowNodeMove && this.state.highlightNode && !this.state.highlightNode.firstChild;
+        this.state.canMoveDown = allowNodeMove && this.state.highlightNode && !this.state.highlightNode.lastChild;
 
         //todo-1: need to add to this selNodeIsMine || selParentIsMine;
         this.state.canCreateNode = this.userPreferences.editMode && this.state.highlightNode && (this.isAdminUser || (!this.isAnonUser /* && selNodeIsMine */));

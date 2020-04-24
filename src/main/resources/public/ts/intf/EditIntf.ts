@@ -40,5 +40,6 @@ export interface EditIntf {
     undoCutSelNodes(): void;
     pasteSelNodes(node: J.NodeInfo, location: string): void;
     insertBookWarAndPeace(): void;
+    emptyTrash(): void;
 }
 
