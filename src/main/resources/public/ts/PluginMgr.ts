@@ -30,10 +30,12 @@ export class PluginMgr implements PluginMgrIntf {
         return this.typeHandlers;
     }
 
-    //todo-0: make it so that some plugins can be flagged as 'admin only' and not show up on the menu to pick them.
+    //todo-1: make it so that some plugins can be flagged as 'admin only' and not show up on the menu to pick them.
     initPlugins = (): void => {
         this.addTypeHandler(new RssTypeHandler());
         this.addTypeHandler(new IPFSNodeTypeHandler());
+
+        //todo-0: use this to set root type on all instances: dev, test, prod
         this.addTypeHandler(new RepoRootTypeHandler());
 
         // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());

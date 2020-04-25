@@ -499,7 +499,7 @@ export class Edit implements EditIntf {
 
         let firstNodeId: string = selNodesArray[0];
 
-        /* todo-0: this was a lazy hack, need to check if ANY of the nodes are deleted not just arbitary first one */
+        /* todo-1: would be better to check if ANY of the nodes are deleted not just arbitary first one */
         let nodeCheck: J.NodeInfo = S.meta64.idToNodeMap[firstNodeId];
         let confirmMsg = null;
         if (nodeCheck.deleted) {

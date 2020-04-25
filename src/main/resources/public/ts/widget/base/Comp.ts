@@ -70,7 +70,7 @@ export abstract class Comp implements CompIntf {
      * allowRect can be set to false for components that are known to be used in cases where not all of their subchildren are react or for
      * whatever reason we want to disable react rendering, and fall back on render-to-text approach
      */
-    constructor(attribs: any) {
+    constructor(attribs?: any) {
         this.attribs = attribs || {};
         this.children = [];
 

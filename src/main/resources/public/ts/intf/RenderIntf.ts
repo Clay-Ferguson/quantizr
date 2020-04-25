@@ -3,6 +3,7 @@ import * as J from "../JavaIntf";
 import { Div } from "../widget/Div";
 import { Img } from "../widget/Img";
 import { Comp } from "../widget/base/Comp";
+import { TypeHandlerIntf } from "./TypeHandlerIntf";
 
 export interface RenderIntf {
     resetTreeDom(): void;
@@ -15,7 +16,6 @@ export interface RenderIntf {
     showNodeUrl(): void;
     getTopRightImageTag(node: J.NodeInfo): Img;
     getNodeBkgImageStyle(node: J.NodeInfo): string;
-    makeRowButtonBar(node: J.NodeInfo, editingAllowed: boolean, allowAvatar: boolean, allowNodeMove: boolean): Comp;
     renderPageFromData(data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string, clickTab?: boolean): Promise<void>;
     firstPage(): void;
     prevPage(): void;
@@ -29,4 +29,5 @@ export interface RenderIntf {
     allowPropertyToDisplay(propName: string): boolean;
     allowPropertyEdit(node: J.NodeInfo, propName: string): boolean;
     isReadOnlyProperty(propName: string): boolean;
+    allowAction(typeHandler: TypeHandlerIntf, action: string): boolean; 
 }

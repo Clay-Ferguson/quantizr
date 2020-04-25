@@ -124,14 +124,6 @@ import org.subnode.util.ValContainer;
  * probably the only code in the system that looks 'redundant' (non-DRY), but
  * this is because we want certain things in certain layers (abstraction related
  * and for loose-coupling).
- * 
- * TODO: need to get all "business logic" out of this layer (there is a tiny bit
- * of it in here), because it doesn't belong here. Should all be contained in
- * service layer, utilities classes, etc.
- * 
- * NOTES: @RequestMapping also supports headers:
- * 
- * @RequestMapping(value = "/ex/foos", headers = "key=val", method = GET)
  */
 @Controller
 @CrossOrigin
