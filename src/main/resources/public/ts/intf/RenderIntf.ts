@@ -8,7 +8,6 @@ import { TypeHandlerIntf } from "./TypeHandlerIntf";
 export interface RenderIntf {
     resetTreeDom(): void;
     updateHighlightNode(node: J.NodeInfo): void;
-    buildRowHeader(node: J.NodeInfo, showPath: boolean, showName: boolean): Div;
     injectSubstitutions(content: string): string;
     renderNodeContent(node: J.NodeInfo, rowStyling: boolean, showHeader: boolean): Comp[];
     renderMarkdown(rowStyling: boolean, node: J.NodeInfo, retState: any): Comp;

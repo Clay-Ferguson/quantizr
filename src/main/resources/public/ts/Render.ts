@@ -22,6 +22,7 @@ import { VideoPlayerDlg } from "./dlg/VideoPlayerDlg";
 import { NavBarIconButton } from "./widget/NavBarIconButton";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { NodeCompButtonBar } from "./comps/NodeCompButtonBar";
+import { NodeCompRowHeader } from "./comps/NodeCompRowHeader";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -107,35 +108,6 @@ export class Render implements RenderIntf {
         }
     }
 
-    buildRowHeader = (node: J.NodeInfo): Div => {
-        let children = [];
-
-        let priority = S.props.getNodePropVal(J.NodeProp.PRIORITY, node);
-        priority = (priority && priority != "0") ? " P" + priority : "";
-
-        if (node.name) {
-            children.push(new Div("Name: " + node.name));
-        }
-
-        children.push(new Div(
-            "ID:" + node.id + " " + //
-            ((node.logicalOrdinal != -1) ? ("[" + node.logicalOrdinal + "] ") : "") + //
-            "Type:" + node.type + //
-            (node.lastModified ? " (Mod: " + S.util.formatDate(new Date(node.lastModified)) + ")" : "") + //
-            priority));
-
-        if (node.owner && node.owner != "?") {
-            let clazz: string = (node.owner === S.meta64.userName) ? "created-by-me" : "created-by-other";
-            children.push(new Span("Created By: " + node.owner, {
-                className: clazz
-            }));
-        }
-
-        return new Div(null, {
-            className: "header-text"
-        }, children);
-    }
-
     injectSubstitutions = (val: string): string => {
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
 
@@ -160,7 +132,7 @@ export class Render implements RenderIntf {
         /* todo-2: enable headerText when appropriate here */
         if (S.meta64.showMetaData) {
             if (showHeader) {
-                ret.push(this.buildRowHeader(node));
+                ret.push(new NodeCompRowHeader(node));
             }
         }
 
