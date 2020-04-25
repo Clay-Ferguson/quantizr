@@ -468,7 +468,12 @@ public class UserManagerService {
 			userPrefs.setShowMetaData(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_METADATA.s()));
 			userPrefs.setImportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_IMPORT_ALLOWED.s()));
 			userPrefs.setExportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_EXPORT_ALLOWED.s()));
-			userPrefs.setMaxUploadFileSize(prefsNode.getIntProp(NodeProp.BIN_MAX_UPLOAD_SIZE.s()));
+
+			long maxFileSize = prefsNode.getIntProp(NodeProp.BIN_MAX_UPLOAD_SIZE.s());
+			if (maxFileSize==0) {
+				maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
+			}
+			userPrefs.setMaxUploadFileSize(maxFileSize);
 		});
 
 		return userPrefs;

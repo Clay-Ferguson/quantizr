@@ -4,8 +4,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { Comp } from "../widget/base/Comp";
-import { Div } from "../widget/Div";
-import { Heading } from "../widget/Heading";
+import { NodeCompMarkdown } from "../comps/NodeCompMarkdown";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -28,7 +27,7 @@ export class RepoRootTypeHandler implements TypeHandlerIntf {
 
     render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
         //this is essentially the 'default rendering' any other node has.
-        return S.render.renderMarkdown(rowStyling, node, {});
+        return new NodeCompMarkdown(node, {});
     }
 
     orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {

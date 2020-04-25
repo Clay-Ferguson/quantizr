@@ -6,6 +6,7 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
+import { NodeCompMarkdown } from "../comps/NodeCompMarkdown";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -33,7 +34,7 @@ export class IPFSNodeTypeHandler implements TypeHandlerIntf {
         let ret: Comp[] = [];
 
         let name = node.content;
-        if (name) {
+    if (name) {
             let linkName = S.props.getNodePropVal("ipfs:linkName", node);
             if (linkName) {
                 ret.push(new Heading(6, "Link Name: " + linkName, { className: "ipfs-text" }));
@@ -43,7 +44,7 @@ export class IPFSNodeTypeHandler implements TypeHandlerIntf {
             if (link) {
                 ret.push(new Heading(6, "Link: " + link, { className: "ipfs-text" }));
             }
-            ret.push(S.render.renderMarkdown(rowStyling, node, {}));
+            ret.push(new NodeCompMarkdown(node, {}));
         }
         else {
             let displayName = S.props.getNodePropVal("ipfs:link", node);

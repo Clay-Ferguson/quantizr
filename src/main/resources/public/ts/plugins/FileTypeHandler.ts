@@ -50,7 +50,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 //                 ret.push(playButton);
 //             }
 //             else if (displayName.toLowerCase().endsWith(".md")) {
-//                 let markdownDiv = S.render.renderMarkdown(rowStyling, node, {});
+//                 let markdownDiv = new NodeCompMarkdown(node, {});
 
 //                 let collapsiblePanel = new CollapsiblePanel(displayName, null, [markdownDiv], true);
 //                 ret.push(collapsiblePanel);

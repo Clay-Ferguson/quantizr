@@ -21,7 +21,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 //         let name = node.content;
 //         if (name) {
-//             ret = S.render.renderMarkdown(rowStyling, node, {});
+//             ret = NodeCompMarkdown(node, {});
 //         }
 //         else {
 //             let folderName = "";

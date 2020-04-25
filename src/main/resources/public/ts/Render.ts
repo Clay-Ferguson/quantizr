@@ -2,11 +2,8 @@ import * as J from "./JavaIntf";
 import { Comp } from "./widget/base/Comp";
 import { Button } from "./widget/Button";
 import { ButtonBar } from "./widget/ButtonBar";
-import { Checkbox } from "./widget/Checkbox";
 import { Div } from "./widget/Div";
-import { Span } from "./widget/Span";
 import { Img } from "./widget/Img";
-import { Anchor } from "./widget/Anchor";
 import { Constants as C, Constants } from "./Constants";
 import { RenderIntf } from "./intf/RenderIntf";
 import { Singletons } from "./Singletons";
@@ -15,14 +12,13 @@ import * as marked from 'marked';
 import * as highlightjs from 'highlightjs';
 import { Icon } from "./widget/Icon";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
-import { MarkdownDiv } from "./widget/MarkdownDiv";
 import { HorizontalLayout } from "./widget/HorizontalLayout";
-import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
-import { VideoPlayerDlg } from "./dlg/VideoPlayerDlg";
 import { NavBarIconButton } from "./widget/NavBarIconButton";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { NodeCompButtonBar } from "./comps/NodeCompButtonBar";
 import { NodeCompRowHeader } from "./comps/NodeCompRowHeader";
+import { NodeCompBinary } from "./comps/NodeCompBinary";
+import { NodeCompMarkdown } from "./comps/NodeCompMarkdown";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -37,76 +33,9 @@ export class Render implements RenderIntf {
     private debug: boolean = false;
     private markedRenderer = null;
 
-    //This flag makes the text ALWAYS decrypt and display onscreen if the person owning the content is viewing it, but this
-    //is most likely never wanted, because it's insecure in screen-share context, or when someone can see your screen for any reason.
-    //todo-1: We could make this a user preference so users in a secure location can just view all encrypted data.
-    //
-    //UPDATE: turning this ON for now, because for testing 'shared' nodes we don't have editing capability and thus need a way to decrypt
-    private immediateDecrypting: boolean = true;
-
     /* Since js is singlethreaded we can have lastOwner get updated from any other function and use it to keep track
     during the rendering, what the last owner was so we can keep from displaying the same avatars unnecessarily */
     private lastOwner: string;
-
-    private renderBinary = (node: J.NodeInfo): Comp => {
-        /*
-         * If this is an image render the image directly onto the page as a visible image
-         */
-        if (S.props.hasImage(node)) {
-            return this.makeImageTag(node);
-        }
-        else if (S.props.hasVideo(node)) {
-            return new ButtonBar([
-                new Button("Play Video", () => {
-                    new VideoPlayerDlg(this.getStreamUrlForNodeAttachment(node)).open();
-                }),
-                new Div("", {
-                    className: "videoDownloadLink"
-                }, [new Anchor(this.getUrlForNodeAttachment(node), "[Download Video]")])
-            ], "marginAll");
-        }
-        else if (S.props.hasAudio(node)) {
-            return new ButtonBar([
-                new Button("Play Audio", () => {
-                    new AudioPlayerDlg(this.getStreamUrlForNodeAttachment(node)).open();
-                }),
-                new Div("", {
-                    className: "audioDownloadLink"
-                }, [new Anchor(this.getUrlForNodeAttachment(node), "[Download Audio]")])
-            ], "marginAll");
-        }
-        /*
-         * If not an image we render a link to the attachment, so that it can be downloaded.
-         */
-        else {
-            let fileName: string = S.props.getNodePropVal(J.NodeProp.BIN_FILENAME, node);
-            let fileSize: string = S.props.getNodePropVal(J.NodeProp.BIN_SIZE, node);
-            let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
-
-            let viewFileLink: Anchor = null;
-            if (fileType == "application/pdf" || fileType.startsWith("text/")) {
-                viewFileLink = new Anchor(this.getUrlForNodeAttachment(node), "[View]", {
-                    target: "_blank",
-                    className: "marginLeft"
-                });
-            }
-
-            return new Div("", {
-                className: "binary-link",
-                title: "File Size:" + fileSize + " Type:" + fileType
-            }, [
-                new Icon("", null, {
-                    "style": { marginRight: '12px', verticalAlign: 'middle' },
-                    className: "fa fa-file fa-lg"
-                }),
-                new Span(fileName, {
-                    className: "normalText marginRight"
-                }),
-                new Anchor(this.getUrlForNodeAttachment(node), "[Download]"),
-                viewFileLink
-            ]);
-        }
-    }
 
     injectSubstitutions = (val: string): string => {
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
@@ -122,9 +51,6 @@ export class Render implements RenderIntf {
      * app and is what the user sees covering 90% of the screen most of the time. The *content* nodes.
      */
     renderNodeContent = (node: J.NodeInfo, rowStyling: boolean, showHeader: boolean): Comp[] => {
-        //todo-3: bring back top right image support. disabling for now to simplify refactoring
-        //let topRightImgTag = null; //this.getTopRightImageTag(node);
-        //let ret: string = topRightImgTag ? topRightImgTag.render_Html() : "";
 
         let ret: Comp[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
@@ -155,7 +81,7 @@ export class Render implements RenderIntf {
             if (!renderComplete) {
                 let retState: any = {};
                 retState.renderComplete = renderComplete;
-                ret.push(this.renderMarkdown(rowStyling, node, retState));
+                ret.push(new NodeCompMarkdown(node, retState));
                 renderComplete = retState.renderComplete;
             }
 
@@ -172,7 +98,7 @@ export class Render implements RenderIntf {
         let isAnAccountNode = node.ownerId && node.id == node.ownerId;
 
         if (S.props.hasBinary(node) && !isAnAccountNode) {
-            let binary = this.renderBinary(node);
+            let binary = new NodeCompBinary(node);
 
             //todo-0: bring this back. I already needed it again.
             /*
@@ -190,112 +116,6 @@ export class Render implements RenderIntf {
         }
 
         return ret;
-    }
-
-    /* Renders 'content' property as markdown. Note: rowStyling arg is not currently being used
-    but will eventually be used again to tweak clazz, the way it originally was used for. */
-    renderMarkdown = (rowStyling: boolean, node: J.NodeInfo, retState: any): Comp => {
-        let content = node.content || "";
-        retState.renderComplete = true;
-
-        let clazz = "markdown-content content-narrow";
-
-        let val;
-        if (content.startsWith(J.Constant.ENC_TAG)) {
-            val = "[Encrypted]";
-        }
-        else {
-            val = this.renderRawMarkdown(node);
-        }
-
-        val = this.injectSubstitutions(val);
-
-        // NOTE: markdown-html doesn't apply any actual styling but instead is used in a JS dom lookup to find all the 
-        // images under each markdown element to apply a styling update post-render.
-        // todo-1: need to research the built-in support in React that allows these kinds of 'post-render' updates.
-        // see: https://reactjs.org/docs/hooks-reference.html#useeffect
-        let div = new MarkdownDiv(val, {
-            className: clazz + " markdown-html",
-        });
-
-        //We always alter all 'img' tags that may have been generated by the markdown engine, to make sure they have
-        //the correct style we want, which is the 100% display across the 'document' area (not full browser, but the full 
-        //width across the same area the text is rendered inside). 
-        div.whenElm(async (elm: HTMLElement) => {
-
-            if (this.immediateDecrypting && content.startsWith(J.Constant.ENC_TAG)) {
-                setTimeout(async () => {
-                    //todo-1: for performance we could create a map of the hash of the encrypted content (key) to the
-                    //decrypted text (val), and hold that map so that once we decrypt a message we never use encryption again at least
-                    //until of course browser refresh (would be Javascript hash)                    
-                    let cipherText = content.substring(J.Constant.ENC_TAG.length);
-                    //console.log("NODE DATA: CIPHERTEXT: "+cipherText);
-
-                    let cipherKey = S.props.getCryptoKey(node);
-                    if (cipherKey) {
-                        let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
-
-                        if (clearText) {
-                            node.content = clearText;
-                            let val2 = this.renderRawMarkdown(node);
-                            div.setContent(val2);
-                        }
-                    }
-                }, 1);
-            }
-        });
-
-        return div;
-    }
-
-    renderRawMarkdown = (node: J.NodeInfo): string => {
-        let content = node.content || "";
-        let val = "";
-
-        // Special case of a PRE-formatted node, we inject backticks to make it render all the content as preformatted markdown */
-        let preProp: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.PRE, node);
-        if (preProp && preProp.value == "1") {
-
-            let nowrapProp: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.NOWRAP, node);
-            let wordWrap = !(nowrapProp && nowrapProp.value == "1");
-
-            if (!!content) {
-                if (wordWrap) {
-                    let contentFormatted = S.util.escapeHtml(content);
-                    contentFormatted = S.util.replaceAll(contentFormatted, "\n\r", "<br>");
-                    contentFormatted = S.util.replaceAll(contentFormatted, "\n", "<br>");
-                    contentFormatted = S.util.replaceAll(contentFormatted, "\r", "<br>");
-                    val = "<div class='fixedFont'>" + contentFormatted + "</div>";
-                }
-                else {
-                    val = "<pre>" + S.util.escapeHtml(content) + "</pre>";
-                }
-            }
-            else {
-                val = "";
-            }
-        }
-        else {
-            this.initMarkdown();
-
-            // todo-1: put some more thought into this...
-            // turning this off because when it appears in a url, blows up the link. Need to find some better way.
-            // if (S.srch.searchText) {
-            //     /* This results in a <strong><em> wrapping the text, which we have a special styling for with a green background for each
-            //     search term so it's easy to see them highlighted on the page */
-            //     content = content.replace(S.srch.searchText, "**_" + S.srch.searchText + "_**");
-            // }
-
-            // Do the actual markdown rendering here.
-            val = marked(content);
-
-            // the marked adds a 'p tag' wrapping we don't need so we remove it just to speed up DOM as much as possible
-            val = val.trim();
-            val = S.util.stripIfStartsWith(val, "<p>");
-            val = S.util.stripIfEndsWith(val, "</p>");
-            //console.log("MARKDOWN OUT: " + mc);
-        }
-        return val;
     }
 
     /**
@@ -384,8 +204,6 @@ export class Render implements RenderIntf {
     renderNodeAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, level: number, layoutClass: string, allowNodeMove: boolean): Comp => {
 
         let id: string = node.id;
-        let prevPageExists: boolean = S.nav.mainOffset > 0;
-        let nextPageExists: boolean = !S.nav.endReached;
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
 
@@ -412,7 +230,7 @@ export class Render implements RenderIntf {
         //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
         let allowAvatar = node.owner != this.lastOwner;
         let buttonBar: Comp = new NodeCompButtonBar(node, editingAllowed, allowAvatar, allowNodeMove);
-        //let bkgStyle: string = this.getNodeBkgImageStyle(node);
+        
         let indentLevel = layoutClass === "node-grid-item" ? 0 : level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
         let cssId: string = "row_" + id;
@@ -500,27 +318,6 @@ export class Render implements RenderIntf {
         S.util.showMessage(message, true);
     }
 
-    getTopRightImageTag = (node: J.NodeInfo): Img => {
-        let topRightImg: string = S.props.getNodePropVal("img.top.right", node);
-        let topRightImgTag: Img;
-        if (topRightImg) {
-            topRightImgTag = new Img({
-                "src": topRightImg,
-                className: "top-right-image"
-            });
-        }
-        return topRightImgTag;
-    }
-
-    getNodeBkgImageStyle = (node: J.NodeInfo): string => {
-        let bkgImg: string = S.props.getNodePropVal('img.node.bkg', node);
-        let bkgImgStyle: string = "";
-        if (bkgImg) {
-            bkgImgStyle = `background-image: url(${bkgImg});`;
-        }
-        return bkgImgStyle;
-    }
-
     allowAction = (typeHandler: TypeHandlerIntf, action: string): boolean => {
         return typeHandler == null || typeHandler.allowAction(action);
     }
@@ -590,7 +387,6 @@ export class Render implements RenderIntf {
                         console.log("RENDER NODE: " + data.node.id + " propCount=" + propCount);
                     }
 
-                    //let bkgStyle: string = this.getNodeBkgImageStyle(data.node);
                     /*
                      * NOTE: mainNodeContent is the parent node of the page content, and is always the node displayed at the top
                      * of the page above all the other nodes which are its child nodes.
@@ -769,12 +565,12 @@ export class Render implements RenderIntf {
                     }
 
                     if (S.nav.mainOffset > 0) {
-                        let firstButton: Comp = new Button("First Page", this.firstPage,
+                        let firstButton: Comp = new Button("First Page", S.view.firstPage,
                             {
                                 id: "firstPageButton",
                                 iconclass: "fa fa-angle-double-left fa-lg"
                             });
-                        let prevButton: Comp = new Button("Prev Page", this.prevPage,
+                        let prevButton: Comp = new Button("Prev Page", S.view.prevPage,
                             {
                                 id: "prevPageButton",
                                 iconclass: "fa fa-angle-left fa-lg"
@@ -793,7 +589,7 @@ export class Render implements RenderIntf {
                     }
 
                     if (!data.endReached) {
-                        let nextButton = new Button("Next Page", this.nextPage,
+                        let nextButton = new Button("Next Page", S.view.nextPage,
                             {
                                 id: "nextPageButton",
                                 iconclass: "fa fa-angle-right fa-lg"
@@ -901,8 +697,6 @@ export class Render implements RenderIntf {
     private renderChildren = (node: J.NodeInfo, newData: boolean, level: number, allowNodeMove: boolean): Comp => {
         if (!node || !node.children) return null;
 
-        //let childCount: number = node.children.length;
-        // console.log("childCount: " + childCount);
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on
          * the client side for various reasons.
@@ -1094,22 +888,6 @@ export class Render implements RenderIntf {
         let buttonBar = new ButtonBar([pasteInlineButton, newNodeButton],
             null, "float-right " + (isFirst ? "marginTop" : ""));
         return buttonBar;
-    }
-
-    firstPage = (): void => {
-        S.view.firstPage();
-    }
-
-    prevPage = (): void => {
-        S.view.prevPage();
-    }
-
-    nextPage = (): void => {
-        S.view.nextPage();
-    }
-
-    lastPage = (): void => {
-        S.view.lastPage();
     }
 
     generateRow = (i: number, node: J.NodeInfo, newData: boolean, childCount: number, rowCount: number, level: number, layoutClass: string, allowNodeMove: boolean): Comp => {
