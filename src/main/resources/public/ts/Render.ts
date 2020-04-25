@@ -4,17 +4,14 @@ import { Button } from "./widget/Button";
 import { ButtonBar } from "./widget/ButtonBar";
 import { Div } from "./widget/Div";
 import { Img } from "./widget/Img";
-import { Constants as C, Constants } from "./Constants";
+import { Constants as C } from "./Constants";
 import { RenderIntf } from "./intf/RenderIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import * as marked from 'marked';
 import * as highlightjs from 'highlightjs';
-import { Icon } from "./widget/Icon";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
-import { HorizontalLayout } from "./widget/HorizontalLayout";
 import { NavBarIconButton } from "./widget/NavBarIconButton";
-import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { NodeCompButtonBar } from "./comps/NodeCompButtonBar";
 import { NodeCompRowHeader } from "./comps/NodeCompRowHeader";
 import { NodeCompBinary } from "./comps/NodeCompBinary";
@@ -212,10 +209,10 @@ export class Render implements RenderIntf {
         //     editingAllowed = S.meta64.isAdminUser && !props.isNonOwnedCommentNode(node)
         //         && !props.isNonOwnedNode(node);
         // }
-        let editingAllowed = S.edit.isEditAllowed(node);
-        if (typeHandler) {
-            editingAllowed = editingAllowed && typeHandler.allowAction("edit");
-        }
+        // let editingAllowed = S.edit.isEditAllowed(node);
+        // if (typeHandler) {
+        //     editingAllowed = editingAllowed && typeHandler.allowAction("edit");
+        // }
         //console.log("Rendering Node Row[" + index + "] editingAllowed=" + editingAllowed);
 
         /*
@@ -229,7 +226,7 @@ export class Render implements RenderIntf {
 
         //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
         let allowAvatar = node.owner != this.lastOwner;
-        let buttonBar: Comp = new NodeCompButtonBar(node, editingAllowed, allowAvatar, allowNodeMove);
+        let buttonBar: Comp = new NodeCompButtonBar(node, allowAvatar, allowNodeMove, true);
         
         let indentLevel = layoutClass === "node-grid-item" ? 0 : level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
@@ -395,125 +392,9 @@ export class Render implements RenderIntf {
 
                     //console.log("mainNodeContent: "+mainNodeContent);
 
-                    //todo-1: it's getting super ugly that all this code is different (replicated) from the normal rows, non-root, not sure if i 
-                    //want to keep this or consolidate.
                     if (mainNodeContent.length > 0) {
                         let id: string = data.node.id;
                         let cssId: string = "row_" + id;
-
-                        //todo-1: lots of these buttons are replicated in both the 'page root node' and 'child node' renderings
-                        //and to i need to consolidate it into a component?
-                        let buttonBar: ButtonBar = null;
-                        let navButtonBar: ButtonBar = null;
-                        let editNodeButton: Button = null;
-                        let createSubNodeButton: Button = null;
-                        let replyButton: Button = null;
-                        let pasteInsideButton: Button = null;
-                        let upLevelButton: NavBarIconButton = null;
-                        let prevButton: NavBarIconButton = null;
-                        let nextButton: NavBarIconButton = null;
-                        let searchButton: NavBarIconButton = null;
-                        let timelineButton: NavBarIconButton = null;
-
-                        if (!S.meta64.isAnonUser) {
-                            searchButton = new NavBarIconButton("fa-search", null, {
-                                "onClick": e => {
-                                    S.nav.clickOnNodeRow(data.node.id);
-                                    new SearchContentDlg().open();
-                                },
-                                "title": "Search under this node"
-                            }, null, null, "");
-
-
-                            timelineButton = new NavBarIconButton("fa-clock-o", null, {
-                                "onClick": e => {
-                                    S.nav.clickOnNodeRow(data.node.id);
-                                    S.srch.timeline("mtm");
-                                },
-                                "title": "View Timeline under this node (by Mod Time)"
-                            }, null, null, "");
-                        }
-
-                        if (S.nav.parentVisibleToUser()) {
-                            upLevelButton = new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
-                                "onClick": e => { S.nav.navUpLevel(); },
-                                "title": "Go to Parent SubNode"
-                            }, null, null, "");
-                        }
-
-                        if (!S.nav.displayingRepositoryRoot()) {
-                            prevButton = new NavBarIconButton("fa-chevron-circle-left", null, {
-                                "onClick": e => { S.nav.navToSibling(-1); },
-                                "title": "Go to Previous SubNode"
-                            }, null, null, "");
-
-                            nextButton = new NavBarIconButton("fa-chevron-circle-right", null, {
-                                "onClick": e => { S.nav.navToSibling(1); },
-                                "title": "Go to Next SubNode"
-                            }, null, null, "");
-                        }
-
-                        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(data.node.type);
-                        var insertAllowed = true;
-                        if (typeHandler) {
-                            insertAllowed = typeHandler.allowAction("insert");
-                        }
-
-                        if (C.NEW_ON_ROOT) {
-                            if (S.meta64.userPreferences.editMode && C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(data.node)) {
-                                createSubNodeButton = new Button("New", () => { S.edit.createSubNode(id, null, true); });
-                            }
-                        }
-
-                        var editAllowed = true;
-                        if (typeHandler) {
-                            editAllowed = typeHandler.allowAction("edit");
-                        }
-
-                        /* Add edit button if edit mode and this isn't the root */
-                        if (editAllowed && S.edit.isEditAllowed(data.node)) {
-
-                            /* Construct Create Subnode Button */
-                            editNodeButton = new Button(null, () => { S.edit.runEditNode(id); },
-                                { "iconclass": "fa fa-edit fa-lg" });
-                        }
-
-                        if (editAllowed && !S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
-                            pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(data.node, 'inside'); }, {
-                                className: "highlightBorder"
-                            });
-                        }
-
-                        let typeIcon: Icon = null;
-                        if (typeHandler) {
-                            /* For now let's only show type icons when we're in edit mode */
-                            if (S.meta64.userPreferences.editMode) {
-                                let iconClass = typeHandler.getIconClass(data.node);
-                                if (iconClass) {
-                                    //todo-1: do all icons have the 'middle'? (if so embed it into class)
-                                    typeIcon = new Icon("", null, {
-                                        style: { marginRight: '6px', verticalAlign: 'middle' },
-                                        className: iconClass
-                                    });
-                                }
-                            }
-                        }
-
-                        let encIcon: Icon = null;
-                        if (S.props.isEncrypted(data.node)) {
-                            encIcon = new Icon("", null, {
-                                "style": { marginRight: '6px', verticalAlign: 'middle' },
-                                className: "fa fa-lock fa-lg"
-                            });
-                        }
-
-                        let sharedIcon: Icon = null;
-                        if (S.props.isMine(data.node) && S.props.isShared(data.node)) {
-                            sharedIcon = new Icon("", null, {
-                                "style": { marginRight: '6px', verticalAlign: 'middle' },
-                                className: "fa fa-share-alt fa-lg"
-                            });
-                        }
 
                         /* Construct Create Subnode Button */
                         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode();
@@ -522,29 +403,8 @@ export class Render implements RenderIntf {
                             console.log("selected: focusNode.uid=" + focusNode.id + " selected=" + selected);
                         }
 
-                        let avatarImg: Img;
-                        //console.log("Root render: data.node.owner=" + data.node.owner);
-                        if (data.node.owner != J.PrincipalName.ADMIN) {
-                            avatarImg = this.makeAvatarImage(data.node);
-                        }
-
-                        if (searchButton || timelineButton || upLevelButton || prevButton || nextButton) {
-                            navButtonBar = new ButtonBar([searchButton, timelineButton, upLevelButton, prevButton, nextButton],
-                                null, "float-right marginTop marginBottom");
-                        }
-
-                        if (typeIcon || encIcon || sharedIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || upLevelButton) {
-                            buttonBar = new ButtonBar([typeIcon, encIcon, sharedIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton],
-                                null, "marginLeft marginTop");
-                        }
-
                         let children = [];
-                        if (buttonBar) {
-                            children.push(new HorizontalLayout([avatarImg, buttonBar, navButtonBar]));
-                        }
-                        else {
-                            children.push(avatarImg);
-                        }
+                        children.push(new NodeCompButtonBar(data.node, true, false, true));
                         children.push(new Div(null, { className: "clearfix" }));
                         children = children.concat(mainNodeContent);
 
@@ -911,7 +771,7 @@ export class Render implements RenderIntf {
         if (!filePart) {
             filePart = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
             if (filePart) {
-                return Constants.IPFS_GATEWAY + filePart;
+                return C.IPFS_GATEWAY + filePart;
             }
         }
 

@@ -42,6 +42,7 @@ export interface Meta64Intf {
 
     expandedAbbrevNodeIds: any;
 
+    //todo-0: rename this to nodeData
     currentNodeData: J.RenderNodeResponse;
 
     userPreferences: J.UserPreferences;

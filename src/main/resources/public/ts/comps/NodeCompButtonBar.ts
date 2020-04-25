@@ -2,7 +2,6 @@ import * as J from "../JavaIntf";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
-import { Div } from "../widget/Div";
 import { Icon } from "../widget/Icon";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
@@ -12,6 +11,8 @@ import { Img } from "../widget/Img";
 import { ButtonBar } from "../widget/ButtonBar";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { ReactNode } from "react";
+import { NavBarIconButton } from "../widget/NavBarIconButton";
+import { SearchContentDlg } from "../dlg/SearchContentDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -23,7 +24,14 @@ export class NodeCompButtonBar extends Comp {
 
     comp: HorizontalLayout = null;
 
-    constructor(public node: J.NodeInfo, public editingAllowed: boolean, public allowAvatar: boolean, public allowNodeMove: boolean) {
+    /* need constructor option that tells us if this is 'root' node so we don't bother with:
+        let upLevelButton: NavBarIconButton = null;
+        let prevButton: NavBarIconButton = null;
+        let nextButton: NavBarIconButton = null;
+        let searchButton: NavBarIconButton = null;
+        let timelineButton: NavBarIconButton = null;
+    */
+    constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean, public isRootNode: boolean) {
         super();
         this.comp = this.build();
     }
@@ -45,6 +53,49 @@ export class NodeCompButtonBar extends Comp {
         let replyButton: Button;
         let deleteNodeButton: Button;
         let pasteInsideButton: Button;
+        let upLevelButton: NavBarIconButton;
+        let prevButton: NavBarIconButton;
+        let nextButton: NavBarIconButton;
+        let searchButton: NavBarIconButton;
+        let timelineButton: NavBarIconButton;
+
+        if (S.nav.parentVisibleToUser()) {
+            upLevelButton = new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
+                "onClick": e => { S.nav.navUpLevel(); },
+                "title": "Go to Parent SubNode"
+            }, null, null, "");
+        }
+
+        if (!S.nav.displayingRepositoryRoot()) {
+            prevButton = new NavBarIconButton("fa-chevron-circle-left", null, {
+                "onClick": e => { S.nav.navToSibling(-1); },
+                "title": "Go to Previous SubNode"
+            }, null, null, "");
+
+            nextButton = new NavBarIconButton("fa-chevron-circle-right", null, {
+                "onClick": e => { S.nav.navToSibling(1); },
+                "title": "Go to Next SubNode"
+            }, null, null, "");
+        }
+
+        if (this.isRootNode && !S.meta64.isAnonUser) {
+            searchButton = new NavBarIconButton("fa-search", null, {
+                "onClick": e => {
+                    S.nav.clickOnNodeRow(node.id);
+                    new SearchContentDlg().open();
+                },
+                "title": "Search under this node"
+            }, null, null, "");
+
+
+            timelineButton = new NavBarIconButton("fa-clock-o", null, {
+                "onClick": e => {
+                    S.nav.clickOnNodeRow(node.id);
+                    S.srch.timeline("mtm");
+                },
+                "title": "View Timeline under this node (by Mod Time)"
+            }, null, null, "");
+        }
 
         //todo-1: need to DRY up places where this code block is repeated
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
@@ -56,6 +107,11 @@ export class NodeCompButtonBar extends Comp {
                     className: iconClass
                 });
             }
+        }
+
+        let editingAllowed = S.edit.isEditAllowed(node);
+        if (typeHandler) {
+            editingAllowed = editingAllowed && typeHandler.allowAction("edit");
         }
 
         if (S.props.isEncrypted(node)) {
@@ -96,7 +152,7 @@ export class NodeCompButtonBar extends Comp {
 
             let selected: boolean = S.meta64.selectedNodes[node.id] ? true : false;
 
-            if (this.editingAllowed && S.render.allowAction(typeHandler, "edit")) {
+            if (editingAllowed && S.render.allowAction(typeHandler, "edit")) {
                 selButton = new Checkbox(null, selected, {
                     onChange: () => {
                         S.nav.toggleNodeSel(selButton.getChecked(), node.id)
@@ -117,7 +173,8 @@ export class NodeCompButtonBar extends Comp {
                 insertNodeButton = new Button("Ins", () => { S.edit.insertNode(node.id); });
             }
 
-            if (this.editingAllowed) {
+            //todo-0: does this editingAllows already factor in this logic?? --> S.edit.isEditAllowed(data.node) ???
+            if (editingAllowed) {
                 editNodeButton = new Button(null, () => { S.edit.runEditNode(node.id); }, {
                     "iconclass": "fa fa-edit fa-lg"
                 });
@@ -148,6 +205,7 @@ export class NodeCompButtonBar extends Comp {
                     "iconclass": "fa fa-trash fa-lg"
                 });
 
+                //this.editingAllowed ?? factors in to this??? (todo-0)
                 if (!S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
                     pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(node, 'inside'); }, {
                         className: "highlightBorder"
@@ -165,15 +223,26 @@ export class NodeCompButtonBar extends Comp {
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
             moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton], null, "marginLeft marginTop");
 
-        if (selButton || typeIcon || encIcon || sharedIcon) {
-            return new HorizontalLayout([selButton, avatarImg, typeIcon, encIcon, sharedIcon, buttonBar], "marginLeft");
+        let navButtonBar = new ButtonBar([searchButton, timelineButton, upLevelButton, prevButton, nextButton],
+                null, "float-right marginTop marginBottom");
+
+        if (!navButtonBar.childrenExist()) {
+            navButtonBar = null;
         }
-        else {
-            return new HorizontalLayout([avatarImg, buttonBar], "marginLeft");
+
+        if (!buttonBar.childrenExist()) {
+            buttonBar = null;
         }
+
+        let ret = new HorizontalLayout([selButton, avatarImg, typeIcon, encIcon, sharedIcon, buttonBar, navButtonBar], "marginLeft");
+
+        if (!ret.childrenExist()) {
+            ret = null;
+        }
+        return ret;
     }
 
-    compRender = () : ReactNode => {
+    compRender = (): ReactNode => {
         /* Delegate rendering to comp */
         return this.comp.compRender();
     }
