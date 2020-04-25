@@ -641,9 +641,11 @@ export class Render implements RenderIntf {
                 });
 
                 //todo-0: get enablement correct for this (or visibility)
-                cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(node); }, {
-                    "iconclass": "fa fa-cut fa-lg"
-                });
+                if (node.type != J.NodeType.REPO_ROOT) {
+                    cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(node); }, {
+                        "iconclass": "fa fa-cut fa-lg"
+                    });
+                }
 
                 if (C.MOVE_UPDOWN_ON_TOOLBAR && allowNodeMove) {
 
@@ -678,7 +680,7 @@ export class Render implements RenderIntf {
         }
 
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
-            moveNodeDownButton, deleteNodeButton, cutNodeButton, replyButton, pasteInsideButton], null, "marginLeft marginTop");
+            moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton], null, "marginLeft marginTop");
 
         if (selButton || typeIcon || encIcon || sharedIcon) {
             return new HorizontalLayout([selButton, avatarImg, typeIcon, encIcon, sharedIcon, buttonBar], "marginLeft");
@@ -847,10 +849,12 @@ export class Render implements RenderIntf {
                             editNodeButton = new Button(null, () => { S.edit.runEditNode(id); },
                                 { "iconclass": "fa fa-edit fa-lg" });
 
-                            //todo-0: get enablement correct for this (or visibility)
-                            cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(data.node); }, {
-                                "iconclass": "fa fa-cut fa-lg"
-                            });
+                            if (data.node.type != J.NodeType.REPO_ROOT) {
+                                //todo-0: get enablement correct for this (or visibility)
+                                cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(data.node); }, {
+                                    "iconclass": "fa fa-cut fa-lg"
+                                });
+                            }
                         }
 
                         if (editAllowed && !S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
@@ -860,9 +864,11 @@ export class Render implements RenderIntf {
 
                         let typeIcon: Icon = null;
                         if (typeHandler) {
+                            console.log("Node for IconClass="+data.node.id);
                             /* For now let's only show type icons when we're in edit mode */
                             if (S.meta64.userPreferences.editMode) {
                                 let iconClass = typeHandler.getIconClass(data.node);
+                                console.log("IconClass="+iconClass);
                                 if (iconClass) {
                                     //todo-1: do all icons have the 'middle'? (if so embed it into class)
                                     typeIcon = new Icon("", null, {

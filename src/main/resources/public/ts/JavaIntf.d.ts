@@ -584,6 +584,7 @@ export const enum NodeType {
     FS_FOLDER = "fs:folder",
     FS_LUCENE = "fs:lucene",
     IPFS_NODE = "sn:ipfsNode",
+    REPO_ROOT = "sn:repoRoot"
 }
 
 export const enum PrincipalName {

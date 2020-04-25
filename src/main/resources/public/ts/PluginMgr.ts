@@ -6,6 +6,7 @@ import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { PluginMgrIntf } from "./intf/PluginMgrIntf";
 import { RssTypeHandler } from "./plugins/RssTypeHandler";
 import { IPFSNodeTypeHandler } from "./plugins/IPFSNodeTypeHandler";
+import { RepoRootTypeHandler } from "./plugins/RepoRootTypeHandler";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -17,7 +18,7 @@ export class PluginMgr implements PluginMgrIntf {
     private typeHandlers: { [key: string]: TypeHandlerIntf } = {};
 
     addTypeHandler = (typeHandler: TypeHandlerIntf): void => {
-        console.log("Adding TypeHandler: type="+typeHandler.getTypeName());
+        console.log("Adding TypeHandler: type=" + typeHandler.getTypeName());
         this.typeHandlers[typeHandler.getTypeName()] = typeHandler;
     }
 
@@ -29,9 +30,12 @@ export class PluginMgr implements PluginMgrIntf {
         return this.typeHandlers;
     }
 
+    //todo-0: make it so that some plugins can be flagged as 'admin only' and not show up on the menu to pick them.
     initPlugins = (): void => {
         this.addTypeHandler(new RssTypeHandler());
         this.addTypeHandler(new IPFSNodeTypeHandler());
+        this.addTypeHandler(new RepoRootTypeHandler());
+
         // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());
         // S.plugin.addTypeHandler("fs:folder", new FolderTypeHandler());
 

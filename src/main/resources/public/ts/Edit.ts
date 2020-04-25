@@ -473,6 +473,7 @@ export class Edit implements EditIntf {
                 //solution is send user to their root now.
                 S.nav.openContentNode(S.meta64.homeNodePath);
                 
+                //do not delete (see note above)
                 //this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode });
             });
         }, null, "btn-danger", "alert alert-danger"

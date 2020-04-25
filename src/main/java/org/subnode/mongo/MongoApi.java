@@ -16,6 +16,7 @@ import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
 import org.subnode.image.ImageSize;
 import org.subnode.image.ImageUtil;
 import org.subnode.model.AccessControlInfo;
@@ -1516,7 +1517,7 @@ public class MongoApi {
 
 		SubNode adminNode = getUserNodeByUserName(getAdminSession(), adminUser);
 		if (adminNode == null) {
-			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, "Repository Root", null, true, null,
+			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, "Repository Root", NodeType.REPO_ROOT.s(), true, null,
 					null);
 
 			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
