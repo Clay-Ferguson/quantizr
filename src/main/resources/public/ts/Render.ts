@@ -668,6 +668,7 @@ export class Render implements RenderIntf {
 
                 if (!S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
                     pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(node, 'inside'); }, {
+                        className: "highlightBorder"
                     });
                 }
             }
@@ -779,7 +780,6 @@ export class Render implements RenderIntf {
                         let buttonBar: ButtonBar = null;
                         let navButtonBar: ButtonBar = null;
                         let editNodeButton: Button = null;
-                        let cutNodeButton: Button = null;
                         let createSubNodeButton: Button = null;
                         let replyButton: Button = null;
                         let pasteInsideButton: Button = null;
@@ -833,8 +833,10 @@ export class Render implements RenderIntf {
                             insertAllowed = typeHandler.allowAction("insert");
                         }
 
-                        if (S.meta64.userPreferences.editMode && C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(data.node)) {
-                            createSubNodeButton = new Button("New", () => { S.edit.createSubNode(id, null, true); });
+                        if (C.NEW_ON_ROOT) {
+                            if (S.meta64.userPreferences.editMode && C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(data.node)) {
+                                createSubNodeButton = new Button("New", () => { S.edit.createSubNode(id, null, true); });
+                            }
                         }
 
                         var editAllowed = true;
@@ -848,27 +850,19 @@ export class Render implements RenderIntf {
                             /* Construct Create Subnode Button */
                             editNodeButton = new Button(null, () => { S.edit.runEditNode(id); },
                                 { "iconclass": "fa fa-edit fa-lg" });
-
-                            if (data.node.type != J.NodeType.REPO_ROOT) {
-                                //todo-0: get enablement correct for this (or visibility)
-                                cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(data.node); }, {
-                                    "iconclass": "fa fa-cut fa-lg"
-                                });
-                            }
                         }
 
                         if (editAllowed && !S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
                             pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(data.node, 'inside'); }, {
+                                className: "highlightBorder"
                             });
                         }
 
                         let typeIcon: Icon = null;
                         if (typeHandler) {
-                            console.log("Node for IconClass="+data.node.id);
                             /* For now let's only show type icons when we're in edit mode */
                             if (S.meta64.userPreferences.editMode) {
                                 let iconClass = typeHandler.getIconClass(data.node);
-                                console.log("IconClass="+iconClass);
                                 if (iconClass) {
                                     //todo-1: do all icons have the 'middle'? (if so embed it into class)
                                     typeIcon = new Icon("", null, {
@@ -914,7 +908,7 @@ export class Render implements RenderIntf {
                         }
 
                         if (typeIcon || encIcon || sharedIcon || createSubNodeButton || editNodeButton || replyButton || pasteInsideButton || upLevelButton) {
-                            buttonBar = new ButtonBar([typeIcon, encIcon, sharedIcon, createSubNodeButton, editNodeButton, cutNodeButton, replyButton, pasteInsideButton],
+                            buttonBar = new ButtonBar([typeIcon, encIcon, sharedIcon, createSubNodeButton, editNodeButton, replyButton, pasteInsideButton],
                                 null, "marginLeft marginTop");
                         }
 
@@ -1257,6 +1251,7 @@ export class Render implements RenderIntf {
             }
 
             pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes(node, target); }, {
+                className: "highlightBorder"
             });
         }
 

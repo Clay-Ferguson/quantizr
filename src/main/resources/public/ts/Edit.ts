@@ -461,23 +461,24 @@ export class Edit implements EditIntf {
     emptyTrash = (): void => {
         S.meta64.clearSelectedNodes();
 
-        new ConfirmDlg("Empty Trash", "Permanently delete your entire Trash Bin",
-        () => {
-            let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode();
-
-            S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
-                nodeIds: [S.meta64.homeNodePath + "/d"],
-                hardDelete: true 
-            }, (res: J.DeleteNodesResponse) => {
-                //if user was viewing trash when the deleted it that's a proble, so for now the short term
-                //solution is send user to their root now.
-                S.nav.openContentNode(S.meta64.homeNodePath);
-                
+        new ConfirmDlg("Permanently delete your entire Trash Bin", "Empty Trash",
+            () => {
                 //do not delete (see note above)
-                //this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode });
-            });
-        }, null, "btn-danger", "alert alert-danger"
-    ).open();
+                //let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode();
+
+                S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+                    nodeIds: [S.meta64.homeNodePath + "/d"],
+                    hardDelete: true
+                }, (res: J.DeleteNodesResponse) => {
+                    //if user was viewing trash when the deleted it that's a proble, so for now the short term
+                    //solution is send user to their root now.
+                    S.nav.openContentNode(S.meta64.homeNodePath);
+
+                    //do not delete (see note above)
+                    //this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode });
+                });
+            }, null, "btn-danger", "alert alert-danger"
+        ).open();
     }
 
     /*
@@ -485,7 +486,7 @@ export class Edit implements EditIntf {
      * has currenly selected (via checkboxes)
      */
     deleteSelNodes = (node: J.NodeInfo, hardDelete: boolean): void => {
-        
+
         if (node != null) {
             S.nav.toggleNodeSel(true, node.id);
         }
@@ -508,7 +509,7 @@ export class Edit implements EditIntf {
             confirmMsg = "Move " + selNodesArray.length + " node(s) to the trash bin ?";
         }
 
-        new ConfirmDlg(confirmMsg, "Confirm Delete "+selNodesArray.length,
+        new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
             () => {
                 let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode();
 

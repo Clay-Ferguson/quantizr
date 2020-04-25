@@ -9,6 +9,7 @@ export class Constants {
     /* ======================================================================== */
     static readonly ENABLE_ACE_EDITOR: boolean = false;
     static readonly INSERT_ATTACHMENT: string = "{{insert-attachment}}";
+    static readonly NEW_ON_ROOT: boolean = false;
     static readonly NEW_ON_TOOLBAR: boolean = true;
     static readonly INS_ON_TOOLBAR: boolean = false;
     static readonly MOVE_UPDOWN_ON_TOOLBAR: boolean = true;

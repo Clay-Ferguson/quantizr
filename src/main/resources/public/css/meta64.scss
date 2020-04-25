@@ -50,6 +50,10 @@ body {
     padding-bottom: 1rem;
 }
 
+.highlightBorder {
+    border: 2px solid green;
+}
+
 .binary-link {
     margin-left: $smallGap;
     margin-bottom: $smallGap;
@@ -647,7 +651,10 @@ which it will do by default. */
 }
 
 .markdown-content {
-    padding: 1em;
+    padding-top: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-bottom: .5em;
 }
 
 .tags-content {
