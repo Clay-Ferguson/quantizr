@@ -135,7 +135,7 @@ export class NodeCompButtonBar extends Comp {
         truly any files in there or not because we really cannot possibly know until we look. The only way to make this Open button
         ONLY show when there ARE truly children fore sure would be to force a check of the file system for every folder type that is ever rendered
         on a page and we don't want to burn that much CPU just to prevent empty-folders from being explored. Empty folders are rare. */
-        if (!isInlineChildren && //
+        if (!this.isRootNode && !isInlineChildren && //
             (node.hasChildren || node.type == "fs:folder" || node.type == "fs:lucene" || node.type == "ipfs:node")) {
 
             /* convert this button to a className attribute for styles */

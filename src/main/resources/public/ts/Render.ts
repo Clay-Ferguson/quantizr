@@ -14,9 +14,9 @@ import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { NavBarIconButton } from "./widget/NavBarIconButton";
 import { NodeCompButtonBar } from "./comps/NodeCompButtonBar";
 import { NodeCompContent } from "./comps/NodeCompContent";
-import { NodeCompRow } from "./comps/NodeCompRow";
 import { NodeCompVerticalRowLayout } from "./comps/NodeCompVerticalRowLayout";
 import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";
+import { NodeCompMainList } from "./comps/NodeCompMainList";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -142,7 +142,6 @@ export class Render implements RenderIntf {
         return typeHandler == null || typeHandler.allowAction(action);
     }
 
-    /* todo-1: this function is way to large. Break out a lot of this into functions */
     renderPageFromData = async (data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string, clickTab: boolean = true): Promise<void> => {
         //console.log("renderPageFromData(): scrollToTop="+scrollToTop);
         this.lastOwner = null;
@@ -153,9 +152,10 @@ export class Render implements RenderIntf {
         }
         S.meta64.setOverlay(true);
 
+        let listView : NodeCompMainList;
+
         // this timeout forces the 'hidden' to be processed and hidden from view 
         const promise = new Promise<void>(async (resolve, reject) => {
-            let output: Comp[] = [];
 
             setTimeout(async () => {
                 try {
@@ -240,42 +240,9 @@ export class Render implements RenderIntf {
 
                     S.util.setElmDisplayById("mainNodeContent", true);
                     this.setMainNodeComp(contentDiv);
-
-                    if (S.nav.mainOffset > 0) {
-                        let firstButton: Comp = new Button("First Page", S.view.firstPage,
-                            {
-                                id: "firstPageButton",
-                                iconclass: "fa fa-angle-double-left fa-lg"
-                            });
-                        let prevButton: Comp = new Button("Prev Page", S.view.prevPage,
-                            {
-                                id: "prevPageButton",
-                                iconclass: "fa fa-angle-left fa-lg"
-                            });
-                        output.push(new ButtonBar([firstButton, prevButton], "text-center marginTop"));
-                    }
-
-                    output.push(new Div(null, { className: "clearfix" }));
-
                     this.lastOwner = data.node.owner;
-                    //console.log("lastOwner (root)=" + data.node.owner);
-                    if (data.node.children) {
-                        let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, data.node);
-                        let allowNodeMove: boolean = !orderByProp;
-                        output.push(this.renderChildren(data.node, newData, 1, allowNodeMove));
-                    }
 
-                    if (!data.endReached) {
-                        let nextButton = new Button("Next Page", S.view.nextPage,
-                            {
-                                id: "nextPageButton",
-                                iconclass: "fa fa-angle-right fa-lg"
-                            });
-
-                        //todo-1: last page button disabled pending refactoring
-                        //let lastButton = this.makeButton("Last Page", "lastPageButton", this.lastPage);
-                        output.push(new ButtonBar([nextButton], "text-center marginTop"));
-                    }
+                    listView = new NodeCompMainList(data.node, newData, data.endReached)
                 }
                 catch (err) {
                     console.error("render fail.");
@@ -287,8 +254,7 @@ export class Render implements RenderIntf {
                 S.util.getElm("listView", async (elm: HTMLElement) => {
                     try {
                         //console.log("listView found.");
-                        let outputDiv = new Div(null, null, output);
-                        this.setListViewComp(outputDiv);
+                        this.setListViewComp(listView);
 
                         if (clickTab) {
                             S.meta64.selectTab("mainTab");
