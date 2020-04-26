@@ -15,6 +15,8 @@ import { NavBarIconButton } from "./widget/NavBarIconButton";
 import { NodeCompButtonBar } from "./comps/NodeCompButtonBar";
 import { NodeCompContent } from "./comps/NodeCompContent";
 import { NodeCompRow } from "./comps/NodeCompRow";
+import { NodeCompVerticalRowLayout } from "./comps/NodeCompVerticalRowLayout";
+import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -374,24 +376,23 @@ export class Render implements RenderIntf {
         }
     }
 
-    private renderChildren = (node: J.NodeInfo, newData: boolean, level: number, allowNodeMove: boolean): Comp => {
+    renderChildren = (node: J.NodeInfo, newData: boolean, level: number, allowNodeMove: boolean): Comp => {
         if (!node || !node.children) return null;
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on
          * the client side for various reasons.
          */
-
         let layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
         if (!layout || layout == "v") {
-            return this.renderVerticalLayout(node, newData, level, allowNodeMove);
+            return new NodeCompVerticalRowLayout(node, newData, level, allowNodeMove);
         }
         else if (layout.indexOf("c") == 0) {
-            return this.renderTableLayout(node, newData, level, layout, allowNodeMove);
+            return new NodeCompTableRowLayout(node, newData, level, layout, allowNodeMove);
         }
         else {
             //of no layout is valid, fall back on vertical.
-            return this.renderVerticalLayout(node, newData, level, allowNodeMove);
+            return new NodeCompVerticalRowLayout(node, newData, level, allowNodeMove);
         }
     }
 
@@ -407,144 +408,6 @@ export class Render implements RenderIntf {
                 S.meta64.parentIdToFocusNodeMap[S.meta64.currentNodeData.node.id] = node;
             }
         }
-    }
-
-    //todo-2: check background colord on vertical layout option also? or is that handled already?
-    renderTableLayout = (node: J.NodeInfo, newData: boolean, level: number, layout: string, allowNodeMove: boolean): Comp => {
-        let tableDiv = new Div(null, { className: 'node-grid-table' });
-        let curRow = new Div(null, { className: 'node-grid-row' });
-
-        let layoutClass = "node-grid-item";
-        let childCount: number = node.children.length;
-        let rowCount: number = 0;
-        let maxCols = 2;
-        if (layout == "c2") {
-            maxCols = 2;
-        }
-        else if (layout == "c3") {
-            maxCols = 3;
-            //layoutClass += " node-grid-item-3";
-        }
-        else if (layout == "c4") {
-            maxCols = 4;
-        }
-        let cellWidth = 100 / maxCols;
-
-        let curCols = 0;
-        for (let i = 0; i < node.children.length; i++) {
-            let comps: Comp[] = [];
-            let n: J.NodeInfo = node.children[i];
-
-            if (!S.edit.nodesToMoveSet[n.id]) {
-                this.updateHighlightNode(n);
-
-                if (newData) {
-                    S.meta64.initNode(n, true);
-
-                    if (this.debug) {
-                        console.log(" RENDER ROW[" + i + "]: node.id=" + n.id);
-                    }
-                }
-
-                let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, level, layoutClass, allowNodeMove);
-                // console.log("row[" + rowCount + "]=" + row);
-                comps.push(row);
-                rowCount++;
-
-                //console.log("lastOwner (child level " + level + ")=" + n.owner);
-                this.lastOwner = n.owner;
-
-                if (n.children) {
-                    comps.push(this.renderChildren(n, newData, level + 1, allowNodeMove));
-                }
-
-                let curCol = new Div(null, {
-                    className: 'node-grid-cell',
-                    style: {
-                        width: cellWidth + '%',
-                        maxWidth: cellWidth + '%'
-                    }
-                }, comps);
-                curRow.children.push(curCol);
-
-                if (++curCols == maxCols) {
-                    tableDiv.children.push(curRow);
-                    curRow = new Div(null, { style: { display: 'table-row' } });
-                    curCols = 0;
-                }
-            }
-        }
-
-        //the last row might not have filled up yet but add it still
-        if (curCols > 0) {
-            tableDiv.children.push(curRow);
-        }
-
-        return tableDiv;
-    }
-
-    renderVerticalLayout = (node: J.NodeInfo, newData: boolean, level: number, allowNodeMove: boolean): Comp => {
-        let layoutClass = "node-table-row";
-        if (S.meta64.userPreferences.editMode) {
-            layoutClass += " editing-border";
-        }
-        else {
-            layoutClass += " non-editing-border"
-        }
-
-        let childCount: number = node.children.length;
-        let rowCount: number = 0;
-        let comps: Comp[] = [];
-        let countToDisplay = 0;
-        
-        //we have to make a pass over children before main loop below, because we need the countToDisplay
-        //to ber correct before the second loop stats.
-        for (let i = 0; i < node.children.length; i++) {
-            let n: J.NodeInfo = node.children[i];
-            if (!S.edit.nodesToMoveSet[n.id]) {
-                countToDisplay++;
-            }
-        }
-
-        for (let i = 0; i < node.children.length; i++) {
-            let n: J.NodeInfo = node.children[i];
-            if (!S.edit.nodesToMoveSet[n.id]) {
-                this.updateHighlightNode(n);
-
-                if (newData) {
-                    S.meta64.initNode(n, true);
-
-                    if (this.debug) {
-                        console.log(" RENDER ROW[" + i + "]: node.id=" + n.id);
-                    }
-                }
-
-                let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, level, layoutClass, allowNodeMove);
-
-                if (rowCount == 0 && S.meta64.userPreferences.editMode) {
-                    comps.push(this.createBetweenNodeButtonBar(n, true, false));
-
-                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                    comps.push(new Div(null, { className: "clearfix" }));
-                }
-                comps.push(row);
-                this.lastOwner = node.owner;
-                //console.log("lastOwner (root)=" + node.owner);
-                rowCount++;
-
-                if (S.meta64.userPreferences.editMode) {
-                    comps.push(this.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay));
-
-                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                    comps.push(new Div(null, { className: "clearfix" }));
-                }
-
-                if (n.children) {
-                    comps.push(this.renderChildren(n, newData, level + 1, allowNodeMove));
-                }
-            }
-        }
-        return new Div(null, null, comps);
     }
 
     /* This is the button bar displayed between all nodes to let nodes be inserted at specific locations 
