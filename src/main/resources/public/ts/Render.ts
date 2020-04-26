@@ -13,14 +13,14 @@ import * as highlightjs from 'highlightjs';
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { NavBarIconButton } from "./widget/NavBarIconButton";
 import { NodeCompButtonBar } from "./comps/NodeCompButtonBar";
-import { NodeCompRowHeader } from "./comps/NodeCompRowHeader";
-import { NodeCompBinary } from "./comps/NodeCompBinary";
-import { NodeCompMarkdown } from "./comps/NodeCompMarkdown";
+import { NodeCompContent } from "./comps/NodeCompContent";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
+
+declare var MathJax;
 
 export class Render implements RenderIntf {
 
@@ -41,78 +41,6 @@ export class Render implements RenderIntf {
             val = S.util.replaceAll(val, "{{paypal-button}}", C.PAY_PAL_BUTTON);
         }
         return val;
-    }
-
-    /*
-     * This is the function that renders each node in the main window. The rendering in here is very central to the
-     * app and is what the user sees covering 90% of the screen most of the time. The *content* nodes.
-     */
-    renderNodeContent = (node: J.NodeInfo, rowStyling: boolean, showHeader: boolean): Comp[] => {
-
-        let ret: Comp[] = [];
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-
-        /* todo-2: enable headerText when appropriate here */
-        if (S.meta64.showMetaData) {
-            if (showHeader) {
-                ret.push(new NodeCompRowHeader(node));
-            }
-        }
-
-        if (S.meta64.showProperties) {
-            let propTable = S.props.renderProperties(node.properties);
-            if (propTable) {
-                ret.push(propTable);
-            }
-        } else {
-            let renderComplete: boolean = false;
-
-            /*
-             * Special Rendering for Nodes that have a plugin-renderer
-             */
-            if (typeHandler) {
-                renderComplete = true;
-                ret.push(typeHandler.render(node, rowStyling));
-            }
-
-            if (!renderComplete) {
-                let retState: any = {};
-                retState.renderComplete = renderComplete;
-                ret.push(new NodeCompMarkdown(node, retState));
-                renderComplete = retState.renderComplete;
-            }
-
-            if (!renderComplete) {
-                let properties = S.props.renderProperties(node.properties);
-                if (properties) {
-                    ret.push(properties);
-                }
-            }
-        }
-
-        /* if node owner matches node id this is someone's account root node, so what we're doing here is not
-        showing the normal attachment for this node, because that will the same as the avatar */
-        let isAnAccountNode = node.ownerId && node.id == node.ownerId;
-
-        if (S.props.hasBinary(node) && !isAnAccountNode) {
-            let binary = new NodeCompBinary(node);
-
-            //todo-0: bring this back. I already needed it again.
-            /*
-             * We append the binary image or resource link either at the end of the text or at the location where
-             * the user has put {{insert-attachment}} if they are using that to make the image appear in a specific
-             * location in the content text.
-             *
-             * NOTE: temporarily removing during refactoring.
-             */
-            // if (util.contains(ret, cnst.INSERT_ATTACHMENT)) {
-            //     ret = S.util.replaceAll(ret, cnst.INSERT_ATTACHMENT, binary.render());
-            // } else {
-            ret.push(binary);
-            //}
-        }
-
-        return ret;
     }
 
     /**
@@ -227,7 +155,7 @@ export class Render implements RenderIntf {
         //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
         let allowAvatar = node.owner != this.lastOwner;
         let buttonBar: Comp = new NodeCompButtonBar(node, allowAvatar, allowNodeMove, true);
-        
+
         let indentLevel = layoutClass === "node-grid-item" ? 0 : level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
         let cssId: string = "row_" + id;
@@ -253,9 +181,7 @@ export class Render implements RenderIntf {
             [
                 buttonBar,
                 new Div(null, { className: "clearfix" }),
-                new Div(null, {
-                    "id": id + "_content"
-                }, this.renderNodeContent(node, true, true))
+                new NodeCompContent(node, true, true)
             ]);
 
         this.setNodeDropHandler(rowDiv, node);
@@ -388,41 +314,37 @@ export class Render implements RenderIntf {
                      * NOTE: mainNodeContent is the parent node of the page content, and is always the node displayed at the top
                      * of the page above all the other nodes which are its child nodes.
                      */
-                    let mainNodeContent: Comp[] = this.renderNodeContent(data.node, false, true);
+                    let mainNodeContent = new NodeCompContent(data.node, false, true);
 
                     //console.log("mainNodeContent: "+mainNodeContent);
 
-                    if (mainNodeContent.length > 0) {
-                        let id: string = data.node.id;
-                        let cssId: string = "row_" + id;
+                    let id: string = data.node.id;
+                    let cssId: string = "row_" + id;
 
-                        /* Construct Create Subnode Button */
-                        let focusNode: J.NodeInfo = S.meta64.getHighlightedNode();
-                        let selected: boolean = focusNode && focusNode.id === id;
-                        if (selected) {
-                            console.log("selected: focusNode.uid=" + focusNode.id + " selected=" + selected);
-                        }
-
-                        let children = [];
-                        children.push(new NodeCompButtonBar(data.node, true, false, true));
-                        children.push(new Div(null, { className: "clearfix" }));
-                        children = children.concat(mainNodeContent);
-
-                        let contentDiv = new Div(null, {
-                            className: (selected ? "mainNodeContentStyle active-row-main" : "mainNodeContentStyle inactive-row-main"),
-                            onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(id); },
-                            id: cssId
-                        }, children);
-
-                        this.setNodeDropHandler(contentDiv, data.node);
-
-                        S.util.setElmDisplayById("mainNodeContent", true);
-                        this.setMainNodeComp(contentDiv);
-
-                    } else {
-                        S.util.setElmDisplayById("mainNodeContent", false);
-                        this.setMainNodeComp(null);
+                    /* Construct Create Subnode Button */
+                    let focusNode: J.NodeInfo = S.meta64.getHighlightedNode();
+                    let selected: boolean = focusNode && focusNode.id === id;
+                    if (selected) {
+                        console.log("selected: focusNode.uid=" + focusNode.id + " selected=" + selected);
                     }
+
+                    let children = [];
+                    children.push(new NodeCompButtonBar(data.node, true, false, true));
+                    children.push(new Div(null, { className: "clearfix" }));
+                    children.push(mainNodeContent);
+
+                    let contentDiv = new Div(null, {
+                        className: (selected ? "mainNodeContentStyle active-row-main" : "mainNodeContentStyle inactive-row-main"),
+                        onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(id); },
+                        id: cssId
+                    }, children);
+
+                    this.setNodeDropHandler(contentDiv, data.node);
+
+                    S.util.setElmDisplayById("mainNodeContent", true);
+                    this.setMainNodeComp(contentDiv);
+
+
 
                     if (S.nav.mainOffset > 0) {
                         let firstButton: Comp = new Button("First Page", S.view.firstPage,
@@ -480,6 +402,11 @@ export class Render implements RenderIntf {
                         S.util.forEachElmBySel("a", (el, i) => {
                             el.setAttribute("target", "_blank");
                         });
+
+                        if (MathJax && MathJax.typeset) {
+                            //note: MathJax.typesetPromise(), also exists
+                            MathJax.typeset();
+                        }
 
                         if (S.meta64.pendingLocationHash) {
                             window.location.hash = S.meta64.pendingLocationHash;

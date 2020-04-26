@@ -19,6 +19,18 @@
     <link rel="stylesheet" href="/css/meta64.css?<%=htmlWebpackPlugin.options.cachebuster%>" />
     <link rel="stylesheet" href="/css/highlightjs/darcula.css">
 
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+
+    <!-- load async? -->
+    <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+
     <title>Quantizr</title>
 </head>
 
@@ -30,7 +42,7 @@
     <div role="toolbar" id="mainNavPanel">
     </div>
 
-    <main role="main" class="container">       
+    <main role="main" class="container">
         <div id="mainTabPanel" class="mainTabPanel" />
     </main>
 

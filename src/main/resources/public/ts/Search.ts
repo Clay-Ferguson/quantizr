@@ -1,5 +1,4 @@
 import * as J from "./JavaIntf";
-import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchIntf } from "./intf/SearchIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
@@ -9,6 +8,7 @@ import { Div } from "./widget/Div";
 import { Comp } from "./widget/base/Comp";
 import { HorizontalLayout } from "./widget/HorizontalLayout";
 import { Img } from "./widget/Img";
+import { NodeCompContent } from "./comps/NodeCompContent";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -140,7 +140,7 @@ export class Search implements SearchIntf {
 
         let buttonBar = this.makeButtonBarHtml(node);
 
-        let content: Comp[] = S.render.renderNodeContent(node, true, true);
+        let content = new NodeCompContent(node, true, true, "srch");
 
         let clazz = "node-table-row";
         if (S.meta64.userPreferences.editMode) {
@@ -156,13 +156,7 @@ export class Search implements SearchIntf {
                 S.srch.clickOnSearchResultRow(node.id);
             }, //
             "id": cssId
-        },//
-            [
-                buttonBar//
-                , new Div(null, {
-                    "id": "srch_content_" + node.id
-                }, content)
-            ]);
+        }, [buttonBar, content]);
     }
 
     makeButtonBarHtml = (node: J.NodeInfo): Comp => {

@@ -9,7 +9,6 @@ export interface RenderIntf {
     resetTreeDom(): void;
     updateHighlightNode(node: J.NodeInfo): void;
     injectSubstitutions(content: string): string;
-    renderNodeContent(node: J.NodeInfo, rowStyling: boolean, showHeader: boolean): Comp[];
     renderNodeAsListItem(node: J.NodeInfo, index: number, count: number, rowCount: number, level: number, layoutClass: string, allowNodeMove: boolean): Comp;
     showNodeUrl(): void;
     renderPageFromData(data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string, clickTab?: boolean): Promise<void>;
