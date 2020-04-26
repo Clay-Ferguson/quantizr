@@ -154,7 +154,7 @@ export class Render implements RenderIntf {
 
         //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
         let allowAvatar = node.owner != this.lastOwner;
-        let buttonBar: Comp = new NodeCompButtonBar(node, allowAvatar, allowNodeMove, true);
+        let buttonBar: Comp = new NodeCompButtonBar(node, allowAvatar, allowNodeMove, false);
 
         let indentLevel = layoutClass === "node-grid-item" ? 0 : level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
@@ -343,8 +343,6 @@ export class Render implements RenderIntf {
 
                     S.util.setElmDisplayById("mainNodeContent", true);
                     this.setMainNodeComp(contentDiv);
-
-
 
                     if (S.nav.mainOffset > 0) {
                         let firstButton: Comp = new Button("First Page", S.view.firstPage,

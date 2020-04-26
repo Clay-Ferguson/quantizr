@@ -59,14 +59,14 @@ export class NodeCompButtonBar extends Comp {
         let searchButton: NavBarIconButton;
         let timelineButton: NavBarIconButton;
 
-        if (S.nav.parentVisibleToUser()) {
+        if (this.isRootNode && S.nav.parentVisibleToUser()) {
             upLevelButton = new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
                 "onClick": e => { S.nav.navUpLevel(); },
                 "title": "Go to Parent SubNode"
             }, null, null, "");
         }
 
-        if (!S.nav.displayingRepositoryRoot()) {
+        if (this.isRootNode && !S.nav.displayingRepositoryRoot()) {
             prevButton = new NavBarIconButton("fa-chevron-circle-left", null, {
                 "onClick": e => { S.nav.navToSibling(-1); },
                 "title": "Go to Previous SubNode"
@@ -223,11 +223,14 @@ export class NodeCompButtonBar extends Comp {
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
             moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton], null, "marginLeft marginTop");
 
-        let navButtonBar = new ButtonBar([searchButton, timelineButton, upLevelButton, prevButton, nextButton],
-                null, "float-right marginTop marginBottom");
+        let navButtonBar;
 
-        if (!navButtonBar.childrenExist()) {
-            navButtonBar = null;
+        if (this.isRootNode) {
+            navButtonBar = new ButtonBar([searchButton, timelineButton, upLevelButton, prevButton, nextButton],
+                null, "float-right marginTop marginBottom");
+            if (!navButtonBar.childrenExist()) {
+                navButtonBar = null;
+            }
         }
 
         if (!buttonBar.childrenExist()) {
