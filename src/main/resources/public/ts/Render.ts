@@ -14,6 +14,7 @@ import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { NavBarIconButton } from "./widget/NavBarIconButton";
 import { NodeCompButtonBar } from "./comps/NodeCompButtonBar";
 import { NodeCompContent } from "./comps/NodeCompContent";
+import { NodeCompRow } from "./comps/NodeCompRow";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -32,7 +33,7 @@ export class Render implements RenderIntf {
 
     /* Since js is singlethreaded we can have lastOwner get updated from any other function and use it to keep track
     during the rendering, what the last owner was so we can keep from displaying the same avatars unnecessarily */
-    private lastOwner: string;
+    public lastOwner: string;
 
     injectSubstitutions = (val: string): string => {
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
@@ -80,112 +81,6 @@ export class Render implements RenderIntf {
             smartLists: true,
             smartypants: false
         });
-    }
-
-    // renderJsonFileSearchResultProperty = (jsonContent: string): string => {
-    //     let content: string = "";
-    //     try {
-    //         console.log("json: " + jsonContent);
-    //         let list: any[] = JSON.parse(jsonContent);
-
-    //         for (let entry of list) {
-    //             content += S.tag.div({
-    //                 "className": "systemFile",
-    //                 //"onClick": () => {meta64.editSystemFile(entry.fileName);}
-    //             }, entry.fileName);
-
-    //             /* openSystemFile worked on linux, but i'm switching to full text file edit capability only and doing that
-    //             inside meta64 from now on, so openSystemFile is no longer being used */
-    //             // let localOpenLink = S.tag.button({
-    //             //     "raised": "raised",
-    //             //     "onClick": "meta64.openSystemFile('" + entry.fileName + "')"
-    //             // }, "Local Open");
-    //             //
-    //             // let downloadLink = "";
-    //             //haven't implemented download capability yet.
-    //             // S.tag.button({
-    //             //     "raised": "raised",
-    //             //     "onClick": "meta64.downloadSystemFile('" + entry.fileName + "')"
-    //             // }, "Download")
-    //             // let linksDiv = tag("div", {
-    //             // }, localOpenLink + downloadLink);
-    //             // content += tag("div", {
-    //             // }, fileNameDiv);
-    //         }
-    //     }
-    //     catch (e) {
-    //         S.util.logAndReThrow("render failed", e);
-    //         content = "[render failed]"
-    //     }
-    //     return content;
-    // }
-
-    /*
-     * This is the primary method for rendering each node (like a row) on the main HTML page that displays node
-     * content. This generates the HTML for a single row/node.
-     *
-     * node is a NodeInfo.java JSON
-     */
-    renderNodeAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, level: number, layoutClass: string, allowNodeMove: boolean): Comp => {
-
-        let id: string = node.id;
-
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-
-        // let editingAllowed: boolean = S.props.isOwnedCommentNode(node);
-        // if (!editingAllowed) {
-        //     editingAllowed = S.meta64.isAdminUser && !props.isNonOwnedCommentNode(node)
-        //         && !props.isNonOwnedNode(node);
-        // }
-        // let editingAllowed = S.edit.isEditAllowed(node);
-        // if (typeHandler) {
-        //     editingAllowed = editingAllowed && typeHandler.allowAction("edit");
-        // }
-        //console.log("Rendering Node Row[" + index + "] editingAllowed=" + editingAllowed);
-
-        /*
-         * if not selected by being the new child, then we try to select based on if this node was the last one
-         * clicked on for this page.
-         */
-        // console.log("test: [" + parentIdToFocusIdMap[currentNodeId]
-        // +"]==["+ node.id + "]")
-        let focusNode: J.NodeInfo = S.meta64.getHighlightedNode();
-        let selected: boolean = (focusNode && focusNode.id === id);
-
-        //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
-        let allowAvatar = node.owner != this.lastOwner;
-        let buttonBar: Comp = new NodeCompButtonBar(node, allowAvatar, allowNodeMove, false);
-
-        let indentLevel = layoutClass === "node-grid-item" ? 0 : level;
-        let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
-        let cssId: string = "row_" + id;
-
-        let activeClass;
-        let inactiveClass;
-
-        if (node.id == S.meta64.currentNodeData.node.id) {
-            activeClass = "active-row-main";
-            inactiveClass = "inactive-row-main";
-        }
-        else {
-            activeClass = "active-row";
-            inactiveClass = "inactive-row";
-        }
-
-        let rowDiv = new Div(null, {
-            className: layoutClass + (selected ? (" " + activeClass) : (" " + inactiveClass)),
-            onClick: (evt) => { S.nav.clickOnNodeRow(id); }, //
-            id: cssId,
-            style: style
-        },
-            [
-                buttonBar,
-                new Div(null, { className: "clearfix" }),
-                new NodeCompContent(node, true, true)
-            ]);
-
-        this.setNodeDropHandler(rowDiv, node);
-        return rowDiv;
     }
 
     setNodeDropHandler = (rowDiv: Comp, node: J.NodeInfo): void => {
@@ -526,11 +421,11 @@ export class Render implements RenderIntf {
         if (layout == "c2") {
             maxCols = 2;
         }
-        if (layout == "c3") {
+        else if (layout == "c3") {
             maxCols = 3;
             //layoutClass += " node-grid-item-3";
         }
-        if (layout == "c4") {
+        else if (layout == "c4") {
             maxCols = 4;
         }
         let cellWidth = 100 / maxCols;
@@ -543,11 +438,19 @@ export class Render implements RenderIntf {
             if (!S.edit.nodesToMoveSet[n.id]) {
                 this.updateHighlightNode(n);
 
-                let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass, allowNodeMove);
-                if (row) {
-                    comps.push(row);
-                    rowCount++;
+                if (newData) {
+                    S.meta64.initNode(n, true);
+
+                    if (this.debug) {
+                        console.log(" RENDER ROW[" + i + "]: node.id=" + n.id);
+                    }
                 }
+
+                let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, level, layoutClass, allowNodeMove);
+                // console.log("row[" + rowCount + "]=" + row);
+                comps.push(row);
+                rowCount++;
+
                 //console.log("lastOwner (child level " + level + ")=" + n.owner);
                 this.lastOwner = n.owner;
 
@@ -591,11 +494,9 @@ export class Render implements RenderIntf {
 
         let childCount: number = node.children.length;
         let rowCount: number = 0;
-
-        //let isMovingNodes = S.util.getPropertyCount(S.edit.nodesToMoveSet) != 0;
         let comps: Comp[] = [];
-
         let countToDisplay = 0;
+        
         //we have to make a pass over children before main loop below, because we need the countToDisplay
         //to ber correct before the second loop stats.
         for (let i = 0; i < node.children.length; i++) {
@@ -610,25 +511,32 @@ export class Render implements RenderIntf {
             if (!S.edit.nodesToMoveSet[n.id]) {
                 this.updateHighlightNode(n);
 
-                let row: Comp = this.generateRow(i, n, newData, childCount, rowCount, level, layoutClass, allowNodeMove);
-                if (row) {
-                    if (rowCount == 0 && S.meta64.userPreferences.editMode) {
-                        comps.push(this.createBetweenNodeButtonBar(n, true, false));
+                if (newData) {
+                    S.meta64.initNode(n, true);
 
-                        //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                        comps.push(new Div(null, { className: "clearfix" }));
+                    if (this.debug) {
+                        console.log(" RENDER ROW[" + i + "]: node.id=" + n.id);
                     }
-                    comps.push(row);
-                    this.lastOwner = node.owner;
-                    //console.log("lastOwner (root)=" + node.owner);
-                    rowCount++;
+                }
 
-                    if (S.meta64.userPreferences.editMode) {
-                        comps.push(this.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay));
+                let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, level, layoutClass, allowNodeMove);
 
-                        //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                        comps.push(new Div(null, { className: "clearfix" }));
-                    }
+                if (rowCount == 0 && S.meta64.userPreferences.editMode) {
+                    comps.push(this.createBetweenNodeButtonBar(n, true, false));
+
+                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                    comps.push(new Div(null, { className: "clearfix" }));
+                }
+                comps.push(row);
+                this.lastOwner = node.owner;
+                //console.log("lastOwner (root)=" + node.owner);
+                rowCount++;
+
+                if (S.meta64.userPreferences.editMode) {
+                    comps.push(this.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay));
+
+                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                    comps.push(new Div(null, { className: "clearfix" }));
                 }
 
                 if (n.children) {
@@ -675,21 +583,6 @@ export class Render implements RenderIntf {
         return buttonBar;
     }
 
-    generateRow = (i: number, node: J.NodeInfo, newData: boolean, childCount: number, rowCount: number, level: number, layoutClass: string, allowNodeMove: boolean): Comp => {
-        if (newData) {
-            S.meta64.initNode(node, true);
-
-            if (this.debug) {
-                console.log(" RENDER ROW[" + i + "]: node.id=" + node.id);
-            }
-        }
-
-        rowCount++; // warning: this is the local variable/parameter
-        let row: Comp = this.renderNodeAsListItem(node, i, childCount, rowCount, level, layoutClass, allowNodeMove);
-        // console.log("row[" + rowCount + "]=" + row);
-        return row;
-    }
-
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo): string => {
         let filePart = S.props.getNodePropVal(J.NodeProp.BIN, node);
 
@@ -720,49 +613,6 @@ export class Render implements RenderIntf {
     getAvatarImgUrl = (node: J.NodeInfo) => {
         if (!node.avatarVer) return null;
         return S.util.getRpcPath() + "bin/avatar" + "?nodeId=" + node.ownerId + "&v=" + node.avatarVer;
-    }
-
-    makeImageTag = (node: J.NodeInfo): Img => {
-        let src: string = this.getUrlForNodeAttachment(node);
-
-        let imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
-        //console.log("imgSize for nodeId=" + node.id + " is " + imgSize + " during render.");
-        let style: any = {};
-        let normalWidth = "";
-
-        if (!imgSize || imgSize == "0") {
-            style.maxWidth = "";
-            style.width = "";
-            normalWidth = "";
-        }
-        else {
-            style.maxWidth = "calc(" + imgSize + "% - 12px)";
-            style.width = "calc(" + imgSize + "% - 12px)";
-            normalWidth = "calc(" + imgSize + "% - 12px)";
-        }
-
-        //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-        let img: Img = new Img({
-            "src": src,
-            className: "attached-img",
-            style,
-            "title": "Click image to enlarge/reduce"
-        });
-
-        img.whenElm((elm: HTMLElement) => {
-            elm.addEventListener("click", () => {
-                if (elm.style.maxWidth) {
-                    elm.style.maxWidth = "";
-                    elm.style.width = "";
-                }
-                else {
-                    elm.style.maxWidth = normalWidth || "100% - 12px";
-                    elm.style.width = normalWidth || "100% - 12px";
-                }
-            });
-        });
-
-        return img;
     }
 
     makeAvatarImage = (node: J.NodeInfo) => {

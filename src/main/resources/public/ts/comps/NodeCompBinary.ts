@@ -12,6 +12,7 @@ import { VideoPlayerDlg } from "../dlg/VideoPlayerDlg";
 import { Anchor } from "../widget/Anchor";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 import { Span } from "../widget/Span";
+import { Img } from "../widget/Img";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -35,7 +36,7 @@ export class NodeCompBinary extends Comp {
          * If this is an image render the image directly onto the page as a visible image
          */
         if (S.props.hasImage(node)) {
-            return S.render.makeImageTag(node);
+            return this.makeImageTag(node);
         }
         else if (S.props.hasVideo(node)) {
             return new ButtonBar([
@@ -88,6 +89,49 @@ export class NodeCompBinary extends Comp {
                 viewFileLink
             ]);
         }
+    }
+
+    makeImageTag = (node: J.NodeInfo): Img => {
+        let src: string = S.render.getUrlForNodeAttachment(node);
+
+        let imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
+        //console.log("imgSize for nodeId=" + node.id + " is " + imgSize + " during render.");
+        let style: any = {};
+        let normalWidth = "";
+
+        if (!imgSize || imgSize == "0") {
+            style.maxWidth = "";
+            style.width = "";
+            normalWidth = "";
+        }
+        else {
+            style.maxWidth = "calc(" + imgSize + "% - 12px)";
+            style.width = "calc(" + imgSize + "% - 12px)";
+            normalWidth = "calc(" + imgSize + "% - 12px)";
+        }
+
+        //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+        let img: Img = new Img({
+            "src": src,
+            className: "attached-img",
+            style,
+            "title": "Click image to enlarge/reduce"
+        });
+
+        img.whenElm((elm: HTMLElement) => {
+            elm.addEventListener("click", () => {
+                if (elm.style.maxWidth) {
+                    elm.style.maxWidth = "";
+                    elm.style.width = "";
+                }
+                else {
+                    elm.style.maxWidth = normalWidth || "100% - 12px";
+                    elm.style.width = normalWidth || "100% - 12px";
+                }
+            });
+        });
+
+        return img;
     }
 
     compRender = () : ReactNode => {
