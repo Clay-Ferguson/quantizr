@@ -23,10 +23,14 @@ export class NodeCompMainList extends Div {
         super();
     }
 
-    build = (rootNode: J.NodeInfo, endReached: boolean): void => {
+    super_CompRender: any = this.compRender;
+    compRender = (): ReactNode => {
+        let rootNode = useSelector((state: AppState) => state.node);
+        let endReached = useSelector((state: AppState) => state.endReached);
+
         if (!rootNode) {
             //console.log("NodeCompMainList.build: null. Nothing to render");
-            return null;
+            return this.super_CompRender();;
         }
         let output: Comp[] = [];
 
@@ -68,14 +72,6 @@ export class NodeCompMainList extends Div {
         }
 
         this.setChildren(output);
-    }
-
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
-        let node = useSelector((state: AppState) => {return state.node;});
-        let endReached = useSelector((state: AppState) => {return state.endReached;});
-
-        this.build(node, endReached);
 
         return this.super_CompRender();
     }

@@ -21,7 +21,8 @@ export class NodeCompRowHeader extends Div {
         });
     }
 
-    build = (): void => {
+    super_CompRender: any = this.compRender;
+    compRender = (): ReactNode => {
         let node = this.node;
         let children = [];
 
@@ -47,11 +48,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         this.setChildren(children);
-    }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
-        this.build();
         return this.super_CompRender();
     }
 }

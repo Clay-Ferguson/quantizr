@@ -25,7 +25,7 @@ export class NodeCompMainNode extends Div {
 
     super_CompRender: any = this.compRender;
     compRender = (): ReactNode => {
-        let node = useSelector((state: AppState) => {return state.node;});
+        let node = useSelector((state: AppState) => state.node);
         if (!node) {
             return this.super_CompRender();
         }

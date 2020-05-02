@@ -71,7 +71,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Permanent Delete", () => {S.edit.deleteSelNodes(null, true);}, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 && S.meta64.state.selNodeIsMine; }), //
                 new MenuItem("Move to Top", () => { S.edit.moveNodeToTop(); }, () => { return S.meta64.state.canMoveUp; }), //
                 new MenuItem("Move to Bottom", () => { S.edit.moveNodeToBottom(); }, () => { return S.meta64.state.canMoveDown; }),//
-                new MenuItem("Trash Bin", () => S.nav.openContentNode(S.meta64.homeNodePath + "/d"),
+                new MenuItem("Show Trash Bin", () => S.nav.openContentNode(S.meta64.homeNodePath + "/d"),
                     //enabled func
                     () => {
                         return !S.meta64.isAnonUser;

@@ -168,7 +168,7 @@ export abstract class Comp implements CompIntf {
 
     //WARNING: Use whenElmEx for DialogBase derived components!
     whenElm = (func: (elm: HTMLElement) => void) => {
-        console.log("whenElm running for " + this.jsClassName);
+        //console.log("whenElm running for " + this.jsClassName);
         if (this.domAddEventRan) {
             console.log("ran whenElm event immediately. domAddEvent had already ran");
             func(this.getElement());
@@ -177,12 +177,12 @@ export abstract class Comp implements CompIntf {
 
         let elm = this.getElement();
         if (elm) {
-            console.log("Looked for and FOUND on DOM: " + this.jsClassName);
+            //console.log("Looked for and FOUND on DOM: " + this.jsClassName);
             func(elm);
             return;
         }
 
-        console.log("queueing the function " + this.jsClassName);
+        //console.log("queueing the function " + this.jsClassName);
         //queue up the 'func' to be called once the domAddEvent gets executed.
         if (!this.domAddFuncs) {
             this.domAddFuncs = [func];

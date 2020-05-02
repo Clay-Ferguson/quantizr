@@ -8,6 +8,7 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { NodeCompMarkdown } from "./NodeCompMarkdown";
 import { NodeCompBinary } from "./NodeCompBinary";
 import { Div } from "../widget/Div";
+import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -35,12 +36,11 @@ export class NodeCompContent extends Div {
         let children: Comp[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
 
-        // /* todo-2: enable headerText when appropriate here */
-        // if (S.meta64.showMetaData) {
-        //     if (this.showHeader) {
-        //         children.push(new NodeCompRowHeader(node));
-        //     }
-        // }
+        if (S.meta64.showMetaData) {
+            if (this.showHeader) {
+                children.push(new NodeCompRowHeader(node));
+            }
+        }
 
         if (S.meta64.showProperties) {
             let propTable = S.props.renderProperties(node.properties);

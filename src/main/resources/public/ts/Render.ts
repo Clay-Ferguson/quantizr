@@ -235,7 +235,6 @@ export class Render implements RenderIntf {
         promise.then(() => {
             S.meta64.setOverlay(false);
             S.meta64.refreshAllGuiEnablement();
-            console.log("Done rendering.");
         });
 
         return promise;

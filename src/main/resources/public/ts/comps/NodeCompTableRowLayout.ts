@@ -21,7 +21,8 @@ export class NodeCompTableRowLayout extends Div {
         super(null, { className: 'node-grid-table' });
     }
 
-    build = (): void => {
+    super_CompRender: any = this.compRender;
+    compRender = (): ReactNode => {
         let nodesToMove = useSelector((state: AppState) => state.nodesToMove);
         let node = this.node;
         let curRow = new Div(null, { className: 'node-grid-row' });
@@ -88,11 +89,7 @@ export class NodeCompTableRowLayout extends Div {
         }
 
         this.setChildren(children);
-    }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
-        this.build();
         return this.super_CompRender();
     }
 }

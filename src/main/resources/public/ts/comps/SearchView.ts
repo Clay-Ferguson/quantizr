@@ -25,7 +25,7 @@ export class SearchView extends Div {
 
     super_CompRender: any = this.compRender;
     compRender = (): ReactNode => {
-        let results = useSelector((state: AppState) => { return state.searchResults; });
+        let results = useSelector((state: AppState) => state.searchResults);
 
         if (!results || results.length == 0) {
             this.setChildren([new Div("No Search Displaying", {

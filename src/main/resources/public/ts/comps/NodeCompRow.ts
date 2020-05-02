@@ -23,7 +23,8 @@ export class NodeCompRow extends Div {
         });
     }
 
-    build = (): void => {
+    super_CompRender: any = this.compRender;
+    compRender = (): ReactNode => {
         let node = this.node;
         let id: string = node.id;
         //console.log("Rendering Node Row[" + index + "] editingAllowed=" + editingAllowed);
@@ -66,11 +67,6 @@ export class NodeCompRow extends Div {
         ]);
 
         S.render.setNodeDropHandler(this, node);
-    }
-
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
-        this.build();
        
         return this.super_CompRender();
     }

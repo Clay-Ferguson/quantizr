@@ -21,7 +21,8 @@ export class NodeCompVerticalRowLayout extends Div {
         super();
     }
 
-    build = (): void => {
+    super_CompRender: any = this.compRender;
+    compRender = (): ReactNode => {
         let nodesToMove = useSelector((state: AppState) => state.nodesToMove);
         let node = this.node;
         let layoutClass = "node-table-row";
@@ -82,11 +83,7 @@ export class NodeCompVerticalRowLayout extends Div {
             }
         }
         this.setChildren(comps);
-    }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
-        this.build();
         return this.super_CompRender();
     }
 }
