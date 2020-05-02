@@ -14,16 +14,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompRow extends Comp {
-
-    comp: Comp = null;
+export class NodeCompRow extends Div {
 
     constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number, public layoutClass: string, public allowNodeMove: boolean) {
-        super();
-        this.comp = this.build();
+        super(null, {
+            onClick: (evt) => { S.nav.clickOnNodeRow(node.id); }, //
+            id: "row_" + node.id,
+        });
     }
 
-    build = (): Comp => {
+    build = (): void => {
         let node = this.node;
         let id: string = node.id;
         //console.log("Rendering Node Row[" + index + "] editingAllowed=" + editingAllowed);
@@ -43,7 +43,6 @@ export class NodeCompRow extends Comp {
 
         let indentLevel = this.layoutClass === "node-grid-item" ? 0 : this.level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
-        let cssId: string = "row_" + id;
 
         let activeClass;
         let inactiveClass;
@@ -57,24 +56,22 @@ export class NodeCompRow extends Comp {
             inactiveClass = "inactive-row";
         }
 
-        let rowDiv = new Div(null, {
-            className: this.layoutClass + (selected ? (" " + activeClass) : (" " + inactiveClass)),
-            onClick: (evt) => { S.nav.clickOnNodeRow(id); }, //
-            id: cssId,
-            style: style
-        },
-            [
-                buttonBar,
-                new Div(null, { className: "clearfix" }),
-                new NodeCompContent(node, true, true)
-            ]);
+        this.attribs.className = this.layoutClass + (selected ? (" " + activeClass) : (" " + inactiveClass))
+        this.attribs.style = style;
 
-        S.render.setNodeDropHandler(rowDiv, node);
-        return rowDiv;
+        this.setChildren([
+            buttonBar,
+            new Div(null, { className: "clearfix" }),
+            new NodeCompContent(node, true, true)
+        ]);
+
+        S.render.setNodeDropHandler(this, node);
     }
 
-    compRender = () : ReactNode => {
-        /* Delegate rendering to comp */
-        return this.comp.compRender();
+    super_CompRender: any = this.compRender;
+    compRender = (): ReactNode => {
+        this.build();
+       
+        return this.super_CompRender();
     }
 }

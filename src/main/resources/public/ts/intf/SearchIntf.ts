@@ -10,8 +10,6 @@ export interface SearchIntf {
     searchOffset: number;
     timelineOffset: number;
 
-    searchResults: any;
-    timelineResults: any;
     highlightRowNode: J.NodeInfo;
 
     idToNodeMap: { [key: string]: J.NodeInfo };
@@ -22,7 +20,6 @@ export interface SearchIntf {
     searchFilesResponse(res: J.FileSearchResponse): any;
     timeline(prop: string): any;
     initSearchNode(node: J.NodeInfo): any;
-    populateSearchResultsPage(data: J.NodeSearchResponse, viewName: string): any;
     renderSearchResultAsListItem(node, index, count, rowCount): any;
     makeButtonBarHtml(node: J.NodeInfo): any;
     clickOnSearchResultRow(id : string): any;

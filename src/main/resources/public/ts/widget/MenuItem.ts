@@ -28,6 +28,7 @@ export class MenuItem extends Div {
         this.setOnClick(func);
         this.setIsEnabledFunc(isEnabledFunc);
         this.setIsVisibleFunc(isVisibleFunc);
+        this.state.content = name;
     }
 
     compRender = (): ReactNode => {

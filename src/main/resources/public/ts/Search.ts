@@ -9,6 +9,7 @@ import { Comp } from "./widget/base/Comp";
 import { HorizontalLayout } from "./widget/HorizontalLayout";
 import { Img } from "./widget/Img";
 import { NodeCompContent } from "./comps/NodeCompContent";
+import { AppState } from "./AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -26,16 +27,6 @@ export class Search implements SearchIntf {
     timelineOffset = 0;
 
     /*
-     * Holds the NodeSearchResponse.java JSON, or null if no search has been done.
-     */
-    searchResults: J.NodeSearchResponse = null;
-
-    /*
-     * Holds the NodeSearchResponse.java JSON, or null if no timeline has been done.
-     */
-    timelineResults: any = null;
-
-    /*
      * Will be the last row clicked on (NodeInfo.java object) and having the red highlight bar
      */
     highlightRowNode: J.NodeInfo = null;
@@ -50,20 +41,27 @@ export class Search implements SearchIntf {
     }
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
-        this.searchResults = res;
-        if (this.searchResults) {
-            S.nav.mainTabPanel.setTabVisibility("search", true);
-        }
-        S.srch.populateSearchResultsPage(S.srch.searchResults, "searchResultsPanel");
+
+        S.meta64.store.dispatch({
+            type: "Action_RenderSearchResults",
+            func: function (state: AppState): AppState {
+                state.searchResults = res.searchResults;
+                return state;
+            }
+        });
+
         S.meta64.selectTab("searchTab");
     }
 
     timelineResponse = (res: J.NodeSearchResponse) => {
-        this.timelineResults = res;
-        if (this.timelineResults) {
-            S.nav.mainTabPanel.setTabVisibility("timeline", true);
-        }
-        S.srch.populateSearchResultsPage(S.srch.timelineResults, "timelineResultsPanel");
+
+        S.meta64.store.dispatch({
+            type: "Action_RenderTimelineResults",
+            func: function (state: AppState): AppState {
+                state.timelineResults = res.searchResults;
+                return state;
+            }
+        });
         S.meta64.selectTab("timelineTab");
     }
 
@@ -102,30 +100,6 @@ export class Search implements SearchIntf {
 
     initSearchNode = (node: J.NodeInfo) => {
         this.idToNodeMap[node.id] = node;
-    }
-
-    populateSearchResultsPage = (data: J.NodeSearchResponse, viewName) => {
-        let childCount = data.searchResults.length;
-
-        /*
-         * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
-         * client side for various reasons.
-         */
-        let rowCount = 0;
-
-        let output: Comp[] = [];
-        let i = -1;
-        data.searchResults.forEach((node: J.NodeInfo) => {
-            i++;
-            this.initSearchNode(node);
-
-            rowCount++;
-            output.push(this.renderSearchResultAsListItem(node, i, childCount, rowCount));
-        });
-
-
-        let div = new Div(null, null, output);
-        div.updateDOM(viewName);
     }
 
     /*
@@ -180,8 +154,7 @@ export class Search implements SearchIntf {
     }
 
     clickSearchNode = (id: string) => {
-        S.util.setElmDisplayById("listView", false);
-        S.util.setElmDisplayById("mainNodeContent", false);
+
         /*
          * update highlight node to point to the node clicked on, just to persist it for later
          */

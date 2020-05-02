@@ -14,13 +14,11 @@ export class TextContent extends Comp {
     constructor(text: string, classes: string = null, public preformatted: boolean = false) {
         super(null);
         this.attribs.className = classes || "alert alert-info";
-        this.setText(text);
+        this.state.text = text;
     }
 
     setText = (text: string) => {
-        this.mergeState({
-            text
-        });
+        this.mergeState({text});
     }
 
     compRender = (): ReactNode => {

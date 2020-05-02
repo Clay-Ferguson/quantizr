@@ -4,9 +4,12 @@ import { Meta64Intf } from "./intf/Meta64Intf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
-import { TabPanel } from "./widget/TabPanel";
-import { MainNavPanel } from "./widget/MainNavPanel";
 import { GraphPanel } from "./widget/GraphPanel";
+import { createStore } from 'redux';
+import { rootReducer } from "./reducers/rootReducer";
+import { App } from "./widget/App";
+import { AppState } from "./AppState";
+import { MainTabPanelIntf } from "./Interfaces";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -14,6 +17,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Meta64 implements Meta64Intf {
+
+    mainTabPanel: MainTabPanelIntf;
+
+    app: App;
+    store: any;
 
     navBarHeight: number = 0;
     pendingLocationHash: string;
@@ -140,19 +148,6 @@ export class Meta64 implements Meta64Intf {
 
     refresh = (): void => {
         S.view.refreshTree(null, true);
-    }
-
-    /* This is an ugly function here, but it will vanish once the tab content area is rendered fully by a react state change */
-    rebuildTab = (tabName: string): void => {
-        if (tabName == "mainTab") {
-            S.render.resetTreeDom();
-        }
-        else if (tabName == "searchTab") {
-            S.srch.populateSearchResultsPage(S.srch.searchResults, "searchResultsPanel");
-        }
-        else if (tabName == "timelineTab") {
-            S.srch.populateSearchResultsPage(S.srch.timelineResults, "timelineResultsPanel");
-        }
     }
 
     selectTab = (tabName: string): void => {
@@ -396,14 +391,14 @@ export class Meta64 implements Meta64Intf {
         //console.log("refreshAllGuiEnablement");
         this.updateState();
 
-        if (S.nav.mainNavPanel) {
-            S.nav.mainNavPanel.refreshState();
-        }
+        // if (S.meta64.mainNavPanel) {
+        //     S.nav.mainNavPanel.refreshState();
+        // }
 
         // we don't refresh state on popup menu, because currently we regenerate completely each time and we
         // are calling updateState() before doing so, but aside from react performance we could do it differently if we ever need to.
         // if (S.nav.mainMenuPopupDlg) {
-        //     S.nav.mainMenuPopupDlg.refreshState();
+        //     S.nav.mainMenuPopupDlg.refreshVisAndEnablement();
         // }
     }
 
@@ -447,33 +442,6 @@ export class Meta64 implements Meta64Intf {
         this.currentNodeData = data;
     }
 
-    // go ahead and make this async
-    anonPageLoadResponse = (res: J.AnonPageLoadResponse): void => {
-
-        S.util.getElm("listView", async (elm: HTMLElement) => {
-            if (res.renderNodeResponse) {
-                S.util.setElmDisplayById("mainNodeContent", true);
-
-                if (res.renderNodeResponse.noDataResponse) {
-                    S.util.setHtml("listView", res.renderNodeResponse.noDataResponse);
-
-                    // how to ensure this is last in all processing pipelines (requests)??? todo-1
-                    // this is very similar to the overlay and scrolling thing needing to always fall in a specific phase
-                    // in specific order of certain async things
-                    this.refreshAllGuiEnablement();
-                }
-                else {
-                    //console.log("anonPageLoad");
-                    await S.render.renderPageFromData(res.renderNodeResponse);
-                }
-
-            } else {
-                S.util.setElmDisplayById("mainNodeContent", false);
-                S.util.setHtml("listView", res.content);
-            }
-        });
-    }
-
     removeBinaryById = (id: string): void => {
         if (!this.currentNodeData || !this.currentNodeData.node) return;
         this.currentNodeData.node.children.forEach((node: J.NodeInfo) => {
@@ -483,18 +451,17 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
-    /*
-     * updates client side maps and client-side identifier for new node, so that this node is 'recognized' by client
-     * side code
-     */
-    initNode = (node: J.NodeInfo, updateMaps?: boolean): void => {
-        if (!node) {
-            console.log("initNode has null node");
-            return;
-        }
+    updateNodeMap = (node: J.NodeInfo): void => {
+        if (!node) return;
 
-        if (updateMaps) {
-            this.idToNodeMap[node.id] = node;
+        this.idToNodeMap = {};
+        this.idToNodeMap[node.id] = node;
+
+        if (node.children) {
+            for (let i = 0; i < node.children.length; i++) {
+                let n: J.NodeInfo = node.children[i];
+                this.idToNodeMap[n.id] = n;
+            }
         }
     }
 
@@ -519,6 +486,9 @@ export class Meta64 implements Meta64Intf {
     }
 
     initApp = async (): Promise<void> => {
+
+        this.store = createStore(rootReducer);
+
         return new Promise<void>(async (resolve, reject) => {
             console.log("initApp running.");
 
@@ -628,11 +598,9 @@ export class Meta64 implements Meta64Intf {
             this.deviceWidth = window.innerWidth;
             this.deviceHeight = window.innerHeight;
 
-            S.nav.mainTabPanel = new TabPanel();
-            S.nav.mainTabPanel.updateDOM("mainTabPanel");
-
-            S.nav.mainNavPanel = new MainNavPanel(null);
-            S.nav.mainNavPanel.updateDOM("mainNavPanel");
+            //This is the root react App component that contains the entire application
+            this.app = new App();
+            this.app.updateDOM("app");
 
             /*
              * This call checks the server to see if we have a session already, and gets back the login information from
@@ -669,6 +637,7 @@ export class Meta64 implements Meta64Intf {
     */
     static overlayCounter: number = 1; //this starting value is important.
     setOverlay = (showOverlay: boolean) => {
+
         Meta64.overlayCounter += showOverlay ? 1 : -1;
         //console.log("overlayCounter=" + Meta64.overlayCounter);
 
@@ -747,7 +716,11 @@ export class Meta64 implements Meta64Intf {
     loadAnonPageHome = (): void => {
         console.log("loadAnonPageHome()");
         S.util.ajax<J.AnonPageLoadRequest, J.AnonPageLoadResponse>("anonPageLoad", {
-        }, this.anonPageLoadResponse);
+        },
+            (res: J.AnonPageLoadResponse): void => {
+                S.render.renderPageFromData(res.renderNodeResponse);
+            }
+        );
     }
 
     saveUserPreferences = (): void => {
@@ -810,7 +783,14 @@ export class Meta64 implements Meta64Intf {
         if (!this.isAnonUser) {
             title += "User: " + res.userName;
         }
-        S.util.setInnerHTMLById("headerAppName", title);
+
+        S.meta64.store.dispatch({
+            type: "Action_LoginResponse",
+            func: function (state: AppState): AppState {
+                state.title = title;
+                return state;
+            }
+        });
     }
 }
 

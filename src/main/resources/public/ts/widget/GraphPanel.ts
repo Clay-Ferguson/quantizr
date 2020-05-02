@@ -24,10 +24,6 @@ export class GraphPanel extends Comp {
         S.meta64.graphPanel = this;
     }
 
-    getTag = (): string => {
-        return "div";
-    }
-
     init = (): void => {
         // S.util.getElm(this.getId(), (elm: HTMLElement) => {
 

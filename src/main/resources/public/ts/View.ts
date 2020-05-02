@@ -25,7 +25,9 @@ export class View implements ViewIntf {
     refreshTreeResponse = async (res?: J.RenderNodeResponse, targetId?: any, scrollToTop?: boolean): Promise<void> => {
         //console.log("refreshTreeResponse: "+S.util.prettyPrint(res));
         await S.render.renderPageFromData(res, scrollToTop, targetId);
-        S.util.delayedFocus("mainNodeContent");
+
+        //todo-0: needs to be done differenetly now?
+        //S.util.delayedFocus("mainNodeContent");
     }
 
     /*

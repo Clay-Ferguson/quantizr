@@ -4,7 +4,7 @@ source ./setenv.sh
 source ./define-functions.sh
 
 # IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
-CLEAN=false
+CLEAN=true
 
 # Ensure output folder for out docier images exists
 mkdir -p ${ipfs_staging}

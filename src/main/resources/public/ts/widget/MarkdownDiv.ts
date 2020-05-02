@@ -16,17 +16,7 @@ export class MarkdownDiv extends Comp {
     constructor(public content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {
         super(attribs);
         this.setChildren(initialChildren);
-        this.setContent(content);
-    }
-
-    getTag = (): string => {
-        return "div";
-    }
-
-    setContent = (content: string) => {
-        this.mergeState({
-            content
-        });
+        this.state.content = content;
     }
 
     compRender = (): ReactNode => {
@@ -34,6 +24,7 @@ export class MarkdownDiv extends Comp {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id="+this.getId()+" constructor.name="+this.constructor.name);
         }
 
+        //console.log("Rendering MarkdownDiv: "+this.getState().content);
         this.attribs.dangerouslySetInnerHTML = { "__html": this.getState().content };
         return S.e('div', this.attribs);
     }

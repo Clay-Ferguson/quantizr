@@ -1,5 +1,5 @@
 import { Comp } from "./base/Comp";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { ReactNode } from "react";
@@ -11,30 +11,29 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Button extends Comp {
 
-    constructor(text: string, public callback: Function, _attribs: Object = null, moreClasses: string="btn-secondary") {
+    constructor(text: string, public callback: Function, _attribs: Object = null, moreClasses: string = "btn-secondary") {
         super(_attribs);
         S.util.mergeAndMixProps(this.attribs, {
-            className: "btn "+moreClasses, /* also: secondary, info, success, danger, warning */
+            className: "btn " + moreClasses, /* also: secondary, info, success, danger, warning */
             type: "button"
         }, " ");
 
+        //console.log("Initial Button enabled=" + this.getState().enabled);
         this.attribs.onClick = callback;
-        this.setText(text);
+        this.state.text = text;
     }
 
-    setText = (text: string) => {
-        this.mergeState({
-            text
-        });
+    setText(text: string): void {
+        this.mergeState({text});
     }
 
     compRender = (): ReactNode => {
-        //console.log("CompRender Button: "+this.jsClassName);
+        console.log("CompRender Button: " + this.jsClassName);
 
         let icon: any;
         if (this.attribs.iconclass) {
-            icon = S.e('i', { 
-                key: "s_"+this.getId(),
+            icon = S.e('i', {
+                key: "s_" + this.getId(),
                 className: this.attribs.iconclass,
                 style: {
                     marginRight: "6px"
@@ -43,9 +42,11 @@ export class Button extends Comp {
         }
 
         if (this.getState().enabled) {
+            //console.log("button is enabled.");
             delete this.attribs.disabled;
         }
         else {
+            //console.log("button is NOT enabled.");
             this.attribs.disabled = "disabled";
         }
 

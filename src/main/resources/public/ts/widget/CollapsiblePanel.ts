@@ -16,13 +16,11 @@ export class CollapsiblePanel extends Comp {
         private stateCallback: Function = null, expanded: boolean = false, private extraToggleButtonClass="") {
         super(attribs);
         this.setChildren(initialChildren);
-        this.setExpanded(expanded)
+        this.state.expanded = expanded;
     }
 
     setExpanded = (expanded: boolean) => {
-        this.mergeState({
-            expanded
-        });
+        this.mergeState({expanded});
     }
 
     compRender = (): ReactNode => {

@@ -9,7 +9,6 @@ export interface RenderIntf {
 
     setNodeDropHandler(rowDiv: Comp, node: J.NodeInfo): void;
     initMarkdown(): void;
-    resetTreeDom(): void;
     updateHighlightNode(node: J.NodeInfo): void;
     injectSubstitutions(content: string): string;
     showNodeUrl(): void;
@@ -22,5 +21,5 @@ export interface RenderIntf {
     isReadOnlyProperty(propName: string): boolean;
     allowAction(typeHandler: TypeHandlerIntf, action: string): boolean; 
     createBetweenNodeButtonBar(node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean): Comp;
-    renderChildren(node: J.NodeInfo, newData: boolean, level: number, allowNodeMove: boolean): Comp;
+    renderChildren(node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp;
 }

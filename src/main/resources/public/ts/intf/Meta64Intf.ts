@@ -1,8 +1,16 @@
 import * as J from "../JavaIntf";
 import { GraphPanel } from "../widget/GraphPanel";
+import { MainTabPanelIntf } from "../Interfaces";
 
 export interface Meta64Intf {
+
+    mainTabPanel: MainTabPanelIntf;
+    app: any; //todo-0: typesafety here
+    store: any;
+
+    //change to AppState type ?
     state: any; //todo-1: create an interface for State properties
+
     appInitialized: boolean;
     pendingLocationHash: string;
 
@@ -42,7 +50,7 @@ export interface Meta64Intf {
 
     expandedAbbrevNodeIds: any;
 
-    //todo-0: rename this to nodeData
+    //todo-1: rename this to nodeData
     currentNodeData: J.RenderNodeResponse;
 
     userPreferences: J.UserPreferences;
@@ -55,7 +63,6 @@ export interface Meta64Intf {
     shutdownServerNode(string): void;
     sendTestEmail(string): void;
     refresh(): void;
-    rebuildTab(tabName: string): void;
     selectTab(pageName: string, clickEvent?: boolean): void;
     getSelectedNodeUidsArray(): string[];
     getSelectedNodeIdsArray(): string[];
@@ -73,9 +80,7 @@ export interface Meta64Intf {
     getOrdinalOfNode(node: J.NodeInfo): number;
     getNumChildNodes(): number;
     setCurrentNodeData(data: J.RenderNodeResponse): void;
-    anonPageLoadResponse(res: J.AnonPageLoadResponse): void;
     removeBinaryById(id: string): void;
-    initNode(node: J.NodeInfo, updateMaps?: boolean): void;
     initApp(): Promise<void>;
     processUrlParams(): void;
     displaySignupMessage(): void
@@ -84,5 +89,6 @@ export interface Meta64Intf {
     openSystemFile(fileName: string);
     onSignIn(googleUser);
     setStateVarsUsingLoginResponse(res: J.LoginResponse): void;
+    updateNodeMap(node: J.NodeInfo): void;
 }
 

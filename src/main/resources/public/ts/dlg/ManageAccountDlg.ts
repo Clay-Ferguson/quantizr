@@ -54,6 +54,7 @@ export class ManageAccountDlg extends DialogBase {
                     "Your Storage Quota: " + S.util.formatMemory(res.binQuota) + "\n" +//
                     "Storage Used: " + S.util.formatMemory(res.binTotal) + "\n" +//
                     "Percent Used: " + used //
+
                 this.message.setText(info);
             });
     }

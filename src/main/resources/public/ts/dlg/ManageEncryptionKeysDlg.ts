@@ -35,12 +35,11 @@ export class ManageEncryptionKeysDlg extends DialogBase {
             ])
         ]);
 
-        this.refreshKeyInfo();
+    this.refreshKeyInfo();
     }
 
     refreshKeyInfo = async () => {
         let keyJson: string = await S.encryption.exportKeys();
         this.textContent.setText(keyJson);
-
     }
 }

@@ -50,7 +50,7 @@ export class SharingDlg extends DialogBase {
      */
     populate = (res: J.GetNodePrivilegesResponse): void => {
         //console.log("populating with: res="+S.util.prettyPrint(res));
-        this.privsTable.updateState(res);
+        this.privsTable.setState(res); 
         this.privsTable.updateDOM();
     }
 

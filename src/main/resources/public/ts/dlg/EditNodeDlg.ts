@@ -227,7 +227,6 @@ export class EditNodeDlg extends DialogBase {
         editPropsTable.addChild(contentTableRow);
 
         this.contentEditor.setWordWrap(isWordWrap);
-
         this.propCheckBoxes = [];
 
         if (this.node.properties) {

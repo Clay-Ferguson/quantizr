@@ -10,7 +10,8 @@ import { Span } from "./Span";
 import { NavBarIconButton } from "./NavBarIconButton";
 import { Div } from "./Div";
 import { ReactNode } from "react";
-import { SearchContentDlg } from "../dlg/SearchContentDlg";
+import { useSelector, useDispatch } from "react-redux";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,10 +22,16 @@ export class MainNavPanel extends NavTag {
 
     constructor(attribs: any) {
         super(attribs);
+    }
+
+    compRender = (): ReactNode => {
+        //console.log("Rendering MainNavPanel");
+
+        const title = useSelector((state: AppState) => state.title);
+        const dispatch = useDispatch();
 
         // navbar-expand-sm would makes it collapsable, but messes up top margin.
         this.attribs.className = "navbar navbar-expand navbar-dark bg-dark fixed-top main-navbar";
-
         let buttons = [];
 
         /* Feature to read from clipboard might scare some users (as it should) so I'm turning this on only for admins
@@ -156,16 +163,17 @@ export class MainNavPanel extends NavTag {
                     className: "nav-item"
                 }, [
                     new NavBarIconButton("fa-bars", "Quantizr", {
-                        "onClick": e => { S.nav.showMainMenu(); },
+                        "onClick": e => {
+                            S.nav.showMainMenu();
+                        },
                         "id": "mainMenu",
                         "title": "Show Main Menu"
                     })
                 ]),
             ]),
 
-            new Span("", {
+            new Span(title, {
                 className: "navbar-brand",
-                "id": "headerAppName"
             }),
 
             new ButtonTag(null, {
@@ -196,67 +204,69 @@ export class MainNavPanel extends NavTag {
             ])
         ]);
 
-        this.whenElm((elm: HTMLElement) => {
-            //since we only ever set this height one time, and don't need it immediately i'm throwing in a timeout
-            //just to be sure the browser has finished calculating it's offsetHeight, but I have no actual evidence or reason
-            //to believe this timeout is necessary (but merely safer and harmless)
-            setTimeout(() => {
-                //see also: clientHeight, offsetHeight, scrollHeight
-                S.meta64.navBarHeight = elm.offsetHeight;
-            }, 750);
-
-            elm.addEventListener("dragenter", (event) => {
-                //console.log('DRAGENTER: ' + S.util.prettyPrint(event));
-                event.preventDefault();
-            });
-
-            elm.addEventListener("dragover", (event) => {
-                //console.log('DRAGOVER: ' + S.util.prettyPrint(event));
-                event.preventDefault();
-                event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
-            });
-
-            elm.addEventListener("drop", (ev) => {
-                ev.stopPropagation();
-                ev.preventDefault();
-
-                //var imageUrl = evt.dataTransfer.getData('URL');
-                //var imageUrl = evt.dataTransfer.getData('text/html');
-
-                let data = ev.dataTransfer.items;
-                for (let i = 0; i < data.length; i++) {
-                    let d = data[i];
-                    console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
-
-                    if ((d.kind == 'string') &&
-                        (d.type.match('^text/plain'))) {
-                    }
-
-                    d.getAsString((s) => {
-                        //This detects drops, successfully but I'm not using it yet.
-                        console.log("DROP STRING[" + i + "]: " + s);
-                    });
-
-                    // else if ((data[i].kind == 'string') &&
-                    //     (data[i].type.match('^text/html'))) {
-                    //     // Drag data item is HTML
-                    //     console.log("... Drop: HTML");
-                    // } else if ((data[i].kind == 'string') &&
-                    //     (data[i].type.match('^text/uri-list'))) {
-                    //     // Drag data item is URI
-                    //     console.log("... Drop: URI");
-                    // } else if ((data[i].kind == 'file') &&
-                    //     (data[i].type.match('^image/'))) {
-                    //     // Drag data item is an image file
-                    //     var f = data[i].getAsFile();
-                    //     console.log("... Drop: File ");
-                    // }
-                }
-            });
-        });
+        return this.tagRender('nav', this.content, this.attribs);
     }
 
-    compRender = (): ReactNode => {
-        return this.tagRender('nav', this.content, this.attribs);
+    super_domAddEvent: any = this.domAddEvent;
+    domAddEvent = (): void => {
+        console.log("overridden domAddEvent: " + this.jsClassName);
+        let elm: HTMLElement = this.getElement();
+
+        //since we only ever set this height one time, and don't need it immediately i'm throwing in a timeout
+        //just to be sure the browser has finished calculating it's offsetHeight, but I have no actual evidence or reason
+        //to believe this timeout is necessary (but merely safer and harmless)
+        setTimeout(() => {
+            //see also: clientHeight, offsetHeight, scrollHeight
+            S.meta64.navBarHeight = elm.offsetHeight;
+        }, 750);
+
+        elm.addEventListener("dragenter", (event) => {
+            //console.log('DRAGENTER: ' + S.util.prettyPrint(event));
+            event.preventDefault();
+        });
+
+        elm.addEventListener("dragover", (event) => {
+            //console.log('DRAGOVER: ' + S.util.prettyPrint(event));
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
+        });
+
+        elm.addEventListener("drop", (ev) => {
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            //var imageUrl = evt.dataTransfer.getData('URL');
+            //var imageUrl = evt.dataTransfer.getData('text/html');
+
+            let data = ev.dataTransfer.items;
+            for (let i = 0; i < data.length; i++) {
+                let d = data[i];
+                console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
+
+                if ((d.kind == 'string') &&
+                    (d.type.match('^text/plain'))) {
+                }
+
+                d.getAsString((s) => {
+                    //This detects drops, successfully but I'm not using it yet.
+                    console.log("DROP STRING[" + i + "]: " + s);
+                });
+
+                // else if ((data[i].kind == 'string') &&
+                //     (data[i].type.match('^text/html'))) {
+                //     // Drag data item is HTML
+                //     console.log("... Drop: HTML");
+                // } else if ((data[i].kind == 'string') &&
+                //     (data[i].type.match('^text/uri-list'))) {
+                //     // Drag data item is URI
+                //     console.log("... Drop: URI");
+                // } else if ((data[i].kind == 'file') &&
+                //     (data[i].type.match('^image/'))) {
+                //     // Drag data item is an image file
+                //     var f = data[i].getAsFile();
+                //     console.log("... Drop: File ");
+                // }
+            }
+        });
     }
 }

@@ -1,6 +1,19 @@
 import * as J from "./JavaIntf";
+import { AppState } from "./AppState";
+import { Action } from "redux";
+import { CompIntf } from "./widget/base/CompIntf";
 
 /* These are Client-side only models, and are not seen on the server side ever */
+
+export interface AppAction extends Action<any> {
+    type: string;
+    func?: (AppState: any) => AppState;
+    data?: any;
+}
+
+export interface MainTabPanelIntf extends CompIntf {
+
+}
 
 /* Function Prototype/Signatore, It is assumed that a return value of false, will abort the iteration, and true continues iterating */
 export interface PropertyIterator {

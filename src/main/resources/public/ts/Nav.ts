@@ -12,7 +12,6 @@ import { Heading } from "./widget/Heading";
 import { MainMenuPopupDlg } from "./dlg/MainMenuPopupDlg";
 import { CompIntf } from "./widget/base/CompIntf";
 import { DialogBaseImpl } from "./DialogBaseImpl";
-import { MainTabPanelIntf } from "./intf/MainTabPanelIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -23,8 +22,6 @@ export class Nav implements NavIntf {
 
     _UID_ROWID_PREFIX: string = "row_";
     mainMenuPopupDlg: DialogBaseImpl;
-    mainNavPanel: CompIntf;
-    mainTabPanel: MainTabPanelIntf;
 
     /* todo-2: eventually when we do paging for other lists, we will need a set of these variables for each list display (i.e. search, timeline, etc) */
     mainOffset: number = 0;
@@ -271,6 +268,8 @@ export class Nav implements NavIntf {
     showMainMenu = (): void => {
         S.meta64.updateState();
         //todo-1: Note: currently S.meta64.refreshAllGuiEnablement has a tight coupling to this for enablement.
+
+        S.meta64.refreshAllGuiEnablement();
         this.mainMenuPopupDlg = new MainMenuPopupDlg();
         this.mainMenuPopupDlg.open("inline-block");
     }

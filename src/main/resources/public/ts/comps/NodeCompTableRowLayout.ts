@@ -13,20 +13,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompTableRowLayout extends Comp {
+export class NodeCompTableRowLayout extends Div {
 
-    comp: Comp = null;
-
-    constructor(public node: J.NodeInfo, public newData: boolean, public level: number, public layout: string, public allowNodeMove: boolean) {
-        super();
-        this.comp = this.build();
+    constructor(public node: J.NodeInfo, public level: number, public layout: string, public allowNodeMove: boolean) {
+        super(null, { className: 'node-grid-table' });
     }
 
-    build = (): Comp => {
+    build = (): void => {
         let node = this.node;
-        let tableDiv = new Div(null, { className: 'node-grid-table' });
         let curRow = new Div(null, { className: 'node-grid-row' });
-
+        let children: Comp[] = [];
         let layoutClass = "node-grid-item";
         let childCount: number = node.children.length;
         let rowCount: number = 0;
@@ -50,12 +46,8 @@ export class NodeCompTableRowLayout extends Comp {
             if (!S.edit.nodesToMoveSet[n.id]) {
                 S.render.updateHighlightNode(n);
 
-                if (this.newData) {
-                    S.meta64.initNode(n, true);
-
-                    if (this.debug) {
-                        console.log(" RENDER ROW[" + i + "]: node.id=" + n.id);
-                    }
+                if (this.debug && n) {
+                    console.log(" RENDER ROW[" + i + "]: node.id=" + n.id);
                 }
 
                 let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove);
@@ -67,7 +59,7 @@ export class NodeCompTableRowLayout extends Comp {
                 S.render.lastOwner = n.owner;
 
                 if (n.children) {
-                    comps.push(S.render.renderChildren(n, this.newData, this.level + 1, this.allowNodeMove));
+                    comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
                 }
 
                 let curCol = new Div(null, {
@@ -80,7 +72,7 @@ export class NodeCompTableRowLayout extends Comp {
                 curRow.children.push(curCol);
 
                 if (++curCols == maxCols) {
-                    tableDiv.children.push(curRow);
+                    children.push(curRow);
                     curRow = new Div(null, { style: { display: 'table-row' } });
                     curCols = 0;
                 }
@@ -89,14 +81,15 @@ export class NodeCompTableRowLayout extends Comp {
 
         //the last row might not have filled up yet but add it still
         if (curCols > 0) {
-            tableDiv.children.push(curRow);
+            children.push(curRow);
         }
 
-        return tableDiv;
+        this.setChildren(children);
     }
 
-    compRender = () : ReactNode => {
-        /* Delegate rendering to comp */
-        return this.comp.compRender();
+    super_CompRender: any = this.compRender;
+    compRender = (): ReactNode => {
+        this.build();
+        return this.super_CompRender();
     }
 }

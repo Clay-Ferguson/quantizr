@@ -13,16 +13,15 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompRowHeader extends Comp {
-
-    comp: Div = null;
+export class NodeCompRowHeader extends Div {
 
     constructor(private node: J.NodeInfo) {
-        super();
-        this.comp = this.build();
+        super(null, {
+            className: "header-text"
+        });
     }
 
-    build = (): Div => {
+    build = (): void => {
         let node = this.node;
         let children = [];
 
@@ -47,13 +46,12 @@ export class NodeCompRowHeader extends Comp {
             }));
         }
 
-        return new Div(null, {
-            className: "header-text"
-        }, children);
+        this.setChildren(children);
     }
 
-    compRender = () : ReactNode => {
-        /* Delegate rendering to comp */
-        return this.comp.compRender();
+    super_CompRender: any = this.compRender;
+    compRender = (): ReactNode => {
+        this.build();
+        return this.super_CompRender();
     }
 }

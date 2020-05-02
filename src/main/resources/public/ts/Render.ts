@@ -2,7 +2,6 @@ import * as J from "./JavaIntf";
 import { Comp } from "./widget/base/Comp";
 import { Button } from "./widget/Button";
 import { ButtonBar } from "./widget/ButtonBar";
-import { Div } from "./widget/Div";
 import { Img } from "./widget/Img";
 import { Constants as C } from "./Constants";
 import { RenderIntf } from "./intf/RenderIntf";
@@ -12,11 +11,9 @@ import * as marked from 'marked';
 import * as highlightjs from 'highlightjs';
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { NavBarIconButton } from "./widget/NavBarIconButton";
-import { NodeCompButtonBar } from "./comps/NodeCompButtonBar";
-import { NodeCompContent } from "./comps/NodeCompContent";
 import { NodeCompVerticalRowLayout } from "./comps/NodeCompVerticalRowLayout";
 import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";
-import { NodeCompMainList } from "./comps/NodeCompMainList";
+import { AppState } from "./AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -26,9 +23,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 declare var MathJax;
 
 export class Render implements RenderIntf {
-
-    listViewComp: Comp = null;
-    mainNodeComp: Comp = null;
 
     private debug: boolean = false;
     private markedRenderer = null;
@@ -86,6 +80,8 @@ export class Render implements RenderIntf {
     }
 
     setNodeDropHandler = (rowDiv: Comp, node: J.NodeInfo): void => {
+        if (!node || !rowDiv) return;
+
         rowDiv.setDropHandler((evt: DragEvent) => {
             let data = evt.dataTransfer.items;
 
@@ -143,106 +139,51 @@ export class Render implements RenderIntf {
     }
 
     renderPageFromData = async (data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string, clickTab: boolean = true): Promise<void> => {
-        //console.log("renderPageFromData(): scrollToTop="+scrollToTop);
+
         this.lastOwner = null;
 
-        let elm = S.util.domElm("mainTab");
-        if (elm) {
-            elm.style.visibility = "hidden";
-        }
         S.meta64.setOverlay(true);
-
-        let listView : NodeCompMainList;
 
         // this timeout forces the 'hidden' to be processed and hidden from view 
         const promise = new Promise<void>(async (resolve, reject) => {
 
             setTimeout(async () => {
                 try {
+                    //if No data was provided we use existing data.
+                    if (!data) {
+                        data = S.meta64.currentNodeData;
+                    } 
+                    //Otherwise we are rendering new data and need to initialize some things
+                    else {
+
+                        S.meta64.setCurrentNodeData(data);
+                        S.meta64.updateNodeMap(data.node);
+                        S.meta64.selectedNodes = {};
+                    }
+
                     //console.log("Setting lastNode="+data.node.id);
                     if (data && data.node) {
                         S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, data.node.id);
                         S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
                     }
 
-                    let newData: boolean = false;
-                    if (!data) {
-                        data = S.meta64.currentNodeData;
-                    } else {
-                        newData = true;
-                    }
-
                     S.nav.endReached = data && data.endReached;
-
-                    S.util.getElm("listView", (elm: HTMLElement) => {
-                        if (!data || !data.node) {
-                            S.util.setElmDisplayById("listView", false);
-                            this.setListViewComp(null);
-                            let contentDiv = new Div("No content available");
-                            this.setMainNodeComp(contentDiv);
-                        } else {
-                            S.util.setElmDisplayById("listView", true);
-                        }
-                    });
-
-                    if (newData) {
-                        S.meta64.idToNodeMap = {};
-
-                        /*
-                         * I'm choosing to reset selected nodes when a new page loads, but this is not a requirement. I just
-                         * don't have a "clear selections" feature which would be needed so user has a way to clear out.
-                         */
-                        S.meta64.selectedNodes = {};
-
-                        //todo-1: Isn't this map needed forever during the app lifetime? Is it better to not blow this away here?
-                        //S.meta64.parentIdToFocusNodeMap = {};
-
-                        S.meta64.initNode(data.node, true);
-                        S.meta64.setCurrentNodeData(data);
-                    }
-
                     let propCount: number = S.meta64.currentNodeData.node.properties ? S.meta64.currentNodeData.node.properties.length : 0;
 
                     if (this.debug) {
                         console.log("RENDER NODE: " + data.node.id + " propCount=" + propCount);
                     }
 
-                    /*
-                     * NOTE: mainNodeContent is the parent node of the page content, and is always the node displayed at the top
-                     * of the page above all the other nodes which are its child nodes.
-                     */
-                    let mainNodeContent = new NodeCompContent(data.node, false, true);
+                    S.meta64.store.dispatch({
+                        type: "Action_RenderPage",
+                        func: function (state: AppState): AppState {
+                            state.node = S.meta64.currentNodeData.node;
+                            state.endReached = S.nav.endReached;
+                            return state;
+                        }
+                    });
 
-                    //console.log("mainNodeContent: "+mainNodeContent);
-
-                    let id: string = data.node.id;
-                    let cssId: string = "row_" + id;
-
-                    /* Construct Create Subnode Button */
-                    let focusNode: J.NodeInfo = S.meta64.getHighlightedNode();
-                    let selected: boolean = focusNode && focusNode.id === id;
-                    if (selected) {
-                        console.log("selected: focusNode.uid=" + focusNode.id + " selected=" + selected);
-                    }
-
-                    let children = [];
-                    children.push(new NodeCompButtonBar(data.node, true, false, true));
-                    children.push(new Div(null, { className: "clearfix" }));
-                    children.push(mainNodeContent);
-
-                    let contentDiv = new Div(null, {
-                        className: (selected ? "mainNodeContentStyle active-row-main" : "mainNodeContentStyle inactive-row-main"),
-                        onClick: (elm: HTMLElement) => { S.nav.clickOnNodeRow(id); },
-                        id: cssId
-                    }, children);
-
-                    this.setNodeDropHandler(contentDiv, data.node);
-
-                    S.util.setElmDisplayById("mainNodeContent", true);
-                    this.setMainNodeComp(contentDiv);
                     this.lastOwner = data.node.owner;
-
-                    listView = new NodeCompMainList(data.node, newData, data.endReached)
                 }
                 catch (err) {
                     console.error("render fail.");
@@ -251,11 +192,11 @@ export class Render implements RenderIntf {
                 }
 
                 //console.log("rendering output=: " + S.util.toJson(output));
-                S.util.getElm("listView", async (elm: HTMLElement) => {
-                    try {
-                        //console.log("listView found.");
-                        this.setListViewComp(listView);
 
+                S.meta64.mainTabPanel.whenElm(async (elm: HTMLElement) => {  
+                    console.log("mainTabComp whenElm success");
+    
+                    try {
                         if (clickTab) {
                             S.meta64.selectTab("mainTab");
                         }
@@ -289,60 +230,20 @@ export class Render implements RenderIntf {
                         resolve();
                     }
                 });
+
             }, 100);
         });
 
         promise.then(() => {
-            let elm = S.util.domElm("mainTab");
-            if (elm) {
-                elm.style.visibility = "visible";
-            }
             S.meta64.setOverlay(false);
             S.meta64.refreshAllGuiEnablement();
+            console.log("Done rendering.");
         });
 
         return promise;
     }
 
-    setListViewComp = (comp: Comp): void => {
-        this.listViewComp = comp;
-        if (!!comp) {
-            comp.updateDOM("listView");
-        }
-        else {
-            S.util.setElmDisplayById("listView", false);
-        }
-    }
-
-    setMainNodeComp = (comp: Comp): void => {
-        this.mainNodeComp = comp;
-        if (!!comp) {
-            comp.updateDOM("mainNodeContent");
-        }
-        else {
-            S.util.setElmDisplayById("mainNodeContent", false);
-        }
-    }
-
-    resetTreeDom = (): void => {
-        if (this.listViewComp) {
-            this.listViewComp.updateDOM("listView");
-            S.util.setElmDisplayById("listView", true);
-        }
-        else {
-            S.util.setElmDisplayById("listView", false);
-        }
-
-        if (this.mainNodeComp) {
-            this.mainNodeComp.updateDOM("mainNodeContent");
-            S.util.setElmDisplayById("mainNodeContent", true);
-        }
-        else {
-            S.util.setElmDisplayById("mainNodeContent", false);
-        }
-    }
-
-    renderChildren = (node: J.NodeInfo, newData: boolean, level: number, allowNodeMove: boolean): Comp => {
+    renderChildren = (node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp => {
         if (!node || !node.children) return null;
 
         /*
@@ -351,14 +252,14 @@ export class Render implements RenderIntf {
          */
         let layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
         if (!layout || layout == "v") {
-            return new NodeCompVerticalRowLayout(node, newData, level, allowNodeMove);
+            return new NodeCompVerticalRowLayout(node, level, allowNodeMove);
         }
         else if (layout.indexOf("c") == 0) {
-            return new NodeCompTableRowLayout(node, newData, level, layout, allowNodeMove);
+            return new NodeCompTableRowLayout(node, level, layout, allowNodeMove);
         }
         else {
             //of no layout is valid, fall back on vertical.
-            return new NodeCompVerticalRowLayout(node, newData, level, allowNodeMove);
+            return new NodeCompVerticalRowLayout(node, level, allowNodeMove);
         }
     }
 
@@ -495,4 +396,3 @@ export class Render implements RenderIntf {
         return S.props.readOnlyPropertyList[propName];
     }
 }
-

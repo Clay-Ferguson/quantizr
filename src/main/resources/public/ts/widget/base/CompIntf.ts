@@ -4,9 +4,8 @@ export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[
 
 export interface CompIntf {
 
+    store: any;
     clazz: string;
-
-    refreshState(): void;
 
     setDomAttr(attrName: string, attrVal: string);
 
@@ -26,8 +25,7 @@ export interface CompIntf {
     setVisible(visible: boolean); 
 
     setState(newState: any): void;
-
-    updateState(newState: any): void;
+    mergeState(moreState: any): any;
 
     setEnabled(enabled: boolean);
 
@@ -37,11 +35,9 @@ export interface CompIntf {
 
     reactRenderHtmlInDiv(type: any): string;
     reactRenderHtmlInSpan(type: any): string;
-    updateDOM(id: string): void;
+    updateDOM(id?: string): void;
 
     setInnerHTML(html: string); 
-
-    getTag() : string;
 
     getAttribs() : Object;
 

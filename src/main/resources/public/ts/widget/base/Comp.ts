@@ -9,6 +9,9 @@ import { Singletons } from "../../Singletons";
 import * as ReactDOM from "react-dom";
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { ReactNode, ReactElement, useState, useEffect } from "react";
+import { Provider } from 'react-redux';
+
+//tip: merging states: this.state = { ...this.state, ...moreState };
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -23,15 +26,15 @@ declare var PROFILE;
  */
 export abstract class Comp implements CompIntf {
 
+    //redux store.
+    public store: any;
+    public rendered: boolean = false;
+
     public debug: boolean = false;
     private static guid: number = 0;
 
     //This must private so that getState us used instead which might return 'state' but it also might return 'initialState'
-    private state: any;
-
-    //This is the state that is in effect up until the first 'render' call, which is when hookState first gets called, and
-    //the setState becomes the function returned from react useState, and the whole React-controlled rendering goes into effect.
-    public initialState: any = { visible: true, enabled: true };
+    public state: any = {}; //todo-0: typesafety here
 
     static idToCompMap: { [key: string]: Comp } = {};
     attribs: any;
@@ -46,8 +49,6 @@ export abstract class Comp implements CompIntf {
 
     jsClassName: string;
     clazz: string;
-
-    setStateFunc: Function;
 
     //holds queue of functions to be ran once this component is rendered.
     domAddFuncs: ((elm: HTMLElement) => void)[];
@@ -76,20 +77,20 @@ export abstract class Comp implements CompIntf {
 
         /* If an ID was specifically provided, then use it, or else generate one */
         let id = this.attribs.id || ("c" + Comp.nextGuid());
-        this.attribs.id = id;
-        this.attribs.key = id;
-
         this.clazz = this.constructor.name;
-        this.jsClassName = this.constructor.name + "[" + id + "]";
-        //console.log("jsClassName: " + this.jsClassName);
-
-        //This map allows us to lookup the Comp directly by its ID similar to a DOM lookup
-        Comp.idToCompMap[id] = this;
+        this.setId(id);
 
         //supposedly this pattern works but I'm not sure it's better than what I'm doing, unless this allows an ability
         //to call super.method() which I'm not sure my current architecture can support super calls to functions that are overridden
         //in base classes
         this.bindExampleFunction = this.bindExampleFunction.bind(this);
+    }
+
+    setId = (id: string) => {
+        this.attribs.id = id;
+        this.attribs.key = id;
+        this.jsClassName = this.constructor.name + "[" + id + "]";
+        Comp.idToCompMap[id] = this;
     }
 
     bindExampleFunction() {
@@ -106,27 +107,22 @@ export abstract class Comp implements CompIntf {
         return ret;
     }
 
-    /* Function refreshes all enablement and visibility based on current state of app */
-    refreshState(): void {
-        let enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
-        let visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
+    // /* Function refreshes all enablement and visibility based on current state of app */
+    // refreshVisAndEnablement(): void {
+    //     this.state.enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
+    //     this.state.visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
 
-        //console.log("refreshState. " + this.jsClassName + " visible=" + visible + " enabled=" + enabled);
+    //     //console.log("refreshState. " + this.jsClassName + " visible=" + visible + " enabled=" + enabled);
 
-        this.mergeState({
-            enabled,
-            visible
-        });
-
-        //recursively set all children states
-        if (this.children && this.children.length > 0) {
-            this.children.forEach((child: Comp) => {
-                if (child) {
-                    child.refreshState();
-                }
-            });
-        }
-    }
+    //     //recursively set all children states
+    //     if (this.children && this.children.length > 0) {
+    //         this.children.forEach((child: Comp) => {
+    //             if (child) {
+    //                 child.refreshVisAndEnablement();
+    //             }
+    //         });
+    //     }
+    // }
 
     setDomAttr = (attrName: string, attrVal: string) => {
         this.whenElm((elm: HTMLElement) => {
@@ -136,15 +132,11 @@ export abstract class Comp implements CompIntf {
     }
 
     setIsEnabledFunc = (isEnabledFunc: Function) => {
-        if (!isEnabledFunc) return;
         this.isEnabledFunc = isEnabledFunc;
-        this.mergeState({ enabled: isEnabledFunc() });
     }
 
     setIsVisibleFunc = (isVisibleFunc: Function) => {
-        if (!isVisibleFunc) return;
         this.isVisibleFunc = isVisibleFunc;
-        this.mergeState({ visible: isVisibleFunc() });
     }
 
     static nextGuid(): number {
@@ -177,12 +169,21 @@ export abstract class Comp implements CompIntf {
 
     //WARNING: Use whenElmEx for DialogBase derived components!
     whenElm = (func: (elm: HTMLElement) => void) => {
+        console.log("whenElm running for " + this.jsClassName);
         if (this.domAddEventRan) {
-            //console.log("ran whenElm event immediately. domAddEvent had already ran");
+            console.log("ran whenElm event immediately. domAddEvent had already ran");
             func(this.getElement());
             return;
         }
 
+        let elm = this.getElement();
+        if (elm) {
+            console.log("Looked for and FOUND on DOM: " + this.jsClassName);
+            func(elm);
+            return;
+        }
+
+        console.log("queueing the function " + this.jsClassName);
         //queue up the 'func' to be called once the domAddEvent gets executed.
         if (!this.domAddFuncs) {
             this.domAddFuncs = [func];
@@ -195,12 +196,12 @@ export abstract class Comp implements CompIntf {
     /* WARNING: this is NOT a setter for 'this.visible'. Perhaps i need to rename it for better clarity, it takes
     this.visible as its input sometimes. Slightly confusing */
     setVisible = (visible: boolean) => {
-        this.mergeState({ visible });
+        this.mergeState({visible}); 
     }
 
     /* WARNING: this is NOT the setter for 'this.enabled' */
     setEnabled = (enabled: boolean) => {
-        this.mergeState({ enabled });
+        this.mergeState({enabled}); 
     }
 
     setClass = (clazz: string): void => {
@@ -234,20 +235,9 @@ export abstract class Comp implements CompIntf {
         this.children = comps || [];
     }
 
-    /**
-     * Elements can ignore this if they never call renderElement, but it's required to implement this to support renderElement
-     */
-    getTag = (): string => {
-        throw "getTag() was not overridden";
-    }
-
     getAttribs = (): Object => {
         return this.attribs;
     }
-
-    //=====================================================================
-    // ALL REACT functions should go below this divider
-    //=====================================================================
 
     renderHtmlElm = (elm: ReactElement): string => {
         return renderToString(elm);
@@ -265,7 +255,10 @@ export abstract class Comp implements CompIntf {
     }
 
     /* Attaches a react element directly to the dom at the DOM id specified. 
-       WARNING: This will only re-render the *children* under the target node and not the attributes or tag of the node itself.   
+       WARNING: This can only re-render the *children* under the target node and not the attributes or tag of the node itself. 
+       
+       Also this can only re-render TOP LEVEL elements, meaning elements that are not children of other React Elements, but attached
+       to the DOM old-school.
     */
     updateDOM = (id: string = null) => {
         if (!id) {
@@ -277,11 +270,23 @@ export abstract class Comp implements CompIntf {
         S.util.getElm(id, (elm: HTMLElement) => {
             //See #RulesOfHooks in this file, for the reason we blowaway the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
-            ReactDOM.render(S.e(this.render, this.attribs), elm);
+
+            let reactElm = S.e(this.render, this.attribs);
+
+            /* If this component has a store then wrap with the Redux Provider to make it all reactive */
+            if (this.store) {
+                //console.log("Rendering with provider");
+                let provider = S.e(Provider, { store: this.store }, reactElm);
+                ReactDOM.render(provider, elm);
+            }
+            else {
+                ReactDOM.render(reactElm, elm);
+            }
         });
     }
 
     makeReactChildren = (): ReactNode[] => {
+        //console.log("makeReactChildren: " + this.jsClassName);
         if (this.children == null || this.children.length == 0) return null;
         let reChildren: ReactNode[] = [];
 
@@ -290,7 +295,7 @@ export abstract class Comp implements CompIntf {
                 let reChild: ReactNode = null;
                 try {
                     //console.log("ChildRender: " + child.jsClassName);
-                    reChild = child.render();
+                    reChild = S.e(child.render, child.attribs);
                 }
                 catch (e) {
                     console.error("Failed to render child " + child.jsClassName + " attribs.key=" + child.attribs.key);
@@ -300,7 +305,7 @@ export abstract class Comp implements CompIntf {
                     reChildren.push(reChild);
                 }
                 else {
-                    console.log("ChildRenderd to null: " + child.jsClassName);
+                    //console.log("ChildRendered to null: " + child.jsClassName);
                 }
             }
         });
@@ -313,7 +318,11 @@ export abstract class Comp implements CompIntf {
 
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
     tagRender = (tag: string, content: string, props: any) => {
-        //console.log("Comp.tagRender: "+this.jsClassName+" id="+props.id);
+        //console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
+
+        this.state.enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
+        this.state.visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
+
         try {
             let children: any[] = this.makeReactChildren();
             if (children) {
@@ -339,40 +348,17 @@ export abstract class Comp implements CompIntf {
         }
     }
 
-    // WARNING: If you get an error like this:
-    // react-dom.development.js:506 Warning: React has detected a change in the order of Hooks called by null. This will lead to bugs and errors if not fixed. 
-    // For more information, read the Rules of Hooks: https://fb.me/rules-of-hooks 
-    // #RulesOfHooks
-    // that's an indication you've hit the MAJOR WEAKNESS in the design of React, that I won't discuss here, but the solution is to not
-    // use setState to render a component that will structurally change in ANY WAY at all (other than perhsps style change or actual content data 
-    // inside the already existing DOM elements)
-    hookState = (newState: any) => {
-        //console.log("hookState[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(newState));
-        const [state, setStateFunc] = useState(newState);
-        this.setStateFunc = setStateFunc;
-        this.state = state;
-        this.initialState = null;
-    }
-
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
-    both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact */
+   both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact */
     mergeState = (moreState: any): any => {
-        //If we still have an initial state then it's the 'active' state we need to merge into
-        if (this.initialState) {
-            this.initialState = { ...this.initialState, ...moreState };
-        }
-        //otherwise the actual 'state' itself is currently the active state to merge into.
-        else {
-            //NOTE: We use the functional variant of the setStateFunc so we can safely build on top of existing state, because remember
-            //React itself always has it's own internal copy of the state even aside from our 'this.state'
-            this.setStateFunc((state: any) => {
-                this.state = { ...state, ...moreState };
-                return this.state;
-            });
-        }
+        this.setState((state: any) => {
+            this.state = { ...state, ...moreState };
+            return this.state;
+        });
+
     }
 
-    /* Note: this method performs a direct state mod, but for react comps it gets overridden using useState return value 
+    /* Note: this method performs a direct state mod, until react overrides it using useState return value 
     
     To add new properties...use this pattern (mergeState above does this)
     setStateFunc(prevState => {
@@ -380,77 +366,58 @@ export abstract class Comp implements CompIntf {
         return {...prevState, ...updatedValues};
     });
     */
-    setState = (newState: any) => {
-        newState = newState || {};
-
-        // If 'hookState' has been called then this function should be pointing to whatever was returned from 'useState' 
-        if (!this.initialState) {
-            this.setStateFunc((state: any) => {
-                //Note that we abandon the old state with this function, and just take the 'newState'
-                this.state = newState;
-                return newState;
-            });
+    setState = (state: any) => {
+        //console.log("setState[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(state));
+        if (typeof state == "function") {
+            this.state = state(this.state);
         }
         else {
-            // If state not yet hooked, we keep the 'state' in initialState
-            this.initialState = newState;
-        }
-    }
-
-    // /* Sets the state bypassing the React re-render cycle. Because of the rules mentioned here: https://fb.me/rules-of-hooks, which are 
-    // completely unacceptable to me, I have a strategy where, whenever the DOM structure of some component can change dramatically,
-    // when re-rendered we just rely on being able to update the state with this method and then just call updateDOM at any point to
-    // completely re-render that entire element of the DOM tree, recursively deep also (without any risk of React stupidly barking at us that
-    // something in our DOM is 'out of order' */
-    updateState = (newState: any) => {
-        //these two lines proven to work.
-        // this.state = newState || {};
-        // this.initialState = null;
-
-        //but switching to these instead.
-        // If 'hookState' has been called then this function should be pointing to whatever was returned from 'useState' 
-        if (!this.initialState) {
-            this.state = newState;
-        }
-        else {
-            // If state not yet hooked, we keep the 'state' in initialState
-            this.initialState = newState;
+            this.state = state;
         }
     }
 
     getState = (): any => {
-        return this.state || this.initialState;
+        return this.state;
     }
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
     render = (): ReactNode => {
+        //console.log("rendering[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.state));
+        this.rendered = true;
+
         let ret: ReactNode = null;
         try {
-            this.hookState(this.initialState || this.state || {});
+            const [state, setState] = useState(this.state);
+            this.state = state;
+            this.setState = setState;
 
             /* This 'useEffect' call makes react call 'domAddEvent' once the dom element comes into existence on the acutal DOM */
             useEffect(this.domAddEvent, []);
 
-            // These two other effect hooks should work fine but just aren't needed yet.
+            // This hook should work fine but just isn't needed yet.
             // useEffect(() => {
             //     console.log("DOM UPDATE: " + this.jsClassName);
             // });
 
             /* 
-            This 'useEffect' call makes react call 'domAddEvent' once the dom element is removed from the acutal DOM.
+            This 'useEffect' call makes react call 'domRemoveEvent' once the dom element is removed from the acutal DOM.
             (NOTE: Remember this won't run for DialogBase because it's done using pure DOM Javascript, which is the same reason
             whenElmEx has to still exist right now)
             */
+            //console.log("calling useState hook2");
             useEffect(() => {
                 return () => {
                     this.domRemoveEvent();
                 }
             }, []);
 
+            this.state.enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
+            this.state.visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
+
             ret = this.compRender();
         }
         catch (e) {
-            console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key);
+            console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key + " Error: " + e);
         }
         return ret;
     }
@@ -462,6 +429,7 @@ export abstract class Comp implements CompIntf {
     }
 
     domAddEvent = (): void => {
+        //console.log("domAddEvent: " + this.jsClassName);
         this.domAddEventRan = true;
 
         if (this.domAddFuncs) {
@@ -471,7 +439,7 @@ export abstract class Comp implements CompIntf {
                 return;
             }
             else {
-                // console.log("domAddFuncs running for "+this.jsClassName+" for "+this.domAddFuncs.length+" functions.");
+                //console.log("domAddFuncs running for "+this.jsClassName+" for "+this.domAddFuncs.length+" functions.");
             }
             this.domAddFuncs.forEach((func) => {
                 func(elm);
@@ -482,7 +450,7 @@ export abstract class Comp implements CompIntf {
 
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state
     // manageent aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
-    compRender = (): ReactNode => {
+    public compRender = (): ReactNode => {
         if (true) {
             throw new Error("compRender should be overridden by the derived class.");
         }
@@ -490,9 +458,11 @@ export abstract class Comp implements CompIntf {
 
     //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
 
+    //todo-1: move this out into a utilities class.
     setDropHandler = (func: (elm: any) => void): void => {
 
         this.whenElm((elm: HTMLElement) => {
+            if (!elm) return;
 
             this.nonDragBorder = elm.style.borderLeft;
 

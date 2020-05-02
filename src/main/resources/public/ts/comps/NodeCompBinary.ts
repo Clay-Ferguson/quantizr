@@ -4,7 +4,6 @@ import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Div } from "../widget/Div";
 import { Icon } from "../widget/Icon";
-import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { ReactNode } from "react";
@@ -20,75 +19,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompBinary extends Comp {
-
-    comp: Comp = null;
+export class NodeCompBinary extends Div {
 
     constructor(public node: J.NodeInfo) {
         super();
-        this.comp = this.build();
-    }
-
-    build = (): Comp => {
-        let node = this.node;
-
-               /*
-         * If this is an image render the image directly onto the page as a visible image
-         */
-        if (S.props.hasImage(node)) {
-            return this.makeImageTag(node);
-        }
-        else if (S.props.hasVideo(node)) {
-            return new ButtonBar([
-                new Button("Play Video", () => {
-                    new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(node)).open();
-                }),
-                new Div("", {
-                    className: "videoDownloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(node), "[Download Video]")])
-            ], "marginAll");
-        }
-        else if (S.props.hasAudio(node)) {
-            return new ButtonBar([
-                new Button("Play Audio", () => {
-                    new AudioPlayerDlg(S.render.getStreamUrlForNodeAttachment(node)).open();
-                }),
-                new Div("", {
-                    className: "audioDownloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(node), "[Download Audio]")])
-            ], "marginAll");
-        }
-        /*
-         * If not an image we render a link to the attachment, so that it can be downloaded.
-         */
-        else {
-            let fileName: string = S.props.getNodePropVal(J.NodeProp.BIN_FILENAME, node);
-            let fileSize: string = S.props.getNodePropVal(J.NodeProp.BIN_SIZE, node);
-            let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
-
-            let viewFileLink: Anchor = null;
-            if (fileType == "application/pdf" || fileType.startsWith("text/")) {
-                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(node), "[View]", {
-                    target: "_blank",
-                    className: "marginLeft"
-                });
-            }
-
-            return new Div("", {
-                className: "binary-link",
-                title: "File Size:" + fileSize + " Type:" + fileType
-            }, [
-                new Icon("", null, {
-                    "style": { marginRight: '12px', verticalAlign: 'middle' },
-                    className: "fa fa-file fa-lg"
-                }),
-                new Span(fileName, {
-                    className: "normalText marginRight"
-                }),
-                new Anchor(S.render.getUrlForNodeAttachment(node), "[Download]"),
-                viewFileLink
-            ]);
-        }
     }
 
     makeImageTag = (node: J.NodeInfo): Img => {
@@ -134,8 +68,70 @@ export class NodeCompBinary extends Comp {
         return img;
     }
 
-    compRender = () : ReactNode => {
-        /* Delegate rendering to comp */
-        return this.comp.compRender();
+    super_CompRender: any = this.compRender;
+    compRender = (): ReactNode => {
+        let node = this.node;
+        if (!node) {
+            this.super_CompRender();
+        }
+
+        /* If this is an image render the image directly onto the page as a visible image */
+        if (S.props.hasImage(node)) {
+            this.setChildren([this.makeImageTag(node)]);
+        }
+        else if (S.props.hasVideo(node)) {
+            this.setChildren([new ButtonBar([
+                new Button("Play Video", () => {
+                    new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(node)).open();
+                }),
+                new Div("", {
+                    className: "videoDownloadLink"
+                }, [new Anchor(S.render.getUrlForNodeAttachment(node), "[Download Video]")])
+            ], "marginAll")]);
+        }
+        else if (S.props.hasAudio(node)) {
+            this.setChildren([new ButtonBar([
+                new Button("Play Audio", () => {
+                    new AudioPlayerDlg(S.render.getStreamUrlForNodeAttachment(node)).open();
+                }),
+                new Div("", {
+                    className: "audioDownloadLink"
+                }, [new Anchor(S.render.getUrlForNodeAttachment(node), "[Download Audio]")])
+            ], "marginAll")]);
+        }
+        /*
+         * If not an image we render a link to the attachment, so that it can be downloaded.
+         */
+        else {
+            let fileName: string = S.props.getNodePropVal(J.NodeProp.BIN_FILENAME, node);
+            let fileSize: string = S.props.getNodePropVal(J.NodeProp.BIN_SIZE, node);
+            let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+
+            let viewFileLink: Anchor = null;
+            if (fileType == "application/pdf" || fileType.startsWith("text/")) {
+                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(node), "[View]", {
+                    target: "_blank",
+                    className: "marginLeft"
+                });
+            }
+
+            this.setChildren([new Div("", {
+                className: "binary-link",
+                title: "File Size:" + fileSize + " Type:" + fileType
+            }, [
+                new Icon("", null, {
+                    "style": { marginRight: '12px', verticalAlign: 'middle' },
+                    className: "fa fa-file fa-lg"
+                }),
+                new Span(fileName, {
+                    className: "normalText marginRight"
+                }),
+                new Anchor(S.render.getUrlForNodeAttachment(node), "[Download]"),
+                viewFileLink
+            ])]);
+        }
+
+
+        return this.super_CompRender();
     }
 }

@@ -4,13 +4,11 @@ import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Comp } from "../widget/base/Comp";
 import { ReactNode } from "react";
-import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { NodeCompRowHeader } from "./NodeCompRowHeader";
-import { NodeCompMarkdown } from "./NodeCompMarkdown";
-import { NodeCompBinary } from "./NodeCompBinary";
 import { Div } from "../widget/Div";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { useSelector, useDispatch } from "react-redux";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -18,19 +16,19 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompMainList extends Comp {
-
-    comp: Comp = null;
+export class NodeCompMainList extends Div {
 
     //pass data.node into here
-    constructor(public rootNode: J.NodeInfo, public newData: boolean, public endReached: boolean) {
+    constructor() {
         super();
-        this.comp = this.build();
     }
 
-    build = (): Comp => {
+    build = (rootNode: J.NodeInfo, endReached: boolean): void => {
+        if (!rootNode) {
+            //console.log("NodeCompMainList.build: null. Nothing to render");
+            return null;
+        }
         let output: Comp[] = [];
-        let rootNode = this.rootNode;
 
         if (S.nav.mainOffset > 0) {
             let firstButton: Comp = new Button("First Page", S.view.firstPage,
@@ -48,17 +46,16 @@ export class NodeCompMainList extends Comp {
 
         output.push(new Div(null, { className: "clearfix" }));
 
-        //todo-0: how to get this correct INSIDE this compoent
         //this.lastOwner = rootNode.owner;
 
         //console.log("lastOwner (root)=" + data.node.owner);
         if (rootNode.children) {
             let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, rootNode);
             let allowNodeMove: boolean = !orderByProp;
-            output.push(S.render.renderChildren(rootNode, this.newData, 1, allowNodeMove));
+            output.push(S.render.renderChildren(rootNode, 1, allowNodeMove));
         }
 
-        if (!this.endReached) {
+        if (!endReached) {
             let nextButton = new Button("Next Page", S.view.nextPage,
                 {
                     id: "nextPageButton",
@@ -70,11 +67,16 @@ export class NodeCompMainList extends Comp {
             output.push(new ButtonBar([nextButton], "text-center marginTop"));
         }
 
-        return new Div(null, null, output);
+        this.setChildren(output);
     }
 
+    super_CompRender: any = this.compRender;
     compRender = (): ReactNode => {
-        /* Delegate rendering to comp */
-        return this.comp.compRender();
+        let node = useSelector((state: AppState) => {return state.node;});
+        let endReached = useSelector((state: AppState) => {return state.endReached;});
+
+        this.build(node, endReached);
+
+        return this.super_CompRender();
     }
 }

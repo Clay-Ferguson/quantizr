@@ -27,9 +27,7 @@ export class TextField extends Comp implements I.TextEditorIntf {
     }
 
     setFieldType = (fieldType: string) => {
-        this.mergeState({
-            fieldType
-        });
+        this.mergeState({fieldType});
     }
 
     insertTextAtCursor = (text: string) => {

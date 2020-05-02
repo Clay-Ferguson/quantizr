@@ -5,7 +5,6 @@ import { Constants as C } from "../Constants";
 import { Comp } from "../widget/base/Comp";
 import { ReactNode } from "react";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { NodeCompRowHeader } from "./NodeCompRowHeader";
 import { NodeCompMarkdown } from "./NodeCompMarkdown";
 import { NodeCompBinary } from "./NodeCompBinary";
 import { Div } from "../widget/Div";
@@ -16,31 +15,37 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompContent extends Comp {
-
-    comp: Comp = null;
+export class NodeCompContent extends Div {
 
     constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix = "") {
-        super();
-        this.comp = this.build();
+        super(null);
     }
 
-    build = (): Comp => {
+    super_CompRender: any = this.compRender;
+    compRender = (): ReactNode => {
         let node = this.node;
-        let ret: Comp[] = [];
+
+        if (!node) {
+            return this.super_CompRender();
+        }
+
+        //console.log("NodeCompContent node is rendering: "+S.util.prettyPrint(node));
+        this.attribs.id = node.id + "_" + this.idPrefix + "_content";
+
+        let children: Comp[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
 
-        /* todo-2: enable headerText when appropriate here */
-        if (S.meta64.showMetaData) {
-            if (this.showHeader) {
-                ret.push(new NodeCompRowHeader(node));
-            }
-        }
+        // /* todo-2: enable headerText when appropriate here */
+        // if (S.meta64.showMetaData) {
+        //     if (this.showHeader) {
+        //         children.push(new NodeCompRowHeader(node));
+        //     }
+        // }
 
         if (S.meta64.showProperties) {
             let propTable = S.props.renderProperties(node.properties);
             if (propTable) {
-                ret.push(propTable);
+                children.push(propTable);
             }
         } else {
             let renderComplete: boolean = false;
@@ -50,32 +55,25 @@ export class NodeCompContent extends Comp {
              */
             if (typeHandler) {
                 renderComplete = true;
-                ret.push(typeHandler.render(node, this.rowStyling));
+                children.push(typeHandler.render(node, this.rowStyling));
             }
 
             if (!renderComplete) {
                 let retState: any = {};
                 retState.renderComplete = renderComplete;
-                ret.push(new NodeCompMarkdown(node, retState));
+                children.push(new NodeCompMarkdown(node, retState));
                 renderComplete = retState.renderComplete;
-            }
-
-            if (!renderComplete) {
-                let properties = S.props.renderProperties(node.properties);
-                if (properties) {
-                    ret.push(properties);
-                }
             }
         }
 
-        /* if node owner matches node id this is someone's account root node, so what we're doing here is not
-        showing the normal attachment for this node, because that will the same as the avatar */
+        // /* if node owner matches node id this is someone's account root node, so what we're doing here is not
+        // showing the normal attachment for this node, because that will the same as the avatar */
         let isAnAccountNode = node.ownerId && node.id == node.ownerId;
 
         if (S.props.hasBinary(node) && !isAnAccountNode) {
             let binary = new NodeCompBinary(node);
 
-            //todo-0: bring this back. I already needed it again.
+            //todo-1: bring this back. I already needed it again.
             /*
              * We append the binary image or resource link either at the end of the text or at the location where
              * the user has put {{insert-attachment}} if they are using that to make the image appear in a specific
@@ -86,15 +84,12 @@ export class NodeCompContent extends Comp {
             // if (util.contains(ret, cnst.INSERT_ATTACHMENT)) {
             //     ret = S.util.replaceAll(ret, cnst.INSERT_ATTACHMENT, binary.render());
             // } else {
-            ret.push(binary);
+            children.push(binary);
             //}
         }
 
-        return new Div(null, { "id": node.id + "_" + this.idPrefix + "_content" }, ret);
-    }
+        this.setChildren(children);
 
-    compRender = (): ReactNode => {
-        /* Delegate rendering to comp */
-        return this.comp.compRender();
+        return this.super_CompRender();
     }
 }

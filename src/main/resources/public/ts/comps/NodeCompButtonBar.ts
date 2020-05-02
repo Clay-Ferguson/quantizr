@@ -20,9 +20,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompButtonBar extends Comp {
-
-    comp: HorizontalLayout = null;
+export class NodeCompButtonBar extends HorizontalLayout {
 
     /* need constructor option that tells us if this is 'root' node so we don't bother with:
         let upLevelButton: NavBarIconButton = null;
@@ -32,11 +30,10 @@ export class NodeCompButtonBar extends Comp {
         let timelineButton: NavBarIconButton = null;
     */
     constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean, public isRootNode: boolean) {
-        super();
-        this.comp = this.build();
+        super(null, "marginLeft");
     }
 
-    build = (): Comp => {
+    build = (): void => {
         let node = this.node;
 
         let typeIcon: Icon;
@@ -173,14 +170,14 @@ export class NodeCompButtonBar extends Comp {
                 insertNodeButton = new Button("Ins", () => { S.edit.insertNode(node.id); });
             }
 
-            //todo-0: does this editingAllows already factor in this logic?? --> S.edit.isEditAllowed(data.node) ???
             if (editingAllowed) {
                 editNodeButton = new Button(null, () => { S.edit.runEditNode(node.id); }, {
                     "iconclass": "fa fa-edit fa-lg"
                 });
 
                 //todo-0: get enablement correct for this (or visibility)
-                if (node.type != J.NodeType.REPO_ROOT) {
+                //bug: when I cut a node, the root node still shows this cut icon.
+                if (node.type != J.NodeType.REPO_ROOT && !S.edit.nodesToMove) {
                     cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(node); }, {
                         "iconclass": "fa fa-cut fa-lg"
                     });
@@ -205,7 +202,6 @@ export class NodeCompButtonBar extends Comp {
                     "iconclass": "fa fa-trash fa-lg"
                 });
 
-                //this.editingAllowed ?? factors in to this??? (todo-0)
                 if (!S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
                     pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(node, 'inside'); }, {
                         className: "highlightBorder"
@@ -237,16 +233,12 @@ export class NodeCompButtonBar extends Comp {
             buttonBar = null;
         }
 
-        let ret = new HorizontalLayout([selButton, avatarImg, typeIcon, encIcon, sharedIcon, buttonBar, navButtonBar], "marginLeft");
-
-        if (!ret.childrenExist()) {
-            ret = null;
-        }
-        return ret;
+        this.setChildren([selButton, avatarImg, typeIcon, encIcon, sharedIcon, buttonBar, navButtonBar]);
     }
 
+    super_CompRender: any = this.compRender;
     compRender = (): ReactNode => {
-        /* Delegate rendering to comp */
-        return this.comp.compRender();
+        this.build();
+        return this.super_CompRender();
     }
 }

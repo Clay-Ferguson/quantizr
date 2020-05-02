@@ -2,7 +2,7 @@ import * as I from "../Interfaces";
 import { Comp } from "./base/Comp";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { ReactNode } from "react";
 
 let S: Singletons;
@@ -12,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Textarea extends Comp implements I.TextEditorIntf {
 
-    constructor(private label: string, attribs: any=null) {
+    constructor(private label: string, attribs: any = null) {
         super(attribs);
         S.util.mergeProps(this.attribs, {
             className: "form-control pre-textarea"
@@ -20,7 +20,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         if (!this.attribs.rows) {
             this.attribs.rows = "5";
         }
-        this.setWordWrap(true);
+        this.state.wordWrap = true;
     }
 
     insertTextAtCursor = (text: string) => {
@@ -53,23 +53,21 @@ export class Textarea extends Comp implements I.TextEditorIntf {
     }
 
     setWordWrap = (wordWrap: boolean): void => {
-        this.mergeState({
-            wordWrap
-        });
+        this.mergeState({ wordWrap });
     }
 
     compRender = (): ReactNode => {
         let children = [];
-    
+
         if (this.label) {
             children.push(S.e('label', {
-                id: this.getId()+"_label",
-                key: this.getId()+"_label",
+                id: this.getId() + "_label",
+                key: this.getId() + "_label",
                 htmlFor: this.getId()
             }, this.label));
         }
 
-        let _attribs = {...this.attribs};
+        let _attribs = { ...this.attribs };
         if (!this.getState().wordWrap) {
             _attribs.style = {
                 whiteSpace: "nowrap",
@@ -79,8 +77,8 @@ export class Textarea extends Comp implements I.TextEditorIntf {
 
         children.push(S.e('textarea', _attribs, _attribs.value));
         return S.e('div', {
-            id: this.getId()+"_textfield",
-            key: this.getId()+"_textfield",
+            id: this.getId() + "_textfield",
+            key: this.getId() + "_textfield",
         }, children);
     }
 }

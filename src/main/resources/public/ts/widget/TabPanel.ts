@@ -1,4 +1,3 @@
-import { Comp } from "./base/Comp";
 import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
@@ -7,41 +6,35 @@ import { Ul } from "./Ul";
 import { Li } from "./Li";
 import { Anchor } from "./Anchor";
 import { ReactNode } from "react";
+import { MainTabComp } from "../comps/MainTabComp";
+import { SearchView } from "../comps/SearchView";
+import { TimelineView } from "../comps/TimelineView";
+import { useSelector, useDispatch } from "react-redux";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class TabPanel extends Comp {
+export class TabPanel extends Div {
 
-    static TAB_PREFIX: string = "tabVis";
-    tabVisibility: { [key: string]: boolean } = {};
-    activeTab: string = null;
+    activeTab: string = "mainTab";
 
     constructor() {
         super(null);
-
-        let obj = {};
-        obj[TabPanel.TAB_PREFIX + "-main"] = true;
-        obj[TabPanel.TAB_PREFIX + "-search"] = false;
-        obj[TabPanel.TAB_PREFIX + "-timeline"] = false;
-
-        this.mergeState(obj);
     }
 
-    setTabVisibility = (tabName: string, visible: boolean): void => {
-        let obj = {};
-        obj[TabPanel.TAB_PREFIX + "-" + tabName] = visible;
-        this.mergeState(obj);
-    }
-
+    super_CompRender: any = this.compRender;
     compRender = (): ReactNode => {
-        let state = this.getState();
-        let mainDisplay = state[TabPanel.TAB_PREFIX + "-main"] ? "inline" : "none";
-        let searchDisplay = state[TabPanel.TAB_PREFIX + "-search"] ? "inline" : "none";
-        let timelineDisplay = state[TabPanel.TAB_PREFIX + "-timeline"] ? "inline" : "none";
+        let searchResults = useSelector((state: AppState) => state.searchResults);
+        let timelineResults = useSelector((state: AppState) => state.timelineResults);
 
+        let mainDisplay = "inline";
+        let searchDisplay = searchResults ? "inline" : "none";
+        let timelineDisplay = timelineResults ? "inline" : "none";
+
+        /* If mainDisplay would be the only tab showing, then don't show that tab */
         if (searchDisplay == "none" && timelineDisplay == "none") {
             mainDisplay = "none";
         }
@@ -64,13 +57,11 @@ export class TabPanel extends Comp {
                         "data-toggle": "tab",
                         className: "nav-link",
                         onClick: () => {
-                            if (this.activeTab != "mainTab") {
-                                S.meta64.rebuildTab("mainTab");
-                            }
                             this.activeTab = "mainTab";
                         }
                     })]
                 ),
+
                 new Li(null, {
                     className: "nav-item",
                     style: { display: searchDisplay }
@@ -79,13 +70,11 @@ export class TabPanel extends Comp {
                         "data-toggle": "tab",
                         className: "nav-link",
                         onClick: () => {
-                            if (this.activeTab != "searchTab") {
-                                S.meta64.rebuildTab("searchTab");
-                            }
                             this.activeTab = "searchTab";
                         }
                     })]
                 ),
+
                 new Li(null, {
                     className: "nav-item",
                     style: { display: timelineDisplay }
@@ -94,9 +83,6 @@ export class TabPanel extends Comp {
                         "data-toggle": "tab",
                         className: "nav-link",
                         onClick: () => {
-                            if (this.activeTab != "timelineTab") {
-                                S.meta64.rebuildTab("timelineTab");
-                            }
                             this.activeTab = "timelineTab"
                         }
                     })]
@@ -122,44 +108,9 @@ export class TabPanel extends Comp {
             // id: "mainScrollingArea",
             role: "main",
         }, [
-            //MAIN TAB
-            //--------
-            new Div(null, {
-                id: "mainTab",
-                className: "tab-pane fade my-tab-pane"
-            }, [
-                new Div(null, {
-                    id: "mainNodeContent",
-                    //style: { 'marginTop': '.5rem' }
-                }),
-                new Div(null, {
-                    id: "listView",
-                    //className: "documentArea"
-                })
-            ]
-            ),
-            //SEARCH TAB
-            //----------
-            new Div(null, {
-                id: "searchTab",
-                className: "tab-pane fade my-tab-pane"
-            }, [
-                new Div("No Search Displaying", {
-                    id: "searchResultsPanel",
-                    className: "searchResultsPanel"
-                })]
-            ),
-            //TIMELINE TAB
-            //------------
-            new Div(null, {
-                id: "timelineTab",
-                className: "tab-pane fade my-tab-pane"
-            }, [
-                new Div("No Timeline Displaying", {
-                    id: "timelineResultsPanel",
-                    className: "timelinePanel"
-                })]
-            ),
+            new MainTabComp(),
+            new SearchView(),
+            new TimelineView(),
 
             // This works perfectly, but isn't ready to deploy yet.
             // //GRAPH TAB
@@ -174,9 +125,10 @@ export class TabPanel extends Comp {
         ]
         );
 
-        return new Div(null, this.attribs
-            , [
-                tabButtons, tabContent
-            ]).compRender();
+        this.setChildren([
+            tabButtons, tabContent
+        ]);
+
+        return this.super_CompRender();
     }
 }

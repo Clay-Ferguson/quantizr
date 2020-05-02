@@ -13,19 +13,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompVerticalRowLayout extends Comp {
+export class NodeCompVerticalRowLayout extends Div {
 
-    comp: Comp = null;
-
-    constructor(public node: J.NodeInfo, public newData: boolean, public level: number, public allowNodeMove: boolean) {
+    constructor(public node: J.NodeInfo, public level: number, public allowNodeMove: boolean) {
         super();
-        this.comp = this.build();
     }
 
-    build = (): Comp => {
+    build = (): void => {
         let node = this.node;
         let layoutClass = "node-table-row";
-        
+
         if (S.meta64.userPreferences.editMode) {
             layoutClass += " editing-border";
         }
@@ -37,7 +34,7 @@ export class NodeCompVerticalRowLayout extends Comp {
         let rowCount: number = 0;
         let comps: Comp[] = [];
         let countToDisplay = 0;
-        
+
         //we have to make a pass over children before main loop below, because we need the countToDisplay
         //to ber correct before the second loop stats.
         for (let i = 0; i < node.children.length; i++) {
@@ -52,12 +49,8 @@ export class NodeCompVerticalRowLayout extends Comp {
             if (!S.edit.nodesToMoveSet[n.id]) {
                 S.render.updateHighlightNode(n);
 
-                if (this.newData) {
-                    S.meta64.initNode(n, true);
-
-                    if (this.debug) {
-                        console.log(" RENDER ROW[" + i + "]: node.id=" + n.id);
-                    }
+                if (this.debug && n) {
+                    console.log(" RENDER ROW[" + i + "]: node.id=" + n.id);
                 }
 
                 let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove);
@@ -81,15 +74,16 @@ export class NodeCompVerticalRowLayout extends Comp {
                 }
 
                 if (n.children) {
-                    comps.push(S.render.renderChildren(n, this.newData, this.level + 1, this.allowNodeMove));
+                    comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
                 }
             }
         }
-        return new Div(null, null, comps);
+        this.setChildren(comps);
     }
 
-    compRender = () : ReactNode => {
-        /* Delegate rendering to comp */
-        return this.comp.compRender();
+    super_CompRender: any = this.compRender;
+    compRender = (): ReactNode => {
+        this.build();
+        return this.super_CompRender();
     }
 }

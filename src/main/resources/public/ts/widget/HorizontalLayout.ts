@@ -17,7 +17,7 @@ export class HorizontalLayout extends Comp {
         this.setChildren(initialComps);
     }
 
-    compRender = () : ReactNode => {
+    public compRender = () : ReactNode => {
         return this.tagRender('div', null, this.attribs);
     }
 }

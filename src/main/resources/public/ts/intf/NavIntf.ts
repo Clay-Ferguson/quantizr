@@ -2,14 +2,11 @@ import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { CompIntf } from "../widget/base/CompIntf";
 import { DialogBaseImpl } from "../DialogBaseImpl";
-import { MainTabPanelIntf } from "./MainTabPanelIntf";
 
 export interface NavIntf {
     _UID_ROWID_PREFIX: string;
 
     mainMenuPopupDlg: DialogBaseImpl;
-    mainNavPanel: CompIntf;
-    mainTabPanel: MainTabPanelIntf;
 
     mainOffset: number;
     endReached: boolean;
