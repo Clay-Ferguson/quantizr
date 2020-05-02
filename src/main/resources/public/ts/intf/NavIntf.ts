@@ -28,7 +28,7 @@ export interface NavIntf {
     navOpenSelectedNode(): void;
     getSelectedDomElement(): HTMLElement;
     clickOnNodeRow(id: string): void;
-    openNodeById(id: string, scrollToFirstChild: boolean): void;
+    openNodeById(id: string): void;
     toggleNodeSel(selected: boolean, id: string): void;
     navPageNodeResponse(res: J.RenderNodeResponse): void;
     navHome(): void;

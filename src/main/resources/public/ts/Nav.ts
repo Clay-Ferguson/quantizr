@@ -84,7 +84,7 @@ export class Nav implements NavIntf {
     navOpenSelectedNode = (): void => {
         let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode();
         if (!currentSelNode) return;
-        S.nav.openNodeById(currentSelNode.id, true);
+        S.nav.openNodeById(currentSelNode.id);
     }
 
     navToSibling = (siblingOffset: number): void => {
@@ -218,14 +218,14 @@ export class Nav implements NavIntf {
         }, this.navPageNodeResponse);
     }
 
-    openNodeById = (id: string, scrollToFirstChild?: boolean): void => {
+    openNodeById = (id: string): void => {
         let node: J.NodeInfo = S.meta64.idToNodeMap[id];
         S.meta64.highlightNode(node, false);
 
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id);
         } else {
-            S.view.refreshTree(node.id, true, null, false, false, scrollToFirstChild);
+            S.view.refreshTree(node.id, true, null, false, false);
         }
     }
 

@@ -132,7 +132,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
             (node.hasChildren || node.type == "fs:folder" || node.type == "fs:lucene" || node.type == "ipfs:node")) {
 
             /* convert this button to a className attribute for styles */
-            openButton = new Button("Open", () => { S.nav.openNodeById(node.id, true) }, null, "btn-primary");
+            openButton = new Button("Open", () => { S.nav.openNodeById(node.id) }, null, "btn-primary");
         }
 
         /*
@@ -171,8 +171,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     "iconclass": "fa fa-edit fa-lg"
                 });
 
-                //todo-0: get enablement correct for this (or visibility)
-                //bug: when I cut a node, the root node still shows this cut icon.
                 if (!this.isRootNode && node.type != J.NodeType.REPO_ROOT && !nodesToMove) {
                     cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(node); }, {
                         "iconclass": "fa fa-cut fa-lg"

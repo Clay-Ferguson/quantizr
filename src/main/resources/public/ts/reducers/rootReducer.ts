@@ -22,12 +22,12 @@ export function rootReducer(state: AppState = initialState, /* action: Action<an
 
     console.log("Action: " + action.type);
 
-    /* If this AppAction has function, then call it */
-    if (action.func) {
-        return action.func(state);
+    /* If this AppAction has 'updateNew' use it to get the new state */
+    if (action.updateNew) {
+        state = action.updateNew(state);
     }
-
-    if (action.update) {
+    /* If this AppAction has 'update' use it to update existing state */
+    else if (action.update) {
         action.update(state);
     }
 

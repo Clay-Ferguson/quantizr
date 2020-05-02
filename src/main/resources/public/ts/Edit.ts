@@ -123,7 +123,6 @@ export class Edit implements EditIntf {
     private moveNodesResponse = (res: J.MoveNodesResponse): void => {
         if (S.util.checkSuccess("Move nodes", res)) {
 
-            //todo-0: streamline this dispatching approach
             S.meta64.dispatch({
                 type: "Action_SetNodesToMove",
                 update: (state: AppState): void => {

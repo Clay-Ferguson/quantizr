@@ -1,15 +1,9 @@
-import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 
 export interface ViewIntf {
     docElm: any;
 
-    refreshTree(nodeId?: string, 
-        renderParentIfLeaf?: boolean, 
-        highlightId?: string, 
-        isInitialRender?: boolean, 
-        forceIPFSRefresh?: boolean,
-        scrollToFirstChild?: boolean): void;
+    refreshTree(nodeId?: string, renderParentIfLeaf?: boolean, highlightId?: string, isInitialRender?: boolean, forceIPFSRefresh?: boolean): void;
     firstPage(): void;
     prevPage(): void;
     nextPage(): void;

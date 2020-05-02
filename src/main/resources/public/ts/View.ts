@@ -20,11 +20,8 @@ export class View implements ViewIntf {
 
     /*
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
-
-     //scrollToFirstChild not used (todo-0)
      */
-    refreshTree = (nodeId?: string, renderParentIfLeaf?: boolean, highlightId?: string, isInitialRender?: boolean, forceIPFSRefresh?: boolean,
-        scrollToFirstChild?: boolean): void => {
+    refreshTree = (nodeId?: string, renderParentIfLeaf?: boolean, highlightId?: string, isInitialRender?: boolean, forceIPFSRefresh?: boolean): void => {
         console.log("refreshTree()");
 
         if (!nodeId) {
