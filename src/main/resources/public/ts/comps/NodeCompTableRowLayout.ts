@@ -6,6 +6,8 @@ import { Comp } from "../widget/base/Comp";
 import { ReactNode } from "react";
 import { NodeCompRow } from "./NodeCompRow";
 import { Div } from "../widget/Div";
+import { AppState } from "../AppState";
+import { useSelector, useDispatch } from "react-redux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,6 +22,7 @@ export class NodeCompTableRowLayout extends Div {
     }
 
     build = (): void => {
+        let nodesToMove = useSelector((state: AppState) => state.nodesToMove);
         let node = this.node;
         let curRow = new Div(null, { className: 'node-grid-row' });
         let children: Comp[] = [];
@@ -43,7 +46,7 @@ export class NodeCompTableRowLayout extends Div {
             let comps: Comp[] = [];
             let n: J.NodeInfo = node.children[i];
 
-            if (!S.edit.nodesToMove.find((elm: J.NodeInfo) => elm.id == n.id)) {
+            if (!(nodesToMove && nodesToMove.find(id => id == n.id))) {
                 S.render.updateHighlightNode(n);
 
                 if (this.debug && n) {

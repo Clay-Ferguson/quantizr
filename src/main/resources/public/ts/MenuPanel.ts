@@ -19,7 +19,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class MenuPanel extends Div {
 
-    constructor() {
+    constructor(public nodesToMove: string[]) {
         super(null, {
             id: "accordion",
             role: "tablist"
@@ -58,7 +58,7 @@ export class MenuPanel extends Div {
             ]),
             new Menu("Edit", [              
                 //new MenuItem("Cut", S.edit.cutSelNodes, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 && S.meta64.state.selNodeIsMine }), //
-                new MenuItem("Undo Cut", S.edit.undoCutSelNodes, () => { return !S.meta64.isAnonUser && S.edit.nodesToMove != null }), //
+                new MenuItem("Undo Cut", S.edit.undoCutSelNodes, () => { return !S.meta64.isAnonUser && nodesToMove != null }), //
 
                 /*
                 I have this feature 90% complete but near the end i realized i have a problem with id v.s. uid, because uid

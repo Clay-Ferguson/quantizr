@@ -10,4 +10,7 @@ export class AppState {
 
     searchResults: NodeInfo[];
     timelineResults: NodeInfo[];
+
+    /* Node Ids to move */
+    nodesToMove: string[];
 }

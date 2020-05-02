@@ -265,12 +265,12 @@ export class Nav implements NavIntf {
         }
     }
 
-    showMainMenu = (): void => {
+    showMainMenu = (nodesToMove: string[]): void => {
         S.meta64.updateState();
         //todo-1: Note: currently S.meta64.refreshAllGuiEnablement has a tight coupling to this for enablement.
 
         S.meta64.refreshAllGuiEnablement();
-        this.mainMenuPopupDlg = new MainMenuPopupDlg();
+        this.mainMenuPopupDlg = new MainMenuPopupDlg(nodesToMove);
         this.mainMenuPopupDlg.open("inline-block");
     }
 

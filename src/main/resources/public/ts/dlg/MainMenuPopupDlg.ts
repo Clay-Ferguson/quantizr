@@ -11,9 +11,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class MainMenuPopupDlg extends DialogBase {
 
-    constructor() {
+    constructor(public nodesToMove: string[]) {
         super(null, "app-modal-menu", true, true);
-        let menu = new MenuPanel();
+        let menu = new MenuPanel(nodesToMove);
         this.setChildren([
             menu
         ]);

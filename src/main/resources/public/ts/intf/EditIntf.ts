@@ -3,7 +3,6 @@ import * as J from "../JavaIntf";
 
 export interface EditIntf {
     showReadOnlyProperties: boolean;
-    nodesToMove: any;
     parentOfNewNode: J.NodeInfo;
     nodeInsertTarget: any;
 
@@ -37,7 +36,7 @@ export interface EditIntf {
     getBestPostDeleteSelNode(): J.NodeInfo;
     cutSelNodes(node: J.NodeInfo): void;
     undoCutSelNodes(): void;
-    pasteSelNodes(node: J.NodeInfo, location: string): void;
+    pasteSelNodes(node: J.NodeInfo, location: string, nodesToMove: string[]): void;
     insertBookWarAndPeace(): void;
     emptyTrash(): void;
 }

@@ -12,6 +12,8 @@ import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { ReactNode } from "react";
 import { NavBarIconButton } from "../widget/NavBarIconButton";
 import { SearchContentDlg } from "../dlg/SearchContentDlg";
+import { AppState } from "../AppState";
+import { useSelector, useDispatch } from "react-redux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -27,6 +29,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
     super_CompRender: any = this.compRender;
     compRender = (): ReactNode => {
+        let nodesToMove = useSelector((state: AppState) => state.nodesToMove);
         let node = this.node;
 
         let typeIcon: Icon;
@@ -168,12 +171,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     "iconclass": "fa fa-edit fa-lg"
                 });
 
-                let hasNodesToMove = S.edit.nodesToMove
-                console.log(">>>>>>>>>> NODE id=" + node.id + " type=" + node.type + " hasNodesToMove=" + hasNodesToMove);
-
                 //todo-0: get enablement correct for this (or visibility)
                 //bug: when I cut a node, the root node still shows this cut icon.
-                if (node.type != J.NodeType.REPO_ROOT && !S.edit.nodesToMove) {
+                if (node.type != J.NodeType.REPO_ROOT && !nodesToMove) {
                     cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(node); }, {
                         "iconclass": "fa fa-cut fa-lg"
                     });
@@ -198,8 +198,8 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     "iconclass": "fa fa-trash fa-lg"
                 });
 
-                if (!S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
-                    pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(node, 'inside'); }, {
+                if (!S.meta64.isAnonUser && nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
+                    pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(node, 'inside', nodesToMove); }, {
                         className: "highlightBorder"
                     });
                 }

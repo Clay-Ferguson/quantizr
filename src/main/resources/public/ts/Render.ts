@@ -281,10 +281,10 @@ export class Render implements RenderIntf {
     
     The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
     */
-    createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean): Comp => {
+    createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, nodesToMove: string[]): Comp => {
 
         let pasteInlineButton: Button = null;
-        if (!S.meta64.isAnonUser && S.edit.nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
+        if (!S.meta64.isAnonUser && nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
 
             let target = null;
             if (S.nav.endReached) {
@@ -297,7 +297,7 @@ export class Render implements RenderIntf {
                 target = "inline";
             }
 
-            pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes(node, target); }, {
+            pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes(node, target, nodesToMove); }, {
                 className: "highlightBorder"
             });
         }

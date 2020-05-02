@@ -10,6 +10,7 @@ import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
+import { AppState } from "./AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -19,11 +20,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Edit implements EditIntf {
 
     showReadOnlyProperties: boolean = true;
-    /*
-     * Node ID array of nodes that are ready to be moved when user clicks 'Finish Moving'
-     */
-    nodesToMove: any = null;
-
     parentOfNewNode: J.NodeInfo = null;
 
     /*
@@ -126,7 +122,16 @@ export class Edit implements EditIntf {
 
     private moveNodesResponse = (res: J.MoveNodesResponse): void => {
         if (S.util.checkSuccess("Move nodes", res)) {
-            this.nodesToMove = null; // reset
+
+            //todo-0: streamline this dispatching approach
+            S.meta64.store.dispatch({
+                type: "Action_SetNodesToMove",
+                func: function (state: AppState): AppState {
+                    state.nodesToMove = null;
+                    return state;
+                }
+            });
+
             S.view.refreshTree(null, false);
         }
     }
@@ -549,7 +554,14 @@ export class Edit implements EditIntf {
     }
 
     undoCutSelNodes = async (): Promise<void> => {
-        this.nodesToMove = null; // reset
+
+        S.meta64.store.dispatch({
+            type: "Action_SetNodesToMove",
+            func: function (state: AppState): AppState {
+                state.nodesToMove = null;
+                return state;
+            }
+        });
 
         /* now we render again and the nodes that were cut will disappear from view */
         await S.render.renderPageFromData();
@@ -562,7 +574,13 @@ export class Edit implements EditIntf {
 
         new ConfirmDlg("Cut " + selNodesArray.length + " node(s), to paste/move to new location ?", "Confirm Cut",
             async () => {
-                this.nodesToMove = selNodesArray;
+                S.meta64.store.dispatch({
+                    type: "Action_SetNodesToMove",
+                    func: function (state: AppState): AppState {
+                        state.nodesToMove = selNodesArray;
+                        return state;
+                    }
+                });
                 S.meta64.selectedNodes = {}; // clear selections.
 
                 /* now we render again and the nodes that were cut will disappear from view */
@@ -572,7 +590,7 @@ export class Edit implements EditIntf {
     }
 
     //location=inside | inline | inline-above (todo-1: put in java-aware enum)
-    pasteSelNodes = (node: J.NodeInfo, location: string): void => {
+    pasteSelNodes = (node: J.NodeInfo, location: string, nodesToMove: string[]): void => {
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently selected
          * page. Later on we can get more specific about allowing precise destination location for moved
@@ -580,7 +598,7 @@ export class Edit implements EditIntf {
          */
         S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             "targetNodeId": node.id,
-            "nodeIds": this.nodesToMove,
+            "nodeIds": nodesToMove,
             "location": location
         }, this.moveNodesResponse);
     }

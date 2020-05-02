@@ -33,7 +33,7 @@ export interface NavIntf {
     navPageNodeResponse(res: J.RenderNodeResponse): void;
     navHome(): void;
     navPublicHome(): void;
-    showMainMenu(): void;
+    showMainMenu(nodesToMove: string[]): void;
     navToSibling(siblingOffset: number): void;
 }
 

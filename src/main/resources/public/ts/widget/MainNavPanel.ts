@@ -28,6 +28,7 @@ export class MainNavPanel extends NavTag {
         //console.log("Rendering MainNavPanel");
 
         const title = useSelector((state: AppState) => state.title);
+        const nodesToMove = useSelector((state: AppState) => state.nodesToMove);
         const dispatch = useDispatch();
 
         // navbar-expand-sm would makes it collapsable, but messes up top margin.
@@ -164,7 +165,7 @@ export class MainNavPanel extends NavTag {
                 }, [
                     new NavBarIconButton("fa-bars", "Quantizr", {
                         "onClick": e => {
-                            S.nav.showMainMenu();
+                            S.nav.showMainMenu(nodesToMove);
                         },
                         "id": "mainMenu",
                         "title": "Show Main Menu"

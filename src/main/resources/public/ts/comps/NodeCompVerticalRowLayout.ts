@@ -6,6 +6,8 @@ import { Comp } from "../widget/base/Comp";
 import { ReactNode } from "react";
 import { NodeCompRow } from "./NodeCompRow";
 import { Div } from "../widget/Div";
+import { AppState } from "../AppState";
+import { useSelector, useDispatch } from "react-redux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,6 +22,7 @@ export class NodeCompVerticalRowLayout extends Div {
     }
 
     build = (): void => {
+        let nodesToMove = useSelector((state: AppState) => state.nodesToMove);
         let node = this.node;
         let layoutClass = "node-table-row";
 
@@ -39,14 +42,14 @@ export class NodeCompVerticalRowLayout extends Div {
         //to ber correct before the second loop stats.
         for (let i = 0; i < node.children.length; i++) {
             let n: J.NodeInfo = node.children[i];
-            if (!S.edit.nodesToMove.find((elm: J.NodeInfo) => elm.id == n.id)) {
+            if (!(nodesToMove && nodesToMove.find(id => id == n.id))) {
                 countToDisplay++;
             }
         }
 
         for (let i = 0; i < node.children.length; i++) {
             let n: J.NodeInfo = node.children[i];
-            if (!S.edit.nodesToMove.find((elm: J.NodeInfo) => elm.id == n.id)) {
+            if (!(nodesToMove && nodesToMove.find(id => id == n.id))) {
                 S.render.updateHighlightNode(n);
 
                 if (this.debug && n) {
@@ -56,7 +59,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove);
 
                 if (rowCount == 0 && S.meta64.userPreferences.editMode) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false));
+                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false, nodesToMove));
 
                     //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     comps.push(new Div(null, { className: "clearfix" }));
@@ -67,7 +70,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 rowCount++;
 
                 if (S.meta64.userPreferences.editMode) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay));
+                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay, nodesToMove));
 
                     //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     comps.push(new Div(null, { className: "clearfix" }));
