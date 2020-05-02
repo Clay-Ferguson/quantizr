@@ -155,7 +155,6 @@ export class Render implements RenderIntf {
                     } 
                     //Otherwise we are rendering new data and need to initialize some things
                     else {
-
                         S.meta64.setCurrentNodeData(data);
                         S.meta64.updateNodeMap(data.node);
                         S.meta64.selectedNodes = {};
@@ -174,12 +173,11 @@ export class Render implements RenderIntf {
                         console.log("RENDER NODE: " + data.node.id + " propCount=" + propCount);
                     }
 
-                    S.meta64.store.dispatch({
+                    S.meta64.dispatch({
                         type: "Action_RenderPage",
-                        func: function (state: AppState): AppState {
+                        update: (state: AppState): void => {
                             state.node = S.meta64.currentNodeData.node;
                             state.endReached = S.nav.endReached;
-                            return state;
                         }
                     });
 

@@ -19,7 +19,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Meta64 implements Meta64Intf {
 
     mainTabPanel: MainTabPanelIntf;
-
     app: App;
     store: any;
 
@@ -784,13 +783,18 @@ export class Meta64 implements Meta64Intf {
             title += "User: " + res.userName;
         }
 
-        S.meta64.store.dispatch({
+        this.dispatch({
             type: "Action_LoginResponse",
-            func: function (state: AppState): AppState {
+            update: (state: AppState): void => {
                 state.title = title;
-                return state;
             }
         });
     }
-}
 
+    dispatch = (action: Object) => {
+        if (!S.meta64.store) {
+            throw new Error("store not ready.");
+        }
+        this.store.dispatch(action);
+    }
+}

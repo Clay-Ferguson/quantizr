@@ -24,8 +24,12 @@ export function rootReducer(state: AppState = initialState, /* action: Action<an
 
     /* If this AppAction has function, then call it */
     if (action.func) {
-        //action.func.bind(this);
         return action.func(state);
     }
+
+    if (action.update) {
+        action.update(state);
+    }
+
     return state;
 }

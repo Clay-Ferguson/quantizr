@@ -8,6 +8,7 @@ import { CompIntf } from "./widget/base/CompIntf";
 export interface AppAction extends Action<any> {
     type: string;
     func?: (AppState: any) => AppState;
+    update?: (AppState: any) => void;
     data?: any;
 }
 

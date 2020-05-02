@@ -91,5 +91,6 @@ export interface Meta64Intf {
     onSignIn(googleUser);
     setStateVarsUsingLoginResponse(res: J.LoginResponse): void;
     updateNodeMap(node: J.NodeInfo): void;
+    dispatch(action: Object): void;
 }
 

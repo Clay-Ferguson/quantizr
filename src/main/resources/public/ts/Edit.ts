@@ -124,11 +124,10 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Move nodes", res)) {
 
             //todo-0: streamline this dispatching approach
-            S.meta64.store.dispatch({
+            S.meta64.dispatch({
                 type: "Action_SetNodesToMove",
-                func: function (state: AppState): AppState {
+                update: (state: AppState): void => {
                     state.nodesToMove = null;
-                    return state;
                 }
             });
 
@@ -555,11 +554,10 @@ export class Edit implements EditIntf {
 
     undoCutSelNodes = async (): Promise<void> => {
 
-        S.meta64.store.dispatch({
+        S.meta64.dispatch({
             type: "Action_SetNodesToMove",
-            func: function (state: AppState): AppState {
+            update: (state: AppState): void => {
                 state.nodesToMove = null;
-                return state;
             }
         });
 
@@ -574,11 +572,10 @@ export class Edit implements EditIntf {
 
         new ConfirmDlg("Cut " + selNodesArray.length + " node(s), to paste/move to new location ?", "Confirm Cut",
             async () => {
-                S.meta64.store.dispatch({
+                S.meta64.dispatch({
                     type: "Action_SetNodesToMove",
-                    func: function (state: AppState): AppState {
+                    update: (state: AppState): void => {
                         state.nodesToMove = selNodesArray;
-                        return state;
                     }
                 });
                 S.meta64.selectedNodes = {}; // clear selections.

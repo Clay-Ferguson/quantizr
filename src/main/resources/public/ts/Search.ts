@@ -42,11 +42,10 @@ export class Search implements SearchIntf {
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
 
-        S.meta64.store.dispatch({
+        S.meta64.dispatch({
             type: "Action_RenderSearchResults",
-            func: function (state: AppState): AppState {
+            update: (state: AppState): void => {
                 state.searchResults = res.searchResults;
-                return state;
             }
         });
 
@@ -55,11 +54,10 @@ export class Search implements SearchIntf {
 
     timelineResponse = (res: J.NodeSearchResponse) => {
 
-        S.meta64.store.dispatch({
+        S.meta64.dispatch({
             type: "Action_RenderTimelineResults",
-            func: function (state: AppState): AppState {
+            update: (state: AppState): void => {
                 state.timelineResults = res.searchResults;
-                return state;
             }
         });
         S.meta64.selectTab("timelineTab");

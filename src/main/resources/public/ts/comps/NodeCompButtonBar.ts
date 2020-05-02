@@ -173,7 +173,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
                 //todo-0: get enablement correct for this (or visibility)
                 //bug: when I cut a node, the root node still shows this cut icon.
-                if (node.type != J.NodeType.REPO_ROOT && !nodesToMove) {
+                if (!this.isRootNode && node.type != J.NodeType.REPO_ROOT && !nodesToMove) {
                     cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(node); }, {
                         "iconclass": "fa fa-cut fa-lg"
                     });
