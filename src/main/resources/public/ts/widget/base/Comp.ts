@@ -10,6 +10,7 @@ import * as ReactDOM from "react-dom";
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { ReactNode, ReactElement, useState, useEffect } from "react";
 import { Provider } from 'react-redux';
+import { AppState } from "../../AppState";
 
 //tip: merging states: this.state = { ...this.state, ...moreState };
 
@@ -32,9 +33,7 @@ export abstract class Comp implements CompIntf {
 
     public debug: boolean = false;
     private static guid: number = 0;
-
-    //This must private so that getState us used instead which might return 'state' but it also might return 'initialState'
-    public state: any = {}; //todo-0: typesafety here
+    public state: any = {}; 
 
     static idToCompMap: { [key: string]: Comp } = {};
     attribs: any;
@@ -285,6 +284,7 @@ export abstract class Comp implements CompIntf {
         });
     }
 
+    //todo-0: rename to buildChildren
     makeReactChildren = (): ReactNode[] => {
         //console.log("makeReactChildren: " + this.jsClassName);
         if (this.children == null || this.children.length == 0) return null;
@@ -355,7 +355,6 @@ export abstract class Comp implements CompIntf {
             this.state = { ...state, ...moreState };
             return this.state;
         });
-
     }
 
     /* Note: this method performs a direct state mod, until react overrides it using useState return value 

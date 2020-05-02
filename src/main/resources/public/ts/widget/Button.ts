@@ -28,8 +28,6 @@ export class Button extends Comp {
     }
 
     compRender = (): ReactNode => {
-        console.log("CompRender Button: " + this.jsClassName);
-
         let icon: any;
         if (this.attribs.iconclass) {
             icon = S.e('i', {

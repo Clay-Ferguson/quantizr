@@ -4,7 +4,6 @@ import * as J from "../JavaIntf";
 export interface EditIntf {
     showReadOnlyProperties: boolean;
     nodesToMove: any;
-    nodesToMoveSet: Object;
     parentOfNewNode: J.NodeInfo;
     nodeInsertTarget: any;
 

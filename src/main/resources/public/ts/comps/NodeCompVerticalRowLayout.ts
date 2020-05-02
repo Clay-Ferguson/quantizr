@@ -39,14 +39,14 @@ export class NodeCompVerticalRowLayout extends Div {
         //to ber correct before the second loop stats.
         for (let i = 0; i < node.children.length; i++) {
             let n: J.NodeInfo = node.children[i];
-            if (!S.edit.nodesToMoveSet[n.id]) {
+            if (!S.edit.nodesToMove.find((elm: J.NodeInfo) => elm.id == n.id)) {
                 countToDisplay++;
             }
         }
 
         for (let i = 0; i < node.children.length; i++) {
             let n: J.NodeInfo = node.children[i];
-            if (!S.edit.nodesToMoveSet[n.id]) {
+            if (!S.edit.nodesToMove.find((elm: J.NodeInfo) => elm.id == n.id)) {
                 S.render.updateHighlightNode(n);
 
                 if (this.debug && n) {

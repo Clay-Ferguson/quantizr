@@ -24,11 +24,6 @@ export class Edit implements EditIntf {
      */
     nodesToMove: any = null;
 
-    /* todo-1: need to find out if there's a better way to do an ordered set in javascript so I don't need
-    both nodesToMove and nodesToMoveSet
-    */
-    nodesToMoveSet: Object = {};
-
     parentOfNewNode: J.NodeInfo = null;
 
     /*
@@ -132,7 +127,6 @@ export class Edit implements EditIntf {
     private moveNodesResponse = (res: J.MoveNodesResponse): void => {
         if (S.util.checkSuccess("Move nodes", res)) {
             this.nodesToMove = null; // reset
-            this.nodesToMoveSet = {};
             S.view.refreshTree(null, false);
         }
     }
@@ -556,7 +550,6 @@ export class Edit implements EditIntf {
 
     undoCutSelNodes = async (): Promise<void> => {
         this.nodesToMove = null; // reset
-        this.nodesToMoveSet = {};
 
         /* now we render again and the nodes that were cut will disappear from view */
         await S.render.renderPageFromData();
@@ -570,20 +563,12 @@ export class Edit implements EditIntf {
         new ConfirmDlg("Cut " + selNodesArray.length + " node(s), to paste/move to new location ?", "Confirm Cut",
             async () => {
                 this.nodesToMove = selNodesArray;
-                this.loadNodesToMoveSet(selNodesArray);
                 S.meta64.selectedNodes = {}; // clear selections.
 
                 /* now we render again and the nodes that were cut will disappear from view */
                 await S.render.renderPageFromData();
             }
         ).open();
-    }
-
-    private loadNodesToMoveSet = (nodeIds: string[]) => {
-        this.nodesToMoveSet = {};
-        for (let id of nodeIds) {
-            this.nodesToMoveSet[id] = true;
-        }
     }
 
     //location=inside | inline | inline-above (todo-1: put in java-aware enum)

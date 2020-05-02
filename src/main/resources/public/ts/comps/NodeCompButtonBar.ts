@@ -3,7 +3,6 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Icon } from "../widget/Icon";
-import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { Checkbox } from "../widget/Checkbox";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
@@ -22,18 +21,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompButtonBar extends HorizontalLayout {
 
-    /* need constructor option that tells us if this is 'root' node so we don't bother with:
-        let upLevelButton: NavBarIconButton = null;
-        let prevButton: NavBarIconButton = null;
-        let nextButton: NavBarIconButton = null;
-        let searchButton: NavBarIconButton = null;
-        let timelineButton: NavBarIconButton = null;
-    */
     constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean, public isRootNode: boolean) {
         super(null, "marginLeft");
     }
 
-    build = (): void => {
+    super_CompRender: any = this.compRender;
+    compRender = (): ReactNode => {
         let node = this.node;
 
         let typeIcon: Icon;
@@ -175,6 +168,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     "iconclass": "fa fa-edit fa-lg"
                 });
 
+                let hasNodesToMove = S.edit.nodesToMove
+                console.log(">>>>>>>>>> NODE id=" + node.id + " type=" + node.type + " hasNodesToMove=" + hasNodesToMove);
+
                 //todo-0: get enablement correct for this (or visibility)
                 //bug: when I cut a node, the root node still shows this cut icon.
                 if (node.type != J.NodeType.REPO_ROOT && !S.edit.nodesToMove) {
@@ -234,11 +230,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
         }
 
         this.setChildren([selButton, avatarImg, typeIcon, encIcon, sharedIcon, buttonBar, navButtonBar]);
-    }
-
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
-        this.build();
         return this.super_CompRender();
     }
 }

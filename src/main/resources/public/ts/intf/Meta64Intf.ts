@@ -1,11 +1,12 @@
 import * as J from "../JavaIntf";
 import { GraphPanel } from "../widget/GraphPanel";
 import { MainTabPanelIntf } from "../Interfaces";
+import { CompIntf } from "../widget/base/CompIntf";
 
 export interface Meta64Intf {
 
     mainTabPanel: MainTabPanelIntf;
-    app: any; //todo-0: typesafety here
+    app: CompIntf;
     store: any;
 
     //change to AppState type ?

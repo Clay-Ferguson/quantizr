@@ -19,19 +19,9 @@ export class View implements ViewIntf {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
     /*
-     * newId is optional parameter which, if supplied, should be the id we scroll to when finally done with the
-     * render.
-     */
-    refreshTreeResponse = async (res?: J.RenderNodeResponse, targetId?: any, scrollToTop?: boolean): Promise<void> => {
-        //console.log("refreshTreeResponse: "+S.util.prettyPrint(res));
-        await S.render.renderPageFromData(res, scrollToTop, targetId);
-
-        //todo-0: needs to be done differenetly now?
-        //S.util.delayedFocus("mainNodeContent");
-    }
-
-    /*
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
+
+     //scrollToFirstChild not used (todo-0)
      */
     refreshTree = (nodeId?: string, renderParentIfLeaf?: boolean, highlightId?: string, isInitialRender?: boolean, forceIPFSRefresh?: boolean,
         scrollToFirstChild?: boolean): void => {
@@ -66,11 +56,11 @@ export class View implements ViewIntf {
             "offset": S.nav.mainOffset,
             "goToLastPage": false,
             "forceIPFSRefresh": forceIPFSRefresh
-        }, (res: J.RenderNodeResponse) => {
+        }, async (res: J.RenderNodeResponse) => {
             if (res.offsetOfNodeFound > -1) {
                 S.nav.mainOffset = res.offsetOfNodeFound;
             }
-            this.refreshTreeResponse(res, highlightId, false);
+            await S.render.renderPageFromData(res, false, highlightId);
         });
     }
 
@@ -111,13 +101,13 @@ export class View implements ViewIntf {
             "offset": S.nav.mainOffset,
             "goToLastPage": goToLastPage,
             "forceIPFSRefresh": false
-        }, (res: J.RenderNodeResponse) => {
+        }, async (res: J.RenderNodeResponse) => {
             if (goToLastPage) {
                 if (res.offsetOfNodeFound > -1) {
                     S.nav.mainOffset = res.offsetOfNodeFound;
                 }
             }
-            this.refreshTreeResponse(res, null, true);
+            await S.render.renderPageFromData(res, true, null);
         });
     }
 
