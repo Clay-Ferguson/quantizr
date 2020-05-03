@@ -50,7 +50,7 @@ export class CollapsiblePanel extends Comp {
                 className: collapseClass,
                 key: "div_div_d" + this.getId()
             },
-                this.makeReactChildren()
+                this.buildChildren()
             ));
     }
 

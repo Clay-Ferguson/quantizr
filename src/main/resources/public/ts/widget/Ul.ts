@@ -18,6 +18,6 @@ export class Ul extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return S.e('ul', this.attribs, this.makeReactChildren());
+        return S.e('ul', this.attribs, this.buildChildren());
     }
 }

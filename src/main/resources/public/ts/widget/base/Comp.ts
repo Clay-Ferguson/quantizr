@@ -284,9 +284,8 @@ export abstract class Comp implements CompIntf {
         });
     }
 
-    //todo-0: rename to buildChildren
-    makeReactChildren = (): ReactNode[] => {
-        //console.log("makeReactChildren: " + this.jsClassName);
+    buildChildren = (): ReactNode[] => {
+        //console.log("buildChildren: " + this.jsClassName);
         if (this.children == null || this.children.length == 0) return null;
         let reChildren: ReactNode[] = [];
 
@@ -324,7 +323,7 @@ export abstract class Comp implements CompIntf {
         this.state.visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
 
         try {
-            let children: any[] = this.makeReactChildren();
+            let children: any[] = this.buildChildren();
             if (children) {
                 if (content) {
                     children.unshift(content);

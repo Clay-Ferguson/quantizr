@@ -28,10 +28,10 @@ export class ButtonBar extends Comp {
                 className: "wrapper " + this.wrapperClass,
                 key: this.getId()+"_wrp" 
             },
-                S.e('div', this.attribs, this.makeReactChildren()));
+                S.e('div', this.attribs, this.buildChildren()));
         }
         else {
-            return S.e('div', this.attribs, this.makeReactChildren());
+            return S.e('div', this.attribs, this.buildChildren());
         }
     }
 }
