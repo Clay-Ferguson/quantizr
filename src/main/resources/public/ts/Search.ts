@@ -10,6 +10,7 @@ import { HorizontalLayout } from "./widget/HorizontalLayout";
 import { Img } from "./widget/Img";
 import { NodeCompContent } from "./comps/NodeCompContent";
 import { AppState } from "./AppState";
+import { dispatch } from "./AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -42,7 +43,7 @@ export class Search implements SearchIntf {
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
 
-        S.meta64.dispatch({
+        dispatch({
             type: "Action_RenderSearchResults",
             update: (state: AppState): void => {
                 state.searchResults = res.searchResults;
@@ -54,7 +55,7 @@ export class Search implements SearchIntf {
 
     timelineResponse = (res: J.NodeSearchResponse) => {
 
-        S.meta64.dispatch({
+        dispatch({
             type: "Action_RenderTimelineResults",
             update: (state: AppState): void => {
                 state.timelineResults = res.searchResults;

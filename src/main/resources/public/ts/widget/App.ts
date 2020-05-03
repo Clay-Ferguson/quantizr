@@ -7,6 +7,7 @@ import { TabPanel } from "./TabPanel";
 import { MainNavPanel } from "./MainNavPanel";
 import { Div } from "./Div";
 import { Main } from "./Main";
+import { store } from "../AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -17,7 +18,7 @@ export class App extends Comp {
 
     constructor(attribs: Object = {}) {
         super(attribs);
-        this.store = S.meta64.store;
+        this.store = store;
     }
 
     compRender = (): ReactNode => {

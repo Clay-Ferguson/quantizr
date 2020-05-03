@@ -11,6 +11,7 @@ import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { AppState } from "./AppState";
+import { dispatch } from "./AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -123,7 +124,7 @@ export class Edit implements EditIntf {
     private moveNodesResponse = (res: J.MoveNodesResponse): void => {
         if (S.util.checkSuccess("Move nodes", res)) {
 
-            S.meta64.dispatch({
+            dispatch({
                 type: "Action_SetNodesToMove",
                 update: (state: AppState): void => {
                     state.nodesToMove = null;
@@ -553,7 +554,7 @@ export class Edit implements EditIntf {
 
     undoCutSelNodes = async (): Promise<void> => {
 
-        S.meta64.dispatch({
+        dispatch({
             type: "Action_SetNodesToMove",
             update: (state: AppState): void => {
                 state.nodesToMove = null;
@@ -571,7 +572,7 @@ export class Edit implements EditIntf {
 
         new ConfirmDlg("Cut " + selNodesArray.length + " node(s), to paste/move to new location ?", "Confirm Cut",
             async () => {
-                S.meta64.dispatch({
+                dispatch({
                     type: "Action_SetNodesToMove",
                     update: (state: AppState): void => {
                         state.nodesToMove = selNodesArray;

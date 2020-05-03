@@ -14,6 +14,7 @@ import { NavBarIconButton } from "./widget/NavBarIconButton";
 import { NodeCompVerticalRowLayout } from "./comps/NodeCompVerticalRowLayout";
 import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";
 import { AppState } from "./AppState";
+import { dispatch } from "./AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -173,7 +174,7 @@ export class Render implements RenderIntf {
                         console.log("RENDER NODE: " + data.node.id + " propCount=" + propCount);
                     }
 
-                    S.meta64.dispatch({
+                    dispatch({
                         type: "Action_RenderPage",
                         update: (state: AppState): void => {
                             state.node = S.meta64.currentNodeData.node;

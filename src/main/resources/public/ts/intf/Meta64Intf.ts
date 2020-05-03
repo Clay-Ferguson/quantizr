@@ -7,7 +7,6 @@ export interface Meta64Intf {
 
     mainTabPanel: MainTabPanelIntf;
     app: CompIntf;
-    store: any;
 
     //change to AppState type ?
     state: any; //todo-1: create an interface for State properties
@@ -91,6 +90,5 @@ export interface Meta64Intf {
     onSignIn(googleUser);
     setStateVarsUsingLoginResponse(res: J.LoginResponse): void;
     updateNodeMap(node: J.NodeInfo): void;
-    dispatch(action: Object): void;
 }
 

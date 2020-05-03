@@ -5,11 +5,11 @@ import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import { GraphPanel } from "./widget/GraphPanel";
-import { createStore } from 'redux';
-import { rootReducer } from "./reducers/rootReducer";
 import { App } from "./widget/App";
 import { AppState } from "./AppState";
 import { MainTabPanelIntf } from "./Interfaces";
+import { dispatch } from "./AppRedux";
+
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -20,7 +20,6 @@ export class Meta64 implements Meta64Intf {
 
     mainTabPanel: MainTabPanelIntf;
     app: App;
-    store: any;
 
     navBarHeight: number = 0;
     pendingLocationHash: string;
@@ -486,8 +485,6 @@ export class Meta64 implements Meta64Intf {
 
     initApp = async (): Promise<void> => {
 
-        this.store = createStore(rootReducer);
-
         return new Promise<void>(async (resolve, reject) => {
             console.log("initApp running.");
 
@@ -783,18 +780,11 @@ export class Meta64 implements Meta64Intf {
             title += "User: " + res.userName;
         }
 
-        this.dispatch({
+        dispatch({
             type: "Action_LoginResponse",
             update: (state: AppState): void => {
                 state.title = title;
             }
         });
-    }
-
-    dispatch = (action: Object) => {
-        if (!S.meta64.store) {
-            throw new Error("store not ready.");
-        }
-        this.store.dispatch(action);
     }
 }
