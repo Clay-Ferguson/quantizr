@@ -24,7 +24,7 @@ export class ActivityPub implements ActivityPubIntf {
 
         // S.util.checkSuccess("Execute Node", res);
         // S.util.showMessage(res.output, true, "modal-lg");
-        // S.view.refreshTree(null, false);
+        // S.view.refreshTree(null, false, null, false, false, null);
         // S.meta64.selectTab("mainTab");
         // S.view.scrollToSelectedNode(null);
     }

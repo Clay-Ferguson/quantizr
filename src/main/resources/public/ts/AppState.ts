@@ -13,4 +13,20 @@ export class AppState {
 
     /* Node Ids to move */
     nodesToMove: string[];
+
+    mstate = {
+        selNodeCount: 0,
+        highlightNode: null,
+        selNodeIsMine: false,
+        homeNodeSelected: false,
+        importFeatureEnabled: false,
+        exportFeatureEnabled: false,
+        highlightOrdinal: 0,
+        numChildNodes: 0,
+        canMoveUp: false,
+        canMoveDown: false,
+        canCreateNode: false,
+        propsToggle: false,
+        allowEditMode: false
+    };
 }

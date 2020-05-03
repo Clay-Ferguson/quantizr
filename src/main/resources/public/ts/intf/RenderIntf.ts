@@ -9,7 +9,7 @@ export interface RenderIntf {
 
     setNodeDropHandler(rowDiv: Comp, node: J.NodeInfo): void;
     initMarkdown(): void;
-    updateHighlightNode(node: J.NodeInfo): void;
+    updateHighlightNode(node: J.NodeInfo, mstate: any): void;
     injectSubstitutions(content: string): string;
     showNodeUrl(): void;
     renderPageFromData(data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string, clickTab?: boolean): Promise<void>;
@@ -20,6 +20,6 @@ export interface RenderIntf {
     allowPropertyEdit(node: J.NodeInfo, propName: string): boolean;
     isReadOnlyProperty(propName: string): boolean;
     allowAction(typeHandler: TypeHandlerIntf, action: string): boolean; 
-    createBetweenNodeButtonBar(node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, nodesToMove: string[]): Comp;
+    createBetweenNodeButtonBar(node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, nodesToMove: string[], mstate: any): Comp;
     renderChildren(node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp;
 }

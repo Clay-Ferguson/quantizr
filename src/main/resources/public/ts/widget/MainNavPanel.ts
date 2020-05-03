@@ -29,6 +29,7 @@ export class MainNavPanel extends NavTag {
 
         const title = useSelector((state: AppState) => state.title);
         const nodesToMove = useSelector((state: AppState) => state.nodesToMove);
+        const mstate = useSelector((state: AppState) => state.mstate);
         const dispatch = useDispatch();
 
         // navbar-expand-sm would makes it collapsable, but messes up top margin.
@@ -97,9 +98,9 @@ export class MainNavPanel extends NavTag {
                     "title": "Toggle Edit Mode on/off"
                 },
                     //isEnabled func
-                    () => { return S.meta64.state.allowEditMode; },
+                    () => { return mstate.allowEditMode; },
                     //isVisible func
-                    () => { return S.meta64.state.allowEditMode; }
+                    () => { return mstate.allowEditMode; }
                 ),
             ]));
 
@@ -166,7 +167,7 @@ export class MainNavPanel extends NavTag {
                 }, [
                     new NavBarIconButton("fa-bars", "Quantizr", {
                         "onClick": e => {
-                            S.nav.showMainMenu(nodesToMove);
+                            S.nav.showMainMenu(nodesToMove, mstate);
                         },
                         "id": "mainMenu",
                         "title": "Show Main Menu"

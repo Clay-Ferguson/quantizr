@@ -3,7 +3,8 @@ import * as J from "../JavaIntf";
 export interface ViewIntf {
     docElm: any;
 
-    refreshTree(nodeId?: string, renderParentIfLeaf?: boolean, highlightId?: string, isInitialRender?: boolean, forceIPFSRefresh?: boolean): void;
+    refreshTree(nodeId: string, renderParentIfLeaf: boolean, highlightId: string, isInitialRender: boolean, forceIPFSRefresh: boolean,
+        mstate: any): void;
     firstPage(): void;
     prevPage(): void;
     nextPage(): void;

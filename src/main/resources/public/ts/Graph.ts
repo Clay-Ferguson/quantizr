@@ -11,8 +11,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Graph implements GraphIntf {
-    graphTreeStructure = () => {
-        let nodeId = S.meta64.state.highlightNode.id;
+    graphTreeStructure = (mstate: any) => {
+        let nodeId = mstate.highlightNode.id;
         S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
             "nodeId": nodeId,
         }, this.graphNodesResponse);

@@ -7,7 +7,7 @@ export interface EditIntf {
     nodeInsertTarget: any;
 
     saveClipboardToNode(): void;
-    splitNode(splitType: string, delimiter: string): void;
+    splitNode(splitType: string, delimiter: string, mstate: any): void;
     openChangePasswordDlg(): void;
     openManageAccountDlg(): void;
     editPreferences(): void;
@@ -18,7 +18,7 @@ export interface EditIntf {
     startEditingNewNode(typeName?: string, createAtTop?: boolean): void;
     insertNodeResponse(res: J.InsertNodeResponse): void;
     createSubNodeResponse(res: J.CreateSubNodeResponse): void;
-    saveNodeResponse(node: J.NodeInfo, res: J.SaveNodeResponse): void;
+    saveNodeResponse(node: J.NodeInfo, res: J.SaveNodeResponse, mstate: any): void;
     editMode(modeVal?: boolean): void;
     moveNodeUp(id?: string): void;
     moveNodeDown(id?: string): void;
@@ -32,12 +32,12 @@ export interface EditIntf {
     createSubNode(id?: any, typeName?: string, createAtTop?: boolean): void;
     clearSelections(): void;
     selectAllNodes() : void;
-    deleteSelNodes(node: J.NodeInfo, hardDelete: boolean): void;
+    deleteSelNodes(node: J.NodeInfo, hardDelete: boolean, mstate: any): void;
     getBestPostDeleteSelNode(): J.NodeInfo;
     cutSelNodes(node: J.NodeInfo): void;
     undoCutSelNodes(): void;
-    pasteSelNodes(node: J.NodeInfo, location: string, nodesToMove: string[]): void;
+    pasteSelNodes(node: J.NodeInfo, location: string, nodesToMove: string[], mstate: any): void;
     insertBookWarAndPeace(): void;
-    emptyTrash(): void;
+    emptyTrash(mstate: any): void;
 }
 

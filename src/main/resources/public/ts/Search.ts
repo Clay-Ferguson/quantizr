@@ -106,12 +106,12 @@ export class Search implements SearchIntf {
      *
      * node is a NodeInfo.java JSON
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number): Comp => {
+    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, mstate: any): Comp => {
 
         let cssId = this._UID_ROWID_PREFIX + node.id;
         // console.log("Rendering Node Row[" + index + "] with id: " +cssId)
 
-        let buttonBar = this.makeButtonBarHtml(node);
+        let buttonBar = this.makeButtonBarHtml(node, mstate);
 
         let content = new NodeCompContent(node, true, true, "srch");
 
@@ -132,14 +132,14 @@ export class Search implements SearchIntf {
         }, [buttonBar, content]);
     }
 
-    makeButtonBarHtml = (node: J.NodeInfo): Comp => {
+    makeButtonBarHtml = (node: J.NodeInfo, mstate: any): Comp => {
         let avatarImg: Img = null;
         if (node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, node) */) {
             avatarImg = S.render.makeAvatarImage(node);
         }
 
         return new HorizontalLayout([avatarImg, new Button("Jump", () => {
-            S.srch.clickSearchNode(node.id);
+            S.srch.clickSearchNode(node.id, mstate);
         }, {
             title: "Jump to this Node in the Main Tab",
             id: "go-" + node.id
@@ -152,7 +152,7 @@ export class Search implements SearchIntf {
         this.setRowHighlight(true);
     }
 
-    clickSearchNode = (id: string) => {
+    clickSearchNode = (id: string, mstate: any) => {
 
         /*
          * update highlight node to point to the node clicked on, just to persist it for later
@@ -162,7 +162,7 @@ export class Search implements SearchIntf {
             throw "Unable to find uid in search results: " + id;
         }
 
-        S.view.refreshTree(this.highlightRowNode.id, true, this.highlightRowNode.id);
+        S.view.refreshTree(this.highlightRowNode.id, true, this.highlightRowNode.id, false, false, mstate);
         S.meta64.selectTab("mainTab");
     }
 

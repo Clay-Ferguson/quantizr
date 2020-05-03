@@ -24,6 +24,8 @@ export class NodeCompTableRowLayout extends Div {
     super_CompRender: any = this.compRender;
     compRender = (): ReactNode => {
         let nodesToMove = useSelector((state: AppState) => state.nodesToMove);
+        let mstate: any = useSelector((state: AppState) => state.mstate);
+
         let node = this.node;
         let curRow = new Div(null, { className: 'node-grid-row' });
         let children: Comp[] = [];
@@ -48,7 +50,7 @@ export class NodeCompTableRowLayout extends Div {
             let n: J.NodeInfo = node.children[i];
 
             if (!(nodesToMove && nodesToMove.find(id => id == n.id))) {
-                S.render.updateHighlightNode(n);
+                S.render.updateHighlightNode(n, mstate.highlightNode);
 
                 if (this.debug && n) {
                     console.log(" RENDER ROW[" + i + "]: node.id=" + n.id);

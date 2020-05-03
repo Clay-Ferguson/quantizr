@@ -84,7 +84,7 @@ export class Nav implements NavIntf {
     navOpenSelectedNode = (): void => {
         let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode();
         if (!currentSelNode) return;
-        S.nav.openNodeById(currentSelNode.id);
+        S.nav.openNodeById(currentSelNode.id, null);
     }
 
     navToSibling = (siblingOffset: number): void => {
@@ -206,14 +206,14 @@ export class Nav implements NavIntf {
         }, this.navPageNodeResponse);
     }
 
-    openNodeById = (id: string): void => {
+    openNodeById = (id: string, mstate: any): void => {
         let node: J.NodeInfo = S.meta64.idToNodeMap[id];
         S.meta64.highlightNode(node, false);
 
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id);
         } else {
-            S.view.refreshTree(node.id, true, null, false, false);
+            S.view.refreshTree(node.id, true, null, false, false, mstate);
         }
     }
 
@@ -253,9 +253,9 @@ export class Nav implements NavIntf {
         }
     }
 
-    showMainMenu = (nodesToMove: string[]): void => {
+    showMainMenu = (nodesToMove: string[], mstate: any): void => {
         S.meta64.recalcMetaState();
-        this.mainMenuPopupDlg = new MainMenuPopupDlg(nodesToMove);
+        this.mainMenuPopupDlg = new MainMenuPopupDlg(nodesToMove, mstate);
         this.mainMenuPopupDlg.open("inline-block");
     }
 

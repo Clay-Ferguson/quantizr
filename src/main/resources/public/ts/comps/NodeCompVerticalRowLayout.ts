@@ -24,6 +24,8 @@ export class NodeCompVerticalRowLayout extends Div {
     super_CompRender: any = this.compRender;
     compRender = (): ReactNode => {
         let nodesToMove = useSelector((state: AppState) => state.nodesToMove);
+        let mstate: any = useSelector((state: AppState) => state.mstate);
+
         let node = this.node;
         let layoutClass = "node-table-row";
 
@@ -51,7 +53,7 @@ export class NodeCompVerticalRowLayout extends Div {
         for (let i = 0; i < node.children.length; i++) {
             let n: J.NodeInfo = node.children[i];
             if (!(nodesToMove && nodesToMove.find(id => id == n.id))) {
-                S.render.updateHighlightNode(n);
+                S.render.updateHighlightNode(n, mstate.highlightNode);
 
                 if (this.debug && n) {
                     console.log(" RENDER ROW[" + i + "]: node.id=" + n.id);
@@ -60,7 +62,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove);
 
                 if (rowCount == 0 && S.meta64.userPreferences.editMode) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false, nodesToMove));
+                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false, nodesToMove, mstate));
 
                     //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     comps.push(new Div(null, { className: "clearfix" }));
@@ -71,7 +73,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 rowCount++;
 
                 if (S.meta64.userPreferences.editMode) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay, nodesToMove));
+                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay, nodesToMove, mstate));
 
                     //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     comps.push(new Div(null, { className: "clearfix" }));

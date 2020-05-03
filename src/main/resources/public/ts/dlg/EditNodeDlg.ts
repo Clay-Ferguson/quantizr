@@ -507,7 +507,7 @@ export class EditNodeDlg extends DialogBase {
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                 node: this.node
             }, (res) => {
-                S.edit.saveNodeResponse(this.node, res);
+                S.edit.saveNodeResponse(this.node, res, null);
             });
 
             resolve();

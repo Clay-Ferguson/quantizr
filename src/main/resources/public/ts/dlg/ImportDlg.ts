@@ -53,7 +53,7 @@ export class ImportDlg extends DialogBase {
         if (S.util.checkSuccess("Import", res)) {
             new MessageDlg("Import Successful", "Import").open();
 
-            S.view.refreshTree(null, false);
+            S.view.refreshTree(null, false, null, false, false, null);
             S.meta64.selectTab("mainTab");
             S.view.scrollToSelectedNode();
         }

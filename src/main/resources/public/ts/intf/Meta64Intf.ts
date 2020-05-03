@@ -8,9 +8,6 @@ export interface Meta64Intf {
     mainTabPanel: MainTabPanelIntf;
     app: CompIntf;
 
-    //change to AppState type ?
-    state: any; //todo-1: create an interface for State properties
-
     appInitialized: boolean;
     pendingLocationHash: string;
 

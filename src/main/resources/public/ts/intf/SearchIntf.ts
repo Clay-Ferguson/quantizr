@@ -20,9 +20,9 @@ export interface SearchIntf {
     searchFilesResponse(res: J.FileSearchResponse): any;
     timeline(prop: string): any;
     initSearchNode(node: J.NodeInfo): any;
-    renderSearchResultAsListItem(node, index, count, rowCount): any;
-    makeButtonBarHtml(node: J.NodeInfo): any;
+    renderSearchResultAsListItem(node, index, count, rowCount, mstate: any): any;
+    makeButtonBarHtml(node: J.NodeInfo, mstate: any): any;
     clickOnSearchResultRow(id : string): any;
-    clickSearchNode(id: string): any;
+    clickSearchNode(id: string, mstate: any): any;
     setRowHighlight(state: boolean): any;
 }

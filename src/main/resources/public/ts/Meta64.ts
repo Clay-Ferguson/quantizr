@@ -23,23 +23,6 @@ export class Meta64 implements Meta64Intf {
     navBarHeight: number = 0;
     pendingLocationHash: string;
 
-    /* This is the state that all enablement and visibility must reference to determine how to enable gui */
-    state = {
-        selNodeCount: 0,
-        highlightNode: null,
-        selNodeIsMine: false,
-        homeNodeSelected: false,
-        importFeatureEnabled: false,
-        exportFeatureEnabled: false,
-        highlightOrdinal: 0,
-        numChildNodes: 0,
-        canMoveUp: false,
-        canMoveDown: false,
-        canCreateNode: false,
-        propsToggle: false,
-        allowEditMode: false
-    };
-
     appInitialized: boolean = false;
     isMobile: boolean;
     isMobileOrTablet: boolean;
@@ -141,8 +124,9 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
+    //todo-0: need mstate here
     refresh = (): void => {
-        S.view.refreshTree(null, true);
+        S.view.refreshTree(null, true, null, false, false, null);
     }
 
     selectTab = (tabName: string): void => {
@@ -290,6 +274,8 @@ export class Meta64 implements Meta64Intf {
      * This function is slightly ugly and against ReactJS principles, but we don't yet have
      * the main display page rendering (of node content) using 'React State' so this 
      * logic is fine for now, and acually faster than React or anything else could ever be anyway.
+     * 
+     * todo-0: state management here (styles) needs to be triggered thru redux.
      */
     highlightNode = async (node: J.NodeInfo, scroll: boolean): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
@@ -353,31 +339,40 @@ export class Meta64 implements Meta64Intf {
      * decouple
      */
     recalcMetaState = () => {
-        /* multiple select nodes */
-        this.state.selNodeCount = S.util.getPropertyCount(this.selectedNodes);
-        this.state.highlightNode = this.getHighlightedNode();
-        this.state.selNodeIsMine = this.state.highlightNode != null && (this.state.highlightNode.owner === this.userName || "admin" === this.userName);
+        let mstate: any = {};
 
-        this.state.homeNodeSelected = this.state.highlightNode != null && this.homeNodeId == this.state.highlightNode.id;
+        /* multiple select nodes */
+        mstate.selNodeCount = S.util.getPropertyCount(this.selectedNodes);
+        mstate.highlightNode = this.getHighlightedNode();
+        mstate.selNodeIsMine = mstate.highlightNode != null && (mstate.highlightNode.owner === this.userName || "admin" === this.userName);
+
+        mstate.homeNodeSelected = mstate.highlightNode != null && this.homeNodeId == mstate.highlightNode.id;
 
         //for now, allowing all users to import+export (todo-2)
-        this.state.importFeatureEnabled = this.isAdminUser || this.userPreferences.importAllowed;
-        this.state.exportFeatureEnabled = this.isAdminUser || this.userPreferences.exportAllowed;
+        mstate.importFeatureEnabled = this.isAdminUser || this.userPreferences.importAllowed;
+        mstate.exportFeatureEnabled = this.isAdminUser || this.userPreferences.exportAllowed;
 
-        this.state.highlightOrdinal = this.getOrdinalOfNode(this.state.highlightNode);
+        mstate.highlightOrdinal = this.getOrdinalOfNode(mstate.highlightNode);
 
-        this.state.numChildNodes = this.getNumChildNodes();
+        mstate.numChildNodes = this.getNumChildNodes();
 
-        let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, this.state.highlightNode);
+        let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, mstate.highlightNode);
         let allowNodeMove: boolean = !orderByProp;
 
-        this.state.canMoveUp = allowNodeMove && this.state.highlightNode && !this.state.highlightNode.firstChild;
-        this.state.canMoveDown = allowNodeMove && this.state.highlightNode && !this.state.highlightNode.lastChild;
+        mstate.canMoveUp = allowNodeMove && mstate.highlightNode && !mstate.highlightNode.firstChild;
+        mstate.canMoveDown = allowNodeMove && mstate.highlightNode && !mstate.highlightNode.lastChild;
 
         //todo-1: need to add to this selNodeIsMine || selParentIsMine;
-        this.state.canCreateNode = this.userPreferences.editMode && this.state.highlightNode && (this.isAdminUser || (!this.isAnonUser /* && selNodeIsMine */));
-        this.state.propsToggle = this.currentNodeData && this.currentNodeData.node && !this.isAnonUser;
-        this.state.allowEditMode = this.currentNodeData && this.currentNodeData.node && !this.isAnonUser;
+        mstate.canCreateNode = this.userPreferences.editMode && mstate.highlightNode && (this.isAdminUser || (!this.isAnonUser /* && selNodeIsMine */));
+        mstate.propsToggle = this.currentNodeData && this.currentNodeData.node && !this.isAnonUser;
+        mstate.allowEditMode = this.currentNodeData && this.currentNodeData.node && !this.isAnonUser;
+
+        dispatch({
+            type: "Action_setMetaState",
+            update: (state: AppState): void => {
+                state.mstate = mstate;
+            }
+        });
     }
 
     /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */
@@ -512,7 +507,7 @@ export class Meta64 implements Meta64Intf {
                 //console.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
 
                 if (event.state && event.state.nodeId) {
-                    S.view.refreshTree(event.state.nodeId, true, event.state.highlightId, false);
+                    S.view.refreshTree(event.state.nodeId, true, event.state.highlightId, false, false, null);
                     this.selectTab("mainTab");
                 }
             };

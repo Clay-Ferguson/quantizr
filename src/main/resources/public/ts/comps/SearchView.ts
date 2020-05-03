@@ -26,6 +26,7 @@ export class SearchView extends Div {
     super_CompRender: any = this.compRender;
     compRender = (): ReactNode => {
         let results = useSelector((state: AppState) => state.searchResults);
+        let mstate = useSelector((state: AppState) => state.mstate);
 
         if (!results || results.length == 0) {
             this.setChildren([new Div("No Search Displaying", {
@@ -50,7 +51,7 @@ export class SearchView extends Div {
             S.srch.initSearchNode(node);
 
             rowCount++;
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount));
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, mstate));
         });
 
         this.setChildren(children);

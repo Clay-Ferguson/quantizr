@@ -28,12 +28,12 @@ export interface NavIntf {
     navOpenSelectedNode(): void;
     getSelectedDomElement(): HTMLElement;
     clickOnNodeRow(id: string): void;
-    openNodeById(id: string): void;
+    openNodeById(id: string, mstate: any): void;
     toggleNodeSel(selected: boolean, id: string): void;
     navPageNodeResponse(res: J.RenderNodeResponse): void;
     navHome(): void;
     navPublicHome(): void;
-    showMainMenu(nodesToMove: string[]): void;
+    showMainMenu(nodesToMove: string[], mstate: any): void;
     navToSibling(siblingOffset: number): void;
 }
 

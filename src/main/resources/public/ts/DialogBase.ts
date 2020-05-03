@@ -14,6 +14,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
+//todo-0: all dialogs need to have a way to get updated based on redux state? or local state changes?
 export abstract class DialogBase extends Comp implements DialogBaseImpl {
 
     //ref counter that allows multiple dialogs to be opened on top of each other and only

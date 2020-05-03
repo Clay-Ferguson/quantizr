@@ -20,8 +20,10 @@ export class View implements ViewIntf {
 
     /*
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
+     * todo-0: everywhere that calls this needs to pass mstate
      */
-    refreshTree = (nodeId?: string, renderParentIfLeaf?: boolean, highlightId?: string, isInitialRender?: boolean, forceIPFSRefresh?: boolean): void => {
+    refreshTree = (nodeId: string, renderParentIfLeaf: boolean, highlightId: string, isInitialRender: boolean, forceIPFSRefresh: boolean, 
+        mstate: any): void => {
         console.log("refreshTree()");
 
         if (!nodeId) {
@@ -30,8 +32,8 @@ export class View implements ViewIntf {
             }
         }
 
-        if (S.meta64.currentNodeData) {
-            S.render.updateHighlightNode(S.meta64.currentNodeData.node);
+        if (S.meta64.currentNodeData && mstate) {
+            S.render.updateHighlightNode(S.meta64.currentNodeData.node, mstate.highlightNode);
         }
 
         console.log("Refreshing tree: nodeId=" + nodeId);

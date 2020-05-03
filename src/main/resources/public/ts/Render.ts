@@ -153,7 +153,7 @@ export class Render implements RenderIntf {
                     //if No data was provided we use existing data.
                     if (!data) {
                         data = S.meta64.currentNodeData;
-                    } 
+                    }
                     //Otherwise we are rendering new data and need to initialize some things
                     else {
                         S.meta64.setCurrentNodeData(data);
@@ -192,9 +192,9 @@ export class Render implements RenderIntf {
 
                 //console.log("rendering output=: " + S.util.toJson(output));
 
-                S.meta64.mainTabPanel.whenElm(async (elm: HTMLElement) => {  
+                S.meta64.mainTabPanel.whenElm(async (elm: HTMLElement) => {
                     console.log("mainTabComp whenElm success");
-    
+
                     try {
                         if (clickTab) {
                             S.meta64.selectTab("mainTab");
@@ -261,17 +261,28 @@ export class Render implements RenderIntf {
         }
     }
 
-    updateHighlightNode = (node: J.NodeInfo) => {
-        if (!node || !S.meta64.state.highlightNode) {
+    updateHighlightNode = (node: J.NodeInfo, mstate: any) => {
+        if (!node || !mstate || !mstate.highlightNode) {
             return;
         }
 
-        if (S.meta64.state.highlightNode.id == node.id) {
-            S.meta64.state.highlightNode = node;
+        let changed = false;
+        if (mstate.highlightNode.id == node.id) {
+            mstate.highlightNode = node;
+            changed = true;
 
             if (S.meta64.currentNodeData && S.meta64.currentNodeData.node) {
                 S.meta64.parentIdToFocusNodeMap[S.meta64.currentNodeData.node.id] = node;
             }
+        }
+
+        if (changed) {
+            dispatch({
+                type: "Action_SetMetaState",
+                update: (state: AppState): void => {
+                    state.mstate = mstate;
+                }
+            });
         }
     }
 
@@ -279,10 +290,10 @@ export class Render implements RenderIntf {
     
     The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
     */
-    createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, nodesToMove: string[]): Comp => {
+    createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, nodesToMove: string[], mstate: any): Comp => {
 
         let pasteInlineButton: Button = null;
-        if (!S.meta64.isAnonUser && nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
+        if (!S.meta64.isAnonUser && nodesToMove != null && (mstate.selNodeIsMine || mstate.homeNodeSelected)) {
 
             let target = null;
             if (S.nav.endReached) {
@@ -295,7 +306,7 @@ export class Render implements RenderIntf {
                 target = "inline";
             }
 
-            pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes(node, target, nodesToMove); }, {
+            pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes(node, target, nodesToMove, mstate); }, {
                 className: "highlightBorder"
             });
         }

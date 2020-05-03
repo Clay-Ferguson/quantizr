@@ -30,6 +30,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
     super_CompRender: any = this.compRender;
     compRender = (): ReactNode => {
         let nodesToMove = useSelector((state: AppState) => state.nodesToMove);
+        let mstate = useSelector((state: AppState) => state.mstate);
         let node = this.node;
 
         let typeIcon: Icon;
@@ -132,7 +133,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
             (node.hasChildren || node.type == "fs:folder" || node.type == "fs:lucene" || node.type == "ipfs:node")) {
 
             /* convert this button to a className attribute for styles */
-            openButton = new Button("Open", () => { S.nav.openNodeById(node.id) }, null, "btn-primary");
+            openButton = new Button("Open", () => { S.nav.openNodeById(node.id, mstate) }, null, "btn-primary");
         }
 
         /*
@@ -192,12 +193,12 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     }
                 }
 
-                deleteNodeButton = new Button(null, () => { S.edit.deleteSelNodes(node, false); }, {
+                deleteNodeButton = new Button(null, () => { S.edit.deleteSelNodes(node, false, mstate); }, {
                     "iconclass": "fa fa-trash fa-lg"
                 });
 
-                if (!S.meta64.isAnonUser && nodesToMove != null && (S.meta64.state.selNodeIsMine || S.meta64.state.homeNodeSelected)) {
-                    pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(node, 'inside', nodesToMove); }, {
+                if (!S.meta64.isAnonUser && nodesToMove != null && (mstate.selNodeIsMine || mstate.homeNodeSelected)) {
+                    pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(node, 'inside', nodesToMove, mstate); }, {
                         className: "highlightBorder"
                     });
                 }

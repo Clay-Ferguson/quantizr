@@ -282,7 +282,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                             node: dlg.node
                         }, (res) => {
-                            S.edit.saveNodeResponse(dlg.node, res);
+                            S.edit.saveNodeResponse(dlg.node, res, null);
                         });
                     }
                 });

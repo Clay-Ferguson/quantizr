@@ -19,7 +19,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class MenuPanel extends Div {
 
-    constructor(public nodesToMove: string[]) {
+    constructor(public nodesToMove: string[], mstate: any) {
         super(null, {
             id: "accordion",
             role: "tablist"
@@ -57,7 +57,7 @@ export class MenuPanel extends Div {
                 //new MenuItem("Documentation", () => { S.nav.openContentNode("/r/public/subnode-docs"); }),
             ]),
             new Menu("Edit", [              
-                //new MenuItem("Cut", S.edit.cutSelNodes, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 && S.meta64.state.selNodeIsMine }), //
+                //new MenuItem("Cut", S.edit.cutSelNodes, () => { return !S.meta64.isAnonUser && mstate.selNodeCount > 0 && mstate.selNodeIsMine }), //
                 new MenuItem("Undo Cut", S.edit.undoCutSelNodes, () => { return !S.meta64.isAnonUser && nodesToMove != null }), //
 
                 /*
@@ -67,17 +67,17 @@ export class MenuPanel extends Div {
                 */
                 //new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !S.meta64.isAnonUser }), //
 
-                new MenuItem("Clear Selections", S.edit.clearSelections, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 }), //
-                new MenuItem("Permanent Delete", () => {S.edit.deleteSelNodes(null, true);}, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeCount > 0 && S.meta64.state.selNodeIsMine; }), //
-                new MenuItem("Move to Top", () => { S.edit.moveNodeToTop(); }, () => { return S.meta64.state.canMoveUp; }), //
-                new MenuItem("Move to Bottom", () => { S.edit.moveNodeToBottom(); }, () => { return S.meta64.state.canMoveDown; }),//
+                new MenuItem("Clear Selections", S.edit.clearSelections, () => { return !S.meta64.isAnonUser && mstate.selNodeCount > 0 }), //
+                new MenuItem("Permanent Delete", () => {S.edit.deleteSelNodes(null, true, mstate);}, () => { return !S.meta64.isAnonUser && mstate.selNodeCount > 0 && mstate.selNodeIsMine; }), //
+                new MenuItem("Move to Top", () => { S.edit.moveNodeToTop(); }, () => { return mstate.canMoveUp; }), //
+                new MenuItem("Move to Bottom", () => { S.edit.moveNodeToBottom(); }, () => { return mstate.canMoveDown; }),//
                 new MenuItem("Show Trash Bin", () => S.nav.openContentNode(S.meta64.homeNodePath + "/d"),
                     //enabled func
                     () => {
                         return !S.meta64.isAnonUser;
                     }
                 ),
-                new MenuItem("Empty Trash", () => S.edit.emptyTrash(),
+                new MenuItem("Empty Trash", () => S.edit.emptyTrash(mstate),
                 //enabled func
                 () => {
                     return !S.meta64.isAnonUser;
@@ -86,30 +86,30 @@ export class MenuPanel extends Div {
                 
             ]),
             new Menu("Uploads", [
-                new MenuItem("Upload from File", () => {S.attachment.openUploadFromFileDlg(false);}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //
-                new MenuItem("Upload from URL", S.attachment.openUploadFromUrlDlg, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //
-                new MenuItem("Upload to IPFS", () => {S.attachment.openUploadFromFileDlg(true)}, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //
+                new MenuItem("Upload from File", () => {S.attachment.openUploadFromFileDlg(false);}, () => { return !S.meta64.isAnonUser && mstate.highlightNode != null && mstate.selNodeIsMine }), //
+                new MenuItem("Upload from URL", S.attachment.openUploadFromUrlDlg, () => { return !S.meta64.isAnonUser && mstate.highlightNode != null && mstate.selNodeIsMine }), //
+                new MenuItem("Upload to IPFS", () => {S.attachment.openUploadFromFileDlg(true)}, () => { return !S.meta64.isAnonUser && mstate.highlightNode != null && mstate.selNodeIsMine }), //
                 new MenuItem("Delete Attachment", S.attachment.deleteAttachment, () => {
-                    return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null
-                        && S.props.hasBinary(S.meta64.state.highlightNode) && S.meta64.state.selNodeIsMine
+                    return !S.meta64.isAnonUser && mstate.highlightNode != null
+                        && S.props.hasBinary(mstate.highlightNode) && mstate.selNodeIsMine
                 })
             ]),
             new Menu("Share", [
-                new MenuItem("Edit Node Sharing", S.share.editNodeSharing, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine }), //
+                new MenuItem("Edit Node Sharing", S.share.editNodeSharing, () => { return !S.meta64.isAnonUser && mstate.highlightNode != null && mstate.selNodeIsMine }), //
                 // new MenuItem("Post Node", () => { S.activityPub.postNode(); },//
                 //     () => {
                 //         return "ramrod" == S.meta64.userName.toLowerCase() ||
                 //             "admin" == S.meta64.userName.toLowerCase();
-                //         //!S.meta64.isAnonUser && S.meta64.state.highlightNode != null && S.meta64.state.selNodeIsMine 
+                //         //!S.meta64.isAnonUser && mstate.highlightNode != null && mstate.selNodeIsMine 
                 //     }),
 
                 //todo-1: temporarily disabling this during mongo conversion
-                //new MenuItem("Find Shared Subnodes", share.findSharedNodes, () => { return  !S.meta64.isAnonUser && S.meta64.state.highlightNode != null })
+                //new MenuItem("Find Shared Subnodes", share.findSharedNodes, () => { return  !S.meta64.isAnonUser && mstate.highlightNode != null })
             ]),
             new Menu("Search", [
-                new MenuItem("All Content", () => { new SearchContentDlg().open(); }, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
-                new MenuItem("By Name", () => { new SearchByNameDlg().open(); }, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
-                new MenuItem("By ID", () => { new SearchByIDDlg().open(); }, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
+                new MenuItem("All Content", () => { new SearchContentDlg().open(); }, () => { return !S.meta64.isAnonUser && mstate.highlightNode != null }), //
+                new MenuItem("By Name", () => { new SearchByNameDlg().open(); }, () => { return !S.meta64.isAnonUser && mstate.highlightNode != null }), //
+                new MenuItem("By ID", () => { new SearchByIDDlg().open(); }, () => { return !S.meta64.isAnonUser && mstate.highlightNode != null }), //
 
                 //new MenuItem("Files", nav.searchFiles, () => { return  !S.meta64.isAnonUser && S.meta64.allowFileSystemSearch },
                 //    () => { return  !S.meta64.isAnonUser && S.meta64.allowFileSystemSearch })
@@ -117,38 +117,38 @@ export class MenuPanel extends Div {
 
             //NOTE:Graph feature is fully functional, but not ready to deploy yet.
             // new Menu("Graph", [
-            //     new MenuItem("Tree Structure", S.graph.graphTreeStructure, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
+            //     new MenuItem("Tree Structure", S.graph.graphTreeStructure, () => { return !S.meta64.isAnonUser && mstate.highlightNode != null }), //
             // ]),
             new Menu("Timeline", [
-                new MenuItem("Created", () => { S.srch.timeline('ctm') }, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
-                new MenuItem("Modified", () => { S.srch.timeline('mtm') }, () => { return !S.meta64.isAnonUser && S.meta64.state.highlightNode != null }), //
+                new MenuItem("Created", () => { S.srch.timeline('ctm') }, () => { return !S.meta64.isAnonUser && mstate.highlightNode != null }), //
+                new MenuItem("Modified", () => { S.srch.timeline('mtm') }, () => { return !S.meta64.isAnonUser && mstate.highlightNode != null }), //
             ]),
             
             new Menu("View", [
                 //todo-1: properties toggle really should be a preferences setting i think, and not a menu option here.
 
                 //this is broken, so I'm just disabling it for now, since this is low priority. todo-1
-                //new MenuItem("Toggle Properties", S.props.propsToggle, () => { return S.meta64.state.propsToggle }, () => { return !S.meta64.isAnonUser }), //
+                //new MenuItem("Toggle Properties", S.props.propsToggle, () => { return mstate.propsToggle }, () => { return !S.meta64.isAnonUser }), //
 
                 new MenuItem("Refresh", S.meta64.refresh), //
-                new MenuItem("Show URL", S.render.showNodeUrl, () => { return S.meta64.state.highlightNode != null }), //
+                new MenuItem("Show URL", S.render.showNodeUrl, () => { return mstate.highlightNode != null }), //
                 new MenuItem("Show Raw Data", () => { S.view.runServerCommand("getJson") },
-                    () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; },
-                    () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
+                    () => { return !S.meta64.isAnonUser && mstate.selNodeIsMine; },
+                    () => { return !S.meta64.isAnonUser && mstate.selNodeIsMine; }), //
             ]),
 
             new Menu("Tools",
             [
                 new MenuItem("Split Node", () => {
                     new SplitNodeDlg().open();
-                }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
+                }, () => { return !S.meta64.isAnonUser && mstate.selNodeIsMine; }), //
                 new MenuItem("Transfer Node", () => {
                     new TransferNodeDlg().open();
-                }, () => { return !S.meta64.isAnonUser && S.meta64.state.selNodeIsMine; }), //
+                }, () => { return !S.meta64.isAnonUser && mstate.selNodeIsMine; }), //
                 //todo-1: disabled during mongo conversion
-                //new MenuItem("Set Node A", view.setCompareNodeA, () => { return S.meta64.isAdminUser && S.meta64.state.highlightNode != null }, () => { return S.meta64.isAdminUser }), //
+                //new MenuItem("Set Node A", view.setCompareNodeA, () => { return S.meta64.isAdminUser && mstate.highlightNode != null }, () => { return S.meta64.isAdminUser }), //
                 //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
-                //    () => { return S.meta64.isAdminUser && S.meta64.state.highlightNode != null }, //
+                //    () => { return S.meta64.isAdminUser && mstate.highlightNode != null }, //
                 //    () => { return S.meta64.isAdminUser }, //
                 //    true
                 //), //
@@ -158,17 +158,17 @@ export class MenuPanel extends Div {
             new Menu("Admin Tools",
                 [
                     new MenuItem("Import", S.edit.openImportDlg, //
-                        () => { return S.meta64.state.importFeatureEnabled && (S.meta64.state.selNodeIsMine || (S.meta64.state.highlightNode != null && S.meta64.homeNodeId == S.meta64.state.highlightNode.id)) },//
-                        () => { return S.meta64.state.importFeatureEnabled }), //
+                        () => { return mstate.importFeatureEnabled && (mstate.selNodeIsMine || (mstate.highlightNode != null && S.meta64.homeNodeId == mstate.highlightNode.id)) },//
+                        () => { return mstate.importFeatureEnabled }), //
                     new MenuItem("Export", S.edit.openExportDlg, //
-                        () => { return S.meta64.state.exportFeatureEnabled && (S.meta64.state.selNodeIsMine || (S.meta64.state.highlightNode != null && S.meta64.homeNodeId == S.meta64.state.highlightNode.id)) },
-                        () => { return S.meta64.state.exportFeatureEnabled },
+                        () => { return mstate.exportFeatureEnabled && (mstate.selNodeIsMine || (mstate.highlightNode != null && S.meta64.homeNodeId == mstate.highlightNode.id)) },
+                        () => { return mstate.exportFeatureEnabled },
                         true//
                     ), //
                     //todo-1: disabled during mongo conversion
-                    //new MenuItem("Set Node A", view.setCompareNodeA, () => { return S.meta64.isAdminUser && S.meta64.state.highlightNode != null }, () => { return S.meta64.isAdminUser }), //
+                    //new MenuItem("Set Node A", view.setCompareNodeA, () => { return S.meta64.isAdminUser && mstate.highlightNode != null }, () => { return S.meta64.isAdminUser }), //
                     //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
-                    //    () => { return S.meta64.isAdminUser && S.meta64.state.highlightNode != null }, //
+                    //    () => { return S.meta64.isAdminUser && mstate.highlightNode != null }, //
                     //    () => { return S.meta64.isAdminUser }, //
                     //    true
                     //), //
@@ -196,16 +196,16 @@ export class MenuPanel extends Div {
             new Menu("IPFS",
                 [
                     new MenuItem("Display Node Info", () => { S.view.runServerCommand("ipfsGetNodeInfo") },
-                        () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && S.meta64.state.selNodeIsMine) },
-                        () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && S.meta64.state.selNodeIsMine) }
+                        () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && mstate.selNodeIsMine) },
+                        () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && mstate.selNodeIsMine) }
                     ),
                     new MenuItem("Force Refresh", () => {
                         let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode();
                         let nodeId: string = currentSelNode != null ? currentSelNode.id : null;
-                        S.view.refreshTree(nodeId, false, nodeId, false, true);
+                        S.view.refreshTree(nodeId, false, nodeId, false, true, mstate);
                     },
-                        () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && S.meta64.state.selNodeIsMine) },
-                        () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && S.meta64.state.selNodeIsMine) }
+                        () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && mstate.selNodeIsMine) },
+                        () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && mstate.selNodeIsMine) }
                     ),
                 ],
                 () => { return S.meta64.isAdminUser; },
@@ -234,8 +234,8 @@ export class MenuPanel extends Div {
                     new MenuItem("Backup DB", () => { S.view.runServerCommand("BackupDb") }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
                     new MenuItem("Reset Public Node", () => { S.view.runServerCommand("initializeAppContent") }, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }), //
                     new MenuItem("Insert Book: War and Peace", S.edit.insertBookWarAndPeace,
-                        () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && S.meta64.state.selNodeIsMine) },
-                        () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && S.meta64.state.selNodeIsMine) }
+                        () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && mstate.selNodeIsMine) },
+                        () => { return S.meta64.isAdminUser || (S.user.isTestUserAccount() && mstate.selNodeIsMine) }
                     ),
 
                     new MenuItem("Rebuild Indexes", S.meta64.rebuildIndexes, () => { return S.meta64.isAdminUser }, () => { return S.meta64.isAdminUser }),

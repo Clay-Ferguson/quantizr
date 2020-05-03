@@ -73,12 +73,12 @@ export class Edit implements EditIntf {
         console.log("insertBookResponse running.");
         S.util.checkSuccess("Insert Book", res);
 
-        S.view.refreshTree(null, false);
+        S.view.refreshTree(null, false, null, false, false, null);
         S.meta64.selectTab("mainTab");
         S.view.scrollToSelectedNode();
     }
 
-    private deleteNodesResponse = (res: J.DeleteNodesResponse, payload: Object): void => {
+    private deleteNodesResponse = (res: J.DeleteNodesResponse, payload: Object, mstate: any): void => {
         if (S.util.checkSuccess("Delete node", res)) {
             S.meta64.clearSelectedNodes();
             let highlightId: string = null;
@@ -89,7 +89,7 @@ export class Edit implements EditIntf {
                 }
             }
 
-            S.view.refreshTree(null, false, highlightId);
+            S.view.refreshTree(null, false, highlightId, false, false, mstate);
         }
     }
 
@@ -121,7 +121,7 @@ export class Edit implements EditIntf {
         }
     }
 
-    private moveNodesResponse = (res: J.MoveNodesResponse): void => {
+    private moveNodesResponse = (res: J.MoveNodesResponse, mstate: any): void => {
         if (S.util.checkSuccess("Move nodes", res)) {
 
             dispatch({
@@ -131,7 +131,7 @@ export class Edit implements EditIntf {
                 }
             });
 
-            S.view.refreshTree(null, false);
+            S.view.refreshTree(null, false, null, false, false, mstate);
         }
     }
 
@@ -217,12 +217,12 @@ export class Edit implements EditIntf {
         }
     }
 
-    saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse): Promise<void> => {
+    saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, mstate: any): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             if (S.util.checkSuccess("Save node", res)) {
                 await this.distributeKeys(node, res.aclEntries);
 
-                S.view.refreshTree(null, false, node.id);
+                S.view.refreshTree(null, false, node.id, false, false, mstate);
                 S.meta64.selectTab("mainTab");
                 resolve();
             }
@@ -456,7 +456,7 @@ export class Edit implements EditIntf {
         await S.render.renderPageFromData();
     }
 
-    emptyTrash = (): void => {
+    emptyTrash = (mstate: any): void => {
         S.meta64.clearSelectedNodes();
 
         new ConfirmDlg("Permanently delete your entire Trash Bin", "Empty Trash",
@@ -483,7 +483,7 @@ export class Edit implements EditIntf {
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
      * has currenly selected (via checkboxes)
      */
-    deleteSelNodes = (node: J.NodeInfo, hardDelete: boolean): void => {
+    deleteSelNodes = (node: J.NodeInfo, hardDelete: boolean, mstate: any): void => {
 
         if (node != null) {
             S.nav.toggleNodeSel(true, node.id);
@@ -515,7 +515,7 @@ export class Edit implements EditIntf {
                     nodeIds: selNodesArray,
                     hardDelete
                 }, (res: J.DeleteNodesResponse) => {
-                    this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode });
+                    this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode }, mstate);
                 });
             },
             null, //no callback
@@ -587,7 +587,7 @@ export class Edit implements EditIntf {
     }
 
     //location=inside | inline | inline-above (todo-1: put in java-aware enum)
-    pasteSelNodes = (node: J.NodeInfo, location: string, nodesToMove: string[]): void => {
+    pasteSelNodes = (node: J.NodeInfo, location: string, nodesToMove: string[], mstate: any): void => {
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently selected
          * page. Later on we can get more specific about allowing precise destination location for moved
@@ -597,7 +597,9 @@ export class Edit implements EditIntf {
             "targetNodeId": node.id,
             "nodeIds": nodesToMove,
             "location": location
-        }, this.moveNodesResponse);
+        }, (res) => {
+            this.moveNodesResponse(res, mstate);
+        });
     }
 
     insertBookWarAndPeace = (): void => {
@@ -645,7 +647,7 @@ export class Edit implements EditIntf {
             });
     }
 
-    splitNode = (splitType: string, delimiter: string): void => {
+    splitNode = (splitType: string, delimiter: string, mstate: any): void => {
         let highlightNode = S.meta64.getHighlightedNode();
         if (!highlightNode) {
             S.util.showMessage("You didn't select a node to split.");
@@ -656,12 +658,14 @@ export class Edit implements EditIntf {
             "splitType": splitType,
             "nodeId": highlightNode.id,
             "delimiter": delimiter
-        }, this.splitNodeResponse);
+        }, (res) => {
+            this.splitNodeResponse(res, mstate);
+        });
     }
 
-    splitNodeResponse = (res: J.SplitNodeResponse): void => {
+    splitNodeResponse = (res: J.SplitNodeResponse, mstate: any): void => {
         if (S.util.checkSuccess("Split content", res)) {
-            S.view.refreshTree(null, false);
+            S.view.refreshTree(null, false, null, false, false, mstate);
             S.meta64.selectTab("mainTab");
             S.view.scrollToSelectedNode();
         }
