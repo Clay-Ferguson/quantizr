@@ -91,6 +91,7 @@ export class MainNavPanel extends NavTag {
             buttons.push(new Li(null, {
                 className: "nav-item"
             }, [
+                //todo-0: this isn't showing up. Probably need ALL this stuff in AppState (all enablement vars)
                 new NavBarIconButton("fa-pencil", null, {
                     "onClick": e => { S.nav.editMode(); },
                     "title": "Toggle Edit Mode on/off"

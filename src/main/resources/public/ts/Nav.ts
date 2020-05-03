@@ -188,20 +188,8 @@ export class Nav implements NavIntf {
          * sets which node is selected on this page (i.e. parent node of this page being the 'key')
          */
         S.meta64.highlightNode(node, false);
-
         S.util.updateHistory(null, node);
-
-        // if (S.meta64.userPreferences.editMode) {
-        //     /*
-        //      * if node.owner is currently null, that means we have not retrieved the owner from the server yet, but
-        //      * if non-null it's already displaying and we do nothing.
-        //      */
-        //     if (!node.owner) {
-        //         //console.log("calling updateNodeInfo");
-        //         S.meta64.updateNodeInfo(node);
-        //     }
-        // }
-        S.meta64.refreshAllGuiEnablement();
+        S.meta64.recalcMetaState();
     }
 
     openContentNode = (nodePathOrId: string): void => {
@@ -236,7 +224,7 @@ export class Nav implements NavIntf {
             delete S.meta64.selectedNodes[id];
         }
 
-        S.meta64.refreshAllGuiEnablement();
+        S.meta64.recalcMetaState();
     }
 
     navPageNodeResponse = async (res: J.RenderNodeResponse): Promise<void> => {
@@ -266,10 +254,7 @@ export class Nav implements NavIntf {
     }
 
     showMainMenu = (nodesToMove: string[]): void => {
-        S.meta64.updateState();
-        //todo-1: Note: currently S.meta64.refreshAllGuiEnablement has a tight coupling to this for enablement.
-
-        S.meta64.refreshAllGuiEnablement();
+        S.meta64.recalcMetaState();
         this.mainMenuPopupDlg = new MainMenuPopupDlg(nodesToMove);
         this.mainMenuPopupDlg.open("inline-block");
     }

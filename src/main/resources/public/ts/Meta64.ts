@@ -10,7 +10,6 @@ import { AppState } from "./AppState";
 import { MainTabPanelIntf } from "./Interfaces";
 import { dispatch } from "./AppRedux";
 
-
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
@@ -26,8 +25,6 @@ export class Meta64 implements Meta64Intf {
 
     /* This is the state that all enablement and visibility must reference to determine how to enable gui */
     state = {
-        prevPageExists: false,
-        nextPageExists: false,
         selNodeCount: 0,
         highlightNode: null,
         selNodeIsMine: false,
@@ -355,10 +352,8 @@ export class Meta64 implements Meta64Intf {
      * Really need to use pub/sub event to broadcast enablement, and let each component do this independently and
      * decouple
      */
-    updateState = () => {
+    recalcMetaState = () => {
         /* multiple select nodes */
-        this.state.prevPageExists = S.nav.mainOffset > 0;
-        this.state.nextPageExists = !S.nav.endReached;
         this.state.selNodeCount = S.util.getPropertyCount(this.selectedNodes);
         this.state.highlightNode = this.getHighlightedNode();
         this.state.selNodeIsMine = this.state.highlightNode != null && (this.state.highlightNode.owner === this.userName || "admin" === this.userName);
@@ -383,21 +378,6 @@ export class Meta64 implements Meta64Intf {
         this.state.canCreateNode = this.userPreferences.editMode && this.state.highlightNode && (this.isAdminUser || (!this.isAnonUser /* && selNodeIsMine */));
         this.state.propsToggle = this.currentNodeData && this.currentNodeData.node && !this.isAnonUser;
         this.state.allowEditMode = this.currentNodeData && this.currentNodeData.node && !this.isAnonUser;
-    }
-
-    refreshAllGuiEnablement = () => {
-        //console.log("refreshAllGuiEnablement");
-        this.updateState();
-
-        // if (S.meta64.mainNavPanel) {
-        //     S.nav.mainNavPanel.refreshState();
-        // }
-
-        // we don't refresh state on popup menu, because currently we regenerate completely each time and we
-        // are calling updateState() before doing so, but aside from react performance we could do it differently if we ever need to.
-        // if (S.nav.mainMenuPopupDlg) {
-        //     S.nav.mainMenuPopupDlg.refreshVisAndEnablement();
-        // }
     }
 
     /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */

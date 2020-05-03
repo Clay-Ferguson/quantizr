@@ -1,6 +1,3 @@
-declare var Dropzone;
-declare var ace;
-
 import { MessageDlg } from "./dlg/MessageDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as I from "./Interfaces";
@@ -434,7 +431,7 @@ export class Util implements UtilIntf {
                             //}
                             //todo-1: not sure I like this tight coupling of the ajax and how to cleanup after a failed call at least
                             //things that normally run. This refreshing enablement normally runs, so let's run it here.
-                            S.meta64.refreshAllGuiEnablement();
+                            S.meta64.recalcMetaState();
                             return;
                         }
                         // WARNING: this looks like the right place for a return but does NOT work. Be careful.

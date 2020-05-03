@@ -74,8 +74,7 @@ export interface Meta64Intf {
     getHighlightedNode(): J.NodeInfo;
     highlightRowById(id, scroll): Promise<void>;
     highlightNode(node: J.NodeInfo, scroll: boolean): Promise<void>;
-    updateState();
-    refreshAllGuiEnablement();
+    recalcMetaState();
     getSingleSelectedNode(): J.NodeInfo;
     getOrdinalOfNode(node: J.NodeInfo): number;
     getNumChildNodes(): number;
