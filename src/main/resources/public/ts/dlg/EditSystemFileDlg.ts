@@ -1,4 +1,5 @@
 import {DialogBase} from "../DialogBase";
+import { AppState } from "../AppState";
 
 /*
 NOTE: This dialog is not yet converted to new Widget Architecture (see ChangePasswordDlgImpl.ts for a working example of the

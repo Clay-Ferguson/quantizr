@@ -5,6 +5,7 @@ import { PubSub } from "../PubSub";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { Comp } from "../widget/base/Comp";
 import { NodeCompMarkdown } from "../comps/NodeCompMarkdown";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,11 +22,11 @@ export class RepoRootTypeHandler implements TypeHandlerIntf {
         return "Repository Root";
     }
 
-    allowPropertyEdit = (propName: string): boolean => {
-        return S.meta64.isAdminUser;
+    allowPropertyEdit = (propName: string, state: AppState): boolean => {
+        return state.isAdminUser;
     }
 
-    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
+    render = (node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp => {
         //this is essentially the 'default rendering' any other node has.
         return new NodeCompMarkdown(node, {});
     }

@@ -3,7 +3,6 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Comp } from "../widget/base/Comp";
-import { ReactNode } from "react";
 import { NodeCompRow } from "./NodeCompRow";
 import { Div } from "../widget/Div";
 import { AppState } from "../AppState";
@@ -21,16 +20,14 @@ export class NodeCompTableRowLayout extends Div {
         super(null, { className: 'node-grid-table' });
     }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
-        let nodesToMove = useSelector((state: AppState) => state.nodesToMove);
-        let mstate: any = useSelector((state: AppState) => state.mstate);
+    preRender = (): void => {
+        let state: AppState = useSelector((state: AppState) => state);
+        let nodesToMove = state.nodesToMove;
 
-        let node = this.node;
         let curRow = new Div(null, { className: 'node-grid-row' });
         let children: Comp[] = [];
         let layoutClass = "node-grid-item";
-        let childCount: number = node.children.length;
+        let childCount: number = this.node.children.length;
         let rowCount: number = 0;
         let maxCols = 2;
         if (this.layout == "c2") {
@@ -45,15 +42,14 @@ export class NodeCompTableRowLayout extends Div {
         let cellWidth = 100 / maxCols;
 
         let curCols = 0;
-        for (let i = 0; i < node.children.length; i++) {
+        for (let i = 0; i < this.node.children.length; i++) {
             let comps: Comp[] = [];
-            let n: J.NodeInfo = node.children[i];
+            let n: J.NodeInfo = this.node.children[i];
 
             if (!(nodesToMove && nodesToMove.find(id => id == n.id))) {
-                S.render.updateHighlightNode(n, mstate.highlightNode);
 
                 if (this.debug && n) {
-                    console.log(" RENDER ROW[" + i + "]: node.id=" + n.id);
+                    console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
                 }
 
                 let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove);
@@ -91,7 +87,5 @@ export class NodeCompTableRowLayout extends Div {
         }
 
         this.setChildren(children);
-
-        return this.super_CompRender();
     }
 }

@@ -6,6 +6,7 @@ import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { NodeTypeListBox } from "../widget/NodeTypeListBox";
+import { AppState } from "../AppState";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -19,10 +20,12 @@ export class ChangeNodeTypeDlg extends DialogBase {
     inlineButton: Button;
     nodeTypeListBox: NodeTypeListBox;
 
-    constructor(selCallback : Function) {
-        super("Set Node Type", "app-modal-content-narrow-width");
-        
+    constructor(selCallback : Function, state: AppState) {
+        super("Set Node Type", "app-modal-content-narrow-width", false, false, state);
         this.selCallback = selCallback;
+    }
+
+    preRender = () => {
         this.setChildren([
             new Form(null, [
                 //todo-p2: need to make this default to the right type.

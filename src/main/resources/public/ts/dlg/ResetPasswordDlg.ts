@@ -9,6 +9,7 @@ import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { DialogBase } from "../DialogBase";
+import { AppState } from "../AppState";
 
 let util: Util;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,10 +21,12 @@ export class ResetPasswordDlg extends DialogBase {
     emailTextField: TextField;
     private user: string;
 
-    constructor(args: Object) {
-        super("Reset Password", "app-modal-content-narrow-width");
+    constructor(args: Object, state: AppState) {
+        super("Reset Password", "app-modal-content-narrow-width", false, false, state);
         this.user = (<any>args).user;
-        
+    }
+    
+    preRender = () => {
         this.setChildren([
             new Form(null, [
                 new TextContent("Enter your user name and email address and a change-password link will be sent to you"),
@@ -37,6 +40,9 @@ export class ResetPasswordDlg extends DialogBase {
                 ])
             ])
         ]);
+        if (this.user) {
+            this.userTextField.setValue(this.user);
+        }
     }
 
     resetPassword = (): void => {
@@ -58,12 +64,6 @@ export class ResetPasswordDlg extends DialogBase {
     resetPasswordResponse = (res: J.ResetPasswordResponse): void => {
         if (util.checkSuccess("Reset password", res)) {
             util.showMessage("Password reset email was sent. Check your email.");
-        }
-    }
-
-    init = (): void => {
-        if (this.user) {
-            this.userTextField.setValue(this.user);
         }
     }
 }

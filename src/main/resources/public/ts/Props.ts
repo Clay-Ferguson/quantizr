@@ -6,6 +6,7 @@ import { PropsIntf } from "./intf/PropsIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
+import { AppState } from "./AppState";
 
 
 let S: Singletons;
@@ -44,9 +45,8 @@ export class Props implements PropsIntf {
     /*
      * Toggles display of properties in the gui.
      */
-    propsToggle = async (): Promise<void> => {
-        S.meta64.showProperties = S.meta64.showProperties ? false : true;
-        await S.render.renderPageFromData();
+    propsToggle = async (state: AppState): Promise<void> => {
+        state.showProperties = state.showProperties ? false : true;
     }
 
     deleteProp = (node: J.NodeInfo, propertyName: string): void => {
@@ -142,11 +142,11 @@ export class Props implements PropsIntf {
     node this simply returns the ENC_KEY property but if not we look up in the ACL on the node a copy of the encrypted
     key that goes with the current user (us, logged in user), which should decrypt using our private key.
     */
-    getCryptoKey = (node: J.NodeInfo) => {
+    getCryptoKey = (node: J.NodeInfo, state: AppState) => {
         let cipherKey = null;
 
         /* if we own this node then this cipherKey for it will be ENC_KEY for us */
-        if (S.meta64.userName == node.owner) {
+        if (state.userName == node.owner) {
             cipherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
             console.log("getting cipherKey for node, from ENC_KEY: " + cipherKey);
         }
@@ -174,9 +174,9 @@ export class Props implements PropsIntf {
         return ret;
     }
 
-    isMine = (node: J.NodeInfo): boolean => {
-        if (!S.meta64.userName || S.meta64.userName == J.PrincipalName.ANON) return false;
-        return S.meta64.userName == node.owner;
+    isMine = (node: J.NodeInfo, state: AppState): boolean => {
+        if (!state.userName || state.userName == J.PrincipalName.ANON) return false;
+        return state.userName == node.owner;
     }
 
     isEncrypted = (node: J.NodeInfo): boolean => {

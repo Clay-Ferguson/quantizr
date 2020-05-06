@@ -9,6 +9,7 @@ import { Button } from "../widget/Button";
 import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,10 +22,12 @@ export class ChangePasswordDlg extends DialogBase {
     pwd: string;
     private passCode: string;
 
-    constructor(args: Object) {
-        super((<any>args).passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width");
+    constructor(args: Object, state: AppState) {
+        super((<any>args).passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width", false, false, state);
         this.passCode = (<any>args).passCode;
-        
+    }
+
+    preRender = () => {
         this.setChildren([
             new Form(null, [
                 new TextContent("Enter your new password below..."),
@@ -40,6 +43,7 @@ export class ChangePasswordDlg extends DialogBase {
                 ])
             ])
         ]);
+        this.passwordField.focus();
     }
 
     /*
@@ -73,13 +77,9 @@ export class ChangePasswordDlg extends DialogBase {
                     if (this.passCode) {
                         window.location.href = window.location.origin;
                     }
-                }
+                }, null, false, 0, this.appState
             );
             dlg.open();
         }
-    }
-
-    init = (): void => {
-        this.passwordField.focus();
     }
 }

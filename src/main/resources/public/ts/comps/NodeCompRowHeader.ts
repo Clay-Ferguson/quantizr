@@ -3,9 +3,9 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Div } from "../widget/Div";
-import { Comp } from "../widget/base/Comp";
-import { ReactNode } from "react";
 import { Span } from "../widget/Span";
+import { AppState } from "../AppState";
+import { useSelector, useDispatch } from "react-redux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,8 +21,8 @@ export class NodeCompRowHeader extends Div {
         });
     }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
+    preRender = (): void => {
+        let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         let children = [];
 
@@ -41,14 +41,12 @@ export class NodeCompRowHeader extends Div {
             priority));
 
         if (node.owner && node.owner != "?") {
-            let clazz: string = (node.owner === S.meta64.userName) ? "created-by-me" : "created-by-other";
+            let clazz: string = (node.owner === state.userName) ? "created-by-me" : "created-by-other";
             children.push(new Span("Created By: " + node.owner, {
                 className: clazz
             }));
         }
 
         this.setChildren(children);
-
-        return this.super_CompRender();
     }
 }

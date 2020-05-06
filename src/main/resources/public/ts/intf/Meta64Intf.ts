@@ -1,7 +1,7 @@
 import * as J from "../JavaIntf";
-import { GraphPanel } from "../widget/GraphPanel";
 import { MainTabPanelIntf } from "../Interfaces";
 import { CompIntf } from "../widget/base/CompIntf";
+import { AppState } from "../AppState";
 
 export interface Meta64Intf {
 
@@ -9,82 +9,43 @@ export interface Meta64Intf {
     app: CompIntf;
 
     appInitialized: boolean;
-    pendingLocationHash: string;
 
     isMobile: boolean;
     isMobileOrTablet: boolean;
 
     curUrlPath: string;
-    urlCmd: string;
-    homeNodeOverride: string;
-
-    nextGuid: number;
-
-    userName: string;
 
     deviceWidth: number;
     deviceHeight: number;
 
-    homeNodeId: string;
-    homeNodePath: string;
-
-    isAdminUser: boolean;
-    allowBashScripting: boolean;
-
-    isAnonUser: boolean;
-    anonUserLandingPageNode: any;
-    allowFileSystemSearch: boolean;
-
-    idToNodeMap: { [key: string]: J.NodeInfo };
-
-    nextUid: number;
-    parentIdToFocusNodeMap: { [key: string]: J.NodeInfo };
-    
-    showProperties: boolean;
-    showMetaData: boolean;
-
-    selectedNodes: any;
-
-    expandedAbbrevNodeIds: any;
-
-    //todo-1: rename this to nodeData
-    currentNodeData: J.RenderNodeResponse;
-
-    userPreferences: J.UserPreferences;
     navBarHeight: number;
-
-    graphPanel: GraphPanel;
 
     setOverlay(showOverlay: boolean): void;
     rebuildIndexes(): void;
     shutdownServerNode(string): void;
     sendTestEmail(string): void;
-    refresh(): void;
+    refresh(state: AppState): void;
     selectTab(pageName: string, clickEvent?: boolean): void;
-    getSelectedNodeUidsArray(): string[];
-    getSelectedNodeIdsArray(): string[];
-    getSelectedNodesAsMapById(): Object;
-    getSelectedNodesArray(): J.NodeInfo[];
-    clearSelectedNodes();
+    getSelNodeUidsArray(state: AppState): string[];
+    getSelNodeIdsArray(state: AppState): string[];
+    getSelNodesAsMapById(state: AppState): Object;
+    getSelNodesArray(state: AppState): J.NodeInfo[];
+    clearSelNodes(state: AppState);
     selectAllNodes(nodeIds : string[]);
     updateNodeInfo(node: J.NodeInfo);
-    getHighlightedNode(): J.NodeInfo;
-    highlightRowById(id, scroll): Promise<void>;
-    highlightNode(node: J.NodeInfo, scroll: boolean): Promise<void>;
-    recalcMetaState();
-    getSingleSelectedNode(): J.NodeInfo;
-    getOrdinalOfNode(node: J.NodeInfo): number;
-    getNumChildNodes(): number;
-    setCurrentNodeData(data: J.RenderNodeResponse): void;
-    removeBinaryById(id: string): void;
+    getHighlightedNode(state: AppState): J.NodeInfo;
+    highlightRowById(id, scroll, state: AppState): void;
+    highlightNode(node: J.NodeInfo, scroll: boolean, state: AppState): void;
+    getSingleSelectedNode(state: AppState): J.NodeInfo;
+    getOrdinalOfNode(node: J.NodeInfo, state: AppState): number;
+    removeBinaryById(id: string, state: AppState): void;
     initApp(): Promise<void>;
-    processUrlParams(): void;
+    processUrlParams(state: AppState): void;
     displaySignupMessage(): void
-    loadAnonPageHome(): void;
-    saveUserPreferences(): void;
+    loadAnonPageHome(state: AppState): void;
+    saveUserPreferences(state: AppState): void;
     openSystemFile(fileName: string);
-    onSignIn(googleUser);
-    setStateVarsUsingLoginResponse(res: J.LoginResponse): void;
-    updateNodeMap(node: J.NodeInfo): void;
+    setStateVarsUsingLoginResponse(res: J.LoginResponse, state: AppState): void;
+    updateNodeMap(node: J.NodeInfo, level: number, state: AppState): void;
 }
 

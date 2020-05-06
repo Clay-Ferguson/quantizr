@@ -4,11 +4,11 @@ import { Meta64Intf } from "./intf/Meta64Intf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
-import { GraphPanel } from "./widget/GraphPanel";
 import { App } from "./widget/App";
 import { AppState } from "./AppState";
 import { MainTabPanelIntf } from "./Interfaces";
-import { dispatch } from "./AppRedux";
+import { dispatch, initialState } from "./AppRedux";
+import { store } from "./AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -21,90 +21,16 @@ export class Meta64 implements Meta64Intf {
     app: App;
 
     navBarHeight: number = 0;
-    pendingLocationHash: string;
 
     appInitialized: boolean = false;
     isMobile: boolean;
     isMobileOrTablet: boolean;
 
     curUrlPath: string = window.location.pathname + window.location.search;
-    urlCmd: string;
-    homeNodeOverride: string;
-
-    /* used as a kind of 'sequence' in the app, when unique vals a needed */
-    nextGuid: number = 0;
-
-    /* name of currently logged in user */
-    userName: string = J.PrincipalName.ANON;
 
     /* screen capabilities */
     deviceWidth: number = 0;
     deviceHeight: number = 0;
-
-    /*
-     * User's root node. Top level of what logged in user is allowed to see.
-     */
-    homeNodeId: string = "";
-    homeNodePath: string = "";
-
-    /*
-     * specifies if this is admin user.
-     */
-    isAdminUser: boolean = false;
-    allowBashScripting: boolean = false;
-
-    /* always start out as anon user until login */
-    isAnonUser: boolean = true;
-    anonUserLandingPageNode: any = null;
-    allowFileSystemSearch: boolean = false;
-
-    /* maps node.id values to NodeInfo.java objects */
-    idToNodeMap: { [key: string]: J.NodeInfo } = {};
-
-    /* counter for local uids */
-    nextUid: number = 1;
-
-    /*
-     * Under any given node, there can be one active 'selected' node that has the highlighting, and will be scrolled
-     * to whenever the page with that child is re-visited, and parentIdToFocusNodeMap holds the map of "parent id to
-     * selected node (NodeInfo object)", where the key is the parent node id, and the value is the currently
-     * selected node within that parent. Note this 'selection state' is only significant on the client, and only for
-     * being able to scroll to the node during navigating around on the tree.
-     */
-    parentIdToFocusNodeMap: { [key: string]: J.NodeInfo } = {};
-
-    /*
-     * toggled by button, and holds if we are going to show properties or not on each node in the main view
-     */
-    showProperties: boolean = false;
-
-    /* Flag that indicates if we are rendering owner, modTime, etc. on each row */
-    showMetaData: boolean = false;
-
-    /*
-     * maps all node uids to true if selected, otherwise the property should be deleted (not existing)
-    todo-1: Javascript has a Set object we can use in cases like this!
-    new Set([1, 2, 3]).forEach(el => {
-        console.log(el * 2);
-    });
-     */
-    selectedNodes: any = {};
-
-    /* Set of all nodes that have been expanded (from the abbreviated form) */
-    expandedAbbrevNodeIds: any = {};
-
-    /* RenderNodeResponse.java object */
-    currentNodeData: J.RenderNodeResponse = null;
-
-    graphPanel: GraphPanel;
-
-    userPreferences: J.UserPreferences = {
-        editMode: false,
-        importAllowed: false,
-        exportAllowed: false,
-        showMetaData: false,
-        maxUploadFileSize: 0
-    };
 
     rebuildIndexes = (): void => {
         S.util.ajax<J.RebuildIndexesRequest, J.RebuildIndexesResponse>("rebuildIndexes", {}, function (res: J.RebuildIndexesResponse) {
@@ -124,39 +50,22 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
-    //todo-0: need mstate here
-    refresh = (): void => {
-        S.view.refreshTree(null, true, null, false, false, null);
+    refresh = (state: AppState): void => {
+        S.view.refreshTree(null, true, null, false, false, state);
     }
 
     selectTab = (tabName: string): void => {
-        //console.log("selectTab (sends click event): " + tabName);
-        let tabElm = document.querySelector("[href='#" + tabName + "']");
-        if (!tabElm) {
-            //console.error("unable to find tab: " + tabName + " modify this code to use something like whenElm");
-
-            //todo-1: fix. doing this bad wait hack for now to try again to find the element.
-            setTimeout(() => {
-                let tabElm = document.querySelector("[href='#" + tabName + "']");
-                if (tabElm) {
-                    //console.log("click tab(1): " + tabName);
-                    S.util.trigger(<HTMLElement>tabElm, "click");
-                }
-                else {
-                    console.error("unable to find tab: " + tabName + " modify this code to use something like whenElm");
-                }
-            }, 1000);
-            return;
-        }
-
-        //console.log("click tab(2): " + tabName);
-        /* The way to select a tab with no JQuery is to simply trigger a click on the tab */
-        S.util.trigger(<HTMLElement>tabElm, "click");
+        dispatch({
+            type: "Action_SelectTab",
+            update: (s: AppState): void => {
+                s.activeTab = tabName;
+            }
+        });
     }
 
-    getSelectedNodeUidsArray = (): string[] => {
+    getSelNodeUidsArray = (state: AppState): string[] => {
         let selArray: string[] = [];
-        S.util.forEachProp(this.selectedNodes, (id, val): boolean => {
+        S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
             selArray.push(id);
             return true;
         });
@@ -166,17 +75,17 @@ export class Meta64 implements Meta64Intf {
     /**
     Returns a new array of all the selected nodes each time it's called.
     */
-    getSelectedNodeIdsArray = (): string[] => {
+    getSelNodeIdsArray = (state: AppState): string[] => {
         let selArray: string[] = [];
 
-        if (!this.selectedNodes) {
+        if (!state.selectedNodes) {
             console.log("no selected nodes.");
         } else {
-            console.log("selectedNode count: " + S.util.getPropertyCount(this.selectedNodes));
+            console.log("selectedNode count: " + S.util.getPropertyCount(state.selectedNodes));
         }
 
-        S.util.forEachProp(this.selectedNodes, (id, val): boolean => {
-            let node: J.NodeInfo = this.idToNodeMap[id];
+        S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
+            let node: J.NodeInfo = state.idToNodeMap[id];
             if (!node) {
                 console.log("unable to find idToNodeMap for id=" + id);
             } else {
@@ -188,13 +97,13 @@ export class Meta64 implements Meta64Intf {
     }
 
     /* return an object with properties for each NodeInfo where the key is the id */
-    getSelectedNodesAsMapById = (): Object => {
+    getSelNodesAsMapById = (state: AppState): Object => {
         let ret: Object = {};
-        let selArray: J.NodeInfo[] = this.getSelectedNodesArray();
+        let selArray: J.NodeInfo[] = this.getSelNodesArray(state);
         if (!selArray || selArray.length == 0) {
-            let highlightNode = this.getHighlightedNode();
-            if (highlightNode) {
-                ret[highlightNode.id] = highlightNode;
+            let node = this.getHighlightedNode(state);
+            if (node) {
+                ret[node.id] = node;
                 return ret;
             }
         }
@@ -207,10 +116,10 @@ export class Meta64 implements Meta64Intf {
     }
 
     /* Gets selected nodes as NodeInfo.java objects array */
-    getSelectedNodesArray = (): J.NodeInfo[] => {
+    getSelNodesArray = (state: AppState): J.NodeInfo[] => {
         let selArray: J.NodeInfo[] = [];
-        S.util.forEachProp(this.selectedNodes, (id, val): boolean => {
-            let node = this.idToNodeMap[id];
+        S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
+            let node = state.idToNodeMap[id];
             if (node) {
                 selArray.push(node);
             }
@@ -219,8 +128,13 @@ export class Meta64 implements Meta64Intf {
         return selArray;
     }
 
-    clearSelectedNodes = () => {
-        this.selectedNodes = {};
+    clearSelNodes = (state: AppState) => {
+        dispatch({
+            type: "Action_ClearSelections", state,
+            update: (s: AppState): void => {
+                s.selectedNodes = {};
+            }
+        });
     }
 
     selectAllNodes = (nodeIds: string[]) => {
@@ -244,156 +158,62 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
-    getHighlightedNode = (): J.NodeInfo => {
-        if (!this.currentNodeData || !this.currentNodeData.node) return null;
-        let ret: J.NodeInfo = this.parentIdToFocusNodeMap[this.currentNodeData.node.id];
+    getHighlightedNode = (state: AppState): J.NodeInfo => {
+        if (!state.node) return null;
+        let ret: J.NodeInfo = state.parentIdToFocusNodeMap[state.node.id];
         return ret;
     }
 
-    highlightRowById = async (id: string, scroll: boolean): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            let node: J.NodeInfo = this.idToNodeMap[id];
-            if (node) {
-                //console.log("highlightRowById calling highlightNode");
-                await this.highlightNode(node, scroll);
-            } else {
-                //if we can't find that node, best behvior is at least to scroll to top.
-                if (scroll) {
-                    S.view.scrollToTop();
-                }
-                console.log("highlightRowById failed to find id: " + id);
-            }
-            resolve();
-        });
-    }
+    highlightRowById = (id: string, scroll: boolean, state: AppState): void => {
 
-    /*
-     * Important: We want this to be the only method that can set values on 'parentIdToFocusNodeMap', and always
-     * setting that value should go thru this function.
-     * 
-     * This function is slightly ugly and against ReactJS principles, but we don't yet have
-     * the main display page rendering (of node content) using 'React State' so this 
-     * logic is fine for now, and acually faster than React or anything else could ever be anyway.
-     * 
-     * todo-0: state management here (styles) needs to be triggered thru redux.
-     */
-    highlightNode = async (node: J.NodeInfo, scroll: boolean): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            //console.log("highlight node: " + node.id);
-            if (!node) {
-                console.log("ignoring null node.");
-                resolve();
-                return;
-            }
-
-            let activeClass = "active-row";
-            let inactiveClass = "inactive-row";
-            let id = this.currentNodeData.node.id;
-
-            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, id);
-            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
-
-            let doneHighlighting: boolean = false;
-
-            /* Unhighlight currently highlighted node if any */
-            let curHighlightedNode: J.NodeInfo = this.parentIdToFocusNodeMap[id];
-            if (curHighlightedNode) {
-                //console.log("already had a highlighted node.");
-                if (curHighlightedNode.id === node.id) {
-                    //console.log("nodeid " + node.uid + " was already highlighted.");
-                    doneHighlighting = true;
-                } else {
-                    let rowElmId = "row_" + curHighlightedNode.id;
-
-                    if (curHighlightedNode.id == this.currentNodeData.node.id) {
-                        S.util.changeOrAddClass(rowElmId, activeClass + "-main", inactiveClass + "-main");
-                    }
-                    else {
-                        S.util.changeOrAddClass(rowElmId, activeClass, inactiveClass);
-                    }
-                }
-            }
-
-            if (!doneHighlighting) {
-                this.parentIdToFocusNodeMap[id] = node;
-                let rowElmId: string = "row_" + node.id;
-
-                if (node.id == this.currentNodeData.node.id) {
-                    S.util.changeOrAddClass(rowElmId, inactiveClass + "-main", activeClass + "-main");
-                }
-                else {
-                    S.util.changeOrAddClass(rowElmId, inactiveClass, activeClass);
-                }
-            }
-
+        let node: J.NodeInfo = state.idToNodeMap[id];
+        if (node) {
+            this.highlightNode(node, scroll, state);
+        } else {
+            //if we can't find that node, best behvior is at least to scroll to top.
             if (scroll) {
-                //console.log("highlightNode calling scrollToSelectedNode.");
-                await S.view.scrollToSelectedNode();
+                S.view.scrollToTop();
             }
-            resolve();
-        });
+            console.log("highlightRowById failed to find id: " + id);
+        }
     }
 
-    /*
-     * Really need to use pub/sub event to broadcast enablement, and let each component do this independently and
-     * decouple
-     */
-    recalcMetaState = () => {
-        let mstate: any = {};
+    highlightNode = (node: J.NodeInfo, scroll: boolean, state: AppState): void => {
 
-        /* multiple select nodes */
-        mstate.selNodeCount = S.util.getPropertyCount(this.selectedNodes);
-        mstate.highlightNode = this.getHighlightedNode();
-        mstate.selNodeIsMine = mstate.highlightNode != null && (mstate.highlightNode.owner === this.userName || "admin" === this.userName);
+        if (!node) {
+            console.log("ignoring null node.");
+            return;
+        }
 
-        mstate.homeNodeSelected = mstate.highlightNode != null && this.homeNodeId == mstate.highlightNode.id;
+        let id = state.node.id;
+        S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, id);
+        S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
 
-        //for now, allowing all users to import+export (todo-2)
-        mstate.importFeatureEnabled = this.isAdminUser || this.userPreferences.importAllowed;
-        mstate.exportFeatureEnabled = this.isAdminUser || this.userPreferences.exportAllowed;
+        state.parentIdToFocusNodeMap[id] = node;
 
-        mstate.highlightOrdinal = this.getOrdinalOfNode(mstate.highlightNode);
-
-        mstate.numChildNodes = this.getNumChildNodes();
-
-        let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, mstate.highlightNode);
-        let allowNodeMove: boolean = !orderByProp;
-
-        mstate.canMoveUp = allowNodeMove && mstate.highlightNode && !mstate.highlightNode.firstChild;
-        mstate.canMoveDown = allowNodeMove && mstate.highlightNode && !mstate.highlightNode.lastChild;
-
-        //todo-1: need to add to this selNodeIsMine || selParentIsMine;
-        mstate.canCreateNode = this.userPreferences.editMode && mstate.highlightNode && (this.isAdminUser || (!this.isAnonUser /* && selNodeIsMine */));
-        mstate.propsToggle = this.currentNodeData && this.currentNodeData.node && !this.isAnonUser;
-        mstate.allowEditMode = this.currentNodeData && this.currentNodeData.node && !this.isAnonUser;
-
-        dispatch({
-            type: "Action_setMetaState",
-            update: (state: AppState): void => {
-                state.mstate = mstate;
-            }
-        });
+        if (scroll) {
+            S.view.scrollToSelectedNode(state);
+        }
     }
 
     /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */
-    getSingleSelectedNode = (): J.NodeInfo => {
+    getSingleSelectedNode = (state: AppState): J.NodeInfo => {
         let ret = null;
-        S.util.forEachProp(this.selectedNodes, (id, val): boolean => {
-            // console.log("found a single Sel NodeID: " + nodeId);
-            ret = this.idToNodeMap[id];
+        S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
+            ret = state.idToNodeMap[id];
             return false;
         });
         return ret;
     }
 
-    getOrdinalOfNode = (node: J.NodeInfo): number => {
+    getOrdinalOfNode = (node: J.NodeInfo, state: AppState): number => {
         let ret = -1;
 
-        if (!node || !this.currentNodeData || !this.currentNodeData.node.children)
+        if (!node || !state.node || !state.node.children)
             return ret;
 
         let idx = -1;
-        this.currentNodeData.node.children.forEach((iterNode): boolean => {
+        state.node.children.forEach((iterNode): boolean => {
             idx++;
             if (node.id === iterNode.id) {
                 ret = idx;
@@ -404,37 +224,25 @@ export class Meta64 implements Meta64Intf {
         return ret;
     }
 
-    getNumChildNodes = (): number => {
-        if (!this.currentNodeData || !this.currentNodeData.node || !this.currentNodeData.node.children)
-            return 0;
-
-        return this.currentNodeData.node.children.length;
-    }
-
-    setCurrentNodeData = (data: J.RenderNodeResponse): void => {
-        this.currentNodeData = data;
-    }
-
-    removeBinaryById = (id: string): void => {
-        if (!this.currentNodeData || !this.currentNodeData.node) return;
-        this.currentNodeData.node.children.forEach((node: J.NodeInfo) => {
+    removeBinaryById = (id: string, state: AppState): void => {
+        if (!state.node) return;
+        state.node.children.forEach((node: J.NodeInfo) => {
             if (node.id === id) {
                 S.props.deleteProp(node, J.NodeProp.BIN_MIME);
             }
         });
     }
 
-    updateNodeMap = (node: J.NodeInfo): void => {
+    updateNodeMap = (node: J.NodeInfo, level: number, state: AppState): void => {
         if (!node) return;
 
-        this.idToNodeMap = {};
-        this.idToNodeMap[node.id] = node;
+        if (level == 1) {
+            state.idToNodeMap = {};
+        }
+        state.idToNodeMap[node.id] = node;
 
         if (node.children) {
-            for (let i = 0; i < node.children.length; i++) {
-                let n: J.NodeInfo = node.children[i];
-                this.idToNodeMap[n.id] = n;
-            }
+            node.children.forEach(n => this.updateNodeMap(n, level+1, state));
         }
     }
 
@@ -463,7 +271,8 @@ export class Meta64 implements Meta64Intf {
         return new Promise<void>(async (resolve, reject) => {
             console.log("initApp running.");
 
-            this.pendingLocationHash = window.location.hash;
+            let state: AppState = store.getState();
+            state.pendingLocationHash = window.location.hash;
             S.plugin.initPlugins();
 
             this.isMobile = this.mobileCheck();
@@ -507,32 +316,35 @@ export class Meta64 implements Meta64Intf {
                 //console.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
 
                 if (event.state && event.state.nodeId) {
-                    S.view.refreshTree(event.state.nodeId, true, event.state.highlightId, false, false, null);
+                    S.view.refreshTree(event.state.nodeId, true, event.state.highlightId, false, false, store.getState());
                     this.selectTab("mainTab");
                 }
             };
 
             document.body.addEventListener("keydown", (event: KeyboardEvent) => {
+
+                let state = store.getState();
+
                 if (event.ctrlKey) {
                     switch (event.code) {
                         case "ArrowDown":
                             this.selectTab("mainTab");
-                            S.view.scrollRelativeToNode("down");
+                            S.view.scrollRelativeToNode("down", state);
                             break;
 
                         case "ArrowUp":
                             this.selectTab("mainTab");
-                            S.view.scrollRelativeToNode("up");
+                            S.view.scrollRelativeToNode("up", state);
                             break;
 
                         case "ArrowLeft":
                             this.selectTab("mainTab");
-                            S.nav.navUpLevel();
+                            S.nav.navUpLevel(state);
                             break;
 
                         case "ArrowRight":
                             this.selectTab("mainTab");
-                            S.nav.navOpenSelectedNode();
+                            S.nav.navOpenSelectedNode(state);
                             break;
 
                         default: break;
@@ -571,7 +383,7 @@ export class Meta64 implements Meta64Intf {
 
             //This is the root react App component that contains the entire application
             this.app = new App();
-            this.app.updateDOM("app");
+            this.app.updateDOM(store, "app");
 
             /*
              * This call checks the server to see if we have a session already, and gets back the login information from
@@ -579,16 +391,16 @@ export class Meta64 implements Meta64Intf {
              */
 
             //this.pingServer();
-            S.user.refreshLogin();
+            S.user.refreshLogin(store.getState());
 
             S.util.initProgressMonitor();
-            this.processUrlParams();
+            this.processUrlParams(null);
 
             this.setOverlay(false);
 
             // todo-1: could replace this pull with a push.
             setTimeout(() => {
-                S.view.displayNotifications(null);
+                S.view.displayNotifications(null, store.getState());
             }, 1000);
 
             // Initialize the 'ServerPush' client-side connection
@@ -652,15 +464,13 @@ export class Meta64 implements Meta64Intf {
             });
     }
 
-    processUrlParams = (): void => {
+    processUrlParams = (state: AppState): void => {
         var passCode = S.util.getParameterByName("passCode");
         if (passCode) {
             setTimeout(() => {
-                new ChangePasswordDlg({ "passCode": passCode }).open();
+                new ChangePasswordDlg({ "passCode": passCode }, state).open();
             }, 100);
         }
-
-        this.urlCmd = S.util.getParameterByName("cmd");
     }
 
     displaySignupMessage = (): void => {
@@ -684,19 +494,19 @@ export class Meta64 implements Meta64Intf {
     // }
     //
 
-    loadAnonPageHome = (): void => {
+    loadAnonPageHome = (state: AppState): void => {
         console.log("loadAnonPageHome()");
         S.util.ajax<J.AnonPageLoadRequest, J.AnonPageLoadResponse>("anonPageLoad", {
         },
             (res: J.AnonPageLoadResponse): void => {
-                S.render.renderPageFromData(res.renderNodeResponse);
+                S.render.renderPageFromData(res.renderNodeResponse, false, null, true, state);
             }
         );
     }
 
-    saveUserPreferences = (): void => {
+    saveUserPreferences = (state: AppState): void => {
         S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
-            "userPreferences": this.userPreferences
+            "userPreferences": state.userPreferences
         });
     }
 
@@ -706,59 +516,42 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
-    // /* This is a wrapper around System.import, to make future refactoring needs easier, and also make the code a bit cleaner */
-    // modRun(modName: string, callback: Function) {
-    //     System.import("/js/" + modName).then((mod) => {
-    //         callback(mod);
-    //     });
-    // }
-
-    //google signon is a work in progress, not functional yet.
-    onSignIn = (googleUser) => {
-        var profile = googleUser.getBasicProfile();
-        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-        console.log('Name: ' + profile.getName());
-        console.log('Image URL: ' + profile.getImageUrl());
-        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-    }
-
-    setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
+    setStateVarsUsingLoginResponse = (res: J.LoginResponse, state: AppState): void => {
         if (res.rootNode) {
-            this.homeNodeId = res.rootNode;
-            this.homeNodePath = res.rootNodePath;
+            state.homeNodeId = res.rootNode;
+            state.homeNodePath = res.rootNodePath;
         }
-        this.userName = res.userName;
-        this.isAdminUser = res.userName === "admin";
+        state.userName = res.userName;
+        state.isAdminUser = res.userName === "admin";
+        state.isAnonUser = res.userName === J.PrincipalName.ANON;
 
         //bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
         //sure i'm keeping this feature.
-        this.allowBashScripting = false; // res.userName === "admin";
+        state.allowBashScripting = false; // res.userName === "admin";
 
-        this.isAnonUser = res.userName === J.PrincipalName.ANON;
+        state.anonUserLandingPageNode = res.anonUserLandingPageNode;
+        state.allowFileSystemSearch = res.allowFileSystemSearch;
 
-        this.anonUserLandingPageNode = res.anonUserLandingPageNode;
-        this.allowFileSystemSearch = res.allowFileSystemSearch;
-
-        this.userPreferences = res.userPreferences;
+        state.userPreferences = res.userPreferences;
 
         //todo-1: admin user had bug where it wasn't loading this at login, so i did this hack for now to make admin logins
         //always set to what settings i prefer.
-        if (this.isAdminUser) {
-            this.showMetaData = false;
+        if (state.isAdminUser) {
+            state.showMetaData = false;
         }
         else {
-            this.showMetaData = res.userPreferences.showMetaData;
+            state.showMetaData = res.userPreferences.showMetaData;
         }
 
         var title = "";
-        if (!this.isAnonUser) {
+        if (!state.isAnonUser) {
             title += "User: " + res.userName;
         }
 
         dispatch({
-            type: "Action_LoginResponse",
-            update: (state: AppState): void => {
-                state.title = title;
+            type: "Action_LoginResponse", state,
+            update: (s: AppState): void => {
+                s.title = title;
             }
         });
     }

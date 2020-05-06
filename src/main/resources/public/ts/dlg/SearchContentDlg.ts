@@ -11,6 +11,7 @@ import { Form } from "../widget/Form";
 import { MessageDlg } from "./MessageDlg";
 import { Checkbox } from "../widget/Checkbox";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { AppState } from "../AppState";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -24,11 +25,12 @@ export class SearchContentDlg extends DialogBase {
     fuzzyCheckbox: Checkbox;
     caseSensitiveCheckbox: Checkbox;
   
-    constructor() {
-        super("Search Content", "app-modal-content-medium-width");
-        
+    constructor(state: AppState) {
+        super("Search Content", "app-modal-content-medium-width", null, false, state);
         S.srch.searchText = null;
+    }
 
+    preRender = () => {
         this.setChildren([
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
@@ -52,6 +54,7 @@ export class SearchContentDlg extends DialogBase {
                 ])
             ])
         ]);
+        this.searchTextField.focus();
     }
 
     search = () => {
@@ -60,7 +63,7 @@ export class SearchContentDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.meta64.getHighlightedNode();
+        let node = S.meta64.getHighlightedNode(this.appState);
         if (!node) {
             S.util.showMessage("No node is selected to search under.");
             return;
@@ -97,12 +100,8 @@ export class SearchContentDlg extends DialogBase {
             this.close();
         }
         else {
-            new MessageDlg("No search results found.", "Search").open();
+            new MessageDlg("No search results found.", "Search", null, null, false, 0, this.appState).open();
         }
-    }
-
-    init = (): void => {
-        this.searchTextField.focus();
     }
 }
 

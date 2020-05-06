@@ -6,6 +6,7 @@ import { Singletons } from "../Singletons";
 import { Constants as C} from "../Constants";
 import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -31,9 +32,11 @@ export class AudioPlayerDlg extends DialogBase {
     //DO NOT DELETE
     // private node: J.NodeInfo;
 
-    constructor(private sourceUrl: string) {
-        super("Audio Player");
+    constructor(private sourceUrl: string, state: AppState) {
+        super("Audio Player", null, false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             new Form(null, [
                 //new TextContent(this.title), 
@@ -67,6 +70,11 @@ export class AudioPlayerDlg extends DialogBase {
                 ])
             ])
         ]);
+        
+        this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
+            S.podcast.player = elm;
+            setTimeout(this.updatePlayButtonText, 1000);
+        });
     }
 
     getAudioElement(): HTMLAudioElement {
@@ -107,7 +115,7 @@ export class AudioPlayerDlg extends DialogBase {
                 S.podcast.play();
             }
             else {
-                S.podcast.pause();
+                S.podcast.pause(this.appState);
             }
             this.updatePlayButtonText();
         }
@@ -134,17 +142,10 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     closeEvent = (): void => {
-        S.podcast.destroyPlayer(null);
+        S.podcast.destroyPlayer(null, this.appState);
     }
 
     closeBtn = (): void => {
-        S.podcast.destroyPlayer(this);
-    }
-
-    init = (): void => {
-        this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
-            S.podcast.player = elm;
-            setTimeout(this.updatePlayButtonText, 1000);
-        });
+        S.podcast.destroyPlayer(this, this.appState);
     }
 }

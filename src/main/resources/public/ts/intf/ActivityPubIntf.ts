@@ -1,3 +1,5 @@
+import { AppState } from "../AppState";
+
 export interface ActivityPubIntf {
-    postNode() : void;
+    postNode(state: AppState) : void;
 }

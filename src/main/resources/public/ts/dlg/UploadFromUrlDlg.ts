@@ -7,6 +7,7 @@ import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Form } from "../widget/Form";
+import { AppState } from "../AppState";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -18,12 +19,14 @@ export class UploadFromUrlDlg extends DialogBase {
     uploadFromUrlTextField: TextField;
     uploadButton: Button;
 
-    constructor(private node: J.NodeInfo, private defaultUrl: string=null) {
-        super("Upload File");
-       
+    constructor(private node: J.NodeInfo, private defaultUrl: string, state: AppState) {
+        super("Upload File", null, false, false, state);
+    }
+
+    preRender = () => {
         this.setChildren([
             new Form(null, [
-                this.uploadFromUrlTextField = new TextField("Upload from URL", null, defaultUrl),
+                this.uploadFromUrlTextField = new TextField("Upload from URL", null, this.defaultUrl),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Close", () => {
@@ -50,7 +53,7 @@ export class UploadFromUrlDlg extends DialogBase {
     uploadFromUrlResponse = (res: J.UploadFromUrlResponse): void => {
         if (S.util.checkSuccess("Upload from URL", res)) {
             this.close();
-            S.meta64.refresh();
+            S.meta64.refresh(this.appState);
         }
     }
 }

@@ -2,10 +2,10 @@ import * as J from "../JavaIntf";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
-import { Comp } from "../widget/base/Comp";
-import { ReactNode } from "react";
 import * as marked from 'marked';
 import { MarkdownDiv } from "../widget/MarkdownDiv";
+import { AppState } from "../AppState";
+import { useSelector, useDispatch } from "react-redux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -78,8 +78,8 @@ export class NodeCompMarkdown extends MarkdownDiv {
         return val;
     }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
+    preRender = (): void => {
+        let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         let content = node.content || "";
         this.retState.renderComplete = true;
@@ -117,7 +117,7 @@ export class NodeCompMarkdown extends MarkdownDiv {
                     let cipherText = content.substring(J.Constant.ENC_TAG.length);
                     //console.log("NODE DATA: CIPHERTEXT: "+cipherText);
 
-                    let cipherKey = S.props.getCryptoKey(node);
+                    let cipherKey = S.props.getCryptoKey(node, state);
                     if (cipherKey) {
                         let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
@@ -130,7 +130,5 @@ export class NodeCompMarkdown extends MarkdownDiv {
                 }, 1);
             }
         });
-        
-        return this.super_CompRender();
     }
 }

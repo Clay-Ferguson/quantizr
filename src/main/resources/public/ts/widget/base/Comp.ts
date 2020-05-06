@@ -10,7 +10,6 @@ import * as ReactDOM from "react-dom";
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { ReactNode, ReactElement, useState, useEffect } from "react";
 import { Provider } from 'react-redux';
-import { AppState } from "../../AppState";
 
 //tip: merging states: this.state = { ...this.state, ...moreState };
 
@@ -27,13 +26,10 @@ declare var PROFILE;
  */
 export abstract class Comp implements CompIntf {
 
-    //redux store.
-    public store: any;
     public rendered: boolean = false;
-
     public debug: boolean = false;
     private static guid: number = 0;
-    public state: any = {}; 
+    public state: any = {};
 
     static idToCompMap: { [key: string]: Comp } = {};
     attribs: any;
@@ -195,12 +191,12 @@ export abstract class Comp implements CompIntf {
     /* WARNING: this is NOT a setter for 'this.visible'. Perhaps i need to rename it for better clarity, it takes
     this.visible as its input sometimes. Slightly confusing */
     setVisible = (visible: boolean) => {
-        this.mergeState({visible}); 
+        this.mergeState({ visible });
     }
 
     /* WARNING: this is NOT the setter for 'this.enabled' */
     setEnabled = (enabled: boolean) => {
-        this.mergeState({enabled}); 
+        this.mergeState({ enabled });
     }
 
     setClass = (clazz: string): void => {
@@ -244,12 +240,12 @@ export abstract class Comp implements CompIntf {
     }
 
     reactRenderHtmlInDiv = (): string => {
-        this.updateDOM(this.getId() + "_re");
+        this.updateDOM(null, this.getId() + "_re");
         return "<div id='" + this.getId() + "_re'></div>";
     }
 
     reactRenderHtmlInSpan = (): string => {
-        this.updateDOM(this.getId() + "_re");
+        this.updateDOM(null, this.getId() + "_re");
         return "<span id='" + this.getId() + "_re'></span>";
     }
 
@@ -259,7 +255,7 @@ export abstract class Comp implements CompIntf {
        Also this can only re-render TOP LEVEL elements, meaning elements that are not children of other React Elements, but attached
        to the DOM old-school.
     */
-    updateDOM = (id: string = null) => {
+    updateDOM = (store: any = null, id: string = null) => {
         if (!id) {
             id = this.getId();
         }
@@ -273,9 +269,9 @@ export abstract class Comp implements CompIntf {
             let reactElm = S.e(this.render, this.attribs);
 
             /* If this component has a store then wrap with the Redux Provider to make it all reactive */
-            if (this.store) {
+            if (store) {
                 //console.log("Rendering with provider");
-                let provider = S.e(Provider, { store: this.store }, reactElm);
+                let provider = S.e(Provider, { store }, reactElm);
                 ReactDOM.render(provider, elm);
             }
             else {
@@ -412,6 +408,7 @@ export abstract class Comp implements CompIntf {
             this.state.enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
             this.state.visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
 
+            this.preRender();
             ret = this.compRender();
         }
         catch (e) {
@@ -444,6 +441,10 @@ export abstract class Comp implements CompIntf {
             });
             this.domAddFuncs = null;
         }
+    }
+
+    /* Intended to be optionally overridable to set children */
+    public preRender = (): void => {
     }
 
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state

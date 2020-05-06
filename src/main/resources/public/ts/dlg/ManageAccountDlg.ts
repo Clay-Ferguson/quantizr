@@ -7,6 +7,7 @@ import { PubSub } from "../PubSub";
 import { TextContent } from "../widget/TextContent";
 import * as J from "../JavaIntf";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -16,9 +17,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ManageAccountDlg extends DialogBase {
     message: TextContent;
 
-    constructor() {
-        super("Manage Account");
+    constructor(state: AppState) {
+        super("Manage Account", null, false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             this.message = new TextContent("loading...", null, true),
 
@@ -32,9 +35,10 @@ export class ManageAccountDlg extends DialogBase {
                 })
             ])
         ]);
+        this.rinit();
     }
 
-    init = (): void => {
+    rinit = (): void => {
         S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,
             (res: J.GetUserAccountInfoResponse) => {
                 let used = "";
@@ -59,8 +63,8 @@ export class ManageAccountDlg extends DialogBase {
             });
     }
 
-    closeAccount = (): void => {
-        S.user.closeAccount();
+    closeAccount = (state: AppState): void => {
+        S.user.closeAccount(state);
         this.close();
     }
 }

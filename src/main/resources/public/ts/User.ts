@@ -6,6 +6,7 @@ import { UserIntf } from "./intf/UserIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
+import { AppState } from "./AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -27,16 +28,16 @@ export class User implements UserIntf {
         window.location.href = window.location.origin;
     }
 
-    closeAccount = (): void => {
+    closeAccount = (state: AppState): void => {
         new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
             () => {
                 new ConfirmDlg("Your data will be deleted and can never be recovered.<p> Are you sure?", "Last Chance... One more Click",
                     () => {
                         this.deleteAllUserLocalDbEntries();
                         S.util.ajax<J.CloseAccountRequest, J.CloseAccountResponse>("closeAccount", {}, this.closeAccountResponse);
-                    }
+                    }, null, null, null, state
                 ).open();
-            }
+            }, null, null, null, state
         ).open();
     }
 
@@ -45,27 +46,27 @@ export class User implements UserIntf {
      * into production, but on my own production these are my "testUserAccounts", so no real user will be able to
      * use these names
      */
-    isTestUserAccount = (): boolean => {
-        return S.meta64.userName.toLowerCase() === "adam" || //
-            S.meta64.userName.toLowerCase() === "bob" || //
-            S.meta64.userName.toLowerCase() === "cory" || //
-            S.meta64.userName.toLowerCase() === "dan";
+    isTestUserAccount = (state: AppState): boolean => {
+        return state.userName.toLowerCase() === "adam" || //
+            state.userName.toLowerCase() === "bob" || //
+            state.userName.toLowerCase() === "cory" || //
+            state.userName.toLowerCase() === "dan";
     }
 
-    openSignupPg = (): void => {
-        new SignupDlg().open();
+    openSignupPg = (state: AppState): void => {
+        new SignupDlg(state).open();
     }
 
     /*
      * This method is ugly. It is the button that can be login *or* logout.
      */
-    openLoginPg = (): void => {
-        let dlg = new LoginDlg(null);
+    openLoginPg = (state: AppState): void => {
+        let dlg = new LoginDlg(null, state);
         dlg.populateFromLocalDb();
         dlg.open();
     }
 
-    refreshLogin = async (): Promise<void> => {
+    refreshLogin = async (state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 console.log("refreshLogin.");
@@ -78,7 +79,7 @@ export class User implements UserIntf {
                 /* if we have known state as logged out, then do nothing here */
                 if (loginState === "0") {
                     console.log("loginState known as logged out. Sending to anon home page. [no, new logic overriding this now]");
-                    S.meta64.loadAnonPageHome();
+                    S.meta64.loadAnonPageHome(state);
                     return;
                 }
 
@@ -96,7 +97,7 @@ export class User implements UserIntf {
                 console.log("refreshLogin with name: " + callUsr);
 
                 if (!callUsr) {
-                    S.meta64.loadAnonPageHome();
+                    S.meta64.loadAnonPageHome(state);
                 } else {
                     //alert('calling login: currently at: '+location.href);
                     S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
@@ -106,9 +107,9 @@ export class User implements UserIntf {
                         "dst": S.util.daylightSavingsTime
                     }, (res: J.LoginResponse) => {
                         if (usingCredentials) {
-                            this.loginResponse(res, callUsr, callPwd, usingCredentials);
+                            this.loginResponse(res, callUsr, callPwd, usingCredentials, null, state);
                         } else {
-                            this.refreshLoginResponse(res);
+                            this.refreshLoginResponse(res, state);
                         }
                     });
                 }
@@ -119,10 +120,10 @@ export class User implements UserIntf {
         });
     }
 
-    logout = async (updateLocalDb: any): Promise<void> => {
+    logout = async (updateLocalDb: any, state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                if (S.meta64.isAnonUser) {
+                if (state.isAnonUser) {
                     return;
                 }
 
@@ -142,14 +143,14 @@ export class User implements UserIntf {
         });
     }
 
-    login = (loginDlg: any, usr: string, pwd: string) => {
+    login = (loginDlg: any, usr: string, pwd: string, state: AppState) => {
         S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
             "userName": usr,
             "password": pwd,
             "tzOffset": new Date().getTimezoneOffset(),
             "dst": S.util.daylightSavingsTime
         }, (res: J.LoginResponse) => {
-            this.loginResponse(res, usr, pwd, null, loginDlg);
+            this.loginResponse(res, usr, pwd, null, loginDlg, state);
         });
     }
 
@@ -166,7 +167,8 @@ export class User implements UserIntf {
         });
     }
 
-    loginResponse = async (res?: J.LoginResponse, usr?: string, pwd?: string, usingCredentials?: boolean, loginDlg?: LoginDlg): Promise<void> => {
+    loginResponse = async (res: J.LoginResponse, usr: string, pwd: string, usingCredentials: boolean, loginDlg: LoginDlg,
+        state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 if (S.util.checkSuccess("Login", res)) {
@@ -183,7 +185,7 @@ export class User implements UserIntf {
                         loginDlg.close();
                     }
 
-                    S.meta64.setStateVarsUsingLoginResponse(res);
+                    S.meta64.setStateVarsUsingLoginResponse(res, state);
 
                     /* set ID to be the page we want to show user right after login */
                     let id: string = null;
@@ -192,7 +194,6 @@ export class User implements UserIntf {
                     if (res.homeNodeOverride) {
                         console.log("loading homeNodeOverride=" + res.homeNodeOverride);
                         id = res.homeNodeOverride;
-                        S.meta64.homeNodeOverride = id;
                     } //
                     else {
                         let lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
@@ -202,12 +203,12 @@ export class User implements UserIntf {
                             id = lastNode;
                             childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
                         } else {
-                            console.log("loading homeNodeId=" + S.meta64.homeNodeId);
-                            id = S.meta64.homeNodeId;
+                            console.log("loading homeNodeId=" + state.homeNodeId);
+                            id = state.homeNodeId;
                         }
                     }
 
-                    S.view.refreshTree(id, true, childId, true, false, null);
+                    S.view.refreshTree(id, true, childId, true, false, state);
 
                     setTimeout(() => {
                         S.encryption.initKeys();
@@ -234,24 +235,24 @@ export class User implements UserIntf {
         });
     }
 
-    private refreshLoginResponse = (res: J.LoginResponse): void => {
+    private refreshLoginResponse = (res: J.LoginResponse, state: AppState): void => {
         console.log("refreshLoginResponse");
 
         if (res.success) {
-            S.meta64.setStateVarsUsingLoginResponse(res);
+            S.meta64.setStateVarsUsingLoginResponse(res, state);
         }
 
-        S.meta64.loadAnonPageHome();
+        S.meta64.loadAnonPageHome(state);
     }
 
-    transferNode = (recursive: boolean, nodeId: string, fromUser: string, toUser: string): void => {
+    transferNode = (recursive: boolean, nodeId: string, fromUser: string, toUser: string, state: AppState): void => {
         S.util.ajax<J.TransferNodeRequest, J.TransferNodeResponse>("transferNode", {
             recursive,
             nodeId,
             fromUser,
             toUser,
         }, (res: J.TransferNodeResponse) => {
-            S.view.refreshTree(null, false, null, false, false, null);
+            S.view.refreshTree(null, false, null, false, false, state);
             S.util.showMessage(res.message);
         });
     }

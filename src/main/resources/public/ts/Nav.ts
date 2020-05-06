@@ -12,6 +12,8 @@ import { Heading } from "./widget/Heading";
 import { MainMenuPopupDlg } from "./dlg/MainMenuPopupDlg";
 import { CompIntf } from "./widget/base/CompIntf";
 import { DialogBaseImpl } from "./DialogBaseImpl";
+import { AppState } from "./AppState";
+import { dispatch } from "./AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -25,74 +27,69 @@ export class Nav implements NavIntf {
 
     /* todo-2: eventually when we do paging for other lists, we will need a set of these variables for each list display (i.e. search, timeline, etc) */
     mainOffset: number = 0;
-    endReached: boolean = true;
 
     /* todo-2: need to have this value passed from server rather than coded in TypeScript, however for now 
     this MUST match RenderNodeService.ROWS_PER_PAGE in Java on server. */
     ROWS_PER_PAGE: number = 25;
 
-    editMode = (): void => {
-        S.edit.editMode();
-    }
-
-    login = (): void => {
-        let dlg = new LoginDlg(null);
+    login = (state: AppState): void => {
+        let dlg = new LoginDlg(null, state);
         dlg.populateFromLocalDb();
         dlg.open();
     }
 
-    logout = (): void => {
-        S.user.logout(true);
+    logout = (state: AppState): void => {
+        S.user.logout(true, state);
     }
 
-    signup = (): void => {
-        S.user.openSignupPg();
+    signup = (state: AppState): void => {
+        S.user.openSignupPg(state);
     }
 
-    preferences = (): void => {
-        new PrefsDlg().open();
+    preferences = (state: AppState): void => {
+        new PrefsDlg(state).open();
     }
 
-    displayingRepositoryRoot = (): boolean => {
-        if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node) return false;
+    displayingRepositoryRoot = (state: AppState): boolean => {
+        if (!state.node) return false;
         //one way to detect repository root (without path, since we don't send paths back to client) is as the only node that owns itself.
         //console.log(S.util.prettyPrint(S.meta64.currentNodeData.node));
-        return S.meta64.currentNodeData.node.id==S.meta64.currentNodeData.node.ownerId;
+        return state.node.id == state.node.ownerId;
     }
 
-    displayingHome = (): boolean => {
-        if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node) return false;
-        if (S.meta64.isAnonUser) {
-            return S.meta64.currentNodeData.node.id === S.meta64.anonUserLandingPageNode;
+    displayingHome = (state: AppState): boolean => {
+        if (!state.node) return false;
+        if (state.isAnonUser) {
+            return state.node.id === state.anonUserLandingPageNode;
         } else {
-            return S.meta64.currentNodeData.node.id === S.meta64.homeNodeId;
+            return state.node.id === state.homeNodeId;
         }
     }
 
-    parentVisibleToUser = (): boolean => {
-        return !this.displayingHome();
+    parentVisibleToUser = (state: AppState): boolean => {
+        return !this.displayingHome(state);
     }
 
-    upLevelResponse = async (res: J.RenderNodeResponse, id: string, scrollToTop: boolean = false): Promise<void> => {
+    upLevelResponse = async (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState): Promise<void> => {
         if (!res || !res.node) {
             S.util.showMessage("No data is visible to you above this node.");
         } else {
-            await S.render.renderPageFromData(res, scrollToTop, id);
+            await S.render.renderPageFromData(res, scrollToTop, id, true, state);
         }
     }
 
-    navOpenSelectedNode = (): void => {
-        let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode();
+    navOpenSelectedNode = (state: AppState): void => {
+        let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!currentSelNode) return;
-        S.nav.openNodeById(currentSelNode.id, null);
+        S.nav.openNodeById(currentSelNode.id, state);
     }
 
-    navToSibling = (siblingOffset: number): void => {
-        if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node) return null;
+    navToSibling = (siblingOffset: number, state: AppState): void => {
+        if (!state.node) return null;
 
         this.mainOffset = 0;
         let res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            "nodeId": S.meta64.currentNodeData.node.id,
+            "nodeId": state.node.id,
             "upLevel": null,
             "siblingOffset": siblingOffset,
             "renderParentIfLeaf": true,
@@ -102,17 +99,17 @@ export class Nav implements NavIntf {
         },
             //success callback
             (res: J.RenderNodeResponse) => {
-                this.upLevelResponse(res, null, true);
+                this.upLevelResponse(res, null, true, state);
             }
             ,
             //fail callback
             (res: string) => {
-                this.navHome();
+                this.navHome(state);
             });
     }
 
-    navUpLevel = (): void => {
-        if (!S.meta64.currentNodeData || !S.meta64.currentNodeData.node) return null;
+    navUpLevel = (state: AppState): void => {
+        if (!state.node) return null;
 
         //Always just scroll to the top before doing an actual 'upLevel' to parent.
         if (S.view.docElm.scrollTop > 100) {
@@ -122,18 +119,18 @@ export class Nav implements NavIntf {
             let's just comment it out. */
             //S.util.animateScrollToTop();
 
-            S.meta64.highlightNode(S.meta64.currentNodeData.node, false);
+            S.meta64.highlightNode(state.node, false, state);
             return;
         }
 
-        if (!this.parentVisibleToUser()) {
+        if (!this.parentVisibleToUser(state)) {
             // Already at root. Can't go up.
             return;
         }
 
         this.mainOffset = 0;
         let res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            "nodeId": S.meta64.currentNodeData.node.id,
+            "nodeId": state.node.id,
             "upLevel": 1,
             "siblingOffset": 0,
             "renderParentIfLeaf": false,
@@ -143,24 +140,24 @@ export class Nav implements NavIntf {
         },
             //success callback
             (res: J.RenderNodeResponse) => {
-                this.upLevelResponse(res, S.meta64.currentNodeData.node.id);
+                this.upLevelResponse(res, state.node.id, false, state);
             }
             ,
             //fail callback
             (res: string) => {
-                this.navHome();
+                this.navHome(state);
             });
     }
 
     /*
      * turn of row selection DOM element of whatever row is currently selected
      */
-    getSelectedDomElement = (): HTMLElement => {
-        var currentSelNode = S.meta64.getHighlightedNode();
+    getSelectedDomElement = (state: AppState): HTMLElement => {
+        var currentSelNode = S.meta64.getHighlightedNode(state);
         if (currentSelNode) {
 
             /* get node by node identifier */
-            let node: J.NodeInfo = S.meta64.idToNodeMap[currentSelNode.id];
+            let node: J.NodeInfo = state.idToNodeMap[currentSelNode.id];
 
             if (node) {
                 //console.log("found highlighted node.id=" + node.id);
@@ -176,23 +173,24 @@ export class Nav implements NavIntf {
         return null;
     }
 
-    clickOnNodeRow = (id: string): void => {
+    clickOnNodeRow = (node: J.NodeInfo, state: AppState): void => {
         //console.log("clickOnNodeRow: uid=" + uid);
-        let node: J.NodeInfo = S.meta64.idToNodeMap[id];
-        if (!node) {
-            //console.log("clickOnNodeRow recieved uid that doesn't map to any node. uid=" + uid);
-            return;
-        }
 
         /*
          * sets which node is selected on this page (i.e. parent node of this page being the 'key')
          */
-        S.meta64.highlightNode(node, false);
-        S.util.updateHistory(null, node);
-        S.meta64.recalcMetaState();
+        S.meta64.highlightNode(node, false, state);
+        S.util.updateHistory(null, node, state);
+
+        dispatch({
+            type: "Action_ClickOnNodeRow", 
+            updateNew: (s: AppState): AppState => {
+                return {...state};
+            }
+        });
     }
 
-    openContentNode = (nodePathOrId: string): void => {
+    openContentNode = (nodePathOrId: string, state: AppState): void => {
         this.mainOffset = 0;
         console.log("openContentNode()");
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -203,37 +201,35 @@ export class Nav implements NavIntf {
             "offset": this.mainOffset,
             "goToLastPage": false,
             "forceIPFSRefresh": false
-        }, this.navPageNodeResponse);
+        }, (res) => { this.navPageNodeResponse(res, state); });
     }
 
-    openNodeById = (id: string, mstate: any): void => {
-        let node: J.NodeInfo = S.meta64.idToNodeMap[id];
-        S.meta64.highlightNode(node, false);
+    openNodeById = (id: string, state: AppState): void => {
+        let node: J.NodeInfo = state.idToNodeMap[id];
+        S.meta64.highlightNode(node, false, state);
 
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id);
         } else {
-            S.view.refreshTree(node.id, true, null, false, false, mstate);
+            S.view.refreshTree(node.id, true, null, false, false, state);
         }
     }
 
-    toggleNodeSel = (selected: boolean, id: string): void => {
+    toggleNodeSel = (selected: boolean, id: string, state: AppState): void => {
         if (selected) {
-            S.meta64.selectedNodes[id] = true;
+            state.selectedNodes[id] = true;
         } else {
-            delete S.meta64.selectedNodes[id];
+            delete state.selectedNodes[id];
         }
-
-        S.meta64.recalcMetaState();
     }
 
-    navPageNodeResponse = async (res: J.RenderNodeResponse): Promise<void> => {
+    navPageNodeResponse = async (res: J.RenderNodeResponse, state: AppState): Promise<void> => {
         console.log("navPageNodeResponse.");
-        S.meta64.clearSelectedNodes();
-        await S.render.renderPageFromData(res, true);
+        S.meta64.clearSelNodes(state);
+        await S.render.renderPageFromData(res, true, null, true, state);
     }
 
-    geoLocation = (): void => {
+    geoLocation = (state: AppState): void => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((location) => {
                 new MessageDlg("Message", "Title", null,
@@ -244,41 +240,40 @@ export class Nav implements NavIntf {
                         new Anchor("https://www.google.com/maps/search/?api=1&query=" + location.coords.latitude + "," + location.coords.longitude,
                             "Show Your Google Maps Location",
                             { "target": "_blank" }),
-                    ])
+                    ]), false, 0, state
                 ).open();
             });
         }
         else {
-            new MessageDlg("GeoLocation is not available on this device.", "Message").open();
+            new MessageDlg("GeoLocation is not available on this device.", "Message", null, null, false, 0, state).open();
         }
     }
 
-    showMainMenu = (nodesToMove: string[], mstate: any): void => {
-        S.meta64.recalcMetaState();
-        this.mainMenuPopupDlg = new MainMenuPopupDlg(nodesToMove, mstate);
+    showMainMenu = (state: AppState): void => {
+        this.mainMenuPopupDlg = new MainMenuPopupDlg(state);
         this.mainMenuPopupDlg.open("inline-block");
     }
 
-    navHome = (): void => {
+    navHome = (state: AppState): void => {
         console.log("navHome()");
-        if (S.meta64.isAnonUser) {
-            S.meta64.loadAnonPageHome();
+        if (state.isAnonUser) {
+            S.meta64.loadAnonPageHome(state);
         } else {
             this.mainOffset = 0;
             S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                "nodeId": S.meta64.homeNodeId,
+                "nodeId": state.homeNodeId,
                 "upLevel": null,
                 "siblingOffset": 0,
                 "renderParentIfLeaf": null,
                 "offset": this.mainOffset,
                 "goToLastPage": false,
                 "forceIPFSRefresh": false
-            }, this.navPageNodeResponse);
+            }, (res) => {this.navPageNodeResponse(res, state);});
         }
     }
 
-    navPublicHome = (): void => {
-        S.meta64.loadAnonPageHome();
+    navPublicHome = (state: AppState): void => {
+        S.meta64.loadAnonPageHome(state);
     }
 }
 

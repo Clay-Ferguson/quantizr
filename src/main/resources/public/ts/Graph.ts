@@ -4,6 +4,7 @@ import { PubSub } from "./PubSub";
 import { Constants as C} from "./Constants";
 import { GraphIntf } from "./intf/GraphIntf";
 import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
+import { AppState } from "./AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -11,8 +12,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Graph implements GraphIntf {
-    graphTreeStructure = (mstate: any) => {
-        let nodeId = mstate.highlightNode.id;
+    graphTreeStructure = (state: AppState) => {
+        let highlightNode = S.meta64.getHighlightedNode(state);
+        if (!highlightNode) {
+            return;
+        }
+        let nodeId = highlightNode.id;
         S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
             "nodeId": nodeId,
         }, this.graphNodesResponse);
@@ -20,7 +25,9 @@ export class Graph implements GraphIntf {
 
     graphNodesResponse = (res: J.GraphResponse) => {
         //console.log(S.util.prettyPrint(res));
-        S.meta64.graphPanel.setGraphData({nodes: res.nodes, edges: res.edges});
+
+        //graphPanel var went away. This will have to be done with AppState now.
+        //S.meta64.graphPanel.setGraphData({nodes: res.nodes, edges: res.edges});
         S.meta64.selectTab("graphTab");
     }
 }

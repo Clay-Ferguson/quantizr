@@ -7,6 +7,7 @@ import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { NodeCompMarkdown } from "../comps/NodeCompMarkdown";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -30,7 +31,7 @@ export class IPFSNodeTypeHandler implements TypeHandlerIntf {
         return false;
     }
 
-    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
+    render = (node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp => {
         let ret: Comp[] = [];
 
         let name = node.content;

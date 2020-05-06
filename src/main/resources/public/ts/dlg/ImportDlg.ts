@@ -7,6 +7,8 @@ import { TextField } from "../widget/TextField";
 import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
+import { AppState } from "../AppState";
+import { store } from "../AppRedux";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -17,9 +19,11 @@ export class ImportDlg extends DialogBase {
 
   importFromFileNameTextField: TextField;
 
-    constructor() {
-        super("Import from XML");
-        
+    constructor(state: AppState) {
+        super("Import from XML", null, false, false, state);
+    }
+    
+    preRender = () => {
         this.setChildren([
             this.importFromFileNameTextField = new TextField("File Name to Import"),
             new ButtonBar([
@@ -32,11 +36,11 @@ export class ImportDlg extends DialogBase {
     }
 
     importNodes = (): void => {
-        var highlightNode = S.meta64.getHighlightedNode();
+        var highlightNode = S.meta64.getHighlightedNode(this.appState);
         var sourceFileName = this.importFromFileNameTextField.getValue();
 
         if (!sourceFileName) {
-            new MessageDlg("Please enter a name for the import file.", "Import").open();
+            new MessageDlg("Please enter a name for the import file.", "Import", null, null, false, 0, this.appState).open();
             return;
         }
 
@@ -51,11 +55,11 @@ export class ImportDlg extends DialogBase {
 
     importResponse = (res: J.ImportResponse): void => {
         if (S.util.checkSuccess("Import", res)) {
-            new MessageDlg("Import Successful", "Import").open();
+            new MessageDlg("Import Successful", "Import",null, null, false, 0, this.appState).open();
 
-            S.view.refreshTree(null, false, null, false, false, null);
+            S.view.refreshTree(null, false, null, false, false, store.getState());
             S.meta64.selectTab("mainTab");
-            S.view.scrollToSelectedNode();
+            S.view.scrollToSelectedNode(this.appState);
         }
     }
 }

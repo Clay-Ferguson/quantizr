@@ -2,6 +2,7 @@ import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { CompIntf } from "../widget/base/CompIntf";
 import { DialogBaseImpl } from "../DialogBaseImpl";
+import { AppState } from "../AppState";
 
 export interface NavIntf {
     _UID_ROWID_PREFIX: string;
@@ -9,31 +10,29 @@ export interface NavIntf {
     mainMenuPopupDlg: DialogBaseImpl;
 
     mainOffset: number;
-    endReached: boolean;
 
     ROWS_PER_PAGE: number;
 
-    editMode(): void;
-    login(): void;
-    logout(): void;
-    signup(): void;
-    preferences(): void;
-    openContentNode(nodePathOrId: string): void;
-    geoLocation(): void;
-    displayingHome(): boolean;
-    displayingRepositoryRoot(): boolean;
-    parentVisibleToUser(): boolean;
-    upLevelResponse(res: J.RenderNodeResponse, id): void;
-    navUpLevel(): void;
-    navOpenSelectedNode(): void;
-    getSelectedDomElement(): HTMLElement;
-    clickOnNodeRow(id: string): void;
-    openNodeById(id: string, mstate: any): void;
-    toggleNodeSel(selected: boolean, id: string): void;
-    navPageNodeResponse(res: J.RenderNodeResponse): void;
-    navHome(): void;
-    navPublicHome(): void;
-    showMainMenu(nodesToMove: string[], mstate: any): void;
-    navToSibling(siblingOffset: number): void;
+    login(state: AppState): void;
+    logout(state: AppState): void;
+    signup(state: AppState): void;
+    preferences(state: AppState): void;
+    openContentNode(nodePathOrId: string, state: AppState): void;
+    geoLocation(state: AppState): void;
+    displayingHome(state: AppState): boolean;
+    displayingRepositoryRoot(state: AppState): boolean;
+    parentVisibleToUser(state: AppState): boolean;
+    upLevelResponse(res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState): void;
+    navUpLevel(state: AppState): void;
+    navOpenSelectedNode(state: AppState): void;
+    getSelectedDomElement(state: AppState): HTMLElement;
+    clickOnNodeRow(node: J.NodeInfo, state: AppState): void;
+    openNodeById(id: string, state: AppState): void;
+    toggleNodeSel(selected: boolean, id: string, state: AppState): void;
+    navPageNodeResponse(res: J.RenderNodeResponse, state: AppState): void;
+    navHome(state: AppState): void;
+    navPublicHome(state: AppState): void;
+    showMainMenu(state: AppState): void;
+    navToSibling(siblingOffset: number, state: AppState): void;
 }
 

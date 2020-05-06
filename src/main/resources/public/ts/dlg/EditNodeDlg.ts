@@ -28,6 +28,7 @@ import { Textarea } from "../widget/Textarea";
 import { SymKeyDataPackage } from "../intf/EncryptionIntf";
 import { Icon } from "../widget/Icon";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -71,12 +72,8 @@ export class EditNodeDlg extends DialogBase {
 
     skdp: SymKeyDataPackage;
 
-    //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
-    //to dangerously opt into this also without hacking the code with this var.
-    allowEditAllProps: boolean = S.meta64.isAdminUser;
-
-    constructor(private node: J.NodeInfo) {
-        super("Edit Node", "app-modal-content", false, true);
+    constructor(private node: J.NodeInfo, state: AppState) {
+        super("Edit Node", "app-modal-content", false, true, state);
     }
 
     createLayoutSelection = (): Selection => {
@@ -96,7 +93,7 @@ export class EditNodeDlg extends DialogBase {
         let selection: Selection = new Selection({
             defaultValue: "0"
         }, "Priority", [
-            { key: "0", val: "none"},
+            { key: "0", val: "none" },
             { key: "1", val: "Top" },
             { key: "2", val: "High" },
             { key: "3", val: "Medium" },
@@ -110,7 +107,7 @@ export class EditNodeDlg extends DialogBase {
         let selection: Selection = new Selection({
             defaultValue: "0"
         }, "Img. Size", [
-            { key: "0", val: "Actual"},
+            { key: "0", val: "Actual" },
             { key: "15", val: "15%" },
             { key: "25", val: "25%" },
             { key: "50", val: "50%" },
@@ -144,8 +141,12 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    initChildren = (): void => {
+    preRender = () => {
         this.initTitleBarComps();
+
+        //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
+        //to dangerously opt into this also without hacking the code with this var.
+        let allowEditAllProps: boolean = this.appState.isAdminUser;
 
         this.setChildren([
             new Form(null, [
@@ -260,12 +261,12 @@ export class EditNodeDlg extends DialogBase {
 
                 //console.log("Creating edit field for property " + prop.name);
 
-                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(this.node, prop.name)) {
+                if (!allowEditAllProps && !S.render.allowPropertyEdit(this.node, prop.name, this.appState)) {
                     console.log("Hiding property: " + prop.name);
                     return;
                 }
 
-                if (this.allowEditAllProps || (
+                if (allowEditAllProps || (
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!this.isGuiControlBasedProp(prop)) {
@@ -317,7 +318,7 @@ export class EditNodeDlg extends DialogBase {
             let dlg = new EditPropertyDlg({
                 editNode: this.node,
                 propSavedFunc: this.propertySaved
-            });
+            }, this.appState);
             this.editPropertyDlgInst = dlg;
             await this.editPropertyDlgInst.open();
         })();
@@ -335,7 +336,7 @@ export class EditNodeDlg extends DialogBase {
 
     openChangeNodeTypeDlg = (): void => {
         (async () => {
-            let dlg = new ChangeNodeTypeDlg(this.setNodeType);
+            let dlg = new ChangeNodeTypeDlg(this.setNodeType, this.appState);
             await dlg.open();
 
             //actually this happens inside setNodeType function, but really we could get rid of that callback
@@ -347,7 +348,7 @@ export class EditNodeDlg extends DialogBase {
     openEncryptionDlg = (): void => {
         (async () => {
             let encrypted: boolean = S.props.isEncrypted(this.node);
-            let dlg = new EncryptionDlg(encrypted);
+            let dlg = new EncryptionDlg(encrypted, this.appState);
 
             /* awaits until dialog is closed */
             await dlg.open();
@@ -433,6 +434,8 @@ export class EditNodeDlg extends DialogBase {
 
     saveNode = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
+            let allowEditAllProps: boolean = this.appState.isAdminUser;
+
             if (this.node) {
                 this.saveCheckboxVal(this.preformattedCheckBox, J.NodeProp.PRE);
                 if (this.inlineChildrenCheckBox) {
@@ -463,7 +466,7 @@ export class EditNodeDlg extends DialogBase {
 
                 //todo-1: an optimization can be done here such that if we just ENCRYPTED the node, we use this.skpd.symKey becuase that
                 //will already be available
-                let cipherKey = S.props.getCryptoKey(this.node);
+                let cipherKey = S.props.getCryptoKey(this.node, this.appState);
                 if (cipherKey) {
                     content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
                     content = J.Constant.ENC_TAG + content;
@@ -488,7 +491,7 @@ export class EditNodeDlg extends DialogBase {
                     //console.log("prop to save?: "+prop.name);
 
                     /* Ignore this property if it's one that cannot be edited as text, or has already been handled/processed */
-                    if (!this.allowEditAllProps && S.render.isReadOnlyProperty(prop.name)) {
+                    if (!allowEditAllProps && S.render.isReadOnlyProperty(prop.name)) {
                         return;
                     }
 
@@ -507,7 +510,7 @@ export class EditNodeDlg extends DialogBase {
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                 node: this.node
             }, (res) => {
-                S.edit.saveNodeResponse(this.node, res, null);
+                S.edit.saveNodeResponse(this.node, res, this.appState);
             });
 
             resolve();
@@ -516,6 +519,7 @@ export class EditNodeDlg extends DialogBase {
 
     makePropEditor = (propEntry: J.PropertyInfo): EditPropsTableRow => {
         let tableRow = new EditPropsTableRow({});
+        let allowEditAllProps: boolean = this.appState.isAdminUser;
         //console.log("Property single-type: " + propEntry.property.name);
 
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
@@ -531,7 +535,7 @@ export class EditNodeDlg extends DialogBase {
 
         //todo-1: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
         //and be better with a Textfield based editor
-        if (!this.allowEditAllProps && isReadOnly) {
+        if (!allowEditAllProps && isReadOnly) {
             let textarea = new Textarea(label + " (read-only)", {
                 "readOnly": "readOnly",
                 "disabled": "disabled",
@@ -600,7 +604,7 @@ export class EditNodeDlg extends DialogBase {
                             //console.log('decrypting: ' + value);
                             let cipherText = value.substring(J.Constant.ENC_TAG.length);
                             (async () => {
-                                let cipherKey = S.props.getCryptoKey(node);
+                                let cipherKey = S.props.getCryptoKey(node, this.appState);
                                 if (cipherKey) {
                                     let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
@@ -627,7 +631,7 @@ export class EditNodeDlg extends DialogBase {
                     //console.log('decrypting: ' + value);
                     let cipherText = value.substring(J.Constant.ENC_TAG.length);
                     (async () => {
-                        let cipherKey = S.props.getCryptoKey(node);
+                        let cipherKey = S.props.getCryptoKey(node, this.appState);
                         if (cipherKey) {
                             let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
                             //console.log('decrypted to:' + value);
@@ -673,7 +677,7 @@ export class EditNodeDlg extends DialogBase {
         new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
             () => {
                 this.deleteSelectedProperties();
-            }
+            }, null, null, null, this.appState
         ).open();
     }
 
@@ -691,13 +695,7 @@ export class EditNodeDlg extends DialogBase {
         this.close();
     }
 
-    init = (): void => {
-        console.log("EditNodeDlg.init");
-        this.initChildren();
-    }
-
     rebuildDlg = (): void => {
-        this.initChildren();
         this.domRender();
     }
 }

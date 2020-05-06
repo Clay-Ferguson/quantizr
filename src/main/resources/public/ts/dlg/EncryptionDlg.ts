@@ -7,6 +7,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Checkbox } from "../widget/Checkbox";
 import { VerticalLayout } from "../widget/VerticalLayout";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,9 +21,11 @@ export class EncryptionDlg extends DialogBase {
 
     encryptAsPrivate: Checkbox;
   
-    constructor(public encrypted: boolean) {
-        super("Node Encryption", "app-modal-content-medium-width");
+    constructor(public encrypted: boolean, state: AppState) {
+        super("Node Encryption", "app-modal-content-medium-width", false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             new Form(null, [
                 new VerticalLayout([

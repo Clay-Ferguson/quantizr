@@ -9,6 +9,7 @@ import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,9 +21,11 @@ export class LoginDlg extends DialogBase {
     userTextField: TextField;
     passwordTextField: TextField;
 
-    constructor(paramsTest: Object) {
-        super("Login", "app-modal-content-narrow-width");
+    constructor(paramsTest: Object, state: AppState) {
+        super("Login", "app-modal-content-narrow-width", false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             new Form(null, [
                 new FormGroup(null,
@@ -56,9 +59,6 @@ export class LoginDlg extends DialogBase {
 
             ])
         ]);
-    }
-
-    init = (): void => {
         this.populateFromLocalDb();
     }
 
@@ -77,7 +77,7 @@ export class LoginDlg extends DialogBase {
     login = (): void => {
         let usr = this.userTextField.getValue();
         let pwd = this.passwordTextField.getValue();
-        S.user.login(this, usr, pwd);
+        S.user.login(this, usr, pwd, this.appState);
         this.close();
     }
 
@@ -88,8 +88,8 @@ export class LoginDlg extends DialogBase {
             "Confirm",
             () => {
                 this.close();
-                new ResetPasswordDlg({ "user": usr }).open();
-            }
+                new ResetPasswordDlg({ "user": usr }, this.appState).open();
+            }, null, null, null, this.appState
         ).open();
     }
 }

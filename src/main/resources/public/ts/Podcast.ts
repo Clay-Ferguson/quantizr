@@ -4,6 +4,7 @@ import { PodcastIntf } from "./intf/PodcastIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C} from "./Constants";
+import { AppState } from "./AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -40,13 +41,13 @@ export class Podcast implements PodcastIntf {
 
     private saveTimer: any = null;
 
-    openPlayerDialog = (mp3Url: string, rssTitle: string) => {
+    openPlayerDialog = (mp3Url: string, rssTitle: string, state: AppState) => {
         let urlHash = S.util.hashOfString(mp3Url);
         this.startTimePending = localStorage[urlHash];
 
         //console.log("startTimePending = localStorage["+urlHash+"]="+localStorage[urlHash]);
 
-        new AudioPlayerDlg(mp3Url).open();
+        new AudioPlayerDlg(mp3Url, state).open();
     }
 
     /* convert from fomrat "minutes:seconds" to absolute number of seconds
@@ -121,7 +122,7 @@ export class Podcast implements PodcastIntf {
         }
     }
 
-    saveTime = (): void => {
+    saveTime = (state: AppState): void => {
         /* the purpose of this timer is to be sure the browser session doesn't timeout while user is playing
         but if the media is paused we DO allow it to timeout. Othwerwise if user is listening to audio, we
         contact the server during this timer to update the time on the server AND keep session from timing out
@@ -137,25 +138,25 @@ export class Podcast implements PodcastIntf {
                 this.player.pause();
             }
 
-            this.savePlayerInfo(this.player.src, this.player.currentTime);
+            this.savePlayerInfo(this.player.src, this.player.currentTime, state);
         }
     }
 
-    pause = (): void => {
+    pause = (state: AppState): void => {
         if (this.player) {
             this.player.pause();
-            this.savePlayerInfo(this.player.src, this.player.currentTime);
+            this.savePlayerInfo(this.player.src, this.player.currentTime, state);
         }
     }
 
-    destroyPlayer = (dlg: AudioPlayerDlg): void => {
+    destroyPlayer = (dlg: AudioPlayerDlg, state: AppState): void => {
         if (this.player) {
             console.log("player.pause()");
             this.player.pause();
 
             setTimeout(() => {
                 console.log("savePlayerInfo");
-                this.savePlayerInfo(this.player.src, this.player.currentTime);
+                this.savePlayerInfo(this.player.src, this.player.currentTime, state);
 
                 //let localPlayer = this.player;
                 this.player = null;
@@ -186,8 +187,8 @@ export class Podcast implements PodcastIntf {
         }
     }
 
-    savePlayerInfo = (url: string, timeOffset: number): void => {
-        if (S.meta64.isAnonUser) return;
+    savePlayerInfo = (url: string, timeOffset: number, state: AppState): void => {
+        if (state.isAnonUser) return;
         let urlHash = S.util.hashOfString(url);
         localStorage[urlHash] = timeOffset;
         //console.log("localStorage["+urlHash+"]="+timeOffset);

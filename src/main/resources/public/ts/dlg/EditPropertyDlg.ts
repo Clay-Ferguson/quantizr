@@ -8,6 +8,7 @@ import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { TextField } from "../widget/TextField";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -24,11 +25,13 @@ export class EditPropertyDlg extends DialogBase {
     propSavedFunc: Function;
     editNode: J.NodeInfo;
 
-    constructor(args: any) {
-        super("Edit Node Property");
+    constructor(args: any, state: AppState) {
+        super("Edit Node Property", null, false, false, state);
         this.propSavedFunc = args.propSavedFunc;
         this.editNode = args.editNode; 
+    }
 
+    preRender = () => {
         this.setChildren([
             new Div(null, null, [
                 this.propertyNameTextarea = new TextField("Name"),
@@ -66,8 +69,5 @@ export class EditPropertyDlg extends DialogBase {
 
         this.editNode.properties.push(res.propertySaved);
         this.propSavedFunc();
-    }
-
-    init = (): void => {
     }
 }

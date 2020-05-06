@@ -5,6 +5,7 @@ import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import { SymKeyDataPackage } from "./intf/EncryptionIntf";
+import { AppState } from "./AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -20,18 +21,18 @@ export class Share implements ShareIntf {
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
-    editNodeSharing = (): void => {
-        let node: J.NodeInfo = S.meta64.getHighlightedNode();
+    editNodeSharing = (state: AppState): void => {
+        let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
 
         if (!node) {
             S.util.showMessage("No node is selected.");
             return;
         }
-        new SharingDlg(node).open();
+        new SharingDlg(node, state).open();
     }
 
-    findSharedNodes = (): void => {
-        let focusNode: J.NodeInfo = S.meta64.getHighlightedNode();
+    findSharedNodes = (state: AppState): void => {
+        let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (focusNode == null) {
             return;
         }

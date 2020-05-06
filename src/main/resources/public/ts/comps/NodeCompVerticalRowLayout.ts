@@ -3,7 +3,6 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Comp } from "../widget/base/Comp";
-import { ReactNode } from "react";
 import { NodeCompRow } from "./NodeCompRow";
 import { Div } from "../widget/Div";
 import { AppState } from "../AppState";
@@ -21,15 +20,13 @@ export class NodeCompVerticalRowLayout extends Div {
         super();
     }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
-        let nodesToMove = useSelector((state: AppState) => state.nodesToMove);
-        let mstate: any = useSelector((state: AppState) => state.mstate);
+    preRender = (): void => {
+        let state: AppState = useSelector((state: AppState) => state);
 
         let node = this.node;
         let layoutClass = "node-table-row";
 
-        if (S.meta64.userPreferences.editMode) {
+        if (state.userPreferences.editMode) {
             layoutClass += " editing-border";
         }
         else {
@@ -37,7 +34,6 @@ export class NodeCompVerticalRowLayout extends Div {
         }
 
         let childCount: number = node.children.length;
-        let rowCount: number = 0;
         let comps: Comp[] = [];
         let countToDisplay = 0;
 
@@ -45,47 +41,45 @@ export class NodeCompVerticalRowLayout extends Div {
         //to ber correct before the second loop stats.
         for (let i = 0; i < node.children.length; i++) {
             let n: J.NodeInfo = node.children[i];
-            if (!(nodesToMove && nodesToMove.find(id => id == n.id))) {
+            if (!(state.nodesToMove && state.nodesToMove.find(id => id == n.id))) {
                 countToDisplay++;
             }
         }
 
+        let rowCount: number = 0;
         for (let i = 0; i < node.children.length; i++) {
             let n: J.NodeInfo = node.children[i];
-            if (!(nodesToMove && nodesToMove.find(id => id == n.id))) {
-                S.render.updateHighlightNode(n, mstate.highlightNode);
+            if (!(state.nodesToMove && state.nodesToMove.find(id => id == n.id))) {
 
                 if (this.debug && n) {
-                    console.log(" RENDER ROW[" + i + "]: node.id=" + n.id);
+                    console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
+                }
+
+                if (rowCount == 0 && state.userPreferences.editMode && this.level == 1) {
+                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state.nodesToMove, state));
+
+                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                    comps.push(new Div(null, { className: "clearfix" }));
                 }
 
                 let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove);
-
-                if (rowCount == 0 && S.meta64.userPreferences.editMode) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false, nodesToMove, mstate));
-
-                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                    comps.push(new Div(null, { className: "clearfix" }));
-                }
                 comps.push(row);
+
                 S.render.lastOwner = node.owner;
-                //console.log("lastOwner (root)=" + node.owner);
                 rowCount++;
-
-                if (S.meta64.userPreferences.editMode) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay, nodesToMove, mstate));
-
-                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                    comps.push(new Div(null, { className: "clearfix" }));
-                }
 
                 if (n.children) {
                     comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
                 }
+
+                if (state.userPreferences.editMode && this.level == 1) {
+                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay, state.nodesToMove, state));
+
+                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                    comps.push(new Div(null, { className: "clearfix" }));
+                }
             }
         }
         this.setChildren(comps);
-
-        return this.super_CompRender();
     }
 }

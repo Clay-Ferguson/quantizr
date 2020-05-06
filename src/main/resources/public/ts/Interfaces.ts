@@ -10,6 +10,10 @@ export interface AppAction extends Action<any> {
     updateNew?: (AppState: any) => AppState;
     update?: (AppState: any) => void;
     data?: any;
+
+    /* If the action is running in a context where we want some existing state object to also get
+    the new state loaded in, we can optionally pass that object in this state */
+    state?: AppState;
 }
 
 export interface MainTabPanelIntf extends CompIntf {

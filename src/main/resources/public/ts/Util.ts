@@ -7,6 +7,7 @@ import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import axios, { AxiosRequestConfig } from 'axios';
+import { AppState } from "./AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -321,13 +322,13 @@ export class Util implements UtilIntf {
         setInterval(this.progressInterval, 1000);
     }
 
-    progressInterval = (): void => {
+    progressInterval = (state: AppState): void => {
         let isWaiting = this.isAjaxWaiting();
         if (isWaiting) {
             this.waitCounter++;
             if (this.waitCounter >= 3) {
                 if (!this.pgrsDlg) {
-                    let dlg = new ProgressDlg();
+                    let dlg = new ProgressDlg(state);
                     this.pgrsDlg = dlg;
                     this.pgrsDlg.open();
                 }
@@ -417,7 +418,7 @@ export class Util implements UtilIntf {
             (response) => {
                 try {
                     this._ajaxCounter--;
-                    this.progressInterval();
+                    this.progressInterval(null);
 
                     if (!response.data.success) {
                         if (response.data.message) {
@@ -429,9 +430,7 @@ export class Util implements UtilIntf {
                             //if (typeof failCallback == "function") {
                             //failCallback(null);
                             //}
-                            //todo-1: not sure I like this tight coupling of the ajax and how to cleanup after a failed call at least
-                            //things that normally run. This refreshing enablement normally runs, so let's run it here.
-                            S.meta64.recalcMetaState();
+
                             return;
                         }
                         // WARNING: this looks like the right place for a return but does NOT work. Be careful.
@@ -459,7 +458,7 @@ export class Util implements UtilIntf {
             (error) => {
                 try {
                     this._ajaxCounter--;
-                    this.progressInterval();
+                    this.progressInterval(null);
                     let status = error.response ? error.response.status : "";
                     let info = "Status: " + status + " message: " + error.message + " stack: " + error.stack
                     console.log("HTTP RESP [" + postName + "]: Error: " + info);
@@ -475,7 +474,7 @@ export class Util implements UtilIntf {
                             // window.onbeforeunload = null;
                             // window.location.href = window.location.origin;
                             // await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
-                            S.nav.login();
+                            S.nav.login(null);
                         }, 200);
                         return;
                     }
@@ -576,11 +575,11 @@ export class Util implements UtilIntf {
     }
 
     flashMessage = (message: string, preformatted: boolean = false, sizeStyle: string = null): void => {
-        new MessageDlg(message, "Message", null, null, preformatted, 3500).open();
+        new MessageDlg(message, "Message", null, null, preformatted, 3500, null).open();
     }
 
     showMessage = (message: string, preformatted: boolean = false, sizeStyle: string = null): void => {
-        new MessageDlg(message, "Message", null, null, preformatted).open();
+        new MessageDlg(message, "Message", null, null, preformatted, 0, null).open();
     }
 
     /* adds all array objects to obj as a set */
@@ -1080,9 +1079,9 @@ export class Util implements UtilIntf {
     NOTE: todo-1 We don't currently have a call to updateHistory for 1) initial page load 2) Search results click 3) timeline click, but those
     would be nice additions.
     */
-    updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null): void => {
+    updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState): void => {
         if (!node) {
-            node = S.meta64.currentNodeData.node;
+            node = appState.node;
         }
         let url, title, state;
 

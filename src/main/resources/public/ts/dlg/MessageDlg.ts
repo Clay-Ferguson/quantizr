@@ -3,20 +3,23 @@ import { Button } from "../widget/Button";
 import { TextContent } from "../widget/TextContent";
 import { Comp } from "../widget/base/Comp";
 import { DialogBase } from "../DialogBase";
+import { AppState } from "../AppState";
 
 /*
  * Callback can be null if you don't need to run any function when the dialog is closed
  */
 export class MessageDlg extends DialogBase {
 
-    constructor(private message: string, title: string, private callback : Function=null, customWidget: Comp=null, private preformatted: boolean = false,
-        flashTimeout: number=0) { 
-        super(title);
+    constructor(private message: string, title: string, private callback: Function, private customWidget: Comp, private preformatted: boolean,
+        private flashTimeout: number, state: AppState) {
+        super(title, null, false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             new TextContent(this.message, null, this.preformatted),
-            customWidget,
-            flashTimeout == 0 ? new ButtonBar([
+            this.customWidget,
+            this.flashTimeout == 0 ? new ButtonBar([
                 new Button("Ok", () => {
                     this.close();
 
@@ -27,12 +30,12 @@ export class MessageDlg extends DialogBase {
             ]) : null
         ]);
 
-        if (flashTimeout > 0) {
+        if (this.flashTimeout > 0) {
             setTimeout(() => {
                 this.whenElmEx((elm: HTMLElement) => {
                     this.close();
                 });
-            }, flashTimeout);
+            }, this.flashTimeout);
         }
     }
 }

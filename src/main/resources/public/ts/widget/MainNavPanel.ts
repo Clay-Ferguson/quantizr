@@ -27,14 +27,13 @@ export class MainNavPanel extends NavTag {
     compRender = (): ReactNode => {
         //console.log("Rendering MainNavPanel");
 
-        const title = useSelector((state: AppState) => state.title);
-        const nodesToMove = useSelector((state: AppState) => state.nodesToMove);
-        const mstate = useSelector((state: AppState) => state.mstate);
-        const dispatch = useDispatch();
+        const state: AppState = useSelector((state: AppState) => state);
+        //const dispatch = useDispatch();
 
         // navbar-expand-sm would makes it collapsable, but messes up top margin.
         this.attribs.className = "navbar navbar-expand navbar-dark bg-dark fixed-top main-navbar";
         let buttons = [];
+        let allowEditMode = state.node && !state.isAnonUser;
 
         /* Feature to read from clipboard might scare some users (as it should) so I'm turning this on only for admins
         until we have a more specific User Preference allowing users to have to opt-in (not opt-out) to use this feature 
@@ -47,9 +46,9 @@ export class MainNavPanel extends NavTag {
                 "title": "Save Clipboard text to a Note"
             },
                 //isEnabled func
-                () => { return S.meta64.isAdminUser /* !S.meta64.isAnonUser */ },
+                () => { return state.isAdminUser /* !S.meta64.isAnonUser */ },
                 //isVisible func
-                () => { return S.meta64.isAdminUser /* !S.meta64.isAnonUser */ }
+                () => { return state.isAdminUser /* !S.meta64.isAnonUser */ }
             )
         ]));
 
@@ -58,20 +57,20 @@ export class MainNavPanel extends NavTag {
                 className: "nav-item"
             }, [
                 new NavBarIconButton("fa-database", null, {
-                    "onClick": e => { S.nav.navHome(); },
+                    "onClick": e => { S.nav.navHome(state); },
                     "title": "Go to Your Root Node"
                 },
                     //isEnabled func
-                    () => { return !S.meta64.isAnonUser; },
+                    () => { return !state.isAnonUser; },
                     //isVisible func
-                    () => { return !S.meta64.isAnonUser; })
+                    () => { return !state.isAnonUser; })
             ]));
 
             buttons.push(new Li(null, {
                 className: "nav-item"
             }, [
                 new NavBarIconButton("fa-home", null, {
-                    "onClick": e => { S.meta64.loadAnonPageHome(); },
+                    "onClick": e => { S.meta64.loadAnonPageHome(state); },
                     "title": "Go to Portal Root Node"
                 })
             ]));
@@ -80,27 +79,26 @@ export class MainNavPanel extends NavTag {
                 className: "nav-item"
             }, [
                 new NavBarIconButton("fa-gear", null, {
-                    "onClick": e => { S.edit.editPreferences(); },
+                    "onClick": e => { S.edit.editPreferences(state); },
                     "title": "Edit your Account Preferences"
                 },
                     //isEnabled func
-                    () => { return !S.meta64.isAnonUser; },
+                    () => { return !state.isAnonUser; },
                     //isVisible func
-                    () => { return !S.meta64.isAnonUser; })
+                    () => { return !state.isAnonUser; })
             ]));
 
             buttons.push(new Li(null, {
                 className: "nav-item"
             }, [
-                //todo-0: this isn't showing up. Probably need ALL this stuff in AppState (all enablement vars)
                 new NavBarIconButton("fa-pencil", null, {
-                    "onClick": e => { S.nav.editMode(); },
+                    "onClick": e => { S.edit.toggleEditMode(state); },
                     "title": "Toggle Edit Mode on/off"
                 },
                     //isEnabled func
-                    () => { return mstate.allowEditMode; },
+                    () => { return allowEditMode; },
                     //isVisible func
-                    () => { return mstate.allowEditMode; }
+                    () => { return allowEditMode; }
                 ),
             ]));
 
@@ -108,13 +106,13 @@ export class MainNavPanel extends NavTag {
                 className: "nav-item"
             }, [
                 new NavBarButton("Signup", {
-                    "onClick": e => { S.nav.signup(); },
+                    "onClick": e => { S.nav.signup(state); },
                     "title": "Create new Quantizr Account"
                 },
                     //isEnabled func
-                    () => { return S.meta64.isAnonUser; },
+                    () => { return state.isAnonUser; },
                     //isVisible func
-                    () => { return S.meta64.isAnonUser; }
+                    () => { return state.isAnonUser; }
                 )
             ]));
         }
@@ -123,13 +121,13 @@ export class MainNavPanel extends NavTag {
             className: "nav-item"
         }, [
             new NavBarIconButton("fa-sign-in", "Login", {
-                "onClick": e => { S.nav.login(); },
+                "onClick": e => { S.nav.login(state); },
                 "title": "Login to Quantizr"
             },
                 //isEnabled func
-                () => { return S.meta64.isAnonUser; },
+                () => { return state.isAnonUser; },
                 //isVisible func
-                () => { return S.meta64.isAnonUser; }
+                () => { return state.isAnonUser; }
             )
         ]));
 
@@ -137,13 +135,13 @@ export class MainNavPanel extends NavTag {
             className: "nav-item"
         }, [
             new NavBarIconButton("fa-sign-out", null, {
-                "onClick": e => { S.nav.logout(); },
+                "onClick": e => { S.nav.logout(state); },
                 "title": "Logout"
             },
                 //isEnabled func
-                () => { return !S.meta64.isAnonUser; },
+                () => { return !state.isAnonUser; },
                 //isVisible func
-                () => { return !S.meta64.isAnonUser; }
+                () => { return !state.isAnonUser; }
             )
         ]));
 
@@ -167,7 +165,7 @@ export class MainNavPanel extends NavTag {
                 }, [
                     new NavBarIconButton("fa-bars", "Quantizr", {
                         "onClick": e => {
-                            S.nav.showMainMenu(nodesToMove, mstate);
+                            S.nav.showMainMenu(state);
                         },
                         "id": "mainMenu",
                         "title": "Show Main Menu"
@@ -175,7 +173,7 @@ export class MainNavPanel extends NavTag {
                 ]),
             ]),
 
-            new Span(title, {
+            new Span(state.title, {
                 className: "navbar-brand",
             }),
 

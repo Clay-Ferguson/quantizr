@@ -7,14 +7,15 @@ import { Div } from "./widget/Div";
 import { Span } from "./widget/Span";
 import * as ReactDOM from "react-dom";
 import { CompIntf } from "./widget/base/CompIntf";
-import { Icon } from "./widget/Icon";
+import { AppState } from "./AppState";
+import { Provider } from 'react-redux';
+import { store } from "./AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-//todo-0: all dialogs need to have a way to get updated based on redux state? or local state changes?
 export abstract class DialogBase extends Comp implements DialogBaseImpl {
 
     //ref counter that allows multiple dialogs to be opened on top of each other and only
@@ -29,9 +30,14 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
 
     extraHeaderComps: CompIntf[];
 
-    constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: boolean = false,
-        private initiallyInvisible: boolean = false) {
+    /* Warning: Base 'Comp' already has 'state', I think it was wrong to rely on 'appState' everywhere inside dialogs, because
+    we need to just let the render methods grab the latest state like every other component in the render method. */
+    appState: AppState;
+
+    constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean,
+        private initiallyInvisible: boolean, appState: AppState) {
         super(null);
+        this.appState = appState;
     }
 
     /* To be overridden by derived classes */
@@ -41,6 +47,7 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
     /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is 
     closed. */
     open = (display: string = null): Promise<DialogBase> => {
+
         return new Promise<DialogBase>((resolve, reject) => {
             let displayStyle = display ? display : (this.initiallyInvisible ? "none" : "block");
 
@@ -80,7 +87,12 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
     domRender = (): void => {
         //this wraps the childern inside the actual dialog component itself
         this.dlgComp = this.makeComp(this.elm);
-        ReactDOM.render(S.e(this.dlgComp.render, this.dlgComp.attribs), this.elm);
+
+        let reactElm = S.e(this.dlgComp.render, this.dlgComp.attribs)
+
+        //console.log("Rendering with provider");
+        let provider = S.e(Provider, { store }, reactElm);
+        ReactDOM.render(provider, this.elm);
     }
 
     //DO NOT DELETE.
@@ -92,6 +104,7 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
 
     public close = () => {
         this.resolve(this);
+        ReactDOM.unmountComponentAtNode(this.elm);
         S.util.domElmRemove(this.getId());
 
         if (--DialogBase.refCounter <= 0) {
@@ -127,6 +140,7 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
             timesIcon.renderRawHtml = true;
         }
 
+        this.preRender();
         content = content.concat(this.children);
 
         /* Display dialogs fullscreen on mobile devices */

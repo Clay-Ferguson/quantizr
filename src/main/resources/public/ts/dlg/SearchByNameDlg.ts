@@ -9,6 +9,7 @@ import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { MessageDlg } from "./MessageDlg";
+import { AppState } from "../AppState";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,9 +21,11 @@ export class SearchByNameDlg extends DialogBase {
     static defaultSearchText: string = "";
     searchTextField: TextField;
   
-    constructor() {
-        super("Search by Node Name", "app-modal-content-medium-width");
-        
+    constructor(state: AppState) {
+        super("Search by Node Name", "app-modal-content-medium-width", false, false, state);
+    }
+
+    preRender = () => {
         this.setChildren([
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
@@ -42,6 +45,7 @@ export class SearchByNameDlg extends DialogBase {
                 ])
             ])
         ]);
+        this.searchTextField.focus();
     }
 
     search = () => {
@@ -50,7 +54,7 @@ export class SearchByNameDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.meta64.getHighlightedNode();
+        let node = S.meta64.getHighlightedNode(this.appState);
         if (!node) {
             S.util.showMessage("No node is selected to search under.");
             return;
@@ -83,12 +87,8 @@ export class SearchByNameDlg extends DialogBase {
             this.close();
         }
         else {
-            new MessageDlg("No search results found.", "Search").open();
+            new MessageDlg("No search results found.", "Search", null, null, false, 0, this.appState).open();
         }
-    }
-
-    init = (): void => {
-        this.searchTextField.focus();
     }
 }
 

@@ -7,6 +7,8 @@ import { ReactNode } from "react";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { Div } from "../widget/Div";
 import { NodeCompContent } from "./NodeCompContent";
+import { useSelector, useDispatch } from "react-redux";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -18,16 +20,17 @@ export class NodeCompRow extends Div {
 
     constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number, public layoutClass: string, public allowNodeMove: boolean) {
         super(null, {
-            onClick: (evt) => { S.nav.clickOnNodeRow(node.id); }, //
             id: "row_" + node.id,
         });
     }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
+    preRender = (): void => {
+        let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         let id: string = node.id;
-        //console.log("Rendering Node Row[" + index + "] editingAllowed=" + editingAllowed);
+        //console.log("Rendering NodeCompRow. id=" + node.id);
+
+        this.attribs.onClick = (evt) => { S.nav.clickOnNodeRow(node, state); }; //
 
         /*
          * if not selected by being the new child, then we try to select based on if this node was the last one
@@ -35,7 +38,7 @@ export class NodeCompRow extends Div {
          */
         // console.log("test: [" + parentIdToFocusIdMap[currentNodeId]
         // +"]==["+ node.id + "]")
-        let focusNode: J.NodeInfo = S.meta64.getHighlightedNode();
+        let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         let selected: boolean = (focusNode && focusNode.id === id);
 
         //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
@@ -43,21 +46,9 @@ export class NodeCompRow extends Div {
         let buttonBar: Comp = new NodeCompButtonBar(node, allowAvatar, this.allowNodeMove, false);
 
         let indentLevel = this.layoutClass === "node-grid-item" ? 0 : this.level;
-        let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
+        let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;        
 
-        let activeClass;
-        let inactiveClass;
-
-        if (node.id == S.meta64.currentNodeData.node.id) {
-            activeClass = "active-row-main";
-            inactiveClass = "inactive-row-main";
-        }
-        else {
-            activeClass = "active-row";
-            inactiveClass = "inactive-row";
-        }
-
-        this.attribs.className = this.layoutClass + (selected ? (" " + activeClass) : (" " + inactiveClass))
+        this.attribs.className = this.layoutClass + (selected ? " active-row" : " inactive-row");
         this.attribs.style = style;
 
         this.setChildren([
@@ -66,8 +57,6 @@ export class NodeCompRow extends Div {
             new NodeCompContent(node, true, true)
         ]);
 
-        S.render.setNodeDropHandler(this, node);
-       
-        return this.super_CompRender();
+        S.render.setNodeDropHandler(this, node, state);
     }
 }

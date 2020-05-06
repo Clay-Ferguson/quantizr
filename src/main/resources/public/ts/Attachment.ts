@@ -6,6 +6,7 @@ import { AttachmentIntf } from "./intf/AttachmentIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
+import { AppState } from "./AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -14,16 +15,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class Attachment implements AttachmentIntf {
 
-    openUploadFromFileDlg = (toIpfs: boolean = false, node: J.NodeInfo=null, autoAddFile: File = null): void => {
+    openUploadFromFileDlg = (toIpfs: boolean, node: J.NodeInfo, autoAddFile: File, state: AppState): void => {
         if (node == null) {
-            node = S.meta64.getHighlightedNode();
+            node = S.meta64.getHighlightedNode(state);
         }
         if (!node) {
             S.util.showMessage("No node is selected.");
             return;
         }
 
-        let dlg = new UploadFromFileDropzoneDlg(node, toIpfs, autoAddFile, false);
+        let dlg = new UploadFromFileDropzoneDlg(node, toIpfs, autoAddFile, false, state);
         dlg.open();
 
         /* Note: To run legacy uploader just put this version of the dialog here, and
@@ -32,9 +33,9 @@ export class Attachment implements AttachmentIntf {
         */
     }
 
-    openUploadFromUrlDlg = (node: J.NodeInfo = null, defaultUrl: string = null): void => {
+    openUploadFromUrlDlg = (node: J.NodeInfo, defaultUrl: string, state: AppState): void => {
         if (!node) {
-            node = S.meta64.getHighlightedNode();
+            node = S.meta64.getHighlightedNode(state);
         }
 
         if (!node) {
@@ -42,30 +43,29 @@ export class Attachment implements AttachmentIntf {
             return;
         }
 
-        let dlg = new UploadFromUrlDlg(node, defaultUrl);
+        let dlg = new UploadFromUrlDlg(node, defaultUrl, state);
         dlg.open();
     }
 
-    deleteAttachment = (): void => {
-        let node: J.NodeInfo = S.meta64.getHighlightedNode();
+    deleteAttachment = (state: AppState): void => {
+        let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
 
         if (node) {
             let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm Delete Attachment", //
                 () => {
                     S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
                         "nodeId": node.id
-                    }, (res: J.DeleteAttachmentResponse): void => { this.deleteAttachmentResponse(res, node.id) });
-                }
+                    }, (res: J.DeleteAttachmentResponse): void => { this.deleteAttachmentResponse(res, node.id, state) });
+                }, null, null, null, state
             );
             dlg.open();
         }
     }
 
-    deleteAttachmentResponse = (res: J.DeleteAttachmentResponse, id: string): void => {
+    deleteAttachmentResponse = (res: J.DeleteAttachmentResponse, id: string, state: AppState): void => {
         if (S.util.checkSuccess("Delete attachment", res)) {
-            S.meta64.removeBinaryById(id);
-            // force re-render from local data.
-            S.meta64.refresh();
+            S.meta64.removeBinaryById(id, state);
+            S.meta64.refresh(state);
         }
     }
 }

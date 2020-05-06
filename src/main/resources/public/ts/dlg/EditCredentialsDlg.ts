@@ -8,6 +8,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 import { TextContent } from "../widget/TextContent";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -22,9 +23,11 @@ export class EditCredentialsDlg extends DialogBase {
     usr: string;
     pwd: string;
 
-    constructor(title2: string, private usrDbProp: string, private pwdDbProp: string) {
-        super(title2, "app-modal-content-narrow-width");
+    constructor(title2: string, private usrDbProp: string, private pwdDbProp: string, state: AppState) {
+        super(title2, "app-modal-content-narrow-width", false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             new TextContent("Quantizr uses Temporal (https://temporal.cloud) as the storage provider for IPFS content, so you can enter your Temporal"+
             " credentials here to enable saving files permanently to IPFS."),
@@ -45,9 +48,6 @@ export class EditCredentialsDlg extends DialogBase {
 
             ])
         ]);
-    }
-
-    init = (): void => {
         this.populateFromLocalDb();
     }
 

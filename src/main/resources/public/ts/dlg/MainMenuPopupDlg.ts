@@ -3,6 +3,7 @@ import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 import { MenuPanel } from "../MenuPanel";
 import { DialogBase } from "../DialogBase";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -11,11 +12,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class MainMenuPopupDlg extends DialogBase {
 
-    constructor(public nodesToMove: string[], mstate: any) {
-        super(null, "app-modal-menu", true, true);
-        let menu = new MenuPanel(nodesToMove, mstate);
+    constructor(state: AppState) {
+        super(null, "app-modal-menu", true, true, state);
+    }
+
+    preRender = () => {
         this.setChildren([
-            menu
+            new MenuPanel(this.appState)
         ]);
     }
 }

@@ -10,6 +10,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { EditCredentialsDlg } from "./EditCredentialsDlg";
 import { TextContent } from "../widget/TextContent";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -44,12 +45,14 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     maxFiles: number = 1;
 
-    constructor(private node: J.NodeInfo, private toIpfs: boolean, private autoAddFile: File, private importMode: boolean) {
-        super(importMode ? "Import File" : (toIpfs ? "Upload File to IPFS" : "Upload File"));
+    constructor(private node: J.NodeInfo, private toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState) {
+        super(importMode ? "Import File" : (toIpfs ? "Upload File to IPFS" : "Upload File"), null, false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             new Form(null, [
-                toIpfs ? new TextContent("NOTE: IPFS Uploads assume you have a Temporal Account (https://temporal.cloud) which will be the service that hosts your IPFS data. You'll be prompted for the Temporal password when the upload begins.") : null,
+                this.toIpfs ? new TextContent("NOTE: IPFS Uploads assume you have a Temporal Account (https://temporal.cloud) which will be the service that hosts your IPFS data. You'll be prompted for the Temporal password when the upload begins.") : null,
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 new ButtonBar([
@@ -63,6 +66,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         ]);
 
         this.uploadButton.setVisible(false);
+        this.configureDropZone();
+        this.runButtonEnablement();
     }
 
     //ref: https://gateway.temporal.cloud/ipfs/Qma4DNFSRR9eGqwm93zMUtqywLFpTRQji4Nnu37MTmNntM/account.html#account-api
@@ -175,7 +180,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     configureDropZone = (): void => {
-        let maxUploadSize = S.meta64.userPreferences.maxUploadFileSize;
+        let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
 
         /* Allow 20MB for Quantizr uploads or 20GB for IPFS */
         let maxFileSize = (this.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
@@ -282,7 +287,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                             node: dlg.node
                         }, (res) => {
-                            S.edit.saveNodeResponse(dlg.node, res, null);
+                            S.edit.saveNodeResponse(dlg.node, res, this.appState);
                         });
                     }
                 });
@@ -290,7 +295,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.on("queuecomplete", function (arg) {
                     if (dlg.sent) {
                         dlg.close();
-                        S.meta64.refresh();
+                        S.meta64.refresh(this.appState);
                     }
                 });
             }
@@ -298,7 +303,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
         S.util.getElm(this.dropzoneDiv.getId(), (elm: HTMLElement) => {
             this.dropzone = new Dropzone("#" + this.dropzoneDiv.getId(), config);
-            let maxUploadSize = S.meta64.userPreferences.maxUploadFileSize;
+            let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
 
             if (this.autoAddFile) {
                 if (!dlg.toTemporal && (this.autoAddFile.size > maxUploadSize * Constants.ONE_MB)) {
@@ -331,7 +336,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 //no function
                 () => {
                     this.explodeZips = false;
-                }
+                }, null, null, this.appState
             ).open();
         }
     }
@@ -341,7 +346,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             return false;
         }
 
-        let maxUploadSize = S.meta64.userPreferences.maxUploadFileSize;
+        let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
         let maxFileSizeMb = (this.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
 
         for (let file of this.fileList) {
@@ -375,17 +380,13 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             this.temporalPwd = await S.localDB.getVal(Constants.LOCALDB_TEMPORAL_PWD);
 
             if (forceEdit || (!this.temporalUsr || !this.temporalPwd)) {
-                let dlg = new EditCredentialsDlg(forceEdit ? "Temporal Credentials" : "Temporal Account Login", Constants.LOCALDB_TEMPORAL_USR, Constants.LOCALDB_TEMPORAL_PWD);
+                let dlg = new EditCredentialsDlg(forceEdit ? "Temporal Credentials" : "Temporal Account Login", 
+                Constants.LOCALDB_TEMPORAL_USR, Constants.LOCALDB_TEMPORAL_PWD, this.appState);
                 await dlg.open();
                 this.temporalUsr = dlg.usr;
                 this.temporalPwd = dlg.pwd;
             }
             resolve(!!this.temporalUsr && !!this.temporalPwd);
         });
-    }
-
-    init = (): void => {
-        this.configureDropZone();
-        this.runButtonEnablement();
     }
 }

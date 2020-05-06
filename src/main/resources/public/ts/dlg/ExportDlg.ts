@@ -11,6 +11,7 @@ import { VerticalLayout } from "../widget/VerticalLayout";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -24,9 +25,11 @@ export class ExportDlg extends DialogBase {
     tarGzRadioButton: RadioButton;
     pdfRadioButton: RadioButton;
 
-    constructor() {
-        super("Export");
+    constructor(state: AppState) {
+        super("Export", null, false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             new Header("Export node content to file..."),
             new RadioButtonGroup([
@@ -48,7 +51,7 @@ export class ExportDlg extends DialogBase {
     }
 
     exportNodes = (): void => {
-        let highlightNode = S.meta64.getHighlightedNode();
+        let highlightNode = S.meta64.getHighlightedNode(this.appState);
         if (highlightNode) {
 
             let format = this.getSelectedFormat();
@@ -93,11 +96,11 @@ export class ExportDlg extends DialogBase {
                     //new Anchor(hostAndPort + "/file/" + res.fileName + "?disp=inline", "Raw View", { "target": "_blank" }),
                     //new Anchor(hostAndPort + "/view/" + res.fileName, "Formatted View", { "target": "_blank" }),
                     new Anchor(downloadLink, "Download: " + downloadLink, null)
-                ])
+                ]), false, 0, this.appState
             ).open();
 
             S.meta64.selectTab("mainTab");
-            S.view.scrollToSelectedNode();
+            S.view.scrollToSelectedNode(this.appState);
         }
     }
 }

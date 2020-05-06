@@ -5,12 +5,12 @@ import { Div } from "./Div";
 import { Ul } from "./Ul";
 import { Li } from "./Li";
 import { Anchor } from "./Anchor";
-import { ReactNode } from "react";
 import { MainTabComp } from "../comps/MainTabComp";
 import { SearchView } from "../comps/SearchView";
 import { TimelineView } from "../comps/TimelineView";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
+import { dispatch } from "../AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -19,16 +19,14 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class TabPanel extends Div {
 
-    activeTab: string = "mainTab";
-
     constructor() {
         super(null);
     }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
-        let searchResults = useSelector((state: AppState) => state.searchResults);
-        let timelineResults = useSelector((state: AppState) => state.timelineResults);
+    preRender = (): void => {
+        let state: AppState = useSelector((state: AppState) => state);
+        let searchResults = state.searchResults;
+        let timelineResults = state.timelineResults;
 
         let mainDisplay = "inline";
         let searchDisplay = searchResults ? "inline" : "none";
@@ -55,9 +53,14 @@ export class TabPanel extends Div {
                 }, [
                     new Anchor("#mainTab", "Main", {
                         "data-toggle": "tab",
-                        className: "nav-link",
+                        className: "nav-link" + (state.activeTab == "mainTab" ? " active" : ""),
                         onClick: () => {
-                            this.activeTab = "mainTab";
+                            dispatch({
+                                type: "Action_SetTab", 
+                                update: (s: AppState): void => {
+                                    s.activeTab = "mainTab";
+                                }
+                            });
                         }
                     })]
                 ),
@@ -68,9 +71,14 @@ export class TabPanel extends Div {
                 },
                     [new Anchor("#searchTab", "Search", {
                         "data-toggle": "tab",
-                        className: "nav-link",
+                        className: "nav-link" + (state.activeTab == "searchTab" ? " active" : ""),
                         onClick: () => {
-                            this.activeTab = "searchTab";
+                            dispatch({
+                                type: "Action_SetTab",
+                                update: (s: AppState): void => {
+                                    s.activeTab = "searchTab";
+                                }
+                            });
                         }
                     })]
                 ),
@@ -81,9 +89,14 @@ export class TabPanel extends Div {
                 },
                     [new Anchor("#timelineTab", "Timeline", {
                         "data-toggle": "tab",
-                        className: "nav-link",
+                        className: "nav-link" + (state.activeTab == "timelineTab" ? " active" : ""),
                         onClick: () => {
-                            this.activeTab = "timelineTab"
+                            dispatch({
+                                type: "Action_SetTab",
+                                update: (s: AppState): void => {
+                                    s.activeTab = "timelineTab";
+                                }
+                            });
                         }
                     })]
                 ),
@@ -128,7 +141,5 @@ export class TabPanel extends Div {
         this.setChildren([
             tabButtons, tabContent
         ]);
-
-        return this.super_CompRender();
     }
 }

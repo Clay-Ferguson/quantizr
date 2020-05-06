@@ -80,7 +80,7 @@ export class Render implements RenderIntf {
         });
     }
 
-    setNodeDropHandler = (rowDiv: Comp, node: J.NodeInfo): void => {
+    setNodeDropHandler = (rowDiv: Comp, node: J.NodeInfo, state: AppState): void => {
         if (!node || !rowDiv) return;
 
         rowDiv.setDropHandler((evt: DragEvent) => {
@@ -97,7 +97,7 @@ export class Render implements RenderIntf {
                         if (s.startsWith(location.protocol + '//' + location.hostname)) {
                             return;
                         }
-                        S.attachment.openUploadFromUrlDlg(node, s);
+                        S.attachment.openUploadFromUrlDlg(node, s, state);
                     });
                     return;
                 }
@@ -112,15 +112,15 @@ export class Render implements RenderIntf {
                     //     return;
                     // }
 
-                    S.attachment.openUploadFromFileDlg(false, node, file);
+                    S.attachment.openUploadFromFileDlg(false, node, file, state);
                     return;
                 }
             }
         });
     }
 
-    showNodeUrl = (): void => {
-        let node: J.NodeInfo = S.meta64.getHighlightedNode();
+    showNodeUrl = (state: AppState): void => {
+        let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("You must first click on a node.");
             return;
@@ -139,50 +139,64 @@ export class Render implements RenderIntf {
         return typeHandler == null || typeHandler.allowAction(action);
     }
 
-    renderPageFromData = async (data?: J.RenderNodeResponse, scrollToTop?: boolean, targetNodeId?: string, clickTab: boolean = true): Promise<void> => {
+    renderPageFromData = async (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, state: AppState): Promise<void> => {
 
         this.lastOwner = null;
-
         S.meta64.setOverlay(true);
 
         // this timeout forces the 'hidden' to be processed and hidden from view 
         const promise = new Promise<void>(async (resolve, reject) => {
 
+            //with redux/react this timer should be able to go away soon.
             setTimeout(async () => {
                 try {
-                    //if No data was provided we use existing data.
-                    if (!data) {
-                        data = S.meta64.currentNodeData;
-                    }
-                    //Otherwise we are rendering new data and need to initialize some things
-                    else {
-                        S.meta64.setCurrentNodeData(data);
-                        S.meta64.updateNodeMap(data.node);
-                        S.meta64.selectedNodes = {};
-                    }
-
-                    //console.log("Setting lastNode="+data.node.id);
-                    if (data && data.node) {
-                        S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, data.node.id);
-                        S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
-                    }
-
-                    S.nav.endReached = data && data.endReached;
-                    let propCount: number = S.meta64.currentNodeData.node.properties ? S.meta64.currentNodeData.node.properties.length : 0;
-
-                    if (this.debug) {
-                        console.log("RENDER NODE: " + data.node.id + " propCount=" + propCount);
-                    }
 
                     dispatch({
-                        type: "Action_RenderPage",
-                        update: (state: AppState): void => {
-                            state.node = S.meta64.currentNodeData.node;
-                            state.endReached = S.nav.endReached;
+                        type: "Action_RenderPage", state,
+                        updateNew: (s: AppState): AppState => {
+                            debugger;
+                            s.node = res.node;
+                            s.endReached = res.endReached;
+                            s.offsetOfNodeFound = res.offsetOfNodeFound;
+                            s.displayedParent = res.displayedParent;
+                            s.noDataResponse = res.noDataResponse;
+        
+                            S.meta64.updateNodeMap(res.node, 1, s);
+                            s.selectedNodes = {};
+        
+                            if (s.node) {
+                                //now that 'redux' is in control and we call this method less directly/often, I need to check to see if
+                                //this method is getting called every time it should.
+                                S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
+                                S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
+                            }
+        
+                            if (this.debug && s.node) {
+                                console.log("RENDER NODE: " + s.node.id);
+                            }
+
+                            if (state.pendingLocationHash) {
+                                window.location.hash = state.pendingLocationHash;
+                                //Note: the substring(1) trims the "#" character off.
+                                S.meta64.highlightRowById(state.pendingLocationHash.substring(1), true, s);
+                                state.pendingLocationHash = null; 
+                            }
+                            else if (targetNodeId) {
+                                S.meta64.highlightRowById(targetNodeId, true, s);
+                            } //
+                            else if (scrollToTop || !S.meta64.getHighlightedNode(s)) {
+                                S.view.scrollToTop();
+                            } //
+                            else {
+                                S.view.scrollToSelectedNode(s);
+                            }
+
+                            return s;
                         }
                     });
 
-                    this.lastOwner = data.node.owner;
+                    //todo-: this is ugly. what is this?
+                    this.lastOwner = state.node.owner;
                 }
                 catch (err) {
                     console.error("render fail.");
@@ -208,22 +222,6 @@ export class Render implements RenderIntf {
                             //note: MathJax.typesetPromise(), also exists
                             MathJax.typeset();
                         }
-
-                        if (S.meta64.pendingLocationHash) {
-                            window.location.hash = S.meta64.pendingLocationHash;
-                            //Note: the substring(1) trims the "#" character off.
-                            await S.meta64.highlightRowById(S.meta64.pendingLocationHash.substring(1), true);
-                            S.meta64.pendingLocationHash = null;
-                        }
-                        else if (targetNodeId) {
-                            await S.meta64.highlightRowById(targetNodeId, true);
-                        } //
-                        else if (scrollToTop || !S.meta64.getHighlightedNode()) {
-                            await S.view.scrollToTop();
-                        } //
-                        else {
-                            await S.view.scrollToSelectedNode();
-                        }
                     }
                     finally {
                         resolve();
@@ -235,7 +233,6 @@ export class Render implements RenderIntf {
 
         promise.then(() => {
             S.meta64.setOverlay(false);
-            S.meta64.recalcMetaState();
         });
 
         return promise;
@@ -261,42 +258,23 @@ export class Render implements RenderIntf {
         }
     }
 
-    updateHighlightNode = (node: J.NodeInfo, mstate: any) => {
-        if (!node || !mstate || !mstate.highlightNode) {
-            return;
-        }
-
-        let changed = false;
-        if (mstate.highlightNode.id == node.id) {
-            mstate.highlightNode = node;
-            changed = true;
-
-            if (S.meta64.currentNodeData && S.meta64.currentNodeData.node) {
-                S.meta64.parentIdToFocusNodeMap[S.meta64.currentNodeData.node.id] = node;
-            }
-        }
-
-        if (changed) {
-            dispatch({
-                type: "Action_SetMetaState",
-                update: (state: AppState): void => {
-                    state.mstate = mstate;
-                }
-            });
-        }
-    }
-
     /* This is the button bar displayed between all nodes to let nodes be inserted at specific locations 
     
     The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
-    */
-    createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, nodesToMove: string[], mstate: any): Comp => {
 
+    todo-0: for 'display inline' (table maybe vert also) this little button bar shows up ABOVE the table, adn would be 
+    better below it.
+    */
+    createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, nodesToMove: string[], state: AppState): Comp => {
         let pasteInlineButton: Button = null;
-        if (!S.meta64.isAnonUser && nodesToMove != null && (mstate.selNodeIsMine || mstate.homeNodeSelected)) {
+
+        let highlightNode = S.meta64.getHighlightedNode(state);
+        let homeNodeSelected = highlightNode != null && state.homeNodeId == highlightNode.id;
+
+        if (!state.isAnonUser && nodesToMove != null && (S.props.isMine(node, state) || node.id==state.homeNodeId)) {
 
             let target = null;
-            if (S.nav.endReached) {
+            if (state.endReached) {
                 target = "inline-end";
             }
             else if (isFirst) {
@@ -306,14 +284,14 @@ export class Render implements RenderIntf {
                 target = "inline";
             }
 
-            pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes(node, target, nodesToMove, mstate); }, {
+            pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes(node, target, nodesToMove, state); }, {
                 className: "highlightBorder"
             });
         }
 
         let newNodeButton = new NavBarIconButton("fa-plus", null, {
             "onClick": e => {
-                S.edit.insertNode(node.id, "u", isFirst ? 0 : 1);
+                S.edit.insertNode(node.id, "u", isFirst ? 0 : 1, state);
             },
             "title": "Insert new node here"
         }, null, null, "btn-sm");
@@ -391,10 +369,10 @@ export class Render implements RenderIntf {
     }
 
     /* Returns true of the logged in user and the type of node allow the property to be edited by the user */
-    allowPropertyEdit = (node: J.NodeInfo, propName: string): boolean => {
+    allowPropertyEdit = (node: J.NodeInfo, propName: string, state: AppState): boolean => {
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
         if (typeHandler) {
-            return typeHandler.allowPropertyEdit(propName);
+            return typeHandler.allowPropertyEdit(propName, state);
         }
         else {
             return this.allowPropertyToDisplay(propName);

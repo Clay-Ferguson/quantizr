@@ -2,10 +2,11 @@ import * as J from "../JavaIntf";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
-import { ReactNode } from "react";
 import { Div } from "../widget/Div";
 import { NodeCompMainNode } from "./NodeCompMainNode";
 import { NodeCompMainList } from "./NodeCompMainList";
+import { AppState } from "../AppState";
+import { useSelector, useDispatch } from "react-redux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -18,18 +19,20 @@ export class MainTabComp extends Div {
     constructor() {
         super(null, {
             id: "mainTab",
-            className: "tab-pane fade my-tab-pane"
         });
     }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
-        
+    preRender = (): void => {
+        let state: AppState = useSelector((state: AppState) => state);
+
+        this.attribs.className = "tab-pane fade my-tab-pane";
+        if (state.activeTab==this.getId()) {
+            this.attribs.className += " show active";
+        }
+
         this.setChildren([
             new NodeCompMainNode(),
             new NodeCompMainList()
         ]);
-
-        return this.super_CompRender();
     }
 }

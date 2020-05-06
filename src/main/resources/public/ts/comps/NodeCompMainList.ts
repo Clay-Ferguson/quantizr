@@ -3,7 +3,6 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Comp } from "../widget/base/Comp";
-import { ReactNode } from "react";
 import { Div } from "../widget/Div";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
@@ -18,19 +17,18 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMainList extends Div {
 
-    //pass data.node into here
     constructor() {
         super();
     }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
-        let rootNode = useSelector((state: AppState) => state.node);
-        let endReached = useSelector((state: AppState) => state.endReached);
+    preRender = (): void => {
+        let state: AppState = useSelector((state: AppState) => state);
+        let rootNode = state.node;
+        let endReached = state.endReached;
 
         if (!rootNode) {
-            //console.log("NodeCompMainList.build: null. Nothing to render");
-            return this.super_CompRender();;
+            this.children = null;
+            return;
         }
         let output: Comp[] = [];
 
@@ -52,7 +50,6 @@ export class NodeCompMainList extends Div {
 
         //this.lastOwner = rootNode.owner;
 
-        //console.log("lastOwner (root)=" + data.node.owner);
         if (rootNode.children) {
             let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, rootNode);
             let allowNodeMove: boolean = !orderByProp;
@@ -72,7 +69,5 @@ export class NodeCompMainList extends Div {
         }
 
         this.setChildren(output);
-
-        return this.super_CompRender();
     }
 }

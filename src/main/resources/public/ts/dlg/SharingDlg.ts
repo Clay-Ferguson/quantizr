@@ -9,6 +9,7 @@ import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -24,12 +25,12 @@ export class SharingDlg extends DialogBase {
     nodePrivsInfo: I.NodePrivilegesInfo;
     dirty: boolean = false;
 
-    constructor(node: J.NodeInfo) {
-        super("Node Sharing", "app-modal-content-medium-width");
+    constructor(node: J.NodeInfo, state: AppState) {
+        super("Node Sharing", "app-modal-content-medium-width", null, false, state);
         this.node = node;
     }
 
-    init = (): void => {
+    preRender = () => {
         this.initChildren();
         this.reload();
     }
@@ -71,7 +72,7 @@ export class SharingDlg extends DialogBase {
     }
 
     shareToPersonDlg = (): void => {
-        let dlg = new ShareToPersonDlg(this.node, this.reload);
+        let dlg = new ShareToPersonDlg(this.node, this.reload, this.appState);
         dlg.open();
     }
 
@@ -105,7 +106,7 @@ export class SharingDlg extends DialogBase {
                     new Button("Share to Public", this.shareNodeToPublic, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
-                        S.meta64.refresh();
+                        S.meta64.refresh(this.appState);
                     })
                 ])
             ])

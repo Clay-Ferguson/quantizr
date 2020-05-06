@@ -8,6 +8,7 @@ import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { TextField } from "../widget/TextField";
 import { TextContent } from "../widget/TextContent";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -24,9 +25,11 @@ export class SplitNodeDlg extends DialogBase {
     customDelimRadioButton: RadioButton;
     delimiterTextField: TextField;
 
-    constructor() {
-        super("Split Node");
+    constructor(state: AppState) {
+        super("Split Node", null, false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             new TextContent("Split into multiple nodes..."),
 
@@ -75,7 +78,7 @@ export class SplitNodeDlg extends DialogBase {
     }
 
     splitNodes = (): void => {
-        let highlightNode = S.meta64.getHighlightedNode();
+        let highlightNode = S.meta64.getHighlightedNode(this.appState);
         if (highlightNode) {
             let splitType = this.childrenRadioButton.getChecked() ? "children" : "inline";
 

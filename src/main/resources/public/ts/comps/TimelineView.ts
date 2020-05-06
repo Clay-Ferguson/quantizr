@@ -3,7 +3,6 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Comp } from "../widget/base/Comp";
-import { ReactNode } from "react";
 import { Div } from "../widget/Div";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
@@ -19,21 +18,24 @@ export class TimelineView extends Div {
     constructor() {
         super(null, {
             id: "timelineTab",
-            className: "tab-pane fade my-tab-pane"
         });
     }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
-        let results = useSelector((state: AppState) => state.timelineResults);
-        let mstate = useSelector((state: AppState) => state.mstate);
+    preRender = (): void => {
+        let state: AppState = useSelector((state: AppState) => state);
+        let results = state.timelineResults;
         
+        this.attribs.className = "tab-pane fade my-tab-pane";
+        if (state.activeTab==this.getId()) {
+            this.attribs.className += " show active";
+        }
+
         if (!results || results.length == 0) {
             this.setChildren([new Div("No Timeline Displaying", {
                 id: "timelineResultsPanel",
                 className: "timelineResultsPanel"
             })]);
-            return this.super_CompRender();
+            return;
         }
 
         let childCount = results.length;
@@ -51,11 +53,9 @@ export class TimelineView extends Div {
             S.srch.initSearchNode(node);
 
             rowCount++;
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, mstate));
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, state));
         });
 
         this.setChildren(children);
-
-        return this.super_CompRender();
     }
 }

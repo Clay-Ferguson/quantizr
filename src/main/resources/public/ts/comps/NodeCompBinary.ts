@@ -6,12 +6,13 @@ import { Div } from "../widget/Div";
 import { Icon } from "../widget/Icon";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
-import { ReactNode } from "react";
 import { VideoPlayerDlg } from "../dlg/VideoPlayerDlg";
 import { Anchor } from "../widget/Anchor";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 import { Span } from "../widget/Span";
 import { Img } from "../widget/Img";
+import { useSelector, useDispatch } from "react-redux";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -68,11 +69,12 @@ export class NodeCompBinary extends Div {
         return img;
     }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
+    preRender = (): void => {
+        let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         if (!node) {
-            this.super_CompRender();
+           this.children = null;
+           return;
         }
 
         /* If this is an image render the image directly onto the page as a visible image */
@@ -82,7 +84,7 @@ export class NodeCompBinary extends Div {
         else if (S.props.hasVideo(node)) {
             this.setChildren([new ButtonBar([
                 new Button("Play Video", () => {
-                    new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(node)).open();
+                    new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(node), null, state).open();
                 }),
                 new Div("", {
                     className: "videoDownloadLink"
@@ -92,7 +94,7 @@ export class NodeCompBinary extends Div {
         else if (S.props.hasAudio(node)) {
             this.setChildren([new ButtonBar([
                 new Button("Play Audio", () => {
-                    new AudioPlayerDlg(S.render.getStreamUrlForNodeAttachment(node)).open();
+                    new AudioPlayerDlg(S.render.getStreamUrlForNodeAttachment(node), state).open();
                 }),
                 new Div("", {
                     className: "audioDownloadLink"
@@ -130,8 +132,5 @@ export class NodeCompBinary extends Div {
                 viewFileLink
             ])]);
         }
-
-
-        return this.super_CompRender();
     }
 }

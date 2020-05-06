@@ -125,6 +125,10 @@ strong em {
     font-weight: bold;
 }
 
+.dlgContainer {
+    display: none;
+}
+
 .overlay {
     z-index: 2147483647;
     background-color: rgba(1, 1, 1, 0.1);

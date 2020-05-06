@@ -3,6 +3,7 @@ import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C} from "./Constants";
 import { ActivityPubIntf } from "./intf/ActivityPubIntf";
+import { AppState } from "./AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -10,8 +11,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 export class ActivityPub implements ActivityPubIntf {
 
-    postNode = (): void => {
-        let node: J.NodeInfo = S.meta64.getHighlightedNode();
+    postNode = (state: AppState): void => {
+        let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (node) {
             S.util.ajax<J.ActivityPubPostRequest, J.ActivityPubPostResponse>("activityPubPost", {
                 "nodeId": node.id,

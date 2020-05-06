@@ -45,8 +45,8 @@ export class Search implements SearchIntf {
 
         dispatch({
             type: "Action_RenderSearchResults",
-            update: (state: AppState): void => {
-                state.searchResults = res.searchResults;
+            update: (s: AppState): void => {
+                s.searchResults = res.searchResults;
             }
         });
 
@@ -57,14 +57,14 @@ export class Search implements SearchIntf {
 
         dispatch({
             type: "Action_RenderTimelineResults",
-            update: (state: AppState): void => {
-                state.timelineResults = res.searchResults;
+            update: (s: AppState): void => {
+                s.timelineResults = res.searchResults;
             }
         });
         S.meta64.selectTab("timelineTab");
     }
 
-    searchFilesResponse = (res: J.FileSearchResponse) => {
+    searchFilesResponse = (res: J.FileSearchResponse, state: AppState) => {
         S.nav.mainOffset = 0;
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             "nodeId": res.searchResultNodeId,
@@ -74,12 +74,12 @@ export class Search implements SearchIntf {
             "offset": 0,
             "goToLastPage": false,
             "forceIPFSRefresh": false
-        }, S.nav.navPageNodeResponse);
+        }, (res) => {S.nav.navPageNodeResponse(res, state)});
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
-    timeline = (prop: string) => {
-        let node = S.meta64.getHighlightedNode();
+    timeline = (prop: string, state: AppState) => {
+        let node = S.meta64.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected to 'timeline' under.");
             return;
@@ -106,17 +106,16 @@ export class Search implements SearchIntf {
      *
      * node is a NodeInfo.java JSON
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, mstate: any): Comp => {
+    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, state: AppState): Comp => {
 
         let cssId = this._UID_ROWID_PREFIX + node.id;
         // console.log("Rendering Node Row[" + index + "] with id: " +cssId)
 
-        let buttonBar = this.makeButtonBarHtml(node, mstate);
-
+        let buttonBar = this.makeButtonBarHtml(node, state);
         let content = new NodeCompContent(node, true, true, "srch");
 
         let clazz = "node-table-row";
-        if (S.meta64.userPreferences.editMode) {
+        if (state.userPreferences.editMode) {
             clazz += " editing-border";
         }
         else {
@@ -126,20 +125,20 @@ export class Search implements SearchIntf {
         return new Div(null, {
             className: clazz + " inactive-row",
             onClick: (elm: HTMLElement) => {
-                S.srch.clickOnSearchResultRow(node.id);
+                this.clickOnSearchResultRow(node.id);
             }, //
             "id": cssId
         }, [buttonBar, content]);
     }
 
-    makeButtonBarHtml = (node: J.NodeInfo, mstate: any): Comp => {
+    makeButtonBarHtml = (node: J.NodeInfo, state: AppState): Comp => {
         let avatarImg: Img = null;
         if (node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, node) */) {
             avatarImg = S.render.makeAvatarImage(node);
         }
 
         return new HorizontalLayout([avatarImg, new Button("Jump", () => {
-            S.srch.clickSearchNode(node.id, mstate);
+            this.clickSearchNode(node.id, state);
         }, {
             title: "Jump to this Node in the Main Tab",
             id: "go-" + node.id
@@ -152,7 +151,7 @@ export class Search implements SearchIntf {
         this.setRowHighlight(true);
     }
 
-    clickSearchNode = (id: string, mstate: any) => {
+    clickSearchNode = (id: string, state: AppState) => {
 
         /*
          * update highlight node to point to the node clicked on, just to persist it for later
@@ -162,7 +161,7 @@ export class Search implements SearchIntf {
             throw "Unable to find uid in search results: " + id;
         }
 
-        S.view.refreshTree(this.highlightRowNode.id, true, this.highlightRowNode.id, false, false, mstate);
+        S.view.refreshTree(this.highlightRowNode.id, true, this.highlightRowNode.id, false, false, state);
         S.meta64.selectTab("mainTab");
     }
 

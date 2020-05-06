@@ -3,12 +3,13 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Comp } from "../widget/base/Comp";
-import { ReactNode } from "react";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { NodeCompMarkdown } from "./NodeCompMarkdown";
 import { NodeCompBinary } from "./NodeCompBinary";
 import { Div } from "../widget/Div";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
+import { useSelector, useDispatch } from "react-redux";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -22,12 +23,13 @@ export class NodeCompContent extends Div {
         super(null);
     }
 
-    super_CompRender: any = this.compRender;
-    compRender = (): ReactNode => {
+    preRender = (): void => {
+        let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
 
         if (!node) {
-            return this.super_CompRender();
+            this.children = null;
+            return;
         }
 
         //console.log("NodeCompContent node is rendering: "+S.util.prettyPrint(node));
@@ -36,13 +38,13 @@ export class NodeCompContent extends Div {
         let children: Comp[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
 
-        if (S.meta64.showMetaData) {
+        if (state.showMetaData) {
             if (this.showHeader) {
                 children.push(new NodeCompRowHeader(node));
             }
         }
 
-        if (S.meta64.showProperties) {
+        if (state.showProperties) {
             let propTable = S.props.renderProperties(node.properties);
             if (propTable) {
                 children.push(propTable);
@@ -55,7 +57,7 @@ export class NodeCompContent extends Div {
              */
             if (typeHandler) {
                 renderComplete = true;
-                children.push(typeHandler.render(node, this.rowStyling));
+                children.push(typeHandler.render(node, this.rowStyling, state));
             }
 
             if (!renderComplete) {
@@ -89,7 +91,5 @@ export class NodeCompContent extends Div {
         }
 
         this.setChildren(children);
-
-        return this.super_CompRender();
     }
 }

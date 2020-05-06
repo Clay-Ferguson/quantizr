@@ -3,17 +3,16 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { ReactNode } from "react";
-import { TabPanel } from "./TabPanel";
-import { MainNavPanel } from "./MainNavPanel";
 import { Div } from "./Div";
-import { Main } from "./Main";
+import { store } from "../AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class App extends Comp {
+//note: class not in use yet
+export class DlgContainer extends Comp {
 
     constructor(attribs: Object = {}) {
         super(attribs);
@@ -21,8 +20,7 @@ export class App extends Comp {
 
     compRender = (): ReactNode => {
         this.setChildren([
-            new Div(null, { role: "toolbar" }, [new MainNavPanel(null)]),
-            new Main({ role: "main", className: "container" }, [S.meta64.mainTabPanel = new TabPanel()])
+            new Div("This is a test"),
         ]);
 
         return this.tagRender('div', null, this.attribs);

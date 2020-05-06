@@ -9,6 +9,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 import { Checkbox } from "../widget/Checkbox";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,9 +22,11 @@ export class TransferNodeDlg extends DialogBase {
     fromTextField: TextField;
     toTextField: TextField;
 
-    constructor() {
-        super("Transfer Node", "app-modal-content-narrow-width");
+    constructor(state: AppState) {
+        super("Transfer Node", "app-modal-content-narrow-width", false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             new Form(null, [
                 new FormGroup(null,
@@ -55,13 +58,13 @@ export class TransferNodeDlg extends DialogBase {
             S.util.showMessage("To and From user names are required.");
             return;
         }
-        let node: J.NodeInfo = S.meta64.getHighlightedNode();
+        let node: J.NodeInfo = S.meta64.getHighlightedNode(this.appState);
         if (!node) {
             S.util.showMessage("No node was selected.");
             return;
         }
         let recursive = this.recursiveCheckBox.getChecked();
-        S.user.transferNode(recursive, node.id, fromUser, toUser);
+        S.user.transferNode(recursive, node.id, fromUser, toUser, this.appState);
         this.close();
     }
 }

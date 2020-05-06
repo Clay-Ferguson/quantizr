@@ -7,6 +7,7 @@ import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
+import { AppState } from "../AppState";
 
 // https://github.com/visjs/vis-network
 //      npm install vis-network
@@ -20,9 +21,11 @@ export class GraphDisplayDlg extends DialogBase {
     graphDiv: Div;
     uploadButton: Button;
 
-    constructor() {
-        super("Graph Display");
+    constructor(state: AppState) {
+        super("Graph Display", null, false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             new Form(null, [
                 this.graphDiv = new Div(null, {
@@ -36,9 +39,7 @@ export class GraphDisplayDlg extends DialogBase {
                 ])
             ])
         ]);
-    }
 
-    init = (): void => {
         this.whenElm((elm: HTMLElement) => {
 
             // create an array with nodes

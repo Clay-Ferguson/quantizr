@@ -21,7 +21,6 @@ export class GraphPanel extends Comp {
     constructor() {
         super({ style: { width: "100%", height: "600px", border: "1px solid gray" } });
         this.init();
-        S.meta64.graphPanel = this;
     }
 
     init = (): void => {

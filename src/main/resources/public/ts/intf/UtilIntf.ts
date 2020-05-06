@@ -1,5 +1,6 @@
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
+import { AppState } from "../AppState";
 
 export interface UtilIntf {
     logAjax: boolean;
@@ -43,7 +44,7 @@ export interface UtilIntf {
 
     getParameterByName(name?: any, url?: any): string;
     initProgressMonitor(): void;
-    progressInterval(): void;
+    progressInterval(state: AppState): void;
     getHostAndPort(): string;
     getRpcPath(): string;
     getRemoteHost(): string;
@@ -101,7 +102,7 @@ export interface UtilIntf {
     triggerCustom(elm: HTMLElement, evt: string, obj: Object): void;
     trigger(elm: HTMLElement, evt: string): void;
     formatDate(date) : string;
-    updateHistory(node: J.NodeInfo, childNode?: J.NodeInfo): void;
+    updateHistory(node: J.NodeInfo, childNode: J.NodeInfo, appState: AppState): void;
     getElm(id: string, exResolve?: (elm: HTMLElement) => void): Promise<HTMLElement>;
     animateScrollToTop(): any;
     assert(check: boolean, op: string): void;

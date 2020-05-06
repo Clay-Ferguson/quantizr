@@ -8,6 +8,7 @@ import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,9 +21,11 @@ export class SignupDlg extends DialogBase {
     passwordTextField: TextField;
     emailTextField: TextField;
 
-    constructor() {
-        super("Create Account", "app-modal-content-medium-width");
-        
+    constructor(state: AppState) {
+        super("Create Account", "app-modal-content-medium-width", null, false, state);
+    }
+    
+    preRender = () => {  
         this.setChildren([
             new Form(null, [
                 this.userTextField = new TextField("User"),
@@ -35,6 +38,9 @@ export class SignupDlg extends DialogBase {
                 ])
             ])
         ]);
+        
+        this.pageInitSignupPg();
+        this.userTextField.focus();
     }
 
     signup = (): void => {
@@ -92,10 +98,5 @@ export class SignupDlg extends DialogBase {
     }
 
     pageInitSignupPg = (): void => {
-    }
-
-    init = (): void => {
-        this.pageInitSignupPg();
-        this.userTextField.focus();
     }
 }

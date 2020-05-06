@@ -1,8 +1,9 @@
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
+import { AppState } from "../AppState";
 
 export interface GraphIntf {
-    graphTreeStructure(mstate: any): any;
+    graphTreeStructure(state: AppState): any;
     graphNodesResponse(res: J.GraphResponse): any;
 }
 

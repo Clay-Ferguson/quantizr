@@ -5,6 +5,7 @@ import { DialogBase } from "../DialogBase";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -15,9 +16,11 @@ export class ManageEncryptionKeysDlg extends DialogBase {
 
     textContent: TextContent;
 
-    constructor() {
-        super("Encryption Keys");
+    constructor(state: AppState) {
+        super("Encryption Keys", null, false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             this.textContent = new TextContent("Getting key info...", "tallTextContent", true),
             new ButtonBar([

@@ -16,6 +16,7 @@ import { Img } from "../widget/Img";
 import { Anchor } from "../widget/Anchor";
 import { ButtonBar } from "../widget/ButtonBar";
 import { MarkdownDiv } from "../widget/MarkdownDiv";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -56,7 +57,7 @@ export class RssTypeHandler implements TypeHandlerIntf {
         return true;
     }
 
-    render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
+    render = (node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp => {
 
         let feedSrc: string = S.props.getNodePropVal("sn:rssFeedSrc", node);
         if (!feedSrc) {
@@ -83,13 +84,13 @@ export class RssTypeHandler implements TypeHandlerIntf {
             we need the container to be rendered before we make this call, but this was a guess and i'm not fully sure why it doesn't
             work without this timeout */
             setTimeout(() => {
-                this.renderItem(this.feedCache[feedSrc], feedSrc, itemListContainer);
+                this.renderItem(this.feedCache[feedSrc], feedSrc, itemListContainer, state);
             }, 1000);
         }
         //otherwise read from the internet
         else {
 
-            let pgrsDlg = new ProgressDlg();
+            let pgrsDlg = new ProgressDlg(state);
             pgrsDlg.open();
 
             //todo-1: to avoid performance issues i'll just allow only 100 items to load for now but this
@@ -99,7 +100,7 @@ export class RssTypeHandler implements TypeHandlerIntf {
                 if (!feed) {
                     if (err.message) {
                         new MessageDlg(
-                            err.message + "<br>Note: you may need '?format=xml' added to the url ?", "Message"
+                            err.message + "<br>Note: you may need '?format=xml' added to the url ?", "Message", null, null, false, 0, state
                         ).open();
                     }
 
@@ -109,7 +110,7 @@ export class RssTypeHandler implements TypeHandlerIntf {
                 }
                 else {
                     this.feedCache[feedSrc] = feed;
-                    this.renderItem(feed, feedSrc, itemListContainer);
+                    this.renderItem(feed, feedSrc, itemListContainer, state);
                 }
             });
         }
@@ -119,7 +120,7 @@ export class RssTypeHandler implements TypeHandlerIntf {
         return itemListContainer;
     }
 
-    renderItem = (feed: any, feedSrc: string, itemListContainer: Comp) => {
+    renderItem = (feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) => {
         //Current approach is to put the feed title in the parent node so we don't need it rendered
         //here also
         let feedOut: Comp[] = []; //tag("h2", {}, feed.title);
@@ -144,13 +145,13 @@ export class RssTypeHandler implements TypeHandlerIntf {
         itemListContainer.children.push(feedOutDiv);
 
         feed.items.forEach((item) => {
-            itemListContainer.children.push(this.buildFeedItem(item));
+            itemListContainer.children.push(this.buildFeedItem(item, state));
         });
 
         itemListContainer.updateDOM();
     }
 
-    buildFeedItem = (entry): Comp => {
+    buildFeedItem = (entry, state: AppState): Comp => {
         let children: Comp[] = [];
         children.push(new Anchor(entry.link, entry.title, {
             style: { fontSize: "25px" },
@@ -161,7 +162,7 @@ export class RssTypeHandler implements TypeHandlerIntf {
             entry.enclosure.type.indexOf("audio/") != -1) {
             let audioButton = new Button("Play Audio", //
                 () => {
-                    S.podcast.openPlayerDialog(entry.enclosure.url, entry.title);
+                    S.podcast.openPlayerDialog(entry.enclosure.url, entry.title, state);
                 });
             children.push(new Div(null, {
                 style: {

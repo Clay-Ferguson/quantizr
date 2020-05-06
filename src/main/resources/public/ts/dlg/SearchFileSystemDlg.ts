@@ -8,6 +8,7 @@ import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -19,16 +20,20 @@ export class SearchFileSystemDlg extends DialogBase {
     static defaultSearchText: string = "";
     searchTextField: TextField;
 
-    constructor() {
-        super("Search File System");
+    constructor(state: AppState) {
+        super("Search File System", null, false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             new Form(null, [
                 new TextContent("Enter text to find. Only content text will be searched. All sub-nodes under the selected node are included in the search."),
                 this.searchTextField = new TextField("Search", {
                     onKeyPress: (e: KeyboardEvent) => { 
                         if (e.which == 13) { // 13==enter key code
-                            this.searchNodes();
+
+                            //commentingn because 'state' is not available here yet.
+                            //this.searchNodes(state);
                             return false;
                         }
                     }
@@ -41,15 +46,16 @@ export class SearchFileSystemDlg extends DialogBase {
                 ])
             ])
         ]);
+        this.searchTextField.focus();
     }
 
-    searchNodes = (): void => {
+    searchNodes = (state: AppState): void => {
         if (!S.util.ajaxReady("searchNodes")) {
             return;
         }
 
         // until we have better validation
-        let node = S.meta64.getHighlightedNode();
+        let node = S.meta64.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected to search under.");
             return;
@@ -75,8 +81,5 @@ export class SearchFileSystemDlg extends DialogBase {
         this.close();
     }
 
-    init = (): void => {
-        this.searchTextField.focus();
-    }
 }
 

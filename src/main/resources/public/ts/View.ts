@@ -4,6 +4,7 @@ import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import { ViewIntf } from "./intf/ViewIntf";
 import { GraphDisplayDlg } from "./dlg/GraphDisplayDlg";
+import { AppState } from "./AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -20,25 +21,18 @@ export class View implements ViewIntf {
 
     /*
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
-     * todo-0: everywhere that calls this needs to pass mstate
      */
-    refreshTree = (nodeId: string, renderParentIfLeaf: boolean, highlightId: string, isInitialRender: boolean, forceIPFSRefresh: boolean, 
-        mstate: any): void => {
+    refreshTree = (nodeId: string, renderParentIfLeaf: boolean, highlightId: string, isInitialRender: boolean, forceIPFSRefresh: boolean,
+        state: AppState): void => {
         console.log("refreshTree()");
 
-        if (!nodeId) {
-            if (S.meta64.currentNodeData && S.meta64.currentNodeData.node) {
-                nodeId = S.meta64.currentNodeData.node.id;
-            }
-        }
-
-        if (S.meta64.currentNodeData && mstate) {
-            S.render.updateHighlightNode(S.meta64.currentNodeData.node, mstate.highlightNode);
+        if (!nodeId && state.node) {
+            nodeId = state.node.id;
         }
 
         console.log("Refreshing tree: nodeId=" + nodeId);
         if (!highlightId) {
-            let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode();
+            let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             highlightId = currentSelNode != null ? currentSelNode.id : nodeId;
         }
 
@@ -59,41 +53,42 @@ export class View implements ViewIntf {
             if (res.offsetOfNodeFound > -1) {
                 S.nav.mainOffset = res.offsetOfNodeFound;
             }
-            await S.render.renderPageFromData(res, false, highlightId);
+
+            await S.render.renderPageFromData(res, false, highlightId, true, state);
         });
     }
 
-    firstPage = (): void => {
+    firstPage = (state: AppState): void => {
         console.log("Running firstPage Query");
         S.nav.mainOffset = 0;
-        this.loadPage(false);
+        this.loadPage(false, state);
     }
 
-    prevPage = (): void => {
+    prevPage = (state: AppState): void => {
         console.log("Running prevPage Query");
         S.nav.mainOffset -= S.nav.ROWS_PER_PAGE;
         if (S.nav.mainOffset < 0) {
             S.nav.mainOffset = 0;
         }
-        this.loadPage(false);
+        this.loadPage(false, state);
     }
 
-    nextPage = (): void => {
+    nextPage = (state: AppState): void => {
         console.log("Running nextPage Query");
         S.nav.mainOffset += S.nav.ROWS_PER_PAGE;
-        this.loadPage(false);
+        this.loadPage(false, state);
     }
 
-    lastPage = (): void => {
+    lastPage = (state: AppState): void => {
         console.log("Running lastPage Query");
         //nav.mainOffset += nav.ROWS_PER_PAGE;
-        this.loadPage(true);
+        this.loadPage(true, state);
     }
 
-    private loadPage = (goToLastPage: boolean): void => {
+    private loadPage = (goToLastPage: boolean, state: AppState): void => {
         console.log("loadPage()");
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            "nodeId": S.meta64.currentNodeData.node.id,
+            "nodeId": state.node.id,
             "upLevel": null,
             "siblingOffset": 0,
             "renderParentIfLeaf": true,
@@ -106,47 +101,48 @@ export class View implements ViewIntf {
                     S.nav.mainOffset = res.offsetOfNodeFound;
                 }
             }
-            await S.render.renderPageFromData(res, true, null);
+
+            await S.render.renderPageFromData(res, true, null, true, state);
         });
     }
 
     //todo-1: need to add logic to detect if this is root node on the page, and if so, we consider the first child the target
-    scrollRelativeToNode = (dir: string) => {
-        let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode();
+    scrollRelativeToNode = (dir: string, state: AppState) => {
+        let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!currentSelNode) return;
 
         //First detect if page root node is selected, before doing a child search
-        if (currentSelNode.id == S.meta64.currentNodeData.node.id) {
+        if (currentSelNode.id == state.node.id) {
             //if going down that means first child node.
-            if (dir == "down" && S.meta64.currentNodeData.node.children && S.meta64.currentNodeData.node.children.length > 0) {
-                S.meta64.highlightNode(S.meta64.currentNodeData.node.children[0], true);
+            if (dir == "down" && state.node.children && state.node.children.length > 0) {
+                S.meta64.highlightNode(state.node.children[0], true, state);
             }
             else if (dir == "up") {
-                S.nav.navUpLevel();
+                S.nav.navUpLevel(state);
             }
             return;
         }
 
-        if (S.meta64.currentNodeData.node.children && S.meta64.currentNodeData.node.children.length > 0) {
+        if (state.node.children && state.node.children.length > 0) {
             let prevChild = null;
             let nodeFound = false;
             let done = false;
-            S.meta64.currentNodeData.node.children.forEach((child: J.NodeInfo) => {
+            state.node.children.forEach((child: J.NodeInfo) => {
                 if (done) return;
 
                 if (nodeFound && dir === "down") {
                     done = true;
-                    S.meta64.highlightNode(child, true);
+                    S.meta64.highlightNode(child, true, state);
                 }
 
                 if (child.id == currentSelNode.id) {
                     if (dir === "up") {
                         if (prevChild) {
                             done = true;
-                            S.meta64.highlightNode(prevChild, true);
+                            S.meta64.highlightNode(prevChild, true, state);
                         }
                         else {
-                            S.meta64.highlightNode(S.meta64.currentNodeData.node, true);
+                            S.meta64.highlightNode(state.node, true, state);
                         }
                     }
                     nodeFound = true;
@@ -156,43 +152,41 @@ export class View implements ViewIntf {
         }
     }
 
-    scrollToSelectedNode = async (): Promise<void> => {
-        return new Promise<void>((resolve, reject) => {
-            S.meta64.setOverlay(true);
+    scrollToSelectedNode = (state: AppState): void => {
 
-            setTimeout(async () => {
-                try {
-                    /* Check to see if we are rendering the top node (page root), and if so
-                    it is better looking to just scroll to zero index, because that will always
-                    be what user wants to see */
-                    let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode();
-                    if (currentSelNode && S.meta64.currentNodeData.node.id == currentSelNode.id) {
-                        this.docElm.scrollTop = 0;
-                        return;
-                    }
+        S.meta64.setOverlay(true);
 
-                    let elm: any = S.nav.getSelectedDomElement();
-                    if (elm) {
-                        elm.scrollIntoView(true);
-
-                        //the 'scrollIntoView' function doesn't work well when we have margin/padding on the document (for our toolbar at the top)
-                        //so we have to account for that by scrolling up a bit from where the 'scrollIntoView' will have put is.
-                        //Only in the rare case of the very last node on the page will this have slightly undesirable effect of
-                        //scrolling up more than we wanted to, but instead of worrying about that I'm keeping this simple.
-                        scrollBy(0, -S.meta64.navBarHeight);
-                    }
-                    else {
-                        this.docElm.scrollTop = 0;
-                    }
-
-                } finally {
-                    setTimeout(() => {
-                        S.meta64.setOverlay(false);
-                        resolve();
-                    }, 100);
+        setTimeout(async () => {
+            try {
+                /* Check to see if we are rendering the top node (page root), and if so
+                it is better looking to just scroll to zero index, because that will always
+                be what user wants to see */
+                let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+                if (currentSelNode && state.node.id == currentSelNode.id) {
+                    this.docElm.scrollTop = 0;
+                    return;
                 }
-            }, 100);
-        });
+
+                let elm: any = S.nav.getSelectedDomElement(state);
+                if (elm) {
+                    elm.scrollIntoView(true);
+
+                    //the 'scrollIntoView' function doesn't work well when we have margin/padding on the document (for our toolbar at the top)
+                    //so we have to account for that by scrolling up a bit from where the 'scrollIntoView' will have put is.
+                    //Only in the rare case of the very last node on the page will this have slightly undesirable effect of
+                    //scrolling up more than we wanted to, but instead of worrying about that I'm keeping this simple.
+                    scrollBy(0, -S.meta64.navBarHeight);
+                }
+                else {
+                    this.docElm.scrollTop = 0;
+                }
+
+            } finally {
+                setTimeout(() => {
+                    S.meta64.setOverlay(false);
+                }, 100);
+            }
+        }, 100);
     }
 
     scrollToTop = async (): Promise<void> => {
@@ -227,15 +221,15 @@ export class View implements ViewIntf {
         return path;
     }
 
-    graphDisplayTest = () => {
+    graphDisplayTest = (state: AppState) => {
         //let node = S.meta64.getHighlightedNode();
 
-        let dlg = new GraphDisplayDlg();
+        let dlg = new GraphDisplayDlg(state);
         dlg.open();
     }
 
-    runServerCommand = (command: string) => {
-        let node = S.meta64.getHighlightedNode();
+    runServerCommand = (command: string, state: AppState) => {
+        let node = S.meta64.getHighlightedNode(state);
 
         S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
             "command": command,
@@ -245,7 +239,7 @@ export class View implements ViewIntf {
                 /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
                 there are other commands that exist also */
                 if (command == "getServerInfo") {
-                    res.serverInfo += "<br>Browser Memory: "+S.util.getBrowserMemoryInfo();
+                    res.serverInfo += "<br>Browser Memory: " + S.util.getBrowserMemoryInfo();
                     res.serverInfo += "<br>Build Time: " + BUILDTIME;
                     res.serverInfo += "<br>Profile: " + PROFILE;
                 }
@@ -253,8 +247,8 @@ export class View implements ViewIntf {
             });
     }
 
-    displayNotifications = (command: string) => {
-        let node = S.meta64.getHighlightedNode();
+    displayNotifications = (command: string, state: AppState) => {
+        let node = S.meta64.getHighlightedNode(state);
 
         S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getNotifications", {
             "command": command,

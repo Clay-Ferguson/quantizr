@@ -8,6 +8,7 @@ import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -18,9 +19,11 @@ export class ShareToPersonDlg extends DialogBase {
 
     shareToUserTextField: TextField;
 
-    constructor(private node: J.NodeInfo, private sharedNodeFunc: Function) {
-        super("Share Node to Person", "app-modal-content-medium-width");
+    constructor(private node: J.NodeInfo, private sharedNodeFunc: Function, state: AppState) {
+        super("Share Node to Person", "app-modal-content-medium-width", false, false, state);
+    }
 
+    preRender = () => {
         this.setChildren([
             new Form(null, [
                 new TextContent("Enter the username of the person you want to share this node with:"),
