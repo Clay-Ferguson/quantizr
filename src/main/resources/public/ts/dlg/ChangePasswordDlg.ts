@@ -60,7 +60,7 @@ export class ChangePasswordDlg extends DialogBase {
                 "passCode": this.passCode
             }, this.changePasswordResponse);
         } else {
-            S.util.showMessage("Invalid password(s).");
+            S.util.showMessage("Invalid password(s).", "Warning");
         }
     }
 

@@ -57,14 +57,14 @@ export class SearchFileSystemDlg extends DialogBase {
         // until we have better validation
         let node = S.meta64.getHighlightedNode(state);
         if (!node) {
-            S.util.showMessage("No node is selected to search under.");
+            S.util.showMessage("No node is selected to search under.", "Warning");
             return;
         }
 
         // until better validation, just check for empty
         let searchText = this.searchTextField.getValue();
         if (!searchText) {
-            S.util.showMessage("Enter search text.");
+            S.util.showMessage("Enter search text.", "Warning");
             return;
         }
 
@@ -77,7 +77,7 @@ export class SearchFileSystemDlg extends DialogBase {
     }
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
-        S.util.showMessage(res.message, true, "modal-lg");
+        S.util.showMessage(res.message, "Note", true, "modal-lg");
         this.close();
     }
 

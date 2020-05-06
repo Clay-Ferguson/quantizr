@@ -61,8 +61,8 @@ export interface UtilIntf {
     isElmVisible(elm: HTMLElement);
     delayedFocus(id: string): void;
     checkSuccess(opFriendlyName, res): boolean;
-    flashMessage(message: string, preformatted?: boolean, sizeStyle?: string): void;
-    showMessage(message: string, preformatted?: boolean, sizeStyle?: string): void;
+    flashMessage(message: string, title: string, preformatted?: boolean, sizeStyle?: string): void;
+    showMessage(message: string, title: string, preformatted?: boolean, sizeStyle?: string): void;
     addAll(obj, a): void;
     addAll(obj, a): void;
     nullOrUndef(obj): boolean;

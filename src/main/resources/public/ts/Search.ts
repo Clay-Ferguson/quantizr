@@ -81,7 +81,7 @@ export class Search implements SearchIntf {
     timeline = (prop: string, state: AppState) => {
         let node = S.meta64.getHighlightedNode(state);
         if (!node) {
-            S.util.showMessage("No node is selected to 'timeline' under.");
+            S.util.showMessage("No node is selected to 'timeline' under.", "Warning");
             return;
         }
 

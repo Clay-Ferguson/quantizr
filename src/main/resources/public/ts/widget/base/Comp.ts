@@ -29,6 +29,8 @@ export abstract class Comp implements CompIntf {
     public rendered: boolean = false;
     public debug: boolean = false;
     private static guid: number = 0;
+
+    //todo-0: make this private?
     public state: any = {};
 
     static idToCompMap: { [key: string]: Comp } = {};
@@ -166,7 +168,6 @@ export abstract class Comp implements CompIntf {
     whenElm = (func: (elm: HTMLElement) => void) => {
         //console.log("whenElm running for " + this.jsClassName);
         if (this.domAddEventRan) {
-            console.log("ran whenElm event immediately. domAddEvent had already ran");
             func(this.getElement());
             return;
         }
@@ -361,6 +362,9 @@ export abstract class Comp implements CompIntf {
     });
     */
     setState = (state: any) => {
+        if (!state) {
+            state = {};
+        }
         //console.log("setState[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(state));
         if (typeof state == "function") {
             this.state = state(this.state);
@@ -382,6 +386,7 @@ export abstract class Comp implements CompIntf {
         let ret: ReactNode = null;
         try {
             const [state, setState] = useState(this.state);
+            //console.warn("Component state was null in render for: " + this.jsClassName);
             this.state = state;
             this.setState = setState;
 
@@ -412,6 +417,7 @@ export abstract class Comp implements CompIntf {
             ret = this.compRender();
         }
         catch (e) {
+            //todo-1: this is not logging the stack
             console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key + " Error: " + e);
         }
         return ret;

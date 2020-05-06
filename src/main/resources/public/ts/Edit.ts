@@ -49,7 +49,7 @@ export class Edit implements EditIntf {
     openImportDlg = (state: AppState): void => {
         let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!node) {
-            S.util.showMessage("No node is selected.");
+            S.util.showMessage("No node is selected.", "Warning");
             return;
         }
 
@@ -116,7 +116,7 @@ export class Edit implements EditIntf {
                 let dlg = new EditNodeDlg(editNode, state);
                 dlg.open();
             } else {
-                S.util.showMessage("You cannot edit nodes that you don't own.");
+                S.util.showMessage("You cannot edit nodes that you don't own.", "Warning");
             }
         }
     }
@@ -365,7 +365,7 @@ export class Edit implements EditIntf {
         }
 
         if (!node) {
-            S.util.showMessage("Unknown nodeId in editNodeClick: " + id);
+            S.util.showMessage("Unknown nodeId in editNodeClick: " + id, "Warning");
             return;
         }
 
@@ -436,10 +436,6 @@ export class Edit implements EditIntf {
         }, async (res: J.SelectAllNodesResponse) => {
             console.log("Node Sel Count: " + res.nodeIds.length);
             S.meta64.selectAllNodes(res.nodeIds);
-
-            //optimization is possible here (todo-1) to simply set the checkbox values of each one
-            //rather than rendering entire page again.
-            //await S.render.renderPageFromData(null, false, null, true, state);
         });
     }
 
@@ -471,14 +467,13 @@ export class Edit implements EditIntf {
      * has currenly selected (via checkboxes)
      */
     deleteSelNodes = (node: J.NodeInfo, hardDelete: boolean, state: AppState): void => {
-
-        if (node != null) {
+        if (node) {
             S.nav.toggleNodeSel(true, node.id, state);
         }
         let selNodesArray = S.meta64.getSelNodeIdsArray(state);
 
         if (!selNodesArray || selNodesArray.length == 0) {
-            S.util.showMessage("You have not selected any nodes to delete.");
+            S.util.showMessage("You have not selected any nodes to delete.", "Warning");
             return;
         }
 
@@ -487,7 +482,7 @@ export class Edit implements EditIntf {
         /* todo-1: would be better to check if ANY of the nodes are deleted not just arbitary first one */
         let nodeCheck: J.NodeInfo = state.idToNodeMap[firstNodeId];
         let confirmMsg = null;
-        if (nodeCheck.deleted) {
+        if (nodeCheck.deleted || hardDelete) {
             confirmMsg = "Permanently Delete " + selNodesArray.length + " node(s) ?"
         }
         else {
@@ -506,8 +501,8 @@ export class Edit implements EditIntf {
                 });
             },
             null, //no callback
-            node.deleted ? "btn-danger" : null,
-            node.deleted ? "alert alert-danger" : null,
+            (nodeCheck.deleted || hardDelete) ? "btn-danger" : null,
+            (nodeCheck.deleted || hardDelete) ? "alert alert-danger" : null,
             state
         ).open();
     }
@@ -541,23 +536,16 @@ export class Edit implements EditIntf {
     }
 
     undoCutSelNodes = async (state: AppState): Promise<void> => {
-
         dispatch({
             type: "Action_SetNodesToMove", state,
             update: (s: AppState): void => {
                 s.nodesToMove = null;
             }
         });
-
-        /* now we render again and the nodes that were cut will disappear from view */
-        //await S.render.renderPageFromData(null, false, null, true, state);
     }
 
     cutSelNodes = (node: J.NodeInfo, state: AppState): void => {
-        debugger;
         S.nav.toggleNodeSel(true, node.id, state);
-
-        debugger;
         let selNodesArray = S.meta64.getSelNodeIdsArray(state);
 
         new ConfirmDlg("Cut " + selNodesArray.length + " node(s), to paste/move to new location ?", "Confirm Cut",
@@ -570,15 +558,12 @@ export class Edit implements EditIntf {
                 });
                 state.selectedNodes = {}; // clear selections.
 
-                /* now we render again and the nodes that were cut will disappear from view */
-                //await S.render.renderPageFromData(null, false, null, true, state);
             }, null, null, null, state
         ).open();
     }
 
     //location=inside | inline | inline-above (todo-1: put in java-aware enum)
     pasteSelNodes = (node: J.NodeInfo, location: string, nodesToMove: string[], state: AppState): void => {
-        debugger;
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently selected
          * page. Later on we can get more specific about allowing precise destination location for moved
@@ -601,7 +586,7 @@ export class Edit implements EditIntf {
                 let node = S.meta64.getHighlightedNode(state);
 
                 if (!node) {
-                    S.util.showMessage("No node is selected.");
+                    S.util.showMessage("No node is selected.", "Warning");
                 } else {
                     S.util.ajax<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
                         "nodeId": node.id,
@@ -620,7 +605,7 @@ export class Edit implements EditIntf {
                     clipText = clipText.trim();
                 }
                 if (!clipText) {
-                    S.util.flashMessage("Nothing saved clipboard is empty!", true);
+                    S.util.flashMessage("Nothing saved clipboard is empty!", "Warning", true);
                     return;
                 }
 
@@ -632,7 +617,7 @@ export class Edit implements EditIntf {
                     "content": clipText
                 },
                     () => {
-                        S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, true);
+                        S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
                     }
                 );
             });
@@ -641,7 +626,7 @@ export class Edit implements EditIntf {
     splitNode = (splitType: string, delimiter: string, state: AppState): void => {
         let highlightNode = S.meta64.getHighlightedNode(state);
         if (!highlightNode) {
-            S.util.showMessage("You didn't select a node to split.");
+            S.util.showMessage("You didn't select a node to split.", "Warning");
             return;
         }
 

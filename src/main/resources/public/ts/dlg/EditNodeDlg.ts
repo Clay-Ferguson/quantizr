@@ -354,7 +354,7 @@ export class EditNodeDlg extends DialogBase {
             await dlg.open();
 
             if (dlg.encrypted && S.props.isPublic(this.node)) {
-                S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.");
+                S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
                 return;
             }
 

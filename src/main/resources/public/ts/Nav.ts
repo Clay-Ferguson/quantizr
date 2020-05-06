@@ -72,7 +72,7 @@ export class Nav implements NavIntf {
 
     upLevelResponse = async (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState): Promise<void> => {
         if (!res || !res.node) {
-            S.util.showMessage("No data is visible to you above this node.");
+            S.util.showMessage("No data is visible to you above this node.", "Warning");
         } else {
             await S.render.renderPageFromData(res, scrollToTop, id, true, state);
         }
@@ -209,7 +209,7 @@ export class Nav implements NavIntf {
         S.meta64.highlightNode(node, false, state);
 
         if (!node) {
-            S.util.showMessage("Unknown nodeId in openNodeByUid: " + id);
+            S.util.showMessage("Unknown nodeId in openNodeByUid: " + id, "Warning");
         } else {
             S.view.refreshTree(node.id, true, null, false, false, state);
         }

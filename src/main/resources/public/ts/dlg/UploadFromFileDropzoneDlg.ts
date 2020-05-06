@@ -225,7 +225,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             init: function () {
                 this.on("addedfile", function (file) {
                     if (!dlg.toTemporal && (file.size > maxUploadSize * Constants.ONE_MB)) {
-                        S.util.showMessage("File is too large. Max Size=" + maxUploadSize + "MB");
+                        S.util.showMessage("File is too large. Max Size=" + maxUploadSize + "MB", "Warning");
                         return;
                     }
                     dlg.updateFileList(this);
@@ -233,7 +233,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("maxfilesexceeded", function (arg) {
-                    S.util.showMessage("Only " + dlg.maxFiles + " file can be uploaded to a node.");
+                    S.util.showMessage("Only " + dlg.maxFiles + " file can be uploaded to a node.", "Warning");
                 });
 
                 this.on("removedfile", function () {
@@ -264,13 +264,13 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("error", function (param1, param2, param3) {
                     if (dlg.sent) {
-                        S.util.showMessage("Upload failed.");
+                        S.util.showMessage("Upload failed.", "Warning");
                     }
                 });
 
                 this.on("success", function (param1, resp, param3) {
                     if (!resp.succese && resp.exceptionClass && resp.exceptionClass.endsWith(".OutOfSpaceException")) {
-                        S.util.showMessage("Upload failed. You're out of storage space on the server. Consider uploading to IPFS using Temporal (https://temporal.cloud)");
+                        S.util.showMessage("Upload failed. You're out of storage space on the server. Consider uploading to IPFS using Temporal (https://temporal.cloud)", "Warning");
                         return;
                     }
                     //console.log("Uploaded to Hash: " + ipfsHash);
@@ -287,7 +287,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                             node: dlg.node
                         }, (res) => {
-                            S.edit.saveNodeResponse(dlg.node, res, this.appState);
+                            S.edit.saveNodeResponse(dlg.node, res, dlg.appState);
                         });
                     }
                 });
@@ -295,7 +295,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.on("queuecomplete", function (arg) {
                     if (dlg.sent) {
                         dlg.close();
-                        S.meta64.refresh(this.appState);
+                        S.meta64.refresh(dlg.appState);
                     }
                 });
             }
@@ -307,7 +307,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
             if (this.autoAddFile) {
                 if (!dlg.toTemporal && (this.autoAddFile.size > maxUploadSize * Constants.ONE_MB)) {
-                    S.util.showMessage("File is too large. Max Size=" + maxUploadSize + "MB");
+                    S.util.showMessage("File is too large. Max Size=" + maxUploadSize + "MB", "Warning");
                     return;
                 }
 

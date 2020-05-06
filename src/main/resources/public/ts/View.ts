@@ -24,8 +24,7 @@ export class View implements ViewIntf {
      */
     refreshTree = (nodeId: string, renderParentIfLeaf: boolean, highlightId: string, isInitialRender: boolean, forceIPFSRefresh: boolean,
         state: AppState): void => {
-        console.log("refreshTree()");
-
+    
         if (!nodeId && state.node) {
             nodeId = state.node.id;
         }
@@ -243,7 +242,7 @@ export class View implements ViewIntf {
                     res.serverInfo += "<br>Build Time: " + BUILDTIME;
                     res.serverInfo += "<br>Profile: " + PROFILE;
                 }
-                S.util.showMessage(res.serverInfo, true);
+                S.util.showMessage(res.serverInfo, "Command Complete", true);
             });
     }
 
@@ -256,7 +255,7 @@ export class View implements ViewIntf {
         },
             (res: J.GetServerInfoResponse) => {
                 if (res.serverInfo) {
-                    S.util.showMessage(res.serverInfo, false);
+                    S.util.showMessage(res.serverInfo, "Notifications", false);
                 }
             });
     }

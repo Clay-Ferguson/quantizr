@@ -25,7 +25,7 @@ export class Share implements ShareIntf {
         let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
 
         if (!node) {
-            S.util.showMessage("No node is selected.");
+            S.util.showMessage("No node is selected.", "Warning");
             return;
         }
         new SharingDlg(node, state).open();

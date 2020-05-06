@@ -50,6 +50,7 @@ export class NodeCompBinary extends Div {
             "src": src,
             className: "attached-img",
             style,
+            /* todo-0: click to enlarg is broken */
             "title": "Click image to enlarge/reduce"
         });
 

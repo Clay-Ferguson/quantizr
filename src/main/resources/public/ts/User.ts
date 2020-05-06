@@ -253,7 +253,7 @@ export class User implements UserIntf {
             toUser,
         }, (res: J.TransferNodeResponse) => {
             S.view.refreshTree(null, false, null, false, false, state);
-            S.util.showMessage(res.message);
+            S.util.showMessage(res.message, "Success");
         });
     }
 }

@@ -65,7 +65,7 @@ export class SearchContentDlg extends DialogBase {
         // until we have better validation
         let node = S.meta64.getHighlightedNode(this.appState);
         if (!node) {
-            S.util.showMessage("No node is selected to search under.");
+            S.util.showMessage("No node is selected to search under.", "Warning");
             return;
         }
 
@@ -73,7 +73,7 @@ export class SearchContentDlg extends DialogBase {
         let searchText = this.searchTextField.getValue();
         S.srch.searchText = searchText;
         if (!searchText) {
-            S.util.showMessage("Enter search text.");
+            S.util.showMessage("Enter search text.", "Warning");
             return;
         }
 

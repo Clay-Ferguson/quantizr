@@ -269,7 +269,7 @@ export class Util implements UtilIntf {
 
     assertNotNull = (varName) => {
         if (typeof eval(varName) === 'undefined') {
-            this.showMessage("Variable not found: " + varName);
+            this.showMessage("Variable not found: " + varName, "Warning");
         }
     }
 
@@ -422,7 +422,7 @@ export class Util implements UtilIntf {
 
                     if (!response.data.success) {
                         if (response.data.message) {
-                            this.showMessage(response.data.message);
+                            this.showMessage(response.data.message, "Warning");
 
                             console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: "
                                 + this.prettyPrint(response));
@@ -494,7 +494,7 @@ export class Util implements UtilIntf {
                     }
                     else {
                         let status = error.response ? error.response.status : "";
-                        this.showMessage("Request failed: ERROR: " + status + ": " + error.message, true);
+                        this.showMessage("Request failed: ERROR: " + status + ": " + error.message, "Warning", true);
                     }
                 } catch (ex) {
                     this.logAndReThrow("Failed processing: " + postName, ex);
@@ -569,17 +569,17 @@ export class Util implements UtilIntf {
      */
     checkSuccess = (opFriendlyName, res): boolean => {
         if (!res.success) {
-            this.showMessage(opFriendlyName + " failed: " + res.message);
+            this.showMessage(opFriendlyName + " failed: " + res.message, "Warning");
         }
         return res.success;
     }
 
-    flashMessage = (message: string, preformatted: boolean = false, sizeStyle: string = null): void => {
-        new MessageDlg(message, "Message", null, null, preformatted, 3500, null).open();
+    flashMessage = (message: string, title: string, preformatted: boolean = false, sizeStyle: string = null): void => {
+        new MessageDlg(message, title, null, null, preformatted, 3500, null).open();
     }
 
-    showMessage = (message: string, preformatted: boolean = false, sizeStyle: string = null): void => {
-        new MessageDlg(message, "Message", null, null, preformatted, 0, null).open();
+    showMessage = (message: string, title: string, preformatted: boolean = false, sizeStyle: string = null): void => {
+        new MessageDlg(message, title, null, null, preformatted, 0, null).open();
     }
 
     /* adds all array objects to obj as a set */
@@ -746,7 +746,7 @@ export class Util implements UtilIntf {
      */
     verifyType = (obj: any, type: any, msg: string) => {
         if (typeof obj !== type) {
-            this.showMessage(msg);
+            this.showMessage(msg, "Warning");
             return false;
         }
         return true;
@@ -1030,7 +1030,7 @@ export class Util implements UtilIntf {
         (<any>navigator).clipboard.writeText(text).then(function () {
             console.log("Copied to clipboard successfully!");
         }, function () {
-            S.util.showMessage("Unable to write to clipboard.");
+            S.util.showMessage("Unable to write to clipboard.", "Warning");
         });
     }
 
@@ -1082,6 +1082,9 @@ export class Util implements UtilIntf {
     updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState): void => {
         if (!node) {
             node = appState.node;
+        }
+        if (!node) {
+            return;
         }
         let url, title, state;
 

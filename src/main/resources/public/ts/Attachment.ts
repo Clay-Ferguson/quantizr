@@ -20,7 +20,7 @@ export class Attachment implements AttachmentIntf {
             node = S.meta64.getHighlightedNode(state);
         }
         if (!node) {
-            S.util.showMessage("No node is selected.");
+            S.util.showMessage("No node is selected.", "Warning");
             return;
         }
 
@@ -39,7 +39,7 @@ export class Attachment implements AttachmentIntf {
         }
 
         if (!node) {
-            S.util.showMessage("No node is selected.");
+            S.util.showMessage("No node is selected.", "Warning");
             return;
         }
 

@@ -8,7 +8,6 @@ export class AppState {
 
     offsetOfNodeFound: number;
     displayedParent: boolean;
-    noDataResponse: string;
     title: string = "";
 
     node: J.NodeInfo;

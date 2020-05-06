@@ -51,7 +51,7 @@ export class ShareToPersonDlg extends DialogBase {
     shareNodeToPerson = (): void => {
         let targetUser = this.shareToUserTextField.getValue();
         if (!targetUser) {
-            S.util.showMessage("Please enter a username");
+            S.util.showMessage("Please enter a username", "Warning");
             return;
         }
 

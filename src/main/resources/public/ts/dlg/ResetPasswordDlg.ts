@@ -56,14 +56,14 @@ export class ResetPasswordDlg extends DialogBase {
                 "email": emailAddress
             }, this.resetPasswordResponse);
         } else {
-            util.showMessage("Oops. Try that again.");
+            util.showMessage("Oops. Try that again.", "Warning");
         }
         this.close();
     }
 
     resetPasswordResponse = (res: J.ResetPasswordResponse): void => {
         if (util.checkSuccess("Reset password", res)) {
-            util.showMessage("Password reset email was sent. Check your email.");
+            util.showMessage("Password reset email was sent. Check your email.", "Warning");
         }
     }
 }

@@ -20,9 +20,6 @@ export class EditPrivsTableRow extends Comp {
     constructor(public aclEntry: J.AccessControlInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
         super(null);
         this.setClass("list-group-item list-group-item-action");
-
-        this.addChild(new Heading(4, "User: " + this.aclEntry.principalName));
-        this.addChild(this.renderAclPrivileges(this.aclEntry));
     }
 
     renderAclPrivileges = (aclEntry: J.AccessControlInfo): Div => {
@@ -39,6 +36,12 @@ export class EditPrivsTableRow extends Comp {
     }
 
     compRender = (): ReactNode => {
+
+        this.setChildren([
+            new Heading(4, "User: " + this.aclEntry.principalName),
+            this.renderAclPrivileges(this.aclEntry)
+        ]);
+
         return this.tagRender('div', null, this.attribs);
     }
 }

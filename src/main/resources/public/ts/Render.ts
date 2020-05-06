@@ -122,7 +122,7 @@ export class Render implements RenderIntf {
     showNodeUrl = (state: AppState): void => {
         let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!node) {
-            S.util.showMessage("You must first click on a node.");
+            S.util.showMessage("You must first click on a node.", "Warning");
             return;
         }
 
@@ -132,7 +132,7 @@ export class Render implements RenderIntf {
             message += "\n\nName-based URL: \n" + window.location.origin + "?n=" + node.name;
         }
 
-        S.util.showMessage(message, true);
+        S.util.showMessage(message, "URL", true);
     }
 
     allowAction = (typeHandler: TypeHandlerIntf, action: string): boolean => {
@@ -140,7 +140,10 @@ export class Render implements RenderIntf {
     }
 
     renderPageFromData = async (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, state: AppState): Promise<void> => {
-
+        if (res.noDataResponse) {
+            S.util.showMessage(res.noDataResponse, "Note");
+            return;
+        }
         this.lastOwner = null;
         S.meta64.setOverlay(true);
 
@@ -154,12 +157,10 @@ export class Render implements RenderIntf {
                     dispatch({
                         type: "Action_RenderPage", state,
                         updateNew: (s: AppState): AppState => {
-                            debugger;
                             s.node = res.node;
                             s.endReached = res.endReached;
                             s.offsetOfNodeFound = res.offsetOfNodeFound;
                             s.displayedParent = res.displayedParent;
-                            s.noDataResponse = res.noDataResponse;
         
                             S.meta64.updateNodeMap(res.node, 1, s);
                             s.selectedNodes = {};
@@ -261,9 +262,6 @@ export class Render implements RenderIntf {
     /* This is the button bar displayed between all nodes to let nodes be inserted at specific locations 
     
     The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
-
-    todo-0: for 'display inline' (table maybe vert also) this little button bar shows up ABOVE the table, adn would be 
-    better below it.
     */
     createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, nodesToMove: string[], state: AppState): Comp => {
         let pasteInlineButton: Button = null;
@@ -342,6 +340,7 @@ export class Render implements RenderIntf {
         let img: Img = new Img({
             src: src,
             className: "avatarImage",
+            /* todo-0: click to enlarg is broken */
             title: "Click image to enlarge/reduce"
         });
 

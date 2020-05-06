@@ -148,7 +148,7 @@ export class RssTypeHandler implements TypeHandlerIntf {
             itemListContainer.children.push(this.buildFeedItem(item, state));
         });
 
-        itemListContainer.updateDOM();
+        itemListContainer.updateDOM(); //<--- todo-0: this call should not be needed with new redux 
     }
 
     buildFeedItem = (entry, state: AppState): Comp => {

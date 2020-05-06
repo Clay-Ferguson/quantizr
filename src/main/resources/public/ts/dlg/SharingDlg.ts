@@ -17,17 +17,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class SharingDlg extends DialogBase {
-
-    //node being operated on by this Dialog.
-    node: J.NodeInfo;
-
     privsTable: EditPrivsTable;
     nodePrivsInfo: I.NodePrivilegesInfo;
     dirty: boolean = false;
 
-    constructor(node: J.NodeInfo, state: AppState) {
+    constructor(private node: J.NodeInfo, state: AppState) {
         super("Node Sharing", "app-modal-content-medium-width", null, false, state);
-        this.node = node;
     }
 
     preRender = () => {
@@ -52,7 +47,7 @@ export class SharingDlg extends DialogBase {
     populate = (res: J.GetNodePrivilegesResponse): void => {
         //console.log("populating with: res="+S.util.prettyPrint(res));
         this.privsTable.setState(res); 
-        this.privsTable.updateDOM();
+        //this.privsTable.updateDOM();
     }
 
     removePrivilege = (principalNodeId: string, privilege: string): void => {
@@ -79,7 +74,7 @@ export class SharingDlg extends DialogBase {
     shareNodeToPublic = (): void => {
         let encrypted = S.props.isEncrypted(this.node);
         if (encrypted) {
-            S.util.showMessage("This node is encrypted, and therefore cannot be made public.");
+            S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
             return;
         }
 

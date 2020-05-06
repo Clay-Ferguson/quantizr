@@ -34,19 +34,19 @@ export class Meta64 implements Meta64Intf {
 
     rebuildIndexes = (): void => {
         S.util.ajax<J.RebuildIndexesRequest, J.RebuildIndexesResponse>("rebuildIndexes", {}, function (res: J.RebuildIndexesResponse) {
-            S.util.showMessage("Index rebuild complete.");
+            S.util.showMessage("Index rebuild complete.", "Note");
         });
     }
 
     shutdownServerNode = (): void => {
         S.util.ajax<J.ShutdownServerNodeRequest, J.ShutdownServerNodeResponse>("shutdownServerNode", {}, function (res: J.ShutdownServerNodeResponse) {
-            S.util.showMessage("Server Node Shutdown initiated.");
+            S.util.showMessage("Server Node Shutdown initiated.", "Note");
         });
     }
 
     sendTestEmail = (): void => {
         S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail", {}, function (res: J.SendTestEmailResponse) {
-            S.util.showMessage("Send Test Email Initiated.");
+            S.util.showMessage("Send Test Email Initiated.", "Note");
         });
     }
 
@@ -180,8 +180,7 @@ export class Meta64 implements Meta64Intf {
 
     highlightNode = (node: J.NodeInfo, scroll: boolean, state: AppState): void => {
 
-        if (!node) {
-            console.log("ignoring null node.");
+        if (!node || !state.node) {
             return;
         }
 
@@ -478,7 +477,7 @@ export class Meta64 implements Meta64Intf {
         if (signupElm) {
             let signupResponse = signupElm.textContent;
             if (signupResponse === "ok") {
-                S.util.showMessage("Signup complete.");
+                S.util.showMessage("Signup complete.", "Note");
             }
         }
     }

@@ -93,7 +93,7 @@ export class SplitNodeDlg extends DialogBase {
                 delim = this.delimiterTextField.getValue();
             }
 
-            S.edit.splitNode(splitType, delim, null)
+            S.edit.splitNode(splitType, delim, this.appState)
         }
         this.close();
     }

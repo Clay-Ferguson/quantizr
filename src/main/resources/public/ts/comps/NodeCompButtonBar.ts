@@ -204,8 +204,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
                 });
 
                 if (!state.isAnonUser && state.nodesToMove != null && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
-
-                    //todo-0: this seems broken.
                     pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(node, 'inside', state.nodesToMove, state); }, {
                         className: "highlightBorder"
                     });

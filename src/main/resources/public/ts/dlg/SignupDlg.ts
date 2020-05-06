@@ -52,27 +52,27 @@ export class SignupDlg extends DialogBase {
         if (!userName || userName.length == 0 || //
             !password || password.length == 0 || //
             !email || email.length == 0) {
-            S.util.showMessage("You cannot leave any fields blank.");
+            S.util.showMessage("You cannot leave any fields blank.", "Warning");
             return;
         }
 
         if (userName.length > 25) {
-            S.util.showMessage("Maximum username length allowed is 25");
+            S.util.showMessage("Maximum username length allowed is 25", "Warning");
             return;
         }
 
         if (!S.util.validUsername(userName)) {
-            S.util.showMessage("Invalid Username. Only letters numbers dashes and underscores allowed.");
+            S.util.showMessage("Invalid Username. Only letters numbers dashes and underscores allowed.", "Warning");
             return;
         }
 
         if (email.length > 25) {
-            S.util.showMessage("Maximum email length allowed is 25");
+            S.util.showMessage("Maximum email length allowed is 25", "Warning");
             return;
         }
 
         if (password.length > 25) {
-            S.util.showMessage("Maximum password length allowed is 25");
+            S.util.showMessage("Maximum password length allowed is 25", "Warning");
             return;
         }
 
@@ -92,7 +92,7 @@ export class SignupDlg extends DialogBase {
             this.close();
 
             S.util.showMessage(
-                "User Information Accepted.<p/><p/>Check your email for account verification."
+                "User Information Accepted.<p/><p/>Check your email for account verification.", "Note"
             );
         }
     }

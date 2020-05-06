@@ -90,9 +90,9 @@ export class MenuPanel extends Div {
                 //new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
                 new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state), () => { return !state.isAnonUser && selNodeCount > 0 }), //
-                new MenuItem("Permanent Delete", () => S.edit.deleteSelNodes(null, true, state), () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine; }), //
                 new MenuItem("Move to Top", () => S.edit.moveNodeToTop(null, state), () => { return canMoveUp; }), //
                 new MenuItem("Move to Bottom", () => S.edit.moveNodeToBottom(null, state), () => { return canMoveDown; }),//
+                new MenuItem("Permanent Delete", () => S.edit.deleteSelNodes(null, true, state), () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine; }), //
                 new MenuItem("Show Trash Bin", () => S.nav.openContentNode(state.homeNodePath + "/d", state),
                     //enabled func
                     () => {
@@ -109,15 +109,15 @@ export class MenuPanel extends Div {
             ]),
             new Menu("Uploads", [
                 new MenuItem("Upload from File", () => S.attachment.openUploadFromFileDlg(false, null, null, state), () => { return !state.isAnonUser && highlightNode != null && selNodeIsMine }), //
-                new MenuItem("Upload from URL", S.attachment.openUploadFromUrlDlg, () => { return !state.isAnonUser && highlightNode != null && selNodeIsMine }), //
+                new MenuItem("Upload from URL", () => S.attachment.openUploadFromUrlDlg(null, null, state), () => { return !state.isAnonUser && highlightNode != null && selNodeIsMine }), //
                 new MenuItem("Upload to IPFS", () => S.attachment.openUploadFromFileDlg(true, null, null, state), () => { return !state.isAnonUser && highlightNode != null && selNodeIsMine }), //
-                new MenuItem("Delete Attachment", S.attachment.deleteAttachment, () => {
+                new MenuItem("Delete Attachment", () => S.attachment.deleteAttachment(state), () => {
                     return !state.isAnonUser && highlightNode != null
                         && S.props.hasBinary(highlightNode) && selNodeIsMine
                 })
             ]),
             new Menu("Share", [
-                new MenuItem("Edit Node Sharing", S.share.editNodeSharing, () => { return !state.isAnonUser && highlightNode != null && selNodeIsMine }), //
+                new MenuItem("Edit Node Sharing", () => S.share.editNodeSharing(state), () => { return !state.isAnonUser && highlightNode != null && selNodeIsMine }), //
                 // new MenuItem("Post Node", () => { S.activityPub.postNode(); },//
                 //     () => {
                 //         return "ramrod" == S.meta64.userName.toLowerCase() ||
@@ -153,7 +153,7 @@ export class MenuPanel extends Div {
                 //new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
 
                 new MenuItem("Refresh", () => S.meta64.refresh(state)), //
-                new MenuItem("Show URL", S.render.showNodeUrl, () => { return highlightNode != null }), //
+                new MenuItem("Show URL", () => S.render.showNodeUrl(state), () => { return highlightNode != null }), //
                 new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", state) ,
                     () => { return !state.isAnonUser && selNodeIsMine; },
                     () => { return !state.isAnonUser && selNodeIsMine; }), //
@@ -261,7 +261,7 @@ export class MenuPanel extends Div {
                     new MenuItem("Send Test Email", () => S.meta64.sendTestEmail(state), () => { return state.isAdminUser }, () => { return state.isAdminUser }),
                     new MenuItem("Encryption Test", async () => {
                         await S.encryption.test();
-                        S.util.showMessage("Encryption Test Complete. Check browser console for output.", true);
+                        S.util.showMessage("Encryption Test Complete. Check browser console for output.", "Note", true);
                     }, () => { return state.isAdminUser }, () => { return state.isAdminUser }),
                     new MenuItem("TTS Test", async () => {
                         let tts = window.speechSynthesis;

@@ -55,12 +55,12 @@ export class TransferNodeDlg extends DialogBase {
         let fromUser = this.fromTextField.getValue();
         let toUser = this.toTextField.getValue();
         if (!fromUser || !toUser) {
-            S.util.showMessage("To and From user names are required.");
+            S.util.showMessage("To and From user names are required.", "Warning");
             return;
         }
         let node: J.NodeInfo = S.meta64.getHighlightedNode(this.appState);
         if (!node) {
-            S.util.showMessage("No node was selected.");
+            S.util.showMessage("No node was selected.", "Warning");
             return;
         }
         let recursive = this.recursiveCheckBox.getChecked();
