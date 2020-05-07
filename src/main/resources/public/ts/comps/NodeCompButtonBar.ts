@@ -214,7 +214,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let avatarImg: Img;
         //console.log("node.owner[" + node.id + "]=" + node.owner + " ownerId=" + node.ownerId + " allowAvatar=" + allowAvatar);
         if (this.allowAvatar && node.owner != J.PrincipalName.ADMIN) {
-            avatarImg = S.render.makeAvatarImage(node);
+            avatarImg = S.render.makeAvatarImage(node, state);
         }
 
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //

@@ -139,104 +139,68 @@ export class Render implements RenderIntf {
         return typeHandler == null || typeHandler.allowAction(action);
     }
 
-    renderPageFromData = async (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, state: AppState): Promise<void> => {
+    //todo-0: this doesn't need to be async now right?
+    renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, state: AppState): void => {
         if (res.noDataResponse) {
             S.util.showMessage(res.noDataResponse, "Note");
             return;
         }
         this.lastOwner = null;
-        S.meta64.setOverlay(true);
 
-        // this timeout forces the 'hidden' to be processed and hidden from view 
-        const promise = new Promise<void>(async (resolve, reject) => {
+        //with redux/react this timer should be able to go away soon.
+        try {
+            dispatch({
+                type: "Action_RenderPage", state,
+                updateNew: (s: AppState): AppState => {
+                    s.node = res.node;
+                    s.endReached = res.endReached;
+                    s.offsetOfNodeFound = res.offsetOfNodeFound;
+                    s.displayedParent = res.displayedParent;
 
-            //with redux/react this timer should be able to go away soon.
-            setTimeout(async () => {
-                try {
+                    S.meta64.updateNodeMap(res.node, 1, s);
+                    s.selectedNodes = {};
 
-                    dispatch({
-                        type: "Action_RenderPage", state,
-                        updateNew: (s: AppState): AppState => {
-                            s.node = res.node;
-                            s.endReached = res.endReached;
-                            s.offsetOfNodeFound = res.offsetOfNodeFound;
-                            s.displayedParent = res.displayedParent;
-        
-                            S.meta64.updateNodeMap(res.node, 1, s);
-                            s.selectedNodes = {};
-        
-                            if (s.node) {
-                                //now that 'redux' is in control and we call this method less directly/often, I need to check to see if
-                                //this method is getting called every time it should.
-                                S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
-                                S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
-                            }
-        
-                            if (this.debug && s.node) {
-                                console.log("RENDER NODE: " + s.node.id);
-                            }
-
-                            if (state.pendingLocationHash) {
-                                window.location.hash = state.pendingLocationHash;
-                                //Note: the substring(1) trims the "#" character off.
-                                S.meta64.highlightRowById(state.pendingLocationHash.substring(1), true, s);
-                                state.pendingLocationHash = null; 
-                            }
-                            else if (targetNodeId) {
-                                S.meta64.highlightRowById(targetNodeId, true, s);
-                            } //
-                            else if (scrollToTop || !S.meta64.getHighlightedNode(s)) {
-                                S.view.scrollToTop();
-                            } //
-                            else {
-                                S.view.scrollToSelectedNode(s);
-                            }
-
-                            return s;
-                        }
-                    });
-
-                    //todo-: this is ugly. what is this?
-                    this.lastOwner = state.node.owner;
-                }
-                catch (err) {
-                    console.error("render fail.");
-                    resolve();
-                    return;
-                }
-
-                //console.log("rendering output=: " + S.util.toJson(output));
-
-                S.meta64.mainTabPanel.whenElm(async (elm: HTMLElement) => {
-                    console.log("mainTabComp whenElm success");
-
-                    try {
-                        if (clickTab) {
-                            S.meta64.selectTab("mainTab");
-                        }
-
-                        S.util.forEachElmBySel("a", (el, i) => {
-                            el.setAttribute("target", "_blank");
-                        });
-
-                        if (MathJax && MathJax.typeset) {
-                            //note: MathJax.typesetPromise(), also exists
-                            MathJax.typeset();
-                        }
+                    if (s.node) {
+                        //now that 'redux' is in control and we call this method less directly/often, I need to check to see if
+                        //this method is getting called every time it should.
+                        S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
+                        S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
                     }
-                    finally {
-                        resolve();
+
+                    if (this.debug && s.node) {
+                        console.log("RENDER NODE: " + s.node.id);
                     }
-                });
 
-            }, 100);
-        });
+                    if (state.pendingLocationHash) {
+                        window.location.hash = state.pendingLocationHash;
+                        //Note: the substring(1) trims the "#" character off.
+                        S.meta64.highlightRowById(state.pendingLocationHash.substring(1), true, s);
+                        state.pendingLocationHash = null;
+                    }
+                    else if (targetNodeId) {
+                        S.meta64.highlightRowById(targetNodeId, true, s);
+                    } //
+                    else if (scrollToTop || !S.meta64.getHighlightedNode(s)) {
+                        S.view.scrollToTop();
+                    } //
+                    else {
+                        S.view.scrollToSelectedNode(s);
+                    }
 
-        promise.then(() => {
-            S.meta64.setOverlay(false);
-        });
+                    return s;
+                }
+            });
 
-        return promise;
+            if (clickTab) {
+                //Warning: I tried moving this logic into the above dispatch and it didn't work.
+                S.meta64.selectTab("mainTab");
+            }
+
+            this.lastOwner = state.node.owner;
+        }
+        catch (err) {
+            console.error("render failed.");
+        }
     }
 
     renderChildren = (node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp => {
@@ -269,7 +233,7 @@ export class Render implements RenderIntf {
         let highlightNode = S.meta64.getHighlightedNode(state);
         let homeNodeSelected = highlightNode != null && state.homeNodeId == highlightNode.id;
 
-        if (!state.isAnonUser && nodesToMove != null && (S.props.isMine(node, state) || node.id==state.homeNodeId)) {
+        if (!state.isAnonUser && nodesToMove != null && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
 
             let target = null;
             if (state.endReached) {
@@ -330,29 +294,31 @@ export class Render implements RenderIntf {
         return S.util.getRpcPath() + "bin/avatar" + "?nodeId=" + node.ownerId + "&v=" + node.avatarVer;
     }
 
-    makeAvatarImage = (node: J.NodeInfo) => {
+    makeAvatarImage = (node: J.NodeInfo, state: AppState) => {
         let src: string = this.getAvatarImgUrl(node);
         if (!src) {
             return null;
         }
+        let key = "avatar-" + node.id;
 
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-        let img: Img = new Img({
-            src: src,
+        let img: Img = new Img(key, {
+            src,
             className: "avatarImage",
-            /* todo-0: click to enlarg is broken */
-            title: "Click image to enlarge/reduce"
-        });
-
-        img.whenElm((elm: HTMLElement) => {
-            elm.addEventListener("click", () => {
-                if (elm.style.maxWidth == "100%") {
-                    elm.style.maxWidth = "80px";
-                }
-                else {
-                    elm.style.maxWidth = "100%";
-                }
-            });
+            title: "Click image to enlarge/reduce",
+            onClick: (evt) => {
+                dispatch({
+                    type: "Action_ClickImage", state,
+                    update: (s: AppState): void => {
+                        if (s.expandedImages[key]) {
+                            delete s.expandedImages[key];
+                        }
+                        else {
+                            s.expandedImages[key] = "y";
+                        }
+                    },
+                });
+            }
         });
 
         return img;

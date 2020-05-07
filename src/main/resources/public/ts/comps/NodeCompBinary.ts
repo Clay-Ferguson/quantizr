@@ -13,6 +13,7 @@ import { Span } from "../widget/Span";
 import { Img } from "../widget/Img";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
+import { dispatch } from "../AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -26,47 +27,46 @@ export class NodeCompBinary extends Div {
         super();
     }
 
-    makeImageTag = (node: J.NodeInfo): Img => {
+    makeImageTag = (node: J.NodeInfo, state: AppState): Img => {
         let src: string = S.render.getUrlForNodeAttachment(node);
 
         let imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
         //console.log("imgSize for nodeId=" + node.id + " is " + imgSize + " during render.");
         let style: any = {};
-        let normalWidth = "";
+        //let normalWidth = "";
 
         if (!imgSize || imgSize == "0") {
             style.maxWidth = "";
             style.width = "";
-            normalWidth = "";
+            //normalWidth = "";
         }
         else {
             style.maxWidth = "calc(" + imgSize + "% - 12px)";
             style.width = "calc(" + imgSize + "% - 12px)";
-            normalWidth = "calc(" + imgSize + "% - 12px)";
+            //normalWidth = "calc(" + imgSize + "% - 12px)";
         }
 
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-        let img: Img = new Img({
-            "src": src,
+        let img: Img = new Img(node.id, {
+            src,
             className: "attached-img",
             style,
-            /* todo-0: click to enlarg is broken */
-            "title": "Click image to enlarge/reduce"
+            "title": "Click image to enlarge/reduce",
+            /* todo-1: click to enlarlge is broken for IPFS upload images for some reason */
+            onClick: (evt) => {
+                dispatch({
+                    type: "Action_ClickImage", state,
+                    update: (s: AppState): void => {
+                        if (s.expandedImages[node.id]) {
+                            delete s.expandedImages[node.id];
+                        }
+                        else {
+                            s.expandedImages[node.id] = "y";
+                        }
+                    },
+                });
+            }
         });
-
-        img.whenElm((elm: HTMLElement) => {
-            elm.addEventListener("click", () => {
-                if (elm.style.maxWidth) {
-                    elm.style.maxWidth = "";
-                    elm.style.width = "";
-                }
-                else {
-                    elm.style.maxWidth = normalWidth || "100% - 12px";
-                    elm.style.width = normalWidth || "100% - 12px";
-                }
-            });
-        });
-
         return img;
     }
 
@@ -74,13 +74,13 @@ export class NodeCompBinary extends Div {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         if (!node) {
-           this.children = null;
-           return;
+            this.children = null;
+            return;
         }
 
         /* If this is an image render the image directly onto the page as a visible image */
         if (S.props.hasImage(node)) {
-            this.setChildren([this.makeImageTag(node)]);
+            this.setChildren([this.makeImageTag(node, state)]);
         }
         else if (S.props.hasVideo(node)) {
             this.setChildren([new ButtonBar([

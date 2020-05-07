@@ -44,7 +44,8 @@ public class AppConfiguration implements WebMvcConfigurer {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**");
+				registry.addMapping("/**")
+						.allowedOrigins("https://" + appProp.getMetaHost() + ":" + appProp.getServerPort());
 			}
 		};
 	}
@@ -95,7 +96,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		// registry
 		// .addResourceHandler("/public/**")
-		// .addResourceLocations("/public/"); 
+		// .addResourceLocations("/public/");
 
 		/*
 		 * This is how we enable the JS files to be edited and tested without doing a
@@ -124,9 +125,9 @@ public class AppConfiguration implements WebMvcConfigurer {
 
 		/*
 		 * I was using this property as a way to be able to load resources directly out
-		 * of
-		 * todo-1: the 'resourceBaseFolder' can actually be removed now, but just for a short time I want to 
-		 * leave it in place, before I comment out. I will not be deleting but commenting.
+		 * of todo-1: the 'resourceBaseFolder' can actually be removed now, but just for
+		 * a short time I want to leave it in place, before I comment out. I will not be
+		 * deleting but commenting.
 		 */
 		if (!StringUtils.isEmpty(appProp.getResourcesBaseFolder())) {
 

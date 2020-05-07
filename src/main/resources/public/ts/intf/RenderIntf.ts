@@ -12,10 +12,10 @@ export interface RenderIntf {
     initMarkdown(): void;
     injectSubstitutions(content: string): string;
     showNodeUrl(state: AppState): void;
-    renderPageFromData(data: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean, state: AppState): Promise<void>;
+    renderPageFromData(data: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean, state: AppState): void; 
     getUrlForNodeAttachment(node: J.NodeInfo): string;
     getStreamUrlForNodeAttachment(node: J.NodeInfo): string;
-    makeAvatarImage(node: J.NodeInfo): Img;
+    makeAvatarImage(node: J.NodeInfo, state: AppState): Img;
     allowPropertyToDisplay(propName: string): boolean;
     allowPropertyEdit(node: J.NodeInfo, propName: string, state: AppState): boolean;
     isReadOnlyProperty(propName: string): boolean;

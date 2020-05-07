@@ -10,7 +10,6 @@ import { VerticalLayout } from "./widget/VerticalLayout";
 import { Anchor } from "./widget/Anchor";
 import { Heading } from "./widget/Heading";
 import { MainMenuPopupDlg } from "./dlg/MainMenuPopupDlg";
-import { CompIntf } from "./widget/base/CompIntf";
 import { DialogBaseImpl } from "./DialogBaseImpl";
 import { AppState } from "./AppState";
 import { dispatch } from "./AppRedux";
@@ -70,11 +69,11 @@ export class Nav implements NavIntf {
         return !this.displayingHome(state);
     }
 
-    upLevelResponse = async (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState): Promise<void> => {
+    upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState): void => {
         if (!res || !res.node) {
             S.util.showMessage("No data is visible to you above this node.", "Warning");
         } else {
-            await S.render.renderPageFromData(res, scrollToTop, id, true, state);
+            S.render.renderPageFromData(res, scrollToTop, id, true, state);
         }
     }
 
@@ -223,10 +222,10 @@ export class Nav implements NavIntf {
         }
     }
 
-    navPageNodeResponse = async (res: J.RenderNodeResponse, state: AppState): Promise<void> => {
+    navPageNodeResponse = (res: J.RenderNodeResponse, state: AppState): void => {
         console.log("navPageNodeResponse.");
         S.meta64.clearSelNodes(state);
-        await S.render.renderPageFromData(res, true, null, true, state);
+        S.render.renderPageFromData(res, true, null, true, state);
     }
 
     geoLocation = (state: AppState): void => {

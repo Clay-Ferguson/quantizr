@@ -13,7 +13,8 @@ export class ProgressDlg extends DialogBase {
         this.setChildren([
             new Div(null, {
                 className: "progress"
-            }, [new Progress()])
+
+            }, [new Progress()]) 
         ]);
     }
 }

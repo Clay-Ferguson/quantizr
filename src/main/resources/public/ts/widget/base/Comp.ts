@@ -30,7 +30,7 @@ export abstract class Comp implements CompIntf {
     public debug: boolean = false;
     private static guid: number = 0;
 
-    //todo-0: make this private?
+    //todo-1: make this private?
     public state: any = {};
 
     static idToCompMap: { [key: string]: Comp } = {};
@@ -347,9 +347,17 @@ export abstract class Comp implements CompIntf {
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
    both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact */
     mergeState = (moreState: any): any => {
+        console.log("Merge state.");
         this.setState((state: any) => {
             this.state = { ...state, ...moreState };
             return this.state;
+        });
+    }
+
+    /* Forces a re-render */
+    reRender = (): any => {
+         this.mergeState({
+            rv: "" + Comp.nextGuid()
         });
     }
 

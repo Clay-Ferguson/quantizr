@@ -53,7 +53,7 @@ export class View implements ViewIntf {
                 S.nav.mainOffset = res.offsetOfNodeFound;
             }
 
-            await S.render.renderPageFromData(res, false, highlightId, true, state);
+            S.render.renderPageFromData(res, false, highlightId, true, state);
         });
     }
 
@@ -101,7 +101,7 @@ export class View implements ViewIntf {
                 }
             }
 
-            await S.render.renderPageFromData(res, true, null, true, state);
+            S.render.renderPageFromData(res, true, null, true, state);
         });
     }
 

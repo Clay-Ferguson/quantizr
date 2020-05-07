@@ -3,6 +3,8 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 import { ReactNode } from "react";
+import { AppState } from "../AppState";
+import { useSelector, useDispatch } from "react-redux";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -11,11 +13,21 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Img extends Comp {
 
-    constructor(attribs : Object = {}) {
+    constructor(private key: string, attribs : Object = {}) {
         super(attribs);
     }
 
     compRender = (): ReactNode => {
+        let expandedImages = useSelector((state: AppState) => state.expandedImages);
+        let style: any = {};
+
+        //console.log("Render IMG: id="+this.getId());
+        if (this.key && expandedImages[this.key]) {
+            style.maxWidth = /* normalWidth || */ "100% - 12px";
+            style.width = /* normalWidth || */ "100% - 12px";
+            this.attribs.style = style;
+        }
+
         return S.e("img", this.attribs);
     }
 }

@@ -69,4 +69,6 @@ export class AppState {
     homeNodePath: string;
 
     pendingLocationHash: string;
+
+    expandedImages = {};
 }

@@ -5,6 +5,8 @@ import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 
+declare var MathJax;
+
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
@@ -52,3 +54,23 @@ export const store = createStore(rootReducer);
 export let dispatch = (action: AppAction) => {
     store.dispatch(action);
 }
+
+/* This listener is temporary until I find a better way to do this code, which needs to always run after any
+render is complete and AFTER the html DOM is updated/final */
+const handleChange = () => {
+    setTimeout(() => {
+
+        /* todo-1: This should be altered to search ONLY inside the DIVs that we know we are altering (markdown? rows?) */
+        S.util.forEachElmBySel("a", (el, i) => {
+            el.setAttribute("target", "_blank");
+        });
+
+        if (MathJax && MathJax.typeset) {
+            //note: MathJax.typesetPromise(), also exists
+            MathJax.typeset();
+        }
+    }, 250);
+}
+
+const unsubscribe = store.subscribe(handleChange);
+// unsubscribe()
