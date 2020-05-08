@@ -117,7 +117,7 @@ export class NodeCompBinary extends Div {
                 className: "binary-link",
                 title: "File Size:" + fileSize + " Type:" + fileType
             }, [
-                new Icon("", null, {
+                new Icon({
                     "style": { marginRight: '12px', verticalAlign: 'middle' },
                     className: "fa fa-file fa-lg"
                 }),

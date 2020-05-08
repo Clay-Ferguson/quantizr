@@ -29,14 +29,17 @@ export class SearchByIDDlg extends DialogBase {
         this.setChildren([
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                this.searchTextField = new TextField("Node ID", {
-                    onKeyPress: (e: KeyboardEvent) => {
-                        if (e.which == 13) { // 13==enter key code
-                            this.search();
-                            return false;
-                        }
-                    }
-                }, SearchByIDDlg.defaultSearchText),
+                this.searchTextField = new TextField("Node ID", 
+                    //todo-0: bring back
+                    //{
+                    // onKeyPress: (e: KeyboardEvent) => {
+                    //     if (e.which == 13) { // 13==enter key code
+                    //         this.search();
+                    //         return false;
+                    //     }
+                    // }
+                    SearchByIDDlg.defaultSearchText
+                ),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", () => {

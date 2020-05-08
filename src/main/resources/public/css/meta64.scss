@@ -439,6 +439,16 @@ input[type="radio"] {
     margin-bottom: $smallGap;
 }
 
+/* We use a tiny gap for password text fields so that the 'Show Password" button can be very close below */
+.passwordTextField {
+    margin-bottom: $tinyGap;
+}
+
+.passwordEyeIcon {
+    cursor: pointer;
+    margin-left: 10px;
+}
+
 .pre-textfield {
     font-family: monospace;
     font-size: 125%;

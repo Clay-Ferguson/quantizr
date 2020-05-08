@@ -27,7 +27,7 @@ declare var PROFILE;
 export abstract class Comp implements CompIntf {
 
     public rendered: boolean = false;
-    public debug: boolean = false;
+    public debug: boolean = true;
     private static guid: number = 0;
 
     //todo-1: make this private?
@@ -76,11 +76,6 @@ export abstract class Comp implements CompIntf {
         let id = this.attribs.id || ("c" + Comp.nextGuid());
         this.clazz = this.constructor.name;
         this.setId(id);
-
-        //supposedly this pattern works but I'm not sure it's better than what I'm doing, unless this allows an ability
-        //to call super.method() which I'm not sure my current architecture can support super calls to functions that are overridden
-        //in base classes
-        this.bindExampleFunction = this.bindExampleFunction.bind(this);
     }
 
     setId = (id: string) => {
@@ -88,9 +83,6 @@ export abstract class Comp implements CompIntf {
         this.attribs.key = id;
         this.jsClassName = this.constructor.name + "[" + id + "]";
         Comp.idToCompMap[id] = this;
-    }
-
-    bindExampleFunction() {
     }
 
     childrenExist = (): boolean => {
@@ -347,7 +339,6 @@ export abstract class Comp implements CompIntf {
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
    both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact */
     mergeState = (moreState: any): any => {
-        console.log("Merge state.");
         this.setState((state: any) => {
             this.state = { ...state, ...moreState };
             return this.state;

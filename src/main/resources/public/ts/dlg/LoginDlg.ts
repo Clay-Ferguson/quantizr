@@ -27,25 +27,33 @@ export class LoginDlg extends DialogBase {
 
     preRender = () => {
         this.setChildren([
+            //new Div("login dialog"),
             new Form(null, [
                 new FormGroup(null,
                     [
-                        this.userTextField = new TextField("User", {
-                            onKeyPress: (e: KeyboardEvent) => {
-                                if (e.which == 13) { // 13==enter key code
-                                    this.login();
-                                    return false;
-                                }
-                            }
-                        }),
-                        this.passwordTextField = new TextField("Password", {
-                            onKeyPress: (e: KeyboardEvent) => {
-                                if (e.which == 13) { // 13==enter key code
-                                    this.login();
-                                    return false;
-                                }
-                            },
-                        }, null, true),
+                        //this.testDiv = new DivWtf("form item WTF DIV2"),
+                        this.userTextField = new TextField("User",
+                            //todo-0: why does react blow up if we have an onKeyPress here?
+                            // {
+                            //     onKeyPress: (e: KeyboardEvent) => {
+                            //         if (e.which == 13) { // 13==enter key code
+                            //             this.login();
+                            //             return false;
+                            //         }
+                            //     }
+                            // }
+                        ),
+                        this.passwordTextField = new TextField("Password", null,
+                            //todo-0: why does react blow up if we have an onKeyPress here?
+                            //{
+                            // onKeyPress: (e: KeyboardEvent) => {
+                            //     if (e.which == 13) { // 13==enter key code
+                            //         this.login();
+                            //         return false;
+                            //     }
+                            // },
+                            //}, 
+                            true),
                     ]
                 ),
                 new ButtonBar(

@@ -35,7 +35,7 @@ export class EditCredentialsDlg extends DialogBase {
                 new FormGroup(null,
                     [
                         this.userTextField = new TextField("User"),
-                        this.passwordTextField = new TextField("Password", null, null, true),
+                        this.passwordTextField = new TextField("Password", null, true),
                     ]
                 ),
                 new ButtonBar(

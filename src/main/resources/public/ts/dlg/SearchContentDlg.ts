@@ -34,14 +34,19 @@ export class SearchContentDlg extends DialogBase {
         this.setChildren([
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                this.searchTextField = new TextField("Search", {
-                    onKeyPress : (e: KeyboardEvent) => { 
-                        if (e.which == 13) { // 13==enter key code
-                            this.search();
-                            return false;
-                        }
-                    }
-                }, SearchContentDlg.defaultSearchText),
+                this.searchTextField = new TextField("Search", 
+                //todo-0: bring back
+                // {
+                //     onKeyPress : (e: KeyboardEvent) => { 
+                //         if (e.which == 13) { // 13==enter key code
+                //             this.search();
+                //             return false;
+                //         }
+                //     },
+                //     value: SearchContentDlg.defaultSearchText
+                // }
+                SearchContentDlg.defaultSearchText
+                ),
                 new HorizontalLayout([
                     this.fuzzyCheckbox = new Checkbox("Fuzzy Search (slower)"),
                     this.caseSensitiveCheckbox = new Checkbox("Case Sensitive")

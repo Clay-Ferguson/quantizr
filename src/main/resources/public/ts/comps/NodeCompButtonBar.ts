@@ -102,7 +102,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass(node);
             if (iconClass) {
-                typeIcon = new Icon("", null, {
+                typeIcon = new Icon({
                     "style": { marginRight: '6px', verticalAlign: 'middle' },
                     className: iconClass
                 });
@@ -115,14 +115,14 @@ export class NodeCompButtonBar extends HorizontalLayout {
         }
 
         if (S.props.isEncrypted(node)) {
-            encIcon = new Icon("", null, {
+            encIcon = new Icon({
                 "style": { marginRight: '6px', verticalAlign: 'middle' },
                 className: "fa fa-lock fa-lg"
             });
         }
 
         if (S.props.isMine(node, state) && S.props.isShared(node)) {
-            sharedIcon = new Icon("", null, {
+            sharedIcon = new Icon({
                 "style": { marginRight: '6px', verticalAlign: 'middle' },
                 className: "fa fa-share-alt fa-lg"
             });

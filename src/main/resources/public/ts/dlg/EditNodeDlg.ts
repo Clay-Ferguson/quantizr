@@ -123,7 +123,7 @@ export class EditNodeDlg extends DialogBase {
         this.extraHeaderComps = [];
 
         if (S.props.isEncrypted(this.node)) {
-            this.extraHeaderComps.push(new Icon("", null, {
+            this.extraHeaderComps.push(new Icon({
                 "style": { marginLeft: '12px', verticalAlign: 'middle' },
                 className: "fa fa-lock fa-lg"
             }));
@@ -133,7 +133,7 @@ export class EditNodeDlg extends DialogBase {
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass(this.node);
             if (iconClass) {
-                this.extraHeaderComps.push(new Icon("", null, {
+                this.extraHeaderComps.push(new Icon({
                     "style": { marginLeft: '12px', verticalAlign: 'middle' },
                     className: iconClass
                 }));
@@ -218,7 +218,7 @@ export class EditNodeDlg extends DialogBase {
 
         //todo-1: does it make sense for FormGroup to contain single fields, or multiple fields? This seems wrong to have a group with one in it.
         let nodeNameFormGroup = new FormGroup();
-        this.nodeNameTextField = new TextField("Node Name", null, this.node.name);
+        this.nodeNameTextField = new TextField("Node Name", this.node.name);
         nodeNameFormGroup.addChild(this.nodeNameTextField);
 
         editPropsTable.addChild(nodeNameFormGroup);
@@ -572,9 +572,7 @@ export class EditNodeDlg extends DialogBase {
                 }
             }
             else {
-                editor = new TextField(null, {
-                    "defaultValue": propValStr
-                });
+                editor = new TextField(null, propValStr);
             }
             this.propNameToEditorCompMap[propEntry.name] = editor as any as Comp;
 

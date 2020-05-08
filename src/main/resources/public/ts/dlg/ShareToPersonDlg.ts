@@ -27,14 +27,17 @@ export class ShareToPersonDlg extends DialogBase {
         this.setChildren([
             new Form(null, [
                 new TextContent("Enter the username of the person you want to share this node with:"),
-                this.shareToUserTextField = new TextField("User to Share With", {
-                    onKeyPress: (e: KeyboardEvent) => {
-                        if (e.which == 13) { // 13==enter key code
-                            this.shareNodeToPerson();
-                            return false;
-                        }
-                    }
-                }),
+                this.shareToUserTextField = new TextField("User to Share With", 
+                //todo-0: bring back
+                // {
+                //     onKeyPress: (e: KeyboardEvent) => {
+                //         if (e.which == 13) { // 13==enter key code
+                //             this.shareNodeToPerson();
+                //             return false;
+                //         }
+                //     }
+                // }
+                ),
                 new ButtonBar([
                     new Button("Share", () => {
                         this.shareNodeToPerson();

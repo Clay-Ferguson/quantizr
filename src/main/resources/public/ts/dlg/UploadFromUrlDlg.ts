@@ -26,7 +26,7 @@ export class UploadFromUrlDlg extends DialogBase {
     preRender = () => {
         this.setChildren([
             new Form(null, [
-                this.uploadFromUrlTextField = new TextField("Upload from URL", null, this.defaultUrl),
+                this.uploadFromUrlTextField = new TextField("Upload from URL", this.defaultUrl),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Close", () => {

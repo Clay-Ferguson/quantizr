@@ -11,12 +11,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Icon extends Comp {
 
-    constructor(public text: string, public callback: Function, _attribs: Object = null) {
-        super(_attribs);
-        this.attribs.onClick = callback;
+    constructor(attribs: Object = null) {
+        super(attribs);
     }
 
     compRender = (): ReactNode => {
-        return S.e('i', this.attribs, null);
+        /* Yes Icon uses 'i' tag, this is not a mistake */
+        return S.e('i', this.attribs);
     }
 }

@@ -29,8 +29,7 @@ export class SignupDlg extends DialogBase {
         this.setChildren([
             new Form(null, [
                 this.userTextField = new TextField("User"),
-                this.passwordTextField = new TextField("Password", null, null, true),
-                new TextContent("Note: Weak passwords may cause a warning (from Chrome Browser) if that password has ever been exposed in a data breach."),
+                this.passwordTextField = new TextField("Password", null, true),
                 this.emailTextField = new TextField("Email"),
                 new ButtonBar([
                     new Button("Create Account", this.signup, null, "btn-primary"),
