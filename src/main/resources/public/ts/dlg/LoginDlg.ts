@@ -27,43 +27,18 @@ export class LoginDlg extends DialogBase {
 
     preRender = () => {
         this.setChildren([
-            //new Div("login dialog"),
             new Form(null, [
-                new FormGroup(null,
-                    [
-                        //this.testDiv = new DivWtf("form item WTF DIV2"),
-                        this.userTextField = new TextField("User",
-                            //todo-0: why does react blow up if we have an onKeyPress here?
-                            // {
-                            //     onKeyPress: (e: KeyboardEvent) => {
-                            //         if (e.which == 13) { // 13==enter key code
-                            //             this.login();
-                            //             return false;
-                            //         }
-                            //     }
-                            // }
-                        ),
-                        this.passwordTextField = new TextField("Password", null,
-                            //todo-0: why does react blow up if we have an onKeyPress here?
-                            //{
-                            // onKeyPress: (e: KeyboardEvent) => {
-                            //     if (e.which == 13) { // 13==enter key code
-                            //         this.login();
-                            //         return false;
-                            //     }
-                            // },
-                            //}, 
-                            true),
-                    ]
-                ),
-                new ButtonBar(
-                    [
-                        new Button("Login", this.login, null, "btn-primary"),
-                        new Button("Forgot Password", this.resetPassword),
-                        new Button("Close", () => {
-                            this.close();
-                        })
-                    ])
+                new FormGroup(null, [
+                    this.userTextField = new TextField("User", null, false, this.login),
+                    this.passwordTextField = new TextField("Password", null, true, this.login)
+                ]),
+                new ButtonBar([
+                    new Button("Login", this.login, null, "btn-primary"),
+                    new Button("Forgot Password", this.resetPassword),
+                    new Button("Close", () => {
+                        this.close();
+                    })
+                ])
 
             ])
         ]);

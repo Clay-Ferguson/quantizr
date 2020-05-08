@@ -18,15 +18,15 @@ export class TextField extends Div implements I.TextEditorIntf {
     input: Input;
     icon: ToggleIcon;
 
-    /* Lots of these constructors are all messed up now after refactor: todo-0 */
-    constructor(public label: string = null, private defaultVal: string="", private isPassword: boolean = false) {
+    constructor(public label: string = null, private defaultVal: string = "", private isPassword: boolean = false,
+        private onEnterKey: () => void = null) {
         super(null);
         S.util.mergeProps(this.attribs, {
             "name": this.getId(),
             className: "form-group",
         });
 
-        this.mergeState({value: defaultVal || ""});
+        this.mergeState({ value: defaultVal || "" });
     }
 
     insertTextAtCursor = (text: string) => {
@@ -58,9 +58,8 @@ export class TextField extends Div implements I.TextEditorIntf {
         }
     }
 
-    /* todo-0: Comp base class sets key always. don't need all these keys right? */
     preRender = (): void => {
-        console.log("INPUT VALUE RESET! preRender: id=[" + this.getId() + "] state.value=" + this.state.value);
+        //console.log("INPUT VALUE RESET! preRender: id=[" + this.getId() + "] state.value=" + this.state.value);
         this.setChildren([
             new Label(this.label, { key: this.getId() + "_label" }),
             new Div(null, {
@@ -88,5 +87,15 @@ export class TextField extends Div implements I.TextEditorIntf {
                 ]) : null
             ])
         ]);
+
+        if (this.onEnterKey) {
+            this.input.attribs.onKeyPress = (e: KeyboardEvent) => {
+                if (e.which == 13) { // 13==enter key code
+                    this.onEnterKey();
+                    return false;
+                }
+            };
+        }
     }
 }
+

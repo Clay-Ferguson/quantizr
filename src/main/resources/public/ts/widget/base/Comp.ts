@@ -96,23 +96,6 @@ export abstract class Comp implements CompIntf {
         return ret;
     }
 
-    // /* Function refreshes all enablement and visibility based on current state of app */
-    // refreshVisAndEnablement(): void {
-    //     this.state.enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
-    //     this.state.visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
-
-    //     //console.log("refreshState. " + this.jsClassName + " visible=" + visible + " enabled=" + enabled);
-
-    //     //recursively set all children states
-    //     if (this.children && this.children.length > 0) {
-    //         this.children.forEach((child: Comp) => {
-    //             if (child) {
-    //                 child.refreshVisAndEnablement();
-    //             }
-    //         });
-    //     }
-    // }
-
     setDomAttr = (attrName: string, attrVal: string) => {
         this.whenElm((elm: HTMLElement) => {
             elm.setAttribute(attrName, attrVal);

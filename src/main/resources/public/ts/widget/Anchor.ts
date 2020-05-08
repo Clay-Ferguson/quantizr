@@ -19,7 +19,6 @@ export class Anchor extends Comp {
     }
 
     compRender = (): ReactNode => {
-        //todo-0: warning: I was passing this.children (not buildChildren) and that's an error. verify no where eise can do this.
         return S.e('a', this.attribs, this.buildChildren() || this.content || this.url);
     }
 }

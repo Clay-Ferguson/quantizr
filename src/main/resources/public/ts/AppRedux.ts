@@ -65,10 +65,13 @@ const handleChange = () => {
             el.setAttribute("target", "_blank");
         });
 
-        if (MathJax && MathJax.typeset) {
-            //note: MathJax.typesetPromise(), also exists
-            MathJax.typeset();
-        }
+        // todo-0: disabling this becasue it causes page to go blank where the math formua is before displaying the fomrmula
+        // and so until I find a way to have MathJax render up front on first render, i won't be using it for now.
+        // maybe the memo feature of react can come to my aid here somehow? to cache things.
+        // if (MathJax && MathJax.typeset) {
+        //     //note: MathJax.typesetPromise(), also exists
+        //     MathJax.typeset();
+        // }
     }, 250);
 }
 
