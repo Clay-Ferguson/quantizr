@@ -70,5 +70,9 @@ export class AppState {
 
     pendingLocationHash: string;
 
+    /* Keeds track of which nodes the user has clicked to expand */
     expandedImages = {};
+
+    //Rss feeds
+    feedCache = {};
 }

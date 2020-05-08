@@ -31,19 +31,15 @@ export class NodeCompBinary extends Div {
         let src: string = S.render.getUrlForNodeAttachment(node);
 
         let imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
-        //console.log("imgSize for nodeId=" + node.id + " is " + imgSize + " during render.");
         let style: any = {};
-        //let normalWidth = "";
 
         if (!imgSize || imgSize == "0") {
             style.maxWidth = "";
             style.width = "";
-            //normalWidth = "";
         }
         else {
             style.maxWidth = "calc(" + imgSize + "% - 12px)";
             style.width = "calc(" + imgSize + "% - 12px)";
-            //normalWidth = "calc(" + imgSize + "% - 12px)";
         }
 
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
@@ -52,7 +48,6 @@ export class NodeCompBinary extends Div {
             className: "attached-img",
             style,
             "title": "Click image to enlarge/reduce",
-            /* todo-1: click to enlarlge is broken for IPFS upload images for some reason */
             onClick: (evt) => {
                 dispatch({
                     type: "Action_ClickImage", state,

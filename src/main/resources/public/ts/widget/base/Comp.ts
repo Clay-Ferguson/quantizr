@@ -354,12 +354,6 @@ export abstract class Comp implements CompIntf {
         });
     }
 
-    /* Forces a re-render */
-    reRender = (): any => {
-         this.mergeState({
-            rv: "" + Comp.nextGuid()
-        });
-    }
 
     /* Note: this method performs a direct state mod, until react overrides it using useState return value 
     
@@ -401,10 +395,11 @@ export abstract class Comp implements CompIntf {
             /* This 'useEffect' call makes react call 'domAddEvent' once the dom element comes into existence on the acutal DOM */
             useEffect(this.domAddEvent, []);
 
-            // This hook should work fine but just isn't needed yet.
-            // useEffect(() => {
-            //     console.log("DOM UPDATE: " + this.jsClassName);
-            // });
+            //This hook should work fine but just isn't needed yet.
+            useEffect(() => {
+                //console.log("DOM UPDATE: " + this.jsClassName);
+                this.domUpdateEvent();
+            });
 
             /* 
             This 'useEffect' call makes react call 'domRemoveEvent' once the dom element is removed from the acutal DOM.
@@ -435,6 +430,10 @@ export abstract class Comp implements CompIntf {
         //Clean up this map, or else this would just be a memory leak
         delete Comp.idToCompMap[this.getId()];
         //console.log("DOM REMOVE:" + this.jsClassName + " compMapSize=" + S.util.getPropertyCount(Comp.idToCompMap));
+    }
+
+    domUpdateEvent = (): void => {
+
     }
 
     domAddEvent = (): void => {

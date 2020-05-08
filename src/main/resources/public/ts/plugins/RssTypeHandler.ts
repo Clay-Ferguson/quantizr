@@ -10,13 +10,13 @@ import { MessageDlg } from "../dlg/MessageDlg";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { TextContent } from "../widget/TextContent";
 import { Heading } from "../widget/Heading";
-import { ProgressDlg } from "../dlg/ProgressDlg";
 import { Para } from "../widget/Para";
 import { Img } from "../widget/Img";
 import { Anchor } from "../widget/Anchor";
 import { ButtonBar } from "../widget/ButtonBar";
 import { MarkdownDiv } from "../widget/MarkdownDiv";
 import { AppState } from "../AppState";
+import { dispatch } from "../AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -24,9 +24,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class RssTypeHandler implements TypeHandlerIntf {
-
-    //map of feeds by URL, so that we only read once until user forces browser refresh.
-    feedCache = {};
 
     getTypeName = (): string => {
         return "sn:rssfeed";
@@ -72,37 +69,28 @@ export class RssTypeHandler implements TypeHandlerIntf {
         //if we find the RSS feed in the cache, use it.
         //disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to 
         //figure this out yet.
-        if (this.feedCache[feedSrc]) {
-            this.renderItem(this.feedCache[feedSrc], feedSrc, itemListContainer, state);
+        if (state.feedCache[feedSrc]) {
+            this.renderItem(state.feedCache[feedSrc], feedSrc, itemListContainer, state);
         }
         //otherwise read from the internet
         else {
+            itemListContainer.addChild(new Div("Loading RSS Feed..."));
 
-            let pgrsDlg = new ProgressDlg(state);
-            pgrsDlg.open();
-
-            //todo-1: to avoid performance issues i'll just allow only 100 items to load for now but this
-            //should be somehow controlled by the user (they may want to wait for the full list)
             parser.parseURL(feedSrc, (err, feed) => {
-
-                pgrsDlg.close();
                 if (!feed) {
-                    if (err.message) {
-                        new MessageDlg(err.message, "Message", null, null, false, 0, state).open();
-                    }
+                    new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
                 }
                 else {
-                    this.feedCache[feedSrc] = feed;
-                    this.renderItem(feed, feedSrc, itemListContainer, state);
-
-                    /* if this works make it a built-in into Comp */
-                    itemListContainer.reRender();
+                    dispatch({
+                        type: "Action_RSSUpdated", state,
+                        update: (s: AppState): void => {
+                            s.feedCache[feedSrc] = feed;
+                        },
+                    });
                 }
             });
         }
 
-        //This render will only attach an empty dom element, and then the async parseURL function above
-        //is when the dom is actually populated.
         return itemListContainer;
     }
 

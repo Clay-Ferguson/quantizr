@@ -139,7 +139,6 @@ export class Render implements RenderIntf {
         return typeHandler == null || typeHandler.allowAction(action);
     }
 
-    //todo-0: this doesn't need to be async now right?
     renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, state: AppState): void => {
         if (res.noDataResponse) {
             S.util.showMessage(res.noDataResponse, "Note");
@@ -147,7 +146,6 @@ export class Render implements RenderIntf {
         }
         this.lastOwner = null;
 
-        //with redux/react this timer should be able to go away soon.
         try {
             dispatch({
                 type: "Action_RenderPage", state,
@@ -192,7 +190,6 @@ export class Render implements RenderIntf {
             });
 
             if (clickTab) {
-                //Warning: I tried moving this logic into the above dispatch and it didn't work.
                 S.meta64.selectTab("mainTab");
             }
 

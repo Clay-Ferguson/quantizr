@@ -41,5 +41,4 @@ export interface CompIntf {
     getAttribs() : Object;
 
     compRender(): ReactNode;
-    reRender(): void;
 }

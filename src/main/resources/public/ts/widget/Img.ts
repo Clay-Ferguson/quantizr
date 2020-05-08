@@ -19,13 +19,12 @@ export class Img extends Comp {
 
     compRender = (): ReactNode => {
         let expandedImages = useSelector((state: AppState) => state.expandedImages);
-        let style: any = {};
 
         //console.log("Render IMG: id="+this.getId());
         if (this.key && expandedImages[this.key]) {
-            style.maxWidth = /* normalWidth || */ "100% - 12px";
-            style.width = /* normalWidth || */ "100% - 12px";
-            this.attribs.style = style;
+            this.attribs.style = this.attribs.style || {};
+            this.attribs.style.maxWidth = "calc(100% - 12px)";
+            this.attribs.style.width = "calc(100% - 12px)";
         }
 
         return S.e("img", this.attribs);
