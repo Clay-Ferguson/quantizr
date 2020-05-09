@@ -171,8 +171,7 @@ public class AttachmentService {
 				}
 			}
 			api.saveSession(session);
-		} 
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw ExUtil.wrapEx(e);
 		}
 
@@ -300,7 +299,7 @@ public class AttachmentService {
 		}
 
 		if (dataUrl) {
-			node.setProp(NodeProp.BIN_DATA_URL.s(), "t"); //t=true
+			node.setProp(NodeProp.BIN_DATA_URL.s(), "t"); // t=true
 		}
 
 		if (imageBytes == null) {
@@ -849,7 +848,8 @@ public class AttachmentService {
 		}
 		/* finally block just for extra safety */
 		finally {
-			// this stream will have been closed by 'attachBinaryFromStream' but we close here too anyway.
+			// this stream will have been closed by 'attachBinaryFromStream' but we close
+			// here too anyway.
 			StreamUtil.close(limitedIs);
 		}
 
@@ -933,7 +933,8 @@ public class AttachmentService {
 		 * Now save the node also since the property on it needs to point to GridFS id
 		 */
 		node.setProp(NodeProp.BIN.s(), new SubNodePropVal(id));
-		node.setProp(NodeProp.BIN_SIZE.s(), streamCount);
+		node.setProp(NodeProp.BIN_SIZE.s(), streamCount); // todo-0: why not 'new SubNodePropVal' here???? or all other
+															// similar places
 	}
 
 	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream, String mimeType) {
@@ -944,6 +945,10 @@ public class AttachmentService {
 		node.setProp(NodeProp.BIN_SIZE.s(), streamSize.getVal());
 	}
 
+	/*
+	 * todo-0: are there places this is called where it doesn't also delete ALL
+	 * binary properties ? via deleteAllBinaryProperties(node);
+	 */
 	public void deleteBinary(MongoSession session, SubNode node) {
 		api.auth(session, node, PrivilegeType.WRITE);
 		String id = node.getStringProp("bin");
@@ -954,9 +959,11 @@ public class AttachmentService {
 		if (!session.isAdmin()) {
 			userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
 		}
+		
 		grid.delete(new Query(Criteria.where("_id").is(id)));
 	}
 
+	// todo-0: propName not used?
 	public InputStream getStream(MongoSession session, SubNode node, String propName, boolean auth, boolean ipfs) {
 		if (auth) {
 			api.auth(session, node, PrivilegeType.READ);
@@ -971,16 +978,23 @@ public class AttachmentService {
 			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 			is = ipfsService.getStream(session, ipfsHash, mimeType);
 		} else {
-			is = getStreamByNodeId(node.getId());
+			is = getStreamByNode(node);
 		}
 		return is;
 	}
 
-	public InputStream getStreamByNodeId(ObjectId nodeId) {
-		log.debug("getStreamByNodeId: " + nodeId.toString());
+	public InputStream getStreamByNode(SubNode node) {
+		if (node == null)
+			return null;
+		log.debug("getStreamByNode: " + node.getId().toHexString());
 
-		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid
-				.findOne(new Query(Criteria.where("metadata.nodeId").is(nodeId)));
+		String id = node.getStringProp("bin");
+		if (id == null) {
+			return null;
+		}
+
+		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(id)));
+		// new Query(Criteria.where("metadata.nodeId").is(nodeId)));
 		if (gridFile == null) {
 			log.debug("gridfs ID not found");
 			return null;
@@ -999,30 +1013,28 @@ public class AttachmentService {
 		}
 	}
 
-	public String getStringByNodeId(MongoSession session, String nodeId) {
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
-
-		SubNode node = api.getNode(session, nodeId, false);
-		return getStringByNode(session, node);
-	}
-
 	public String getStringByNode(MongoSession session, SubNode node) {
 		String ret = null;
 		if (node != null) {
 			api.auth(session, node, PrivilegeType.READ);
-			ret = getStringByNodeId(node.getId());
+			ret = getStringByNodeEx(node);
 		}
 		return ret;
 	}
 
 	/* Gets the content of the grid resource by reading it into a string */
-	public String getStringByNodeId(ObjectId nodeId) {
-		log.debug("getStringByNodeId: " + nodeId.toString());
+	public String getStringByNodeEx(SubNode node) {
+		if (node==null) return null;
+		log.debug("getStringByNode: " + node.getId().toHexString());
+
+		String id = node.getStringProp("bin");
+		if (id == null) {
+			return null;
+		}
 
 		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid
-				.findOne(new Query(Criteria.where("metadata.nodeId").is(nodeId)));
+				.findOne(new Query(Criteria.where("_id").is(id)));
+				//new Query(Criteria.where("metadata.nodeId").is(nodeId)));
 		if (gridFile == null) {
 			log.debug("gridfs ID not found");
 			return null;

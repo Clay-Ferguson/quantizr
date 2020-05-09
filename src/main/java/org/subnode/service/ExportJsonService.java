@@ -147,7 +147,7 @@ public class ExportJsonService {
 				String resourceName = "classpath:/nodes/" + subFolder + "/" + oid.toHexString() + "-" + binFileName;
 				Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 				is = resource.getInputStream();
-				lis = new LimitedInputStreamEx(is, session.getMaxUploadSize()); 
+				lis = new LimitedInputStreamEx(is, session.getMaxUploadSize());
 				attachmentService.writeStream(session, node, lis, binFileName, binMime);
 				api.save(session, node);
 
@@ -168,28 +168,23 @@ public class ExportJsonService {
 			log.debug("FileName: " + binFileName);
 		}
 
-		ObjectId oid = node.getId();
-		if (oid != null) {
-			// log.debug("oid=" + oid.toString());
-			InputStream is = attachmentService.getStreamByNodeId(oid);
-			if (is != null) {
-				try {
-					String targetFileName = targetFolder + File.separator + oid.toHexString() + "-" + binFileName;
-					File targetFile = new File(targetFileName);
-					FileUtils.copyInputStreamToFile(is, targetFile);
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					StreamUtil.close(is);
-				}
-
-				ret = true;
-			} else {
-				log.debug("Unable to get inputstream or oid.");
+		InputStream is = attachmentService.getStreamByNode(node);
+		if (is != null) {
+			try {
+				String targetFileName = targetFolder + File.separator + node.getId().toHexString() + "-" + binFileName;
+				File targetFile = new File(targetFileName);
+				FileUtils.copyInputStreamToFile(is, targetFile);
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				StreamUtil.close(is);
 			}
+
+			ret = true;
 		} else {
-			log.debug("unable to get oid");
+			log.debug("Unable to get inputstream or oid.");
 		}
+
 		return ret;
 	}
 

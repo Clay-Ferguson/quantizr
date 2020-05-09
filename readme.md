@@ -2,11 +2,7 @@
 
 Quantizr is a content publishing/hosting platform where everything exists on a tree-structured database and each user owns a branch on this global tree which can be shared with other users. Each piece of data on the tree is called a "Node", and each node has it's own unique URL, and can markdown text (and/or images and arbitrary file attachments) and can be shared to specific other users or made public. A node can represent anything from a full document to just a paragraph, or even one sentence of content, and it's up to the user to create whatever they want and structure it as they want.
 
-# Quantizr with IPFS
-
-Experimental IPFS Connectivity is now working in Quantizr (not at quantizr.com yet). As a minimal proof-of-concept there is already the ability go crawl the IPFS MerkleDAG starting at some root point and then browse from there. This makes Quantizr able to become a fully functional "IPFS Browser". Quantizr will also function as a "full text search" over any and all content it has "crawled" in the IPFS network, because Quantizr caches all IPFS data it encounters into it's MongoDB and (this making data full-text searchable using the MongoDB/Lucene search technology). So Quantizr instances across the distributed web will each independently be able to function as a search engine for any amount of IPFS data that they choose to "crawl".
-
-## Link to a live instance:
+## Link to a live test instance:
 
 https://quantizr.com
 
@@ -17,20 +13,22 @@ https://quantizr.com
 * Java Language
 * Spring Boot Web App
 * Runs in embedded Tomcat
-* Dockerfile provided (Docker Supported)
 * REST-like Endpoint using ajax/JSON for all browser calls.
 * MongoDB data storage (via. Mongo for Docker)
-* IPFS File Access (via. GO-IPFS for Docker, experimental alpha, not much there)
+* IPFS File Access (supports uploading files to IPFS)
 * File System Index/Search (via Lucene+Tika)
+* Dockerfile Compose files for deployment
 
 ## Browser (Client Side)
 
 * Single Page Application (SPA)
-* TypeScript Language: No hand-coded Javascript
-* Bootstrap4 for layout/styling
+* TypeScript Language
+* Bootstrap 4 for layout/styling
 * Webpack-generated single bundle JS file
-* ReactJS-based HTML generation. Template-free architecture used (with functional React components)
+* ReactJS + Redux Store
 * Ace Editor for Content Editing
+* MathJax for rendering Latex math formulas
+
 
 ## How to Build the App
 

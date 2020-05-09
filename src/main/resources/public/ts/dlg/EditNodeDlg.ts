@@ -572,6 +572,7 @@ export class EditNodeDlg extends DialogBase {
                 }
             }
             else {
+                //console.log("Creating TextField or property: " + propEntry.name + " value=" + propValStr);
                 editor = new TextField(null, propValStr);
             }
             this.propNameToEditorCompMap[propEntry.name] = editor as any as Comp;

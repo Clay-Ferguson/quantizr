@@ -27,7 +27,7 @@ declare var PROFILE;
 export abstract class Comp implements CompIntf {
 
     public rendered: boolean = false;
-    public debug: boolean = true;
+    public debug: boolean = false;
     private static guid: number = 0;
 
     //todo-1: make this private?
