@@ -59,7 +59,6 @@ export class TextField extends Div implements I.TextEditorIntf {
     }
 
     preRender = (): void => {
-        //console.log("INPUT VALUE RESET! preRender: id=[" + this.getId() + "] state.value=" + this.state.value);
         this.setChildren([
             new Label(this.label, { key: this.getId() + "_label" }),
             new Div(null, {
@@ -80,8 +79,8 @@ export class TextField extends Div implements I.TextEditorIntf {
                             this.icon.toggleClass();
                         },
                     }, [
-                        this.icon = new ToggleIcon("fa-eye", "fa-eye-slash", {
-                            className: "fa passwordEyeIcon",
+                        this.icon = new ToggleIcon("fa-eye-slash", "fa-eye", {
+                            className: "fa fa-lg passwordEyeIcon",
                         })
                     ])
                 ]) : null

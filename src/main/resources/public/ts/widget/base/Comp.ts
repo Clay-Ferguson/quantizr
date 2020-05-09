@@ -8,7 +8,7 @@ import { Constants as C } from "../../Constants";
 import { Singletons } from "../../Singletons";
 import * as ReactDOM from "react-dom";
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
-import { ReactNode, ReactElement, useState, useEffect } from "react";
+import { ReactNode, ReactElement, useState, useEffect, useLayoutEffect } from "react";
 import { Provider } from 'react-redux';
 
 //tip: merging states: this.state = { ...this.state, ...moreState };
@@ -375,12 +375,16 @@ export abstract class Comp implements CompIntf {
                 this.domUpdateEvent();
             });
 
+            useLayoutEffect(() => {
+                //console.log("DOM PRE-UPDATE: " + this.jsClassName);
+                this.domPreUpdateEvent();
+            });
+
             /* 
             This 'useEffect' call makes react call 'domRemoveEvent' once the dom element is removed from the acutal DOM.
             (NOTE: Remember this won't run for DialogBase because it's done using pure DOM Javascript, which is the same reason
             whenElmEx has to still exist right now)
             */
-            //console.log("calling useState hook2");
             useEffect(() => {
                 return () => {
                     this.domRemoveEvent();
@@ -389,6 +393,10 @@ export abstract class Comp implements CompIntf {
 
             this.state.enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
             this.state.visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
+
+            // todo-1: something like this could encapsulate retting display, but currently isn't needed.
+            // this.attribs.style = this.attribs.style || {};
+            // this.attribs.style.display = this.getState().visible ? "block" : "none";
 
             this.preRender();
             ret = this.compRender();
@@ -407,7 +415,9 @@ export abstract class Comp implements CompIntf {
     }
 
     domUpdateEvent = (): void => {
+    }
 
+    domPreUpdateEvent = (): void => {
     }
 
     domAddEvent = (): void => {

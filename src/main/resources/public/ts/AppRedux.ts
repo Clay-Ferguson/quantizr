@@ -56,24 +56,11 @@ export let dispatch = (action: AppAction) => {
 }
 
 /* This listener is temporary until I find a better way to do this code, which needs to always run after any
-render is complete and AFTER the html DOM is updated/final */
-const handleChange = () => {
-    setTimeout(() => {
+render is complete and AFTER the html DOM is updated/final 
 
-        /* todo-1: This should be altered to search ONLY inside the DIVs that we know we are altering (markdown? rows?) */
-        S.util.forEachElmBySel("a", (el, i) => {
-            el.setAttribute("target", "_blank");
-        });
-
-        // todo-0: disabling this becasue it causes page to go blank where the math formua is before displaying the fomrmula
-        // and so until I find a way to have MathJax render up front on first render, i won't be using it for now.
-        // maybe the memo feature of react can come to my aid here somehow? to cache things.
-        // if (MathJax && MathJax.typeset) {
-        //     //note: MathJax.typesetPromise(), also exists
-        //     MathJax.typeset();
-        // }
-    }, 250);
-}
-
-const unsubscribe = store.subscribe(handleChange);
-// unsubscribe()
+This works, but is currently not needed.
+*/
+// const handleChange = () => {
+// }
+// const unsubscribe = store.subscribe(handleChange);
+// // unsubscribe()

@@ -19,11 +19,6 @@ export class Div extends Comp {
     }
 
     compRender = (): ReactNode => {
-
-        //uncomment this and then test it (or is it better to do this at lower layer inside Comp?) todo-0
-        // this.attribs.style = this.attribs.style || {};
-        // this.attribs.style.display = this.getState().visible ? "block" : "none";
-
         this.state.content = this.content;
         return this.tagRender('div', this.state.content /* this.getState().content*/, this.attribs);
     }
