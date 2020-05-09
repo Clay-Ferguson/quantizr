@@ -422,7 +422,7 @@ public class AttachmentService {
 			// log.debug("flush complete.");
 			// };
 
-			InputStream is = getStream(session, node, null, allowAuth, ipfs);
+			InputStream is = getStream(session, node, allowAuth, ipfs);
 			InputStreamResource isr = new InputStreamResource(is);
 
 			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
@@ -487,7 +487,7 @@ public class AttachmentService {
 				fileName = "filename";
 			}
 
-			InputStream is = getStream(session, node, null, allowAuth, ipfs);
+			InputStream is = getStream(session, node, allowAuth, ipfs);
 			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 			log.debug("Getting Binary for nodeId=" + nodeId + " size=" + size);
 
@@ -686,7 +686,7 @@ public class AttachmentService {
 				fileName = "filename";
 			}
 
-			InputStream is = getStream(session, node, null, true, ipfs);
+			InputStream is = getStream(session, null, true, ipfs);
 			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 
 			if (size == 0) {
@@ -933,8 +933,7 @@ public class AttachmentService {
 		 * Now save the node also since the property on it needs to point to GridFS id
 		 */
 		node.setProp(NodeProp.BIN.s(), new SubNodePropVal(id));
-		node.setProp(NodeProp.BIN_SIZE.s(), streamCount); // todo-0: why not 'new SubNodePropVal' here???? or all other
-															// similar places
+		node.setProp(NodeProp.BIN_SIZE.s(), streamCount); 
 	}
 
 	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream, String mimeType) {
@@ -963,13 +962,9 @@ public class AttachmentService {
 		grid.delete(new Query(Criteria.where("_id").is(id)));
 	}
 
-	// todo-0: propName not used?
-	public InputStream getStream(MongoSession session, SubNode node, String propName, boolean auth, boolean ipfs) {
+	public InputStream getStream(MongoSession session, SubNode node, boolean auth, boolean ipfs) {
 		if (auth) {
 			api.auth(session, node, PrivilegeType.READ);
-		}
-		if (propName == null) {
-			propName = "bin";
 		}
 
 		InputStream is = null;
@@ -1054,10 +1049,10 @@ public class AttachmentService {
 		}
 	}
 
-	public AutoCloseInputStream getAutoClosingStream(MongoSession session, SubNode node, String propName, boolean auth,
-			boolean ipfs) {
-		return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, propName, auth, ipfs)));
-	}
+	// public AutoCloseInputStream getAutoClosingStream(MongoSession session, SubNode node, boolean auth,
+	// 		boolean ipfs) {
+	// 	return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, auth, ipfs)));
+	// }
 
 	/**
 	 * This method makes a single pass over all grid items doing all the daily

@@ -243,7 +243,7 @@ public class MongoTest {
 
 			log.debug("inserted root for binary testing.", null, "image/png", null);
 
-			InputStream inStream = attachmentService.getStream(session, node, null, true, false);
+			InputStream inStream = attachmentService.getStream(session, node, true, false);
 			FileUtils.copyInputStreamToFile(inStream, new File("/home/clay/test-image2.png"));
 			log.debug("completed reading back the file, and writing out a copy.");
 		}

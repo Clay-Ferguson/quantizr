@@ -295,7 +295,7 @@ public abstract class ExportArchiveBase {
 
 					InputStream is = null;
 					try {
-						is = attachmentService.getStream(session, node, null, false, false);
+						is = attachmentService.getStream(session, node, false, false);
 						BufferedInputStream bis = new BufferedInputStream(is);
 						long length = node.getIntProp(NodeProp.BIN_SIZE.s());
 
