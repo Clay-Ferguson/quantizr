@@ -303,19 +303,21 @@ export class Render implements RenderIntf {
             src,
             className: "avatarImage",
             title: "Click image to enlarge/reduce",
-            onClick: (evt) => {
-                dispatch({
-                    type: "Action_ClickImage", state,
-                    update: (s: AppState): void => {
-                        if (s.expandedImages[key]) {
-                            delete s.expandedImages[key];
-                        }
-                        else {
-                            s.expandedImages[key] = "y";
-                        }
-                    },
-                });
-            }
+
+            // I decided not to let avatars be clickable.
+            // onClick: (evt) => {
+            //     dispatch({
+            //         type: "Action_ClickImage", state,
+            //         update: (s: AppState): void => {
+            //             if (s.expandedImages[key]) {
+            //                 delete s.expandedImages[key];
+            //             }
+            //             else {
+            //                 s.expandedImages[key] = "y";
+            //             }
+            //         },
+            //     });
+            // }
         });
 
         return img;

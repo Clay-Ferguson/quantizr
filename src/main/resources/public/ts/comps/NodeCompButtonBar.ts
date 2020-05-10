@@ -152,7 +152,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
             let selected: boolean = state.selectedNodes[node.id] ? true : false;
 
-            if (editingAllowed && S.render.allowAction(typeHandler, "edit")) {
+            if (editingAllowed && S.render.allowAction(typeHandler, "edit") && 
+                //no need to ever select home node
+                node.id != state.homeNodeId) {
                 selButton = new Checkbox(null, selected, {
                     onChange: () => {
                         S.nav.toggleNodeSel(selButton.getChecked(), node.id, state)
