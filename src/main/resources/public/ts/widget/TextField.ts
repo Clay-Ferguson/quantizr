@@ -39,14 +39,11 @@ export class TextField extends Div implements I.TextEditorIntf {
     setMode = (mode: string): void => {
     }
 
-    /* getters and setters changed to use state. need to test all usages: todo-0 */
     setValue = (val: string): void => {
         if (this.input) {
-            //console.log("TextField setVal: [" + this.getId() + "]" + val);
             this.input.mergeState({ value: val || "" });
         }
         else {
-            //console.log("TextField setVal: [" + this.getId() + "]" + val);
             this.mergeState({ value: val || "" });
         }
     }
@@ -61,7 +58,6 @@ export class TextField extends Div implements I.TextEditorIntf {
     }
 
     preRender = (): void => {
-        //console.log("TextField preRender: [" + this.getId() + "]" + this.state.value);
         this.setChildren([
             new Label(this.label, { key: this.getId() + "_label" }),
             new Div(null, {

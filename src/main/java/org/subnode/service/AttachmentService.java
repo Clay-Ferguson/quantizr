@@ -944,10 +944,6 @@ public class AttachmentService {
 		node.setProp(NodeProp.BIN_SIZE.s(), streamSize.getVal());
 	}
 
-	/*
-	 * todo-0: are there places this is called where it doesn't also delete ALL
-	 * binary properties ? via deleteAllBinaryProperties(node);
-	 */
 	public void deleteBinary(MongoSession session, SubNode node) {
 		api.auth(session, node, PrivilegeType.WRITE);
 		String id = node.getStringProp("bin");
