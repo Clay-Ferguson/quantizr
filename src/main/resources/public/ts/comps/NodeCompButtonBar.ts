@@ -37,7 +37,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let highlightNode = S.meta64.getHighlightedNode(state);
         let homeNodeSelected = highlightNode != null && state.homeNodeId == highlightNode.id;
 
-        //console.log("NodeCompButtonBar[" + node.id + "] editMode=" + state.userPreferences.editMode);
+        //console.log("NodeCompButtonBar_[" + node.id + "] editMode=" + state.userPreferences.editMode);
 
         let typeIcon: Icon;
         let encIcon: Icon;
@@ -165,7 +165,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
                 insertAllowed = typeHandler.allowAction("insert");
             }
 
-            if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node, state) && node.id != state.node.id) {
+            if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node, state) &&
+                //not page root node 'or' page no children exist.
+                (node.id != state.node.id || !node.children || node.children.length == 0)) {
                 createSubNodeButton = new Button("New", () => { S.edit.createSubNode(node.id, null, true, state); });
             }
 
@@ -199,9 +201,12 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     }
                 }
 
-                deleteNodeButton = new Button(null, () => { S.edit.deleteSelNodes(node, false, state); }, {
-                    "iconclass": "fa fa-trash fa-lg"
-                });
+                //not user's account node!
+                if (node.id != state.homeNodeId) {
+                    deleteNodeButton = new Button(null, () => { S.edit.deleteSelNodes(node, false, state); }, {
+                        "iconclass": "fa fa-trash fa-lg"
+                    });
+                }
 
                 if (!state.isAnonUser && state.nodesToMove != null && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
                     pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(node, 'inside', state.nodesToMove, state); }, {

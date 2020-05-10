@@ -469,6 +469,19 @@ export class Edit implements EditIntf {
             return;
         }
 
+        let failMsg = null;
+        selNodesArray.forEach(id => {
+            if (id == state.homeNodeId) {
+                failMsg = "Oops. You don't delete your account root node!";
+                return false;
+            }
+        });
+        
+        if (failMsg) {
+            S.util.showMessage(failMsg, "Warning");
+            return;
+        }
+
         let firstNodeId: string = selNodesArray[0];
 
         /* todo-1: would be better to check if ANY of the nodes are deleted not just arbitary first one */
