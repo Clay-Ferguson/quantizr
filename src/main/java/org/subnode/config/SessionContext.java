@@ -35,6 +35,8 @@ public class SessionContext {
 	@Autowired
 	RepositoryUtil repoUtil;
 
+	private String error;
+
 	/* Identification of user's account root node */
 	// private Ref_Info rootRef_Info;
 	private String rootId;
@@ -180,5 +182,13 @@ public class SessionContext {
 
 	public void setSignupSuccessMessage(String signupSuccessMessage) {
 		this.signupSuccessMessage = signupSuccessMessage;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 }

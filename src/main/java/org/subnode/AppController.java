@@ -803,6 +803,11 @@ public class AppController {
 				sessionContext.setSignupSuccessMessage(null);
 			}
 
+			if (sessionContext.getError()!=null) {
+				res.setServerInfo(sessionContext.getError());
+				sessionContext.setError(null);
+			}
+
 			res.setSuccess(true);
 			return res;
 		});
