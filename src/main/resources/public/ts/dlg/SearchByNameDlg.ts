@@ -25,6 +25,7 @@ export class SearchByNameDlg extends DialogBase {
         super("Search by Node Name", "app-modal-content-medium-width", false, false, state);
     }
 
+    //renderDlg(): CompIntf[] {
     preRender = () => {
         this.setChildren([
             new Form(null, [

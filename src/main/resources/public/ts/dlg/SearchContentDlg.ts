@@ -12,6 +12,7 @@ import { MessageDlg } from "./MessageDlg";
 import { Checkbox } from "../widget/Checkbox";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -30,8 +31,8 @@ export class SearchContentDlg extends DialogBase {
         S.srch.searchText = null;
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        let children = [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
                 this.searchTextField = new TextField("Search", SearchContentDlg.defaultSearchText, false, this.search),
@@ -46,8 +47,9 @@ export class SearchContentDlg extends DialogBase {
                     })
                 ])
             ])
-        ]);
+        ];
         this.searchTextField.focus();
+        return children;
     }
 
     search = () => {

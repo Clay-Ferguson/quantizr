@@ -9,6 +9,7 @@ import { Singletons } from "../Singletons";
 import { TextField } from "../widget/TextField";
 import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -29,8 +30,8 @@ export class SplitNodeDlg extends DialogBase {
         super("Split Node", null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        let children = [
             new TextContent("Split into multiple nodes..."),
 
             new RadioButtonGroup([
@@ -72,9 +73,10 @@ export class SplitNodeDlg extends DialogBase {
                     this.close();
                 })
             ])
-        ]);
+        ];
 
         this.delimiterTextField.setVisible(false);
+        return children;
     }
 
     splitNodes = (): void => {

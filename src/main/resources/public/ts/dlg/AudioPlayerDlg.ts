@@ -7,6 +7,7 @@ import { Constants as C} from "../Constants";
 import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -36,8 +37,14 @@ export class AudioPlayerDlg extends DialogBase {
         super("Audio Player", null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        //todo-0: move out of this method.
+        this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
+            S.podcast.player = elm;
+            setTimeout(this.updatePlayButtonText, 1000);
+        });
+
+        return [
             new Form(null, [
                 //new TextContent(this.title), 
                 this.audioPlayer = new AudioPlayer({
@@ -69,12 +76,7 @@ export class AudioPlayerDlg extends DialogBase {
                     new Button("2x", this.speed2Button)
                 ])
             ])
-        ]);
-        
-        this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
-            S.podcast.player = elm;
-            setTimeout(this.updatePlayButtonText, 1000);
-        });
+        ];
     }
 
     getAudioElement(): HTMLAudioElement {

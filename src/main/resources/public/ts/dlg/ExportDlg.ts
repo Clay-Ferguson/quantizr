@@ -12,6 +12,7 @@ import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -29,8 +30,8 @@ export class ExportDlg extends DialogBase {
         super("Export", null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        return [
             new Header("Export node content to file..."),
             new RadioButtonGroup([
                 this.zipRadioButton = new RadioButton("ZIP", false, "exportTypeGroup"),
@@ -47,7 +48,7 @@ export class ExportDlg extends DialogBase {
                     this.close();
                 })
             ])
-        ]);
+        ];
     }
 
     exportNodes = (): void => {

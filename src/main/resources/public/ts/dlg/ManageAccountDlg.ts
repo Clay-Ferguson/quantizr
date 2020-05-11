@@ -8,6 +8,7 @@ import { TextContent } from "../widget/TextContent";
 import * as J from "../JavaIntf";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,8 +22,8 @@ export class ManageAccountDlg extends DialogBase {
         super("Manage Account", null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        let children = [
             this.message = new TextContent("loading...", null, true),
 
             new CollapsiblePanel("More...", null, [
@@ -34,8 +35,9 @@ export class ManageAccountDlg extends DialogBase {
                     this.close();
                 })
             ])
-        ]);
+        ];
         this.rinit();
+        return children;
     }
 
     rinit = (): void => {

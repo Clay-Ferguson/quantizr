@@ -10,6 +10,7 @@ import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { MessageDlg } from "./MessageDlg";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -25,8 +26,8 @@ export class SearchByIDDlg extends DialogBase {
         super("Search by Node ID", "app-modal-content-medium-width", false, false, state);
     }
     
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        let children = [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
                 this.searchTextField = new TextField("Node ID", SearchByIDDlg.defaultSearchText, false, this.search
@@ -38,8 +39,9 @@ export class SearchByIDDlg extends DialogBase {
                     })
                 ])
             ])
-        ]);
+        ];
         this.searchTextField.focus();
+        return children;
     }
 
     search = () => {

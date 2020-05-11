@@ -10,6 +10,7 @@ import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -27,8 +28,11 @@ export class ChangePasswordDlg extends DialogBase {
         this.passCode = (<any>args).passCode;
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        //todo-0: does this belong here?
+        this.passwordField.focus();
+        
+        return [
             new Form(null, [
                 new TextContent("Enter your new password below..."),
                 this.passwordField = new TextField("New Password", null, true),
@@ -42,8 +46,7 @@ export class ChangePasswordDlg extends DialogBase {
                     })
                 ])
             ])
-        ]);
-        this.passwordField.focus();
+        ];
     }
 
     /*

@@ -29,6 +29,7 @@ import { SymKeyDataPackage } from "../intf/EncryptionIntf";
 import { Icon } from "../widget/Icon";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -72,8 +73,10 @@ export class EditNodeDlg extends DialogBase {
 
     skdp: SymKeyDataPackage;
 
-    constructor(private node: J.NodeInfo, state: AppState) {
-        super("Edit Node", "app-modal-content", false, true, state);
+    constructor(node: J.NodeInfo, state: AppState) {
+        super("Edit Node", "app-modal-content", false, false /* todo-0 I guess initially invisible thing is not needed now? true */, state);
+        debugger;
+        this.mergeState({node});
     }
 
     createLayoutSelection = (): Selection => {
@@ -120,18 +123,19 @@ export class EditNodeDlg extends DialogBase {
     }
 
     initTitleBarComps = (): void => {
+        let state = this.getState();
         this.extraHeaderComps = [];
 
-        if (S.props.isEncrypted(this.node)) {
+        if (S.props.isEncrypted(state.node)) {
             this.extraHeaderComps.push(new Icon({
                 "style": { marginLeft: '12px', verticalAlign: 'middle' },
                 className: "fa fa-lock fa-lg"
             }));
         }
 
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {
-            let iconClass = typeHandler.getIconClass(this.node);
+            let iconClass = typeHandler.getIconClass(state.node);
             if (iconClass) {
                 this.extraHeaderComps.push(new Icon({
                     "style": { marginLeft: '12px', verticalAlign: 'middle' },
@@ -141,14 +145,15 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    preRender = () => {
+    renderDlg(): CompIntf[] {
+        let state = this.getState();
         this.initTitleBarComps();
 
         //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
         //to dangerously opt into this also without hacking the code with this var.
         let allowEditAllProps: boolean = this.appState.isAdminUser;
 
-        this.setChildren([
+        let children = [
             new Form(null, [
                 //this.help = new TextContent("Help content."),
                 new Div(null, {
@@ -171,7 +176,7 @@ export class EditNodeDlg extends DialogBase {
                         this.cancelButton = new Button("Cancel", this.cancelEdit)
                     ])
             ])
-        ]);
+        ];
 
         let optionsBar = new Div("", null, [
             this.preformattedCheckBox = new Checkbox("Plain Text", false, {
@@ -188,13 +193,13 @@ export class EditNodeDlg extends DialogBase {
                     }
                 }
             }),
-            this.inlineChildrenCheckBox = this.node.hasChildren ? new Checkbox("Inline Children", false) : null
+            this.inlineChildrenCheckBox = state.node.hasChildren ? new Checkbox("Inline Children", false) : null
         ]);
 
         let selectionsBar = new FormInline(null, [
-            this.layoutSelection = this.node.hasChildren ? this.createLayoutSelection() : null,
+            this.layoutSelection = state.node.hasChildren ? this.createLayoutSelection() : null,
             this.prioritySelection = this.createPrioritySelection(),
-            this.imgSizeSelection = S.props.hasImage(this.node) ? this.createImgSizeSelection() : null
+            this.imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection() : null
         ]);
 
         let collapsiblePropsTable = new EditPropsTable({
@@ -202,8 +207,8 @@ export class EditNodeDlg extends DialogBase {
         });
         let editPropsTable = new EditPropsTable();
 
-        let isPre = !!S.props.getNodePropVal(J.NodeProp.PRE, this.node);
-        let isWordWrap = !S.props.getNodePropVal(J.NodeProp.NOWRAP, this.node);
+        let isPre = !!S.props.getNodePropVal(J.NodeProp.PRE, state.node);
+        let isWordWrap = !S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node);
 
         this.preformattedCheckBox.setChecked(isPre);
         this.wordWrapCheckBox.setChecked(isWordWrap);
@@ -218,20 +223,20 @@ export class EditNodeDlg extends DialogBase {
 
         //todo-1: does it make sense for FormGroup to contain single fields, or multiple fields? This seems wrong to have a group with one in it.
         let nodeNameFormGroup = new FormGroup();
-        this.nodeNameTextField = new TextField("Node Name", this.node.name);
+        this.nodeNameTextField = new TextField("Node Name", state.node.name);
         nodeNameFormGroup.addChild(this.nodeNameTextField);
 
         editPropsTable.addChild(nodeNameFormGroup);
 
-        let content = this.node.content;
-        let contentTableRow = this.makeContentEditorFormGroup(this.node, isPre, isWordWrap);
+        let content = state.node.content;
+        let contentTableRow = this.makeContentEditorFormGroup(state.node, isPre, isWordWrap);
         editPropsTable.addChild(contentTableRow);
 
         this.contentEditor.setWordWrap(isWordWrap);
         this.propCheckBoxes = [];
 
-        if (this.node.properties) {
-            this.node.properties.forEach((prop: J.PropertyInfo) => {
+        if (state.node.properties) {
+            state.node.properties.forEach((prop: J.PropertyInfo) => {
 
                 if (prop.name == J.NodeProp.LAYOUT) {
                     if (this.layoutSelection) {
@@ -261,7 +266,7 @@ export class EditNodeDlg extends DialogBase {
 
                 //console.log("Creating edit field for property " + prop.name);
 
-                if (!allowEditAllProps && !S.render.allowPropertyEdit(this.node, prop.name, this.appState)) {
+                if (!allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
                     console.log("Hiding property: " + prop.name);
                     return;
                 }
@@ -299,6 +304,7 @@ export class EditNodeDlg extends DialogBase {
         this.propertyEditFieldContainer.setChildren([editPropsTable, collapsiblePanel]);
 
         //this.addPropertyButton.setVisible(!S.edit.editingUnsavedNode);
+        return children;
     }
 
     isGuiControlBasedProp = (prop: J.PropertyInfo): boolean => {
@@ -313,19 +319,19 @@ export class EditNodeDlg extends DialogBase {
     }
 
     addProperty = (): void => {
+        let state = this.getState();
         (async () => {
             /* always save existing node before opening new property dialog */
             let dlg = new EditPropertyDlg({
-                editNode: this.node,
-                propSavedFunc: this.propertySaved
+                editNode: state.node,
+                propSavedFunc: () => {
+                    //this.setState(state); //<---- todo-0: this is what is SHOULD be here
+                    this.rebuildDlg();
+                }
             }, this.appState);
             this.editPropertyDlgInst = dlg;
             await this.editPropertyDlgInst.open();
         })();
-    }
-
-    propertySaved = (): void => {
-        this.rebuildDlg();
     }
 
     insertTime = (): void => {
@@ -338,22 +344,19 @@ export class EditNodeDlg extends DialogBase {
         (async () => {
             let dlg = new ChangeNodeTypeDlg(this.setNodeType, this.appState);
             await dlg.open();
-
-            //actually this happens inside setNodeType function, but really we could get rid of that callback
-            //and use an await to do all that here.
-            //this.rebuildDlg(); //todo-1: this is overkill. Will do it with targeted react setState eventually
         })();
     }
 
     openEncryptionDlg = (): void => {
+        let state = this.getState();
         (async () => {
-            let encrypted: boolean = S.props.isEncrypted(this.node);
+            let encrypted: boolean = S.props.isEncrypted(state.node);
             let dlg = new EncryptionDlg(encrypted, this.appState);
 
             /* awaits until dialog is closed */
             await dlg.open();
 
-            if (dlg.encrypted && S.props.isPublic(this.node)) {
+            if (dlg.encrypted && S.props.isPublic(state.node)) {
                 S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
                 return;
             }
@@ -364,19 +367,19 @@ export class EditNodeDlg extends DialogBase {
                 /* If we're turning off encryption for the node */
                 if (!dlg.encrypted) {
                     /* Take what's in the editor and put
-                    that into this.node.content, becasue it's the correct and only place the correct updated text is guaranteed to be
+                    that into this.node.content, because it's the correct and only place the correct updated text is guaranteed to be
                     in the case where the user made some changes before disabling encryption. */
-                    this.node.content = this.contentEditor.getValue();
-                    S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, null);
+                    state.node.content = this.contentEditor.getValue();
+                    S.props.setNodePropVal(J.NodeProp.ENC_KEY, state.node, null);
                 }
                 /* Else need to ensure node is encrypted */
                 else {
                     // if we need to encrypt and the content is not currently encrypted.
-                    if (!this.node.content.startsWith(J.Constant.ENC_TAG)) {
+                    if (!state.node.content.startsWith(J.Constant.ENC_TAG)) {
                         let content = this.contentEditor.getValue();
                         this.skdp = await S.encryption.encryptSharableString(null, content);
-                        this.node.content = J.Constant.ENC_TAG + this.skdp.cipherText;
-                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, this.node, this.skdp.cipherKey);
+                        state.node.content = J.Constant.ENC_TAG + this.skdp.cipherText;
+                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, state.node, this.skdp.cipherKey);
                     }
                 }
 
@@ -386,12 +389,13 @@ export class EditNodeDlg extends DialogBase {
     }
 
     setNodeType = (newType: string): void => {
+        let state = this.getState();
         S.util.ajax<J.SetNodeTypeRequest, J.SetNodeTypeResponse>("setNodeType", {
-            nodeId: this.node.id,
+            nodeId: state.node.id,
             type: newType
         },
             (res) => {
-                this.node.type = newType;
+                state.node.type = newType;
                 this.setNodeTypeResponse(res);
             });
     }
@@ -401,27 +405,16 @@ export class EditNodeDlg extends DialogBase {
         this.rebuildDlg();
     }
 
-    savePropertyResponse(res: any): void {
-        S.util.checkSuccess("Save properties", res);
-
-        this.node.properties.push(res.propertySaved);
-        this.rebuildDlg();
-    }
-
     deleteProperty(propName: string) {
         S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperty", {
-            "nodeId": this.node.id,
+            "nodeId": this.getState().node.id,
             "propName": propName
         }, (res) => {
-            this.deletePropertyResponse(res, propName);
+            if (S.util.checkSuccess("Delete property", res)) {
+                S.props.deleteProp(this.getState().node, propName);
+                this.rebuildDlg();
+            }
         });
-    }
-
-    deletePropertyResponse = (res: any, prop: any) => {
-        if (S.util.checkSuccess("Delete property", res)) {
-            S.props.deleteProp(this.node, prop);
-            this.rebuildDlg();
-        }
     }
 
     saveCheckboxVal = (checkbox: Checkbox, propName: string, invert: boolean = false): void => {
@@ -429,14 +422,15 @@ export class EditNodeDlg extends DialogBase {
         if (invert) {
             val = (val == "1" ? null : "1");
         }
-        S.props.setNodePropVal(propName, this.node, val);
+        S.props.setNodePropVal(propName, this.getState().node, val);
     }
 
     saveNode = async (): Promise<void> => {
+        let state = this.getState();
         return new Promise<void>(async (resolve, reject) => {
             let allowEditAllProps: boolean = this.appState.isAdminUser;
-
-            if (this.node) {
+            debugger;
+            if (state.node) {
                 this.saveCheckboxVal(this.preformattedCheckBox, J.NodeProp.PRE);
                 if (this.inlineChildrenCheckBox) {
                     this.saveCheckboxVal(this.inlineChildrenCheckBox, J.NodeProp.INLINE_CHILDREN);
@@ -446,16 +440,16 @@ export class EditNodeDlg extends DialogBase {
                 /* Get state of the 'layout' dropdown */
                 if (this.layoutSelection) {
                     let layout = this.layoutSelection.getSelection();
-                    S.props.setNodePropVal(J.NodeProp.LAYOUT, this.node, layout);
+                    S.props.setNodePropVal(J.NodeProp.LAYOUT, state.node, layout);
                 }
 
                 /* Get state of the 'priority' dropdown */
                 let priority = this.prioritySelection.getSelection();
-                S.props.setNodePropVal(J.NodeProp.PRIORITY, this.node, priority);
+                S.props.setNodePropVal(J.NodeProp.PRIORITY, state.node, priority);
 
                 if (this.imgSizeSelection) {
                     let imgSize = this.imgSizeSelection.getSelection();
-                    S.props.setNodePropVal(J.NodeProp.IMG_SIZE, this.node, imgSize);
+                    S.props.setNodePropVal(J.NodeProp.IMG_SIZE, state.node, imgSize);
                 }
             }
 
@@ -466,7 +460,7 @@ export class EditNodeDlg extends DialogBase {
 
                 //todo-1: an optimization can be done here such that if we just ENCRYPTED the node, we use this.skpd.symKey becuase that
                 //will already be available
-                let cipherKey = S.props.getCryptoKey(this.node, this.appState);
+                let cipherKey = S.props.getCryptoKey(state.node, this.appState);
                 if (cipherKey) {
                     content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
                     content = J.Constant.ENC_TAG + content;
@@ -480,13 +474,13 @@ export class EditNodeDlg extends DialogBase {
                 nodeName = "";
             }
 
-            this.node.name = nodeName;
-            this.node.content = content;
+            state.node.name = nodeName;
+            state.node.content = content;
             let newProps: J.PropertyInfo[] = [];
 
             /* Now scan over all properties to build up what to save */
-            if (this.node.properties) {
-                this.node.properties.forEach((prop: J.PropertyInfo) => {
+            if (state.node.properties) {
+                state.node.properties.forEach((prop: J.PropertyInfo) => {
 
                     //console.log("prop to save?: "+prop.name);
 
@@ -504,13 +498,13 @@ export class EditNodeDlg extends DialogBase {
                     newProps.push(prop);
                 });
             }
-            this.node.properties = newProps;
+            state.node.properties = newProps;
 
             //console.log("calling saveNode(). PostData=" + S.util.toJson(this.node));
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-                node: this.node
+                node: state.node
             }, (res) => {
-                S.edit.saveNodeResponse(this.node, res, this.appState);
+                S.edit.saveNodeResponse(state.node, res, this.appState);
             });
 
             resolve();

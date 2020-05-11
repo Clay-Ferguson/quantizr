@@ -10,6 +10,7 @@ import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { DialogBase } from "../DialogBase";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let util: Util;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -26,8 +27,8 @@ export class ResetPasswordDlg extends DialogBase {
         this.user = (<any>args).user;
     }
     
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        let children = [
             new Form(null, [
                 new TextContent("Enter your user name and email address and a change-password link will be sent to you"),
                 this.userTextField = new TextField("User Name"),
@@ -39,10 +40,11 @@ export class ResetPasswordDlg extends DialogBase {
                     })
                 ])
             ])
-        ]);
+        ];
         if (this.user) {
             this.userTextField.setValue(this.user);
         }
+        return children;
     }
 
     resetPassword = (): void => {

@@ -618,7 +618,7 @@ export class Util implements UtilIntf {
     }
 
     setInnerHTMLById = (id: string, val: string): void => {
-        S.util.getElm(id, (elm: HTMLElement) => {
+        this.getElm(id, (elm: HTMLElement) => {
             this.setInnerHTML(elm, val);
         });
     }
@@ -959,7 +959,7 @@ export class Util implements UtilIntf {
 
     //todo-1: is this still used ? eliminate it.
     removeClassFromElmById = (id: string, clazz: string) => {
-        S.util.getElm(id, (elm: HTMLElement) => {
+        this.getElm(id, (elm: HTMLElement) => {
             this.removeClassFromElm(elm, clazz);
         });
     }
@@ -980,7 +980,7 @@ export class Util implements UtilIntf {
     //todo-1: is this still used ? eliminate it.
     addClassToElmById = (id: string, clazz: string): void => {
         //console.log("Adding class "+clazz+" to dom id "+id);
-        S.util.getElm(id, (elm: HTMLElement) => {
+        this.getElm(id, (elm: HTMLElement) => {
             //console.log("found dom id, adding class now.");
             this.addClassToElm(elm, clazz);
         });
@@ -1027,10 +1027,10 @@ export class Util implements UtilIntf {
     }
 
     copyToClipboard = (text: string) => {
-        (<any>navigator).clipboard.writeText(text).then(function () {
+        (<any>navigator).clipboard.writeText(text).then(() => {
             console.log("Copied to clipboard successfully!");
-        }, function () {
-            S.util.showMessage("Unable to write to clipboard.", "Warning");
+        }, () => {
+            this.showMessage("Unable to write to clipboard.", "Warning");
         });
     }
 

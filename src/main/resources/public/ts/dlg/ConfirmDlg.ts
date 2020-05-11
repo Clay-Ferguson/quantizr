@@ -4,6 +4,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 export class ConfirmDlg extends DialogBase {
 
@@ -11,8 +12,8 @@ export class ConfirmDlg extends DialogBase {
         super(title, "app-modal-content-narrow-width", false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        return [
             new Form(null, [
                 new TextContent(this.text, this.textClass),
                 new ButtonBar([
@@ -26,6 +27,6 @@ export class ConfirmDlg extends DialogBase {
                     } : this.close)
                 ])
             ])
-        ]);
+        ];
     }
 }

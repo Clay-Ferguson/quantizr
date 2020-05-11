@@ -16,18 +16,17 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export abstract class DialogBase extends Comp implements DialogBaseImpl {
+export abstract class DialogBase extends Div implements DialogBaseImpl {
 
     //ref counter that allows multiple dialogs to be opened on top of each other and only
     //when the final one closes out do we go back to enabling scrolling on body again.
     static refCounter = 0;
 
+    static BACKDROP_PREFIX = "backdrop-";
     static backdropZIndex: number = 16000000;
     resolve: Function;
 
     elm: HTMLElement;
-    dlgComp: Comp;
-
     extraHeaderComps: CompIntf[];
 
     /* Warning: Base 'Comp' already has 'state', I think it was wrong to rely on 'appState' everywhere inside dialogs, because
@@ -38,6 +37,10 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
         private initiallyInvisible: boolean, appState: AppState) {
         super(null);
         this.appState = appState;
+
+        this.attribs.className = S.meta64.isMobile ?
+            (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen") :
+            (this.overrideClass ? this.overrideClass : "app-modal-content");
     }
 
     /* To be overridden by derived classes */
@@ -59,14 +62,14 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
 
             // Create dialog container and attach to document.body.
             this.elm = document.createElement('div');
-            this.elm.setAttribute("id", this.getId());
+            this.elm.setAttribute("id", DialogBase.BACKDROP_PREFIX + this.getId());
 
             // WARNING: Don't use 'className' here, this is pure javascript.
             this.elm.setAttribute("class", "app-modal");
             this.elm.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex) + "; display: " + displayStyle + ";");
             document.body.appendChild(this.elm);
 
-            //This basically creates the 'children'
+            //This basically creates the 'children' (nope this is obsolete, remove it todo-0)
             this.init();
 
             //this renders the dlgComp onto the screen (on the backdrop elm)
@@ -85,10 +88,7 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
     }
 
     domRender = (): void => {
-        //this wraps the childern inside the actual dialog component itself
-        this.dlgComp = this.makeComp(this.elm);
-
-        let reactElm = S.e(this.dlgComp.render, this.dlgComp.attribs)
+        let reactElm = S.e(this.render, this.attribs);
 
         //console.log("Rendering with provider");
         let provider = S.e(Provider, { store }, reactElm);
@@ -106,6 +106,7 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
         this.resolve(this);
         ReactDOM.unmountComponentAtNode(this.elm);
         S.util.domElmRemove(this.getId());
+        S.util.domElmRemove(DialogBase.BACKDROP_PREFIX + this.getId());
 
         if (--DialogBase.refCounter <= 0) {
             if (S.meta64.isMobile) {
@@ -114,15 +115,16 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
         }
     }
 
-    /* Returns the single Component to go inside the dialog, which is the entire content of the dialog
-    as a Div that contains the header of the dialog and all the 'this.children' appended below it, so we expect
-    this.children to already be populated by the time we get in here, which can safely be put in init() to make
-    sure they are */
-    makeComp = (backdrop: HTMLElement): Comp => {
+    renderDlg(): CompIntf[] {
+        return [new Div("oops. renderDlg not overridden")];
+    }
+
+    preRender = (): void => {
+        let backdrop: HTMLElement = this.elm;
 
         let timesIcon: Comp;
         //Dialog Header with close button (x) right justified on it.
-        let content: CompIntf[] = [];
+        let children: CompIntf[] = [];
 
         let titleChildren = this.extraHeaderComps ? this.extraHeaderComps : [];
         titleChildren = titleChildren.concat(timesIcon = new Span("&times;", {
@@ -132,7 +134,7 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
 
         //NOTE: title will be null for the main menu, which is actually implemented as a dialog using this base class.
         if (this.title) {
-            content.push(new Div(this.title, {
+            children.push(new Div(this.title, {
                 className: "app-modal-title"
             },
                 titleChildren
@@ -140,25 +142,16 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
             timesIcon.renderRawHtml = true;
         }
 
-        this.preRender();
-        content = content.concat(this.children);
-
-        /* Display dialogs fullscreen on mobile devices */
-        let clazz = S.meta64.isMobile ?
-            (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen") :
-            (this.overrideClass ? this.overrideClass : "app-modal-content");
-
-        // Note this optionally uses overrideClass which can come from above
-        let contentDiv: Div = new Div(null, {
-            className: clazz
-        }, content)
+        children = children.concat(this.renderDlg());
+        this.setChildren(children);
 
         //clicking outside the dialog will close it. We only use this for the main menu of the app, because clicking outside a dialog
         //is too easy to do while your editing and can cause loss of work/editing.
+        //todo-0: this is going to add too many listeners? shouldn't be in a render method?
         if (this.closeByOutsideClick) {
             backdrop.addEventListener("click", (evt: any) => {
                 //get our dialog itself.
-                let contentElm = S.util.domElm(contentDiv.getId());
+                let contentElm: any = S.util.domElm(this.getId());
 
                 //check if the click was outside the dialog.
                 if (!!contentElm && !contentElm.contains(evt.target)) {
@@ -166,7 +159,5 @@ export abstract class DialogBase extends Comp implements DialogBaseImpl {
                 }
             });
         }
-
-        return contentDiv;
     }
 }

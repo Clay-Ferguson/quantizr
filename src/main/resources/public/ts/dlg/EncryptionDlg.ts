@@ -8,6 +8,7 @@ import { PubSub } from "../PubSub";
 import { Checkbox } from "../widget/Checkbox";
 import { VerticalLayout } from "../widget/VerticalLayout";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -25,8 +26,8 @@ export class EncryptionDlg extends DialogBase {
         super("Node Encryption", "app-modal-content-medium-width", false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        return [
             new Form(null, [
                 new VerticalLayout([
                     this.encryptAsPrivate = new Checkbox("Encrypt Content", this.encrypted),
@@ -41,7 +42,7 @@ export class EncryptionDlg extends DialogBase {
                     })
                 ])
             ])
-        ]);
+        ];
     }
 
     save = (): void => {

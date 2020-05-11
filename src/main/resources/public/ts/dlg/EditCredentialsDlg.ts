@@ -9,6 +9,7 @@ import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -27,15 +28,20 @@ export class EditCredentialsDlg extends DialogBase {
         super(title2, "app-modal-content-narrow-width", false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        this.userTextField = new TextField("User"),
+        this.passwordTextField = new TextField("Password", null, true),
+
+        this.populateFromLocalDb();
+
+        return [
             new TextContent("Quantizr uses Temporal (https://temporal.cloud) as the storage provider for IPFS content, so you can enter your Temporal"+
             " credentials here to enable saving files permanently to IPFS."),
             new Form(null, [
                 new FormGroup(null,
                     [
-                        this.userTextField = new TextField("User"),
-                        this.passwordTextField = new TextField("Password", null, true),
+                        this.userTextField,
+                        this.passwordTextField,
                     ]
                 ),
                 new ButtonBar(
@@ -47,8 +53,7 @@ export class EditCredentialsDlg extends DialogBase {
                     ])
 
             ])
-        ]);
-        this.populateFromLocalDb();
+        ];
     }
 
     populateFromLocalDb = async (): Promise<void> => {

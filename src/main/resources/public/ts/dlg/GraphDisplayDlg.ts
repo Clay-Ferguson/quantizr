@@ -8,6 +8,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 // https://github.com/visjs/vis-network
 //      npm install vis-network
@@ -25,8 +26,8 @@ export class GraphDisplayDlg extends DialogBase {
         super("Graph Display", null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        let children = [
             new Form(null, [
                 this.graphDiv = new Div(null, {
                     id: "mynetwork",
@@ -38,7 +39,7 @@ export class GraphDisplayDlg extends DialogBase {
                     })
                 ])
             ])
-        ]);
+        ];
 
         this.whenElm((elm: HTMLElement) => {
 
@@ -69,6 +70,7 @@ export class GraphDisplayDlg extends DialogBase {
             var options = {};
             var network = new Network(container, data, options);
         });
+        return children;
     }
 }
 

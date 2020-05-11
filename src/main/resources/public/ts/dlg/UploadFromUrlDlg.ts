@@ -8,6 +8,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -23,8 +24,8 @@ export class UploadFromUrlDlg extends DialogBase {
         super("Upload File", null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        return [
             new Form(null, [
                 this.uploadFromUrlTextField = new TextField("Upload from URL", this.defaultUrl),
                 new ButtonBar([
@@ -34,7 +35,7 @@ export class UploadFromUrlDlg extends DialogBase {
                     })
                 ])
             ])
-        ]);
+        ];
     }
 
     upload = (): void => {

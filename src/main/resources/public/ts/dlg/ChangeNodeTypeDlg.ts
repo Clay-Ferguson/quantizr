@@ -7,6 +7,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { NodeTypeListBox } from "../widget/NodeTypeListBox";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -25,8 +26,8 @@ export class ChangeNodeTypeDlg extends DialogBase {
         this.selCallback = selCallback;
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        return [
             new Form(null, [
                 //todo-p2: need to make this default to the right type.
                 this.nodeTypeListBox = new NodeTypeListBox(this.selType, true),
@@ -40,7 +41,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
                     })
                 ])
             ])
-        ]);
+        ];
     }
 
     setNodeType = (): void => {

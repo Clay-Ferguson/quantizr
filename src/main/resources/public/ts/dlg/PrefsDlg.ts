@@ -9,6 +9,7 @@ import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -23,8 +24,8 @@ export class PrefsDlg extends DialogBase {
         super("Preferences", null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        return [
             new Form(null, [
                 new FormGroup(null,
                     [
@@ -40,7 +41,7 @@ export class PrefsDlg extends DialogBase {
                     ])
 
             ])
-        ]);
+        ];
     }
 
     savePreferences = (): void => {

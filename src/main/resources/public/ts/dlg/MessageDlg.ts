@@ -4,6 +4,7 @@ import { TextContent } from "../widget/TextContent";
 import { Comp } from "../widget/base/Comp";
 import { DialogBase } from "../DialogBase";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 /*
  * Callback can be null if you don't need to run any function when the dialog is closed
@@ -15,8 +16,18 @@ export class MessageDlg extends DialogBase {
         super(title, null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg = (): CompIntf[] => {
+
+        //todo-0: this timer is ugly to have in the render right?
+        if (this.flashTimeout > 0) {
+            setTimeout(() => {
+                this.whenElmEx((elm: HTMLElement) => {
+                    this.close();
+                });
+            }, this.flashTimeout);
+        }
+
+        return [
             new TextContent(this.message, null, this.preformatted),
             this.customWidget,
             this.flashTimeout == 0 ? new ButtonBar([
@@ -28,14 +39,6 @@ export class MessageDlg extends DialogBase {
                     }
                 }, null, "btn-primary")
             ]) : null
-        ]);
-
-        if (this.flashTimeout > 0) {
-            setTimeout(() => {
-                this.whenElmEx((elm: HTMLElement) => {
-                    this.close();
-                });
-            }, this.flashTimeout);
-        }
+        ];
     }
 }

@@ -10,6 +10,7 @@ import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 import { Checkbox } from "../widget/Checkbox";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -26,8 +27,8 @@ export class TransferNodeDlg extends DialogBase {
         super("Transfer Node", "app-modal-content-narrow-width", false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        return [
             new Form(null, [
                 new FormGroup(null,
                     [
@@ -48,7 +49,7 @@ export class TransferNodeDlg extends DialogBase {
                         })
                     ])
             ])
-        ]);
+        ];
     }
 
     transfer = (): void => {

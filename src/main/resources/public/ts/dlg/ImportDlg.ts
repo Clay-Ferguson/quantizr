@@ -9,6 +9,7 @@ import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { AppState } from "../AppState";
 import { store } from "../AppRedux";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -23,8 +24,8 @@ export class ImportDlg extends DialogBase {
         super("Import from XML", null, false, false, state);
     }
     
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        return [
             this.importFromFileNameTextField = new TextField("File Name to Import"),
             new ButtonBar([
                 new Button("Import", this.importNodes, null, "btn-primary"),
@@ -32,7 +33,7 @@ export class ImportDlg extends DialogBase {
                     this.close();
                 })
             ])
-        ]);
+        ];
     }
 
     importNodes = (): void => {

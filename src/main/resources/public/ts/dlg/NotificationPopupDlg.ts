@@ -1,6 +1,7 @@
 import { TextContent } from "../widget/TextContent";
 import { DialogBase } from "../DialogBase";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 /*
  * Notification Dialog that pops up and displays for a short time and then automatically destroys itself
@@ -11,10 +12,10 @@ export class NotificationPopupDlg extends DialogBase {
         super(title, null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        return [
             new TextContent(this.message),
-        ]);
+        ];
     }
 
     show(message: string, title: string, timeout: number=3000) {

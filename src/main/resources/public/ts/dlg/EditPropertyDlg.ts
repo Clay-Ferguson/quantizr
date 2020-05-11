@@ -9,6 +9,7 @@ import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { TextField } from "../widget/TextField";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -31,8 +32,8 @@ export class EditPropertyDlg extends DialogBase {
         this.editNode = args.editNode; 
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        return [
             new Div(null, null, [
                 this.propertyNameTextarea = new TextField("Name"),
                 this.propertyValTextarea = new Textarea("Value")
@@ -44,7 +45,7 @@ export class EditPropertyDlg extends DialogBase {
                     this.close()
                 })
             ])
-        ]);
+        ];
     }
 
     saveProperty = (): void => {

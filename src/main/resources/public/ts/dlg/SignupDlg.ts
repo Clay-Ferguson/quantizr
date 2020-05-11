@@ -9,6 +9,7 @@ import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -25,8 +26,8 @@ export class SignupDlg extends DialogBase {
         super("Create Account", "app-modal-content-medium-width", null, false, state);
     }
     
-    preRender = () => {  
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        let children = [
             new Form(null, [
                 this.userTextField = new TextField("User"),
                 this.passwordTextField = new TextField("Password", null, true),
@@ -36,10 +37,11 @@ export class SignupDlg extends DialogBase {
                     new Button("Cancel", this.close)
                 ])
             ])
-        ]);
+        ];
         
         this.pageInitSignupPg();
         this.userTextField.focus();
+        return children;
     }
 
     signup = (): void => {

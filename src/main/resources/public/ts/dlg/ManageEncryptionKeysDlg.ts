@@ -6,6 +6,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,8 +21,8 @@ export class ManageEncryptionKeysDlg extends DialogBase {
         super("Encryption Keys", null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        let children = [
             this.textContent = new TextContent("Getting key info...", "tallTextContent", true),
             new ButtonBar([
                 //both of these operations need some kind of confirmation dialog to come up after
@@ -36,9 +37,10 @@ export class ManageEncryptionKeysDlg extends DialogBase {
                     this.close();
                 })
             ])
-        ]);
+        ];
 
-    this.refreshKeyInfo();
+        this.refreshKeyInfo();
+        return children;
     }
 
     refreshKeyInfo = async () => {

@@ -11,6 +11,7 @@ import { PubSub } from "../PubSub";
 import { EditCredentialsDlg } from "./EditCredentialsDlg";
 import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -49,8 +50,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         super(importMode ? "Import File" : (toIpfs ? "Upload File to IPFS" : "Upload File"), null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        let children = [
             new Form(null, [
                 this.toIpfs ? new TextContent("NOTE: IPFS Uploads assume you have a Temporal Account (https://temporal.cloud) which will be the service that hosts your IPFS data. You'll be prompted for the Temporal password when the upload begins.") : null,
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
@@ -63,11 +64,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     })
                 ])
             ])
-        ]);
+        ];
 
         this.uploadButton.setVisible(false);
         this.configureDropZone();
         this.runButtonEnablement();
+        return children;
     }
 
     //ref: https://gateway.temporal.cloud/ipfs/Qma4DNFSRR9eGqwm93zMUtqywLFpTRQji4Nnu37MTmNntM/account.html#account-api

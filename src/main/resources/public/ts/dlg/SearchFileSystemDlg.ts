@@ -9,6 +9,7 @@ import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -24,8 +25,8 @@ export class SearchFileSystemDlg extends DialogBase {
         super("Search File System", null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        let children = [
             new Form(null, [
                 new TextContent("Enter text to find. Only content text will be searched. All sub-nodes under the selected node are included in the search."),
                 this.searchTextField = new TextField("Search", SearchFileSystemDlg.defaultSearchText, null, () => this.searchNodes(this.appState)),
@@ -36,8 +37,9 @@ export class SearchFileSystemDlg extends DialogBase {
                     })
                 ])
             ])
-        ]);
+        ];
         this.searchTextField.focus();
+        return children;
     }
 
     searchNodes = (state: AppState): void => {

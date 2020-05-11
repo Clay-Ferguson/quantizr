@@ -10,6 +10,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -25,8 +26,8 @@ export class LoginDlg extends DialogBase {
         super("Login", "app-modal-content-narrow-width", false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        let children = [
             new Form(null, [
                 new FormGroup(null, [
                     this.userTextField = new TextField("User", null, false, this.login),
@@ -41,8 +42,9 @@ export class LoginDlg extends DialogBase {
                 ])
 
             ])
-        ]);
+        ];
         this.populateFromLocalDb();
+        return children;
     }
 
     populateFromLocalDb = async (): Promise<void> => {

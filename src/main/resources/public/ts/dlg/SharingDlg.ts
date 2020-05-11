@@ -10,6 +10,7 @@ import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -25,9 +26,22 @@ export class SharingDlg extends DialogBase {
         super("Node Sharing", "app-modal-content-medium-width", null, false, state);
     }
 
-    preRender = () => {
-        this.initChildren();
+    renderDlg(): CompIntf[] {
+        let children = [
+            new Form(null, [
+                this.privsTable = new EditPrivsTable(this.nodePrivsInfo, this.removePrivilege),
+                new ButtonBar([
+                    new Button("Share with Person", this.shareToPersonDlg, null, "btn-primary"),
+                    new Button("Share to Public", this.shareNodeToPublic, null, "btn-primary"),
+                    new Button("Close", () => {
+                        this.close();
+                        S.meta64.refresh(this.appState);
+                    })
+                ])
+            ])
+        ];
         this.reload();
+        return children;
     }
 
     /*
@@ -90,21 +104,5 @@ export class SharingDlg extends DialogBase {
             "principal": "public",
             "privileges": [J.PrivilegeType.READ],
         }, this.reload);
-    }
-
-    initChildren = (): void => {
-        this.setChildren([
-            new Form(null, [
-                this.privsTable = new EditPrivsTable(this.nodePrivsInfo, this.removePrivilege),
-                new ButtonBar([
-                    new Button("Share with Person", this.shareToPersonDlg, null, "btn-primary"),
-                    new Button("Share to Public", this.shareNodeToPublic, null, "btn-primary"),
-                    new Button("Close", () => {
-                        this.close();
-                        S.meta64.refresh(this.appState);
-                    })
-                ])
-            ])
-        ]);
     }
 }

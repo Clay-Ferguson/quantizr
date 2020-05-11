@@ -8,6 +8,7 @@ import { Constants as C} from "../Constants";
 import { PubSub } from "../PubSub";
 import { VideoPlayer } from "../widget/VideoPlayer";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -25,8 +26,8 @@ export class VideoPlayerDlg extends DialogBase {
         super(mediaTitle ? mediaTitle : "Video", null, false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        return [
             new Form(null, [
                 //space is at a premium for mobile, so let's just not even show the header.
                 this.mediaTitle ? new TextContent(this.mediaTitle) : null,
@@ -55,7 +56,7 @@ export class VideoPlayerDlg extends DialogBase {
                     })
                 ])
             ])
-        ]);
+        ];
     }
 
     getVideoElement(): HTMLVideoElement {

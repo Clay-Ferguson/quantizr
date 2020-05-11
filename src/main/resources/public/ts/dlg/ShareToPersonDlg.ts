@@ -9,6 +9,7 @@ import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -23,8 +24,8 @@ export class ShareToPersonDlg extends DialogBase {
         super("Share Node to Person", "app-modal-content-medium-width", false, false, state);
     }
 
-    preRender = () => {
-        this.setChildren([
+    renderDlg(): CompIntf[] {
+        return [
             new Form(null, [
                 new TextContent("Enter the username of the person you want to share this node with:"),
                 this.shareToUserTextField = new TextField("User to Share With", null, false, this.shareNodeToPerson),
@@ -38,7 +39,7 @@ export class ShareToPersonDlg extends DialogBase {
                     })
                 ])
             ])
-        ]);
+        ];
     }
 
     shareNodeToPerson = (): void => {
