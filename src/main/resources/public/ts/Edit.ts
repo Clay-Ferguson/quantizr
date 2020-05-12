@@ -172,18 +172,18 @@ export class Edit implements EditIntf {
 
         if (S.edit.nodeInsertTarget) {
             S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
-                "parentId": S.edit.parentOfNewNode.id,
-                "targetOrdinal": S.edit.nodeInsertTarget.ordinal + this.nodeInsertTargetOrdinalOffset,
-                "newNodeName": "",
-                "typeName": typeName ? typeName : "u"
+                parentId: S.edit.parentOfNewNode.id,
+                targetOrdinal: S.edit.nodeInsertTarget.ordinal + this.nodeInsertTargetOrdinalOffset,
+                newNodeName: "",
+                typeName: typeName ? typeName : "u"
             }, (res) => { this.insertNodeResponse(res, state); });
         } else {
             S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                "nodeId": S.edit.parentOfNewNode.id,
-                "newNodeName": "",
-                "typeName": typeName ? typeName : "u",
-                "createAtTop": createAtTop,
-                "content": null
+                nodeId: S.edit.parentOfNewNode.id,
+                newNodeName: "",
+                typeName: typeName ? typeName : "u",
+                createAtTop: createAtTop,
+                content: null
             }, (res) => { S.edit.createSubNodeResponse(res, state); });
         }
     }
@@ -261,8 +261,8 @@ export class Edit implements EditIntf {
         let node: J.NodeInfo = state.idToNodeMap[id];
         if (node) {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
-                "nodeId": node.id,
-                "targetName": "up"
+                nodeId: node.id,
+                targetName: "up"
             }, (res) => { this.setNodePositionResponse(res, state); });
         } else {
             console.log("idToNodeMap does not contain " + id);
@@ -278,8 +278,8 @@ export class Edit implements EditIntf {
         let node: J.NodeInfo = state.idToNodeMap[id];
         if (node) {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
-                "nodeId": node.id,
-                "targetName": "down"
+                nodeId: node.id,
+                targetName: "down"
             }, (res) => { this.setNodePositionResponse(res, state); });
         } else {
             console.log("idToNodeMap does not contain " + id);
@@ -294,8 +294,8 @@ export class Edit implements EditIntf {
         let node: J.NodeInfo = state.idToNodeMap[id];
         if (node) {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
-                "nodeId": node.id,
-                "targetName": "top"
+                nodeId: node.id,
+                targetName: "top"
             }, (res) => { this.setNodePositionResponse(res, state); });
         } else {
             console.log("idToNodeMap does not contain " + id);
@@ -310,8 +310,8 @@ export class Edit implements EditIntf {
         let node: J.NodeInfo = state.idToNodeMap[id];
         if (node) {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
-                "nodeId": node.id,
-                "targetName": "bottom"
+                nodeId: node.id,
+                targetName: "bottom"
             }, (res) => { this.setNodePositionResponse(res, state); });
         } else {
             console.log("idToNodeMap does not contain " + id);
@@ -362,7 +362,7 @@ export class Edit implements EditIntf {
         }
 
         S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
-            "nodeId": node.id
+            nodeId: node.id
         }, (res) => { this.initNodeEditResponse(res, state) });
     }
 
@@ -424,7 +424,7 @@ export class Edit implements EditIntf {
     selectAllNodes = async (state: AppState): Promise<void> => {
         let highlightNode = S.meta64.getHighlightedNode(state);
         S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
-            "parentNodeId": highlightNode.id
+            parentNodeId: highlightNode.id
         }, async (res: J.SelectAllNodesResponse) => {
             console.log("Node Sel Count: " + res.nodeIds.length);
             S.meta64.selectAllNodes(res.nodeIds);
@@ -575,9 +575,9 @@ export class Edit implements EditIntf {
          * nodes.
          */
         S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
-            "targetNodeId": node.id,
-            "nodeIds": nodesToMove,
-            "location": location
+            targetNodeId: node.id,
+            nodeIds: nodesToMove,
+            location
         }, (res) => {
             this.moveNodesResponse(res, state);
         });
@@ -594,9 +594,9 @@ export class Edit implements EditIntf {
                     S.util.showMessage("No node is selected.", "Warning");
                 } else {
                     S.util.ajax<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
-                        "nodeId": node.id,
-                        "bookName": "War and Peace",
-                        "truncated": S.user.isTestUserAccount(state)
+                        nodeId: node.id,
+                        bookName: "War and Peace",
+                        truncated: S.user.isTestUserAccount(state)
                     }, (res) => { this.insertBookResponse(res, state); });
                 }
             }, null, null, null, state
@@ -615,11 +615,11 @@ export class Edit implements EditIntf {
                 }
 
                 S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                    "nodeId": "~notes",
-                    "newNodeName": "",
-                    "typeName": "u",
-                    "createAtTop": true,
-                    "content": clipText
+                    nodeId: "~notes",
+                    newNodeName: "",
+                    typeName: "u",
+                    createAtTop: true,
+                    content: clipText
                 },
                     () => {
                         S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
@@ -636,9 +636,9 @@ export class Edit implements EditIntf {
         }
 
         S.util.ajax<J.SplitNodeRequest, J.SplitNodeResponse>("splitNode", {
-            "splitType": splitType,
-            "nodeId": highlightNode.id,
-            "delimiter": delimiter
+            splitType: splitType,
+            nodeId: highlightNode.id,
+            delimiter
         }, (res) => {
             this.splitNodeResponse(res, state);
         });

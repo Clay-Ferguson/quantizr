@@ -38,7 +38,7 @@ export class Share implements ShareIntf {
         }
 
         S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
-            "nodeId": focusNode.id
+            nodeId: focusNode.id
         }, this.findSharedNodesResponse);
     }
 
@@ -78,9 +78,9 @@ export class Share implements ShareIntf {
             //console.log("userCipherKey=" + userCipherKey);
 
             await S.util.ajax<J.SetCipherKeyRequest, J.SetCipherKeyResponse>("setCipherKey", {
-                "nodeId": node.id,
-                "principalNodeId": principalNodeId,
-                "cipherKey": userCipherKey,
+                nodeId: node.id,
+                principalNodeId: principalNodeId,
+                cipherKey: userCipherKey,
             });
 
             //console.log("Added cipher key: " + userCipherKey + " for principalNodeId: " + principalNodeId);

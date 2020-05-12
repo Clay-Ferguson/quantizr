@@ -88,13 +88,13 @@ export class Nav implements NavIntf {
 
         this.mainOffset = 0;
         let res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            "nodeId": state.node.id,
-            "upLevel": null,
-            "siblingOffset": siblingOffset,
-            "renderParentIfLeaf": true,
-            "offset": this.mainOffset,
-            "goToLastPage": false,
-            "forceIPFSRefresh": false
+            nodeId: state.node.id,
+            upLevel: null,
+            siblingOffset: siblingOffset,
+            renderParentIfLeaf: true,
+            offset: this.mainOffset,
+            goToLastPage: false,
+            forceIPFSRefresh: false
         },
             //success callback
             (res: J.RenderNodeResponse) => {
@@ -129,13 +129,13 @@ export class Nav implements NavIntf {
 
         this.mainOffset = 0;
         let res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            "nodeId": state.node.id,
-            "upLevel": 1,
-            "siblingOffset": 0,
-            "renderParentIfLeaf": false,
-            "offset": this.mainOffset,
-            "goToLastPage": false,
-            "forceIPFSRefresh": false
+            nodeId: state.node.id,
+            upLevel: 1,
+            siblingOffset: 0,
+            renderParentIfLeaf: false,
+            offset: this.mainOffset,
+            goToLastPage: false,
+            forceIPFSRefresh: false
         },
             //success callback
             (res: J.RenderNodeResponse) => {
@@ -193,13 +193,13 @@ export class Nav implements NavIntf {
         this.mainOffset = 0;
         console.log("openContentNode()");
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            "nodeId": nodePathOrId,
-            "upLevel": null,
-            "siblingOffset": 0,
-            "renderParentIfLeaf": null,
-            "offset": this.mainOffset,
-            "goToLastPage": false,
-            "forceIPFSRefresh": false
+            nodeId: nodePathOrId,
+            upLevel: null,
+            siblingOffset: 0,
+            renderParentIfLeaf: null,
+            offset: this.mainOffset,
+            goToLastPage: false,
+            forceIPFSRefresh: false
         }, (res) => { this.navPageNodeResponse(res, state); });
     }
 
@@ -260,13 +260,13 @@ export class Nav implements NavIntf {
         } else {
             this.mainOffset = 0;
             S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                "nodeId": state.homeNodeId,
-                "upLevel": null,
-                "siblingOffset": 0,
-                "renderParentIfLeaf": null,
-                "offset": this.mainOffset,
-                "goToLastPage": false,
-                "forceIPFSRefresh": false
+                nodeId: state.homeNodeId,
+                upLevel: null,
+                siblingOffset: 0,
+                renderParentIfLeaf: null,
+                offset: this.mainOffset,
+                goToLastPage: false,
+                forceIPFSRefresh: false
             }, (res) => {this.navPageNodeResponse(res, state);});
         }
     }

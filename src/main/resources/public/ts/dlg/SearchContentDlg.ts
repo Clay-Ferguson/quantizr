@@ -78,14 +78,14 @@ export class SearchContentDlg extends DialogBase {
         let caseSensitive = this.caseSensitiveCheckbox.getChecked();
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
-            "nodeId": node.id,
-            "searchText": searchText,
-            "sortDir": "",
-            "sortField": "",
-            "searchProp": "",
-            "fuzzy": fuzzy,
-            "caseSensitive": caseSensitive,
-            "searchDefinition": ""
+            nodeId: node.id,
+            searchText,
+            sortDir: "",
+            sortField: "",
+            searchProp: "",
+            fuzzy: fuzzy,
+            caseSensitive,
+            searchDefinition: ""
         }, this.searchNodesResponse);
     }
 

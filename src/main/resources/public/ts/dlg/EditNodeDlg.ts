@@ -404,8 +404,8 @@ export class EditNodeDlg extends DialogBase {
 
     deleteProperty(propName: string) {
         S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperty", {
-            "nodeId": this.getState().node.id,
-            "propName": propName
+            nodeId: this.getState().node.id,
+            propName: propName
         }, (res) => {
             if (S.util.checkSuccess("Delete property", res)) {
                 let state = this.getState();

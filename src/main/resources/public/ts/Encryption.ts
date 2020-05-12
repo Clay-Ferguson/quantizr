@@ -305,7 +305,7 @@ export class Encryption implements EncryptionIntf {
 
                 if (republish) {
                     S.util.ajax<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
-                        "keyJson": pubKeyStr
+                        keyJson: pubKeyStr
                     }, this.savePublicKeyResponse);
                 }
             }

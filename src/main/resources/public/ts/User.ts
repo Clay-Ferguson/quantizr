@@ -101,10 +101,10 @@ export class User implements UserIntf {
                 } else {
                     //alert('calling login: currently at: '+location.href);
                     S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
-                        "userName": callUsr,
-                        "password": callPwd,
-                        "tzOffset": new Date().getTimezoneOffset(),
-                        "dst": S.util.daylightSavingsTime
+                        userName: callUsr,
+                        password: callPwd,
+                        tzOffset: new Date().getTimezoneOffset(),
+                        dst: S.util.daylightSavingsTime
                     }, (res: J.LoginResponse) => {
                         if (usingCredentials) {
                             this.loginResponse(res, callUsr, callPwd, usingCredentials, null, state);
@@ -145,10 +145,10 @@ export class User implements UserIntf {
 
     login = (loginDlg: any, usr: string, pwd: string, state: AppState) => {
         S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
-            "userName": usr,
-            "password": pwd,
-            "tzOffset": new Date().getTimezoneOffset(),
-            "dst": S.util.daylightSavingsTime
+            userName: usr,
+            password: pwd,
+            tzOffset: new Date().getTimezoneOffset(),
+            dst: S.util.daylightSavingsTime
         }, (res: J.LoginResponse) => {
             this.loginResponse(res, usr, pwd, null, loginDlg, state);
         });

@@ -47,8 +47,8 @@ export class ImportDlg extends DialogBase {
 
         if (highlightNode) {
             S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
-                "nodeId": highlightNode.id,
-                "sourceFileName": sourceFileName
+                nodeId: highlightNode.id,
+                sourceFileName: sourceFileName
             }, this.importResponse);
         }
         this.close();

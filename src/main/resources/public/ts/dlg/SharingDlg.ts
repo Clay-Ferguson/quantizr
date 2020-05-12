@@ -49,9 +49,9 @@ export class SharingDlg extends DialogBase {
      */
     reload = (): void => {
         S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            "nodeId": this.node.id,
-            "includeAcl": true,
-            "includeOwners": true
+            nodeId: this.node.id,
+            includeAcl: true,
+            includeOwners: true
         }, this.populate);
     }
 
@@ -65,17 +65,17 @@ export class SharingDlg extends DialogBase {
 
     removePrivilege = (principalNodeId: string, privilege: string): void => {
         S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
-            "nodeId": this.node.id,
-            "principalNodeId": principalNodeId,
-            "privilege": privilege
+            nodeId: this.node.id,
+            principalNodeId,
+            privilege
         }, this.removePrivilegeResponse);
     }
 
     removePrivilegeResponse = (res: J.RemovePrivilegeResponse): void => {
         S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            "nodeId": this.node.id,
-            "includeAcl": true,
-            "includeOwners": true
+            nodeId: this.node.id,
+            includeAcl: true,
+            includeOwners: true
         }, this.populate);
     }
 
@@ -99,9 +99,9 @@ export class SharingDlg extends DialogBase {
          * TODO: this additional call can be avoided as an optimization
          */
         S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
-            "nodeId": this.node.id,
-            "principal": "public",
-            "privileges": [J.PrivilegeType.READ],
+            nodeId: this.node.id,
+            principal: "public",
+            privileges: [J.PrivilegeType.READ],
         }, this.reload);
     }
 }

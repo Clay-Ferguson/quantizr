@@ -19,7 +19,7 @@ export class Graph implements GraphIntf {
         }
         let nodeId = highlightNode.id;
         S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
-            "nodeId": nodeId,
+            nodeId: nodeId,
         }, this.graphNodesResponse);
     }
 

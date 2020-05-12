@@ -43,8 +43,8 @@ export class UploadFromUrlDlg extends DialogBase {
 
         if (sourceUrl) {
             S.util.ajax<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
-                "nodeId": this.node.id,
-                "sourceUrl": sourceUrl
+                nodeId: this.node.id,
+                sourceUrl
             }, this.uploadFromUrlResponse);
 
             this.close();

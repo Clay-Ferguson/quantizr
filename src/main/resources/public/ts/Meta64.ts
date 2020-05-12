@@ -150,9 +150,9 @@ export class Meta64 implements Meta64Intf {
     //note: this code is not currently in use
     updateNodeInfo = (node: J.NodeInfo) => {
         S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            "nodeId": node.id,
-            "includeAcl": false,
-            "includeOwners": true
+            nodeId: node.id,
+            includeAcl: false,
+            includeOwners: true
         }, (res: J.GetNodePrivilegesResponse) => {
             //this.updateNodeInfoResponse(res, node);
         });
@@ -511,7 +511,7 @@ export class Meta64 implements Meta64Intf {
 
     openSystemFile = (fileName: string) => {
         S.util.ajax<J.OpenSystemFileRequest, J.OpenSystemFileResponse>("openSystemFile", {
-            "fileName": fileName
+            fileName
         });
     }
 

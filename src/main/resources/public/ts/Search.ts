@@ -67,13 +67,13 @@ export class Search implements SearchIntf {
     searchFilesResponse = (res: J.FileSearchResponse, state: AppState) => {
         S.nav.mainOffset = 0;
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            "nodeId": res.searchResultNodeId,
-            "upLevel": null,
-            "siblingOffset": 0,
-            "renderParentIfLeaf": null,
-            "offset": 0,
-            "goToLastPage": false,
-            "forceIPFSRefresh": false
+            nodeId: res.searchResultNodeId,
+            upLevel: null,
+            siblingOffset: 0,
+            renderParentIfLeaf: null,
+            offset: 0,
+            goToLastPage: false,
+            forceIPFSRefresh: false
         }, (res) => {S.nav.navPageNodeResponse(res, state)});
     }
 
@@ -86,14 +86,14 @@ export class Search implements SearchIntf {
         }
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
-            "nodeId": node.id,
-            "searchText": "",
-            "sortDir": "DESC",
-            "sortField": prop,
-            "searchProp": null,
-            "fuzzy": false,
-            "caseSensitive": false,
-            "searchDefinition": ""
+            nodeId: node.id,
+            searchText: "",
+            sortDir: "DESC",
+            sortField: prop,
+            searchProp: null,
+            fuzzy: false,
+            caseSensitive: false,
+            searchDefinition: ""
         }, this.timelineResponse);
     }
 

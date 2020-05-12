@@ -15,7 +15,7 @@ export class ActivityPub implements ActivityPubIntf {
         let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (node) {
             S.util.ajax<J.ActivityPubPostRequest, J.ActivityPubPostResponse>("activityPubPost", {
-                "nodeId": node.id,
+                nodeId: node.id,
             }, this.activityPubPostResponse);
         }
     }

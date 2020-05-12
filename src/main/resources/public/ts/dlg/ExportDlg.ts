@@ -58,8 +58,8 @@ export class ExportDlg extends DialogBase {
             let format = this.getSelectedFormat();
 
             S.util.ajax<J.ExportRequest, J.ExportResponse>("export", {
-                "nodeId": highlightNode.id,
-                "exportExt": format
+                nodeId: highlightNode.id,
+                exportExt: format
             }, (res: J.ExportResponse) => {
                 this.exportResponse(res);
             });

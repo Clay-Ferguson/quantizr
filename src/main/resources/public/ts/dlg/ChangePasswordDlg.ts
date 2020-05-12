@@ -60,8 +60,8 @@ export class ChangePasswordDlg extends DialogBase {
 
         if (this.pwd && this.pwd.length >= 4) {
             S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {
-                "newPassword": this.pwd,
-                "passCode": this.passCode
+                newPassword: this.pwd,
+                passCode: this.passCode
             }, this.changePasswordResponse);
         } else {
             S.util.showMessage("Invalid password(s).", "Warning");

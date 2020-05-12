@@ -41,13 +41,13 @@ export class View implements ViewIntf {
         nav.mainOffset = 0;
         */
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            "nodeId": nodeId,
-            "upLevel": null,
-            "siblingOffset": 0,
-            "renderParentIfLeaf": !!renderParentIfLeaf,
-            "offset": S.nav.mainOffset,
-            "goToLastPage": false,
-            "forceIPFSRefresh": forceIPFSRefresh
+            nodeId: nodeId,
+            upLevel: null,
+            siblingOffset: 0,
+            renderParentIfLeaf: !!renderParentIfLeaf,
+            offset: S.nav.mainOffset,
+            goToLastPage: false,
+            forceIPFSRefresh
         }, async (res: J.RenderNodeResponse) => {
             if (res.offsetOfNodeFound > -1) {
                 S.nav.mainOffset = res.offsetOfNodeFound;
@@ -87,13 +87,13 @@ export class View implements ViewIntf {
     private loadPage = (goToLastPage: boolean, state: AppState): void => {
         console.log("loadPage()");
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            "nodeId": state.node.id,
-            "upLevel": null,
-            "siblingOffset": 0,
-            "renderParentIfLeaf": true,
-            "offset": S.nav.mainOffset,
-            "goToLastPage": goToLastPage,
-            "forceIPFSRefresh": false
+            nodeId: state.node.id,
+            upLevel: null,
+            siblingOffset: 0,
+            renderParentIfLeaf: true,
+            offset: S.nav.mainOffset,
+            goToLastPage: goToLastPage,
+            forceIPFSRefresh: false
         }, async (res: J.RenderNodeResponse) => {
             if (goToLastPage) {
                 if (res.offsetOfNodeFound > -1) {
@@ -231,8 +231,8 @@ export class View implements ViewIntf {
         let node = S.meta64.getHighlightedNode(state);
 
         S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
-            "command": command,
-            "nodeId": !!node ? node.id : null
+            command: command,
+            nodeId: !!node ? node.id : null
         },
             (res: J.GetServerInfoResponse) => {
                 /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
@@ -250,8 +250,8 @@ export class View implements ViewIntf {
         let node = S.meta64.getHighlightedNode(state);
 
         S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getNotifications", {
-            "command": command,
-            "nodeId": !!node ? node.id : null
+            command: command,
+            nodeId: !!node ? node.id : null
         },
             (res: J.GetServerInfoResponse) => {
                 if (res.serverInfo) {

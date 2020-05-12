@@ -51,10 +51,10 @@ export class Attachment implements AttachmentIntf {
         let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
 
         if (node) {
-            let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm Delete Attachment", //
+            let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
                 () => {
                     S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
-                        "nodeId": node.id
+                        nodeId: node.id
                     }, (res: J.DeleteAttachmentResponse): void => { this.deleteAttachmentResponse(res, node.id, state) });
                 }, null, null, null, state
             );

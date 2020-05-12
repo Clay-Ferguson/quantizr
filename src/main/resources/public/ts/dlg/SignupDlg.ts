@@ -78,9 +78,9 @@ export class SignupDlg extends DialogBase {
         }
 
         S.util.ajax<J.SignupRequest, J.SignupResponse>("signup", {
-            "userName": userName,
-            "password": password,
-            "email": email
+            userName,
+            password,
+            email
         }, this.signupResponse);
 
         this.close();

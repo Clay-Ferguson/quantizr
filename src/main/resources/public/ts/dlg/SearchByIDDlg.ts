@@ -66,14 +66,14 @@ export class SearchByIDDlg extends DialogBase {
         SearchByIDDlg.defaultSearchText = searchText;
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
-            "nodeId": node.id,
-            "searchText": searchText,
-            "sortDir": "",
-            "sortField": "",
-            "searchProp": "node.id",
-            "fuzzy": false,
-            "caseSensitive": false,
-            "searchDefinition": ""
+            nodeId: node.id,
+            searchText,
+            sortDir: "",
+            sortField: "",
+            searchProp: "node.id",
+            fuzzy: false,
+            caseSensitive: false,
+            searchDefinition: ""
         }, this.searchNodesResponse);
     }
 
