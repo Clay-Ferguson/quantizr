@@ -84,6 +84,7 @@ export interface GetServerInfoRequest extends RequestBase {
 
 export interface GetSharedNodesRequest extends RequestBase {
     nodeId: string;
+    shareTarget: string;
 }
 
 export interface GetUserAccountInfoRequest extends RequestBase {

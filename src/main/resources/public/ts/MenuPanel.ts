@@ -124,7 +124,8 @@ export class MenuPanel extends Div {
                 //             "admin" == S.meta64.userName.toLowerCase();
                 //         //!state.isAnonUser && highlightNode != null && selNodeIsMine 
                 //     }),
-                new MenuItem("Show Shared Nodes", () => S.share.findSharedNodes(state), () => { return  !state.isAnonUser && highlightNode != null })
+                new MenuItem("Show All Shares", () => S.share.findSharedNodes(state, null), () => { return  !state.isAnonUser && highlightNode != null }),
+                new MenuItem("Show Public Shares", () => S.share.findSharedNodes(state, "public"), () => { return  !state.isAnonUser && highlightNode != null })
             ]),
             new Menu("Search", [
                 new MenuItem("All Content", () => { new SearchContentDlg(state).open(); }, () => { return !state.isAnonUser && highlightNode != null }), //

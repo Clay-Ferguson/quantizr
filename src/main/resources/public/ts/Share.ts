@@ -27,14 +27,16 @@ export class Share implements ShareIntf {
         new SharingDlg(node, state).open();
     }
 
-    findSharedNodes = (state: AppState): void => {
+    /* If target is non-null we only return shares to that particlar person (or public) */
+    findSharedNodes = (state: AppState, shareTarget: string): void => {
         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (focusNode == null) {
             return;
         }
 
         S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
-            nodeId: focusNode.id
+            nodeId: focusNode.id,
+            shareTarget
         }, (res) => {
             S.srch.searchNodesResponse(res);
         });

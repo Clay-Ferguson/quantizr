@@ -114,6 +114,12 @@ public class NodeSearchService {
 		SubNode searchRoot = api.getNode(session, req.getNodeId());
 
 		for (SubNode node : api.searchSubGraphByAcl(session, searchRoot, SubNode.FIELD_MODIFY_TIME, MAX_NODES)) {
+
+			/* If we're only looking for shares to a specific person (or public) then check here */
+			if (req.getShareTarget()!=null && !node.getAc().containsKey(req.getShareTarget())) {
+				continue;
+			}
+
 			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter + 1,
 					false, false, false);
 			searchResults.add(info);

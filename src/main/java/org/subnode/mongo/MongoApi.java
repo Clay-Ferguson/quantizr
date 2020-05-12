@@ -1138,7 +1138,7 @@ public class MongoApi {
 		}
 
 		if (!StringUtils.isEmpty(sortField)) {
-			//todo-1: sort dir is being passed from client but not used here?
+			// todo-1: sort dir is being passed from client but not used here?
 			query.with(Sort.by(Sort.Direction.DESC, sortField));
 		}
 
@@ -1155,13 +1155,16 @@ public class MongoApi {
 		 * before the end of the string. Without the trailing (.+)$ we would be
 		 * including the node itself in addition to all its children.
 		 */
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexRecursiveChildrenOfPath(node.getPath()))//
-		.and(SubNode.FIELD_AC).ne(null);
+
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexRecursiveChildrenOfPath(node.getPath())) //
+				.and(SubNode.FIELD_AC).ne(null);
 
 		// examples from online:
-		// Aggregation aggregation = Aggregation.newAggregation( Aggregation.match(Criteria.where("docs").exists(true)));
-		//Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("docs").ne(Collections.EMPTY_LIST)));
-		//Criteria.where("docs").not().size(0);
+		// Aggregation aggregation = Aggregation.newAggregation(
+		// Aggregation.match(Criteria.where("docs").exists(true)));
+		// Aggregation aggregation =
+		// Aggregation.newAggregation(Aggregation.match(Criteria.where("docs").ne(Collections.EMPTY_LIST)));
+		// Criteria.where("docs").not().size(0);
 
 		query.addCriteria(criteria);
 
