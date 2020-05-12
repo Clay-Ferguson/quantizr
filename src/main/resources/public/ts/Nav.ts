@@ -173,7 +173,13 @@ export class Nav implements NavIntf {
     }
 
     clickOnNodeRow = (node: J.NodeInfo, state: AppState): void => {
-        //console.log("clickOnNodeRow: uid=" + uid);
+        //console.log("clickOnNodeRow: id=" + node.id);
+
+        /* First check if this node is already highlighted and if so just return */
+        let highlightNode = S.meta64.getHighlightedNode(state);
+        if (highlightNode && highlightNode.id==node.id) {
+            return;
+        }
 
         /*
          * sets which node is selected on this page (i.e. parent node of this page being the 'key')

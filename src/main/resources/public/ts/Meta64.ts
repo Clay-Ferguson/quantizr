@@ -179,7 +179,6 @@ export class Meta64 implements Meta64Intf {
     }
 
     highlightNode = (node: J.NodeInfo, scroll: boolean, state: AppState): void => {
-
         if (!node || !state.node) {
             return;
         }

@@ -3,7 +3,6 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Comp } from "../widget/base/Comp";
-import { ReactNode } from "react";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { Div } from "../widget/Div";
 import { NodeCompContent } from "./NodeCompContent";
