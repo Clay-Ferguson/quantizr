@@ -444,6 +444,13 @@ input[type="radio"] {
     margin-bottom: $tinyGap;
 }
 
+.rowIcon {
+    margin-left: 10px;
+    margin-right: 67px;
+    vertical-align: 'middle';
+    cursor: pointer;
+}
+
 .passwordEyeIcon {
     cursor: pointer;
     margin-left: 10px;

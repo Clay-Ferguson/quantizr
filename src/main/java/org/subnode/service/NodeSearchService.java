@@ -14,7 +14,9 @@ import org.subnode.model.NodeInfo;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.request.GetSharedNodesRequest;
 import org.subnode.request.NodeSearchRequest;
+import org.subnode.response.GetSharedNodesResponse;
 import org.subnode.response.NodeSearchResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.DateUtil;
@@ -77,7 +79,7 @@ public class NodeSearchService {
 				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter + 1,
 						false, false, false);
 				searchResults.add(info);
-		}
+			}
 		}
 		// othwerwise we're searching all node properties, only under the selected node.
 		else {
@@ -98,4 +100,33 @@ public class NodeSearchService {
 		return res;
 	}
 
+	public GetSharedNodesResponse getSharedNodes(MongoSession session, GetSharedNodesRequest req) {
+		GetSharedNodesResponse res = new GetSharedNodesResponse();
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+		int MAX_NODES = 100;
+
+		List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
+		res.setSearchResults(searchResults);
+		int counter = 0;
+
+		SubNode searchRoot = api.getNode(session, req.getNodeId());
+
+		for (SubNode node : api.searchSubGraphByAcl(session, searchRoot, 
+			//todo-0: add some sorting. random not good.	
+			//req.getSortField(),
+				MAX_NODES)) {
+			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter + 1,
+					false, false, false);
+			searchResults.add(info);
+			if (counter++ > MAX_NODES) {
+				break;
+			}
+		}
+
+		res.setSuccess(true);
+		log.debug("search results count: " + counter);
+		return res;
+	}
 }

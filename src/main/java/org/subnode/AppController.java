@@ -43,6 +43,7 @@ import org.subnode.request.ExecuteNodeRequest;
 import org.subnode.request.ExportRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.GetServerInfoRequest;
+import org.subnode.request.GetSharedNodesRequest;
 import org.subnode.request.GetUserAccountInfoRequest;
 import org.subnode.request.GraphRequest;
 import org.subnode.request.InitNodeEditRequest;
@@ -331,8 +332,7 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/getNodePrivileges", method = RequestMethod.POST)
-	public @ResponseBody Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req,
-			HttpSession session) {
+	public @ResponseBody Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req, HttpSession session) {
 		return callProc.run("getNodePrivileges", req, session, ms -> {
 			return aclService.getNodePrivileges(ms, req);
 		});
@@ -532,8 +532,8 @@ public class AppController {
 	 * explanation.
 	 */
 	@RequestMapping(value = API_PATH + "/bin_legacy/{fileName}", method = RequestMethod.GET)
-	public Object getBinaryLegacy(@PathVariable("fileName") String fileName,
-			@RequestParam("nodeId") String nodeId, HttpSession session) {
+	public Object getBinaryLegacy(@PathVariable("fileName") String fileName, @RequestParam("nodeId") String nodeId,
+			HttpSession session) {
 		return callProc.run("bin", null, session, ms -> {
 			return attachmentService.getBinary_legacy(null, nodeId);
 		});
@@ -622,8 +622,7 @@ public class AppController {
 	@RequestMapping(value = API_PATH + "/stream/{fileName}", method = RequestMethod.GET)
 	public void streamMultiPart(//
 			@PathVariable("fileName") String fileName, //
-			@RequestParam("nodeId") String nodeId,
-			@RequestParam(name = "disp", required = false) final String disp, //
+			@RequestParam("nodeId") String nodeId, @RequestParam(name = "disp", required = false) final String disp, //
 			HttpServletRequest request, HttpServletResponse response, //
 			HttpSession session) {
 		callProc.run("stream", null, session, ms -> {
@@ -656,7 +655,7 @@ public class AppController {
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
 			HttpSession session) {
 		return callProc.run("upload", null, session, ms -> {
-			//log.debug("Uploading as user: "+ms.getUser());
+			// log.debug("Uploading as user: "+ms.getUser());
 			return attachmentService.uploadMultipleFiles(ms, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
 					"true".equalsIgnoreCase(ipfs));
 		});
@@ -697,35 +696,22 @@ public class AppController {
 		});
 	}
 
-	/*
-	 * currently disabled from the GUI menu, until we add back in this capability on
-	 * the new mongo design
-	 */
-	// @RequestMapping(value = API_PATH + "/getSharedNodes", method =
-	// RequestMethod.POST)
-	// public @ResponseBody GetSharedNodesResponse getSharedNodes(@RequestBody
-	// GetSharedNodesRequest
-	// req) {
-	//
-	// logRequest("getSharedNodes", req);
-	// checkJcr();
-	// GetSharedNodesResponse res = new GetSharedNodesResponse();
-	//
-	// nodeSearchService.getSharedNodes(null, req, res);
-	// return res;
-	// }
+	@RequestMapping(value = API_PATH + "/getSharedNodes", method = RequestMethod.POST)
+	public @ResponseBody Object getSharedNodes(@RequestBody GetSharedNodesRequest req, HttpSession session) {
+		return callProc.run("getSharedNodes", req, session, ms -> {
+			return nodeSearchService.getSharedNodes(ms, req);
+		});
+	}
 
 	@RequestMapping(value = API_PATH + "/saveUserPreferences", method = RequestMethod.POST)
-	public @ResponseBody Object saveUserPreferences(@RequestBody SaveUserPreferencesRequest req,
-			HttpSession session) {
+	public @ResponseBody Object saveUserPreferences(@RequestBody SaveUserPreferencesRequest req, HttpSession session) {
 		return callProc.run("saveUserPreferences", req, session, ms -> {
 			return userManagerService.saveUserPreferences(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getUserAccountInfo", method = RequestMethod.POST)
-	public @ResponseBody Object getUserAccountInfo(@RequestBody GetUserAccountInfoRequest req,
-			HttpSession session) {
+	public @ResponseBody Object getUserAccountInfo(@RequestBody GetUserAccountInfoRequest req, HttpSession session) {
 		return callProc.run("getUserAcccountInfo", req, session, ms -> {
 			return userManagerService.getUserAccountInfo(req);
 		});
@@ -752,7 +738,7 @@ public class AppController {
 				res.setServerInfo(systemService.backupDb());
 			} else if (req.getCommand().equalsIgnoreCase("initializeAppContent")) {
 				log.error("initializeAppContent is obsolet, and was also refactored without being retested");
-				//res.setServerInfo(systemService.initializeAppContent());
+				// res.setServerInfo(systemService.initializeAppContent());
 			} else if (req.getCommand().equalsIgnoreCase("getServerInfo")) {
 				res.setServerInfo(systemService.getSystemInfo());
 			} else if (req.getCommand().equalsIgnoreCase("getJson")) {
@@ -803,7 +789,7 @@ public class AppController {
 				sessionContext.setSignupSuccessMessage(null);
 			}
 
-			if (sessionContext.getError()!=null) {
+			if (sessionContext.getError() != null) {
 				res.setServerInfo(sessionContext.getError());
 				sessionContext.setError(null);
 			}
@@ -841,8 +827,7 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/shutdownServerNode", method = RequestMethod.POST)
-	public @ResponseBody Object shutdownServerNode(@RequestBody ShutdownServerNodeRequest req,
-			HttpSession session) {
+	public @ResponseBody Object shutdownServerNode(@RequestBody ShutdownServerNodeRequest req, HttpSession session) {
 		return callProc.run("shutdownServerNode", req, session, ms -> {
 			ShutdownServerNodeResponse res = new ShutdownServerNodeResponse();
 			if (!sessionContext.isAdmin()) {

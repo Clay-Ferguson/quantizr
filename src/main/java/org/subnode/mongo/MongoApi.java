@@ -1,7 +1,6 @@
 package org.subnode.mongo;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -289,41 +288,6 @@ public class MongoApi {
 		SubNode userNode = getNode(session, node.getOwner());
 		return userNode.getStringProp(NodeProp.USER.s());
 	}
-
-	// This whole entire approach was a very bad idea...
-	// We will be converting this to something mroe akin to DNS where a node that's
-	// named, doesn't even need to
-	// know it's named (decoupled)
-	// public void renameNode(MongoSession session, SubNode node, String newName) {
-	// auth(session, node, PrivilegeType.WRITE);
-
-	// newName = FileTools.ensureValidFileNameChars(newName);
-	// newName = newName.trim();
-	// if (newName.length() == 0) {
-	// throw ExUtil.newEx("No node name provided.");
-	// }
-
-	// log.debug("Renaming node: " + node.getId().toHexString());
-
-	// int nodePathLen = node.getPath().length();
-	// String newPathPrefix = node.getParentPath() + "/" + newName;
-
-	// SubNode checkExists = getNode(session, newPathPrefix);
-	// if (checkExists != null) {
-	// throw ExUtil.newEx("Node already exists");
-	// }
-
-	// // change all paths of all children (recursively) to start with the new path
-	// for (SubNode n : getSubGraph(session, node)) {
-	// String path = n.getPath();
-	// String chopPath = path.substring(nodePathLen);
-	// String newPath = newPathPrefix + chopPath;
-	// n.setPath(newPath);
-	// n.setDisableParentCheck(true);
-	// }
-
-	// node.setPath(newPathPrefix);
-	// }
 
 	public void deleteNode(MongoSession session, SubNode node) {
 		attachmentService.deleteBinary(session, node);
@@ -672,7 +636,8 @@ public class MongoApi {
 			throw ExUtil.wrapEx(ex);
 		}
 
-		//todo-1: I have a 'formatMemory' written in javascript, and need to do same here or see if there's an apachie string function for it.
+		// todo-1: I have a 'formatMemory' written in javascript, and need to do same
+		// here or see if there's an apachie string function for it.
 		float kb = totalJsonBytes / 1024f;
 		return "Node Count: " + numDocs + "<br>Total JSON Size: " + kb + " KB";
 	}
@@ -1175,7 +1140,35 @@ public class MongoApi {
 			query.with(Sort.by(Sort.Direction.DESC, sortField));
 		}
 
-		saveSession(session);
+		saveSession(session); //todo-0: why saving session upon a READ operation ?
+		return ops.find(query, SubNode.class);
+	}
+
+	public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, SubNode node, /*String sortField,*/ int limit) {
+		auth(session, node, PrivilegeType.READ);
+
+		Query query = new Query();
+		query.limit(limit);
+		/*
+		 * This regex finds all that START WITH path, have some characters after path,
+		 * before the end of the string. Without the trailing (.+)$ we would be
+		 * including the node itself in addition to all its children.
+		 */
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexRecursiveChildrenOfPath(node.getPath()))//
+		.and(SubNode.FIELD_AC).ne(null);
+
+		// examples from online:
+		// Aggregation aggregation = Aggregation.newAggregation( Aggregation.match(Criteria.where("docs").exists(true)));
+		//Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("docs").ne(Collections.EMPTY_LIST)));
+		//Criteria.where("docs").not().size(0);
+
+		query.addCriteria(criteria);
+
+		// if (!StringUtils.isEmpty(sortField)) {
+		// 	query.with(Sort.by(Sort.Direction.DESC, sortField));
+		// }
+
+		saveSession(session); //todo-0: why saving session upon a READ operation ?
 		return ops.find(query, SubNode.class);
 	}
 
@@ -1290,16 +1283,14 @@ public class MongoApi {
 		ops.indexOps(clazz).ensureIndex(new Index().on(property, dir));
 	}
 
-	// DO NOT DELETE.
-	//
-	// I tried to create just ONE full text index, and i get exceptions, and even if
-	// i try to build
-	// a text index
-	// on a specific property I also get exceptions, to currently i am having to
-	// resort to using
-	// only the
-	// createTextIndexes() below which does the 'onAllFields' option which DOES work
-	// for some readon
+	/*
+	 * DO NOT DELETE.
+	 * 
+	 * I tried to create just ONE full text index, and i get exceptions, and even if
+	 * i try to build a text index on a specific property I also get exceptions, so
+	 * currently i am having to resort to using only the createTextIndexes() below
+	 * which does the 'onAllFields' option which DOES work for some readonly
+	 */
 	// public void createUniqueTextIndex(MongoSession session, Class<?> clazz,
 	// String property) {
 	// requireAdmin(session);
@@ -1388,7 +1379,6 @@ public class MongoApi {
 		}
 
 		save(session, userNode);
-
 		return userNode;
 	}
 
@@ -1517,8 +1507,8 @@ public class MongoApi {
 
 		SubNode adminNode = getUserNodeByUserName(getAdminSession(), adminUser);
 		if (adminNode == null) {
-			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, "Repository Root", NodeType.REPO_ROOT.s(), true, null,
-					null);
+			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, "Repository Root", NodeType.REPO_ROOT.s(),
+					true, null, null);
 
 			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
 

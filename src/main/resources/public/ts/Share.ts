@@ -14,10 +14,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class Share implements ShareIntf {
 
-    private findSharedNodesResponse = (res: J.GetSharedNodesResponse) => {
-        S.srch.searchNodesResponse(res);
-    }
-
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
@@ -39,7 +35,9 @@ export class Share implements ShareIntf {
 
         S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             nodeId: focusNode.id
-        }, this.findSharedNodesResponse);
+        }, (res) => {
+            S.srch.searchNodesResponse(res);
+        });
     }
 
     /* Whenever an encrypted node is shared to a user, this is the final operation we run which
