@@ -230,6 +230,13 @@ public class NodeEditService {
 		if (node == null) {
 			throw new RuntimeEx("Unable find node to save: nodeId=" + nodeId);
 		}
+
+		/* The only purpose of this limit is to stop hackers from using up lots of space, because our only current
+		quota is on attachment file size uploads */
+		if (nodeInfo.getContent().length() > 64*1024) {
+			throw new RuntimeEx("Max text length is 64K");
+		}
+
 		node.setContent(nodeInfo.getContent());
 
 		// if we're setting node name to a different node name
