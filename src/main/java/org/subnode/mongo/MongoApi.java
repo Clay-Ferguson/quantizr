@@ -1,6 +1,7 @@
 package org.subnode.mongo;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -1137,14 +1138,14 @@ public class MongoApi {
 		}
 
 		if (!StringUtils.isEmpty(sortField)) {
+			//todo-1: sort dir is being passed from client but not used here?
 			query.with(Sort.by(Sort.Direction.DESC, sortField));
 		}
 
-		saveSession(session); //todo-0: why saving session upon a READ operation ?
 		return ops.find(query, SubNode.class);
 	}
 
-	public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, SubNode node, /*String sortField,*/ int limit) {
+	public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, SubNode node, String sortField, int limit) {
 		auth(session, node, PrivilegeType.READ);
 
 		Query query = new Query();
@@ -1164,11 +1165,10 @@ public class MongoApi {
 
 		query.addCriteria(criteria);
 
-		// if (!StringUtils.isEmpty(sortField)) {
-		// 	query.with(Sort.by(Sort.Direction.DESC, sortField));
-		// }
+		if (!StringUtils.isEmpty(sortField)) {
+			query.with(Sort.by(Sort.Direction.DESC, sortField));
+		}
 
-		saveSession(session); //todo-0: why saving session upon a READ operation ?
 		return ops.find(query, SubNode.class);
 	}
 
