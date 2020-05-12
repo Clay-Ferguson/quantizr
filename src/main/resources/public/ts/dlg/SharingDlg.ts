@@ -60,8 +60,6 @@ export class SharingDlg extends DialogBase {
      */
     populate = (res: J.GetNodePrivilegesResponse): void => {
         //console.log("populating with: res="+S.util.prettyPrint(res));
-
-        //todo-0: this *should* fail until I make it 'mergeState' instead right?
         this.privsTable.setState(res); 
     }
 

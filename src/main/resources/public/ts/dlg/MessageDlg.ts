@@ -14,11 +14,7 @@ export class MessageDlg extends DialogBase {
     constructor(private message: string, title: string, private callback: Function, private customWidget: Comp, private preformatted: boolean,
         private flashTimeout: number, state: AppState) {
         super(title, null, false, state);
-    }
 
-    renderDlg = (): CompIntf[] => {
-
-        //todo-0: this timer is ugly to have in the render right?
         if (this.flashTimeout > 0) {
             setTimeout(() => {
                 this.whenElmEx((elm: HTMLElement) => {
@@ -26,7 +22,9 @@ export class MessageDlg extends DialogBase {
                 });
             }, this.flashTimeout);
         }
+    }
 
+    renderDlg = (): CompIntf[] => {
         return [
             new TextContent(this.message, null, this.preformatted),
             this.customWidget,

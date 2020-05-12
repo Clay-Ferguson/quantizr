@@ -323,8 +323,15 @@ export abstract class Comp implements CompIntf {
        both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact 
        */
     mergeState = (moreState: any): any => {
-        this.setState((state: any) => {
+        this.setStateEx((state: any) => {
             this.state = { ...state, ...moreState };
+            return this.state;
+        });
+    }
+
+    setState = (newState: any): any => {
+        this.setStateEx((state: any) => {
+            this.state = { ...newState };
             return this.state;
         });
     }
@@ -339,7 +346,7 @@ export abstract class Comp implements CompIntf {
 
     There are places where 'mergeState' works but 'setState' fails, that needs investigation like EditNodeDlg.
     */
-    setState = (state: any) => {
+    setStateEx = (state: any) => {
         if (!state) {
             state = {};
         }
@@ -363,10 +370,10 @@ export abstract class Comp implements CompIntf {
 
         let ret: ReactNode = null;
         try {
-            const [state, setState] = useState(this.state);
+            const [state, setStateEx] = useState(this.state);
             //console.warn("Component state was null in render for: " + this.jsClassName);
             this.state = state;
-            this.setState = setState;
+            this.setStateEx = setStateEx;
 
             /* This 'useEffect' call makes react call 'domAddEvent' once the dom element comes into existence on the acutal DOM */
             useEffect(this.domAddEvent, []);
