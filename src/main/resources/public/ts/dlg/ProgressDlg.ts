@@ -7,7 +7,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 export class ProgressDlg extends DialogBase {
 
     constructor(state: AppState) {
-        super("Processing...", "app-modal-content-narrow-width", false, false, state);
+        super("Processing...", "app-modal-content-narrow-width", false, state);
     }
 
     renderDlg(): CompIntf[] {

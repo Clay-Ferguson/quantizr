@@ -21,7 +21,7 @@ export class ShareToPersonDlg extends DialogBase {
     shareToUserTextField: TextField;
 
     constructor(private node: J.NodeInfo, private sharedNodeFunc: Function, state: AppState) {
-        super("Share Node to Person", "app-modal-content-medium-width", false, false, state);
+        super("Share Node to Person", "app-modal-content-medium-width", false, state);
     }
 
     renderDlg(): CompIntf[] {

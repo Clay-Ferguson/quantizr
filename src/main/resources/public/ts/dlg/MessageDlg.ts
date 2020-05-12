@@ -13,7 +13,7 @@ export class MessageDlg extends DialogBase {
 
     constructor(private message: string, title: string, private callback: Function, private customWidget: Comp, private preformatted: boolean,
         private flashTimeout: number, state: AppState) {
-        super(title, null, false, false, state);
+        super(title, null, false, state);
     }
 
     renderDlg = (): CompIntf[] => {

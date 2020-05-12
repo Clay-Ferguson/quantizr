@@ -9,7 +9,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 export class NotificationPopupDlg extends DialogBase {
 
     constructor(private message: string, title: string, state: AppState) {
-        super(title, null, false, false, state);
+        super(title, null, false, state);
     }
 
     renderDlg(): CompIntf[] {

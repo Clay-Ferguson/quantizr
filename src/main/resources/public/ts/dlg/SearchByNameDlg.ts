@@ -22,7 +22,7 @@ export class SearchByNameDlg extends DialogBase {
     searchTextField: TextField;
   
     constructor(state: AppState) {
-        super("Search by Node Name", "app-modal-content-medium-width", false, false, state);
+        super("Search by Node Name", "app-modal-content-medium-width", false, state);
     }
 
     //renderDlg(): CompIntf[] {

@@ -23,7 +23,7 @@ export class SignupDlg extends DialogBase {
     emailTextField: TextField;
 
     constructor(state: AppState) {
-        super("Create Account", "app-modal-content-medium-width", null, false, state);
+        super("Create Account", "app-modal-content-medium-width", null, state);
     }
     
     renderDlg(): CompIntf[] {

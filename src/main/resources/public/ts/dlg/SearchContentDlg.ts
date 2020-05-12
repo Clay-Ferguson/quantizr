@@ -27,7 +27,7 @@ export class SearchContentDlg extends DialogBase {
     caseSensitiveCheckbox: Checkbox;
   
     constructor(state: AppState) {
-        super("Search Content", "app-modal-content-medium-width", null, false, state);
+        super("Search Content", "app-modal-content-medium-width", null, state);
         S.srch.searchText = null;
     }
 

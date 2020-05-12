@@ -24,15 +24,13 @@ export class ChangePasswordDlg extends DialogBase {
     private passCode: string;
 
     constructor(args: Object, state: AppState) {
-        super((<any>args).passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width", false, false, state);
+        super((<any>args).passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width", false, state);
         this.passCode = (<any>args).passCode;
     }
 
     renderDlg(): CompIntf[] {
-        //todo-0: does this belong here?
-        this.passwordField.focus();
         
-        return [
+        let children = [
             new Form(null, [
                 new TextContent("Enter your new password below..."),
                 this.passwordField = new TextField("New Password", null, true),
@@ -47,6 +45,9 @@ export class ChangePasswordDlg extends DialogBase {
                 ])
             ])
         ];
+
+        this.passwordField.focus();
+        return children;
     }
 
     /*

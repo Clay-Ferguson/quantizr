@@ -23,7 +23,7 @@ export class ResetPasswordDlg extends DialogBase {
     private user: string;
 
     constructor(args: Object, state: AppState) {
-        super("Reset Password", "app-modal-content-narrow-width", false, false, state);
+        super("Reset Password", "app-modal-content-narrow-width", false, state);
         this.user = (<any>args).user;
     }
     

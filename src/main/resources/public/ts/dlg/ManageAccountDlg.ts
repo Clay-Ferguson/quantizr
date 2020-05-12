@@ -19,7 +19,7 @@ export class ManageAccountDlg extends DialogBase {
     message: TextContent;
 
     constructor(state: AppState) {
-        super("Manage Account", null, false, false, state);
+        super("Manage Account", null, false, state);
     }
 
     renderDlg(): CompIntf[] {
@@ -36,11 +36,11 @@ export class ManageAccountDlg extends DialogBase {
                 })
             ])
         ];
-        this.rinit();
+        this.init();
         return children;
     }
 
-    rinit = (): void => {
+    init = (): void => {
         S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,
             (res: J.GetUserAccountInfoResponse) => {
                 let used = "";

@@ -21,7 +21,7 @@ export class ImportDlg extends DialogBase {
   importFromFileNameTextField: TextField;
 
     constructor(state: AppState) {
-        super("Import from XML", null, false, false, state);
+        super("Import from XML", null, false, state);
     }
     
     renderDlg(): CompIntf[] {

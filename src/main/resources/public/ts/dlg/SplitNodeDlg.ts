@@ -27,7 +27,7 @@ export class SplitNodeDlg extends DialogBase {
     delimiterTextField: TextField;
 
     constructor(state: AppState) {
-        super("Split Node", null, false, false, state);
+        super("Split Node", null, false, state);
     }
 
     renderDlg(): CompIntf[] {

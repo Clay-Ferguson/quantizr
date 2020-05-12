@@ -9,7 +9,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 export class ConfirmDlg extends DialogBase {
 
     constructor(private text: string, title: string, private yesCallback: Function, private noCallback: Function, private yesButtonClass, private textClass:string, state: AppState) {
-        super(title, "app-modal-content-narrow-width", false, false, state);
+        super(title, "app-modal-content-narrow-width", false, state);
     }
 
     renderDlg(): CompIntf[] {

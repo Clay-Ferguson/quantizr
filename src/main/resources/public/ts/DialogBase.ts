@@ -26,15 +26,14 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     static backdropZIndex: number = 16000000;
     resolve: Function;
 
-    elm: HTMLElement;
+    backdrop: HTMLElement;
     extraHeaderComps: CompIntf[];
 
     /* Warning: Base 'Comp' already has 'state', I think it was wrong to rely on 'appState' everywhere inside dialogs, because
     we need to just let the render methods grab the latest state like every other component in the render method. */
     appState: AppState;
 
-    constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean,
-        private initiallyInvisible: boolean, appState: AppState) {
+    constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState) {
         super(null);
         this.appState = appState;
 
@@ -43,34 +42,34 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             (this.overrideClass ? this.overrideClass : "app-modal-content");
     }
 
-    /* To be overridden by derived classes */
-    init = () => {
-    }
-
     /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is 
     closed. */
     open = (display: string = null): Promise<DialogBase> => {
 
         return new Promise<DialogBase>((resolve, reject) => {
-            let displayStyle = display ? display : (this.initiallyInvisible ? "none" : "block");
-
-            if (this.initiallyInvisible) {
-                this.whenElmEx((elm: HTMLElement) => {
-                    elm.style.display = "inline-block";
-                });
-            }
 
             // Create dialog container and attach to document.body.
-            this.elm = document.createElement('div');
-            this.elm.setAttribute("id", DialogBase.BACKDROP_PREFIX + this.getId());
+            this.backdrop = document.createElement('div');
+            this.backdrop.setAttribute("id", DialogBase.BACKDROP_PREFIX + this.getId());
 
             // WARNING: Don't use 'className' here, this is pure javascript.
-            this.elm.setAttribute("class", "app-modal");
-            this.elm.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex) + "; display: " + displayStyle + ";");
-            document.body.appendChild(this.elm);
+            this.backdrop.setAttribute("class", "app-modal");
+            this.backdrop.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex)); 
+            document.body.appendChild(this.backdrop);
 
-            //This basically creates the 'children' (nope this is obsolete, remove it todo-0)
-            this.init();
+            //clicking outside the dialog will close it. We only use this for the main menu of the app, because clicking outside a dialog
+            //is too easy to do while your editing and can cause loss of work/editing.
+            if (this.closeByOutsideClick) {
+                this.backdrop.addEventListener("click", (evt: any) => {
+                    //get our dialog itself.
+                    let contentElm: any = S.util.domElm(this.getId());
+
+                    //check if the click was outside the dialog.
+                    if (!!contentElm && !contentElm.contains(evt.target)) {
+                        this.close();
+                    }
+                });
+            }
 
             //this renders the dlgComp onto the screen (on the backdrop elm)
             this.domRender();
@@ -92,7 +91,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
 
         //console.log("Rendering with provider");
         let provider = S.e(Provider, { store }, reactElm);
-        ReactDOM.render(provider, this.elm);
+        ReactDOM.render(provider, this.backdrop);
     }
 
     //DO NOT DELETE.
@@ -104,7 +103,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
 
     public close = () => {
         this.resolve(this);
-        ReactDOM.unmountComponentAtNode(this.elm);
+        ReactDOM.unmountComponentAtNode(this.backdrop);
         S.util.domElmRemove(this.getId());
         S.util.domElmRemove(DialogBase.BACKDROP_PREFIX + this.getId());
 
@@ -116,12 +115,10 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     }
 
     renderDlg(): CompIntf[] {
-        return [new Div("oops. renderDlg not overridden")];
+        return [new Div("override renderDlg to provide dialog content.")];
     }
 
     preRender = (): void => {
-        let backdrop: HTMLElement = this.elm;
-
         let timesIcon: Comp;
         //Dialog Header with close button (x) right justified on it.
         let children: CompIntf[] = [];
@@ -144,20 +141,5 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
 
         children = children.concat(this.renderDlg());
         this.setChildren(children);
-
-        //clicking outside the dialog will close it. We only use this for the main menu of the app, because clicking outside a dialog
-        //is too easy to do while your editing and can cause loss of work/editing.
-        //todo-0: this is going to add too many listeners? shouldn't be in a render method?
-        if (this.closeByOutsideClick) {
-            backdrop.addEventListener("click", (evt: any) => {
-                //get our dialog itself.
-                let contentElm: any = S.util.domElm(this.getId());
-
-                //check if the click was outside the dialog.
-                if (!!contentElm && !contentElm.contains(evt.target)) {
-                    this.close();
-                }
-            });
-        }
     }
 }

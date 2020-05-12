@@ -24,7 +24,7 @@ export class TransferNodeDlg extends DialogBase {
     toTextField: TextField;
 
     constructor(state: AppState) {
-        super("Transfer Node", "app-modal-content-narrow-width", false, false, state);
+        super("Transfer Node", "app-modal-content-narrow-width", false, state);
     }
 
     renderDlg(): CompIntf[] {

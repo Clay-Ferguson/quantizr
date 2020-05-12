@@ -18,7 +18,7 @@ export class ManageEncryptionKeysDlg extends DialogBase {
     textContent: TextContent;
 
     constructor(state: AppState) {
-        super("Encryption Keys", null, false, false, state);
+        super("Encryption Keys", null, false, state);
     }
 
     renderDlg(): CompIntf[] {

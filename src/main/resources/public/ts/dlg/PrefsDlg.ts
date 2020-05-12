@@ -21,7 +21,7 @@ export class PrefsDlg extends DialogBase {
     showMetadataCheckBox: Checkbox;
 
     constructor(state: AppState) {
-        super("Preferences", null, false, false, state);
+        super("Preferences", null, false, state);
     }
 
     renderDlg(): CompIntf[] {

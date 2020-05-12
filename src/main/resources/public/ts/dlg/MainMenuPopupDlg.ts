@@ -14,7 +14,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class MainMenuPopupDlg extends DialogBase {
 
     constructor(state: AppState) {
-        super(null, "app-modal-menu", true, true, state);
+        super(null, "app-modal-menu", true, state);
     }
 
     renderDlg(): CompIntf[] {

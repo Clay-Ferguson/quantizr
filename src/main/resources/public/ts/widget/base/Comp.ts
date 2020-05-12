@@ -320,14 +320,14 @@ export abstract class Comp implements CompIntf {
     }
 
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
-   both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact */
+       both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact 
+       */
     mergeState = (moreState: any): any => {
         this.setState((state: any) => {
             this.state = { ...state, ...moreState };
             return this.state;
         });
     }
-
 
     /* Note: this method performs a direct state mod, until react overrides it using useState return value 
     
@@ -336,6 +336,8 @@ export abstract class Comp implements CompIntf {
         // Object.assign would also work
         return {...prevState, ...updatedValues};
     });
+
+    There are places where 'mergeState' works but 'setState' fails, that needs investigation like EditNodeDlg.
     */
     setState = (state: any) => {
         if (!state) {

@@ -35,6 +35,4 @@ export class EditSystemFileDlgImpl extends DialogBase {
   //       console.log("cancel.");
   //   }
   //
-  //   init = (): void => {
-  //   }
 }

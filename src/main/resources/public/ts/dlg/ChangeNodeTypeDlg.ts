@@ -22,7 +22,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
     nodeTypeListBox: NodeTypeListBox;
 
     constructor(selCallback : Function, state: AppState) {
-        super("Set Node Type", "app-modal-content-narrow-width", false, false, state);
+        super("Set Node Type", "app-modal-content-narrow-width", false, state);
         this.selCallback = selCallback;
     }
 

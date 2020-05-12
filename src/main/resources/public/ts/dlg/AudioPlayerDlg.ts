@@ -34,17 +34,12 @@ export class AudioPlayerDlg extends DialogBase {
     // private node: J.NodeInfo;
 
     constructor(private sourceUrl: string, state: AppState) {
-        super("Audio Player", null, false, false, state);
+        super("Audio Player", null, false, state);
     }
 
     renderDlg(): CompIntf[] {
-        //todo-0: move out of this method.
-        this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
-            S.podcast.player = elm;
-            setTimeout(this.updatePlayButtonText, 1000);
-        });
-
-        return [
+    
+        let children = [
             new Form(null, [
                 //new TextContent(this.title), 
                 this.audioPlayer = new AudioPlayer({
@@ -77,6 +72,13 @@ export class AudioPlayerDlg extends DialogBase {
                 ])
             ])
         ];
+
+        this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
+            S.podcast.player = elm;
+            setTimeout(this.updatePlayButtonText, 1000);
+        });
+        
+        return children;
     }
 
     getAudioElement(): HTMLAudioElement {

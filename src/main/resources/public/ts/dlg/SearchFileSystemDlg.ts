@@ -22,7 +22,7 @@ export class SearchFileSystemDlg extends DialogBase {
     searchTextField: TextField;
 
     constructor(state: AppState) {
-        super("Search File System", null, false, false, state);
+        super("Search File System", null, false, state);
     }
 
     renderDlg(): CompIntf[] {

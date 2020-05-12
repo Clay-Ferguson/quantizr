@@ -47,7 +47,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     maxFiles: number = 1;
 
     constructor(private node: J.NodeInfo, private toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState) {
-        super(importMode ? "Import File" : (toIpfs ? "Upload File to IPFS" : "Upload File"), null, false, false, state);
+        super(importMode ? "Import File" : (toIpfs ? "Upload File to IPFS" : "Upload File"), null, false, state);
     }
 
     renderDlg(): CompIntf[] {

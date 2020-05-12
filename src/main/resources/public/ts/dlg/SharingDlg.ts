@@ -23,7 +23,7 @@ export class SharingDlg extends DialogBase {
     dirty: boolean = false;
 
     constructor(private node: J.NodeInfo, state: AppState) {
-        super("Node Sharing", "app-modal-content-medium-width", null, false, state);
+        super("Node Sharing", "app-modal-content-medium-width", null, state);
     }
 
     renderDlg(): CompIntf[] {
@@ -60,8 +60,9 @@ export class SharingDlg extends DialogBase {
      */
     populate = (res: J.GetNodePrivilegesResponse): void => {
         //console.log("populating with: res="+S.util.prettyPrint(res));
+
+        //todo-0: this *should* fail until I make it 'mergeState' instead right?
         this.privsTable.setState(res); 
-        //this.privsTable.updateDOM();
     }
 
     removePrivilege = (principalNodeId: string, privilege: string): void => {

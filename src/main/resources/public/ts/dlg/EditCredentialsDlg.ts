@@ -25,7 +25,7 @@ export class EditCredentialsDlg extends DialogBase {
     pwd: string;
 
     constructor(title2: string, private usrDbProp: string, private pwdDbProp: string, state: AppState) {
-        super(title2, "app-modal-content-narrow-width", false, false, state);
+        super(title2, "app-modal-content-narrow-width", false, state);
     }
 
     renderDlg(): CompIntf[] {

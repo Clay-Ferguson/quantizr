@@ -74,8 +74,7 @@ export class EditNodeDlg extends DialogBase {
     skdp: SymKeyDataPackage;
 
     constructor(node: J.NodeInfo, state: AppState) {
-        super("Edit Node", "app-modal-content", false, false /* todo-0 I guess initially invisible thing is not needed now? true */, state);
-        debugger;
+        super("Edit Node", "app-modal-content", false, state);
         this.mergeState({node});
     }
 
@@ -325,8 +324,7 @@ export class EditNodeDlg extends DialogBase {
             let dlg = new EditPropertyDlg({
                 editNode: state.node,
                 propSavedFunc: () => {
-                    //this.setState(state); //<---- todo-0: this is what is SHOULD be here
-                    this.rebuildDlg();
+                    this.mergeState(state); 
                 }
             }, this.appState);
             this.editPropertyDlgInst = dlg;
@@ -383,7 +381,8 @@ export class EditNodeDlg extends DialogBase {
                     }
                 }
 
-                this.rebuildDlg();
+                //this.rebuildDlg();
+                this.mergeState(state);
             }
         })();
     }
@@ -395,14 +394,12 @@ export class EditNodeDlg extends DialogBase {
             type: newType
         },
             (res) => {
+                S.util.checkSuccess("Save properties", res);
                 state.node.type = newType;
-                this.setNodeTypeResponse(res);
+                
+                //this.rebuildDlg();
+                this.mergeState(state);
             });
-    }
-
-    setNodeTypeResponse = (res: any): void => {
-        S.util.checkSuccess("Save properties", res);
-        this.rebuildDlg();
     }
 
     deleteProperty(propName: string) {
@@ -411,8 +408,9 @@ export class EditNodeDlg extends DialogBase {
             "propName": propName
         }, (res) => {
             if (S.util.checkSuccess("Delete property", res)) {
-                S.props.deleteProp(this.getState().node, propName);
-                this.rebuildDlg();
+                let state = this.getState();
+                S.props.deleteProp(state.node, propName);
+                this.mergeState(state);
             }
         });
     }
@@ -429,7 +427,7 @@ export class EditNodeDlg extends DialogBase {
         let state = this.getState();
         return new Promise<void>(async (resolve, reject) => {
             let allowEditAllProps: boolean = this.appState.isAdminUser;
-            debugger;
+            
             if (state.node) {
                 this.saveCheckboxVal(this.preformattedCheckBox, J.NodeProp.PRE);
                 if (this.inlineChildrenCheckBox) {
@@ -688,7 +686,7 @@ export class EditNodeDlg extends DialogBase {
         this.close();
     }
 
-    rebuildDlg = (): void => {
-        this.domRender();
-    }
+    // rebuildDlg = (): void => {
+    //     this.domRender();
+    // }
 }

@@ -23,7 +23,7 @@ export class GraphDisplayDlg extends DialogBase {
     uploadButton: Button;
 
     constructor(state: AppState) {
-        super("Graph Display", null, false, false, state);
+        super("Graph Display", null, false, state);
     }
 
     renderDlg(): CompIntf[] {

@@ -21,7 +21,7 @@ export class UploadFromUrlDlg extends DialogBase {
     uploadButton: Button;
 
     constructor(private node: J.NodeInfo, private defaultUrl: string, state: AppState) {
-        super("Upload File", null, false, false, state);
+        super("Upload File", null, false, state);
     }
 
     renderDlg(): CompIntf[] {

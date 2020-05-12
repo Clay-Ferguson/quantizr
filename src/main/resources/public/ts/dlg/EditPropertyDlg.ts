@@ -27,7 +27,7 @@ export class EditPropertyDlg extends DialogBase {
     editNode: J.NodeInfo;
 
     constructor(args: any, state: AppState) {
-        super("Edit Node Property", null, false, false, state);
+        super("Edit Node Property", null, false, state);
         this.propSavedFunc = args.propSavedFunc;
         this.editNode = args.editNode; 
     }

@@ -23,7 +23,7 @@ export class EncryptionDlg extends DialogBase {
     encryptAsPrivate: Checkbox;
   
     constructor(public encrypted: boolean, state: AppState) {
-        super("Node Encryption", "app-modal-content-medium-width", false, false, state);
+        super("Node Encryption", "app-modal-content-medium-width", false, state);
     }
 
     renderDlg(): CompIntf[] {

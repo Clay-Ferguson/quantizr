@@ -27,7 +27,7 @@ export class ExportDlg extends DialogBase {
     pdfRadioButton: RadioButton;
 
     constructor(state: AppState) {
-        super("Export", null, false, false, state);
+        super("Export", null, false, state);
     }
 
     renderDlg(): CompIntf[] {

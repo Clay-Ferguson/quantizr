@@ -23,7 +23,7 @@ export class LoginDlg extends DialogBase {
     passwordTextField: TextField;
 
     constructor(paramsTest: Object, state: AppState) {
-        super("Login", "app-modal-content-narrow-width", false, false, state);
+        super("Login", "app-modal-content-narrow-width", false, state);
     }
 
     renderDlg(): CompIntf[] {
