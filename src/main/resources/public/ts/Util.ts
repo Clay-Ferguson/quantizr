@@ -91,6 +91,11 @@ export class Util implements UtilIntf {
         return hash;
     }
 
+    hashOfObject = (obj: Object) => {
+        if (!obj) return "null";
+        return this.hashOfString(JSON.stringify(obj));
+    }
+
     /** Returns one of the types listed in 'fileExtensionTypes' based on fileName where fileName can either be an actual
     extension or else a full filename including extension */
     getFileTypeFormFileName = (fileName: string): string => {
@@ -1193,5 +1198,14 @@ export class Util implements UtilIntf {
             ret += "<br>UsedHeapSize: " + this.formatMemory(p.memory.usedJSHeapSize);
         }
         return ret;
+    }
+
+    perfStart = (): number => {
+        return performance.now();
+    }
+
+    perfEnd = (message: string, startTime: number): void => {
+        const endTime = performance.now();
+        console.log(message + " Time=" + (endTime - startTime));
     }
 }

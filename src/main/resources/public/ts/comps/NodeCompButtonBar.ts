@@ -23,7 +23,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class NodeCompButtonBar extends HorizontalLayout {
 
     constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean, public isRootNode: boolean) {
-        super(null, "marginLeft");
+        super(null, "marginLeft", {
+            id: "NodeCompButtonBar_" + node.id
+        });
     }
 
     preRender = (): void => {
@@ -33,9 +35,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
             this.children = null;
             return;
         }
-
-        let highlightNode = S.meta64.getHighlightedNode(state);
-        let homeNodeSelected = highlightNode != null && state.homeNodeId == highlightNode.id;
 
         //console.log("NodeCompButtonBar_[" + node.id + "] editMode=" + state.userPreferences.editMode);
 
@@ -125,8 +124,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
             });
         }
 
-        //let isInlineChildren = !!S.props.getNodePropVal(J.NodeProp.INLINE_CHILDREN, node);
-
         /* Construct Open Button.
         We always enable for fs:folder, to that by clicking to open a folder that will cause the server to re-check and see if there are
         truly any files in there or not because we really cannot possibly know until we look. The only way to make this Open button
@@ -149,7 +146,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
             let selected: boolean = state.selectedNodes[node.id] ? true : false;
 
-            if (editingAllowed && S.render.allowAction(typeHandler, "edit") && 
+            if (editingAllowed && S.render.allowAction(typeHandler, "edit") &&
                 //no need to ever select home node
                 node.id != state.homeNodeId) {
                 selButton = new Checkbox(null, selected, {

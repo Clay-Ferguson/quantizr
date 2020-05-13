@@ -9,18 +9,19 @@ export interface UtilIntf {
     pgrsDlg: any;
 
     validUsername(inputtxt: string): boolean;
-    hashOfString(s: string) : number;
+    hashOfString(s: string): number;
+    hashOfObject(obj: Object);
     isImageFileName(fileName: string): boolean;
     isAudioFileName(fileName: string): boolean;
     isVideoFileName(fileName: string): boolean;
-    isEditableFile(fileName: string) : boolean;
+    isEditableFile(fileName: string): boolean;
     prettyPrint(obj: Object): void;
     buf2hex(arr: Uint8Array): string;
     hex2buf(str: string): Uint8Array;
     escapeRegExp(s: string): string;
     escapeForAttrib(s: string): string;
     unencodeHtml(s: string): string;
-    escapeHtml(str: string): string; 
+    escapeHtml(str: string): string;
     replaceAll(s: string, find: string, replace: string): string;
     contains(s: string, str: string): boolean;
     startsWith(s: string, str: string): boolean;
@@ -52,7 +53,7 @@ export interface UtilIntf {
     //todo-1: need to make all calls to these functions use promises (be careful about failure case)
     ajax<RequestType, ResponseType>(postName: string, postData: RequestType,
         callback?: (response: ResponseType) => void,
-         failCallback?: (response: string) => void);
+        failCallback?: (response: string) => void);
     logAndThrow(message: string);
     logAndReThrow(message: string, exception: any);
     ajaxReady(requestName): boolean;
@@ -70,7 +71,7 @@ export interface UtilIntf {
     getTextAreaValById(id): string;
     domElm(id: string): HTMLElement;
     domElmObjRemove(elm: Element);
-    domElmRemove(id : string): void;
+    domElmRemove(id: string): void;
     domElmObjCss(elm: HTMLElement, prop: string, val: string): void;
     setInnerHTMLById(id: string, val: string): void;
     setInnerHTML(elm: HTMLElement, val: string): void;
@@ -101,11 +102,13 @@ export interface UtilIntf {
     copyToClipboard(text: string);
     triggerCustom(elm: HTMLElement, evt: string, obj: Object): void;
     trigger(elm: HTMLElement, evt: string): void;
-    formatDate(date) : string;
+    formatDate(date): string;
     updateHistory(node: J.NodeInfo, childNode: J.NodeInfo, appState: AppState): void;
     getElm(id: string, exResolve?: (elm: HTMLElement) => void): Promise<HTMLElement>;
     animateScrollToTop(): any;
     assert(check: boolean, op: string): void;
     formatMemory(val: number): string;
     getBrowserMemoryInfo(): string;
+    perfStart(): number;
+    perfEnd(message: string, startTime: number): void;
 }

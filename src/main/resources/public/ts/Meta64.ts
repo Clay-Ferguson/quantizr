@@ -184,9 +184,13 @@ export class Meta64 implements Meta64Intf {
         }
 
         let id = state.node.id;
-        S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, id);
-        S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
 
+        /* for best performance (user experience), do this async */
+        setTimeout(() => {
+            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, id);
+            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
+        }, 250);
+        
         state.parentIdToFocusNodeMap[id] = node;
 
         if (scroll) {
@@ -240,7 +244,7 @@ export class Meta64 implements Meta64Intf {
         state.idToNodeMap[node.id] = node;
 
         if (node.children) {
-            node.children.forEach(n => this.updateNodeMap(n, level+1, state));
+            node.children.forEach(n => this.updateNodeMap(n, level + 1, state));
         }
     }
 

@@ -14,6 +14,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export const initialState = new AppState();
 
+
 /**
  * Takes a state as input, does the action on it, and returns the resulting new state.
  */
@@ -34,9 +35,6 @@ export function rootReducer(state: AppState = initialState, /* action: Action<an
         in each component be smart enough to only retrieve exactly what's needed, which will speed up rendering a lot, and once
         we have that this line can be removed. This line is forcing react to see we have a whole new state and can trigger
         re-render of everything in that state 
-        
-        todo-0: Related to this is the fact that when this massive full state change happens it triggers TabPanel also to render, and 
-        that blows up because the active tab currently can only be controled by click which is bad. need active tab to come from STATE variable.
         */
         state = { ...state };
     }

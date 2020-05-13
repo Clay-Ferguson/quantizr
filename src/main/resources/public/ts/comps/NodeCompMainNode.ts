@@ -16,8 +16,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMainNode extends Div {
 
-    constructor() {
-        super();
+    constructor(state: AppState) {
+        super(null, {
+            id: "row_" + state.node.id,
+        });
     }
 
     preRender = (): void => {
@@ -28,18 +30,22 @@ export class NodeCompMainNode extends Div {
             this.children = null;
             return;
         }
-        
+
         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         let selected: boolean = (focusNode && focusNode.id === node.id);
         this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main")
 
-        this.attribs.id = "row_" + node.id;
         this.attribs.onClick = (elm: HTMLElement) => { S.nav.clickOnNodeRow(node, state); };
         S.render.setNodeDropHandler(this, node, state);
 
+        //console.log("NodeCompNameNode id="+node.id+" hash="+S.util.hashOfObject(node));
+
         this.setChildren([
             new NodeCompButtonBar(node, true, false, true),
-            new Div(null, { className: "clearfix" }),
+            new Div(null, {
+                className: "clearfix",
+                id: "button_bar_clearfix_" + node.id
+            }),
             new NodeCompContent(node, false, true)
         ]);
     }

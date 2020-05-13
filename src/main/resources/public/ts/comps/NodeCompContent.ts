@@ -20,7 +20,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class NodeCompContent extends Div {
 
     constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix = "") {
-        super(null);
+        super(null, {
+            id: "NodeCompContent_"+node.id
+        });
     }
 
     preRender = (): void => {

@@ -173,11 +173,11 @@ export class Nav implements NavIntf {
     }
 
     clickOnNodeRow = (node: J.NodeInfo, state: AppState): void => {
-        //console.log("clickOnNodeRow: id=" + node.id);
+        console.log("clickOnNodeRow: id=" + node.id);
 
         /* First check if this node is already highlighted and if so just return */
         let highlightNode = S.meta64.getHighlightedNode(state);
-        if (highlightNode && highlightNode.id==node.id) {
+        if (highlightNode && highlightNode.id == node.id) {
             return;
         }
 
@@ -185,12 +185,16 @@ export class Nav implements NavIntf {
          * sets which node is selected on this page (i.e. parent node of this page being the 'key')
          */
         S.meta64.highlightNode(node, false, state);
-        S.util.updateHistory(null, node, state);
+
+        /* We do this async just to make the fastest possible response when clicking on a node */
+        setTimeout(() => {
+            S.util.updateHistory(null, node, state);
+        }, 250);
 
         dispatch({
-            type: "Action_ClickOnNodeRow", 
+            type: "Action_ClickOnNodeRow",
             updateNew: (s: AppState): AppState => {
-                return {...state};
+                return { ...state };
             }
         });
     }
@@ -273,7 +277,7 @@ export class Nav implements NavIntf {
                 offset: this.mainOffset,
                 goToLastPage: false,
                 forceIPFSRefresh: false
-            }, (res) => {this.navPageNodeResponse(res, state);});
+            }, (res) => { this.navPageNodeResponse(res, state); });
         }
     }
 

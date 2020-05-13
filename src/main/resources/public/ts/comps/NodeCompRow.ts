@@ -45,14 +45,17 @@ export class NodeCompRow extends Div {
         let buttonBar: Comp = new NodeCompButtonBar(node, allowAvatar, this.allowNodeMove, false);
 
         let indentLevel = this.layoutClass === "node-grid-item" ? 0 : this.level;
-        let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;        
+        let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
 
         this.attribs.className = this.layoutClass + (selected ? " active-row" : " inactive-row");
         this.attribs.style = style;
 
         this.setChildren([
             buttonBar,
-            new Div(null, { className: "clearfix" }),
+            new Div(null, {
+                className: "clearfix",
+                id: "button_bar_clearfix_" + node.id
+            }),
             new NodeCompContent(node, true, true)
         ]);
 

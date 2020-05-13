@@ -26,6 +26,7 @@ declare var PROFILE;
  */
 export abstract class Comp implements CompIntf {
 
+    static renderCounter: number = 0;
     public rendered: boolean = false;
     public debug: boolean = false;
     private static guid: number = 0;
@@ -365,7 +366,10 @@ export abstract class Comp implements CompIntf {
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
     render = (): ReactNode => {
-        //console.log("rendering[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.state));
+        Comp.renderCounter++;
+        if (this.debug) {
+            console.log("rendering: " + this.jsClassName + " counter=" + Comp.renderCounter); // + "] STATE=" + S.util.prettyPrint(this.state));
+        }
         this.rendered = true;
 
         let ret: ReactNode = null;
@@ -379,15 +383,19 @@ export abstract class Comp implements CompIntf {
             useEffect(this.domAddEvent, []);
 
             //This hook should work fine but just isn't needed yet.
-            useEffect(() => {
-                //console.log("DOM UPDATE: " + this.jsClassName);
-                this.domUpdateEvent();
-            });
+            if (this.domUpdateEvent) {
+                useEffect(() => {
+                    //console.log("DOM UPDATE: " + this.jsClassName);
+                    this.domUpdateEvent();
+                });
+            }
 
-            useLayoutEffect(() => {
-                //console.log("DOM PRE-UPDATE: " + this.jsClassName);
-                this.domPreUpdateEvent();
-            });
+            if (this.domPreUpdateEvent) {
+                useLayoutEffect(() => {
+                    //console.log("DOM PRE-UPDATE: " + this.jsClassName);
+                    this.domPreUpdateEvent();
+                });
+            }
 
             /* 
             This 'useEffect' call makes react call 'domRemoveEvent' once the dom element is removed from the acutal DOM.
@@ -423,11 +431,9 @@ export abstract class Comp implements CompIntf {
         //console.log("DOM REMOVE:" + this.jsClassName + " compMapSize=" + S.util.getPropertyCount(Comp.idToCompMap));
     }
 
-    domUpdateEvent = (): void => {
-    }
+    domUpdateEvent = null;
 
-    domPreUpdateEvent = (): void => {
-    }
+    domPreUpdateEvent = null;
 
     domAddEvent = (): void => {
         //console.log("domAddEvent: " + this.jsClassName);
