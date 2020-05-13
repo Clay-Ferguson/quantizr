@@ -33,12 +33,12 @@ export class NodeCompMainList extends Div {
         let output: Comp[] = [];
 
         if (S.nav.mainOffset > 0) {
-            let firstButton: Comp = new Button("First Page", S.view.firstPage,
+            let firstButton: Comp = new Button("First Page", () => S.view.firstPage(state),
                 {
                     id: "firstPageButton",
                     iconclass: "fa fa-angle-double-left fa-lg"
                 });
-            let prevButton: Comp = new Button("Prev Page", S.view.prevPage,
+            let prevButton: Comp = new Button("Prev Page", () => S.view.prevPage(state),
                 {
                     id: "prevPageButton",
                     iconclass: "fa fa-angle-left fa-lg"
@@ -57,14 +57,14 @@ export class NodeCompMainList extends Div {
         }
 
         if (!endReached) {
-            let nextButton = new Button("Next Page", S.view.nextPage,
+            let nextButton = new Button("Next Page", () => S.view.nextPage(state),
                 {
                     id: "nextPageButton",
                     iconclass: "fa fa-angle-right fa-lg"
                 });
 
             //todo-1: last page button disabled pending refactoring
-            //let lastButton = this.makeButton("Last Page", "lastPageButton", this.lastPage);
+            //let lastButton = this.makeButton("Last Page", "lastPageButton", () => this.lastPage(state));
             output.push(new ButtonBar([nextButton], "text-center marginTop"));
         }
 
