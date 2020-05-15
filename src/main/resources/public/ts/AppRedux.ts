@@ -14,7 +14,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export const initialState = new AppState();
 
-
 /**
  * Takes a state as input, does the action on it, and returns the resulting new state.
  */
@@ -55,6 +54,7 @@ export const store = createStore(rootReducer);
 
 export let dispatch = (action: AppAction) => {
     store.dispatch(action);
+    //console.log("Dispatch Complete: " + action.type);
 }
 
 /* This listener is temporary until I find a better way to do this code, which needs to always run after any
@@ -62,7 +62,8 @@ render is complete and AFTER the html DOM is updated/final
 
 This works, but is currently not needed.
 */
-// const handleChange = () => {
-// }
-// const unsubscribe = store.subscribe(handleChange);
+const handleChange = () => {
+    //console.log("AppRedux change.");
+}
+const unsubscribe = store.subscribe(handleChange);
 // // unsubscribe()

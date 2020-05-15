@@ -19,10 +19,18 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompContent extends Div {
 
+    /* switches for performance testing. */
+    static showRowHeader: boolean = true;
+    static renderMarkdown: boolean = true;
+
     constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix = "") {
         super(null, {
-            id: "NodeCompContent_"+node.id
+            id: "NodeCompContent_" + node.id
         });
+
+        if (!NodeCompContent.showRowHeader) {
+            this.showHeader = false;
+        }
     }
 
     preRender = (): void => {
@@ -63,10 +71,18 @@ export class NodeCompContent extends Div {
             }
 
             if (!renderComplete) {
+                //todo-0: do we still need retState? this is ugly.
                 let retState: any = {};
                 retState.renderComplete = renderComplete;
-                children.push(new NodeCompMarkdown(node, retState));
-                renderComplete = retState.renderComplete;
+                
+                if (NodeCompContent.renderMarkdown) {
+                    children.push(new NodeCompMarkdown(node, retState));
+                    renderComplete = retState.renderComplete;
+                }
+                else {
+                    children.push(new Div(node.content));
+                    renderComplete = true;
+                }
             }
         }
 

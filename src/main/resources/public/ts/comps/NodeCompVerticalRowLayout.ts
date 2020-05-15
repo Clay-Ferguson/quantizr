@@ -16,6 +16,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompVerticalRowLayout extends Div {
 
+    /* switch for performance testing only */
+    static showBetweenBar : boolean = true;
+
     constructor(public node: J.NodeInfo, public level: number, public allowNodeMove: boolean) {
         super();
     }
@@ -55,7 +58,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
                 }
 
-                if (rowCount == 0 && state.userPreferences.editMode && this.level == 1) {
+                if (NodeCompVerticalRowLayout.showBetweenBar && rowCount == 0 && state.userPreferences.editMode && this.level == 1) {
                     comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state.nodesToMove, state));
 
                     //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
@@ -72,7 +75,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
                 }
 
-                if (state.userPreferences.editMode && this.level == 1) {
+                if (NodeCompVerticalRowLayout.showBetweenBar && state.userPreferences.editMode && this.level == 1) {
                     comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay, state.nodesToMove, state));
 
                     //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space

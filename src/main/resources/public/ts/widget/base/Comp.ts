@@ -41,7 +41,11 @@ export abstract class Comp implements CompIntf {
     attribs: any;
 
     /* this is a more powerful of doing what React.memo can do but supports keys in a better way than React.memo, because
-    rect memo, relies on props, and we want to be able to have a custom key object provider instead, which is more flexible and powerful */
+    rect memo, relies on props, and we want to be able to have a custom key object provider instead, which is more flexible and powerful.
+    
+    Update: It turned out he complexity cost AND performance improvement was horrible, so this memoMap stuff is currently disabled
+    with this switch, but I'm leaving the code here in case there IS a future scenario where this code may be leveraged. 
+    */
     static enableMemoMap: boolean = false;
     static memoMap: { [key: string]: ReactNode } = {};
 
@@ -251,6 +255,7 @@ export abstract class Comp implements CompIntf {
             //See #RulesOfHooks in this file, for the reason we blowaway the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
 
+            (this.render as any).displayName = this.jsClassName;
             let reactElm = S.e(this.render, this.attribs);
 
             /* If this component has a store then wrap with the Redux Provider to make it all reactive */
@@ -275,6 +280,7 @@ export abstract class Comp implements CompIntf {
                 let reChild: ReactNode = null;
                 try {
                     //console.log("ChildRender: " + child.jsClassName);
+                    (this.render as any).displayName = child.jsClassName;
                     reChild = S.e(child.render, child.attribs);
                 }
                 catch (e) {
@@ -461,15 +467,16 @@ export abstract class Comp implements CompIntf {
                 //note: getting full state here is a big performance hit? There's definitely a performance issue.
                 appState = useSelector((state: AppState) => state);
 
+                //NOTE: The final experimental definition of this function is that it returns a 'string' not an object.
                 let keyObj = this.makeCacheKeyObj(appState, state, props);
                 //console.log("keyObj=" + S.util.prettyPrint(keyObj));
                 if (keyObj) {
-                    key = this.constructor.name + "_" +  /* JSON.stringify(keyObj); */ S.util.hashOfObject(keyObj);
+                    key = keyObj; //this.constructor.name + "_" + JSON.stringify(keyObj); // S.util.hashOfObject(keyObj);
 
                     //console.log("CACHE KEY HASH: "+key);
                     let rnode: ReactNode = Comp.memoMap[key];
                     if (rnode) {
-                        console.log("********** CACHE HIT: " + this.jsClassName);
+                        //console.log("********** CACHE HIT: " + this.jsClassName);
                         return rnode;
                     }
                 }

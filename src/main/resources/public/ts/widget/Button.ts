@@ -41,7 +41,7 @@ export class Button extends Comp {
             });
         }
 
-        /* This is really ugly to alter 'attribs' DURING a render. Need to do this when the 'enabled' state var changes only */
+        /* todo-0: This is really ugly to alter 'attribs' DURING a render. Need to do this when the 'enabled' state var changes only */
         if (this.getState().enabled) {
             //console.log("button is enabled.");
             delete this.attribs.disabled;
@@ -64,14 +64,4 @@ export class Button extends Comp {
 
         return S.e('button', this.attribs, [icon, this.getState().text]);
     }
-
-     /* Return an object such that, if this object changes, we must render, or else we don't need to render */
-    //  makeCacheKeyObj = (appState: AppState, state: any, props: any) => {
-    //     state = this.getState();
-    //     return {
-    //         stateText: state.text,
-    //         stateEnabled: state.enabled,
-    //         props,
-    //     };
-    // }
 }
