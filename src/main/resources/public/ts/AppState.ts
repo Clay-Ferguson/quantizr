@@ -25,15 +25,6 @@ export class AppState {
 
     activeTab: string = "mainTab";
 
-    /*
-    * Under any given node, there can be one active 'selected' node that has the highlighting, and will be scrolled
-    * to whenever the page with that child is re-visited, and parentIdToFocusNodeMap holds the map of "parent id to
-    * selected node (NodeInfo object)", where the key is the parent node id, and the value is the currently
-    * selected node within that parent. Note this 'selection state' is only significant on the client, and only for
-    * being able to scroll to the node during navigating around on the tree.
-    */
-    parentIdToFocusNodeMap: { [key: string]: J.NodeInfo } = {};
-
     userPreferences: J.UserPreferences = {
         editMode: false,
         importAllowed: false,

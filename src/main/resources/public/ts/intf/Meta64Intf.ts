@@ -19,6 +19,9 @@ export interface Meta64Intf {
     deviceHeight: number;
 
     navBarHeight: number;
+    parentIdToFocusNodeMap: { [key: string]: J.NodeInfo };
+    curHighlightNodeCompRow: CompIntf;
+    idToNodeCompRowMap: { [key: string]: CompIntf };
 
     setOverlay(showOverlay: boolean): void;
     rebuildIndexes(): void;

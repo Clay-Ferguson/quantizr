@@ -34,6 +34,17 @@ export class Meta64 implements Meta64Intf {
     deviceWidth: number = 0;
     deviceHeight: number = 0;
 
+    /*
+    * Under any given node, there can be one active 'selected' node that has the highlighting, and will be scrolled
+    * to whenever the page with that child is re-visited, and parentIdToFocusNodeMap holds the map of "parent id to
+    * selected node (NodeInfo object)", where the key is the parent node id, and the value is the currently
+    * selected node within that parent. Note this 'selection state' is only significant on the client, and only for
+    * being able to scroll to the node during navigating around on the tree.
+    */
+    parentIdToFocusNodeMap: { [key: string]: J.NodeInfo } = {};
+    idToNodeCompRowMap: { [key: string]: CompIntf } = {};
+    curHighlightNodeCompRow: CompIntf = null;
+
     rebuildIndexes = (): void => {
         S.util.ajax<J.RebuildIndexesRequest, J.RebuildIndexesResponse>("rebuildIndexes", {}, function (res: J.RebuildIndexesResponse) {
             S.util.showMessage("Index rebuild complete.", "Note");
@@ -162,7 +173,7 @@ export class Meta64 implements Meta64Intf {
 
     getHighlightedNode = (state: AppState): J.NodeInfo => {
         if (!state.node) return null;
-        let ret: J.NodeInfo = state.parentIdToFocusNodeMap[state.node.id];
+        let ret: J.NodeInfo = S.meta64.parentIdToFocusNodeMap[state.node.id];
         return ret;
     }
 
@@ -192,8 +203,8 @@ export class Meta64 implements Meta64Intf {
             S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, id);
             S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
         }, 250);
-        
-        state.parentIdToFocusNodeMap[id] = node;
+
+        S.meta64.parentIdToFocusNodeMap[id] = node;
 
         if (scroll) {
             S.view.scrollToSelectedNode(state);
@@ -386,7 +397,7 @@ export class Meta64 implements Meta64Intf {
             this.deviceHeight = window.innerHeight;
 
             //This is the root react App component that contains the entire application
-            this.app = new App() ; //new AppDemo(); 
+            this.app = new App(); //new AppDemo(); 
             this.app.updateDOM(store, "app");
 
             /*

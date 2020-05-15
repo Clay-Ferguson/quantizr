@@ -8,6 +8,7 @@ import { Div } from "../widget/Div";
 import { NodeCompContent } from "./NodeCompContent";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -25,6 +26,9 @@ export class NodeCompRow extends Div {
         super(null, {
             id: "row_" + node.id,
         });
+
+        //todo-0: need cleanup for this in the unmount listener? --OR-- can we just cleanup whenever there's a 'renderNode' callto server? yes the latter.
+        S.meta64.idToNodeCompRowMap[node.id] = this;
     }
 
     preRender = (): void => {
@@ -34,7 +38,22 @@ export class NodeCompRow extends Div {
         let id: string = node.id;
         //console.log("Rendering NodeCompRow. id=" + node.id);
 
-        this.attribs.onClick = (evt) => { S.nav.clickNodeRow(node, state); };
+        this.attribs.onClick = (evt) => { 
+            let lastComp: CompIntf = null;
+
+            //get previously selected node, to force it to render (as unhighlighted)
+            let highlightNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            if (highlightNode) {
+                lastComp = S.meta64.idToNodeCompRowMap[highlightNode.id];
+            }
+
+            S.nav.clickNodeRow(node, state);
+            
+            if (lastComp) {
+                lastComp.forceRender();
+            }
+            this.forceRender(); 
+        };
 
         //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
         let buttonBar: Comp = null;

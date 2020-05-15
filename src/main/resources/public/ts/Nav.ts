@@ -189,14 +189,14 @@ export class Nav implements NavIntf {
         /* We do this async just to make the fastest possible response when clicking on a node */
         setTimeout(() => {
             S.util.updateHistory(null, node, state);
-        }, 250);
 
-        dispatch({
-            type: "Action_ClickNodeRow",
-            updateNew: (s: AppState): AppState => {
-                return { ...state };
-            }
-        });
+            dispatch({
+                type: "Action_ClickNodeRow",
+                updateNew: (s: AppState): AppState => {
+                    return { ...state };
+                }
+            });
+        }, 10);
     }
 
     openContentNode = (nodePathOrId: string, state: AppState): void => {

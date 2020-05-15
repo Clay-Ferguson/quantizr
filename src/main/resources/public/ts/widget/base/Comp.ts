@@ -344,6 +344,10 @@ export abstract class Comp implements CompIntf {
         });
     }
 
+    forceRender = () => {
+        this.mergeState({ forceRender: Comp.nextGuid() });
+    }
+
     setState = (newState: any): any => {
         this.setStateEx((state: any) => {
             this.state = { ...newState };
@@ -407,7 +411,7 @@ export abstract class Comp implements CompIntf {
             //this.setStateEx = setStateEx;
 
             this.setStateEx = (state) => {
-                
+
                 //React will bark at us if we allow a setState call to execute on a component that's no longer mounted, so that's why we have the 'isMounted' 
                 //varible. The error in React says this:
                 //Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function. in Unknown
@@ -463,7 +467,7 @@ export abstract class Comp implements CompIntf {
             /* if we are caching this ReactNode (memoizing) then try to get object from cache 
             instead of rendering it */
             if (Comp.enableMemoMap && this.makeCacheKeyObj) {
-                
+
                 //note: getting full state here is a big performance hit? There's definitely a performance issue.
                 appState = useSelector((state: AppState) => state);
 
