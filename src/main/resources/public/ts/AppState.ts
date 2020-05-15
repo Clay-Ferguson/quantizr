@@ -3,6 +3,10 @@ import { NodeInfo } from "./JavaIntf";
 
 /* root react Redux state for entire app */
 export class AppState {
+    //for testing in AppDemo
+    counter: number = 0; 
+    compDemoIdActive: number = -1;
+
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
 

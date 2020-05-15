@@ -38,6 +38,10 @@ export function rootReducer(state: AppState = initialState, /* action: Action<an
         */
         state = { ...state };
     }
+    /* If this AppAction has 'updateEx' use it to update existing state, and DO NOT create a new state object */
+    else if (action.updateEx) {
+        action.updateEx(state);
+    }
 
     /* If this action wants us to update it's own copy of a 'state' do that here */
     if (action.state) {

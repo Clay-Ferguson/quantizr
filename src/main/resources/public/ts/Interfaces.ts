@@ -9,6 +9,7 @@ export interface AppAction extends Action<any> {
     type: string;
     updateNew?: (AppState: any) => AppState;
     update?: (AppState: any) => void;
+    updateEx?: (AppState: any) => void;
     data?: any;
 
     /* If the action is running in a context where we want some existing state object to also get

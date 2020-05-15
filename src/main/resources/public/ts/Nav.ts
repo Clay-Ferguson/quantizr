@@ -172,8 +172,8 @@ export class Nav implements NavIntf {
         return null;
     }
 
-    clickOnNodeRow = (node: J.NodeInfo, state: AppState): void => {
-        console.log("clickOnNodeRow: id=" + node.id);
+    clickNodeRow = (node: J.NodeInfo, state: AppState): void => {
+        //console.log("clickNodeRow: id=" + node.id);
 
         /* First check if this node is already highlighted and if so just return */
         let highlightNode = S.meta64.getHighlightedNode(state);
@@ -192,7 +192,7 @@ export class Nav implements NavIntf {
         }, 250);
 
         dispatch({
-            type: "Action_ClickOnNodeRow",
+            type: "Action_ClickNodeRow",
             updateNew: (s: AppState): AppState => {
                 return { ...state };
             }

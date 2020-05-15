@@ -30,6 +30,11 @@ export class MainTabComp extends Div {
             this.attribs.className += " show active";
         }
 
+        if (!state.node) {
+            this.setChildren(null);
+            return;
+        }
+
         this.setChildren([
             new NodeCompMainNode(state),
             new NodeCompMainList()

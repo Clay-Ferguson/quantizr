@@ -26,7 +26,7 @@ export interface NavIntf {
     navUpLevel(state: AppState): void;
     navOpenSelectedNode(state: AppState): void;
     getSelectedDomElement(state: AppState): HTMLElement;
-    clickOnNodeRow(node: J.NodeInfo, state: AppState): void;
+    clickNodeRow(node: J.NodeInfo, state: AppState): void;
     openNodeById(id: string, state: AppState): void;
     toggleNodeSel(selected: boolean, id: string, state: AppState): void;
     navPageNodeResponse(res: J.RenderNodeResponse, state: AppState): void;

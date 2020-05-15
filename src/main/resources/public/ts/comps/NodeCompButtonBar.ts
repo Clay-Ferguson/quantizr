@@ -80,7 +80,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         if (this.isRootNode && !state.isAnonUser) {
             searchButton = new NavBarIconButton("fa-search", null, {
                 "onClick": e => {
-                    S.nav.clickOnNodeRow(node, state);
+                    S.nav.clickNodeRow(node, state);
                     new SearchContentDlg(state).open();
                 },
                 "title": "Search under this node"
@@ -89,7 +89,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
             timelineButton = new NavBarIconButton("fa-clock-o", null, {
                 "onClick": e => {
-                    S.nav.clickOnNodeRow(node, state);
+                    S.nav.clickNodeRow(node, state);
                     S.srch.timeline("mtm", state);
                 },
                 "title": "View Timeline under this node (by Mod Time)"

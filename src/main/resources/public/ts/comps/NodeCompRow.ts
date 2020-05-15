@@ -25,11 +25,12 @@ export class NodeCompRow extends Div {
 
     preRender = (): void => {
         let state: AppState = useSelector((state: AppState) => state);
+    
         let node = this.node;
         let id: string = node.id;
         //console.log("Rendering NodeCompRow. id=" + node.id);
 
-        this.attribs.onClick = (evt) => { S.nav.clickOnNodeRow(node, state); }; //
+        this.attribs.onClick = (evt) => { S.nav.clickNodeRow(node, state); }; 
 
         /*
          * if not selected by being the new child, then we try to select based on if this node was the last one
@@ -61,4 +62,20 @@ export class NodeCompRow extends Div {
 
         S.render.setNodeDropHandler(this, node, state);
     }
+
+    /* Return an object such that, if this object changes, we must render, or else we don't need to render 
+    
+    This cache key is going to be tricky to get correct. It may be better to just store which node is highlighted to UNHIGHLIGHT it, and
+    highlight the new one during a node click, which is the real place i'm trying to solve performance. Also having every node get a copy of AppState
+    every time it renders also may be destroying performance.
+    */
+    // makeCacheKeyObj = (appState: AppState, state: any, props: any) => {
+    //     state = this.getState();
+    //     return {
+    //         nodeId: this.node.id,
+    //         content: this.node.content,
+    //         stateEnabled: state.enabled,
+    //         props,
+    //     };
+    // }
 }

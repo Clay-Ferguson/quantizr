@@ -35,7 +35,7 @@ export class NodeCompMainNode extends Div {
         let selected: boolean = (focusNode && focusNode.id === node.id);
         this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main")
 
-        this.attribs.onClick = (elm: HTMLElement) => { S.nav.clickOnNodeRow(node, state); };
+        this.attribs.onClick = (elm: HTMLElement) => { S.nav.clickNodeRow(node, state); };
         S.render.setNodeDropHandler(this, node, state);
 
         //console.log("NodeCompNameNode id="+node.id+" hash="+S.util.hashOfObject(node));

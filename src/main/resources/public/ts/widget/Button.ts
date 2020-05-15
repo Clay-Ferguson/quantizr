@@ -3,6 +3,7 @@ import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { ReactNode } from "react";
+import { AppState } from "../AppState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -24,10 +25,11 @@ export class Button extends Comp {
     }
 
     setText(text: string): void {
-        this.mergeState({text});
+        this.mergeState({ text });
     }
 
     compRender = (): ReactNode => {
+        //console.log("**************** ButtonRenderCount="+Button.buttonRenderCount);
         let icon: any;
         if (this.attribs.iconclass) {
             icon = S.e('i', {
@@ -39,6 +41,7 @@ export class Button extends Comp {
             });
         }
 
+        /* This is really ugly to alter 'attribs' DURING a render. Need to do this when the 'enabled' state var changes only */
         if (this.getState().enabled) {
             //console.log("button is enabled.");
             delete this.attribs.disabled;
@@ -61,4 +64,14 @@ export class Button extends Comp {
 
         return S.e('button', this.attribs, [icon, this.getState().text]);
     }
+
+     /* Return an object such that, if this object changes, we must render, or else we don't need to render */
+    //  makeCacheKeyObj = (appState: AppState, state: any, props: any) => {
+    //     state = this.getState();
+    //     return {
+    //         stateText: state.text,
+    //         stateEnabled: state.enabled,
+    //         props,
+    //     };
+    // }
 }

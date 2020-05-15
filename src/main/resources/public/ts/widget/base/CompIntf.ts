@@ -34,7 +34,7 @@ export interface CompIntf {
 
     reactRenderHtmlInDiv(type: any): string;
     reactRenderHtmlInSpan(type: any): string;
-    updateDOM(id?: string): void;
+    updateDOM(store: any, id: string): void;
 
     setInnerHTML(html: string); 
 

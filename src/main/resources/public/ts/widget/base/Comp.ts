@@ -10,6 +10,9 @@ import * as ReactDOM from "react-dom";
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { ReactNode, ReactElement, useState, useEffect, useLayoutEffect } from "react";
 import { Provider } from 'react-redux';
+import React from "react";
+import { AppState } from "../../AppState";
+import { useSelector, useDispatch } from "react-redux";
 
 //tip: merging states: this.state = { ...this.state, ...moreState };
 
@@ -36,6 +39,11 @@ export abstract class Comp implements CompIntf {
 
     static idToCompMap: { [key: string]: Comp } = {};
     attribs: any;
+
+    /* this is a more powerful of doing what React.memo can do but supports keys in a better way than React.memo, because
+    rect memo, relies on props, and we want to be able to have a custom key object provider instead, which is more flexible and powerful */
+    static enableMemoMap: boolean = false;
+    static memoMap: { [key: string]: ReactNode } = {};
 
     /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored */
     children: CompIntf[];
@@ -364,23 +372,49 @@ export abstract class Comp implements CompIntf {
         return this.state;
     }
 
+    /* Derived classes can implement this to perform something similar to "React.memo" were we memoize based on wether the object
+    that this function returns (or more accurately the hash of it) changes upon additional renderings */
+    makeCacheKeyObj = null;
+
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
-    render = (): ReactNode => {
-        Comp.renderCounter++;
-        if (this.debug) {
-            console.log("rendering: " + this.jsClassName + " counter=" + Comp.renderCounter); // + "] STATE=" + S.util.prettyPrint(this.state));
-        }
+    render = (props: any): ReactNode => {
+
         this.rendered = true;
 
         let ret: ReactNode = null;
         try {
             const [state, setStateEx] = useState(this.state);
+
+            const [isMounted, setIsMounted] = useState<boolean>(false);
+            //to not delete: logic moved into callbacks below instead, but left here for clarity.
+            // useEffect(() => {
+            //     setIsMounted(true);
+            // }, []);
+            // useEffect(() => {
+            //     return () => {
+            //         setIsMounted(false);
+            //     }
+            // }, []);
+
             //console.warn("Component state was null in render for: " + this.jsClassName);
             this.state = state;
-            this.setStateEx = setStateEx;
+            //this.setStateEx = setStateEx;
+
+            this.setStateEx = (state) => {
+                
+                //React will bark at us if we allow a setState call to execute on a component that's no longer mounted, so that's why we have the 'isMounted' 
+                //varible. The error in React says this:
+                //Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function. in Unknown
+
+                if (!isMounted) return;
+                setStateEx(state);
+            }
 
             /* This 'useEffect' call makes react call 'domAddEvent' once the dom element comes into existence on the acutal DOM */
-            useEffect(this.domAddEvent, []);
+            useEffect(() => {
+                setIsMounted(true);
+                this.domAddEvent();
+            }, []);
 
             //This hook should work fine but just isn't needed yet.
             if (this.domUpdateEvent) {
@@ -404,6 +438,7 @@ export abstract class Comp implements CompIntf {
             */
             useEffect(() => {
                 return () => {
+                    setIsMounted(false);
                     this.domRemoveEvent();
                 }
             }, []);
@@ -416,12 +451,47 @@ export abstract class Comp implements CompIntf {
             // this.attribs.style.display = this.getState().visible ? "block" : "none";
 
             this.preRender();
+            let key = null;
+            let appState: AppState = null;
+
+            /* if we are caching this ReactNode (memoizing) then try to get object from cache 
+            instead of rendering it */
+            if (Comp.enableMemoMap && this.makeCacheKeyObj) {
+                
+                //note: getting full state here is a big performance hit? There's definitely a performance issue.
+                appState = useSelector((state: AppState) => state);
+
+                let keyObj = this.makeCacheKeyObj(appState, state, props);
+                //console.log("keyObj=" + S.util.prettyPrint(keyObj));
+                if (keyObj) {
+                    key = this.constructor.name + "_" +  /* JSON.stringify(keyObj); */ S.util.hashOfObject(keyObj);
+
+                    //console.log("CACHE KEY HASH: "+key);
+                    let rnode: ReactNode = Comp.memoMap[key];
+                    if (rnode) {
+                        console.log("********** CACHE HIT: " + this.jsClassName);
+                        return rnode;
+                    }
+                }
+            }
+
+            Comp.renderCounter++;
+            if (this.debug) {
+                console.log("rendering: " + this.jsClassName + " counter=" + Comp.renderCounter); //+ " PROPS=" + S.util.prettyPrint(props));
+            }
+
             ret = this.compRender();
+
+            /* If we have the cache key provider, cache this node for later */
+            if (Comp.enableMemoMap && this.makeCacheKeyObj) {
+                Comp.memoMap[key] = ret;
+            }
         }
         catch (e) {
             //todo-1: this is not logging the stack
             console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key + " Error: " + e);
         }
+
         return ret;
     }
 

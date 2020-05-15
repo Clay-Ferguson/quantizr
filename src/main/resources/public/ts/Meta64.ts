@@ -9,6 +9,8 @@ import { AppState } from "./AppState";
 import { MainTabPanelIntf } from "./Interfaces";
 import { dispatch, initialState } from "./AppRedux";
 import { store } from "./AppRedux";
+import { CompIntf } from "./widget/base/CompIntf";
+import { AppDemo } from "./widget/AppDemo";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -18,7 +20,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Meta64 implements Meta64Intf {
 
     mainTabPanel: MainTabPanelIntf;
-    app: App;
+    app: CompIntf;
 
     navBarHeight: number = 0;
 
@@ -384,7 +386,7 @@ export class Meta64 implements Meta64Intf {
             this.deviceHeight = window.innerHeight;
 
             //This is the root react App component that contains the entire application
-            this.app = new App();
+            this.app = new App() ; //new AppDemo(); 
             this.app.updateDOM(store, "app");
 
             /*
