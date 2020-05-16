@@ -22,7 +22,7 @@ export class NodeCompMarkdown extends MarkdownDiv {
     //UPDATE: turning this ON for now, because for testing 'shared' nodes we don't have editing capability and thus need a way to decrypt
     private immediateDecrypting: boolean = true;
 
-    constructor(public node: J.NodeInfo, public retState: any) {
+    constructor(public node: J.NodeInfo) {
         super(null, {
             className: "markdown-content content-narrow markdown-html",
         });
@@ -82,7 +82,6 @@ export class NodeCompMarkdown extends MarkdownDiv {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         let content = node.content || "";
-        this.retState.renderComplete = true;
 
         let val;
         if (content.startsWith(J.Constant.ENC_TAG)) {

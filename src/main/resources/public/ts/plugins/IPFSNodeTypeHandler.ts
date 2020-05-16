@@ -45,7 +45,7 @@ export class IPFSNodeTypeHandler implements TypeHandlerIntf {
             if (link) {
                 ret.push(new Heading(6, "Link: " + link, { className: "ipfs-text" }));
             }
-            ret.push(new NodeCompMarkdown(node, {}));
+            ret.push(new NodeCompMarkdown(node));
         }
         else {
             let displayName = S.props.getNodePropVal("ipfs:link", node);

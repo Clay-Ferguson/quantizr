@@ -28,7 +28,7 @@ export class RepoRootTypeHandler implements TypeHandlerIntf {
 
     render = (node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp => {
         //this is essentially the 'default rendering' any other node has.
-        return new NodeCompMarkdown(node, {});
+        return new NodeCompMarkdown(node);
     }
 
     orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {

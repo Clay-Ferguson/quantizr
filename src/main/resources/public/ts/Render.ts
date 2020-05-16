@@ -155,6 +155,7 @@ export class Render implements RenderIntf {
                     s.offsetOfNodeFound = res.offsetOfNodeFound;
                     s.displayedParent = res.displayedParent;
 
+                    S.meta64.idToNodeCompRowMap = {};
                     S.meta64.updateNodeMap(res.node, 1, s);
                     s.selectedNodes = {};
 

@@ -60,34 +60,24 @@ export class NodeCompContent extends Div {
                 children.push(propTable);
             }
         } else {
-            let renderComplete: boolean = false;
-
             /*
              * Special Rendering for Nodes that have a plugin-renderer
              */
             if (typeHandler) {
-                renderComplete = true;
                 children.push(typeHandler.render(node, this.rowStyling, state));
             }
-
-            if (!renderComplete) {
-                //todo-0: do we still need retState? this is ugly.
-                let retState: any = {};
-                retState.renderComplete = renderComplete;
-                
+            else {
                 if (NodeCompContent.renderMarkdown) {
-                    children.push(new NodeCompMarkdown(node, retState));
-                    renderComplete = retState.renderComplete;
+                    children.push(new NodeCompMarkdown(node));
                 }
                 else {
                     children.push(new Div(node.content));
-                    renderComplete = true;
                 }
             }
         }
 
-        // /* if node owner matches node id this is someone's account root node, so what we're doing here is not
-        // showing the normal attachment for this node, because that will the same as the avatar */
+        /* if node owner matches node id this is someone's account root node, so what we're doing here is not
+         showing the normal attachment for this node, because that will the same as the avatar */
         let isAnAccountNode = node.ownerId && node.id == node.ownerId;
 
         if (S.props.hasBinary(node) && !isAnAccountNode) {

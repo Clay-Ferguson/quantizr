@@ -18,8 +18,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompRow extends Div {
 
-    /* we have this flag so we can turn off buttons to troubleshoot performance. todo-0: set true
-    */
+    /* we have this flag so we can turn off buttons to troubleshoot performance. */
     static showButtonBar: boolean = true;
 
     constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number, public layoutClass: string, public allowNodeMove: boolean) {
@@ -27,7 +26,6 @@ export class NodeCompRow extends Div {
             id: "row_" + node.id,
         });
 
-        //todo-0: need cleanup for this in the unmount listener? --OR-- can we just cleanup whenever there's a 'renderNode' callto server? yes the latter.
         S.meta64.idToNodeCompRowMap[node.id] = this;
     }
 
