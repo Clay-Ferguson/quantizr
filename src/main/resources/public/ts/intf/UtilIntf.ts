@@ -4,7 +4,6 @@ import { AppState } from "../AppState";
 
 export interface UtilIntf {
     logAjax: boolean;
-    //offline: boolean;
     waitCounter: number;
     pgrsDlg: any;
 

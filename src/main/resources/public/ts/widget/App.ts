@@ -14,7 +14,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class App extends Comp {
-
     tabPanel: TabPanel = null;
 
     constructor(attribs: Object = {}) {

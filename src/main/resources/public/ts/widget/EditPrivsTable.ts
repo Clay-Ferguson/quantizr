@@ -24,7 +24,7 @@ export class EditPrivsTable extends Comp {
     }
 
     compRender = (): ReactNode => {
-        this.removeAllChildren();
+        this.children = null;
 
         let nodePrivsInfo: I.NodePrivilegesInfo = this.getState();
         //console.log("compRender[" + this.jsClassName + "] STATE: " + S.util.prettyPrint(nodePrivsInfo));

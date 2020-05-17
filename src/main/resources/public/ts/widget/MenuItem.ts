@@ -15,17 +15,16 @@ export class MenuItem extends Div {
     constructor(public name: string, public clickFunc: Function, isEnabledFunc?: Function, isVisibleFunc?: Function, bottomSeparator?: boolean) {
         super(name, {
             className: "list-group-item list-group-item-action",
+            //todo-0: get rid of arrow function here
+            onClick: () => {
+                /* always dispose the menu before running the menu function */
+                if (S.nav.mainMenuPopupDlg) {
+                    (<MainMenuPopupDlg>S.nav.mainMenuPopupDlg).close();
+                }
+                clickFunc();
+            }
         });
 
-        let func = () => {
-            /* always dispose the menu before running the menu function */
-            if (S.nav.mainMenuPopupDlg) {
-                (<MainMenuPopupDlg>S.nav.mainMenuPopupDlg).close();
-            }
-            clickFunc();
-        };
-
-        this.setOnClick(func);
         this.setIsEnabledFunc(isEnabledFunc);
         this.setIsVisibleFunc(isVisibleFunc);
         this.state.content = name;

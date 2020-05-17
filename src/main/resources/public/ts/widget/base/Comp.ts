@@ -17,6 +17,7 @@ import { useSelector, useDispatch } from "react-redux";
 //tip: merging states: this.state = { ...this.state, ...moreState };
 
 let S: Singletons;
+//todo-0: all calls like this can use non-arrow functions.
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
@@ -28,7 +29,6 @@ declare var PROFILE;
  * The innerHTML approach is being phased out in order to transition fully over to normal ReactJS. 
  */
 export abstract class Comp implements CompIntf {
-
     static renderCounter: number = 0;
     public rendered: boolean = false;
     public debug: boolean = false;
@@ -72,9 +72,6 @@ export abstract class Comp implements CompIntf {
 
     renderRawHtml: boolean = false;
 
-    /* Used to restore the border style after a drag event ends */
-    nonDragBorder: string = null;
-
     /**
      * 'react' should be true only if this component and all its decendants are true React components that are rendered and
      * controlled by ReactJS (rather than our own innerHTML)
@@ -92,16 +89,17 @@ export abstract class Comp implements CompIntf {
         this.setId(id);
     }
 
-    setId = (id: string) => {
+    private setId(id: string) {
         this.attribs.id = id;
         this.attribs.key = id;
         this.jsClassName = this.constructor.name + "[" + id + "]";
     }
 
-    childrenExist = (): boolean => {
+    childrenExist(): boolean {
         if (this.children == null || this.children.length == 0) return false;
         let ret = false;
-        this.children.forEach((child: Comp) => {
+        //todo-0: an optimization here is to use old-school iteration to return immediately when ret is true.
+        this.children.forEach(function(child: Comp) { 
             if (child) {
                 ret = true;
             }
@@ -109,18 +107,11 @@ export abstract class Comp implements CompIntf {
         return ret;
     }
 
-    setDomAttr = (attrName: string, attrVal: string) => {
-        this.whenElm((elm: HTMLElement) => {
-            elm.setAttribute(attrName, attrVal);
-            this.attribs[attrName] = attrVal;
-        });
-    }
-
-    setIsEnabledFunc = (isEnabledFunc: Function) => {
+    setIsEnabledFunc(isEnabledFunc: Function) {
         this.isEnabledFunc = isEnabledFunc;
     }
 
-    setIsVisibleFunc = (isVisibleFunc: Function) => {
+    setIsVisibleFunc(isVisibleFunc: Function) {
         this.isVisibleFunc = isVisibleFunc;
     }
 
@@ -128,28 +119,24 @@ export abstract class Comp implements CompIntf {
         return ++Comp.guid;
     }
 
-    removeAllChildren = (): void => {
-        this.children = [];
-    }
-
-    getId = (): string => {
+    getId(): string {
         return this.attribs.id;
     }
 
     /* Warning: Under lots of circumstances it's better to call util.getElm rather than getElement() because getElement returns
     null unless the element is already created and rendered onto the DOM */
-    getElement = (): HTMLElement => {
+    getElement(): HTMLElement {
         return <HTMLElement>document.getElementById(this.getId());
     }
 
     //This is the original implementation of whenElm which uses a timer to wait for the element to come into existence
     //and is only used in one odd place where we manually attach Dialogs to the DOM (see DialogBase.ts)
-    whenElmEx = (func: (elm: HTMLElement) => void) => {
+    whenElmEx(func: (elm: HTMLElement) => void) {
         S.util.getElm(this.getId(), func);
     }
 
     //WARNING: Use whenElmEx for DialogBase derived components!
-    whenElm = (func: (elm: HTMLElement) => void) => {
+    whenElm(func: (elm: HTMLElement) => void) {
         //console.log("whenElm running for " + this.jsClassName);
         if (this.domAddEventRan) {
             func(this.getElement());
@@ -175,53 +162,53 @@ export abstract class Comp implements CompIntf {
 
     /* WARNING: this is NOT a setter for 'this.visible'. Perhaps i need to rename it for better clarity, it takes
     this.visible as its input sometimes. Slightly confusing */
-    setVisible = (visible: boolean) => {
+    setVisible(visible: boolean) {
         this.mergeState({ visible });
     }
 
     /* WARNING: this is NOT the setter for 'this.enabled' */
-    setEnabled = (enabled: boolean) => {
+    setEnabled(enabled: boolean) {
         this.mergeState({ enabled });
     }
 
-    setClass = (clazz: string): void => {
+    setClass(clazz: string): void {
         this.attribs.className = clazz;
     }
 
-    setInnerHTML = (html: string) => {
-        this.whenElm((elm: HTMLElement) => {
+    setInnerHTML(html: string) {
+        this.whenElm(function(elm: HTMLElement) {
             elm.innerHTML = html;
         });
     }
 
-    addChild = (comp: Comp): void => {
+    addChild(comp: Comp): void {
         if (!comp) return;
         this.children.push(comp);
     }
 
-    addChildren = (comps: Comp[]): void => {
+    addChildren(comps: Comp[]): void {
         this.children.push.apply(this.children, comps);
     }
 
-    setChildren = (comps: CompIntf[]) => {
+    setChildren(comps: CompIntf[]) {
         this.children = comps || [];
     }
 
-    getAttribs = (): Object => {
+    getAttribs(): Object {
         return this.attribs;
     }
 
-    renderHtmlElm = (elm: ReactElement): string => {
+    renderHtmlElm (elm: ReactElement): string {
         return renderToString(elm);
         //return renderToStaticMarkup(elm);
     }
 
-    reactRenderHtmlInDiv = (): string => {
+    reactRenderHtmlInDiv(): string {
         this.updateDOM(null, this.getId() + "_re");
         return "<div id='" + this.getId() + "_re'></div>";
     }
 
-    reactRenderHtmlInSpan = (): string => {
+    reactRenderHtmlInSpan(): string {
         this.updateDOM(null, this.getId() + "_re");
         return "<span id='" + this.getId() + "_re'></span>";
     }
@@ -232,7 +219,7 @@ export abstract class Comp implements CompIntf {
        Also this can only re-render TOP LEVEL elements, meaning elements that are not children of other React Elements, but attached
        to the DOM old-school.
     */
-    updateDOM = (store: any = null, id: string = null) => {
+    updateDOM(store: any = null, id: string = null) {
         if (!id) {
             id = this.getId();
         }
@@ -243,8 +230,8 @@ export abstract class Comp implements CompIntf {
             //See #RulesOfHooks in this file, for the reason we blowaway the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
 
-            (this.render as any).displayName = this.jsClassName;
-            let reactElm = S.e(this.render, this.attribs);
+            (this._render as any).displayName = this.jsClassName;
+            let reactElm = S.e(this._render, this.attribs);
 
             /* If this component has a store then wrap with the Redux Provider to make it all reactive */
             if (store) {
@@ -258,18 +245,18 @@ export abstract class Comp implements CompIntf {
         });
     }
 
-    buildChildren = (): ReactNode[] => {
+    buildChildren(): ReactNode[] {
         //console.log("buildChildren: " + this.jsClassName);
         if (this.children == null || this.children.length == 0) return null;
         let reChildren: ReactNode[] = [];
 
-        this.children.forEach((child: Comp) => {
+        this.children.forEach(function(child: Comp) { 
             if (child) {
                 let reChild: ReactNode = null;
                 try {
                     //console.log("ChildRender: " + child.jsClassName);
-                    (this.render as any).displayName = child.jsClassName;
-                    reChild = S.e(child.render, child.attribs);
+                    (this._render as any).displayName = child.jsClassName;
+                    reChild = S.e(child._render, child.attribs);
                 }
                 catch (e) {
                     console.error("Failed to render child " + child.jsClassName + " attribs.key=" + child.attribs.key);
@@ -282,16 +269,16 @@ export abstract class Comp implements CompIntf {
                     //console.log("ChildRendered to null: " + child.jsClassName);
                 }
             }
-        });
+        }, this);
         return reChildren;
     }
 
-    focus = (): void => {
+    focus(): void {
         S.util.delayedFocus(this.getId());
     }
 
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
-    tagRender = (tag: string, content: string, props: any) => {
+    tagRender(tag: string, content: string, props: any) { 
         //console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
 
         this.state.enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
@@ -325,14 +312,14 @@ export abstract class Comp implements CompIntf {
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
        both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact 
        */
-    mergeState = (moreState: any): any => {
+    mergeState(moreState: any): any {
         this.setStateEx((state: any) => {
             this.state = { ...state, ...moreState };
             return this.state;
         });
     }
 
-    forceRender = () => {
+    forceRender() {
         this.mergeState({ forceRender: Comp.nextGuid() });
     }
 
@@ -353,7 +340,7 @@ export abstract class Comp implements CompIntf {
 
     There are places where 'mergeState' works but 'setState' fails, that needs investigation like EditNodeDlg.
     */
-    setStateEx = (state: any) => {
+    setStateEx(state: any) {
         if (!state) {
             state = {};
         }
@@ -366,7 +353,7 @@ export abstract class Comp implements CompIntf {
         }
     }
 
-    getState = (): any => {
+    getState(): any {
         return this.state;
     }
 
@@ -375,8 +362,7 @@ export abstract class Comp implements CompIntf {
     makeCacheKeyObj = null;
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
-    render = (props: any): ReactNode => {
-
+    _render = (props: any): ReactNode => {
         this.rendered = true;
 
         let ret: ReactNode = null;
@@ -389,7 +375,7 @@ export abstract class Comp implements CompIntf {
             //console.warn("Component state was null in render for: " + this.jsClassName);
             this.state = state;
 
-            this.setStateEx = setStateEx;
+            this.setStateEx = setStateEx.bind(this);
             // #memoReq
             // this.setStateEx = (state) => {
             //     //React will bark at us if we allow a setState call to execute on a component that's no longer mounted, so that's why we have the 'isMounted' 
@@ -449,7 +435,7 @@ export abstract class Comp implements CompIntf {
             if (Comp.enableMemoMap && this.makeCacheKeyObj) {
 
                 //note: getting full state here is a big performance hit? There's definitely a performance issue.
-                appState = useSelector((state: AppState) => state);
+                appState = useSelector(function(state: AppState) {return state});
 
                 //NOTE: The final experimental definition of this function is that it returns a 'string' not an object.
                 let keyObj = this.makeCacheKeyObj(appState, state, props);
@@ -472,7 +458,7 @@ export abstract class Comp implements CompIntf {
             }
 
             if (!this.compRender) {
-                throw new Error("compRender not implemented in "+this.jsClassName);
+                throw new Error("compRender not implemented in " + this.jsClassName);
             }
             ret = this.compRender();
 
@@ -489,6 +475,8 @@ export abstract class Comp implements CompIntf {
         return ret;
     }
 
+    // DO NOT DELETE
+    //
     // WARNING: This isn't redundant. React requires this to be a function that returns a function.
     // domRemoveEventFunc = () => {
     //     return this.domRemoveEvent;
@@ -502,6 +490,7 @@ export abstract class Comp implements CompIntf {
 
     domPreUpdateEvent = null;
 
+    //todo-0: can carefully make this a non-arrow functiono (but search for all uses, because some classes will have to call this via 'super' now)
     domAddEvent = (): void => {
         //console.log("domAddEvent: " + this.jsClassName);
         this.domAddEventRan = true;
@@ -515,9 +504,9 @@ export abstract class Comp implements CompIntf {
             else {
                 //console.log("domAddFuncs running for "+this.jsClassName+" for "+this.domAddFuncs.length+" functions.");
             }
-            this.domAddFuncs.forEach((func) => {
+            this.domAddFuncs.forEach(function(func) {
                 func(elm);
-            });
+            }, this);
             this.domAddFuncs = null;
         }
     }
@@ -534,16 +523,18 @@ export abstract class Comp implements CompIntf {
     //todo-1: move this out into a utilities class.
     setDropHandler = (func: (elm: any) => void): void => {
 
+        //this func should bind if it needs to, but not in here.
+        //func = func.bind(this);
         this.whenElm((elm: HTMLElement) => {
             if (!elm) return;
 
-            this.nonDragBorder = elm.style.borderLeft;
+            let nonDragBorder = elm.style.borderLeft;
 
-            elm.addEventListener("dragenter", (event) => {
+            elm.addEventListener("dragenter", function(event) {
                 event.preventDefault();
             });
 
-            elm.addEventListener("dragover", (event) => {
+            elm.addEventListener("dragover", function(event) {
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
 
@@ -551,15 +542,15 @@ export abstract class Comp implements CompIntf {
                 elm.style.borderLeft = "9px dotted green";
             });
 
-            elm.addEventListener("dragleave", (event) => {
+            elm.addEventListener("dragleave", function(event) {
                 event.preventDefault();
-                elm.style.borderLeft = this.nonDragBorder;
+                elm.style.borderLeft = nonDragBorder;
             });
 
-            elm.addEventListener("drop", (event) => {
+            elm.addEventListener("drop", function(event) {
                 event.stopPropagation();
                 event.preventDefault();
-                elm.style.borderLeft = this.nonDragBorder;
+                elm.style.borderLeft = nonDragBorder;
                 func(event);
             });
         });

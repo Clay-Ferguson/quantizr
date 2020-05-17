@@ -5,10 +5,9 @@ export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[
 export interface CompIntf {
     clazz: string;
 
-    setDomAttr(attrName: string, attrVal: string);
     setIsEnabledFunc(isEnabledFunc: Function); 
     setIsVisibleFunc(isVisibleFunc: Function);
-    removeAllChildren(): void;
+    
     getId(): string;
     getElement(): HTMLElement; 
     whenElm(func: Function); 
