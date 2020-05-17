@@ -18,7 +18,7 @@ export class DlgContainer extends Comp {
         super(attribs);
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         this.setChildren([
             new Div("This is a test"),
         ]);

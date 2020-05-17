@@ -32,7 +32,7 @@ export class Input extends Comp {
         })
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         /* I have several places in other classes where 'conten' and 'attribs' is in reverse/wrong order. check */
         let state = this.getState();
         this.attribs.value = state.value;

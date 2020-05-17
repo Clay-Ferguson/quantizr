@@ -457,9 +457,6 @@ export abstract class Comp implements CompIntf {
                 console.log("rendering: " + this.jsClassName + " counter=" + Comp.renderCounter); //+ " PROPS=" + S.util.prettyPrint(props));
             }
 
-            if (!this.compRender) {
-                throw new Error("compRender not implemented in " + this.jsClassName);
-            }
             ret = this.compRender();
 
             /* If we have the cache key provider, cache this node for later */
@@ -518,7 +515,7 @@ export abstract class Comp implements CompIntf {
 
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state
     // manageent aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
-    public compRender = null;
+    abstract compRender(): ReactNode;
 
     //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
 

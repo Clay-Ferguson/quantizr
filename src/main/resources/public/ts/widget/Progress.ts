@@ -22,7 +22,7 @@ export class Progress extends Comp {
         });
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         return S.e('div', this.attribs);
     }
 }

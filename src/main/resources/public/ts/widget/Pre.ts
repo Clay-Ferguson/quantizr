@@ -16,7 +16,7 @@ export class Pre extends Comp {
         super(attribs);
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         return S.e('pre', this.attribs, (this.content || ""));
     }
 }

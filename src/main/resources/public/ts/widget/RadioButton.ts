@@ -65,7 +65,7 @@ export class RadioButton extends Comp {
         //return this.state.checked;
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         // this.initState({
         //     checked: p.checked
         // });

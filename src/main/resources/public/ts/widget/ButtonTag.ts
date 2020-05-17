@@ -17,7 +17,7 @@ export class ButtonTag extends Comp {
     }
 
     /* Div element is a special case where it renders just its children if there are any, and if not it renders 'content' */
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         return S.e('button', this.attribs, S.e('span', {
             key: "s_"+this.getId(),
             className: "navbar-toggler-icon"

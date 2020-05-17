@@ -30,7 +30,7 @@ export class MenuItem extends Div {
         this.state.content = name;
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         let state = this.getState();
         let _style = { display: (state.visible ? '' : 'none') };
         let enablement = state.enabled ? {} : { disabled: "disabled" };

@@ -23,7 +23,7 @@ export class EditPrivsTable extends Comp {
         this.setClass("list-group marginBottom");
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         this.children = null;
 
         let nodePrivsInfo: I.NodePrivilegesInfo = this.getState();

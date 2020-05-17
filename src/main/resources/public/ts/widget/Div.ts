@@ -18,7 +18,7 @@ export class Div extends Comp {
         this.setChildren(this.initialChildren);
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         this.state.content = this.content;
         return this.tagRender('div', this.state.content /* this.getState().content*/, this.attribs);
     }

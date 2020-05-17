@@ -56,7 +56,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         this.mergeState({ wordWrap });
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         let children = [];
 
         if (this.label) {

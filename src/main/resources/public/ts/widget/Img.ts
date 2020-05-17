@@ -17,7 +17,7 @@ export class Img extends Comp {
         super(attribs);
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         let expandedImages = useSelector((state: AppState) => state.expandedImages);
 
         //console.log("Render IMG: id="+this.getId());

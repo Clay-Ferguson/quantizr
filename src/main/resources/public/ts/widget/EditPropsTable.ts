@@ -15,7 +15,7 @@ export class EditPropsTable extends Comp {
         super(attribs);
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         return this.tagRender('div', null, this.attribs);
     }
 }

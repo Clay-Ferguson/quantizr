@@ -16,7 +16,7 @@ export class Header extends Comp {
         this.attribs.className = (centered ? "horizontal center-justified layout" : "") + " dialog-header";
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         return this.tagRender('div', this.text, this.attribs);
     }
 }

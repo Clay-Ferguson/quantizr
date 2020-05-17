@@ -16,7 +16,7 @@ export class NavTag extends Comp {
         this.setChildren(initialChildren);
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         return this.tagRender('nav', this.content, this.attribs);
     }
 }

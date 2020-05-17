@@ -35,7 +35,7 @@ export class EditPrivsTableRow extends Comp {
         return div;
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
 
         this.setChildren([
             new Heading(4, "User: " + this.aclEntry.principalName),

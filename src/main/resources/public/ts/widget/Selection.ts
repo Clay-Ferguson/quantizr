@@ -46,7 +46,7 @@ export class Selection extends Comp {
         });
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         let children = [];
     
         if (this.label) {

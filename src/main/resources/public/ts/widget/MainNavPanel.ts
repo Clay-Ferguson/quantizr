@@ -24,7 +24,7 @@ export class MainNavPanel extends NavTag {
         super(attribs);
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         //console.log("Rendering MainNavPanel");
 
         const state: AppState = useSelector((state: AppState) => state);

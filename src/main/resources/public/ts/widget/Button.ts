@@ -28,7 +28,7 @@ export class Button extends Comp {
         this.mergeState({ text });
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         //console.log("**************** ButtonRenderCount="+Button.buttonRenderCount);
         let icon: any;
         if (this.attribs.iconclass) {

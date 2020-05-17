@@ -22,7 +22,7 @@ export class AudioPlayer extends Comp {
         return <HTMLAudioElement>this.getElement();
     }
     
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         let elm = S.e('audio', this.attribs);
         return elm;
     }

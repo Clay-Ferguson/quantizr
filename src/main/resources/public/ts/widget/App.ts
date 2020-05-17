@@ -26,7 +26,7 @@ export class App extends Comp {
         });
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         this.setChildren([
             new Div(null, { role: "toolbar" }, [new MainNavPanel(null)]),
             new Main({ role: "main", className: "container" }, [

@@ -17,7 +17,7 @@ export class FormInline extends Comp {
         this.setChildren(initialChildren);
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         return this.tagRender('div', null, this.attribs);
     }
 }

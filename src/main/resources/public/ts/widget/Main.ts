@@ -18,7 +18,7 @@ export class Main extends Comp {
         this.setChildren(children);
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         return this.tagRender('main', null, this.attribs);
     }
 }

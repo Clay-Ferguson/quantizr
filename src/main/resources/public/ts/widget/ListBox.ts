@@ -29,7 +29,7 @@ export class ListBox extends Comp {
         this.selectedRow.setSelectedState(true);
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
          /* For each of the ListBoxRows we need to tell them all who their parent is */
          this.children.forEach(function(row: ListBoxRow) {
             if (row) {

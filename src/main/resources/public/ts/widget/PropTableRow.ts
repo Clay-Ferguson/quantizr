@@ -19,7 +19,7 @@ export class PropTableRow extends Comp {
         this.setChildren(initialChildren);
     }
 
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         return this.tagRender('tr', null, this.attribs);
     }
 }
