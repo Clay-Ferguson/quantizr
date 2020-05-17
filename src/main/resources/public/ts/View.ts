@@ -126,7 +126,7 @@ export class View implements ViewIntf {
             let prevChild = null;
             let nodeFound = false;
             let done = false;
-            state.node.children.forEach((child: J.NodeInfo) => {
+            state.node.children.forEach(function(child: J.NodeInfo) {
                 if (done) return;
 
                 if (nodeFound && dir === "down") {

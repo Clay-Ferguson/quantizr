@@ -18,11 +18,11 @@ export class Selection extends Comp {
         //https://hackerthemes.com/bootstrap-cheatsheet/#m-1 
         this.attribs.className = "custom-select "+moreClasses; 
 
-        selectionOptions.forEach((row: Object) => {
+        selectionOptions.forEach(function (row: Object) {
             //NOTE: for default selection we do it this way rather than the 'elm.selectedIndex' which is used to
             //to set selected item after rendered.
             this.children.push(new SelectionOption(row['key'], row['val']));
-        });
+        }, this);
     }
 
     getSelection = (): string => {
@@ -37,7 +37,7 @@ export class Selection extends Comp {
     setSelection = (key: string) => {
         this.whenElm((elm: HTMLSelectElement) => {
             let idx = -1;
-            this.children.forEach((row: SelectionOption) => {
+            this.children.forEach(function(row: SelectionOption) {
                 idx++;
                 if (row.key == key) {
                     elm.selectedIndex = idx;

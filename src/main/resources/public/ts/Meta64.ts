@@ -237,7 +237,7 @@ export class Meta64 implements Meta64Intf {
             return ret;
 
         let idx = -1;
-        state.node.children.forEach((iterNode): boolean => {
+        state.node.children.forEach(function(iterNode): boolean {
             idx++;
             if (node.id === iterNode.id) {
                 ret = idx;
@@ -250,7 +250,7 @@ export class Meta64 implements Meta64Intf {
 
     removeBinaryById = (id: string, state: AppState): void => {
         if (!state.node) return;
-        state.node.children.forEach((node: J.NodeInfo) => {
+        state.node.children.forEach(function(node: J.NodeInfo) {
             if (node.id === id) {
                 S.props.deleteProp(node, J.NodeProp.BIN_MIME);
             }
@@ -266,7 +266,9 @@ export class Meta64 implements Meta64Intf {
         state.idToNodeMap[node.id] = node;
 
         if (node.children) {
-            node.children.forEach(n => this.updateNodeMap(n, level + 1, state));
+            node.children.forEach(function(n) {
+                this.updateNodeMap(n, level + 1, state);
+            }, this);
         }
     }
 

@@ -118,9 +118,9 @@ export class RssTypeHandler implements TypeHandlerIntf {
         let feedOutDiv = new Div(null, null, feedOut);
         itemListContainer.children.push(feedOutDiv);
 
-        feed.items.forEach((item) => {
+        feed.items.forEach(function(item) {
             itemListContainer.children.push(this.buildFeedItem(item, state));
-        });
+        }, this);
     }
 
     buildFeedItem = (entry, state: AppState): Comp => {

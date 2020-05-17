@@ -31,14 +31,14 @@ export class ListBox extends Comp {
 
     compRender = (): ReactNode => {
          /* For each of the ListBoxRows we need to tell them all who their parent is */
-         this.children.forEach((row: ListBoxRow) => {
+         this.children.forEach(function(row: ListBoxRow) {
             if (row) {
                 if (row.selected) {
                     this.selectedRow = row;
                 }
                 row.setListBox(this);
             }
-        });
+        }, this);
 
         return this.tagRender('div', null, this.attribs);
     }

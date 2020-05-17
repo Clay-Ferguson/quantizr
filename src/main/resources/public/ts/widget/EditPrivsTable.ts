@@ -30,9 +30,9 @@ export class EditPrivsTable extends Comp {
         //console.log("compRender[" + this.jsClassName + "] STATE: " + S.util.prettyPrint(nodePrivsInfo));
 
         if (nodePrivsInfo.aclEntries) {
-            nodePrivsInfo.aclEntries.forEach((aclEntry) => {
+            nodePrivsInfo.aclEntries.forEach(function(aclEntry) {
                 this.addChild(new EditPrivsTableRow(aclEntry, this.removePrivilege));
-            });
+            }, this);
         }
         return this.tagRender('div', null, this.attribs);
     }

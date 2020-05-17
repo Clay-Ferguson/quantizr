@@ -48,7 +48,7 @@ export class TimelineView extends Div {
 
         let children: Comp[] = [];
         let i = -1;
-        results.forEach((node: J.NodeInfo) => {
+        results.forEach(function(node: J.NodeInfo) {
             i++;
             S.srch.initSearchNode(node);
 

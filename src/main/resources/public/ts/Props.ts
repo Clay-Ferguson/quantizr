@@ -92,7 +92,7 @@ export class Props implements PropsIntf {
                 // "sourceClass" : "[propsTable]"
             });
 
-            properties.forEach((property: J.PropertyInfo) => {
+            properties.forEach(function(property: J.PropertyInfo) {
                 //console.log("Render Prop: "+property.name);
                 if (S.render.allowPropertyToDisplay(property.name)) {
 
@@ -165,7 +165,7 @@ export class Props implements PropsIntf {
     isPublic = (node: J.NodeInfo): boolean => {
         if (!node.ac) return false;
         let ret = false;
-        node.ac.forEach((ace: J.AccessControlInfo) => {
+        node.ac.forEach(function(ace: J.AccessControlInfo) {
             if (ace.principalNodeId == 'public') {
                 ret = true;
                 return false; //stop iteration.

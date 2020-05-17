@@ -17,11 +17,11 @@ export class RadioButtonGroup extends Comp {
         this.attribs.className = moreClasses; 
         this.setChildren(initialButtons);
 
-        initialButtons.forEach((row: RadioButton) => {
+        initialButtons.forEach(function(row: RadioButton) {
             if (row.attribs.checked == "checked") {
                 this.attribs.selected = (<any>row.attribs).name;
             }
-        });
+        }, this);
     }
 
     compRender = (): ReactNode => {

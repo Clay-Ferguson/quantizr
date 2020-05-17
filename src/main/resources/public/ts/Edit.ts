@@ -489,7 +489,7 @@ export class Edit implements EditIntf {
         }
 
         let failMsg = null;
-        selNodesArray.forEach(id => {
+        selNodesArray.forEach(function(id) {
             if (id == state.homeNodeId) {
                 failMsg = "Oops. You don't delete your account root node!";
                 return false;

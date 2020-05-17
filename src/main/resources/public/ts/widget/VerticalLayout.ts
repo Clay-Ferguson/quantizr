@@ -18,7 +18,7 @@ export class VerticalLayout extends Comp {
 
         // Wrap all the children provided in Divs, and then make those be the children
         let divWrapComps: Comp[] = [];
-        initialComps.forEach((child: Comp) => {
+        initialComps.forEach(function(child: Comp) {
             if (child) {
                 divWrapComps.push(new Div(null, null, [child]));
             }

@@ -75,7 +75,7 @@ export class EditNodeDlg extends DialogBase {
 
     constructor(node: J.NodeInfo, state: AppState) {
         super("Edit Node", "app-modal-content", false, state);
-        this.mergeState({node});
+        this.mergeState({ node });
     }
 
     createLayoutSelection = (): Selection => {
@@ -235,7 +235,7 @@ export class EditNodeDlg extends DialogBase {
         this.propCheckBoxes = [];
 
         if (state.node.properties) {
-            state.node.properties.forEach((prop: J.PropertyInfo) => {
+            state.node.properties.forEach(function (prop: J.PropertyInfo) {
 
                 if (prop.name == J.NodeProp.LAYOUT) {
                     if (this.layoutSelection) {
@@ -278,7 +278,7 @@ export class EditNodeDlg extends DialogBase {
                         collapsiblePropsTable.addChild(tableRow);
                     }
                 }
-            });
+            }, this);
         }
 
         if (!collapsiblePropsTable.childrenExist()) {
@@ -324,7 +324,7 @@ export class EditNodeDlg extends DialogBase {
             let dlg = new EditPropertyDlg({
                 editNode: state.node,
                 propSavedFunc: () => {
-                    this.mergeState(state); 
+                    this.mergeState(state);
                 }
             }, this.appState);
             this.editPropertyDlgInst = dlg;
@@ -396,7 +396,7 @@ export class EditNodeDlg extends DialogBase {
             (res) => {
                 S.util.checkSuccess("Save properties", res);
                 state.node.type = newType;
-                
+
                 //this.rebuildDlg();
                 this.mergeState(state);
             });
@@ -427,7 +427,7 @@ export class EditNodeDlg extends DialogBase {
         let state = this.getState();
         return new Promise<void>(async (resolve, reject) => {
             let allowEditAllProps: boolean = this.appState.isAdminUser;
-            
+
             if (state.node) {
                 this.saveCheckboxVal(this.preformattedCheckBox, J.NodeProp.PRE);
                 if (this.inlineChildrenCheckBox) {
@@ -478,7 +478,7 @@ export class EditNodeDlg extends DialogBase {
 
             /* Now scan over all properties to build up what to save */
             if (state.node.properties) {
-                state.node.properties.forEach((prop: J.PropertyInfo) => {
+                state.node.properties.forEach(function (prop: J.PropertyInfo) {
 
                     //console.log("prop to save?: "+prop.name);
 
@@ -494,7 +494,7 @@ export class EditNodeDlg extends DialogBase {
                     }
 
                     newProps.push(prop);
-                });
+                }, this);
             }
             state.node.properties = newProps;
 
@@ -649,7 +649,7 @@ export class EditNodeDlg extends DialogBase {
         let ret = false;
 
         /* Iterate over all property checkboxes */
-        this.propCheckBoxes.forEach((checkbox: Checkbox) => {
+        this.propCheckBoxes.forEach(function (checkbox: Checkbox) {
             if (checkbox.getChecked()) {
                 ret = true;
                 //return false to stop iterating.
@@ -671,12 +671,12 @@ export class EditNodeDlg extends DialogBase {
 
     deleteSelectedProperties = (): void => {
         /* Iterate over all property checkboxes */
-        this.propCheckBoxes.forEach((checkbox: Checkbox) => {
+        this.propCheckBoxes.forEach(function (checkbox: Checkbox) {
             if (checkbox.getChecked()) {
                 let prop: J.PropertyInfo = this.compIdToPropMap[checkbox.getId()];
                 this.deleteProperty(prop.name);
             }
-        });
+        }, this);
     }
 
     cancelEdit = (): void => {

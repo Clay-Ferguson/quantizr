@@ -10,7 +10,7 @@ export class PubSub {
             throw "Unknown publish name: " + name;
         }
         PubSub.lastFires[name] = args;
-        PubSub.registry[name].forEach(fn => {
+        PubSub.registry[name].forEach(function(fn) {
             fn.apply(null, args);
         });
     }

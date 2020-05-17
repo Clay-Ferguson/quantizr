@@ -25,13 +25,13 @@ export class EditPrivsTableRow extends Comp {
     renderAclPrivileges = (aclEntry: J.AccessControlInfo): Div => {
 
         let div = new Div();
-        aclEntry.privileges.forEach((privilege, index) => {
+        aclEntry.privileges.forEach(function(privilege, index) {
             let buttons = new ButtonBar([new Button("Remove", () => {
                 this.removePrivilege(aclEntry.principalNodeId, privilege.privilegeName);
             })], null, "marginBottom");
             div.addChild(buttons);
             div.addChild(new TextContent(aclEntry.principalName + " has privilege " + privilege.privilegeName + " on this node."));
-        });
+        }, this);
         return div;
     }
 
