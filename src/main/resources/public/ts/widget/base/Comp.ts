@@ -99,7 +99,7 @@ export abstract class Comp implements CompIntf {
         if (this.children == null || this.children.length == 0) return false;
         let ret = false;
         //todo-0: an optimization here is to use old-school iteration to return immediately when ret is true.
-        this.children.forEach(function(child: Comp) { 
+        this.children.forEach(function (child: Comp) {
             if (child) {
                 ret = true;
             }
@@ -176,7 +176,7 @@ export abstract class Comp implements CompIntf {
     }
 
     setInnerHTML(html: string) {
-        this.whenElm(function(elm: HTMLElement) {
+        this.whenElm(function (elm: HTMLElement) {
             elm.innerHTML = html;
         });
     }
@@ -198,7 +198,7 @@ export abstract class Comp implements CompIntf {
         return this.attribs;
     }
 
-    renderHtmlElm (elm: ReactElement): string {
+    renderHtmlElm(elm: ReactElement): string {
         return renderToString(elm);
         //return renderToStaticMarkup(elm);
     }
@@ -250,7 +250,7 @@ export abstract class Comp implements CompIntf {
         if (this.children == null || this.children.length == 0) return null;
         let reChildren: ReactNode[] = [];
 
-        this.children.forEach(function(child: Comp) { 
+        this.children.forEach(function (child: Comp) {
             if (child) {
                 let reChild: ReactNode = null;
                 try {
@@ -278,7 +278,7 @@ export abstract class Comp implements CompIntf {
     }
 
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
-    tagRender(tag: string, content: string, props: any) { 
+    tagRender(tag: string, content: string, props: any) {
         //console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
 
         this.state.enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
@@ -391,7 +391,7 @@ export abstract class Comp implements CompIntf {
             //     setIsMounted(true);
             //     this.domAddEvent();
             // }, []);
-            useEffect(this.domAddEvent, []);
+            useEffect(this._domAddEvent || (this._domAddEvent = this.domAddEvent.bind(this)), []);
 
             //This hook should work fine but just isn't needed yet.
             if (this.domUpdateEvent) {
@@ -435,7 +435,7 @@ export abstract class Comp implements CompIntf {
             if (Comp.enableMemoMap && this.makeCacheKeyObj) {
 
                 //note: getting full state here is a big performance hit? There's definitely a performance issue.
-                appState = useSelector(function(state: AppState) {return state});
+                appState = useSelector(function (state: AppState) { return state });
 
                 //NOTE: The final experimental definition of this function is that it returns a 'string' not an object.
                 let keyObj = this.makeCacheKeyObj(appState, state, props);
@@ -490,9 +490,11 @@ export abstract class Comp implements CompIntf {
 
     domPreUpdateEvent = null;
 
-    //todo-0: can carefully make this a non-arrow functiono (but search for all uses, because some classes will have to call this via 'super' now)
-    domAddEvent = (): void => {
+    _domAddEvent: () => void = null;
+    domAddEvent(): void {
         //console.log("domAddEvent: " + this.jsClassName);
+
+        //todo-0: due to the way React unmounts and remounts stuff, this domAddEventRan will be a bad idea. get rid if this variable completely.
         this.domAddEventRan = true;
 
         if (this.domAddFuncs) {
@@ -504,7 +506,7 @@ export abstract class Comp implements CompIntf {
             else {
                 //console.log("domAddFuncs running for "+this.jsClassName+" for "+this.domAddFuncs.length+" functions.");
             }
-            this.domAddFuncs.forEach(function(func) {
+            this.domAddFuncs.forEach(function (func) {
                 func(elm);
             }, this);
             this.domAddFuncs = null;
@@ -523,18 +525,16 @@ export abstract class Comp implements CompIntf {
     //todo-1: move this out into a utilities class.
     setDropHandler = (func: (elm: any) => void): void => {
 
-        //this func should bind if it needs to, but not in here.
-        //func = func.bind(this);
         this.whenElm((elm: HTMLElement) => {
             if (!elm) return;
 
             let nonDragBorder = elm.style.borderLeft;
 
-            elm.addEventListener("dragenter", function(event) {
+            elm.addEventListener("dragenter", function (event) {
                 event.preventDefault();
             });
 
-            elm.addEventListener("dragover", function(event) {
+            elm.addEventListener("dragover", function (event) {
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
 
@@ -542,12 +542,12 @@ export abstract class Comp implements CompIntf {
                 elm.style.borderLeft = "9px dotted green";
             });
 
-            elm.addEventListener("dragleave", function(event) {
+            elm.addEventListener("dragleave", function (event) {
                 event.preventDefault();
                 elm.style.borderLeft = nonDragBorder;
             });
 
-            elm.addEventListener("drop", function(event) {
+            elm.addEventListener("drop", function (event) {
                 event.stopPropagation();
                 event.preventDefault();
                 elm.style.borderLeft = nonDragBorder;

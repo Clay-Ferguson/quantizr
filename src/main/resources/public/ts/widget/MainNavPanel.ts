@@ -208,9 +208,8 @@ export class MainNavPanel extends NavTag {
         return this.tagRender('nav', this.content, this.attribs);
     }
 
-    super_domAddEvent: any = this.domAddEvent;
-    domAddEvent = (): void => {
-        console.log("overridden domAddEvent: " + this.jsClassName);
+    domAddEvent(): void {
+        console.log("**************** overridden domAddEvent: " + this.jsClassName);
         let elm: HTMLElement = this.getElement();
 
         //since we only ever set this height one time, and don't need it immediately i'm throwing in a timeout
