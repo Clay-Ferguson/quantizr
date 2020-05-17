@@ -19,6 +19,12 @@ export class App extends Comp {
 
     constructor(attribs: Object = {}) {
         super(attribs);
+
+        //Since we only instantiate ONE App ever we don't need an 'unsubscribe' and also
+        //our pubsub doesn't even HAVE any unsubscribe function yet.
+        PubSub.sub(C.PUBSUB_ClearComponentCache, () => {
+            this.tabPanel = null;
+        });
     }
 
     compRender = (): ReactNode => {

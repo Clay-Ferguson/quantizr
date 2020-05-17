@@ -18,6 +18,7 @@ export class Constants {
     /* ======================================================================== */
 
     static readonly PUBSUB_SingletonsReady = "pubsub-singletons-ready";
+    static readonly PUBSUB_ClearComponentCache = "clear-componenet-cache";
 
     static readonly LOCALDB_LOGIN_USR: string = "loginUsr";
     static readonly LOCALDB_LOGIN_PWD: string = "loginPwd";

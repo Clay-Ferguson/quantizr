@@ -58,11 +58,8 @@ export function rootReducer(state: AppState = initialState, /* action: Action<an
 export const store = createStore(rootReducer);
 
 export let dispatch = (action: AppAction) => {
+    PubSub.pub(C.PUBSUB_ClearComponentCache);
 
-    /* todo-0: this tight coupling to panels needs to be replaced with a pubsub event called CLEAR_COMP_CACHE */
-    if (S && S.meta64) {
-        (S.meta64.app as any).tabPanel = null;
-    }
     store.dispatch(action);
     //console.log("Dispatch Complete: " + action.type);
 }
