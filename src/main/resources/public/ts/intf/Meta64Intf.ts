@@ -4,7 +4,6 @@ import { AppState } from "../AppState";
 
 export interface Meta64Intf {
 
-    state: AppState;
     app: CompIntf;
 
     appInitialized: boolean;

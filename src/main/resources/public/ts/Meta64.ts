@@ -6,7 +6,7 @@ import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import { App } from "./widget/App";
 import { AppState } from "./AppState";
-import { dispatch, initialState } from "./AppRedux";
+import { dispatch, initialState, appState } from "./AppRedux";
 import { store } from "./AppRedux";
 import { CompIntf } from "./widget/base/CompIntf";
 import { AppDemo } from "./widget/AppDemo";
@@ -18,10 +18,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class Meta64 implements Meta64Intf {
 
-    /* We have this copy of AppState here so we can do a performance optimization in many functions where during our renders
-    we can avoid creating NEW functions, and point to existing functions, and make these functions fall back to using
-    S.meta64.state whenever they are invoked with no state parameter */
-    state: AppState; 
     app: CompIntf;
 
     navBarHeight: number = 0;
@@ -184,7 +180,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     getHighlightedNode = (state: AppState = null): J.NodeInfo => {
-        state = state || S.meta64.state;
+        state = appState(state);
         if (!state.node) return null;
         let ret: J.NodeInfo = S.meta64.parentIdToFocusNodeMap[state.node.id];
         return ret;

@@ -13,7 +13,7 @@ import { Span } from "../widget/Span";
 import { Img } from "../widget/Img";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
-import { dispatch } from "../AppRedux";
+import { dispatch, appState } from "../AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -48,21 +48,25 @@ export class NodeCompBinary extends Div {
             className: "attached-img",
             style,
             "title": "Click image to enlarge/reduce",
-            onClick: (evt) => {
-                dispatch({
-                    type: "Action_ClickImage", state,
-                    update: (s: AppState): void => {
-                        if (s.expandedImages[node.id]) {
-                            delete s.expandedImages[node.id];
-                        }
-                        else {
-                            s.expandedImages[node.id] = "y";
-                        }
-                    },
-                });
-            }
+            onClick: S.meta64.getNodeFunc(this.cached_clickOnImage, "NodeCompBinary.clickOnImage", node.id),
         });
         return img;
+    }
+
+    cached_clickOnImage = (nodeId: string) => {
+        let state = appState();
+
+        dispatch({
+            type: "Action_ClickImage", state,
+            update: (s: AppState): void => {
+                if (s.expandedImages[nodeId]) {
+                    delete s.expandedImages[nodeId];
+                }
+                else {
+                    s.expandedImages[nodeId] = "y";
+                }
+            },
+        });
     }
 
     preRender = (): void => {

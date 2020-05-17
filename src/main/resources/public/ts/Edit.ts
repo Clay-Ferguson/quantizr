@@ -11,7 +11,7 @@ import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { AppState } from "./AppState";
-import { dispatch } from "./AppRedux";
+import { dispatch, appState } from "./AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -253,7 +253,7 @@ export class Edit implements EditIntf {
     }
 
     cached_moveNodeUp = (id: string, state?: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
         if (!id) {
             let selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             id = selNode.id;
@@ -271,7 +271,7 @@ export class Edit implements EditIntf {
     }
 
     cached_moveNodeDown = (id: string, state: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
         if (!id) {
             let selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             id = selNode.id;
@@ -350,7 +350,7 @@ export class Edit implements EditIntf {
     }
 
     cached_runEditNode = (id: any, state?: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
         let node: J.NodeInfo = null;
         if (!id) {
             node = S.meta64.getHighlightedNode(state);
@@ -374,7 +374,7 @@ export class Edit implements EditIntf {
     }
 
     insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
         if (!state.node || !state.node.children) return;
         this.parentOfNewNode = state.node;
         if (!this.parentOfNewNode) {
@@ -406,7 +406,7 @@ export class Edit implements EditIntf {
     }
 
     createSubNode = (id: any, typeName: string, createAtTop: boolean, state: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
         /*
          * If no uid provided we deafult to creating a node under the currently viewed node (parent of current page), or any selected
          * node if there is a selected node.
@@ -477,7 +477,7 @@ export class Edit implements EditIntf {
      * has currenly selected (via checkboxes)
      */
     deleteSelNodes = (nodeId: string, hardDelete: boolean, state?: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
         if (nodeId) {
             S.nav.setNodeSel(true, nodeId, state);
         }
@@ -569,7 +569,7 @@ export class Edit implements EditIntf {
     }
 
     cached_cutSelNodes = (nodeId: string, state?: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
 
         S.nav.setNodeSel(true, nodeId, state);
         let selNodesArray = S.meta64.getSelNodeIdsArray(state);
@@ -589,13 +589,13 @@ export class Edit implements EditIntf {
     }
 
     cached_pasteSelNodesInside = (nodeId: string) => {
-        let state = S.meta64.state;
+        let state = appState();
         S.edit.pasteSelNodes(nodeId, 'inside', state);
     }
     
     //location=inside | inline | inline-above (todo-1: put in java-aware enum)
     pasteSelNodes = (nodeId: string, location: string, state?: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently selected
          * page. Later on we can get more specific about allowing precise destination location for moved

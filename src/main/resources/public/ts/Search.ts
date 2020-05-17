@@ -124,9 +124,7 @@ export class Search implements SearchIntf {
 
         return new Div(null, {
             className: clazz + " inactive-row",
-            onClick: (elm: HTMLElement) => {
-                this.clickOnSearchResultRow(node.id);
-            }, //
+            onClick: S.meta64.getNodeFunc(this.cached_clickOnSearchResultRow, "S.srch.clickOnSearchResultRow", node.id),
             "id": cssId
         }, [buttonBar, content]);
     }
@@ -145,7 +143,8 @@ export class Search implements SearchIntf {
         }, "btn-secondary marginLeft")], "marginTop marginLeft");
     }
 
-    clickOnSearchResultRow = (id: string) => {
+    cached_clickOnSearchResultRow = (id: string) => {
+        //wow this implementation is obsolete.
         this.setRowHighlight(false);
         this.highlightRowNode = this.idToNodeMap[id];
         this.setRowHighlight(true);

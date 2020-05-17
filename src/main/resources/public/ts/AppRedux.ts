@@ -47,15 +47,15 @@ export function rootReducer(state: AppState = initialState, /* action: Action<an
         Object.assign(action.state, state);
     }
 
-    //todo-0: will I need to put user clicks/actions calling in a queue, to ensure
-    //the correct (latest) states always during any function?
-    if (S && S.meta64) {
-        S.meta64.state = state;
-    }
     return state;
 }
 
 export const store = createStore(rootReducer);
+
+/* For syntactical sugar we allow a state to get passed or not */
+export const appState = (state?: AppState): AppState => {
+    return state || store.getState();
+}
 
 export let dispatch = (action: AppAction) => {
     PubSub.pub(C.PUBSUB_ClearComponentCache);

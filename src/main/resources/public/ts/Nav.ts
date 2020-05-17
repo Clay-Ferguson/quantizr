@@ -12,7 +12,7 @@ import { Heading } from "./widget/Heading";
 import { MainMenuPopupDlg } from "./dlg/MainMenuPopupDlg";
 import { DialogBaseImpl } from "./DialogBaseImpl";
 import { AppState } from "./AppState";
-import { dispatch, fastDispatch } from "./AppRedux";
+import { dispatch, fastDispatch, appState } from "./AppRedux";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 
 let S: Singletons;
@@ -93,7 +93,7 @@ export class Nav implements NavIntf {
     }
 
     navToSibling = (siblingOffset: number, state?: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
         if (!state.node) return null;
 
         this.mainOffset = 0;
@@ -118,7 +118,7 @@ export class Nav implements NavIntf {
     }
 
     navUpLevel = (event: any = null): void => {
-        let state = S.meta64.state;
+        let state = appState();
         if (!state.node) return null;
 
         //Always just scroll to the top before doing an actual 'upLevel' to parent.
@@ -186,7 +186,7 @@ export class Nav implements NavIntf {
     /* NOTE: Elements that have this as an onClick method must have the nodeId 
     on an attribute of the element */
     cached_clickNodeRow = (nodeId: string, state?: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
         console.log("clickNodeRow: id=" + nodeId);
 
         /* First check if this node is already highlighted and if so just return */
@@ -233,7 +233,7 @@ export class Nav implements NavIntf {
     }
 
     cached_openNodeById = (id: string, state: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
         let node: J.NodeInfo = state.idToNodeMap[id];
         S.meta64.highlightNode(node, false, state);
 
@@ -245,7 +245,7 @@ export class Nav implements NavIntf {
     }
 
     cached_toggleNodeSel = (id: string, state: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
         if (state.selectedNodes[id]) {
             delete state.selectedNodes[id];
         } else {
@@ -254,7 +254,7 @@ export class Nav implements NavIntf {
     }
 
     setNodeSel = (selected: boolean, id: string, state: AppState): void => {
-        state = state || S.meta64.state;
+        state = appState(state);
         if (selected) {
             state.selectedNodes[id] = true;
         } else {
@@ -316,13 +316,13 @@ export class Nav implements NavIntf {
     }
 
     runSearch = (): void => {
-        let state = S.meta64.state;
+        let state = appState();
         this.cached_clickNodeRow(state.node.id);
         new SearchContentDlg(state).open();
     }
 
     runTimeline = (): void => {
-        let state = S.meta64.state;
+        let state = appState();
         this.cached_clickNodeRow(state.node.id);
         S.srch.timeline("mtm", state);
     }

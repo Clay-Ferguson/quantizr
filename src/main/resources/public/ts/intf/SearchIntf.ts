@@ -23,7 +23,7 @@ export interface SearchIntf {
     initSearchNode(node: J.NodeInfo): any;
     renderSearchResultAsListItem(node, index, count, rowCount, state: AppState): any;
     makeButtonBarHtml(node: J.NodeInfo, state: AppState): any;
-    clickOnSearchResultRow(id : string): any;
+    cached_clickOnSearchResultRow(id : string): any;
     clickSearchNode(id: string, state: AppState): any;
     setRowHighlight(state: boolean): any;
 }
