@@ -15,20 +15,25 @@ export class ListBoxRow extends Comp {
     /* Each listbox row has a reference to its parent (containing) list box, and needs to ineract with it to coordinate selected items. */
     listBox: ListBox;
 
-    constructor(public content: string, onClick: Function, public selected: boolean) {
-        super(null);
-        this.setClass("list-group-item list-group-item-action listBoxRow");
-        this.setSelectedState(selected);
-        this.setOnClick(() => {
-            if (this.listBox) {
-                this.listBox.rowClickNotify(this);
-            }
-            if (typeof onClick == "function") {
-                onClick();
-            }
+    constructor(public content: string, private onClickCallback: Function, public selected: boolean) {
+        super({
+            className: "list-group-item list-group-item-action listBoxRow"
         });
+
+        this.attribs.onClick = this.onClick;
+        this.setSelectedState(selected);
     }
 
+    onClick = () => {
+        if (this.listBox) {
+            this.listBox.rowClickNotify(this);
+        }
+        if (this.onClickCallback) {
+            this.onClickCallback();
+        }
+    }
+
+    /* todo-0: this isn't a very 'react'-ish way to do things */
     setSelectedState = (selected: boolean) => {
         this.whenElm((elm: HTMLElement) => {
             if (selected) {

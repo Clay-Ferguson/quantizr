@@ -188,14 +188,6 @@ export abstract class Comp implements CompIntf {
         this.attribs.className = clazz;
     }
 
-    setOnClick = (onClick: Function): void => {
-        this.attribs.onClick = () => {
-            if (!this.isEnabledFunc || this.isEnabledFunc()) {
-                onClick();
-            }
-        };
-    }
-
     setInnerHTML = (html: string) => {
         this.whenElm((elm: HTMLElement) => {
             elm.innerHTML = html;

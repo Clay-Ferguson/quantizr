@@ -538,10 +538,7 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             let checkbox: Checkbox = new Checkbox(label, false, {
-                onClick: (evt: any) => {
-                    //console.log("checkbox click: evt.target.checked: "+evt.target.checked);
-                    this.propertyCheckboxChanged();
-                }
+                onClick: this.propertyCheckboxChanged
             });
             this.propCheckBoxes.push(checkbox);
             this.compIdToPropMap[checkbox.getId()] = propEntry;
