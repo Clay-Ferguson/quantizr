@@ -28,7 +28,7 @@ export class MenuPanel extends Div {
         });
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 
         let selNodeCount = S.util.getPropertyCount(state.selectedNodes);

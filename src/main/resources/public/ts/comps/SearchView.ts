@@ -21,7 +21,7 @@ export class SearchView extends Div {
         });
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let results = state.searchResults;
 

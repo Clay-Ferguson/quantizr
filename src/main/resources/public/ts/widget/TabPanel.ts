@@ -23,7 +23,7 @@ export class TabPanel extends Div {
         super(null);
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let searchResults = state.searchResults;
         let timelineResults = state.timelineResults;

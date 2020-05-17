@@ -69,7 +69,7 @@ export class NodeCompBinary extends Div {
         });
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         if (!node) {

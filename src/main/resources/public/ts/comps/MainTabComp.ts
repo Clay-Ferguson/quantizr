@@ -22,7 +22,7 @@ export class MainTabComp extends Div {
         });
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 
         this.attribs.className = "tab-pane fade my-tab-pane";

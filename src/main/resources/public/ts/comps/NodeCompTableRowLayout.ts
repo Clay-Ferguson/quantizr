@@ -20,7 +20,7 @@ export class NodeCompTableRowLayout extends Div {
         super(null, { className: 'node-grid-table' });
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let nodesToMove = state.nodesToMove;
 

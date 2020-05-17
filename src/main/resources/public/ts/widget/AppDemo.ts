@@ -21,7 +21,7 @@ export class AppDemo extends Div {
         super();
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 
         this.setChildren([

@@ -24,7 +24,7 @@ export class CompDemoButton extends Div {
         this.setStateEx({ counter: 0, idx: idx });
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let cstate = this.getState();
 

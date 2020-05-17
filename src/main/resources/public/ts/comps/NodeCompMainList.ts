@@ -21,7 +21,7 @@ export class NodeCompMainList extends Div {
         super();
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let rootNode = state.node;
         let endReached = state.endReached;

@@ -118,7 +118,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         return [new Div("override renderDlg to provide dialog content.")];
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let timesIcon: Comp;
         //Dialog Header with close button (x) right justified on it.
         let children: CompIntf[] = [];

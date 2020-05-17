@@ -57,7 +57,7 @@ export class TextField extends Div implements I.TextEditorIntf {
         }
     }
 
-    preRender = (): void => {
+    preRender(): void {
         this.setChildren([
             new Label(this.label, { key: this.getId() + "_label" }),
             new Div(null, {

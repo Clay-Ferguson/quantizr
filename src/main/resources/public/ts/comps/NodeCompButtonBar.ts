@@ -28,7 +28,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         });
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         if (!node) {

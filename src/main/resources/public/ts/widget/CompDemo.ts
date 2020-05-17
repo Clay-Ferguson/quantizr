@@ -19,7 +19,7 @@ export class CompDemo extends Div {
         this.setStateEx({ counter: 0 });
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let cstate = this.getState();
 

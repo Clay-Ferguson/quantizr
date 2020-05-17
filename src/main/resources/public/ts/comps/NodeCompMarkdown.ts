@@ -78,7 +78,7 @@ export class NodeCompMarkdown extends MarkdownDiv {
         return val;
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         let content = node.content || "";

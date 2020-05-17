@@ -23,7 +23,7 @@ export class NodeCompVerticalRowLayout extends Div {
         super();
     }
 
-    preRender = (): void => {
+    preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 
         let node = this.node;

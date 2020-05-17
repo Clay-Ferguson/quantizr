@@ -424,9 +424,8 @@ export abstract class Comp implements CompIntf {
             // this.attribs.style = this.attribs.style || {};
             // this.attribs.style.display = this.getState().visible ? "block" : "none";
 
-            if (this.preRender) {
-                this.preRender();
-            }
+            this.preRender();
+            
             let key = null;
             let appState: AppState = null;
 
@@ -511,7 +510,8 @@ export abstract class Comp implements CompIntf {
     }
 
     /* Intended to be optionally overridable to set children */
-    public preRender = null;
+    preRender(): void {
+    }
 
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state
     // manageent aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
