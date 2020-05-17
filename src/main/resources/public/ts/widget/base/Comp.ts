@@ -36,8 +36,6 @@ export abstract class Comp implements CompIntf {
 
     //todo-1: make this private?
     public state: any = {};
-
-    static idToCompMap: { [key: string]: Comp } = {};
     attribs: any;
 
     /* this is a more powerful of doing what React.memo can do but supports keys in a better way than React.memo, because
@@ -45,6 +43,9 @@ export abstract class Comp implements CompIntf {
     
     Update: It turned out he complexity cost AND performance improvement was horrible, so this memoMap stuff is currently disabled
     with this switch, but I'm leaving the code here in case there IS a future scenario where this code may be leveraged. 
+    
+    NOTE: IF you turn enableMemoMap back on you need so also find the tag
+    #memoReq in this file and uncomment those blocks
     */
     static enableMemoMap: boolean = false;
     static memoMap: { [key: string]: ReactNode } = {};
@@ -95,7 +96,6 @@ export abstract class Comp implements CompIntf {
         this.attribs.id = id;
         this.attribs.key = id;
         this.jsClassName = this.constructor.name + "[" + id + "]";
-        Comp.idToCompMap[id] = this;
     }
 
     childrenExist = (): boolean => {
@@ -126,10 +126,6 @@ export abstract class Comp implements CompIntf {
 
     static nextGuid(): number {
         return ++Comp.guid;
-    }
-
-    static findById(id: string): Comp {
-        return Comp.idToCompMap[id];
     }
 
     removeAllChildren = (): void => {
@@ -395,50 +391,45 @@ export abstract class Comp implements CompIntf {
         try {
             const [state, setStateEx] = useState(this.state);
 
-            const [isMounted, setIsMounted] = useState<boolean>(false);
-            //to not delete: logic moved into callbacks below instead, but left here for clarity.
-            // useEffect(() => {
-            //     setIsMounted(true);
-            // }, []);
-            // useEffect(() => {
-            //     return () => {
-            //         setIsMounted(false);
-            //     }
-            // }, []);
+            //#memoReq
+            //const [isMounted, setIsMounted] = useState<boolean>(false);
 
             //console.warn("Component state was null in render for: " + this.jsClassName);
             this.state = state;
-            //this.setStateEx = setStateEx;
 
-            this.setStateEx = (state) => {
-
-                //React will bark at us if we allow a setState call to execute on a component that's no longer mounted, so that's why we have the 'isMounted' 
-                //varible. The error in React says this:
-                //Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function. in Unknown
-
-                if (!isMounted) return;
-                setStateEx(state);
-            }
+            this.setStateEx = setStateEx;
+            // #memoReq
+            // this.setStateEx = (state) => {
+            //     //React will bark at us if we allow a setState call to execute on a component that's no longer mounted, so that's why we have the 'isMounted' 
+            //     //varible. The error in React says this:
+            //     //Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function. in Unknown
+            //     //if (!isMounted) return;
+            //     setStateEx(state);
+            // }
 
             /* This 'useEffect' call makes react call 'domAddEvent' once the dom element comes into existence on the acutal DOM */
-            useEffect(() => {
-                setIsMounted(true);
-                this.domAddEvent();
-            }, []);
+            // #memoReq
+            // useEffect(() => {
+            //     setIsMounted(true);
+            //     this.domAddEvent();
+            // }, []);
+            useEffect(this.domAddEvent, []);
 
             //This hook should work fine but just isn't needed yet.
             if (this.domUpdateEvent) {
-                useEffect(() => {
-                    //console.log("DOM UPDATE: " + this.jsClassName);
-                    this.domUpdateEvent();
-                });
+                // useEffect(() => {
+                //     //console.log("DOM UPDATE: " + this.jsClassName);
+                //     this.domUpdateEvent();
+                // });
+                useEffect(this.domUpdateEvent);
             }
 
             if (this.domPreUpdateEvent) {
-                useLayoutEffect(() => {
-                    //console.log("DOM PRE-UPDATE: " + this.jsClassName);
-                    this.domPreUpdateEvent();
-                });
+                // useLayoutEffect(() => {
+                //     //console.log("DOM PRE-UPDATE: " + this.jsClassName);
+                //     this.domPreUpdateEvent();
+                // });
+                useLayoutEffect(this.domPreUpdateEvent);
             }
 
             /* 
@@ -446,12 +437,7 @@ export abstract class Comp implements CompIntf {
             (NOTE: Remember this won't run for DialogBase because it's done using pure DOM Javascript, which is the same reason
             whenElmEx has to still exist right now)
             */
-            useEffect(() => {
-                return () => {
-                    setIsMounted(false);
-                    this.domRemoveEvent();
-                }
-            }, []);
+            //useEffect(this.domRemoveEventFunc, []);
 
             this.state.enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
             this.state.visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
@@ -460,7 +446,9 @@ export abstract class Comp implements CompIntf {
             // this.attribs.style = this.attribs.style || {};
             // this.attribs.style.display = this.getState().visible ? "block" : "none";
 
-            this.preRender();
+            if (this.preRender) {
+                this.preRender();
+            }
             let key = null;
             let appState: AppState = null;
 
@@ -491,6 +479,9 @@ export abstract class Comp implements CompIntf {
                 console.log("rendering: " + this.jsClassName + " counter=" + Comp.renderCounter); //+ " PROPS=" + S.util.prettyPrint(props));
             }
 
+            if (!this.compRender) {
+                throw new Error("compRender not implemented in "+this.jsClassName);
+            }
             ret = this.compRender();
 
             /* If we have the cache key provider, cache this node for later */
@@ -506,11 +497,14 @@ export abstract class Comp implements CompIntf {
         return ret;
     }
 
-    domRemoveEvent = (): void => {
-        //Clean up this map, or else this would just be a memory leak
-        delete Comp.idToCompMap[this.getId()];
-        //console.log("DOM REMOVE:" + this.jsClassName + " compMapSize=" + S.util.getPropertyCount(Comp.idToCompMap));
-    }
+    // WARNING: This isn't redundant. React requires this to be a function that returns a function.
+    // domRemoveEventFunc = () => {
+    //     return this.domRemoveEvent;
+    // }
+
+    // domRemoveEvent = (): void => {
+    //     //console.log("DOM REMOVE:" + this.jsClassName);
+    // }
 
     domUpdateEvent = null;
 
@@ -537,16 +531,11 @@ export abstract class Comp implements CompIntf {
     }
 
     /* Intended to be optionally overridable to set children */
-    public preRender = (): void => {
-    }
+    public preRender = null;
 
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state
     // manageent aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
-    public compRender = (): ReactNode => {
-        if (true) {
-            throw new Error("compRender should be overridden by the derived class.");
-        }
-    }
+    public compRender = null;
 
     //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
 

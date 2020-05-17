@@ -24,7 +24,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
     constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean, public isRootNode: boolean) {
         super(null, "marginLeft", {
-            id: "NodeCompButtonBar_" + node.id
+            id: "NodeCompButtonBar_" + node.id,
         });
     }
 
@@ -58,42 +58,41 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let searchButton: NavBarIconButton;
         let timelineButton: NavBarIconButton;
 
-        if (this.isRootNode && S.nav.parentVisibleToUser(state)) {
-            upLevelButton = new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
-                "onClick": e => { S.nav.navUpLevel(state); },
-                "title": "Go to Parent SubNode"
-            }, null, null, "");
-        }
+        if (this.isRootNode) {
+            if (S.nav.parentVisibleToUser(state)) {
+                upLevelButton = new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
+                    /* For onclick functions I need a new approach for some (not all) where I can get by 
+                    with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
+                    directly off the DOM */
+                    "onClick": S.nav.navUpLevel,
+                    "title": "Go to Parent SubNode"
+                }, null, null, "");
+            }
 
-        if (this.isRootNode && !S.nav.displayingRepositoryRoot(state)) {
-            prevButton = new NavBarIconButton("fa-chevron-circle-left", null, {
-                "onClick": e => { S.nav.navToSibling(-1, state); },
-                "title": "Go to Previous SubNode"
-            }, null, null, "");
+            if (!S.nav.displayingRepositoryRoot(state)) {
+                prevButton = new NavBarIconButton("fa-chevron-circle-left", null, {
+                    "onClick": S.nav.navToPrev,
+                    "title": "Go to Previous SubNode"
+                }, null, null, "");
 
-            nextButton = new NavBarIconButton("fa-chevron-circle-right", null, {
-                "onClick": e => { S.nav.navToSibling(1, state); },
-                "title": "Go to Next SubNode"
-            }, null, null, "");
-        }
+                nextButton = new NavBarIconButton("fa-chevron-circle-right", null, {
+                    "onClick": S.nav.navToNext,
+                    "title": "Go to Next SubNode"
+                }, null, null, "");
+            }
 
-        if (this.isRootNode && !state.isAnonUser) {
-            searchButton = new NavBarIconButton("fa-search", null, {
-                "onClick": e => {
-                    S.nav.clickNodeRow(node, state);
-                    new SearchContentDlg(state).open();
-                },
-                "title": "Search under this node"
-            }, null, null, "");
+            if (!state.isAnonUser) {
+                searchButton = new NavBarIconButton("fa-search", null, {
+                    "onClick": S.nav.runSearch,
+                    "title": "Search under this node"
+                }, null, null, "");
 
 
-            timelineButton = new NavBarIconButton("fa-clock-o", null, {
-                "onClick": e => {
-                    S.nav.clickNodeRow(node, state);
-                    S.srch.timeline("mtm", state);
-                },
-                "title": "View Timeline under this node (by Mod Time)"
-            }, null, null, "");
+                timelineButton = new NavBarIconButton("fa-clock-o", null, {
+                    "onClick": S.nav.runTimeline,
+                    "title": "View Timeline under this node (by Mod Time)"
+                }, null, null, "");
+            }
         }
 
         //todo-1: need to DRY up places where this code block is repeated
@@ -133,7 +132,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
             (node.hasChildren || node.type == "fs:folder" || node.type == "fs:lucene" || node.type == "ipfs:node")) {
 
             /* convert this button to a className attribute for styles */
-            openButton = new Button("Open", () => { S.nav.openNodeById(node.id, state) }, null, "btn-primary");
+            openButton = new Button("Open", S.meta64.getNodeFunc(S.nav.cached_openNodeById, "S.nav.openNodeById", node.id), null, "btn-primary");
         }
 
         /*
@@ -150,9 +149,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
                 //no need to ever select home node
                 node.id != state.homeNodeId) {
                 selButton = new Checkbox(null, selected, {
-                    onChange: () => {
-                        S.nav.toggleNodeSel(selButton.getChecked(), node.id, state)
-                    },
+                    onChange: S.meta64.getNodeFunc(S.nav.cached_toggleNodeSel, "S.nav.toggleNodeSel", node.id)
                 });
             }
 
@@ -164,20 +161,20 @@ export class NodeCompButtonBar extends HorizontalLayout {
             if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node, state) &&
                 //not page root node 'or' page no children exist.
                 (node.id != state.node.id || !node.children || node.children.length == 0)) {
-                createSubNodeButton = new Button("New", () => { S.edit.createSubNode(node.id, null, true, state); });
+                createSubNodeButton = new Button("New", S.meta64.getNodeFunc(S.edit.cached_newSubNode, "S.edit.newSubNode", node.id));
             }
 
             if (C.INS_ON_TOOLBAR) {
-                insertNodeButton = new Button("Ins", () => { S.edit.insertNode(node.id, null, 0, state); });
+                insertNodeButton = new Button("Ins", S.meta64.getNodeFunc(S.edit.cached_toolbarInsertNode, "S.edit.toolbarInsertNode", node.id));
             }
 
             if (editingAllowed) {
-                editNodeButton = new Button(null, () => { S.edit.runEditNode(node.id, state); }, {
+                editNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_runEditNode, "S.edit.runEditNode", node.id), {
                     "iconclass": "fa fa-edit fa-lg"
                 });
 
                 if (!this.isRootNode && node.type != J.NodeType.REPO_ROOT && !state.nodesToMove) {
-                    cutNodeButton = new Button(null, () => { S.edit.cutSelNodes(node, state); }, {
+                    cutNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_cutSelNodes, "S.edit.cutSelNodes", node.id), {
                         "iconclass": "fa fa-cut fa-lg"
                     });
                 }
@@ -185,13 +182,13 @@ export class NodeCompButtonBar extends HorizontalLayout {
                 if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove) {
 
                     if (!node.firstChild) {
-                        moveNodeUpButton = new Button(null, () => { S.edit.moveNodeUp(node.id, state); }, {
+                        moveNodeUpButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_moveNodeUp, "S.edit.moveNodeUp", node.id), {
                             "iconclass": "fa fa-arrow-up fa-lg"
                         });
                     }
 
-                    if (!node.lastChild) {
-                        moveNodeDownButton = new Button(null, () => { S.edit.moveNodeDown(node.id, state); }, {
+                    if (!node.lastChild && state.node.children && state.node.children.length > 1) {
+                        moveNodeDownButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_moveNodeDown, "S.edit.moveNodeDown", node.id), {
                             "iconclass": "fa fa-arrow-down fa-lg"
                         });
                     }
@@ -199,13 +196,13 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
                 //not user's account node!
                 if (node.id != state.homeNodeId) {
-                    deleteNodeButton = new Button(null, () => { S.edit.deleteSelNodes(node, false, state); }, {
+                    deleteNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_softDeleteSelNodes, "S.edit.softDeleteSelNodes", node.id), {
                         "iconclass": "fa fa-trash fa-lg"
                     });
                 }
 
                 if (!state.isAnonUser && state.nodesToMove != null && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
-                    pasteInsideButton = new Button("Paste Inside", () => { S.edit.pasteSelNodes(node, 'inside', state.nodesToMove, state); }, {
+                    pasteInsideButton = new Button("Paste Inside", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodesInside, "S.edit.pasteSelNodesInside", node.id), {
                         className: "highlightBorder"
                     });
                 }

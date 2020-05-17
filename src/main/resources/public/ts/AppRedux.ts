@@ -47,14 +47,31 @@ export function rootReducer(state: AppState = initialState, /* action: Action<an
         Object.assign(action.state, state);
     }
 
+    //todo-0: will I need to put user clicks/actions calling in a queue, to ensure
+    //the correct (latest) states always during any function?
+    if (S && S.meta64) {
+        S.meta64.state = state;
+    }
     return state;
 }
 
 export const store = createStore(rootReducer);
 
 export let dispatch = (action: AppAction) => {
+
+    /* todo-0: this tight coupling to panels needs to be replaced with a pubsub event called CLEAR_COMP_CACHE */
+    if (S && S.meta64) {
+        (S.meta64.app as any).tabPanel = null;
+    }
     store.dispatch(action);
     //console.log("Dispatch Complete: " + action.type);
+}
+
+/* This is MUCH faster, for when structural changes won't happen (only style changes for example),
+becuase it doesn't reset static objects to null, meaning they get reused, without reconstructing */
+export let fastDispatch = (action: AppAction) => {
+    store.dispatch(action);
+    //console.log("Fast Dispatch Complete: " + action.type);
 }
 
 /* This listener is temporary until I find a better way to do this code, which needs to always run after any

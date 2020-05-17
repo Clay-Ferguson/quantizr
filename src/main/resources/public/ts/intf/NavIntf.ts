@@ -23,16 +23,21 @@ export interface NavIntf {
     displayingRepositoryRoot(state: AppState): boolean;
     parentVisibleToUser(state: AppState): boolean;
     upLevelResponse(res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState): void;
-    navUpLevel(state: AppState): void;
+    navUpLevel(event?: any): void;
     navOpenSelectedNode(state: AppState): void;
     getSelectedDomElement(state: AppState): HTMLElement;
-    clickNodeRow(node: J.NodeInfo, state: AppState): void;
-    openNodeById(id: string, state: AppState): void;
-    toggleNodeSel(selected: boolean, id: string, state: AppState): void;
+    cached_clickNodeRow(nodeId: string, state?: AppState): void;
+    cached_openNodeById(id: string, state?: AppState): void;
+    cached_toggleNodeSel(id: string, state?: AppState): void;
+    setNodeSel(selected: boolean, id: string, state: AppState): void;
     navPageNodeResponse(res: J.RenderNodeResponse, state: AppState): void;
     navHome(state: AppState): void;
     navPublicHome(state: AppState): void;
     showMainMenu(state: AppState): void;
-    navToSibling(siblingOffset: number, state: AppState): void;
+    navToSibling(siblingOffset: number, state?: AppState): void;
+    navToPrev(): void;
+    navToNext(): void;
+    runSearch(): void;
+    runTimeline(): void;
 }
 

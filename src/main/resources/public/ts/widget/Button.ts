@@ -41,13 +41,10 @@ export class Button extends Comp {
             });
         }
 
-        /* todo-0: This is really ugly to alter 'attribs' DURING a render. Need to do this when the 'enabled' state var changes only */
         if (this.getState().enabled) {
-            //console.log("button is enabled.");
             delete this.attribs.disabled;
         }
         else {
-            //console.log("button is NOT enabled.");
             this.attribs.disabled = "disabled";
         }
 

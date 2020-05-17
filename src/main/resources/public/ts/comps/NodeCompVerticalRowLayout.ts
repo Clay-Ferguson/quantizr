@@ -59,7 +59,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 }
 
                 if (NodeCompVerticalRowLayout.showBetweenBar && rowCount == 0 && state.userPreferences.editMode && this.level == 1) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state.nodesToMove, state));
+                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
 
                     //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     comps.push(new Div(null, { className: "clearfix" }));
@@ -76,7 +76,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 }
 
                 if (NodeCompVerticalRowLayout.showBetweenBar && state.userPreferences.editMode && this.level == 1) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay, state.nodesToMove, state));
+                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay, state));
 
                     //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     comps.push(new Div(null, { className: "clearfix" }));

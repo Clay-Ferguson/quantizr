@@ -15,6 +15,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class App extends Comp {
 
+    tabPanel: TabPanel = null;
+
     constructor(attribs: Object = {}) {
         super(attribs);
     }
@@ -22,7 +24,9 @@ export class App extends Comp {
     compRender = (): ReactNode => {
         this.setChildren([
             new Div(null, { role: "toolbar" }, [new MainNavPanel(null)]),
-            new Main({ role: "main", className: "container" }, [S.meta64.mainTabPanel = new TabPanel()])
+            new Main({ role: "main", className: "container" }, [
+                this.tabPanel || (this.tabPanel = new TabPanel())
+            ])
         ]);
 
         return this.tagRender('div', null, this.attribs);

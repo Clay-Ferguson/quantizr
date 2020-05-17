@@ -1,11 +1,10 @@
 import * as J from "../JavaIntf";
-import { MainTabPanelIntf } from "../Interfaces";
 import { CompIntf } from "../widget/base/CompIntf";
 import { AppState } from "../AppState";
 
 export interface Meta64Intf {
 
-    mainTabPanel: MainTabPanelIntf;
+    state: AppState;
     app: CompIntf;
 
     appInitialized: boolean;
@@ -21,7 +20,12 @@ export interface Meta64Intf {
     navBarHeight: number;
     parentIdToFocusNodeMap: { [key: string]: J.NodeInfo };
     curHighlightNodeCompRow: CompIntf;
-    idToNodeCompRowMap: { [key: string]: CompIntf };
+
+    //function cache
+    fc: { [key: string]: Function };
+
+    //function cache accessor
+    getNodeFunc(func: (id: string) => void, name: string, id: string): () => void;
 
     setOverlay(showOverlay: boolean): void;
     rebuildIndexes(): void;
@@ -34,9 +38,9 @@ export interface Meta64Intf {
     getSelNodesAsMapById(state: AppState): Object;
     getSelNodesArray(state: AppState): J.NodeInfo[];
     clearSelNodes(state: AppState);
-    selectAllNodes(nodeIds : string[]);
+    selectAllNodes(nodeIds: string[]);
     updateNodeInfo(node: J.NodeInfo);
-    getHighlightedNode(state: AppState): J.NodeInfo;
+    getHighlightedNode(state?: AppState): J.NodeInfo;
     highlightRowById(id, scroll, state: AppState): void;
     highlightNode(node: J.NodeInfo, scroll: boolean, state: AppState): void;
     getSingleSelectedNode(state: AppState): J.NodeInfo;

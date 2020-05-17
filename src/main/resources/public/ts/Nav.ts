@@ -12,7 +12,8 @@ import { Heading } from "./widget/Heading";
 import { MainMenuPopupDlg } from "./dlg/MainMenuPopupDlg";
 import { DialogBaseImpl } from "./DialogBaseImpl";
 import { AppState } from "./AppState";
-import { dispatch } from "./AppRedux";
+import { dispatch, fastDispatch } from "./AppRedux";
+import { SearchContentDlg } from "./dlg/SearchContentDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -80,10 +81,19 @@ export class Nav implements NavIntf {
     navOpenSelectedNode = (state: AppState): void => {
         let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!currentSelNode) return;
-        S.nav.openNodeById(currentSelNode.id, state);
+        S.nav.cached_openNodeById(currentSelNode.id, state);
     }
 
-    navToSibling = (siblingOffset: number, state: AppState): void => {
+    navToPrev = () => {
+        S.nav.navToSibling(-1);
+    }
+
+    navToNext = () => {
+        S.nav.navToSibling(1);
+    }
+
+    navToSibling = (siblingOffset: number, state?: AppState): void => {
+        state = state || S.meta64.state;
         if (!state.node) return null;
 
         this.mainOffset = 0;
@@ -107,7 +117,8 @@ export class Nav implements NavIntf {
             });
     }
 
-    navUpLevel = (state: AppState): void => {
+    navUpLevel = (event: any = null): void => {
+        let state = S.meta64.state;
         if (!state.node) return null;
 
         //Always just scroll to the top before doing an actual 'upLevel' to parent.
@@ -172,13 +183,21 @@ export class Nav implements NavIntf {
         return null;
     }
 
-    clickNodeRow = (node: J.NodeInfo, state: AppState): void => {
-        //console.log("clickNodeRow: id=" + node.id);
+    /* NOTE: Elements that have this as an onClick method must have the nodeId 
+    on an attribute of the element */
+    cached_clickNodeRow = (nodeId: string, state?: AppState): void => {
+        state = state || S.meta64.state;
+        console.log("clickNodeRow: id=" + nodeId);
 
         /* First check if this node is already highlighted and if so just return */
-        let highlightNode = S.meta64.getHighlightedNode(state);
-        if (highlightNode && highlightNode.id == node.id) {
+        let highlightNode = S.meta64.getHighlightedNode();
+        if (highlightNode && highlightNode.id == nodeId) {
             return;
+        }
+
+        let node: J.NodeInfo = state.idToNodeMap[nodeId];
+        if (!node) {
+            throw new Error("node not found in idToNodeMap: " + nodeId);
         }
 
         /*
@@ -189,14 +208,14 @@ export class Nav implements NavIntf {
         /* We do this async just to make the fastest possible response when clicking on a node */
         setTimeout(() => {
             S.util.updateHistory(null, node, state);
-
-            dispatch({
-                type: "Action_ClickNodeRow",
-                updateNew: (s: AppState): AppState => {
-                    return { ...state };
-                }
-            });
         }, 10);
+
+        fastDispatch({
+            type: "Action_ClickNodeRow",
+            updateNew: (s: AppState): AppState => {
+                return { ...state };
+            }
+        });
     }
 
     openContentNode = (nodePathOrId: string, state: AppState): void => {
@@ -213,7 +232,8 @@ export class Nav implements NavIntf {
         }, (res) => { this.navPageNodeResponse(res, state); });
     }
 
-    openNodeById = (id: string, state: AppState): void => {
+    cached_openNodeById = (id: string, state: AppState): void => {
+        state = state || S.meta64.state;
         let node: J.NodeInfo = state.idToNodeMap[id];
         S.meta64.highlightNode(node, false, state);
 
@@ -224,7 +244,17 @@ export class Nav implements NavIntf {
         }
     }
 
-    toggleNodeSel = (selected: boolean, id: string, state: AppState): void => {
+    cached_toggleNodeSel = (id: string, state: AppState): void => {
+        state = state || S.meta64.state;
+        if (state.selectedNodes[id]) {
+            delete state.selectedNodes[id];
+        } else {
+            state.selectedNodes[id] = true;
+        }
+    }
+
+    setNodeSel = (selected: boolean, id: string, state: AppState): void => {
+        state = state || S.meta64.state;
         if (selected) {
             state.selectedNodes[id] = true;
         } else {
@@ -283,6 +313,18 @@ export class Nav implements NavIntf {
 
     navPublicHome = (state: AppState): void => {
         S.meta64.loadAnonPageHome(state);
+    }
+
+    runSearch = (): void => {
+        let state = S.meta64.state;
+        this.cached_clickNodeRow(state.node.id);
+        new SearchContentDlg(state).open();
+    }
+
+    runTimeline = (): void => {
+        let state = S.meta64.state;
+        this.cached_clickNodeRow(state.node.id);
+        S.srch.timeline("mtm", state);
     }
 }
 

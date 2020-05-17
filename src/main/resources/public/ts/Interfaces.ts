@@ -17,10 +17,6 @@ export interface AppAction extends Action<any> {
     state?: AppState;
 }
 
-export interface MainTabPanelIntf extends CompIntf {
-
-}
-
 /* Function Prototype/Signatore, It is assumed that a return value of false, will abort the iteration, and true continues iterating */
 export interface PropertyIterator {
     (prop: string, val: any): boolean;

@@ -21,23 +21,30 @@ export interface EditIntf {
     createSubNodeResponse(res: J.CreateSubNodeResponse, state: AppState): void;
     saveNodeResponse(node: J.NodeInfo, res: J.SaveNodeResponse, state: AppState): void;
     toggleEditMode(state: AppState): void;
-    moveNodeUp(id: string, state: AppState): void;
-    moveNodeDown(id: string, state: AppState): void;
+    cached_moveNodeUp(id: string, state?: AppState): void;
+    cached_moveNodeDown(id: string, state?: AppState): void;
     moveNodeToTop(id: string, state: AppState): void;
     moveNodeToBottom(id: string, state: AppState): void;
     getNodeAbove(node: J.NodeInfo, state: AppState): any;
     getNodeBelow(node: J.NodeInfo, state: AppState): J.NodeInfo;
     getFirstChildNode(state: AppState): any;
-    runEditNode(id: any, state: AppState): void;
-    insertNode(id: any, typeName: string, ordinalOffset: number, state: AppState): void;
+    cached_runEditNode(id: any, state?: AppState): void;
+    insertNode(id: string, typeName: string, ordinalOffset: number, state?: AppState): void;
+    cached_toolbarInsertNode(id: string): void;
     createSubNode(id: any, typeName: string, createAtTop: boolean, state: AppState): void;
     selectAllNodes(state: AppState) : void;
-    deleteSelNodes(node: J.NodeInfo, hardDelete: boolean, state: AppState): void;
+    cached_softDeleteSelNodes(nodeId: string);
+    deleteSelNodes(nodeId: string, hardDelete: boolean, state?: AppState): void;
     getBestPostDeleteSelNode(state: AppState): J.NodeInfo;
-    cutSelNodes(node: J.NodeInfo, state: AppState): void;
+    cached_cutSelNodes(nodeId: string, state?: AppState): void;
     undoCutSelNodes(state: AppState): void;
-    pasteSelNodes(node: J.NodeInfo, location: string, nodesToMove: string[], state: AppState): void;
+    cached_pasteSelNodesInside(nodeId: string);
+    pasteSelNodes(nodeId: string, location: string, state?: AppState): void;
+    cached_pasteSelNodes_InlineEnd(nodeId: string);
+    cached_pasteSelNodes_InlineAbove(nodeId: string);
+    cached_pasteSelNodes_Inline(nodeId: string);
     insertBookWarAndPeace(state: AppState): void;
     emptyTrash(state: AppState): void;
+    cached_newSubNode(id: any);
 }
 

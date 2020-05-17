@@ -18,7 +18,7 @@ export class NodeCompMainNode extends Div {
 
     constructor(state: AppState) {
         super(null, {
-            id: "row_" + state.node.id,
+            id: "row_" + state.node.id
         });
     }
 
@@ -35,7 +35,7 @@ export class NodeCompMainNode extends Div {
         let selected: boolean = (focusNode && focusNode.id === node.id);
         this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main")
 
-        this.attribs.onClick = (elm: HTMLElement) => { S.nav.clickNodeRow(node, state); };
+        this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
         S.render.setNodeDropHandler(this, node, state);
 
         //console.log("NodeCompNameNode id="+node.id+" hash="+S.util.hashOfObject(node));

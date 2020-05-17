@@ -192,7 +192,7 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Insert node", res)) {
             S.meta64.updateNodeMap(res.newNode, 1, state);
             S.meta64.highlightNode(res.newNode, true, state);
-            this.runEditNode(res.newNode.id, state);
+            this.cached_runEditNode(res.newNode.id, state);
         }
     }
 
@@ -203,7 +203,7 @@ export class Edit implements EditIntf {
             }
             else {
                 S.meta64.updateNodeMap(res.newNode, 1, state);
-                this.runEditNode(res.newNode.id, state);
+                this.cached_runEditNode(res.newNode.id, state);
             }
         }
     }
@@ -252,7 +252,8 @@ export class Edit implements EditIntf {
         });
     }
 
-    moveNodeUp = (id: string, state: AppState): void => {
+    cached_moveNodeUp = (id: string, state?: AppState): void => {
+        state = state || S.meta64.state;
         if (!id) {
             let selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             id = selNode.id;
@@ -269,7 +270,8 @@ export class Edit implements EditIntf {
         }
     }
 
-    moveNodeDown = (id: string, state: AppState): void => {
+    cached_moveNodeDown = (id: string, state: AppState): void => {
+        state = state || S.meta64.state;
         if (!id) {
             let selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             id = selNode.id;
@@ -347,7 +349,8 @@ export class Edit implements EditIntf {
         return state.node.children[0];
     }
 
-    runEditNode = (id: any, state: AppState): void => {
+    cached_runEditNode = (id: any, state?: AppState): void => {
+        state = state || S.meta64.state;
         let node: J.NodeInfo = null;
         if (!id) {
             node = S.meta64.getHighlightedNode(state);
@@ -366,7 +369,12 @@ export class Edit implements EditIntf {
         }, (res) => { this.initNodeEditResponse(res, state) });
     }
 
-    insertNode = (id: any, typeName: string, ordinalOffset: number, state: AppState): void => {
+    cached_toolbarInsertNode = (id: string): void => {
+        S.edit.insertNode(id, null, 0); 
+    }
+
+    insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState): void => {
+        state = state || S.meta64.state;
         if (!state.node || !state.node.children) return;
         this.parentOfNewNode = state.node;
         if (!this.parentOfNewNode) {
@@ -392,7 +400,13 @@ export class Edit implements EditIntf {
         }
     }
 
+    /* Need all cached functions to be prefixed so they're recognizable, since refactoring them can break things */
+    cached_newSubNode = (id: any) => {
+        S.edit.createSubNode(id, null, true, null);
+    }
+
     createSubNode = (id: any, typeName: string, createAtTop: boolean, state: AppState): void => {
+        state = state || S.meta64.state;
         /*
          * If no uid provided we deafult to creating a node under the currently viewed node (parent of current page), or any selected
          * node if there is a selected node.
@@ -454,13 +468,18 @@ export class Edit implements EditIntf {
         ).open();
     }
 
+    cached_softDeleteSelNodes = (nodeId: string) => {
+        this.deleteSelNodes(nodeId, false);
+    }
+
     /*
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
      * has currenly selected (via checkboxes)
      */
-    deleteSelNodes = (node: J.NodeInfo, hardDelete: boolean, state: AppState): void => {
-        if (node) {
-            S.nav.toggleNodeSel(true, node.id, state);
+    deleteSelNodes = (nodeId: string, hardDelete: boolean, state?: AppState): void => {
+        state = state || S.meta64.state;
+        if (nodeId) {
+            S.nav.setNodeSel(true, nodeId, state);
         }
         let selNodesArray = S.meta64.getSelNodeIdsArray(state);
 
@@ -549,8 +568,10 @@ export class Edit implements EditIntf {
         });
     }
 
-    cutSelNodes = (node: J.NodeInfo, state: AppState): void => {
-        S.nav.toggleNodeSel(true, node.id, state);
+    cached_cutSelNodes = (nodeId: string, state?: AppState): void => {
+        state = state || S.meta64.state;
+
+        S.nav.setNodeSel(true, nodeId, state);
         let selNodesArray = S.meta64.getSelNodeIdsArray(state);
 
         new ConfirmDlg("Cut " + selNodesArray.length + " node(s), to paste/move to new location ?", "Confirm Cut",
@@ -567,20 +588,38 @@ export class Edit implements EditIntf {
         ).open();
     }
 
+    cached_pasteSelNodesInside = (nodeId: string) => {
+        let state = S.meta64.state;
+        S.edit.pasteSelNodes(nodeId, 'inside', state);
+    }
+    
     //location=inside | inline | inline-above (todo-1: put in java-aware enum)
-    pasteSelNodes = (node: J.NodeInfo, location: string, nodesToMove: string[], state: AppState): void => {
+    pasteSelNodes = (nodeId: string, location: string, state?: AppState): void => {
+        state = state || S.meta64.state;
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently selected
          * page. Later on we can get more specific about allowing precise destination location for moved
          * nodes.
          */
         S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
-            targetNodeId: node.id,
-            nodeIds: nodesToMove,
+            targetNodeId: nodeId,
+            nodeIds: state.nodesToMove,
             location
         }, (res) => {
             this.moveNodesResponse(res, state);
         });
+    }
+
+    cached_pasteSelNodes_InlineEnd = (nodeId: string) => {
+        S.edit.pasteSelNodes(nodeId, "inline-end");
+    }
+
+    cached_pasteSelNodes_InlineAbove = (nodeId: string) => {
+        S.edit.pasteSelNodes(nodeId, "inline-above");
+    }
+
+    cached_pasteSelNodes_Inline = (nodeId: string) => {
+        S.edit.pasteSelNodes(nodeId, "inline");
     }
 
     insertBookWarAndPeace = (state: AppState): void => {

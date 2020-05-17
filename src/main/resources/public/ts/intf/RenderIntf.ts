@@ -20,6 +20,6 @@ export interface RenderIntf {
     allowPropertyEdit(node: J.NodeInfo, propName: string, state: AppState): boolean;
     isReadOnlyProperty(propName: string): boolean;
     allowAction(typeHandler: TypeHandlerIntf, action: string): boolean; 
-    createBetweenNodeButtonBar(node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, nodesToMove: string[], state: AppState): Comp;
+    createBetweenNodeButtonBar(node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, state: AppState): Comp;
     renderChildren(node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp;
 }

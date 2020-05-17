@@ -83,6 +83,7 @@ export class Render implements RenderIntf {
     setNodeDropHandler = (rowDiv: Comp, node: J.NodeInfo, state: AppState): void => {
         if (!node || !rowDiv) return;
 
+        //use cached function here.
         rowDiv.setDropHandler((evt: DragEvent) => {
             let data = evt.dataTransfer.items;
 
@@ -155,7 +156,6 @@ export class Render implements RenderIntf {
                     s.offsetOfNodeFound = res.offsetOfNodeFound;
                     s.displayedParent = res.displayedParent;
 
-                    S.meta64.idToNodeCompRowMap = {};
                     S.meta64.updateNodeMap(res.node, 1, s);
                     s.selectedNodes = {};
 
@@ -225,26 +225,23 @@ export class Render implements RenderIntf {
     
     The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
     */
-    createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, nodesToMove: string[], state: AppState): Comp => {
+    createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, state: AppState): Comp => {
         let pasteInlineButton: Button = null;
 
-        let highlightNode = S.meta64.getHighlightedNode(state);
-        let homeNodeSelected = highlightNode != null && state.homeNodeId == highlightNode.id;
+        if (!state.isAnonUser && state.nodesToMove != null && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
 
-        if (!state.isAnonUser && nodesToMove != null && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
-
-            let target = null;
+            let func: Function = null;
             if (state.endReached) {
-                target = "inline-end";
+                func = S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_InlineEnd, "S.edit.pasteSelNodes_InlineEnd", node.id);
             }
             else if (isFirst) {
-                target = "inline-above";
+                func = S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_InlineAbove, "S.edit.pasteSelNodes_InlineAbove", node.id);
             }
             else {
-                target = "inline";
+                func = S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_Inline, "S.edit.pasteSelNodes_Inline", node.id);
             }
 
-            pasteInlineButton = new Button("Paste Inline", () => { S.edit.pasteSelNodes(node, target, nodesToMove, state); }, {
+            pasteInlineButton = new Button("Paste Inline", func, {
                 className: "highlightBorder"
             });
         }

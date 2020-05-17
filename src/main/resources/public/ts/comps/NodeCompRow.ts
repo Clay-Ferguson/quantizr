@@ -8,7 +8,6 @@ import { Div } from "../widget/Div";
 import { NodeCompContent } from "./NodeCompContent";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
-import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -23,35 +22,17 @@ export class NodeCompRow extends Div {
 
     constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number, public layoutClass: string, public allowNodeMove: boolean) {
         super(null, {
-            id: "row_" + node.id,
+            id: "row_" + node.id
         });
-
-        S.meta64.idToNodeCompRowMap[node.id] = this;
     }
 
     preRender = (): void => {
         let state: AppState = useSelector((state: AppState) => state);
-
         let node = this.node;
         let id: string = node.id;
         //console.log("Rendering NodeCompRow. id=" + node.id);
 
-        this.attribs.onClick = (evt) => { 
-            let lastComp: CompIntf = null;
-
-            //get previously selected node, to force it to render (as unhighlighted)
-            let highlightNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
-            if (highlightNode) {
-                lastComp = S.meta64.idToNodeCompRowMap[highlightNode.id];
-            }
-
-            S.nav.clickNodeRow(node, state);
-            
-            if (lastComp) {
-                lastComp.forceRender();
-            }
-            this.forceRender(); 
-        };
+        this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
 
         //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
         let buttonBar: Comp = null;
