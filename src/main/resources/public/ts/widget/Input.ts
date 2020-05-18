@@ -13,19 +13,19 @@ export class Input extends Comp {
 
     constructor(attribs: Object = {}) {
         super(attribs);
-        this.attribs.onChange = this.onChange;
+        this.attribs.onChange = this.onChange.bind(this);
         this.mergeState({
             value: this.attribs.value || "",
             type: this.attribs.type
         });
     }
 
-    onChange = (evt): void => {
+    onChange(evt): void {
         console.log("New Val [" + evt.target.value + "] this.id=" + this.getId());
         this.mergeState({ value: evt.target.value });
     }
 
-    toggleType = (): void => {
+    _toggleType = (): void => {
         let state = this.getState();
         this.mergeState({
             type: state.type == "password" ? "text" : "password"

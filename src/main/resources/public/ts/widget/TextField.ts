@@ -29,17 +29,17 @@ export class TextField extends Div implements I.TextEditorIntf {
         this.mergeState({ value: defaultVal || "" });
     }
 
-    insertTextAtCursor = (text: string) => {
+    insertTextAtCursor(text: string) {
         //should we implement this ? todo-1
     }
 
-    setWordWrap = (wordWrap: boolean): void => {
+    setWordWrap(wordWrap: boolean): void {
     }
 
-    setMode = (mode: string): void => {
+    setMode(mode: string): void {
     }
 
-    setValue = (val: string): void => {
+    setValue(val: string): void {
         if (this.input) {
             this.input.mergeState({ value: val || "" });
         }
@@ -48,7 +48,7 @@ export class TextField extends Div implements I.TextEditorIntf {
         }
     }
 
-    getValue = (): string => {
+    getValue(): string {
         if (this.input) {
             return this.input.getState().value;
         }
@@ -74,8 +74,8 @@ export class TextField extends Div implements I.TextEditorIntf {
                     new Anchor(null, null, {
                         onClick: (evt) => {
                             evt.preventDefault();
-                            this.input.toggleType();
-                            this.icon.toggleClass();
+                            this.input._toggleType();
+                            this.icon._toggleClass();
                         },
                     }, [
                         this.icon = new ToggleIcon("fa-eye-slash", "fa-eye", {

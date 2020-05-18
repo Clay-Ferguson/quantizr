@@ -27,7 +27,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         //should we implement this ? todo-1
     }
 
-    setMode = (mode: string): void => {
+    setMode(mode: string): void {
     }
 
     getValue = (): string => {
@@ -52,7 +52,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         }
     }
 
-    setWordWrap = (wordWrap: boolean): void => {
+    setWordWrap(wordWrap: boolean): void {
         this.mergeState({ wordWrap });
     }
 

@@ -69,7 +69,7 @@ export class NodeCompRow extends Div {
     experimental code is being left in place for now, but the approach didn't work. There's more notes in Comp.ts
     about this performance hack attempt.
     */
-    makeCacheKeyObj = (appState: AppState, state: any, props: any) => {
+    makeCacheKeyObj(appState: AppState, state: any, props: any) {
         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(appState);
         let selected: boolean = (focusNode && focusNode.id === this.node.id);
         let key = this.node.id + " " + selected;

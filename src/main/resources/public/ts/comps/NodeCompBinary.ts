@@ -27,7 +27,7 @@ export class NodeCompBinary extends Div {
         super();
     }
 
-    makeImageTag = (node: J.NodeInfo, state: AppState): Img => {
+    makeImageTag(node: J.NodeInfo, state: AppState): Img {
         let src: string = S.render.getUrlForNodeAttachment(node);
 
         let imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);

@@ -53,7 +53,7 @@ export class CompDemoButton extends Div {
     }
 
     /* Return an object such that, if this object changes, we must render, or else we don't need to render */
-    makeCacheKeyObj = (appState: AppState, state: any, props: any) => {
+    makeCacheKeyObj(appState: AppState, state: any, props: any) {
         state = this.getState();
         return {
             appStateCounter: appState.counter,

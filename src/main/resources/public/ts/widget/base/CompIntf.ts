@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { AppState } from "../../AppState";
 
 export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[]) => React.ReactNode;
 
@@ -24,4 +25,5 @@ export interface CompIntf {
     getAttribs() : Object;
     compRender(): ReactNode;
     forceRender(): void;
+    makeCacheKeyObj(appState: AppState, state: any, props: any);
 }

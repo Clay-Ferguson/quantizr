@@ -359,7 +359,9 @@ export abstract class Comp implements CompIntf {
 
     /* Derived classes can implement this to perform something similar to "React.memo" were we memoize based on wether the object
     that this function returns (or more accurately the hash of it) changes upon additional renderings */
-    makeCacheKeyObj = null;
+    makeCacheKeyObj(appState: AppState, state: any, props: any) {
+        return null;
+    };
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
     _render = (props: any): ReactNode => {
@@ -430,8 +432,12 @@ export abstract class Comp implements CompIntf {
             let appState: AppState = null;
 
             /* if we are caching this ReactNode (memoizing) then try to get object from cache 
-            instead of rendering it */
-            if (Comp.enableMemoMap && this.makeCacheKeyObj) {
+            instead of rendering it 
+            
+            TODO: If we ever re-enable this code find a way to make it so that components not providing any makeCacheKeyObj can be detected
+            and and avoid even entering into this block on a component by component basis
+            */
+            if (Comp.enableMemoMap) {
 
                 //note: getting full state here is a big performance hit? There's definitely a performance issue.
                 appState = useSelector(function (state: AppState) { return state });
@@ -459,7 +465,7 @@ export abstract class Comp implements CompIntf {
             ret = this.compRender();
 
             /* If we have the cache key provider, cache this node for later */
-            if (Comp.enableMemoMap && this.makeCacheKeyObj) {
+            if (key) {
                 Comp.memoMap[key] = ret;
             }
         }

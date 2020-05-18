@@ -35,8 +35,7 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         return elm && (<any>elm).checked;
     }
 
-    compRender = (): ReactNode  => {
-
+    compRender(): ReactNode {
         let _attribs = this.attribs; //todo-1: remove unnecessary varible.
 
         if (this.label) {

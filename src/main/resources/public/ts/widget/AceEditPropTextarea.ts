@@ -64,35 +64,35 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
         });
     }
 
-    setWordWrap = (wordWrap: boolean): void => {
+    setWordWrap(wordWrap: boolean): void {
         if (this.getAceEditor()) {
             this.getAceEditor().session.setUseWrapMode(wordWrap);
         }
     }
 
-    setMode = (mode: string): void => {
+    setMode(mode: string): void {
         if (this.getAceEditor()) {
             this.getAceEditor().session.setMode(mode);
         }
     }
 
-    showKeyboardShortcuts = () => {
+    showKeyboardShortcuts() {
         ace.config.loadModule("ace/ext/keybinding_menu", (module) => {
             module.init(this.aceEditor);
             this.aceEditor.showKeyboardShortcuts();
         });
     }
 
-    insertTextAtCursor = (text: string) => {
+    insertTextAtCursor(text: string) {
         this.aceEditor.session.insert(this.aceEditor.getCursorPosition(), text);
     }
 
-    getAceEditor = (): any => {
+    getAceEditor(): any {
         return this.aceEditor;
     }
 
     //should we make this just return a promise, and wait for the control ?
-    getValue = (): string => {
+    getValue(): string {
         if (!this.aceEditor) {
             //console.log("Ace.getValue(1)="+this.initialValue);
             return this.initialValue;
@@ -102,7 +102,7 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
         return val;
     }
 
-    setValue = (val: string): void => {
+    setValue(val: string): void {
         this.whenElm((elm: HTMLElement) => {
             //console.log("Ace.setValue="+val);
             this.aceEditor.setValue(val /* S.util.escapeHtml(val) */, 0);

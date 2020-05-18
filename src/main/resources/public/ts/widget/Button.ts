@@ -29,7 +29,6 @@ export class Button extends Comp {
     }
 
     compRender(): ReactNode {
-        //console.log("**************** ButtonRenderCount="+Button.buttonRenderCount);
         let icon: any;
         if (this.attribs.iconclass) {
             icon = S.e('i', {

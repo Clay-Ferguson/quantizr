@@ -23,7 +23,7 @@ export class GraphPanel extends Comp {
         this.init();
     }
 
-    init = (): void => {
+    init(): void {
         // S.util.getElm(this.getId(), (elm: HTMLElement) => {
 
         //     // create an array with nodes
@@ -52,7 +52,7 @@ export class GraphPanel extends Comp {
         // });
     }
 
-    setGraphData = (data: any): void => {
+    setGraphData(data: any): void {
         this.whenElm((elm: HTMLElement) => {
 
             // Lazy create network, and populate with data.

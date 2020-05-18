@@ -10,7 +10,6 @@ import { Img } from "../widget/Img";
 import { ButtonBar } from "../widget/ButtonBar";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { NavBarIconButton } from "../widget/NavBarIconButton";
-import { SearchContentDlg } from "../dlg/SearchContentDlg";
 import { AppState } from "../AppState";
 import { useSelector, useDispatch } from "react-redux";
 

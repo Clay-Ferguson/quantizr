@@ -22,7 +22,7 @@ export class EditPrivsTableRow extends Comp {
         this.setClass("list-group-item list-group-item-action");
     }
 
-    renderAclPrivileges = (aclEntry: J.AccessControlInfo): Div => {
+    renderAclPrivileges(aclEntry: J.AccessControlInfo): Div {
 
         let div = new Div();
         aclEntry.privileges.forEach(function(privilege, index) {

@@ -28,7 +28,7 @@ export class NodeCompMarkdown extends MarkdownDiv {
         });
     }
 
-    renderRawMarkdown = (node: J.NodeInfo): string => {
+    renderRawMarkdown(node: J.NodeInfo): string {
         let content = node.content || "";
         let val = "";
 

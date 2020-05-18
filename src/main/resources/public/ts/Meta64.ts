@@ -50,7 +50,7 @@ export class Meta64 implements Meta64Intf {
     /* Creates/Access a function that does operation 'name' on a node identified by 'id */
     getNodeFunc = (func: (id: string) => void, name: string, id: string): () => void => {
         let k = name + "_" + id;
-        return this.fc[k] || (this.fc[k] = () => func(id));
+        return this.fc[k] || (this.fc[k] = function() {func(id);});
     }
 
     rebuildIndexes = (): void => {

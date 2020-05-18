@@ -1,5 +1,5 @@
 import { Comp } from "./base/Comp";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Div } from "./Div";
@@ -18,7 +18,7 @@ export class VerticalLayout extends Comp {
 
         // Wrap all the children provided in Divs, and then make those be the children
         let divWrapComps: Comp[] = [];
-        initialComps.forEach(function(child: Comp) {
+        initialComps.forEach(function (child: Comp) {
             if (child) {
                 divWrapComps.push(new Div(null, null, [child]));
             }
@@ -27,7 +27,7 @@ export class VerticalLayout extends Comp {
         this.setChildren(divWrapComps);
     }
 
-    compRender = () : ReactNode => {
+    compRender(): ReactNode {
         return this.tagRender('div', null, this.attribs);
     }
 }
