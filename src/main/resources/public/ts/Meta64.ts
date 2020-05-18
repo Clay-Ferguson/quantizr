@@ -45,12 +45,19 @@ export class Meta64 implements Meta64Intf {
     // Function cache: Creating NEW functions (like "let a = () => {...do something}"), is an expensive operation (performance) so we have this
     // cache to allow reuse of function definitions.
     // will need a strategy to empty this out periodically (todo-0)
-    fc: { [key: string]: () => void } = {};
+    private fc: { [key: string]: () => void } = {};
+    private fcCount: number = 0;
 
-    /* Creates/Access a function that does operation 'name' on a node identified by 'id */
-    getNodeFunc = (func: (id: string) => void, name: string, id: string): () => void => {
-        let k = name + "_" + id;
-        return this.fc[k] || (this.fc[k] = function() {func(id);});
+    /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
+    getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {
+        let k = op + "_" + id;
+        if (!this.fc[k]) {
+            this.fc[k] = function () { func(id); };
+
+            /* we hold the count in a var since calculating manually requires an inefficient iteration */
+            this.fcCount++;
+        }
+        return this.fc[k];
     }
 
     rebuildIndexes = (): void => {
@@ -237,7 +244,8 @@ export class Meta64 implements Meta64Intf {
             return ret;
 
         let idx = -1;
-        state.node.children.forEach(function(iterNode): boolean {
+        //todo-0: need faster way that CAN abort when found.
+        state.node.children.forEach(function (iterNode): boolean {
             idx++;
             if (node.id === iterNode.id) {
                 ret = idx;
@@ -250,7 +258,8 @@ export class Meta64 implements Meta64Intf {
 
     removeBinaryById = (id: string, state: AppState): void => {
         if (!state.node) return;
-        state.node.children.forEach(function(node: J.NodeInfo) {
+        //todo-0: need faster way that CAN abort when found.
+        state.node.children.forEach(function (node: J.NodeInfo) {
             if (node.id === id) {
                 S.props.deleteProp(node, J.NodeProp.BIN_MIME);
             }
@@ -266,7 +275,7 @@ export class Meta64 implements Meta64Intf {
         state.idToNodeMap[node.id] = node;
 
         if (node.children) {
-            node.children.forEach(function(n) {
+            node.children.forEach(function (n) {
                 this.updateNodeMap(n, level + 1, state);
             }, this);
         }
@@ -429,12 +438,26 @@ export class Meta64 implements Meta64Intf {
                 S.view.displayNotifications(null, store.getState());
             }, 1000);
 
+            // todo-1: could replace this pull with a push.
+            setTimeout(() => {
+                this.maintenanceCycle();
+            }, 30000);
+
             // Initialize the 'ServerPush' client-side connection
             S.push.init();
 
             console.log("initApp complete.");
             resolve();
         });
+    }
+
+    maintenanceCycle = () => {
+        //console.log("Maintenance fcCount: "+this.fcCount);
+        /* Clean out function referenes after a threshold is reached */
+        if (this.fcCount > 500) {
+            this.fc = {};
+            this.fcCount = 0;
+        }
     }
 
     /* The overlayCounter allows recursive operations which show/hide the overlay

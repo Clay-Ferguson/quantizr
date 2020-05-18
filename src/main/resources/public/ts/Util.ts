@@ -807,6 +807,8 @@ export class Util implements UtilIntf {
         }
     }
 
+    /* Note: There is also Object.keys(obj).length, which computes internally an entire array, as part of processing
+    so it's debatable wether the overhead of that is better for large objects */
     getPropertyCount = (obj: Object): number => {
         if (!obj) return 0;
         let count = 0;

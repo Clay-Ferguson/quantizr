@@ -20,9 +20,6 @@ export interface Meta64Intf {
     parentIdToFocusNodeMap: { [key: string]: J.NodeInfo };
     curHighlightNodeCompRow: CompIntf;
 
-    //function cache
-    fc: { [key: string]: Function };
-
     //function cache accessor
     getNodeFunc(func: (id: string) => void, name: string, id: string): () => void;
 
