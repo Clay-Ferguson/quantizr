@@ -27,12 +27,11 @@ export class CompDemoButton extends Div {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let cstate = this.getState();
-
         let children: CompIntf[] = [];
 
         children.push(new HorizontalLayout([
             new Div("Button " + cstate.idx + ": Inc CompDemo.state.counter=" + cstate.counter + " AppState.counter=" + state.counter, {
-                className: "btn btn-primary" + (state.compDemoIdActive == cstate.idx ? " redBorder": ""), 
+                className: "btn btn-primary" + (state.compDemoIdActive == cstate.idx ? " testHighlight": ""), 
                 type: "button",
                 onClick: () => {
                     Comp.renderCounter = 0;

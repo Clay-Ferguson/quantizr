@@ -9,6 +9,7 @@ import { dispatch } from "../AppRedux";
 import { CompDemo } from "./CompDemo";
 import { HorizontalLayout } from "./HorizontalLayout";
 import { Comp } from "./base/Comp";
+import { runClassDemoTest } from "../ClassDemoTest";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -19,6 +20,7 @@ export class AppDemo extends Div {
 
     constructor() {
         super();
+        runClassDemoTest();
     }
 
     preRender(): void {

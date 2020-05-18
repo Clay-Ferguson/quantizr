@@ -7,7 +7,8 @@ export class PubSub {
     
     static pub = (name: string, ...args: any[]) => {
         if (!PubSub.registry[name]) {
-            throw "Unknown publish name: " + name;
+            console.log("Unknown PubSub name: " + name);
+            return;
         }
         PubSub.lastFires[name] = args;
         PubSub.registry[name].forEach(function(fn) {
