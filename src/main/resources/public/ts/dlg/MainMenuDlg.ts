@@ -11,8 +11,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-//todo-0: rename to MainMenuDlg
-export class MainMenuPopupDlg extends DialogBase {
+export class MainMenuDlg extends DialogBase {
 
     constructor() {
         super(null, "app-modal-menu", true, store.getState());

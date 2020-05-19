@@ -118,7 +118,8 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
         if ((state.isAdminUser || S.props.isMine(node, state)) && S.props.isShared(node)) {
             sharedIcon = new Icon({
-                className: "fa fa-share-alt fa-lg rowIcon"
+                className: "fa fa-share-alt fa-lg rowIcon",
+                onClick: () => S.share.editNodeSharing(state, node)
             });
         }
 

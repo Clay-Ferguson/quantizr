@@ -9,7 +9,6 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { VerticalLayout } from "./widget/VerticalLayout";
 import { Anchor } from "./widget/Anchor";
 import { Heading } from "./widget/Heading";
-import { MainMenuPopupDlg } from "./dlg/MainMenuPopupDlg";
 import { AppState } from "./AppState";
 import { dispatch, fastDispatch, appState } from "./AppRedux";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";

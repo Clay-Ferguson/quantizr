@@ -17,8 +17,8 @@ export class Share implements ShareIntf {
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
-    editNodeSharing = (state: AppState): void => {
-        let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
+    editNodeSharing = (state: AppState, node: J.NodeInfo): void => {
+        if (!node) node = S.meta64.getHighlightedNode(state);
 
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");

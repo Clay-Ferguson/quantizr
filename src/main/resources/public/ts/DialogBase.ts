@@ -10,7 +10,7 @@ import { CompIntf } from "./widget/base/CompIntf";
 import { AppState } from "./AppState";
 import { Provider } from 'react-redux';
 import { store } from "./AppRedux";
-import startup from "./Startup";
+import clientInfo from "./ClientInfo";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -37,7 +37,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         super(null);
         this.appState = appState;
 
-        this.attribs.className = startup.isMobile ?
+        this.attribs.className = clientInfo.isMobile ?
             (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen") :
             (this.overrideClass ? this.overrideClass : "app-modal-content");
     }
@@ -77,7 +77,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             if (++DialogBase.refCounter == 1) {
                 /* we only hide and reshow the scroll bar and disable scrolling when we're in mobile mode, because that's when 
                 full-screen dialogs are in use, which is when we need this. */
-                if (startup.isMobile) {
+                if (clientInfo.isMobile) {
                     document.body.style.overflow = 'hidden';
                 }
             }
@@ -102,7 +102,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             S.util.domElmRemove(DialogBase.BACKDROP_PREFIX + this.getId());
 
             if (--DialogBase.refCounter <= 0) {
-                if (startup.isMobile) {
+                if (clientInfo.isMobile) {
                     document.body.style.overflow = 'auto';
                 }
             }
