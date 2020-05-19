@@ -5,6 +5,7 @@ import { Constants as C } from "./Constants";
 import { ViewIntf } from "./intf/ViewIntf";
 import { GraphDisplayDlg } from "./dlg/GraphDisplayDlg";
 import { AppState } from "./AppState";
+import { fastDispatch } from "./AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -24,7 +25,7 @@ export class View implements ViewIntf {
      */
     refreshTree = (nodeId: string, renderParentIfLeaf: boolean, highlightId: string, isInitialRender: boolean, forceIPFSRefresh: boolean,
         state: AppState): void => {
-    
+
         if (!nodeId && state.node) {
             nodeId = state.node.id;
         }
@@ -110,6 +111,8 @@ export class View implements ViewIntf {
         let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!currentSelNode) return;
 
+        let newNode: J.NodeInfo = null;
+
         //First detect if page root node is selected, before doing a child search
         if (currentSelNode.id == state.node.id) {
             //if going down that means first child node.
@@ -119,34 +122,52 @@ export class View implements ViewIntf {
             else if (dir == "up") {
                 S.nav.navUpLevel();
             }
-            return;
         }
-
-        if (state.node.children && state.node.children.length > 0) {
+        else if (state.node.children && state.node.children.length > 0) {
             let prevChild = null;
             let nodeFound = false;
-            let done = false;
-            state.node.children.forEach(function(child: J.NodeInfo) {
-                if (done) return;
+
+            state.node.children.some((child: J.NodeInfo) => {
+                let ret = false;
 
                 if (nodeFound && dir === "down") {
-                    done = true;
+                    ret = true;
+                    newNode = child;
                     S.meta64.highlightNode(child, true, state);
                 }
 
                 if (child.id == currentSelNode.id) {
                     if (dir === "up") {
                         if (prevChild) {
-                            done = true;
+                            ret = true;
+                            newNode = prevChild;
                             S.meta64.highlightNode(prevChild, true, state);
                         }
                         else {
+                            newNode = state.node;
                             S.meta64.highlightNode(state.node, true, state);
                         }
                     }
                     nodeFound = true;
                 }
                 prevChild = child;
+
+                //NOTE: returning true stops the iteration.
+                return ret;
+            });
+        }
+
+        if (newNode) {
+            /* We do this async just to make the fastest possible response when clicking on a node */
+            setTimeout(() => {
+                S.util.updateHistory(null, newNode, state);
+            }, 10);
+
+            fastDispatch({
+                type: "Action_FastRefresh",
+                updateNew: (s: AppState): AppState => {
+                    return { ...state };
+                }
             });
         }
     }
@@ -174,6 +195,7 @@ export class View implements ViewIntf {
                     //so we have to account for that by scrolling up a bit from where the 'scrollIntoView' will have put is.
                     //Only in the rare case of the very last node on the page will this have slightly undesirable effect of
                     //scrolling up more than we wanted to, but instead of worrying about that I'm keeping this simple.
+
                     scrollBy(0, -S.meta64.navBarHeight);
                 }
                 else {

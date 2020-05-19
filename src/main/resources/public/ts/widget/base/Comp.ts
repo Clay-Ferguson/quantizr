@@ -17,7 +17,6 @@ import { useSelector, useDispatch } from "react-redux";
 //tip: merging states: this.state = { ...this.state, ...moreState };
 
 let S: Singletons;
-//todo-0: all calls like this can use non-arrow functions.
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
@@ -64,12 +63,6 @@ export abstract class Comp implements CompIntf {
     //holds queue of functions to be ran once this component is rendered.
     domAddFuncs: ((elm: HTMLElement) => void)[];
 
-    //keeps track of knowledge that the element already got rendered so any whenElm
-    //functions will run immediately rather than wait for the lifecycle even which will never happen again?
-    //I'm actually not sure if lifecycle runs again when setStat is called, but using this state variable should
-    //nonetheless be correct.
-    domAddEventRan: boolean;
-
     renderRawHtml: boolean = false;
 
     /**
@@ -95,16 +88,10 @@ export abstract class Comp implements CompIntf {
         this.jsClassName = this.constructor.name + "[" + id + "]";
     }
 
+    /* Returns true if there are any non-null children */
     childrenExist(): boolean {
         if (this.children == null || this.children.length == 0) return false;
-        let ret = false;
-        //todo-0: an optimization here is to use old-school iteration to return immediately when ret is true.
-        this.children.forEach(function (child: Comp) {
-            if (child) {
-                ret = true;
-            }
-        });
-        return ret;
+        return this.children.some(child => !!child);
     }
 
     setIsEnabledFunc(isEnabledFunc: Function) {
@@ -138,10 +125,6 @@ export abstract class Comp implements CompIntf {
     //WARNING: Use whenElmEx for DialogBase derived components!
     whenElm(func: (elm: HTMLElement) => void) {
         //console.log("whenElm running for " + this.jsClassName);
-        if (this.domAddEventRan) {
-            func(this.getElement());
-            return;
-        }
 
         let elm = this.getElement();
         if (elm) {
@@ -427,7 +410,7 @@ export abstract class Comp implements CompIntf {
             // this.attribs.style.display = this.getState().visible ? "block" : "none";
 
             this.preRender();
-            
+
             let key = null;
             let appState: AppState = null;
 
@@ -495,9 +478,6 @@ export abstract class Comp implements CompIntf {
     _domAddEvent: () => void = null;
     domAddEvent(): void {
         //console.log("domAddEvent: " + this.jsClassName);
-
-        //todo-0: due to the way React unmounts and remounts stuff, this domAddEventRan will be a bad idea. get rid if this variable completely.
-        this.domAddEventRan = true;
 
         if (this.domAddFuncs) {
             let elm: HTMLElement = this.getElement();

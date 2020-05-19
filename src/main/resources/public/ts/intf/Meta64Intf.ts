@@ -40,7 +40,6 @@ export interface Meta64Intf {
     highlightRowById(id, scroll, state: AppState): void;
     highlightNode(node: J.NodeInfo, scroll: boolean, state: AppState): void;
     getSingleSelectedNode(state: AppState): J.NodeInfo;
-    getOrdinalOfNode(node: J.NodeInfo, state: AppState): number;
     removeBinaryById(id: string, state: AppState): void;
     initApp(): Promise<void>;
     processUrlParams(state: AppState): void;

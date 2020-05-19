@@ -18,7 +18,54 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class NodeCompMainList extends Div {
 
     constructor() {
-        super();
+        super(null, {
+            // welp this doesn't work...Not sure why. 
+            // onKeyDown: (event: KeyboardEvent) => {
+            //     console.log("keydown: event.code=" + event.code);
+            // }
+        });
+
+        // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node, but I realized listening on 'body' wasn't good
+        // because ALL input goes thru, and then when I tried to put it on THIS component only the above onKeyDown isn't working, so
+        // for now I'm just putting all this in the back burner.
+        // document.body.addEventListener("keydown", (event: KeyboardEvent) => {
+        //     console.log("keydown: "+event.code);
+        //     let state: AppState = null;
+        //     if (event.ctrlKey) {
+        //         switch (event.code) {
+        //             case "ArrowDown": 
+        //                 if (this.keyDebounce()) return;
+        //                 this.selectTab("mainTab");
+        //                 state = store.getState();
+        //                 S.view.scrollRelativeToNode("down", state);
+        //                 break;
+
+        //             case "ArrowUp":
+        //                 if (this.keyDebounce()) return;
+        //                 this.selectTab("mainTab");
+        //                 state = store.getState();
+        //                 S.view.scrollRelativeToNode("up", state);
+        //                 break;
+
+        //             case "ArrowLeft":
+        //                 if (this.keyDebounce()) return;
+        //                 this.selectTab("mainTab");
+        //                 S.nav.navUpLevel();
+        //                 break;
+
+        //             case "ArrowRight":
+        //                 if (this.keyDebounce()) return;
+        //                 this.selectTab("mainTab");
+        //                 state = store.getState();
+        //                 S.nav.navOpenSelectedNode(state);
+        //                 break;
+
+        //             default: break;
+        //         }
+        //     }
+        // });
+
+
     }
 
     preRender(): void {

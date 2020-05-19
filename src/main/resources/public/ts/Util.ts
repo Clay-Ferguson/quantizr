@@ -726,7 +726,8 @@ export class Util implements UtilIntf {
     }
 
     currentTimeMillis = (): number => {
-        return new Date().getMilliseconds();
+        //warning DO NOT USE getMilliseconds, which is only 0 thru 999
+        return new Date().getTime();
     }
 
     getInputVal = (id: string): any => {

@@ -23,7 +23,7 @@ export class AppState {
     /* Node Ids to move */
     nodesToMove: string[];
 
-    activeTab: string = "mainTab";
+    activeTab: string = null;
 
     userPreferences: J.UserPreferences = {
         editMode: false,

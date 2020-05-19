@@ -25,8 +25,6 @@ export interface EditIntf {
     cached_moveNodeDown(id: string, state?: AppState): void;
     moveNodeToTop(id: string, state: AppState): void;
     moveNodeToBottom(id: string, state: AppState): void;
-    getNodeAbove(node: J.NodeInfo, state: AppState): any;
-    getNodeBelow(node: J.NodeInfo, state: AppState): J.NodeInfo;
     getFirstChildNode(state: AppState): any;
     cached_runEditNode(id: any, state?: AppState): void;
     insertNode(id: string, typeName: string, ordinalOffset: number, state?: AppState): void;

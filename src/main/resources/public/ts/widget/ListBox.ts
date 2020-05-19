@@ -11,6 +11,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class ListBox extends Comp {
+
+    //todo-0: make selected ID be in the state of this (listbox), not a property on list items themselves
     selectedRow: ListBoxRow = null;
 
     constructor() {

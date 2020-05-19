@@ -320,29 +320,6 @@ export class Edit implements EditIntf {
         }
     }
 
-    /*
-     * Returns the node above the specified node or null if node is itself the top node
-     */
-    getNodeAbove = (node: J.NodeInfo, state: AppState): any => {
-        if (!state.node) return null;
-        let ordinal: number = S.meta64.getOrdinalOfNode(node, state);
-        if (ordinal <= 0)
-            return null;
-        return state.node.children[ordinal - 1];
-    }
-
-    /*
-     * Returns the node below the specified node or null if node is itself the bottom node
-     */
-    getNodeBelow = (node: J.NodeInfo, state: AppState): J.NodeInfo => {
-        if (!state.node || !state.node.children) return null;
-        let ordinal: number = S.meta64.getOrdinalOfNode(node, state);
-        console.log("ordinal = " + ordinal);
-        if (ordinal == -1 || ordinal >= state.node.children.length - 1)
-            return null;
-
-        return state.node.children[ordinal + 1];
-    }
 
     getFirstChildNode = (state: AppState): any => {
         if (!state.node || !state.node.children) return null;
@@ -370,7 +347,7 @@ export class Edit implements EditIntf {
     }
 
     cached_toolbarInsertNode = (id: string): void => {
-        S.edit.insertNode(id, null, 0); 
+        S.edit.insertNode(id, null, 0);
     }
 
     insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState): void => {
@@ -489,13 +466,10 @@ export class Edit implements EditIntf {
         }
 
         let failMsg = null;
-        selNodesArray.forEach(function(id) {
-            if (id == state.homeNodeId) {
-                failMsg = "Oops. You don't delete your account root node!";
-                return false;
-            }
-        });
-        
+        if (selNodesArray.find(id => id == state.homeNodeId )) {
+            failMsg = "Sorry, you can't delete your account root node!";
+        }
+
         if (failMsg) {
             S.util.showMessage(failMsg, "Warning");
             return;
@@ -592,7 +566,7 @@ export class Edit implements EditIntf {
         let state = appState();
         S.edit.pasteSelNodes(nodeId, 'inside', state);
     }
-    
+
     //location=inside | inline | inline-above (todo-1: put in java-aware enum)
     pasteSelNodes = (nodeId: string, location: string, state?: AppState): void => {
         state = appState(state);

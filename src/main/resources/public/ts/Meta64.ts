@@ -44,9 +44,10 @@ export class Meta64 implements Meta64Intf {
 
     // Function cache: Creating NEW functions (like "let a = () => {...do something}"), is an expensive operation (performance) so we have this
     // cache to allow reuse of function definitions.
-    // will need a strategy to empty this out periodically (todo-0)
     private fc: { [key: string]: () => void } = {};
     private fcCount: number = 0;
+
+    private static lastKeyDownTime: number = 0;
 
     /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
     getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {
@@ -83,6 +84,16 @@ export class Meta64 implements Meta64Intf {
     }
 
     selectTab = (tabName: string): void => {
+        let state = store.getState();
+        
+        /* if tab is already active no need to update state now 
+        
+        SOME codepaths like (openNode) are currently relying on selectTab
+        to cause the dispatch/update, even when tab isn't changing, so need
+        to find all those before we can optimize here to ignore setting to same tab.
+        */
+        //if (state.activeTab==tabName) return;
+
         dispatch({
             type: "Action_SelectTab",
             update: (s: AppState): void => {
@@ -189,13 +200,18 @@ export class Meta64 implements Meta64Intf {
     getHighlightedNode = (state: AppState = null): J.NodeInfo => {
         state = appState(state);
         if (!state.node) return null;
-        let ret: J.NodeInfo = S.meta64.parentIdToFocusNodeMap[state.node.id];
-        return ret;
+        return S.meta64.parentIdToFocusNodeMap[state.node.id];
     }
 
     highlightRowById = (id: string, scroll: boolean, state: AppState): void => {
 
         let node: J.NodeInfo = state.idToNodeMap[id];
+
+        /* If node now known, resort to taking the best, previous node we had */
+        if (!node) {
+            node = this.getHighlightedNode(state);
+        }
+
         if (node) {
             this.highlightNode(node, scroll, state);
         } else {
@@ -237,33 +253,12 @@ export class Meta64 implements Meta64Intf {
         return ret;
     }
 
-    getOrdinalOfNode = (node: J.NodeInfo, state: AppState): number => {
-        let ret = -1;
-
-        if (!node || !state.node || !state.node.children)
-            return ret;
-
-        let idx = -1;
-        //todo-0: need faster way that CAN abort when found.
-        state.node.children.forEach(function (iterNode): boolean {
-            idx++;
-            if (node.id === iterNode.id) {
-                ret = idx;
-                return false; //stop iterating.
-            }
-            return true;
-        });
-        return ret;
-    }
-
     removeBinaryById = (id: string, state: AppState): void => {
-        if (!state.node) return;
-        //todo-0: need faster way that CAN abort when found.
-        state.node.children.forEach(function (node: J.NodeInfo) {
-            if (node.id === id) {
-                S.props.deleteProp(node, J.NodeProp.BIN_MIME);
-            }
-        });
+        if (!state.node || !state.node.children) return;
+        let node = state.node.children.find(node => node.id==id);
+        if (node) {
+            S.props.deleteProp(node, J.NodeProp.BIN_MIME);
+        }
     }
 
     updateNodeMap = (node: J.NodeInfo, level: number, state: AppState): void => {
@@ -356,36 +351,9 @@ export class Meta64 implements Meta64Intf {
                 }
             };
 
-            document.body.addEventListener("keydown", (event: KeyboardEvent) => {
-
-                let state = store.getState();
-
-                if (event.ctrlKey) {
-                    switch (event.code) {
-                        case "ArrowDown":
-                            this.selectTab("mainTab");
-                            S.view.scrollRelativeToNode("down", state);
-                            break;
-
-                        case "ArrowUp":
-                            this.selectTab("mainTab");
-                            S.view.scrollRelativeToNode("up", state);
-                            break;
-
-                        case "ArrowLeft":
-                            this.selectTab("mainTab");
-                            S.nav.navUpLevel();
-                            break;
-
-                        case "ArrowRight":
-                            this.selectTab("mainTab");
-                            S.nav.navOpenSelectedNode(state);
-                            break;
-
-                        default: break;
-                    }
-                }
-            });
+            // This works, but we don't need it. Could later be used to hook into ESC key to close dialogs or for other uses.
+            // document.body.addEventListener("keydown", (event: KeyboardEvent) => {
+            // });
 
             if (this.appInitialized)
                 return;
@@ -449,6 +417,16 @@ export class Meta64 implements Meta64Intf {
             console.log("initApp complete.");
             resolve();
         });
+    }
+
+    keyDebounce = () => {
+        let now = S.util.currentTimeMillis();
+        //allow one operation every quarter second.
+        if (Meta64.lastKeyDownTime > 0 && now - Meta64.lastKeyDownTime < 250) { 
+            return true;
+        }
+        Meta64.lastKeyDownTime = now;
+        return false;
     }
 
     maintenanceCycle = () => {

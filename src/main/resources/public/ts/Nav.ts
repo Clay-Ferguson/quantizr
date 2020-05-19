@@ -211,7 +211,7 @@ export class Nav implements NavIntf {
         }, 10);
 
         fastDispatch({
-            type: "Action_ClickNodeRow",
+            type: "Action_FastRefresh",
             updateNew: (s: AppState): AppState => {
                 return { ...state };
             }

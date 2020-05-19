@@ -163,15 +163,7 @@ export class Props implements PropsIntf {
     }
 
     isPublic = (node: J.NodeInfo): boolean => {
-        if (!node.ac) return false;
-        let ret = false;
-        node.ac.forEach(function(ace: J.AccessControlInfo) {
-            if (ace.principalNodeId == 'public') {
-                ret = true;
-                return false; //stop iteration.
-            }
-        });
-        return ret;
+        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId == 'public');
     }
 
     isMine = (node: J.NodeInfo, state: AppState): boolean => {

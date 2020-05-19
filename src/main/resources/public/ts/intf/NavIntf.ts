@@ -7,6 +7,7 @@ import { AppState } from "../AppState";
 export interface NavIntf {
     _UID_ROWID_PREFIX: string;
 
+    /* todo-0: it's ugly to have this variable here. I guess maybe in meta64 is slightly better. Where is mainTab stored? maybe there */
     mainMenuPopupDlg: DialogBaseImpl;
 
     mainOffset: number;
