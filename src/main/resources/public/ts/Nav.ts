@@ -10,7 +10,6 @@ import { VerticalLayout } from "./widget/VerticalLayout";
 import { Anchor } from "./widget/Anchor";
 import { Heading } from "./widget/Heading";
 import { MainMenuPopupDlg } from "./dlg/MainMenuPopupDlg";
-import { DialogBaseImpl } from "./DialogBaseImpl";
 import { AppState } from "./AppState";
 import { dispatch, fastDispatch, appState } from "./AppRedux";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
@@ -23,7 +22,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Nav implements NavIntf {
 
     _UID_ROWID_PREFIX: string = "row_";
-    mainMenuPopupDlg: DialogBaseImpl;
 
     /* todo-2: eventually when we do paging for other lists, we will need a set of these variables for each list display (i.e. search, timeline, etc) */
     mainOffset: number = 0;
@@ -289,8 +287,7 @@ export class Nav implements NavIntf {
     }
 
     showMainMenu = (state: AppState): void => {
-        this.mainMenuPopupDlg = new MainMenuPopupDlg(state);
-        this.mainMenuPopupDlg.open("inline-block");
+        S.mainMenu.open("inline-block");
     }
 
     navHome = (state: AppState): void => {

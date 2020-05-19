@@ -12,6 +12,7 @@ import { Div } from "./Div";
 import { ReactNode } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
+import startup from "../Startup";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -52,7 +53,7 @@ export class MainNavPanel extends NavTag {
             )
         ]));
 
-        if (!S.meta64.isMobile) {
+        if (!startup.isMobile) {
             buttons.push(new Li(null, {
                 className: "nav-item"
             }, [

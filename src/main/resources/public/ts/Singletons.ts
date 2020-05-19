@@ -17,6 +17,7 @@ import { GraphIntf } from "./intf/GraphIntf";
 import { ServerPushIntf } from "./intf/ServerPushIntf";
 import { LocalDBIntf } from "./intf/LocalDBIntf";
 import { PluginMgrIntf } from "./intf/PluginMgrIntf";
+import { DialogBaseImpl } from "./DialogBaseImpl";
 
 /* NOTE: If this Singleton pattern looks countrary to good module design, keep in mind all module systems
 are susceptible to circular references, and these Singtons are an unbreakable solution to that 
@@ -41,6 +42,7 @@ export interface Singletons {
     podcast: PodcastIntf;
     rssReader: RSSReaderIntf;
     localDB: LocalDBIntf;
+    mainMenu: DialogBaseImpl;
 
     //React.createElement
     e: Function;

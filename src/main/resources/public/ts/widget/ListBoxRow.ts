@@ -2,10 +2,10 @@ import { Comp } from "./base/Comp";
 import { ListBox } from "./ListBox";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { ReactNode } from "react";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
@@ -17,11 +17,10 @@ export class ListBoxRow extends Comp {
 
     constructor(public content: string, private onClickCallback: Function, public selected: boolean) {
         super({
-            className: "list-group-item list-group-item-action listBoxRow"
+            className: "list-group-item list-group-item-action listBoxRow",
         });
 
         this.attribs.onClick = this.onClick;
-        this.setSelectedState(selected);
     }
 
     onClick = () => {
@@ -33,23 +32,12 @@ export class ListBoxRow extends Comp {
         }
     }
 
-    /* todo-0: this isn't a very 'react'-ish way to do things */
-    setSelectedState = (selected: boolean) => {
-        this.whenElm((elm: HTMLElement) => {
-            if (selected) {
-                S.util.addClassToElm(elm, "selectedListItem");
-            }
-            else {
-                S.util.removeClassFromElm(elm, "selectedListItem");
-            }
-        });
-    }
-
     setListBox(listBox: ListBox) {
         this.listBox = listBox;
     }
 
     compRender(): ReactNode {
+        this.attribs.className = "list-group-item list-group-item-action listBoxRow" + (this.selected ? " selectedListItem" : "");
         return this.tagRender('div', this.content, this.attribs);
     }
 }

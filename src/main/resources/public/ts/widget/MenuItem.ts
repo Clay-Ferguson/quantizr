@@ -1,8 +1,7 @@
 import { Div } from "./Div";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
-import { MainMenuPopupDlg } from "../dlg/MainMenuPopupDlg";
+import { Constants as C } from "../Constants";
 import { ReactNode } from "react";
 
 let S: Singletons;
@@ -15,11 +14,8 @@ export class MenuItem extends Div {
     constructor(public name: string, public clickFunc: Function, isEnabledFunc?: Function, isVisibleFunc?: Function, bottomSeparator?: boolean) {
         super(name, {
             className: "list-group-item list-group-item-action",
-            onClick: function() {
-                /* always dispose the menu before running the menu function */
-                if (S.nav.mainMenuPopupDlg) {
-                    (<MainMenuPopupDlg>S.nav.mainMenuPopupDlg).close();
-                }
+            onClick: function () {
+                S.mainMenu.close();
                 clickFunc();
             }
         });

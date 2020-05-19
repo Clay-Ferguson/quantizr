@@ -8,9 +8,6 @@ export interface Meta64Intf {
 
     appInitialized: boolean;
 
-    isMobile: boolean;
-    isMobileOrTablet: boolean;
-
     curUrlPath: string;
 
     deviceWidth: number;

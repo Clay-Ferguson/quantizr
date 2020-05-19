@@ -1,17 +1,10 @@
-import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
-import { CompIntf } from "../widget/base/CompIntf";
-import { DialogBaseImpl } from "../DialogBaseImpl";
 import { AppState } from "../AppState";
 
 export interface NavIntf {
     _UID_ROWID_PREFIX: string;
 
-    /* todo-0: it's ugly to have this variable here. I guess maybe in meta64 is slightly better. Where is mainTab stored? maybe there */
-    mainMenuPopupDlg: DialogBaseImpl;
-
     mainOffset: number;
-
     ROWS_PER_PAGE: number;
 
     login(state: AppState): void;

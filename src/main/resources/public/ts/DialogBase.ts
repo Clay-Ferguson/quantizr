@@ -10,6 +10,7 @@ import { CompIntf } from "./widget/base/CompIntf";
 import { AppState } from "./AppState";
 import { Provider } from 'react-redux';
 import { store } from "./AppRedux";
+import startup from "./Startup";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -21,7 +22,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     //ref counter that allows multiple dialogs to be opened on top of each other and only
     //when the final one closes out do we go back to enabling scrolling on body again.
     static refCounter = 0;
-
     static BACKDROP_PREFIX = "backdrop-";
     static backdropZIndex: number = 16000000;
     resolve: Function;
@@ -37,7 +37,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         super(null);
         this.appState = appState;
 
-        this.attribs.className = S.meta64.isMobile ?
+        this.attribs.className = startup.isMobile ?
             (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen") :
             (this.overrideClass ? this.overrideClass : "app-modal-content");
     }
@@ -54,7 +54,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
 
             // WARNING: Don't use 'className' here, this is pure javascript.
             this.backdrop.setAttribute("class", "app-modal");
-            this.backdrop.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex)); 
+            this.backdrop.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex));
             document.body.appendChild(this.backdrop);
 
             //clicking outside the dialog will close it. We only use this for the main menu of the app, because clicking outside a dialog
@@ -77,7 +77,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             if (++DialogBase.refCounter == 1) {
                 /* we only hide and reshow the scroll bar and disable scrolling when we're in mobile mode, because that's when 
                 full-screen dialogs are in use, which is when we need this. */
-                if (S.meta64.isMobile) {
+                if (startup.isMobile) {
                     document.body.style.overflow = 'hidden';
                 }
             }
@@ -94,29 +94,22 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         ReactDOM.render(provider, this.backdrop);
     }
 
-    //DO NOT DELETE.
-    //example override pattern.
-    // superClose : Function = this.close;
-    // close = () => {
-    //     this.superClose();
-    // }
-
     public close = () => {
         this.resolve(this);
-        ReactDOM.unmountComponentAtNode(this.backdrop);
-        S.util.domElmRemove(this.getId());
-        S.util.domElmRemove(DialogBase.BACKDROP_PREFIX + this.getId());
+        if (this.getElement()) {
+            ReactDOM.unmountComponentAtNode(this.backdrop);
+            S.util.domElmRemove(this.getId());
+            S.util.domElmRemove(DialogBase.BACKDROP_PREFIX + this.getId());
 
-        if (--DialogBase.refCounter <= 0) {
-            if (S.meta64.isMobile) {
-                document.body.style.overflow = 'auto';
+            if (--DialogBase.refCounter <= 0) {
+                if (startup.isMobile) {
+                    document.body.style.overflow = 'auto';
+                }
             }
         }
     }
 
-    renderDlg(): CompIntf[] {
-        return [new Div("override renderDlg to provide dialog content.")];
-    }
+    abstract renderDlg(): CompIntf[];
 
     preRender(): void {
         let timesIcon: Comp;

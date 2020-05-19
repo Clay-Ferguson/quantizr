@@ -2,42 +2,33 @@ import { Comp } from "./base/Comp";
 import { ListBoxRow } from "./ListBoxRow";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { ReactNode } from "react";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
 export class ListBox extends Comp {
 
-    //todo-0: make selected ID be in the state of this (listbox), not a property on list items themselves
-    selectedRow: ListBoxRow = null;
-
     constructor() {
         super(null);
         this.setClass("list-group marginBottom");
+        this.mergeState({ selectedRowId: null });
     }
 
     rowClickNotify = (row: ListBoxRow): void => {
-        /* Unselect any previously selected row */
-        if (this.selectedRow) {
-            this.selectedRow.setSelectedState(false);
-        }
-
-        /* Select the row that just got clicked */
-        this.selectedRow = row;
-        this.selectedRow.setSelectedState(true);
+        this.mergeState({
+            selectedRowId: row.getId()
+        })
     }
 
     compRender(): ReactNode {
-         /* For each of the ListBoxRows we need to tell them all who their parent is */
-         this.children.forEach(function(row: ListBoxRow) {
+        let state = this.getState();
+        this.children.forEach(function (row: ListBoxRow) {
             if (row) {
-                if (row.selected) {
-                    this.selectedRow = row;
-                }
+                row.selected = state.selectedRowId==row.getId();
                 row.setListBox(this);
             }
         }, this);

@@ -34,6 +34,7 @@ import { ActivityPub } from "./ActivityPub";
 import * as React from "react";
 import { ServerPush } from "./ServerPush";
 import { LocalDB } from "./LocalDB";
+import { MainMenuPopupDlg } from "./dlg/MainMenuPopupDlg";
 
 export class Factory {
     /* 
@@ -69,6 +70,7 @@ export class Factory {
             podcast: new Podcast(),
             rssReader: new RSSReader(),
             localDB: new LocalDB(),
+            mainMenu: new MainMenuPopupDlg(),
 
             //Use this version of the render method to help troubleshoot missing 'key' props
             //todo-1: move this function into some other static location that is safe to import

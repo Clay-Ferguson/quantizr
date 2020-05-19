@@ -8,7 +8,7 @@ new architecture)
 */
 /* I commented this code out when i transitioned over to ES6 modules, but since this is not a core feature
 i haven't re-enabled it yet */
-export class EditSystemFileDlgImpl extends DialogBase {
+export class EditSystemFileDlgImpl { //extends DialogBase {
   //
   //   constructor(private fileName: string) {
   //       super("EditSystemFileDlg");

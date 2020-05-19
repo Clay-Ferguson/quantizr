@@ -166,6 +166,9 @@ export abstract class Comp implements CompIntf {
 
     addChild(comp: Comp): void {
         if (!comp) return;
+        if (!this.children) {
+            this.children = [];
+        }
         this.children.push(comp);
     }
 
