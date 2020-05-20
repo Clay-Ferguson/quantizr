@@ -21,7 +21,6 @@ export class NavBarIconButton extends Comp {
 
     compRender(): ReactNode {
         let state = this.getState();
-        //console.log("compRender " + this.jsClassName + "(" + this.text + ", icon=" + this.iconClass + ") state to visible=" + state.visible);
         let _style = { display: (state.visible && !state.disabled ? '' : 'none') };
         let _attribs = { ...this.attribs, ...{ style: _style } };
 

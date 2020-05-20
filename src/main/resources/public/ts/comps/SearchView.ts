@@ -45,7 +45,6 @@ export class SearchView extends Div {
          * client side for various reasons.
          */
         let rowCount = 0;
-
         let children: Comp[] = [];
         let i = -1;
         results.forEach(function(node: J.NodeInfo) {

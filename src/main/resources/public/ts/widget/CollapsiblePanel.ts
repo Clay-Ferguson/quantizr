@@ -38,7 +38,7 @@ export class CollapsiblePanel extends Comp {
                 "data-toggle": collapseClass,
                 id: "div_a_" + this.getId(),
                 key: "div_a_" + this.getId(),
-                onClick: this._onToggle || (this._onToggle = this.onToggle.bind(this))
+                onClick: this._onToggle
             }, //
                 S.e('span', {
                     className: innerStyle,
@@ -54,8 +54,7 @@ export class CollapsiblePanel extends Comp {
             ));
     }
 
-    _onToggle: () => void = null;
-    onToggle(): void {
+    _onToggle = (): void => {
         let expanded = !this.getState().expanded;
         this.setExpanded(expanded);
         if (this.stateCallback) {

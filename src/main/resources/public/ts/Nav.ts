@@ -184,7 +184,7 @@ export class Nav implements NavIntf {
     on an attribute of the element */
     cached_clickNodeRow = (nodeId: string, state?: AppState): void => {
         state = appState(state);
-        console.log("clickNodeRow: id=" + nodeId);
+        //console.log("clickNodeRow: id=" + nodeId);
 
         /* First check if this node is already highlighted and if so just return */
         let highlightNode = S.meta64.getHighlightedNode();

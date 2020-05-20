@@ -83,7 +83,7 @@ export class Meta64 implements Meta64Intf {
 
     selectTab = (tabName: string): void => {
         let state = store.getState();
-        
+
         /* if tab is already active no need to update state now 
         
         SOME codepaths like (openNode) are currently relying on selectTab
@@ -253,7 +253,7 @@ export class Meta64 implements Meta64Intf {
 
     removeBinaryById = (id: string, state: AppState): void => {
         if (!state.node || !state.node.children) return;
-        let node = state.node.children.find(node => node.id==id);
+        let node = state.node.children.find(node => node.id == id);
         if (node) {
             S.props.deleteProp(node, J.NodeProp.BIN_MIME);
         }
@@ -323,8 +323,41 @@ export class Meta64 implements Meta64Intf {
                 }
             };
 
-            // This works, but we don't need it. Could later be used to hook into ESC key to close dialogs or for other uses.
+            // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node.
+            // WARNING: even with tabIndex added none of the other DIVS react renders seem to be able to accept an onKeyDown event.
+            // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs re Open, because this WILL 
+            // capture events going to dialogs / edit fields
             // document.body.addEventListener("keydown", (event: KeyboardEvent) => {
+            //     console.log("keydown: "+event.code);
+            //     let state: AppState = null;
+            //     if (event.ctrlKey) {
+            //         switch (event.code) {
+            //             case "ArrowDown": 
+            //                 if (this.keyDebounce()) return;
+            //                 state = store.getState();
+            //                 S.view.scrollRelativeToNode("down", state);
+            //                 break;
+
+            //             case "ArrowUp":
+            //                 if (this.keyDebounce()) return;
+            //                 state = store.getState();
+            //                 S.view.scrollRelativeToNode("up", state);
+            //                 break;
+
+            //             case "ArrowLeft":
+            //                 if (this.keyDebounce()) return;
+            //                 S.nav.navUpLevel();
+            //                 break;
+
+            //             case "ArrowRight":
+            //                 if (this.keyDebounce()) return;
+            //                 state = store.getState();
+            //                 S.nav.navOpenSelectedNode(state);
+            //                 break;
+
+            //             default: break;
+            //         }
+            //     }
             // });
 
             if (this.appInitialized)
@@ -394,7 +427,7 @@ export class Meta64 implements Meta64Intf {
     keyDebounce = () => {
         let now = S.util.currentTimeMillis();
         //allow one operation every quarter second.
-        if (Meta64.lastKeyDownTime > 0 && now - Meta64.lastKeyDownTime < 250) { 
+        if (Meta64.lastKeyDownTime > 0 && now - Meta64.lastKeyDownTime < 250) {
             return true;
         }
         Meta64.lastKeyDownTime = now;
@@ -526,7 +559,7 @@ export class Meta64 implements Meta64Intf {
 
         //bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
         //sure i'm keeping this feature.
-        state.allowBashScripting = false; // res.userName === "admin";
+        state.allowBashScripting = false;
 
         state.anonUserLandingPageNode = res.anonUserLandingPageNode;
         state.allowFileSystemSearch = res.allowFileSystemSearch;

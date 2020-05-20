@@ -35,8 +35,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
             return;
         }
 
-        //console.log("NodeCompButtonBar_[" + node.id + "] editMode=" + state.userPreferences.editMode);
-
         let typeIcon: Icon;
         let encIcon: Icon;
         let sharedIcon: Icon;
@@ -210,7 +208,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
         }
 
         let avatarImg: Img;
-        //console.log("node.owner[" + node.id + "]=" + node.owner + " ownerId=" + node.ownerId + " allowAvatar=" + allowAvatar);
         if (this.allowAvatar && node.owner != J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeAvatarImage(node, state);
         }

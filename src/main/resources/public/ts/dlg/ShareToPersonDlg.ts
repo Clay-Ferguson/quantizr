@@ -10,6 +10,7 @@ import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { store } from "../AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -46,6 +47,12 @@ export class ShareToPersonDlg extends DialogBase {
         let targetUser = this.shareToUserTextField.getValue();
         if (!targetUser) {
             S.util.showMessage("Please enter a username", "Warning");
+            return;
+        }
+
+        let appState = store.getState();
+        if (targetUser==appState.userName) {
+            S.util.showMessage("You can't share a node to yourself.", "Warning");
             return;
         }
 
