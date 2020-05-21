@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.subnode.config.AppProp;
 import org.subnode.config.ConstantsProvider;
+import org.subnode.config.NodeName;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
@@ -141,6 +142,15 @@ public class UserManagerService {
 			UserPreferences userPreferences = getUserPreferences();
 			sessionContext.setUserPreferences(userPreferences);
 			res.setUserPreferences(userPreferences);
+
+			Long lastLoginTime = userNode.getIntProp(NodeProp.LAST_LOGIN_TIME.s());
+			if (lastLoginTime == null) {
+				lastLoginTime = 0L;
+			}
+			sessionContext.setLastLoginTime(lastLoginTime);
+			userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), new Date().getTime());
+			api.save(session, userNode);
+
 			res.setSuccess(true);
 		}
 
@@ -156,7 +166,41 @@ public class UserManagerService {
 		if (res.getUserPreferences() == null) {
 			res.setUserPreferences(getDefaultUserPreferences());
 		}
+
 		return res;
+	}
+
+	/*
+	 * todo-0: Starting to implement this just made me realize I need to have all
+	 * times (both long or string formatted) stored as UTC So I'll make that
+	 * transition first and then come back here
+	 */
+	public String getInboxNotification(MongoSession session) {
+		String userName = sessionContext.getUserName();
+		if (userName == null) {
+			return null;
+		}
+		SubNode userNode = api.getUserNodeByUserName(session, userName);
+		if (userNode == null) {
+			throw new RuntimeEx("User not found: " + userName);
+		}
+		String ret = null;
+		Long lastLoginTime = sessionContext.getLastLoginTime();
+
+		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "Inbox");
+
+		if (userInbox != null) {
+			SubNode inboxNode = api.getNewestChild(session, userInbox);
+			if (inboxNode != null) {
+
+				long inboxNodeTimeLong = inboxNode.getModifyTime().getTime();
+				if (inboxNodeTimeLong - lastLoginTime > 0) {
+					Date now = new Date();
+					ret = "Your inbox has new information, added " + DateUtil.formatDurationMillis(now.getTime() - inboxNodeTimeLong) +" ago."; 
+				}
+			}
+		}
+		return ret;
 	}
 
 	public CloseAccountResponse closeAccount(CloseAccountRequest req) {
@@ -182,9 +226,9 @@ public class UserManagerService {
 		userStats.forEach((final ObjectId key, final UserStats stat) -> {
 			SubNode node = api.getNode(session, key);
 			if (node != null) {
-				//log.debug("Setting stat.binUsage=" + stat.binUsage);
+				// log.debug("Setting stat.binUsage=" + stat.binUsage);
 				node.setProp(NodeProp.BIN_TOTAL.s(), stat.binUsage);
-				node.setProp(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA); 
+				node.setProp(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA);
 			} else {
 				log.debug("Node not found by key: " + key);
 			}
@@ -208,7 +252,7 @@ public class UserManagerService {
 		// get the size of the attachment on this node
 		long binSize = node.getIntProp(NodeProp.BIN_SIZE.s());
 		if (binSize > 0L) {
-			//log.debug("Will +/- amt: " + binSize);
+			// log.debug("Will +/- amt: " + binSize);
 
 			if (userNode == null) {
 				userNode = api.getUserNodeByUserName(null, null);
@@ -227,7 +271,7 @@ public class UserManagerService {
 		if (binTotal == null) {
 			binTotal = 0L;
 		}
-		//log.debug("before binTotal=" + binTotal);
+		// log.debug("before binTotal=" + binTotal);
 		binTotal += sign * binSize;
 		if (binTotal < 0) {
 			binTotal = 0L;
@@ -238,7 +282,7 @@ public class UserManagerService {
 			throw new OutOfSpaceException();
 		}
 
-		//log.debug("after binTotal=" + binTotal);
+		// log.debug("after binTotal=" + binTotal);
 		userNode.setProp(NodeProp.BIN_TOTAL.s(), binTotal);
 	}
 
@@ -470,7 +514,7 @@ public class UserManagerService {
 			userPrefs.setExportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_EXPORT_ALLOWED.s()));
 
 			long maxFileSize = prefsNode.getIntProp(NodeProp.BIN_MAX_UPLOAD_SIZE.s());
-			if (maxFileSize==0) {
+			if (maxFileSize == 0) {
 				maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
 			}
 			userPrefs.setMaxUploadFileSize(maxFileSize);

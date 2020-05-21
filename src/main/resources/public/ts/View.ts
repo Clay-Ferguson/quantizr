@@ -6,6 +6,7 @@ import { ViewIntf } from "./intf/ViewIntf";
 import { GraphDisplayDlg } from "./dlg/GraphDisplayDlg";
 import { AppState } from "./AppState";
 import { fastDispatch } from "./AppRedux";
+import { InboxNotifyDlg } from "./dlg/InboxNotifyDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -277,7 +278,12 @@ export class View implements ViewIntf {
         },
             (res: J.GetServerInfoResponse) => {
                 if (res.serverInfo) {
-                    S.util.showMessage(res.serverInfo, "Notifications", false);
+                    if (res.infoType == "inbox") {
+                        new InboxNotifyDlg(res.serverInfo, state).open();
+                    }
+                    else {
+                        S.util.showMessage(res.serverInfo, "Notifications", false);
+                    }
                 }
             });
     }

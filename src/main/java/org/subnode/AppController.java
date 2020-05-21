@@ -794,6 +794,14 @@ public class AppController {
 				sessionContext.setError(null);
 			}
 
+			// todo-0: why does this run when sessionContext.userName == null ?? is this
+			// normal? Shouldn't userName at least default to "anon" (anonymous?)
+			String inboxMessage = userManagerService.getInboxNotification(ms);
+			if (inboxMessage != null) {
+				res.setServerInfo(inboxMessage);
+				res.setInfoType("inbox");
+			}
+
 			res.setSuccess(true);
 			return res;
 		});

@@ -45,6 +45,7 @@ public class SessionContext {
 	private String password;
 	private String timezone;
 	private String timeZoneAbbrev;
+	private long lastLoginTime;
 
 	private UserPreferences userPreferences;
 
@@ -81,6 +82,7 @@ public class SessionContext {
 		return repoUtil.isTestAccountName(userName);
 	}
 
+	// todo-0: move this into DateUtil
 	public String formatTime(Date date) {
 		if (date == null)
 			return null;
@@ -190,5 +192,13 @@ public class SessionContext {
 
 	public void setError(String error) {
 		this.error = error;
+	}
+
+	public long getLastLoginTime() {
+		return lastLoginTime;
+	}
+
+	public void setLastLoginTime(long lastLoginTime) {
+		this.lastLoginTime = lastLoginTime;
 	}
 }

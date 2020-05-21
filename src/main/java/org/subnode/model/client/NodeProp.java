@@ -95,6 +95,7 @@ public enum NodeProp {
     IMG_SIZE("sn:imgSize", "s"),//
 
     BIN_TOTAL("sn:binTot", "s"),//
+    LAST_LOGIN_TIME("sn:lastLogin", "s"),//
 
     //amount of bytes the user is ALLOWED to save.
     BIN_QUOTA("sn:binQuota", "s"),//

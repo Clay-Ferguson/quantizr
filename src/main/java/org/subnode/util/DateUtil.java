@@ -2,6 +2,10 @@ package org.subnode.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -23,22 +27,26 @@ public class DateUtil {
 	public static final String DATE_FORMAT_NO_TIMEZONE = "yyyy/MM/dd hh:mm:ss a";
 	public static final String DATE_FORMAT_NO_TIME = "yyyy/MM/dd";
 	public static final String DATE_FORMAT_FILENAME_COMPAT = "yyMMddhhmmss";
-	
+
 	/** Used to format date values */
 	public static final Locale DATE_FORMAT_LOCALE = Locale.US;
 
 	/* Note: this object is Session-specific to the timezone will be per user */
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
-	private static final SimpleDateFormat dateFormatNoTime = new SimpleDateFormat(DATE_FORMAT_NO_TIME, DateUtil.DATE_FORMAT_LOCALE);
-	private static final SimpleDateFormat dateFormatFileNameCompat = new SimpleDateFormat(DATE_FORMAT_FILENAME_COMPAT, DateUtil.DATE_FORMAT_LOCALE);
-	
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_NO_TIMEZONE,
+			DateUtil.DATE_FORMAT_LOCALE);
+	private static final SimpleDateFormat dateFormatNoTime = new SimpleDateFormat(DATE_FORMAT_NO_TIME,
+			DateUtil.DATE_FORMAT_LOCALE);
+	private static final SimpleDateFormat dateFormatFileNameCompat = new SimpleDateFormat(DATE_FORMAT_FILENAME_COMPAT,
+			DateUtil.DATE_FORMAT_LOCALE);
+
 	private static final HashMap<String, String> zoneMap = new HashMap<String, String>();
 
 	/*
-	 * Date APIs have deprecated the use of short abbreviations for timezones, but we preferr to
-	 * still have them shown for at least United States timezones, so we have to implement our own
-	 * way of detecting the proper one and also consider proper Daylight Savings Time value, which
-	 * is of course coming from the browser.
+	 * Date APIs have deprecated the use of short abbreviations for timezones, but
+	 * we preferr to still have them shown for at least United States timezones, so
+	 * we have to implement our own way of detecting the proper one and also
+	 * consider proper Daylight Savings Time value, which is of course coming from
+	 * the browser.
 	 */
 	static {
 		zoneMap.put("-4S", "AST"); // ATLANTIC STANDARD TIME UTC - 4
@@ -108,24 +116,90 @@ public class DateUtil {
 
 		return gmtZoneStr;
 	}
-	
+
 	public static Date parse(String time) {
 		try {
 			time = time.replace("-", "/");
 			return dateFormat.parse(time);
-		}
-		catch (ParseException e) {
+		} catch (ParseException e) {
 			/* if date parse fails, try without the time */
 			if (time.length() > 10) {
 				time = time.substring(0, 10);
 				try {
 					return dateFormatNoTime.parse(time);
-				}
-				catch (ParseException e1) {
+				} catch (ParseException e1) {
 					throw new RuntimeEx(e);
 				}
 			}
 			throw new RuntimeEx(e);
 		}
+	}
+
+	/* Formats this duration into a string that describes the time about the way a human would say it. For example
+	if it was a number of days ago you don't include minutes and seconds etc. */
+	public static String formatDurationMillis(long different) {
+		StringBuilder sb = new StringBuilder();
+		long secondsInMilli = 1000;
+		long minutesInMilli = secondsInMilli * 60;
+		long hoursInMilli = minutesInMilli * 60;
+		long daysInMilli = hoursInMilli * 24;
+
+		long days = different / daysInMilli;
+		different = different % daysInMilli;
+
+		long hours = different / hoursInMilli;
+		different = different % hoursInMilli;
+
+		long minutes = different / minutesInMilli;
+		different = different % minutesInMilli;
+
+		long seconds = different / secondsInMilli;
+
+		if (days > 0) {
+			sb.append(String.valueOf(days));
+			sb.append(" days");
+		}
+
+		if (hours > 0) {
+			if (sb.length() > 0)
+				sb.append(" ");
+			sb.append(String.valueOf(hours));
+			sb.append(" hours");
+		}
+
+		if (days == 0 && minutes > 0) {
+			if (sb.length() > 0)
+				sb.append(" ");
+			sb.append(String.valueOf(minutes));
+			sb.append(" minutes");
+		}
+
+		if (days == 0 && hours == 0 && minutes < 3 && seconds > 0) {
+			if (sb.length() > 0)
+				sb.append(" ");
+			sb.append(String.valueOf(seconds));
+			sb.append(" seconds");
+		}
+
+		return sb.toString();
+	}
+
+	public static String getFormattedDateTime() {
+		return ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
+
+		// supposedly this also works:
+		// thisMoment = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmX")
+		// .withZone(ZoneOffset.UTC)
+		// .format(Instant.now());
+	}
+
+	// This is from a trustworthy-looking StackOverflow article, but untested by me.
+	public static Date parse8601Time(String timeStr) {
+		// if you know the input is UTC:
+		// java.util.Date date = Date.from( Instant.parse( "2014-12-12T10:39:40Z" ));
+
+		// else, if could be ANY timezone:
+		OffsetDateTime odt = OffsetDateTime.parse(timeStr);
+		return Date.from(odt.toInstant());
 	}
 }

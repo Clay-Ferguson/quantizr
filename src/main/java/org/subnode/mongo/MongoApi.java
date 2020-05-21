@@ -1000,11 +1000,26 @@ public class MongoApi {
 		query.addCriteria(criteria);
 
 		saveSession(session);
+		//for 'findOne' is it also advantageous to also setup the query criteria with something like LIMIT=1 (sql)?
 		SubNode nodeFound = ops.findOne(query, SubNode.class);
 		if (nodeFound == null) {
 			return 0L;
 		}
 		return nodeFound.getOrdinal();
+	}
+
+	public SubNode getNewestChild(MongoSession session, SubNode node) {
+		auth(session, node, PrivilegeType.READ);
+
+		Query query = new Query();
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(node.getPath()));
+		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+		query.addCriteria(criteria);
+
+		//todo-0: why is there a saveSession on a read-only operation???? this this everywhere. this could be huge performance hit.
+		saveSession(session);
+		SubNode nodeFound = ops.findOne(query, SubNode.class);
+		return nodeFound;
 	}
 
 	public SubNode getSiblingAbove(MongoSession session, SubNode node) {
@@ -1373,6 +1388,7 @@ public class MongoApi {
 		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 		userNode.setProp(NodeProp.BIN_TOTAL.s(), 0);
+		userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), 0);
 		userNode.setProp(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA);
 
 		userNode.setContent("### Account: " + user);
@@ -1416,10 +1432,11 @@ public class MongoApi {
 		if (session == null) {
 			session = getAdminSession();
 		}
+		//todo-0: I think this happens with 'anon' user?
 		if (user == null) {
 			user = sessionContext.getUserName();
 		}
-		user = user.trim();
+		user = user.trim(); 
 
 		// For the ADMIN user their root node is considered to be the entire root of the
 		// whole DB
