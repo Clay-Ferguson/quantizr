@@ -170,11 +170,6 @@ public class UserManagerService {
 		return res;
 	}
 
-	/*
-	 * todo-0: Starting to implement this just made me realize I need to have all
-	 * times (both long or string formatted) stored as UTC So I'll make that
-	 * transition first and then come back here
-	 */
 	public String getInboxNotification(MongoSession session) {
 		String userName = sessionContext.getUserName();
 		if (userName == null) {

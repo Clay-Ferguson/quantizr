@@ -266,6 +266,9 @@ public class AttachmentService {
 
 		int maxFileSize = session.getMaxUploadSize();
 
+		/* Clear out any leftover binary properties */
+		deleteAllBinaryProperties(node);
+
 		if (calcImageSize && ImageUtil.isImageMime(mimeType)) {
 			LimitedInputStream is = null;
 			try {

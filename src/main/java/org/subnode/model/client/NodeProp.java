@@ -50,6 +50,7 @@ public enum NodeProp {
     // FS_FOLDER("fs:folder"), //
     // FS_LUCENE("fs:lucene"), //
 
+    //todo-0: remove hardcoded strings in typescript (and java?)
     IPFS_LINK("ipfs:link", "s"), //
     IPFS_LINK_NAME("ipfs:linkName", "s"), //
 

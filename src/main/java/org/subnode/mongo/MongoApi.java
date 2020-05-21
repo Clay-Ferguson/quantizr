@@ -999,6 +999,7 @@ public class MongoApi {
 		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
 		query.addCriteria(criteria);
 
+		//todo-0: why is there a saveSession on a read-only operation???? check this everywhere. this could be huge performance hit.
 		saveSession(session);
 		//for 'findOne' is it also advantageous to also setup the query criteria with something like LIMIT=1 (sql)?
 		SubNode nodeFound = ops.findOne(query, SubNode.class);
@@ -1016,8 +1017,6 @@ public class MongoApi {
 		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
 		query.addCriteria(criteria);
 
-		//todo-0: why is there a saveSession on a read-only operation???? this this everywhere. this could be huge performance hit.
-		saveSession(session);
 		SubNode nodeFound = ops.findOne(query, SubNode.class);
 		return nodeFound;
 	}

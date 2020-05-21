@@ -119,9 +119,8 @@ public class NodeEditService {
 		}
 
 		String userNodeHexId = session.getUserNode().getId().toHexString();
-		SubNode linksNode = apiUtil.ensureNodeExists(session,
-				NodeName.ROOT_OF_ALL_USERS + "/" + userNodeHexId + "/", NodeName.LINKS, "### Links",
-				null, true, null, null);
+		SubNode linksNode = apiUtil.ensureNodeExists(session, NodeName.ROOT_OF_ALL_USERS + "/" + userNodeHexId + "/",
+				NodeName.LINKS, "### Links", null, true, null, null);
 
 		SubNode newNode = api.createNode(session, linksNode, null, SubNodeTypes.UNSTRUCTURED, 0L,
 				CreateNodeLocation.LAST);
@@ -231,9 +230,11 @@ public class NodeEditService {
 			throw new RuntimeEx("Unable find node to save: nodeId=" + nodeId);
 		}
 
-		/* The only purpose of this limit is to stop hackers from using up lots of space, because our only current
-		quota is on attachment file size uploads */
-		if (nodeInfo.getContent().length() > 64*1024) {
+		/*
+		 * The only purpose of this limit is to stop hackers from using up lots of
+		 * space, because our only current quota is on attachment file size uploads
+		 */
+		if (nodeInfo.getContent().length() > 64 * 1024) {
 			throw new RuntimeEx("Max text length is 64K");
 		}
 
@@ -257,21 +258,27 @@ public class NodeEditService {
 
 		if (nodeInfo.getProperties() != null) {
 			for (PropertyInfo property : nodeInfo.getProperties()) {
-				/*
-				 * save only if server determines the property is savable. Just protection.
-				 * Client shouldn't be trying to save stuff that is illegal to save, but we have
-				 * to assume the worst behavior from client code, for security and robustness.
-				 */
-				if (session.isAdmin() || SubNodeUtil.isSavableProperty(property.getName())) {
-					//log.debug("Property to save: " + property.getName() + "=" + property.getValue());
-					node.setProp(property.getName(), property.getValue());
+
+				if ("[null]".equals(property.getValue())) {
+					node.deleteProp(property.getName());
 				} else {
-					/**
-					 * TODO: This case indicates that data was sent unnecessarily. fix! (i.e. make
-					 * sure this block cannot ever be entered)
+					/*
+					 * save only if server determines the property is savable. Just protection.
+					 * Client shouldn't be trying to save stuff that is illegal to save, but we have
+					 * to assume the worst behavior from client code, for security and robustness.
 					 */
-					// log.debug("Ignoring unneeded save attempt on unneeded
-					// prop: " + property.getName());
+					if (session.isAdmin() || SubNodeUtil.isSavableProperty(property.getName())) {
+						// log.debug("Property to save: " + property.getName() + "=" +
+						// property.getValue());
+						node.setProp(property.getName(), property.getValue());
+					} else {
+						/**
+						 * TODO: This case indicates that data was sent unnecessarily. fix! (i.e. make
+						 * sure this block cannot ever be entered)
+						 */
+						// log.debug("Ignoring unneeded save attempt on unneeded
+						// prop: " + property.getName());
+					}
 				}
 			}
 

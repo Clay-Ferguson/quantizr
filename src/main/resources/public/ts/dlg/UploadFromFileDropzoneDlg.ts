@@ -271,6 +271,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("success", function (param1, resp, param3) {
+                    //todo-0: get rid of the tight coupling to an exception class name here. This was a quick fix/hack
                     if (!resp.succese && resp.exceptionClass && resp.exceptionClass.endsWith(".OutOfSpaceException")) {
                         S.util.showMessage("Upload failed. You're out of storage space on the server. Consider uploading to IPFS using Temporal (https://temporal.cloud)", "Warning");
                         return;
@@ -280,6 +281,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     //https://developer.mozilla.org/en-US/docs/Web/API/File
                     if (dlg.ipfsFile) {
                         let ipfsHash = resp.response;
+
+                        /* delete the BIN property if it's there. Can't have BIN and IPFS_LINK at same time. */
+                        S.props.setNodePropVal(J.NodeProp.BIN, dlg.node, "[null]");
 
                         S.props.setNodePropVal(J.NodeProp.IPFS_LINK, dlg.node, ipfsHash);
                         S.props.setNodePropVal(J.NodeProp.BIN_MIME, dlg.node, dlg.ipfsFile.type);

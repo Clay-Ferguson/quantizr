@@ -30,13 +30,12 @@ export class EditCredentialsDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         this.userTextField = new TextField("User"),
-        this.passwordTextField = new TextField("Password", null, true),
-
-        this.populateFromLocalDb();
+            this.passwordTextField = new TextField("Password", null, true),
+            this.populateFromLocalDb();
 
         return [
-            new TextContent("Quantizr uses Temporal (https://temporal.cloud) as the storage provider for IPFS content, so you can enter your Temporal"+
-            " credentials here to enable saving files permanently to IPFS."),
+            new TextContent("Quantizr uses Temporal (https://temporal.cloud) as the storage provider for IPFS content, so you can enter your Temporal" +
+                " credentials here to enable saving files permanently to IPFS."),
             new Form(null, [
                 new FormGroup(null,
                     [
@@ -56,15 +55,10 @@ export class EditCredentialsDlg extends DialogBase {
         ];
     }
 
-    populateFromLocalDb = async (): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            try {
-                this.userTextField.setValue(this.usr = await S.localDB.getVal(this.usrDbProp));
-                this.passwordTextField.setValue(this.pwd = await S.localDB.getVal(this.pwdDbProp));
-            }
-            finally {
-                resolve();
-            }
+    populateFromLocalDb = (): void => {
+        this.whenElm(async (elm: HTMLElement) => {
+            this.userTextField.setValue(this.usr = await S.localDB.getVal(this.usrDbProp));
+            this.passwordTextField.setValue(this.pwd = await S.localDB.getVal(this.pwdDbProp));
         });
     }
 
