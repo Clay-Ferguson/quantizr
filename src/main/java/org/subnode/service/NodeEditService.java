@@ -83,9 +83,8 @@ public class NodeEditService {
 
 		String nodeId = req.getNodeId();
 		SubNode node = null;
-		if (nodeId.startsWith("~")) {
-			//create node type for 'notes' (todo-0)
-			node = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "Notes", NodeType.NONE.s());
+		if (nodeId.equals("~notes")) {
+			node = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "Notes", NodeType.NOTES.s());
 		} else {
 			node = api.getNode(session, nodeId);
 		}
@@ -119,11 +118,7 @@ public class NodeEditService {
 			return res;
 		}
 
-		String userNodeHexId = session.getUserNode().getId().toHexString();
-
-		//todo-0: this needs to be a node type like "notes" (in fact shouldn't this BE notes?)
-		SubNode linksNode = apiUtil.ensureNodeExists(session, NodeName.ROOT_OF_ALL_USERS + "/" + userNodeHexId + "/",
-				NodeName.LINKS, "### Links", null, true, null, null);
+		SubNode linksNode = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "Notes", NodeType.NOTES.s());
 
 		SubNode newNode = api.createNode(session, linksNode, null, NodeType.NONE.s(), 0L,
 				CreateNodeLocation.LAST);

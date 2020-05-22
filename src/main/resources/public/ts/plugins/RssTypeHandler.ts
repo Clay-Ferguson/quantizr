@@ -26,11 +26,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class RssTypeHandler extends TypeBase {
 
     constructor() {
-        //pros should go on constants file todo-0
-        super("sn:rssfeed", "RSS Feed", "fa-rss");
+        super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss");
     }
 
     allowPropertyEdit = (propName: string): boolean => {
+        //pros should go on constants file todo-0
         if (propName == "sn:rssFeedSrc") {
             return true;
         }
@@ -151,4 +151,3 @@ export class RssTypeHandler extends TypeBase {
         }, children);
     }
 }
-

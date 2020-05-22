@@ -589,6 +589,8 @@ export const enum NodeType {
     REPO_ROOT = "sn:repoRoot",
     TRASH_BIN = "sn:trashBin",
     INBOX = "sn:inbox",
+    NOTES = "sn:notes",
+    RSS_FEED = "sn:rssfeed", 
     NONE = "u",
     FS_FILE = "fs:file",
     FS_FOLDER = "fs:folder",

@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeType {
 
-    //INTERNAL types
+    // INTERNAL types
     REPO_ROOT("sn:repoRoot"), //
 
-    //todo-1: create a 'typehandler' for this and setup just like repo_root
-    TRASH_BIN("sn:trashBin"), 
-    INBOX("sn:inbox"),
+    // todo-0: strings should be referenced from here in the Type Handler classes.
+    TRASH_BIN("sn:trashBin"), //
+    INBOX("sn:inbox"), //
+    NOTES("sn:notes"), //
+    RSS_FEED("sn:rssfeed"), //
 
     NONE("u"), //
     FS_FILE("fs:file"), //

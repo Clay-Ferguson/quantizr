@@ -8,6 +8,7 @@ import { IPFSNodeTypeHandler } from "./plugins/IPFSNodeTypeHandler";
 import { RepoRootTypeHandler } from "./plugins/RepoRootTypeHandler";
 import { TrashNodeTypeHandler } from "./plugins/TrashNodeTypeHandler";
 import { InboxNodeTypeHandler } from "./plugins/InboxNodeTypeHandler";
+import { NotesNodeTypeHandler } from "./plugins/NotesNodeTypeHandler";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -40,6 +41,7 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new RepoRootTypeHandler());
         this.addTypeHandler(new TrashNodeTypeHandler());
         this.addTypeHandler(new InboxNodeTypeHandler());
+        this.addTypeHandler(new NotesNodeTypeHandler());
 
         // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());
         // S.plugin.addTypeHandler("fs:folder", new FolderTypeHandler());
