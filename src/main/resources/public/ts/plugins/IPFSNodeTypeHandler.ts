@@ -25,7 +25,7 @@ export class IPFSNodeTypeHandler implements TypeHandlerIntf {
     }
 
     allowPropertyEdit = (propName: string): boolean => {
-        if (propName == "sn:linkName" || propName == "ipfs:link") {
+        if (propName == "sn:linkName" || propName == J.NodeProp.IPFS_LINK) {
             return true;
         }
         return false;
@@ -36,21 +36,21 @@ export class IPFSNodeTypeHandler implements TypeHandlerIntf {
 
         let name = node.content;
     if (name) {
-            let linkName = S.props.getNodePropVal("ipfs:linkName", node);
+            let linkName = S.props.getNodePropVal(J.NodeProp.IPFS_LINK_NAME, node);
             if (linkName) {
                 ret.push(new Heading(6, "Link Name: " + linkName, { className: "ipfs-text" }));
             }
 
-            let link = S.props.getNodePropVal("ipfs:link", node);
+            let link = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
             if (link) {
                 ret.push(new Heading(6, "Link: " + link, { className: "ipfs-text" }));
             }
             ret.push(new NodeCompMarkdown(node));
         }
         else {
-            let displayName = S.props.getNodePropVal("ipfs:link", node);
+            let displayName = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
             // let folderName = "";
-            // let displayName = S.props.getNodePropVal("ipfs:link", node);
+            // let displayName = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
             // if (displayName) {
             //     folderName = S.util.getNameFromPath(displayName);
             // }

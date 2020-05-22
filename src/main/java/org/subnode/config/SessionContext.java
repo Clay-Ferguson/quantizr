@@ -82,7 +82,7 @@ public class SessionContext {
 		return repoUtil.isTestAccountName(userName);
 	}
 
-	// todo-0: move this into DateUtil
+	/* NOTE: Not a generic formatTime utility function. This is initialized PER user (via their timezone) */
 	public String formatTime(Date date) {
 		if (date == null)
 			return null;

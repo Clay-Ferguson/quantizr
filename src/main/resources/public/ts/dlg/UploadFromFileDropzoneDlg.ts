@@ -271,7 +271,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("success", function (param1, resp, param3) {
-                    //todo-0: get rid of the tight coupling to an exception class name here. This was a quick fix/hack
+                    //todo-1: get rid of the tight coupling to an exception class name here. This was a quick fix/hack
                     if (!resp.succese && resp.exceptionClass && resp.exceptionClass.endsWith(".OutOfSpaceException")) {
                         S.util.showMessage("Upload failed. You're out of storage space on the server. Consider uploading to IPFS using Temporal (https://temporal.cloud)", "Warning");
                         return;
