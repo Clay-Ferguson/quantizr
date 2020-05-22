@@ -193,8 +193,8 @@ public class NodeEditService {
 		 * delegating this special type processing out to each type-specific code for
 		 * this.
 		 */
-		if (req.getType().equals("sn:rssfeed")) {
-			node.setProp("sn:rssFeedSrc", "");
+		if (req.getType().equals(NodeType.RSS_FEED.s())) {
+			node.setProp(NodeProp.RSS_FEED_SRC.s(), "");
 		}
 
 		// same thing here. temporary hack for type handline

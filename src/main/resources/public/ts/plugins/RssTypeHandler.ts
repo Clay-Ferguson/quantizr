@@ -30,8 +30,7 @@ export class RssTypeHandler extends TypeBase {
     }
 
     allowPropertyEdit = (propName: string): boolean => {
-        //pros should go on constants file todo-0
-        if (propName == "sn:rssFeedSrc") {
+        if (propName == J.NodeProp.RSS_FEED_SRC) {
             return true;
         }
         return false;
@@ -39,9 +38,9 @@ export class RssTypeHandler extends TypeBase {
 
     render = (node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp => {
 
-        let feedSrc: string = S.props.getNodePropVal("sn:rssFeedSrc", node);
+        let feedSrc: string = S.props.getNodePropVal(J.NodeProp.RSS_FEED_SRC, node);
         if (!feedSrc) {
-            return (new TextContent("You need to set the 'sn:rssFeedSrc' property of this node to the url of the RSS feed."));
+            return (new TextContent("You need to set the '"+J.NodeProp.RSS_FEED_SRC+"' property of this node to the url of the RSS feed."));
         }
 
         let content = node.content;
