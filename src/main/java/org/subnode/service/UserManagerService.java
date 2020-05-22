@@ -176,9 +176,8 @@ public class UserManagerService {
 			return null;
 		}
 		SubNode userNode = api.getUserNodeByUserName(session, userName);
-		if (userNode == null) {
-			throw new RuntimeEx("User not found: " + userName);
-		}
+		if (userNode == null) return null;
+		
 		String ret = null;
 		Long lastLoginTime = sessionContext.getLastLoginTime();
 

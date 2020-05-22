@@ -1,26 +1,17 @@
 package org.subnode.response;
 
+import java.util.List;
 import org.subnode.response.base.ResponseBase;
 
 public class GetServerInfoResponse extends ResponseBase {
-	private String serverInfo;
 
-	//Types: note==null | inbox
-	private String infoType; 
+	private List<InfoMessage> messages;
 
-	public String getServerInfo() {
-		return serverInfo;
+	public List<InfoMessage> getMessages() {
+		return messages;
 	}
 
-	public void setServerInfo(String serverInfo) {
-		this.serverInfo = serverInfo;
-	}
-
-	public String getInfoType() {
-		return infoType;
-	}
-
-	public void setInfoType(String infoType) {
-		this.infoType = infoType;
+	public void setMessages(List<InfoMessage> messages) {
+		this.messages = messages;
 	}
 }

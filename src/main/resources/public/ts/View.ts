@@ -258,14 +258,19 @@ export class View implements ViewIntf {
             nodeId: !!node ? node.id : null
         },
             (res: J.GetServerInfoResponse) => {
-                /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
-                there are other commands that exist also */
-                if (command == "getServerInfo") {
-                    res.serverInfo += "<br>Browser Memory: " + S.util.getBrowserMemoryInfo();
-                    res.serverInfo += "<br>Build Time: " + BUILDTIME;
-                    res.serverInfo += "<br>Profile: " + PROFILE;
+
+                if (res.messages) {
+                    res.messages.forEach(m => {
+                        /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
+                  there are other commands that exist also */
+                        if (command == "getServerInfo") {
+                            m.message += "<br>Browser Memory: " + S.util.getBrowserMemoryInfo();
+                            m.message += "<br>Build Time: " + BUILDTIME;
+                            m.message += "<br>Profile: " + PROFILE;
+                        }
+                        S.util.showMessage(m.message, "Command Complete", true);
+                    });
                 }
-                S.util.showMessage(res.serverInfo, "Command Complete", true);
             });
     }
 
@@ -277,13 +282,20 @@ export class View implements ViewIntf {
             nodeId: !!node ? node.id : null
         },
             (res: J.GetServerInfoResponse) => {
-                if (res.serverInfo) {
-                    if (res.infoType == "inbox") {
-                        new InboxNotifyDlg(res.serverInfo, state).open();
-                    }
-                    else {
-                        S.util.showMessage(res.serverInfo, "Notifications", false);
-                    }
+                if (res.messages) {
+
+                    res.messages.forEach(m => {
+                        if (m.type != "inbox") {
+                            //todo-0: really need to put ALL messages into a single dialog display
+                            S.util.showMessage(m.message, "Notifications", false);
+                        }
+                    });
+
+                    res.messages.forEach(m => {
+                        if (m.type == "inbox") {
+                            new InboxNotifyDlg(m.message, state).open();
+                        }
+                    });
                 }
             });
     }

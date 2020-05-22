@@ -1432,7 +1432,7 @@ public class MongoApi {
 		if (session == null) {
 			session = getAdminSession();
 		}
-		//todo-0: I think this happens with 'anon' user?
+		
 		if (user == null) {
 			user = sessionContext.getUserName();
 		}

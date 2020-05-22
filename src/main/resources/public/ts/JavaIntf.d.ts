@@ -322,8 +322,7 @@ export interface GetPublicServerInfoResponse extends ResponseBase {
 }
 
 export interface GetServerInfoResponse extends ResponseBase {
-    serverInfo: string;
-    infoType: string;
+    messages: InfoMessage[];
 }
 
 export interface GetSharedNodesResponse extends ResponseBase {
@@ -341,6 +340,11 @@ export interface GraphResponse extends ResponseBase {
 }
 
 export interface ImportResponse extends ResponseBase {
+}
+
+export interface InfoMessage {
+    message: string;
+    type: string;
 }
 
 export interface InitNodeEditResponse extends ResponseBase {

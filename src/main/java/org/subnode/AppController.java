@@ -1,6 +1,7 @@
 package org.subnode;
 
 import java.util.Date;
+import java.util.LinkedList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -78,6 +79,7 @@ import org.subnode.response.CloseAccountResponse;
 import org.subnode.response.ExecuteNodeResponse;
 import org.subnode.response.ExportResponse;
 import org.subnode.response.GetServerInfoResponse;
+import org.subnode.response.InfoMessage;
 import org.subnode.response.LogoutResponse;
 import org.subnode.response.PingResponse;
 import org.subnode.response.RebuildIndexesResponse;
@@ -721,6 +723,7 @@ public class AppController {
 	public @ResponseBody Object getServerInfo(@RequestBody GetServerInfoRequest req, HttpSession session) {
 		return callProc.run("getServerInfo", req, session, ms -> {
 			GetServerInfoResponse res = new GetServerInfoResponse();
+			res.setMessages(new LinkedList<InfoMessage>());
 
 			if (req.getCommand().equalsIgnoreCase("getJson")) {
 				// allow this one if user owns node.
@@ -731,18 +734,18 @@ public class AppController {
 			log.debug("Command: " + req.getCommand());
 
 			if (req.getCommand().equalsIgnoreCase("ipfsGetNodeInfo")) {
-				res.setServerInfo(ipfsService.getNodeInfo(ms, req.getNodeId()));
+				res.getMessages().add(new InfoMessage(ipfsService.getNodeInfo(ms, req.getNodeId()), null));
 			} else if (req.getCommand().equalsIgnoreCase("compactDb")) {
-				res.setServerInfo(systemService.compactDb());
+				res.getMessages().add(new InfoMessage(systemService.compactDb(), null));
 			} else if (req.getCommand().equalsIgnoreCase("backupDb")) {
-				res.setServerInfo(systemService.backupDb());
+				res.getMessages().add(new InfoMessage(systemService.backupDb(), null));
 			} else if (req.getCommand().equalsIgnoreCase("initializeAppContent")) {
 				log.error("initializeAppContent is obsolet, and was also refactored without being retested");
 				// res.setServerInfo(systemService.initializeAppContent());
 			} else if (req.getCommand().equalsIgnoreCase("getServerInfo")) {
-				res.setServerInfo(systemService.getSystemInfo());
+				res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));
 			} else if (req.getCommand().equalsIgnoreCase("getJson")) {
-				res.setServerInfo(systemService.getJson(ms, req.getNodeId()));
+				res.getMessages().add(new InfoMessage(systemService.getJson(ms, req.getNodeId()), null));
 			} else {
 				throw new RuntimeEx("Invalid command: " + req.getCommand());
 			}
@@ -783,23 +786,21 @@ public class AppController {
 	public @ResponseBody Object getNotifications(@RequestBody GetServerInfoRequest req, HttpSession session) {
 		return callProc.run("getNotifications", req, session, ms -> {
 			GetServerInfoResponse res = new GetServerInfoResponse();
+			res.setMessages(new LinkedList<InfoMessage>());
 
 			if (sessionContext.getSignupSuccessMessage() != null) {
-				res.setServerInfo(sessionContext.getSignupSuccessMessage());
+				res.getMessages().add(new InfoMessage(sessionContext.getSignupSuccessMessage(), null));
 				sessionContext.setSignupSuccessMessage(null);
 			}
 
 			if (sessionContext.getError() != null) {
-				res.setServerInfo(sessionContext.getError());
+				res.getMessages().add(new InfoMessage(sessionContext.getError(), null));
 				sessionContext.setError(null);
 			}
 
-			// todo-0: why does this run when sessionContext.userName == null ?? is this
-			// normal? Shouldn't userName at least default to "anon" (anonymous?)
 			String inboxMessage = userManagerService.getInboxNotification(ms);
 			if (inboxMessage != null) {
-				res.setServerInfo(inboxMessage);
-				res.setInfoType("inbox");
+				res.getMessages().add(new InfoMessage(inboxMessage, "inbox"));
 			}
 
 			res.setSuccess(true);
