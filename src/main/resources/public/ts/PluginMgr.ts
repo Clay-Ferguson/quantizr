@@ -1,4 +1,3 @@
-import * as J from "./JavaIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
@@ -7,6 +6,7 @@ import { PluginMgrIntf } from "./intf/PluginMgrIntf";
 import { RssTypeHandler } from "./plugins/RssTypeHandler";
 import { IPFSNodeTypeHandler } from "./plugins/IPFSNodeTypeHandler";
 import { RepoRootTypeHandler } from "./plugins/RepoRootTypeHandler";
+import { TrashNodeTypeHandler } from "./plugins/TrashNodeTypeHandler";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -37,6 +37,7 @@ export class PluginMgr implements PluginMgrIntf {
 
         //todo-0: use this to set root type on all instances: dev, test, prod
         this.addTypeHandler(new RepoRootTypeHandler());
+        this.addTypeHandler(new TrashNodeTypeHandler());
 
         // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());
         // S.plugin.addTypeHandler("fs:folder", new FolderTypeHandler());

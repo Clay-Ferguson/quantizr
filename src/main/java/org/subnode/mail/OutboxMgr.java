@@ -2,21 +2,17 @@ package org.subnode.mail;
 
 import java.util.List;
 
-import java.util.Date;
 import org.subnode.config.ConstantsProvider;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.SubNodeTypes;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.XString;
-import org.joda.time.DateTime;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,7 +116,9 @@ public class OutboxMgr {
 	 */
 	public void addInboxNotification(MongoSession session, String userName, SubNode userNode, SubNode node,
 			String notifyMessage) {
-		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "Inbox");
+
+		//todo-0: change unstructured to inbox 
+		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "Inbox", NodeType.NONE.s());
 
 		if (userInbox != null) {
 
@@ -135,7 +133,7 @@ public class OutboxMgr {
 				return;
 			}
 
-			notifyNode = api.createNode(session, userInbox, null, SubNodeTypes.UNSTRUCTURED, 0L,
+			notifyNode = api.createNode(session, userInbox, null, NodeType.NONE.s(), 0L,
 					CreateNodeLocation.FIRST);
 
 			// trim to 280 like twitter.
@@ -170,7 +168,7 @@ public class OutboxMgr {
 	public void queueMailUsingAdminSession(MongoSession session, final String recipients, final String subject,
 			final String content) {
 		SubNode outboxNode = getSystemOutbox(session);
-		SubNode outboundEmailNode = api.createNode(session, outboxNode.getPath() + "/?", SubNodeTypes.UNSTRUCTURED);
+		SubNode outboundEmailNode = api.createNode(session, outboxNode.getPath() + "/?", NodeType.NONE.s());
 
 		outboundEmailNode.setProp(NodeProp.EMAIL_CONTENT.s(), content);
 		outboundEmailNode.setProp(NodeProp.EMAIL_SUBJECT.s(), subject);

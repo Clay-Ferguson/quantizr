@@ -24,7 +24,6 @@ import org.subnode.model.PrivilegeInfo;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.SubNodeTypes;
 import org.subnode.service.AttachmentService;
 import org.subnode.util.Const;
 import org.subnode.util.Convert;
@@ -354,13 +353,13 @@ public class MongoApi {
 
 	public SubNode createNode(MongoSession session, String path) {
 		ObjectId ownerId = getOwnerNodeIdFromSession(session);
-		SubNode node = new SubNode(ownerId, path, SubNodeTypes.UNSTRUCTURED, null);
+		SubNode node = new SubNode(ownerId, path, NodeType.NONE.s(), null);
 		return node;
 	}
 
 	public SubNode createNode(MongoSession session, String path, String type, String ownerName) {
 		if (type == null) {
-			type = SubNodeTypes.UNSTRUCTURED;
+			type = NodeType.NONE.s();
 		}
 		ObjectId ownerId = getOwnerNodeIdFromSession(session);
 		SubNode node = new SubNode(ownerId, path, type, null);
@@ -369,7 +368,7 @@ public class MongoApi {
 
 	public SubNode createNode(MongoSession session, String path, String type) {
 		if (type == null) {
-			type = SubNodeTypes.UNSTRUCTURED;
+			type = NodeType.NONE.s();
 		}
 		ObjectId ownerId = getOwnerNodeIdFromSession(session);
 		SubNode node = new SubNode(ownerId, path, type, null);
@@ -395,7 +394,7 @@ public class MongoApi {
 		}
 
 		if (type == null) {
-			type = SubNodeTypes.UNSTRUCTURED;
+			type = NodeType.NONE.s();
 		}
 
 		String path = (parent == null ? "" : parent.getPath()) + "/" + relPath;
@@ -773,7 +772,8 @@ public class MongoApi {
 		SubNode ret = null;
 
 		if (name.equals("inbox")) {
-			ret = getSpecialNode(session, session.getUser(), null, NodeName.INBOX, "Inbox");
+			//todo-0: change unstructured to...
+			ret = getSpecialNode(session, session.getUser(), null, NodeName.INBOX, "Inbox", NodeType.NONE.s());
 		}
 
 		return ret;
@@ -1409,7 +1409,7 @@ public class MongoApi {
 	 * userNode if you know it, to save cycles
 	 */
 	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode, String pathPart,
-			String nodeName) {
+			String nodeName, String type) {
 		if (userNode == null) {
 			userNode = getUserNodeByUserName(session, user);
 		}
@@ -1420,7 +1420,7 @@ public class MongoApi {
 		String path = userNode.getPath() + "/" + pathPart;
 		SubNode node = getNode(session, path);
 		if (node == null) {
-			node = createNode(session, userNode, pathPart, SubNodeTypes.UNSTRUCTURED, 0L, CreateNodeLocation.LAST);
+			node = createNode(session, userNode, pathPart, type, 0L, CreateNodeLocation.LAST);
 			node.setOwner(userNode.getId());
 			node.setContent(nodeName);
 			save(session, node);

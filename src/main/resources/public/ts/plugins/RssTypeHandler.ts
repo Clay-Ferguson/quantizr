@@ -7,7 +7,6 @@ import { Div } from "../widget/Div";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { MessageDlg } from "../dlg/MessageDlg";
-import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { TextContent } from "../widget/TextContent";
 import { Heading } from "../widget/Heading";
 import { Para } from "../widget/Para";
@@ -17,20 +16,18 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { MarkdownDiv } from "../widget/MarkdownDiv";
 import { AppState } from "../AppState";
 import { dispatch } from "../AppRedux";
+import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class RssTypeHandler implements TypeHandlerIntf {
+export class RssTypeHandler extends TypeBase {
 
-    getTypeName = (): string => {
-        return "sn:rssfeed";
-    }
-
-    getName = (): string => {
-        return "RSS Feed";
+    constructor() {
+        //pros should go on constants file todo-0
+        super("sn:rssfeed", "RSS Feed", "fa-rss");
     }
 
     allowPropertyEdit = (propName: string): boolean => {
@@ -38,14 +35,6 @@ export class RssTypeHandler implements TypeHandlerIntf {
             return true;
         }
         return false;
-    }
-
-    getIconClass(node: J.NodeInfo): string {
-        return "fa fa-rss fa-lg";
-    }
-
-    allowAction(action: string): boolean {
-        return true;
     }
 
     render = (node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp => {

@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.OutboxMgr;
@@ -13,7 +14,6 @@ import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.SubNodeTypes;
 import org.subnode.request.AppDropRequest;
 import org.subnode.request.CreateSubNodeRequest;
 import org.subnode.request.DeletePropertyRequest;
@@ -84,7 +84,8 @@ public class NodeEditService {
 		String nodeId = req.getNodeId();
 		SubNode node = null;
 		if (nodeId.startsWith("~")) {
-			node = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "Notes");
+			//create node type for 'notes'
+			node = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "Notes", NodeType.NONE.s());
 		} else {
 			node = api.getNode(session, nodeId);
 		}
@@ -122,7 +123,7 @@ public class NodeEditService {
 		SubNode linksNode = apiUtil.ensureNodeExists(session, NodeName.ROOT_OF_ALL_USERS + "/" + userNodeHexId + "/",
 				NodeName.LINKS, "### Links", null, true, null, null);
 
-		SubNode newNode = api.createNode(session, linksNode, null, SubNodeTypes.UNSTRUCTURED, 0L,
+		SubNode newNode = api.createNode(session, linksNode, null, NodeType.NONE.s(), 0L,
 				CreateNodeLocation.LAST);
 
 		String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
@@ -149,10 +150,6 @@ public class NodeEditService {
 		log.debug("Inserting under parent: " + parentNodeId);
 		SubNode parentNode = api.getNode(session, parentNodeId);
 
-		// if (req.getTypeName().equals(SubNodeTypes.FS_FILE) ||
-		// req.getTypeName().equals(SubNodeTypes.FS_FOLDER)) {
-		// log.debug("FS Create: " + req.getNewNodeName());
-		// } else {
 		SubNode newNode = api.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
 				CreateNodeLocation.ORDINAL);
 		newNode.setContent("");

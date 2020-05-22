@@ -2,26 +2,22 @@ import * as J from "../JavaIntf";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { NodeCompMarkdown } from "../comps/NodeCompMarkdown";
 import { AppState } from "../AppState";
+import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class IPFSNodeTypeHandler implements TypeHandlerIntf {
+export class IPFSNodeTypeHandler extends TypeBase {
 
-    getTypeName = (): string => {
-        return J.NodeType.IPFS_NODE;
-    }
-
-    getName = (): string => {
-        return "IPFS Node";
+    constructor() {
+        super(J.NodeType.IPFS_NODE, "IPFS Node", "fa-sitemap");
     }
 
     allowPropertyEdit = (propName: string): boolean => {
@@ -59,19 +55,6 @@ export class IPFSNodeTypeHandler implements TypeHandlerIntf {
         }
 
         return new Div(null, null, ret);
-    }
-
-    orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {
-        return _props;
-    }
-
-    getIconClass(node: J.NodeInfo): string {
-        //https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
-        return "fa fa-sitemap fa-lg";
-    }
-
-    allowAction(action: string): boolean {
-        return true;
     }
 }
 

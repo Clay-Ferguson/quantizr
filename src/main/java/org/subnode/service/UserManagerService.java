@@ -10,6 +10,7 @@ import org.subnode.config.ConstantsProvider;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.OutOfSpaceException;
 import org.subnode.exception.base.RuntimeEx;
@@ -181,7 +182,8 @@ public class UserManagerService {
 		String ret = null;
 		Long lastLoginTime = sessionContext.getLastLoginTime();
 
-		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "Inbox");
+		//todo-0: change unstructured to...
+		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "Inbox", NodeType.NONE.s());
 
 		if (userInbox != null) {
 			SubNode inboxNode = api.getNewestChild(session, userInbox);

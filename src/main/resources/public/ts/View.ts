@@ -286,7 +286,7 @@ export class View implements ViewIntf {
 
                     res.messages.forEach(m => {
                         if (m.type != "inbox") {
-                            //todo-0: really need to put ALL messages into a single dialog display
+                            //todo-1: really need to put ALL messages into a single dialog display
                             S.util.showMessage(m.message, "Notifications", false);
                         }
                     });

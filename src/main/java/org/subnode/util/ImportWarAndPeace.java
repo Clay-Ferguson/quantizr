@@ -12,11 +12,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import org.subnode.config.SpringContextUtil;
+import org.subnode.model.client.NodeType;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.SubNodeTypes;
 
 /**
  * Reads the special proprietary-formatted file of the book 'War and Peace' to load into the
@@ -121,7 +121,7 @@ public class ImportWarAndPeace {
 
 			addParagraph();
 
-			curChapter = api.createNode(session, curBook, SubNodeTypes.UNSTRUCTURED, 0L, CreateNodeLocation.LAST);
+			curChapter = api.createNode(session, curBook, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
 			curChapter.setContent("C" + String.valueOf(globalChapter) + ". " + line);
 			api.save(session, curChapter);
 			return true;
@@ -145,7 +145,7 @@ public class ImportWarAndPeace {
 
 		// line = XString.injectForQuotations(line);
 
-		SubNode paraNode = api.createNode(session, curChapter, SubNodeTypes.UNSTRUCTURED, 0L, CreateNodeLocation.LAST);
+		SubNode paraNode = api.createNode(session, curChapter, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
 		paraNode.setContent("VS" + globalVerse + ". " + line);
 		api.save(session, paraNode);
 		paragraph.setLength(0);
@@ -165,7 +165,7 @@ public class ImportWarAndPeace {
 			if (globalBook > maxBooks) return false;
 			addParagraph();
 
-			curBook = api.createNode(session, root, SubNodeTypes.UNSTRUCTURED, 0L, CreateNodeLocation.LAST);
+			curBook = api.createNode(session, root, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
 			curBook.setContent("B" + String.valueOf(globalBook) + ". " + line);
 			api.save(session, curBook);
 			return true;

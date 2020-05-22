@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
+import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -143,7 +144,7 @@ public class NodeMoveService {
 			if (session == null) {
 				session = ThreadLocals.getMongoSession();
 			}
-			SubNode trashNode = api.getSpecialNode(session, session.getUser(), null, NodeName.TRASH, "### Trash");
+			SubNode trashNode = api.getSpecialNode(session, session.getUser(), null, NodeName.TRASH, "### Trash", NodeType.TRASH_BIN.s());
 			moveNodesInternal(session, "inside", trashNode.getId().toHexString(), req.getNodeIds());
 			res.setSuccess(true);
 			return res;
