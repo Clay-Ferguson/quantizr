@@ -9,6 +9,7 @@ public enum NodeType {
 
     //todo-1: create a 'typehandler' for this and setup just like repo_root
     TRASH_BIN("sn:trashBin"), 
+    INBOX("sn:inbox"),
 
     NONE("u"), //
     FS_FILE("fs:file"), //

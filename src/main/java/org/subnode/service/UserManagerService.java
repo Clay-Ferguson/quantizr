@@ -181,9 +181,7 @@ public class UserManagerService {
 		
 		String ret = null;
 		Long lastLoginTime = sessionContext.getLastLoginTime();
-
-		//todo-0: change unstructured to...
-		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "Inbox", NodeType.NONE.s());
+		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "Inbox", NodeType.INBOX.s());
 
 		if (userInbox != null) {
 			SubNode inboxNode = api.getNewestChild(session, userInbox);

@@ -772,8 +772,7 @@ public class MongoApi {
 		SubNode ret = null;
 
 		if (name.equals("inbox")) {
-			//todo-0: change unstructured to...
-			ret = getSpecialNode(session, session.getUser(), null, NodeName.INBOX, "Inbox", NodeType.NONE.s());
+			ret = getSpecialNode(session, session.getUser(), null, NodeName.INBOX, "Inbox", NodeType.INBOX.s());
 		}
 
 		return ret;
