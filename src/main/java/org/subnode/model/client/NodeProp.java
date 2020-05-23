@@ -26,6 +26,8 @@ public enum NodeProp {
     EMAIL_RECIP("sn:recip", "s"), //
     EMAIL_SUBJECT("sn:subject", "s"), //
 
+    USER_NAME("sn:userName", "s"), //
+
     /*
      * when a node id pointing to some other node, we set it's target id to the node
      * it points to. For now used only for inbox to point to nodes

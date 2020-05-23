@@ -9,6 +9,8 @@ import { RepoRootTypeHandler } from "./plugins/RepoRootTypeHandler";
 import { TrashNodeTypeHandler } from "./plugins/TrashNodeTypeHandler";
 import { InboxNodeTypeHandler } from "./plugins/InboxNodeTypeHandler";
 import { NotesNodeTypeHandler } from "./plugins/NotesNodeTypeHandler";
+import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
+import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -40,6 +42,8 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new TrashNodeTypeHandler());
         this.addTypeHandler(new InboxNodeTypeHandler()); 
         this.addTypeHandler(new NotesNodeTypeHandler());
+        this.addTypeHandler(new FriendsListTypeHandler());
+        this.addTypeHandler(new FriendTypeHandler());
 
         // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());
         // S.plugin.addTypeHandler("fs:folder", new FolderTypeHandler());
