@@ -27,7 +27,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     resolve: Function;
 
     backdrop: HTMLElement;
-    extraHeaderComps: CompIntf[];
 
     /* Warning: Base 'Comp' already has 'state', I think it was wrong to rely on 'appState' everywhere inside dialogs, because
     we need to just let the render methods grab the latest state like every other component in the render method. */
@@ -110,13 +109,19 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     }
 
     abstract renderDlg(): CompIntf[];
+    
+    /* Can be overridden to customize content (normally icons) in title bar */
+    getExtraTitleBarComps(): CompIntf[] {
+        return null;
+    }
 
     preRender(): void {
         let timesIcon: Comp;
         //Dialog Header with close button (x) right justified on it.
         let children: CompIntf[] = [];
 
-        let titleChildren = this.extraHeaderComps ? this.extraHeaderComps : [];
+        let extraHeaderComps = this.getExtraTitleBarComps();
+        let titleChildren = extraHeaderComps ? extraHeaderComps : [];
         titleChildren = titleChildren.concat(timesIcon = new Span("&times;", {
             className: "float-right app-modal-title-close-icon",
             onClick: this.close

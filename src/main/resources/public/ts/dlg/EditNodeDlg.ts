@@ -121,32 +121,33 @@ export class EditNodeDlg extends DialogBase {
         return selection;
     }
 
-    initTitleBarComps = (): void => {
+    getExtraTitleBarComps(): CompIntf[] {
         let state = this.getState();
-        this.extraHeaderComps = [];
+        let comps: CompIntf[] = [];
 
         if (S.props.isEncrypted(state.node)) {
-            this.extraHeaderComps.push(new Icon({
+            comps.push(new Icon({
                 "style": { marginLeft: '12px', verticalAlign: 'middle' },
                 className: "fa fa-lock fa-lg"
             }));
         }
 
+        debugger;
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass(state.node);
             if (iconClass) {
-                this.extraHeaderComps.push(new Icon({
+                comps.push(new Icon({
                     "style": { marginLeft: '12px', verticalAlign: 'middle' },
                     className: iconClass
                 }));
             }
         }
+        return comps;
     }
 
     renderDlg(): CompIntf[] {
         let state = this.getState();
-        this.initTitleBarComps();
 
         //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
         //to dangerously opt into this also without hacking the code with this var.

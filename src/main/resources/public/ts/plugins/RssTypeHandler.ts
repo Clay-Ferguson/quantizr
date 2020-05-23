@@ -40,7 +40,7 @@ export class RssTypeHandler extends TypeBase {
 
         let feedSrc: string = S.props.getNodePropVal(J.NodeProp.RSS_FEED_SRC, node);
         if (!feedSrc) {
-            return (new TextContent("You need to set the '"+J.NodeProp.RSS_FEED_SRC+"' property of this node to the url of the RSS feed."));
+            return (new TextContent("Set the '"+J.NodeProp.RSS_FEED_SRC+"' node property to the RSS Feed URL.", "alert alert-info marginLeft marginTop"));
         }
 
         let content = node.content;
