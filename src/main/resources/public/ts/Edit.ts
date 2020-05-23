@@ -445,6 +445,21 @@ export class Edit implements EditIntf {
         ).open();
     }
 
+    clearInbox = (state: AppState): void => {
+        S.meta64.clearSelNodes(state);
+
+        new ConfirmDlg("Permanently delete your entire Inbox", "Cleaer Inbox",
+            () => {
+                S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+                    nodeIds: [state.homeNodePath + "/inbox"],
+                    hardDelete: true
+                }, (res: J.DeleteNodesResponse) => {
+                    S.nav.openContentNode(state.homeNodePath, state);
+                });
+            }, null, "btn-danger", "alert alert-danger", state
+        ).open();
+    }
+
     cached_softDeleteSelNodes = (nodeId: string) => {
         this.deleteSelNodes(nodeId, false);
     }

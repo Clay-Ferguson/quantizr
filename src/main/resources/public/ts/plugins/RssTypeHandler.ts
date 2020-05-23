@@ -29,14 +29,14 @@ export class RssTypeHandler extends TypeBase {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss");
     }
 
-    allowPropertyEdit = (propName: string): boolean => {
+    allowPropertyEdit(propName: string): boolean {
         if (propName == J.NodeProp.RSS_FEED_SRC) {
             return true;
         }
         return false;
     }
 
-    render = (node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp => {
+    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
 
         let feedSrc: string = S.props.getNodePropVal(J.NodeProp.RSS_FEED_SRC, node);
         if (!feedSrc) {
@@ -82,7 +82,7 @@ export class RssTypeHandler extends TypeBase {
         return itemListContainer;
     }
 
-    renderItem = (feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) => {
+    renderItem(feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) {
         //Current approach is to put the feed title in the parent node so we don't need it rendered
         //here also
         let feedOut: Comp[] = []; //tag("h2", {}, feed.title);
@@ -111,7 +111,7 @@ export class RssTypeHandler extends TypeBase {
         }, this);
     }
 
-    buildFeedItem = (entry, state: AppState): Comp => {
+    buildFeedItem(entry, state: AppState): Comp {
         let children: Comp[] = [];
         children.push(new Anchor(entry.link, entry.title, {
             style: { fontSize: "25px" },

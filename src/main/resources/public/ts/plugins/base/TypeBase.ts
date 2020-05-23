@@ -18,19 +18,19 @@ export class TypeBase implements TypeHandlerIntf {
     constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string) {
     }
 
-    getTypeName = (): string => {
+    getTypeName(): string {
         return this.typeName;
     }
 
-    getName = (): string => {
+    getName(): string {
         return this.displayName;
     }
 
-    allowPropertyEdit = (propName: string, state: AppState): boolean => {
+    allowPropertyEdit(propName: string, state: AppState): boolean {
         return state.isAdminUser;
     }
 
-    render = (node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp => {
+    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
         //this is essentially the 'default rendering' any other node has.
         return new NodeCompMarkdown(node);
     }

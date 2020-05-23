@@ -20,14 +20,14 @@ export class IPFSNodeTypeHandler extends TypeBase {
         super(J.NodeType.IPFS_NODE, "IPFS Node", "fa-sitemap");
     }
 
-    allowPropertyEdit = (propName: string): boolean => {
+    allowPropertyEdit(propName: string): boolean {
         if (propName == "sn:linkName" || propName == J.NodeProp.IPFS_LINK) {
             return true;
         }
         return false;
     }
 
-    render = (node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp => {
+    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
         let ret: Comp[] = [];
 
         let name = node.content;

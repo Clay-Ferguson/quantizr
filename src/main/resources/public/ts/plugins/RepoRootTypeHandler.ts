@@ -16,7 +16,7 @@ export class RepoRootTypeHandler extends TypeBase {
         super(J.NodeType.REPO_ROOT, "Repository Root", "fa-home");
     }
 
-    allowPropertyEdit = (propName: string, state: AppState): boolean => {
+    allowPropertyEdit(propName: string, state: AppState): boolean {
         return true;
     }
 }

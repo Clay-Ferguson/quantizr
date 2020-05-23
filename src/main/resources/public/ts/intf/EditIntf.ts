@@ -43,6 +43,7 @@ export interface EditIntf {
     cached_pasteSelNodes_Inline(nodeId: string);
     insertBookWarAndPeace(state: AppState): void;
     emptyTrash(state: AppState): void;
+    clearInbox(state: AppState): void;
     cached_newSubNode(id: any);
 }
 

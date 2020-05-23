@@ -39,8 +39,8 @@ export class PluginMgr implements PluginMgrIntf {
 
         //todo-0: use these to set root type on all instances: dev, test, prod (then remove from here, this list)
         // this.addTypeHandler(new RepoRootTypeHandler());
-        // this.addTypeHandler(new TrashNodeTypeHandler());
-        // this.addTypeHandler(new InboxNodeTypeHandler());
+        //this.addTypeHandler(new TrashNodeTypeHandler());
+        //this.addTypeHandler(new InboxNodeTypeHandler()); 
         // this.addTypeHandler(new NotesNodeTypeHandler());
 
         // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());

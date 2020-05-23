@@ -99,13 +99,6 @@ export class MenuPanel extends Div {
                         return !state.isAnonUser;
                     }
                 ),
-                new MenuItem("Empty Trash", () => S.edit.emptyTrash(state),
-                //enabled func
-                () => {
-                    return !state.isAnonUser;
-                }
-            ),
-                
             ]),
             new Menu("Uploads", [
                 new MenuItem("Upload from File", () => S.attachment.openUploadFromFileDlg(false, null, null, state), () => { return !state.isAnonUser && highlightNode != null && selNodeIsMine }), //
