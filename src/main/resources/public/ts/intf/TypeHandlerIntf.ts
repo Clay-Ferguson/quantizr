@@ -10,4 +10,5 @@ export interface TypeHandlerIntf {
     getIconClass(node : J.NodeInfo): string;
     allowAction(action : string): boolean;
     allowPropertyEdit(typeName: string, state: AppState): boolean;
+    getAllowUserSelect();
 }

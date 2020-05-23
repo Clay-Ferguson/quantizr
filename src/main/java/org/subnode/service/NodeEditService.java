@@ -84,7 +84,7 @@ public class NodeEditService {
 		String nodeId = req.getNodeId();
 		SubNode node = null;
 		if (nodeId.equals("~notes")) {
-			node = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "Notes", NodeType.NOTES.s());
+			node = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "### Notes", NodeType.NOTES.s());
 		} else {
 			node = api.getNode(session, nodeId);
 		}
@@ -118,7 +118,7 @@ public class NodeEditService {
 			return res;
 		}
 
-		SubNode linksNode = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "Notes", NodeType.NOTES.s());
+		SubNode linksNode = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "### Notes", NodeType.NOTES.s());
 
 		SubNode newNode = api.createNode(session, linksNode, null, NodeType.NONE.s(), 0L,
 				CreateNodeLocation.LAST);

@@ -17,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class TrashNodeTypeHandler extends TypeBase {
     constructor() {
-        super(J.NodeType.TRASH_BIN, "Trash Bin", "fa-trash");
+        super(J.NodeType.TRASH_BIN, "Trash Bin", "fa-trash", false);
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {

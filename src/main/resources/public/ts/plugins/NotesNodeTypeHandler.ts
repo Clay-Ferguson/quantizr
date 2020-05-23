@@ -11,6 +11,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class NotesNodeTypeHandler extends TypeBase {
     constructor() {
-        super(J.NodeType.NOTES, "Notes", "fa-sticky-note");
+        super(J.NodeType.NOTES, "Notes", "fa-sticky-note", false);
     }
 }

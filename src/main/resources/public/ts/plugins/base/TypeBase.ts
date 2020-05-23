@@ -15,7 +15,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* NOTE: Defaults to only allowing 'admin' to edit unless allowPropertyEdit is overridden */
 export class TypeBase implements TypeHandlerIntf {
 
-    constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string) {
+    constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string, private allowUserSelect: boolean=true) {
     }
 
     getTypeName(): string {
@@ -46,6 +46,10 @@ export class TypeBase implements TypeHandlerIntf {
 
     allowAction(action: string): boolean {
         return true;
+    }
+
+    getAllowUserSelect(): boolean {
+        return this.allowUserSelect;
     }
 }
 

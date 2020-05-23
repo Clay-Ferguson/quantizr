@@ -772,7 +772,7 @@ public class MongoApi {
 		SubNode ret = null;
 
 		if (name.equals("inbox")) {
-			ret = getSpecialNode(session, session.getUser(), null, NodeName.INBOX, "Inbox", NodeType.INBOX.s());
+			ret = getSpecialNode(session, session.getUser(), null, NodeName.INBOX, "### Inbox", NodeType.INBOX.s());
 		}
 
 		return ret;

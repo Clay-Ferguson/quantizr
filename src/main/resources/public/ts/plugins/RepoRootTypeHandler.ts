@@ -13,7 +13,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class RepoRootTypeHandler extends TypeBase {
 
     constructor() {
-        super(J.NodeType.REPO_ROOT, "Repository Root", "fa-home");
+        super(J.NodeType.REPO_ROOT, "Repository Root", "fa-home", false);
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {

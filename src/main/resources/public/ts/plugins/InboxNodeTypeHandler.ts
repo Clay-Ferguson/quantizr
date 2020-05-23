@@ -17,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class InboxNodeTypeHandler extends TypeBase {
     constructor() {
-        super(J.NodeType.INBOX, "Inbox", "fa-inbox");
+        super(J.NodeType.INBOX, "Inbox", "fa-inbox", false);
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
