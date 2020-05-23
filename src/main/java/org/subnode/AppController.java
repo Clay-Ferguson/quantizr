@@ -42,6 +42,7 @@ import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.DeletePropertyRequest;
 import org.subnode.request.ExecuteNodeRequest;
 import org.subnode.request.ExportRequest;
+import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.GetServerInfoRequest;
 import org.subnode.request.GetSharedNodesRequest;
@@ -340,6 +341,13 @@ public class AppController {
 	public @ResponseBody Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req, HttpSession session) {
 		return callProc.run("getNodePrivileges", req, session, ms -> {
 			return aclService.getNodePrivileges(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/getFriends", method = RequestMethod.POST)
+	public @ResponseBody Object getFriends(@RequestBody GetFriendsRequest req, HttpSession session) {
+		return callProc.run("getFriends", req, session, ms -> {
+			return userManagerService.getFriends(ms, req);
 		});
 	}
 

@@ -11,6 +11,7 @@ import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { store } from "../AppRedux";
+import { FriendsDlg } from "./FriendsDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -35,12 +36,21 @@ export class ShareToPersonDlg extends DialogBase {
                         this.shareNodeToPerson();
                         this.close();
                     }, null, "btn-primary"),
+                    new Button("Choose from Friends", () => {
+                        this.chooseFriendDlg();
+                        //this.close();
+                    }, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
                     })
                 ])
             ])
         ];
+    }
+
+    chooseFriendDlg = (): void => {
+        let friendsDlg: FriendsDlg = new FriendsDlg(this.appState);
+        friendsDlg.open();
     }
 
     shareNodeToPerson = (): void => {

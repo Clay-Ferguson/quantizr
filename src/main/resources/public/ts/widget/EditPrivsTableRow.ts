@@ -15,6 +15,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+//todo-0: can ListBoxRow be a base class for this?
 export class EditPrivsTableRow extends Comp {
 
     constructor(public aclEntry: J.AccessControlInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {

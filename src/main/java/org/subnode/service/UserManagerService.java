@@ -2,6 +2,7 @@ package org.subnode.service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -24,6 +25,7 @@ import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.CloseAccountRequest;
+import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetUserAccountInfoRequest;
 import org.subnode.request.LoginRequest;
 import org.subnode.request.ResetPasswordRequest;
@@ -32,6 +34,8 @@ import org.subnode.request.SaveUserPreferencesRequest;
 import org.subnode.request.SignupRequest;
 import org.subnode.response.ChangePasswordResponse;
 import org.subnode.response.CloseAccountResponse;
+import org.subnode.response.FriendInfo;
+import org.subnode.response.GetFriendsResponse;
 import org.subnode.response.GetUserAccountInfoResponse;
 import org.subnode.response.LoginResponse;
 import org.subnode.response.ResetPasswordResponse;
@@ -662,6 +666,26 @@ public class UserManagerService {
 			res.setMessage("A password reset link has been sent to your email. Check your email in a minute or so.");
 			res.setSuccess(true);
 		});
+		return res;
+	}
+
+	public GetFriendsResponse getFriends(MongoSession session, GetFriendsRequest req) {
+		GetFriendsResponse res = new GetFriendsResponse();
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+
+		List<FriendInfo> friends = new LinkedList<FriendInfo>();
+
+		//todo-0: work in progress
+		for (int i=0; i < 10; i++) {
+			FriendInfo fi = new FriendInfo();
+			fi.setUserName("Name "+i);
+			friends.add(fi);
+		}
+
+		res.setFriends(friends);
+		res.setSuccess(true);
 		return res;
 	}
 }

@@ -71,6 +71,9 @@ export interface FileSystemReindexRequest extends RequestBase {
     nodeId: string;
 }
 
+export interface GetFriendsRequest extends RequestBase {
+}
+
 export interface GetNodePrivilegesRequest extends RequestBase {
     nodeId: string;
     includeAcl: boolean;
@@ -312,6 +315,14 @@ export interface FileSystemReindexResponse extends ResponseBase {
     report: string;
 }
 
+export interface FriendInfo {
+    userName: string;
+}
+
+export interface GetFriendsResponse extends ResponseBase {
+    friends: FriendInfo[];
+}
+
 export interface GetNodePrivilegesResponse extends ResponseBase {
     aclEntries: AccessControlInfo[];
     owners: string[];
@@ -549,6 +560,7 @@ export const enum NodeProp {
     EMAIL_CONTENT = "sn:content",
     EMAIL_RECIP = "sn:recip",
     EMAIL_SUBJECT = "sn:subject",
+    USER_NAME = "sn:userName",
     TARGET_ID = "sn:target_id",
     USER = "sn:user",
     PWD_HASH = "sn:pwdHash",
