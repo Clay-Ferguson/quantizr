@@ -300,7 +300,7 @@ export class Render implements RenderIntf {
         let img: Img = new Img(key, {
             src,
             className: "avatarImage",
-            title: "Click image to enlarge/reduce",
+            title: "Node owned by: "+node.owner,
 
             // I decided not to let avatars be clickable.
             // onClick: (evt) => {
