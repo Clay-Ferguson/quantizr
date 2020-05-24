@@ -31,7 +31,7 @@ export class Button extends Comp {
     compRender(): ReactNode {
         let icon: any;
         if (this.attribs.iconclass) {
-            icon = S.e('i', {
+            icon = S.e("i", {
                 key: "s_" + this.getId(),
                 className: this.attribs.iconclass,
                 style: {
@@ -58,6 +58,6 @@ export class Button extends Comp {
         //     display : this.getState().visible ? "inline-block" : "none"
         // };
 
-        return S.e('button', this.attribs, [icon, this.getState().text]);
+        return S.e("button", this.attribs, [icon, this.getState().text]);
     }
 }

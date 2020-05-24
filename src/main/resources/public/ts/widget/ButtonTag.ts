@@ -1,5 +1,5 @@
 import { Comp } from "./base/Comp";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { ReactNode } from "react";
@@ -16,10 +16,13 @@ export class ButtonTag extends Comp {
         super(attribs);
     }
 
-    /* Div element is a special case where it renders just its children if there are any, and if not it renders 'content' */
+    /* Div element is a special case where it renders just its children if there are any, and if not it renders 'content' 
+    
+    todo-0: inside widget or all 'ts' files replace 'button', 'span', 'div', etc with double quote strings
+    */
     compRender(): ReactNode {
         return S.e('button', this.attribs, S.e('span', {
-            key: "s_"+this.getId(),
+            key: "s_" + this.getId(),
             className: "navbar-toggler-icon"
         }));
     }

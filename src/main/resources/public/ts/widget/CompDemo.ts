@@ -22,7 +22,6 @@ export class CompDemo extends Div {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let cstate = this.getState();
-
         let children: CompIntf[] = [];
 
         for (let i = 0; i < 10; i++) {

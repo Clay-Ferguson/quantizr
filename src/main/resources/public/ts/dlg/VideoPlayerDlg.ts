@@ -32,7 +32,7 @@ export class VideoPlayerDlg extends DialogBase {
                 //space is at a premium for mobile, so let's just not even show the header.
                 this.mediaTitle ? new TextContent(this.mediaTitle) : null,
                 this.videoPlayer = new VideoPlayer({
-                    "src": this.sourceUrl,
+                    src: this.sourceUrl,
                     style: {
                         width: "100%",
                         border: "3px solid gray",
@@ -43,8 +43,8 @@ export class VideoPlayerDlg extends DialogBase {
                     },
                     //"ontimeupdate": () => { S.podcast.onTimeUpdate(this); },
                     //"oncanplay": () => { S.podcast.onCanPlay(this); },
-                    "controls": "controls",
-                    "autoPlay": "autoplay",
+                    controls: "controls",
+                    autoPlay: "autoplay",
                     //"muted" : "false",
                     //"volume": "0.9",
                     //"preload": "auto"

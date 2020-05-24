@@ -54,8 +54,8 @@ export class ResetPasswordDlg extends DialogBase {
         /* Note: Admin check is done also on server, so no browser hacking can get around this */
         if (userName && emailAddress && userName.toLowerCase() != "admin") {
             util.ajax<J.ResetPasswordRequest, J.ResetPasswordResponse>("resetPassword", {
-                "user": userName,
-                "email": emailAddress
+                user: userName,
+                email: emailAddress
             }, this.resetPasswordResponse);
         } else {
             util.showMessage("Oops. Try that again.", "Warning");

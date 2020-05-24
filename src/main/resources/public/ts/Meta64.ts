@@ -538,7 +538,7 @@ export class Meta64 implements Meta64Intf {
 
     saveUserPreferences = (state: AppState): void => {
         S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
-            "userPreferences": state.userPreferences
+            userPreferences: state.userPreferences
         });
     }
 

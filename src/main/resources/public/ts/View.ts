@@ -222,7 +222,6 @@ export class View implements ViewIntf {
 
     getPathDisplay = (node: J.NodeInfo): string => {
         if (node == null) return "";
-
         var path = "ID: " + node.id;
 
         if (node.lastModified) {
@@ -244,8 +243,6 @@ export class View implements ViewIntf {
     }
 
     graphDisplayTest = (state: AppState) => {
-        //let node = S.meta64.getHighlightedNode();
-
         let dlg = new GraphDisplayDlg(state);
         dlg.open();
     }
@@ -283,7 +280,6 @@ export class View implements ViewIntf {
         },
             (res: J.GetServerInfoResponse) => {
                 if (res.messages) {
-
                     res.messages.forEach(m => {
                         if (m.type != "inbox") {
                             //todo-1: really need to put ALL messages into a single dialog display

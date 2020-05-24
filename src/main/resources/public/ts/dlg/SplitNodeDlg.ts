@@ -20,7 +20,6 @@ export class SplitNodeDlg extends DialogBase {
 
     inlineRadioButton: RadioButton;
     childrenRadioButton: RadioButton;
-
     doubleSpacedRadioButton: RadioButton;
     tripleSpacedRadioButton: RadioButton;
     customDelimRadioButton: RadioButton;

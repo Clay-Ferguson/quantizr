@@ -125,7 +125,7 @@ export class Search implements SearchIntf {
         return new Div(null, {
             className: clazz + " inactive-row",
             onClick: S.meta64.getNodeFunc(this.cached_clickOnSearchResultRow, "S.srch.clickOnSearchResultRow", node.id),
-            "id": cssId
+            id: cssId
         }, [buttonBar, content]);
     }
 

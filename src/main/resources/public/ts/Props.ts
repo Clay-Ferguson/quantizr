@@ -87,7 +87,7 @@ export class Props implements PropsIntf {
     renderProperties = (properties: J.PropertyInfo[]): PropTable => {
         if (properties) {
             let propTable = new PropTable({
-                "border": "1",
+                border: "1",
                 className: "property-table"
                 // "sourceClass" : "[propsTable]"
             });

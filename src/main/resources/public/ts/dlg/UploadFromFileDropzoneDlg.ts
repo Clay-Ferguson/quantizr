@@ -86,8 +86,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     'Content-Type': 'text/plain'
                 },
                 body: JSON.stringify({
-                    "username": this.temporalUsr,
-                    "password": this.temporalPwd
+                    username: this.temporalUsr,
+                    password: this.temporalPwd
                 })
             })//
                 .then(res => res.json())//

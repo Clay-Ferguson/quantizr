@@ -23,13 +23,13 @@ export class NodeCompTableRowLayout extends Div {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let nodesToMove = state.nodesToMove;
-
         let curRow = new Div(null, { className: 'node-grid-row' });
         let children: Comp[] = [];
         let layoutClass = "node-grid-item";
         let childCount: number = this.node.children.length;
         let rowCount: number = 0;
         let maxCols = 2;
+        
         if (this.layout == "c2") {
             maxCols = 2;
         }

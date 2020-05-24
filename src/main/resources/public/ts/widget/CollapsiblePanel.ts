@@ -35,6 +35,7 @@ export class CollapsiblePanel extends Comp {
             S.e('a', {
                 href: "#" + this.getId(),
                 className: style+" "+this.extraToggleButtonClass,
+                //Warning: This can't be camel case!
                 "data-toggle": collapseClass,
                 id: "div_a_" + this.getId(),
                 key: "div_a_" + this.getId(),

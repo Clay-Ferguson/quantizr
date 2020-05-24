@@ -106,8 +106,7 @@ export class Nav implements NavIntf {
             //success callback
             (res: J.RenderNodeResponse) => {
                 this.upLevelResponse(res, null, true, state);
-            }
-            ,
+            },
             //fail callback
             (res: string) => {
                 this.navHome(state);
@@ -148,8 +147,7 @@ export class Nav implements NavIntf {
             //success callback
             (res: J.RenderNodeResponse) => {
                 this.upLevelResponse(res, state.node.id, false, state);
-            }
-            ,
+            },
             //fail callback
             (res: string) => {
                 this.navHome(state);

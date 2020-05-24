@@ -47,7 +47,7 @@ export class NodeCompBinary extends Div {
             src,
             className: "attached-img",
             style,
-            "title": "Click image to enlarge/reduce",
+            title: "Click image to enlarge/reduce",
             onClick: S.meta64.getNodeFunc(this.cached_clickOnImage, "NodeCompBinary.clickOnImage", node.id),
         });
         return img;
@@ -122,7 +122,7 @@ export class NodeCompBinary extends Div {
                 title: "File Size:" + fileSize + " Type:" + fileType
             }, [
                 new Icon({
-                    "style": { marginRight: '12px', verticalAlign: 'middle' },
+                    style: { marginRight: '12px', verticalAlign: 'middle' },
                     className: "fa fa-file fa-lg"
                 }),
                 new Span(fileName, {

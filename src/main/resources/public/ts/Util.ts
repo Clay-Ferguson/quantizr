@@ -49,7 +49,6 @@ export class Util implements UtilIntf {
     rhost: string;
     logAjax: boolean = false;
     timeoutMessageShown: boolean = false;
-
     waitCounter: number = 0;
     pgrsDlg: ProgressDlg = null;
 
@@ -1102,8 +1101,8 @@ export class Util implements UtilIntf {
                 url += "#" + childNode.id;
             }
             state = {
-                "nodeId": ":" + node.name,
-                "highlightId": (childNode && childNode.id != node.id) ? childNode.id : null
+                nodeId: ":" + node.name,
+                highlightId: (childNode && childNode.id != node.id) ? childNode.id : null
             };
             title = node.name;
         }
@@ -1113,8 +1112,8 @@ export class Util implements UtilIntf {
                 url += "#" + childNode.id;
             }
             state = {
-                "nodeId": node.id,
-                "highlightId": (childNode && childNode.id != node.id) ? childNode.id : null
+                nodeId: node.id,
+                highlightId: (childNode && childNode.id != node.id) ? childNode.id : null
             };
             title = node.id;
         }

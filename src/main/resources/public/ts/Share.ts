@@ -84,7 +84,6 @@ export class Share implements ShareIntf {
             });
 
             //console.log("Added cipher key: " + userCipherKey + " for principalNodeId: " + principalNodeId);
-
             resolve();
         });
     }

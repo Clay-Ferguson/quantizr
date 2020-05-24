@@ -4,7 +4,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { Checkbox } from "../widget/Checkbox";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
@@ -27,19 +27,15 @@ export class PrefsDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new FormGroup(null,
-                    [
-                        this.showMetadataCheckBox = new Checkbox("Show Metadata", this.appState.showMetaData),
-                    ]
-                ),
-                new ButtonBar(
-                    [
-                        new Button("Save", this.savePreferences, null, "btn-primary"),
-                        new Button("Cancel", () => {
-                            this.close();
-                        })
-                    ])
-
+                new FormGroup(null, [
+                    this.showMetadataCheckBox = new Checkbox("Show Metadata", this.appState.showMetaData),
+                ]),
+                new ButtonBar([
+                    new Button("Save", this.savePreferences, null, "btn-primary"),
+                    new Button("Cancel", () => {
+                        this.close();
+                    })
+                ])
             ])
         ];
     }

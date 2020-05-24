@@ -247,10 +247,10 @@ export class Render implements RenderIntf {
         }
 
         let newNodeButton = new NavBarIconButton("fa-plus", null, {
-            "onClick": e => {
+            onClick: e => {
                 S.edit.insertNode(node.id, "u", isFirst ? 0 : 1, state);
             },
-            "title": "Insert new node here"
+            title: "Insert new node here"
         }, null, null, "btn-sm");
         let buttonBar = new ButtonBar([pasteInlineButton, newNodeButton],
             null, "float-right " + (isFirst ? "marginTop" : ""));

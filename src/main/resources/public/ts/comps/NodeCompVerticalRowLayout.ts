@@ -25,7 +25,6 @@ export class NodeCompVerticalRowLayout extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-
         let node = this.node;
         let layoutClass = "node-table-row";
 
