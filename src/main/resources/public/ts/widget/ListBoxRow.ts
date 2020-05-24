@@ -12,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ListBoxRow extends Div {
 
     /* The isSelectedFunc is a way of delegating the state holding which row is selected to to the parent ListBox itself */
-    constructor(private listBox: ListBox, content: string, public payload: any, public isSelectedFunc: (row: ListBoxRow) => boolean) {
+    constructor(private listBox: ListBox = null, content: string = null, public payload: any = null, public isSelectedFunc: (row: ListBoxRow) => boolean = null) {
         super(content, {
             className: "list-group-item list-group-item-action listBoxRow",
         });
@@ -25,10 +25,12 @@ export class ListBoxRow extends Div {
     }
 
     onClick() {
-        this.listBox.rowClick(this);
+        if (this.listBox) {
+            this.listBox.rowClick(this);
+        }
     }
 
     preRender(): void {
-        this.attribs.className = "list-group-item list-group-item-action listBoxRow" + (this.isSelectedFunc(this) ? " selectedListItem" : "");
+        this.attribs.className = "list-group-item list-group-item-action listBoxRow" + ((this.isSelectedFunc && this.isSelectedFunc(this)) ? " selectedListItem" : "");
     }
 }
