@@ -132,7 +132,6 @@ export class EditNodeDlg extends DialogBase {
             }));
         }
 
-        debugger;
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass(state.node);

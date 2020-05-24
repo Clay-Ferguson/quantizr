@@ -808,7 +808,10 @@ export class Util implements UtilIntf {
     }
 
     /* Note: There is also Object.keys(obj).length, which computes internally an entire array, as part of processing
-    so it's debatable wether the overhead of that is better for large objects */
+    so it's debatable wether the overhead of that is better for large objects 
+    
+    NOTE: Can I use Object.getOwnPropertyNames(obj), instead of this iterator ? todo-0
+    */
     getPropertyCount = (obj: Object): number => {
         if (!obj) return 0;
         let count = 0;
@@ -858,6 +861,8 @@ export class Util implements UtilIntf {
     /* Iterates by callling callback with property key/value pairs for each property in the object 
     
     check to see if tyescript has a better native way to iterate 'hasOwn' properties
+    
+    NOTE: Can I use Object.getOwnPropertyNames(obj), instead of this iterator ? todo-0
     */
     forEachProp = (obj: Object, callback: I.PropertyIterator): void => {
         if (!obj) return;

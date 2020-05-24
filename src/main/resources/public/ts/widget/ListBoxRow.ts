@@ -11,31 +11,24 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ListBoxRow extends Div {
 
-    /* Each listbox row has a reference to its parent (containing) list box, and needs to ineract with it to coordinate selected items. */
-    listBox: ListBox;
-
-    constructor(content: string, private onClickCallback: Function, public selected: boolean) {
+    /* The isSelectedFunc is a way of delegating the state holding which row is selected to to the parent ListBox itself */
+    constructor(private listBox: ListBox, content: string, public payload: any, public isSelectedFunc: (row: ListBoxRow) => boolean) {
         super(content, {
             className: "list-group-item list-group-item-action listBoxRow",
         });
 
+        // todo-0: possibly could do 'auto-wrapping' using something like this:
+        // getMethods = (obj) => Object.getOwnPropertyNames(obj).filter(item => typeof obj[item] === 'function')
+        // in a utility method that binds all methods automatically to 'this' if they start with an understore.
+        this.onClick = this.onClick.bind(this);
         this.attribs.onClick = this.onClick;
     }
 
-    onClick = () => {
-        if (this.listBox) {
-            this.listBox.rowClickNotify(this);
-        }
-        if (this.onClickCallback) {
-            this.onClickCallback();
-        }
-    }
-
-    setListBox(listBox: ListBox) {
-        this.listBox = listBox;
+    onClick() {
+        this.listBox.rowClick(this);
     }
 
     preRender(): void {
-        this.attribs.className = "list-group-item list-group-item-action listBoxRow" + (this.selected ? " selectedListItem" : "");
+        this.attribs.className = "list-group-item list-group-item-action listBoxRow" + (this.isSelectedFunc(this) ? " selectedListItem" : "");
     }
 }

@@ -14,22 +14,23 @@ export class ListBox extends Div {
     constructor() {
         super();
         this.setClass("list-group marginBottom");
-        this.mergeState({ selectedRowId: null });
+        this.mergeState({ selectedPayload: null });
+
+        this.rowClick = this.rowClick.bind(this);
+        this.isSelectedFunc = this.isSelectedFunc.bind(this);
     }
 
-    rowClickNotify = (row: ListBoxRow): void => {
+    rowClick(row: ListBoxRow): void {
+        //console.log("Merging state. selId=" + row.getId());
         this.mergeState({
-            selectedRowId: row.getId()
-        })
+            selectedPayload: row.payload
+        });
     }
 
-    preRender(): void {
+    isSelectedFunc(row: ListBoxRow): boolean {
         let state = this.getState();
-        this.children.forEach(function (row: ListBoxRow) {
-            if (row) {
-                row.selected = state.selectedRowId==row.getId();
-                row.setListBox(this);
-            }
-        }, this);
+        let ret = state.selectedPayload == row.payload;
+        //console.log("isSelectedFunc: state.selectedPayload=" + state.selectedPayload + " row.id=[" + row.getId() + "] =" + ret);
+        return ret;
     }
 }

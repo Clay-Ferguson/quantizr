@@ -1,9 +1,9 @@
-import { ListBoxRow } from "./ListBoxRow";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { ListBox } from "./ListBox";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
+import { NodeTypeListBoxRow } from "./NodeTypeListBoxRow";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -11,19 +11,21 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class NodeTypeListBox extends ListBox {
-    selType: string = "u";
 
     constructor(defaultSel: string, allowFileSysCreate: boolean) {
         super();
 
+        this.mergeState({ selectedPayload: defaultSel });
+
         //First load the non-type (generic) type.
-        let children = [new ListBoxRow("Text/Markdown", () => { this.selType = "u"; }, true)];
+        //todo-0: I think it would be better if EVEN markdown had a TypeHandler even if it's default and doesn't show an icon
+        let children = [new NodeTypeListBoxRow(this, "Text/Markdown", "u", this.isSelectedFunc)];
 
         //Then load all the types from all the actual TypeHandlers.
         let typeHandlers = S.plugin.getAllTypeHandlers();
         S.util.forEachProp(typeHandlers, (k, typeHandler: TypeHandlerIntf): boolean => {
             if (typeHandler.getAllowUserSelect()) {
-                children.push(new ListBoxRow(typeHandler.getName(), () => { this.selType = typeHandler.getTypeName(); }, false));
+                children.push(new NodeTypeListBoxRow(this, typeHandler.getName(), typeHandler.getTypeName(), this.isSelectedFunc));
             }
             return true;
         });

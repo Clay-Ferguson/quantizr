@@ -10,7 +10,6 @@ import * as ReactDOM from "react-dom";
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { ReactNode, ReactElement, useState, useEffect, useLayoutEffect } from "react";
 import { Provider } from 'react-redux';
-import React from "react";
 import { AppState } from "../../AppState";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -31,9 +30,10 @@ export abstract class Comp implements CompIntf {
     static renderCounter: number = 0;
     public rendered: boolean = false;
     public debug: boolean = false;
+    public debugState: boolean = false;
     private static guid: number = 0;
 
-    //todo-1: make this private?
+    //todo-0: make this private? I think private is better, because accidental uses of 'this.state' can be wrong.
     public state: any = {};
     attribs: any;
 
@@ -301,6 +301,9 @@ export abstract class Comp implements CompIntf {
     mergeState(moreState: any): any {
         this.setStateEx((state: any) => {
             this.state = { ...state, ...moreState };
+            if (this.debugState) {
+                console.log("mergeState final[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.state));
+            }
             return this.state;
         });
     }
@@ -330,12 +333,15 @@ export abstract class Comp implements CompIntf {
         if (!state) {
             state = {};
         }
-        //console.log("setState[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(state));
         if (typeof state == "function") {
             this.state = state(this.state);
         }
         else {
             this.state = state;
+        }
+
+        if (this.debugState) {
+            console.log("setStateEx[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.state));
         }
     }
 
