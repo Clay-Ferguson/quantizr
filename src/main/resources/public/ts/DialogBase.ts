@@ -48,7 +48,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         return new Promise<DialogBase>((resolve, reject) => {
 
             // Create dialog container and attach to document.body.
-            this.backdrop = document.createElement('div');
+            this.backdrop = document.createElement("div");
             this.backdrop.setAttribute("id", DialogBase.BACKDROP_PREFIX + this.getId());
 
             // WARNING: Don't use 'className' here, this is pure javascript.

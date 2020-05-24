@@ -17,6 +17,6 @@ export class Label extends Comp {
 
     compRender(): ReactNode {
         this.state.content = this.content;
-        return this.tagRender('label', this.state.content, this.attribs);
+        return this.tagRender("label", this.state.content, this.attribs);
     }
 }

@@ -34,7 +34,7 @@ public class DeadlockDetectorTest {
 				Thread.currentThread().setName("T1");
 				log.debug("Thread T1 Started.");
 
-				// Thread 1 gets lock 'a'
+				// Thread 1 gets lock "a"
 				a.lockEx();
 				System.out.println("T1: Lock a entered. And sleeping 3 seconds.");
 				delay(3000);

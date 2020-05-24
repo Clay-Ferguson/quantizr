@@ -31,7 +31,7 @@ export class MenuItem extends Div {
         let enablement = state.enabled ? {} : { disabled: "disabled" };
         let enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
 
-        return this.tagRender('div', state.content,
+        return this.tagRender("div", state.content,
             { ...this.attribs, ...enablement, ...{ style: _style, className: "list-group-item list-group-item-action " + enablementClass } }
         );
     }

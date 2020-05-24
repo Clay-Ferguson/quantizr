@@ -28,11 +28,11 @@ export class CollapsiblePanel extends Comp {
         let innerStyle = this.textLink ? "file-link" : "";
         let collapseClass = this.getState().expanded ? "expand" : "collapse";
 
-        return S.e('div', {
+        return S.e("div", {
             style: { marginTop: "10px", marginBottom: "10px" },
             key: "div_" + this.getId()
         },//
-            S.e('a', {
+            S.e("a", {
                 href: "#" + this.getId(),
                 className: style+" "+this.extraToggleButtonClass,
                 //Warning: This can't be camel case!
@@ -41,12 +41,12 @@ export class CollapsiblePanel extends Comp {
                 key: "div_a_" + this.getId(),
                 onClick: this._onToggle
             }, //
-                S.e('span', {
+                S.e("span", {
                     className: innerStyle,
                     key: "div_a_div_" + this.getId()
                 }, this.buttonText),
             ),
-            S.e('div', {
+            S.e("div", {
                 id: this.getId(),
                 className: collapseClass,
                 key: "div_div_d" + this.getId()

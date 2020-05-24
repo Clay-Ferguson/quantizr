@@ -22,11 +22,10 @@ export class Menu extends Div {
                 new Div(name, {
                     className: "card-header menuHeading mb-0",
                     "data-toggle": "collapse",
-                    "href": "#collapse" + this.getId(),
+                    href: "#collapse" + this.getId(),
                     role: "tab",
                     id: "heading" + this.getId()
-                }  
-                ),
+                }),
 
                 new Div(null, {
                     id: "collapse" + this.getId(),
@@ -63,6 +62,6 @@ export class Menu extends Div {
         let _style = { display: (state.visible && !state.disabled ? '' : 'none') };
         let _attribs = { ...this.attribs, ...{ style: _style } };
 
-        return this.tagRender('div', state.content, _attribs);
+        return this.tagRender("div", state.content, _attribs);
     }
 }

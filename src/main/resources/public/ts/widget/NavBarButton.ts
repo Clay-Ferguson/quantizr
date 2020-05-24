@@ -26,7 +26,7 @@ export class NavBarButton extends Comp {
         let _style = { display: (state.visible && !state.disabled ? '' : 'none') };
         let _attribs = { ...this.attribs, ...{ style: _style } };
 
-        return S.e('button', _attribs,
+        return S.e("button", _attribs,
             S.e("i", {
                 key: "s_"+this.getId(),
                 className: "fa fa-lg button-font",

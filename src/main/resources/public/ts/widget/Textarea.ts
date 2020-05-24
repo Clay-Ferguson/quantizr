@@ -60,7 +60,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         let children = [];
 
         if (this.label) {
-            children.push(S.e('label', {
+            children.push(S.e("label", {
                 id: this.getId() + "_label",
                 key: this.getId() + "_label",
                 htmlFor: this.getId()
@@ -76,7 +76,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         }
 
         children.push(S.e('textarea', _attribs, _attribs.value));
-        return S.e('div', {
+        return S.e("div", {
             id: this.getId() + "_textfield",
             key: this.getId() + "_textfield",
         }, children);

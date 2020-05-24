@@ -23,7 +23,7 @@ export class AudioPlayer extends Comp {
     }
     
     compRender(): ReactNode {
-        let elm = S.e('audio', this.attribs);
+        let elm = S.e("audio", this.attribs);
         return elm;
     }
 }

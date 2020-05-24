@@ -34,7 +34,7 @@ export class ToggleIcon extends Comp {
     compRender(): ReactNode {
         let state = this.getState();
         this.attribs.className = state.className + " " + (state.toggle ? this.toggleOnClass : this.toggleOffClass);
-        /* Yes Icon used 'i' tag, this is not a mistake */
-        return S.e('i', this.attribs);
+        /* Yes Icon used "i" tag, this is not a mistake */
+        return S.e("i", this.attribs);
     }
 }

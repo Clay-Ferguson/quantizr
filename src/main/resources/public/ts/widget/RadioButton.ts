@@ -71,11 +71,11 @@ export class RadioButton extends Comp {
         // });
 
         if (this.label) {
-            return S.e('span', { key: this.attribs.id + "_span" }, 
-            S.e('input', this.attribs), S.e('label', { key: this.attribs.id + "_label", htmlFor: this.attribs.id }, this.label));
+            return S.e("span", { key: this.attribs.id + "_span" }, 
+            S.e("input", this.attribs), S.e("label", { key: this.attribs.id + "_label", htmlFor: this.attribs.id }, this.label));
         }
         else {
-            return S.e('span', { key: this.attribs.id + "_span" }, S.e('input', this.attribs));
+            return S.e("span", { key: this.attribs.id + "_span" }, S.e("input", this.attribs));
         }
     }
 }

@@ -39,15 +39,15 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         let _attribs = this.attribs; //todo-1: remove unnecessary varible.
 
         if (this.label) {
-            return S.e('span', { key: _attribs.id + "_span" }, S.e('input', _attribs), 
-            S.e('label', { 
+            return S.e("span", { key: _attribs.id + "_span" }, S.e("input", _attribs), 
+            S.e("label", { 
                 key: _attribs.id + "_label", 
                 className: "checkbox-label",
                 htmlFor: _attribs.id 
             }, this.label));
         }
         else {
-            return S.e('span', { key: _attribs.id + "_span" }, S.e('input', _attribs));
+            return S.e("span", { key: _attribs.id + "_span" }, S.e("input", _attribs));
         }
     }
 }

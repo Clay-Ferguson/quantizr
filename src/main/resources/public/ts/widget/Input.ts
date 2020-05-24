@@ -37,6 +37,6 @@ export class Input extends Comp {
         let state = this.getState();
         this.attribs.value = state.value;
         this.attribs.type = state.type;
-        return S.e('input', this.attribs);
+        return S.e("input", this.attribs);
     }
 }

@@ -43,8 +43,8 @@ export class MainNavPanel extends NavTag {
             className: "nav-item"
         }, [
             new NavBarIconButton("fa-clipboard", null, {
-                "onClick": e => { S.edit.saveClipboardToNode(); },
-                "title": "Save Clipboard text to a Note"
+                onClick: e => { S.edit.saveClipboardToNode(); },
+                title: "Save Clipboard text to a Note"
             },
                 //isEnabled func
                 () => { return state.isAdminUser /* !S.meta64.isAnonUser */ },
@@ -58,8 +58,8 @@ export class MainNavPanel extends NavTag {
                 className: "nav-item"
             }, [
                 new NavBarIconButton("fa-database", null, {
-                    "onClick": e => { S.nav.navHome(state); },
-                    "title": "Go to Your Root Node"
+                    onClick: e => { S.nav.navHome(state); },
+                    title: "Go to Your Root Node"
                 },
                     //isEnabled func
                     () => { return !state.isAnonUser; },
@@ -71,8 +71,8 @@ export class MainNavPanel extends NavTag {
                 className: "nav-item"
             }, [
                 new NavBarIconButton("fa-home", null, {
-                    "onClick": e => { S.meta64.loadAnonPageHome(state); },
-                    "title": "Go to Portal Root Node"
+                    onClick: e => { S.meta64.loadAnonPageHome(state); },
+                    title: "Go to Portal Root Node"
                 })
             ]));
 
@@ -80,8 +80,8 @@ export class MainNavPanel extends NavTag {
                 className: "nav-item"
             }, [
                 new NavBarIconButton("fa-gear", null, {
-                    "onClick": e => { S.edit.editPreferences(state); },
-                    "title": "Edit your Account Preferences"
+                    onClick: e => { S.edit.editPreferences(state); },
+                    title: "Edit your Account Preferences"
                 },
                     //isEnabled func
                     () => { return !state.isAnonUser; },
@@ -93,8 +93,8 @@ export class MainNavPanel extends NavTag {
                 className: "nav-item"
             }, [
                 new NavBarIconButton("fa-pencil", null, {
-                    "onClick": e => { S.edit.toggleEditMode(state); },
-                    "title": "Toggle Edit Mode on/off"
+                    onClick: e => { S.edit.toggleEditMode(state); },
+                    title: "Toggle Edit Mode on/off"
                 },
                     //isEnabled func
                     () => { return allowEditMode; },
@@ -107,8 +107,8 @@ export class MainNavPanel extends NavTag {
                 className: "nav-item"
             }, [
                 new NavBarButton("Signup", {
-                    "onClick": e => { S.nav.signup(state); },
-                    "title": "Create new Quantizr Account"
+                    onClick: e => { S.nav.signup(state); },
+                    title: "Create new Quantizr Account"
                 },
                     //isEnabled func
                     () => { return state.isAnonUser; },
@@ -122,8 +122,8 @@ export class MainNavPanel extends NavTag {
             className: "nav-item"
         }, [
             new NavBarIconButton("fa-sign-in", "Login", {
-                "onClick": e => { S.nav.login(state); },
-                "title": "Login to Quantizr"
+                onClick: e => { S.nav.login(state); },
+                title: "Login to Quantizr"
             },
                 //isEnabled func
                 () => { return state.isAnonUser; },
@@ -136,8 +136,8 @@ export class MainNavPanel extends NavTag {
             className: "nav-item"
         }, [
             new NavBarIconButton("fa-sign-out", null, {
-                "onClick": e => { S.nav.logout(state); },
-                "title": "Logout"
+                onClick: e => { S.nav.logout(state); },
+                title: "Logout"
             },
                 //isEnabled func
                 () => { return !state.isAnonUser; },
@@ -165,11 +165,11 @@ export class MainNavPanel extends NavTag {
                     className: "nav-item"
                 }, [
                     new NavBarIconButton("fa-bars", "Quantizr", {
-                        "onClick": e => {
+                        onClick: e => {
                             S.nav.showMainMenu(state);
                         },
-                        "id": "mainMenu",
-                        "title": "Show Main Menu"
+                        id: "mainMenu",
+                        title: "Show Main Menu"
                     })
                 ]),
             ]),
@@ -180,7 +180,7 @@ export class MainNavPanel extends NavTag {
 
             new ButtonTag(null, {
                 className: "navbar-toggler",
-                "type": "button",
+                type: "button",
                 "data-toggle": "collapse",
                 "data-target": "#navbarsMainNav",
                 "aria-controls": "navbarsMainNav",
@@ -190,7 +190,7 @@ export class MainNavPanel extends NavTag {
 
             new Div(null, {
                 className: "collapse navbar-collapse",
-                "id": "navbarsMainNav"
+                id: "navbarsMainNav"
             }, [
                 //I don't need any left-justified navbar items for now, but also without this "mr-auto" empty navbar-nav
                 //element here also the right justified ones won't even work and all get force to left.
@@ -206,7 +206,7 @@ export class MainNavPanel extends NavTag {
             ])
         ]);
 
-        return this.tagRender('nav', this.content, this.attribs);
+        return this.tagRender("nav", this.content, this.attribs);
     }
 
     domAddEvent(): void {

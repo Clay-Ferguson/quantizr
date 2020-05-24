@@ -24,12 +24,12 @@ export class NavBarIconButton extends Comp {
         let _style = { display: (state.visible && !state.disabled ? '' : 'none') };
         let _attribs = { ...this.attribs, ...{ style: _style } };
 
-        return S.e('button', _attribs,
+        return S.e("button", _attribs,
             S.e("i", {
                 key: "i_" + this.getId(),
                 className: "fa fa-lg " + this.iconClass,
             }, [
-                S.e('span', {
+                S.e("span", {
                     key: "s_" + this.getId(),
                     className: 'button-font'
                 }, this.text == null ? null : " " + this.text)

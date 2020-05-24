@@ -18,10 +18,10 @@ export class ButtonTag extends Comp {
 
     /* Div element is a special case where it renders just its children if there are any, and if not it renders 'content' 
     
-    todo-0: inside widget or all 'ts' files replace 'button', 'span', 'div', etc with double quote strings
+    todo-0: inside widget or all 'ts' files replace "button", "span", "div", etc with double quote strings
     */
     compRender(): ReactNode {
-        return S.e('button', this.attribs, S.e('span', {
+        return S.e("button", this.attribs, S.e("span", {
             key: "s_" + this.getId(),
             className: "navbar-toggler-icon"
         }));
