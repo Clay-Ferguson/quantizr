@@ -14,9 +14,6 @@ export class FormGroup extends Div {
     constructor(attribs: Object = null, public initialChildren: Comp[] = null) {
         super(null, attribs);
         this.attribs.className = "form-group";
-    }
-
-    preRender = (): void => {
         this.setChildren(this.initialChildren);
     }
 }
