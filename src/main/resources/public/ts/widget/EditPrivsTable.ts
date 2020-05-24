@@ -1,20 +1,19 @@
-import { Comp } from "./base/Comp";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { ReactNode } from "react";
 import * as I from "../Interfaces";
 import { EditPrivsTableRow } from "./EditPrivsTableRow";
+import { Div } from "./Div";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class EditPrivsTable extends Comp {
+export class EditPrivsTable extends Div {
 
     constructor(nodePrivsInfo: I.NodePrivilegesInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
-        super({});
+        super();
         this.mergeState(nodePrivsInfo);
 
         //let width = window.innerWidth * 0.6;
@@ -23,7 +22,7 @@ export class EditPrivsTable extends Comp {
         this.setClass("list-group marginBottom");
     }
 
-    compRender(): ReactNode {
+    preRender(): void {
         this.children = [];
 
         let nodePrivsInfo: I.NodePrivilegesInfo = this.getState();
@@ -34,6 +33,5 @@ export class EditPrivsTable extends Comp {
                 this.addChild(new EditPrivsTableRow(aclEntry, this.removePrivilege));
             }, this);
         }
-        return this.tagRender('div', null, this.attribs);
     }
 }

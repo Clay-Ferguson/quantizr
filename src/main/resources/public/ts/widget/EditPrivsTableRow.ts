@@ -1,4 +1,3 @@
-import { Comp } from "./base/Comp";
 import * as J from "../JavaIntf";
 import { Div } from "./Div";
 import { Button } from "./Button";
@@ -7,7 +6,6 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Heading } from "./Heading";
-import { ReactNode } from "react";
 import { ButtonBar } from "./ButtonBar";
 
 let S: Singletons;
@@ -16,10 +14,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 //todo-0: can ListBoxRow be a base class for this?
-export class EditPrivsTableRow extends Comp {
+export class EditPrivsTableRow extends Div {
 
     constructor(public aclEntry: J.AccessControlInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
-        super(null);
+        super();
         this.setClass("list-group-item list-group-item-action");
     }
 
@@ -36,13 +34,10 @@ export class EditPrivsTableRow extends Comp {
         return div;
     }
 
-    compRender(): ReactNode {
-
+    preRender(): void {
         this.setChildren([
             new Heading(4, "User: " + this.aclEntry.principalName),
             this.renderAclPrivileges(this.aclEntry)
         ]);
-
-        return this.tagRender('div', null, this.attribs);
     }
 }

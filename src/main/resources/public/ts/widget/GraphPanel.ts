@@ -1,10 +1,9 @@
-import { Comp } from "./base/Comp";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 
 import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
-import { ReactNode } from "react";
+import { Div } from "./Div";
 
 // https://github.com/visjs/vis-network
 //      npm install vis-network
@@ -14,13 +13,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class GraphPanel extends Comp {
+export class GraphPanel extends Div {
 
     network: Network;
 
     constructor() {
-        super({ style: { width: "100%", height: "600px", border: "1px solid gray" } });
-        this.init();
+        super(null, { style: { width: "100%", height: "600px", border: "1px solid gray" } });
     }
 
     init(): void {
@@ -66,9 +64,8 @@ export class GraphPanel extends Comp {
         });
     }
 
-    compRender(): ReactNode {
+    preRender(): void {
         this.init();
-        return this.tagRender('div', "", this.attribs);
     }
 }
 

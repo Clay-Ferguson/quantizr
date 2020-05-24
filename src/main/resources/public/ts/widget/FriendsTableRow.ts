@@ -1,11 +1,9 @@
-import { Comp } from "./base/Comp";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Heading } from "./Heading";
-import { ReactNode } from "react";
-import { ButtonBar } from "./ButtonBar";
 import { FriendInfo } from "../JavaIntf";
+import { Div } from "./Div";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -13,18 +11,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 //todo-0: can ListBoxRow be a base class for this?
-export class FriendsTableRow extends Comp {
+export class FriendsTableRow extends Div {
 
     constructor(public friend: FriendInfo) {
-        super(null);
+        super();
         this.setClass("list-group-item list-group-item-action");
     }
 
-    compRender(): ReactNode {
+    preRender(): void {
         this.setChildren([
             new Heading(4, this.friend.userName),
         ]);
-
-        return this.tagRender('div', null, this.attribs);
     }
 }

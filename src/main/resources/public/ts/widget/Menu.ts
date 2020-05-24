@@ -56,6 +56,7 @@ export class Menu extends Div {
         this.setIsVisibleFunc(isVisibleFunc);
     }
 
+    /* todo-0: look at this again. This function has an ugly look to it */
     compRender(): ReactNode {
         let state = this.getState();
         //console.log("compRender " + this.jsClassName + " state to visible=" + state.visible);

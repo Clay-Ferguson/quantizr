@@ -127,7 +127,7 @@ export class EditNodeDlg extends DialogBase {
 
         if (S.props.isEncrypted(state.node)) {
             comps.push(new Icon({
-                "style": { marginLeft: '12px', verticalAlign: 'middle' },
+                style: { marginLeft: '12px', verticalAlign: 'middle' },
                 className: "fa fa-lock fa-lg"
             }));
         }
@@ -138,7 +138,7 @@ export class EditNodeDlg extends DialogBase {
             let iconClass = typeHandler.getIconClass(state.node);
             if (iconClass) {
                 comps.push(new Icon({
-                    "style": { marginLeft: '12px', verticalAlign: 'middle' },
+                    style: { marginLeft: '12px', verticalAlign: 'middle' },
                     className: iconClass
                 }));
             }
@@ -511,7 +511,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makePropEditor = (propEntry: J.PropertyInfo): EditPropsTableRow => {
-        let tableRow = new EditPropsTableRow({});
+        let tableRow = new EditPropsTableRow();
         let allowEditAllProps: boolean = this.appState.isAdminUser;
         //console.log("Property single-type: " + propEntry.property.name);
 
@@ -530,9 +530,9 @@ export class EditNodeDlg extends DialogBase {
         //and be better with a Textfield based editor
         if (!allowEditAllProps && isReadOnly) {
             let textarea = new Textarea(label + " (read-only)", {
-                "readOnly": "readOnly",
-                "disabled": "disabled",
-                "defaultValue": propValStr
+                readOnly: "readOnly",
+                disabled: "disabled",
+                defaultValue: propValStr
             });
 
             formGroup.addChild(textarea);
@@ -683,8 +683,4 @@ export class EditNodeDlg extends DialogBase {
     cancelEdit = (): void => {
         this.close();
     }
-
-    // rebuildDlg = (): void => {
-    //     this.domRender();
-    // }
 }

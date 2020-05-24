@@ -1,19 +1,18 @@
-import { Comp } from "./base/Comp";
 import { ListBoxRow } from "./ListBoxRow";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
-import { ReactNode } from "react";
+import { Div } from "./Div";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class ListBox extends Comp {
+export class ListBox extends Div {
 
     constructor() {
-        super(null);
+        super();
         this.setClass("list-group marginBottom");
         this.mergeState({ selectedRowId: null });
     }
@@ -24,7 +23,7 @@ export class ListBox extends Comp {
         })
     }
 
-    compRender(): ReactNode {
+    preRender(): void {
         let state = this.getState();
         this.children.forEach(function (row: ListBoxRow) {
             if (row) {
@@ -32,7 +31,5 @@ export class ListBox extends Comp {
                 row.setListBox(this);
             }
         }, this);
-
-        return this.tagRender('div', null, this.attribs);
     }
 }

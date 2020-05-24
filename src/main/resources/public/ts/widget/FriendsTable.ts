@@ -1,8 +1,6 @@
-import { Comp } from "./base/Comp";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { ReactNode } from "react";
 import { FriendInfo } from "../JavaIntf";
 import { Div } from "./Div";
 import { FriendsTableRow } from "./FriendsTableRow";
@@ -12,7 +10,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class FriendsTable extends Comp {
+export class FriendsTable extends Div {
 
     constructor(private friends: FriendInfo[]) {
         super();
@@ -20,7 +18,7 @@ export class FriendsTable extends Comp {
         this.setClass("list-group marginBottom");
     }
 
-    compRender(): ReactNode {
+    preRender(): void {
         this.children = [];
 
         let friends: FriendInfo[] = this.getState().friends;
@@ -31,6 +29,5 @@ export class FriendsTable extends Comp {
                 this.addChild(new FriendsTableRow(friend));
             }, this);
         }
-        return this.tagRender('div', null, this.attribs);
     }
 }

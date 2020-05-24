@@ -390,7 +390,7 @@ export class Meta64 implements Meta64Intf {
             this.deviceHeight = window.innerHeight;
 
             //This is the root react App component that contains the entire application
-            this.app = new App(); // AppDemo(); 
+            this.app = new App(); //AppDemo(); 
             this.app.updateDOM(store, "app");
 
             /*
