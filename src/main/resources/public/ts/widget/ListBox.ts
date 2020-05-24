@@ -21,7 +21,7 @@ export class ListBox extends Div {
     }
 
     rowClick(row: ListBoxRow): void {
-        //console.log("Merging state. selId=" + row.getId());
+        //console.log("Merging state with selectedPayload="+row.payload);
         this.mergeState({
             selectedPayload: row.payload
         });
@@ -30,7 +30,7 @@ export class ListBox extends Div {
     isSelectedFunc(row: ListBoxRow): boolean {
         let state = this.getState();
         let ret = state.selectedPayload == row.payload;
-        //console.log("isSelectedFunc: state.selectedPayload=" + state.selectedPayload + " row.id=[" + row.getId() + "] =" + ret);
+        //console.log("isSelectedFunc: state.selectedPayload=" + state.selectedPayload + " row.id=[" + row.getId() + "] SELECTED=" + ret);
         return ret;
     }
 }

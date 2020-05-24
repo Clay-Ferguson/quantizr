@@ -1,21 +1,23 @@
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { FriendInfo } from "../JavaIntf";
-import { Div } from "./Div";
 import { FriendsTableRow } from "./FriendsTableRow";
+import { ListBox } from "./ListBox";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class FriendsTable extends Div {
+export class FriendsTable extends ListBox {
 
     constructor(private friends: FriendInfo[]) {
         super();
-        this.mergeState(friends);
-        this.setClass("list-group marginBottom");
+        this.mergeState({
+            selectedPayload: null,
+            friends
+        });
     }
 
     preRender(): void {
@@ -25,8 +27,8 @@ export class FriendsTable extends Div {
         //console.log("compRender[" + this.jsClassName + "] STATE: " + S.util.prettyPrint(nodePrivsInfo));
 
         if (friends) {
-            friends.forEach(function(friend) {
-                this.addChild(new FriendsTableRow(friend));
+            friends.forEach(function (friend) {
+                this.addChild(new FriendsTableRow(this, friend));
             }, this);
         }
     }

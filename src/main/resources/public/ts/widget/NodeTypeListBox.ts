@@ -19,6 +19,7 @@ export class NodeTypeListBox extends ListBox {
 
         //First load the non-type (generic) type.
         //todo-0: I think it would be better if EVEN markdown had a TypeHandler even if it's default and doesn't show an icon
+        //todo-0: no need to pass isSelectedFunc, since we pass the listbox already
         let children = [new NodeTypeListBoxRow(this, "Text/Markdown", "u", this.isSelectedFunc)];
 
         //Then load all the types from all the actual TypeHandlers.

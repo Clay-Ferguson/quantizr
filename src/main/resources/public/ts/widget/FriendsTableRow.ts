@@ -3,24 +3,24 @@ import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Heading } from "./Heading";
 import { FriendInfo } from "../JavaIntf";
-import { Div } from "./Div";
+import { ListBoxRow } from "./ListBoxRow";
+import { ListBox } from "./ListBox";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-//todo-0: can ListBoxRow be a base class for this?
-export class FriendsTableRow extends Div {
+export class FriendsTableRow extends ListBoxRow {
 
-    constructor(public friend: FriendInfo) {
-        super();
-        this.setClass("list-group-item list-group-item-action");
+    constructor(listBox: ListBox, public friend: FriendInfo) {
+        super(listBox, null, friend.userName, listBox.isSelectedFunc);
     }
 
     preRender(): void {
+        super.preRender();
         this.setChildren([
-            new Heading(4, this.friend.userName),
+            new Heading(5, this.friend.userName),
         ]);
     }
 }
