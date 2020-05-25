@@ -31,6 +31,8 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
 
+/* todo-0: data loss scenario. Create new node, type some text, then set type to plain (or whatever?), and it DELETES the text you just entered. oops */
+
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
@@ -46,7 +48,6 @@ export class EditNodeDlg extends DialogBase {
     //help: TextContent;
     propertyEditFieldContainer: Div;
 
-    preformattedCheckBox: Checkbox;
     wordWrapCheckBox: Checkbox;
     inlineChildrenCheckBox: Checkbox;
     saveNodeButton: Button;
@@ -121,6 +122,22 @@ export class EditNodeDlg extends DialogBase {
         return selection;
     }
 
+    getTitleIconComp(): CompIntf {
+        let state = this.getState();
+
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+        if (typeHandler) {
+            let iconClass = typeHandler.getIconClass(state.node);
+            if (iconClass) {
+                return new Icon({
+                    style: { marginRight: '12px', verticalAlign: 'middle' },
+                    className: iconClass
+                });
+            }
+        }
+        return null;
+    }
+
     getExtraTitleBarComps(): CompIntf[] {
         let state = this.getState();
         let comps: CompIntf[] = [];
@@ -132,16 +149,6 @@ export class EditNodeDlg extends DialogBase {
             }));
         }
 
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
-        if (typeHandler) {
-            let iconClass = typeHandler.getIconClass(state.node);
-            if (iconClass) {
-                comps.push(new Icon({
-                    style: { marginLeft: '12px', verticalAlign: 'middle' },
-                    className: iconClass
-                }));
-            }
-        }
         return comps;
     }
 
@@ -178,13 +185,6 @@ export class EditNodeDlg extends DialogBase {
         ];
 
         let optionsBar = new Div("", null, [
-            this.preformattedCheckBox = new Checkbox("Plain Text", false, {
-                onChange: (evt: any) => {
-                    if (this.contentEditor) {
-                        this.contentEditor.setMode(evt.target.checked ? "ace/mode/text" : "ace/mode/markdown");
-                    }
-                }
-            }),
             this.wordWrapCheckBox = new Checkbox("Word Wrap", true, {
                 onChange: (evt: any) => {
                     if (this.contentEditor) {
@@ -206,19 +206,8 @@ export class EditNodeDlg extends DialogBase {
         });
         let editPropsTable = new EditPropsTable();
 
-        let isPre = !!S.props.getNodePropVal(J.NodeProp.PRE, state.node);
         let isWordWrap = !S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node);
-
-        this.preformattedCheckBox.setChecked(isPre);
         this.wordWrapCheckBox.setChecked(isWordWrap);
-
-        /* If not preformatted text, then always turn on word-wrap because for now at least this means the content
-        will be in markdown mode, and we definitely want wordwrap on for markdown editing */
-        if (C.ENABLE_ACE_EDITOR) {
-            if (!isPre) {
-                isWordWrap = true;
-            }
-        }
 
         //todo-1: does it make sense for FormGroup to contain single fields, or multiple fields? This seems wrong to have a group with one in it.
         let nodeNameFormGroup = new FormGroup();
@@ -228,7 +217,7 @@ export class EditNodeDlg extends DialogBase {
         editPropsTable.addChild(nodeNameFormGroup);
 
         let content = state.node.content;
-        let contentTableRow = this.makeContentEditorFormGroup(state.node, isPre, isWordWrap);
+        let contentTableRow = this.makeContentEditorFormGroup(state.node, isWordWrap);
         editPropsTable.addChild(contentTableRow);
 
         this.contentEditor.setWordWrap(isWordWrap);
@@ -429,7 +418,6 @@ export class EditNodeDlg extends DialogBase {
             let allowEditAllProps: boolean = this.appState.isAdminUser;
 
             if (state.node) {
-                this.saveCheckboxVal(this.preformattedCheckBox, J.NodeProp.PRE);
                 if (this.inlineChildrenCheckBox) {
                     this.saveCheckboxVal(this.inlineChildrenCheckBox, J.NodeProp.INLINE_CHILDREN);
                 }
@@ -550,7 +538,7 @@ export class EditNodeDlg extends DialogBase {
 
             if (multiLine) {
                 if (C.ENABLE_ACE_EDITOR) {
-                    editor = new AceEditPropTextarea(propEntry.value, "25em", false, false);
+                    editor = new AceEditPropTextarea(propEntry.value, "25em", null, false);
                 }
                 else {
                     editor = new Textarea(null, {
@@ -573,7 +561,7 @@ export class EditNodeDlg extends DialogBase {
         return tableRow;
     }
 
-    makeContentEditorFormGroup = (node: J.NodeInfo, isPre: boolean, isWordWrap: boolean): FormGroup => {
+    makeContentEditorFormGroup = (node: J.NodeInfo, isWordWrap: boolean): FormGroup => {
         let value = node.content;
         let formGroup = new FormGroup();
         let encrypted = value.startsWith(J.Constant.ENC_TAG);
@@ -582,7 +570,8 @@ export class EditNodeDlg extends DialogBase {
         //console.log("making field editor for [" + propName + "] val[" + value + "]");
 
         if (C.ENABLE_ACE_EDITOR) {
-            this.contentEditor = new AceEditPropTextarea(encrypted ? "[encrypted]" : value, "25em", isPre, isWordWrap);
+            let aceMode = node.type == J.NodeType.PLAIN_TEXT ? "ace/mode/text" : "ace/mode/markdown";
+            this.contentEditor = new AceEditPropTextarea(encrypted ? "[encrypted]" : value, "25em", aceMode, isWordWrap);
 
             this.contentEditor.whenElm((elm: HTMLElement) => {
                 let timer = setInterval(() => {

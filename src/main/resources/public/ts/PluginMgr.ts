@@ -11,6 +11,8 @@ import { InboxNodeTypeHandler } from "./plugins/InboxNodeTypeHandler";
 import { NotesNodeTypeHandler } from "./plugins/NotesNodeTypeHandler";
 import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
 import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
+import { MarkdownTypeHandler } from "./plugins/MarkdownTypeHandler";
+import { TextTypeHandler } from "./plugins/TextTypeHandler";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -36,6 +38,10 @@ export class PluginMgr implements PluginMgrIntf {
 
     //todo-1: make it so that some plugins can be flagged as 'admin only' and not show up on the menu to pick them.
     initPlugins = (): void => {
+        /* We could have made each type base-class automatically register here, but they'd executed in nondeterminisitic order
+        so it's better to just have this one place where we define all them in the order we want */
+        this.addTypeHandler(new MarkdownTypeHandler());
+        this.addTypeHandler(new TextTypeHandler());
         this.addTypeHandler(new RssTypeHandler());
         this.addTypeHandler(new IPFSNodeTypeHandler());
         this.addTypeHandler(new RepoRootTypeHandler());

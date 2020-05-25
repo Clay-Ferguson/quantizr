@@ -242,7 +242,6 @@ export class Props implements PropsIntf {
         ]);
 
         S.util.addAll(this.controlBasedPropertyList, [ //
-            J.NodeProp.PRE, //
             J.NodeProp.INLINE_CHILDREN, //
             J.NodeProp.NOWRAP, //
             J.NodeProp.LAYOUT, //

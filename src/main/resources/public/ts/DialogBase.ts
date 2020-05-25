@@ -109,9 +109,13 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     }
 
     abstract renderDlg(): CompIntf[];
-    
+
     /* Can be overridden to customize content (normally icons) in title bar */
     getExtraTitleBarComps(): CompIntf[] {
+        return null;
+    }
+
+    getTitleIconComp(): CompIntf {
         return null;
     }
 
@@ -120,8 +124,14 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         //Dialog Header with close button (x) right justified on it.
         let children: CompIntf[] = [];
 
+        let titleIconComp: CompIntf = this.getTitleIconComp();
         let extraHeaderComps = this.getExtraTitleBarComps();
-        let titleChildren = extraHeaderComps ? extraHeaderComps : [];
+        let titleChildren: CompIntf[] = [titleIconComp, new Span(this.title)];
+
+        if (extraHeaderComps) {
+            titleChildren = titleChildren.concat(extraHeaderComps);
+        }
+
         titleChildren = titleChildren.concat(timesIcon = new Span("&times;", {
             className: "float-right app-modal-title-close-icon",
             onClick: this.close
@@ -129,7 +139,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
 
         //NOTE: title will be null for the main menu, which is actually implemented as a dialog using this base class.
         if (this.title) {
-            children.push(new Div(this.title, {
+            children.push(new Div(null, {
                 className: "app-modal-title"
             },
                 titleChildren

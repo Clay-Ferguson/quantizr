@@ -21,7 +21,6 @@ export class NodeCompContent extends Div {
 
     /* switches for performance testing. */
     static showRowHeader: boolean = true;
-    static renderMarkdown: boolean = true;
 
     constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix = "") {
         super(null, {
@@ -66,13 +65,9 @@ export class NodeCompContent extends Div {
             if (typeHandler) {
                 children.push(typeHandler.render(node, this.rowStyling, state));
             }
+            //note: this path is obsolete now. always will have a type.
             else {
-                if (NodeCompContent.renderMarkdown) {
-                    children.push(new NodeCompMarkdown(node));
-                }
-                else {
-                    children.push(new Div(node.content));
-                }
+                children.push(new NodeCompMarkdown(node));
             }
         }
 

@@ -12,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class NodeTypeListBoxRow extends ListBoxRow {
 
-    constructor(listBox: ListBox, content: string, payload: any, isSelectedFunc: (row: ListBoxRow) => boolean) {
-        super(listBox, content, payload, isSelectedFunc);
+    constructor(listBox: ListBox, content: string, payload: any) {
+        super(listBox, content, payload, listBox.isSelectedFunc);
     }
 }

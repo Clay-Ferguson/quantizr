@@ -16,9 +16,11 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
     aceEditor: any;
     initialValue: string;
 
-    constructor(value: string, public heightString, public plainText: boolean = false, public wordWrap: boolean = true) {
+    constructor(value: string, public heightString, public aceMode: string, public wordWrap: boolean = true) {
         //super(S.util.escapeHtml(propEntry.property.value), {});
         super(value, {});
+
+        this.aceMode = this.aceMode || "ace/mode/text";
 
         /* for safety, I'm setting this here redundantly, just to protect against me renaming this class someday and inadvertently breaking code. */
         this.clazz = "AceEditPropTextarea";
@@ -57,10 +59,15 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
             this.aceEditor.renderer.setShowGutter(false);
             this.aceEditor.setHighlightActiveLine(false);
 
-            let mode = plainText ? "ace/mode/text" : "ace/mode/markdown";
-            this.aceEditor.session.setMode(mode);
+            this.aceEditor.session.setMode(this.aceMode);
 
-            this.aceEditor.session.setUseWrapMode(wordWrap);
+            //always force word wrapping for markdown mode ??? maybe not, markdown can contain long code blocks sometimes, so
+            //leave this up to user???
+            if (this.aceMode == "ace/mode/markdown") {
+                this.wordWrap = true;
+            }
+
+            this.aceEditor.session.setUseWrapMode(this.wordWrap);
         });
     }
 

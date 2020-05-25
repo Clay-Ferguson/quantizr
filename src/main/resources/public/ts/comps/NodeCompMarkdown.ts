@@ -32,9 +32,7 @@ export class NodeCompMarkdown extends MarkdownDiv {
         let content = node.content || "";
         let val = "";
 
-        // Special case of a PRE-formatted node, we inject backticks to make it render all the content as preformatted markdown */
-        let preProp: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.PRE, node);
-        if (preProp && preProp.value == "1") {
+        if (node.type==J.NodeType.PLAIN_TEXT) {
 
             let nowrapProp: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.NOWRAP, node);
             let wordWrap = !(nowrapProp && nowrapProp.value == "1");

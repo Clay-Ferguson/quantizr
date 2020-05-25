@@ -17,9 +17,6 @@ export class ListBoxRow extends Div {
             className: "list-group-item list-group-item-action listBoxRow",
         });
 
-        // todo-0: possibly could do 'auto-wrapping' using something like this:
-        // getMethods = (obj) => Object.getOwnPropertyNames(obj).filter(item => typeof obj[item] === 'function')
-        // in a utility method that binds all methods automatically to 'this' if they start with an understore.
         this.onClick = this.onClick.bind(this);
         this.attribs.onClick = this.onClick;
     }
