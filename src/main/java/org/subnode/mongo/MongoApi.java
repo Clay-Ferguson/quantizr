@@ -1456,6 +1456,22 @@ public class MongoApi {
 		return ret;
 	}
 
+	/* Finds the first node matching 'type' under 'path' (non-recursively, direct children only) */
+	public SubNode findTypedNodeUnderPath(MongoSession session, String path, String type) {
+
+		// Other wise for ordinary users root is based off their username
+		Query query = new Query();
+		Criteria criteria = Criteria.where(//
+				SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(path))//
+				.and(SubNode.FIELD_TYPE).is(type);
+
+		query.addCriteria(criteria);
+		saveSession(session);
+		SubNode ret = ops.findOne(query, SubNode.class);
+		auth(session, ret, PrivilegeType.READ);
+		return ret;
+	}
+
 	/*
 	 * Returns one (or first) node contained directly under path (non-recursively)
 	 * that has a matching propName and propVal

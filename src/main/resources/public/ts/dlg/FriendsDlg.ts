@@ -17,6 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FriendsDlg extends DialogBase {
     friendsTable: FriendsTable;
+    selectedName: string;
     
     constructor(state: AppState) {
         super("Friends", "app-modal-content-medium-width", null, state);
@@ -28,7 +29,8 @@ export class FriendsDlg extends DialogBase {
                 this.friendsTable = new FriendsTable(null),
                 new ButtonBar([
                     new Button("Choose", () => {
-
+                        this.selectedName = this.friendsTable.getState().selectedPayload;
+                        this.close();
                     }, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();

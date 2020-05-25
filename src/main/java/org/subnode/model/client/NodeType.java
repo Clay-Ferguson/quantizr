@@ -11,6 +11,8 @@ public enum NodeType {
     NOTES("sn:notes"), //
     
     RSS_FEED("sn:rssfeed"), //
+    FRIEND_LIST("sn:friendList"), //
+    FRIEND("sn:friend"), //
 
     NONE("u"), //
     FS_FILE("fs:file"), //

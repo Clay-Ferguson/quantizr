@@ -36,9 +36,11 @@ export class ShareToPersonDlg extends DialogBase {
                         this.shareNodeToPerson();
                         this.close();
                     }, null, "btn-primary"),
-                    new Button("Choose from Friends", () => {
-                        this.chooseFriendDlg();
-                        //this.close();
+                    new Button("Choose from Friends", async () => {
+                        let friendsDlg: FriendsDlg = new FriendsDlg(this.appState);
+                        await friendsDlg.open();
+                        this.close();
+                        this.shareToPersonImmediate(friendsDlg.selectedName);
                     }, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
@@ -46,11 +48,6 @@ export class ShareToPersonDlg extends DialogBase {
                 ])
             ])
         ];
-    }
-
-    chooseFriendDlg = (): void => {
-        let friendsDlg: FriendsDlg = new FriendsDlg(this.appState);
-        friendsDlg.open();
     }
 
     shareNodeToPerson = (): void => {
@@ -66,9 +63,13 @@ export class ShareToPersonDlg extends DialogBase {
             return;
         }
 
+        this.shareToPersonImmediate(targetUser);
+    }
+
+    shareToPersonImmediate = (userName: string) => {
         S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
-            principal: targetUser,
+            principal: userName,
             privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE],
         }, this.reloadFromShareWithPerson);
     }

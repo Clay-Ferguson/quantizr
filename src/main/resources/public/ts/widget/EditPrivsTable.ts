@@ -3,7 +3,6 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import * as I from "../Interfaces";
 import { EditPrivsTableRow } from "./EditPrivsTableRow";
-import { Div } from "./Div";
 import { ListBox } from "./ListBox";
 
 let S: Singletons;

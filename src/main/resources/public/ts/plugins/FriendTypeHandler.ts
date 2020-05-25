@@ -12,6 +12,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class FriendTypeHandler extends TypeBase {
     constructor() {
         //todo-0: eventually this true will be false (not chooseable as a node type)
-        super(J.NodeType.INBOX, "Friend", "fa-user", true);
+        super(J.NodeType.FRIEND, "Friend", "fa-user", true);
     }
 }

@@ -181,11 +181,13 @@ public class UserManagerService {
 			return null;
 		}
 		SubNode userNode = api.getUserNodeByUserName(session, userName);
-		if (userNode == null) return null;
-		
+		if (userNode == null)
+			return null;
+
 		String ret = null;
 		Long lastLoginTime = sessionContext.getLastLoginTime();
-		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "### Inbox", NodeType.INBOX.s());
+		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "### Inbox",
+				NodeType.INBOX.s());
 
 		if (userInbox != null) {
 			SubNode inboxNode = api.getNewestChild(session, userInbox);
@@ -194,7 +196,8 @@ public class UserManagerService {
 				long inboxNodeTimeLong = inboxNode.getModifyTime().getTime();
 				if (inboxNodeTimeLong - lastLoginTime > 0) {
 					Date now = new Date();
-					ret = "Your inbox has new information, added " + DateUtil.formatDurationMillis(now.getTime() - inboxNodeTimeLong) +" ago."; 
+					ret = "Your inbox has new information, added "
+							+ DateUtil.formatDurationMillis(now.getTime() - inboxNodeTimeLong) + " ago.";
 				}
 			}
 		}
@@ -677,15 +680,24 @@ public class UserManagerService {
 
 		List<FriendInfo> friends = new LinkedList<FriendInfo>();
 
-		//todo-0: work in progress
-		for (int i=0; i < 10; i++) {
-			FriendInfo fi = new FriendInfo();
-			fi.setUserName("Name "+i);
-			friends.add(fi);
+		SubNode userNode = api.getUserNodeByUserName(session, null);
+		if (userNode == null)
+			return res;
+
+		SubNode friendsNode = api.findTypedNodeUnderPath(session, userNode.getPath(), NodeType.FRIEND_LIST.s());
+		if (friendsNode == null)
+			return res;
+
+		// todo-0: extract friends off this node.
+		for (SubNode friendNode : api.getChildren(session, friendsNode, null, null)) {
+				FriendInfo fi = new FriendInfo();
+				fi.setUserName(friendNode.getContent());
+				friends.add(fi);
 		}
 
 		res.setFriends(friends);
 		res.setSuccess(true);
+
 		return res;
 	}
 }
