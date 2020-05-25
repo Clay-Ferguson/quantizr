@@ -688,16 +688,14 @@ public class UserManagerService {
 		if (friendsNode == null)
 			return res;
 
-		// todo-0: extract friends off this node.
 		for (SubNode friendNode : api.getChildren(session, friendsNode, null, null)) {
-				FriendInfo fi = new FriendInfo();
-				fi.setUserName(friendNode.getContent());
-				friends.add(fi);
+			FriendInfo fi = new FriendInfo();
+			fi.setUserName(friendNode.getContent());
+			friends.add(fi);
 		}
 
 		res.setFriends(friends);
 		res.setSuccess(true);
-
 		return res;
 	}
 }

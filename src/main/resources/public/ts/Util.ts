@@ -808,21 +808,11 @@ export class Util implements UtilIntf {
     }
 
     /* Note: There is also Object.keys(obj).length, which computes internally an entire array, as part of processing
-    so it's debatable wether the overhead of that is better for large objects 
-    
-    NOTE: Can I use Object.getOwnPropertyNames(obj), instead of this iterator ? todo-0
-    */
+    so it's debatable wether the overhead of that is better for large objects */
     getPropertyCount = (obj: Object): number => {
         if (!obj) return 0;
-        let count = 0;
-        let prop;
-
-        for (prop in obj) {
-            if (obj.hasOwnProperty(prop)) {
-                count++;
-            }
-        }
-        return count;
+        let names: string[] = Object.getOwnPropertyNames(obj);
+        return names ? names.length : 0;
     }
 
     forEachElmBySel = (sel: string, callback: Function): void => {
@@ -859,18 +849,15 @@ export class Util implements UtilIntf {
     }
 
     /* Iterates by callling callback with property key/value pairs for each property in the object 
-    
-    check to see if tyescript has a better native way to iterate 'hasOwn' properties
-    
-    NOTE: Can I use Object.getOwnPropertyNames(obj), instead of this iterator ? todo-0
-    */
+    check to see if tyescript has a better native way to iterate 'hasOwn' properties */
     forEachProp = (obj: Object, callback: I.PropertyIterator): void => {
         if (!obj) return;
-        for (let prop in obj) {
-            if (obj.hasOwnProperty(prop)) {
+        let names: any[] = Object.getOwnPropertyNames(obj);
+        if (names) {
+            names.forEach(function (prop) {
                 /* we use the unusual '== false' here so that returning a value is optional, but if you return false it terminates looping */
                 if (callback(prop, obj[prop]) === false) return;
-            }
+            }, this);
         }
     }
 
