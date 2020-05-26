@@ -27,7 +27,7 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {
-        return state.isAdminUser;
+        return true;
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {

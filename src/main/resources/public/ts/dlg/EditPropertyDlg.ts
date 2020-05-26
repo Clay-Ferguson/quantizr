@@ -44,7 +44,7 @@ export class EditPropertyDlg extends DialogBase {
                 new Button("Cancel", () => {
                     this.close()
                 })
-            ])
+            ], null, "marginTop")
         ];
     }
 

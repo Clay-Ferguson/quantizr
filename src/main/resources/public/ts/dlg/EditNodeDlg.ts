@@ -309,7 +309,6 @@ export class EditNodeDlg extends DialogBase {
     addProperty = (): void => {
         let state = this.getState();
         (async () => {
-            /* always save existing node before opening new property dialog */
             let dlg = new EditPropertyDlg({
                 editNode: state.node,
                 propSavedFunc: () => {
@@ -626,6 +625,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     propertyCheckboxChanged = (): void => {
+        debugger;
         if (this.areAnyPropsChecked()) {
             this.deletePropButton.setEnabled(true);
         }

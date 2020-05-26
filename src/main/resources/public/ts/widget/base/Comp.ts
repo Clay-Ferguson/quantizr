@@ -143,14 +143,17 @@ export abstract class Comp implements CompIntf {
         }
     }
 
-    /* WARNING: this is NOT a setter for 'this.visible'. Perhaps i need to rename it for better clarity, it takes
-    this.visible as its input sometimes. Slightly confusing */
     setVisible(visible: boolean) {
+        if (this.isVisibleFunc) {
+            console.warn("component " + this.jsClassName + " called setVisible, when an isVisibleFunc is in effect. This is a bug.");
+        }
         this.mergeState({ visible });
     }
 
-    /* WARNING: this is NOT the setter for 'this.enabled' */
     setEnabled(enabled: boolean) {
+        if (this.isEnabledFunc) {
+            console.warn("component " + this.jsClassName + " called setEnabled, when an isEnabledFunc is in effect. This is a bug.");
+        }
         this.mergeState({ enabled });
     }
 
@@ -263,12 +266,32 @@ export abstract class Comp implements CompIntf {
         S.util.delayedFocus(this.getId());
     }
 
+    updateVisAndEnablement() {
+        //put this big mess in a fucntion
+        if (this.isEnabledFunc) {
+            this.state.enabled = this.isEnabledFunc();
+        }
+        else {
+            if (this.state.enabled === undefined) {
+                this.state.enabled = true;
+            }
+        }
+
+        if (this.isVisibleFunc) {
+            this.state.visible = this.isVisibleFunc();
+        }
+        else {
+            if (this.state.visible === undefined) {
+                this.state.visible = true;
+            }
+        }
+    }
+
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
     tagRender(tag: string, content: string, props: any) {
         //console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
 
-        this.state.enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
-        this.state.visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
+        this.updateVisAndEnablement();
 
         try {
             let children: any[] = this.buildChildren();
@@ -411,8 +434,7 @@ export abstract class Comp implements CompIntf {
             */
             //useEffect(this.domRemoveEventFunc, []);
 
-            this.state.enabled = this.isEnabledFunc ? this.isEnabledFunc() : true;
-            this.state.visible = this.isVisibleFunc ? this.isVisibleFunc() : true;
+            this.updateVisAndEnablement();
 
             // todo-1: something like this could encapsulate retting display, but currently isn't needed.
             // this.attribs.style = this.attribs.style || {};
