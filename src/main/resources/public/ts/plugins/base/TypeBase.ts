@@ -15,7 +15,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* NOTE: Defaults to only allowing 'admin' to edit unless allowPropertyEdit is overridden */
 export class TypeBase implements TypeHandlerIntf {
 
-    constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string, private allowUserSelect: boolean = true) {
+    constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string, private allowUserSelect: boolean) {
     }
 
     getTypeName(): string {
@@ -38,7 +38,7 @@ export class TypeBase implements TypeHandlerIntf {
         return _props;
     }
 
-    getIconClass(node: J.NodeInfo): string {
+    getIconClass(): string {
         //https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
         if (!this.iconStyle) return null;
         return "fa " + this.iconStyle + " fa-lg";

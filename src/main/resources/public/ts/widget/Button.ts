@@ -21,7 +21,7 @@ export class Button extends Comp {
 
         //console.log("Initial Button enabled=" + this.getState().enabled);
         this.attribs.onClick = callback;
-        this.state.text = text;
+        this.setText(text);
     }
 
     setText(text: string): void {

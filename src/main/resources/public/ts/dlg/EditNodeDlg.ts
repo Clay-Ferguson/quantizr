@@ -127,7 +127,7 @@ export class EditNodeDlg extends DialogBase {
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {
-            let iconClass = typeHandler.getIconClass(state.node);
+            let iconClass = typeHandler.getIconClass();
             if (iconClass) {
                 return new Icon({
                     style: { marginRight: '12px', verticalAlign: 'middle' },

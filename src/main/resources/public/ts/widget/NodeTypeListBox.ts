@@ -17,11 +17,10 @@ export class NodeTypeListBox extends ListBox {
         this.mergeState({ selectedPayload: defaultSel });
         let children = [];
 
-        //Then load all the types from all the actual TypeHandlers.
         let typeHandlers = S.plugin.getAllTypeHandlers();
         S.util.forEachProp(typeHandlers, (k, typeHandler: TypeHandlerIntf): boolean => {
             if (typeHandler.getAllowUserSelect()) {
-                children.push(new NodeTypeListBoxRow(this, typeHandler.getName(), typeHandler.getTypeName()));
+                children.push(new NodeTypeListBoxRow(this, typeHandler)); 
             }
             return true;
         });

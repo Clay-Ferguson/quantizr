@@ -95,7 +95,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         //todo-1: need to DRY up places where this code block is repeated
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
         if (typeHandler) {
-            let iconClass = typeHandler.getIconClass(node);
+            let iconClass = typeHandler.getIconClass();
             if (iconClass) {
                 typeIcon = new Icon({
                     className: iconClass + " rowIcon",

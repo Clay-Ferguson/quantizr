@@ -14,7 +14,8 @@ public enum NodeType {
     FRIEND_LIST("sn:friendList"), //
     FRIEND("sn:friend"), //
 
-    NONE("u"), //
+    NONE("u"), //same as 'markdown' really
+    PLAIN_TEXT("sn:txt"), //
     FS_FILE("fs:file"), //
     FS_FOLDER("fs:folder"), //
     FS_LUCENE("fs:lucene"), //

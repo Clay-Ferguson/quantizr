@@ -20,7 +20,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         if (!this.attribs.rows) {
             this.attribs.rows = "5";
         }
-        this.state.wordWrap = true;
+        this.setWordWrap(true);
     }
 
     insertTextAtCursor = (text: string) => {

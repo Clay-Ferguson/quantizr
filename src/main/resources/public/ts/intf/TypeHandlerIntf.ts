@@ -7,7 +7,7 @@ export interface TypeHandlerIntf {
     getTypeName(): string;
     getName(): string;
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp;
-    getIconClass(node : J.NodeInfo): string;
+    getIconClass(): string;
     allowAction(action : string): boolean;
     allowPropertyEdit(typeName: string, state: AppState): boolean;
     getAllowUserSelect();

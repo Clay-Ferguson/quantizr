@@ -580,7 +580,6 @@ export const enum NodeProp {
     BIN_DATA_URL = "sn:dataUrl",
     FILE_NAME = "sn:fileName",
     JSON_FILE_SEARCH_RESULT = "sn:json",
-    //PRE = "sn:pre",
     NOWRAP = "sn:nowrap",
     BIN_DATA = "sn:jcrData",
     BIN = "bin",

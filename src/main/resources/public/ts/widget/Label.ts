@@ -11,12 +11,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Label extends Comp {
 
-    constructor(public content: string = "", attribs: Object = {}) {
+    constructor(content: string = "", attribs: Object = {}) {
         super(attribs);
+        this.setText(content);
+    }
+
+    setText = (content: string) => {
+        this.mergeState({content});
     }
 
     compRender(): ReactNode {
-        this.state.content = this.content;
-        return this.tagRender("label", this.state.content, this.attribs);
+        return this.tagRender("label", this.getState().content, this.attribs);
     }
 }

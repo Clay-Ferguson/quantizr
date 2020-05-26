@@ -84,7 +84,6 @@ public enum NodeProp {
     FILE_NAME("sn:fileName", "s"),
 
     JSON_FILE_SEARCH_RESULT("sn:json", "s"), //
-    PRE("sn:pre", "s"), //
     NOWRAP("sn:nowrap", "s"),
 
     BIN_DATA("sn:jcrData", "s"),

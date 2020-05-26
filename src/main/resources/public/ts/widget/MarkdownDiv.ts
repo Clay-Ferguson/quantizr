@@ -15,10 +15,14 @@ declare var MathJax;
 /* Div that holds Pre-Rendered HTML that came from markdown rendering */
 export class MarkdownDiv extends Comp {
 
-    constructor(public content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {
+    constructor(content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {
         super(attribs);
         this.setChildren(initialChildren);
-        this.state.content = content;
+        this.setText(content);
+    }
+
+    setText = (content: string) => {
+        this.mergeState({content});
     }
 
     compRender(): ReactNode {

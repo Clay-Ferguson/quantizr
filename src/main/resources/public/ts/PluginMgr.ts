@@ -25,6 +25,9 @@ export class PluginMgr implements PluginMgrIntf {
 
     addTypeHandler = (typeHandler: TypeHandlerIntf): void => {
         console.log("Adding TypeHandler: type=" + typeHandler.getTypeName());
+        if (this.typeHandlers[typeHandler.getTypeName()]) {
+            throw new Error("duplicate type handler: " + typeHandler.getTypeName());
+        }
         this.typeHandlers[typeHandler.getTypeName()] = typeHandler;
     }
 
@@ -46,7 +49,7 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new IPFSNodeTypeHandler());
         this.addTypeHandler(new RepoRootTypeHandler());
         this.addTypeHandler(new TrashNodeTypeHandler());
-        this.addTypeHandler(new InboxNodeTypeHandler()); 
+        this.addTypeHandler(new InboxNodeTypeHandler());
         this.addTypeHandler(new NotesNodeTypeHandler());
         this.addTypeHandler(new FriendsListTypeHandler());
         this.addTypeHandler(new FriendTypeHandler());

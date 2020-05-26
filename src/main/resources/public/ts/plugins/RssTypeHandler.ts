@@ -26,7 +26,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class RssTypeHandler extends TypeBase {
 
     constructor() {
-        super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss");
+        super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
     }
 
     allowPropertyEdit(propName: string): boolean {
