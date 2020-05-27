@@ -59,6 +59,7 @@ su -s
 # Note4: Also check this line in your 'start.sh' script "-v /etc/letsencrypt/live/quantizr.com:/letsencrypt \" because you may need to add an "-0002", to that
 #        whenever the letsencrypt had added that. It usually DOES increment an 000X number each time on that folder every time you run 'certbot'
 
+su -s (or su -) ...whichever works
 cd /etc/letsencrypt/live/quantizr.com
 openssl pkcs12 -export -in fullchain.pem -inkey privkey.pem -out keystore.p12 -name tomcat -CAfile chain.pem -caname root
 
@@ -80,7 +81,7 @@ sudo netstat -tulpn | grep LISTEN
 # then run the rewnew command like this: 
 
 Step 1:
-   certbot renew -v --force-renew --apache
+   sudo certbot renew -v --force-renew --apache
 Step 2:
    then after that run the openssl export command above, again!
    Warning: If you export the key using the command above and go with the 'no password' option then you should 
