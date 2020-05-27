@@ -263,7 +263,9 @@ export abstract class Comp implements CompIntf {
     }
 
     focus(): void {
-        S.util.delayedFocus(this.getId());
+        this.whenElm((elm: HTMLSelectElement) => {
+            S.util.delayedFocus(this.getId());
+        });
     }
 
     updateVisAndEnablement() {

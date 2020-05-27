@@ -29,6 +29,9 @@ export class SearchContentDlg extends DialogBase {
     constructor(state: AppState) {
         super("Search Content", "app-modal-content-medium-width", null, state);
         S.srch.searchText = null;
+        this.whenElm((elm: HTMLSelectElement) => {
+            this.searchTextField.focus();
+        });
     }
 
     renderDlg(): CompIntf[] {
@@ -48,7 +51,6 @@ export class SearchContentDlg extends DialogBase {
                 ])
             ])
         ];
-        this.searchTextField.focus();
         return children;
     }
 

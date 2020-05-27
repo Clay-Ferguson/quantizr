@@ -31,17 +31,11 @@ export class View implements ViewIntf {
             nodeId = state.node.id;
         }
 
-        console.log("Refreshing tree: nodeId=" + nodeId);
         if (!highlightId) {
             let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             highlightId = currentSelNode != null ? currentSelNode.id : nodeId;
         }
 
-        /*
-        I don't know of any reason 'refreshTree' should itself reset the offset, but I leave this comment here
-        as a hint for the future.
-        nav.mainOffset = 0;
-        */
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: nodeId,
             upLevel: null,
@@ -54,7 +48,6 @@ export class View implements ViewIntf {
             if (res.offsetOfNodeFound > -1) {
                 S.nav.mainOffset = res.offsetOfNodeFound;
             }
-
             S.render.renderPageFromData(res, false, highlightId, true, state);
         });
     }
@@ -87,7 +80,6 @@ export class View implements ViewIntf {
     }
 
     private loadPage = (goToLastPage: boolean, state: AppState): void => {
-        console.log("loadPage()");
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: state.node.id,
             upLevel: null,

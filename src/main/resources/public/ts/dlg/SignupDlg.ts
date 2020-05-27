@@ -24,6 +24,9 @@ export class SignupDlg extends DialogBase {
 
     constructor(state: AppState) {
         super("Create Account", "app-modal-content-medium-width", null, state);
+        this.whenElm((elm: HTMLSelectElement) => {
+            this.userTextField.focus();
+        });
     }
     
     renderDlg(): CompIntf[] {
@@ -40,7 +43,6 @@ export class SignupDlg extends DialogBase {
         ];
         
         this.pageInitSignupPg();
-        this.userTextField.focus();
         return children;
     }
 

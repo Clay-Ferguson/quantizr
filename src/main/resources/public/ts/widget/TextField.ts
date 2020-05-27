@@ -29,6 +29,13 @@ export class TextField extends Div implements I.TextEditorIntf {
         this.mergeState({ value: defaultVal || "" });
     }
 
+    //Overriding base class so we can focus the correct part of this composite component.
+    focus(): void {
+        this.whenElm((elm: HTMLSelectElement) => {
+            this.input.focus();
+        });
+    }
+
     insertTextAtCursor(text: string) {
         //should we implement this ? todo-1
     }
@@ -62,6 +69,9 @@ export class TextField extends Div implements I.TextEditorIntf {
             new Label(this.label, { key: this.getId() + "_label" }),
             new Div(null, {
                 className: "input-group",
+                //NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
+                //to the component, or elase there's a react-rerender flicker.
+                style: {fontFamily: "monospace"}
             }, [
                 this.input = new Input({
                     className: "form-control pre-textfield",

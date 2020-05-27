@@ -24,6 +24,9 @@ export class SearchByNameDlg extends DialogBase {
   
     constructor(state: AppState) {
         super("Search by Node Name", "app-modal-content-medium-width", false, state);
+        this.whenElm((elm: HTMLSelectElement) => {
+            this.searchTextField.focus();
+        });
     }
 
     renderDlg(): CompIntf[] {
@@ -39,7 +42,6 @@ export class SearchByNameDlg extends DialogBase {
                 ])
             ])
         ];
-        this.searchTextField.focus();
         return children;
     }
 

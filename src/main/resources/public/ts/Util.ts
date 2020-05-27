@@ -558,10 +558,9 @@ export class Util implements UtilIntf {
 
     /* set focus to element by id */
     delayedFocus = (id: string): void => {
-        /* so user sees the focus fast we try at .5 seconds */
         setTimeout(() => {
             this.focusElmById(id);
-        }, 750);
+        }, 250);
     }
 
     /*
@@ -572,7 +571,7 @@ export class Util implements UtilIntf {
      * requires: res.success res.message
      */
     checkSuccess = (opFriendlyName, res): boolean => {
-        if (!res.success) {
+        if (!res || !res.success) {
             this.showMessage(opFriendlyName + " failed: " + res.message, "Warning");
         }
         return res.success;

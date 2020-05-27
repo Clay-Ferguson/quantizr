@@ -571,7 +571,7 @@ export class EditNodeDlg extends DialogBase {
         let encrypted = value.startsWith(J.Constant.ENC_TAG);
 
         value = S.util.escapeForAttrib(value);
-        //console.log("making field editor for [" + propName + "] val[" + value + "]");
+        //console.log("making field editor for val[" + value + "]");
 
         if (C.ENABLE_ACE_EDITOR) {
             let aceMode = node.type == J.NodeType.PLAIN_TEXT ? "ace/mode/text" : "ace/mode/markdown";

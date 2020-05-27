@@ -23,6 +23,9 @@ export class SearchFileSystemDlg extends DialogBase {
 
     constructor(state: AppState) {
         super("Search File System", null, false, state);
+        this.whenElm((elm: HTMLSelectElement) => {
+            this.searchTextField.focus();
+        });
     }
 
     renderDlg(): CompIntf[] {
@@ -38,7 +41,6 @@ export class SearchFileSystemDlg extends DialogBase {
                 ])
             ])
         ];
-        this.searchTextField.focus();
         return children;
     }
 

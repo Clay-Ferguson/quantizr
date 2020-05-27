@@ -26,10 +26,12 @@ export class ChangePasswordDlg extends DialogBase {
     constructor(args: Object, state: AppState) {
         super((<any>args).passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width", false, state);
         this.passCode = (<any>args).passCode;
+        this.whenElm((elm: HTMLSelectElement) => {
+            this.passwordField.focus();
+        });
     }
 
     renderDlg(): CompIntf[] {
-        
         let children = [
             new Form(null, [
                 new TextContent("Enter your new password below..."),
@@ -45,8 +47,6 @@ export class ChangePasswordDlg extends DialogBase {
                 ])
             ])
         ];
-
-        this.passwordField.focus();
         return children;
     }
 

@@ -549,6 +549,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     setStateVarsUsingLoginResponse = (res: J.LoginResponse, state: AppState): void => {
+        if (!res) return;
         if (res.rootNode) {
             state.homeNodeId = res.rootNode;
             state.homeNodePath = res.rootNodePath;

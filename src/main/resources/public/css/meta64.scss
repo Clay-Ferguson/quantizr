@@ -19,6 +19,12 @@ $body-color: white;
 
 @import "bootswatch.scss";
 
+//This does work (border around focused edit fields) but I don't need it.
+// .form-control:focus {
+//     border-color: green;
+//     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 0, 0, 0.6);
+// }
+
 $menuItemHoverBackgroundColor: $primary;
 $nodeBorderBottomColor: $gray-700;
 
@@ -426,9 +432,10 @@ input[type="radio"] {
     //margin-right: 7px;
 }
 
-.pre-textarea {
-    font-family: monospace;
-    font-size: 125%;
+.pre-textarea, .pre-textfield {
+     //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
+     //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
+    font-family: inherit; //monospace;
 }
 
 .my-ace-editor {
@@ -454,11 +461,6 @@ input[type="radio"] {
 .passwordEyeIcon {
     cursor: pointer;
     margin-left: 10px;
-}
-
-.pre-textfield {
-    font-family: monospace;
-    font-size: 125%;
 }
 
 .bash-exec-button {

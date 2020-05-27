@@ -17,9 +17,11 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         S.util.mergeProps(this.attribs, {
             className: "form-control pre-textarea"
         });
+    
         if (!this.attribs.rows) {
-            this.attribs.rows = "5";
+            this.attribs.rows = "1";
         }
+
         this.setWordWrap(true);
     }
 
@@ -67,11 +69,12 @@ export class Textarea extends Comp implements I.TextEditorIntf {
             }, this.label));
         }
 
+        //todo-0: this attribs stuff is ugly
         let _attribs = { ...this.attribs };
         if (!this.getState().wordWrap) {
             _attribs.style = {
                 whiteSpace: "nowrap",
-                overflow: "auto"
+                overflow: "auto",
             }
         }
 
@@ -79,6 +82,9 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         return S.e("div", {
             id: this.getId() + "_textfield",
             key: this.getId() + "_textfield",
+            //NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
+            //to the component, or elase there's a react-rerender flicker.
+            style: {fontFamily: "monospace"}
         }, children);
     }
 }

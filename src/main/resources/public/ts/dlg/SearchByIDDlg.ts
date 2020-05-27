@@ -24,6 +24,9 @@ export class SearchByIDDlg extends DialogBase {
 
     constructor(state: AppState) {
         super("Search by Node ID", "app-modal-content-medium-width", false, state);
+        this.whenElm((elm: HTMLSelectElement) => {
+            this.searchTextField.focus();
+        });
     }
     
     renderDlg(): CompIntf[] {
@@ -40,7 +43,6 @@ export class SearchByIDDlg extends DialogBase {
                 ])
             ])
         ];
-        this.searchTextField.focus();
         return children;
     }
 
