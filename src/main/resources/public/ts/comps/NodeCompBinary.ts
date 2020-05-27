@@ -38,8 +38,14 @@ export class NodeCompBinary extends Div {
             style.width = "";
         }
         else {
-            style.maxWidth = "calc(" + imgSize + "% - 12px)";
-            style.width = "calc(" + imgSize + "% - 12px)";
+            imgSize = imgSize.trim();
+
+            //for backwards compatability if no units are given assume percent
+            if (!imgSize.endsWith("%") && !imgSize.endsWith("px")) {
+                imgSize += "%";
+            }
+            style.maxWidth = "calc(" + imgSize + " - 12px)";
+            style.width = "calc(" + imgSize + " - 12px)";
         }
 
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently

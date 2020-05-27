@@ -111,12 +111,17 @@ export class EditNodeDlg extends DialogBase {
             defaultValue: "0"
         }, "Img. Size", [
             { key: "0", val: "Actual" },
-            { key: "15", val: "15%" },
-            { key: "25", val: "25%" },
-            { key: "50", val: "50%" },
-            { key: "80", val: "80%" },
-            { key: "90", val: "90%" },
-            { key: "100", val: "100%" },
+            { key: "15%", val: "15%" },
+            { key: "25%", val: "25%" },
+            { key: "50%", val: "50%" },
+            { key: "80%", val: "80%" },
+            { key: "90%", val: "90%" },
+            { key: "100%", val: "100%" },
+            { key: "100px", val: "100px" },
+            { key: "200px", val: "200px" },
+            { key: "400px", val: "400px" },
+            { key: "800px", val: "800px" },
+            { key: "1000px", val: "1000px" },
 
         ], "m-2"); // "w-25 m-2");
         return selection;
