@@ -65,7 +65,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 		SubNode.FIELD_CREATE_TIME, SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES })
 public class SubNode {
 	public static final String FIELD_ID = "_id";
-	private boolean updateModTimeOnSave = true;
 
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
 
@@ -555,17 +554,6 @@ public class SubNode {
 	@JsonIgnore
 	public void setDisableParentCheck(boolean disableParentCheck) {
 		this.disableParentCheck = disableParentCheck;
-	}
-
-
-	@JsonIgnore
-	public boolean isUpdateModTimeOnSave() {
-		return updateModTimeOnSave;
-	}
-
-	@JsonIgnore
-	public void setUpdateModTimeOnSave(boolean updateModTimeOnSave) {
-		this.updateModTimeOnSave = updateModTimeOnSave;
 	}
 
 	public void addProperties(SubNodePropertyMap properties) {

@@ -135,7 +135,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.setCreateTime(now);
 		}
 
-		if (node.isUpdateModTimeOnSave()) {
+		if (!MongoThreadLocal.getAutoTimestampDisabled()) {
 			dbObj.put(SubNode.FIELD_MODIFY_TIME, now);
 			node.setModifyTime(now);
 		}

@@ -13,6 +13,7 @@ import org.subnode.model.PropertyInfo;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AppDropRequest;
 import org.subnode.request.CreateSubNodeRequest;
@@ -80,6 +81,8 @@ public class NodeEditService {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
+
+		MongoThreadLocal.setAutoTimestampDisabled(true);
 
 		String nodeId = req.getNodeId();
 		SubNode node = null;
@@ -151,10 +154,16 @@ public class NodeEditService {
 				CreateNodeLocation.ORDINAL);
 		newNode.setContent("");
 
+		/* When a user creates a new node we use "ModTime==0" (never modified) as a way to indicate the node is in 'draft mode',
+		and should not be visible to other users until "Save" is clicked.
+
+		todo-0: insofar as inbox and notifications, need to be sure that's delayed also until the "save".
+		*/
+		MongoThreadLocal.setAutoTimestampDisabled(true);
+
 		api.save(session, newNode);
 		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false, false,
 				false));
-		// }
 		res.setSuccess(true);
 		return res;
 	}
@@ -216,7 +225,7 @@ public class NodeEditService {
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
 
-		// log.debug("saveNode. nodeId=" + nodeId + " nodeName=" + nodeInfo.getName());
+		//log.debug("saveNode. nodeId=" + nodeId + " nodeName=" + nodeInfo.getName());
 		SubNode node = api.getNode(session, nodeId);
 		api.authRequireOwnerOfNode(session, node);
 
