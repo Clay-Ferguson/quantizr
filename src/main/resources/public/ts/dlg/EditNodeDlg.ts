@@ -630,7 +630,6 @@ export class EditNodeDlg extends DialogBase {
     }
 
     propertyCheckboxChanged = (): void => {
-        debugger;
         if (this.areAnyPropsChecked()) {
             this.deletePropButton.setEnabled(true);
         }

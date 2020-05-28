@@ -40,18 +40,12 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         /* we just resort to returning the value the object was originally created to have if the gui elmement doesn't exist yet on the DOM
         when we got into here */
         else {
-            return this.attribs.value;
+            return this.getState().value;
         }
     }
 
-    setValue = (val: string): void => {
-        this.attribs.value = val;
-        let elm = this.getElement();
-        if (elm) {
-            //is it necessary to set attribs, i'm kinda rusty on how this works. I'm thinking if we call 'setValue' before this Widget
-            //ever gets rendered we better have it's attribs value correct right?
-            (<any>elm).value = val;
-        }
+    setValue = (value: string): void => {
+        this.mergeState({ value });
     }
 
     setWordWrap(wordWrap: boolean): void {
@@ -59,6 +53,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
     }
 
     compRender(): ReactNode {
+        let state = this.getState();
         let children = [];
 
         if (this.label) {
@@ -69,16 +64,17 @@ export class Textarea extends Comp implements I.TextEditorIntf {
             }, this.label));
         }
 
-        //todo-0: this attribs stuff is ugly
         let _attribs = { ...this.attribs };
-        if (!this.getState().wordWrap) {
+        if (!state.wordWrap) {
             _attribs.style = {
                 whiteSpace: "nowrap",
                 overflow: "auto",
             }
         }
 
-        children.push(S.e('textarea', _attribs, _attribs.value));
+        _attribs.value = state.value;
+
+        children.push(S.e('textarea', _attribs));
         return S.e("div", {
             id: this.getId() + "_textfield",
             key: this.getId() + "_textfield",

@@ -34,6 +34,7 @@ export interface TextEditorIntf {
     setMode(mode: string): void;
     insertTextAtCursor(text: string): void;
     getValue(): string;
+    setValue(val: string): void;
     focus(): void;
     whenElm(func: Function): void;
 }
