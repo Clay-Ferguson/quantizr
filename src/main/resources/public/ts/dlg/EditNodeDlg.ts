@@ -331,11 +331,9 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    openChangeNodeTypeDlg = (): void => {
-        (async () => {
-            let dlg = new ChangeNodeTypeDlg(this.setNodeType, this.appState);
-            await dlg.open();
-        })();
+    openChangeNodeTypeDlg = (): void => {    
+        let dlg = new ChangeNodeTypeDlg(this.setNodeType, this.appState);
+        dlg.open();
     }
 
     openEncryptionDlg = (): void => {
@@ -374,7 +372,6 @@ export class EditNodeDlg extends DialogBase {
                     }
                 }
 
-                //this.rebuildDlg();
                 this.mergeState(state);
             }
         })();
@@ -382,17 +379,8 @@ export class EditNodeDlg extends DialogBase {
 
     setNodeType = (newType: string): void => {
         let state = this.getState();
-        S.util.ajax<J.SetNodeTypeRequest, J.SetNodeTypeResponse>("setNodeType", {
-            nodeId: state.node.id,
-            type: newType
-        },
-            (res) => {
-                S.util.checkSuccess("Save properties", res);
-                state.node.type = newType;
-
-                //this.rebuildDlg();
-                this.mergeState(state);
-            });
+        state.node.type = newType;
+        this.mergeState({ node: state.node });
     }
 
     deleteProperty(propName: string) {
@@ -605,6 +593,14 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditor = new Textarea(null, {
                 rows: "20",
                 defaultValue: encrypted ? "[encrypted]" : value
+            }, 
+            /* onBlur value setter, required so that we don't loose edits when react decides to re-render */
+            (value: string) => {
+                let state = this.getState();
+                if (value != state.node.content) {
+                    state.node.content = value;
+                    this.mergeState(state);
+                }
             });
 
             this.contentEditor.whenElm((elm: HTMLElement) => {

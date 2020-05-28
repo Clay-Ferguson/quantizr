@@ -70,7 +70,6 @@ import org.subnode.request.SelectAllNodesRequest;
 import org.subnode.request.SendTestEmailRequest;
 import org.subnode.request.SetCipherKeyRequest;
 import org.subnode.request.SetNodePositionRequest;
-import org.subnode.request.SetNodeTypeRequest;
 import org.subnode.request.ShutdownServerNodeRequest;
 import org.subnode.request.SignupRequest;
 import org.subnode.request.SplitNodeRequest;
@@ -512,13 +511,6 @@ public class AppController {
 	public @ResponseBody Object saveProperty(@RequestBody SavePropertyRequest req, HttpSession session) {
 		return callProc.run("saveProperty", req, session, ms -> {
 			return nodeEditService.saveProperty(ms, req);
-		});
-	}
-
-	@RequestMapping(value = API_PATH + "/setNodeType", method = RequestMethod.POST)
-	public @ResponseBody Object setNodeType(@RequestBody SetNodeTypeRequest req, HttpSession session) {
-		return callProc.run("setNodeType", req, session, ms -> {
-			return nodeEditService.setNodeType(ms, req);
 		});
 	}
 

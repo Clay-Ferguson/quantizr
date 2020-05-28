@@ -223,11 +223,6 @@ export interface SetNodePositionRequest extends RequestBase {
     targetName: string;
 }
 
-export interface SetNodeTypeRequest extends RequestBase {
-    nodeId: string;
-    type: string;
-}
-
 export interface ShutdownServerNodeRequest extends RequestBase {
 }
 
@@ -446,9 +441,6 @@ export interface SetCipherKeyResponse extends ResponseBase {
 }
 
 export interface SetNodePositionResponse extends ResponseBase {
-}
-
-export interface SetNodeTypeResponse extends ResponseBase {
 }
 
 export interface ShutdownServerNodeResponse extends ResponseBase {

@@ -12,12 +12,14 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Textarea extends Comp implements I.TextEditorIntf {
 
-    constructor(private label: string, attribs: any = null) {
+    /* If parent needs to update state based on content entered by user the updateValFunc can be passed in
+    to capture all changes user entered. */
+    constructor(private label: string, attribs: any = null, private updateValFunc: (value: string) => void = null) {
         super(attribs);
         S.util.mergeProps(this.attribs, {
             className: "form-control pre-textarea"
         });
-    
+
         if (!this.attribs.rows) {
             this.attribs.rows = "1";
         }
@@ -74,13 +76,38 @@ export class Textarea extends Comp implements I.TextEditorIntf {
 
         _attribs.value = state.value;
 
+        // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
+        _attribs.onChange = (evt: any) => {
+            //console.log("e.target.value=" + evt.target.value);
+            this.mergeState({ value: evt.target.value });
+        }
+
+        if (this.updateValFunc) {
+            /* Warning: Do not try to use onChange here. That's overkill AND won't work well */
+            _attribs.onBlur = (evt: any) => {
+                /* save value off 'evt' here, because if we don't JavaScript is smart enough to bark if we use the even later in the timer
+                when it knows the target dom element is dead/gone, because of a re-render */
+                let value = evt.target.value;
+
+                /* React is tricky when you do something in an event that an cause a state change (plus a re-render), because 
+                when that re-render happens it will blow up the eventing that was underway (like an onBlur+onClick when clicking a button while an 
+                edit field has focus), so we delay the processing of the blur to always give any pending onClicks to run first. It's not a clean solution
+                but works.
+                To clarify: if you remove this timer then some 'onClick' events will get ignored. Buttons not working.
+                */
+                setTimeout(() => {
+                    this.updateValFunc(value);
+                }, 500);
+            }
+        }
+
         children.push(S.e('textarea', _attribs));
         return S.e("div", {
             id: this.getId() + "_textfield",
             key: this.getId() + "_textfield",
             //NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
             //to the component, or elase there's a react-rerender flicker.
-            style: {fontFamily: "monospace"}
+            style: { fontFamily: "monospace" }
         }, children);
     }
 }

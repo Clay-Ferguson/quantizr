@@ -21,7 +21,6 @@ import org.subnode.request.DeletePropertyRequest;
 import org.subnode.request.InsertNodeRequest;
 import org.subnode.request.SaveNodeRequest;
 import org.subnode.request.SavePropertyRequest;
-import org.subnode.request.SetNodeTypeRequest;
 import org.subnode.request.SplitNodeRequest;
 import org.subnode.request.TransferNodeRequest;
 import org.subnode.response.AppDropResponse;
@@ -30,7 +29,6 @@ import org.subnode.response.DeletePropertyResponse;
 import org.subnode.response.InsertNodeResponse;
 import org.subnode.response.SaveNodeResponse;
 import org.subnode.response.SavePropertyResponse;
-import org.subnode.response.SetNodeTypeResponse;
 import org.subnode.response.SplitNodeResponse;
 import org.subnode.response.TransferNodeResponse;
 import org.subnode.util.Convert;
@@ -155,10 +153,7 @@ public class NodeEditService {
 		newNode.setContent("");
 
 		/* When a user creates a new node we use "ModTime==0" (never modified) as a way to indicate the node is in 'draft mode',
-		and should not be visible to other users until "Save" is clicked.
-
-		todo-0: insofar as inbox and notifications, need to be sure that's delayed also until the "save".
-		*/
+		and should not be visible to other users until "Save" is clicked. */
 		MongoThreadLocal.setAutoTimestampDisabled(true);
 
 		api.save(session, newNode);
@@ -183,36 +178,6 @@ public class NodeEditService {
 
 		PropertyInfo propertySaved = new PropertyInfo(req.getPropertyName(), req.getPropertyValue());
 		res.setPropertySaved(propertySaved);
-		res.setSuccess(true);
-		return res;
-	}
-
-	public SetNodeTypeResponse setNodeType(MongoSession session, SetNodeTypeRequest req) {
-		SetNodeTypeResponse res = new SetNodeTypeResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
-		String nodeId = req.getNodeId();
-		SubNode node = api.getNode(session, nodeId);
-		node.setType(req.getType());
-
-		/*
-		 * This is a hack for now, to ensure certain subproperties exist on nodes of
-		 * those types, but there will eventually be a pluggable interface here for
-		 * delegating this special type processing out to each type-specific code for
-		 * this.
-		 */
-		if (req.getType().equals(NodeType.RSS_FEED.s())) {
-			node.setProp(NodeProp.RSS_FEED_SRC.s(), "");
-		}
-
-		// same thing here. temporary hack for type handline
-		if (req.getType().equals("bash")) {
-			node.setProp("sn:name", "");
-			node.setProp("sn:fileName", "");
-		}
-
-		api.save(session, node);
 		res.setSuccess(true);
 		return res;
 	}
@@ -242,6 +207,7 @@ public class NodeEditService {
 		}
 
 		node.setContent(nodeInfo.getContent());
+		node.setType(nodeInfo.getType());
 
 		// if we're setting node name to a different node name
 		if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0
