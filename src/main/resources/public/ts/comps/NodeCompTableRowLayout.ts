@@ -41,6 +41,17 @@ export class NodeCompTableRowLayout extends Div {
         }
         let cellWidth = 100 / maxCols;
 
+        let countToDisplay = 0;
+
+        //we have to make a pass over children before main loop below, because we need the countToDisplay
+        //to ber correct before the second loop stats.
+        for (let i = 0; i < this.node.children.length; i++) {
+            let n: J.NodeInfo = this.node.children[i];
+            if (!(state.nodesToMove && state.nodesToMove.find(id => id == n.id))) {
+                countToDisplay++;
+            }
+        }
+
         let curCols = 0;
         for (let i = 0; i < this.node.children.length; i++) {
             let comps: Comp[] = [];
@@ -50,6 +61,13 @@ export class NodeCompTableRowLayout extends Div {
 
                 if (this.debug && n) {
                     console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
+                }
+
+                if (rowCount == 0 && state.userPreferences.editMode && this.level == 1) {
+                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
+
+                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                    comps.push(new Div(null, { className: "clearfix" }));
                 }
 
                 let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove);
@@ -62,6 +80,13 @@ export class NodeCompTableRowLayout extends Div {
 
                 if (n.children) {
                     comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
+                }
+
+                if (state.userPreferences.editMode && this.level == 1) {
+                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay, state));
+
+                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                    comps.push(new Div(null, { className: "clearfix" }));
                 }
 
                 let curCol = new Div(null, {

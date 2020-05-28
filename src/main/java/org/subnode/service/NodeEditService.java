@@ -5,6 +5,7 @@ import java.util.Calendar;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.OutboxMgr;
@@ -264,7 +265,9 @@ public class NodeEditService {
 			Calendar lastModified = Calendar.getInstance();
 			node.setModifyTime(lastModified.getTime());
 
-			if (!StringUtil.isEmpty(node.getContent())) {
+			if (!StringUtil.isEmpty(node.getContent()) //
+				//don't evern send notifications when 'admin' is the one doing the editing.
+				&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
 			}
 
