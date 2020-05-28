@@ -54,16 +54,6 @@ public class OutboxMgr {
 		boolean sendEmail = false;
 		boolean addToInbox = true;
 
-		// Date modTime = node.getModifyTime();
-		// Date now = new Date();
-
-		// Minutes minutes = Minutes.minutesBetween(new DateTime(modTime), new
-		// DateTime(now));
-		// // log.debug("Minutes since last edit: " + minutes.getMinutes());
-		// if (minutes.getMinutes() < 60) {
-		// return;
-		// }
-
 		/*
 		 * put in a catch block, because nothing going wrong in here should be allowed
 		 * to blow up the save operation

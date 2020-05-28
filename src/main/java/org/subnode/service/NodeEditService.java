@@ -295,16 +295,12 @@ public class NodeEditService {
 				res.setAclEntries(api.getAclEntries(session, node));
 			}
 
-			/*
-			 * Note: It's important to call this before we update the modifyTime (next
-			 * couple lines down)
-			 */
+			Calendar lastModified = Calendar.getInstance();
+			node.setModifyTime(lastModified.getTime());
+
 			if (!StringUtil.isEmpty(node.getContent())) {
 				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
 			}
-
-			Calendar lastModified = Calendar.getInstance();
-			node.setModifyTime(lastModified.getTime());
 
 			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, -1,
 					false, false, false);
