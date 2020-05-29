@@ -31,8 +31,6 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
 
-/* todo-0: data loss scenario. Create new node, type some text, then set type to plain (or whatever?), and it DELETES the text you just entered. oops */
-
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;

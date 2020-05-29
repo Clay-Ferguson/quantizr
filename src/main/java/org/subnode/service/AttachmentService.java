@@ -689,7 +689,7 @@ public class AttachmentService {
 				fileName = "filename";
 			}
 
-			InputStream is = getStream(session, null, true, ipfs);
+			InputStream is = getStream(session, node, true, ipfs);
 			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 
 			if (size == 0) {

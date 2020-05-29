@@ -22,7 +22,6 @@ export class NodeCompVerticalRowLayout extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let node = this.node; //todo-0: get rid of this var.
         let layoutClass = "node-table-row";
 
         if (state.userPreferences.editMode) {
@@ -32,22 +31,22 @@ export class NodeCompVerticalRowLayout extends Div {
             layoutClass += " non-editing-border"
         }
 
-        let childCount: number = node.children.length;
+        let childCount: number = this.node.children.length;
         let comps: Comp[] = [];
         let countToDisplay = 0;
 
         //we have to make a pass over children before main loop below, because we need the countToDisplay
         //to ber correct before the second loop stats.
-        for (let i = 0; i < node.children.length; i++) {
-            let n: J.NodeInfo = node.children[i];
+        for (let i = 0; i < this.node.children.length; i++) {
+            let n: J.NodeInfo = this.node.children[i];
             if (!(state.nodesToMove && state.nodesToMove.find(id => id == n.id))) {
                 countToDisplay++;
             }
         }
 
         let rowCount: number = 0;
-        for (let i = 0; i < node.children.length; i++) {
-            let n: J.NodeInfo = node.children[i];
+        for (let i = 0; i < this.node.children.length; i++) {
+            let n: J.NodeInfo = this.node.children[i];
             if (!(state.nodesToMove && state.nodesToMove.find(id => id == n.id))) {
 
                 if (this.debug && n) {
@@ -64,7 +63,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove);
                 comps.push(row);
 
-                S.render.lastOwner = node.owner;
+                S.render.lastOwner = this.node.owner;
                 rowCount++;
 
                 if (n.children) {

@@ -84,6 +84,7 @@ public class Convert {
 
 		String ownerId = node.getOwner().toHexString();
 		String avatarVer = null;
+
 		/*
 		 * todo-2: this is a spot that can be optimized. We should be able to send just
 		 * the userNodeId back to client, and the client should be able to deal with
@@ -96,9 +97,9 @@ public class Convert {
 			// todo-1: looks like import corrupts the 'owner' (needs research), but the code
 			// below sets to owner to 'admin' which will
 			// be safe for now because the admin is the only user capable of import/export.
-			log.debug("Unable to find userNode from nodeOwner: " + //
-					(node.getOwner() != null ? ownerId : ("null owner on node: " + node.getId().toHexString())) + //
-					" tried to find owner=" + node.getOwner().toHexString());
+			// log.debug("Unable to find userNode from nodeOwner: " + //
+			// 		(node.getOwner() != null ? ownerId : ("null owner on node: " + node.getId().toHexString())) + //
+			// 		" tried to find owner=" + node.getOwner().toHexString());
 		} else {
 			nameProp = userNode.getStringProp(NodeProp.USER.s());
 			avatarVer = userNode.getStringProp(NodeProp.BIN.s());
@@ -154,8 +155,11 @@ public class Convert {
 					// + count) + "]: "
 					// + XString.prettyPrint(node));
 
+					//NOTE: If this is set to false it then only would allow one level of depth in the 'inlineChildren' capability
+					boolean multiLevel = true;
+
 					nodeInfo.getChildren().add(convertToNodeInfo(sessionContext, session, n, htmlOnly, allowAbbreviated,
-							initNodeEdit, logicalOrdinal, false, firstChild, lastChild));
+							initNodeEdit, logicalOrdinal, multiLevel, firstChild, lastChild));
 				}
 			}
 		}
