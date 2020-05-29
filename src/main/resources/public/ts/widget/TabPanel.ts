@@ -21,6 +21,7 @@ export class TabPanel extends Div {
 
     constructor() {
         super(null);
+        this.attribs.className = "col-" + C.mainPanelCols + " offset-" + C.leftNavPanelCols;
     }
 
     preRender(): void {
@@ -56,7 +57,7 @@ export class TabPanel extends Div {
                         className: "nav-link" + (state.activeTab == "mainTab" ? " active" : ""),
                         onClick: () => {
                             dispatch({
-                                type: "Action_SetTab", 
+                                type: "Action_SetTab",
                                 update: (s: AppState): void => {
                                     s.activeTab = "mainTab";
                                 }

@@ -234,6 +234,14 @@ strong em {
     min-width: 350px;
 }
 
+.leftNavPanel {
+    border: 1px solid green;
+}
+
+.rightNavPanel {
+    border: 1px solid green;
+}
+
 .my-tab-pane {
     width: 100%;
     padding-top: $smallGap;
