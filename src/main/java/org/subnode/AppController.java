@@ -325,10 +325,11 @@ public class AppController {
 		});
 	}
 
-	/* Called when user does drag-n-drop onto the application window 
-	
-	NOTE: Looks like this is currently not enabled in TypeScript
-	*/
+	/*
+	 * Called when user does drag-n-drop onto the application window
+	 * 
+	 * NOTE: Looks like this is currently not enabled in TypeScript
+	 */
 	@RequestMapping(value = API_PATH + "/appDrop", method = RequestMethod.POST)
 	public @ResponseBody Object appDrop(@RequestBody AppDropRequest req, HttpSession session) {
 		return callProc.run("appDrop", req, session, ms -> {
@@ -931,24 +932,8 @@ public class AppController {
 	// reference: https://www.baeldung.com/spring-server-sent-events
 	@GetMapping(API_PATH + "/serverPush")
 	public SseEmitter serverPush() {
-		// disabling the below code, which was already proven to work. no bugs.
-		// SseEmitter emitter = new SseEmitter();
-		// ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
-		// sseMvcExecutor.execute(() -> {
-		// try {
-		// for (int i = 0; true; i++) {
-		// SseEventBuilder event = SseEmitter.event() //
-		// .data("SSE Event - " + LocalTime.now().toString()) //
-		// .id(String.valueOf(i)) //
-		// .name("serverPushEvent");
-		// emitter.send(event);
-		// Thread.sleep(3000);
-		// }
-		// } catch (Exception ex) {
-		// emitter.completeWithError(ex);
-		// }
-		// });
-		// return emitter;
-		return null;
+		SseEmitter pushEmitter = new SseEmitter();
+		sessionContext.setPushEmitter(pushEmitter);
+		return pushEmitter;
 	}
 }

@@ -1,9 +1,12 @@
 package org.subnode.mail;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.subnode.config.ConstantsProvider;
 import org.subnode.config.NodeName;
+import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.CreateNodeLocation;
@@ -11,12 +14,15 @@ import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.response.ServerPushInfo;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.XString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * Manages the node where we store all emails that are queued up to be sent.
@@ -43,6 +49,9 @@ public class OutboxMgr {
 
 	@Autowired
 	private SubNodeUtil apiUtil;
+
+	@Autowired
+	private SessionContext sessionContext;
 
 	/*
 	 * node=Node that was created.
@@ -104,13 +113,13 @@ public class OutboxMgr {
 	 * 		"replied to you."
 	 * </pre>
 	 */
-	public void addInboxNotification(MongoSession session, String userName, SubNode userNode, SubNode node,
+	public void addInboxNotification(MongoSession session, String recieverUserName, SubNode userNode, SubNode node,
 			String notifyMessage) {
 
-		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "### Inbox", NodeType.INBOX.s());
+		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "### Inbox",
+				NodeType.INBOX.s());
 
 		if (userInbox != null) {
-
 			/*
 			 * First look to see if there is a target node already existing in this persons
 			 * inbox that points to the node in question
@@ -122,19 +131,47 @@ public class OutboxMgr {
 				return;
 			}
 
-			notifyNode = api.createNode(session, userInbox, null, NodeType.NONE.s(), 0L,
-					CreateNodeLocation.FIRST);
+			notifyNode = api.createNode(session, userInbox, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST);
 
 			// trim to 280 like twitter.
 			String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
 
-			String content = String.format("#### **%s** " + notifyMessage + "\n\n%s?id=%s\n\n%s", userName,
+			String content = String.format("#### **%s** " + notifyMessage + "\n\n%s?id=%s\n\n%s", sessionContext.getUserName(),
 					constProvider.getHostAndPort(), node.getId().toHexString(), shortContent);
 
 			notifyNode.setOwner(userInbox.getOwner());
 			notifyNode.setContent(content);
 			notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getId().toHexString());
 			api.save(session, notifyNode);
+
+			sendServerPushInfo(recieverUserName, new ServerPushInfo("nodeAdded", node.getId().toHexString()));
+		}
+	}
+
+	public void sendServerPushInfo(String recipientUserName, ServerPushInfo info) {
+		SessionContext userSession = SessionContext.getSessionByUserName(recipientUserName);
+
+		//If user is currently logged in we have a session here.
+		if (userSession != null) {
+			SseEmitter pushEmitter = userSession.getPushEmitter();
+			if (pushEmitter != null) {
+				ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
+				sseMvcExecutor.execute(() -> {
+					try {
+						// NOTE: Not sure SseEventBuilder is something we'll ever need, when we can just send JSON, and so this means we pick up 
+						// the message with onmssage and not addEventListener, on the browser.
+						// SseEventBuilder event = SseEmitter.event() //
+						// 		.data(msg) //
+						// 		.id(String.valueOf(info.hashCode()))
+						// 		.name("serverPushEvent");
+						// pushEmitter.send(event);
+
+						pushEmitter.send(info, MediaType.APPLICATION_JSON);
+					} catch (Exception ex) {
+						pushEmitter.completeWithError(ex);
+					}
+				});
+			}
 		}
 	}
 

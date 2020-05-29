@@ -437,6 +437,11 @@ export interface SelectAllNodesResponse extends ResponseBase {
 export interface SendTestEmailResponse extends ResponseBase {
 }
 
+export interface ServerPushInfo {
+    type: string;
+    nodeId: string;
+}
+
 export interface SetCipherKeyResponse extends ResponseBase {
 }
 

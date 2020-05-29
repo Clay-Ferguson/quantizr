@@ -2,6 +2,9 @@ import { ServerPushIntf } from "./intf/ServerPushIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C} from "./Constants";
+import * as J from "./JavaIntf";
+import { InboxNotifyDlg } from "./dlg/InboxNotifyDlg";
+import { store } from "./AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -15,28 +18,28 @@ export class ServerPush implements ServerPushIntf {
     init = (): any => {
         console.log("ServerPush.init");
 
-        // taking whole block offline for now. 
-        // Serverside is disabled right now on purpose. 
-        //define call to server
-        // const eventSource = new EventSource(S.util.getRpcPath() + "serverPush");
+        const eventSource = new EventSource(S.util.getRpcPath() + "serverPush");
 
-        // eventSource.onmessage = e => {
-        //     //const msg = JSON.parse(e.data);
-        //     console.log("ServerPush Recieved: " + e.data);
-        // };
+        eventSource.onmessage = e => {
+            console.log("ServerPush Recieved: " + e.data);
+            new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
+        };
 
-        // eventSource.onopen = (e: any) => {
-        //     console.log("ServerPush.onopen" + e);
-        // }
+        eventSource.onopen = (e: any) => {
+            console.log("ServerPush.onopen" + e);
+        }
 
-        // eventSource.onerror = (e: any) => {
-        //     console.log("ServerPush.onerror:" + e);
-        // };
+        eventSource.onerror = (e: any) => {
+            console.log("ServerPush.onerror:" + e);
+        };
 
-        // // set handler function for the event type 
-        // eventSource.addEventListener('serverPushEvent', function (e: any) {
-        //     console.log("ServerPushEvent:", e.data);
-        // }, false);
+        eventSource.addEventListener('serverPushEvent', function (e: any) {
+            // let serverPushInfo: J.ServerPushInfo = JSON.parse(e.data);
+            // debugger;
+            //console.log("ServerPushEvent:", S.util.prettyPrint(serverPushInfo));
+            //NOTE: For now we don't do anything that great or scalable but just let user know their inbox had new goodies in it.
+            //new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
+        }, false);
     }
 }
 

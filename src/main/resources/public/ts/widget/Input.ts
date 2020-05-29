@@ -21,7 +21,7 @@ export class Input extends Comp {
     }
 
     onChange(evt): void {
-        console.log("New Val [" + evt.target.value + "] this.id=" + this.getId());
+        //console.log("New Val [" + evt.target.value + "] this.id=" + this.getId());
         this.mergeState({ value: evt.target.value });
     }
 

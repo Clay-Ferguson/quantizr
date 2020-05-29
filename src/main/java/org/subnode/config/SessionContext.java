@@ -2,6 +2,7 @@ package org.subnode.config;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.TimeZone;
 
 import javax.annotation.PreDestroy;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * Wrapper for holding variables that we need to maintain server state of for a
@@ -61,13 +63,27 @@ public class SessionContext {
 
 	private HttpSession httpSessionToInvalidate;
 
+	/* Emitter for sending push notifications to the client */
+	private SseEmitter pushEmitter;
+
+	private static HashMap<String, SessionContext> allSessions = new HashMap<String, SessionContext>();
+
 	public SessionContext() {
 		log.trace(String.format("Creating Session object hashCode[%d]", hashCode()));
+	}
+
+	public static SessionContext getSessionByUserName(String userName) {
+		synchronized (allSessions) {
+			return allSessions.get(userName);
+		}
 	}
 
 	@PreDestroy
 	public void preDestroy() {
 		log.trace(String.format("Destroying Session object hashCode[%d] of user %s", hashCode(), userName));
+		synchronized (allSessions) {
+			allSessions.remove(userName);
+		}
 	}
 
 	public boolean isAdmin() {
@@ -82,7 +98,10 @@ public class SessionContext {
 		return repoUtil.isTestAccountName(userName);
 	}
 
-	/* NOTE: Not a generic formatTime utility function. This is initialized PER user (via their timezone) */
+	/*
+	 * NOTE: Not a generic formatTime utility function. This is initialized PER user
+	 * (via their timezone)
+	 */
 	public String formatTime(Date date) {
 		if (date == null)
 			return null;
@@ -120,6 +139,9 @@ public class SessionContext {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+		synchronized (allSessions) {
+			allSessions.put(userName, this);
+		}
 	}
 
 	public String getPassword() {
@@ -200,5 +222,13 @@ public class SessionContext {
 
 	public void setLastLoginTime(long lastLoginTime) {
 		this.lastLoginTime = lastLoginTime;
+	}
+
+	public SseEmitter getPushEmitter() {
+		return pushEmitter;
+	}
+
+	public void setPushEmitter(SseEmitter pushEmitter) {
+		this.pushEmitter = pushEmitter;
 	}
 }

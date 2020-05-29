@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.subnode.model.client.PrincipalName;
+import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.model.client.NodeProp;
@@ -233,8 +234,8 @@ public class AclService {
 				final SubNode _principalNode = principalNode;
 				adminRunner.run(_session -> {
 					try {
-						outboxMgr.addInboxNotification(_session, _session.getUser(), _principalNode, node,
-						"shared a node with you.");
+						outboxMgr.addInboxNotification(_session, principal, _principalNode, node,
+						"shared this node with you:");
 					} catch (Exception e) {
 						log.debug("failed sending notification", e);
 					}

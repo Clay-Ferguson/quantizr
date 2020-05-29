@@ -17,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class InboxNotifyDlg extends DialogBase {
 
     constructor(private text: string, state: AppState) {
-        super("New Info", "app-modal-content-narrow-width", false, state);
+        super("Notification", "app-modal-content-narrow-width", false, state);
     }
 
     renderDlg(): CompIntf[] {
