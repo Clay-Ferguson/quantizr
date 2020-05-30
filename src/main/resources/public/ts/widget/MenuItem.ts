@@ -12,20 +12,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class MenuItem extends Div {
 
     constructor(public name: string, public clickFunc: Function, isEnabledFunc?: Function, isVisibleFunc?: Function, bottomSeparator?: boolean) {
-        super(name, {
-            className: "list-group-item list-group-item-action",
-            onClick: function () {
-                //Note: We're not always hosted in a dialog.
-                if (S.mainMenu) {
-                    S.mainMenu.close();
-                }
-                clickFunc();
-            }
-        });
+        super(name);
 
         this.setIsEnabledFunc(isEnabledFunc);
         this.setIsVisibleFunc(isVisibleFunc);
         this.state.content = name;
+        this.onClick = this.onClick.bind(this);
     }
 
     compRender(): ReactNode {
@@ -34,8 +26,23 @@ export class MenuItem extends Div {
         let enablement = state.enabled ? {} : { disabled: "disabled" };
         let enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
 
-        return this.tagRender("div", state.content,
-            { ...this.attribs, ...enablement, ...{ style: _style, className: "list-group-item list-group-item-action " + enablementClass } }
-        );
+        return this.tagRender("div", state.content, {
+            ...this.attribs, ...enablement, ...{
+                style: _style,
+                className: "list-group-menu-item list-group-item-action " + enablementClass + "  list-group-transparent",
+                onClick: this.onClick
+            }
+        });
+    }
+
+    onClick(): void {
+        let state = this.getState();
+        if (!state.enabled) return;
+        
+        //Note: We're not always hosted in a dialog.
+        if (S.mainMenu) {
+            S.mainMenu.close();
+        }
+        this.clickFunc();
     }
 }

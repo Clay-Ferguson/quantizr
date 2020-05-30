@@ -46,14 +46,13 @@ export class MenuPanel extends Div {
         let canMoveUp = allowNodeMove && highlightNode && !highlightNode.firstChild;
         let canMoveDown = allowNodeMove && highlightNode && !highlightNode.lastChild;
 
-        let propsToggle = state.node && !state.isAnonUser;
-        let allowEditMode = state.node && !state.isAnonUser;
+        // let propsToggle = state.node && !state.isAnonUser;
+        // let allowEditMode = state.node && !state.isAnonUser;
 
         this.setChildren([
+            //WARNING: The string 'Navigate' is also in Menu.activeMenu.
             new Menu("Navigate", [
-                new MenuItem("Portal Node", () => S.meta64.loadAnonPageHome(state) ),
-                
-                new MenuItem("Home Node", () => S.nav.navHome(state),
+                new MenuItem("Home", () => S.nav.navHome(state),
                     //enabled func
                     () => {
                         return !state.isAnonUser;
@@ -65,23 +64,24 @@ export class MenuPanel extends Div {
                         return !state.isAnonUser;
                     }
                 ),
+                new MenuItem("Portal", () => S.meta64.loadAnonPageHome(state)),
 
                 //I'm removing my RSS feeds, for now (mainly to remove any political or interest-specific content from the platform)
                 //new MenuItem("Podcast Feeds", () => { S.nav.openContentNode("/r/rss"); }),
 
-                new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide", state) ),
+                new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide", state)),
 
                 //new MenuItem("Sample Document", () => { S.nav.openContentNode("/r/books/war-and-peace"); }),
 
-                new MenuItem("Getting Started", () => S.nav.openContentNode(":getting-started", state) ),
+                new MenuItem("Getting Started", () => S.nav.openContentNode(":getting-started", state)),
 
                 //this is on nav bar already
                 //new MenuItem("Logout", () => S.nav.logout(state)),
 
                 //I decided ALL information will be stored native right in mongo, and no filesystem stuff.
                 //new MenuItem("Documentation", () => { S.nav.openContentNode("/r/public/subnode-docs"); }),
-            ], null, null, true),
-            new Menu("Edit", [              
+            ]),
+            new Menu("Edit", [
                 //new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
                 new MenuItem("Undo Cut", S.edit.undoCutSelNodes, () => { return !state.isAnonUser && state.nodesToMove != null }), //
 
@@ -120,8 +120,8 @@ export class MenuPanel extends Div {
                 //             "admin" == S.meta64.userName.toLowerCase();
                 //         //!state.isAnonUser && highlightNode != null && selNodeIsMine 
                 //     }),
-                new MenuItem("Show All Shares", () => S.share.findSharedNodes(state, null), () => { return  !state.isAnonUser && highlightNode != null }),
-                new MenuItem("Show Public Shares", () => S.share.findSharedNodes(state, "public"), () => { return  !state.isAnonUser && highlightNode != null })
+                new MenuItem("Show All Shares", () => S.share.findSharedNodes(state, null), () => { return !state.isAnonUser && highlightNode != null }),
+                new MenuItem("Show Public Shares", () => S.share.findSharedNodes(state, "public"), () => { return !state.isAnonUser && highlightNode != null })
             ]),
             new Menu("Search", [
                 new MenuItem("All Content", () => { new SearchContentDlg(state).open(); }, () => { return !state.isAnonUser && highlightNode != null }), //
@@ -137,10 +137,10 @@ export class MenuPanel extends Div {
             //     new MenuItem("Tree Structure", S.graph.graphTreeStructure, () => { return !state.isAnonUser && highlightNode != null }), //
             // ]),
             new Menu("Timeline", [
-                new MenuItem("Created", () => S.srch.timeline('ctm', state) , () => { return !state.isAnonUser && highlightNode != null }), //
-                new MenuItem("Modified", () =>  S.srch.timeline('mtm', state) , () => { return !state.isAnonUser && highlightNode != null }), //
+                new MenuItem("Created", () => S.srch.timeline('ctm', state), () => { return !state.isAnonUser && highlightNode != null }), //
+                new MenuItem("Modified", () => S.srch.timeline('mtm', state), () => { return !state.isAnonUser && highlightNode != null }), //
             ]),
-            
+
             new Menu("View", [
                 //todo-1: properties toggle really should be a preferences setting i think, and not a menu option here.
 
@@ -149,23 +149,23 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Refresh", () => S.meta64.refresh(state)), //
                 new MenuItem("Show URL", () => S.render.showNodeUrl(state), () => { return highlightNode != null }), //
-                new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", state) ,
+                new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", state),
                     () => { return !state.isAnonUser && selNodeIsMine; },
                     () => { return !state.isAnonUser && selNodeIsMine; }), //
             ]),
 
             new Menu("Tools",
-            [
-                new MenuItem("Split Node", () => new SplitNodeDlg(state).open(), () => { return !state.isAnonUser && selNodeIsMine; }), //
-                new MenuItem("Transfer Node", () => {new TransferNodeDlg(state).open()}, () => { return !state.isAnonUser && selNodeIsMine; }), //
-                //todo-1: disabled during mongo conversion
-                //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
-                //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
-                //    () => { return state.isAdminUser && highlightNode != null }, //
-                //    () => { return state.isAdminUser }, //
-                //    true
-                //), //
-            ]),
+                [
+                    new MenuItem("Split Node", () => new SplitNodeDlg(state).open(), () => { return !state.isAnonUser && selNodeIsMine; }), //
+                    new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open() }, () => { return !state.isAnonUser && selNodeIsMine; }), //
+                    //todo-1: disabled during mongo conversion
+                    //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
+                    //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
+                    //    () => { return state.isAdminUser && highlightNode != null }, //
+                    //    () => { return state.isAdminUser }, //
+                    //    true
+                    //), //
+                ]),
 
             //need to make export safe for end users to use (recarding file sizes)
             new Menu("Admin Tools",
@@ -208,7 +208,7 @@ export class MenuPanel extends Div {
 
             new Menu("IPFS",
                 [
-                    new MenuItem("Display Node Info", () => S.view.runServerCommand("ipfsGetNodeInfo", state) ,
+                    new MenuItem("Display Node Info", () => S.view.runServerCommand("ipfsGetNodeInfo", state),
                         () => { return state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine) },
                         () => { return state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine) }
                     ),
@@ -230,7 +230,7 @@ export class MenuPanel extends Div {
                     //     () => { return state.isAdminUser },
                     //     () => { return state.isAdminUser }
                     // ),
-                    new MenuItem("Refresh Index", () => S.view.runServerCommand("refreshLuceneIndex", state) ,
+                    new MenuItem("Refresh Index", () => S.view.runServerCommand("refreshLuceneIndex", state),
                         () => { return state.isAdminUser },
                         () => { return state.isAdminUser }
                     ),
@@ -241,11 +241,11 @@ export class MenuPanel extends Div {
             new Menu("Admin",
                 [
                     //new MenuItem("Graph Display Test", () => {S.view.graphDisplayTest()}, () => { return state.isAdminUser }, () => { return state.isAdminUser }), //
-                    new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", state) , () => { return state.isAdminUser }, () => { return state.isAdminUser }), //
-                    new MenuItem("Compact DB", () => S.view.runServerCommand("compactDb", state) , () => { return state.isAdminUser }, () => { return state.isAdminUser }), //
+                    new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", state), () => { return state.isAdminUser }, () => { return state.isAdminUser }), //
+                    new MenuItem("Compact DB", () => S.view.runServerCommand("compactDb", state), () => { return state.isAdminUser }, () => { return state.isAdminUser }), //
 
-                    new MenuItem("Backup DB", () =>  S.view.runServerCommand("BackupDb", state) , () => { return state.isAdminUser }, () => { return state.isAdminUser }), //
-                    new MenuItem("Reset Public Node", () => S.view.runServerCommand("initializeAppContent", state) , () => { return state.isAdminUser }, () => { return state.isAdminUser }), //
+                    new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", state), () => { return state.isAdminUser }, () => { return state.isAdminUser }), //
+                    new MenuItem("Reset Public Node", () => S.view.runServerCommand("initializeAppContent", state), () => { return state.isAdminUser }, () => { return state.isAdminUser }), //
                     new MenuItem("Insert Book: War and Peace", S.edit.insertBookWarAndPeace,
                         () => { return state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine) },
                         () => { return state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine) }

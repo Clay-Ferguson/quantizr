@@ -166,9 +166,9 @@ export class MainNavPanel extends NavTag {
                 }, [
                     new NavBarIconButton("fa-bars", "Quantizr", {
                         onClick: e => {
-                            //if (clientInfo.isMobile) {
+                            if (clientInfo.isMobile) {
                                 S.nav.showMainMenu(state);
-                            //}
+                            }
                         },
                         id: "mainMenu",
                         title: "Show Main Menu"
