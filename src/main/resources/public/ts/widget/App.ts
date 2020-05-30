@@ -5,7 +5,6 @@ import { TabPanel } from "./TabPanel";
 import { MainNavPanel } from "./MainNavPanel";
 import { Div } from "./Div";
 import { Main } from "./Main";
-import { AppHeader } from "./AppHeader";
 import { LeftNavPanel } from "./LeftNavPanel";
 import { RightNavPanel } from "./RightNavPanel";
 

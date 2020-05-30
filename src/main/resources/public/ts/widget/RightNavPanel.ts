@@ -14,15 +14,13 @@ export class RightNavPanel extends Div {
 
     constructor() {
         super();
+        this.attribs.className = "col-" + C.rightNavPanelCols + " offset-" + (C.leftNavPanelCols + C.mainPanelCols) + " rightNavPanel position-fixed";
     }
 
     preRender(): void {
         const state: AppState = useSelector((state: AppState) => state);
 
-        this.attribs.className = "col-" + C.rightNavPanelCols + " offset-" + (C.leftNavPanelCols + C.mainPanelCols) + " rightNavPanel position-fixed";
-
         this.setChildren([
-            new Div("Right Nav Panel Child")
         ]);
     }
 }

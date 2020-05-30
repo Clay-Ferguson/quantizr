@@ -24,7 +24,8 @@ export class MenuPanel extends Div {
     constructor(state: AppState) {
         super(null, {
             id: "accordion",
-            role: "tablist"
+            role: "tablist",
+            className: "menuPanel"
         });
     }
 
@@ -50,6 +51,8 @@ export class MenuPanel extends Div {
 
         this.setChildren([
             new Menu("Navigate", [
+                new MenuItem("Portal Node", () => S.meta64.loadAnonPageHome(state) ),
+                
                 new MenuItem("Home Node", () => S.nav.navHome(state),
                     //enabled func
                     () => {
@@ -62,7 +65,6 @@ export class MenuPanel extends Div {
                         return !state.isAnonUser;
                     }
                 ),
-                new MenuItem("Portal Node", () => S.meta64.loadAnonPageHome(state) ),
 
                 //I'm removing my RSS feeds, for now (mainly to remove any political or interest-specific content from the platform)
                 //new MenuItem("Podcast Feeds", () => { S.nav.openContentNode("/r/rss"); }),
@@ -73,11 +75,12 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Getting Started", () => S.nav.openContentNode(":getting-started", state) ),
 
-                new MenuItem("Logout", () => S.nav.logout(state)),
+                //this is on nav bar already
+                //new MenuItem("Logout", () => S.nav.logout(state)),
 
                 //I decided ALL information will be stored native right in mongo, and no filesystem stuff.
                 //new MenuItem("Documentation", () => { S.nav.openContentNode("/r/public/subnode-docs"); }),
-            ]),
+            ], null, null, true),
             new Menu("Edit", [              
                 //new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
                 new MenuItem("Undo Cut", S.edit.undoCutSelNodes, () => { return !state.isAnonUser && state.nodesToMove != null }), //

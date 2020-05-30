@@ -166,7 +166,9 @@ export class MainNavPanel extends NavTag {
                 }, [
                     new NavBarIconButton("fa-bars", "Quantizr", {
                         onClick: e => {
-                            S.nav.showMainMenu(state);
+                            //if (clientInfo.isMobile) {
+                                S.nav.showMainMenu(state);
+                            //}
                         },
                         id: "mainMenu",
                         title: "Show Main Menu"
@@ -217,7 +219,9 @@ export class MainNavPanel extends NavTag {
         //to believe this timeout is necessary (but merely safer and harmless)
         setTimeout(() => {
             //see also: clientHeight, offsetHeight, scrollHeight
-            S.meta64.navBarHeight = elm.offsetHeight;
+            //NOTE: I added the additional 20, when I went to 'container-fluid' instead of 'container' for the main
+            //panel, which I needed to do after adding the left and right panels to the main layout.
+            S.meta64.navBarHeight = elm.offsetHeight+20;
         }, 750);
 
         elm.addEventListener("dragenter", (event) => {

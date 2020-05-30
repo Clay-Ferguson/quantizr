@@ -32,6 +32,9 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     we need to just let the render methods grab the latest state like every other component in the render method. */
     appState: AppState;
 
+    /* this is a slight hack so we can ignore 'close()' calls that are bogus */
+    opened: boolean = false;
+
     constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState) {
         super(null);
         this.appState = appState;
@@ -44,7 +47,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is 
     closed. */
     open = (display: string = null): Promise<DialogBase> => {
-
+        this.opened = true;
         return new Promise<DialogBase>((resolve, reject) => {
 
             // Create dialog container and attach to document.body.
@@ -94,6 +97,8 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     }
 
     public close = () => {
+        if (!this.opened) return;
+        this.opened = false;
         this.resolve(this);
         if (this.getElement()) {
             ReactDOM.unmountComponentAtNode(this.backdrop);

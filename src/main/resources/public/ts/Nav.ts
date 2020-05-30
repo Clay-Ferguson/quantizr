@@ -284,7 +284,9 @@ export class Nav implements NavIntf {
     }
 
     showMainMenu = (state: AppState): void => {
-        S.mainMenu.open("inline-block");
+        if (S.mainMenu) {
+            S.mainMenu.open("inline-block");
+        }
     }
 
     navHome = (state: AppState): void => {

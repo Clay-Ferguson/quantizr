@@ -15,7 +15,10 @@ export class MenuItem extends Div {
         super(name, {
             className: "list-group-item list-group-item-action",
             onClick: function () {
-                S.mainMenu.close();
+                //Note: We're not always hosted in a dialog.
+                if (S.mainMenu) {
+                    S.mainMenu.close();
+                }
                 clickFunc();
             }
         });

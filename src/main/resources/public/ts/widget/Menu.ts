@@ -2,7 +2,7 @@ import { MenuItem } from "./MenuItem";
 import { Div } from "./Div";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { ReactNode } from "react";
 
 let S: Singletons;
@@ -12,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Menu extends Div {
 
-    constructor(public name: string, menuItems: MenuItem[], isEnabledFunc?: Function, isVisibleFunc?: Function) {
+    constructor(public name: string, menuItems: MenuItem[], isEnabledFunc?: Function, isVisibleFunc?: Function, show?: boolean) {
         super(null, {
             className: "card menuCard"
         });
@@ -29,7 +29,7 @@ export class Menu extends Div {
 
                 new Div(null, {
                     id: "collapse" + this.getId(),
-                    className: "collapse", // "collapse show",
+                    className: "collapse" + (show ? " show" : ""),
                     role: "tabpanel",
                     "aria-labelledby": "heading" + this.getId(),
                     "data-parent": "#accordion"

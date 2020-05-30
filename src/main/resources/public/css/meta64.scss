@@ -41,6 +41,7 @@ $lightenRowFactor: 1.75;
 /* warning: this 9px should match the 9px highlight border in Comp.ts */
 $fatBorderSize: 9px;
 $mediumBorderSize: 6px;
+$smallBorderSize: 3px;
 
 html {
     // not supported by all browers.
@@ -235,11 +236,11 @@ strong em {
 }
 
 .leftNavPanel {
-    border: 1px solid green;
+    padding: 15px;
 }
 
 .rightNavPanel {
-    border: 1px solid green;
+    padding: 15px; 
 }
 
 .my-tab-pane {
@@ -286,6 +287,10 @@ strong em {
     border-radius: $borderRadiusLarge; 
     cursor: pointer;
     font-weight: bold;
+}
+
+.menuPanel {
+    border: $smallBorderSize solid $nodeBorderBottomColor; 
 }
 
 .small-margin-right {
