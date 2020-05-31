@@ -109,8 +109,6 @@ export class Search implements SearchIntf {
     renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, state: AppState): Comp => {
 
         let cssId = this._UID_ROWID_PREFIX + node.id;
-        // console.log("Rendering Node Row[" + index + "] with id: " +cssId)
-
         let buttonBar = this.makeButtonBarHtml(node, state);
         let content = new NodeCompContent(node, true, true, "srch");
 

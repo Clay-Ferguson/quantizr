@@ -24,9 +24,9 @@ export class NodeCompContent extends Div {
 
     domPreUpdateFunc: Function;
 
-    constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix = "") {
+    constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix?: string) {
         super(null, {
-            id: "NodeCompContent_" + node.id
+            id: (idPrefix ? idPrefix : "c") + node.id
         });
 
         if (!NodeCompContent.showRowHeader) {
@@ -42,10 +42,6 @@ export class NodeCompContent extends Div {
             this.children = null;
             return;
         }
-
-        //console.log("NodeCompContent node is rendering: "+S.util.prettyPrint(node));
-        //todo-0: is idPrefix still used? if so use it and not 'c'
-        this.attribs.id = "c" + node.id + "_" + this.idPrefix;
 
         let children: Comp[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);

@@ -2,6 +2,7 @@
 @import "variables.scss";
 
 $rootNodeBorder: true;
+$highlightActiveMenuItems: false;
 
 $border-radius: .3rem;
 $borderRadiusLarge: 1em;
@@ -179,7 +180,6 @@ strong em {
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.4);
 }
-
 
 /* Modal Content/ Dialog Box. This is the outter frame of the dialog itself */
 
@@ -387,8 +387,9 @@ input[type="radio"] {
     color: $disabled-body-color;
     padding: 5px; 
 
-    //required for alignment
-    border-left: 5px solid transparent;  
+    @if $highlightActiveMenuItems {
+        border-left: 5px solid transparent;     
+    }
 }
 
 .mainMenuItemDisabled:hover {
@@ -403,7 +404,10 @@ input[type="radio"] {
     cursor: pointer;
     font-weight: normal;
     background-color: transparent;
-    border-left: 5px solid $nodeBorderBottomColor;  
+
+    @if $highlightActiveMenuItems {
+        border-left: 5px solid $nodeBorderBottomColor; 
+    } 
     padding: 5px;
 }
 
@@ -804,7 +808,6 @@ which it will do by default. */
 .non-editing-border {
     border-bottom: 1px dotted lightslategray;
 }
-
 
 /*
 With "Display: table", the only way to get the internal 'node-grid-item' cell content to render with the SAME
