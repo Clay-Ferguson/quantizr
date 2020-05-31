@@ -11,7 +11,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class NavBarIconButton extends Comp {
 
-    constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private specialClasses: string = "nav-link" /* small-margin-right */) {
+    constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private specialClasses: string="") {
         super(attribs);
         this.attribs.type = "button";
         this.attribs.className = "btn " + specialClasses + " align-middle btn-primary";

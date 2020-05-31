@@ -12,7 +12,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Menu extends Div {
 
-    /* This is sort of 'state' but not really worthy of being in actual official state (todo-0: move to meta64.ts? */
     static activeMenu: string = "Navigate";
 
     constructor(public name: string, public menuItems: MenuItem[]) {
