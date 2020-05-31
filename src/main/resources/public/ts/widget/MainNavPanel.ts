@@ -27,9 +27,7 @@ export class MainNavPanel extends NavTag {
 
     compRender(): ReactNode {
         //console.log("Rendering MainNavPanel");
-
         const state: AppState = useSelector((state: AppState) => state);
-        //const dispatch = useDispatch();
 
         // navbar-expand-sm would makes it collapsable, but messes up top margin.
         this.attribs.className = "navbar navbar-expand navbar-dark bg-dark fixed-top main-navbar";
@@ -39,33 +37,28 @@ export class MainNavPanel extends NavTag {
         /* Feature to read from clipboard might scare some users (as it should) so I'm turning this on only for admins
         until we have a more specific User Preference allowing users to have to opt-in (not opt-out) to use this feature 
         */
-        buttons.push(new Li(null, {
-            className: "nav-item"
-        }, [
-            new NavBarIconButton("fa-clipboard", null, {
-                onClick: e => { S.edit.saveClipboardToNode(); },
-                title: "Save Clipboard text to a Note"
-            },
-                //isEnabled func
-                () => { return state.isAdminUser /* !S.meta64.isAnonUser */ },
-                //isVisible func
-                () => { return state.isAdminUser /* !S.meta64.isAnonUser */ }
-            )
-        ]));
-
-        if (!clientInfo.isMobile) {
+        if (state.isAdminUser) {
             buttons.push(new Li(null, {
                 className: "nav-item"
             }, [
-                new NavBarIconButton("fa-database", null, {
-                    onClick: e => { S.nav.navHome(state); },
-                    title: "Go to Your Root Node"
-                },
-                    //isEnabled func
-                    () => { return !state.isAnonUser; },
-                    //isVisible func
-                    () => { return !state.isAnonUser; })
+                new NavBarIconButton("fa-clipboard", null, {
+                    onClick: e => { S.edit.saveClipboardToNode(); },
+                    title: "Save Clipboard text to a Note"
+                })
             ]));
+        }
+
+        if (!clientInfo.isMobile) {
+            if (!state.isAnonUser) {
+                buttons.push(new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-database", null, {
+                        onClick: e => { S.nav.navHome(state); },
+                        title: "Go to Your Root Node"
+                    })
+                ]));
+            }
 
             buttons.push(new Li(null, {
                 className: "nav-item"
@@ -76,75 +69,61 @@ export class MainNavPanel extends NavTag {
                 })
             ]));
 
-            buttons.push(new Li(null, {
-                className: "nav-item"
-            }, [
-                new NavBarIconButton("fa-gear", null, {
-                    onClick: e => { S.edit.editPreferences(state); },
-                    title: "Edit your Account Preferences"
-                },
-                    //isEnabled func
-                    () => { return !state.isAnonUser; },
-                    //isVisible func
-                    () => { return !state.isAnonUser; })
-            ]));
+            if (!state.isAnonUser) {
+                buttons.push(new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-gear", null, {
+                        onClick: e => { S.edit.editPreferences(state); },
+                        title: "Edit your Account Preferences"
+                    })
+                ]));
+            }
 
-            buttons.push(new Li(null, {
-                className: "nav-item"
-            }, [
-                new NavBarIconButton("fa-pencil", null, {
-                    onClick: e => { S.edit.toggleEditMode(state); },
-                    title: "Toggle Edit Mode on/off"
-                },
-                    //isEnabled func
-                    () => { return allowEditMode; },
-                    //isVisible func
-                    () => { return allowEditMode; }
-                ),
-            ]));
+            if (allowEditMode) {
+                buttons.push(new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-pencil", null, {
+                        onClick: e => { S.edit.toggleEditMode(state); },
+                        title: "Toggle Edit Mode on/off"
+                    }),
+                ]));
+            }
 
+            if (state.isAnonUser) {
+                buttons.push(new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarButton("Signup", {
+                        onClick: e => { S.nav.signup(state); },
+                        title: "Create new Quantizr Account"
+                    })
+                ]));
+            }
+        }
+
+        if (state.isAnonUser) {
             buttons.push(new Li(null, {
                 className: "nav-item"
             }, [
-                new NavBarButton("Signup", {
-                    onClick: e => { S.nav.signup(state); },
-                    title: "Create new Quantizr Account"
-                },
-                    //isEnabled func
-                    () => { return state.isAnonUser; },
-                    //isVisible func
-                    () => { return state.isAnonUser; }
-                )
+                new NavBarIconButton("fa-sign-in", "Login", {
+                    onClick: e => { S.nav.login(state); },
+                    title: "Login to Quantizr"
+                })
             ]));
         }
 
-        buttons.push(new Li(null, {
-            className: "nav-item"
-        }, [
-            new NavBarIconButton("fa-sign-in", "Login", {
-                onClick: e => { S.nav.login(state); },
-                title: "Login to Quantizr"
-            },
-                //isEnabled func
-                () => { return state.isAnonUser; },
-                //isVisible func
-                () => { return state.isAnonUser; }
-            )
-        ]));
-
-        buttons.push(new Li(null, {
-            className: "nav-item"
-        }, [
-            new NavBarIconButton("fa-sign-out", null, {
-                onClick: e => { S.nav.logout(state); },
-                title: "Logout"
-            },
-                //isEnabled func
-                () => { return !state.isAnonUser; },
-                //isVisible func
-                () => { return !state.isAnonUser; }
-            )
-        ]));
+        if (!state.isAnonUser) {
+            buttons.push(new Li(null, {
+                className: "nav-item"
+            }, [
+                new NavBarIconButton("fa-sign-out", null, {
+                    onClick: e => { S.nav.logout(state); },
+                    title: "Logout"
+                })
+            ]));
+        }
 
         //example of a dropdown menu would go here.
         // <li class="nav-item dropdown">
@@ -221,7 +200,7 @@ export class MainNavPanel extends NavTag {
             //see also: clientHeight, offsetHeight, scrollHeight
             //NOTE: I added the additional 20, when I went to 'container-fluid' instead of 'container' for the main
             //panel, which I needed to do after adding the left and right panels to the main layout.
-            S.meta64.navBarHeight = elm.offsetHeight+20;
+            S.meta64.navBarHeight = elm.offsetHeight + 20;
         }, 750);
 
         elm.addEventListener("dragenter", (event) => {

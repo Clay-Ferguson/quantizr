@@ -63,32 +63,32 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     directly off the DOM */
                     onClick: S.nav.navUpLevel,
                     title: "Go to Parent Node"
-                }, null, null, "");
+                });
             }
 
             if (!S.nav.displayingRepositoryRoot(state)) {
                 prevButton = new NavBarIconButton("fa-chevron-circle-left", null, {
                     onClick: S.nav.navToPrev,
                     title: "Go to Previous Node"
-                }, null, null, "");
+                });
 
                 nextButton = new NavBarIconButton("fa-chevron-circle-right", null, {
                     onClick: S.nav.navToNext,
                     title: "Go to Next Node"
-                }, null, null, "");
+                });
             }
 
             if (!state.isAnonUser) {
                 searchButton = new NavBarIconButton("fa-search", null, {
                     onClick: S.nav.runSearch,
                     title: "Search underneath Node"
-                }, null, null, "");
+                });
 
 
                 timelineButton = new NavBarIconButton("fa-clock-o", null, {
                     onClick: S.nav.runTimeline,
                     title: "View Timeline underneath Node (by Mod Time)"
-                }, null, null, "");
+                });
             }
         }
 

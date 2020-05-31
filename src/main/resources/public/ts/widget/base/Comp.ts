@@ -54,9 +54,6 @@ export abstract class Comp implements CompIntf {
 
     logEnablementLogic: boolean = true;
 
-    isEnabledFunc: Function;
-    isVisibleFunc: Function;
-
     jsClassName: string;
     clazz: string;
 
@@ -92,14 +89,6 @@ export abstract class Comp implements CompIntf {
     childrenExist(): boolean {
         if (this.children == null || this.children.length == 0) return false;
         return this.children.some(child => !!child);
-    }
-
-    setIsEnabledFunc(isEnabledFunc: Function) {
-        this.isEnabledFunc = isEnabledFunc;
-    }
-
-    setIsVisibleFunc(isVisibleFunc: Function) {
-        this.isVisibleFunc = isVisibleFunc;
     }
 
     static nextGuid(): number {
@@ -144,16 +133,10 @@ export abstract class Comp implements CompIntf {
     }
 
     setVisible(visible: boolean) {
-        if (this.isVisibleFunc) {
-            console.warn("component " + this.jsClassName + " called setVisible, when an isVisibleFunc is in effect. This is a bug.");
-        }
         this.mergeState({ visible });
     }
 
     setEnabled(enabled: boolean) {
-        if (this.isEnabledFunc) {
-            console.warn("component " + this.jsClassName + " called setEnabled, when an isEnabledFunc is in effect. This is a bug.");
-        }
         this.mergeState({ enabled });
     }
 
@@ -269,23 +252,12 @@ export abstract class Comp implements CompIntf {
     }
 
     updateVisAndEnablement() {
-        //put this big mess in a fucntion
-        if (this.isEnabledFunc) {
-            this.state.enabled = this.isEnabledFunc();
-        }
-        else {
-            if (this.state.enabled === undefined) {
-                this.state.enabled = true;
-            }
+        if (this.state.enabled === undefined) {
+            this.state.enabled = true;
         }
 
-        if (this.isVisibleFunc) {
-            this.state.visible = this.isVisibleFunc();
-        }
-        else {
-            if (this.state.visible === undefined) {
-                this.state.visible = true;
-            }
+        if (this.state.visible === undefined) {
+            this.state.visible = true;
         }
     }
 

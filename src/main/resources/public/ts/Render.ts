@@ -251,7 +251,7 @@ export class Render implements RenderIntf {
                 S.edit.insertNode(node.id, "u", isFirst ? 0 : 1, state);
             },
             title: "Insert new node here"
-        }, null, null, "btn-sm");
+        }, "btn-sm");
         let buttonBar = new ButtonBar([pasteInlineButton, newNodeButton],
             null, "float-right " + (isFirst ? "marginTop" : ""));
         return buttonBar;

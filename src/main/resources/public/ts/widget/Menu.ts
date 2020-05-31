@@ -15,13 +15,10 @@ export class Menu extends Div {
     /* This is sort of 'state' but not really worthy of being in actual official state (todo-0: move to meta64.ts? */
     static activeMenu: string = "Navigate";
 
-    constructor(public name: string, public menuItems: MenuItem[], isEnabledFunc?: Function, isVisibleFunc?: Function /*, show?: boolean */) {
+    constructor(public name: string, public menuItems: MenuItem[]) {
         super(null, {
             className: "card menuCard"
         });
-
-        this.setIsEnabledFunc(isEnabledFunc);
-        this.setIsVisibleFunc(isVisibleFunc);
     }
 
     compRender(): ReactNode {

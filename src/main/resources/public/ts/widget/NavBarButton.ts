@@ -12,12 +12,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class NavBarButton extends Comp {
 
-    constructor(public content: string = "", attribs: Object = {}, private _isEnabledFunc: Function=null, private _isVisibleFunc: Function=null) {
+    constructor(public content: string = "", attribs: Object = {} ) {
         super(attribs);
         this.attribs.type = "button"; 
         this.attribs.className = "btn nav-link align-middle btn-primary small-margin-right";
-        this.setIsEnabledFunc(_isEnabledFunc);
-        this.setIsVisibleFunc(_isVisibleFunc);
     }
 
     compRender(): ReactNode {

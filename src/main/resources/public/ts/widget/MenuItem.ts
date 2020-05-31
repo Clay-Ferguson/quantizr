@@ -11,11 +11,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class MenuItem extends Div {
 
-    constructor(public name: string, public clickFunc: Function, isEnabledFunc?: Function, isVisibleFunc?: Function, bottomSeparator?: boolean) {
+    constructor(public name: string, public clickFunc: Function) {
         super(name);
-
-        this.setIsEnabledFunc(isEnabledFunc);
-        this.setIsVisibleFunc(isVisibleFunc);
         this.state.content = name;
         this.onClick = this.onClick.bind(this);
     }
