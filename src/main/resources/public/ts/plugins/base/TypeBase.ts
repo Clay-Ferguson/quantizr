@@ -6,6 +6,7 @@ import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import { Comp } from "../../widget/base/Comp";
 import { NodeCompMarkdown } from "../../comps/NodeCompMarkdown";
 import { AppState } from "../../AppState";
+import { CompIntf } from "../../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -50,6 +51,9 @@ export class TypeBase implements TypeHandlerIntf {
 
     getAllowUserSelect(): boolean {
         return this.allowUserSelect;
+    }
+
+    getDomPreUpdateFunction(parent: CompIntf): void {
     }
 }
 

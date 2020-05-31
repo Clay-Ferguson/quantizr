@@ -6,7 +6,6 @@ import * as RssParser from 'rss-parser';
 import { Div } from "../widget/Div";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
-import { MessageDlg } from "../dlg/MessageDlg";
 import { TextContent } from "../widget/TextContent";
 import { Heading } from "../widget/Heading";
 import { Para } from "../widget/Para";
@@ -17,6 +16,7 @@ import { MarkdownDiv } from "../widget/MarkdownDiv";
 import { AppState } from "../AppState";
 import { dispatch } from "../AppRedux";
 import { TypeBase } from "./base/TypeBase";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -40,12 +40,10 @@ export class RssTypeHandler extends TypeBase {
 
         let feedSrc: string = S.props.getNodePropVal(J.NodeProp.RSS_FEED_SRC, node);
         if (!feedSrc) {
-            return (new TextContent("Set the '"+J.NodeProp.RSS_FEED_SRC+"' node property to the RSS Feed URL.", "alert alert-info marginLeft marginTop"));
+            return (new TextContent("Set the '" + J.NodeProp.RSS_FEED_SRC + "' node property to the RSS Feed URL.", "alert alert-info marginLeft marginTop"));
         }
 
         let content = node.content;
-
-        //ret += new Div("Feed Source: " + src);
         let itemListContainer: Div = new Div("", { className: "rss-feed-listing" }, [
             new Heading(3, content)
         ]);
@@ -57,16 +55,31 @@ export class RssTypeHandler extends TypeBase {
         //if we find the RSS feed in the cache, use it.
         //disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to 
         //figure this out yet.
-        if (state.feedCache[feedSrc]) {
+        if (state.failedFeedCache[feedSrc]) {
+            return new Div("Feed Failed: " + feedSrc, {
+                className: "marginAll"
+            });
+        }
+        else if (state.feedCache[feedSrc]) {
             this.renderItem(state.feedCache[feedSrc], feedSrc, itemListContainer, state);
         }
         //otherwise read from the internet
         else {
             itemListContainer.addChild(new Div("Loading RSS Feed..."));
 
-            parser.parseURL(feedSrc, (err, feed) => {
+            //The 'rss-parser' doc suggested herokuapp, but I don't know if I can write my own service or use some better one?
+            const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+
+            parser.parseURL(CORS_PROXY + feedSrc, (err, feed) => {
                 if (!feed) {
-                    new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
+                    //new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
+                    //console.log(err.message || "RSS Feed failed to load.");
+                    dispatch({
+                        type: "Action_RSSUpdated", state,
+                        update: (s: AppState): void => {
+                            s.failedFeedCache[feedSrc] = "true";
+                        },
+                    });
                 }
                 else {
                     dispatch({
@@ -106,7 +119,7 @@ export class RssTypeHandler extends TypeBase {
         let feedOutDiv = new Div(null, null, feedOut);
         itemListContainer.children.push(feedOutDiv);
 
-        feed.items.forEach(function(item) {
+        feed.items.forEach(function (item) {
             itemListContainer.children.push(this.buildFeedItem(item, state));
         }, this);
     }
@@ -148,5 +161,14 @@ export class RssTypeHandler extends TypeBase {
                 paddingTop: "10px"
             }
         }, children);
+    }
+
+    /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px in side because
+    otherwise we get rediculously large images */
+    getDomPreUpdateFunction(parent: CompIntf): void {
+        S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el, i) => {
+            el.style.maxWidth = "300px";
+            el.style.width = "300px";
+        });
     }
 }

@@ -70,4 +70,5 @@ export class AppState {
 
     //Rss feeds
     feedCache = {};
+    failedFeedCache = {};
 }

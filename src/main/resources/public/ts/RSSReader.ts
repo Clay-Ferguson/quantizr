@@ -1,7 +1,7 @@
 import { RSSReaderIntf } from "./intf/RSSReaderIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
+import { Constants as C } from "./Constants";
 import axios from 'axios';
 
 /*
@@ -21,6 +21,7 @@ export class RSSReader implements RSSReaderIntf {
     FAKE_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)Chrome/53.0.2785.143Safari/537.36";
 
     readFeed = (feedSrc: string, callback: Function): void => {
+        //console.log("Read feed: " + feedSrc);
 
         // accepts:{
         //     xml:"application/rss+xml"
@@ -31,7 +32,7 @@ export class RSSReader implements RSSReaderIntf {
             //responseType: "document",
             headers: {
                 //"Accept": "application/rss+xml",
-                "user-agent" : this.FAKE_USER_AGENT 
+                "user-agent": this.FAKE_USER_AGENT
             },
         })
             .then((response) => {

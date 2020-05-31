@@ -22,6 +22,8 @@ export class NodeCompContent extends Div {
     /* switches for performance testing. */
     static showRowHeader: boolean = true;
 
+    domPreUpdateFunc: Function;
+
     constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix = "") {
         super(null, {
             id: "NodeCompContent_" + node.id
@@ -42,7 +44,8 @@ export class NodeCompContent extends Div {
         }
 
         //console.log("NodeCompContent node is rendering: "+S.util.prettyPrint(node));
-        this.attribs.id = node.id + "_" + this.idPrefix + "_content";
+        //todo-0: is idPrefix still used? if so use it and not 'c'
+        this.attribs.id = "c" + node.id + "_" + this.idPrefix;
 
         let children: Comp[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
@@ -63,6 +66,7 @@ export class NodeCompContent extends Div {
              * Special Rendering for Nodes that have a plugin-renderer
              */
             if (typeHandler) {
+                this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
                 children.push(typeHandler.render(node, this.rowStyling, state));
             }
             //note: this path is obsolete now. always will have a type.
@@ -94,5 +98,14 @@ export class NodeCompContent extends Div {
         }
 
         this.setChildren(children);
+    }
+
+    /* We do two things in here: 1) update formula rendering, and 2) change all "a" tags inside this div to have a target=_blank */
+    domPreUpdateEvent = (): void => {
+        if (this.domPreUpdateFunc) {
+            this.whenElm((elm) => {
+                this.domPreUpdateFunc(this);
+            });
+        }
     }
 }
