@@ -11,10 +11,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class MenuItem extends Div {
 
-    constructor(public name: string, public clickFunc: Function) {
+    constructor(public name: string, public clickFunc: Function, enabled: boolean=true) {
         super(name);
         this.state.content = name;
         this.onClick = this.onClick.bind(this);
+        this.setEnabled(enabled);
     }
 
     compRender(): ReactNode {

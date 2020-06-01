@@ -43,15 +43,15 @@ export class MenuPanel extends Div {
         let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, highlightNode);
         let allowNodeMove: boolean = !orderByProp;
 
-        let canMoveUp = allowNodeMove && highlightNode && !highlightNode.firstChild;
-        let canMoveDown = allowNodeMove && highlightNode && !highlightNode.lastChild;
+        let canMoveUp = !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.firstChild);
+        let canMoveDown = !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.lastChild);
 
         let children = [];
 
         //WARNING: The string 'Navigate' is also in Menu.activeMenu.
         children.push(new Menu("Navigate", [
-            !state.isAnonUser ? new MenuItem("Home", () => S.nav.navHome(state)) : null,
-            !state.isAnonUser ? new MenuItem("Inbox", () => S.nav.openContentNode(state.homeNodePath + "/inbox", state)) : null,
+            new MenuItem("Home", () => S.nav.navHome(state), !state.isAnonUser),
+            new MenuItem("Inbox", () => S.nav.openContentNode(state.homeNodePath + "/inbox", state), !state.isAnonUser),
             new MenuItem("Portal", () => S.meta64.loadAnonPageHome(state)),
 
             //I'm removing my RSS feeds, for now (mainly to remove any political or interest-specific content from the platform)
@@ -68,7 +68,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Edit", [
             //new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
-            !state.isAnonUser && state.nodesToMove != null ? new MenuItem("Undo Cut", S.edit.undoCutSelNodes) : null, //
+            new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !state.isAnonUser && state.nodesToMove != null), //
 
             /*
             I have this feature 90% complete but near the end i realized i have a problem with id v.s. uid, because uid
@@ -77,50 +77,56 @@ export class MenuPanel extends Div {
             */
             //new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
-            !state.isAnonUser && selNodeCount > 0 ? new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state)) : null, //
-            canMoveUp ? new MenuItem("Move to Top", () => S.edit.moveNodeToTop(null, state)) : null, //
-            canMoveDown ? new MenuItem("Move to Bottom", () => S.edit.moveNodeToBottom(null, state)) : null,//
-            !state.isAnonUser && selNodeCount > 0 && selNodeIsMine ? new MenuItem("Permanent Delete", () => S.edit.deleteSelNodes(null, true, state)) : null, //
-            !state.isAnonUser ? new MenuItem("Show Trash Bin", () => S.nav.openContentNode(state.homeNodePath + "/d", state)) : null,
+            new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state), !state.isAnonUser && selNodeCount > 0), //
+            new MenuItem("Move to Top", () => S.edit.moveNodeToTop(null, state), canMoveUp), //
+            new MenuItem("Move to Bottom", () => S.edit.moveNodeToBottom(null, state), canMoveDown),//
+            new MenuItem("Permanent Delete", () => S.edit.deleteSelNodes(null, true, state), !state.isAnonUser && selNodeCount > 0 && selNodeIsMine), //
+            new MenuItem("Show Trash Bin", () => S.nav.openContentNode(state.homeNodePath + "/d", state), !state.isAnonUser),
         ]));
 
         children.push(new Menu("Uploads", [
-            !state.isAnonUser && highlightNode != null && selNodeIsMine ? //
-                new MenuItem("Upload from File", () => S.attachment.openUploadFromFileDlg(false, null, null, state)) : null, //
 
-            !state.isAnonUser && highlightNode != null && selNodeIsMine ? //
-                new MenuItem("Upload from URL", () => S.attachment.openUploadFromUrlDlg(null, null, state)) : null, //
+            new MenuItem("Upload from File", () => S.attachment.openUploadFromFileDlg(false, null, null, state), //
+                !state.isAnonUser && highlightNode != null && selNodeIsMine), //
 
-            !state.isAnonUser && highlightNode != null && selNodeIsMine ? //
-                new MenuItem("Upload to IPFS", () => S.attachment.openUploadFromFileDlg(true, null, null, state)) : null, //
+            new MenuItem("Upload from URL", () => S.attachment.openUploadFromUrlDlg(null, null, state), //
+                !state.isAnonUser && highlightNode != null && selNodeIsMine), //
 
-            !state.isAnonUser && highlightNode != null && S.props.hasBinary(highlightNode) && selNodeIsMine ? //
-                new MenuItem("Delete Attachment", () => S.attachment.deleteAttachment(state)) : null
+            new MenuItem("Upload to IPFS", () => S.attachment.openUploadFromFileDlg(true, null, null, state), //
+                !state.isAnonUser && highlightNode != null && selNodeIsMine), //
+
+            new MenuItem("Delete Attachment", () => S.attachment.deleteAttachment(state), //
+                !state.isAnonUser && highlightNode != null && S.props.hasBinary(highlightNode) && selNodeIsMine)
         ]));
 
         children.push(new Menu("Share", [
-            !state.isAnonUser && highlightNode != null && selNodeIsMine ? new MenuItem("Edit Node Sharing", () => S.share.editNodeSharing(state)) : null, //
+            new MenuItem("Edit Node Sharing", () => S.share.editNodeSharing(state), //
+                !state.isAnonUser && highlightNode != null && selNodeIsMine), //
+
             // new MenuItem("Post Node", () => { S.activityPub.postNode(); },//
             //     () => {
             //         return "ramrod" == S.meta64.userName.toLowerCase() ||
             //             "admin" == S.meta64.userName.toLowerCase();
             //         //!state.isAnonUser && highlightNode != null && selNodeIsMine 
             //     }),
-            !state.isAnonUser && highlightNode != null ? //
-                new MenuItem("Show All Shares", () => S.share.findSharedNodes(state, null)) : null,
-            !state.isAnonUser && highlightNode != null ? //
-                new MenuItem("Show Public Shares", () => S.share.findSharedNodes(state, "public")) : null
+
+            new MenuItem("Show All Shares", () => S.share.findSharedNodes(state, null), //
+                !state.isAnonUser && highlightNode != null),
+
+            new MenuItem("Show Public Shares", () => S.share.findSharedNodes(state, "public"), //
+                !state.isAnonUser && highlightNode != null)
         ]));
 
         children.push(new Menu("Search", [
-            !state.isAnonUser && highlightNode != null ? //
-                new MenuItem("All Content", () => { new SearchContentDlg(state).open(); }) : null, //
 
-            !state.isAnonUser && highlightNode != null ? //
-                new MenuItem("By Name", () => { new SearchByNameDlg(state).open(); }) : null, //
+            new MenuItem("All Content", () => { new SearchContentDlg(state).open(); }, //
+                !state.isAnonUser && highlightNode != null), //
 
-            !state.isAnonUser && highlightNode != null ? //
-                new MenuItem("By ID", () => { new SearchByIDDlg(state).open(); }) : null, //
+            new MenuItem("By Name", () => { new SearchByNameDlg(state).open(); }, //
+                !state.isAnonUser && highlightNode != null), //
+
+            new MenuItem("By ID", () => { new SearchByIDDlg(state).open(); }, //
+                !state.isAnonUser && highlightNode != null), //
 
             //new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch })
@@ -131,11 +137,12 @@ export class MenuPanel extends Div {
         //     new MenuItem("Tree Structure", S.graph.graphTreeStructure, () => { return !state.isAnonUser && highlightNode != null }), //
         // ]),
         children.push(new Menu("Timeline", [
-            !state.isAnonUser && highlightNode != null ? //
-                new MenuItem("Created", () => S.srch.timeline('ctm', state)) : null, //
 
-            !state.isAnonUser && highlightNode != null ? //
-                new MenuItem("Modified", () => S.srch.timeline('mtm', state)) : null, //
+            new MenuItem("Created", () => S.srch.timeline('ctm', state), //
+                !state.isAnonUser && highlightNode != null), //
+
+            new MenuItem("Modified", () => S.srch.timeline('mtm', state), //
+                !state.isAnonUser && highlightNode != null), //
         ]));
 
         children.push(new Menu("View", [
@@ -146,19 +153,17 @@ export class MenuPanel extends Div {
 
             new MenuItem("Refresh", () => S.meta64.refresh(state)), //
 
-            highlightNode != null ? //
-                new MenuItem("Show URL", () => S.render.showNodeUrl(state)) : null, //
+            new MenuItem("Show URL", () => S.render.showNodeUrl(state), highlightNode != null), //
 
-            !state.isAnonUser && selNodeIsMine ? //
-                new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", state)) : null, //
+            new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", state), //
+                !state.isAnonUser && selNodeIsMine), //
         ]));
 
         children.push(new Menu("Tools", [
-            !state.isAnonUser && selNodeIsMine ? //
-                new MenuItem("Split Node", () => new SplitNodeDlg(state).open()) : null, //
 
-            !state.isAnonUser && selNodeIsMine ? //
-                new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open() }) : null, //
+            new MenuItem("Split Node", () => new SplitNodeDlg(state).open(), !state.isAnonUser && selNodeIsMine), //
+
+            new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open() }, !state.isAnonUser && selNodeIsMine), //
 
             //todo-1: disabled during mongo conversion
             //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
@@ -172,11 +177,12 @@ export class MenuPanel extends Div {
         //need to make export safe for end users to use (recarding file sizes)
         if (state.isAdminUser) {
             children.push(new Menu("Admin Tools", [
-                importFeatureEnabled && (selNodeIsMine || (highlightNode != null && state.homeNodeId == highlightNode.id)) ? //
-                    new MenuItem("Import", () => S.edit.openImportDlg(state)) : null, //
 
-                exportFeatureEnabled && (selNodeIsMine || (highlightNode != null && state.homeNodeId == highlightNode.id)) ? //
-                    new MenuItem("Export", () => S.edit.openExportDlg(state)) : null, //
+                new MenuItem("Import", () => S.edit.openImportDlg(state), //
+                    importFeatureEnabled && (selNodeIsMine || (highlightNode != null && state.homeNodeId == highlightNode.id))), //
+
+                new MenuItem("Export", () => S.edit.openExportDlg(state),
+                    exportFeatureEnabled && (selNodeIsMine || (highlightNode != null && state.homeNodeId == highlightNode.id))), //
 
                 //todo-1: disabled during mongo conversion
                 //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
@@ -196,10 +202,10 @@ export class MenuPanel extends Div {
         // let fileSystemMenu = makeTopLevelMenu("FileSys", fileSystemMenuItems);
 
         children.push(new Menu("Account", [
-            !state.isAnonUser ? new MenuItem("Preferences", () => S.edit.editPreferences(state)) : null, //
-            !state.isAnonUser ? new MenuItem("Change Password", () => S.edit.openChangePasswordDlg(state)) : null, //
-            !state.isAnonUser ? new MenuItem("Manage Account", () => S.edit.openManageAccountDlg(state)) : null, //
-            !state.isAnonUser ? new MenuItem("Encryption Keys", () => { new ManageEncryptionKeysDlg(state).open(); }) : null, //
+            new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), //
+            new MenuItem("Change Password", () => S.edit.openChangePasswordDlg(state), !state.isAnonUser), //
+            new MenuItem("Manage Account", () => S.edit.openManageAccountDlg(state), !state.isAnonUser), //
+            new MenuItem("Encryption Keys", () => { new ManageEncryptionKeysDlg(state).open(); }, !state.isAnonUser), //
 
             // menuItem("Full Repository Export", "fullRepositoryExport", "
             // S.edit.fullRepositoryExport();") + //
@@ -207,15 +213,16 @@ export class MenuPanel extends Div {
 
         if (state.isAdminUser) {
             children.push(new Menu("IPFS", [
-                state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine) ? //
-                    new MenuItem("Display Node Info", () => S.view.runServerCommand("ipfsGetNodeInfo", state)) : null,
 
-                state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine) ? //
-                    new MenuItem("Force Refresh", () => {
-                        let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
-                        let nodeId: string = currentSelNode != null ? currentSelNode.id : null;
-                        S.view.refreshTree(nodeId, false, nodeId, false, true, state);
-                    }) : null
+                new MenuItem("Display Node Info", () => S.view.runServerCommand("ipfsGetNodeInfo", state), //
+                    state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)),
+
+                new MenuItem("Force Refresh", () => {
+                    let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+                    let nodeId: string = currentSelNode != null ? currentSelNode.id : null;
+                    S.view.refreshTree(nodeId, false, nodeId, false, true, state);
+                },
+                    state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine))
             ]));
         }
 
