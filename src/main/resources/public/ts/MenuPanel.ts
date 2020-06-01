@@ -42,9 +42,10 @@ export class MenuPanel extends Div {
 
         let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, highlightNode);
         let allowNodeMove: boolean = !orderByProp;
+        let isPageRootNode = state.node && highlightNode && state.node.id==highlightNode.id;
 
-        let canMoveUp = !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.firstChild);
-        let canMoveDown = !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.lastChild);
+        let canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.firstChild);
+        let canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.lastChild);
 
         let children = [];
 

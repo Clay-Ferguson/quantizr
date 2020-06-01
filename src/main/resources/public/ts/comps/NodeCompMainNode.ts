@@ -39,7 +39,7 @@ export class NodeCompMainNode extends Div {
         S.render.setNodeDropHandler(this, node, state);
 
         this.setChildren([
-            new NodeCompButtonBar(node, true, false, true),
+            new NodeCompButtonBar(node, true, false),
             new Div(null, {
                 className: "clearfix",
                 id: "button_bar_clearfix_" + node.id

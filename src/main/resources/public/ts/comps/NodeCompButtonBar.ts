@@ -21,7 +21,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompButtonBar extends HorizontalLayout {
 
-    constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean, public isRootNode: boolean) {
+    constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean) {
         super(null, "marginLeft", {
             id: "NodeCompButtonBar_" + node.id,
         });
@@ -55,7 +55,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let searchButton: NavBarIconButton;
         let timelineButton: NavBarIconButton;
 
-        if (this.isRootNode) {
+        let isPageRootNode = state.node && this.node.id==state.node.id;
+
+        if (state.node && this.node.id==state.node.id) {
             if (S.nav.parentVisibleToUser(state)) {
                 upLevelButton = new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
                     /* For onclick functions I need a new approach for some (not all) where I can get by 
@@ -133,7 +135,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         ONLY show when there ARE truly children fore sure would be to force a check of the file system for every folder type that is ever rendered
         on a page and we don't want to burn that much CPU just to prevent empty-folders from being explored. Empty folders are rare.
         */
-        if (node.hasChildren && !this.isRootNode && 
+        if (node.hasChildren && !isPageRootNode && 
             //If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
             (!isInlineChildren || state.userPreferences.editMode)) {
 
@@ -184,7 +186,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     title: "Edit Node"
                 });
 
-                if (!this.isRootNode && node.type != J.NodeType.REPO_ROOT && !state.nodesToMove) {
+                if (!isPageRootNode && node.type != J.NodeType.REPO_ROOT && !state.nodesToMove) {
                     cutNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_cutSelNodes, "S.edit.cutSelNodes", node.id), {
                         iconclass: "fa fa-cut fa-lg",
                         title: "Cut selected Node(s) to paste elsewhere."
@@ -235,7 +237,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
         let navButtonBar;
 
-        if (this.isRootNode) {
+        if (isPageRootNode) {
             navButtonBar = new ButtonBar([searchButton, timelineButton, upLevelButton, prevButton, nextButton],
                 null, "float-right marginTop marginBottom");
             if (!navButtonBar.childrenExist()) {
