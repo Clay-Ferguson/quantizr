@@ -34,6 +34,7 @@ export class Edit implements EditIntf {
     nodeInsertTarget: any = null;
     nodeInsertTargetOrdinalOffset: number = 0;
 
+    //todo-0: all 4 of these calls can be removed. just create dlg in function.
     openChangePasswordDlg = (state: AppState): void => {
         new ChangePasswordDlg({}, state).open();
     }

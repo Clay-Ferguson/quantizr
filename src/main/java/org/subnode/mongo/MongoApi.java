@@ -945,10 +945,12 @@ public class MongoApi {
 		 */
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(path));
 
-		//This condition ensures that when users create a node and are still editing that node
-		//will be invisible to others until they click "save"
-		//todo-1: at some future time we can write code to find any nodes which are
-		//orphaned by a user creating but never saving changes.
+		/*
+		 * This condition ensures that when users create a node and are still editing
+		 * that node will be invisible to others until they click "save" todo-1: at some
+		 * future time we can write code to find any nodes which are orphaned by a user
+		 * creating but never saving changes.
+		 */
 		criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
 
 		if (sort != null) {
@@ -1005,7 +1007,8 @@ public class MongoApi {
 		query.addCriteria(criteria);
 
 		saveSession(session);
-		//for 'findOne' is it also advantageous to also setup the query criteria with something like LIMIT=1 (sql)?
+		// for 'findOne' is it also advantageous to also setup the query criteria with
+		// something like LIMIT=1 (sql)?
 		SubNode nodeFound = ops.findOne(query, SubNode.class);
 		if (nodeFound == null) {
 			return 0L;
@@ -1413,8 +1416,8 @@ public class MongoApi {
 	 * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
 	 * userNode if you know it, to save cycles
 	 */
-	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode, String pathPart,
-			String nodeName, String type) {
+	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode, String pathPart, String nodeName,
+			String type) {
 		if (userNode == null) {
 			userNode = getUserNodeByUserName(session, user);
 		}
@@ -1437,11 +1440,11 @@ public class MongoApi {
 		if (session == null) {
 			session = getAdminSession();
 		}
-		
+
 		if (user == null) {
 			user = sessionContext.getUserName();
 		}
-		user = user.trim(); 
+		user = user.trim();
 
 		// For the ADMIN user their root node is considered to be the entire root of the
 		// whole DB
@@ -1462,7 +1465,10 @@ public class MongoApi {
 		return ret;
 	}
 
-	/* Finds the first node matching 'type' under 'path' (non-recursively, direct children only) */
+	/*
+	 * Finds the first node matching 'type' under 'path' (non-recursively, direct
+	 * children only)
+	 */
 	public SubNode findTypedNodeUnderPath(MongoSession session, String path, String type) {
 
 		// Other wise for ordinary users root is based off their username

@@ -85,6 +85,13 @@ body {
     margin-left: 8px;
 }
 
+.profileImage {
+    border-radius: $borderRadiusMedium;
+    max-width: 400px;
+    cursor: pointer;
+    margin: 16px;
+}
+
 .main-navbar {
     padding: $tinyGap;
 }
@@ -216,19 +223,21 @@ strong em {
 
 //We hav this 80% width version so that the main menu can use it because to close that without selecting an option
 //the user needs space to click in outside the menu which closes the menu.
+//todo-0: note this now ONLY applies to main menu itself, so update variable names and designs accordingly.
 .app-modal-content-almost-fullscreen {
     border: 2px solid $modal-content-border-color;
     background-color: $modal-content-bg;
     padding: $smallGap;
-    width: 80%;
+    width: 18em;
+    max-width: 18em;
     height: 100%;
 }
 
 /* Modal Content/ Dialog Box */
 
 .menuContainer {
-    min-width: 16em;
-    width: 16em;
+    min-width: 18em;
+    width: 18em;
 }
 
 .app-modal-menu {

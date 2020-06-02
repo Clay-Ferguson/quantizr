@@ -9,6 +9,7 @@ export class AppState {
 
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
+    //userBio: string;
 
     offsetOfNodeFound: number;
     displayedParent: boolean;
@@ -62,6 +63,9 @@ export class AppState {
 
     homeNodeId: string;
     homeNodePath: string;
+
+    //todo-0: this was only added for ProfileDlg and doesn't need to be here.
+    avatarVer: string;
 
     pendingLocationHash: string;
 

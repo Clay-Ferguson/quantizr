@@ -11,6 +11,7 @@ import { TimelineView } from "../comps/TimelineView";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
 import { dispatch } from "../AppRedux";
+import clientInfo from "../ClientInfo";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,7 +22,13 @@ export class TabPanel extends Div {
 
     constructor() {
         super(null);
-        this.attribs.className = "col-" + C.mainPanelCols + " offset-" + C.leftNavPanelCols;
+
+        if (clientInfo.isMobile) {
+            this.attribs.className = "col-12";
+        }
+        else {
+            this.attribs.className = "col-" + C.mainPanelCols + " offset-" + C.leftNavPanelCols;
+        }
     }
 
     preRender(): void {

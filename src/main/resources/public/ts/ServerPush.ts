@@ -35,7 +35,6 @@ export class ServerPush implements ServerPushIntf {
 
         eventSource.addEventListener('serverPushEvent', function (e: any) {
             // let serverPushInfo: J.ServerPushInfo = JSON.parse(e.data);
-            // debugger;
             //console.log("ServerPushEvent:", S.util.prettyPrint(serverPushInfo));
             //NOTE: For now we don't do anything that great or scalable but just let user know their inbox had new goodies in it.
             //new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();

@@ -7,6 +7,7 @@ import { Comp } from "../../widget/base/Comp";
 import { NodeCompMarkdown } from "../../comps/NodeCompMarkdown";
 import { AppState } from "../../AppState";
 import { CompIntf } from "../../widget/base/CompIntf";
+import { store } from "../../AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -17,6 +18,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class TypeBase implements TypeHandlerIntf {
 
     constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string, private allowUserSelect: boolean) {
+        let state: AppState = store.getState();
+        if (state.isAdminUser) this.allowUserSelect = true;
     }
 
     getTypeName(): string {

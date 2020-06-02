@@ -284,13 +284,13 @@ export class Render implements RenderIntf {
         return this.getAttachmentUrl("stream", node);
     }
 
-    getAvatarImgUrl = (node: J.NodeInfo) => {
-        if (!node.avatarVer) return null;
-        return S.util.getRpcPath() + "bin/avatar" + "?nodeId=" + node.ownerId + "&v=" + node.avatarVer;
+    getAvatarImgUrl = (ownerId: string, avatarVer: string /* node: J.NodeInfo*/) => {
+        if (!avatarVer) return null;
+        return S.util.getRpcPath() + "bin/avatar" + "?nodeId=" + ownerId + "&v=" + avatarVer;
     }
 
     makeAvatarImage = (node: J.NodeInfo, state: AppState) => {
-        let src: string = this.getAvatarImgUrl(node);
+        let src: string = this.getAvatarImgUrl(node.ownerId, node.avatarVer);
         if (!src) {
             return null;
         }

@@ -101,6 +101,8 @@ export class Textarea extends Comp implements I.TextEditorIntf {
             }
         }
 
+        _attribs.style = { fontFamily: "monospace" };
+
         children.push(S.e('textarea', _attribs));
         return S.e("div", {
             id: this.getId() + "_textfield",

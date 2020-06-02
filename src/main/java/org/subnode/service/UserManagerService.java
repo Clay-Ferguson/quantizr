@@ -27,20 +27,24 @@ import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.CloseAccountRequest;
 import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetUserAccountInfoRequest;
+import org.subnode.request.GetUserProfileRequest;
 import org.subnode.request.LoginRequest;
 import org.subnode.request.ResetPasswordRequest;
 import org.subnode.request.SavePublicKeyRequest;
 import org.subnode.request.SaveUserPreferencesRequest;
+import org.subnode.request.SaveUserProfileRequest;
 import org.subnode.request.SignupRequest;
 import org.subnode.response.ChangePasswordResponse;
 import org.subnode.response.CloseAccountResponse;
 import org.subnode.response.FriendInfo;
 import org.subnode.response.GetFriendsResponse;
 import org.subnode.response.GetUserAccountInfoResponse;
+import org.subnode.response.GetUserProfileResponse;
 import org.subnode.response.LoginResponse;
 import org.subnode.response.ResetPasswordResponse;
 import org.subnode.response.SavePublicKeyResponse;
 import org.subnode.response.SaveUserPreferencesResponse;
+import org.subnode.response.SaveUserProfileResponse;
 import org.subnode.response.SignupResponse;
 import org.subnode.util.Const;
 import org.subnode.util.DateUtil;
@@ -140,6 +144,7 @@ public class UserManagerService {
 			String id = userNode.getId().toHexString();
 			sessionContext.setRootId(id);
 			res.setRootNode(id);
+			res.setAvatarVer(userNode.getStringProp(NodeProp.BIN.s()));
 			res.setRootNodePath(userNode.getPath());
 			res.setUserName(userName);
 			res.setAllowFileSystemSearch(appProp.isAllowFileSystemSearch());
@@ -495,6 +500,53 @@ public class UserManagerService {
 			userPreferences.setShowMetaData(showMetaData);
 
 			res.setSuccess(true);
+		});
+		return res;
+	}
+
+	public SaveUserProfileResponse saveUserProfile(final SaveUserProfileRequest req) {
+		SaveUserProfileResponse res = new SaveUserProfileResponse();
+		final String userName = sessionContext.getUserName();
+		
+		adminRunner.run(session -> {
+			boolean failed = false;
+			SubNode userNode = api.getUserNodeByUserName(session, userName);
+
+			// If userName is changing, validate it first.
+			if (!req.getUserName().equals(userName)) {
+				validator.checkUserName(req.getUserName());
+
+				SubNode nodeFound = api.getUserNodeByUserName(session, req.getUserName());
+				if (nodeFound != null) {
+					res.setMessage("User already exists.");
+					res.setSuccess(false);
+					failed = true;
+				}
+			}
+
+			if (!failed) {
+				// todo-0: looks like sn:user and sn:userName exist? WTF
+				userNode.setProp(NodeProp.USER.s(), req.getUserName());
+				userNode.setProp(NodeProp.USER_BIO.s(), req.getUserBio());
+				sessionContext.setUserName(req.getUserName());
+				api.save(session, userNode);
+				res.setSuccess(true);
+			}
+		});
+		return res;
+	}
+
+	public GetUserProfileResponse getUserProfile(final GetUserProfileRequest req) {
+		GetUserProfileResponse res = new GetUserProfileResponse();
+		final String userName = sessionContext.getUserName();
+
+		adminRunner.run(session -> {
+			SubNode userNode = api.getUserNodeByUserName(session, userName);
+			if (userNode != null) {
+				res.setUserName(userNode.getStringProp(NodeProp.USER.s()));
+				res.setUserBio(userNode.getStringProp(NodeProp.USER_BIO.s()));
+				res.setSuccess(true);
+			}
 		});
 		return res;
 	}

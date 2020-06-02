@@ -40,8 +40,15 @@ export class SharingDlg extends DialogBase {
                 ])
             ])
         ];
-        this.reload();
+
         return children;
+    }
+
+    queryServer(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            this.reload();
+            resolve();
+        });
     }
 
     /*
@@ -52,15 +59,10 @@ export class SharingDlg extends DialogBase {
             nodeId: this.node.id,
             includeAcl: true,
             includeOwners: true
-        }, this.populate);
-    }
-
-    /*
-     * Processes the response gotten back from the server containing ACL info so we can populate the sharing page in the gui
-     */
-    populate = (res: J.GetNodePrivilegesResponse): void => {
-        //console.log("populating with: res="+S.util.prettyPrint(res));
-        this.privsTable.setState(res); 
+        }, (res: J.GetNodePrivilegesResponse): void => {
+            //console.log("populating with: res="+S.util.prettyPrint(res));
+            this.privsTable.setState(res);
+        });
     }
 
     removePrivilege = (principalNodeId: string, privilege: string): void => {
@@ -76,7 +78,10 @@ export class SharingDlg extends DialogBase {
             nodeId: this.node.id,
             includeAcl: true,
             includeOwners: true
-        }, this.populate);
+        }, (res: J.GetNodePrivilegesResponse): void => {
+            //console.log("populating with: res="+S.util.prettyPrint(res));
+            this.privsTable.setState(res);
+        });
     }
 
     shareToPersonDlg = (): void => {

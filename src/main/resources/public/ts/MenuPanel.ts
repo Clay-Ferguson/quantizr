@@ -13,6 +13,7 @@ import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { AppState } from "./AppState";
 import { useSelector, useDispatch } from "react-redux";
+import { ProfileDlg } from "./dlg/ProfileDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -203,6 +204,7 @@ export class MenuPanel extends Div {
         // let fileSystemMenu = makeTopLevelMenu("FileSys", fileSystemMenuItems);
 
         children.push(new Menu("Account", [
+            new MenuItem("Profile", () => { new ProfileDlg(state).open();}), //
             new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), //
             new MenuItem("Change Password", () => S.edit.openChangePasswordDlg(state), !state.isAnonUser), //
             new MenuItem("Manage Account", () => S.edit.openManageAccountDlg(state), !state.isAnonUser), //

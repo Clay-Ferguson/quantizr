@@ -40,6 +40,7 @@ public enum NodeProp {
      * these nodes.
      */
     USER("sn:user", "s"), //
+    USER_BIO("sn:userBio", "s"), //
     PWD_HASH("sn:pwdHash", "s"), //
 
     FILE_SYNC_LINK("fs:link", "s"), //

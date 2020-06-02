@@ -6,6 +6,10 @@ import org.subnode.response.base.ResponseBase;
 public class LoginResponse extends ResponseBase {
 
 	private String /* Ref Info */ rootNode;
+
+	// version (which is now just the GRID ID) needed to retrieve profile image (account node binary attachment)
+	private String avatarVer;
+
 	private String rootNodePath;
 
 	/* will be username or 'anonymous' if server rejected login */
@@ -14,9 +18,9 @@ public class LoginResponse extends ResponseBase {
 	private String anonUserLandingPageNode;
 
 	/*
-	 * we can optionally send back something here to force the client to load the specified node
-	 * instead of whatever other node it would have loaded for whatever series of reasons. This is a
-	 * hard override for anything else.
+	 * we can optionally send back something here to force the client to load the
+	 * specified node instead of whatever other node it would have loaded for
+	 * whatever series of reasons. This is a hard override for anything else.
 	 */
 	private String homeNodeOverride;
 
@@ -26,6 +30,14 @@ public class LoginResponse extends ResponseBase {
 
 	public String getUserName() {
 		return userName;
+	}
+
+	public String getAvatarVer() {
+		return avatarVer;
+	}
+
+	public void setAvatarVer(String avatarVer) {
+		this.avatarVer = avatarVer;
 	}
 
 	public void setUserName(String userName) {

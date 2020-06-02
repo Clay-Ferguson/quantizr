@@ -7,6 +7,7 @@ import { Div } from "./Div";
 import { Main } from "./Main";
 import { LeftNavPanel } from "./LeftNavPanel";
 import { RightNavPanel } from "./RightNavPanel";
+import clientInfo from "../ClientInfo";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -31,14 +32,14 @@ export class App extends Div {
             new Div(null, { role: "toolbar" }, [new MainNavPanel(null)]),
             //For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
             //both get sized right with no overlapping.
-            new Main({ role: "main", className: "container-fluid" }, [
+            new Main({ role: "main", className: clientInfo.isMobile ? "container" : "container-fluid" }, [
                 new Div(null, {
                     className: "row",
                     role: "banner"
                 }, [
-                    new LeftNavPanel(),
+                    clientInfo.isMobile ? null : new LeftNavPanel(),
                     this.tabPanel || (this.tabPanel = new TabPanel()),
-                    new RightNavPanel()
+                    clientInfo.isMobile ? null : new RightNavPanel()
                 ])
             ])
         ]);

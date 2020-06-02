@@ -93,6 +93,9 @@ export interface GetSharedNodesRequest extends RequestBase {
 export interface GetUserAccountInfoRequest extends RequestBase {
 }
 
+export interface GetUserProfileRequest extends RequestBase {
+}
+
 export interface GraphRequest extends RequestBase {
     nodeId: string;
 }
@@ -203,6 +206,11 @@ export interface SavePublicKeyRequest extends RequestBase {
 
 export interface SaveUserPreferencesRequest extends RequestBase {
     userPreferences: UserPreferences;
+}
+
+export interface SaveUserProfileRequest extends RequestBase {
+    userName: string;
+    userBio: string;
 }
 
 export interface SelectAllNodesRequest extends RequestBase {
@@ -340,6 +348,11 @@ export interface GetUserAccountInfoResponse extends ResponseBase {
     binQuota: number;
 }
 
+export interface GetUserProfileResponse extends ResponseBase {
+    userName: string;
+    userBio: string;
+}
+
 export interface GraphResponse extends ResponseBase {
     nodes: GraphNode[];
     edges: GraphEdge[];
@@ -367,6 +380,7 @@ export interface InsertNodeResponse extends ResponseBase {
 
 export interface LoginResponse extends ResponseBase {
     rootNode: string;
+    avatarVer: string;
     rootNodePath: string;
     userName: string;
     anonUserLandingPageNode: string;
@@ -428,6 +442,9 @@ export interface SavePublicKeyResponse extends ResponseBase {
 }
 
 export interface SaveUserPreferencesResponse extends ResponseBase {
+}
+
+export interface SaveUserProfileResponse extends ResponseBase {
 }
 
 export interface SelectAllNodesResponse extends ResponseBase {
@@ -560,6 +577,7 @@ export const enum NodeProp {
     USER_NAME = "sn:userName",
     TARGET_ID = "sn:target_id",
     USER = "sn:user",
+    USER_BIO = "sn:userBio",
     PWD_HASH = "sn:pwdHash",
     FILE_SYNC_LINK = "fs:link",
     FILENAME = "sn:fileName",

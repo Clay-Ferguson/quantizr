@@ -47,6 +47,7 @@ import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.GetServerInfoRequest;
 import org.subnode.request.GetSharedNodesRequest;
 import org.subnode.request.GetUserAccountInfoRequest;
+import org.subnode.request.GetUserProfileRequest;
 import org.subnode.request.GraphRequest;
 import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.InsertBookRequest;
@@ -66,6 +67,7 @@ import org.subnode.request.SaveNodeRequest;
 import org.subnode.request.SavePropertyRequest;
 import org.subnode.request.SavePublicKeyRequest;
 import org.subnode.request.SaveUserPreferencesRequest;
+import org.subnode.request.SaveUserProfileRequest;
 import org.subnode.request.SelectAllNodesRequest;
 import org.subnode.request.SendTestEmailRequest;
 import org.subnode.request.SetCipherKeyRequest;
@@ -713,6 +715,20 @@ public class AppController {
 	public @ResponseBody Object saveUserPreferences(@RequestBody SaveUserPreferencesRequest req, HttpSession session) {
 		return callProc.run("saveUserPreferences", req, session, ms -> {
 			return userManagerService.saveUserPreferences(req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/getUserProfile", method = RequestMethod.POST)
+	public @ResponseBody Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
+		return callProc.run("getUserProfile", req, session, ms -> {
+			return userManagerService.getUserProfile(req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/saveUserProfile", method = RequestMethod.POST)
+	public @ResponseBody Object saveUserProfile(@RequestBody SaveUserProfileRequest req, HttpSession session) {
+		return callProc.run("saveUserProfile", req, session, ms -> {
+			return userManagerService.saveUserProfile(req);
 		});
 	}
 

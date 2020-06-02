@@ -22,4 +22,5 @@ export interface RenderIntf {
     allowAction(typeHandler: TypeHandlerIntf, action: string): boolean; 
     createBetweenNodeButtonBar(node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, state: AppState): Comp;
     renderChildren(node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp;
+    getAvatarImgUrl(ownerId: string, avatarVer: string): string;
 }

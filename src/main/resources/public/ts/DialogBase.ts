@@ -48,7 +48,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     closed. */
     open = (display: string = null): Promise<DialogBase> => {
         this.opened = true;
-        return new Promise<DialogBase>((resolve, reject) => {
+        return new Promise<DialogBase>(async (resolve, reject) => {
 
             // Create dialog container and attach to document.body.
             this.backdrop = document.createElement("div");
@@ -73,6 +73,12 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
                 });
             }
 
+            /* If the dialog has a function to load from server, call here first */
+            let queryServerPromise = this.queryServer();
+            if (queryServerPromise) {
+                await queryServerPromise;
+            }
+
             //this renders the dlgComp onto the screen (on the backdrop elm)
             this.domRender();
 
@@ -86,6 +92,13 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
 
             this.resolve = resolve;
         });
+    }
+
+    /* NOTE: query server is always forced to complete BEFORE any dialog GUI is allowed to render in case we need to
+    get information from the server before displaying the dialog. This is optional. Many dialogs of course don't need to get data 
+    from the server before displaying */
+    queryServer(): Promise<void> {
+        return null;
     }
 
     domRender(): void {

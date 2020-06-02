@@ -150,7 +150,8 @@ export class MainNavPanel extends NavTag {
                             }
                         },
                         id: "mainMenu",
-                        title: "Show Main Menu"
+                        //only applies to mobile. just don't show title for now.
+                        //title: "Show Main Menu"
                     }, "nav-link")
                 ]),
             ]),
