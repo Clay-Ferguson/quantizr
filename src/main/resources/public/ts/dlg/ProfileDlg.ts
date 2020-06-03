@@ -14,6 +14,8 @@ import { TextField } from "../widget/TextField";
 import { Textarea } from "../widget/Textarea";
 import { Img } from "../widget/Img";
 import { store, dispatch } from "../AppRedux";
+import { Label } from "../widget/Label";
+import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -30,47 +32,77 @@ export class ProfileDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-
-        let profileImg: Img = this.makeProfileImg();
+        let state = this.getState();
+        let profileImg: CompIntf = this.makeProfileImg();
 
         let children = [
             new Form(null, [
-                profileImg,
-                new FormGroup(null, [
-                    new Div(null, null, [
-                        this.userNameTextField = new TextField("User Name"),
-                        this.bioTextarea = new Textarea("Bio", {
-                            rows: 5
-                        })
+                new Div(null, {
+                    className: "row"
+                }, [
+                    new Div(null, {
+                        className: "col-6"
+                    }, [
+                        new Div(null, null, [
+                            this.userNameTextField = new TextField("User Name", state.defaultUserName),
+                            this.bioTextarea = new Textarea("Bio", {
+                                rows: 15
+                            })
+                        ]),
+                    ]),
+
+                    new Div(null, {
+                        className: "col-6"
+                    }, [
+                        new Div(null, null, [
+                            new Label("Profile Picture")
+                        ]),
+                        profileImg,
                     ]),
                 ]),
-                new ButtonBar([
-                    new Button("Save", this.save, null, "btn-primary"),
-                    new Button("Cancel", () => {
-                        this.close();
-                    })
+
+                new Div(null, {
+                    className: "row"
+                }, [
+                    new Div(null, {
+                        className: "col-12"
+                    }, [
+                        new ButtonBar([
+                            new Button("Save", this.save, null, "btn-primary"),
+                            new Button("Cancel", () => {
+                                this.close();
+                            })
+                        ], null, "marginTop")
+                    ])
                 ])
             ])
         ];
 
+        this.bioTextarea.setValue(state.defaultBio);
         return children;
     }
 
     queryServer(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            this.reload();
+        return new Promise<void>(async (resolve, reject) => {
+            await this.reload();
             resolve();
         });
     }
 
-    /*
-     * Gets privileges from server and displays in GUI also. Assumes gui is already at correct page.
-     */
-    reload = (): void => {
-        S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-        }, (res: J.GetUserProfileResponse): void => {
-            this.userNameTextField.setValue(res.userName),
-            this.bioTextarea.setValue(res.userBio)
+    reload(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+            }, (res: J.GetUserProfileResponse): void => {
+                if (res) {
+                    this.mergeState({
+                        defaultUserName: res.userName,
+                        defaultBio: res.userBio,
+                        avatarVer: res.avatarVer,
+                        userNodeId: res.userNodeId
+                    });
+                }
+                resolve();
+            });
         });
     }
 
@@ -90,8 +122,7 @@ export class ProfileDlg extends DialogBase {
         if (S.util.checkSuccess("Saving Profile", res)) {
             let state: AppState = store.getState();
             let userName = this.userNameTextField.getValue();
-            let userBio = this.bioTextarea.getValue();
-        
+
             dispatch({
                 type: "Action_UpdateUserProfile", state,
                 update: (s: AppState): void => {
@@ -100,40 +131,51 @@ export class ProfileDlg extends DialogBase {
                 },
             });
 
+            S.meta64.refresh(state);
             this.close();
         }
     }
 
-    makeProfileImg() {
+    makeProfileImg(): CompIntf {
+        let state = this.getState();
+        let avatarVer = this.getState().avatarVer;
+        let src: string = S.render.getAvatarImgUrl(this.appState.homeNodeId, avatarVer);
 
-        let src: string = S.render.getAvatarImgUrl(this.appState.homeNodeId, this.appState.avatarVer);
-        if (!src) {
-            return null;
+        let onClick = (evt) => {
+            let dlg = new UploadFromFileDropzoneDlg(state.userNodeId, null, false, null, false, this.appState, () => {
+
+                S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                }, (res: J.GetUserProfileResponse): void => {
+                    if (res) {
+                        this.mergeState({
+                            // NOTE: It's correct here to get only avatar info back from server on this query, and ignore
+                            // the other info, that may be currently being edited.
+                            // defaultUserName: res.userName,
+                            // defaultBio: res.userBio,
+                            avatarVer: res.avatarVer,
+                            userNodeId: res.userNodeId
+                        });
+                    }
+                });
+            });
+            dlg.open();
+        };
+
+        if (src) {
+            //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+            let img: Img = new Img("profile-img", {
+                className: "profileImage",
+                title: "Click to upload new Profile Image",
+                src,
+                onClick
+            });
+            return img;
         }
-
-        //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-        let img: Img = new Img("profile-img", {
-            src,
-            className: "profileImage",
-            title: "Click to upload new Profile Image",
-
-            // I decided not to let avatars be clickable.
-            onClick: (evt) => {
-
-                // dispatch({
-                //     type: "Action_ClickImage", state,
-                //     update: (s: AppState): void => {
-                //         if (s.expandedImages[key]) {
-                //             delete s.expandedImages[key];
-                //         }
-                //         else {
-                //             s.expandedImages[key] = "y";
-                //         }
-                //     },
-                // });
-            }
-        });
-
-        return img;
+        else {
+            return new Div("Click to upload Profile Image", {
+                className: "profileImageHolder",
+                onClick
+            });
+        }
     }
 }

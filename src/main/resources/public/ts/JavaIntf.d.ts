@@ -351,6 +351,8 @@ export interface GetUserAccountInfoResponse extends ResponseBase {
 export interface GetUserProfileResponse extends ResponseBase {
     userName: string;
     userBio: string;
+    avatarVer: string;
+    userNodeId: string;
 }
 
 export interface GraphResponse extends ResponseBase {
@@ -380,7 +382,6 @@ export interface InsertNodeResponse extends ResponseBase {
 
 export interface LoginResponse extends ResponseBase {
     rootNode: string;
-    avatarVer: string;
     rootNodePath: string;
     userName: string;
     anonUserLandingPageNode: string;

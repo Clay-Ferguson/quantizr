@@ -24,7 +24,9 @@ export class Attachment implements AttachmentIntf {
             return;
         }
 
-        let dlg = new UploadFromFileDropzoneDlg(node, toIpfs, autoAddFile, false, state);
+        let dlg = new UploadFromFileDropzoneDlg(node.id, node, toIpfs, autoAddFile, false, state, () => {
+            S.meta64.refresh(state);
+        });
         dlg.open();
 
         /* Note: To run legacy uploader just put this version of the dialog here, and

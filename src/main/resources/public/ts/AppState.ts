@@ -64,9 +64,6 @@ export class AppState {
     homeNodeId: string;
     homeNodePath: string;
 
-    //todo-0: this was only added for ProfileDlg and doesn't need to be here.
-    avatarVer: string;
-
     pendingLocationHash: string;
 
     /* Keeds track of which nodes the user has clicked to expand */

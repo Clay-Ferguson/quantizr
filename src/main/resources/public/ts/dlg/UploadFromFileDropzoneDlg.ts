@@ -46,7 +46,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     maxFiles: number = 1;
 
-    constructor(private node: J.NodeInfo, private toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState) {
+    constructor(private nodeId: string, private node: J.NodeInfo, private toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
         super(importMode ? "Import File" : (toIpfs ? "Upload File to IPFS" : "Upload File"), null, false, state);
     }
 
@@ -257,7 +257,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }
                     /* Else we'll be uploading onto Quantizr and saving to ipfs based on the 'ipfs' flag */
                     else {
-                        formData.append("nodeId", dlg.node.id);
+                        formData.append("nodeId", dlg.nodeId);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
                         formData.append("ipfs", dlg.toIpfs ? "true" : "false");
                     }
@@ -301,7 +301,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.on("queuecomplete", function (arg) {
                     if (dlg.sent) {
                         dlg.close();
-                        S.meta64.refresh(dlg.appState);
+
+                        //NOTE: when running from ProfileDlg this is not appropriate, so this needs to be in 'callback' form here.
+                        if (dlg.afterUploadFunc) {
+                            dlg.afterUploadFunc();
+                        }
                     }
                 });
             }

@@ -552,7 +552,6 @@ export class Meta64 implements Meta64Intf {
         if (!res) return;
         if (res.rootNode) {
             state.homeNodeId = res.rootNode;
-            state.avatarVer = res.avatarVer;
             state.homeNodePath = res.rootNodePath;
         }
         state.userName = res.userName;

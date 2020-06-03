@@ -144,7 +144,6 @@ public class UserManagerService {
 			String id = userNode.getId().toHexString();
 			sessionContext.setRootId(id);
 			res.setRootNode(id);
-			res.setAvatarVer(userNode.getStringProp(NodeProp.BIN.s()));
 			res.setRootNodePath(userNode.getPath());
 			res.setUserName(userName);
 			res.setAllowFileSystemSearch(appProp.isAllowFileSystemSearch());
@@ -545,6 +544,8 @@ public class UserManagerService {
 			if (userNode != null) {
 				res.setUserName(userNode.getStringProp(NodeProp.USER.s()));
 				res.setUserBio(userNode.getStringProp(NodeProp.USER_BIO.s()));
+				res.setAvatarVer(userNode.getStringProp(NodeProp.BIN.s()));
+				res.setUserNodeId(userNode.getId().toHexString());
 				res.setSuccess(true);
 			}
 		});

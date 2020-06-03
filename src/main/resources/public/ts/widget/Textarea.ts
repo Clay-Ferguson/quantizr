@@ -74,7 +74,9 @@ export class Textarea extends Comp implements I.TextEditorIntf {
             }
         }
 
-        _attribs.value = state.value;
+        if (state.value) {
+            _attribs.value = state.value;
+        }
 
         // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
         _attribs.onChange = (evt: any) => {

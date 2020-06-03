@@ -284,7 +284,7 @@ export class Render implements RenderIntf {
         return this.getAttachmentUrl("stream", node);
     }
 
-    getAvatarImgUrl = (ownerId: string, avatarVer: string /* node: J.NodeInfo*/) => {
+    getAvatarImgUrl = (ownerId: string, avatarVer: string) => {
         if (!avatarVer) return null;
         return S.util.getRpcPath() + "bin/avatar" + "?nodeId=" + ownerId + "&v=" + avatarVer;
     }

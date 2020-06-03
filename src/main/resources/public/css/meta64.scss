@@ -86,11 +86,22 @@ body {
 }
 
 .profileImage {
-    border-radius: $borderRadiusMedium;
-    max-width: 400px;
+    border-radius: $borderRadiusLarge;
+    width: 300px;
     cursor: pointer;
-    margin: 16px;
+    padding: 8px;
+    border: 6px dotted $nodeBorderBottomColor;
 }
+
+.profileImageHolder {
+    border-radius: $borderRadiusLarge;
+    width: 300px;
+    height: 300px;
+    cursor: pointer;
+    padding: 8px;
+    border: 6px dotted $nodeBorderBottomColor;
+}
+
 
 .main-navbar {
     padding: $tinyGap;
@@ -643,6 +654,7 @@ input[type="radio"] {
 }
 
 .dropzone {
+    background-color: $modal-content-bg;
     border: 4px dashed lightGray;
     margin-bottom: 16px;
     height: 420px;

@@ -7,9 +7,6 @@ public class LoginResponse extends ResponseBase {
 
 	private String /* Ref Info */ rootNode;
 
-	// version (which is now just the GRID ID) needed to retrieve profile image (account node binary attachment)
-	private String avatarVer;
-
 	private String rootNodePath;
 
 	/* will be username or 'anonymous' if server rejected login */
@@ -30,14 +27,6 @@ public class LoginResponse extends ResponseBase {
 
 	public String getUserName() {
 		return userName;
-	}
-
-	public String getAvatarVer() {
-		return avatarVer;
-	}
-
-	public void setAvatarVer(String avatarVer) {
-		this.avatarVer = avatarVer;
 	}
 
 	public void setUserName(String userName) {

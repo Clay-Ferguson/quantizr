@@ -3,6 +3,7 @@ import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { ReactNode } from "react";
+import { CompIntf } from "./base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -11,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Form extends Comp {
 
-    constructor(attribs: Object, private initialChildren: Comp[] = null) {
+    constructor(attribs: Object, private initialChildren: CompIntf[] = null) {
         super(attribs);
     }
 
