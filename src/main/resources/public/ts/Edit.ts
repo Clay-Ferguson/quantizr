@@ -12,6 +12,7 @@ import { Constants as C } from "./Constants";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { AppState } from "./AppState";
 import { dispatch, appState } from "./AppRedux";
+import { ProfileDlg } from "./dlg/ProfileDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -34,7 +35,10 @@ export class Edit implements EditIntf {
     nodeInsertTarget: any = null;
     nodeInsertTargetOrdinalOffset: number = 0;
 
-    //todo-0: all 4 of these calls can be removed. just create dlg in function.
+    openProfileDlg = (state: AppState): void => {
+        new ProfileDlg(state).open();
+    }
+
     openChangePasswordDlg = (state: AppState): void => {
         new ChangePasswordDlg({}, state).open();
     }
@@ -484,7 +488,7 @@ export class Edit implements EditIntf {
         }
 
         let failMsg = null;
-        if (selNodesArray.find(id => id == state.homeNodeId )) {
+        if (selNodesArray.find(id => id == state.homeNodeId)) {
             failMsg = "Sorry, you can't delete your account root node!";
         }
 

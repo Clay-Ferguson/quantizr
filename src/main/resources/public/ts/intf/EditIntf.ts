@@ -9,6 +9,7 @@ export interface EditIntf {
 
     saveClipboardToNode(): void;
     splitNode(splitType: string, delimiter: string, state: AppState): void;
+    openProfileDlg(state: AppState): void;
     openChangePasswordDlg(state: AppState): void;
     openManageAccountDlg(state: AppState): void;
     editPreferences(state: AppState): void;

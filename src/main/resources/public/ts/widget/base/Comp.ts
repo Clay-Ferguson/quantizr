@@ -33,7 +33,7 @@ export abstract class Comp implements CompIntf {
     public debugState: boolean = false;
     private static guid: number = 0;
 
-    //todo-0: make this private? I think private is better, because accidental uses of 'this.state' can be wrong.
+    //todo-1: make this private? I think private is better, because accidental uses of 'this.state' can be wrong.
     public state: any = {};
     attribs: any;
 

@@ -114,11 +114,6 @@ export class ProfileDlg extends DialogBase {
     }
 
     saveResponse = (res: J.SaveUserPreferencesResponse): void => {
-        //todo-0: if you replicate a user name it DOES return 'success=true', along with this message.
-        if (res.message) {
-            S.util.showMessage(res.message, "Warning");
-        }
-
         if (S.util.checkSuccess("Saving Profile", res)) {
             let state: AppState = store.getState();
             let userName = this.userNameTextField.getValue();

@@ -524,7 +524,6 @@ public class UserManagerService {
 			}
 
 			if (!failed) {
-				// todo-0: looks like sn:user and sn:userName exist? WTF
 				userNode.setProp(NodeProp.USER.s(), req.getUserName());
 				userNode.setProp(NodeProp.USER_BIO.s(), req.getUserBio());
 				sessionContext.setUserName(req.getUserName());
