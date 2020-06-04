@@ -172,8 +172,6 @@ export class User implements UserIntf {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 if (S.util.checkSuccess("Login", res)) {
-                    //console.log("loginResponse: usr=" + usr);
-                    //console.log("homeNodeOverride: " + res.homeNodeOverride);
 
                     if (usr !== J.PrincipalName.ANON) {
                         await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
@@ -192,18 +190,15 @@ export class User implements UserIntf {
                     let childId: string = null;
 
                     if (res.homeNodeOverride) {
-                        //console.log("loading homeNodeOverride=" + res.homeNodeOverride);
                         id = res.homeNodeOverride;
                     } //
                     else {
                         let lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
 
                         if (lastNode) {
-                            //console.log("loading lastNode=" + lastNode);
                             id = lastNode;
                             childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
                         } else {
-                            //console.log("loading homeNodeId=" + state.homeNodeId);
                             id = state.homeNodeId;
                         }
                     }

@@ -4,6 +4,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { ReactNode } from "react";
+import { CompIntf } from "./base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -14,7 +15,7 @@ export class Menu extends Div {
 
     static activeMenu: string = "Navigate";
 
-    constructor(public name: string, public menuItems: MenuItem[]) {
+    constructor(public name: string, public menuItems: CompIntf[]) {
         super(null, {
             className: "card menuCard"
         });

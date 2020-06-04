@@ -399,6 +399,10 @@ input[type="radio"] {
     margin: 0 auto;
 }
 
+.menuItemSeparator {
+    border-bottom: 2px solid $nodeBorderBottomColor;
+}
+
 .mainMenuItemDisabled {
     cursor: auto;
     font-weight: lighter;

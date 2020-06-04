@@ -1,6 +1,7 @@
 import * as J from "./JavaIntf";
 import { Menu } from "./widget/Menu";
 import { MenuItem } from "./widget/MenuItem";
+import { MenuItemSeparator } from "./widget/MenuItemSeparator";
 import { Div } from "./widget/Div";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
@@ -13,7 +14,6 @@ import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { AppState } from "./AppState";
 import { useSelector, useDispatch } from "react-redux";
-import { ProfileDlg } from "./dlg/ProfileDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -80,10 +80,26 @@ export class MenuPanel extends Div {
             //new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
             new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state), !state.isAnonUser && selNodeCount > 0), //
+            new MenuItem("Split Node", () => new SplitNodeDlg(state).open(), !state.isAnonUser && selNodeIsMine), //
+            new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open() }, !state.isAnonUser && selNodeIsMine), //
+
+            new MenuItemSeparator(), //
+            
             new MenuItem("Move to Top", () => S.edit.moveNodeToTop(null, state), canMoveUp), //
             new MenuItem("Move to Bottom", () => S.edit.moveNodeToBottom(null, state), canMoveDown),//
+            new MenuItemSeparator(), //
+
             new MenuItem("Permanent Delete", () => S.edit.deleteSelNodes(null, true, state), !state.isAnonUser && selNodeCount > 0 && selNodeIsMine), //
             new MenuItem("Show Trash Bin", () => S.nav.openContentNode(state.homeNodePath + "/d", state), !state.isAnonUser),
+
+
+            //todo-1: disabled during mongo conversion
+            //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
+            //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
+            //    () => { return state.isAdminUser && highlightNode != null }, //
+            //    () => { return state.isAdminUser }, //
+            //    true
+            //), //
         ]));
 
         children.push(new Menu("Uploads", [
@@ -96,6 +112,8 @@ export class MenuPanel extends Div {
 
             new MenuItem("Upload to IPFS", () => S.attachment.openUploadFromFileDlg(true, null, null, state), //
                 !state.isAnonUser && highlightNode != null && selNodeIsMine), //
+
+            new MenuItemSeparator(), //
 
             new MenuItem("Delete Attachment", () => S.attachment.deleteAttachment(state), //
                 !state.isAnonUser && highlightNode != null && S.props.hasBinary(highlightNode) && selNodeIsMine)
@@ -160,22 +178,6 @@ export class MenuPanel extends Div {
             new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", state), //
                 !state.isAnonUser && selNodeIsMine), //
         ]));
-
-        children.push(new Menu("Tools", [
-
-            new MenuItem("Split Node", () => new SplitNodeDlg(state).open(), !state.isAnonUser && selNodeIsMine), //
-
-            new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open() }, !state.isAnonUser && selNodeIsMine), //
-
-            //todo-1: disabled during mongo conversion
-            //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
-            //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
-            //    () => { return state.isAdminUser && highlightNode != null }, //
-            //    () => { return state.isAdminUser }, //
-            //    true
-            //), //
-        ]));
-
         //need to make export safe for end users to use (recarding file sizes)
         if (state.isAdminUser) {
             children.push(new Menu("Admin Tools", [
