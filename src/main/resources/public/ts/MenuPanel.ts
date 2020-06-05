@@ -171,8 +171,6 @@ export class MenuPanel extends Div {
             //this is broken, so I'm just disabling it for now, since this is low priority. todo-1
             //new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
 
-            new MenuItem("Refresh", () => S.meta64.refresh(state)), //
-
             new MenuItem("Show URL", () => S.render.showNodeUrl(state), highlightNode != null), //
 
             new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", state), //

@@ -166,24 +166,21 @@ export class EditNodeDlg extends DialogBase {
             new Form(null, [
                 //this.help = new TextContent("Help content."),
                 new Div(null, {
-                },
-                    [
-                        this.propertyEditFieldContainer = new Div("", {
-                        }),
-                    ]
-                ),
-                this.buttonBar = new ButtonBar(
-                    [
-                        this.saveNodeButton = new Button("Save", () => {
-                            this.saveNode();
-                            this.close();
-                        }, null, "btn-primary"),
-                        this.setTypeButton = new Button("Set Type", this.openChangeNodeTypeDlg),
-                        //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
+                }, [
+                    this.propertyEditFieldContainer = new Div("", {
+                    }),
+                ]),
+                this.buttonBar = new ButtonBar([
+                    this.saveNodeButton = new Button("Save", () => {
+                        this.saveNode();
+                        this.close();
+                    }, null, "btn-primary"),
+                    this.setTypeButton = new Button("Set Type", this.openChangeNodeTypeDlg),
+                    //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
 
-                        this.encryptionButton = new Button("Encryption", this.openEncryptionDlg),
-                        this.cancelButton = new Button("Cancel", this.cancelEdit)
-                    ])
+                    this.encryptionButton = new Button("Encryption", this.openEncryptionDlg),
+                    this.cancelButton = new Button("Cancel", this.cancelEdit)
+                ])
             ])
         ];
 
@@ -204,6 +201,7 @@ export class EditNodeDlg extends DialogBase {
             this.imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection() : null
         ]);
 
+        // This is the table that contains the custom editable properties.
         let collapsiblePropsTable = new EditPropsTable({
             className: "edit-props-table form-group-border"
         });
@@ -255,8 +253,6 @@ export class EditNodeDlg extends DialogBase {
                     return;
                 }
 
-                //console.log("Creating edit field for property " + prop.name);
-
                 if (!allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
                     console.log("Hiding property: " + prop.name);
                     return;
@@ -274,11 +270,10 @@ export class EditNodeDlg extends DialogBase {
         }
 
         if (!collapsiblePropsTable.childrenExist()) {
-            collapsiblePropsTable.addChild(new TextContent("Node has no custom properties."));
+            collapsiblePropsTable.addChild(new TextContent("No custom properties."));
         }
 
-        this.propsButtonBar = new ButtonBar(
-            [
+        this.propsButtonBar = new ButtonBar([
                 this.addPropertyButton = new Button("Add Property", this.addProperty),
                 this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
             ]);
@@ -329,7 +324,7 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    openChangeNodeTypeDlg = (): void => {    
+    openChangeNodeTypeDlg = (): void => {
         let dlg = new ChangeNodeTypeDlg(this.setNodeType, this.appState);
         dlg.open();
     }
@@ -591,15 +586,15 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditor = new Textarea(null, {
                 rows: "20",
                 defaultValue: encrypted ? "[encrypted]" : value
-            }, 
-            /* onBlur value setter, required so that we don't loose edits when react decides to re-render */
-            (value: string) => {
-                let state = this.getState();
-                if (value != state.node.content) {
-                    state.node.content = value;
-                    this.mergeState(state);
-                }
-            });
+            },
+                /* onBlur value setter, required so that we don't loose edits when react decides to re-render */
+                (value: string) => {
+                    let state = this.getState();
+                    if (value != state.node.content) {
+                        state.node.content = value;
+                        this.mergeState(state);
+                    }
+                });
 
             this.contentEditor.whenElm((elm: HTMLElement) => {
                 if (encrypted) {
