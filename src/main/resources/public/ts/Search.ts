@@ -122,10 +122,10 @@ export class Search implements SearchIntf {
      *
      * node is a NodeInfo.java JSON
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, state: AppState): Comp => {
+    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, allowAvatar: boolean, state: AppState): Comp => {
 
         let cssId = this._UID_ROWID_PREFIX + node.id;
-        let buttonBar = this.makeButtonBarHtml(node, state);
+        let buttonBar = this.makeButtonBarHtml(node, allowAvatar, state);
         let content = new NodeCompContent(node, true, true, "srch");
 
         let clazz = "node-table-row";
@@ -143,9 +143,9 @@ export class Search implements SearchIntf {
         }, [buttonBar, content]);
     }
 
-    makeButtonBarHtml = (node: J.NodeInfo, state: AppState): Comp => {
+    makeButtonBarHtml = (node: J.NodeInfo, allowAvatar: boolean, state: AppState): Comp => {
         let avatarImg: Img = null;
-        if (node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, node) */) {
+        if (allowAvatar && node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, node) */) {
             avatarImg = S.render.makeAvatarImage(node, state);
         }
 

@@ -26,6 +26,7 @@ import org.subnode.util.Convert;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
+import org.subnode.util.XString;
 
 /**
  * Service for searching the repository. This searching is currently very basic,
@@ -95,6 +96,7 @@ public class NodeSearchService {
 
 			for (SubNode node : api.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText,
 					req.getSortField(), MAX_NODES, req.getFuzzy(), req.getCaseSensitive())) {
+				//log.debug("NodeFound: node: "+ XString.prettyPrint(node));
 				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, counter + 1,
 						false, false, false);
 				searchResults.add(info);

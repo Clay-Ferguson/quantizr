@@ -21,6 +21,7 @@ import org.subnode.response.RenderNodeResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
+import org.subnode.util.XString;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -267,6 +268,7 @@ public class NodeRenderService {
 				break;
 			}
 			SubNode n = iterator.next();
+			//log.debug("NodeFound: node: "+ XString.prettyPrint(n));
 
 			idx++;
 			if (idx > offset) {

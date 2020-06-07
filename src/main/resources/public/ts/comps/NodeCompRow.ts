@@ -46,7 +46,7 @@ export class NodeCompRow extends Div {
 
         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         let selected: boolean = (focusNode && focusNode.id === id);
-        this.attribs.className = this.layoutClass + (selected ? " active-row" : " inactive-row");
+        this.attribs.className = (this.layoutClass || "") + (selected ? " active-row" : " inactive-row");
         this.attribs.style = style;
 
         this.setChildren([

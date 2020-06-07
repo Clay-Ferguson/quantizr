@@ -6,13 +6,12 @@ import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
+import { NodeCompRow } from "./NodeCompRow";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
-
-//todo-0: bug. when i did a timeline on a node every row on the timeline showed the same avatar as the node i did the timeline on
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class TimelineView extends Div {
@@ -26,17 +25,19 @@ export class TimelineView extends Div {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let results = state.timelineResults;
-        
+
         this.attribs.className = "tab-pane fade my-tab-pane";
-        if (state.activeTab==this.getId()) {
+        if (state.activeTab == this.getId()) {
             this.attribs.className += " show active";
         }
 
         if (!results || results.length == 0) {
-            this.setChildren([new Div("No Timeline Displaying", {
-                id: "timelineResultsPanel",
-                className: "timelineResultsPanel"
-            })]);
+            this.setChildren([
+                new Div("No Timeline Displaying", {
+                    id: "timelineResultsPanel",
+                    className: "timelineResultsPanel"
+                })
+            ]);
             return;
         }
 
@@ -48,13 +49,15 @@ export class TimelineView extends Div {
          */
         let rowCount = 0;
         let children: Comp[] = [];
-        let i = -1;
-        results.forEach(function(node: J.NodeInfo) {
-            i++;
+        let i = 0;
+        let lastOwner: string = null;
+        results.forEach((node: J.NodeInfo) => {
+            //console.log("TIMELINE: node id=" + node.id + " content: " + node.content);
             S.srch.initSearchNode(node);
 
-            rowCount++;
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, state));
+            let allowAvatar = node.owner != lastOwner;
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, state));
+            lastOwner = node.owner;
         });
 
         this.setChildren(children);

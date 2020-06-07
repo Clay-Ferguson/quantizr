@@ -1125,6 +1125,15 @@ public class MongoApi {
 		 * including the node itself in addition to all its children.
 		 */
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexRecursiveChildrenOfPath(node.getPath()));
+
+		/*
+		 * This condition ensures that when users create a node and are still editing
+		 * that node will be invisible to others until they click "save" todo-1: at some
+		 * future time we can write code to find any nodes which are orphaned by a user
+		 * creating but never saving changes.
+		 */
+		criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
+
 		query.addCriteria(criteria);
 
 		if (!StringUtils.isEmpty(text)) {

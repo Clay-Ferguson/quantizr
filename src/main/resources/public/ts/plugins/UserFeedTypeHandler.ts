@@ -11,8 +11,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 /* Type of node that hosts the user's social media posts, which I think will
 also have an option to include (or not) other friends who they are following */
-export class PostListTypeHandler extends TypeBase {
+export class UserFeedTypeHandler extends TypeBase {
     constructor() {
-        super(J.NodeType.FRIEND, "Post List", "fa-th-list", true);
+        super(J.NodeType.USER_FEED, "User Feed", "fa-th-list", true);
     }
 }

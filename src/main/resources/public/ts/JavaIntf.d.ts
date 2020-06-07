@@ -628,6 +628,7 @@ export const enum NodeType {
     RSS_FEED = "sn:rssfeed",
     FRIEND_LIST = "sn:friendList",
     FRIEND = "sn:friend",
+    USER_FEED = "sn:userFeed",
     NONE = "u",
     PLAIN_TEXT = "sn:txt",
     FS_FILE = "fs:file",

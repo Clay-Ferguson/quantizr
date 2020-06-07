@@ -52,7 +52,7 @@ export class SearchView extends Div {
             S.srch.initSearchNode(node);
 
             rowCount++;
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, state));
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, true /* todo-0: get param right */, state));
         });
 
         this.setChildren(children);

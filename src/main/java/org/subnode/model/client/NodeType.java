@@ -13,6 +13,7 @@ public enum NodeType {
     RSS_FEED("sn:rssfeed"), //
     FRIEND_LIST("sn:friendList"), //
     FRIEND("sn:friend"), //
+    USER_FEED("sn:userFeed"), //
 
     NONE("u"), //same as 'markdown' really
     PLAIN_TEXT("sn:txt"), //
