@@ -13,4 +13,6 @@ export interface TypeHandlerIntf {
     allowPropertyEdit(typeName: string, state: AppState): boolean;
     getAllowUserSelect();
     getDomPreUpdateFunction(parent: CompIntf): void;
+    getCustomProperties(): string[];
+    ensureDefaultProperties(node: J.NodeInfo);
 }

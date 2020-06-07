@@ -74,7 +74,7 @@ export class Search implements SearchIntf {
             offset: 0,
             goToLastPage: false,
             forceIPFSRefresh: false
-        }, (res) => {S.nav.navPageNodeResponse(res, state)});
+        }, (res) => { S.nav.navPageNodeResponse(res, state) });
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
@@ -95,6 +95,22 @@ export class Search implements SearchIntf {
             caseSensitive: false,
             searchDefinition: ""
         }, this.timelineResponse);
+    }
+
+    feed = (nodeId: string) => {
+        S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
+            nodeId
+        }, this.feedResponse);
+    }
+
+    feedResponse = (res: J.NodeFeedResponse) => {
+        dispatch({
+            type: "Action_RenderFeedResults",
+            update: (s: AppState): void => {
+                s.feedResults = res.searchResults;
+            }
+        });
+        S.meta64.selectTab("feedTab");
     }
 
     initSearchNode = (node: J.NodeInfo) => {

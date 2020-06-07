@@ -26,4 +26,5 @@ export interface SearchIntf {
     cached_clickOnSearchResultRow(id : string): any;
     clickSearchNode(id: string, state: AppState): any;
     setRowHighlight(state: boolean): any;
+    feed(nodeId: string): any;
 }

@@ -57,6 +57,7 @@ import org.subnode.request.LogoutRequest;
 import org.subnode.request.LuceneIndexRequest;
 import org.subnode.request.LuceneSearchRequest;
 import org.subnode.request.MoveNodesRequest;
+import org.subnode.request.NodeFeedRequest;
 import org.subnode.request.NodeSearchRequest;
 import org.subnode.request.PingRequest;
 import org.subnode.request.RebuildIndexesRequest;
@@ -694,6 +695,13 @@ public class AppController {
 	public @ResponseBody Object nodeSearch(@RequestBody NodeSearchRequest req, HttpSession session) {
 		return callProc.run("nodeSearch", req, session, ms -> {
 			return nodeSearchService.search(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/nodeFeed", method = RequestMethod.POST)
+	public @ResponseBody Object nodeFeed(@RequestBody NodeFeedRequest req, HttpSession session) {
+		return callProc.run("nodeFeed", req, session, ms -> {
+			return nodeSearchService.nodeFeed(ms, req);
 		});
 	}
 

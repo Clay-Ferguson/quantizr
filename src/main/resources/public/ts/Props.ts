@@ -129,6 +129,7 @@ export class Props implements PropsIntf {
         if (!node || !node.properties)
             return null;
 
+        //need to use the array find() function here (todo-0)
         for (var i = 0; i < node.properties.length; i++) {
             let prop: J.PropertyInfo = node.properties[i];
             if (prop.name === propertyName) {

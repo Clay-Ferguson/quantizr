@@ -33,5 +33,6 @@ export interface NavIntf {
     navToNext(): void;
     runSearch(): void;
     runTimeline(): void;
+    runTimeline(): void;
 }
 

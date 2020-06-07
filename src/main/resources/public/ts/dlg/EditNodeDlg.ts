@@ -30,11 +30,14 @@ import { Icon } from "../widget/Icon";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { Label } from "../widget/Label";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
+
+//todo-0: bug, adding a property allows duplicating a property name.
 
 export class EditNodeDlg extends DialogBase {
     header: Header;
@@ -158,6 +161,14 @@ export class EditNodeDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         let state = this.getState();
 
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+        let customProps: string[] = null;
+        if (typeHandler) {
+            customProps = typeHandler.getCustomProperties();
+
+            typeHandler.ensureDefaultProperties(state.node);
+        }
+
         //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
         //to dangerously opt into this also without hacking the code with this var.
         let allowEditAllProps: boolean = this.appState.isAdminUser;
@@ -178,7 +189,7 @@ export class EditNodeDlg extends DialogBase {
                     this.setTypeButton = new Button("Set Type", this.openChangeNodeTypeDlg),
                     //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
 
-                    this.encryptionButton = new Button("Encryption", this.openEncryptionDlg),
+                    this.encryptionButton = !customProps ? new Button("Encryption", this.openEncryptionDlg) : null,
                     this.cancelButton = new Button("Cancel", this.cancelEdit)
                 ])
             ])
@@ -201,27 +212,51 @@ export class EditNodeDlg extends DialogBase {
             this.imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection() : null
         ]);
 
-        // This is the table that contains the custom editable properties.
-        let collapsiblePropsTable = new EditPropsTable({
-            className: "edit-props-table form-group-border"
-        });
-        let editPropsTable = new EditPropsTable();
+        // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
+        let propsTable = null;
+        let mainPropsTable = null;
+
+        //if customProps exists then the props are all added into 'editPropsTable' instead of the collapsible panel
+        if (!customProps) {
+            propsTable = new EditPropsTable({
+                className: "edit-props-table form-group-border"
+            });
+            //This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
+            mainPropsTable = new EditPropsTable();
+        }
+        else {
+            //This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
+            mainPropsTable = new EditPropsTable({
+                className: "edit-props-table form-group-border"
+            });
+        }
+
+        let propsParent: CompIntf = customProps ? mainPropsTable : propsTable;
 
         let isWordWrap = !S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node);
         this.wordWrapCheckBox.setChecked(isWordWrap);
 
         //todo-1: does it make sense for FormGroup to contain single fields, or multiple fields? This seems wrong to have a group with one in it.
-        let nodeNameFormGroup = new FormGroup();
-        this.nodeNameTextField = new TextField("Node Name", state.node.name);
-        nodeNameFormGroup.addChild(this.nodeNameTextField);
+        if (!customProps) {
+            let nodeNameFormGroup = new FormGroup();
+            this.nodeNameTextField = new TextField("Node Name", state.node.name);
+            nodeNameFormGroup.addChild(this.nodeNameTextField);
+            mainPropsTable.addChild(nodeNameFormGroup);
+        }
 
-        editPropsTable.addChild(nodeNameFormGroup);
+        //We use 4 rows instead of 15 only if this is a customProps node.
+        let rows = "15"
+        if (customProps && !!customProps.find(p => p == "content")) {
+            rows = "4";
+        }
 
-        let content = state.node.content;
-        let contentTableRow = this.makeContentEditorFormGroup(state.node, isWordWrap);
-        editPropsTable.addChild(contentTableRow);
+        if (!customProps || (customProps && !!customProps.find(p => p == "content"))) {
+            let content = state.node.content;
+            let contentTableRow = this.makeContentEditorFormGroup(state.node, isWordWrap, rows);
+            mainPropsTable.addChild(contentTableRow);
+            this.contentEditor.setWordWrap(isWordWrap);
+        }
 
-        this.contentEditor.setWordWrap(isWordWrap);
         this.propCheckBoxes = [];
 
         if (state.node.properties) {
@@ -262,34 +297,33 @@ export class EditNodeDlg extends DialogBase {
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!this.isGuiControlBasedProp(prop)) {
-                        let tableRow = this.makePropEditor(prop);
-                        collapsiblePropsTable.addChild(tableRow);
+                        let allowSelection = !customProps || !customProps.find(p => p == prop.name);
+                        let tableRow = this.makePropEditor(prop, allowSelection);
+                        propsParent.addChild(tableRow);
                     }
                 }
             }, this);
         }
 
-        if (!collapsiblePropsTable.childrenExist()) {
-            collapsiblePropsTable.addChild(new TextContent("No custom properties."));
+        if (!propsParent.childrenExist()) {
+            propsParent.addChild(new TextContent("No custom properties."));
         }
 
         this.propsButtonBar = new ButtonBar([
-                this.addPropertyButton = new Button("Add Property", this.addProperty),
-                this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
-            ]);
-        //initially disabled.
+            this.addPropertyButton = new Button("Add Property", this.addProperty),
+            this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
+        ]);
+        
         this.deletePropButton.setEnabled(false);
 
-        collapsiblePropsTable.addChild(this.propsButtonBar);
+        propsParent.addChild(this.propsButtonBar);
 
-        let collapsiblePanel = new CollapsiblePanel("More...", null, [optionsBar, selectionsBar, collapsiblePropsTable], false,
+        let collapsiblePanel = !customProps ? new CollapsiblePanel("More...", null, [optionsBar, selectionsBar, propsTable], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
-            }, EditNodeDlg.morePanelExpanded, "float-right");
+            }, EditNodeDlg.morePanelExpanded, "float-right") : null;
 
-        this.propertyEditFieldContainer.setChildren([editPropsTable, collapsiblePanel]);
-
-        //this.addPropertyButton.setVisible(!S.edit.editingUnsavedNode);
+        this.propertyEditFieldContainer.setChildren([mainPropsTable, collapsiblePanel]);
         return children;
     }
 
@@ -426,7 +460,6 @@ export class EditNodeDlg extends DialogBase {
 
             let content: string;
             if (this.contentEditor) {
-
                 content = this.contentEditor.getValue();
 
                 //todo-1: an optimization can be done here such that if we just ENCRYPTED the node, we use this.skpd.symKey becuase that
@@ -438,14 +471,17 @@ export class EditNodeDlg extends DialogBase {
                 }
             }
 
-            let nodeName = this.nodeNameTextField.getValue();
+            if (this.nodeNameTextField) {
+                let nodeName = this.nodeNameTextField.getValue();
 
-            //convert any empty string to null here to be sure DB storage is least amount.
-            if (!nodeName) {
-                nodeName = "";
+                //convert any empty string to null here to be sure DB storage is least amount.
+                if (!nodeName) {
+                    nodeName = "";
+                }
+
+                state.node.name = nodeName;
             }
 
-            state.node.name = nodeName;
             state.node.content = content;
             let newProps: J.PropertyInfo[] = [];
 
@@ -482,7 +518,7 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
-    makePropEditor = (propEntry: J.PropertyInfo): EditPropsTableRow => {
+    makePropEditor = (propEntry: J.PropertyInfo, allowCheckbox: boolean): EditPropsTableRow => {
         let tableRow = new EditPropsTableRow();
         let allowEditAllProps: boolean = this.appState.isAdminUser;
         //console.log("Property single-type: " + propEntry.property.name);
@@ -510,13 +546,18 @@ export class EditNodeDlg extends DialogBase {
             formGroup.addChild(textarea);
         }
         else {
-            let checkbox: Checkbox = new Checkbox(label, false, {
-                onClick: this.propertyCheckboxChanged
-            });
-            this.propCheckBoxes.push(checkbox);
-            this.compIdToPropMap[checkbox.getId()] = propEntry;
+            if (allowCheckbox) {
+                let checkbox: Checkbox = new Checkbox(label, false, {
+                    onClick: this.propertyCheckboxChanged
+                });
+                this.propCheckBoxes.push(checkbox);
 
-            formGroup.addChild(checkbox);
+                this.compIdToPropMap[checkbox.getId()] = propEntry;
+                formGroup.addChild(checkbox);
+            }
+            else {
+                formGroup.addChild(new Label(label));
+            }
 
             let editor: I.TextEditorIntf = null;
             let multiLine = false;
@@ -546,7 +587,7 @@ export class EditNodeDlg extends DialogBase {
         return tableRow;
     }
 
-    makeContentEditorFormGroup = (node: J.NodeInfo, isWordWrap: boolean): FormGroup => {
+    makeContentEditorFormGroup = (node: J.NodeInfo, isWordWrap: boolean, rows: string): FormGroup => {
         let value = node.content;
         let formGroup = new FormGroup();
         let encrypted = value.startsWith(J.Constant.ENC_TAG);
@@ -584,7 +625,7 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             this.contentEditor = new Textarea(null, {
-                rows: "20",
+                rows,
                 defaultValue: encrypted ? "[encrypted]" : value
             },
                 /* onBlur value setter, required so that we don't loose edits when react decides to re-render */

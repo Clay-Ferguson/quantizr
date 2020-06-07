@@ -43,6 +43,9 @@ public enum NodeProp {
 
     FILE_SYNC_LINK("fs:link", "s"), //
 
+    //Goes on 'Friend' nodes, and is added automatically by server (not user)
+    USER_NODE_ID("sn:userNodeId", "s"), //
+
     // this pre-existed when i created FS_FILENAME (may be unused?)
     FILENAME("sn:fileName", "s"), //
     NAME("sn:name", "s"), //

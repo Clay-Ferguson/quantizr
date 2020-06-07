@@ -26,6 +26,16 @@ export class TypeBase implements TypeHandlerIntf {
         return this.typeName;
     }
 
+    /* If this returns non-null the editor dialog is expected to show only the enumerated properties for editing */
+    getCustomProperties(): string[] {
+        return null;
+    }
+
+    /* Types can override this to ensure that during node editing there is a hook to prefill and create any properties that are
+    required to exist on that type of node in case they aren't existing yet */
+    ensureDefaultProperties(node: J.NodeInfo) {
+    }
+
     getName(): string {
         return this.displayName;
     }
@@ -57,6 +67,20 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     getDomPreUpdateFunction(parent: CompIntf): void {
+    }
+
+    ensureStringPropExists(node: J.NodeInfo, propName: string) {
+        let prop: J.PropertyInfo = S.props.getNodeProp(propName, node);
+        if (!prop) {
+            if (!node.properties) {
+                node.properties = [];
+            }
+            //todo-0: need an object with constructor for this.
+            node.properties.push({
+                name: propName,
+                value: ""
+            });
+        }
     }
 }
 

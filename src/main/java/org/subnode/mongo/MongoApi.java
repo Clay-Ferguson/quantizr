@@ -931,6 +931,7 @@ public class MongoApi {
 		if (limit != null) {
 			query.limit(limit.intValue());
 		}
+
 		/*
 		 * This regex finds all that START WITH "path/" and then end with some other
 		 * string that does NOT contain "/", so that we know it's not at a deeper level

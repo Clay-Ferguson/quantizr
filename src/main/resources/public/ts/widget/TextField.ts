@@ -66,7 +66,7 @@ export class TextField extends Div implements I.TextEditorIntf {
 
     preRender(): void {
         this.setChildren([
-            new Label(this.label, { key: this.getId() + "_label" }),
+            this.label ? new Label(this.label, { key: this.getId() + "_label" }) : null,
             new Div(null, {
                 className: "input-group",
                 //NOTE: Yes we set font on the PARENT and then use 'inherit' to get it

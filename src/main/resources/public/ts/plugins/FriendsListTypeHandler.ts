@@ -3,6 +3,13 @@ import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { TypeBase } from "./base/TypeBase";
+import { AppState } from "../AppState";
+import { Comp } from "../widget/base/Comp";
+import { Heading } from "../widget/Heading";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { ButtonBar } from "../widget/ButtonBar";
+import { Button } from "../widget/Button";
+import { Div } from "../widget/Div";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -11,7 +18,20 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FriendsListTypeHandler extends TypeBase {
     constructor() {
-        //todo-0: eventually this true will be false (not chooseable as a node type)
         super(J.NodeType.FRIEND_LIST, "Friends List", "fa-users", true);
+    }
+
+    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
+
+        let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
+        return new HorizontalLayout([
+            new Heading(4, "Friends List", {
+                className: "marginAll"
+            }),
+            new ButtonBar([
+                new Button("Show Feed", () => S.srch.feed(node.id))
+            ], null, "float-right marginBottom"),
+            new Div(null, { className: "clearfix" })
+        ]);
     }
 }

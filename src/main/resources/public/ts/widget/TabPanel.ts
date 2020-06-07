@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
 import { dispatch } from "../AppRedux";
 import clientInfo from "../ClientInfo";
+import { FeedView } from "../comps/FeedView";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -35,13 +36,15 @@ export class TabPanel extends Div {
         let state: AppState = useSelector((state: AppState) => state);
         let searchResults = state.searchResults;
         let timelineResults = state.timelineResults;
+        let feedResults = state.feedResults;
 
         let mainDisplay = "inline";
         let searchDisplay = searchResults ? "inline" : "none";
         let timelineDisplay = timelineResults ? "inline" : "none";
+        let feedDisplay = feedResults ? "inline" : "none";
 
         /* If mainDisplay would be the only tab showing, then don't show that tab */
-        if (searchDisplay == "none" && timelineDisplay == "none") {
+        if (searchDisplay == "none" && timelineDisplay == "none" && feedDisplay == "none") {
             mainDisplay = "none";
         }
 
@@ -109,6 +112,24 @@ export class TabPanel extends Div {
                     })]
                 ),
 
+                new Li(null, {
+                    className: "nav-item",
+                    style: { display: feedDisplay }
+                },
+                    [new Anchor("#feedTab", "Feed", {
+                        "data-toggle": "tab",
+                        className: "nav-link" + (state.activeTab == "feedTab" ? " active" : ""),
+                        onClick: () => {
+                            dispatch({
+                                type: "Action_SetTab",
+                                update: (s: AppState): void => {
+                                    s.activeTab = "feedTab";
+                                }
+                            });
+                        }
+                    })]
+                ),
+
                     // This works perfectly, but isn't ready to deploy yet.
                     // new Li(null, {
                     //     className: "nav-item",
@@ -132,6 +153,7 @@ export class TabPanel extends Div {
             new MainTabComp(),
             new SearchView(),
             new TimelineView(),
+            new FeedView(),
 
             // This works perfectly, but isn't ready to deploy yet.
             // //GRAPH TAB

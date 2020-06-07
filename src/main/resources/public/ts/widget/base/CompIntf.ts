@@ -22,5 +22,7 @@ export interface CompIntf {
     getAttribs() : Object;
     compRender(): ReactNode;
     forceRender(): void;
-    makeCacheKeyObj(appState: AppState, state: any, props: any);
+    makeCacheKeyObj(appState: AppState, state: any, props: any): void;
+    addChild(comp: CompIntf): void;
+    childrenExist(): boolean;
 }

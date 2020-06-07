@@ -29,11 +29,18 @@ export class RssTypeHandler extends TypeBase {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
     }
 
+    getCustomProperties(): string[] {
+        return [J.NodeProp.RSS_FEED_SRC, 
+        //content isn't a 'property' in the 'properties' array, but is a prop ON SubNode.java, so we don't have a J.NodeProp for it.    
+        "content"];
+    }
+
     allowPropertyEdit(propName: string): boolean {
-        if (propName == J.NodeProp.RSS_FEED_SRC) {
-            return true;
-        }
-        return false;
+        return true;
+    }
+
+    ensureDefaultProperties(node: J.NodeInfo) {
+        this.ensureStringPropExists(node, J.NodeProp.RSS_FEED_SRC);
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {

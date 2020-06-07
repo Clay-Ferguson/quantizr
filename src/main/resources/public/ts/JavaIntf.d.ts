@@ -148,6 +148,10 @@ export interface MoveNodesRequest extends RequestBase {
     location: string;
 }
 
+export interface NodeFeedRequest extends RequestBase {
+    nodeId: string;
+}
+
 export interface NodeSearchRequest extends RequestBase {
     sortDir: string;
     sortField: string;
@@ -402,6 +406,10 @@ export interface LuceneSearchResponse extends ResponseBase {
 export interface MoveNodesResponse extends ResponseBase {
 }
 
+export interface NodeFeedResponse extends ResponseBase {
+    searchResults: NodeInfo[];
+}
+
 export interface NodeSearchResponse extends ResponseBase {
     searchResults: NodeInfo[];
 }
@@ -580,6 +588,7 @@ export const enum NodeProp {
     USER_BIO = "sn:userBio",
     PWD_HASH = "sn:pwdHash",
     FILE_SYNC_LINK = "fs:link",
+    USER_NODE_ID = "sn:userNodeId",
     FILENAME = "sn:fileName",
     NAME = "sn:name",
     IPFS_LINK = "ipfs:link",

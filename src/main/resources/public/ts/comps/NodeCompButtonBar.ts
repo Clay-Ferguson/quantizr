@@ -233,7 +233,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         }
 
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
-            moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton], null, "marginLeft marginTop");
+            moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton], null, "marginLeft");
 
         let navButtonBar;
 

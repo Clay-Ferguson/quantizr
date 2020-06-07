@@ -13,6 +13,7 @@ import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
 import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
 import { MarkdownTypeHandler } from "./plugins/MarkdownTypeHandler";
 import { TextTypeHandler } from "./plugins/TextTypeHandler";
+import { PostListTypeHandler } from "./plugins/PostListTypeHandler";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -53,6 +54,7 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new NotesNodeTypeHandler());
         this.addTypeHandler(new FriendsListTypeHandler());
         this.addTypeHandler(new FriendTypeHandler());
+        this.addTypeHandler(new PostListTypeHandler());
 
         // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());
         // S.plugin.addTypeHandler("fs:folder", new FolderTypeHandler());
