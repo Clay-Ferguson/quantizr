@@ -21,41 +21,45 @@ export class FeedView extends Div {
         });
     }
 
-    // taken from TimelineView, and not yet made into Feed view...
-    // preRender(): void {
-    //     let state: AppState = useSelector((state: AppState) => state);
-    //     let results = state.timelineResults;
-        
-    //     this.attribs.className = "tab-pane fade my-tab-pane";
-    //     if (state.activeTab==this.getId()) {
-    //         this.attribs.className += " show active";
-    //     }
+    preRender(): void {
+        let state: AppState = useSelector((state: AppState) => state);
+        let results = state.feedResults;
 
-    //     if (!results || results.length == 0) {
-    //         this.setChildren([new Div("No Timeline Displaying", {
-    //             id: "timelineResultsPanel",
-    //             className: "timelineResultsPanel"
-    //         })]);
-    //         return;
-    //     }
+        this.attribs.className = "tab-pane fade my-tab-pane";
+        if (state.activeTab == this.getId()) {
+            this.attribs.className += " show active";
+        }
 
-    //     let childCount = results.length;
+        if (!results || results.length == 0) {
+            this.setChildren([
+                new Div("No User Feed Displaying", {
+                    id: "feedResultsPanel"
+                })
+            ]);
+            return;
+        }
 
-    //     /*
-    //      * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
-    //      * client side for various reasons.
-    //      */
-    //     let rowCount = 0;
-    //     let children: Comp[] = [];
-    //     let i = -1;
-    //     results.forEach(function(node: J.NodeInfo) {
-    //         i++;
-    //         S.srch.initSearchNode(node);
+        let childCount = results.length;
 
-    //         rowCount++;
-    //         children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, state));
-    //     });
+        /*
+         * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
+         * client side for various reasons.
+         */
+        let rowCount = 0;
+        let children: Comp[] = [];
+        let i = 0;
+        let lastOwner: string = null;
+        results.forEach((node: J.NodeInfo) => {
+            //console.log("FEED: node id=" + node.id + " content: " + node.content);
+            S.srch.initSearchNode(node);
 
-    //     this.setChildren(children);
-    // }
+            let allowAvatar = node.owner != lastOwner;
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, state));
+            lastOwner = node.owner;
+            i++;
+            rowCount++;
+        });
+
+        this.setChildren(children);
+    }
 }

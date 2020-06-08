@@ -35,7 +35,6 @@ export class TimelineView extends Div {
             this.setChildren([
                 new Div("No Timeline Displaying", {
                     id: "timelineResultsPanel",
-                    className: "timelineResultsPanel"
                 })
             ]);
             return;
@@ -58,6 +57,8 @@ export class TimelineView extends Div {
             let allowAvatar = node.owner != lastOwner;
             children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, state));
             lastOwner = node.owner;
+            i++;
+            rowCount++;
         });
 
         this.setChildren(children);

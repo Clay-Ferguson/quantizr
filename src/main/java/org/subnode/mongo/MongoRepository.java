@@ -4,7 +4,7 @@ import javax.annotation.PreDestroy;
 
 import org.subnode.AppServer;
 import org.subnode.config.AppProp;
-
+import org.subnode.service.UserFeedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +32,9 @@ public class MongoRepository {
 
 	@Autowired
 	private MongoApi api;
+
+	@Autowired
+	private UserFeedService userFeedService;
 
 	/*
 	 * Because of the criticality of this variable, I am not using the Spring getter
@@ -119,6 +122,8 @@ public class MongoRepository {
 			// if (appProp.getMongoTest()) {
 			// mongoTest.mainTest();
 			// }
+
+			userFeedService.init();
 
 			log.debug("MongoRepository fully initialized.");
 			fullInit = true;

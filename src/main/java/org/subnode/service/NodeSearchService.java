@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
+import org.subnode.model.UserFeedInfo;
+import org.subnode.model.UserFeedItem;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
@@ -56,6 +58,9 @@ public class NodeSearchService {
 
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
+
+	@Autowired
+	private UserFeedService userFeedService;
 
 	public NodeSearchResponse search(MongoSession session, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();
@@ -112,14 +117,15 @@ public class NodeSearchService {
 
 	//todo-0: work in progress...feedNode not yet functional.
 	public NodeFeedResponse nodeFeed(MongoSession session, NodeFeedRequest req) {
+
+		/* todo-0: This is TEMPORARY, we will end up keeping userFeedService up to date another way later */
+		userFeedService.init();
+
 		NodeFeedResponse res = new NodeFeedResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
 		int MAX_NODES = 100;
-
-		List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
-		res.setSearchResults(searchResults);
 		int counter = 0;
 
 		SubNode feedNode = api.getNode(session, req.getNodeId());
@@ -129,13 +135,15 @@ public class NodeSearchService {
 			Iterable<SubNode> friendNodes = api.getChildrenUnderParentPath(session, feedNode.getPath(), null,
 					MAX_NODES);
 
+			List<UserFeedItem> fullFeedList = new LinkedList<UserFeedItem>();
+
 			for (SubNode friendNode : friendNodes) {
 				String userName = null;
 				String userNodeId = friendNode.getStringProp(NodeProp.USER_NODE_ID.s());
 
 				/*
-				 * when user first adds, this friendNode won't have the userNodeId yet to add if
-				 * not existing
+				 * when user first adds, this friendNode won't have the userNodeId yet, so add if
+				 * not yet existing
 				 */
 				if (userNodeId == null) {
 					userName = friendNode.getStringProp(NodeProp.USER.s());
@@ -151,12 +159,33 @@ public class NodeSearchService {
 						friendNode.setProp(NodeProp.USER_NODE_ID.s(), userNodeId);
 					}
 				}
-				// String user = friendNode.getStringProp(NodeProp.USER.s());
+				else {
+					userName = friendNode.getStringProp(NodeProp.USER.s());
+				}
+
+				synchronized (UserFeedService.userFeedInfoMap) {
+					UserFeedInfo userFeedInfo = UserFeedService.userFeedInfoMap.get(userName);
+					fullFeedList.addAll(userFeedInfo.getUserFeedList());
+				}
+
 				log.debug("Processing Friend Node[" + userName + "]: id=" + friendNode.getId().toHexString());
 			}
 
+			List<NodeInfo> results = new LinkedList<NodeInfo>();
+
+			//todo-0: need to sort fullFeedList by time
+			for (UserFeedItem ufi : fullFeedList) {
+				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, ufi.getNode(), true, true, false, counter + 1,
+						false, false, false);
+				results.add(info);
+				if (counter++ > MAX_NODES) {
+					break;
+				}
+			}
+
+			res.setSearchResults(results);
 			res.setSuccess(true);
-			log.debug("search results count: " + counter);
+			//log.debug("feed count: " + counter);
 		}
 		return res;
 	}

@@ -33,7 +33,6 @@ export class SearchView extends Div {
         if (!results || results.length == 0) {
             this.setChildren([new Div("No Search Displaying", {
                 id: "searchResultsPanel",
-                className: "searchResultsPanel"
             })]);
             return;
         }
@@ -46,13 +45,16 @@ export class SearchView extends Div {
          */
         let rowCount = 0;
         let children: Comp[] = [];
-        let i = -1;
+        let i = 0;
+        let lastOwner: string = null;
         results.forEach(function(node: J.NodeInfo) {
-            i++;
             S.srch.initSearchNode(node);
 
+            let allowAvatar = node.owner != lastOwner;
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, state));
+            lastOwner = node.owner;
+            i++;
             rowCount++;
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, true /* todo-0: get param right */, state));
         });
 
         this.setChildren(children);
