@@ -37,6 +37,9 @@ $nodeBorderBottomColor: $gray-700;
 $createdByMeBackgroundColor: green;
 $createdByMeTextColor: white;
 
+$createdByAnotherBackgroundColor: $gray-700;
+$createdByAnotherTextColor: white;
+
 $listBackgroundColor: lightGray;
 
 $smallGap: 12px;
@@ -764,6 +767,8 @@ which it will do by default. */
 }
 
 .created-by-other {
+    background: $createdByAnotherBackgroundColor;
+    color: $createdByAnotherTextColor;
     padding: 4px;
 }
 
@@ -1052,4 +1057,14 @@ i'm backing out for now
 
 .testHighlight {
     background-color: green;
+}
+
+@keyframes fadeInRowBkg {
+    from {background-color: $nodeBorderBottomColor;}
+    to {background-color: transparent;}
+}
+  
+.fadeInRowBkgClz {
+    animation-name: fadeInRowBkg;
+    animation-duration: 3s;
 }

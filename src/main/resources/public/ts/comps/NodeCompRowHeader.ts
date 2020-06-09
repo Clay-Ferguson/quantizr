@@ -15,7 +15,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompRowHeader extends Div {
 
-    constructor(private node: J.NodeInfo) {
+    constructor(private node: J.NodeInfo, private isFeed: boolean = false) {
         super(null, {
             className: "header-text"
         });
@@ -26,27 +26,38 @@ export class NodeCompRowHeader extends Div {
         let node = this.node;
         let children = [];
 
-        let priority = S.props.getNodePropVal(J.NodeProp.PRIORITY, node);
-        priority = (priority && priority != "0") ? " P" + priority : "";
-
-        if (node.name) {
-            children.push(new Div("Name: " + node.name));
+        /* We show a simplified header for User Feed rows, because these are always visible and don't need a lot of the info */
+        if (this.isFeed) {
+            if (node.owner && node.owner != "?") {
+                children.push(new Span(node.owner, {
+                    className: (node.owner === state.userName) ? "created-by-me" : "created-by-other"
+                }));
+                children.push(new Span(S.util.formatDate(new Date(node.lastModified)), {
+                    className: "marginLeft"
+                }));
+            }
         }
+        else {
+            let priority = S.props.getNodePropVal(J.NodeProp.PRIORITY, node);
+            priority = (priority && priority != "0") ? " P" + priority : "";
 
-        children.push(new Div(
-            "ID:" + node.id + " " + //
-            ((node.logicalOrdinal != -1) ? ("[" + node.logicalOrdinal + "] ") : "") + //
-            "Type:" + node.type + //
-            (node.lastModified ? " (Mod: " + S.util.formatDate(new Date(node.lastModified)) + ")" : "") + //
-            priority));
+            if (node.name) {
+                children.push(new Span("Name: " + node.name));
+            }
 
-        if (node.owner && node.owner != "?") {
-            let clazz: string = (node.owner === state.userName) ? "created-by-me" : "created-by-other";
-            children.push(new Span("Created By: " + node.owner, {
-                className: clazz
-            }));
+            if (node.owner && node.owner != "?") {
+                children.push(new Span(node.owner, {
+                    className: (node.owner === state.userName) ? "created-by-me" : "created-by-other"
+                }));
+            }
+
+            children.push(new Span(
+                "ID:" + node.id + " " + //
+                ((node.logicalOrdinal != -1) ? ("[" + node.logicalOrdinal + "] ") : " ") + //
+                node.type + //
+                (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") + //
+                priority));
         }
-
         this.setChildren(children);
     }
 }

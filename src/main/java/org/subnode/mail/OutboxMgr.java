@@ -15,6 +15,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.ServerPushInfo;
+import org.subnode.service.UserFeedService;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.XString;
 import org.slf4j.Logger;
@@ -52,6 +53,9 @@ public class OutboxMgr {
 
 	@Autowired
 	private SessionContext sessionContext;
+
+	@Autowired
+	private UserFeedService userFeedService;
 
 	/*
 	 * node=Node that was created.
@@ -93,6 +97,8 @@ public class OutboxMgr {
 						addInboxNotification(session, userName, userNode, node, "replied to you.");
 					}
 				}
+
+				userFeedService.nodeSaveNotify(session, node);
 			} catch (Exception e) {
 				log.debug("failed sending notification", e);
 			}
@@ -136,8 +142,9 @@ public class OutboxMgr {
 			// trim to 280 like twitter.
 			String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
 
-			String content = String.format("#### **%s** " + notifyMessage + "\n\n%s?id=%s\n\n%s", sessionContext.getUserName(),
-					constProvider.getHostAndPort(), node.getId().toHexString(), shortContent);
+			String content = String.format("#### **%s** " + notifyMessage + "\n\n%s?id=%s\n\n%s",
+					sessionContext.getUserName(), constProvider.getHostAndPort(), node.getId().toHexString(),
+					shortContent);
 
 			notifyNode.setOwner(userInbox.getOwner());
 			notifyNode.setContent(content);
@@ -151,19 +158,20 @@ public class OutboxMgr {
 	public void sendServerPushInfo(String recipientUserName, ServerPushInfo info) {
 		SessionContext userSession = SessionContext.getSessionByUserName(recipientUserName);
 
-		//If user is currently logged in we have a session here.
+		// If user is currently logged in we have a session here.
 		if (userSession != null) {
 			SseEmitter pushEmitter = userSession.getPushEmitter();
 			if (pushEmitter != null) {
 				ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
 				sseMvcExecutor.execute(() -> {
 					try {
-						// NOTE: Not sure SseEventBuilder is something we'll ever need, when we can just send JSON, and so this means we pick up 
+						// NOTE: Not sure SseEventBuilder is something we'll ever need, when we can just
+						// send JSON, and so this means we pick up
 						// the message with onmssage and not addEventListener, on the browser.
 						// SseEventBuilder event = SseEmitter.event() //
-						// 		.data(msg) //
-						// 		.id(String.valueOf(info.hashCode()))
-						// 		.name("serverPushEvent");
+						// .data(msg) //
+						// .id(String.valueOf(info.hashCode()))
+						// .name("serverPushEvent");
 						// pushEmitter.send(event);
 
 						pushEmitter.send(info, MediaType.APPLICATION_JSON);

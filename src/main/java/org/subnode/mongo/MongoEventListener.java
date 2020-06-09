@@ -6,6 +6,7 @@ import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.service.UserFeedService;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
 
@@ -49,7 +50,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	 */
 	@Override
 	public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
-		//log.debug("MONGO SAVE EVENT.");
+		// log.debug("MONGO SAVE EVENT.");
 		SubNode node = event.getSource();
 
 		Document dbObj = event.getDocument();
@@ -63,7 +64,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		if (id == null) {
 			id = new ObjectId();
 			node.setId(id);
-			//log.debug("New Node ID generated: " + id);
+			// log.debug("New Node ID generated: " + id);
 		}
 		dbObj.put(SubNode.FIELD_ID, id);
 
@@ -179,8 +180,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Override
 	public void onAfterConvert(AfterConvertEvent<SubNode> event) {
-		//Document dbObj = event.getDocument();
-		//ObjectId id = dbObj.getObjectId(SubNode.FIELD_ID);
+		// Document dbObj = event.getDocument();
+		// ObjectId id = dbObj.getObjectId(SubNode.FIELD_ID);
 	}
 
 	// @Override

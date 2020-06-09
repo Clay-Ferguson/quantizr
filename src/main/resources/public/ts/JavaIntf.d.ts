@@ -314,6 +314,10 @@ export interface ExportResponse extends ResponseBase {
     fileName: string;
 }
 
+export interface FeedPushInfo extends ServerPushInfo {
+    nodeInfo: NodeInfo;
+}
+
 export interface FileSearchResponse extends ResponseBase {
     searchResultNodeId: string;
 }

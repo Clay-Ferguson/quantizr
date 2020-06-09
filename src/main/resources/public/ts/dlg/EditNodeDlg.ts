@@ -38,6 +38,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 //todo-0: bug, adding a property allows duplicating a property name.
+//todo-0: if you start editing a new node but just cancel without entering text stuff breaks, page HANGS!!. and it might have to do with
+//the server orphaning a node?.... because without the modTime some queries can't see it, etc?
 
 export class EditNodeDlg extends DialogBase {
     header: Header;

@@ -97,7 +97,7 @@ public class NodeEditService {
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
 
 		api.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false, false,
+		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false,
 				false));
 		res.setSuccess(true);
 		return res;
@@ -158,7 +158,7 @@ public class NodeEditService {
 		MongoThreadLocal.setAutoTimestampDisabled(true);
 
 		api.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, true, false, -1, false, false,
+		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false,
 				false));
 		res.setSuccess(true);
 		return res;
@@ -271,7 +271,7 @@ public class NodeEditService {
 				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
 			}
 
-			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, -1,
+			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1,
 					false, false, false);
 			res.setNode(newNodeInfo);
 			api.saveSession(session);

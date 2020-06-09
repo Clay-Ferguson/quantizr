@@ -7,6 +7,8 @@ import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
+import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -38,7 +40,13 @@ export class NodeCompMainNode extends Div {
         this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
         S.render.setNodeDropHandler(this, node, state);
 
+        let header: CompIntf = null;
+        if (state.showMetaData) {
+            header = new NodeCompRowHeader(node, false);
+        }
+
         this.setChildren([
+            header,
             new NodeCompButtonBar(node, true, false),
             new Div(null, {
                 className: "clearfix",

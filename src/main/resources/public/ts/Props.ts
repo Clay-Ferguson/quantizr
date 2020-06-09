@@ -125,18 +125,11 @@ export class Props implements PropsIntf {
      * brute force searches on node (NodeInfo.java) object properties list, and returns the first property
      * (PropertyInfo.java) with name matching propertyName, else null.
      */
-    getNodeProp = (propertyName: string, node: J.NodeInfo): J.PropertyInfo => {
+    getNodeProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {
         if (!node || !node.properties)
             return null;
 
-        //need to use the array find() function here (todo-0)
-        for (var i = 0; i < node.properties.length; i++) {
-            let prop: J.PropertyInfo = node.properties[i];
-            if (prop.name === propertyName) {
-                return prop;
-            }
-        }
-        return null;
+        return node.properties.find(p => p.name===propName);
     }
 
     /* Gets the crypto key from this node that will allow user to decrypt the node. If the user is the owner of the 

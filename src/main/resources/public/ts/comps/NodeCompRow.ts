@@ -8,6 +8,8 @@ import { Div } from "../widget/Div";
 import { NodeCompContent } from "./NodeCompContent";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
+import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -49,7 +51,13 @@ export class NodeCompRow extends Div {
         this.attribs.className = (this.layoutClass || "") + (selected ? " active-row" : " inactive-row");
         this.attribs.style = style;
 
+        let header: CompIntf = null;
+        if (state.showMetaData) {
+            header = new NodeCompRowHeader(node, false);
+        }
+
         this.setChildren([
+            header,
             buttonBar,
             buttonBar ? new Div(null, {
                 className: "clearfix",

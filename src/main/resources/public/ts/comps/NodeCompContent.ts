@@ -24,7 +24,7 @@ export class NodeCompContent extends Div {
 
     domPreUpdateFunc: Function;
 
-    constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix?: string) {
+    constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix?: string, public isFeed?: boolean) {
         super(null, {
             id: (idPrefix ? idPrefix : "c") + node.id
         });
@@ -46,11 +46,6 @@ export class NodeCompContent extends Div {
         let children: Comp[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
 
-        if (state.showMetaData) {
-            if (this.showHeader) {
-                children.push(new NodeCompRowHeader(node));
-            }
-        }
 
         if (state.showProperties) {
             let propTable = S.props.renderProperties(node.properties);

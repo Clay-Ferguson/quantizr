@@ -9,6 +9,8 @@ import { NodeCompMarkdown } from "../comps/NodeCompMarkdown";
 import { Div } from "../widget/Div";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Heading } from "../widget/Heading";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,8 +23,12 @@ export class InboxNodeTypeHandler extends TypeBase {
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
-        return new Div(null, null, [
-            new NodeCompMarkdown(node),
+
+        let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
+        return new HorizontalLayout([
+            new Heading(4, "Inbox", {
+                className: "marginAll"
+            }),
             new ButtonBar([
                 new Button("Clear Inbox", () => {
                     S.edit.clearInbox(state)

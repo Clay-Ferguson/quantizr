@@ -51,7 +51,7 @@ export class SearchView extends Div {
             S.srch.initSearchNode(node);
 
             let allowAvatar = node.owner != lastOwner;
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, state));
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, "srch", state));
             lastOwner = node.owner;
             i++;
             rowCount++;

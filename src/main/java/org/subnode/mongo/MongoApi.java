@@ -771,8 +771,14 @@ public class MongoApi {
 	public SubNode getNodeByLocation(MongoSession session, String name, boolean allowAuth) {
 		SubNode ret = null;
 
-		if (name.equals("inbox")) {
-			ret = getSpecialNode(session, session.getUser(), null, NodeName.INBOX, "### Inbox", NodeType.INBOX.s());
+		if (name.equals(NodeName.INBOX)) {
+			ret = getSpecialNode(session, session.getUser(), null, NodeName.INBOX, null /* plugin remders */, NodeType.INBOX.s());
+		}
+		else if (name.equals(NodeName.FRIEND_LIST)) {
+			ret = getSpecialNode(session, session.getUser(), null, NodeName.FRIEND_LIST, null /* plugin remders */, NodeType.FRIEND_LIST.s());
+		}
+		else if (name.equals(NodeName.USER_FEED)) {
+			ret = getSpecialNode(session, session.getUser(), null, NodeName.USER_FEED, null /* plugin renders */, NodeType.USER_FEED.s());
 		}
 
 		return ret;

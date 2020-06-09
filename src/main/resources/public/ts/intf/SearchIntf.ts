@@ -21,7 +21,7 @@ export interface SearchIntf {
     searchFilesResponse(res: J.FileSearchResponse, state: AppState): any;
     timeline(prop: string, state: AppState): any;
     initSearchNode(node: J.NodeInfo): any;
-    renderSearchResultAsListItem(node, index, count, rowCount, allowAvatar: boolean, state: AppState): any;
+    renderSearchResultAsListItem(node: J.NodeInfo, index: number, count: number, rowCount: number, allowAvatar: boolean, prefix: string, state: AppState): any;
     makeButtonBarHtml(node: J.NodeInfo, allowAvatar: boolean, state: AppState): any;
     cached_clickOnSearchResultRow(id : string): any;
     clickSearchNode(id: string, state: AppState): any;

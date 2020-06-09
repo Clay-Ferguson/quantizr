@@ -50,7 +50,7 @@ public class Convert {
 	 * by the browser to render the node
 	 */
 	public NodeInfo convertToNodeInfo(SessionContext sessionContext, MongoSession session, SubNode node,
-			boolean htmlOnly, boolean allowAbbreviated, boolean initNodeEdit, long logicalOrdinal,
+			boolean htmlOnly, boolean initNodeEdit, long logicalOrdinal,
 			boolean allowInlineChildren, boolean firstChild, boolean lastChild) {
 
 		ImageSize imageSize = null;
@@ -77,7 +77,7 @@ public class Convert {
 		boolean hasChildren = (api.getChildCount(session, node) > 0);
 		// log.trace("hasNodes=" + hasNodes + " path=" + node.getPath());
 
-		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly, allowAbbreviated,
+		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly,
 				initNodeEdit);
 
 		List<AccessControlInfo> acList = buildAccessControlList(sessionContext, node);
@@ -158,7 +158,7 @@ public class Convert {
 					//NOTE: If this is set to false it then only would allow one level of depth in the 'inlineChildren' capability
 					boolean multiLevel = true;
 
-					nodeInfo.getChildren().add(convertToNodeInfo(sessionContext, session, n, htmlOnly, allowAbbreviated,
+					nodeInfo.getChildren().add(convertToNodeInfo(sessionContext, session, n, htmlOnly,
 							initNodeEdit, logicalOrdinal, multiLevel, firstChild, lastChild));
 				}
 			}
@@ -187,7 +187,7 @@ public class Convert {
 	}
 
 	public List<PropertyInfo> buildPropertyInfoList(SessionContext sessionContext, SubNode node, //
-			boolean htmlOnly, boolean allowAbbreviated, boolean initNodeEdit) {
+			boolean htmlOnly, boolean initNodeEdit) {
 
 		List<PropertyInfo> props = null;
 		SubNodePropertyMap propMap = node.getProperties();
@@ -201,7 +201,7 @@ public class Convert {
 				props = new LinkedList<PropertyInfo>();
 			}
 
-			PropertyInfo propInfo = convertToPropertyInfo(sessionContext, node, propName, p, htmlOnly, allowAbbreviated,
+			PropertyInfo propInfo = convertToPropertyInfo(sessionContext, node, propName, p, htmlOnly,
 					initNodeEdit);
 			// log.debug(" PROP Name: " + propName + " val=" + p.getValue().toString());
 
@@ -247,7 +247,7 @@ public class Convert {
 	}
 
 	public PropertyInfo convertToPropertyInfo(SessionContext sessionContext, SubNode node, String propName,
-			SubNodePropVal prop, boolean htmlOnly, boolean allowAbbreviated, boolean initNodeEdit) {
+			SubNodePropVal prop, boolean htmlOnly, boolean initNodeEdit) {
 		try {
 			String value = formatValue(sessionContext, prop.getValue(), false, initNodeEdit);
 			/* log.trace(String.format("prop[%s]=%s", prop.getName(), value)); */

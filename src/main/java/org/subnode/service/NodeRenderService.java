@@ -178,7 +178,7 @@ public class NodeRenderService {
 		// log.debug(
 		// "RENDER: " + node.getPath() /* XString.prettyPrint(node) */ + " ordinal=" +
 		// ordinal + "level=" + level);
-		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, true, false, ordinal,
+		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, ordinal,
 				level > 0, false, false);
 
 		if (level > 0) {
@@ -384,7 +384,7 @@ public class NodeRenderService {
 			return res;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, false, false, true, -1, false,
+		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, false, true, -1, false,
 				false, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
