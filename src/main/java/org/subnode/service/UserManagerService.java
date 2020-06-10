@@ -152,12 +152,9 @@ public class UserManagerService {
 			sessionContext.setUserPreferences(userPreferences);
 			res.setUserPreferences(userPreferences);
 
-			Long lastLoginTime = userNode.getIntProp(NodeProp.LAST_LOGIN_TIME.s());
-			if (lastLoginTime == null) {
-				lastLoginTime = 0L;
-			}
-			sessionContext.setLastLoginTime(lastLoginTime);
-			userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), new Date().getTime());
+			Date now = new Date();
+			sessionContext.setLastLoginTime(now.getTime());
+			userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), now.getTime());
 			api.save(session, userNode);
 
 			res.setSuccess(true);
@@ -189,22 +186,26 @@ public class UserManagerService {
 			return null;
 
 		String ret = null;
-		Long lastLoginTime = sessionContext.getLastLoginTime();
 		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "### Inbox",
 				NodeType.INBOX.s());
+
+		Date now = new Date();
+		long lastInboxNotifyTime = userNode.getIntProp(NodeProp.LAST_INBOX_NOTIFY_TIME.s());
 
 		if (userInbox != null) {
 			SubNode inboxNode = api.getNewestChild(session, userInbox);
 			if (inboxNode != null) {
-
 				long inboxNodeTimeLong = inboxNode.getModifyTime().getTime();
-				if (inboxNodeTimeLong - lastLoginTime > 0) {
-					Date now = new Date();
+
+				if (inboxNodeTimeLong - lastInboxNotifyTime > 0) {
 					ret = "Your inbox has new information, added "
 							+ DateUtil.formatDurationMillis(now.getTime() - inboxNodeTimeLong) + " ago.";
 				}
 			}
 		}
+
+		userNode.setProp(NodeProp.LAST_INBOX_NOTIFY_TIME.s(), now.getTime());
+		api.save(session, userNode);
 		return ret;
 	}
 
@@ -506,7 +507,7 @@ public class UserManagerService {
 	public SaveUserProfileResponse saveUserProfile(final SaveUserProfileRequest req) {
 		SaveUserProfileResponse res = new SaveUserProfileResponse();
 		final String userName = sessionContext.getUserName();
-		
+
 		adminRunner.run(session -> {
 			boolean failed = false;
 			SubNode userNode = api.getUserNodeByUserName(session, userName);

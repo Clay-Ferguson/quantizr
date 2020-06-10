@@ -48,6 +48,8 @@ public class SessionContext {
 	private String password;
 	private String timezone;
 	private String timeZoneAbbrev;
+
+	//variable not currently being used (due to refactoring)
 	private long lastLoginTime;
 
 	private UserPreferences userPreferences;

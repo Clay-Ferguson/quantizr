@@ -99,6 +99,7 @@ public enum NodeProp {
 
     BIN_TOTAL("sn:binTot", "s"),//
     LAST_LOGIN_TIME("sn:lastLogin", "s"),//
+    LAST_INBOX_NOTIFY_TIME("sn:lastInboxNotify", "s"),//
 
     //amount of bytes the user is ALLOWED to save.
     BIN_QUOTA("sn:binQuota", "s"),//

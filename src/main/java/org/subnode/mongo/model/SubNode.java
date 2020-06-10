@@ -124,12 +124,12 @@ public class SubNode {
 	private SubNodePropertyMap properties;
 
 	/*
-	 * ACL=Access Control List 
+	 * ACL=Access Control List
 	 * 
-	 * Keys are userNodeIds, and values is a comma delimited
-	 * list of any of PrivilegeType.java values. However in addition to userNodeIds
-	 * identifying users the additional key of "public" is allowed as a key which
-	 * indicates privileges granted to everyone (the entire public)
+	 * Keys are userNodeIds, and values is a comma delimited list of any of
+	 * PrivilegeType.java values. However in addition to userNodeIds identifying
+	 * users the additional key of "public" is allowed as a key which indicates
+	 * privileges granted to everyone (the entire public)
 	 */
 	public static final String FIELD_AC = "ac";
 	@Field(FIELD_AC)
@@ -263,8 +263,12 @@ public class SubNode {
 		return owner != null ? owner.toHexString() : null;
 	}
 
-	/* todo-1: All dates need to be stored as UTC/GMC so that the timezone offset is zero, because there's no timezone information stored anywhere,
-	and the only place any timezones ever come into play is when displaying the time to a user. */
+	/*
+	 * todo-1: All dates need to be stored as UTC/GMC so that the timezone offset is
+	 * zero, because there's no timezone information stored anywhere, and the only
+	 * place any timezones ever come into play is when displaying the time to a
+	 * user.
+	 */
 	@JsonProperty(FIELD_CREATE_TIME)
 	public Date getCreateTime() {
 		return createTime;
@@ -370,8 +374,10 @@ public class SubNode {
 	}
 
 	@JsonIgnore
-	//todo-1: all these 'setProp' functions should be smart enough to detect if the property set
-	//will have no effect (value not changing), and in that case then NOT add to the list of dirty nodes.
+	// todo-1: all these 'setProp' functions should be smart enough to detect if the
+	// property set
+	// will have no effect (value not changing), and in that case then NOT add to
+	// the list of dirty nodes.
 	public void setProp(String key, Long val) {
 		MongoThreadLocal.dirty(this);
 		if (val == null) {
@@ -411,12 +417,12 @@ public class SubNode {
 				return null;
 
 			if (v.getValue() instanceof Integer) {
-				return String.valueOf((Integer)v.getValue());
+				return String.valueOf((Integer) v.getValue());
 			}
 			if (v.getValue() instanceof Long) {
-				return String.valueOf((Long)v.getValue());
+				return String.valueOf((Long) v.getValue());
 			}
-			
+
 			return (String) v.getValue();
 		} catch (Exception e) {
 			ExUtil.error(log, "failed to get String from key: " + key, e);
@@ -433,12 +439,13 @@ public class SubNode {
 			Object val = v.getValue();
 
 			if (val instanceof Integer) {
-				return Long.valueOf((Integer)val); 
+				return Long.valueOf((Integer) val);
 			}
 
-			//todo-1: When saving from client the values are always sent as strings, and this is a workaround until that changes.
+			// todo-1: When saving from client the values are always sent as strings, and
+			// this is a workaround until that changes.
 			if (val instanceof String) {
-				return Long.parseLong((String)val);
+				return Long.parseLong((String) val);
 			}
 			return (Long) v.getValue();
 		} catch (Exception e) {

@@ -1,5 +1,6 @@
 package org.subnode.mail;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -153,6 +154,13 @@ public class OutboxMgr {
 			api.save(session, notifyNode);
 
 			sendServerPushInfo(recieverUserName, new InboxPushInfo(node.getId().toHexString()));
+
+			SubNode recieverAccountNode = api.getUserNodeByUserName(session, recieverUserName);
+			if (recieverAccountNode != null) {
+				Date now = new Date();
+				recieverAccountNode.setProp(NodeProp.LAST_INBOX_NOTIFY_TIME.s(), now.getTime());
+				api.save(session, recieverAccountNode);
+			}
 		}
 	}
 
@@ -169,12 +177,15 @@ public class OutboxMgr {
 						SseEventBuilder event = SseEmitter.event() //
 								.data(info) //
 								.id(String.valueOf(info.hashCode()))//
-								.name(info.getType()); 
+								.name(info.getType());
 						pushEmitter.send(event);
 
-						// DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking up
-						// in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead and let 
-						// the 'name' in the builder route different objects to different event listeners on the client. Not really sure
+						// DO NOT DELETE. This way of sending also works, and I was originally doing it
+						// this way and picking up
+						// in eventSource.onmessage = e => {} on the browser, but I decided to use the
+						// builder instead and let
+						// the 'name' in the builder route different objects to different event
+						// listeners on the client. Not really sure
 						// if either approach has major advantages over the other.
 						// pushEmitter.send(info, MediaType.APPLICATION_JSON);
 					} catch (Exception ex) {
