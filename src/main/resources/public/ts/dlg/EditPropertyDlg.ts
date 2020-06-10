@@ -5,7 +5,7 @@ import { Button } from "../widget/Button";
 import { Div } from "../widget/Div";
 import { Textarea } from "../widget/Textarea";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { TextField } from "../widget/TextField";
 import { AppState } from "../AppState";
@@ -23,13 +23,9 @@ export class EditPropertyDlg extends DialogBase {
 
     propertyNameTextarea: TextField;
     propertyValTextarea: Textarea;
-    propSavedFunc: Function;
-    editNode: J.NodeInfo;
 
-    constructor(args: any, state: AppState) {
+    constructor(private editNode: J.NodeInfo, private propSavedFunc: Function, state: AppState) {
         super("Edit Node Property", null, false, state);
-        this.propSavedFunc = args.propSavedFunc;
-        this.editNode = args.editNode; 
     }
 
     renderDlg(): CompIntf[] {
@@ -50,6 +46,13 @@ export class EditPropertyDlg extends DialogBase {
 
     saveProperty = (): void => {
         let name = this.propertyNameTextarea.getValue();
+
+        /* verify first that this property doesn't already exist */
+        if (!!S.props.getNodeProp(name, this.editNode)) {
+            S.util.showMessage("Property already exists: " + name, "Warning");
+            return;
+        }
+
         let val = this.propertyValTextarea.getValue();
 
         var postData = {

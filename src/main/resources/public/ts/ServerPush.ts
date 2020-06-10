@@ -54,6 +54,7 @@ export class ServerPush implements ServerPushIntf {
             //todo-0: (bug) when adam shared a node to bob, bob got the notification and then clicked the link to open the node in a different tab
             //and this results in ANOTHER duplicate notification of the same share. Probably solution is let session store the timestamp of the
             //most recent of this kind of notification and only show notifications always greater than that timestamp.
+            //tip: this line in UserManagerService is the place to look: "if (inboxNodeTimeLong - lastLoginTime > 0) {"
             new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
         }, false);
     }
