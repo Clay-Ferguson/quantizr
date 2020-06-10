@@ -371,6 +371,10 @@ export interface GraphResponse extends ResponseBase {
 export interface ImportResponse extends ResponseBase {
 }
 
+export interface InboxPushInfo extends ServerPushInfo {
+    nodeId: string;
+}
+
 export interface InfoMessage {
     message: string;
     type: string;
@@ -469,7 +473,6 @@ export interface SendTestEmailResponse extends ResponseBase {
 
 export interface ServerPushInfo {
     type: string;
-    nodeId: string;
 }
 
 export interface SetCipherKeyResponse extends ResponseBase {

@@ -17,7 +17,6 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.FeedPushInfo;
-import org.subnode.response.ServerPushInfo;
 import org.subnode.util.Convert;
 import org.subnode.util.ValContainer;
 import org.slf4j.Logger;

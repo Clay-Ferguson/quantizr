@@ -14,6 +14,7 @@ import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.response.InboxPushInfo;
 import org.subnode.response.ServerPushInfo;
 import org.subnode.service.UserFeedService;
 import org.subnode.util.SubNodeUtil;
@@ -21,9 +22,9 @@ import org.subnode.util.XString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
 /**
  * Manages the node where we store all emails that are queued up to be sent.
@@ -151,7 +152,7 @@ public class OutboxMgr {
 			notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getId().toHexString());
 			api.save(session, notifyNode);
 
-			sendServerPushInfo(recieverUserName, new ServerPushInfo("nodeAdded", node.getId().toHexString()));
+			sendServerPushInfo(recieverUserName, new InboxPushInfo(node.getId().toHexString()));
 		}
 	}
 
@@ -165,16 +166,17 @@ public class OutboxMgr {
 				ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
 				sseMvcExecutor.execute(() -> {
 					try {
-						// NOTE: Not sure SseEventBuilder is something we'll ever need, when we can just
-						// send JSON, and so this means we pick up
-						// the message with onmssage and not addEventListener, on the browser.
-						// SseEventBuilder event = SseEmitter.event() //
-						// .data(msg) //
-						// .id(String.valueOf(info.hashCode()))
-						// .name("serverPushEvent");
-						// pushEmitter.send(event);
+						SseEventBuilder event = SseEmitter.event() //
+								.data(info) //
+								.id(String.valueOf(info.hashCode()))//
+								.name(info.getType()); 
+						pushEmitter.send(event);
 
-						pushEmitter.send(info, MediaType.APPLICATION_JSON);
+						// DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking up
+						// in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead and let 
+						// the 'name' in the builder route different objects to different event listeners on the client. Not really sure
+						// if either approach has major advantages over the other.
+						// pushEmitter.send(info, MediaType.APPLICATION_JSON);
 					} catch (Exception ex) {
 						pushEmitter.completeWithError(ex);
 					}

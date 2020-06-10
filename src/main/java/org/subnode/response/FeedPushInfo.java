@@ -11,7 +11,7 @@ public class FeedPushInfo extends ServerPushInfo {
 	}
 
 	public FeedPushInfo(NodeInfo nodeInfo) {
-		super("feedPush", null);
+		super("feedPush");
 		this.nodeInfo = nodeInfo;
 	}
 
