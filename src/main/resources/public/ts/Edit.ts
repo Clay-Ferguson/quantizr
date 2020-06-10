@@ -197,7 +197,7 @@ export class Edit implements EditIntf {
 
     insertNodeResponse = (res: J.InsertNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Insert node", res)) {
-            S.meta64.updateNodeMap(res.newNode, 1, state);
+            S.meta64.updateNodeMap(res.newNode, state);
             S.meta64.highlightNode(res.newNode, true, state);
             this.cached_runEditNode(res.newNode.id, state);
         }
@@ -209,7 +209,7 @@ export class Edit implements EditIntf {
                 S.meta64.refresh(state);
             }
             else {
-                S.meta64.updateNodeMap(res.newNode, 1, state);
+                S.meta64.updateNodeMap(res.newNode, state);
                 this.cached_runEditNode(res.newNode.id, state);
             }
         }

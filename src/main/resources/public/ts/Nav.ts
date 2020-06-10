@@ -192,6 +192,7 @@ export class Nav implements NavIntf {
 
         let node: J.NodeInfo = state.idToNodeMap[nodeId];
         if (!node) {
+            //console.log("idToNodeMap: "+S.util.prettyPrint(state.idToNodeMap));
             throw new Error("node not found in idToNodeMap: " + nodeId);
         }
 

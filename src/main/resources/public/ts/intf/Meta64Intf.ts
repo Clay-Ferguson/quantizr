@@ -45,6 +45,6 @@ export interface Meta64Intf {
     saveUserPreferences(state: AppState): void;
     openSystemFile(fileName: string);
     setStateVarsUsingLoginResponse(res: J.LoginResponse, state: AppState): void;
-    updateNodeMap(node: J.NodeInfo, level: number, state: AppState): void;
+    updateNodeMap(node: J.NodeInfo, state: AppState): void;
 }
 

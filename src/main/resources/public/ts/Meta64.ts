@@ -259,17 +259,13 @@ export class Meta64 implements Meta64Intf {
         }
     }
 
-    updateNodeMap = (node: J.NodeInfo, level: number, state: AppState): void => {
+    updateNodeMap = (node: J.NodeInfo, state: AppState): void => {
         if (!node) return;
-
-        if (level == 1) {
-            state.idToNodeMap = {};
-        }
         state.idToNodeMap[node.id] = node;
 
         if (node.children) {
             node.children.forEach(function (n) {
-                this.updateNodeMap(n, level + 1, state);
+                this.updateNodeMap(n, state);
             }, this);
         }
     }
