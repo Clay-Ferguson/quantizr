@@ -11,7 +11,7 @@ import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { AppState } from "./AppState";
-import { dispatch, appState } from "./AppRedux";
+import { dispatch, appState, store } from "./AppRedux";
 import { ProfileDlg } from "./dlg/ProfileDlg";
 
 let S: Singletons;
@@ -22,7 +22,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Edit implements EditIntf {
 
     showReadOnlyProperties: boolean = true;
-    parentOfNewNode: J.NodeInfo = null;
 
     /*
      * type=NodeInfo.java
@@ -32,6 +31,7 @@ export class Edit implements EditIntf {
      * creating in a 'create under parent' mode, versus non-null meaning 'insert inline' type of insert.
      *
      */
+    //todo-0: get these variables out of this global type state
     nodeInsertTarget: any = null;
     nodeInsertTargetOrdinalOffset: number = 0;
 
@@ -167,17 +167,17 @@ export class Edit implements EditIntf {
         return node.owner != "admin";
     }
 
-    startEditingNewNode = (typeName: string, createAtTop: boolean, state: AppState): void => {
+    startEditingNewNode = (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void => {
         if (S.edit.nodeInsertTarget) {
             S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
-                parentId: S.edit.parentOfNewNode.id,
+                parentId: parentNode.id,
                 targetOrdinal: S.edit.nodeInsertTarget.ordinal + this.nodeInsertTargetOrdinalOffset,
                 newNodeName: "",
                 typeName: typeName ? typeName : "u"
             }, (res) => { this.insertNodeResponse(res, state); });
         } else {
             S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                nodeId: S.edit.parentOfNewNode.id,
+                nodeId: parentNode.id,
                 newNodeName: "",
                 typeName: typeName ? typeName : "u",
                 createAtTop: createAtTop,
@@ -352,14 +352,6 @@ export class Edit implements EditIntf {
         state = appState(state);
         if (!state.node || !state.node.children) return;
 
-        //NOTE: The insert is always an 'inline' in page insert, so the page root (top of page) node is always the parent of the insert.
-        //todo-0: having this be a singleton variable is a bit awkward
-        this.parentOfNewNode = state.node;
-        if (!this.parentOfNewNode) {
-            console.log("Unknown parent");
-            return;
-        }
-
         /*
          * We get the node selected for the insert position by using the uid if one was passed in or using the
          * currently highlighted node if no uid was passed.
@@ -374,16 +366,17 @@ export class Edit implements EditIntf {
         if (node) {
             this.nodeInsertTarget = node;
             this.nodeInsertTargetOrdinalOffset = ordinalOffset;
-            this.startEditingNewNode(typeName, false, state);
+            this.startEditingNewNode(typeName, false, state.node, state);
         }
     }
 
     /* Need all cached functions to be prefixed so they're recognizable, since refactoring them can break things */
     cached_newSubNode = (id: any) => {
-        S.edit.createSubNode(id, null, true, null);
+        let state = store.getState();
+        S.edit.createSubNode(id, null, true, state.node, null);
     }
 
-    createSubNode = (id: any, typeName: string, createAtTop: boolean, state: AppState): void => {
+    createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void => {
         state = appState(state);
         /*
          * If no uid provided we deafult to creating a node under the currently viewed node (parent of current page), or any selected
@@ -392,15 +385,15 @@ export class Edit implements EditIntf {
         if (!id) {
             let highlightNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             if (highlightNode) {
-                this.parentOfNewNode = highlightNode;
+                parentNode = highlightNode;
             }
             else {
                 if (!state.node || !state.node.children) return null;
-                this.parentOfNewNode = state.node;
+                parentNode = state.node;
             }
         } else {
-            this.parentOfNewNode = state.idToNodeMap[id];
-            if (!this.parentOfNewNode) {
+            parentNode = state.idToNodeMap[id];
+            if (!parentNode) {
                 console.log("Unknown nodeId in createSubNode: " + id);
                 return;
             }
@@ -410,7 +403,7 @@ export class Edit implements EditIntf {
          * this indicates we are NOT inserting inline. An inline insert would always have a target.
          */
         this.nodeInsertTarget = null;
-        this.startEditingNewNode(typeName, createAtTop, state);
+        this.startEditingNewNode(typeName, createAtTop, parentNode, state);
     }
 
     selectAllNodes = async (state: AppState): Promise<void> => {
@@ -682,9 +675,6 @@ export class Edit implements EditIntf {
     }
 
     addComment = (node: J.NodeInfo, state: AppState) => {
-        //todo-0: make this always a "comment" type?
-        debugger;
-
         //&&& this function is similar but not workable.
         //S.edit.insertNode(node.id, "u", 0, state);
     }

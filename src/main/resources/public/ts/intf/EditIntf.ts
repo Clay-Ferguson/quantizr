@@ -4,7 +4,6 @@ import { AppState } from "../AppState";
 
 export interface EditIntf {
     showReadOnlyProperties: boolean;
-    parentOfNewNode: J.NodeInfo;
     nodeInsertTarget: any;
 
     saveClipboardToNode(): void;
@@ -17,7 +16,7 @@ export interface EditIntf {
     openExportDlg(state: AppState): void;
     isEditAllowed(node: any, state: AppState): boolean;
     isInsertAllowed(node: any, state: AppState): boolean;
-    startEditingNewNode(typeName: string, createAtTop: boolean, state: AppState): void;
+    startEditingNewNode(typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void;
     insertNodeResponse(res: J.InsertNodeResponse, state: AppState): void;
     createSubNodeResponse(res: J.CreateSubNodeResponse, state: AppState): void;
     saveNodeResponse(node: J.NodeInfo, res: J.SaveNodeResponse, state: AppState): void;
@@ -30,7 +29,7 @@ export interface EditIntf {
     cached_runEditNode(id: any, state?: AppState): void;
     insertNode(id: string, typeName: string, ordinalOffset: number, state?: AppState): void;
     cached_toolbarInsertNode(id: string): void;
-    createSubNode(id: any, typeName: string, createAtTop: boolean, state: AppState): void;
+    createSubNode(id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void;
     selectAllNodes(state: AppState) : void;
     cached_softDeleteSelNodes(nodeId: string);
     deleteSelNodes(nodeId: string, hardDelete: boolean, state?: AppState): void;
