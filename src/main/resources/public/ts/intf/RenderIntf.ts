@@ -7,12 +7,13 @@ import { AppState } from "../AppState";
 
 export interface RenderIntf {
     lastOwner: string;
+    fadeInId: string;
 
     setNodeDropHandler(rowDiv: Comp, node: J.NodeInfo, state: AppState): void;
     initMarkdown(): void;
     injectSubstitutions(content: string): string;
     showNodeUrl(state: AppState): void;
-    renderPageFromData(data: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean, state: AppState): void; 
+    renderPageFromData(data: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean, allowScroll: boolean, state: AppState): void; 
     getUrlForNodeAttachment(node: J.NodeInfo): string;
     getStreamUrlForNodeAttachment(node: J.NodeInfo): string;
     makeAvatarImage(node: J.NodeInfo, state: AppState): Img;

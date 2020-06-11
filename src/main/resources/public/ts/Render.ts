@@ -27,6 +27,7 @@ export class Render implements RenderIntf {
 
     private debug: boolean = false;
     private markedRenderer = null;
+    fadeInId: string;
 
     /* Since js is singlethreaded we can have lastOwner get updated from any other function and use it to keep track
     during the rendering, what the last owner was so we can keep from displaying the same avatars unnecessarily */
@@ -140,7 +141,7 @@ export class Render implements RenderIntf {
         return typeHandler == null || typeHandler.allowAction(action);
     }
 
-    renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, state: AppState): void => {
+    renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true, state: AppState): void => {
         if (res.noDataResponse) {
             S.util.showMessage(res.noDataResponse, "Note");
             return;
@@ -174,16 +175,18 @@ export class Render implements RenderIntf {
                     if (state.pendingLocationHash) {
                         window.location.hash = state.pendingLocationHash;
                         //Note: the substring(1) trims the "#" character off.
-                        S.meta64.highlightRowById(state.pendingLocationHash.substring(1), true, s);
+                        if (allowScroll) {
+                            S.meta64.highlightRowById(state.pendingLocationHash.substring(1), true, s);
+                        }
                         state.pendingLocationHash = null;
                     }
-                    else if (targetNodeId) {
+                    else if (allowScroll && targetNodeId) {
                         S.meta64.highlightRowById(targetNodeId, true, s);
                     } //
-                    else if (scrollToTop || !S.meta64.getHighlightedNode(s)) {
+                    else if (allowScroll && (scrollToTop || !S.meta64.getHighlightedNode(s))) {
                         S.view.scrollToTop();
                     } //
-                    else {
+                    else if (allowScroll) {
                         S.view.scrollToSelectedNode(s);
                     }
 
@@ -301,7 +304,7 @@ export class Render implements RenderIntf {
         let img: Img = new Img(key, {
             src,
             className: "avatarImage",
-            title: "Node owned by: "+node.owner,
+            title: "Node owned by: " + node.owner,
 
             // I decided not to let avatars be clickable.
             // onClick: (evt) => {

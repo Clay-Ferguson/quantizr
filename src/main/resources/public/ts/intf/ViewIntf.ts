@@ -4,7 +4,7 @@ import { AppState } from "../AppState";
 export interface ViewIntf {
     docElm: any;
 
-    refreshTree(nodeId: string, renderParentIfLeaf: boolean, highlightId: string, isInitialRender: boolean, forceIPFSRefresh: boolean, state: AppState): void;
+    refreshTree(nodeId: string, renderParentIfLeaf: boolean, highlightId: string, isInitialRender: boolean, forceIPFSRefresh: boolean, allowScroll: boolean, state: AppState): void;
     firstPage(state: AppState): void;
     prevPage(state: AppState): void;
     nextPage(state: AppState): void;

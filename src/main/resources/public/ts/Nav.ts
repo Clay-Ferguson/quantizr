@@ -71,7 +71,7 @@ export class Nav implements NavIntf {
         if (!res || !res.node) {
             S.util.showMessage("No data is visible to you above this node.", "Warning");
         } else {
-            S.render.renderPageFromData(res, scrollToTop, id, true, state);
+            S.render.renderPageFromData(res, scrollToTop, id, true, true, state);
         }
     }
 
@@ -236,7 +236,7 @@ export class Nav implements NavIntf {
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id, "Warning");
         } else {
-            S.view.refreshTree(node.id, true, null, false, false, state);
+            S.view.refreshTree(node.id, true, null, false, false, true, state);
         }
     }
 
@@ -261,7 +261,7 @@ export class Nav implements NavIntf {
     navPageNodeResponse = (res: J.RenderNodeResponse, state: AppState): void => {
         console.log("navPageNodeResponse.");
         S.meta64.clearSelNodes(state);
-        S.render.renderPageFromData(res, true, null, true, state);
+        S.render.renderPageFromData(res, true, null, true, true, state);
     }
 
     geoLocation = (state: AppState): void => {

@@ -4,7 +4,6 @@ import { AppState } from "../AppState";
 
 export interface EditIntf {
     showReadOnlyProperties: boolean;
-    nodeInsertTarget: any;
 
     saveClipboardToNode(): void;
     splitNode(splitType: string, delimiter: string, state: AppState): void;
@@ -16,7 +15,7 @@ export interface EditIntf {
     openExportDlg(state: AppState): void;
     isEditAllowed(node: any, state: AppState): boolean;
     isInsertAllowed(node: any, state: AppState): boolean;
-    startEditingNewNode(typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void;
+    startEditingNewNode(typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, nodeInsertTarget: J.NodeInfo, ordinalOffset: number, state: AppState): void;
     insertNodeResponse(res: J.InsertNodeResponse, state: AppState): void;
     createSubNodeResponse(res: J.CreateSubNodeResponse, state: AppState): void;
     saveNodeResponse(node: J.NodeInfo, res: J.SaveNodeResponse, state: AppState): void;

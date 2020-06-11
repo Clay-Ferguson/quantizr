@@ -35,7 +35,12 @@ export class NodeCompMainNode extends Div {
 
         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         let selected: boolean = (focusNode && focusNode.id === node.id);
-        this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main")
+        this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main");
+
+        if (S.render.fadeInId == node.id) { 
+            S.render.fadeInId = null;
+            this.attribs.className += " fadeInRowBkgClz";
+        }
 
         this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
         S.render.setNodeDropHandler(this, node, state);

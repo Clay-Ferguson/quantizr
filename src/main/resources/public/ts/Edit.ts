@@ -23,18 +23,6 @@ export class Edit implements EditIntf {
 
     showReadOnlyProperties: boolean = true;
 
-    /*
-     * type=NodeInfo.java
-     *
-     * When inserting a new node, this holds the node that was clicked on at the time the insert was requested, and
-     * is sent to server for ordinal position assignment of new node. Also if this var is null, it indicates we are
-     * creating in a 'create under parent' mode, versus non-null meaning 'insert inline' type of insert.
-     *
-     */
-    //todo-0: get these variables out of this global type state
-    nodeInsertTarget: any = null;
-    nodeInsertTargetOrdinalOffset: number = 0;
-
     openProfileDlg = (state: AppState): void => {
         new ProfileDlg(state).open();
     }
@@ -72,7 +60,7 @@ export class Edit implements EditIntf {
         console.log("insertBookResponse running.");
         S.util.checkSuccess("Insert Book", res);
 
-        S.view.refreshTree(null, false, null, false, false, state);
+        S.view.refreshTree(null, false, null, false, false, true, state);
         S.meta64.selectTab("mainTab");
         S.view.scrollToSelectedNode(state);
     }
@@ -88,7 +76,7 @@ export class Edit implements EditIntf {
                 }
             }
 
-            S.view.refreshTree(null, false, highlightId, false, false, state);
+            S.view.refreshTree(null, false, highlightId, false, false, true, state);
         }
     }
 
@@ -129,7 +117,7 @@ export class Edit implements EditIntf {
                 },
             });
 
-            S.view.refreshTree(null, false, null, false, false, state);
+            S.view.refreshTree(null, false, null, false, false, true, state);
         }
     }
 
@@ -167,11 +155,16 @@ export class Edit implements EditIntf {
         return node.owner != "admin";
     }
 
-    startEditingNewNode = (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void => {
-        if (S.edit.nodeInsertTarget) {
+    /*
+    * nodeInsertTarget holds the node that was clicked on at the time the insert was requested, and
+    * is sent to server for ordinal position assignment of new node. Also if this var is null, it indicates we are
+    * creating in a 'create under parent' mode, versus non-null meaning 'insert inline' type of insert.
+    */
+    startEditingNewNode = (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, nodeInsertTarget: J.NodeInfo, ordinalOffset: number, state: AppState): void => {
+        if (nodeInsertTarget) {
             S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                 parentId: parentNode.id,
-                targetOrdinal: S.edit.nodeInsertTarget.ordinal + this.nodeInsertTargetOrdinalOffset,
+                targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
                 newNodeName: "",
                 typeName: typeName ? typeName : "u"
             }, (res) => { this.insertNodeResponse(res, state); });
@@ -210,8 +203,8 @@ export class Edit implements EditIntf {
         return new Promise<void>(async (resolve, reject) => {
             if (S.util.checkSuccess("Save node", res)) {
                 await this.distributeKeys(node, res.aclEntries);
-                S.view.refreshTree(null, false, node.id, false, false, state);
-                S.meta64.selectTab("mainTab");
+                S.view.refreshTree(null, false, node.id, false, false, false, state);
+                //S.meta64.selectTab("mainTab");
                 resolve();
             }
         });
@@ -364,9 +357,7 @@ export class Edit implements EditIntf {
         }
 
         if (node) {
-            this.nodeInsertTarget = node;
-            this.nodeInsertTargetOrdinalOffset = ordinalOffset;
-            this.startEditingNewNode(typeName, false, state.node, state);
+            this.startEditingNewNode(typeName, false, state.node, node, ordinalOffset, state);
         }
     }
 
@@ -399,11 +390,7 @@ export class Edit implements EditIntf {
             }
         }
 
-        /*
-         * this indicates we are NOT inserting inline. An inline insert would always have a target.
-         */
-        this.nodeInsertTarget = null;
-        this.startEditingNewNode(typeName, createAtTop, parentNode, state);
+        this.startEditingNewNode(typeName, createAtTop, parentNode, null, 0, state);
     }
 
     selectAllNodes = async (state: AppState): Promise<void> => {
@@ -668,7 +655,7 @@ export class Edit implements EditIntf {
 
     splitNodeResponse = (res: J.SplitNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Split content", res)) {
-            S.view.refreshTree(null, false, null, false, false, state);
+            S.view.refreshTree(null, false, null, false, false, true, state);
             S.meta64.selectTab("mainTab");
             S.view.scrollToSelectedNode(state);
         }

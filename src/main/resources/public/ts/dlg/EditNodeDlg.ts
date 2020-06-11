@@ -507,6 +507,7 @@ export class EditNodeDlg extends DialogBase {
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                 node: state.node
             }, (res) => {
+                S.render.fadeInId = state.node.id;
                 S.edit.saveNodeResponse(state.node, res, this.appState);
             });
 

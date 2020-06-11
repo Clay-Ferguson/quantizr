@@ -49,6 +49,12 @@ export class NodeCompRow extends Div {
         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         let selected: boolean = (focusNode && focusNode.id === id);
         this.attribs.className = (this.layoutClass || "") + (selected ? " active-row" : " inactive-row");
+
+        if (S.render.fadeInId == node.id) { 
+            S.render.fadeInId = null;
+            this.attribs.className += " fadeInRowBkgClz";
+        }
+
         this.attribs.style = style;
 
         let header: CompIntf = null;

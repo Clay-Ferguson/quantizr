@@ -43,7 +43,7 @@ export class ServerPush implements ServerPushIntf {
                         s.feedResults = s.feedResults || [];
 
                         //this is a slight hack to cause the new rows to animate their background, but it's ok, and I plan to leave it like this
-                        (nodeInfo as any).fadeIn = true;
+                        S.render.fadeInId = nodeInfo.id;
                         s.feedResults.unshift(nodeInfo);
                     }
                 });

@@ -25,7 +25,7 @@ export class View implements ViewIntf {
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
     refreshTree = (nodeId: string, renderParentIfLeaf: boolean, highlightId: string, isInitialRender: boolean, forceIPFSRefresh: boolean,
-        state: AppState): void => {
+        allowScroll: boolean, state: AppState): void => {
 
         if (!nodeId && state.node) {
             nodeId = state.node.id;
@@ -48,7 +48,7 @@ export class View implements ViewIntf {
             if (res.offsetOfNodeFound > -1) {
                 S.nav.mainOffset = res.offsetOfNodeFound;
             }
-            S.render.renderPageFromData(res, false, highlightId, true, state);
+            S.render.renderPageFromData(res, false, highlightId, true, allowScroll, state);
         });
     }
 
@@ -95,7 +95,7 @@ export class View implements ViewIntf {
                 }
             }
 
-            S.render.renderPageFromData(res, true, null, true, state);
+            S.render.renderPageFromData(res, true, null, true, true, state);
         });
     }
 

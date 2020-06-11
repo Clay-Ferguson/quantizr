@@ -78,7 +78,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     refresh = (state: AppState): void => {
-        S.view.refreshTree(null, true, null, false, false, state);
+        S.view.refreshTree(null, true, null, false, false, true, state);
     }
 
     selectTab = (tabName: string): void => {
@@ -314,7 +314,7 @@ export class Meta64 implements Meta64Intf {
                 //console.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
 
                 if (event.state && event.state.nodeId) {
-                    S.view.refreshTree(event.state.nodeId, true, event.state.highlightId, false, false, store.getState());
+                    S.view.refreshTree(event.state.nodeId, true, event.state.highlightId, false, false, true, store.getState());
                     this.selectTab("mainTab");
                 }
             };
@@ -527,7 +527,7 @@ export class Meta64 implements Meta64Intf {
         S.util.ajax<J.AnonPageLoadRequest, J.AnonPageLoadResponse>("anonPageLoad", {
         },
             (res: J.AnonPageLoadResponse): void => {
-                S.render.renderPageFromData(res.renderNodeResponse, false, null, true, state);
+                S.render.renderPageFromData(res.renderNodeResponse, false, null, true, true, state);
             }
         );
     }

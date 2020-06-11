@@ -136,8 +136,8 @@ export class Search implements SearchIntf {
             clazz += " non-editing-border"
         }
 
-        if ((node as any).fadeIn) {
-            delete (node as any).fadeIn;
+        if (S.render.fadeInId == node.id) { 
+            S.render.fadeInId = null;
             clazz += " fadeInRowBkgClz";
         }
 
@@ -183,7 +183,7 @@ export class Search implements SearchIntf {
             throw "Unable to find uid in search results: " + id;
         }
 
-        S.view.refreshTree(this.highlightRowNode.id, true, this.highlightRowNode.id, false, false, state);
+        S.view.refreshTree(this.highlightRowNode.id, true, this.highlightRowNode.id, false, false, true, state);
         S.meta64.selectTab("mainTab");
     }
 

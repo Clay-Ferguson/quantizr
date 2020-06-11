@@ -203,7 +203,7 @@ export class User implements UserIntf {
                         }
                     }
 
-                    S.view.refreshTree(id, true, childId, true, false, state);
+                    S.view.refreshTree(id, true, childId, true, false, true, state);
 
                     setTimeout(() => {
                         S.encryption.initKeys();
@@ -245,7 +245,7 @@ export class User implements UserIntf {
             fromUser,
             toUser,
         }, (res: J.TransferNodeResponse) => {
-            S.view.refreshTree(null, false, null, false, false, state);
+            S.view.refreshTree(null, false, null, false, false, true, state);
             S.util.showMessage(res.message, "Success");
         });
     }
