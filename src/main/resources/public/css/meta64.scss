@@ -764,12 +764,14 @@ which it will do by default. */
     background: $createdByMeBackgroundColor;
     color: $createdByMeTextColor;
     padding: 4px;
+    margin-right: 10px;
 }
 
 .created-by-other {
     background: $createdByAnotherBackgroundColor;
     color: $createdByAnotherTextColor;
     padding: 4px;
+    margin-right: 10px;
 }
 
 .header-text {
@@ -1067,4 +1069,11 @@ i'm backing out for now
 .fadeInRowBkgClz {
     animation-name: fadeInRowBkg;
     animation-duration: 3s;
+}
+
+.rowFooterIcon {
+    margin-right: 12px;
+    margin-bottom: 12px;  
+    vertical-align: 'middle';
+    cursor: pointer;
 }

@@ -128,7 +128,7 @@ public class NodeSearchService {
 		 * todo-0: This is TEMPORARY, we will end up keeping userFeedService up to date
 		 * another way later
 		 */
-		//userFeedService.init();
+		// userFeedService.init();
 
 		NodeFeedResponse res = new NodeFeedResponse();
 		if (session == null) {
@@ -148,8 +148,11 @@ public class NodeSearchService {
 
 			List<UserFeedItem> fullFeedList = new LinkedList<UserFeedItem>();
 
-			/* we store the set of the currently active userNodeIds in the session, so that directly from the user's session memory
-			 we can tell who all the users are in the feed they are now viewing */
+			/*
+			 * we store the set of the currently active userNodeIds in the session, so that
+			 * directly from the user's session memory we can tell who all the users are in
+			 * the feed they are now viewing
+			 */
 			HashSet<String> userNodeIds = new HashSet<String>();
 
 			for (SubNode friendNode : friendNodes) {
@@ -164,7 +167,8 @@ public class NodeSearchService {
 				if (userNodeId == null) {
 					userName = friendNode.getStringProp(NodeProp.USER.s());
 
-					//if USER_NODE_ID has not been set on the node yet then get it and set it first here.
+					// if USER_NODE_ID has not been set on the node yet then get it and set it first
+					// here.
 					if (userName != null) {
 						ValContainer<SubNode> _userNode = new ValContainer<SubNode>();
 						final String _userName = userName;
@@ -181,19 +185,29 @@ public class NodeSearchService {
 					userName = friendNode.getStringProp(NodeProp.USER.s());
 				}
 
-				/* Look up the cached User Feed nodes (in memory) and add all of 'userName' cached items into the full feed list */
+				/*
+				 * Look up the cached User Feed nodes (in memory) and add all of 'userName'
+				 * cached items into the full feed list
+				 */
 				synchronized (UserFeedService.userFeedInfoMapByUserName) {
 					UserFeedInfo userFeedInfo = UserFeedService.userFeedInfoMapByUserName.get(userName);
-					fullFeedList.addAll(userFeedInfo.getUserFeedList());
+					if (userFeedInfo != null) {
+						fullFeedList.addAll(userFeedInfo.getUserFeedList());
+					}
 				}
 
 				log.debug("Processing Friend Node[" + userName + "]: id=" + friendNode.getId().toHexString());
 			}
 
-			/* Now add the feed of the current user because a user should be able to see his own posts appear in the feed */
+			/*
+			 * Now add the feed of the current user because a user should be able to see his
+			 * own posts appear in the feed
+			 */
 			synchronized (UserFeedService.userFeedInfoMapByUserName) {
 				UserFeedInfo userFeedInfo = UserFeedService.userFeedInfoMapByUserName.get(sessionContext.getUserName());
-				fullFeedList.addAll(userFeedInfo.getUserFeedList());
+				if (userFeedInfo != null) {
+					fullFeedList.addAll(userFeedInfo.getUserFeedList());
+				}
 			}
 
 			/* Sort the feed items chrononologially */
@@ -204,7 +218,10 @@ public class NodeSearchService {
 				}
 			});
 
-			/* Generate the final presentation info objects to send back to client (NodeInfo list) */
+			/*
+			 * Generate the final presentation info objects to send back to client (NodeInfo
+			 * list)
+			 */
 			List<NodeInfo> results = new LinkedList<NodeInfo>();
 			for (UserFeedItem ufi : fullFeedList) {
 				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, ufi.getNode(), true, false,
@@ -248,8 +265,8 @@ public class NodeSearchService {
 				continue;
 			}
 
-			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1,
-					false, false, false);
+			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1, false,
+					false, false);
 			searchResults.add(info);
 			if (counter++ > MAX_NODES) {
 				break;

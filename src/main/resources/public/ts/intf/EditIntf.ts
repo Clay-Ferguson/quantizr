@@ -46,5 +46,6 @@ export interface EditIntf {
     emptyTrash(state: AppState): void;
     clearInbox(state: AppState): void;
     cached_newSubNode(id: any);
+    addComment(node: J.NodeInfo, state: AppState): void;
 }
 

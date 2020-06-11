@@ -168,15 +168,6 @@ export class Edit implements EditIntf {
     }
 
     startEditingNewNode = (typeName: string, createAtTop: boolean, state: AppState): void => {
-        /*
-         * If we didn't create the node we are inserting under, and neither did "admin", then we need to send notification
-         * email upon saving this new node.
-         */
-        // if (S.meta64.userName != S.edit.parentOfNewNode.owner && //
-        //     S.edit.parentOfNewNode.owner != "admin") {
-        //     S.edit.sendNotificationPendingSave = true;
-        // }
-
         if (S.edit.nodeInsertTarget) {
             S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                 parentId: S.edit.parentOfNewNode.id,
@@ -360,6 +351,9 @@ export class Edit implements EditIntf {
     insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState): void => {
         state = appState(state);
         if (!state.node || !state.node.children) return;
+
+        //NOTE: The insert is always an 'inline' in page insert, so the page root (top of page) node is always the parent of the insert.
+        //todo-0: having this be a singleton variable is a bit awkward
         this.parentOfNewNode = state.node;
         if (!this.parentOfNewNode) {
             console.log("Unknown parent");
@@ -685,5 +679,13 @@ export class Edit implements EditIntf {
             S.meta64.selectTab("mainTab");
             S.view.scrollToSelectedNode(state);
         }
+    }
+
+    addComment = (node: J.NodeInfo, state: AppState) => {
+        //todo-0: make this always a "comment" type?
+        debugger;
+
+        //&&& this function is similar but not workable.
+        //S.edit.insertNode(node.id, "u", 0, state);
     }
 }
