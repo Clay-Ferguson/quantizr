@@ -12,6 +12,7 @@ import { NodeCompContent } from "./comps/NodeCompContent";
 import { AppState } from "./AppState";
 import { dispatch } from "./AppRedux";
 import { NodeCompRowHeader } from "./comps/NodeCompRowHeader";
+import { NodeCompRowFooter } from "./comps/NodeCompRowFooter";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -43,7 +44,6 @@ export class Search implements SearchIntf {
     }
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
-
         dispatch({
             type: "Action_RenderSearchResults",
             update: (s: AppState): void => {
@@ -55,7 +55,6 @@ export class Search implements SearchIntf {
     }
 
     timelineResponse = (res: J.NodeSearchResponse) => {
-
         dispatch({
             type: "Action_RenderTimelineResults",
             update: (s: AppState): void => {
@@ -123,7 +122,7 @@ export class Search implements SearchIntf {
      *
      * node is a NodeInfo.java JSON
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, allowAvatar: boolean, prefix: string, state: AppState): Comp => {
+    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, allowAvatar: boolean, prefix: string, isFeed: boolean, state: AppState): Comp => {
 
         let cssId = this._UID_ROWID_PREFIX + node.id;
         let buttonBar = this.makeButtonBarHtml(node, allowAvatar, state);
@@ -147,8 +146,10 @@ export class Search implements SearchIntf {
             onClick: S.meta64.getNodeFunc(this.cached_clickOnSearchResultRow, "S.srch.clickOnSearchResultRow", node.id),
             id: cssId
         }, [
-            new NodeCompRowHeader(node, true),
-            buttonBar, content]);
+            new NodeCompRowHeader(node, isFeed),
+            buttonBar, content,
+            isFeed ? new NodeCompRowFooter(node, isFeed) : null
+        ]);
     }
 
     makeButtonBarHtml = (node: J.NodeInfo, allowAvatar: boolean, state: AppState): Comp => {

@@ -75,7 +75,7 @@ export class TypeBase implements TypeHandlerIntf {
             if (!node.properties) {
                 node.properties = [];
             }
-            //todo-0: need an object with constructor for this.
+
             node.properties.push({
                 name: propName,
                 value: ""

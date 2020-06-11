@@ -772,13 +772,14 @@ public class MongoApi {
 		SubNode ret = null;
 
 		if (name.equals(NodeName.INBOX)) {
-			ret = getSpecialNode(session, session.getUser(), null, NodeName.INBOX, null /* plugin remders */, NodeType.INBOX.s());
-		}
-		else if (name.equals(NodeName.FRIEND_LIST)) {
-			ret = getSpecialNode(session, session.getUser(), null, NodeName.FRIEND_LIST, null /* plugin remders */, NodeType.FRIEND_LIST.s());
-		}
-		else if (name.equals(NodeName.USER_FEED)) {
-			ret = getSpecialNode(session, session.getUser(), null, NodeName.USER_FEED, null /* plugin renders */, NodeType.USER_FEED.s());
+			ret = getSpecialNode(session, session.getUser(), null, NodeName.INBOX, null /* plugin remders */,
+					NodeType.INBOX.s());
+		} else if (name.equals(NodeName.FRIEND_LIST)) {
+			ret = getSpecialNode(session, session.getUser(), null, NodeName.FRIEND_LIST, null /* plugin remders */,
+					NodeType.FRIEND_LIST.s());
+		} else if (name.equals(NodeName.USER_FEED)) {
+			ret = getSpecialNode(session, session.getUser(), null, NodeName.USER_FEED, null /* plugin renders */,
+					NodeType.USER_FEED.s());
 		}
 
 		return ret;
@@ -1447,6 +1448,15 @@ public class MongoApi {
 			node = createNode(session, userNode, pathPart, type, 0L, CreateNodeLocation.LAST);
 			node.setOwner(userNode.getId());
 			node.setContent(nodeName);
+
+			// todo-1: and make this some kind of hook so that we don't have an ugly coupling here
+			// for this type, although this technical debt isn't that bad
+			if (type.equals(NodeType.USER_FEED.s())) {
+				List<String> privileges = new LinkedList<String>();
+				privileges.add(PrivilegeType.READ.s());
+				aclService.addPrivilege(session, node, "public", privileges, null);
+			}
+
 			save(session, node);
 		}
 		return node;

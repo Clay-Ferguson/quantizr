@@ -54,7 +54,7 @@ export class FeedView extends Div {
             S.srch.initSearchNode(node);
 
             let allowAvatar = node.owner != lastOwner;
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, "feed", state));
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, "feed", true, state));
             lastOwner = node.owner;
             i++;
             rowCount++;

@@ -188,8 +188,11 @@ public class AclService {
 					}
 				}
 				log.debug("principalPublicKey: " + principalPubKey);
-				res.setPrincipalPublicKey(principalPubKey);
-				res.setPrincipalNodeId(mapKey);
+
+				if (res != null) {
+					res.setPrincipalPublicKey(principalPubKey);
+					res.setPrincipalNodeId(mapKey);
+				}
 			}
 		}
 
@@ -235,7 +238,7 @@ public class AclService {
 				adminRunner.run(_session -> {
 					try {
 						outboxMgr.addInboxNotification(_session, principal, _principalNode, node,
-						"shared this node with you:");
+								"shared this node with you:");
 					} catch (Exception e) {
 						log.debug("failed sending notification", e);
 					}
