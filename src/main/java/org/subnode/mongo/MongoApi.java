@@ -1454,6 +1454,7 @@ public class MongoApi {
 			if (type.equals(NodeType.USER_FEED.s())) {
 				List<String> privileges = new LinkedList<String>();
 				privileges.add(PrivilegeType.READ.s());
+				privileges.add(PrivilegeType.WRITE.s());
 				aclService.addPrivilege(session, node, "public", privileges, null);
 			}
 

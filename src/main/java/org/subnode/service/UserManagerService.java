@@ -742,9 +742,12 @@ public class UserManagerService {
 			return res;
 
 		for (SubNode friendNode : api.getChildren(session, friendsNode, null, null)) {
-			FriendInfo fi = new FriendInfo();
-			fi.setUserName(friendNode.getContent());
-			friends.add(fi);
+			String userName = friendNode.getStringProp(NodeProp.USER.s());
+			if (userName != null) {
+				FriendInfo fi = new FriendInfo();
+				fi.setUserName(userName);
+				friends.add(fi);
+			}
 		}
 
 		res.setFriends(friends);

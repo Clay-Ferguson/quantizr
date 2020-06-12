@@ -84,13 +84,6 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Editing node", res)) {
             let node: J.NodeInfo = res.nodeInfo;
 
-            // /* if this is a comment node and we are the commenter */
-            // let editingAllowed: boolean = props.isOwnedCommentNode(node);
-
-            // if (!editingAllowed) {
-            //     editingAllowed = meta64.isAdminUser || (!props.isNonOwnedCommentNode(node)
-            //         && !props.isNonOwnedNode(node));
-            // }
             let editingAllowed = this.isEditAllowed(node, state);
 
             if (editingAllowed) {
@@ -175,7 +168,9 @@ export class Edit implements EditIntf {
                 typeName: typeName ? typeName : "u",
                 createAtTop: createAtTop,
                 content: null
-            }, (res) => { S.edit.createSubNodeResponse(res, state); });
+            }, (res) => { 
+                this.createSubNodeResponse(res, state); 
+            });
         }
     }
 
@@ -318,6 +313,7 @@ export class Edit implements EditIntf {
     }
 
     cached_runEditNode = (id: any, state?: AppState): void => {
+        debugger;
         state = appState(state);
         let node: J.NodeInfo = null;
         if (!id) {
@@ -334,11 +330,13 @@ export class Edit implements EditIntf {
 
         S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: node.id
-        }, (res) => { this.initNodeEditResponse(res, state) });
+        }, (res) => { 
+            this.initNodeEditResponse(res, state);
+        });
     }
 
     cached_toolbarInsertNode = (id: string): void => {
-        S.edit.insertNode(id, null, 0);
+        this.insertNode(id, null, 0);
     }
 
     insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState): void => {
@@ -364,7 +362,7 @@ export class Edit implements EditIntf {
     /* Need all cached functions to be prefixed so they're recognizable, since refactoring them can break things */
     cached_newSubNode = (id: any) => {
         let state = store.getState();
-        S.edit.createSubNode(id, null, true, state.node, null);
+        this.createSubNode(id, null, true, state.node, null);
     }
 
     createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void => {
@@ -560,7 +558,7 @@ export class Edit implements EditIntf {
 
     cached_pasteSelNodesInside = (nodeId: string) => {
         let state = appState();
-        S.edit.pasteSelNodes(nodeId, 'inside', state);
+        this.pasteSelNodes(nodeId, 'inside', state);
     }
 
     //location=inside | inline | inline-above (todo-1: put in java-aware enum)
@@ -581,15 +579,15 @@ export class Edit implements EditIntf {
     }
 
     cached_pasteSelNodes_InlineEnd = (nodeId: string) => {
-        S.edit.pasteSelNodes(nodeId, "inline-end");
+        this.pasteSelNodes(nodeId, "inline-end");
     }
 
     cached_pasteSelNodes_InlineAbove = (nodeId: string) => {
-        S.edit.pasteSelNodes(nodeId, "inline-above");
+        this.pasteSelNodes(nodeId, "inline-above");
     }
 
     cached_pasteSelNodes_Inline = (nodeId: string) => {
-        S.edit.pasteSelNodes(nodeId, "inline");
+        this.pasteSelNodes(nodeId, "inline");
     }
 
     insertBookWarAndPeace = (state: AppState): void => {
@@ -662,7 +660,18 @@ export class Edit implements EditIntf {
     }
 
     addComment = (node: J.NodeInfo, state: AppState) => {
-        //&&& this function is similar but not workable.
-        //S.edit.insertNode(node.id, "u", 0, state);
+        state = appState(state);
+        debugger;
+
+        S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+            nodeId: node.id,
+            newNodeName: "",
+            typeName: J.NodeType.NONE,
+            createAtTop: false,
+            content: null
+        }, (res) => { 
+            debugger;
+            this.createSubNodeResponse(res, state); 
+        });
     }
 }

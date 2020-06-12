@@ -37,7 +37,6 @@ export class ShareToPersonDlg extends DialogBase {
                         this.close();
                     }, null, "btn-primary"),
                     new Button("Choose from Friends", async () => {
-                        //todo-0: bug. this is broken. comes up with empty list.
                         let friendsDlg: FriendsDlg = new FriendsDlg(this.appState);
                         await friendsDlg.open();
                         this.close();
