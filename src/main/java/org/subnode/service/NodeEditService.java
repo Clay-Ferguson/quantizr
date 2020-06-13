@@ -33,12 +33,10 @@ import org.subnode.response.SavePropertyResponse;
 import org.subnode.response.SplitNodeResponse;
 import org.subnode.response.TransferNodeResponse;
 import org.subnode.util.Convert;
-import org.subnode.util.ExUtil;
 import org.subnode.util.Util;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 
-import opennlp.tools.util.StringUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -95,6 +93,10 @@ public class NodeEditService {
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 		newNode = api.createNode(session, node, null, req.getTypeName(), 0L, createLoc);
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
+
+		if (req.isTypeLock()) {
+			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
+		}
 
 		api.save(session, newNode);
 		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false,
@@ -265,7 +267,7 @@ public class NodeEditService {
 			Calendar lastModified = Calendar.getInstance();
 			node.setModifyTime(lastModified.getTime());
 
-			if (!StringUtil.isEmpty(node.getContent()) //
+			if (!StringUtils.isEmpty(node.getContent()) //
 				//don't evern send notifications when 'admin' is the one doing the editing.
 				&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());

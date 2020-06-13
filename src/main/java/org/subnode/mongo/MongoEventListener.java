@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventLis
 import org.springframework.data.mongodb.core.mapping.event.AfterConvertEvent;
 import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
+import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
@@ -27,6 +28,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Autowired
 	private MongoApi api;
+
+	@Autowired
+	private UserFeedService userFeedService;
 
 	/*
 	 * todo-2: This is a temporary hack to allow our ExportJsonService.resetNode
@@ -142,10 +146,14 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		removeDefaultProps(node);
+
+		if (node.isDeleted()) {
+			userFeedService.nodeDeleteNotify(node.getId().toHexString());
+		}
 	}
 
 	/*
-	 * For properties that are being set to their defalt behaviors as if the
+	 * For properties that are being set to their default behaviors as if the
 	 * property didn't exist (such as vertical layout is assumed if no layout
 	 * property is specified) we remove those properties when the client is passing
 	 * them in to be saved, or from any other source they are being passed to be
@@ -168,7 +176,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Override
 	public void onAfterSave(AfterSaveEvent<SubNode> event) {
-		SubNode node = event.getSource();
+		// SubNode node = event.getSource();
 	}
 
 	@Override
@@ -184,9 +192,14 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// ObjectId id = dbObj.getObjectId(SubNode.FIELD_ID);
 	}
 
-	// @Override
-	// public void onAfterDelete(AfterDeleteEvent<SubNode> event) {
-	// SubNode node = event.getSource();
-	// node.setWriting(false);
-	// }
+	@Override
+	public void onBeforeDelete(BeforeDeleteEvent<SubNode> event) {
+		Document doc = event.getDocument();
+		if (doc != null) {
+			Object val = doc.get("_id");
+			if (val instanceof ObjectId) {
+				userFeedService.nodeDeleteNotify(((ObjectId) val).toHexString());
+			}
+		}
+	}
 }

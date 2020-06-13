@@ -13,6 +13,9 @@ public class CreateSubNodeRequest extends RequestBase {
 	private String typeName;
 	private boolean createAtTop;
 
+	/* Adds TYPE_LOCK property which prevents user from being able to change the type on the node */
+	private boolean typeLock;
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -51,5 +54,13 @@ public class CreateSubNodeRequest extends RequestBase {
 
 	public void setCreateAtTop(boolean createAtTop) {
 		this.createAtTop = createAtTop;
+	}
+
+	public boolean isTypeLock() {
+		return typeLock;
+	}
+
+	public void setTypeLock(boolean typeLock) {
+		this.typeLock = typeLock;
 	}
 }

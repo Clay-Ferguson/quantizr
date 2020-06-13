@@ -15,4 +15,7 @@ export interface TypeHandlerIntf {
     getDomPreUpdateFunction(parent: CompIntf): void;
     getCustomProperties(): string[];
     ensureDefaultProperties(node: J.NodeInfo);
+    getAllowPropertyAdd(): boolean;
+    getAllowContentEdit(): boolean;
+    getEditLabelForProp(propName: string): string;
 }

@@ -51,7 +51,11 @@ export class ServerPush implements ServerPushIntf {
         }, false);
 
         eventSource.addEventListener("inboxPush", function (e: any) {
-            new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
+            //Removing this type notification for now, because it's not really ready. For example, if bob creates a reply to a feed item bob gets
+            //the notification, which is wrong. In other words based on the new 'feed' capability notification can
+            //end up being just a redundant annoyance.
+            //todo-0
+            //new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
         }, false);
     }
 }

@@ -58,7 +58,6 @@ export class PrefsDlg extends DialogBase {
 
     savePreferencesResponse = (res: J.SaveUserPreferencesResponse): void => {
         if (S.util.checkSuccess("Saving Preferences", res)) {
-            S.meta64.selectTab("mainTab");
             S.meta64.refresh(this.appState);
         }
     }

@@ -17,15 +17,28 @@ export class FriendTypeHandler extends TypeBase {
         super(J.NodeType.FRIEND, "Friend", "fa-user", true);
     }
 
+    getEditLabelForProp(propName: string): string {
+        if (propName == J.NodeProp.USER) {
+            return "User Name";
+        }
+        return propName;
+    }
+
+    getAllowPropertyAdd(): boolean {
+        return false;
+    }
+
+    getAllowContentEdit(): boolean {
+        return false;
+    }
+
     getCustomProperties(): string[] {
-        return [J.NodeProp.USER,
-            //content isn't a 'property' in the 'properties' array, but is a prop ON SubNode.java, so we don't have a J.NodeProp for it.    
-            "content"];
+        return [J.NodeProp.USER];
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {
         //USER_NODE_ID is generated and maintained by the server, and we can ignore it in the editor.
-        return propName != J.NodeProp.USER_NODE_ID;
+        return propName == J.NodeProp.USER;
     }
 
     ensureDefaultProperties(node: J.NodeInfo) {

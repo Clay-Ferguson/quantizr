@@ -100,7 +100,6 @@ export class ExportDlg extends DialogBase {
                 ]), false, 0, this.appState
             ).open();
 
-            S.meta64.selectTab("mainTab");
             S.view.scrollToSelectedNode(this.appState);
         }
     }

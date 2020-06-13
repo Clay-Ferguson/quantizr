@@ -182,7 +182,6 @@ export class Nav implements NavIntf {
     on an attribute of the element */
     cached_clickNodeRow = (nodeId: string, state?: AppState): void => {
         state = appState(state);
-        //console.log("clickNodeRow: id=" + nodeId);
 
         /* First check if this node is already highlighted and if so just return */
         let highlightNode = S.meta64.getHighlightedNode();
@@ -236,7 +235,7 @@ export class Nav implements NavIntf {
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id, "Warning");
         } else {
-            S.view.refreshTree(node.id, true, null, false, false, true, state);
+            S.view.refreshTree(node.id, true, null, false, false, true, true, state);
         }
     }
 
@@ -262,6 +261,7 @@ export class Nav implements NavIntf {
         console.log("navPageNodeResponse.");
         S.meta64.clearSelNodes(state);
         S.render.renderPageFromData(res, true, null, true, true, state);
+        S.meta64.selectTab("mainTab");
     }
 
     geoLocation = (state: AppState): void => {

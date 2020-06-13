@@ -128,7 +128,6 @@ export class Render implements RenderIntf {
             return;
         }
 
-        S.meta64.selectTab("mainTab");
         let message: string = "ID-based URL: \n" + window.location.origin + "?id=" + node.id;
         if (node.name) {
             message += "\n\nName-based URL: \n" + window.location.origin + "?n=" + node.name;
@@ -152,6 +151,13 @@ export class Render implements RenderIntf {
             dispatch({
                 type: "Action_RenderPage", state,
                 updateNew: (s: AppState): AppState => {
+                    //VERY IMPORTANT to return a NEW object so we create it here. If you don't return new object rendering can fail.
+                    s = {...s};
+
+                    if (!s.activeTab || clickTab) {
+                        s.activeTab = "mainTab";
+                    }
+                    
                     s.node = res.node;
                     s.endReached = res.endReached;
                     s.offsetOfNodeFound = res.offsetOfNodeFound;
@@ -193,10 +199,6 @@ export class Render implements RenderIntf {
                     return s;
                 }
             });
-
-            if (clickTab) {
-                S.meta64.selectTab("mainTab");
-            }
 
             this.lastOwner = state.node.owner;
         }

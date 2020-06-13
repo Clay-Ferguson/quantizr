@@ -125,14 +125,12 @@ public class Convert {
 			}
 		}
 
-		boolean deleted = node.getPath().contains("/"+NodeName.TRASH+"/") ||  node.getPath().endsWith("/"+NodeName.TRASH);
-
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, ownerId,
 				node.getOrdinal(), //
 				node.getModifyTime(), propList, acList, hasChildren, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
-				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey, dataUrl, deleted, avatarVer);
+				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey, dataUrl, node.isDeleted(), avatarVer);
 
 		if (allowInlineChildren) {
 			boolean hasInlineChildren = node.getBooleanProp(NodeProp.INLINE_CHILDREN.s());

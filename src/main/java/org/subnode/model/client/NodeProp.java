@@ -109,7 +109,9 @@ public enum NodeProp {
     INLINE_CHILDREN("inlineChildren", "s"), //
     PRIORITY("priority", "s"), //
     LAYOUT("layout", "s"),
-    ORDER_BY("orderBy", "s");
+    ORDER_BY("orderBy", "s"),
+    
+    TYPE_LOCK("sn:typLoc", "s");
 
     @JsonValue
     private final String value;

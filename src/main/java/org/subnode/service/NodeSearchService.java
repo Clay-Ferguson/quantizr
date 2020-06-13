@@ -128,7 +128,7 @@ public class NodeSearchService {
 		 * todo-0: This is TEMPORARY, we will end up keeping userFeedService up to date
 		 * another way later
 		 */
-		// userFeedService.init();
+		//userFeedService.init();
 
 		NodeFeedResponse res = new NodeFeedResponse();
 		if (session == null) {
@@ -154,6 +154,9 @@ public class NodeSearchService {
 			 * the feed they are now viewing
 			 */
 			HashSet<String> userNodeIds = new HashSet<String>();
+
+			//We have to add in ourselves here so that we get our own feed updated per our own posts */
+			userNodeIds.add(sessionContext.getRootId());
 
 			for (SubNode friendNode : friendNodes) {
 				String userName = null;

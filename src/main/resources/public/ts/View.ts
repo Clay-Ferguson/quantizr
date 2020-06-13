@@ -25,7 +25,7 @@ export class View implements ViewIntf {
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
     refreshTree = (nodeId: string, renderParentIfLeaf: boolean, highlightId: string, isInitialRender: boolean, forceIPFSRefresh: boolean,
-        allowScroll: boolean, state: AppState): void => {
+        allowScroll: boolean, setTab: boolean, state: AppState): void => {
 
         if (!nodeId && state.node) {
             nodeId = state.node.id;
@@ -48,7 +48,7 @@ export class View implements ViewIntf {
             if (res.offsetOfNodeFound > -1) {
                 S.nav.mainOffset = res.offsetOfNodeFound;
             }
-            S.render.renderPageFromData(res, false, highlightId, true, allowScroll, state);
+            S.render.renderPageFromData(res, false, highlightId, setTab, allowScroll, state);
         });
     }
 
@@ -167,6 +167,7 @@ export class View implements ViewIntf {
 
     scrollToSelectedNode = (state: AppState): void => {
 
+        //todo-1: is this still good? the overlay ?
         S.meta64.setOverlay(true);
 
         setTimeout(async () => {

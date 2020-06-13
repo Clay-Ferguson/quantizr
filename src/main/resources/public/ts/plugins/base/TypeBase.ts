@@ -22,11 +22,28 @@ export class TypeBase implements TypeHandlerIntf {
         if (state.isAdminUser) this.allowUserSelect = true;
     }
 
+    getEditLabelForProp(propName: string): string {
+        return propName;
+    }
+
+    /* Enables editor to show buttons for adding/deleting custom properties */
+    getAllowPropertyAdd(): boolean {
+        return true;
+    }
+
+    /* Enables editor to control wether content edit textarea shows up in editor dialog */
+    getAllowContentEdit(): boolean {
+        return true;
+    }
+
     getTypeName(): string {
         return this.typeName;
     }
 
-    /* If this returns non-null the editor dialog is expected to show only the enumerated properties for editing */
+    /* If this returns non-null the editor dialog is expected to show only the enumerated properties for editing 
+    
+    note: adding 'content' to this (not a genuine property like the rest, is allowed)
+    */
     getCustomProperties(): string[] {
         return null;
     }

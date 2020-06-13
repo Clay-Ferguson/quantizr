@@ -21,7 +21,9 @@ export function rootReducer(state: AppState = initialState, /* action: Action<an
 
     console.log("Action: " + action.type);
 
-    /* If this AppAction has 'updateNew' use it to get the new state */
+    /* If this AppAction has 'updateNew' use it to get the new state, but this really is just an opportunity for a BUG where the
+    the updateNew might accidentally NOT create a brand new state object, and if it doesn't then the entire rendering breaks, so really
+    I need to phase this out and always use 'update' instead and not even HAVE an 'updateNew' */
     if (action.updateNew) {
         state = action.updateNew(state);
     }

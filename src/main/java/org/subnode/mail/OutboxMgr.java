@@ -69,30 +69,32 @@ public class OutboxMgr {
 		boolean sendEmail = false;
 		boolean addToInbox = true;
 
-		/*
-		 * put in a catch block, because nothing going wrong in here should be allowed
-		 * to blow up the save operation
-		 */
+		// log.debug("Sending Notifications for node edit by user " + sessionContext.getUserName() + ": id="
+		// 		+ node.getId().toHexString());
+
 		adminRunner.run(session -> {
+			/*
+			 * put in a catch block, because nothing going wrong in here should be allowed
+			 * to blow up the save operation
+			 */
 			try {
 				SubNode parentNode = api.getParent(session, node);
+
+				/*
+				 * userNode here will be the root node of the person whose node has just been
+				 * replied to, and the person recieving a notification in their inbox
+				 */
+				SubNode userNode = api.getNode(session, parentNode.getOwner());
+				if (userNode == null) {
+					log.warn("No userNode was found for parentNode.owner=" + parentNode.getOwner());
+					return;
+				}
 
 				/*
 				 * Check first that we are not creating a node under one WE OWN, becasue we
 				 * don't need to send a notification to ourselves.
 				 */
 				if (parentNode != null && !parentNode.getOwner().equals(node.getOwner())) {
-
-					/*
-					 * userNode here will be the root node of the person whose node has just been
-					 * replied to, and the person recieving a notification in their inbox
-					 */
-					SubNode userNode = api.getNode(session, parentNode.getOwner());
-					if (userNode == null) {
-						log.warn("No userNode was found for parentNode.owner=" + parentNode.getOwner());
-						return;
-					}
-
 					if (sendEmail) {
 						sendEmailNotification(session, userName, userNode, node);
 					} else if (addToInbox) {
@@ -100,7 +102,12 @@ public class OutboxMgr {
 					}
 				}
 
+				/*
+				 * But for live-updating feeds we DO need to send even if it's our own node
+				 * being created
+				 */
 				userFeedService.nodeSaveNotify(session, node);
+
 			} catch (Exception e) {
 				log.debug("failed sending notification", e);
 			}

@@ -60,8 +60,7 @@ export class Edit implements EditIntf {
         console.log("insertBookResponse running.");
         S.util.checkSuccess("Insert Book", res);
 
-        S.view.refreshTree(null, false, null, false, false, true, state);
-        S.meta64.selectTab("mainTab");
+        S.view.refreshTree(null, false, null, false, false, true, true, state);
         S.view.scrollToSelectedNode(state);
     }
 
@@ -76,7 +75,7 @@ export class Edit implements EditIntf {
                 }
             }
 
-            S.view.refreshTree(null, false, highlightId, false, false, true, state);
+            S.view.refreshTree(null, false, highlightId, false, false, true, true, state);
         }
     }
 
@@ -110,7 +109,7 @@ export class Edit implements EditIntf {
                 },
             });
 
-            S.view.refreshTree(null, false, null, false, false, true, state);
+            S.view.refreshTree(null, false, null, false, false, true, true, state);
         }
     }
 
@@ -167,7 +166,8 @@ export class Edit implements EditIntf {
                 newNodeName: "",
                 typeName: typeName ? typeName : "u",
                 createAtTop: createAtTop,
-                content: null
+                content: null,
+                typeLock: false
             }, (res) => { 
                 this.createSubNodeResponse(res, state); 
             });
@@ -198,8 +198,7 @@ export class Edit implements EditIntf {
         return new Promise<void>(async (resolve, reject) => {
             if (S.util.checkSuccess("Save node", res)) {
                 await this.distributeKeys(node, res.aclEntries);
-                S.view.refreshTree(null, false, node.id, false, false, false, state);
-                //S.meta64.selectTab("mainTab");
+                S.view.refreshTree(null, false, node.id, false, false, false, false, state); //done
                 resolve();
             }
         });
@@ -300,12 +299,13 @@ export class Edit implements EditIntf {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "bottom"
-            }, (res) => { this.setNodePositionResponse(res, state); });
+            }, (res) => { 
+                this.setNodePositionResponse(res, state); 
+            });
         } else {
             console.log("idToNodeMap does not contain " + id);
         }
     }
-
 
     getFirstChildNode = (state: AppState): any => {
         if (!state.node || !state.node.children) return null;
@@ -313,7 +313,6 @@ export class Edit implements EditIntf {
     }
 
     cached_runEditNode = (id: any, state?: AppState): void => {
-        debugger;
         state = appState(state);
         let node: J.NodeInfo = null;
         if (!id) {
@@ -626,7 +625,8 @@ export class Edit implements EditIntf {
                     newNodeName: "",
                     typeName: "u",
                     createAtTop: true,
-                    content: clipText
+                    content: clipText,
+                    typeLock: false
                 },
                     () => {
                         S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
@@ -653,24 +653,37 @@ export class Edit implements EditIntf {
 
     splitNodeResponse = (res: J.SplitNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Split content", res)) {
-            S.view.refreshTree(null, false, null, false, false, true, state);
-            S.meta64.selectTab("mainTab");
+            S.view.refreshTree(null, false, null, false, false, true, true, state);
             S.view.scrollToSelectedNode(state);
         }
     }
 
     addComment = (node: J.NodeInfo, state: AppState) => {
         state = appState(state);
-        debugger;
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             nodeId: node.id,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: false,
-            content: null
+            content: null,
+            typeLock: false
         }, (res) => { 
-            debugger;
+            this.createSubNodeResponse(res, state); 
+        });
+    }
+
+    addFriend = (node: J.NodeInfo, state: AppState) => {
+        state = appState(state);
+
+        S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+            nodeId: node.id,
+            newNodeName: "",
+            typeName: J.NodeType.FRIEND,
+            createAtTop: true,
+            content: null,
+            typeLock: true
+        }, (res) => { 
             this.createSubNodeResponse(res, state); 
         });
     }

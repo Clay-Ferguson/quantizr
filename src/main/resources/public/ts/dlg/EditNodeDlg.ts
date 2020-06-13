@@ -74,7 +74,7 @@ export class EditNodeDlg extends DialogBase {
     skdp: SymKeyDataPackage;
 
     constructor(node: J.NodeInfo, state: AppState) {
-        super("Edit Node", "app-modal-content", false, state);
+        super("Edit", "app-modal-content", false, state);
         this.mergeState({ node });
     }
 
@@ -167,6 +167,11 @@ export class EditNodeDlg extends DialogBase {
             typeHandler.ensureDefaultProperties(state.node);
         }
 
+        let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
+
+        //regardless of value, if this property is present we consider the type locked
+        let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
+
         //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
         //to dangerously opt into this also without hacking the code with this var.
         let allowEditAllProps: boolean = this.appState.isAdminUser;
@@ -184,7 +189,8 @@ export class EditNodeDlg extends DialogBase {
                         this.saveNode();
                         this.close();
                     }, null, "btn-primary"),
-                    this.setTypeButton = new Button("Set Type", this.openChangeNodeTypeDlg),
+
+                    this.setTypeButton = !typeLocked ? new Button("Set Type", this.openChangeNodeTypeDlg) : null,
                     //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
 
                     this.encryptionButton = !customProps ? new Button("Encryption", this.openEncryptionDlg) : null,
@@ -242,17 +248,19 @@ export class EditNodeDlg extends DialogBase {
             mainPropsTable.addChild(nodeNameFormGroup);
         }
 
-        //We use 4 rows instead of 15 only if this is a customProps node.
-        let rows = "15"
-        if (customProps && !!customProps.find(p => p == "content")) {
-            rows = "4";
-        }
+        if (allowContentEdit) {
+            //We use 4 rows instead of 15 only if this is a customProps node.
+            let rows = "15"
+            if (customProps && !!customProps.find(p => p == "content")) {
+                rows = "4";
+            }
 
-        if (!customProps || (customProps && !!customProps.find(p => p == "content"))) {
-            let content = state.node.content;
-            let contentTableRow = this.makeContentEditorFormGroup(state.node, isWordWrap, rows);
-            mainPropsTable.addChild(contentTableRow);
-            this.contentEditor.setWordWrap(isWordWrap);
+            if (!customProps || (customProps && !!customProps.find(p => p == "content"))) {
+                let content = state.node.content;
+                let contentTableRow = this.makeContentEditorFormGroup(state.node, isWordWrap, rows);
+                mainPropsTable.addChild(contentTableRow);
+                this.contentEditor.setWordWrap(isWordWrap);
+            }
         }
 
         this.propCheckBoxes = [];
@@ -296,7 +304,7 @@ export class EditNodeDlg extends DialogBase {
 
                     if (!this.isGuiControlBasedProp(prop)) {
                         let allowSelection = !customProps || !customProps.find(p => p == prop.name);
-                        let tableRow = this.makePropEditor(prop, allowSelection);
+                        let tableRow = this.makePropEditor(typeHandler, prop, allowSelection);
                         propsParent.addChild(tableRow);
                     }
                 }
@@ -307,14 +315,18 @@ export class EditNodeDlg extends DialogBase {
             propsParent.addChild(new TextContent("No custom properties."));
         }
 
-        this.propsButtonBar = new ButtonBar([
-            this.addPropertyButton = new Button("Add Property", this.addProperty),
-            this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
-        ]);
+        let allowPropertyAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
 
-        this.deletePropButton.setEnabled(false);
+        if (allowPropertyAdd) {
+            this.propsButtonBar = new ButtonBar([
+                this.addPropertyButton = new Button("Add Property", this.addProperty),
+                this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
+            ]);
 
-        propsParent.addChild(this.propsButtonBar);
+            this.deletePropButton.setEnabled(false);
+
+            propsParent.addChild(this.propsButtonBar);
+        }
 
         let collapsiblePanel = !customProps ? new CollapsiblePanel("More...", null, [optionsBar, selectionsBar, propsTable], false,
             (state: boolean) => {
@@ -515,7 +527,7 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
-    makePropEditor = (propEntry: J.PropertyInfo, allowCheckbox: boolean): EditPropsTableRow => {
+    makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean): EditPropsTableRow => {
         let tableRow = new EditPropsTableRow();
         let allowEditAllProps: boolean = this.appState.isAdminUser;
         //console.log("Property single-type: " + propEntry.property.name);
@@ -525,7 +537,7 @@ export class EditNodeDlg extends DialogBase {
         let formGroup = new FormGroup();
         let propVal = propEntry.value;
 
-        let label = propEntry.name; //S.render.sanitizePropertyName(propEntry.property.name);
+        let label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name; 
         let propValStr = propVal ? propVal : "";
         propValStr = S.util.escapeForAttrib(propValStr);
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value

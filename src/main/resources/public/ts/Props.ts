@@ -96,7 +96,7 @@ export class Props implements PropsIntf {
                 //console.log("Render Prop: "+property.name);
                 if (S.render.allowPropertyToDisplay(property.name)) {
 
-                    let propNameCell = new PropTableCell(property.name /*S.render.sanitizePropertyName(property.name) */, {
+                    let propNameCell = new PropTableCell(property.name, {
                         className: "prop-table-name-col"
                     });
 

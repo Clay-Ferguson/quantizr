@@ -48,6 +48,9 @@ public class UserFeedService {
 	@Autowired
 	private Convert convert;
 
+	@Autowired
+	private SessionContext sessionContext;
+
 	/* Map key is userName */
 	static HashMap<String, UserFeedInfo> userFeedInfoMapByUserName = new HashMap<String, UserFeedInfo>();
 
@@ -59,10 +62,10 @@ public class UserFeedService {
 
 	public void init() {
 		log.debug("UserFeedService.init()");
-		processAllUsers();
+		initAllUsers();
 	}
 
-	private void processAllUsers() {
+	private void initAllUsers() {
 		userFeedInfoMapByUserName.clear();
 		userFeedInfoMapByPath.clear();
 
@@ -117,7 +120,10 @@ public class UserFeedService {
 	 * node, and needs to be cached as a userFeedItem
 	 */
 	public void nodeSaveNotify(MongoSession session, SubNode node) {
-		//log.debug("UserFeedService.nodeSaveNotify: " + node.getPath());
+
+		// log.debug("UserFeedService.nodeSaveNotify: user " + sessionContext.getUserName() + ": id="
+		// 		+ node.getId().toHexString());
+
 		/*
 		 * We check the parent node, and all ancestors nodes, of 'node', to see if any
 		 * of them are a feed node that we have cached because if so then we'll update
@@ -133,9 +139,10 @@ public class UserFeedService {
 				break;
 
 			path = path.substring(0, lastSlashIdx);
-			//log.debug("    subpath:" + path);
+			//log.debug(" subpath:" + path);
 			UserFeedInfo userFeedInfo = userFeedInfoMapByPath.get(path);
 			if (userFeedInfo != null) {
+				//log.debug("SubPath part IS a feed: " + path);
 				ensureNodeInUserFeedInfo(session, userFeedInfo, node);
 				break;
 			}
@@ -153,11 +160,13 @@ public class UserFeedService {
 		for (UserFeedItem ufi : userFeedInfo.getUserFeedList()) {
 			if (ufi.getNodeId().equals(node.getId())) {
 				userFeedItem = ufi;
+				//log.debug("ensureNodeInuserFeedInfo: feed Info did already contain the node.");
 				break;
 			}
 		}
 
 		if (userFeedItem == null) {
+			//log.debug("Creating a new item to add into feed.");
 			userFeedItem = new UserFeedItem();
 			userFeedItem.setNodeId(node.getId());
 			userFeedInfo.getUserFeedList().add(userFeedItem);
@@ -172,10 +181,11 @@ public class UserFeedService {
 	/*
 	 * This will result in a push that makes everyone following the owner of node
 	 * (as one of their friends), have their feed information updated in realtime in
-	 * their browser without even requiring a database query of any kind
+	 * their browser without requiring a database query
 	 */
 	private void pushNodeUpdateToAllFriends(MongoSession session, SubNode node) {
-
+		// log.debug("Pushing update to all friends: user " + sessionContext.getUserName() + ": id="
+		// 		+ node.getId().toHexString());
 		Set<String> keys = null;
 
 		/*
@@ -189,21 +199,50 @@ public class UserFeedService {
 
 		ValContainer<NodeInfo> nodeInfoVal = new ValContainer<NodeInfo>();
 
+		/* Iterate each session one at a time */
 		for (String key : keys) {
-			SessionContext sessionContext = SessionContext.allSessions.get(key);
-			if (sessionContext != null) {
-				if (sessionContext.getFeedUserNodeIds() != null
-						&& sessionContext.getFeedUserNodeIds().contains(node.getOwner().toHexString())) {
-					//log.debug("USER NEED A PUSH: " + sessionContext.getUserName());
+			SessionContext iterSessionContext = SessionContext.allSessions.get(key);
+			if (iterSessionContext != null) {
+				//log.debug("Processing a session to maybe push to: "+iterSessionContext.getUserName());
+				
+				/*
+				 * Check if the owner of 'node' is in the list of accounts the sessionContext
+				 * has as frieldList, and this only finds it if this user has viewed their feed
+				 * since logging in, otherwise there's nothign to do here
+				 */
+				if (iterSessionContext.getFeedUserNodeIds() != null
+						&& iterSessionContext.getFeedUserNodeIds().contains(node.getOwner().toHexString())) {
+					// log.debug("USER NEED A PUSH: " + sessionContext.getUserName());
 
-					// lazily create the info val
+					// lazily create the info val, as needed and only once, because the same infoVal
+					// can go out to all users.
 					if (nodeInfoVal.getVal() == null) {
-						nodeInfoVal.setVal(convert.convertToNodeInfo(sessionContext, session, node, true, false, 1,
+						nodeInfoVal.setVal(convert.convertToNodeInfo(iterSessionContext, session, node, true, false, 1,
 								false, false, false));
 					}
 
-					outboxMgr.sendServerPushInfo(sessionContext.getUserName(), new FeedPushInfo(nodeInfoVal.getVal()));
+					outboxMgr.sendServerPushInfo(iterSessionContext.getUserName(), new FeedPushInfo(nodeInfoVal.getVal()));
 				}
+			}
+		}
+	}
+
+	/* Called whenever a node is deleted to get it out of the memory cache */
+	public void nodeDeleteNotify(String nodeId) {
+		for (UserFeedInfo ufinf : userFeedInfoMapByUserName.values()) {
+			UserFeedItem itemFound = null;
+
+			for (UserFeedItem ufi : ufinf.getUserFeedList()) {
+				if (ufi.getNodeId().toHexString().equals(nodeId)) {
+					itemFound = ufi;
+					break; // break inner loop
+				}
+			}
+
+			if (itemFound != null) {
+				// todo-1: this won't yet update browsers automatically if something's deleted, and I'm not sure this is important to have.
+				ufinf.getUserFeedList().remove(itemFound);
+				break; // break outter loop (returns)
 			}
 		}
 	}

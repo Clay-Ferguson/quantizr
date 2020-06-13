@@ -36,6 +36,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     newNodeName: string;
     typeName: string;
     createAtTop: boolean;
+    typeLock: boolean;
 }
 
 export interface DeleteAttachmentRequest extends RequestBase {
@@ -626,6 +627,7 @@ export const enum NodeProp {
     PRIORITY = "priority",
     LAYOUT = "layout",
     ORDER_BY = "orderBy",
+    TYPE_LOCK = "sn:typLoc",
 }
 
 export const enum NodeType {
