@@ -16,6 +16,7 @@ export interface PropsIntf {
     getNodeProp(propertyName: string, node: J.NodeInfo): J.PropertyInfo;
     getNodePropVal(propertyName : string, node: J.NodeInfo): string;
     setNodePropVal(propertyName : string, node: J.NodeInfo, val: string): void;
+    setNodeProp(node: J.NodeInfo, newProp: J.PropertyInfo): void;
     isEncrypted(node: J.NodeInfo): boolean;
     isShared(node: J.NodeInfo): boolean;
     isPublic(node: J.NodeInfo): boolean;

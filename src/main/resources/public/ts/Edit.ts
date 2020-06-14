@@ -198,7 +198,7 @@ export class Edit implements EditIntf {
         return new Promise<void>(async (resolve, reject) => {
             if (S.util.checkSuccess("Save node", res)) {
                 await this.distributeKeys(node, res.aclEntries);
-                S.view.refreshTree(null, false, node.id, false, false, false, false, state); //done
+                S.view.refreshTree(null, false, node.id, false, false, false, false, state); 
                 resolve();
             }
         });

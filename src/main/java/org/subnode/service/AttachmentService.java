@@ -33,6 +33,7 @@ import org.subnode.image.ImageUtil;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
@@ -164,6 +165,16 @@ public class AttachmentService {
 					// log.debug("Uploading file: " + fileName + " contentType=" + contentType);
 
 					LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
+
+					/*
+					 * User might still be editing the node, and is uploading before ever clicking
+					 * 'save' so we just disallow uploads to ever update the timestamp, because the
+					 * timesamp existance is what makes the node become visible to the rest of the
+					 * world if shared, and so we don't update that timestamp, and also really the
+					 * time that an attachment is added is usually not important and only content
+					 * editing needs to ever trigger timestamp update on the node
+					 */
+					MongoThreadLocal.setAutoTimestampDisabled(true);
 
 					// attaches AND closes the stream.
 					attachBinaryFromStream(session, node, nodeId, fileName, size, limitedIs, contentType, -1, -1,
@@ -344,6 +355,16 @@ public class AttachmentService {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
+		/*
+		 * User might still be editing the node, and is uploading before ever clicking
+		 * 'save' so we just disallow uploads editing to ever update the timestamp,
+		 * because the timesamp existance is what makes the node become visible to the
+		 * rest of the world if shared, and so we don't update that timestamp, and also
+		 * really the time that an attachment is added is usually not important and only
+		 * content editing needs to ever trigger timestamp update on the node
+		 */
+		MongoThreadLocal.setAutoTimestampDisabled(true);
+
 		String nodeId = req.getNodeId();
 		SubNode node = api.getNode(session, nodeId);
 		deleteBinary(session, node);
@@ -719,6 +740,16 @@ public class AttachmentService {
 	 * or any other kind of content actually.
 	 */
 	public UploadFromUrlResponse readFromUrl(MongoSession session, UploadFromUrlRequest req) {
+		/*
+		 * User might still be editing the node, and is uploading before ever clicking
+		 * 'save' so we just disallow uploads to ever update the timestamp, because the
+		 * timesamp existance is what makes the node become visible to the rest of the
+		 * world if shared, and so we don't update that timestamp, and also really the
+		 * time that an attachment is added is usually not important and only content
+		 * editing needs to ever trigger timestamp update on the node
+		 */
+		MongoThreadLocal.setAutoTimestampDisabled(true);
+		
 		UploadFromUrlResponse res = new UploadFromUrlResponse();
 		readFromUrl(session, req.getSourceUrl(), req.getNodeId(), null, 0);
 		res.setSuccess(true);
@@ -936,7 +967,7 @@ public class AttachmentService {
 		 * Now save the node also since the property on it needs to point to GridFS id
 		 */
 		node.setProp(NodeProp.BIN.s(), new SubNodePropVal(id));
-		node.setProp(NodeProp.BIN_SIZE.s(), streamCount); 
+		node.setProp(NodeProp.BIN_SIZE.s(), streamCount);
 	}
 
 	public void writeStreamToIpfs(MongoSession session, SubNode node, InputStream stream, String mimeType) {
@@ -957,7 +988,7 @@ public class AttachmentService {
 		if (!session.isAdmin()) {
 			userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
 		}
-		
+
 		grid.delete(new Query(Criteria.where("_id").is(id)));
 	}
 
@@ -1018,7 +1049,8 @@ public class AttachmentService {
 
 	/* Gets the content of the grid resource by reading it into a string */
 	public String getStringByNodeEx(SubNode node) {
-		if (node==null) return null;
+		if (node == null)
+			return null;
 		log.debug("getStringByNode: " + node.getId().toHexString());
 
 		String id = node.getStringProp("bin");
@@ -1026,9 +1058,8 @@ public class AttachmentService {
 			return null;
 		}
 
-		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid
-				.findOne(new Query(Criteria.where("_id").is(id)));
-				//new Query(Criteria.where("metadata.nodeId").is(nodeId)));
+		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(id)));
+		// new Query(Criteria.where("metadata.nodeId").is(nodeId)));
 		if (gridFile == null) {
 			log.debug("gridfs ID not found");
 			return null;
@@ -1048,9 +1079,11 @@ public class AttachmentService {
 		}
 	}
 
-	// public AutoCloseInputStream getAutoClosingStream(MongoSession session, SubNode node, boolean auth,
-	// 		boolean ipfs) {
-	// 	return new AutoCloseInputStream(new BufferedInputStream(getStream(session, node, auth, ipfs)));
+	// public AutoCloseInputStream getAutoClosingStream(MongoSession session,
+	// SubNode node, boolean auth,
+	// boolean ipfs) {
+	// return new AutoCloseInputStream(new BufferedInputStream(getStream(session,
+	// node, auth, ipfs)));
 	// }
 
 	/**

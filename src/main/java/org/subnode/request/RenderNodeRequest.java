@@ -32,6 +32,9 @@ public class RenderNodeRequest extends RequestBase {
 
 	private boolean goToLastPage;
 
+	/* If true that means we only want to load a NodeInfo for the actual node specified and not any children */
+	private boolean singleNode;
+
 	@JsonProperty(required = false)
 	private boolean forceIPFSRefresh;
 
@@ -93,4 +96,12 @@ public class RenderNodeRequest extends RequestBase {
 	public void setSiblingOffset(int siblingOffset) {
 		this.siblingOffset = siblingOffset;
 	} 
+
+	public boolean isSingleNode() {
+		return singleNode;
+	}
+
+	public void setSingleNode(boolean singleNode) {
+		this.singleNode = singleNode;
+	}
 }

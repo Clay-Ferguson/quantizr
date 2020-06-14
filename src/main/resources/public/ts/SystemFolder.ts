@@ -91,7 +91,8 @@ export class SystemFolder {
     //     //     "siblingOffset": 0,
     //     //     "renderParentIfLeaf": null,
     //     //     "offset": 0,
-    //     //     "goToLastPage" : false
+    //     //     "goToLastPage" : false,
+    //            singleNode: false
     //     // }, nav.navPageNodeResponse);
     // }
     //

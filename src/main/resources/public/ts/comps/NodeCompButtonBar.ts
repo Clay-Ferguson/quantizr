@@ -55,9 +55,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let searchButton: NavBarIconButton;
         let timelineButton: NavBarIconButton;
 
-        let isPageRootNode = state.node && this.node.id==state.node.id;
+        let isPageRootNode = state.node && this.node.id == state.node.id;
 
-        if (state.node && this.node.id==state.node.id) {
+        if (state.node && this.node.id == state.node.id) {
             if (S.nav.parentVisibleToUser(state)) {
                 upLevelButton = new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
                     /* For onclick functions I need a new approach for some (not all) where I can get by 
@@ -107,8 +107,10 @@ export class NodeCompButtonBar extends HorizontalLayout {
         }
 
         let editingAllowed = S.edit.isEditAllowed(node, state);
+        let editableNode = true;
         if (typeHandler) {
             editingAllowed = editingAllowed && typeHandler.allowAction("edit");
+            editableNode = typeHandler.allowAction("editNode");
         }
 
         if (S.props.isEncrypted(node)) {
@@ -135,13 +137,13 @@ export class NodeCompButtonBar extends HorizontalLayout {
         ONLY show when there ARE truly children fore sure would be to force a check of the file system for every folder type that is ever rendered
         on a page and we don't want to burn that much CPU just to prevent empty-folders from being explored. Empty folders are rare.
         */
-        if (node.hasChildren && !isPageRootNode && 
+        if (node.hasChildren && !isPageRootNode &&
             //If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
             (!isInlineChildren || state.userPreferences.editMode)) {
 
             /* convert this button to a className attribute for styles */
-            openButton = new Button("Open", S.meta64.getNodeFunc(S.nav.cached_openNodeById, "S.nav.openNodeById", node.id), 
-            {title: "Open Node to access its children."}, "btn-primary");
+            openButton = new Button("Open", S.meta64.getNodeFunc(S.nav.cached_openNodeById, "S.nav.openNodeById", node.id),
+                { title: "Open Node to access its children." }, "btn-primary");
         }
 
         /*
@@ -172,19 +174,21 @@ export class NodeCompButtonBar extends HorizontalLayout {
                 //not page root node 'or' page no children exist.
                 (node.id != state.node.id || !node.children || node.children.length == 0)) {
                 createSubNodeButton = new Button("New", S.meta64.getNodeFunc(S.edit.cached_newSubNode, "S.edit.newSubNode", node.id),
-                {title: "Create new Node as a child of this node."});
+                    { title: "Create new Node as a child of this node." });
             }
 
             if (C.INS_ON_TOOLBAR) {
                 insertNodeButton = new Button("Ins", S.meta64.getNodeFunc(S.edit.cached_toolbarInsertNode, "S.edit.toolbarInsertNode", node.id),
-                {title: "Insert new Node at this location."});
+                    { title: "Insert new Node at this location." });
             }
 
             if (editingAllowed) {
-                editNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_runEditNode, "S.edit.runEditNode", node.id), {
-                    iconclass: "fa fa-edit fa-lg",
-                    title: "Edit Node"
-                });
+                if (editableNode) {
+                    editNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_runEditNode, "S.edit.runEditNode", node.id), {
+                        iconclass: "fa fa-edit fa-lg",
+                        title: "Edit Node"
+                    });
+                }
 
                 if (!isPageRootNode && node.type != J.NodeType.REPO_ROOT && !state.nodesToMove) {
                     cutNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_cutSelNodes, "S.edit.cutSelNodes", node.id), {

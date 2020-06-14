@@ -20,7 +20,7 @@ export class UploadFromUrlDlg extends DialogBase {
     uploadFromUrlTextField: TextField;
     uploadButton: Button;
 
-    constructor(private node: J.NodeInfo, private defaultUrl: string, state: AppState) {
+    constructor(private node: J.NodeInfo, private defaultUrl: string, private onUploadFunc: Function, state: AppState) {
         super("Upload File", null, false, state);
     }
 
@@ -54,7 +54,13 @@ export class UploadFromUrlDlg extends DialogBase {
     uploadFromUrlResponse = (res: J.UploadFromUrlResponse): void => {
         if (S.util.checkSuccess("Upload from URL", res)) {
             this.close();
-            S.meta64.refresh(this.appState);
+
+            if (this.onUploadFunc) {
+                this.onUploadFunc();
+            }
+            else {
+                S.meta64.refresh(this.appState);
+            }
         }
     }
 }

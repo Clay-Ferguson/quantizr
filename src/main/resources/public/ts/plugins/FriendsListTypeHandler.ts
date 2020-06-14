@@ -21,6 +21,15 @@ export class FriendsListTypeHandler extends TypeBase {
         super(J.NodeType.FRIEND_LIST, "Friends List", "fa-users", true);
     }
 
+    allowAction(action : string): boolean {
+        switch (action) {
+            case "editNode":
+                return false;
+            default:
+                return true;
+        }
+    }
+
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
 
         let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);

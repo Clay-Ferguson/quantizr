@@ -21,7 +21,6 @@ import org.subnode.response.RenderNodeResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.XString;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +82,14 @@ public class NodeRenderService {
 
 		if (node == null) {
 			res.setNoDataResponse("Node not found.");
+			return res;
+		}
+
+		/* If only the single node was requested return that */
+		if (req.isSingleNode()) {
+			NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, 0, false, false, false);
+			res.setNode(nodeInfo);
+			res.setSuccess(true);
 			return res;
 		}
 

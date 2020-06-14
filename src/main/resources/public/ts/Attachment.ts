@@ -7,6 +7,8 @@ import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import { AppState } from "./AppState";
+import { fastDispatch } from "./AppRedux";
+import { AxiosPromise } from "axios";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -35,7 +37,7 @@ export class Attachment implements AttachmentIntf {
         */
     }
 
-    openUploadFromUrlDlg = (node: J.NodeInfo, defaultUrl: string, state: AppState): void => {
+    openUploadFromUrlDlg = (node: J.NodeInfo, defaultUrl: string, onUploadFunc: Function, state: AppState): void => {
         if (!node) {
             node = S.meta64.getHighlightedNode(state);
         }
@@ -45,29 +47,82 @@ export class Attachment implements AttachmentIntf {
             return;
         }
 
-        let dlg = new UploadFromUrlDlg(node, defaultUrl, state);
+        let dlg = new UploadFromUrlDlg(node, defaultUrl, onUploadFunc, state);
         dlg.open();
     }
 
-    deleteAttachment = (state: AppState): void => {
-        let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
+    deleteAttachment = (node: J.NodeInfo, state: AppState): Promise<boolean> => {
+        return new Promise<boolean>(async (resolve, reject) => {
+            node = node || S.meta64.getHighlightedNode(state);
+            let deleted = false;
+            let delPromise: AxiosPromise<any> = null;
+            if (node) {
+                let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
+                    () => {
+                        delPromise = S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
+                            nodeId: node.id
+                        }, (res: J.DeleteAttachmentResponse): void => {
+                            this.deleteAttachmentResponse(res, node.id, state);
+                            deleted = true;
+                        });
+                    }, null, null, null, state
+                );
+                await dlg.open();
+                if (delPromise) {
+                    await delPromise;
+                }
+            }
+            resolve(deleted);
+        });
+    }
 
-        if (node) {
-            let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
-                () => {
-                    S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
-                        nodeId: node.id
-                    }, (res: J.DeleteAttachmentResponse): void => { this.deleteAttachmentResponse(res, node.id, state) });
-                }, null, null, null, state
-            );
-            dlg.open();
-        }
+    /* Queries the server for the purpose of just loading the binary properties into node, and leaving everything else intact */
+    refreshBinaryPropsFromServer = (node: J.NodeInfo): Promise<any> => {
+        let res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            nodeId: node.id,
+            upLevel: null,
+            siblingOffset: 0,
+            renderParentIfLeaf: false,
+            offset: 0,
+            goToLastPage: false,
+            forceIPFSRefresh: false,
+            singleNode: true
+        },
+            (res: J.RenderNodeResponse) => {
+                debugger;
+                if (res.node.properties) {
+                    S.props.setNodeProp(node, S.props.getNodeProp(J.NodeProp.BIN_MIME, res.node));
+                    S.props.setNodeProp(node, S.props.getNodeProp(J.NodeProp.BIN, res.node));
+                }
+            });
+
+        return res;
     }
 
     deleteAttachmentResponse = (res: J.DeleteAttachmentResponse, id: string, state: AppState): void => {
         if (S.util.checkSuccess("Delete attachment", res)) {
-            S.meta64.removeBinaryById(id, state);
-            S.meta64.refresh(state);
+            this.removeBinaryPropertiesById(id, state);
+
+            //but for now just do a dispatch that forces a refresh from client memory (not server)
+            fastDispatch({
+                type: "Action_FastRefresh",
+                updateNew: (s: AppState): AppState => {
+                    return { ...state };
+                }
+            });
+        }
+    }
+
+    removeBinaryPropertiesById = (id: string, state: AppState) => {
+        if (!state.node || !state.node.children) return;
+        let node = state.node.children.find(node => node.id == id);
+    }
+
+    removeBinaryProperties = (node: J.NodeInfo) => {
+        if (node) {
+            //todo-0: need to make this remove ALL binary properties
+            S.props.deleteProp(node, J.NodeProp.BIN_MIME);
+            S.props.deleteProp(node, J.NodeProp.BIN);
         }
     }
 }

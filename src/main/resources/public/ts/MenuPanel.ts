@@ -107,23 +107,6 @@ export class MenuPanel extends Div {
             //), //
         ]));
 
-        children.push(new Menu("Uploads", [
-
-            new MenuItem("Upload from File", () => S.attachment.openUploadFromFileDlg(false, null, null, state), //
-                !state.isAnonUser && highlightNode != null && selNodeIsMine), //
-
-            new MenuItem("Upload from URL", () => S.attachment.openUploadFromUrlDlg(null, null, state), //
-                !state.isAnonUser && highlightNode != null && selNodeIsMine), //
-
-            new MenuItem("Upload to IPFS", () => S.attachment.openUploadFromFileDlg(true, null, null, state), //
-                !state.isAnonUser && highlightNode != null && selNodeIsMine), //
-
-            new MenuItemSeparator(), //
-
-            new MenuItem("Delete Attachment", () => S.attachment.deleteAttachment(state), //
-                !state.isAnonUser && highlightNode != null && S.props.hasBinary(highlightNode) && selNodeIsMine)
-        ]));
-
         children.push(new Menu("Share", [
             new MenuItem("Edit Node Sharing", () => S.share.editNodeSharing(state), //
                 !state.isAnonUser && highlightNode != null && selNodeIsMine), //

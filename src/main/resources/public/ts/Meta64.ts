@@ -251,14 +251,6 @@ export class Meta64 implements Meta64Intf {
         return ret;
     }
 
-    removeBinaryById = (id: string, state: AppState): void => {
-        if (!state.node || !state.node.children) return;
-        let node = state.node.children.find(node => node.id == id);
-        if (node) {
-            S.props.deleteProp(node, J.NodeProp.BIN_MIME);
-        }
-    }
-
     updateNodeMap = (node: J.NodeInfo, state: AppState): void => {
         if (!node) return;
         state.idToNodeMap[node.id] = node;

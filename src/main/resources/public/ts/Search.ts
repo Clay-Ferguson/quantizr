@@ -73,7 +73,8 @@ export class Search implements SearchIntf {
             renderParentIfLeaf: null,
             offset: 0,
             goToLastPage: false,
-            forceIPFSRefresh: false
+            forceIPFSRefresh: false,
+            singleNode: false
         }, (res) => { S.nav.navPageNodeResponse(res, state) });
     }
 

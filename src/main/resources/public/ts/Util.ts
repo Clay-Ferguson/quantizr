@@ -6,7 +6,7 @@ import { UtilIntf } from "./intf/UtilIntf";
 import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 import { AppState } from "./AppState";
 
 let S: Singletons;
@@ -372,7 +372,7 @@ export class Util implements UtilIntf {
 
     ajax = <RequestType, ResponseType>(postName: string, postData: RequestType, //
         callback?: (response: ResponseType) => void, //
-        failCallback?: (info: string) => void) => {
+        failCallback?: (info: string) => void): AxiosPromise<any> => {
         postData = postData || {} as RequestType;
         let axiosRequest;
 

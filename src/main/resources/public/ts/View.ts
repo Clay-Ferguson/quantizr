@@ -43,7 +43,8 @@ export class View implements ViewIntf {
             renderParentIfLeaf: !!renderParentIfLeaf,
             offset: S.nav.mainOffset,
             goToLastPage: false,
-            forceIPFSRefresh
+            forceIPFSRefresh,
+            singleNode: false
         }, async (res: J.RenderNodeResponse) => {
             if (res.offsetOfNodeFound > -1) {
                 S.nav.mainOffset = res.offsetOfNodeFound;
@@ -87,7 +88,8 @@ export class View implements ViewIntf {
             renderParentIfLeaf: true,
             offset: S.nav.mainOffset,
             goToLastPage: goToLastPage,
-            forceIPFSRefresh: false
+            forceIPFSRefresh: false,
+            singleNode: false
         }, async (res: J.RenderNodeResponse) => {
             if (goToLastPage) {
                 if (res.offsetOfNodeFound > -1) {

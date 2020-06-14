@@ -92,7 +92,7 @@ export class Props implements PropsIntf {
                 // "sourceClass" : "[propsTable]"
             });
 
-            properties.forEach(function(property: J.PropertyInfo) {
+            properties.forEach(function (property: J.PropertyInfo) {
                 //console.log("Render Prop: "+property.name);
                 if (S.render.allowPropertyToDisplay(property.name)) {
 
@@ -129,7 +129,7 @@ export class Props implements PropsIntf {
         if (!node || !node.properties)
             return null;
 
-        return node.properties.find(p => p.name===propName);
+        return node.properties.find(p => p.name === propName);
     }
 
     /* Gets the crypto key from this node that will allow user to decrypt the node. If the user is the owner of the 
@@ -194,9 +194,6 @@ export class Props implements PropsIntf {
         return prop ? prop.value : null;
     }
 
-    /**
-     * Sets property value and returns true only if the value has changed
-     */
     setNodePropVal = (propertyName: string, node: J.NodeInfo, val: string): void => {
         let prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
 
@@ -214,6 +211,25 @@ export class Props implements PropsIntf {
                 node.properties = [];
             }
             node.properties.push(prop);
+        }
+    }
+
+    setNodeProp = (node: J.NodeInfo, newProp: J.PropertyInfo): void => {
+        let prop: J.PropertyInfo = this.getNodeProp(newProp.name, node);
+
+        /* If we found a property by propertyName, then set it's value 
+        
+        search all typescript for " != null", becasuse that's usually a bug (todo-0)
+        */
+        if (prop) {
+            prop.value = newProp.value;
+        }
+        /* Else this is a new property we must add (ret remains true here) */
+        else {
+            if (!node.properties) {
+                node.properties = [];
+            }
+            node.properties.push(newProp);
         }
     }
 

@@ -20,6 +20,15 @@ export class UserFeedTypeHandler extends TypeBase {
         super(J.NodeType.USER_FEED, "User Feed", "fa-th-list", true);
     }
 
+    allowAction(action : string): boolean {
+        switch (action) {
+            case "editNode":
+                return false;
+            default:
+                return true;
+        }
+    }
+
     //todo-0: for node types FriendList and UserFeed need to remove buttons during edit mode for
     //'new', 'edit', 'cut'
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {

@@ -1,6 +1,7 @@
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { AppState } from "../AppState";
+import { AxiosPromise } from "axios";
 
 export interface UtilIntf {
     logAjax: boolean;
@@ -52,7 +53,7 @@ export interface UtilIntf {
     //todo-1: need to make all calls to these functions use promises (be careful about failure case)
     ajax<RequestType, ResponseType>(postName: string, postData: RequestType,
         callback?: (response: ResponseType) => void,
-        failCallback?: (response: string) => void);
+        failCallback?: (response: string) => void): AxiosPromise<any>;
     logAndThrow(message: string);
     logAndReThrow(message: string, exception: any);
     ajaxReady(requestName): boolean;

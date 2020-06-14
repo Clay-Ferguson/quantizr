@@ -23,14 +23,15 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompBinary extends Div {
 
-    constructor(public node: J.NodeInfo) {
+    /* editorEmbed is true when this component is inside the node editor dialog */
+    constructor(public node: J.NodeInfo, private isEditorEmbed: boolean) {
         super();
     }
 
     makeImageTag(node: J.NodeInfo, state: AppState): Img {
         let src: string = S.render.getUrlForNodeAttachment(node);
 
-        let imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
+        let imgSize = this.isEditorEmbed ? "200px" : S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
         let style: any = {};
 
         if (!imgSize || imgSize == "0") {
@@ -60,6 +61,8 @@ export class NodeCompBinary extends Div {
     }
 
     cached_clickOnImage = (nodeId: string) => {
+        if (this.isEditorEmbed) return;
+
         let state = appState();
 
         dispatch({
@@ -77,47 +80,47 @@ export class NodeCompBinary extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let node = this.node;
-        if (!node) {
+        if (!this.node) {
             this.children = null;
             return;
         }
 
         /* If this is an image render the image directly onto the page as a visible image */
-        if (S.props.hasImage(node)) {
-            this.setChildren([this.makeImageTag(node, state)]);
+        if (S.props.hasImage(this.node)) {
+            this.setChildren([this.makeImageTag(this.node, state)]);
         }
-        else if (S.props.hasVideo(node)) {
+        else if (S.props.hasVideo(this.node)) {
             this.setChildren([new ButtonBar([
                 new Button("Play Video", () => {
-                    new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(node), null, state).open();
+                    new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(this.node), null, state).open();
                 }),
                 new Div("", {
                     className: "videoDownloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(node), "[Download Video]")])
+                }, [new Anchor(S.render.getUrlForNodeAttachment(this.node), "[Download Video]")])
             ], "marginAll")]);
         }
-        else if (S.props.hasAudio(node)) {
+        else if (S.props.hasAudio(this.node)) {
             this.setChildren([new ButtonBar([
                 new Button("Play Audio", () => {
-                    new AudioPlayerDlg(S.render.getStreamUrlForNodeAttachment(node), state).open();
+                    new AudioPlayerDlg(S.render.getStreamUrlForNodeAttachment(this.node), state).open();
                 }),
                 new Div("", {
                     className: "audioDownloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(node), "[Download Audio]")])
+                }, [new Anchor(S.render.getUrlForNodeAttachment(this.node), "[Download Audio]")])
             ], "marginAll")]);
         }
         /*
          * If not an image we render a link to the attachment, so that it can be downloaded.
          */
         else {
-            let fileName: string = S.props.getNodePropVal(J.NodeProp.BIN_FILENAME, node);
-            let fileSize: string = S.props.getNodePropVal(J.NodeProp.BIN_SIZE, node);
-            let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+            //in the node editor dialog where binary props are userd, add these (todo-0)
+            let fileName: string = S.props.getNodePropVal(J.NodeProp.BIN_FILENAME, this.node);
+            let fileSize: string = S.props.getNodePropVal(J.NodeProp.BIN_SIZE, this.node);
+            let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, this.node);
 
             let viewFileLink: Anchor = null;
             if (fileType == "application/pdf" || fileType.startsWith("text/")) {
-                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(node), "[View]", {
+                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(this.node), "[View]", {
                     target: "_blank",
                     className: "marginLeft"
                 });
@@ -134,7 +137,7 @@ export class NodeCompBinary extends Div {
                 new Span(fileName, {
                     className: "normalText marginRight"
                 }),
-                new Anchor(S.render.getUrlForNodeAttachment(node), "[Download]"),
+                new Anchor(S.render.getUrlForNodeAttachment(this.node), "[Download]"),
                 viewFileLink
             ])]);
         }

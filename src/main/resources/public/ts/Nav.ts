@@ -101,7 +101,8 @@ export class Nav implements NavIntf {
             renderParentIfLeaf: true,
             offset: this.mainOffset,
             goToLastPage: false,
-            forceIPFSRefresh: false
+            forceIPFSRefresh: false,
+            singleNode: false
         },
             //success callback
             (res: J.RenderNodeResponse) => {
@@ -142,7 +143,8 @@ export class Nav implements NavIntf {
             renderParentIfLeaf: false,
             offset: this.mainOffset,
             goToLastPage: false,
-            forceIPFSRefresh: false
+            forceIPFSRefresh: false,
+            singleNode: false
         },
             //success callback
             (res: J.RenderNodeResponse) => {
@@ -223,7 +225,8 @@ export class Nav implements NavIntf {
             renderParentIfLeaf: null,
             offset: this.mainOffset,
             goToLastPage: false,
-            forceIPFSRefresh: false
+            forceIPFSRefresh: false,
+            singleNode: false
         }, (res) => { this.navPageNodeResponse(res, state); });
     }
 
@@ -308,7 +311,8 @@ export class Nav implements NavIntf {
                 renderParentIfLeaf: null,
                 offset: this.mainOffset,
                 goToLastPage: false,
-                forceIPFSRefresh: false
+                forceIPFSRefresh: false,
+                singleNode: false
             }, (res) => { this.navPageNodeResponse(res, state); });
         }
     }

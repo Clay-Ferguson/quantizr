@@ -12,6 +12,8 @@ import { EditCredentialsDlg } from "./EditCredentialsDlg";
 import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { Checkbox } from "../widget/Checkbox";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -46,23 +48,31 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     maxFiles: number = 1;
 
-    constructor(private nodeId: string, private node: J.NodeInfo, private toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
-        super(importMode ? "Import File" : (toIpfs ? "Upload File to IPFS" : "Upload File"), null, false, state);
+    constructor(private nodeId: string, private node: J.NodeInfo, toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
+        super(importMode ? "Import File" : "Upload File", null, false, state);
+        this.mergeState({ toIpfs });
     }
 
     renderDlg(): CompIntf[] {
+        let state = this.getState();
         let children = [
             new Form(null, [
-                this.toIpfs ? new TextContent("NOTE: IPFS Uploads assume you have a Temporal Account (https://temporal.cloud) which will be the service that hosts your IPFS data. You'll be prompted for the Temporal password when the upload begins.") : null,
+                new HorizontalLayout([
+                    new Checkbox("Save to IPFS", state.toIpfs, {
+                        onClick: this.toggleIpfs,
+                    })
+                ]),
+                state.toIpfs ? new TextContent("NOTE: IPFS Uploads assume you have a Temporal Account (https://temporal.cloud) which will be the service that hosts your IPFS data. You'll be prompted for the Temporal password when the upload begins.") : null,
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
-                    this.toIpfs ? new Button("IPFS Credentials", () => { this.getTemporalCredentials(true); }, null, "btn-primary") : null,
+                    new Button("Upload from URL", this.uploadFromUrl,
+                        state.toIpfs ? new Button("IPFS Credentials", () => { this.getTemporalCredentials(true); }, null, "btn-primary") : null),
                     new Button("Close", () => {
                         this.close();
-                    })
-                ])
+                    }),
+                ]),
             ])
         ];
 
@@ -70,6 +80,13 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         this.configureDropZone();
         this.runButtonEnablement();
         return children;
+    }
+
+    toggleIpfs = (): void => {
+        let state = this.getState();
+        this.mergeState({
+            toIpfs: !state.toIpfs
+        });
     }
 
     //ref: https://gateway.temporal.cloud/ipfs/Qma4DNFSRR9eGqwm93zMUtqywLFpTRQji4Nnu37MTmNntM/account.html#account-api
@@ -114,12 +131,20 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         });
     }
 
+    uploadFromUrl = (): void => {
+        let state = this.getState();
+        S.attachment.openUploadFromUrlDlg(this.node, null, () => {
+            this.close();
+        }, state);
+    }
+
     upload = async (): Promise<boolean> => {
+        let state = this.getState();
         return new Promise<boolean>(async (resolve, reject) => {
             if (this.filesAreValid()) {
                 let allowUpload = true;
 
-                if (this.toIpfs && this.toTemporal) {
+                if (state.toIpfs && this.toTemporal) {
                     let credsOk = await this.getTemporalCredentials(false);
                     if (!credsOk) {
                         resolve(false);
@@ -182,17 +207,18 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     configureDropZone = (): void => {
+        let state = this.getState();
         let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
 
         /* Allow 20MB for Quantizr uploads or 20GB for IPFS */
-        let maxFileSize = (this.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
+        let maxFileSize = (state.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
 
         let action;
         if (this.importMode) {
             action = S.util.getRpcPath() + "streamImport";
         }
         else {
-            action = (this.toIpfs && this.toTemporal) ? (this.TEMPORAL_HOST + "/v2/ipfs/public/file/add") :
+            action = (state.toIpfs && this.toTemporal) ? (this.TEMPORAL_HOST + "/v2/ipfs/public/file/add") :
                 S.util.getRpcPath() + "upload";
         }
         let url = action;
@@ -206,7 +232,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             url,
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
-            paramName: (dlg.toIpfs && dlg.toTemporal) ? "file" : "files",
+            paramName: (state.toIpfs && dlg.toTemporal) ? "file" : "files",
             maxFilesize: maxFileSize,
             parallelUploads: 2,
 
@@ -246,7 +272,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.on("sending", function (file: File, xhr, formData) {
                     dlg.sent = true;
                     /* If Uploading DIRECTLY to Temporal.cloud */
-                    if (dlg.toIpfs && dlg.toTemporal) {
+                    if (state.toIpfs && dlg.toTemporal) {
                         dlg.ipfsFile = file;
                         formData.append("file", file);
                         formData.append("hold_time", "1");
@@ -259,7 +285,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     else {
                         formData.append("nodeId", dlg.nodeId);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
-                        formData.append("ipfs", dlg.toIpfs ? "true" : "false");
+                        formData.append("ipfs", state.toIpfs ? "true" : "false");
                     }
                     dlg.zipQuestionAnswered = false;
                 });
@@ -301,8 +327,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.on("queuecomplete", function (arg) {
                     if (dlg.sent) {
                         dlg.close();
-
-                        //NOTE: when running from ProfileDlg this is not appropriate, so this needs to be in 'callback' form here.
                         if (dlg.afterUploadFunc) {
                             dlg.afterUploadFunc();
                         }
@@ -352,12 +376,13 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     filesAreValid = (): boolean => {
+        let state = this.getState();
         if (!this.fileList || this.fileList.length == 0 || this.fileList.length > this.maxFiles) {
             return false;
         }
 
         let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
-        let maxFileSizeMb = (this.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
+        let maxFileSizeMb = (state.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
 
         for (let file of this.fileList) {
             if (file.size > maxFileSizeMb * Constants.ONE_MB) {
@@ -390,8 +415,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             this.temporalPwd = await S.localDB.getVal(Constants.LOCALDB_TEMPORAL_PWD);
 
             if (forceEdit || (!this.temporalUsr || !this.temporalPwd)) {
-                let dlg = new EditCredentialsDlg(forceEdit ? "Temporal Credentials" : "Temporal Account Login", 
-                Constants.LOCALDB_TEMPORAL_USR, Constants.LOCALDB_TEMPORAL_PWD, this.appState);
+                let dlg = new EditCredentialsDlg(forceEdit ? "Temporal Credentials" : "Temporal Account Login",
+                    Constants.LOCALDB_TEMPORAL_USR, Constants.LOCALDB_TEMPORAL_PWD, this.appState);
                 await dlg.open();
                 this.temporalUsr = dlg.usr;
                 this.temporalPwd = dlg.pwd;

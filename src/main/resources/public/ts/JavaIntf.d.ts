@@ -187,6 +187,7 @@ export interface RenderNodeRequest extends RequestBase {
     upLevel: number;
     renderParentIfLeaf: boolean;
     goToLastPage: boolean;
+    singleNode: boolean;
     forceIPFSRefresh: boolean;
 }
 

@@ -31,6 +31,8 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Label } from "../widget/Label";
+import { NodeCompBinary } from "../comps/NodeCompBinary";
+import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -50,6 +52,8 @@ export class EditNodeDlg extends DialogBase {
     wordWrapCheckBox: Checkbox;
     inlineChildrenCheckBox: Checkbox;
     saveNodeButton: Button;
+    uploadButton: Button;
+    deleteUploadButton: Button;
     setTypeButton: Button;
     encryptionButton: Button;
     insertTimeButton: Button;
@@ -72,6 +76,9 @@ export class EditNodeDlg extends DialogBase {
     static morePanelExpanded: boolean = false;
 
     skdp: SymKeyDataPackage;
+
+    //if user uploads or deletes an upload we set this, to force refresh when dialog closes even if they don't click save.
+    binaryDirty: boolean = false;
 
     constructor(node: J.NodeInfo, state: AppState) {
         super("Edit", "app-modal-content", false, state);
@@ -159,6 +166,8 @@ export class EditNodeDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         let state = this.getState();
 
+        let hasAttachment: boolean = S.props.hasBinary(state.node);
+
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
         let customProps: string[] = null;
         if (typeHandler) {
@@ -190,10 +199,10 @@ export class EditNodeDlg extends DialogBase {
                         this.close();
                     }, null, "btn-primary"),
 
-                    this.setTypeButton = !typeLocked ? new Button("Set Type", this.openChangeNodeTypeDlg) : null,
-                    //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
+                    this.uploadButton = new Button("Upload", this.upload),
+                    hasAttachment ? this.deleteUploadButton = new Button("Delete Upload", this.deleteUpload) : null,
 
-                    this.encryptionButton = !customProps ? new Button("Encryption", this.openEncryptionDlg) : null,
+                    //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
                     this.cancelButton = new Button("Cancel", this.cancelEdit)
                 ])
             ])
@@ -201,6 +210,7 @@ export class EditNodeDlg extends DialogBase {
 
         let optionsBar = new Div("", null, [
             this.wordWrapCheckBox = new Checkbox("Word Wrap", true, {
+                className: "marginRight",
                 onChange: (evt: any) => {
                     if (this.contentEditor) {
                         this.contentEditor.setWordWrap(evt.target.checked);
@@ -211,6 +221,8 @@ export class EditNodeDlg extends DialogBase {
         ]);
 
         let selectionsBar = new FormInline(null, [
+            this.setTypeButton = !typeLocked ? new Button("Set Type", this.openChangeNodeTypeDlg) : null,
+            this.encryptionButton = !customProps ? new Button("Encryption", this.openEncryptionDlg, null, "btn-secondary marginRight") : null,
             this.layoutSelection = state.node.hasChildren ? this.createLayoutSelection() : null,
             this.prioritySelection = this.createPrioritySelection(),
             this.imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection() : null
@@ -240,12 +252,8 @@ export class EditNodeDlg extends DialogBase {
         let isWordWrap = !S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node);
         this.wordWrapCheckBox.setChecked(isWordWrap);
 
-        //todo-1: does it make sense for FormGroup to contain single fields, or multiple fields? This seems wrong to have a group with one in it.
         if (!customProps) {
-            let nodeNameFormGroup = new FormGroup();
             this.nodeNameTextField = new TextField("Node Name", state.node.name);
-            nodeNameFormGroup.addChild(this.nodeNameTextField);
-            mainPropsTable.addChild(nodeNameFormGroup);
         }
 
         if (allowContentEdit) {
@@ -256,7 +264,6 @@ export class EditNodeDlg extends DialogBase {
             }
 
             if (!customProps || (customProps && !!customProps.find(p => p == "content"))) {
-                let content = state.node.content;
                 let contentTableRow = this.makeContentEditorFormGroup(state.node, isWordWrap, rows);
                 mainPropsTable.addChild(contentTableRow);
                 this.contentEditor.setWordWrap(isWordWrap);
@@ -328,12 +335,17 @@ export class EditNodeDlg extends DialogBase {
             propsParent.addChild(this.propsButtonBar);
         }
 
-        let collapsiblePanel = !customProps ? new CollapsiblePanel("More...", null, [optionsBar, selectionsBar, propsTable], false,
+        let collapsiblePanel = !customProps ? new CollapsiblePanel("More...", null, [optionsBar, selectionsBar, propsTable, this.nodeNameTextField], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
             }, EditNodeDlg.morePanelExpanded, "float-right") : null;
 
-        this.propertyEditFieldContainer.setChildren([mainPropsTable, collapsiblePanel]);
+        let binary = null;
+        if (hasAttachment) {
+            binary = new NodeCompBinary(state.node, true);
+        }
+
+        this.propertyEditFieldContainer.setChildren([mainPropsTable, binary, collapsiblePanel]);
         return children;
     }
 
@@ -369,6 +381,34 @@ export class EditNodeDlg extends DialogBase {
     openChangeNodeTypeDlg = (): void => {
         let dlg = new ChangeNodeTypeDlg(this.setNodeType, this.appState);
         dlg.open();
+    }
+
+    upload = async (): Promise<void> => {
+        let state = this.getState();
+
+        let dlg = new UploadFromFileDropzoneDlg(state.node.id, state.node, state.toIpfs, null, false, this.appState, async () => {            
+            await S.attachment.refreshBinaryPropsFromServer(state.node);
+            this.forceRender();
+            this.binaryDirty = true;
+        });
+        await dlg.open();
+    }
+
+    deleteUpload = async (): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            let state = this.getState();
+
+            /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
+            call has fully completed. */
+            let deleted: boolean = await S.attachment.deleteAttachment(state.node, this.appState);
+
+            if (deleted) {
+                S.attachment.removeBinaryProperties(state.node);
+                this.forceRender();
+                this.binaryDirty = true;
+            }
+            resolve();
+        });
     }
 
     openEncryptionDlg = (): void => {
@@ -537,7 +577,7 @@ export class EditNodeDlg extends DialogBase {
         let formGroup = new FormGroup();
         let propVal = propEntry.value;
 
-        let label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name; 
+        let label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
         let propValStr = propVal ? propVal : "";
         propValStr = S.util.escapeForAttrib(propValStr);
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
@@ -597,7 +637,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makeContentEditorFormGroup = (node: J.NodeInfo, isWordWrap: boolean, rows: string): FormGroup => {
-        let value = node.content;
+        let value = node.content || "";
         let formGroup = new FormGroup();
         let encrypted = value.startsWith(J.Constant.ENC_TAG);
 
@@ -713,5 +753,9 @@ export class EditNodeDlg extends DialogBase {
 
     cancelEdit = (): void => {
         this.close();
+
+        if (this.binaryDirty) {
+            S.meta64.refresh(this.appState);
+        }
     }
 }

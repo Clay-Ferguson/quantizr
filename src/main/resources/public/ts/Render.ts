@@ -99,7 +99,7 @@ export class Render implements RenderIntf {
                         if (s.startsWith(location.protocol + '//' + location.hostname)) {
                             return;
                         }
-                        S.attachment.openUploadFromUrlDlg(node, s, state);
+                        S.attachment.openUploadFromUrlDlg(node, s, null, state);
                     });
                     return;
                 }

@@ -71,7 +71,7 @@ export class NodeCompContent extends Div {
         let isAnAccountNode = node.ownerId && node.id == node.ownerId;
 
         if (S.props.hasBinary(node) && !isAnAccountNode) {
-            let binary = new NodeCompBinary(node);
+            let binary = new NodeCompBinary(node, false);
 
             //todo-1: bring this back. I already needed it again.
             /*
