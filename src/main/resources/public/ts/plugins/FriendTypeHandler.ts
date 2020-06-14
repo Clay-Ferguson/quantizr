@@ -17,6 +17,15 @@ export class FriendTypeHandler extends TypeBase {
         super(J.NodeType.FRIEND, "Friend", "fa-user", true);
     }
 
+    allowAction(action: string): boolean {
+        switch (action) {
+            case "upload":
+                return false;
+            default:
+                return true;
+        }
+    }
+
     getEditLabelForProp(propName: string): string {
         if (propName == J.NodeProp.USER) {
             return "User Name";

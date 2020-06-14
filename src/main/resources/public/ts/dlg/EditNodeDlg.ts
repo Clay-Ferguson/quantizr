@@ -185,6 +185,8 @@ export class EditNodeDlg extends DialogBase {
         //to dangerously opt into this also without hacking the code with this var.
         let allowEditAllProps: boolean = this.appState.isAdminUser;
 
+        let allowUpload: boolean = typeHandler ? typeHandler.allowAction("upload") : true;
+
         let children = [
             new Form(null, [
                 //this.help = new TextContent("Help content."),
@@ -199,8 +201,8 @@ export class EditNodeDlg extends DialogBase {
                         this.close();
                     }, null, "btn-primary"),
 
-                    this.uploadButton = new Button("Upload", this.upload),
-                    hasAttachment ? this.deleteUploadButton = new Button("Delete Upload", this.deleteUpload) : null,
+                    this.uploadButton = allowUpload ? new Button("Upload", this.upload) : null,
+                    (hasAttachment && allowUpload) ? this.deleteUploadButton = new Button("Delete Upload", this.deleteUpload) : null,
 
                     //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
                     this.cancelButton = new Button("Cancel", this.cancelEdit)
