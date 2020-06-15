@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
-import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.image.ImageSize;
 import org.subnode.model.AccessControlInfo;
@@ -50,8 +50,8 @@ public class Convert {
 	 * by the browser to render the node
 	 */
 	public NodeInfo convertToNodeInfo(SessionContext sessionContext, MongoSession session, SubNode node,
-			boolean htmlOnly, boolean initNodeEdit, long logicalOrdinal,
-			boolean allowInlineChildren, boolean firstChild, boolean lastChild) {
+			boolean htmlOnly, boolean initNodeEdit, long logicalOrdinal, boolean allowInlineChildren,
+			boolean firstChild, boolean lastChild) {
 
 		ImageSize imageSize = null;
 		String dataUrl = null;
@@ -77,8 +77,7 @@ public class Convert {
 		boolean hasChildren = (api.getChildCount(session, node) > 0);
 		// log.trace("hasNodes=" + hasNodes + " path=" + node.getPath());
 
-		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly,
-				initNodeEdit);
+		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly, initNodeEdit);
 
 		List<AccessControlInfo> acList = buildAccessControlList(sessionContext, node);
 
@@ -98,12 +97,14 @@ public class Convert {
 			// below sets to owner to 'admin' which will
 			// be safe for now because the admin is the only user capable of import/export.
 			// log.debug("Unable to find userNode from nodeOwner: " + //
-			// 		(node.getOwner() != null ? ownerId : ("null owner on node: " + node.getId().toHexString())) + //
-			// 		" tried to find owner=" + node.getOwner().toHexString());
+			// (node.getOwner() != null ? ownerId : ("null owner on node: " +
+			// node.getId().toHexString())) + //
+			// " tried to find owner=" + node.getOwner().toHexString());
 		} else {
 			nameProp = userNode.getStringProp(NodeProp.USER.s());
 			avatarVer = userNode.getStringProp(NodeProp.BIN.s());
 		}
+
 		String owner = userNode == null ? PrincipalName.ADMIN.s() : nameProp;
 
 		log.trace("RENDER ID=" + node.getId().toHexString() + " rootId=" + ownerId + " session.rootId="
@@ -132,6 +133,31 @@ public class Convert {
 				imageSize != null ? imageSize.getHeight() : 0, //
 				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey, dataUrl, node.isDeleted(), avatarVer);
 
+		/*
+		 * Special case for "Friend" type nodes, to get enough information for the
+		 * browser to be able to render the avatar and the bio of the person. Eventually
+		 * we need to remove this kind of type-specific tight-coupling from here and
+		 * make some kind of plugin (like client has) for hooking into this kind of
+		 * type-specific logic
+		 */
+		if (node.getType().equals(NodeType.FRIEND.s())) {
+			String friendAccountId = node.getStringProp(NodeProp.USER_NODE_ID);
+			SubNode friendAccountNode = api.getNode(session, friendAccountId, false);
+			if (friendAccountNode != null) {
+				String friendAvatarVer = userNode.getStringProp(NodeProp.BIN.s());
+				if (nodeInfo.getProperties() == null) {
+					nodeInfo.setProperties(new LinkedList<PropertyInfo>());
+				}
+
+				String userBio = userNode.getStringProp(NodeProp.USER_BIO.s());
+
+				//A property prefixed with "_" is an indicator that this is a 'payload data' item sent to help client render
+				//but not a 'true' property of the actual node. These two properties are enough to render the link to the avatar image
+				nodeInfo.getProperties().add(new PropertyInfo("_avatarVer", friendAvatarVer));
+				nodeInfo.getProperties().add(new PropertyInfo("_userBio", userBio));
+			}
+		}
+
 		if (allowInlineChildren) {
 			boolean hasInlineChildren = node.getBooleanProp(NodeProp.INLINE_CHILDREN.s());
 			if (hasInlineChildren) {
@@ -153,11 +179,12 @@ public class Convert {
 					// + count) + "]: "
 					// + XString.prettyPrint(node));
 
-					//NOTE: If this is set to false it then only would allow one level of depth in the 'inlineChildren' capability
+					// NOTE: If this is set to false it then only would allow one level of depth in
+					// the 'inlineChildren' capability
 					boolean multiLevel = true;
 
-					nodeInfo.getChildren().add(convertToNodeInfo(sessionContext, session, n, htmlOnly,
-							initNodeEdit, logicalOrdinal, multiLevel, firstChild, lastChild));
+					nodeInfo.getChildren().add(convertToNodeInfo(sessionContext, session, n, htmlOnly, initNodeEdit,
+							logicalOrdinal, multiLevel, firstChild, lastChild));
 				}
 			}
 		}
@@ -199,8 +226,7 @@ public class Convert {
 				props = new LinkedList<PropertyInfo>();
 			}
 
-			PropertyInfo propInfo = convertToPropertyInfo(sessionContext, node, propName, p, htmlOnly,
-					initNodeEdit);
+			PropertyInfo propInfo = convertToPropertyInfo(sessionContext, node, propName, p, htmlOnly, initNodeEdit);
 			// log.debug(" PROP Name: " + propName + " val=" + p.getValue().toString());
 
 			props.add(propInfo);

@@ -95,6 +95,17 @@ body {
     border: 6px dotted $nodeBorderBottomColor;
 }
 
+.friendImage {
+    width: 200px;
+    cursor: pointer;
+    border: 2px solid $nodeBorderBottomColor;
+    margin: 10px;
+}
+
+.userBio {
+    margin: 10px;
+}
+
 .profileImageHolder {
     border-radius: $borderRadiusLarge;
     width: 300px;

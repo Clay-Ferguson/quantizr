@@ -6,6 +6,8 @@ import { TypeBase } from "./base/TypeBase";
 import { Heading } from "../widget/Heading";
 import { Comp } from "../widget/base/Comp";
 import { AppState } from "../AppState";
+import { Div } from "../widget/Div";
+import { Img } from "../widget/Img";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -55,10 +57,30 @@ export class FriendTypeHandler extends TypeBase {
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
-
         let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
-        return new Heading(4, "User: " + (user ? user : ""), {
-            className: "marginAll"
-        });
+
+        let avatarVer: string = S.props.getNodePropVal("_avatarVer", node);
+        let userBio: string = S.props.getNodePropVal("_userBio", node);
+        let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
+
+        let img: Img = null;
+        if (avatarVer) {
+            let src: string = S.render.getAvatarImgUrl(userNodeId, avatarVer);
+            if (src) {
+                img = new Img(null, {
+                    className: "friendImage",
+                    src,
+                });
+            }
+        }
+        return new Div(null, null, [
+            new Heading(4, "User: " + (user ? user : ""), {
+                className: "marginAll"
+            }),
+            new Div(userBio, {
+                className: "userBio"
+            }),
+            img
+        ]);
     }
 }
