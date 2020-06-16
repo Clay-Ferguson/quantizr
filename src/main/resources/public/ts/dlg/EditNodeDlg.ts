@@ -33,6 +33,7 @@ import { Label } from "../widget/Label";
 import { NodeCompBinary } from "../comps/NodeCompBinary";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg"
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -110,7 +111,7 @@ export class EditNodeDlg extends DialogBase {
     createImgSizeSelection = (): Selection => {
         let selection: Selection = new Selection({
             defaultValue: "0"
-        }, "Img. Size", [
+        }, "Image Size", [
             { key: "0", val: "Actual" },
             { key: "15%", val: "15%" },
             { key: "25%", val: "25%" },
@@ -197,7 +198,7 @@ export class EditNodeDlg extends DialogBase {
                     }, null, "btn-primary"),
 
                     this.uploadButton = allowUpload ? new Button("Upload", this.upload) : null,
-                    (hasAttachment && allowUpload) ? this.deleteUploadButton = new Button("Delete Upload", this.deleteUpload) : null,
+                    //(hasAttachment && allowUpload) ? this.deleteUploadButton = new Button("Delete Upload", this.deleteUpload) : null,
 
                     //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
                     this.cancelButton = new Button("Cancel", this.cancelEdit)
@@ -222,8 +223,8 @@ export class EditNodeDlg extends DialogBase {
             this.encryptionButton = !customProps ? new Button("Encryption", this.openEncryptionDlg, null, "btn-secondary marginRight") : null,
             this.layoutSelection = state.node.hasChildren ? this.createLayoutSelection() : null,
             this.prioritySelection = this.createPrioritySelection(),
-            this.imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection() : null
         ]);
+        this.imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection() : null
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
         let propsTable = null;
@@ -337,12 +338,20 @@ export class EditNodeDlg extends DialogBase {
                 EditNodeDlg.morePanelExpanded = state;
             }, EditNodeDlg.morePanelExpanded, "float-right") : null;
 
-        let binary = null;
+        let binarySection: HorizontalLayout = null;
         if (hasAttachment) {
-            binary = new NodeCompBinary(state.node, true);
+            binarySection = new HorizontalLayout([
+                new NodeCompBinary(state.node, true),
+                new Div(null, {
+                    className: "marginLeft"
+                }, [
+                    this.imgSizeSelection,
+                    (hasAttachment && allowUpload) ? this.deleteUploadButton = new Button("Delete Upload", this.deleteUpload) : null,
+                ])
+            ], "row");
         }
 
-        this.propertyEditFieldContainer.setChildren([mainPropsTable, binary, collapsiblePanel]);
+        this.propertyEditFieldContainer.setChildren([mainPropsTable, binarySection, collapsiblePanel]);
         return children;
     }
 
@@ -369,7 +378,7 @@ export class EditNodeDlg extends DialogBase {
             name: dlg.name,
             value: ""
         });
-        this.mergeState({state});
+        this.mergeState({ state });
 
         //we don't need to return an actual promise here
         return null;

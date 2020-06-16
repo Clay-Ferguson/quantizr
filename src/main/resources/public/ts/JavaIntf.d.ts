@@ -550,15 +550,15 @@ export interface GraphEdge {
     from: string;
 }
 
-export interface PropertyInfo {
-    name: string;
-    value: string;
-}
-
 export interface WebFingerLink {
     rel: string;
     type: string;
     href: string;
+}
+
+export interface PropertyInfo {
+    name: string;
+    value: string;
 }
 
 export interface PrivilegeInfo {

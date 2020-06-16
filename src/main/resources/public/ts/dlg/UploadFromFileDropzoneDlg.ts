@@ -135,6 +135,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let state = this.getState();
         S.attachment.openUploadFromUrlDlg(this.node, null, () => {
             this.close();
+
+            if (this.afterUploadFunc) {
+                this.afterUploadFunc();
+            }
         }, state);
     }
 

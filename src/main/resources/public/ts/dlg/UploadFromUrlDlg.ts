@@ -46,8 +46,6 @@ export class UploadFromUrlDlg extends DialogBase {
                 nodeId: this.node.id,
                 sourceUrl
             }, this.uploadFromUrlResponse);
-
-            this.close();
         }
     }
 
