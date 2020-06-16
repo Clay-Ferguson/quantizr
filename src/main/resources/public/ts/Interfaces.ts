@@ -1,9 +1,13 @@
 import * as J from "./JavaIntf";
 import { AppState } from "./AppState";
 import { Action } from "redux";
-import { CompIntf } from "./widget/base/CompIntf";
 
 /* These are Client-side only models, and are not seen on the server side ever */
+
+export interface ValueIntf {
+    getValue();
+    setValue(val: any);
+}
 
 export interface AppAction extends Action<any> {
     type: string;

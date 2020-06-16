@@ -17,7 +17,6 @@ export interface RenderIntf {
     getUrlForNodeAttachment(node: J.NodeInfo): string;
     getStreamUrlForNodeAttachment(node: J.NodeInfo): string;
     makeAvatarImage(node: J.NodeInfo, state: AppState): Img;
-    allowPropertyToDisplay(propName: string): boolean;
     allowPropertyEdit(node: J.NodeInfo, propName: string, state: AppState): boolean;
     isReadOnlyProperty(propName: string): boolean;
     allowAction(typeHandler: TypeHandlerIntf, action: string): boolean; 

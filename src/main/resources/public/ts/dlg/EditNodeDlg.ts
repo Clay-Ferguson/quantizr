@@ -1,7 +1,6 @@
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { DialogBase } from "../DialogBase";
-import { EditPropertyDlg } from "./EditPropertyDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { Button } from "../widget/Button";
 import { Header } from "../widget/Header";
@@ -33,6 +32,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Label } from "../widget/Label";
 import { NodeCompBinary } from "../comps/NodeCompBinary";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
+import { EditPropertyDlg } from "./EditPropertyDlg"
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -60,11 +60,6 @@ export class EditNodeDlg extends DialogBase {
     addPropertyButton: Button;
     deletePropButton: Button;
     cancelButton: Button;
-
-    editPropertyDlgInst: any;
-
-    //Maps property names to the actual editor Comp (editor, checkbox, etc) that is currently editing it.
-    propNameToEditorCompMap: { [key: string]: Comp } = {};
 
     //maps the DOM ids of dom elements the property that DOM element is editing.
     compIdToPropMap: { [key: string]: J.PropertyInfo } = {};
@@ -362,16 +357,22 @@ export class EditNodeDlg extends DialogBase {
         // instead so I don't need to parse any DOM or domIds inorder to iterate over the list of them????
     }
 
-    addProperty = (): void => {
+    addProperty = async (): Promise<void> => {
         let state = this.getState();
-        (async () => {
-            let dlg = new EditPropertyDlg(state.node,
-                () => {
-                    this.mergeState(state);
-                }, this.appState);
-            this.editPropertyDlgInst = dlg;
-            await this.editPropertyDlgInst.open();
-        })();
+        let dlg = new EditPropertyDlg(state.node, this.appState);
+        await dlg.open();
+
+        if (!state.node.properties) {
+            state.node.properties = [];
+        }
+        state.node.properties.push({
+            name: dlg.name,
+            value: ""
+        });
+        this.mergeState({state});
+
+        //we don't need to return an actual promise here
+        return null;
     }
 
     insertTime = (): void => {
@@ -388,7 +389,7 @@ export class EditNodeDlg extends DialogBase {
     upload = async (): Promise<void> => {
         let state = this.getState();
 
-        let dlg = new UploadFromFileDropzoneDlg(state.node.id, state.node, state.toIpfs, null, false, this.appState, async () => {            
+        let dlg = new UploadFromFileDropzoneDlg(state.node.id, state.node, state.toIpfs, null, false, this.appState, async () => {
             await S.attachment.refreshBinaryPropsFromServer(state.node);
             this.forceRender();
             this.binaryDirty = true;
@@ -533,29 +534,6 @@ export class EditNodeDlg extends DialogBase {
             }
 
             state.node.content = content;
-            let newProps: J.PropertyInfo[] = [];
-
-            /* Now scan over all properties to build up what to save */
-            if (state.node.properties) {
-                state.node.properties.forEach(function (prop: J.PropertyInfo) {
-
-                    //console.log("prop to save?: "+prop.name);
-
-                    /* Ignore this property if it's one that cannot be edited as text, or has already been handled/processed */
-                    if (!allowEditAllProps && S.render.isReadOnlyProperty(prop.name)) {
-                        return;
-                    }
-
-                    let comp = this.propNameToEditorCompMap[prop.name] as any as I.TextEditorIntf;
-                    if (comp) {
-                        prop.value = comp.getValue();
-                        //console.log("value from editor comp: "+prop.value);
-                    }
-
-                    newProps.push(prop);
-                }, this);
-            }
-            state.node.properties = newProps;
 
             //console.log("calling saveNode(). PostData=" + S.util.toJson(this.node));
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
@@ -610,28 +588,36 @@ export class EditNodeDlg extends DialogBase {
                 formGroup.addChild(new Label(label));
             }
 
-            let editor: I.TextEditorIntf = null;
+            let valEditor: I.TextEditorIntf = null;
             let multiLine = false;
 
             if (multiLine) {
                 if (C.ENABLE_ACE_EDITOR) {
-                    editor = new AceEditPropTextarea(propEntry.value, "25em", null, false);
+                    valEditor = new AceEditPropTextarea(propEntry.value, "25em", null, false);
                 }
                 else {
-                    editor = new Textarea(null, {
+                    valEditor = new Textarea(null, {
                         rows: "20",
                         defaultValue: propEntry.value
                     });
-                    editor.focus();
+                    valEditor.focus();
                 }
             }
             else {
                 //console.log("Creating TextField or property: " + propEntry.name + " value=" + propValStr);
-                editor = new TextField(null, propValStr);
+                valEditor = new TextField(null, null /* propValStr */, false, null, {
+                    getValue: () => {
+                        return S.props.getNodePropVal(propEntry.name, this.getState().node);
+                    },
+                    setValue: (val: any) => {
+                        let state = this.getState();
+                        S.props.setNodePropVal(propEntry.name, this.getState().node, val);
+                        this.mergeState(state, true);
+                    }
+                });
             }
-            this.propNameToEditorCompMap[propEntry.name] = editor as any as Comp;
 
-            formGroup.addChild(editor as any as Comp);
+            formGroup.addChild(valEditor as any as Comp);
         }
 
         tableRow.addChildren([formGroup]);
@@ -678,15 +664,16 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditor = new Textarea(null, {
                 rows,
                 defaultValue: encrypted ? "[encrypted]" : value
-            },
-                /* onBlur value setter, required so that we don't loose edits when react decides to re-render */
-                (value: string) => {
+            }, {
+                getValue: () => {
+                    return this.getState().node.content;
+                },
+                setValue: (val: any) => {
                     let state = this.getState();
-                    if (value != state.node.content) {
-                        state.node.content = value;
-                        this.mergeState(state);
-                    }
-                });
+                    state.node.content = val;
+                    this.mergeState(state, true);
+                }
+            });
 
             this.contentEditor.whenElm((elm: HTMLElement) => {
                 if (encrypted) {

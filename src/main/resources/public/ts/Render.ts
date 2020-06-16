@@ -152,12 +152,12 @@ export class Render implements RenderIntf {
                 type: "Action_RenderPage", state,
                 updateNew: (s: AppState): AppState => {
                     //VERY IMPORTANT to return a NEW object so we create it here. If you don't return new object rendering can fail.
-                    s = {...s};
+                    s = { ...s };
 
                     if (!s.activeTab || clickTab) {
                         s.activeTab = "mainTab";
                     }
-                    
+
                     s.node = res.node;
                     s.endReached = res.endReached;
                     s.offsetOfNodeFound = res.offsetOfNodeFound;
@@ -234,7 +234,7 @@ export class Render implements RenderIntf {
     createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, state: AppState): Comp => {
         let pasteInlineButton: Button = null;
 
-        if (!state.isAnonUser && state.nodesToMove != null && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
+        if (!state.isAnonUser && !!state.nodesToMove && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
 
             let func: Function = null;
             if (state.endReached) {
@@ -327,24 +327,10 @@ export class Render implements RenderIntf {
         return img;
     }
 
-    allowPropertyToDisplay = (propName: string): boolean => {
-        //if (S.meta64.isAdminUser) return true;
-        if (propName.startsWith("sn:")) return false;
-
-        let allow = !S.props.simpleModePropertyBlackList[propName];
-        console.log("Allow Prop " + propName + " = " + allow);
-        return allow;
-    }
-
     /* Returns true of the logged in user and the type of node allow the property to be edited by the user */
     allowPropertyEdit = (node: J.NodeInfo, propName: string, state: AppState): boolean => {
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-        if (typeHandler) {
-            return typeHandler.allowPropertyEdit(propName, state);
-        }
-        else {
-            return this.allowPropertyToDisplay(propName);
-        }
+        return typeHandler ? typeHandler.allowPropertyEdit(propName, state) : true;
     }
 
     isReadOnlyProperty = (propName: string): boolean => {

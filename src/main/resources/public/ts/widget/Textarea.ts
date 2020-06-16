@@ -4,6 +4,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { ReactNode } from "react";
+import { ValueIntf } from "../Interfaces";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -12,9 +13,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Textarea extends Comp implements I.TextEditorIntf {
 
-    /* If parent needs to update state based on content entered by user the updateValFunc can be passed in
-    to capture all changes user entered. */
-    constructor(private label: string, attribs: any = null, private updateValFunc: (value: string) => void = null) {
+    constructor(private label: string, attribs: any = null, private valueIntf: ValueIntf = null) {
         super(attribs);
         S.util.mergeProps(this.attribs, {
             className: "form-control pre-textarea"
@@ -25,6 +24,34 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         }
 
         this.setWordWrap(true);
+
+        /* If we weren't passed a delegated value interface, then construct one */
+        if (!this.valueIntf) {
+            this.valueIntf = {
+                setValue: (val: string): void => {
+                    this.mergeState({ value: val || "" }, true);
+                },
+
+                getValue: (): string => {
+                    return this.getState().value;
+                }
+            }
+        }
+
+        // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
+        this.attribs.onChange = (evt: any) => {
+            //console.log("e.target.value=" + evt.target.value);
+            this.updateValFunc(evt.target.value);
+        }
+
+        this.attribs.defaultValue = this.valueIntf.getValue();
+    }
+
+    //Handler to update state if edit field looses focus
+    updateValFunc(value: string): void {
+        if (value != this.valueIntf.getValue()) {
+            this.valueIntf.setValue(value);
+        }
     }
 
     insertTextAtCursor = (text: string) => {
@@ -34,20 +61,12 @@ export class Textarea extends Comp implements I.TextEditorIntf {
     setMode(mode: string): void {
     }
 
-    getValue = (): string => {
-        let elm = this.getElement();
-        if (elm) {
-            return (<any>elm).value.trim();
-        }
-        /* we just resort to returning the value the object was originally created to have if the gui elmement doesn't exist yet on the DOM
-        when we got into here */
-        else {
-            return this.getState().value;
-        }
+    setValue(val: string): void {
+        this.valueIntf.setValue(val);
     }
 
-    setValue = (value: string): void => {
-        this.mergeState({ value });
+    getValue(): string {
+        return this.valueIntf.getValue();
     }
 
     setWordWrap(wordWrap: boolean): void {
@@ -75,32 +94,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         }
 
         if (state.value) {
-            _attribs.value = state.value;
-        }
-
-        // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
-        _attribs.onChange = (evt: any) => {
-            //console.log("e.target.value=" + evt.target.value);
-            this.mergeState({ value: evt.target.value });
-        }
-
-        if (this.updateValFunc) {
-            /* Warning: Do not try to use onChange here. That's overkill AND won't work well */
-            _attribs.onBlur = (evt: any) => {
-                /* save value off 'evt' here, because if we don't JavaScript is smart enough to bark if we use the even later in the timer
-                when it knows the target dom element is dead/gone, because of a re-render */
-                let value = evt.target.value;
-
-                /* React is tricky when you do something in an event that an cause a state change (plus a re-render), because 
-                when that re-render happens it will blow up the eventing that was underway (like an onBlur+onClick when clicking a button while an 
-                edit field has focus), so we delay the processing of the blur to always give any pending onClicks to run first. It's not a clean solution
-                but works.
-                To clarify: if you remove this timer then some 'onClick' events will get ignored. Buttons not working.
-                */
-                setTimeout(() => {
-                    this.updateValFunc(value);
-                }, 500);
-            }
+            _attribs.value = this.valueIntf.getValue(); 
         }
 
         _attribs.style = { fontFamily: "monospace" };

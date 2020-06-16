@@ -22,21 +22,22 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class EditPropertyDlg extends DialogBase {
 
     propertyNameTextarea: TextField;
-    propertyValTextarea: Textarea;
 
-    constructor(private editNode: J.NodeInfo, private propSavedFunc: Function, state: AppState) {
-        super("Edit Node Property", null, false, state);
+    /* name endered by user. We get the results of this dialog by reading this var */
+    name: string;
+
+    constructor(private editNode: J.NodeInfo, state: AppState) {
+        super("Edit Property Name", null, false, state);
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
                 this.propertyNameTextarea = new TextField("Name"),
-                this.propertyValTextarea = new Textarea("Value")
             ]),
 
             new ButtonBar([
-                new Button("Save", this.saveProperty, null, "btn-primary"),
+                new Button("Save", this.save, null, "btn-primary"),
                 new Button("Cancel", () => {
                     this.close()
                 })
@@ -44,8 +45,8 @@ export class EditPropertyDlg extends DialogBase {
         ];
     }
 
-    saveProperty = (): void => {
-        let name = this.propertyNameTextarea.getValue();
+    save = (): void => {
+        this.name = this.propertyNameTextarea.getValue();
 
         /* verify first that this property doesn't already exist */
         if (!!S.props.getNodeProp(name, this.editNode)) {
@@ -53,25 +54,6 @@ export class EditPropertyDlg extends DialogBase {
             return;
         }
 
-        let val = this.propertyValTextarea.getValue();
-
-        var postData = {
-            nodeId: this.editNode.id,
-            propertyName: name,
-            propertyValue: val
-        };
-        S.util.ajax<J.SavePropertyRequest, J.SavePropertyResponse>("saveProperty", postData, this.savePropertyResponse);
-    }
-
-    savePropertyResponse = (res: J.SavePropertyResponse): void => {
-        S.util.checkSuccess("Save properties", res);
         this.close();
-
-        if (!this.editNode.properties) {
-            this.editNode.properties = [];
-        }
-
-        this.editNode.properties.push(res.propertySaved);
-        this.propSavedFunc();
     }
 }

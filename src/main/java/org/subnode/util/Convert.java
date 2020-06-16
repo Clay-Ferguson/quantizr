@@ -144,17 +144,25 @@ public class Convert {
 			String friendAccountId = node.getStringProp(NodeProp.USER_NODE_ID);
 			SubNode friendAccountNode = api.getNode(session, friendAccountId, false);
 			if (friendAccountNode != null) {
-				String friendAvatarVer = userNode.getStringProp(NodeProp.BIN.s());
+				String friendAvatarVer = friendAccountNode.getStringProp(NodeProp.BIN.s());
+
 				if (nodeInfo.getProperties() == null) {
 					nodeInfo.setProperties(new LinkedList<PropertyInfo>());
 				}
 
-				String userBio = userNode.getStringProp(NodeProp.USER_BIO.s());
+				String userBio = friendAccountNode.getStringProp(NodeProp.USER_BIO.s());
 
-				//A property prefixed with "_" is an indicator that this is a 'payload data' item sent to help client render
-				//but not a 'true' property of the actual node. These two properties are enough to render the link to the avatar image
-				nodeInfo.getProperties().add(new PropertyInfo("_avatarVer", friendAvatarVer));
-				nodeInfo.getProperties().add(new PropertyInfo("_userBio", userBio));
+				// A property prefixed with "_" is an indicator that this is a 'payload data'
+				// item sent to help client render
+				// but not a 'true' property of the actual node. These two properties are enough
+				// to render the link to the avatar image
+				if (friendAvatarVer != null) {
+					nodeInfo.getProperties().add(new PropertyInfo("_avatarVer", friendAvatarVer));
+				}
+
+				if (userBio != null) {
+					nodeInfo.getProperties().add(new PropertyInfo("_userBio", userBio));
+				}
 			}
 		}
 

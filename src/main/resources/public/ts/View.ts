@@ -33,7 +33,7 @@ export class View implements ViewIntf {
 
         if (!highlightId) {
             let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
-            highlightId = currentSelNode != null ? currentSelNode.id : nodeId;
+            highlightId = !!currentSelNode ? currentSelNode.id : nodeId;
         }
 
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {

@@ -89,10 +89,8 @@ export class Attachment implements AttachmentIntf {
             singleNode: true
         },
             (res: J.RenderNodeResponse) => {
-                debugger;
                 if (res.node.properties) {
-                    S.props.setNodeProp(node, S.props.getNodeProp(J.NodeProp.BIN_MIME, res.node));
-                    S.props.setNodeProp(node, S.props.getNodeProp(J.NodeProp.BIN, res.node));
+                    S.props.transferBinaryProps(res.node, node);
                 }
             });
 
@@ -120,9 +118,10 @@ export class Attachment implements AttachmentIntf {
 
     removeBinaryProperties = (node: J.NodeInfo) => {
         if (node) {
-            //todo-0: need to make this remove ALL binary properties
-            S.props.deleteProp(node, J.NodeProp.BIN_MIME);
-            S.props.deleteProp(node, J.NodeProp.BIN);
+            S.util.forEachProp(S.props.allBinaryProps, (k, v): boolean => {
+                S.props.deleteProp(node, k);
+                return true;
+            });
         }
     }
 }

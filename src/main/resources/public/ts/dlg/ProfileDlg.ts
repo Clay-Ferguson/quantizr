@@ -6,7 +6,6 @@ import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
-import { FormGroup } from "../widget/FormGroup";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Div } from "../widget/Div";
@@ -44,9 +43,23 @@ export class ProfileDlg extends DialogBase {
                         className: "col-6"
                     }, [
                         new Div(null, null, [
-                            this.userNameTextField = new TextField("User Name", state.defaultUserName),
+                            this.userNameTextField = new TextField("User Name", state.defaultUserName, false, null, {
+                                getValue: () => {
+                                    return this.getState().defaultUserName;
+                                },
+                                setValue: (val: any) => {
+                                    this.mergeState({ defaultUserName: val }, true);
+                                }
+                            }),
                             this.bioTextarea = new Textarea("Bio", {
                                 rows: 15
+                            }, {
+                                getValue: () => {
+                                    return this.getState().defaultBio;
+                                },
+                                setValue: (val: any) => {
+                                    this.mergeState({ defaultBio: val }, true);
+                                }
                             })
                         ]),
                     ]),
@@ -78,10 +91,10 @@ export class ProfileDlg extends DialogBase {
             ])
         ];
 
-        this.bioTextarea.setValue(state.defaultBio);
         return children;
     }
 
+    /* Base class override used to get data before rendering the dialog */
     queryServer(): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             await this.reload();

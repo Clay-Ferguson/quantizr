@@ -7,26 +7,54 @@ import { Label } from "./Label";
 import { Input } from "./Input";
 import { Anchor } from "./Anchor";
 import { ToggleIcon } from "./ToggleIcon";
+import { ValueIntf } from "../Interfaces";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class TextField extends Div implements I.TextEditorIntf {
+export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
 
     input: Input;
     icon: ToggleIcon;
 
+    //the defaltVal here will be overridden by valueIntf return value if valueIntf is provided.
+    //and ditto for Textarea right ? todo-0
     constructor(public label: string = null, private defaultVal: string = "", private isPassword: boolean = false,
-        private onEnterKey: () => void = null) {
+        private onEnterKey: () => void = null, private valueIntf: ValueIntf = null) {
         super(null);
         S.util.mergeProps(this.attribs, {
             "name": this.getId(),
             className: "form-group",
         });
 
-        this.mergeState({ value: defaultVal || "" });
+        /* If we weren't passed a delegated value interface, then construct one. */
+        if (!this.valueIntf) {
+            //todo-0: don't I need to inject defaultVal param i here?
+            this.valueIntf = {
+                setValue: (val: string): void => {
+                    this.mergeState({ value: val || "" }, true);
+                },
+
+                getValue: (): string => {
+                    return this.getState().value;
+                }
+            }
+        }
+
+        // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
+        this.attribs.onChange = (evt: any) => {
+            //console.log("e.target.value=" + evt.target.value);
+            this.updateValFunc(evt.target.value);
+        }
+    }
+
+    //Handler to update state if edit field looses focus
+    updateValFunc(value: string): void {
+        if (value != this.valueIntf.getValue()) {
+            this.valueIntf.setValue(value);
+        }
     }
 
     //Overriding base class so we can focus the correct part of this composite component.
@@ -47,21 +75,11 @@ export class TextField extends Div implements I.TextEditorIntf {
     }
 
     setValue(val: string): void {
-        if (this.input) {
-            this.input.mergeState({ value: val || "" });
-        }
-        else {
-            this.mergeState({ value: val || "" });
-        }
+        this.valueIntf.setValue(val);
     }
 
     getValue(): string {
-        if (this.input) {
-            return this.input.getState().value;
-        }
-        else {
-            return this.getState().value;
-        }
+        return this.valueIntf.getValue();
     }
 
     preRender(): void {
@@ -71,12 +89,12 @@ export class TextField extends Div implements I.TextEditorIntf {
                 className: "input-group",
                 //NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
                 //to the component, or elase there's a react-rerender flicker.
-                style: {fontFamily: "monospace"}
+                style: { fontFamily: "monospace" }
             }, [
                 this.input = new Input({
                     className: "form-control pre-textfield",
                     type: this.isPassword ? "password" : "text",
-                    value: this.state.value,
+                    value: this.valueIntf.getValue() 
                 }),
                 this.isPassword ? new Div(null, {
                     className: "input-group-addon",

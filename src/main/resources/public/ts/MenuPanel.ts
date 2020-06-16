@@ -35,7 +35,7 @@ export class MenuPanel extends Div {
 
         let selNodeCount = S.util.getPropertyCount(state.selectedNodes);
         let highlightNode = S.meta64.getHighlightedNode(state);
-        let selNodeIsMine = highlightNode != null && (highlightNode.owner === state.userName || "admin" === state.userName);
+        let selNodeIsMine = !!highlightNode && (highlightNode.owner === state.userName || "admin" === state.userName);
 
         //for now, allowing all users to import+export (todo-2)
         let importFeatureEnabled = state.isAdminUser || state.userPreferences.importAllowed;
@@ -75,7 +75,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Edit", [
             //new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
-            new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !state.isAnonUser && state.nodesToMove != null), //
+            new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !state.isAnonUser && !!state.nodesToMove), //
 
             /*
             I have this feature 90% complete but near the end i realized i have a problem with id v.s. uid, because uid
@@ -109,7 +109,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Share", [
             new MenuItem("Edit Node Sharing", () => S.share.editNodeSharing(state), //
-                !state.isAnonUser && highlightNode != null && selNodeIsMine), //
+                !state.isAnonUser && !!highlightNode && selNodeIsMine), //
 
             // new MenuItem("Post Node", () => { S.activityPub.postNode(); },//
             //     () => {
@@ -119,22 +119,22 @@ export class MenuPanel extends Div {
             //     }),
 
             new MenuItem("Show All Shares", () => S.share.findSharedNodes(state, null), //
-                !state.isAnonUser && highlightNode != null),
+                !state.isAnonUser && !!highlightNode),
 
             new MenuItem("Show Public Shares", () => S.share.findSharedNodes(state, "public"), //
-                !state.isAnonUser && highlightNode != null)
+                !state.isAnonUser && !!highlightNode)
         ]));
 
         children.push(new Menu("Search", [
 
             new MenuItem("All Content", () => { new SearchContentDlg(state).open(); }, //
-                !state.isAnonUser && highlightNode != null), //
+                !state.isAnonUser && !!highlightNode), //
 
             new MenuItem("By Name", () => { new SearchByNameDlg(state).open(); }, //
-                !state.isAnonUser && highlightNode != null), //
+                !state.isAnonUser && !!highlightNode), //
 
             new MenuItem("By ID", () => { new SearchByIDDlg(state).open(); }, //
-                !state.isAnonUser && highlightNode != null), //
+                !state.isAnonUser && !!highlightNode), //
 
             //new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch })
@@ -147,10 +147,10 @@ export class MenuPanel extends Div {
         children.push(new Menu("Timeline", [
 
             new MenuItem("Created", () => S.srch.timeline('ctm', state), //
-                !state.isAnonUser && highlightNode != null), //
+                !state.isAnonUser && !!highlightNode), //
 
             new MenuItem("Modified", () => S.srch.timeline('mtm', state), //
-                !state.isAnonUser && highlightNode != null), //
+                !state.isAnonUser && !!highlightNode), //
         ]));
 
         children.push(new Menu("View", [
@@ -159,7 +159,7 @@ export class MenuPanel extends Div {
             //this is broken, so I'm just disabling it for now, since this is low priority. todo-1
             //new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
 
-            new MenuItem("Show URL", () => S.render.showNodeUrl(state), highlightNode != null), //
+            new MenuItem("Show URL", () => S.render.showNodeUrl(state), !!highlightNode), //
 
             new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", state), //
                 !state.isAnonUser && selNodeIsMine), //
@@ -169,10 +169,10 @@ export class MenuPanel extends Div {
             children.push(new Menu("Admin Tools", [
 
                 new MenuItem("Import", () => S.edit.openImportDlg(state), //
-                    importFeatureEnabled && (selNodeIsMine || (highlightNode != null && state.homeNodeId == highlightNode.id))), //
+                    importFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId == highlightNode.id))), //
 
                 new MenuItem("Export", () => S.edit.openExportDlg(state),
-                    exportFeatureEnabled && (selNodeIsMine || (highlightNode != null && state.homeNodeId == highlightNode.id))), //
+                    exportFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId == highlightNode.id))), //
 
                 //todo-1: disabled during mongo conversion
                 //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
@@ -210,7 +210,7 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Force Refresh", () => {
                     let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
-                    let nodeId: string = currentSelNode != null ? currentSelNode.id : null;
+                    let nodeId: string = !!currentSelNode ? currentSelNode.id : null;
                     S.view.refreshTree(nodeId, false, nodeId, false, true, true, true, state);
                 },
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine))

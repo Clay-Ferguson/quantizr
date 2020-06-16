@@ -113,7 +113,6 @@ export class NodeCompBinary extends Div {
          * If not an image we render a link to the attachment, so that it can be downloaded.
          */
         else {
-            //in the node editor dialog where binary props are userd, add these (todo-0)
             let fileName: string = S.props.getNodePropVal(J.NodeProp.BIN_FILENAME, this.node);
             let fileSize: string = S.props.getNodePropVal(J.NodeProp.BIN_SIZE, this.node);
             let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, this.node);

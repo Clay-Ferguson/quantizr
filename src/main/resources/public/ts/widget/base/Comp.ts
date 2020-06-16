@@ -33,6 +33,12 @@ export abstract class Comp implements CompIntf {
     public debugState: boolean = false;
     private static guid: number = 0;
 
+    //This is boolean is kinda tricky. It is needed for when we have text inputs bound to state by onChange to update state
+    //and end up setting state into parent which forces a rerender, and destroys the focus and cursor position as the render creates a NEW
+    //component, and this flag makes the component keep the same 'key' attribute by not rendering with new keys on all elements during onChange
+    //So reuseChildren tells the component keep children if they exist. (mainly only functional in Dialogs currently)
+    public reuseChildren: boolean = false;
+
     //todo-1: make this private? I think private is better, because accidental uses of 'this.state' can be wrong.
     public state: any = {};
     attribs: any;
@@ -295,7 +301,10 @@ export abstract class Comp implements CompIntf {
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
        both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact 
        */
-    mergeState(moreState: any): any {
+    mergeState(moreState: any, reuseChildren: boolean=false): any {
+        if (reuseChildren) {
+            this.reuseChildren = true;
+        }
         this.setStateEx((state: any) => {
             this.state = { ...state, ...moreState };
             if (this.debugState) {
@@ -410,11 +419,12 @@ export abstract class Comp implements CompIntf {
 
             this.updateVisAndEnablement();
 
-            // todo-1: something like this could encapsulate retting display, but currently isn't needed.
-            // this.attribs.style = this.attribs.style || {};
-            // this.attribs.style.display = this.getState().visible ? "block" : "none";
-
-            this.preRender();
+            if (this.reuseChildren) {
+                this.reuseChildren = false;
+            }
+            else {
+                this.preRender();   
+            }
 
             let key = null;
             let appState: AppState = null;
@@ -500,7 +510,8 @@ export abstract class Comp implements CompIntf {
         }
     }
 
-    /* Intended to be optionally overridable to set children */
+    /* Intended to be optionally overridable to set children, and the ONLY thing to be done in this method should also be 
+    just to set the children */
     preRender(): void {
     }
 

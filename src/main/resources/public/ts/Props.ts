@@ -15,9 +15,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Props implements PropsIntf {
-    simpleModePropertyBlackList: any = {};
-
     readOnlyPropertyList: any = {};
+
+    allBinaryProps: any = {};
 
     /* Holds the list of properties that are edited using something like a checkbox, or dropdown menu, or whatever, such
     that it would never make sense to display an edit field for editing their value in the editor */
@@ -32,6 +32,16 @@ export class Props implements PropsIntf {
         }
 
         return propsNew;
+    }
+
+    /* copies all the binary properties from source node to destination node */
+    transferBinaryProps = (srcNode: J.NodeInfo, dstNode: J.NodeInfo): void => {
+        if (!srcNode.properties) return;
+        dstNode.properties = dstNode.properties || [];
+        S.util.forEachProp(this.allBinaryProps, (k, v): boolean => {
+            this.setNodeProp(dstNode, S.props.getNodeProp(k, srcNode));
+            return true;
+        });
     }
 
     moveNodePosition = (props: J.PropertyInfo[], idx: number, typeName: string): number => {
@@ -94,26 +104,20 @@ export class Props implements PropsIntf {
 
             properties.forEach(function (property: J.PropertyInfo) {
                 //console.log("Render Prop: "+property.name);
-                if (S.render.allowPropertyToDisplay(property.name)) {
+                let propNameCell = new PropTableCell(property.name, {
+                    className: "prop-table-name-col"
+                });
 
-                    let propNameCell = new PropTableCell(property.name, {
-                        className: "prop-table-name-col"
-                    });
+                let valCellAttrs = {
+                    className: "prop-table-val-col"
+                };
+                let propValCell: PropTableCell;
+                propValCell = new PropTableCell(property.value, valCellAttrs);
 
-                    let valCellAttrs = {
-                        className: "prop-table-val-col"
-                    };
-                    let propValCell: PropTableCell;
-                    propValCell = new PropTableCell(property.value, valCellAttrs);
-
-                    let propTableRow = new PropTableRow({
-                        className: "prop-table-row"
-                    }, [propNameCell, propValCell])
-                    propTable.addChild(propTableRow);
-
-                } else {
-                    console.log("Hiding property: " + property.name);
-                }
+                let propTableRow = new PropTableRow({
+                    className: "prop-table-row"
+                }, [propNameCell, propValCell])
+                propTable.addChild(propTableRow);
             });
             return propTable;
         } else {
@@ -133,7 +137,7 @@ export class Props implements PropsIntf {
     }
 
     /* Gets the crypto key from this node that will allow user to decrypt the node. If the user is the owner of the 
-    node this simply returns the ENC_KEY property but if not we look up in the ACL on the node a copy of the encrypted
+node this simply returns the ENC_KEY property but if not we look up in the ACL on the node a copy of the encrypted
     key that goes with the current user (us, logged in user), which should decrypt using our private key.
     */
     getCryptoKey = (node: J.NodeInfo, state: AppState) => {
@@ -198,7 +202,7 @@ export class Props implements PropsIntf {
         let prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
 
         /* If we found a property by propertyName, then set it's value */
-        if (prop != null) {
+        if (!!prop) {
             prop.value = val;
         }
         /* Else this is a new property we must add (ret remains true here) */
@@ -215,12 +219,10 @@ export class Props implements PropsIntf {
     }
 
     setNodeProp = (node: J.NodeInfo, newProp: J.PropertyInfo): void => {
+        if (!newProp) return;
         let prop: J.PropertyInfo = this.getNodeProp(newProp.name, node);
 
-        /* If we found a property by propertyName, then set it's value 
-        
-        search all typescript for " != null", becasuse that's usually a bug (todo-0)
-        */
+        /* If we found a property by propertyName, then set it's value */
         if (prop) {
             prop.value = newProp.value;
         }
@@ -235,12 +237,19 @@ export class Props implements PropsIntf {
 
     //here's the simple mode property hider!
     initConstants = () => {
-        S.util.addAll(this.simpleModePropertyBlackList, [ //
+        S.util.addAll(this.allBinaryProps, [ //
             J.NodeProp.IMG_WIDTH,//
             J.NodeProp.IMG_HEIGHT, //
             J.NodeProp.BIN_MIME, //
-            J.NodeProp.ENC_KEY, //
             J.NodeProp.BIN, //
+
+            J.NodeProp.BIN_FILENAME, //
+            J.NodeProp.BIN_SIZE, //
+            J.NodeProp.BIN_DATA_URL,
+
+            J.NodeProp.IPFS_LINK, //
+            J.NodeProp.IPFS_LINK_NAME, // 
+            J.NodeProp.IPFS_OK, //
         ]);
 
         S.util.addAll(this.readOnlyPropertyList, [ //

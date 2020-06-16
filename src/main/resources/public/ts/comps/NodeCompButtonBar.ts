@@ -222,7 +222,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     });
                 }
 
-                if (!state.isAnonUser && state.nodesToMove != null && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
+                if (!state.isAnonUser && !!state.nodesToMove && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
                     pasteInsideButton = new Button("Paste Inside", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodesInside, "S.edit.pasteSelNodesInside", node.id), {
                         className: "highlightBorder",
                         title: "Paste Node(s) you've cut. (Inside this node as more children)"

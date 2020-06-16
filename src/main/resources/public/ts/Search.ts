@@ -37,9 +37,9 @@ export class Search implements SearchIntf {
     idToNodeMap: { [key: string]: J.NodeInfo } = {};
 
     numSearchResults = (res: J.NodeSearchResponse): number => {
-        return res != null && //
-            res.searchResults != null && //
-            res.searchResults.length != null ? //
+        return !!res && //
+            !!res.searchResults && //
+            !!res.searchResults.length ? //
             res.searchResults.length : 0;
     }
 

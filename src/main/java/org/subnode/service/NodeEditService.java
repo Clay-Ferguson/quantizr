@@ -21,7 +21,6 @@ import org.subnode.request.CreateSubNodeRequest;
 import org.subnode.request.DeletePropertyRequest;
 import org.subnode.request.InsertNodeRequest;
 import org.subnode.request.SaveNodeRequest;
-import org.subnode.request.SavePropertyRequest;
 import org.subnode.request.SplitNodeRequest;
 import org.subnode.request.TransferNodeRequest;
 import org.subnode.response.AppDropResponse;
@@ -29,7 +28,6 @@ import org.subnode.response.CreateSubNodeResponse;
 import org.subnode.response.DeletePropertyResponse;
 import org.subnode.response.InsertNodeResponse;
 import org.subnode.response.SaveNodeResponse;
-import org.subnode.response.SavePropertyResponse;
 import org.subnode.response.SplitNodeResponse;
 import org.subnode.response.TransferNodeResponse;
 import org.subnode.util.Convert;
@@ -162,25 +160,6 @@ public class NodeEditService {
 		api.save(session, newNode);
 		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false,
 				false));
-		res.setSuccess(true);
-		return res;
-	}
-
-	/*
-	 * Saves the value(s) of properties on the node specified in the request.
-	 */
-	public SavePropertyResponse saveProperty(MongoSession session, SavePropertyRequest req) {
-		SavePropertyResponse res = new SavePropertyResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
-		String nodeId = req.getNodeId();
-		SubNode node = api.getNode(session, nodeId);
-		node.setProp(req.getPropertyName(), req.getPropertyValue());
-		api.save(session, node);
-
-		PropertyInfo propertySaved = new PropertyInfo(req.getPropertyName(), req.getPropertyValue());
-		res.setPropertySaved(propertySaved);
 		res.setSuccess(true);
 		return res;
 	}

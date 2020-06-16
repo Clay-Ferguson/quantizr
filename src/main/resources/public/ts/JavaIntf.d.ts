@@ -200,12 +200,6 @@ export interface SaveNodeRequest extends RequestBase {
     node: NodeInfo;
 }
 
-export interface SavePropertyRequest extends RequestBase {
-    nodeId: string;
-    propertyName: string;
-    propertyValue: string;
-}
-
 export interface SavePublicKeyRequest extends RequestBase {
     keyJson: string;
 }
@@ -451,10 +445,6 @@ export interface ResetPasswordResponse extends ResponseBase {
 export interface SaveNodeResponse extends ResponseBase {
     node: NodeInfo;
     aclEntries: AccessControlInfo[];
-}
-
-export interface SavePropertyResponse extends ResponseBase {
-    propertySaved: PropertyInfo;
 }
 
 export interface SavePublicKeyResponse extends ResponseBase {

@@ -3,7 +3,7 @@ import { PropTable } from "../widget/PropTable";
 import { AppState } from "../AppState";
 
 export interface PropsIntf {
-    simpleModePropertyBlackList: any;
+    allBinaryProps: any;
     readOnlyPropertyList: any;
     controlBasedPropertyList: any;
 
@@ -26,4 +26,5 @@ export interface PropsIntf {
     hasAudio(node: J.NodeInfo): boolean;
     hasVideo(node: J.NodeInfo): boolean;
     getCryptoKey(node: J.NodeInfo, state: AppState): string;
+    transferBinaryProps(srcNode: J.NodeInfo, dstNode: J.NodeInfo): void;
 }

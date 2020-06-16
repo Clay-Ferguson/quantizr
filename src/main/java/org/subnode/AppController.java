@@ -65,7 +65,6 @@ import org.subnode.request.RemovePrivilegeRequest;
 import org.subnode.request.RenderNodeRequest;
 import org.subnode.request.ResetPasswordRequest;
 import org.subnode.request.SaveNodeRequest;
-import org.subnode.request.SavePropertyRequest;
 import org.subnode.request.SavePublicKeyRequest;
 import org.subnode.request.SaveUserPreferencesRequest;
 import org.subnode.request.SaveUserProfileRequest;
@@ -508,13 +507,6 @@ public class AppController {
 	public @ResponseBody Object saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
 		return callProc.run("saveNode", req, session, ms -> {
 			return nodeEditService.saveNode(ms, req);
-		});
-	}
-
-	@RequestMapping(value = API_PATH + "/saveProperty", method = RequestMethod.POST)
-	public @ResponseBody Object saveProperty(@RequestBody SavePropertyRequest req, HttpSession session) {
-		return callProc.run("saveProperty", req, session, ms -> {
-			return nodeEditService.saveProperty(ms, req);
 		});
 	}
 

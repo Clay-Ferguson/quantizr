@@ -585,7 +585,11 @@ export class Util implements UtilIntf {
         new MessageDlg(message, title, null, null, preformatted, 0, null).open();
     }
 
-    /* adds all array objects to obj as a set */
+    /* adds all array objects to obj as a map with each being a key mapped holding a value 'true' 
+    
+    todo-0: I there a better Map functionality in TS/JS?
+    todo-0: use forEach iterator, not loop here.
+    */
     addAll = (obj, a): void => {
         for (let i = 0; i < a.length; i++) {
             if (!a[i]) {
@@ -611,7 +615,7 @@ export class Util implements UtilIntf {
         }
 
         let e = document.getElementById(id);
-        return e != null;
+        return !!e;
     }
 
     /* Takes textarea dom Id (# optional) and returns its value */
@@ -742,7 +746,7 @@ export class Util implements UtilIntf {
             //elm.node.value = val;
             (<any>elm).value = val;
         }
-        return elm != null;
+        return !!elm;
     }
 
     /*

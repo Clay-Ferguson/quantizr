@@ -5,6 +5,7 @@ export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[
 
 export interface CompIntf {
     clazz: string;
+    reuseChildren: boolean;
     
     getId(): string;
     getElement(): HTMLElement; 
@@ -12,7 +13,8 @@ export interface CompIntf {
     whenElmEx(func: Function); 
     setVisible(visible: boolean); 
     setState(newState: any): void;
-    mergeState(moreState: any): any;
+    getState(): any;
+    mergeState(moreState: any, reuseChildren?: boolean): any;
     setEnabled(enabled: boolean);
     setClass(clazz: string): void; 
     reactRenderHtmlInDiv(type: any): string;
