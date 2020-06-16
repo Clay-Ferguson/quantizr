@@ -334,6 +334,6 @@ export class Render implements RenderIntf {
     }
 
     isReadOnlyProperty = (propName: string): boolean => {
-        return S.props.readOnlyPropertyList[propName];
+        return S.props.readOnlyPropertyList.has(propName);
     }
 }

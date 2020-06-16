@@ -586,8 +586,7 @@ export class Util implements UtilIntf {
     }
 
     /* adds all array objects to obj as a map with each being a key mapped holding a value 'true' 
-    
-    todo-0: I there a better Map functionality in TS/JS?
+
     todo-0: use forEach iterator, not loop here.
     */
     addAll = (obj, a): void => {
@@ -598,6 +597,13 @@ export class Util implements UtilIntf {
                 obj[a[i]] = true;
             }
         }
+    }
+
+    addAllToSet = (set: Set<string>, array): void => {
+        if (!array) return;
+        array.forEach(v => {
+            set.add(v);
+        })
     }
 
     nullOrUndef = (obj): boolean => {

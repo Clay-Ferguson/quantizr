@@ -3,8 +3,9 @@ import { PropTable } from "../widget/PropTable";
 import { AppState } from "../AppState";
 
 export interface PropsIntf {
+    //todo-0: convert all three to Set...
     allBinaryProps: any;
-    readOnlyPropertyList: any;
+    readOnlyPropertyList: Set<string>;
     controlBasedPropertyList: any;
 
     initConstants(): void;

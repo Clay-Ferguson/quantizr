@@ -66,6 +66,7 @@ export interface UtilIntf {
     showMessage(message: string, title: string, preformatted?: boolean, sizeStyle?: string): void;
     addAll(obj, a): void;
     addAll(obj, a): void;
+    addAllToSet(set: Set<string>, array): void;
     nullOrUndef(obj): boolean;
     elementExists(id): boolean;
     getTextAreaValById(id): string;

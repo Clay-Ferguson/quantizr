@@ -15,7 +15,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Props implements PropsIntf {
-    readOnlyPropertyList: any = {};
+
+    //here's another way to do Maps in TS, but everywhere I'm doing this need to 
+    //switch to Map or Set in entire codebase (todo-0)
+    //var arr : { [key:string]:number; } = {};
+
+    readOnlyPropertyList: Set<string> = new Set<string>();
 
     allBinaryProps: any = {};
 
@@ -252,7 +257,7 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
             J.NodeProp.IPFS_OK, //
         ]);
 
-        S.util.addAll(this.readOnlyPropertyList, [ //
+        S.util.addAllToSet(this.readOnlyPropertyList, [ //
             J.NodeProp.IMG_WIDTH, //
             J.NodeProp.IMG_HEIGHT, //
             J.NodeProp.BIN, //
