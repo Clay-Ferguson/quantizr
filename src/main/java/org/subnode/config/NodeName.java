@@ -8,11 +8,14 @@ public class NodeName {
 	public static final String USER = "usr";
 	public static final String SYSTEM = "sys";
 	public static final String OUTBOX = "outbox";
+
+	//todo-0: these are going away (identifying by type not node path part now)
 	public static final String INBOX = "inbox";
 	public static final String FRIEND_LIST = "friendList";
 	public static final String USER_FEED = "userFeed";
 	public static final String NOTES = "notes";
 	public static final String LINKS = "links";	
+
 	public static final String TRASH = "d";
 
 	public static final String PUBLIC = "public";

@@ -44,7 +44,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
 
         // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
         this.attribs.onChange = (evt: any) => {
-            Comp.renderCachedChildren = true; //need same code on Textarea (todo-0)
+            Comp.renderCachedChildren = true;
 
             //console.log("e.target.value=" + evt.target.value);
             this.updateValFunc(evt.target.value);

@@ -20,8 +20,6 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     input: Input;
     icon: ToggleIcon;
 
-    //the defaltVal here will be overridden by valueIntf return value if valueIntf is provided.
-    //and ditto for Textarea right ? todo-0
     constructor(public label: string = null, private defaultVal: string = "", private isPassword: boolean = false,
         private onEnterKey: () => void = null, private valueIntf: ValueIntf = null) {
         super(null);

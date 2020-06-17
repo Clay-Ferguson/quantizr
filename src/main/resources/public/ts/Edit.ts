@@ -64,18 +64,10 @@ export class Edit implements EditIntf {
         S.view.scrollToSelectedNode(state);
     }
 
-    private deleteNodesResponse = (res: J.DeleteNodesResponse, payload: Object, state: AppState): void => {
+    private deleteNodesResponse = (res: J.DeleteNodesResponse, postDeleteSelNodeId: string, state: AppState): void => {
         if (S.util.checkSuccess("Delete node", res)) {
             S.meta64.clearSelNodes(state);
-            let highlightId: string = null;
-            if (payload) {
-                let selNode = payload["postDeleteSelNode"];
-                if (selNode) {
-                    highlightId = selNode.id;
-                }
-            }
-
-            S.view.refreshTree(null, false, highlightId, false, false, true, true, state);
+            S.view.refreshTree(postDeleteSelNodeId, false, postDeleteSelNodeId, false, false, true, true, state);
         }
     }
 
@@ -168,8 +160,8 @@ export class Edit implements EditIntf {
                 createAtTop: createAtTop,
                 content: null,
                 typeLock: false
-            }, (res) => { 
-                this.createSubNodeResponse(res, state); 
+            }, (res) => {
+                this.createSubNodeResponse(res, state);
             });
         }
     }
@@ -198,7 +190,7 @@ export class Edit implements EditIntf {
         return new Promise<void>(async (resolve, reject) => {
             if (S.util.checkSuccess("Save node", res)) {
                 await this.distributeKeys(node, res.aclEntries);
-                S.view.refreshTree(null, false, node.id, false, false, false, false, state); 
+                S.view.refreshTree(null, false, node.id, false, false, false, false, state);
                 resolve();
             }
         });
@@ -299,8 +291,8 @@ export class Edit implements EditIntf {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "bottom"
-            }, (res) => { 
-                this.setNodePositionResponse(res, state); 
+            }, (res) => {
+                this.setNodePositionResponse(res, state);
             });
         } else {
             console.log("idToNodeMap does not contain " + id);
@@ -329,7 +321,7 @@ export class Edit implements EditIntf {
 
         S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: node.id
-        }, (res) => { 
+        }, (res) => {
             this.initNodeEditResponse(res, state);
         });
     }
@@ -463,6 +455,13 @@ export class Edit implements EditIntf {
             failMsg = "Sorry, you can't delete your account root node!";
         }
 
+        let postDeleteSelNodeId: string = null;
+
+        /* if one of the nodes being deleted is the page root, then render the account root, rather than trying to find ist's parent */
+        if (selNodesArray.find(id => id == state.node.id)) {
+            postDeleteSelNodeId = state.homeNodeId;
+        }
+
         if (failMsg) {
             S.util.showMessage(failMsg, "Warning");
             return;
@@ -482,13 +481,21 @@ export class Edit implements EditIntf {
 
         new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
             () => {
-                let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode(state);
+                if (!postDeleteSelNodeId) {
+                    let node: J.NodeInfo = this.getBestPostDeleteSelNode(state);
+                    if (node) {
+                        postDeleteSelNodeId = node.id;
+                    }
+                }
 
+                if (!postDeleteSelNodeId) {
+                    postDeleteSelNodeId = state.homeNodeId;
+                }
                 S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                     nodeIds: selNodesArray,
                     hardDelete
                 }, (res: J.DeleteNodesResponse) => {
-                    this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode }, state);
+                    this.deleteNodesResponse(res, postDeleteSelNodeId, state);
                 });
             },
             null, //no callback
@@ -502,9 +509,14 @@ export class Edit implements EditIntf {
     getBestPostDeleteSelNode = (state: AppState): J.NodeInfo => {
         /* Use a hashmap-type approach to saving all selected nodes into a lookup map */
         let nodesMap: Object = S.meta64.getSelNodesAsMapById(state);
+
+        //If we are deleting the page root node return 'null' to trigger an 'upLevel'
+        if (nodesMap[state.node.id]) {
+            return null;
+        }
+
         let bestNode: J.NodeInfo = null;
         let takeNextNode: boolean = false;
-
         if (!state.node || !state.node.children) return null;
 
         /* now we scan the children, and the last child we encounterd up until we find the rist one in nodesMap will be the
@@ -668,8 +680,8 @@ export class Edit implements EditIntf {
             createAtTop: false,
             content: null,
             typeLock: false
-        }, (res) => { 
-            this.createSubNodeResponse(res, state); 
+        }, (res) => {
+            this.createSubNodeResponse(res, state);
         });
     }
 
@@ -683,8 +695,8 @@ export class Edit implements EditIntf {
             createAtTop: true,
             content: null,
             typeLock: true
-        }, (res) => { 
-            this.createSubNodeResponse(res, state); 
+        }, (res) => {
+            this.createSubNodeResponse(res, state);
         });
     }
 }

@@ -81,10 +81,14 @@ public class NodeEditService {
 		String nodeId = req.getNodeId();
 		SubNode node = null;
 		if (nodeId.equals("~notes")) {
-			node = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "### Notes",
-					NodeType.NOTES.s());
+			node = api.getSpecialNode(session, session.getUser(), null, "### Notes", NodeType.NOTES.s());
 		} else {
 			node = api.getNode(session, nodeId);
+		}
+		if (node == null) {
+			res.setMessage("unable to locate parent for insert");
+			res.setSuccess(false);
+			return res;
 		}
 		SubNode newNode = null;
 
@@ -120,8 +124,13 @@ public class NodeEditService {
 			return res;
 		}
 
-		SubNode linksNode = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "### Notes",
+		SubNode linksNode = api.getSpecialNode(session, session.getUser(), null, "### Notes",
 				NodeType.NOTES.s());
+
+		if (linksNode == null) {
+			log.warn("unable to get linksNode");
+			return null;
+		}
 
 		SubNode newNode = api.createNode(session, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
 
@@ -222,7 +231,8 @@ public class NodeEditService {
 					 * to assume the worst behavior from client code, for security and robustness.
 					 */
 					if (session.isAdmin() || SubNodeUtil.isSavableProperty(property.getName())) {
-						//log.debug("Property to save: " + property.getName() + "=" + property.getValue());
+						// log.debug("Property to save: " + property.getName() + "=" +
+						// property.getValue());
 						node.setProp(property.getName(), property.getValue());
 					} else {
 						/**

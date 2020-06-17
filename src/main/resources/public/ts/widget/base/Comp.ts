@@ -240,9 +240,10 @@ export abstract class Comp implements CompIntf {
             this.children = this.cachedChildren;
         }
         else {
-            //not sure this full clone is needed, but i'm doing it for now, until optimizing later (todo-0)
-            this.cachedChildren = [];
-            this.cachedChildren = this.cachedChildren.concat(this.children);
+            //looks like we don't need to clone the children, we can just use as is.
+            // this.cachedChildren = [];
+            // this.cachedChildren = this.cachedChildren.concat(this.children);
+            this.cachedChildren = this.children;
         }
 
         //console.log("buildChildren: " + this.jsClassName);
@@ -444,7 +445,7 @@ export abstract class Comp implements CompIntf {
             DO NOT DELETE THE COMMENTNED IF BELOW (it serves as warning of what NOT to do.)
             */
             //if (!Comp.renderCachedChildren) {
-                this.preRender();
+            this.preRender();
             //}
 
             let key = null;

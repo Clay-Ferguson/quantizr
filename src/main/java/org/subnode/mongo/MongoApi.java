@@ -767,18 +767,20 @@ public class MongoApi {
 
 	/**
 	 * Locations are special enumerated locations: like 'inbox'
+	 * 
+	 * todo: need to pass a type into here not a node name, adn then get rid of the three NodeName components
 	 */
 	public SubNode getNodeByLocation(MongoSession session, String name, boolean allowAuth) {
 		SubNode ret = null;
 
 		if (name.equals(NodeName.INBOX)) {
-			ret = getSpecialNode(session, session.getUser(), null, NodeName.INBOX, null /* plugin remders */,
+			ret = getSpecialNode(session, session.getUser(), null, null /* plugin renders */,
 					NodeType.INBOX.s());
 		} else if (name.equals(NodeName.FRIEND_LIST)) {
-			ret = getSpecialNode(session, session.getUser(), null, NodeName.FRIEND_LIST, null /* plugin remders */,
+			ret = getSpecialNode(session, session.getUser(), null, null /* plugin renders */,
 					NodeType.FRIEND_LIST.s());
 		} else if (name.equals(NodeName.USER_FEED)) {
-			ret = getSpecialNode(session, session.getUser(), null, NodeName.USER_FEED, null /* plugin renders */,
+			ret = getSpecialNode(session, session.getUser(), null, null /* plugin renders */,
 					NodeType.USER_FEED.s());
 		}
 
@@ -1426,6 +1428,8 @@ public class MongoApi {
 		return userNode;
 	}
 
+
+
 	/*
 	 * Returns Inbox node for the specified user, and automatically creates it if
 	 * not already existing
@@ -1433,24 +1437,29 @@ public class MongoApi {
 	 * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
 	 * userNode if you know it, to save cycles
 	 */
-	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode, String pathPart, String nodeName,
+	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode, String nodeName,
 			String type) {
 		if (userNode == null) {
 			userNode = getUserNodeByUserName(session, user);
 		}
+
 		if (userNode == null) {
-			throw new RuntimeEx("userNode not found.");
+			log.warn("userNode not found for user name: " + user);
+			return null;
 		}
 
-		String path = userNode.getPath() + "/" + pathPart;
-		SubNode node = getNode(session, path);
+		String path = userNode.getPath();
+		SubNode node = findTypedNodeUnderPath(session, path, type);
+
 		if (node == null) {
-			node = createNode(session, userNode, pathPart, type, 0L, CreateNodeLocation.LAST);
+			node = createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST);
 			node.setOwner(userNode.getId());
 			node.setContent(nodeName);
 
-			// todo-1: and make this some kind of hook so that we don't have an ugly coupling here
-			// for this type, although this technical debt isn't that bad
+			/*
+			 * todo-1: and make this some kind of hook so that we don't have an ugly tight
+			 * coupling here for this type, although this technical debt isn't that bad
+			 */
 			if (type.equals(NodeType.USER_FEED.s())) {
 				List<String> privileges = new LinkedList<String>();
 				privileges.add(PrivilegeType.READ.s());
@@ -1462,6 +1471,31 @@ public class MongoApi {
 		}
 		return node;
 	}
+
+	public SubNode getTrashNode(MongoSession session, String user, SubNode userNode, String nodeName) {
+		if (userNode == null) {
+			userNode = getUserNodeByUserName(session, user);
+		}
+
+		if (userNode == null) {
+			log.warn("userNode not found for user name: " + user);
+			return null;
+		}
+
+		String path = userNode.getPath() + "/" + NodeName.TRASH;
+		SubNode node = getNode(session, path);
+
+		if (node == null) {
+			node = createNode(session, userNode, NodeName.TRASH, NodeType.TRASH_BIN.s(), 0L, CreateNodeLocation.LAST);
+			node.setOwner(userNode.getId());
+
+			//currently the plugin isn't rendering the word "Trash Bin", so it's rendering content markdown (fix it. todo-0)
+			node.setContent(nodeName);
+			save(session, node);
+		}
+		return node;
+	}
+
 
 	public SubNode getUserNodeByUserName(MongoSession session, String user) {
 		if (session == null) {

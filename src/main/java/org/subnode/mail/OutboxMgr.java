@@ -69,8 +69,9 @@ public class OutboxMgr {
 		boolean sendEmail = false;
 		boolean addToInbox = true;
 
-		// log.debug("Sending Notifications for node edit by user " + sessionContext.getUserName() + ": id="
-		// 		+ node.getId().toHexString());
+		// log.debug("Sending Notifications for node edit by user " +
+		// sessionContext.getUserName() + ": id="
+		// + node.getId().toHexString());
 
 		adminRunner.run(session -> {
 			/*
@@ -131,8 +132,7 @@ public class OutboxMgr {
 	public void addInboxNotification(MongoSession session, String recieverUserName, SubNode userNode, SubNode node,
 			String notifyMessage) {
 
-		SubNode userInbox = api.getSpecialNode(session, null, userNode, NodeName.INBOX, "### Inbox",
-				NodeType.INBOX.s());
+		SubNode userInbox = api.getSpecialNode(session, null, userNode, "### Inbox", NodeType.INBOX.s());
 
 		if (userInbox != null) {
 			/*
