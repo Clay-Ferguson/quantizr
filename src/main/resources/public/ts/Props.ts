@@ -16,10 +16,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class Props implements PropsIntf {
 
-    //here's another way to do Maps in TS, but everywhere I'm doing this need to 
-    //switch to Map or Set in entire codebase (todo-0)
-    //var arr : { [key:string]:number; } = {};
-
     readOnlyPropertyList: Set<string> = new Set<string>();
 
     allBinaryProps: any = {};

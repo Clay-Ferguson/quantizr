@@ -34,7 +34,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         if (!this.valueIntf) {
             this.valueIntf = {
                 setValue: (val: string): void => {
-                    this.mergeState({ value: val || "" }, true);
+                    this.mergeState({ value: val || "" });
                 },
 
                 getValue: (): string => {

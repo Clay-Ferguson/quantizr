@@ -29,7 +29,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         if (!this.valueIntf) {
             this.valueIntf = {
                 setValue: (val: string): void => {
-                    this.mergeState({ value: val || "" }, true);
+                    this.mergeState({ value: val || "" });
                 },
 
                 getValue: (): string => {

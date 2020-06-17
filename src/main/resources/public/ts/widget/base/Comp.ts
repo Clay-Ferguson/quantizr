@@ -70,8 +70,6 @@ export abstract class Comp implements CompIntf {
 
     renderRawHtml: boolean = false;
 
-    cachedReactNode: ReactNode;
-
     /**
      * 'react' should be true only if this component and all its decendants are true React components that are rendered and
      * controlled by ReactJS (rather than our own innerHTML)
@@ -323,10 +321,8 @@ export abstract class Comp implements CompIntf {
 
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
        both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact
-       
-       todo-0: remove reuseChildren param
        */
-    mergeState(moreState: any, reuseChildren: boolean = false): any {
+    mergeState(moreState: any): any {
         this.setStateEx((state: any) => {
             this.state = { ...state, ...moreState };
             if (this.debugState) {
@@ -497,10 +493,6 @@ export abstract class Comp implements CompIntf {
             console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key + " Error: " + e);
         }
 
-        //todo-0: need to try again to see if caching at this layer can work
-        //because if at all possible it's going to be faster than caching just the
-        //Comp children which is the current approach.
-        //this.cachedReactNode = ret;
         return ret;
     }
 

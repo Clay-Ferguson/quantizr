@@ -25,18 +25,42 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class RssTypeHandler extends TypeBase {
 
+    static MAX_FEED_ITEMS: number = 50;
+
     constructor() {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
     }
 
-    getCustomProperties(): string[] {
-        return [J.NodeProp.RSS_FEED_SRC,
-            //content isn't a 'property' in the 'properties' array, but is a prop ON SubNode.java, so we don't have a J.NodeProp for it.    
-            "content"];
+    allowAction(action: string): boolean {
+        switch (action) {
+            case "upload":
+                return false;
+            default:
+                return true;
+        }
     }
 
-    allowPropertyEdit(propName: string): boolean {
-        return true;
+    getEditLabelForProp(propName: string): string {
+        if (propName == J.NodeProp.RSS_FEED_SRC) {
+            return "RSS Feed URL";
+        }
+        return propName;
+    }
+
+    getAllowPropertyAdd(): boolean {
+        return false;
+    }
+
+    getAllowContentEdit(): boolean {
+        return false;
+    }
+
+    getCustomProperties(): string[] {
+        return [J.NodeProp.RSS_FEED_SRC];
+    }
+
+    allowPropertyEdit(propName: string, state: AppState): boolean {
+        return propName == J.NodeProp.RSS_FEED_SRC;
     }
 
     ensureDefaultProperties(node: J.NodeInfo) {
@@ -73,6 +97,7 @@ export class RssTypeHandler extends TypeBase {
         //otherwise read from the internet
         else {
             itemListContainer.addChild(new Div("Loading RSS Feed..."));
+            itemListContainer.addChild(new Div("(For large feeds this can take a few seconds)"));
 
             //The 'rss-parser' doc suggested herokuapp, but I don't know if I can write my own service or use some better one?
             const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
@@ -105,7 +130,7 @@ export class RssTypeHandler extends TypeBase {
     renderItem(feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) {
         //Current approach is to put the feed title in the parent node so we don't need it rendered
         //here also
-        let feedOut: Comp[] = []; //tag("h2", {}, feed.title);
+        let feedOut: Comp[] = []; 
 
         let description = feed.description || "";
         let pubDate = feed.pubDate || "";
@@ -128,10 +153,7 @@ export class RssTypeHandler extends TypeBase {
 
         let itemCount = 0;
         feed.items.forEach(function (item) {
-
-            //only process the first 50 items. todo-1: at some point we can make this a user option.
-            //todo-0: test this out on joerogan's podcast
-            if (itemCount < 50) {
+            if (itemCount < RssTypeHandler.MAX_FEED_ITEMS) {
                 itemListContainer.getChildren().push(this.buildFeedItem(item, state));
             }
             itemCount++;

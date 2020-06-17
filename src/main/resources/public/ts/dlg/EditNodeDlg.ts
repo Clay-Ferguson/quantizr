@@ -623,7 +623,7 @@ export class EditNodeDlg extends DialogBase {
                         //console.log("settingValue[" + propEntry.name + "]=" + val);
                         let state = this.getState();
                         S.props.setNodePropVal(propEntry.name, this.getState().node, val);
-                        this.mergeState(state, true);
+                        this.mergeState(state);
                     }
                 });
             }
@@ -682,7 +682,7 @@ export class EditNodeDlg extends DialogBase {
                 setValue: (val: any) => {
                     let state = this.getState();
                     state.node.content = val;
-                    this.mergeState(state, true);
+                    this.mergeState(state);
                 }
             });
 

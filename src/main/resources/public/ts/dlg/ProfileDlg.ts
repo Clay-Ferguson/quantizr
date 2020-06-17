@@ -48,7 +48,7 @@ export class ProfileDlg extends DialogBase {
                                     return this.getState().defaultUserName;
                                 },
                                 setValue: (val: any) => {
-                                    this.mergeState({ defaultUserName: val }, true);
+                                    this.mergeState({ defaultUserName: val });
                                 }
                             }),
                             this.bioTextarea = new Textarea("Bio", {
@@ -58,7 +58,7 @@ export class ProfileDlg extends DialogBase {
                                     return this.getState().defaultBio;
                                 },
                                 setValue: (val: any) => {
-                                    this.mergeState({ defaultBio: val }, true);
+                                    this.mergeState({ defaultBio: val });
                                 }
                             })
                         ]),
