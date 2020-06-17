@@ -258,8 +258,10 @@ export class Render implements RenderIntf {
             },
             title: "Insert new node here"
         }, "btn-sm");
+
         let buttonBar = new ButtonBar([pasteInlineButton, newNodeButton],
             null, "float-right " + (isFirst ? "marginTop" : ""));
+
         return buttonBar;
     }
 

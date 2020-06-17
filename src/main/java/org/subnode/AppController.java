@@ -431,6 +431,7 @@ public class AppController {
 		});
 	}
 
+	/* Creates a new node as a child of the specified node */
 	@RequestMapping(value = API_PATH + "/createSubNode", method = RequestMethod.POST)
 	public @ResponseBody Object createSubNode(@RequestBody CreateSubNodeRequest req, HttpSession session) {
 		return callProc.run("createSubNode", req, session, ms -> {

@@ -90,6 +90,17 @@ public class NodeEditService {
 			res.setSuccess(false);
 			return res;
 		}
+
+		/* We have this hack (until the privileges are more nuanced, or updated) which verifies if someone is 
+		inserting under a USER_FEED node we don't allow it unless its' the person who OWNS the USER_FEED, and we have this check
+		because right now our design is that USER_FEED nodes are by definition automatically 'public'
+		*/
+		if (node.getType().equals(NodeType.USER_FEED.s()) && !sessionContext.getRootId().equals(node.getOwner().toHexString())) {
+			res.setMessage("You aren't allowed to create a node here.");
+			res.setSuccess(false);
+			return res;
+		}
+
 		SubNode newNode = null;
 
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
@@ -157,6 +168,16 @@ public class NodeEditService {
 		String parentNodeId = req.getParentId();
 		log.debug("Inserting under parent: " + parentNodeId);
 		SubNode parentNode = api.getNode(session, parentNodeId);
+
+		/* We have this hack (until the privileges are more nuanced, or updated) which verifies if someone is 
+		inserting under a USER_FEED node we don't allow it unless its' the person who OWNS the USER_FEED, and we have this check
+		because right now our design is that USER_FEED nodes are by definition automatically 'public'
+		*/
+		if (parentNode.getType().equals(NodeType.USER_FEED.s()) && !sessionContext.getRootId().equals(parentNode.getOwner().toHexString())) {
+			res.setMessage("You aren't allowed to create a node here.");
+			res.setSuccess(false);
+			return res;
+		}
 
 		SubNode newNode = api.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
 				CreateNodeLocation.ORDINAL);
