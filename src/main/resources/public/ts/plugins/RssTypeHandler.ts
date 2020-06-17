@@ -30,9 +30,9 @@ export class RssTypeHandler extends TypeBase {
     }
 
     getCustomProperties(): string[] {
-        return [J.NodeProp.RSS_FEED_SRC, 
-        //content isn't a 'property' in the 'properties' array, but is a prop ON SubNode.java, so we don't have a J.NodeProp for it.    
-        "content"];
+        return [J.NodeProp.RSS_FEED_SRC,
+            //content isn't a 'property' in the 'properties' array, but is a prop ON SubNode.java, so we don't have a J.NodeProp for it.    
+            "content"];
     }
 
     allowPropertyEdit(propName: string): boolean {
@@ -124,10 +124,17 @@ export class RssTypeHandler extends TypeBase {
         }
 
         let feedOutDiv = new Div(null, null, feedOut);
-        itemListContainer.children.push(feedOutDiv);
+        itemListContainer.getChildren().push(feedOutDiv);
 
+        let itemCount = 0;
         feed.items.forEach(function (item) {
-            itemListContainer.children.push(this.buildFeedItem(item, state));
+
+            //only process the first 50 items. todo-1: at some point we can make this a user option.
+            //todo-0: test this out on joerogan's podcast
+            if (itemCount < 50) {
+                itemListContainer.getChildren().push(this.buildFeedItem(item, state));
+            }
+            itemCount++;
         }, this);
     }
 

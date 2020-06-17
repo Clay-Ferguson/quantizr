@@ -25,9 +25,10 @@ https://quantizr.com
 * TypeScript Language
 * Bootstrap 4 for layout/styling
 * Webpack-generated single bundle JS file
-* ReactJS + Redux Store
+* ReactJS with Redux 
 * Ace Editor for Content Editing
 * MathJax for rendering Latex math formulas
+* NPM rss-parser Package
 
 
 ## How to Build the App

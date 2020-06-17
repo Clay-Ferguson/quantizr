@@ -39,7 +39,7 @@ export class NodeCompContent extends Div {
         let node = this.node;
 
         if (!node) {
-            this.children = null;
+            this.setChildren(null);
             return;
         }
 

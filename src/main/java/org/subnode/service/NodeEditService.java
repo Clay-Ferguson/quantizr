@@ -35,7 +35,6 @@ import org.subnode.util.Util;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 
-
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -82,7 +81,8 @@ public class NodeEditService {
 		String nodeId = req.getNodeId();
 		SubNode node = null;
 		if (nodeId.equals("~notes")) {
-			node = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "### Notes", NodeType.NOTES.s());
+			node = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "### Notes",
+					NodeType.NOTES.s());
 		} else {
 			node = api.getNode(session, nodeId);
 		}
@@ -97,8 +97,8 @@ public class NodeEditService {
 		}
 
 		api.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false,
-				false));
+		res.setNewNode(
+				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false, false));
 		res.setSuccess(true);
 		return res;
 	}
@@ -120,10 +120,10 @@ public class NodeEditService {
 			return res;
 		}
 
-		SubNode linksNode = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "### Notes", NodeType.NOTES.s());
+		SubNode linksNode = api.getSpecialNode(session, session.getUser(), null, NodeName.NOTES, "### Notes",
+				NodeType.NOTES.s());
 
-		SubNode newNode = api.createNode(session, linksNode, null, NodeType.NONE.s(), 0L,
-				CreateNodeLocation.LAST);
+		SubNode newNode = api.createNode(session, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
 
 		String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
 		String content = title != null ? "#### " + title + "\n" : "";
@@ -153,13 +153,16 @@ public class NodeEditService {
 				CreateNodeLocation.ORDINAL);
 		newNode.setContent("");
 
-		/* When a user creates a new node we use "ModTime==0" (never modified) as a way to indicate the node is in 'draft mode',
-		and should not be visible to other users until "Save" is clicked. */
+		/*
+		 * When a user creates a new node we use "ModTime==0" (never modified) as a way
+		 * to indicate the node is in 'draft mode', and should not be visible to other
+		 * users until "Save" is clicked.
+		 */
 		MongoThreadLocal.setAutoTimestampDisabled(true);
 
 		api.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false,
-				false));
+		res.setNewNode(
+				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false, false));
 		res.setSuccess(true);
 		return res;
 	}
@@ -172,7 +175,7 @@ public class NodeEditService {
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
 
-		//log.debug("saveNode. nodeId=" + nodeId + " nodeName=" + nodeInfo.getName());
+		// log.debug("saveNode. nodeId=" + nodeId + " nodeName=" + nodeInfo.getName());
 		SubNode node = api.getNode(session, nodeId);
 		api.authRequireOwnerOfNode(session, node);
 
@@ -184,7 +187,7 @@ public class NodeEditService {
 		 * The only purpose of this limit is to stop hackers from using up lots of
 		 * space, because our only current quota is on attachment file size uploads
 		 */
-		if (nodeInfo.getContent() !=null && nodeInfo.getContent().length() > 64 * 1024) {
+		if (nodeInfo.getContent() != null && nodeInfo.getContent().length() > 64 * 1024) {
 			throw new RuntimeEx("Max text length is 64K");
 		}
 
@@ -219,8 +222,7 @@ public class NodeEditService {
 					 * to assume the worst behavior from client code, for security and robustness.
 					 */
 					if (session.isAdmin() || SubNodeUtil.isSavableProperty(property.getName())) {
-						// log.debug("Property to save: " + property.getName() + "=" +
-						// property.getValue());
+						//log.debug("Property to save: " + property.getName() + "=" + property.getValue());
 						node.setProp(property.getName(), property.getValue());
 					} else {
 						/**
@@ -247,13 +249,13 @@ public class NodeEditService {
 			node.setModifyTime(lastModified.getTime());
 
 			if (!StringUtils.isEmpty(node.getContent()) //
-				//don't evern send notifications when 'admin' is the one doing the editing.
-				&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
+					// don't evern send notifications when 'admin' is the one doing the editing.
+					&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
 			}
 
-			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1,
-					false, false, false);
+			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1, false,
+					false, false);
 			res.setNode(newNodeInfo);
 			api.saveSession(session);
 		}

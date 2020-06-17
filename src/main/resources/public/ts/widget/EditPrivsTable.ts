@@ -10,7 +10,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-
 export class EditPrivsTable extends ListBox {
 
     constructor(nodePrivsInfo: I.NodePrivilegesInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
@@ -23,7 +22,7 @@ export class EditPrivsTable extends ListBox {
     }
 
     preRender(): void {
-        this.children = [];
+        this.setChildren([]);
 
         let nodePrivsInfo: I.NodePrivilegesInfo = this.getState();
         //console.log("compRender[" + this.jsClassName + "] STATE: " + S.util.prettyPrint(nodePrivsInfo));

@@ -42,7 +42,9 @@ export class NodeCompRowHeader extends Div {
             priority = (priority && priority != "0") ? " P" + priority : "";
 
             if (node.name) {
-                children.push(new Span("Name: " + node.name));
+                children.push(new Span("Name: " + node.name, {
+                    className: "marginRight"
+                }));
             }
 
             if (node.owner && node.owner != "?") {

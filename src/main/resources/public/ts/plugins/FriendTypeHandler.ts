@@ -73,14 +73,17 @@ export class FriendTypeHandler extends TypeBase {
                 });
             }
         }
-        return new Div(null, null, [
-            new Heading(4, "User: " + (user ? user : ""), {
-                className: "marginAll"
-            }),
-            new Div(userBio, {
-                className: "userBio"
-            }),
-            img
+        return new Div(null, {
+            className: "row marginLeft"
+        }, [
+            img,
+            new Div(null, null, [
+                new Heading(4, "User: " + (user ? user : ""), {
+                    className: "marginAll"
+                }),
+                new Div(userBio, {
+                    className: "userBio"
+                })])
         ]);
     }
 }

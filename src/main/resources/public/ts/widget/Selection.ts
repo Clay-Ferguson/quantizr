@@ -37,7 +37,7 @@ export class Selection extends Comp {
     setSelection = (key: string) => {
         this.whenElm((elm: HTMLSelectElement) => {
             let idx = -1;
-            this.children.forEach(function(row: SelectionOption) {
+            this.getChildren().forEach(function(row: SelectionOption) {
                 idx++;
                 if (row.key == key) {
                     elm.selectedIndex = idx;

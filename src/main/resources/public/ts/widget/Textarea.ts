@@ -38,13 +38,24 @@ export class Textarea extends Comp implements I.TextEditorIntf {
             }
         }
 
-        // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
-        this.attribs.onChange = (evt: any) => {
-            //console.log("e.target.value=" + evt.target.value);
-            this.updateValFunc(evt.target.value);
+        if (this.attribs.defaultVal) {
+            this.valueIntf.setValue(this.attribs.defaultVal);
         }
 
-        this.attribs.defaultValue = this.valueIntf.getValue();
+        // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
+        this.attribs.onChange = (evt: any) => {
+            Comp.renderCachedChildren = true; //need same code on Textarea (todo-0)
+
+            //console.log("e.target.value=" + evt.target.value);
+            this.updateValFunc(evt.target.value);
+
+            //todo-0: research if there is any kind of 'afterOnChange' event i'm unaware of.
+            //or some way of knowing react has completed it's render cycle that resulted from the onChange
+            //state change
+            setTimeout(() => {
+                Comp.renderCachedChildren = false;
+            }, 250);
+        }
     }
 
     //Handler to update state if edit field looses focus

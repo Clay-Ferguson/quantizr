@@ -142,26 +142,30 @@ public class Convert {
 		 */
 		if (node.getType().equals(NodeType.FRIEND.s())) {
 			String friendAccountId = node.getStringProp(NodeProp.USER_NODE_ID);
-			SubNode friendAccountNode = api.getNode(session, friendAccountId, false);
-			if (friendAccountNode != null) {
-				String friendAvatarVer = friendAccountNode.getStringProp(NodeProp.BIN.s());
 
-				if (nodeInfo.getProperties() == null) {
-					nodeInfo.setProperties(new LinkedList<PropertyInfo>());
-				}
+			//NOTE: Right when the Friend node is first created, before a person has been selected, this WILL be null, and is normal
+			if (friendAccountId != null) {
+				SubNode friendAccountNode = api.getNode(session, friendAccountId, false);
+				if (friendAccountNode != null) {
+					String friendAvatarVer = friendAccountNode.getStringProp(NodeProp.BIN.s());
 
-				String userBio = friendAccountNode.getStringProp(NodeProp.USER_BIO.s());
+					if (nodeInfo.getProperties() == null) {
+						nodeInfo.setProperties(new LinkedList<PropertyInfo>());
+					}
 
-				// A property prefixed with "_" is an indicator that this is a 'payload data'
-				// item sent to help client render
-				// but not a 'true' property of the actual node. These two properties are enough
-				// to render the link to the avatar image
-				if (friendAvatarVer != null) {
-					nodeInfo.getProperties().add(new PropertyInfo("_avatarVer", friendAvatarVer));
-				}
+					String userBio = friendAccountNode.getStringProp(NodeProp.USER_BIO.s());
 
-				if (userBio != null) {
-					nodeInfo.getProperties().add(new PropertyInfo("_userBio", userBio));
+					// A property prefixed with "_" is an indicator that this is a 'payload data'
+					// item sent to help client render
+					// but not a 'true' property of the actual node. These two properties are enough
+					// to render the link to the avatar image
+					if (friendAvatarVer != null) {
+						nodeInfo.getProperties().add(new PropertyInfo("_avatarVer", friendAvatarVer));
+					}
+
+					if (userBio != null) {
+						nodeInfo.getProperties().add(new PropertyInfo("_userBio", userBio));
+					}
 				}
 			}
 		}

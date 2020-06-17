@@ -168,7 +168,6 @@ export class EditNodeDlg extends DialogBase {
         let customProps: string[] = null;
         if (typeHandler) {
             customProps = typeHandler.getCustomProperties();
-
             typeHandler.ensureDefaultProperties(state.node);
         }
 
@@ -271,8 +270,7 @@ export class EditNodeDlg extends DialogBase {
         this.propCheckBoxes = [];
 
         if (state.node.properties) {
-            state.node.properties.forEach(function (prop: J.PropertyInfo) {
-
+            state.node.properties.forEach((prop: J.PropertyInfo) => {
                 if (prop.name == J.NodeProp.LAYOUT) {
                     if (this.layoutSelection) {
                         this.layoutSelection.setSelection(prop.value);
@@ -313,7 +311,7 @@ export class EditNodeDlg extends DialogBase {
                         propsParent.addChild(tableRow);
                     }
                 }
-            }, this);
+            });
         }
 
         if (!propsParent.childrenExist()) {
@@ -544,7 +542,7 @@ export class EditNodeDlg extends DialogBase {
 
             state.node.content = content;
 
-            //console.log("calling saveNode(). PostData=" + S.util.toJson(this.node));
+            //console.log("calling saveNode(). PostData=" + S.util.toJson(state.node));
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                 node: state.node
             }, (res) => {
@@ -613,12 +611,16 @@ export class EditNodeDlg extends DialogBase {
                 }
             }
             else {
-                //console.log("Creating TextField or property: " + propEntry.name + " value=" + propValStr);
-                valEditor = new TextField(null, null /* propValStr */, false, null, {
-                    getValue: () => {
-                        return S.props.getNodePropVal(propEntry.name, this.getState().node);
+                //console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
+
+                valEditor = new TextField(null, null, false, null, {
+                    getValue: (): string => {
+                        let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
+                        //console.log("getValue["+propEntry.name+"]=" + val);
+                        return val;
                     },
                     setValue: (val: any) => {
+                        //console.log("settingValue[" + propEntry.name + "]=" + val);
                         let state = this.getState();
                         S.props.setNodePropVal(propEntry.name, this.getState().node, val);
                         this.mergeState(state, true);

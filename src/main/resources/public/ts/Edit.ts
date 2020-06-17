@@ -21,7 +21,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class Edit implements EditIntf {
 
-    showReadOnlyProperties: boolean = true;
+    showReadOnlyProperties: boolean = false;
 
     openProfileDlg = (state: AppState): void => {
         new ProfileDlg(state).open();

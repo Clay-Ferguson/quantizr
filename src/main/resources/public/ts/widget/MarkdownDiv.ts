@@ -26,7 +26,7 @@ export class MarkdownDiv extends Comp {
     }
 
     compRender(): ReactNode {
-        if (this.children && this.children.length > 0) {
+        if (this.getChildren() && this.getChildren().length > 0) {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
 

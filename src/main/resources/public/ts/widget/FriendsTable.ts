@@ -21,7 +21,7 @@ export class FriendsTable extends ListBox {
     }
 
     preRender(): void {
-        this.children = [];
+        this.setChildren([]);
 
         let friends: FriendInfo[] = this.getState().friends;
         //console.log("compRender[" + this.jsClassName + "] STATE: " + S.util.prettyPrint(nodePrivsInfo));

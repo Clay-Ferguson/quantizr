@@ -31,7 +31,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         if (!node) {
-            this.children = null;
+            this.setChildren(null);
             return;
         }
 

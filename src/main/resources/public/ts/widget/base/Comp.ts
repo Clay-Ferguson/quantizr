@@ -37,7 +37,7 @@ export abstract class Comp implements CompIntf {
     //and end up setting state into parent which forces a rerender, and destroys the focus and cursor position as the render creates a NEW
     //component, and this flag makes the component keep the same 'key' attribute by not rendering with new keys on all elements during onChange
     //So reuseChildren tells the component keep children if they exist. (mainly only functional in Dialogs currently)
-    public reuseChildren: boolean = false;
+    static renderCachedChildren: boolean = false;
 
     //todo-1: make this private? I think private is better, because accidental uses of 'this.state' can be wrong.
     public state: any = {};
@@ -56,7 +56,9 @@ export abstract class Comp implements CompIntf {
     static memoMap: { [key: string]: ReactNode } = {};
 
     /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored */
-    children: CompIntf[];
+    private children: CompIntf[];
+
+    private cachedChildren: CompIntf[];
 
     logEnablementLogic: boolean = true;
 
@@ -67,6 +69,8 @@ export abstract class Comp implements CompIntf {
     domAddFuncs: ((elm: HTMLElement) => void)[];
 
     renderRawHtml: boolean = false;
+
+    cachedReactNode: ReactNode;
 
     /**
      * 'react' should be true only if this component and all its decendants are true React components that are rendered and
@@ -165,11 +169,21 @@ export abstract class Comp implements CompIntf {
     }
 
     addChildren(comps: Comp[]): void {
+        if (!this.children) {
+            this.children = [];
+        }
         this.children.push.apply(this.children, comps);
     }
 
     setChildren(comps: CompIntf[]) {
         this.children = comps || [];
+    }
+
+    getChildren(): CompIntf[] {
+        if (!this.children) {
+            this.children = [];
+        }
+        return this.children;
     }
 
     getAttribs(): Object {
@@ -224,6 +238,15 @@ export abstract class Comp implements CompIntf {
     }
 
     buildChildren(): ReactNode[] {
+        if (Comp.renderCachedChildren && this.cachedChildren) {
+            this.children = this.cachedChildren;
+        }
+        else {
+            //not sure this full clone is needed, but i'm doing it for now, until optimizing later (todo-0)
+            this.cachedChildren = [];
+            this.cachedChildren = this.cachedChildren.concat(this.children);
+        }
+
         //console.log("buildChildren: " + this.jsClassName);
         if (this.children == null || this.children.length == 0) return null;
         let reChildren: ReactNode[] = [];
@@ -299,12 +322,11 @@ export abstract class Comp implements CompIntf {
     }
 
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
-       both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact 
+       both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact
+       
+       todo-0: remove reuseChildren param
        */
-    mergeState(moreState: any, reuseChildren: boolean=false): any {
-        if (reuseChildren) {
-            this.reuseChildren = true;
-        }
+    mergeState(moreState: any, reuseChildren: boolean = false): any {
         this.setStateEx((state: any) => {
             this.state = { ...state, ...moreState };
             if (this.debugState) {
@@ -419,12 +441,15 @@ export abstract class Comp implements CompIntf {
 
             this.updateVisAndEnablement();
 
-            if (this.reuseChildren) {
-                this.reuseChildren = false;
-            }
-            else {
-                this.preRender();   
-            }
+            /* Theoretically we could avoid calling preRender if it weren't for the fact that React monitors
+            which hooks get called at each render cycle, so if we bypass the preRender because we wont' be using 
+            the children it generates, react will still throw an error becasue the calls to those hooks will not have been made.
+
+            DO NOT DELETE THE COMMENTNED IF BELOW (it serves as warning of what NOT to do.)
+            */
+            //if (!Comp.renderCachedChildren) {
+                this.preRender();
+            //}
 
             let key = null;
             let appState: AppState = null;
@@ -472,6 +497,10 @@ export abstract class Comp implements CompIntf {
             console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key + " Error: " + e);
         }
 
+        //todo-0: need to try again to see if caching at this layer can work
+        //because if at all possible it's going to be faster than caching just the
+        //Comp children which is the current approach.
+        //this.cachedReactNode = ret;
         return ret;
     }
 

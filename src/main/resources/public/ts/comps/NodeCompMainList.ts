@@ -27,7 +27,7 @@ export class NodeCompMainList extends Div {
         let endReached = state.endReached;
 
         if (!rootNode) {
-            this.children = null;
+            this.setChildren(null);
             return;
         }
         let output: Comp[] = [];

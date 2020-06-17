@@ -5,7 +5,6 @@ export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[
 
 export interface CompIntf {
     clazz: string;
-    reuseChildren: boolean;
     
     getId(): string;
     getElement(): HTMLElement; 
@@ -27,4 +26,6 @@ export interface CompIntf {
     makeCacheKeyObj(appState: AppState, state: any, props: any): void;
     addChild(comp: CompIntf): void;
     childrenExist(): boolean;
+    setChildren(comps: CompIntf[]): void;
+    getChildren(): CompIntf[];
 }

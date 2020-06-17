@@ -8,6 +8,7 @@ import { Input } from "./Input";
 import { Anchor } from "./Anchor";
 import { ToggleIcon } from "./ToggleIcon";
 import { ValueIntf } from "../Interfaces";
+import { Comp } from "./base/Comp";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -31,7 +32,6 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
 
         /* If we weren't passed a delegated value interface, then construct one. */
         if (!this.valueIntf) {
-            //todo-0: don't I need to inject defaultVal param i here?
             this.valueIntf = {
                 setValue: (val: string): void => {
                     this.mergeState({ value: val || "" }, true);
@@ -43,10 +43,23 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
             }
         }
 
+        //NOTE: "!=null" is important here, don't switch to !!defaultVal or even just 'defaultVal'. We mean litterally 
+        //every value other than null here. is this identical thing needed in "Textarea" also ? todo-0
+        if (defaultVal != null) {
+            this.valueIntf.setValue(defaultVal);
+        }
+
         // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
         this.attribs.onChange = (evt: any) => {
+            Comp.renderCachedChildren = true; //need same code on Textarea (todo-0)
+
+            //todo-0: it will be critical to have a finally block here.
             //console.log("e.target.value=" + evt.target.value);
             this.updateValFunc(evt.target.value);
+
+            setTimeout(() => {
+                Comp.renderCachedChildren = false;
+            }, 250);
         }
     }
 
@@ -83,6 +96,8 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     }
 
     preRender(): void {
+        //console.log("preRender id=" + this.getId() + " value=" + this.valueIntf.getValue());
+
         this.setChildren([
             this.label ? new Label(this.label, { key: this.getId() + "_label" }) : null,
             new Div(null, {
@@ -94,7 +109,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
                 this.input = new Input({
                     className: "form-control pre-textfield",
                     type: this.isPassword ? "password" : "text",
-                    value: this.valueIntf.getValue() 
+                    value: this.valueIntf.getValue()
                 }),
                 this.isPassword ? new Div(null, {
                     className: "input-group-addon",

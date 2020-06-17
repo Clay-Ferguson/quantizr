@@ -29,7 +29,7 @@ export class NodeCompMainNode extends Div {
         let node = state.node;
 
         if (!node) {
-            this.children = null;
+            this.setChildren(null);
             return;
         }
 

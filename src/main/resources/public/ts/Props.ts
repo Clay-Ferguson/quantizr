@@ -262,7 +262,8 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
             J.NodeProp.IMG_HEIGHT, //
             J.NodeProp.BIN, //
             J.NodeProp.BIN_MIME, //
-            J.NodeProp.BIN_SIZE //
+            J.NodeProp.BIN_SIZE, //
+            J.NodeProp.BIN_FILENAME
         ]);
 
         S.util.addAll(this.controlBasedPropertyList, [ //
