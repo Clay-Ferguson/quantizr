@@ -126,7 +126,7 @@ public class NodeSearchService {
 	public NodeFeedResponse nodeFeed(MongoSession session, NodeFeedRequest req) {
 		/*
 		 * todo-0: This is TEMPORARY, we will end up keeping userFeedService up to date
-		 * another way later
+		 * another way later. For now we could at least add an admin menu option to run this on demand ?
 		 */
 		//userFeedService.init();
 

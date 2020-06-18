@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import org.subnode.config.ConstantsProvider;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
+import org.subnode.model.UserFeedInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.CreateNodeLocation;
@@ -92,22 +93,33 @@ public class OutboxMgr {
 				}
 
 				/*
-				 * Check first that we are not creating a node under one WE OWN, becasue we
-				 * don't need to send a notification to ourselves.
+				 * If the parentNode has any ancestry (parents) that are anyone's actual
+				 * USER_FEED node then we know this node will being seen by everyone who wants
+				 * to see it in their feeds, and nobody's INBOX gets notifiations
 				 */
-				if (parentNode != null && !parentNode.getOwner().equals(node.getOwner())) {
-					if (sendEmail) {
-						sendEmailNotification(session, userName, userNode, node);
-					} else if (addToInbox) {
-						addInboxNotification(session, userName, userNode, node, "replied to you.");
-					}
-				}
+				UserFeedInfo userFeedInfo = userFeedService.findAncestorUserFeedInfo(session, node);
 
 				/*
-				 * But for live-updating feeds we DO need to send even if it's our own node
-				 * being created
+				 * Check first that we are not creating a node under one WE OWN, becasue we
+				 * don't need to send a notification to ourselves. The 'userFeedInfo' check here
+				 * is to be sure if this is going into a feed it won't be sent as email or inbox
+				 * notification.
 				 */
-				userFeedService.nodeSaveNotify(session, node);
+				if (userFeedInfo == null) {
+					if (parentNode != null && !parentNode.getOwner().equals(node.getOwner())) {
+						if (sendEmail) {
+							sendEmailNotification(session, userName, userNode, node);
+						} else if (addToInbox) {
+							addInboxNotification(session, userName, userNode, node, "replied to you.");
+						}
+					}
+				} else {
+					/*
+					 * But for live-updating feeds we DO need to send even if it's our own node
+					 * being created
+					 */
+					userFeedService.ensureNodeInUserFeedInfo(session, userFeedInfo, node);
+				}
 
 			} catch (Exception e) {
 				log.debug("failed sending notification", e);

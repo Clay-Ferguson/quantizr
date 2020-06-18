@@ -119,13 +119,13 @@ public class UserFeedService {
 	 * chance to see if it's a child (or decendent at any level deep) of a feed
 	 * node, and needs to be cached as a userFeedItem
 	 */
-	public void nodeSaveNotify(MongoSession session, SubNode node) {
+	public UserFeedInfo findAncestorUserFeedInfo(MongoSession session, SubNode node) {
 
 		// log.debug("UserFeedService.nodeSaveNotify: user " + sessionContext.getUserName() + ": id="
 		// 		+ node.getId().toHexString());
 
 		/*
-		 * We check the parent node, and all ancestors nodes, of 'node', to see if any
+		 * We check the parent node AND all ancestors nodes, of 'node', to see if any
 		 * of them are a feed node that we have cached because if so then we'll update
 		 * our cache by adding it into the cache, and be creaful to remove it before
 		 * adding it in at top so that we don't have any duplicates
@@ -143,17 +143,17 @@ public class UserFeedService {
 			UserFeedInfo userFeedInfo = userFeedInfoMapByPath.get(path);
 			if (userFeedInfo != null) {
 				//log.debug("SubPath part IS a feed: " + path);
-				ensureNodeInUserFeedInfo(session, userFeedInfo, node);
-				break;
+				return userFeedInfo;
 			}
 		}
+		return null;
 	}
 
 	/*
 	 * Ensure the 'node' is in the userFeedInfo by creating or updating if it
 	 * already is there
 	 */
-	private void ensureNodeInUserFeedInfo(MongoSession session, UserFeedInfo userFeedInfo, SubNode node) {
+	public void ensureNodeInUserFeedInfo(MongoSession session, UserFeedInfo userFeedInfo, SubNode node) {
 		UserFeedItem userFeedItem = null;
 
 		// first scan to see if we already have a userFeedItem for this node

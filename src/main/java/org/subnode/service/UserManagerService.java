@@ -8,7 +8,6 @@ import java.util.Random;
 
 import org.subnode.config.AppProp;
 import org.subnode.config.ConstantsProvider;
-import org.subnode.config.NodeName;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
