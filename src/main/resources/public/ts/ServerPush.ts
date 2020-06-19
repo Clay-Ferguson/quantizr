@@ -35,8 +35,11 @@ export class ServerPush implements ServerPushIntf {
 
         eventSource.addEventListener("feedPush", function (e: any) {
             let obj = JSON.parse(e.data);
+            //console.log("Incomming Push: "+S.util.prettyPrint(obj));
             let nodeInfo: J.NodeInfo = obj.nodeInfo;
             if (nodeInfo) {
+                //todo-0: I think this dispatch is working, but another full FeedView refresh (from actual server query too) is somehow following after also
+                //so need to check and see how to avoid that.
                 dispatch({
                     type: "Action_RenderFeedResults",
                     update: (s: AppState): void => {
@@ -45,6 +48,10 @@ export class ServerPush implements ServerPushIntf {
                         //this is a slight hack to cause the new rows to animate their background, but it's ok, and I plan to leave it like this
                         S.render.fadeInId = nodeInfo.id;
                         s.feedResults.unshift(nodeInfo);
+
+                        //todo-0: need to scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
+                        //then remove the nodeInfo.id from the list becasue it would be redundant in the list.
+                        s.feedResults = S.meta64.removeRedundantFeedItems(s.feedResults);
                     }
                 });
             }

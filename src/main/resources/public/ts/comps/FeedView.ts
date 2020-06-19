@@ -23,14 +23,13 @@ export class FeedView extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let results = state.feedResults;
 
         this.attribs.className = "tab-pane fade my-tab-pane";
         if (state.activeTab == this.getId()) {
             this.attribs.className += " show active";
         }
 
-        if (!results || results.length == 0) {
+        if (!state.feedResults || state.feedResults.length == 0) {
             this.setChildren([
                 new Div("No User Feed Displaying", {
                     id: "feedResultsPanel"
@@ -39,7 +38,7 @@ export class FeedView extends Div {
             return;
         }
 
-        let childCount = results.length;
+        let childCount = state.feedResults.length;
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
@@ -49,7 +48,7 @@ export class FeedView extends Div {
         let children: Comp[] = [];
         let i = 0;
         let lastOwner: string = null;
-        results.forEach((node: J.NodeInfo) => {
+        state.feedResults.forEach((node: J.NodeInfo) => {
             //console.log("FEED: node id=" + node.id + " content: " + node.content);
             S.srch.initSearchNode(node);
 

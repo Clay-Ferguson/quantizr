@@ -581,4 +581,19 @@ export class Meta64 implements Meta64Intf {
             }
         });
     }
+
+    removeRedundantFeedItems = (feedResults: J.NodeInfo[]): J.NodeInfo[] => {
+        if (!feedResults || feedResults.length==0) return feedResults;
+
+        //first build teh set of ids that that are in 'ni.parent.id' 
+        let idSet: Set<string> = new Set<string>();
+        feedResults.forEach((ni: J.NodeInfo) => {
+            if (ni.parent) {
+                idSet.add(ni.parent.id);
+            }
+        });
+
+        //now return filtered list only for items where 'id' is not in the set above.
+        return feedResults.filter(ni => !idSet.has(ni.id));
+    }
 }

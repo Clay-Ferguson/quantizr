@@ -45,5 +45,6 @@ export interface Meta64Intf {
     openSystemFile(fileName: string);
     setStateVarsUsingLoginResponse(res: J.LoginResponse, state: AppState): void;
     updateNodeMap(node: J.NodeInfo, state: AppState): void;
+    removeRedundantFeedItems(feedResults: J.NodeInfo[]): J.NodeInfo[];
 }
 

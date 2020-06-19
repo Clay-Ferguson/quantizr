@@ -183,6 +183,7 @@ public class OutboxMgr {
 		}
 	}
 
+	//todo-0: move this method to userFeedService
 	public void sendServerPushInfo(String recipientUserName, ServerPushInfo info) {
 		SessionContext userSession = SessionContext.getSessionByUserName(recipientUserName);
 
