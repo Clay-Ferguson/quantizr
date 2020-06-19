@@ -116,34 +116,62 @@ export class Search implements SearchIntf {
 
     initSearchNode = (node: J.NodeInfo) => {
         this.idToNodeMap[node.id] = node;
+
+        //NOTE: only the getFeed call (Feed tab) will have items with some parents populated.
+        if (node.parent) {
+            this.idToNodeMap[node.parent.id] = node.parent;
+        }
     }
 
     /*
      * Renders a single line of search results on the search results page.
      *
      * node is a NodeInfo.java JSON
+     * 
+     * todo-0: maybe remove 'indent' param. ended up not needing it.
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, allowAvatar: boolean, prefix: string, isFeed: boolean, state: AppState): Comp => {
+    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, allowAvatar: boolean, prefix: string, isFeed: boolean, isParent: boolean, state: AppState): Comp => {
+
+        /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the 
+        item we are rendering */
+        let parentItem: Comp = null;
+        if (node.parent) {
+            parentItem = this.renderSearchResultAsListItem(node.parent, index, count, rowCount, allowAvatar, prefix, isFeed, true, state);
+        }
 
         let cssId = this._UID_ROWID_PREFIX + node.id;
         let buttonBar = this.makeButtonBarHtml(node, allowAvatar, state);
         let content = new NodeCompContent(node, true, true, prefix, true);
 
         let clazz = "node-table-row";
-        if (state.userPreferences.editMode) {
-            clazz += " editing-border";
-        }
-        else {
-            clazz += " non-editing-border"
-        }
+        //if (state.userPreferences.editMode) {
+        //    clazz += " editing-border";
+        //}
+        //else {
+        //clazz += " non-editing-border"
+        //}
 
-        if (S.render.fadeInId == node.id) { 
+        if (S.render.fadeInId == node.id) {
             S.render.fadeInId = null;
             clazz += " fadeInRowBkgClz";
         }
 
-        return new Div(null, {
-            className: clazz + " inactive-row",
+        if (isFeed) {
+            if (isParent) {
+                clazz += " inactive-feed-row-parent";
+            }
+            else {
+                if (parentItem) {
+                    clazz += " inactive-feed-row";
+                }
+            }
+        }
+        else {
+            clazz += " inactive-row"
+        }
+
+        let div = new Div(null, {
+            className: clazz,
             onClick: S.meta64.getNodeFunc(this.cached_clickOnSearchResultRow, "S.srch.clickOnSearchResultRow", node.id),
             id: cssId
         }, [
@@ -151,6 +179,10 @@ export class Search implements SearchIntf {
             buttonBar, content,
             isFeed ? new NodeCompRowFooter(node, isFeed) : null
         ]);
+
+        return new Div(null, {
+            className: isParent ? "userFeedItemParent" : "userFeedItem"
+        }, [parentItem, div]);
     }
 
     makeButtonBarHtml = (node: J.NodeInfo, allowAvatar: boolean, state: AppState): Comp => {
@@ -169,9 +201,12 @@ export class Search implements SearchIntf {
 
     cached_clickOnSearchResultRow = (id: string) => {
         //wow this implementation is obsolete.
-        this.setRowHighlight(false);
-        this.highlightRowNode = this.idToNodeMap[id];
-        this.setRowHighlight(true);
+
+        //DO NOT DELETE (this works, and may be needed some day)
+        //There's really no reason to indicate to user what row is highlighted, so I let't just not clutter the screen for now
+        // this.setRowHighlight(false);
+        // this.highlightRowNode = this.idToNodeMap[id];
+        // this.setRowHighlight(true);
     }
 
     clickSearchNode = (id: string, state: AppState) => {

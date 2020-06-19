@@ -517,6 +517,7 @@ export interface NodeInfo {
     lastChild: boolean;
     width: number;
     height: number;
+    parent: NodeInfo;
     children: NodeInfo[];
     imgId: string;
     owner: string;

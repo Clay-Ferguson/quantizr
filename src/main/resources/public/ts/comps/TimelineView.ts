@@ -55,7 +55,7 @@ export class TimelineView extends Div {
             S.srch.initSearchNode(node);
 
             let allowAvatar = node.owner != lastOwner;
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, "timeln", false, state));
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, "timeln", false, false, state));
             lastOwner = node.owner;
             i++;
             rowCount++;

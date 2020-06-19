@@ -102,6 +102,7 @@ import org.subnode.service.NodeRenderService;
 import org.subnode.service.NodeSearchService;
 import org.subnode.service.SolrSearchService;
 import org.subnode.service.SystemService;
+import org.subnode.service.UserFeedService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ValContainer;
@@ -202,6 +203,9 @@ public class AppController {
 
 	@Autowired
 	private MailSender mailSender;
+
+	@Autowired
+	private UserFeedService userFeedService;
 
 	private static final boolean logRequests = false;
 
@@ -694,7 +698,7 @@ public class AppController {
 	@RequestMapping(value = API_PATH + "/nodeFeed", method = RequestMethod.POST)
 	public @ResponseBody Object nodeFeed(@RequestBody NodeFeedRequest req, HttpSession session) {
 		return callProc.run("nodeFeed", req, session, ms -> {
-			return nodeSearchService.nodeFeed(ms, req);
+			return userFeedService.nodeFeed(ms, req);
 		});
 	}
 

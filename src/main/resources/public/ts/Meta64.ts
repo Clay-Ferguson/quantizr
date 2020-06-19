@@ -255,6 +255,11 @@ export class Meta64 implements Meta64Intf {
         if (!node) return;
         state.idToNodeMap[node.id] = node;
 
+        //NOTE: only the getFeed call (Feed tab) will have items with some parents populated.
+        if (node.parent) {
+            state.idToNodeMap[node.parent.id] = node.parent;
+        }
+
         if (node.children) {
             node.children.forEach(function (n) {
                 this.updateNodeMap(n, state);

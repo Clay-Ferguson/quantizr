@@ -35,7 +35,7 @@ export class UserFeedTypeHandler extends TypeBase {
 
         let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
         return new HorizontalLayout([
-            new Heading(4, "My Posts", {
+            new Heading(4, "Posts: "+node.owner, {
                 className: "marginAll"
             }),
         ]);

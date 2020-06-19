@@ -42,6 +42,10 @@ public class NodeInfo {
 	private int width;
 	private int height;
 
+	/* This is only populated when generating user "feeds", because we want the feed to be able to show the 
+	context for the reply of a post, which entails showing the parent of the reply above the reply */
+	private NodeInfo parent;
+
 	private List<NodeInfo> children;
 
 	/*
@@ -260,5 +264,13 @@ public class NodeInfo {
 
 	public void setAvatarVer(String avatarVer) {
 		this.avatarVer = avatarVer;
+	}
+
+	public NodeInfo getParent() {
+		return parent;
+	}
+
+	public void setParent(NodeInfo parent) {
+		this.parent = parent;
 	}
 }

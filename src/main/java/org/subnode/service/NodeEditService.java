@@ -67,6 +67,9 @@ public class NodeEditService {
 	@Autowired
 	private OutboxMgr outboxMgr;
 
+	@Autowired
+	private UserFeedService userFeedService;
+
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request.
 	 */
@@ -91,11 +94,15 @@ public class NodeEditService {
 			return res;
 		}
 
-		/* We have this hack (until the privileges are more nuanced, or updated) which verifies if someone is 
-		inserting under a USER_FEED node we don't allow it unless its' the person who OWNS the USER_FEED, and we have this check
-		because right now our design is that USER_FEED nodes are by definition automatically 'public'
-		*/
-		if (node.getType().equals(NodeType.USER_FEED.s()) && !sessionContext.getRootId().equals(node.getOwner().toHexString())) {
+		/*
+		 * We have this hack (until the privileges are more nuanced, or updated) which
+		 * verifies if someone is inserting under a USER_FEED node we don't allow it
+		 * unless its' the person who OWNS the USER_FEED, and we have this check because
+		 * right now our design is that USER_FEED nodes are by definition automatically
+		 * 'public'
+		 */
+		if (node.getType().equals(NodeType.USER_FEED.s())
+				&& !sessionContext.getRootId().equals(node.getOwner().toHexString())) {
 			res.setMessage("You aren't allowed to create a node here.");
 			res.setSuccess(false);
 			return res;
@@ -114,6 +121,11 @@ public class NodeEditService {
 		api.save(session, newNode);
 		res.setNewNode(
 				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false, false));
+
+		if (newNode.getType().equals(NodeType.USER_FEED.s())) {
+			userFeedService.addUserFeedInfo(session, newNode, null, sessionContext.getUserName());
+		}
+
 		res.setSuccess(true);
 		return res;
 	}
@@ -135,8 +147,7 @@ public class NodeEditService {
 			return res;
 		}
 
-		SubNode linksNode = api.getSpecialNode(session, session.getUser(), null, "### Notes",
-				NodeType.NOTES.s());
+		SubNode linksNode = api.getSpecialNode(session, session.getUser(), null, "### Notes", NodeType.NOTES.s());
 
 		if (linksNode == null) {
 			log.warn("unable to get linksNode");
@@ -169,11 +180,15 @@ public class NodeEditService {
 		log.debug("Inserting under parent: " + parentNodeId);
 		SubNode parentNode = api.getNode(session, parentNodeId);
 
-		/* We have this hack (until the privileges are more nuanced, or updated) which verifies if someone is 
-		inserting under a USER_FEED node we don't allow it unless its' the person who OWNS the USER_FEED, and we have this check
-		because right now our design is that USER_FEED nodes are by definition automatically 'public'
-		*/
-		if (parentNode.getType().equals(NodeType.USER_FEED.s()) && !sessionContext.getRootId().equals(parentNode.getOwner().toHexString())) {
+		/*
+		 * We have this hack (until the privileges are more nuanced, or updated) which
+		 * verifies if someone is inserting under a USER_FEED node we don't allow it
+		 * unless its' the person who OWNS the USER_FEED, and we have this check because
+		 * right now our design is that USER_FEED nodes are by definition automatically
+		 * 'public'
+		 */
+		if (parentNode.getType().equals(NodeType.USER_FEED.s())
+				&& !sessionContext.getRootId().equals(parentNode.getOwner().toHexString())) {
 			res.setMessage("You aren't allowed to create a node here.");
 			res.setSuccess(false);
 			return res;
@@ -193,6 +208,11 @@ public class NodeEditService {
 		api.save(session, newNode);
 		res.setNewNode(
 				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false, false));
+
+		if (newNode.getType().equals(NodeType.USER_FEED.s())) {
+			userFeedService.addUserFeedInfo(session, newNode, null, sessionContext.getUserName());
+		}
+
 		res.setSuccess(true);
 		return res;
 	}

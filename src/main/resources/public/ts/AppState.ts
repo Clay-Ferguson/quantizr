@@ -44,7 +44,9 @@ export class AppState {
     */
     selectedNodes: any = {};
 
-    /* maps node.id values to NodeInfo.java objects */
+    /* maps node.id values to NodeInfo.java objects 
+    Make this use a Map type (typescript)
+    */
     idToNodeMap: { [key: string]: J.NodeInfo } = {};
 
     isAdminUser: boolean;
