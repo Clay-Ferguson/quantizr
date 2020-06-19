@@ -66,6 +66,7 @@ public class SessionContext {
 
 	private HttpSession httpSessionToInvalidate;
 
+
 	/* Emitter for sending push notifications to the client */
 	private SseEmitter pushEmitter;
 

@@ -25,6 +25,7 @@ import org.subnode.mongo.model.AccessControl;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.AttachmentService;
+import org.subnode.service.UserFeedService;
 import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
@@ -83,6 +84,9 @@ public class MongoApi {
 
 	@Autowired
 	private AttachmentService attachmentService;
+
+	@Autowired
+	private UserFeedService userFeedService;
 
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
@@ -1468,6 +1472,10 @@ public class MongoApi {
 			}
 
 			save(session, node);
+
+			if (type.equals(NodeType.USER_FEED.s())) {
+				userFeedService.addUserFeedInfo(session, node, null, sessionContext.getUserName());
+			}
 		}
 		return node;
 	}

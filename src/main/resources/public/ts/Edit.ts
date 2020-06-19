@@ -67,7 +67,11 @@ export class Edit implements EditIntf {
     private deleteNodesResponse = (res: J.DeleteNodesResponse, postDeleteSelNodeId: string, state: AppState): void => {
         if (S.util.checkSuccess("Delete node", res)) {
             S.meta64.clearSelNodes(state);
-            S.view.refreshTree(postDeleteSelNodeId, false, postDeleteSelNodeId, false, false, true, true, state);
+            
+            //We only want to pass a nodeId here if we are going to root node.
+            let nodeId = postDeleteSelNodeId == state.homeNodeId ? postDeleteSelNodeId : null;
+
+            S.view.refreshTree(nodeId, false, postDeleteSelNodeId, false, false, true, true, state);
         }
     }
 

@@ -36,10 +36,13 @@ export class Textarea extends Comp implements I.TextEditorIntf {
                     return this.getState().value;
                 }
             }
-        }
 
-        if (this.attribs.defaultVal) {
-            this.valueIntf.setValue(this.attribs.defaultVal);
+            //WARNING: It's ok to call setValue inside the constructor when we created out own valueIntf object, because we know
+            //it cannot go into infinite recursion, but if valueIntf was passed in, it would be dangerous, and also wouldn't make any sense
+            //because we'd expect the passed valueIntf to be in control and no defaultVal param would need to be passed in
+            if (this.attribs.defaultVal) {
+                this.valueIntf.setValue(this.attribs.defaultVal);
+            }
         }
 
         // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
@@ -104,10 +107,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
             }
         }
 
-        if (state.value) {
-            _attribs.value = this.valueIntf.getValue(); 
-        }
-
+        _attribs.value = this.valueIntf.getValue();
         _attribs.style = { fontFamily: "monospace" };
 
         children.push(S.e('textarea', _attribs));

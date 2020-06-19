@@ -204,9 +204,8 @@ public class UserFeedService {
 	 * their browser without requiring a database query
 	 */
 	private void pushNodeUpdateToAllFriends(MongoSession session, SubNode node) {
-		// log.debug("Pushing update to all friends: user " +
-		// sessionContext.getUserName() + ": id="
-		// + node.getId().toHexString());
+		log.debug("Pushing update to all friends: from user " + sessionContext.getUserName() + ": id="
+				+ node.getId().toHexString());
 		Set<String> keys = null;
 
 		/*
@@ -224,8 +223,7 @@ public class UserFeedService {
 		for (String key : keys) {
 			SessionContext iterSessionContext = SessionContext.allSessions.get(key);
 			if (iterSessionContext != null) {
-				// log.debug("Processing a session to maybe push to:
-				// "+iterSessionContext.getUserName());
+				log.debug("Processing a session to maybe push to:" + iterSessionContext.getUserName());
 
 				/*
 				 * Check if the owner of 'node' is in the list of accounts the sessionContext
@@ -234,7 +232,7 @@ public class UserFeedService {
 				 */
 				if (iterSessionContext.getFeedUserNodeIds() != null
 						&& iterSessionContext.getFeedUserNodeIds().contains(node.getOwner().toHexString())) {
-					// log.debug("USER NEED A PUSH: " + sessionContext.getUserName());
+					log.debug("USER NEED A PUSH: " + sessionContext.getUserName());
 
 					// lazily create the info val, as needed and only once, because the same infoVal
 					// can go out to all users.
@@ -287,7 +285,7 @@ public class UserFeedService {
 		 * another way later. For now we could at least add an admin menu option to run
 		 * this on demand ?
 		 */
-		// init();
+		//init();
 
 		NodeFeedResponse res = new NodeFeedResponse();
 		if (session == null) {
@@ -296,13 +294,13 @@ public class UserFeedService {
 		int MAX_NODES = 100;
 		int counter = 0;
 
-		SubNode feedNode = api.getNode(session, req.getNodeId());
-		if (feedNode != null) {
-			if (!feedNode.getType().equals(NodeType.FRIEND_LIST.s())) {
+		SubNode friendListNode = api.getNode(session, req.getNodeId());
+		if (friendListNode != null) {
+			if (!friendListNode.getType().equals(NodeType.FRIEND_LIST.s())) {
 				throw new RuntimeException("only FRIEND_LIST type nodes can generate a feed.");
 			}
 
-			Iterable<SubNode> friendNodes = api.getChildrenUnderParentPath(session, feedNode.getPath(), null,
+			Iterable<SubNode> friendNodes = api.getChildrenUnderParentPath(session, friendListNode.getPath(), null,
 					MAX_NODES);
 
 			List<UserFeedItem> fullFeedList = new LinkedList<UserFeedItem>();
@@ -319,7 +317,7 @@ public class UserFeedService {
 			userNodeIds.add(sessionContext.getRootId());
 
 			for (SubNode friendNode : friendNodes) {
-				String userName = null;
+				String friendUserName = null;
 				String userNodeId = friendNode.getStringProp(NodeProp.USER_NODE_ID.s());
 
 				/*
@@ -327,13 +325,13 @@ public class UserFeedService {
 				 * if not yet existing
 				 */
 				if (userNodeId == null) {
-					userName = friendNode.getStringProp(NodeProp.USER.s());
+					friendUserName = friendNode.getStringProp(NodeProp.USER.s());
 
 					// if USER_NODE_ID has not been set on the node yet then get it and set it first
 					// here.
-					if (userName != null) {
+					if (friendUserName != null) {
 						ValContainer<SubNode> _userNode = new ValContainer<SubNode>();
-						final String _userName = userName;
+						final String _userName = friendUserName;
 						adminRunner.run(s -> {
 							_userNode.setVal(api.getUserNodeByUserName(s, _userName));
 						});
@@ -344,25 +342,30 @@ public class UserFeedService {
 						}
 					}
 				} else {
-					userName = friendNode.getStringProp(NodeProp.USER.s());
+					friendUserName = friendNode.getStringProp(NodeProp.USER.s());
 				}
 
 				if (userNodeId != null) {
 					userNodeIds.add(userNodeId);
 				}
 
+				log.debug("user "+sessionContext.getUserName()+" has friend: "+friendUserName);
+
 				/*
 				 * Look up the cached User Feed nodes (in memory) and add all of 'userName'
 				 * cached items into the full feed list
 				 */
 				synchronized (UserFeedService.userFeedInfoMapByUserName) {
-					UserFeedInfo userFeedInfo = UserFeedService.userFeedInfoMapByUserName.get(userName);
+					UserFeedInfo userFeedInfo = UserFeedService.userFeedInfoMapByUserName.get(friendUserName);
 					if (userFeedInfo != null) {
+						//todo-0: remove this once troubleshooting is complete.
+						for (UserFeedItem ufi : userFeedInfo.getUserFeedList()) {
+							log.debug("Friend post: "+friendUserName+" post.content: "+ufi.getNode().getContent());
+						}
+
 						fullFeedList.addAll(userFeedInfo.getUserFeedList());
 					}
 				}
-
-				log.debug("Processing Friend Node[" + userName + "]: id=" + friendNode.getId().toHexString());
 			}
 
 			/*

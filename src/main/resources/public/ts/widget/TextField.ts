@@ -39,17 +39,21 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
                     return this.getState().value;
                 }
             }
-        }
 
-        //NOTE: "!=null" is important here, don't switch to !!defaultVal or even just 'defaultVal'. We mean litterally 
-        //every value other than null here. is this identical thing needed in "Textarea" also ? todo-0
-        if (defaultVal != null) {
-            this.valueIntf.setValue(defaultVal);
+            //WARNING: It's ok to call setValue inside the constructor when we created out own valueIntf object, because we know
+            //it cannot go into infinite recursion, but if valueIntf was passed in, it would be dangerous, and also wouldn't make any sense
+            //because we'd expect the passed valueIntf to be in control and no defaultVal param would need to be passed in
+            //
+            //NOTE: "!=null" is important here, don't switch to !!defaultVal or even just 'defaultVal'. We mean litterally 
+            //every value other than null here. is this identical thing needed in "Textarea" also ? todo-0
+            if (defaultVal != null) {
+                this.valueIntf.setValue(defaultVal);
+            }
         }
 
         // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
         this.attribs.onChange = (evt: any) => {
-            Comp.renderCachedChildren = true; //need same code on Textarea (todo-0)
+            Comp.renderCachedChildren = true; 
 
             //todo-0: it will be critical to have a finally block here.
             //console.log("e.target.value=" + evt.target.value);
