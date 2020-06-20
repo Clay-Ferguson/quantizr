@@ -7,6 +7,9 @@ import { AppState } from "../AppState";
 import { Comp } from "../widget/base/Comp";
 import { Heading } from "../widget/Heading";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { Div } from "../widget/Div";
+import { ButtonBar } from "../widget/ButtonBar";
+import { Button } from "../widget/Button";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,7 +23,7 @@ export class UserFeedTypeHandler extends TypeBase {
         super(J.NodeType.USER_FEED, "User Feed", "fa-th-list", true);
     }
 
-    allowAction(action : string): boolean {
+    allowAction(action: string): boolean {
         switch (action) {
             case "editNode":
                 return false;
@@ -34,10 +37,18 @@ export class UserFeedTypeHandler extends TypeBase {
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
 
         let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
-        return new HorizontalLayout([
-            new Heading(4, "Posts: "+node.owner, {
+        return new Div(null, null, [
+            new Heading(4, "Posts: " + node.owner, {
                 className: "marginAll"
             }),
+
+            // this works perfectly but might be confusing to user to have too many different buttons doing the same thing
+            // new ButtonBar([
+            //     new Button("Refresh Feed", () => {
+            //         S.nav.navFeed(state)
+            //     })
+            // ], null, "float-right marginBottom"),
+            //new Div(null, { className: "clearfix" })
         ]);
     }
 }

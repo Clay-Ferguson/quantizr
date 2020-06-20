@@ -6,6 +6,8 @@ import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
+import { Button } from "../widget/Button";
+import { ButtonBar } from "../widget/ButtonBar";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -31,7 +33,7 @@ export class FeedView extends Div {
 
         if (!state.feedResults || state.feedResults.length == 0) {
             this.setChildren([
-                new Div("No User Feed Displaying", {
+                new Div("Nothing to show here. Nobody has posted anything.", {
                     id: "feedResultsPanel"
                 })
             ]);
@@ -46,6 +48,14 @@ export class FeedView extends Div {
          */
         let rowCount = 0;
         let children: Comp[] = [];
+
+        children.push(new ButtonBar([
+            new Button("Refresh Feed", () => {
+                S.nav.navFeed(state)
+            })
+        ], null, "float-right marginBottom"));
+        children.push(new Div(null, { className: "clearfix" }));
+
         let i = 0;
         let lastOwner: string = null;
         state.feedResults.forEach((node: J.NodeInfo) => {

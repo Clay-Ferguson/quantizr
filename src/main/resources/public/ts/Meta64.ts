@@ -582,6 +582,7 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
+    //todo-0: need to decide if I want this. It's disabled currently (not called)
     removeRedundantFeedItems = (feedResults: J.NodeInfo[]): J.NodeInfo[] => {
         if (!feedResults || feedResults.length==0) return feedResults;
 
