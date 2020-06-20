@@ -96,7 +96,8 @@ public class UserFeedService {
 				String userName = accountNode.getStringProp(NodeProp.USER);
 
 				if (userFeedInfoMapByUserName.containsKey(userName)) {
-					log.error("ERROR: Multiple accounts named "+userName+" skipping redundant one for UserFeedService initializing.");
+					log.error("ERROR: Multiple accounts named " + userName
+							+ " skipping redundant one for UserFeedService initializing.");
 					continue;
 				}
 
@@ -135,8 +136,9 @@ public class UserFeedService {
 			}
 		}
 
-		// log.debug("UserFeedInfo [hashcode=" + userFeedInfo.hashCode() + "] of user " + userFeedInfo.getUserName() + " has count="
-		// 		+ userFeedInfo.getUserFeedList().size());
+		// log.debug("UserFeedInfo [hashcode=" + userFeedInfo.hashCode() + "] of user "
+		// + userFeedInfo.getUserName() + " has count="
+		// + userFeedInfo.getUserFeedList().size());
 
 		// NOTE: Even if we don't have any posts yet in userFeedInfo, we still need to
 		// add to the cache.
@@ -153,8 +155,9 @@ public class UserFeedService {
 	 */
 	public UserFeedInfo findAncestorUserFeedInfo(MongoSession session, SubNode node) {
 
-		// log.debug("UserFeedService.findAncestorUserFeedInfo: user " + sessionContext.getUserName() + ": id="
-		// 		+ node.getId().toHexString());
+		// log.debug("UserFeedService.findAncestorUserFeedInfo: user " +
+		// sessionContext.getUserName() + ": id="
+		// + node.getId().toHexString());
 		/*
 		 * We check the parent node AND all ancestors nodes, of 'node', to see if any of
 		 * them are a feed node that we have cached because if so then we'll update our
@@ -170,10 +173,10 @@ public class UserFeedService {
 				break;
 
 			path = path.substring(0, lastSlashIdx);
-			//log.debug("  subpath:" + path);
+			// log.debug(" subpath:" + path);
 			UserFeedInfo userFeedInfo = userFeedInfoMapByPath.get(path);
 			if (userFeedInfo != null) {
-				//log.debug("   SubPath part IS a feed: " + path);
+				// log.debug(" SubPath part IS a feed: " + path);
 				return userFeedInfo;
 			}
 		}
@@ -188,8 +191,9 @@ public class UserFeedService {
 	public void ensureNodeInUserFeedInfo(MongoSession session, UserFeedInfo userFeedInfo, SubNode node) {
 		UserFeedItem userFeedItem = null;
 
-		// log.debug("Node is a descendant of userFeed for user " + userFeedInfo.getUserName() + " content="
-		// 		+ node.getContent());
+		// log.debug("Node is a descendant of userFeed for user " +
+		// userFeedInfo.getUserName() + " content="
+		// + node.getContent());
 
 		// first scan to see if we already have a userFeedItem for this node
 		for (UserFeedItem ufi : userFeedInfo.getUserFeedList()) {
@@ -211,12 +215,13 @@ public class UserFeedService {
 		userFeedItem.setModTime(node.getModifyTime());
 		userFeedItem.setNode(node);
 
-		//I decided to update ONLY to the current user who made a change
-		//becasue I realized pushing to everyone's feed might cause screen updates
-		//when we don't want them.
+		// I decided to update ONLY to the current user who made a change
+		// becasue I realized pushing to everyone's feed might cause screen updates
+		// when we don't want them.
 		pushNodeNotificationToSession(session, sessionContext, node, null);
 
-		// This would push the node out to all users in realtime and update all their Feed pages
+		// This would push the node out to all users in realtime and update all their
+		// Feed pages
 		// pushNodeUpdateToAllFriends(session, node);
 	}
 
@@ -255,7 +260,7 @@ public class UserFeedService {
 	/* We allow nodeInfo to be null, and we can just generate on demand if it is */
 	public void pushNodeNotificationToSession(MongoSession session, SessionContext sc, SubNode node,
 			NodeInfo nodeInfo) {
-		//log.debug("Processing a session to maybe push to:" + sc.getUserName());
+		// log.debug("Processing a session to maybe push to:" + sc.getUserName());
 
 		/*
 		 * Check if the owner of 'node' is in the list of accounts the sessionContext
@@ -263,7 +268,7 @@ public class UserFeedService {
 		 * since logging in, otherwise there's nothign to do here
 		 */
 		if (sc.getFeedUserNodeIds() != null && sc.getFeedUserNodeIds().contains(node.getOwner().toHexString())) {
-			//log.debug("USER GETTING A PUSH: " + sc.getUserName());
+			// log.debug("USER GETTING A PUSH: " + sc.getUserName());
 
 			if (nodeInfo == null) {
 				nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false, false);
@@ -338,39 +343,21 @@ public class UserFeedService {
 			userNodeIds.add(sessionContext.getRootId());
 
 			for (SubNode friendNode : friendNodes) {
-				String friendUserName = null;
 				String userNodeId = friendNode.getStringProp(NodeProp.USER_NODE_ID.s());
-
-				/*
-				 * when user first adds, this friendNode won't have the userNodeId yet, so add
-				 * if not yet existing
-				 */
 				if (userNodeId == null) {
-					friendUserName = friendNode.getStringProp(NodeProp.USER.s());
-
-					// if USER_NODE_ID has not been set on the node yet then get it and set it first
-					// here.
-					if (friendUserName != null) {
-						ValContainer<SubNode> _userNode = new ValContainer<SubNode>();
-						final String _userName = friendUserName;
-						adminRunner.run(s -> {
-							_userNode.setVal(api.getUserNodeByUserName(s, _userName));
-						});
-
-						if (_userNode.getVal() != null) {
-							userNodeId = _userNode.getVal().getId().toHexString();
-							friendNode.setProp(NodeProp.USER_NODE_ID.s(), userNodeId);
-						}
-					}
-				} else {
-					friendUserName = friendNode.getStringProp(NodeProp.USER.s());
+					log.warn("user node id missing on node: " + friendNode.getId().toHexString());
+					continue;
+				}
+				String friendUserName = friendNode.getStringProp(NodeProp.USER.s());
+				if (friendUserName == null) {
+					log.warn("user missing on node: " + friendNode.getId().toHexString());
+					continue;
 				}
 
-				if (userNodeId != null) {
-					userNodeIds.add(userNodeId);
-				}
+				userNodeIds.add(userNodeId);
 
-				//log.debug("user " + sessionContext.getUserName() + " has friend: " + friendUserName);
+				// log.debug("user " + sessionContext.getUserName() + " has friend: " +
+				// friendUserName);
 
 				/*
 				 * Look up the cached User Feed nodes (in memory) and add all of 'userName'
@@ -379,10 +366,11 @@ public class UserFeedService {
 				synchronized (UserFeedService.userFeedInfoMapByUserName) {
 					UserFeedInfo userFeedInfo = UserFeedService.userFeedInfoMapByUserName.get(friendUserName);
 					if (userFeedInfo != null) {
-						// for troubleshooting 
+						// for troubleshooting
 						// for (UserFeedItem ufi : userFeedInfo.getUserFeedList()) {
-						// 	log.debug(
-						// 			"Friend post: " + friendUserName + " post.content: " + ufi.getNode().getContent());
+						// log.debug(
+						// "Friend post: " + friendUserName + " post.content: " +
+						// ufi.getNode().getContent());
 						// }
 
 						fullFeedList.addAll(userFeedInfo.getUserFeedList());
@@ -395,17 +383,19 @@ public class UserFeedService {
 			 * own posts appear in the feed
 			 */
 			synchronized (UserFeedService.userFeedInfoMapByUserName) {
-				//log.debug("Now adding in our own feed posts: " + sessionContext.getUserName());
+				// log.debug("Now adding in our own feed posts: " +
+				// sessionContext.getUserName());
 				UserFeedInfo userFeedInfo = UserFeedService.userFeedInfoMapByUserName.get(sessionContext.getUserName());
 
 				if (userFeedInfo != null) {
 
-					//log.debug("UserFeedInfo [hashcode=" + userFeedInfo.hashCode() + "] of user " + userFeedInfo.getUserName()
-					//		+ " has count=" + userFeedInfo.getUserFeedList().size());
+					// log.debug("UserFeedInfo [hashcode=" + userFeedInfo.hashCode() + "] of user "
+					// + userFeedInfo.getUserName()
+					// + " has count=" + userFeedInfo.getUserFeedList().size());
 
 					// for troubleshooting
 					// for (UserFeedItem ufi : userFeedInfo.getUserFeedList()) {
-					// 	log.debug("   OUR OWN: content=" + ufi.getNode().getContent());
+					// log.debug(" OUR OWN: content=" + ufi.getNode().getContent());
 					// }
 
 					fullFeedList.addAll(userFeedInfo.getUserFeedList());

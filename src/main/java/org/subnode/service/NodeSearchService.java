@@ -1,9 +1,6 @@
 package org.subnode.service;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,24 +11,17 @@ import org.springframework.stereotype.Component;
 
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
-import org.subnode.model.UserFeedInfo;
-import org.subnode.model.UserFeedItem;
-import org.subnode.model.client.NodeProp;
-import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetSharedNodesRequest;
-import org.subnode.request.NodeFeedRequest;
 import org.subnode.request.NodeSearchRequest;
 import org.subnode.response.GetSharedNodesResponse;
-import org.subnode.response.NodeFeedResponse;
 import org.subnode.response.NodeSearchResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.ValContainer;
 
 /**
  * Service for searching the repository. This searching is currently very basic,
@@ -129,7 +119,12 @@ public class NodeSearchService {
 		res.setSearchResults(searchResults);
 		int counter = 0;
 
-		SubNode searchRoot = api.getNode(session, req.getNodeId());
+		//DO NOT DELETE (may want searching under selected node as an option some day)
+		//we can remove nodeId from req, because we always search from account root now.
+		//SubNode searchRoot = api.getNode(session, req.getNodeId());
+
+		//search under account root only
+		SubNode searchRoot = api.getNode(session, sessionContext.getRootId());
 
 		for (SubNode node : api.searchSubGraphByAcl(session, searchRoot, SubNode.FIELD_MODIFY_TIME, MAX_NODES)) {
 

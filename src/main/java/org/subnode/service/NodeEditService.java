@@ -2,7 +2,6 @@ package org.subnode.service;
 
 import java.util.Calendar;
 
-import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
@@ -15,6 +14,7 @@ import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoThreadLocal;
+import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AppDropRequest;
 import org.subnode.request.CreateSubNodeRequest;
@@ -32,6 +32,7 @@ import org.subnode.response.SplitNodeResponse;
 import org.subnode.response.TransferNodeResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.Util;
+import org.subnode.util.ValContainer;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 
@@ -70,6 +71,9 @@ public class NodeEditService {
 	@Autowired
 	private UserFeedService userFeedService;
 
+	@Autowired
+	private RunAsMongoAdmin adminRunner;
+	
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request.
 	 */
@@ -308,7 +312,35 @@ public class NodeEditService {
 			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1, false,
 					false, false);
 			res.setNode(newNodeInfo);
-			api.saveSession(session);
+			// api.saveSession(session); //shouldn't be necessar
+		}
+
+		//todo-0: eventually we need a plugin-type architecture to decouple this kind of type-specific code from the general node saving.
+		if (node.getType().equals(NodeType.FRIEND.s())) {
+			String userNodeId = node.getStringProp(NodeProp.USER_NODE_ID.s());
+
+			/*
+			 * when user first adds, this friendNode won't have the userNodeId yet, so add
+			 * if not yet existing
+			 */
+			if (userNodeId == null) {
+				String friendUserName = node.getStringProp(NodeProp.USER.s());
+
+				// if USER_NODE_ID has not been set on the node yet then get it and set it first
+				// here.
+				if (friendUserName != null) {
+					ValContainer<SubNode> _userNode = new ValContainer<SubNode>();
+					final String _userName = friendUserName;
+					adminRunner.run(s -> {
+						_userNode.setVal(api.getUserNodeByUserName(s, _userName));
+					});
+
+					if (_userNode.getVal() != null) {
+						userNodeId = _userNode.getVal().getId().toHexString();
+						node.setProp(NodeProp.USER_NODE_ID.s(), userNodeId);
+					}
+				}
+			} 
 		}
 
 		res.setSuccess(true);
