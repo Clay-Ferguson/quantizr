@@ -295,8 +295,15 @@ strong em {
     padding-bottom: 10px;
 }
 
+.customScrollbar {
+    //I was trying to get Firefox scrollbars to look better but it doesn't work.
+    scrollbar-width: auto;
+    scrollbar-color:  $body-bg;
+}
+
 .customScrollbar::-webkit-scrollbar-track {
-	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 	border-radius: 8px;
 	background-color: $scrollTrack;
 }
@@ -308,7 +315,8 @@ strong em {
 
 .customScrollbar::-webkit-scrollbar-thumb {
 	border-radius: 8px;
-	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 	background-color: $scrollThumb;
 }
 
