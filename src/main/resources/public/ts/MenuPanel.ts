@@ -54,7 +54,7 @@ export class MenuPanel extends Div {
         children.push(new Menu("Navigate", [
             new MenuItem("Portal", () => S.meta64.loadAnonPageHome(state)),
             new MenuItem("Home", () => S.nav.navHome(state), !state.isAnonUser),
-            new MenuItem("Inbox", () => S.nav.openContentNode(state.homeNodePath + "/inbox", state), !state.isAnonUser),
+            new MenuItem("Inbox", () => S.nav.openContentNode("~inbox", state), !state.isAnonUser),
             new MenuItem("Friends", () => S.nav.openContentNode("~friendList", state), !state.isAnonUser),
 
             //this appears to be broken for user 'bob' at least. Also "Show Feed" is broken on the feed node

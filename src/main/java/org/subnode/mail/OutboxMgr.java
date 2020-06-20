@@ -147,31 +147,33 @@ public class OutboxMgr {
 		SubNode userInbox = api.getSpecialNode(session, null, userNode, "### Inbox", NodeType.INBOX.s());
 
 		if (userInbox != null) {
+			//log.debug("userInbox id=" + userInbox.getId().toHexString());
+
 			/*
 			 * First look to see if there is a target node already existing in this persons
 			 * inbox that points to the node in question
 			 */
 			SubNode notifyNode = api.findSubNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(),
 					node.getId().toHexString());
-			if (notifyNode != null) {
-				// log.debug("target existed: " + node.getId().toHexString());
-				return;
+
+			/* If there's no notification for this node already in the user's inbox then add one */		
+			if (notifyNode == null) {
+				notifyNode = api.createNode(session, userInbox, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST);
+
+				// trim to 280 like twitter.
+				String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
+
+				String content = String.format("#### **%s** " + notifyMessage + "\n\n%s?id=%s\n\n%s",
+						sessionContext.getUserName(), constProvider.getHostAndPort(), node.getId().toHexString(),
+						shortContent);
+
+				notifyNode.setOwner(userInbox.getOwner());
+				notifyNode.setContent(content);
+				notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getId().toHexString());
+				api.save(session, notifyNode);
 			}
-
-			notifyNode = api.createNode(session, userInbox, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST);
-
-			// trim to 280 like twitter.
-			String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
-
-			String content = String.format("#### **%s** " + notifyMessage + "\n\n%s?id=%s\n\n%s",
-					sessionContext.getUserName(), constProvider.getHostAndPort(), node.getId().toHexString(),
-					shortContent);
-
-			notifyNode.setOwner(userInbox.getOwner());
-			notifyNode.setContent(content);
-			notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getId().toHexString());
-			api.save(session, notifyNode);
-
+			
+			//and then always send out a push notification so the user sees live there's a new share comming in or being re-added even.
 			sendServerPushInfo(recieverUserName, new InboxPushInfo(node.getId().toHexString()));
 
 			SubNode recieverAccountNode = api.getUserNodeByUserName(session, recieverUserName);
@@ -183,7 +185,7 @@ public class OutboxMgr {
 		}
 	}
 
-	//todo-0: move this method to userFeedService
+	// todo-0: move this method to userFeedService
 	public void sendServerPushInfo(String recipientUserName, ServerPushInfo info) {
 		SessionContext userSession = SessionContext.getSessionByUserName(recipientUserName);
 

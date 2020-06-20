@@ -62,7 +62,7 @@ export class ServerPush implements ServerPushIntf {
             //the notification, which is wrong. In other words based on the new 'feed' capability notification can
             //end up being just a redundant annoyance.
             //todo-0
-            //new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
+            new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
         }, false);
     }
 }
