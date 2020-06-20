@@ -6,6 +6,7 @@ import { Div } from "../widget/Div";
 import { Span } from "../widget/Span";
 import { AppState } from "../AppState";
 import { useSelector, useDispatch } from "react-redux";
+import { Img } from "../widget/Img";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -26,6 +27,14 @@ export class NodeCompRowHeader extends Div {
         let node = this.node;
         let children = [];
 
+        let avatarImg: Img = null;
+        if (node.owner != J.PrincipalName.ADMIN) {
+            avatarImg = S.render.makeAvatarImage(node, state);
+            if (avatarImg) {
+                children.push(avatarImg);
+            }
+        }
+
         /* We show a simplified header for User Feed rows, because these are always visible and don't need a lot of the info */
         if (this.isFeed) {
             if (node.owner && node.owner != "?") {
@@ -41,15 +50,15 @@ export class NodeCompRowHeader extends Div {
             let priority = S.props.getNodePropVal(J.NodeProp.PRIORITY, node);
             priority = (priority && priority != "0") ? " P" + priority : "";
 
-            if (node.name) {
-                children.push(new Span("Name: " + node.name, {
-                    className: "marginRight"
-                }));
-            }
-
             if (node.owner && node.owner != "?") {
                 children.push(new Span(node.owner, {
                     className: (node.owner === state.userName) ? "created-by-me" : "created-by-other"
+                }));
+            }
+
+            if (node.name) {
+                children.push(new Span(node.name, {
+                    className: "btn-secondary nodeName"
                 }));
             }
 
@@ -58,7 +67,8 @@ export class NodeCompRowHeader extends Div {
                 ((node.logicalOrdinal != -1) ? ("[" + node.logicalOrdinal + "] ") : " ") + //
                 node.type + //
                 (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") + //
-                priority));
+                priority
+            ));
         }
         this.setChildren(children);
     }

@@ -231,8 +231,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
             }
         }
 
+        //If showMetaData is true the avatar will show up in a different place (very upper left), instead of here
         let avatarImg: Img;
-        if (this.allowAvatar && node.owner != J.PrincipalName.ADMIN) {
+        if (!state.showMetaData && this.allowAvatar && node.owner != J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeAvatarImage(node, state);
         }
 

@@ -578,7 +578,7 @@ input[type="radio"] {
 .rowIcon {
     margin-left: 10px;
     margin-right: 6px;
-    vertical-align: 'middle';
+    vertical-align: middle;
     cursor: pointer;
 }
 
@@ -775,6 +775,7 @@ which it will do by default. */
     color: $createdByMeTextColor;
     padding: 4px;
     margin-right: 10px;
+    margin-left: 10px;
 }
 
 .created-by-other {
@@ -782,12 +783,18 @@ which it will do by default. */
     color: $createdByAnotherTextColor;
     padding: 4px;
     margin-right: 10px;
+    margin-left: 10px;
 }
 
 .header-text {
     font-size: small;
     margin-left: 16px;
     padding-top: 10px;
+}
+
+.nodeName {
+    padding: 4px;
+    margin-right: 10px;
 }
 
 .content-narrow {
@@ -1093,7 +1100,7 @@ i'm backing out for now
 .rowFooterIcon {
     margin-right: 12px;
     margin-bottom: 12px;  
-    vertical-align: 'middle';
+    vertical-align: middle;
     cursor: pointer;
 }
 

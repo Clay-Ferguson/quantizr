@@ -175,8 +175,9 @@ export class Search implements SearchIntf {
             onClick: S.meta64.getNodeFunc(this.cached_clickOnSearchResultRow, "S.srch.clickOnSearchResultRow", node.id),
             id: cssId
         }, [
+            buttonBar,
             new NodeCompRowHeader(node, isFeed),
-            buttonBar, content,
+            content,
             isFeed ? new NodeCompRowFooter(node, isFeed) : null
         ]);
 
@@ -186,17 +187,15 @@ export class Search implements SearchIntf {
     }
 
     makeButtonBarHtml = (node: J.NodeInfo, allowAvatar: boolean, state: AppState): Comp => {
-        let avatarImg: Img = null;
-        if (allowAvatar && node.owner != J.PrincipalName.ADMIN /* && S.props.getNodePropVal(J.NodeProp.BIN, node) */) {
-            avatarImg = S.render.makeAvatarImage(node, state);
-        }
-
-        return new HorizontalLayout([avatarImg, new Button("Jump", () => {
-            this.clickSearchNode(node.id, state);
-        }, {
-            title: "Jump to this Node in the Main Tab",
-            id: "go-" + node.id
-        }, "btn-secondary marginLeft")], "marginTop marginLeft");
+        return new HorizontalLayout([
+            new Button("Jump", () => {
+                this.clickSearchNode(node.id, state);
+            }, {
+                title: "Jump to this Node in the Main Tab",
+                id: "go-" + node.id
+            }, "btn-secondary marginLeft"),
+            new Div(null, { className: "clearfix" })
+        ], "marginTop marginLeft float-right");
     }
 
     cached_clickOnSearchResultRow = (id: string) => {
