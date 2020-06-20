@@ -110,6 +110,7 @@ export class Search implements SearchIntf {
             update: (s: AppState): void => {
                 //s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
                 s.feedResults = res.searchResults;
+                s.feedDirty = false;
             }
         });
         S.meta64.selectTab("feedTab");

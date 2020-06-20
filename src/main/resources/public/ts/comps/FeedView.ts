@@ -49,11 +49,18 @@ export class FeedView extends Div {
         let rowCount = 0;
         let children: Comp[] = [];
 
-        children.push(new ButtonBar([
-            new Button("Refresh Feed", () => {
-                S.nav.navFeed(state)
-            })
-        ], null, "float-right marginBottom"));
+        let refreshFeedButton = new ButtonBar([
+            new Div(null, {
+                className: (state.feedDirty ? "feedDirtyButton" : "feedNotDirtyButton")
+            }, [
+                new Button("Refresh Feed" + (state.feedDirty ? " (New Posts)" : ""), () => {
+                    S.nav.navFeed(state)
+                })
+            ])
+        ], null, "float-right marginBottom");
+
+        children.push(refreshFeedButton);
+
         children.push(new Div(null, { className: "clearfix" }));
 
         let i = 0;

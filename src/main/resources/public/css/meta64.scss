@@ -1114,3 +1114,12 @@ i'm backing out for now
 .userFeedParent {
     border: 2px solid $nodeBorderBottomColor;
 }
+
+.feedDirtyButton {
+    border: 4px solid green;
+}
+
+//This class exists only so the space for the border is always taken up
+.feedNotDirtyButton {
+    border: 4px solid transparent;
+}

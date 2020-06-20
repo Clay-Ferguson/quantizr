@@ -215,14 +215,7 @@ public class UserFeedService {
 		userFeedItem.setModTime(node.getModifyTime());
 		userFeedItem.setNode(node);
 
-		// I decided to update ONLY to the current user who made a change
-		// becasue I realized pushing to everyone's feed might cause screen updates
-		// when we don't want them.
-		pushNodeNotificationToSession(session, sessionContext, node, null);
-
-		// This would push the node out to all users in realtime and update all their
-		// Feed pages
-		// pushNodeUpdateToAllFriends(session, node);
+		pushNodeUpdateToAllFriends(session, node);
 	}
 
 	/*
@@ -257,7 +250,7 @@ public class UserFeedService {
 		}
 	}
 
-	/* We allow nodeInfo to be null, and we can just generate on demand if it is */
+	/* We allow nodeInfo to be null, and we generate it on demand if it is */
 	public void pushNodeNotificationToSession(MongoSession session, SessionContext sc, SubNode node,
 			NodeInfo nodeInfo) {
 		// log.debug("Processing a session to maybe push to:" + sc.getUserName());
@@ -268,7 +261,7 @@ public class UserFeedService {
 		 * since logging in, otherwise there's nothign to do here
 		 */
 		if (sc.getFeedUserNodeIds() != null && sc.getFeedUserNodeIds().contains(node.getOwner().toHexString())) {
-			// log.debug("USER GETTING A PUSH: " + sc.getUserName());
+			//log.debug("USER GETTING A PUSH: " + sc.getUserName());
 
 			if (nodeInfo == null) {
 				nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false, false);

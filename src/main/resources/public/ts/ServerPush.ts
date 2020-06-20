@@ -45,13 +45,24 @@ export class ServerPush implements ServerPushIntf {
                     update: (s: AppState): void => {
                         s.feedResults = s.feedResults || [];
 
-                        //this is a slight hack to cause the new rows to animate their background, but it's ok, and I plan to leave it like this
-                        S.render.fadeInId = nodeInfo.id;
-                        s.feedResults.unshift(nodeInfo);
+                        /* If we detect the incomming change that is our own creation, we display it, but if it's not our own we
+                        don't display because for now we aren't doing live feed updates since that can be a nuisance for users to have the
+                        page change while they're maybe reading it */
+                        if (nodeInfo.owner == s.userName) {
 
-                        //todo-0: need to scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
-                        //then remove the nodeInfo.id from the list becasue it would be redundant in the list.
-                        //s.feedResults = S.meta64.removeRedundantFeedItems(s.feedResults);
+                            //this is a slight hack to cause the new rows to animate their background, but it's ok, and I plan to leave it like this
+                            S.render.fadeInId = nodeInfo.id;
+                            s.feedResults.unshift(nodeInfo);
+
+                            //todo-0: need to scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
+                            //then remove the nodeInfo.id from the list becasue it would be redundant in the list.
+                            //s.feedResults = S.meta64.removeRedundantFeedItems(s.feedResults);
+                        }
+                        else {
+                            /* note: we could que up the incomming nodeInfo, adn then avoid a call to the server but for now we just
+                            keep it simple and only set a dirty flag */
+                            s.feedDirty = true;
+                        }
                     }
                 });
             }

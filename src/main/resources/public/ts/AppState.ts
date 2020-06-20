@@ -6,6 +6,9 @@ export class AppState {
     //up until guiReady the main App component will just render "loading..."
     guiReady: boolean = false;
 
+    /* flag that indicates the user can click "Refresh Feed" because there are new changes read */
+    feedDirty: boolean = false;
+
     //for testing in AppDemo
     counter: number = 0; 
     compDemoIdActive: number = -1;
