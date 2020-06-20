@@ -18,8 +18,10 @@ export class Share implements ShareIntf {
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
     editNodeSharing = (state: AppState, node: J.NodeInfo): void => {
-        if (!node) node = S.meta64.getHighlightedNode(state);
-
+        if (!node) {
+            node = S.meta64.getHighlightedNode(state);
+        }
+        
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
             return;
@@ -48,7 +50,7 @@ export class Share implements ShareIntf {
     */
     addCipherKeyToNode = async (node: J.NodeInfo, principalPublicKeyStr: string, principalNodeId: string): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            if (principalNodeId=="public") {
+            if (principalNodeId == "public") {
                 console.warn("public node has encryption turned on. This is a bug.");
                 resolve();
             }

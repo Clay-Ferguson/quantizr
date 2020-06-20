@@ -54,6 +54,7 @@ export class EditNodeDlg extends DialogBase {
     inlineChildrenCheckBox: Checkbox;
     saveNodeButton: Button;
     uploadButton: Button;
+    shareButton: Button;
     deleteUploadButton: Button;
     setTypeButton: Button;
     encryptionButton: Button;
@@ -181,6 +182,7 @@ export class EditNodeDlg extends DialogBase {
         let allowEditAllProps: boolean = this.appState.isAdminUser;
 
         let allowUpload: boolean = typeHandler ? typeHandler.allowAction("upload") : true;
+        let allowShare = true;
 
         let children = [
             new Form(null, [
@@ -197,6 +199,7 @@ export class EditNodeDlg extends DialogBase {
                     }, null, "btn-primary"),
 
                     this.uploadButton = allowUpload ? new Button("Upload", this.upload) : null,
+                    this.shareButton = allowShare ? new Button("Share", this.share) : null,
                     //(hasAttachment && allowUpload) ? this.deleteUploadButton = new Button("Delete Upload", this.deleteUpload) : null,
 
                     //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
@@ -391,6 +394,17 @@ export class EditNodeDlg extends DialogBase {
     openChangeNodeTypeDlg = (): void => {
         let dlg = new ChangeNodeTypeDlg(this.setNodeType, this.appState);
         dlg.open();
+    }
+
+    share = (): void => {
+        let state = this.getState();
+        S.share.editNodeSharing(this.appState, state.node);
+        // let dlg = new UploadFromFileDropzoneDlg(state.node.id, state.node, state.toIpfs, null, false, this.appState, async () => {
+        //     await S.attachment.refreshBinaryPropsFromServer(state.node);
+        //     this.forceRender();
+        //     this.binaryDirty = true;
+        // });
+        // await dlg.open();
     }
 
     upload = async (): Promise<void> => {

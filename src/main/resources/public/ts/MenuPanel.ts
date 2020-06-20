@@ -108,8 +108,9 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Share", [
-            new MenuItem("Edit Node Sharing", () => S.share.editNodeSharing(state), //
-                !state.isAnonUser && !!highlightNode && selNodeIsMine), //
+            //moved into editor dialog
+            // new MenuItem("Edit Node Sharing", () => S.share.editNodeSharing(state), //
+            //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
 
             // new MenuItem("Post Node", () => { S.activityPub.postNode(); },//
             //     () => {
