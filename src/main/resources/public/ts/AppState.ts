@@ -3,6 +3,9 @@ import { NodeInfo } from "./JavaIntf";
 
 /* root react Redux state for entire app */
 export class AppState {
+    //up until guiReady the main App component will just render "loading..."
+    guiReady: boolean = false;
+
     //for testing in AppDemo
     counter: number = 0; 
     compDemoIdActive: number = -1;

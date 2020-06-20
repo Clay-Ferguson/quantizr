@@ -158,6 +158,7 @@ export class Render implements RenderIntf {
                         s.activeTab = "mainTab";
                     }
 
+                    s.guiReady = true;
                     s.node = res.node;
                     s.endReached = res.endReached;
                     s.offsetOfNodeFound = res.offsetOfNodeFound;

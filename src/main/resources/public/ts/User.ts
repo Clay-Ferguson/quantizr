@@ -220,6 +220,9 @@ export class User implements UserIntf {
                         await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null);
                         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
 
+                        //todo-0: can't we do the equivalent of a load with the USR, PWD, and STATE set right in this page
+                        //without forcing a location.reload, which could go into a loop and create an accidental
+                        //self-inflicted denial of service attack!
                         location.reload();
                     }
                 }

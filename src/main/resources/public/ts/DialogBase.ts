@@ -30,8 +30,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
 
     /* Warning: Base 'Comp' already has 'state', I think it was wrong to rely on 'appState' everywhere inside dialogs, because
     we need to just let the render methods grab the latest state like every other component in the render method. 
-    
-    todo-0: Need to slowly phase on just calls to store.getState(), because I don't think this variable is needed.
     */
     appState: AppState;
 

@@ -8,6 +8,10 @@ import { Main } from "./Main";
 import { LeftNavPanel } from "./LeftNavPanel";
 import { RightNavPanel } from "./RightNavPanel";
 import clientInfo from "../ClientInfo";
+import { AppState } from "../AppState";
+import { useSelector, useDispatch } from "react-redux";
+
+//todo-0: everywhere in the app that calls 'store.getState()' is highly suspicious becasue userSelector should be used most of the time
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -28,6 +32,13 @@ export class App extends Div {
     }
 
     preRender(): void {
+        const appState: AppState = useSelector((state: AppState) => state);
+
+        if (!appState.guiReady) {
+            this.setChildren([new Div("Loading...")]);
+            return;
+        }
+
         this.setChildren([
             new Div(null, { role: "toolbar" }, [new MainNavPanel(null)]),
             //For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
