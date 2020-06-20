@@ -27,7 +27,7 @@ export class ProfileDlg extends DialogBase {
     bioTextarea: Textarea;
 
     constructor(state: AppState) {
-        super("Profile", null, false, state);
+        super("Profile: "+state.userName, null, false, state);
     }
 
     renderDlg(): CompIntf[] {
@@ -43,14 +43,15 @@ export class ProfileDlg extends DialogBase {
                         className: "col-6"
                     }, [
                         new Div(null, null, [
-                            this.userNameTextField = new TextField("User Name", state.defaultUserName, false, null, {
-                                getValue: () => {
-                                    return this.getState().defaultUserName;
-                                },
-                                setValue: (val: any) => {
-                                    this.mergeState({ defaultUserName: val });
-                                }
-                            }),
+                            // I'm disabling ability to change user name because of a bug (duplicate name risk)
+                            // this.userNameTextField = new TextField("User Name", state.defaultUserName, false, null, {
+                            //     getValue: () => {
+                            //         return this.getState().defaultUserName;
+                            //     },
+                            //     setValue: (val: any) => {
+                            //         this.mergeState({ defaultUserName: val });
+                            //     }
+                            // }),
                             this.bioTextarea = new Textarea("Bio", {
                                 rows: 15
                             }, {
@@ -121,7 +122,7 @@ export class ProfileDlg extends DialogBase {
 
     save = (): void => {
         S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
-            userName: this.userNameTextField.getValue(),
+            userName: null, //this.userNameTextField.getValue(),
             userBio: this.bioTextarea.getValue()
         }, this.saveResponse);
     }
@@ -129,15 +130,16 @@ export class ProfileDlg extends DialogBase {
     saveResponse = (res: J.SaveUserPreferencesResponse): void => {
         if (S.util.checkSuccess("Saving Profile", res)) {
             let state: AppState = store.getState();
-            let userName = this.userNameTextField.getValue();
 
-            dispatch({
-                type: "Action_UpdateUserProfile", state,
-                update: (s: AppState): void => {
-                    s.userName = userName;
-                    s.title = "User: " + userName;
-                },
-            });
+            // DO NOT DELETE: this will come back eventually
+            //let userName = this.userNameTextField.getValue();
+            // dispatch({
+            //     type: "Action_UpdateUserProfile", state,
+            //     update: (s: AppState): void => {
+            //         s.userName = userName;
+            //         s.title = "User: " + userName;
+            //     },
+            // });
 
             S.meta64.refresh(state);
             this.close();

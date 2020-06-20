@@ -510,22 +510,23 @@ public class UserManagerService {
 			boolean failed = false;
 			SubNode userNode = api.getUserNodeByUserName(session, userName);
 
+			// DO NOT DELETE: This is temporaryly disabled (no ability to edit userNaem)
 			// If userName is changing, validate it first.
-			if (!req.getUserName().equals(userName)) {
-				validator.checkUserName(req.getUserName());
+			// if (!req.getUserName().equals(userName)) {
+			// 	validator.checkUserName(req.getUserName());
 
-				SubNode nodeFound = api.getUserNodeByUserName(session, req.getUserName());
-				if (nodeFound != null) {
-					res.setMessage("User already exists.");
-					res.setSuccess(false);
-					failed = true;
-				}
-			}
+			// 	SubNode nodeFound = api.getUserNodeByUserName(session, req.getUserName());
+			// 	if (nodeFound != null) {
+			// 		res.setMessage("User already exists.");
+			// 		res.setSuccess(false);
+			// 		failed = true;
+			// 	}
+			// }
 
 			if (!failed) {
-				userNode.setProp(NodeProp.USER.s(), req.getUserName());
+				//userNode.setProp(NodeProp.USER.s(), req.getUserName());
 				userNode.setProp(NodeProp.USER_BIO.s(), req.getUserBio());
-				sessionContext.setUserName(req.getUserName());
+				//sessionContext.setUserName(req.getUserName());
 				api.save(session, userNode);
 				res.setSuccess(true);
 			}
