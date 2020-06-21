@@ -84,9 +84,15 @@ export class SharingDlg extends DialogBase {
         });
     }
 
-    shareToPersonDlg = (): void => {
+    shareToPersonDlg = async (): Promise<void> => {
         let dlg = new ShareToPersonDlg(this.node, this.reload, this.appState);
-        dlg.open();
+        await dlg.open();
+        if (dlg.closeContiningDialogs) {
+            this.close();
+        }
+
+        //this promise currently isn't needed
+        return null;
     }
 
     shareNodeToPublic = (): void => {
