@@ -52,7 +52,7 @@ export class NodeCompBinary extends Div {
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
         let img: Img = new Img(node.id, {
             src,
-            className: "attached-img",
+            className: this.isEditorEmbed ? "attached-img-in-editor" : "attached-img-in-row",
             style,
             title: "Click image to enlarge/reduce",
             onClick: S.meta64.getNodeFunc(this.cached_clickOnImage, "NodeCompBinary.clickOnImage", node.id),

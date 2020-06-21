@@ -75,7 +75,7 @@ export class MainNavPanel extends NavTag {
                 }, [
                     new NavBarIconButton("fa-gear", null, {
                         onClick: e => { S.edit.editPreferences(state); },
-                        title: "Edit your Account Preferences"
+                        title: "Edit Preferences"
                     }, "nav-link", "off")
                 ]));
             }
@@ -95,10 +95,10 @@ export class MainNavPanel extends NavTag {
                 buttons.push(new Li(null, {
                     className: "nav-item"
                 }, [
-                    new NavBarButton("Signup", {
+                    new NavBarIconButton("fa-user-plus", "Signup", {
                         onClick: e => { S.nav.signup(state); },
-                        title: "Create new Quantizr Account"
-                    })
+                        title: "Create new Account"
+                    }, "nav-link", "off")
                 ]));
             }
         }

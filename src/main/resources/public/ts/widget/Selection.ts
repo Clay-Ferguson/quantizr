@@ -53,7 +53,8 @@ export class Selection extends Comp {
             children.push(S.e("label", {
                 id: this.getId()+"_label",
                 key: this.getId()+"_label",
-                htmlFor: this.getId()
+                htmlFor: this.getId(),
+                className: "selectLabel"
             }, this.label));
         }
 

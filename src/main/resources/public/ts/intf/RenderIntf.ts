@@ -12,7 +12,7 @@ export interface RenderIntf {
     setNodeDropHandler(rowDiv: Comp, node: J.NodeInfo, state: AppState): void;
     initMarkdown(): void;
     injectSubstitutions(content: string): string;
-    showNodeUrl(state: AppState): void;
+    showNodeUrl(node: J.NodeInfo, state: AppState): void;
     renderPageFromData(data: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean, allowScroll: boolean, state: AppState): void; 
     getUrlForNodeAttachment(node: J.NodeInfo): string;
     getStreamUrlForNodeAttachment(node: J.NodeInfo): string;

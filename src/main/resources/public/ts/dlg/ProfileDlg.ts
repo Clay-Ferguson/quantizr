@@ -54,7 +54,7 @@ export class ProfileDlg extends DialogBase {
                             // }),
                             this.bioTextarea = new Textarea("Bio", {
                                 rows: 15
-                            }, {
+                            }, null, {
                                 getValue: () => {
                                     return this.getState().defaultBio;
                                 },

@@ -34,6 +34,7 @@ import { NodeCompBinary } from "../comps/NodeCompBinary";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg"
 import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { LayoutRow } from "../widget/LayoutRow";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -198,7 +199,7 @@ export class EditNodeDlg extends DialogBase {
                         this.close();
                     }, null, "btn-primary"),
 
-                    this.uploadButton = allowUpload ? new Button("Upload", this.upload) : null,
+                    this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
                     this.shareButton = allowShare ? new Button("Share", this.share) : null,
                     //(hasAttachment && allowUpload) ? this.deleteUploadButton = new Button("Delete Upload", this.deleteUpload) : null,
 
@@ -339,17 +340,28 @@ export class EditNodeDlg extends DialogBase {
                 EditNodeDlg.morePanelExpanded = state;
             }, EditNodeDlg.morePanelExpanded, "float-right") : null;
 
-        let binarySection: HorizontalLayout = null;
+        let binarySection: LayoutRow = null;
         if (hasAttachment) {
-            binarySection = new HorizontalLayout([
-                new NodeCompBinary(state.node, true),
+            let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, state.node);
+
+            binarySection = new LayoutRow([
+                new Div(null, { className: "col-4" }, [
+                    new NodeCompBinary(state.node, true),
+                ]),
+
                 new Div(null, {
-                    className: "marginLeft"
+                    className: "col-8"
                 }, [
                     this.imgSizeSelection,
-                    (hasAttachment && allowUpload) ? this.deleteUploadButton = new Button("Delete Upload", this.deleteUpload) : null,
-                ])
-            ], "row");
+                    new ButtonBar([
+                        this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
+                        this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
+                        new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }),
+                    ]),
+                    ipfsLink ? new Div("Stored on IPFS (https://temporal.cloud)", {className: "marginTop"}) : null,
+                ]),
+
+            ], "binaryEditorSection")
         }
 
         this.propertyEditFieldContainer.setChildren([mainPropsTable, binarySection, collapsiblePanel]);
@@ -589,9 +601,8 @@ export class EditNodeDlg extends DialogBase {
         if (!allowEditAllProps && isReadOnly) {
             let textarea = new Textarea(label + " (read-only)", {
                 readOnly: "readOnly",
-                disabled: "disabled",
-                defaultValue: propValStr
-            });
+                disabled: "disabled"
+            }, propValStr);
 
             formGroup.addChild(textarea);
         }
@@ -619,8 +630,7 @@ export class EditNodeDlg extends DialogBase {
                 else {
                     valEditor = new Textarea(null, {
                         rows: "20",
-                        defaultValue: propEntry.value
-                    });
+                    }, propEntry.value);
                     valEditor.focus();
                 }
             }
@@ -686,10 +696,15 @@ export class EditNodeDlg extends DialogBase {
             });
         }
         else {
+            //todo-0: encryption needs to be reworked because defaultValue is going away (see comment below)
+            if (encrypted) {
+                throw new Error("encryption not currently supported");
+            }
+
             this.contentEditor = new Textarea(null, {
                 rows,
-                defaultValue: encrypted ? "[encrypted]" : value
-            }, {
+                //defaultValue: encrypted ? "[encrypted]" : value
+            }, null, {
                 getValue: () => {
                     return this.getState().node.content;
                 },

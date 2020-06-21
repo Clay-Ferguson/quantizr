@@ -661,10 +661,16 @@ input[type="radio"] {
     border: 1px dotted green;
 }
 
-.attached-img {
+.attached-img-in-row {
     cursor: pointer;
     margin-left: $smallGap;
     margin-bottom: $smallGap;
+    border-radius: .6em;
+    border: 1px solid $gray-700
+}
+
+.attached-img-in-editor {
+    cursor: pointer;
     border-radius: .6em;
     border: 1px solid $gray-700
 }
@@ -1146,4 +1152,16 @@ i'm backing out for now
 .iconToggleOff {
     border: 2px solid transparent;
     padding: 5px;
+}
+
+.selectLabel {
+    margin-bottom: 0px;
+}
+
+.binaryEditorSection {
+    margin-left: 6px;
+    margin-right: 6px;
+    padding: 10px;
+    border-radius: .6em;
+    border: 2px solid $gray-700
 }

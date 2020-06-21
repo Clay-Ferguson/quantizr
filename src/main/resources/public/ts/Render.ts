@@ -121,16 +121,24 @@ export class Render implements RenderIntf {
         });
     }
 
-    showNodeUrl = (state: AppState): void => {
-        let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
+    showNodeUrl = (node: J.NodeInfo, state: AppState): void => {
+        if (!node) {
+            node = S.meta64.getHighlightedNode(state);
+        }
         if (!node) {
             S.util.showMessage("You must first click on a node.", "Warning");
             return;
         }
 
-        let message: string = "ID-based URL: \n" + window.location.origin + "?id=" + node.id;
+        let message: string = "ID-based Node URL: \n" + window.location.origin + "?id=" + node.id;
         if (node.name) {
-            message += "\n\nName-based URL: \n" + window.location.origin + "?n=" + node.name;
+            message += "\n\nName-based Node URL: \n" + window.location.origin + "?n=" + node.name;
+        }
+
+        let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+        if (ipfsLink) {
+            let ipfsUrl = S.render.getUrlForNodeAttachment(node);
+            message += "\n\nIPFS Attachment URL: \n" + ipfsUrl;
         }
 
         S.util.showMessage(message, "URL", true);
