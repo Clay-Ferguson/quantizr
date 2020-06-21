@@ -33,7 +33,6 @@ import { Label } from "../widget/Label";
 import { NodeCompBinary } from "../comps/NodeCompBinary";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg"
-import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { LayoutRow } from "../widget/LayoutRow";
 
 let S: Singletons;
@@ -127,7 +126,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "800px", val: "800px" },
             { key: "1000px", val: "1000px" },
 
-        ], "m-2"); // "w-25 m-2");
+        ], "m-2 w-25"); // "w-25 m-2");
         return selection;
     }
 
@@ -356,7 +355,7 @@ export class EditNodeDlg extends DialogBase {
                     new ButtonBar([
                         this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
                         this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
-                        new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }),
+                        ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null,
                     ]),
                     ipfsLink ? new Div("Stored on IPFS (https://temporal.cloud)", {className: "marginTop"}) : null,
                 ]),
@@ -411,12 +410,6 @@ export class EditNodeDlg extends DialogBase {
     share = (): void => {
         let state = this.getState();
         S.share.editNodeSharing(this.appState, state.node);
-        // let dlg = new UploadFromFileDropzoneDlg(state.node.id, state.node, state.toIpfs, null, false, this.appState, async () => {
-        //     await S.attachment.refreshBinaryPropsFromServer(state.node);
-        //     this.forceRender();
-        //     this.binaryDirty = true;
-        // });
-        // await dlg.open();
     }
 
     upload = async (): Promise<void> => {

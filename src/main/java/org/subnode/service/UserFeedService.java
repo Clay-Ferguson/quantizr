@@ -18,9 +18,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.FeedPushInfo;
-import org.subnode.util.Const;
 import org.subnode.util.Convert;
-import org.subnode.util.ValContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,7 +121,7 @@ public class UserFeedService {
 			log.debug("Found UserFeed Node to get Timeline of: " + feedNode.getId().toHexString());
 
 			/* Process all the nodes under this user's USER_FEED node */
-			for (SubNode node : api.searchSubGraph(session, feedNode, null, "", SubNode.FIELD_MODIFY_TIME, 10, false,
+			for (SubNode node : api.searchSubGraph(session, feedNode, null, "", SubNode.FIELD_MODIFY_TIME, 25, false,
 					false)) {
 
 				UserFeedItem userFeedItem = new UserFeedItem();
