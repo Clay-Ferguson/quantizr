@@ -39,8 +39,10 @@ export class ShareToPersonDlg extends DialogBase {
                     new Button("Choose from Friends", async () => {
                         let friendsDlg: FriendsDlg = new FriendsDlg(this.appState);
                         await friendsDlg.open();
-                        this.close();
-                        this.shareToPersonImmediate(friendsDlg.selectedName);
+                        if (friendsDlg.selectedName) {
+                            this.close();
+                            this.shareToPersonImmediate(friendsDlg.selectedName);
+                        }
                     }, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
@@ -58,7 +60,7 @@ export class ShareToPersonDlg extends DialogBase {
         }
 
         let appState = store.getState();
-        if (targetUser==appState.userName) {
+        if (targetUser == appState.userName) {
             S.util.showMessage("You can't share a node to yourself.", "Warning");
             return;
         }

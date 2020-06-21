@@ -44,7 +44,7 @@ export class MainNavPanel extends NavTag {
                 new NavBarIconButton("fa-clipboard", null, {
                     onClick: e => { S.edit.saveClipboardToNode(); },
                     title: "Save Clipboard text to a Note"
-                }, "nav-link")
+                }, "nav-link", "off")
             ]));
         }
 
@@ -56,7 +56,7 @@ export class MainNavPanel extends NavTag {
                     new NavBarIconButton("fa-database", null, {
                         onClick: e => { S.nav.navHome(state); },
                         title: "Go to Your Root Node"
-                    }, "nav-link")
+                    }, "nav-link", "off")
                 ]));
             }
 
@@ -66,7 +66,7 @@ export class MainNavPanel extends NavTag {
                 new NavBarIconButton("fa-home", null, {
                     onClick: e => { S.meta64.loadAnonPageHome(state); },
                     title: "Go to Portal Root Node"
-                }, "nav-link")
+                }, "nav-link", "off")
             ]));
 
             if (!state.isAnonUser) {
@@ -76,7 +76,7 @@ export class MainNavPanel extends NavTag {
                     new NavBarIconButton("fa-gear", null, {
                         onClick: e => { S.edit.editPreferences(state); },
                         title: "Edit your Account Preferences"
-                    }, "nav-link")
+                    }, "nav-link", "off")
                 ]));
             }
 
@@ -87,7 +87,7 @@ export class MainNavPanel extends NavTag {
                     new NavBarIconButton("fa-pencil", null, {
                         onClick: e => { S.edit.toggleEditMode(state); },
                         title: "Toggle Edit Mode on/off"
-                    }, "nav-link", state.userPreferences.editMode),
+                    }, "nav-link", state.userPreferences.editMode ? "on" : "off"),
                 ]));
             }
 
@@ -110,7 +110,7 @@ export class MainNavPanel extends NavTag {
                 new NavBarIconButton("fa-sign-in", "Login", {
                     onClick: e => { S.nav.login(state); },
                     title: "Login to Quantizr"
-                }, "nav-link")
+                }, "nav-link", "off")
             ]));
         }
 
@@ -121,7 +121,7 @@ export class MainNavPanel extends NavTag {
                 new NavBarIconButton("fa-sign-out", null, {
                     onClick: e => { S.nav.logout(state); },
                     title: "Logout"
-                }, "nav-link")
+                }, "nav-link", "off")
             ]));
         }
 
@@ -152,7 +152,7 @@ export class MainNavPanel extends NavTag {
                         id: "mainMenu",
                         //only applies to mobile. just don't show title for now.
                         //title: "Show Main Menu"
-                    }, "nav-link")
+                    }, "nav-link", "off")
                 ]),
             ]),
 
