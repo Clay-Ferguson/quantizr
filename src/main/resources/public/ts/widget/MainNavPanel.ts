@@ -84,7 +84,7 @@ export class MainNavPanel extends NavTag {
                 buttons.push(new Li(null, {
                     className: "nav-item"
                 }, [
-                    new NavBarIconButton("fa-pencil", null, {
+                    new NavBarIconButton("fa-pencil", state.userPreferences.editMode ? "ON" : "OFF", {
                         onClick: e => { S.edit.toggleEditMode(state); },
                         title: "Toggle Edit Mode on/off"
                     }, "nav-link"),

@@ -379,18 +379,24 @@ strong em {
     margin-right: 8px;
 }
 
+//The width/height looks awesome, but FireFox is jank so for now we will just use the smaller native controls.
 input[type="checkbox"] {
-    height: 25px;
-    width: 25px;
+    // height: 25px;
+    // width: 25px;
     margin-right: 8px;
-    margin-top: 8px;
-    margin-bottom: 8px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    margin-left: 16px
 }
 
+//The width/height looks awesome, but FireFox is jank so for now we will just use the smaller native controls.
 input[type="radio"] {
-    height: 25px;
-    width: 25px;
-    margin: 8px;
+    // height: 25px;
+    // width: 25px;
+    margin-right: 8px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    margin-left: 16px
 }
 
 .edit-prop-checkbox-col {
