@@ -115,7 +115,6 @@ body {
     border: 6px dotted $nodeBorderBottomColor;
 }
 
-
 .main-navbar {
     padding: $tinyGap;
 }
@@ -258,11 +257,6 @@ strong em {
 }
 
 /* Modal Content/ Dialog Box */
-
-.menuContainer {
-    min-width: 18em;
-    width: 18em;
-}
 
 .app-modal-menu {
     border: 2px solid $modal-content-border-color;
@@ -981,59 +975,6 @@ i'm backing out for now
     background-color: #eee;
 }
 
-/* Media Queries below are per Bootstap 4 standard */
-
-/* Small devices (tiny, 320px and up) */
-
-/* Small devices (portrait phones?, 576px and up) */
-@media (min-width: 576px) {
-    .modal-lg {
-        width: 500px;
-        height: 800px;
-    }
-
-    .container{
-        max-width: 500px;
-    }
-}
-
-/* Medium devices (tablets, 768px and up) */
-@media (min-width: 768px) {
-    .modal-lg {
-        width: 700px;
-        height: 700px;
-    }
-
-    .container{
-        max-width: 700px;
-    }
-}
-
-/* Large devices (desktops, 992px and up) */
-@media (min-width: 992px) {
-    .modal-lg {
-        width: 900px;
-        height: 900px;
-    }
-
-    .container{
-        max-width: 800px;
-    }
-}
-
-/* Extra large devices (large desktops, 1200px and up) */
-
-@media (min-width: 1200px) {
-    .modal-lg {
-        width: 1198px;
-        height: 1198px;
-    }
-
-    .container{
-        max-width: 1000px;
-    }
-}
-
 /*
 * Sidebar
 */
@@ -1145,7 +1086,7 @@ i'm backing out for now
 }
 
 .iconToggleOn {
-    border: 2px solid #c8c8c8;
+    border: 2px solid #e0e0e0;
     padding: 5px;
 }
 
@@ -1164,4 +1105,82 @@ i'm backing out for now
     padding: 10px;
     border-radius: .6em;
     border: 2px solid $gray-700
+}
+
+/************************************************************** 
+Media Queries below are per Bootstap 4 standard */
+
+/* Small devices (tiny, 320px and up) */
+
+/* Small devices (portrait phones?, 576px and up) */
+@media (min-width: 576px) {
+    .menuContainer {
+        min-width: 8em;
+        width: 8em;
+        //border: 1px solid red;
+    }
+
+    .modal-lg {
+        width: 500px;
+        height: 800px;
+    }
+
+    .container{
+        max-width: 500px;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .menuContainer {
+        min-width: 10em;
+        width: 10em;
+        //border: 1px solid yellow;
+    }  
+
+    .modal-lg {
+        width: 700px;
+        height: 700px;
+    }
+
+    .container{
+        max-width: 700px;
+    }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    .menuContainer {
+        min-width: 12em;
+        width: 12em;
+        //border: 1px solid green;
+    }  
+
+    .modal-lg {
+        width: 900px;
+        height: 900px;
+    }
+
+    .container{
+        max-width: 800px;
+    }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+
+@media (min-width: 1200px) {
+    .menuContainer {
+        min-width: 16em;
+        width: 16em;
+        //border: 1px solid blue;
+    }  
+
+    .modal-lg {
+        width: 1198px;
+        height: 1198px;
+    }
+
+    .container{
+        max-width: 1000px;
+    }
 }
