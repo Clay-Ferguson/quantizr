@@ -200,7 +200,6 @@ export class EditNodeDlg extends DialogBase {
 
                     this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
                     this.shareButton = allowShare ? new Button("Share", this.share) : null,
-                    //(hasAttachment && allowUpload) ? this.deleteUploadButton = new Button("Delete Upload", this.deleteUpload) : null,
 
                     //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
                     this.cancelButton = new Button("Cancel", this.cancelEdit)
@@ -344,7 +343,7 @@ export class EditNodeDlg extends DialogBase {
             let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, state.node);
 
             binarySection = new LayoutRow([
-                new Div(null, { className: "col-4" }, [
+                new Div(null, { className: "col-4 editBinaryContainer" }, [
                     new NodeCompBinary(state.node, true),
                 ]),
 
