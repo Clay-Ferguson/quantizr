@@ -1,5 +1,8 @@
 import { Factory } from "./Factory";
 
+//set in index.html
+declare var browserSupported;
+
 window.onerror = function (message, url, line, col, err) {
 	var msg = "ERROR: " + message + " [url:" + url + "] line " + line + " col: " + col;
 	if (err.stack) {
@@ -8,9 +11,10 @@ window.onerror = function (message, url, line, col, err) {
 	console.log(msg);
 }
 
-console.log("bundle entrypoint running.");
-let factory = new Factory();
-factory.constructAll();
+if (browserSupported) {
+	console.log("bundle entrypoint running.");
+	let factory = new Factory();
+	factory.constructAll();
 
-factory.singletons.meta64.initApp();
-
+	factory.singletons.meta64.initApp();
+}

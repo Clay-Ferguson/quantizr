@@ -2,24 +2,23 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <meta name="theme-color" content="#000000"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="theme-color" content="#000000" />
 
-    <meta name="mobile-web-app-capable" content="yes"/>
-    <meta name="application-name" content="quantizr.com"/>
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="quantizr.com" />
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3"/>
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=3"/>
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=3"/>
-    <link rel="manifest" href="/site.webmanifest"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=3" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=3" />
+    <link rel="manifest" href="/site.webmanifest" />
 
-    <link rel="stylesheet" href="/font-awesome-4.7.0/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/font-awesome-4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="/js/dropzone/dropzone.css?v=dz7" />
     <link rel="stylesheet" href="/css/meta64.css?<%=htmlWebpackPlugin.options.cachebuster%>" />
-    <link rel="stylesheet" href="/css/highlightjs/darcula.css"/>
+    <link rel="stylesheet" href="/css/highlightjs/darcula.css" />
 
-    <!-- todo-0: temporarily turning this off
     <script>
         MathJax = {
             tex: {
@@ -29,7 +28,6 @@
     </script>
     <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
     </script>
-    -->
 
     <title>Quantizr</title>
 </head>
@@ -42,6 +40,40 @@
     <div id="app">
         Loading...
     </div>
+
+    <script>
+        var browserSupported = true;
+        
+        function oldIEdetection() {
+            var ua = window.navigator.userAgent;
+            var msie = ua.indexOf('MSIE ');
+            if (msie > 0) {
+                browserSupported = false;
+                // IE 10 or older, return version number
+                return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+            }
+            var trident = ua.indexOf('Trident/');
+            if (trident > 0) {
+                browserSupported = false;
+                // IE 11, return version number
+                var rv = ua.indexOf('rv:');
+                return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+            }
+            var edge = ua.indexOf('Edge/');
+            if (edge > 0) {
+                //Edge (IE 12+), return version number
+                //return 'IE ' + parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+                return null;
+            }
+            // User uses other browser
+            return null;
+        }
+        var result = oldIEdetection();
+        if (result) {
+            document.write("Browser not supported: IE "+result);
+            document.write("<br>Try a modern browser like Chrome, Firefox, or Edge.")
+        }
+    </script>
 
     <script src="/js/jquery/jquery-3.3.1.min.js"></script>
     <script src="/js/popper/popper.min.js?v=1"></script>
