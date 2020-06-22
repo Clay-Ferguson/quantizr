@@ -21,8 +21,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-declare var MathJax;
-
 export class Render implements RenderIntf {
 
     private debug: boolean = false;
