@@ -524,8 +524,12 @@ export class Meta64 implements Meta64Intf {
         S.util.ajax<J.AnonPageLoadRequest, J.AnonPageLoadResponse>("anonPageLoad", {
         },
             (res: J.AnonPageLoadResponse): void => {
+                //todo-0: It's really awkward how AnonPageLoadResponse wraps a RenderNodeResponse inside it. Fix that.
+                if (!res.success || !res.renderNodeResponse || ! res.renderNodeResponse.success) {
+                    S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
+                }
                 S.render.renderPageFromData(res.renderNodeResponse, false, null, true, true, state);
-            }
+            },
         );
     }
 
@@ -584,7 +588,7 @@ export class Meta64 implements Meta64Intf {
 
     //todo-0: need to decide if I want this. It's disabled currently (not called)
     removeRedundantFeedItems = (feedResults: J.NodeInfo[]): J.NodeInfo[] => {
-        if (!feedResults || feedResults.length==0) return feedResults;
+        if (!feedResults || feedResults.length == 0) return feedResults;
 
         //first build teh set of ids that that are in 'ni.parent.id' 
         let idSet: Set<string> = new Set<string>();

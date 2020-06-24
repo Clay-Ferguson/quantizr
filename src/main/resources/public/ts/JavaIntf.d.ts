@@ -498,6 +498,7 @@ export interface ResponseBase {
     message: string;
     stackTrace: string;
     exceptionClass: string;
+    exceptionType: string;
 }
 
 export interface NodeInfo {

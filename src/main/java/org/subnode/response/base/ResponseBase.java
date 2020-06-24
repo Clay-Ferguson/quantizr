@@ -8,6 +8,9 @@ public class ResponseBase {
 	private String stackTrace;
 	private String exceptionClass;
 
+	//for now only 'auth' is available here (will make an enum eventually)
+	private String exceptionType;
+
 	public ResponseBase() {
 		ThreadLocals.setResponse(this);
 	}
@@ -42,5 +45,13 @@ public class ResponseBase {
 
 	public void setExceptionClass(String exceptionClass) {
 		this.exceptionClass = exceptionClass;
+	}
+
+	public String getExceptionType() {
+		return exceptionType;
+	}
+
+	public void setExceptionType(String exceptionType) {
+		this.exceptionType = exceptionType;
 	}
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
+import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeType;
@@ -77,8 +78,18 @@ public class NodeRenderService {
 
 		String targetId = req.getNodeId();
 
-		//log.debug("renderNode targetId:" + targetId);
-		SubNode node = api.getNode(session, targetId);
+		// log.debug("renderNode targetId:" + targetId);
+		SubNode node = null;
+		try {
+			node = api.getNode(session, targetId);
+		} catch (NodeAuthFailedException e) {
+			res.setSuccess(false);
+			res.setMessage("Unauthorized.");
+			res.setExceptionType("auth");
+			log.error("error", e);
+			//throw e;
+			return res;
+		}
 
 		if (node == null) {
 			res.setNoDataResponse("Node not found.");
@@ -87,7 +98,8 @@ public class NodeRenderService {
 
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
-			NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, 0, false, false, false);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, 0, false, false,
+					false);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -141,7 +153,7 @@ public class NodeRenderService {
 				scanToNode = true;
 
 				while (node != null && levelsUpRemaining > 0) {
-					//log.debug("upLevelsRemaining=" + levelsUpRemaining);
+					// log.debug("upLevelsRemaining=" + levelsUpRemaining);
 					try {
 						SubNode parent = api.getParent(session, node);
 						if (parent != null) {
@@ -149,11 +161,13 @@ public class NodeRenderService {
 						} else {
 							break;
 						}
-						//log.trace("   upLevel to nodeid: " + node.getPath());
+						// log.trace(" upLevel to nodeid: " + node.getPath());
 						levelsUpRemaining--;
 					} catch (Exception e) {
-						/* UPDATE: It's never actually a render problem if we can't grab the parent in cases
-						where we tried to. Always just allow it to render 'node' itself. */
+						/*
+						 * UPDATE: It's never actually a render problem if we can't grab the parent in
+						 * cases where we tried to. Always just allow it to render 'node' itself.
+						 */
 						scanToNode = false;
 						break;
 					}
@@ -185,8 +199,8 @@ public class NodeRenderService {
 		// log.debug(
 		// "RENDER: " + node.getPath() /* XString.prettyPrint(node) */ + " ordinal=" +
 		// ordinal + "level=" + level);
-		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, ordinal,
-				level > 0, false, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, ordinal, level > 0,
+				false, false);
 
 		if (level > 0) {
 			return nodeInfo;
@@ -213,8 +227,8 @@ public class NodeRenderService {
 		String orderBy = node.getStringProp("orderBy");
 		Sort sort = null;
 		if ("priority asc".equalsIgnoreCase(orderBy)) {
-			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_PROPERTIES + ".priority").and(
-				Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_PROPERTIES + ".priority")
+					.and(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
 		} else {
 			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
 		}
@@ -275,7 +289,7 @@ public class NodeRenderService {
 				break;
 			}
 			SubNode n = iterator.next();
-			//log.debug("NodeFound: node: "+ XString.prettyPrint(n));
+			// log.debug("NodeFound: node: "+ XString.prettyPrint(n));
 
 			idx++;
 			if (idx > offset) {
@@ -391,8 +405,8 @@ public class NodeRenderService {
 			return res;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, false, true, -1, false,
-				false, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, false, true, -1, false, false,
+				false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;

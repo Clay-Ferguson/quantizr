@@ -147,7 +147,7 @@ export class Render implements RenderIntf {
     }
 
     renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true, state: AppState): void => {
-        if (res.noDataResponse) {
+        if (res && res.noDataResponse) {
             S.util.showMessage(res.noDataResponse, "Note");
             return;
         }
@@ -165,13 +165,16 @@ export class Render implements RenderIntf {
                     }
 
                     s.guiReady = true;
-                    s.node = res.node;
-                    s.endReached = res.endReached;
-                    s.offsetOfNodeFound = res.offsetOfNodeFound;
-                    s.displayedParent = res.displayedParent;
+
+                    if (res) {
+                        s.node = res.node;
+                        s.endReached = res.endReached;
+                        s.offsetOfNodeFound = res.offsetOfNodeFound;
+                        s.displayedParent = res.displayedParent;
+                    }
 
                     s.idToNodeMap = {};
-                    S.meta64.updateNodeMap(res.node, s);
+                    if (res) S.meta64.updateNodeMap(res.node, s);
                     s.selectedNodes = {};
 
                     if (s.node) {
@@ -207,7 +210,9 @@ export class Render implements RenderIntf {
                 }
             });
 
-            this.lastOwner = state.node.owner;
+            if (state.node) {
+                this.lastOwner = state.node.owner;
+            }
         }
         catch (err) {
             console.error("render failed.");
