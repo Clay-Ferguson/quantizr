@@ -54,12 +54,12 @@ export class MenuPanel extends Div {
         children.push(new Menu("Navigate", [
             new MenuItem("Portal", () => S.meta64.loadAnonPageHome(state)),
             new MenuItem("Home", () => S.nav.navHome(state), !state.isAnonUser),
-            new MenuItem("Inbox", () => S.nav.openContentNode("~inbox", state), !state.isAnonUser),
-            new MenuItem("Friends", () => S.nav.openContentNode("~friendList", state), !state.isAnonUser),
+            new MenuItem("Inbox", () => S.nav.openContentNode("~"+J.NodeType.INBOX, state), !state.isAnonUser),
+            new MenuItem("Friends", () => S.nav.openContentNode("~"+J.NodeType.FRIEND_LIST, state), !state.isAnonUser),
 
             //this appears to be broken for user 'bob' at least. Also "Show Feed" is broken on the feed node
             new MenuItem("Feed", () => S.nav.navFeed(state), !state.isAnonUser),
-            new MenuItem("Post", () => S.nav.openContentNode("~userFeed", state), !state.isAnonUser),
+            new MenuItem("Post", () => S.nav.openContentNode("~"+J.NodeType.USER_FEED, state), !state.isAnonUser),
 
             //I'm removing my RSS feeds, for now (mainly to remove any political or interest-specific content from the platform)
             //new MenuItem("Podcast Feeds", () => { S.nav.openContentNode("/r/rss"); }),

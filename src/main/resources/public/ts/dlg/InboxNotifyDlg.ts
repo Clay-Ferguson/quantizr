@@ -1,3 +1,4 @@
+import * as J from "../JavaIntf";
 import { DialogBase } from "../DialogBase";
 import { TextContent } from "../widget/TextContent";
 import { ButtonBar } from "../widget/ButtonBar";
@@ -35,7 +36,7 @@ export class InboxNotifyDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Go to Inbox", () => {
                         this.close();
-                        S.nav.openContentNode("~inbox", this.appState);
+                        S.nav.openContentNode("~"+J.NodeType.INBOX, this.appState);
                     }),
                     new Button("Maybe later", () => {
                         this.close();

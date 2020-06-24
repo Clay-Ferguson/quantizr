@@ -637,7 +637,7 @@ export class Edit implements EditIntf {
                 }
 
                 S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                    nodeId: "~notes",
+                    nodeId: "~"+J.NodeType.NOTES,
                     newNodeName: "",
                     typeName: "u",
                     createAtTop: true,

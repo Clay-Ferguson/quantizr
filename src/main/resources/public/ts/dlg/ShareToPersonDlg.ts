@@ -51,7 +51,7 @@ export class ShareToPersonDlg extends DialogBase {
                     new Button("Add Friends", async () => {
                         this.closeContiningDialogs = true;
                         this.close();
-                        S.nav.openContentNode("~friendList", this.appState);
+                        S.nav.openContentNode("~"+J.NodeType.FRIEND_LIST, this.appState);
                     }, null, "btn-primary"),
                     
                     new Button("Close", () => {

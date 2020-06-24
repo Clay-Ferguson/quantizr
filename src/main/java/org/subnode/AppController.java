@@ -27,6 +27,7 @@ import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.MailSender;
+import org.subnode.model.client.NodeType;
 import org.subnode.mongo.AclService;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.RunAsMongoAdmin;
@@ -276,7 +277,7 @@ public class AppController {
 	 */
 	@RequestMapping(value = "/inbox")
 	public String inbox(Model model) {
-		sessionContext.setUrlId("~inbox");
+		sessionContext.setUrlId("~"+NodeType.INBOX.s());
 		return "forward:/index.html";
 	}
 

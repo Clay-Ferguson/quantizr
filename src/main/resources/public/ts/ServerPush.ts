@@ -54,7 +54,7 @@ export class ServerPush implements ServerPushIntf {
                             S.render.fadeInId = nodeInfo.id;
                             s.feedResults.unshift(nodeInfo);
 
-                            //todo-0: need to scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
+                            //scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
                             //then remove the nodeInfo.id from the list becasue it would be redundant in the list.
                             //s.feedResults = S.meta64.removeRedundantFeedItems(s.feedResults);
                         }

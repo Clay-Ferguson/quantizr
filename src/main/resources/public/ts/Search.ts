@@ -127,10 +127,6 @@ export class Search implements SearchIntf {
 
     /*
      * Renders a single line of search results on the search results page.
-     *
-     * node is a NodeInfo.java JSON
-     * 
-     * todo-0: maybe remove 'indent' param. ended up not needing it.
      */
     renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, allowAvatar: boolean, prefix: string, isFeed: boolean, isParent: boolean, state: AppState): Comp => {
 
@@ -201,7 +197,7 @@ export class Search implements SearchIntf {
     }
 
     cached_clickOnSearchResultRow = (id: string) => {
-        //wow this implementation is obsolete.
+        //this implementation is obsolete (update if we ever need to uncomment this)
 
         //DO NOT DELETE (this works, and may be needed some day)
         //There's really no reason to indicate to user what row is highlighted, so I let't just not clutter the screen for now

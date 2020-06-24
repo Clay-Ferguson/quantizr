@@ -294,7 +294,7 @@ export class Nav implements NavIntf {
     }
 
     navFeed = (state: AppState): void => {
-        S.srch.feed("~friendList");
+        S.srch.feed("~"+J.NodeType.FRIEND_LIST);
     }
 
     navHome = (state: AppState): void => {

@@ -769,28 +769,6 @@ public class MongoApi {
 		return ret;
 	}
 
-	/**
-	 * Locations are special enumerated locations: like 'inbox'
-	 * 
-	 * todo: need to pass a type into here not a node name, adn then get rid of the three NodeName components
-	 */
-	public SubNode getNodeByLocation(MongoSession session, String name, boolean allowAuth) {
-		SubNode ret = null;
-
-		if (name.equals(NodeName.INBOX)) {
-			ret = getSpecialNode(session, session.getUser(), null, null /* plugin renders */,
-					NodeType.INBOX.s());
-		} else if (name.equals(NodeName.FRIEND_LIST)) {
-			ret = getSpecialNode(session, session.getUser(), null, null /* plugin renders */,
-					NodeType.FRIEND_LIST.s());
-		} else if (name.equals(NodeName.USER_FEED)) {
-			ret = getSpecialNode(session, session.getUser(), null, null /* plugin renders */,
-					NodeType.USER_FEED.s());
-		}
-
-		return ret;
-	}
-
 	public SubNode getNode(MongoSession session, String path) {
 		return getNode(session, path, true);
 	}
@@ -802,7 +780,7 @@ public class MongoApi {
 	 * 1) ID (hex string, no special prefix)
 	 * 2) path (starts with slash), 
 	 * 3) name (starts with colon)
-	 * 4) special named location, like '~inbox' (starts with tilde)
+	 * 4) special named location, like '~sn:inbox' (starts with tilde)
 	 * </pre>
 	 */
 	public SubNode getNode(MongoSession session, String searchArg, boolean allowAuth) {
@@ -813,8 +791,9 @@ public class MongoApi {
 
 		SubNode ret = null;
 
+		//inbox, friend_list, and user_feed need to be passed as type instead, prefixed with tilde.
 		if (searchArg.startsWith("~")) {
-			ret = getNodeByLocation(session, searchArg.substring(1), allowAuth);
+			ret = getSpecialNode(session, session.getUser(), null, null, searchArg.substring(1));
 		}
 		// Node name lookups are done by prefixing the search with a colon (:)
 		else if (searchArg.startsWith(":")) {

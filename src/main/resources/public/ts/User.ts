@@ -99,7 +99,6 @@ export class User implements UserIntf {
                 if (!callUsr) {
                     S.meta64.loadAnonPageHome(state);
                 } else {
-                    //alert('calling login: currently at: '+location.href);
                     S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
                         userName: callUsr,
                         password: callPwd,
