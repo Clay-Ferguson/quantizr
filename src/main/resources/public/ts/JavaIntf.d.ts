@@ -11,9 +11,6 @@ export interface AddPrivilegeRequest extends RequestBase {
     principal: string;
 }
 
-export interface AnonPageLoadRequest extends RequestBase {
-}
-
 export interface AppDropRequest extends RequestBase {
     data: string;
 }
@@ -267,11 +264,6 @@ export interface ActivityPubPostResponse extends ResponseBase {
 export interface AddPrivilegeResponse extends ResponseBase {
     principalPublicKey: string;
     principalNodeId: string;
-}
-
-export interface AnonPageLoadResponse extends ResponseBase {
-    content: string;
-    renderNodeResponse: RenderNodeResponse;
 }
 
 export interface AppDropResponse extends ResponseBase {

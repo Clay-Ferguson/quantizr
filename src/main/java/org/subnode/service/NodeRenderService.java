@@ -13,16 +13,13 @@ import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.request.AnonPageLoadRequest;
 import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.RenderNodeRequest;
-import org.subnode.response.AnonPageLoadResponse;
 import org.subnode.response.InitNodeEditResponse;
 import org.subnode.response.RenderNodeResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +84,7 @@ public class NodeRenderService {
 			res.setMessage("Unauthorized.");
 			res.setExceptionType("auth");
 			log.error("error", e);
-			//throw e;
+			// throw e;
 			return res;
 		}
 
@@ -417,8 +414,7 @@ public class NodeRenderService {
 	 * displayed in the browser when a non-logged in user (i.e. anonymouse user) is
 	 * browsing the site, and this method retrieves that page data.
 	 */
-	public AnonPageLoadResponse anonPageLoad(MongoSession session, AnonPageLoadRequest req) {
-		AnonPageLoadResponse res = new AnonPageLoadResponse();
+	public RenderNodeResponse anonPageLoad(MongoSession session, RenderNodeRequest req) {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -433,26 +429,9 @@ public class NodeRenderService {
 			id = appProp.getUserLandingPageNode();
 		}
 
-		if (!StringUtils.isEmpty(id)) {
-			RenderNodeRequest renderNodeReq = new RenderNodeRequest();
+		log.debug("Anon Render Node ID: " + id);
+		req.setNodeId(id);
 
-			/*
-			 * if user specified an ID= parameter on the url we display that immediately, or
-			 * else we display the node that the admin has configured to be the default
-			 * landing page node.
-			 */
-
-			log.debug("Render Node ID: " + id);
-			renderNodeReq.setNodeId(id);
-
-			RenderNodeResponse renderNodeRes = renderNode(session, renderNodeReq);
-			res.setRenderNodeResponse(renderNodeRes);
-			res.setSuccess(true);
-		} //
-		else {
-			res.setContent("No content available.");
-			res.setSuccess(true);
-		}
-		return res;
+		return renderNode(session, req);
 	}
 }

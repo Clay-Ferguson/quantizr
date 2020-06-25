@@ -11,7 +11,6 @@ import org.subnode.exception.NotLoggedInException;
 import org.subnode.model.UserPreferences;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
-import org.subnode.request.AnonPageLoadRequest;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.LoginRequest;
 import org.subnode.request.ResetPasswordRequest;
@@ -79,7 +78,7 @@ public class CallProcessor {
 			 * that some RPC call is attempted.
 			 */
 			if (!(req instanceof LoginRequest) && //
-					!(req instanceof AnonPageLoadRequest) && //
+					//!(req instanceof AnonPageLoadRequest) && //
 					!(req instanceof SignupRequest) && //
 					!(req instanceof ResetPasswordRequest) && //
 					!(req instanceof ChangePasswordRequest) && //

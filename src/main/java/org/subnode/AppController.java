@@ -33,7 +33,6 @@ import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddPrivilegeRequest;
-import org.subnode.request.AnonPageLoadRequest;
 import org.subnode.request.AppDropRequest;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.CloseAccountRequest;
@@ -683,7 +682,7 @@ public class AppController {
 	}
 
 	@RequestMapping(value = API_PATH + "/anonPageLoad", method = RequestMethod.POST)
-	public @ResponseBody Object anonPageLoad(@RequestBody AnonPageLoadRequest req, HttpSession session) {
+	public @ResponseBody Object anonPageLoad(@RequestBody RenderNodeRequest req, HttpSession session) {
 		return callProc.run("anonPageLoad", req, session, ms -> {
 			return nodeRenderService.anonPageLoad(null, req);
 		});
