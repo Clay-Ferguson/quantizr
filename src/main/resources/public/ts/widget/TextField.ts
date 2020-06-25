@@ -53,15 +53,18 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
 
         // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
         this.attribs.onChange = (evt: any) => {
-            Comp.renderCachedChildren = true; 
+            Comp.renderCachedChildren = true;
 
-            //todo-0: it will be critical to have a finally block here.
-            //console.log("e.target.value=" + evt.target.value);
-            this.updateValFunc(evt.target.value);
-
-            setTimeout(() => {
-                Comp.renderCachedChildren = false;
-            }, 250);
+            try {
+                //todo-0: it will be critical to have a finally block here.
+                //console.log("e.target.value=" + evt.target.value);
+                this.updateValFunc(evt.target.value);
+            }
+            finally {
+                setTimeout(() => {
+                    Comp.renderCachedChildren = false;
+                }, 250);
+            }
         }
     }
 

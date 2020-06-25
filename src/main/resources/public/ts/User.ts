@@ -140,18 +140,12 @@ export class User implements UserIntf {
         });
     }
 
-    deleteAllUserLocalDbEntries = async (): Promise<void> => {
-        //todo-0: can use a promiseAll here instead right ?
-        return new Promise<void>(async (resolve, reject) => {
-            try {
-                await S.localDB.setVal(C.LOCALDB_LOGIN_USR, null);
-                await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null);
-                await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null);
-            }
-            finally {
-                resolve();
-            }
-        });
+    deleteAllUserLocalDbEntries = (): Promise<any> => {
+        return Promise.all([
+                S.localDB.setVal(C.LOCALDB_LOGIN_USR, null),
+                S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null),
+                S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null)
+        ]);
     }
 
     loginResponse = async (res: J.LoginResponse, usr: string, pwd: string, calledFromLoginDlg: boolean,

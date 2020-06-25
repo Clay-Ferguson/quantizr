@@ -13,7 +13,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Textarea extends Comp implements I.TextEditorIntf {
 
-    constructor(private label: string, attribs: any = null, private defaultValue: string=null, private valueIntf: ValueIntf = null) {
+    constructor(private label: string, attribs: any = null, private defaultValue: string = null, private valueIntf: ValueIntf = null) {
         super(attribs);
         S.util.mergeProps(this.attribs, {
             className: "form-control pre-textarea"
@@ -49,15 +49,18 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         this.attribs.onChange = (evt: any) => {
             Comp.renderCachedChildren = true;
 
-            //console.log("e.target.value=" + evt.target.value);
-            this.updateValFunc(evt.target.value);
-
-            //todo-0: research if there is any kind of 'afterOnChange' event i'm unaware of.
-            //or some way of knowing react has completed it's render cycle that resulted from the onChange
-            //state change
-            setTimeout(() => {
-                Comp.renderCachedChildren = false;
-            }, 250);
+            try {
+                //console.log("e.target.value=" + evt.target.value);
+                this.updateValFunc(evt.target.value);
+            }
+            finally {
+                //todo-0: research if there is any kind of 'afterOnChange' event i'm unaware of.
+                //or some way of knowing react has completed it's render cycle that resulted from the onChange
+                //state change
+                setTimeout(() => {
+                    Comp.renderCachedChildren = false;
+                }, 250);
+            }
         }
     }
 
