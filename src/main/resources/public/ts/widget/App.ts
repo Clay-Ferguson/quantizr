@@ -11,7 +11,7 @@ import clientInfo from "../ClientInfo";
 import { AppState } from "../AppState";
 import { useSelector, useDispatch } from "react-redux";
 
-//todo-0: everywhere in the app that calls 'store.getState()' is highly suspicious becasue userSelector should be used most of the time
+//todo-1: everywhere in the app that calls 'store.getState()' is highly suspicious becasue userSelector should be used most of the time
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

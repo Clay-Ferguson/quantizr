@@ -54,9 +54,8 @@ export class Textarea extends Comp implements I.TextEditorIntf {
                 this.updateValFunc(evt.target.value);
             }
             finally {
-                //todo-0: research if there is any kind of 'afterOnChange' event i'm unaware of.
-                //or some way of knowing react has completed it's render cycle that resulted from the onChange
-                //state change
+                /* React doesn't have a 'global' way to know when all rendering that's about to be done HAS been done, so all we can do here, is
+                use a timeout */
                 setTimeout(() => {
                     Comp.renderCachedChildren = false;
                 }, 250);

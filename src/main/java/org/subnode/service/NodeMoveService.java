@@ -145,7 +145,7 @@ public class NodeMoveService {
 				session = ThreadLocals.getMongoSession();
 			}
 		
-			SubNode trashNode = api.getTrashNode(session, session.getUser(), null, "### Trash");
+			SubNode trashNode = api.getTrashNode(session, session.getUser(), null);
 			moveNodesInternal(session, "inside", trashNode.getId().toHexString(), req.getNodeIds());
 			res.setSuccess(true);
 			return res;

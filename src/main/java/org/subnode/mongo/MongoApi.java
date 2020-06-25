@@ -1459,7 +1459,7 @@ public class MongoApi {
 		return node;
 	}
 
-	public SubNode getTrashNode(MongoSession session, String user, SubNode userNode, String nodeName) {
+	public SubNode getTrashNode(MongoSession session, String user, SubNode userNode) {
 		if (userNode == null) {
 			userNode = getUserNodeByUserName(session, user);
 		}
@@ -1475,9 +1475,6 @@ public class MongoApi {
 		if (node == null) {
 			node = createNode(session, userNode, NodeName.TRASH, NodeType.TRASH_BIN.s(), 0L, CreateNodeLocation.LAST);
 			node.setOwner(userNode.getId());
-
-			//currently the plugin isn't rendering the word "Trash Bin", so it's rendering content markdown (fix it. todo-0)
-			node.setContent(nodeName);
 			save(session, node);
 		}
 		return node;

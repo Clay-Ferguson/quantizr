@@ -29,7 +29,7 @@ export function rootReducer(state: AppState = initialState, /* action: Action<an
     else if (action.update) {
         action.update(state);
 
-        /* todo-0: this line is a stop-gap because for now our 'sensitivity' for re-renders needs to be ANYTHING in the state 
+        /* todo-1: this line is a stop-gap because for now our 'sensitivity' for re-renders needs to be ANYTHING in the state 
         can trigger everything to rerender. This line will go away once we have the ability to have the useSelector() calls
         in each component be smart enough to only retrieve exactly what's needed, which will speed up rendering a lot, and once
         we have that this line can be removed. This line is forcing react to see we have a whole new state and can trigger

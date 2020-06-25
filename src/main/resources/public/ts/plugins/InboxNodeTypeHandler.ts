@@ -5,7 +5,6 @@ import { PubSub } from "../PubSub";
 import { TypeBase } from "./base/TypeBase";
 import { AppState } from "../AppState";
 import { Comp } from "../widget/base/Comp";
-import { NodeCompMarkdown } from "../comps/NodeCompMarkdown";
 import { Div } from "../widget/Div";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";

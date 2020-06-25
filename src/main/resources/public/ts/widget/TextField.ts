@@ -56,11 +56,12 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
             Comp.renderCachedChildren = true;
 
             try {
-                //todo-0: it will be critical to have a finally block here.
                 //console.log("e.target.value=" + evt.target.value);
                 this.updateValFunc(evt.target.value);
             }
             finally {
+                /* React doesn't have a 'global' way to know when all rendering that's about to be done HAS been done, so all we can do here, is
+                use a timeout */
                 setTimeout(() => {
                     Comp.renderCachedChildren = false;
                 }, 250);
