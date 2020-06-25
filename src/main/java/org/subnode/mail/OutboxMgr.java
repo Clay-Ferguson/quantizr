@@ -2,8 +2,6 @@ package org.subnode.mail;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.subnode.config.ConstantsProvider;
 import org.subnode.config.NodeName;
@@ -17,7 +15,6 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.InboxPushInfo;
-import org.subnode.response.ServerPushInfo;
 import org.subnode.service.UserFeedService;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.XString;
@@ -25,8 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
 /**
  * Manages the node where we store all emails that are queued up to be sent.
@@ -174,46 +169,13 @@ public class OutboxMgr {
 			}
 			
 			//and then always send out a push notification so the user sees live there's a new share comming in or being re-added even.
-			sendServerPushInfo(recieverUserName, new InboxPushInfo(node.getId().toHexString()));
+			userFeedService.sendServerPushInfo(recieverUserName, new InboxPushInfo(node.getId().toHexString()));
 
 			SubNode recieverAccountNode = api.getUserNodeByUserName(session, recieverUserName);
 			if (recieverAccountNode != null) {
 				Date now = new Date();
 				recieverAccountNode.setProp(NodeProp.LAST_INBOX_NOTIFY_TIME.s(), now.getTime());
 				api.save(session, recieverAccountNode);
-			}
-		}
-	}
-
-	// todo-0: move this method to userFeedService
-	public void sendServerPushInfo(String recipientUserName, ServerPushInfo info) {
-		SessionContext userSession = SessionContext.getSessionByUserName(recipientUserName);
-
-		// If user is currently logged in we have a session here.
-		if (userSession != null) {
-			SseEmitter pushEmitter = userSession.getPushEmitter();
-			if (pushEmitter != null) {
-				ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
-				sseMvcExecutor.execute(() -> {
-					try {
-						SseEventBuilder event = SseEmitter.event() //
-								.data(info) //
-								.id(String.valueOf(info.hashCode()))//
-								.name(info.getType());
-						pushEmitter.send(event);
-
-						// DO NOT DELETE. This way of sending also works, and I was originally doing it
-						// this way and picking up
-						// in eventSource.onmessage = e => {} on the browser, but I decided to use the
-						// builder instead and let
-						// the 'name' in the builder route different objects to different event
-						// listeners on the client. Not really sure
-						// if either approach has major advantages over the other.
-						// pushEmitter.send(info, MediaType.APPLICATION_JSON);
-					} catch (Exception ex) {
-						pushEmitter.completeWithError(ex);
-					}
-				});
 			}
 		}
 	}

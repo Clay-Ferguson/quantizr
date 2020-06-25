@@ -2,6 +2,8 @@ package org.subnode.service;
 
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import org.subnode.config.NodeName;
@@ -23,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,6 +36,7 @@ import java.util.List;
 
 import org.subnode.request.NodeFeedRequest;
 import org.subnode.response.NodeFeedResponse;
+import org.subnode.response.ServerPushInfo;
 import org.subnode.util.ThreadLocals;
 
 /**
@@ -266,7 +271,39 @@ public class UserFeedService {
 				lookupParent(session, nodeInfo, node.getPath());
 			}
 
-			outboxMgr.sendServerPushInfo(sc.getUserName(), new FeedPushInfo(nodeInfo));
+			sendServerPushInfo(sc.getUserName(), new FeedPushInfo(nodeInfo));
+		}
+	}
+
+	public void sendServerPushInfo(String recipientUserName, ServerPushInfo info) {
+		SessionContext userSession = SessionContext.getSessionByUserName(recipientUserName);
+
+		// If user is currently logged in we have a session here.
+		if (userSession != null) {
+			SseEmitter pushEmitter = userSession.getPushEmitter();
+			if (pushEmitter != null) {
+				ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
+				sseMvcExecutor.execute(() -> {
+					try {
+						SseEventBuilder event = SseEmitter.event() //
+								.data(info) //
+								.id(String.valueOf(info.hashCode()))//
+								.name(info.getType());
+						pushEmitter.send(event);
+
+						// DO NOT DELETE. This way of sending also works, and I was originally doing it
+						// this way and picking up
+						// in eventSource.onmessage = e => {} on the browser, but I decided to use the
+						// builder instead and let
+						// the 'name' in the builder route different objects to different event
+						// listeners on the client. Not really sure
+						// if either approach has major advantages over the other.
+						// pushEmitter.send(info, MediaType.APPLICATION_JSON);
+					} catch (Exception ex) {
+						pushEmitter.completeWithError(ex);
+					}
+				});
+			}
 		}
 	}
 
