@@ -356,7 +356,7 @@ export class EditNodeDlg extends DialogBase {
                         this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
                         ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null,
                     ]),
-                    ipfsLink ? new Div("Stored on IPFS (https://temporal.cloud)", {className: "marginTop"}) : null,
+                    ipfsLink ? new Div("Stored on IPFS (https://temporal.cloud)", { className: "marginTop" }) : null,
                 ]),
 
             ], "binaryEditorSection")
@@ -688,19 +688,22 @@ export class EditNodeDlg extends DialogBase {
             });
         }
         else {
-            //todo-0: encryption needs to be reworked because defaultValue is going away (see comment below)
-            if (encrypted) {
-                throw new Error("encryption not currently supported");
-            }
-
             this.contentEditor = new Textarea(null, {
                 rows,
-                //defaultValue: encrypted ? "[encrypted]" : value
+                defaultValue: encrypted ? "" : value
             }, null, {
                 getValue: () => {
-                    return this.getState().node.content;
+                    let ret = this.getState().node.content;
+                    if (ret.startsWith(J.Constant.ENC_TAG)) {
+                        ret = "";
+                    }
+                    return ret;
                 },
                 setValue: (val: any) => {
+                    /* Ignore calls to set the encrypted string during editing. */
+                    if (val.startsWith(J.Constant.ENC_TAG)) {
+                        return;
+                    }
                     let state = this.getState();
                     state.node.content = val;
                     this.mergeState(state);
@@ -709,13 +712,13 @@ export class EditNodeDlg extends DialogBase {
 
             this.contentEditor.whenElm((elm: HTMLElement) => {
                 if (encrypted) {
-                    //console.log('decrypting: ' + value);
+                    //console.log("decrypting: " + value);
                     let cipherText = value.substring(J.Constant.ENC_TAG.length);
                     (async () => {
                         let cipherKey = S.props.getCryptoKey(node, this.appState);
                         if (cipherKey) {
                             let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
-                            //console.log('decrypted to:' + value);
+                            //console.log("decrypted to:" + value);
                             (this.contentEditor as Textarea).setValue(clearText);
                         }
                     })();
