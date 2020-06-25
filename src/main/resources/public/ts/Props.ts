@@ -17,12 +17,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Props implements PropsIntf {
 
     readOnlyPropertyList: Set<string> = new Set<string>();
-
-    allBinaryProps: any = {};
+    allBinaryProps: Set<string> = new Set<string>();
 
     /* Holds the list of properties that are edited using something like a checkbox, or dropdown menu, or whatever, such
     that it would never make sense to display an edit field for editing their value in the editor */
-    controlBasedPropertyList: any = {};
+    controlBasedPropertyList: Set<string> = new Set<string>();
 
     orderProps = (propOrder: string[], _props: J.PropertyInfo[]): J.PropertyInfo[] => {
         let propsNew: J.PropertyInfo[] = S.util.arrayClone(_props);
@@ -39,9 +38,8 @@ export class Props implements PropsIntf {
     transferBinaryProps = (srcNode: J.NodeInfo, dstNode: J.NodeInfo): void => {
         if (!srcNode.properties) return;
         dstNode.properties = dstNode.properties || [];
-        S.util.forEachProp(this.allBinaryProps, (k, v): boolean => {
+        this.allBinaryProps.forEach(k => {
             this.setNodeProp(dstNode, S.props.getNodeProp(k, srcNode));
-            return true;
         });
     }
 
@@ -238,7 +236,7 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
 
     //here's the simple mode property hider!
     initConstants = () => {
-        S.util.addAll(this.allBinaryProps, [ //
+        S.util.addAllToSet(this.allBinaryProps, [ //
             J.NodeProp.IMG_WIDTH,//
             J.NodeProp.IMG_HEIGHT, //
             J.NodeProp.BIN_MIME, //
@@ -262,7 +260,7 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
             J.NodeProp.BIN_FILENAME
         ]);
 
-        S.util.addAll(this.controlBasedPropertyList, [ //
+        S.util.addAllToSet(this.controlBasedPropertyList, [ //
             J.NodeProp.INLINE_CHILDREN, //
             J.NodeProp.NOWRAP, //
             J.NodeProp.LAYOUT, //

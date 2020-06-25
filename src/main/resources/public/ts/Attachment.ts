@@ -118,9 +118,8 @@ export class Attachment implements AttachmentIntf {
 
     removeBinaryProperties = (node: J.NodeInfo) => {
         if (node) {
-            S.util.forEachProp(S.props.allBinaryProps, (k, v): boolean => {
-                S.props.deleteProp(node, k);
-                return true;
+            S.props.allBinaryProps.forEach(s => {
+                S.props.deleteProp(node, s);
             });
         }
     }

@@ -3,10 +3,9 @@ import { PropTable } from "../widget/PropTable";
 import { AppState } from "../AppState";
 
 export interface PropsIntf {
-    //todo-0: convert all three to Set...
-    allBinaryProps: any;
+    allBinaryProps: Set<string>;
     readOnlyPropertyList: Set<string>;
-    controlBasedPropertyList: any;
+    controlBasedPropertyList: Set<string>;
 
     initConstants(): void;
     orderProps(propOrder: string[], _props: J.PropertyInfo[]): J.PropertyInfo[];
