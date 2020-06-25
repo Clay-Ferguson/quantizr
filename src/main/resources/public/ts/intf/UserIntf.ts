@@ -8,11 +8,9 @@ export interface UserIntf {
     closeAccount(state: AppState): void;
     isTestUserAccount(state: AppState): boolean;
     openSignupPg(state: AppState): void;
-    openLoginPg(state: AppState): void;
     refreshLogin(state: AppState): void;
     logout(updateLocalDb: boolean, state: AppState): any;
-    login(loginDlg, usr: string, pwd: string, state: AppState): any;
     deleteAllUserLocalDbEntries(): any;
-    loginResponse(res: J.LoginResponse, usr: string, pwd: string, usingLocalDb: boolean, loginDlg: LoginDlg, state: AppState): any;
+    loginResponse(res: J.LoginResponse, usr: string, pwd: string, usingLocalDb: boolean, state: AppState): any;
     transferNode(recursive: boolean, nodeId: string, fromUser: string, toUser: string, state: AppState): void;
 }

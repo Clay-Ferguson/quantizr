@@ -1,5 +1,4 @@
 import * as J from "./JavaIntf";
-import { LoginDlg } from "./dlg/LoginDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { UserIntf } from "./intf/UserIntf";
@@ -57,15 +56,6 @@ export class User implements UserIntf {
         new SignupDlg(state).open();
     }
 
-    /*
-     * This method is ugly. It is the button that can be login *or* logout.
-     */
-    openLoginPg = (state: AppState): void => {
-        let dlg = new LoginDlg(null, state);
-        dlg.populateFromLocalDb();
-        dlg.open();
-    }
-
     refreshLogin = async (state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
@@ -78,14 +68,13 @@ export class User implements UserIntf {
 
                 /* if we have known state as logged out, then do nothing here */
                 if (loginState === "0") {
-                    console.log("loginState known as logged out. Sending to anon home page. [no, new logic overriding this now]");
+                    console.log("loginState known as logged out. Sending to anon home page.");
                     S.meta64.loadAnonPageHome(state);
                     return;
                 }
 
                 let usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
                 let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
-
                 let usingCredentials: boolean = usr && pwd;
 
                 /*
@@ -105,12 +94,21 @@ export class User implements UserIntf {
                         tzOffset: new Date().getTimezoneOffset(),
                         dst: S.util.daylightSavingsTime
                     }, (res: J.LoginResponse) => {
+                        
                         if (usingCredentials) {
-                            this.loginResponse(res, callUsr, callPwd, usingCredentials, null, state);
+                            this.loginResponse(res, callUsr, callPwd, false, state);
                         } else {
-                            this.refreshLoginResponse(res, state);
+                            if (res.success) {
+                                S.meta64.setStateVarsUsingLoginResponse(res, state);
+                            }
+                    
+                            S.meta64.loadAnonPageHome(state);
                         }
-                    });
+                    },
+                        (error: string) => {
+                            S.user.deleteAllUserLocalDbEntries();
+                            S.meta64.loadAnonPageHome(state);
+                        });
                 }
             }
             finally {
@@ -142,18 +140,8 @@ export class User implements UserIntf {
         });
     }
 
-    login = (loginDlg: any, usr: string, pwd: string, state: AppState) => {
-        S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
-            userName: usr,
-            password: pwd,
-            tzOffset: new Date().getTimezoneOffset(),
-            dst: S.util.daylightSavingsTime
-        }, (res: J.LoginResponse) => {
-            this.loginResponse(res, usr, pwd, null, loginDlg, state);
-        });
-    }
-
     deleteAllUserLocalDbEntries = async (): Promise<void> => {
+        //todo-0: can use a promiseAll here instead right ?
         return new Promise<void>(async (resolve, reject) => {
             try {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_USR, null);
@@ -166,7 +154,7 @@ export class User implements UserIntf {
         });
     }
 
-    loginResponse = async (res: J.LoginResponse, usr: string, pwd: string, usingCredentials: boolean, loginDlg: LoginDlg,
+    loginResponse = async (res: J.LoginResponse, usr: string, pwd: string, calledFromLoginDlg: boolean,
         state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
@@ -176,10 +164,6 @@ export class User implements UserIntf {
                         await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
                         await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
                         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");
-                    }
-
-                    if (loginDlg) {
-                        loginDlg.close();
                     }
 
                     S.meta64.setStateVarsUsingLoginResponse(res, state);
@@ -208,21 +192,17 @@ export class User implements UserIntf {
                         S.encryption.initKeys();
                     }, 500);
                 } else {
-                    if (usingCredentials) {
-                        console.log("LocalDb login failed.");
+                    console.log("LocalDb login failed.");
 
-                        /*
-                         * blow away failed credentials and reload page, should result in brand new page load as anon
-                         * this.
-                         */
-                        await S.localDB.setVal(C.LOCALDB_LOGIN_USR, null);
-                        await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null);
-                        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
-
-                        //todo-0: can't we do the equivalent of a load with the USR, PWD, and STATE set right in this page
-                        //without forcing a location.reload, which could go into a loop and create an accidental
-                        //self-inflicted denial of service attack!
-                        location.reload();
+                    //location.reload();
+                    if (!calledFromLoginDlg) {
+                        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null);
+                        S.nav.login(state);
+                    }
+                    else {
+                        //if we tried a login and it wasn't from a login dialog then just blow away the login state
+                        //so that any kind of page refresh is guaranteed to just show login dialog and not try to login
+                        await this.deleteAllUserLocalDbEntries();
                     }
                 }
             }
@@ -230,14 +210,6 @@ export class User implements UserIntf {
                 resolve();
             }
         });
-    }
-
-    private refreshLoginResponse = (res: J.LoginResponse, state: AppState): void => {
-        if (res.success) {
-            S.meta64.setStateVarsUsingLoginResponse(res, state);
-        }
-
-        S.meta64.loadAnonPageHome(state);
     }
 
     transferNode = (recursive: boolean, nodeId: string, fromUser: string, toUser: string, state: AppState): void => {

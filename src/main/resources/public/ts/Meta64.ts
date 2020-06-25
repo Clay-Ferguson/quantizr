@@ -525,7 +525,7 @@ export class Meta64 implements Meta64Intf {
         },
             (res: J.AnonPageLoadResponse): void => {
                 //todo-0: It's really awkward how AnonPageLoadResponse wraps a RenderNodeResponse inside it. Fix that.
-                if (!res.success || !res.renderNodeResponse || ! res.renderNodeResponse.success) {
+                if (!res.success || !res.renderNodeResponse || !res.renderNodeResponse.success && res.renderNodeResponse.exceptionType=="auth") {
                     S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
                 }
                 S.render.renderPageFromData(res.renderNodeResponse, false, null, true, true, state);

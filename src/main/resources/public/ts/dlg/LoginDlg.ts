@@ -1,3 +1,4 @@
+import * as J from "../JavaIntf";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { ResetPasswordDlg } from "./ResetPasswordDlg";
 import { ButtonBar } from "../widget/ButtonBar";
@@ -57,8 +58,18 @@ export class LoginDlg extends DialogBase {
     login = (): void => {
         let usr = this.userTextField.getValue();
         let pwd = this.passwordTextField.getValue();
-        S.user.login(this, usr, pwd, this.appState);
-        this.close();
+        
+        if (usr && pwd) {
+            S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
+                userName: usr,
+                password: pwd,
+                tzOffset: new Date().getTimezoneOffset(),
+                dst: S.util.daylightSavingsTime
+            }, (res: J.LoginResponse) => {
+                S.user.loginResponse(res, usr, pwd, true, this.appState);
+                this.close()
+            });
+        }
     }
 
     resetPassword = (): any => {

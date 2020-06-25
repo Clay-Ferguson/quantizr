@@ -45,7 +45,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
             //because we'd expect the passed valueIntf to be in control and no defaultVal param would need to be passed in
             //
             //NOTE: "!=null" is important here, don't switch to !!defaultVal or even just 'defaultVal'. We mean litterally 
-            //every value other than null here. is this identical thing needed in "Textarea" also ? todo-0
+            //every value other than null here. is this identical thing needed in "Textarea" also ? 
             if (defaultVal != null) {
                 this.valueIntf.setValue(defaultVal);
             }

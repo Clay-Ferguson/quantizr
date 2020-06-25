@@ -431,9 +431,10 @@ export class Util implements UtilIntf {
                             console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: "
                                 + this.prettyPrint(response));
 
-                            //if (typeof failCallback == "function") {
-                            //failCallback(null);
-                            //}
+                            //calling the failCallback here is new. (6/24/2020)
+                            if (typeof failCallback == "function") {
+                                failCallback(null);
+                            }
 
                             return;
                         }
@@ -458,6 +459,8 @@ export class Util implements UtilIntf {
             },
             //------------------------------------------------
             // Handle Fail
+            // We should only reach here when there's an actual failure to call the server, and is completely
+            // separete from the server perhaps haveing an exception where it sent back an error.
             //------------------------------------------------
             (error) => {
                 try {
