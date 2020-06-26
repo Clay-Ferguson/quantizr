@@ -143,7 +143,7 @@ export class MainNavPanel extends NavTag {
                 new Li(null, {
                     className: "nav-item"
                 }, [
-                    new NavBarIconButton("fa-bars", "Quantizr", {
+                    new NavBarIconButton(clientInfo.isMobile ? "fa-bars" : null, "Quanta", {
                         onClick: e => {
                             if (clientInfo.isMobile) {
                                 S.nav.showMainMenu(state);

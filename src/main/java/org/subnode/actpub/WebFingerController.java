@@ -40,7 +40,8 @@ public class WebFingerController {
 		
 		if (resource.startsWith("acct:")) {
 			String user = resource.substring(5);
-			if ("wclayf@quantizr.com".equals(user)) {
+			//todo-0: need to make this pull from properties file.
+			if ("wclayf@quanta.wiki".equals(user)) {
 				res.setSubject(resource);
 				
 				List<WebFingerLink> links = new LinkedList<WebFingerLink>();

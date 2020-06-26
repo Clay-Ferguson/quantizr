@@ -4,7 +4,7 @@ Quantizr is a content publishing/hosting platform where everything exists on a t
 
 ## Link to a live test instance:
 
-https://quantizr.com
+https://quanta.wiki
 
 # Tech-Stack Summary
 

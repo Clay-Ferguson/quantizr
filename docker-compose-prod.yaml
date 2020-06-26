@@ -47,7 +47,7 @@ services:
             - '/home/clay/quantizr-data/docs:/docs'
             - '/home/clay/quantizr-data/tmp:/subnode-tmp'
             - '/home/clay/quantizr-data/log:/subnode-log'
-            - '/etc/letsencrypt/live/quantizr.com:/letsencrypt'
+            - '/etc/letsencrypt/live/quanta.wiki:/letsencrypt'
         ports:
             - '443:443'
             - '80:80'
@@ -63,7 +63,7 @@ services:
             profileName: "prod" 
             server.port: "443" 
             httpProtocol: "https" 
-            metaHost: "quantizr.com" 
+            metaHost: "quanta.wiki" 
             reSaveAll: "false"
             allowFileSystemSearch: "false" 
             forceIndexRebuild: "false"
@@ -83,10 +83,10 @@ services:
             server.ssl.keyAlias: "tomcat" 
 
             mail.port: ""
-            mail.user: "postmaster@quantizr.com" 
+            mail.user: "postmaster@quanta.wiki" 
             mail.password: "${emailPassword}" 
             mail.host: "smtp.mailgun.org" 
-            mail.from: "admin@quantizr.com"
+            mail.from: "admin@quanta.wiki"
 
         image: subnode-prod
         depends_on:

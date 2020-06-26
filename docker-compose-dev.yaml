@@ -92,10 +92,10 @@ services:
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/subnode-tmp" 
             mail.port: ""
-            mail.user: "postmaster@quantizr.com" 
+            mail.user: "postmaster@quanta.wiki" 
             mail.password: "${emailPassword}" 
             mail.host: "smtp.mailgun.org" 
-            mail.from: "admin@quantizr.com"
+            mail.from: "admin@quanta.wiki"
             JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
             ipfs.host: "http://ipfs:5001"
         image: subnode-dev

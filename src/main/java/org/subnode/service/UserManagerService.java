@@ -415,11 +415,11 @@ public class UserManagerService {
 		 */
 		log.debug("Signup URL: " + signupLink);
 
-		content = "Welcome to quantizr.com: " + userName + //
+		content = "Welcome to Quanta: " + userName + //
 				"<p>\nClick this link to complete signup: <br>\n" + signupLink;
 
 		if (!StringUtils.isEmpty(appProp.getMailHost())) {
-			outboxMgr.queueEmail(email, "quantizr.com - Account Signup", content);
+			outboxMgr.queueEmail(email, "Quanta - Account Signup", content);
 		}
 	}
 
