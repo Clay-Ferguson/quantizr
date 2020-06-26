@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum NodeType {
 
     // INTERNAL types
+    ACCOUNT("sn:account"),//
     REPO_ROOT("sn:repoRoot"), //
     TRASH_BIN("sn:trashBin"), //
     INBOX("sn:inbox"), //

@@ -6,6 +6,7 @@ import { PluginMgrIntf } from "./intf/PluginMgrIntf";
 import { RssTypeHandler } from "./plugins/RssTypeHandler";
 import { IPFSNodeTypeHandler } from "./plugins/IPFSNodeTypeHandler";
 import { RepoRootTypeHandler } from "./plugins/RepoRootTypeHandler";
+import { AccountTypeHandler } from "./plugins/AccountTypeHandler";
 import { TrashNodeTypeHandler } from "./plugins/TrashNodeTypeHandler";
 import { InboxNodeTypeHandler } from "./plugins/InboxNodeTypeHandler";
 import { NotesNodeTypeHandler } from "./plugins/NotesNodeTypeHandler";
@@ -25,7 +26,7 @@ export class PluginMgr implements PluginMgrIntf {
     private typeHandlers: { [key: string]: TypeHandlerIntf } = {};
 
     addTypeHandler = (typeHandler: TypeHandlerIntf): void => {
-        console.log("Adding TypeHandler: type=" + typeHandler.getTypeName());
+        //console.log("Adding TypeHandler: type=" + typeHandler.getTypeName());
         if (this.typeHandlers[typeHandler.getTypeName()]) {
             throw new Error("duplicate type handler: " + typeHandler.getTypeName());
         }
@@ -49,6 +50,7 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new RssTypeHandler());
         this.addTypeHandler(new IPFSNodeTypeHandler());
         this.addTypeHandler(new RepoRootTypeHandler());
+        this.addTypeHandler(new AccountTypeHandler());
         this.addTypeHandler(new TrashNodeTypeHandler());
         this.addTypeHandler(new InboxNodeTypeHandler());
         this.addTypeHandler(new NotesNodeTypeHandler());

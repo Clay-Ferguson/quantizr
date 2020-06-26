@@ -5,21 +5,19 @@ import { PubSub } from "../PubSub";
 import { AppState } from "../AppState";
 import { TypeBase } from "./base/TypeBase";
 import { Comp } from "../widget/base/Comp";
-import { Div } from "../widget/Div";
-import { Button } from "../widget/Button";
-import { ButtonBar } from "../widget/ButtonBar";
 import { Heading } from "../widget/Heading";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 
+//todo-0: make this type get set automatically during signup.
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class RepoRootTypeHandler extends TypeBase {
+export class AccountTypeHandler extends TypeBase {
 
     constructor() {
-        super(J.NodeType.REPO_ROOT, "Repository Root", "fa-home", false);
+        super(J.NodeType.ACCOUNT, "Account Root", "fa-database", false);
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {
@@ -28,7 +26,7 @@ export class RepoRootTypeHandler extends TypeBase {
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
         return new HorizontalLayout([
-            new Heading(4, "Repository Root", {
+            new Heading(4, "User Account Root", {
                 className: "marginAll"
             })
         ]);

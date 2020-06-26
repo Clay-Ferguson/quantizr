@@ -616,6 +616,7 @@ export const enum NodeProp {
 }
 
 export const enum NodeType {
+    ACCOUNT = "sn:account",
     REPO_ROOT = "sn:repoRoot",
     TRASH_BIN = "sn:trashBin",
     INBOX = "sn:inbox",

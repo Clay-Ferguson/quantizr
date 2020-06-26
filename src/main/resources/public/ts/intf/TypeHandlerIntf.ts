@@ -11,11 +11,11 @@ export interface TypeHandlerIntf {
     getIconClass(): string;
     allowAction(action : string): boolean;
     allowPropertyEdit(typeName: string, state: AppState): boolean;
-    getAllowUserSelect();
     getDomPreUpdateFunction(parent: CompIntf): void;
     getCustomProperties(): string[];
     ensureDefaultProperties(node: J.NodeInfo);
     getAllowPropertyAdd(): boolean;
     getAllowContentEdit(): boolean;
     getEditLabelForProp(propName: string): string;
+    getAllowUserSelect(): boolean;
 }

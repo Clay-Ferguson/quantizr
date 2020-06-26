@@ -18,8 +18,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class TypeBase implements TypeHandlerIntf {
 
     constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string, private allowUserSelect: boolean) {
-        let state: AppState = store.getState();
-        if (state.isAdminUser) this.allowUserSelect = true;
+    }
+
+    getAllowUserSelect(): boolean {
+        return this.allowUserSelect;
     }
 
     getEditLabelForProp(propName: string): string {
@@ -78,10 +80,6 @@ export class TypeBase implements TypeHandlerIntf {
     /* todo-1: Need an enum of all possible actions */
     allowAction(action: string): boolean {
         return true;
-    }
-
-    getAllowUserSelect(): boolean {
-        return this.allowUserSelect;
     }
 
     getDomPreUpdateFunction(parent: CompIntf): void {

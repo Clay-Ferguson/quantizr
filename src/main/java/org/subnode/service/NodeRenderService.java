@@ -187,6 +187,7 @@ public class NodeRenderService {
 
 		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, scanToPath, 0, 0);
 		res.setNode(nodeInfo);
+		res.setSuccess(true);
 		return res;
 	}
 
