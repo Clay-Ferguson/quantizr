@@ -25,7 +25,8 @@ sudo ufw allow https
 sudo ufw allow ssh
 sudo ufw enable
 
-# Install Certbot
+# =================================================================================
+# Install Certbot (Ubuntu 18.04 steps)
 sudo apt-get update
 sudo apt-get install software-properties-common
 sudo add-apt-repository ppa:certbot/certbot
@@ -33,6 +34,11 @@ sudo apt-get update
 sudo apt-get install python-certbot-apache
 sudo apt-get update
 sudo certbot --apache
+# =================================================================================
+# Install Certbot (Ubuntu 20.04 steps)
+# https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-20-04
+# The new steps are entered into my local quanta node.
+
 
 # Setting up new Certificate
 
@@ -54,11 +60,10 @@ su -s
 # The above commands, generate the PEM files, but SpringBoot needs a "p12" file, so we run this command to generate the
 # p12 file
 
-# Note1: I think maybe this openssl command ALSO needs to be run as root, so do 'su -' or 'su -s' before running it.
-# Note2: When this prompts you for a password enter the same one you have in start.sh in the 'server.ssl.key-store-password' property
-# Note3: After running this REBOOT the server. It (apache2) will be sitting on port 80 and 443, but don't try to shut it down to fix that, instead REBOOT!
-# Note4: Also check this line in your 'start.sh' script "-v /etc/letsencrypt/live/quanta.wiki:/letsencrypt \" because you may need to add an "-0002", to that
-#        whenever the letsencrypt had added that. It usually DOES increment an 000X number each time on that folder every time you run 'certbot'
+# Note: When this prompts you for a password enter the same one you have in start.sh in the 'server.ssl.key-store-password' property
+# Note: After running this REBOOT the server. It (apache2) will be sitting on port 80 and 443, but don't try to shut it down to fix that, instead REBOOT!
+# Note: Note that the following should also be a volume line in the prod yaml file:
+#        - '/etc/letsencrypt/live/quanta.wiki:/letsencrypt'
 
 su -s (or su -) ...whichever works
 cd /etc/letsencrypt/live/quanta.wiki
@@ -75,7 +80,11 @@ sudo /etc/init.d/apache2 stop
 # verify it's dead:
 sudo netstat -tulpn | grep LISTEN
 
+# That's it. The above should setup LetsEncrypt with Certbot, and the rest of this file (below) is about renewing only.
+
+# -----------------------------
 # Renewal
+# -----------------------------
 # Certbot certificates only last 3 months or so (I think) and here's how to renew
 
 # First shutdown the WebApp, because certbot needs to use the same ports, 

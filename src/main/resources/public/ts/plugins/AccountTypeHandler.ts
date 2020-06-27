@@ -8,7 +8,6 @@ import { Comp } from "../widget/base/Comp";
 import { Heading } from "../widget/Heading";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 
-//todo-0: make this type get set automatically during signup.
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;

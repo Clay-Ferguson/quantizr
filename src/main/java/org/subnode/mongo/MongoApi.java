@@ -1388,7 +1388,7 @@ public class MongoApi {
 		// todo-1: is user validated here (no invalid characters, etc. and invalid
 		// flowpaths tested?)
 
-		SubNode userNode = createNode(session, newUserNodePath, null);
+		SubNode userNode = createNode(session, newUserNodePath, NodeType.ACCOUNT.s());
 		ObjectId id = new ObjectId();
 		userNode.setId(id);
 		userNode.setOwner(id);
