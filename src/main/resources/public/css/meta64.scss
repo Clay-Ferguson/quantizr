@@ -537,6 +537,8 @@ input[type="radio"] {
 
 .selectedListItem {
     background-color: $secondary;
+    border-radius: .6em;
+    border: 2px solid $gray-400;
 }
 
 .small-padding {
@@ -1110,6 +1112,12 @@ i'm backing out for now
 
 .editBinaryContainer {
     padding-left: 0px;
+}
+
+.heading5 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 1.2;
 }
 
 /************************************************************** 

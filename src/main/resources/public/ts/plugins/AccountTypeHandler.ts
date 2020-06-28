@@ -25,7 +25,7 @@ export class AccountTypeHandler extends TypeBase {
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
         return new HorizontalLayout([
-            new Heading(4, "User Account Root", {
+            new Heading(4, "User Account: "+node.owner, {
                 className: "marginAll"
             })
         ]);

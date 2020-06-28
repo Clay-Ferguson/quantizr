@@ -28,6 +28,7 @@ export class ListBoxRow extends Div {
     }
 
     preRender(): void {
-        this.attribs.className = "list-group-item list-group-item-action listBoxRow" + ((this.isSelectedFunc && this.isSelectedFunc(this)) ? " selectedListItem" : "");
+        this.attribs.className = "list-group-item list-group-item-action listBoxRow" +
+            ((this.isSelectedFunc && this.isSelectedFunc(this)) ? " selectedListItem" : "");
     }
 }

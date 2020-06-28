@@ -5,6 +5,7 @@ import { Heading } from "./Heading";
 import { FriendInfo } from "../JavaIntf";
 import { ListBoxRow } from "./ListBoxRow";
 import { ListBox } from "./ListBox";
+import { Div } from "./Div";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,7 +21,9 @@ export class FriendsTableRow extends ListBoxRow {
     preRender(): void {
         super.preRender();
         this.setChildren([
-            new Heading(5, this.friend.userName),
+            new Div(this.friend.userName, {
+                className: "heading5"
+            }),
         ]);
     }
 }
