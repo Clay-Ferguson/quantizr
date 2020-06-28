@@ -1,8 +1,8 @@
-# Quantizr Server Push
+# Quanta Server Push
 
-Quantizr uses SpringBoot SseEmitter and JavaScript EventSource to accomplish server push from browser to server.
+Quanta uses SpringBoot SseEmitter and JavaScript EventSource to accomplish server push from browser to server.
 
-The implementation doesn't support IE11, but does support modern browsers. There are shims available to make EventSouce work in IE11, but none of that is included in Quantizr. Quantizr app expects a modern browser.
+The implementation doesn't support IE11, but does support modern browsers. There are shims available to make EventSouce work in IE11, but none of that is included in Quanta. Quanta app expects a modern browser.
 
 The APIs are so simple I decided to write this note file and explain so here it is:
 

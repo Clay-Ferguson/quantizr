@@ -27,7 +27,7 @@ Looks like this:
 
 This tells java to use the `loader.path` to make the compiler override any classes in jars in the build code with the ones directly from your target folder.
 
-NOTE: the subnode.jar is the name of the Quantizr spring-boot fat jar (for historical/legacy reasons only)
+NOTE: the subnode.jar is the name of the Quanta spring-boot fat jar (for historical/legacy reasons only)
 
 
 ## 3) The 'dev' profile of maven has this plugin in it:
@@ -56,6 +56,6 @@ To make things as fast as possible we also have a profile named 'java-compile' w
 
 Once you've ran build-dev.sh, and have the docker instance up and running, let's say you then make some changes to any Java files at all. You can then restart the app using the updated Java source, simply by running `restart-dev.sh`. What that will do is run a build to update class files, in the /target/classes folder than then do a `docker restart` command, to restart.
 
-Since the Quantizr app can restart in around 2 seconds the only overhead is the time to actually built the new class files, and even something like JRebel can't avoid having to at least *compile* the classes, so this is a great solution for avoiding the expencs, and time, and complexities of JRebel.
+Since the Quanta app can restart in around 2 seconds the only overhead is the time to actually built the new class files, and even something like JRebel can't avoid having to at least *compile* the classes, so this is a great solution for avoiding the expencs, and time, and complexities of JRebel.
 
 On my Core i7 laptop the full build takes around 1 minute, but using the above technique, I can edit some Java Source files and then use 'restart-dev.sh' to get them deployed and 'live' in 4 seconds! Actually I think, in my case this is even much FASTER than JRebel can accomplish.

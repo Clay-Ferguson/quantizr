@@ -1,6 +1,6 @@
 # Lucene Search
 
-Quantizr has an experimental capability to do File System indexing/searching using Lucene & Tika. 
+Quanta has an experimental capability to do File System indexing/searching using Lucene & Tika. 
 
 ## Technical Notes
 

@@ -1,8 +1,8 @@
 # Custom Node Types
 
-Quantizr supports a very rudimentary Node Typing system, where a node can have a specific type, and render a specific way, with a custom icon, etc.
+Quanta supports a very rudimentary Node Typing system, where a node can have a specific type, and render a specific way, with a custom icon, etc.
 
-Another word for the 'Type' system in Quantizr, is 'plugins'. A Node type is a specific kind of plugin, or configurable type of node. 
+Another word for the 'Type' system in Quanta, is 'plugins'. A Node type is a specific kind of plugin, or configurable type of node. 
 
 See also: 'podcast-plugin.md'
 
