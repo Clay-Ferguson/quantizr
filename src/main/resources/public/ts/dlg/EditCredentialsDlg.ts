@@ -34,7 +34,7 @@ export class EditCredentialsDlg extends DialogBase {
             this.populateFromLocalDb();
 
         return [
-            new TextContent("Quantizr uses Temporal (https://temporal.cloud) as the storage provider for IPFS content, so you can enter your Temporal" +
+            new TextContent("Quanta uses Temporal (https://temporal.cloud) as the storage provider for IPFS content, so you can enter your Temporal" +
                 " credentials here to enable saving files permanently to IPFS."),
             new Form(null, [
                 new FormGroup(null,

@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
  * database. However, we do support allowing certain text files to be edited,
  * but when edited, the changes made are written back out to the file as well.
  * If any file content on the filesystem ever gets updated outside from the
- * knowledge of Quantizr app, then the app is smart enough to know to import the
+ * knowledge of Quanta app, then the app is smart enough to know to import the
  * filesystem content of that file back into subnode. That is, when there's a
  * difference between two files the filesystem wins.
  * 

@@ -14,7 +14,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 PUBLIC KEY ENCRYPTION
 ---------------------
 This class is for proof-of-concept work related to doing Public Key Encryption in the browser using the
-WebCryptoAPI, for a "Secure Messaging" feature of Quantizr. Currently the way this test/develop is run is by using
+WebCryptoAPI, for a "Secure Messaging" feature of Quana. Currently the way this test/develop is run is by using
 'encryption.test()'
 
 We will be using LocalDB.ts implementation to store the keys in the browser, but we will also support
@@ -315,6 +315,8 @@ export class Encryption implements EncryptionIntf {
         });
     }
 
+    //todo-0: compiler showing lots of syntax errors here in crypto api?
+    //Check the official browser spect to find out what's toing on.
     genSymKey = async (): Promise<CryptoKey> => {
         let key: CryptoKey = await window.crypto.subtle.generateKey({
             name: this.SYM_ALGO,
@@ -328,7 +330,7 @@ export class Encryption implements EncryptionIntf {
     }
 
     /**
-     * Returns a string the user can save locally containing all encryption keys stored by Quantizr in their browser.
+     * Returns a string the user can save locally containing all encryption keys stored by Quanta in their browser.
      */
     exportKeys = (): Promise<string> => {
         return new Promise<string>(async (resolve, reject) => {

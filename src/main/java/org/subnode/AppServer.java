@@ -31,7 +31,7 @@ public class AppServer {
 	private static boolean shuttingDown;
 	private static boolean enableScheduling;
 
-	/* Java Main entry point for Quantizr application */
+	/* Java Main entry point for Quanta application */
 	public static void main(String[] args) {
 		log.trace("main() trace log test.");
 		/*

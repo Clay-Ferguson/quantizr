@@ -109,7 +109,7 @@ export class MainNavPanel extends NavTag {
             }, [
                 new NavBarIconButton("fa-sign-in", "Login", {
                     onClick: e => { S.nav.login(state); },
-                    title: "Login to Quantizr"
+                    title: "Login to Quanta"
                 }, "nav-link", "off")
             ]));
         }

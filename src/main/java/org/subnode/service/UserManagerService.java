@@ -713,10 +713,10 @@ public class UserManagerService {
 			String passCode = ownerNode.getId().toHexString() + "-" + String.valueOf(authCode);
 
 			String link = constProvider.getHostAndPort() + "?passCode=" + passCode;
-			String content = "Password reset was requested on Quantizr account: " + user + //
+			String content = "Password reset was requested on Quanta account: " + user + //
 			"<p>\nGo to this link to reset your password: <br>\n" + link;
 
-			outboxMgr.queueEmail(email, "Quantizr Password Reset", content);
+			outboxMgr.queueEmail(email, "Quanta Password Reset", content);
 
 			res.setMessage("A password reset link has been sent to your email. Check your email in a minute or so.");
 			res.setSuccess(true);

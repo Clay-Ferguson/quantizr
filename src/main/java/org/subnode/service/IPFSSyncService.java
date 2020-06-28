@@ -252,7 +252,7 @@ public class IPFSSyncService {
 
 		List<String> keysToDelete = new LinkedList<String>();
 		/*
-		 * And finally we clean out orphaned nodes. Any nodes that exist in Quantizr DB
+		 * And finally we clean out orphaned nodes. Any nodes that exist in Quanta DB
 		 * for which there is no longer an associated IPFS node.
 		 */
 		for (Map.Entry<String, SubNode> entry : nodeMap.entrySet()) {
@@ -350,7 +350,7 @@ public class IPFSSyncService {
 				content = "";
 			}
 
-			// Set as 'preformatted' text, so the the Quantizr app doesn't try to render it
+			// Set as 'preformatted' text, so the the Quanta app doesn't try to render it
 			// as markdown.
 			newNode.setProp("sn:pre", 1);
 		}

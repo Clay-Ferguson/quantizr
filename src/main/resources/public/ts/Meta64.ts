@@ -368,7 +368,7 @@ export class Meta64 implements Meta64Intf {
             // todo-1: actually this is a nuisance unless user is actually EDITING a node right now
             // so until i make it able to detect if user is editing i'm removing this.
             // window.onbeforeunload = () => {
-            //     return "Leave Quantizr ?";
+            //     return "Leave Quanta ?";
             // };
 
             /*

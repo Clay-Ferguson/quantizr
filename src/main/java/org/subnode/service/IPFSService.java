@@ -74,7 +74,7 @@ public class IPFSService {
     private AttachmentService attachmentService;
 
     /**
-     * Looks up quantizr node by 'nodeId', and gets the 'ipfs:link' property, which
+     * Looks up quanta node by 'nodeId', and gets the 'ipfs:link' property, which
      * is used to retrieve the MerkleNode (as JSON), and then pretty prints it and
      * returns it.
      */

@@ -37,7 +37,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     dropzoneDiv: Div = null;
     sent: boolean = false;
 
-    /* If this is true we upload directly to temporal rather than routing thru Quantizr */
+    /* If this is true we upload directly to temporal rather than routing thru Quanta */
     toTemporal: boolean = true;
     temporalToken: string = null;
     temporalUsr: string;
@@ -214,7 +214,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let state = this.getState();
         let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
 
-        /* Allow 20MB for Quantizr uploads or 20GB for IPFS */
+        /* Allow 20MB for Quanta uploads or 20GB for IPFS */
         let maxFileSize = (state.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
 
         let action;
@@ -285,7 +285,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         xhr.setRequestHeader("Cache-Control", "no-cache");
                         xhr.setRequestHeader("Authorization", "Bearer " + dlg.temporalToken);
                     }
-                    /* Else we'll be uploading onto Quantizr and saving to ipfs based on the 'ipfs' flag */
+                    /* Else we'll be uploading onto Quanta and saving to ipfs based on the 'ipfs' flag */
                     else {
                         formData.append("nodeId", dlg.nodeId);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");

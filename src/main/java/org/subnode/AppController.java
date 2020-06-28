@@ -900,7 +900,7 @@ public class AppController {
 				try {
 					mailSender.init();
 					mailSender.sendMail("wclayf@gmail.com", null,
-							"<h1>Hello from Quantizr! Time=" + timeString + "</h1>", "Test Subject");
+							"<h1>Hello from Quanta! Time=" + timeString + "</h1>", "Test Subject");
 				} finally {
 					mailSender.close();
 				}
