@@ -5,9 +5,9 @@ services:
         container_name: mongo-prod
         volumes:
             - '/var/lib/mongodb:/data/db'
-            - '/home/clay/quantizr-data/mongo-dumps:/mongo-dumps'
-            - '/home/clay/quantizr-data/mongo-scripts:/mongo-scripts'
-            - '/home/clay/quantizr-data/mongo-conf/mongod.conf:/etc/mongod.conf'
+            - '/home/clay/quanta-data/mongo-dumps:/mongo-dumps'
+            - '/home/clay/quanta-data/mongo-scripts:/mongo-scripts'
+            - '/home/clay/quanta-data/mongo-conf/mongod.conf:/etc/mongod.conf'
         command: mongod --config /etc/mongod.conf
         ports:
             - '27017:27017'
@@ -44,9 +44,9 @@ services:
             - '443'
             - '80'
         volumes:
-            - '/home/clay/quantizr-data/docs:/docs'
-            - '/home/clay/quantizr-data/tmp:/subnode-tmp'
-            - '/home/clay/quantizr-data/log:/subnode-log'
+            - '/home/clay/quanta-data/docs:/docs'
+            - '/home/clay/quanta-data/tmp:/subnode-tmp'
+            - '/home/clay/quanta-data/log:/subnode-log'
             - '/etc/letsencrypt/live/quanta.wiki:/letsencrypt'
         ports:
             - '443:443'
