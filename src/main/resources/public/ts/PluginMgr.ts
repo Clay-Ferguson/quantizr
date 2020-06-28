@@ -15,6 +15,7 @@ import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
 import { MarkdownTypeHandler } from "./plugins/MarkdownTypeHandler";
 import { TextTypeHandler } from "./plugins/TextTypeHandler";
 import { UserFeedTypeHandler } from "./plugins/UserFeedTypeHandler";
+import { InboxEntryTypeHandler } from "./plugins/InboxEntryTypeHandler";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -53,6 +54,7 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new AccountTypeHandler());
         this.addTypeHandler(new TrashNodeTypeHandler());
         this.addTypeHandler(new InboxNodeTypeHandler());
+        this.addTypeHandler(new InboxEntryTypeHandler());
         this.addTypeHandler(new NotesNodeTypeHandler());
         this.addTypeHandler(new FriendsListTypeHandler());
         this.addTypeHandler(new FriendTypeHandler());

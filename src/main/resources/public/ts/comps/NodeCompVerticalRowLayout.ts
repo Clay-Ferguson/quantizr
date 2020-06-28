@@ -7,6 +7,7 @@ import { NodeCompRow } from "./NodeCompRow";
 import { Div } from "../widget/Div";
 import { AppState } from "../AppState";
 import { useSelector, useDispatch } from "react-redux";
+import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -22,6 +23,7 @@ export class NodeCompVerticalRowLayout extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
         let layoutClass = "node-table-row";
 
         if (state.userPreferences.editMode) {
@@ -54,6 +56,9 @@ export class NodeCompVerticalRowLayout extends Div {
 		*/
         if (this.node.type==J.NodeType.USER_FEED && !S.props.isMine(this.node, state)) {
             allowInsert = false;
+        }
+        else if (typeHandler) {
+            allowInsert = typeHandler.allowAction("addChild");
         }
 
         let rowCount: number = 0;

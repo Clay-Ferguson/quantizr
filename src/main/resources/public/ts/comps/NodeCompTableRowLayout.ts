@@ -7,6 +7,7 @@ import { NodeCompRow } from "./NodeCompRow";
 import { Div } from "../widget/Div";
 import { AppState } from "../AppState";
 import { useSelector, useDispatch } from "react-redux";
+import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -22,6 +23,7 @@ export class NodeCompTableRowLayout extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
         let nodesToMove = state.nodesToMove;
         let curRow = new Div(null, { className: 'node-grid-row' });
         let children: Comp[] = [];
@@ -29,7 +31,7 @@ export class NodeCompTableRowLayout extends Div {
         let childCount: number = this.node.children.length;
         let rowCount: number = 0;
         let maxCols = 2;
-        
+
         if (this.layout == "c2") {
             maxCols = 2;
         }
@@ -59,9 +61,15 @@ export class NodeCompTableRowLayout extends Div {
         because right now our design is that USER_FEED nodes are by definition automatically 'public'
         
         NOTE: Server also enforces this check if it gets by the client.
+
+        todo-0: Move this logic to INSIDE the allowAction of userFeed type.(note this is in both table row layout and vertical layout classes)
 		*/
-        if (this.node.type==J.NodeType.USER_FEED && !S.props.isMine(this.node, state)) {
+        if (this.node.type == J.NodeType.USER_FEED && !S.props.isMine(this.node, state)) {
             allowInsert = false;
+        }
+
+        else if (typeHandler) {
+            allowInsert = typeHandler.allowAction("addChild");
         }
 
         let curCols = 0;

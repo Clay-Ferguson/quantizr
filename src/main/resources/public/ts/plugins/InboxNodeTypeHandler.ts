@@ -21,6 +21,22 @@ export class InboxNodeTypeHandler extends TypeBase {
         super(J.NodeType.INBOX, "Inbox", "fa-inbox", false);
     }
 
+    allowAction(action: string): boolean {
+        return false;
+    }
+
+    getAllowPropertyAdd(): boolean {
+        return false;
+    }
+
+    getAllowContentEdit(): boolean {
+        return false;
+    }
+
+    allowPropertyEdit(propName: string, state: AppState): boolean {
+        return false
+    }
+
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
 
         let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);

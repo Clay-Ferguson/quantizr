@@ -77,7 +77,10 @@ export class TypeBase implements TypeHandlerIntf {
         return "fa " + this.iconStyle + " fa-lg";
     }
 
-    /* todo-1: Need an enum of all possible actions */
+    /* todo-1: Need an enum of all possible actions 
+    
+    Known ones: addChild
+    */
     allowAction(action: string): boolean {
         return true;
     }

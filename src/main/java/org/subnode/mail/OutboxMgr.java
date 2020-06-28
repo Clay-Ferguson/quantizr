@@ -153,7 +153,7 @@ public class OutboxMgr {
 
 			/* If there's no notification for this node already in the user's inbox then add one */		
 			if (notifyNode == null) {
-				notifyNode = api.createNode(session, userInbox, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST);
+				notifyNode = api.createNode(session, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L, CreateNodeLocation.FIRST);
 
 				// trim to 280 like twitter.
 				String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
