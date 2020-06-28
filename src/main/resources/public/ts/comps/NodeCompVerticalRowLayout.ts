@@ -58,7 +58,7 @@ export class NodeCompVerticalRowLayout extends Div {
             allowInsert = false;
         }
         else if (typeHandler) {
-            allowInsert = typeHandler.allowAction("addChild");
+            allowInsert =  state.isAdminUser || typeHandler.allowAction("addChild");
         }
 
         let rowCount: number = 0;

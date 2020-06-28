@@ -69,7 +69,7 @@ export class NodeCompTableRowLayout extends Div {
         }
 
         else if (typeHandler) {
-            allowInsert = typeHandler.allowAction("addChild");
+            allowInsert =  state.isAdminUser || typeHandler.allowAction("addChild");
         }
 
         let curCols = 0;

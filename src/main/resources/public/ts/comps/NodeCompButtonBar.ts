@@ -109,8 +109,8 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let editingAllowed = S.edit.isEditAllowed(node, state);
         let editableNode = true;
         if (typeHandler) {
-            editingAllowed = editingAllowed && typeHandler.allowAction("edit");
-            editableNode = typeHandler.allowAction("editNode");
+            editingAllowed = state.isAdminUser || (editingAllowed && typeHandler.allowAction("edit"));
+            editableNode = state.isAdminUser || typeHandler.allowAction("editNode");
         }
 
         if (S.props.isEncrypted(node)) {
@@ -156,7 +156,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
             let selected: boolean = state.selectedNodes[node.id] ? true : false;
 
-            if (editingAllowed && S.render.allowAction(typeHandler, "edit") &&
+            if (editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, "edit")) &&
                 //no need to ever select home node
                 node.id != state.homeNodeId) {
                 selButton = new Checkbox(null, selected, {
@@ -167,7 +167,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
             let insertAllowed = true;
             if (typeHandler) {
-                insertAllowed = typeHandler.allowAction("insert");
+                insertAllowed = state.isAdminUser || typeHandler.allowAction("insert");
             }
 
             if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node, state) &&
