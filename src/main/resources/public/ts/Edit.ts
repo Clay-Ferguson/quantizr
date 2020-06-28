@@ -67,7 +67,7 @@ export class Edit implements EditIntf {
     private deleteNodesResponse = (res: J.DeleteNodesResponse, postDeleteSelNodeId: string, state: AppState): void => {
         if (S.util.checkSuccess("Delete node", res)) {
             S.meta64.clearSelNodes(state);
-            
+
             //We only want to pass a nodeId here if we are going to root node.
             let nodeId = postDeleteSelNodeId == state.homeNodeId ? postDeleteSelNodeId : null;
 
@@ -425,7 +425,7 @@ export class Edit implements EditIntf {
         new ConfirmDlg("Permanently delete your entire Inbox", "Cleaer Inbox",
             () => {
                 S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
-                    nodeIds: [state.homeNodePath + "/inbox"],
+                    nodeIds: ["~" + J.NodeType.INBOX],
                     hardDelete: true
                 }, (res: J.DeleteNodesResponse) => {
                     S.nav.openContentNode(state.homeNodePath, state);
@@ -637,7 +637,7 @@ export class Edit implements EditIntf {
                 }
 
                 S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                    nodeId: "~"+J.NodeType.NOTES,
+                    nodeId: "~" + J.NodeType.NOTES,
                     newNodeName: "",
                     typeName: "u",
                     createAtTop: true,
