@@ -690,7 +690,7 @@ export class EditNodeDlg extends DialogBase {
         else {
             this.contentEditor = new Textarea(null, {
                 rows,
-                defaultValue: encrypted ? "" : value
+                //defaultValue: encrypted ? "" : value
             }, null, {
                 getValue: () => {
                     let ret = this.getState().node.content;

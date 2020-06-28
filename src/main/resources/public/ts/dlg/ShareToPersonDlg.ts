@@ -21,7 +21,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ShareToPersonDlg extends DialogBase {
 
     shareToUserTextField: TextField;
-    closeContiningDialogs: boolean = false;
 
     constructor(private node: J.NodeInfo, private sharedNodeFunc: Function, state: AppState) {
         super("Share Node to Person", "app-modal-content-medium-width", false, state);
@@ -46,12 +45,6 @@ export class ShareToPersonDlg extends DialogBase {
                             this.close();
                             this.shareToPersonImmediate(friendsDlg.selectedName);
                         }
-                    }, null, "btn-primary"),
-
-                    new Button("Add Friends", async () => {
-                        this.closeContiningDialogs = true;
-                        this.close();
-                        S.nav.openContentNode("~"+J.NodeType.FRIEND_LIST, this.appState);
                     }, null, "btn-primary"),
                     
                     new Button("Close", () => {
