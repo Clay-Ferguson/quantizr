@@ -110,7 +110,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let editingAllowed = S.edit.isEditAllowed(node, state);
         let editableNode = true;
         if (typeHandler) {
-            editingAllowed = state.isAdminUser || (editingAllowed && typeHandler.allowAction(NodeActionType.edit, node, state));
+            editingAllowed = state.isAdminUser || (editingAllowed && typeHandler.allowAction(NodeActionType.editNode, node, state));
             editableNode = state.isAdminUser || typeHandler.allowAction(NodeActionType.editNode, node, state);
         }
 
@@ -157,7 +157,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
             let selected: boolean = state.selectedNodes[node.id] ? true : false;
 
-            if (editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.edit, node, state)) &&
+            if (editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, node, state)) &&
                 //no need to ever select home node
                 node.id != state.homeNodeId) {
                 selButton = new Checkbox(null, selected, {
