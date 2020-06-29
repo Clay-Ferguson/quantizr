@@ -12,6 +12,7 @@ import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { NavBarIconButton } from "../widget/NavBarIconButton";
 import { AppState } from "../AppState";
 import { useSelector, useDispatch } from "react-redux";
+import { NodeActionType } from "../enums/NodeActionType";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -109,8 +110,8 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let editingAllowed = S.edit.isEditAllowed(node, state);
         let editableNode = true;
         if (typeHandler) {
-            editingAllowed = state.isAdminUser || (editingAllowed && typeHandler.allowAction("edit", node, state));
-            editableNode = state.isAdminUser || typeHandler.allowAction("editNode", node, state);
+            editingAllowed = state.isAdminUser || (editingAllowed && typeHandler.allowAction(NodeActionType.edit, node, state));
+            editableNode = state.isAdminUser || typeHandler.allowAction(NodeActionType.editNode, node, state);
         }
 
         if (S.props.isEncrypted(node)) {
@@ -156,7 +157,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
             let selected: boolean = state.selectedNodes[node.id] ? true : false;
 
-            if (editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, "edit", node, state)) &&
+            if (editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.edit, node, state)) &&
                 //no need to ever select home node
                 node.id != state.homeNodeId) {
                 selButton = new Checkbox(null, selected, {
@@ -167,7 +168,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
             let insertAllowed = true;
             if (typeHandler) {
-                insertAllowed = state.isAdminUser || typeHandler.allowAction("insert", node, state);
+                insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, node, state);
             }
 
             if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node, state) &&

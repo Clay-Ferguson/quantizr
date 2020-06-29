@@ -8,6 +8,7 @@ import { NodeCompMarkdown } from "../../comps/NodeCompMarkdown";
 import { AppState } from "../../AppState";
 import { CompIntf } from "../../widget/base/CompIntf";
 import { store } from "../../AppRedux";
+import { NodeActionType } from "../../enums/NodeActionType";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -77,11 +78,7 @@ export class TypeBase implements TypeHandlerIntf {
         return "fa " + this.iconStyle + " fa-lg";
     }
 
-    /* todo-1: Need an enum of all possible actions 
-    
-    Known ones: addChild, editNode
-    */
-    allowAction(action: string, node: J.NodeInfo, appState: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         return true;
     }
 

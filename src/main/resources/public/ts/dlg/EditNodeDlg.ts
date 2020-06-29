@@ -34,6 +34,7 @@ import { NodeCompBinary } from "../comps/NodeCompBinary";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg"
 import { LayoutRow } from "../widget/LayoutRow";
+import { NodeActionType } from "../enums/NodeActionType";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -181,7 +182,7 @@ export class EditNodeDlg extends DialogBase {
         //to dangerously opt into this also without hacking the code with this var.
         let allowEditAllProps: boolean = this.appState.isAdminUser;
 
-        let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction("upload", state.node, this.appState)) : true;
+        let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
         let allowShare = true;
 
         let children = [

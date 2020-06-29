@@ -17,6 +17,7 @@ import { AppState } from "../AppState";
 import { dispatch } from "../AppRedux";
 import { TypeBase } from "./base/TypeBase";
 import { CompIntf } from "../widget/base/CompIntf";
+import { NodeActionType } from "../enums/NodeActionType";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -31,9 +32,9 @@ export class RssTypeHandler extends TypeBase {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
     }
 
-    allowAction(action: string, node: J.NodeInfo, appState: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
-            case "upload":
+            case NodeActionType.upload:
                 return false;
             default:
                 return true;

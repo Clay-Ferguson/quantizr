@@ -10,6 +10,7 @@ import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { Div } from "../widget/Div";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
+import { NodeActionType } from "../enums/NodeActionType";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -23,12 +24,12 @@ export class UserFeedTypeHandler extends TypeBase {
         super(J.NodeType.USER_FEED, "User Feed", "fa-th-list", true);
     }
 
-    allowAction(action: string, node: J.NodeInfo, appState: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
 
         switch (action) {
-            case "addChild":
+            case NodeActionType.addChild:
                 return S.props.isMine(node, appState);
-            case "editNode":
+            case NodeActionType.editNode:
                 return false;
             default:
                 return true;

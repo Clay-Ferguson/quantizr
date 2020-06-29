@@ -40,7 +40,7 @@ public class WebFingerController {
 		
 		if (resource.startsWith("acct:")) {
 			String user = resource.substring(5);
-			//todo-0: need to make this pull from properties file.
+			//todo-1: need to make this pull from properties file.
 			if ("wclayf@quanta.wiki".equals(user)) {
 				res.setSubject(resource);
 				

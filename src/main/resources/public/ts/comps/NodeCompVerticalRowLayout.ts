@@ -8,6 +8,7 @@ import { Div } from "../widget/Div";
 import { AppState } from "../AppState";
 import { useSelector, useDispatch } from "react-redux";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
+import { NodeActionType } from "../enums/NodeActionType";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -55,7 +56,7 @@ export class NodeCompVerticalRowLayout extends Div {
         NOTE: Server also enforces this check if it gets by the client.
 		*/
         if (typeHandler) {
-            allowInsert =  state.isAdminUser || typeHandler.allowAction("addChild", this.node, state);
+            allowInsert =  state.isAdminUser || typeHandler.allowAction(NodeActionType.addChild, this.node, state);
         }
 
         let rowCount: number = 0;

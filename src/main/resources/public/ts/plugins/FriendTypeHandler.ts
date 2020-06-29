@@ -8,6 +8,7 @@ import { Comp } from "../widget/base/Comp";
 import { AppState } from "../AppState";
 import { Div } from "../widget/Div";
 import { Img } from "../widget/Img";
+import { NodeActionType } from "../enums/NodeActionType";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -19,9 +20,9 @@ export class FriendTypeHandler extends TypeBase {
         super(J.NodeType.FRIEND, "Friend", "fa-user", true);
     }
 
-    allowAction(action: string, node: J.NodeInfo, appState: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
-            case "upload":
+            case NodeActionType.upload:
                 return false;
             default:
                 return true;

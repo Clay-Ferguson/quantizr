@@ -15,6 +15,7 @@ import { NodeCompVerticalRowLayout } from "./comps/NodeCompVerticalRowLayout";
 import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";
 import { AppState } from "./AppState";
 import { dispatch } from "./AppRedux";
+import { NodeActionType } from "./enums/NodeActionType";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -142,7 +143,7 @@ export class Render implements RenderIntf {
         S.util.showMessage(message, "URL", true);
     }
 
-    allowAction = (typeHandler: TypeHandlerIntf, action: string, node: J.NodeInfo, appState: AppState): boolean => {
+    allowAction = (typeHandler: TypeHandlerIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean => {
         return typeHandler == null || typeHandler.allowAction(action, node, appState);
     }
 
