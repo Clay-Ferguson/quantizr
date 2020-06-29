@@ -19,7 +19,7 @@ export interface RenderIntf {
     makeAvatarImage(node: J.NodeInfo, state: AppState): Img;
     allowPropertyEdit(node: J.NodeInfo, propName: string, state: AppState): boolean;
     isReadOnlyProperty(propName: string): boolean;
-    allowAction(typeHandler: TypeHandlerIntf, action: string): boolean; 
+    allowAction(typeHandler: TypeHandlerIntf, action: string, node: J.NodeInfo, appState: AppState): boolean; 
     createBetweenNodeButtonBar(node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, state: AppState): Comp;
     renderChildren(node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp;
     getAvatarImgUrl(ownerId: string, avatarVer: string): string;

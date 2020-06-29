@@ -23,8 +23,11 @@ export class UserFeedTypeHandler extends TypeBase {
         super(J.NodeType.USER_FEED, "User Feed", "fa-th-list", true);
     }
 
-    allowAction(action: string): boolean {
+    allowAction(action: string, node: J.NodeInfo, appState: AppState): boolean {
+
         switch (action) {
+            case "addChild":
+                return S.props.isMine(node, appState);
             case "editNode":
                 return false;
             default:

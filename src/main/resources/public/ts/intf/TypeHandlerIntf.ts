@@ -9,7 +9,7 @@ export interface TypeHandlerIntf {
     getName(): string;
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp;
     getIconClass(): string;
-    allowAction(action : string): boolean;
+    allowAction(action : string, node: J.NodeInfo, appState: AppState): boolean;
     allowPropertyEdit(typeName: string, state: AppState): boolean;
     getDomPreUpdateFunction(parent: CompIntf): void;
     getCustomProperties(): string[];

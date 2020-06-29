@@ -142,8 +142,8 @@ export class Render implements RenderIntf {
         S.util.showMessage(message, "URL", true);
     }
 
-    allowAction = (typeHandler: TypeHandlerIntf, action: string): boolean => {
-        return typeHandler == null || typeHandler.allowAction(action);
+    allowAction = (typeHandler: TypeHandlerIntf, action: string, node: J.NodeInfo, appState: AppState): boolean => {
+        return typeHandler == null || typeHandler.allowAction(action, node, appState);
     }
 
     renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true, state: AppState): void => {

@@ -79,9 +79,9 @@ export class TypeBase implements TypeHandlerIntf {
 
     /* todo-1: Need an enum of all possible actions 
     
-    Known ones: addChild
+    Known ones: addChild, editNode
     */
-    allowAction(action: string): boolean {
+    allowAction(action: string, node: J.NodeInfo, appState: AppState): boolean {
         return true;
     }
 

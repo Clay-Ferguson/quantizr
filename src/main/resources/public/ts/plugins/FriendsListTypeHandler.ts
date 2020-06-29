@@ -21,7 +21,7 @@ export class FriendsListTypeHandler extends TypeBase {
         super(J.NodeType.FRIEND_LIST, "Friends List", "fa-users", true);
     }
 
-    allowAction(action : string): boolean {
+    allowAction(action : string, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
             case "editNode":
                 return false;

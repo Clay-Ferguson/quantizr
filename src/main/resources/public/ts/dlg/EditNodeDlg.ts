@@ -181,7 +181,7 @@ export class EditNodeDlg extends DialogBase {
         //to dangerously opt into this also without hacking the code with this var.
         let allowEditAllProps: boolean = this.appState.isAdminUser;
 
-        let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction("upload")) : true;
+        let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction("upload", state.node, this.appState)) : true;
         let allowShare = true;
 
         let children = [

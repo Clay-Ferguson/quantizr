@@ -15,7 +15,7 @@ export class InboxEntryTypeHandler extends TypeBase {
         super(J.NodeType.INBOX_ENTRY, "Inbox Entry", "fa-envelope", false);
     }
 
-    allowAction(action: string): boolean {
+    allowAction(action: string, node: J.NodeInfo, appState: AppState): boolean {
         return false;
     }
 

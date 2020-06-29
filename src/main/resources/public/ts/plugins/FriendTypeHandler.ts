@@ -19,7 +19,7 @@ export class FriendTypeHandler extends TypeBase {
         super(J.NodeType.FRIEND, "Friend", "fa-user", true);
     }
 
-    allowAction(action: string): boolean {
+    allowAction(action: string, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
             case "upload":
                 return false;

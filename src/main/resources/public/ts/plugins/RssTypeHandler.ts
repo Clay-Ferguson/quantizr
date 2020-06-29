@@ -31,7 +31,7 @@ export class RssTypeHandler extends TypeBase {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
     }
 
-    allowAction(action: string): boolean {
+    allowAction(action: string, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
             case "upload":
                 return false;

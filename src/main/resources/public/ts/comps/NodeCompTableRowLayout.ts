@@ -61,15 +61,9 @@ export class NodeCompTableRowLayout extends Div {
         because right now our design is that USER_FEED nodes are by definition automatically 'public'
         
         NOTE: Server also enforces this check if it gets by the client.
-
-        todo-0: Move this logic to INSIDE the allowAction of userFeed type.(note this is in both table row layout and vertical layout classes)
-		*/
-        if (this.node.type == J.NodeType.USER_FEED && !S.props.isMine(this.node, state)) {
-            allowInsert = false;
-        }
-
-        else if (typeHandler) {
-            allowInsert =  state.isAdminUser || typeHandler.allowAction("addChild");
+        */
+        if (typeHandler) {
+            allowInsert =  state.isAdminUser || typeHandler.allowAction("addChild", this.node, state);
         }
 
         let curCols = 0;

@@ -54,11 +54,8 @@ export class NodeCompVerticalRowLayout extends Div {
         
         NOTE: Server also enforces this check if it gets by the client.
 		*/
-        if (this.node.type==J.NodeType.USER_FEED && !S.props.isMine(this.node, state)) {
-            allowInsert = false;
-        }
-        else if (typeHandler) {
-            allowInsert =  state.isAdminUser || typeHandler.allowAction("addChild");
+        if (typeHandler) {
+            allowInsert =  state.isAdminUser || typeHandler.allowAction("addChild", this.node, state);
         }
 
         let rowCount: number = 0;

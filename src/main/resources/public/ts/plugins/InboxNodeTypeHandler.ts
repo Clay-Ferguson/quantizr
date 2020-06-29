@@ -21,7 +21,7 @@ export class InboxNodeTypeHandler extends TypeBase {
         super(J.NodeType.INBOX, "Inbox", "fa-inbox", false);
     }
 
-    allowAction(action: string): boolean {
+    allowAction(action: string, node: J.NodeInfo, appState: AppState): boolean {
         return false;
     }
 
