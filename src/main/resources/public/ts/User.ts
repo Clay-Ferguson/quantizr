@@ -75,6 +75,7 @@ export class User implements UserIntf {
 
                 let usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
                 let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
+                debugger;
                 let usingCredentials: boolean = usr && pwd;
 
                 /*
@@ -94,19 +95,20 @@ export class User implements UserIntf {
                         tzOffset: new Date().getTimezoneOffset(),
                         dst: S.util.daylightSavingsTime
                     }, (res: J.LoginResponse) => {
-                        
+
                         if (usingCredentials) {
                             this.loginResponse(res, callUsr, callPwd, false, state);
                         } else {
                             if (res.success) {
                                 S.meta64.setStateVarsUsingLoginResponse(res, state);
                             }
-                    
+
                             S.meta64.loadAnonPageHome(state);
                         }
                     },
-                        (error: string) => {
-                            S.user.deleteAllUserLocalDbEntries();
+                        async (error: string) => {
+                            //S.user.deleteAllUserLocalDbEntries();
+                            await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null);
                             S.meta64.loadAnonPageHome(state);
                         });
                 }
@@ -120,6 +122,11 @@ export class User implements UserIntf {
     logout = async (updateLocalDb: any, state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
+                //todo-0: temporary hack for testing usr pwd loss. 
+                let usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
+                let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
+                debugger;
+
                 if (state.isAnonUser) {
                     return;
                 }
@@ -142,9 +149,9 @@ export class User implements UserIntf {
 
     deleteAllUserLocalDbEntries = (): Promise<any> => {
         return Promise.all([
-                S.localDB.setVal(C.LOCALDB_LOGIN_USR, null),
-                S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null),
-                S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null)
+            //S.localDB.setVal(C.LOCALDB_LOGIN_USR, null),
+            //S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null),
+            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null)
         ]);
     }
 
@@ -152,11 +159,18 @@ export class User implements UserIntf {
         state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
+                debugger;
                 if (S.util.checkSuccess("Login", res)) {
 
                     if (usr !== J.PrincipalName.ANON) {
-                        await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
-                        await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
+                        if (usr) {
+                            debugger;
+                            await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
+                        }
+
+                        if (pwd) {
+                            await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
+                        }
                         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");
                     }
 
@@ -196,7 +210,8 @@ export class User implements UserIntf {
                     else {
                         //if we tried a login and it wasn't from a login dialog then just blow away the login state
                         //so that any kind of page refresh is guaranteed to just show login dialog and not try to login
-                        await this.deleteAllUserLocalDbEntries();
+                        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null);
+                        //await this.deleteAllUserLocalDbEntries();
                     }
                 }
             }
