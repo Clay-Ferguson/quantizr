@@ -1125,6 +1125,41 @@ i'm backing out for now
     overflow: auto;
 }
 
+.priorityTag {
+    border-radius: 1em;
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 5px;
+    margin-left: 5px;
+}
+
+.priorityTag1 {
+    @extend .priorityTag;
+    border: 3px solid red;
+}
+
+.priorityTag2 {
+    @extend .priorityTag;
+    border: 3px solid orangered;
+}
+
+.priorityTag3 {
+    @extend .priorityTag;
+    border: 3px solid yellow;
+}
+
+.priorityTag4 {
+    @extend .priorityTag;
+    border: 3px solid green;
+}
+
+.priorityTag5 {
+    @extend .priorityTag;
+    border: 3px solid blueviolet;
+}
+
+
 /************************************************************** 
 Media Queries below are per Bootstap 4 standard */
 

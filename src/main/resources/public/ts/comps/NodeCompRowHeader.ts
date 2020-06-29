@@ -47,8 +47,8 @@ export class NodeCompRowHeader extends Div {
             }
         }
         else {
-            let priority = S.props.getNodePropVal(J.NodeProp.PRIORITY, node);
-            priority = (priority && priority != "0") ? " P" + priority : "";
+            let priorityVal = S.props.getNodePropVal(J.NodeProp.PRIORITY, node);
+            let priority = (priorityVal && priorityVal != "0") ? "P" + priorityVal : "";
 
             if (node.owner && node.owner != "?") {
                 children.push(new Span(node.owner, {
@@ -66,9 +66,14 @@ export class NodeCompRowHeader extends Div {
                 "ID:" + node.id + " " + //
                 ((node.logicalOrdinal != -1) ? ("[" + node.logicalOrdinal + "] ") : " ") + //
                 node.type + //
-                (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") + //
-                priority
+                (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") //
             ));
+
+            if (priority) {
+                children.push(new Span(priority, {
+                    className: "priorityTag"+priorityVal
+                }));
+            }
         }
         this.setChildren(children);
     }
