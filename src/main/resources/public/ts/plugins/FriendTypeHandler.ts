@@ -21,12 +21,13 @@ export class FriendTypeHandler extends TypeBase {
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
-        switch (action) {
-            case NodeActionType.upload:
-                return false;
-            default:
-                return true;
-        }
+        // switch (action) {
+        //     case NodeActionType.upload:
+        //         return false;
+        //     default:
+        //         return true;
+        // }
+        return false;
     }
 
     getEditLabelForProp(propName: string): string {

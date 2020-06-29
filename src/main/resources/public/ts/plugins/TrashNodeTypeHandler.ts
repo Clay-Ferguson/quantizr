@@ -9,6 +9,7 @@ import { Heading } from "../widget/Heading";
 import { Div } from "../widget/Div";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { NodeActionType } from "../enums/NodeActionType";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -18,6 +19,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class TrashNodeTypeHandler extends TypeBase {
     constructor() {
         super(J.NodeType.TRASH_BIN, "Trash Bin", "fa-trash", false);
+    }
+
+    allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
+        // switch (action) {
+        //     case NodeActionType.editNode:
+        //         return false;
+        //     default:
+        //         return true;
+        // }
+        return false;
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {

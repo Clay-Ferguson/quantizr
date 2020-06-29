@@ -23,12 +23,13 @@ export class FriendsListTypeHandler extends TypeBase {
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
-        switch (action) {
-            case NodeActionType.editNode:
-                return false;
-            default:
-                return true;
-        }
+        // switch (action) {
+        //     case NodeActionType.editNode:
+        //         return false;
+        //     default:
+        //         return true;
+        // }
+        return false;
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
