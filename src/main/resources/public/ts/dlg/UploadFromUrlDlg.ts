@@ -38,6 +38,10 @@ export class UploadFromUrlDlg extends DialogBase {
         ];
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     upload = (): void => {
         let sourceUrl = this.uploadFromUrlTextField.getValue();
 

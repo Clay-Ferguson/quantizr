@@ -40,6 +40,10 @@ export class PrefsDlg extends DialogBase {
         ];
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     savePreferences = (): void => {
         this.appState.showMetaData = this.showMetadataCheckBox.getChecked();
 

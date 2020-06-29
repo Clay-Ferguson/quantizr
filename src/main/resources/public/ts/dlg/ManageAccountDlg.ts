@@ -40,6 +40,10 @@ export class ManageAccountDlg extends DialogBase {
         return children;
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     init = (): void => {
         S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,
             (res: J.GetUserAccountInfoResponse) => {

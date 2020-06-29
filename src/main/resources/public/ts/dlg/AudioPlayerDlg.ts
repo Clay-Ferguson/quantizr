@@ -81,6 +81,10 @@ export class AudioPlayerDlg extends DialogBase {
         return children;
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     getAudioElement(): HTMLAudioElement {
         let elm: HTMLAudioElement = this.audioPlayer.getAudioElement();
         if (elm == null) {

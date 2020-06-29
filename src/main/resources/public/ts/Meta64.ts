@@ -365,6 +365,11 @@ export class Meta64 implements Meta64Intf {
              * $ (window).on("orientationchange", _.orientationHandler);
              */
 
+            window.addEventListener("resize", () => {
+                this.deviceWidth = window.innerWidth;
+                this.deviceHeight = window.innerHeight;
+            });
+
             // todo-1: actually this is a nuisance unless user is actually EDITING a node right now
             // so until i make it able to detect if user is editing i'm removing this.
             // window.onbeforeunload = () => {

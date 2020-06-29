@@ -72,5 +72,9 @@ export class GraphDisplayDlg extends DialogBase {
         });
         return children;
     }
+
+    renderButtons(): CompIntf {
+        return null;
+    }
 }
 

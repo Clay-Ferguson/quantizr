@@ -48,6 +48,10 @@ export class LoginDlg extends DialogBase {
         return children;
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     populateFromLocalDb = (): void => {
         this.whenElm(async (elm: HTMLElement) => {
             let usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);

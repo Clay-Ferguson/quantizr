@@ -95,6 +95,10 @@ export class ProfileDlg extends DialogBase {
         return children;
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     /* Base class override used to get data before rendering the dialog */
     queryServer(): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {

@@ -44,6 +44,10 @@ export class SharingDlg extends DialogBase {
         return children;
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     queryServer(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             this.reload();

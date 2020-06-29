@@ -55,6 +55,10 @@ export class ShareToPersonDlg extends DialogBase {
         ];
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     shareNodeToPerson = (): void => {
         let targetUser = this.shareToUserTextField.getValue();
         if (!targetUser) {

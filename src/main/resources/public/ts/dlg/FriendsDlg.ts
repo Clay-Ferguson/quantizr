@@ -42,6 +42,10 @@ export class FriendsDlg extends DialogBase {
         return children;
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     reload = (): void => {
         S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends", {
         },  (res: J.GetFriendsResponse): void => {

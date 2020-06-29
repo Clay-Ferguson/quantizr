@@ -51,6 +51,10 @@ export class ExportDlg extends DialogBase {
         ];
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     exportNodes = (): void => {
         let highlightNode = S.meta64.getHighlightedNode(this.appState);
         if (highlightNode) {

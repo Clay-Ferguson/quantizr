@@ -46,6 +46,10 @@ export class SearchByIDDlg extends DialogBase {
         return children;
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     search = () => {
         if (!S.util.ajaxReady("searchNodes")) {
             return;

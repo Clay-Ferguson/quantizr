@@ -78,6 +78,10 @@ export class SplitNodeDlg extends DialogBase {
         return children;
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     splitNodes = (): void => {
         let highlightNode = S.meta64.getHighlightedNode(this.appState);
         if (highlightNode) {

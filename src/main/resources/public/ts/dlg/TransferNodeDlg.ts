@@ -47,6 +47,10 @@ export class TransferNodeDlg extends DialogBase {
         ];
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     transfer = (): void => {
         let fromUser = this.fromTextField.getValue();
         let toUser = this.toTextField.getValue();

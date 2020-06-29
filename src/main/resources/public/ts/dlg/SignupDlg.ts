@@ -46,6 +46,10 @@ export class SignupDlg extends DialogBase {
         return children;
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     signup = (): void => {
         let userName = this.userTextField.getValue();
         let password = this.passwordTextField.getValue();

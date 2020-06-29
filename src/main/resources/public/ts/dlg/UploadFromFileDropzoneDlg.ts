@@ -82,6 +82,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         return children;
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     toggleIpfs = (): void => {
         let state = this.getState();
         this.mergeState({

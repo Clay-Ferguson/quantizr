@@ -193,18 +193,18 @@ export class EditNodeDlg extends DialogBase {
                     this.propertyEditFieldContainer = new Div("", {
                     }),
                 ]),
-                this.buttonBar = new ButtonBar([
-                    this.saveNodeButton = new Button("Save", () => {
-                        this.saveNode();
-                        this.close();
-                    }, null, "btn-primary"),
+                // this.buttonBar = new ButtonBar([
+                //     this.saveNodeButton = new Button("Save", () => {
+                //         this.saveNode();
+                //         this.close();
+                //     }, null, "btn-primary"),
 
-                    this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
-                    this.shareButton = allowShare ? new Button("Share", this.share) : null,
+                //     this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
+                //     this.shareButton = allowShare ? new Button("Share", this.share) : null,
 
-                    //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
-                    this.cancelButton = new Button("Cancel", this.cancelEdit)
-                ])
+                //     //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
+                //     this.cancelButton = new Button("Cancel", this.cancelEdit)
+                // ])
             ])
         ];
 
@@ -365,6 +365,45 @@ export class EditNodeDlg extends DialogBase {
 
         this.propertyEditFieldContainer.setChildren([mainPropsTable, binarySection, collapsiblePanel]);
         return children;
+    }
+
+    renderButtons(): CompIntf {
+        let state = this.getState();
+
+        let hasAttachment: boolean = S.props.hasBinary(state.node);
+
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+        //let customProps: string[] = null;
+        if (typeHandler) {
+            //customProps = typeHandler.getCustomProperties();
+            typeHandler.ensureDefaultProperties(state.node);
+        }
+
+        // let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
+
+        // //regardless of value, if this property is present we consider the type locked
+        // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
+
+        // //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
+        // //to dangerously opt into this also without hacking the code with this var.
+        // let allowEditAllProps: boolean = this.appState.isAdminUser;
+
+        let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
+        let allowShare = true;
+
+
+        return this.buttonBar = new ButtonBar([
+            this.saveNodeButton = new Button("Save", () => {
+                this.saveNode();
+                this.close();
+            }, null, "btn-primary"),
+
+            this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
+            this.shareButton = allowShare ? new Button("Share", this.share) : null,
+
+            //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
+            this.cancelButton = new Button("Cancel", this.cancelEdit)
+        ])
     }
 
     isGuiControlBasedProp = (prop: J.PropertyInfo): boolean => {

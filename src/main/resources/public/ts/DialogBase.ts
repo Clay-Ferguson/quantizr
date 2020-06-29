@@ -36,6 +36,9 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     /* this is a slight hack so we can ignore 'close()' calls that are bogus */
     opened: boolean = false;
 
+    /* I added this capability to make the internals of the dialog scroll, but didn't like it ultimately */
+    internalScrolling: boolean = false;
+
     constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState) {
         super(null);
         this.appState = appState;
@@ -128,6 +131,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     }
 
     abstract renderDlg(): CompIntf[];
+    abstract renderButtons(): CompIntf;
 
     /* Can be overridden to customize content (normally icons) in title bar */
     getExtraTitleBarComps(): CompIntf[] {
@@ -166,7 +170,25 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             timesIcon.renderRawHtml = true;
         }
 
-        children = children.concat(this.renderDlg());
+        let contentAttribs: any = null;
+
+        /* This will make the content area of the dialog above the buttons be scrollable, with a max size that is the full
+        page size before scrolling. This scrolling makes the dialog buttons always stay visible and not themselves scroll */
+        if (this.internalScrolling) {
+            let style = {
+                maxHeight: "" + (S.meta64.deviceHeight - S.meta64.navBarHeight - 50) + "px"
+            };
+            contentAttribs = {
+                className: "dialogContentArea",
+                style
+            };
+        }
+
+        let contentDiv = new Div(null, contentAttribs, this.renderDlg());
+
+        children.push(contentDiv);
+        children.push(this.renderButtons());
+
         this.setChildren(children);
     }
 }

@@ -55,6 +55,10 @@ export class EditCredentialsDlg extends DialogBase {
         ];
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     populateFromLocalDb = (): void => {
         this.whenElm(async (elm: HTMLElement) => {
             this.userTextField.setValue(this.usr = await S.localDB.getVal(this.usrDbProp));

@@ -44,6 +44,10 @@ export class ChangeNodeTypeDlg extends DialogBase {
         ];
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     setNodeType = (): void => {
         this.selCallback(this.nodeTypeListBox.getState().selectedPayload); 
     }

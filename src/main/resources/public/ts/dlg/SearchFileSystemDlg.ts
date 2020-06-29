@@ -44,6 +44,10 @@ export class SearchFileSystemDlg extends DialogBase {
         return children;
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     searchNodes = (state: AppState): void => {
         if (!S.util.ajaxReady("searchNodes")) {
             return;

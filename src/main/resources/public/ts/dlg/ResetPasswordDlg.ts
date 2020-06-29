@@ -47,6 +47,10 @@ export class ResetPasswordDlg extends DialogBase {
         return children;
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     resetPassword = (): void => {
         var userName = this.userTextField.getValue();
         var emailAddress = this.emailTextField.getValue();

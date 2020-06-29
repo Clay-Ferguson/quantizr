@@ -36,6 +36,10 @@ export class ImportDlg extends DialogBase {
         ];
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     importNodes = (): void => {
         var highlightNode = S.meta64.getHighlightedNode(this.appState);
         var sourceFileName = this.importFromFileNameTextField.getValue();

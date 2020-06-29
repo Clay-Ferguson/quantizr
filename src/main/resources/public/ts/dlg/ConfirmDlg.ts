@@ -30,4 +30,8 @@ export class ConfirmDlg extends DialogBase {
             ])
         ];
     }
+
+    renderButtons(): CompIntf {
+        return null;
+    }
 }

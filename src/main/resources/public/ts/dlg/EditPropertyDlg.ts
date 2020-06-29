@@ -45,6 +45,10 @@ export class EditPropertyDlg extends DialogBase {
         ];
     }
 
+    renderButtons(): CompIntf {
+        return null;
+    }
+
     save = (): void => {
         this.name = this.propertyNameTextarea.getValue();
 
