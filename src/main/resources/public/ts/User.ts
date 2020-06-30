@@ -75,7 +75,6 @@ export class User implements UserIntf {
 
                 let usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
                 let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
-                debugger;
                 let usingCredentials: boolean = usr && pwd;
 
                 /*
@@ -122,11 +121,6 @@ export class User implements UserIntf {
     logout = async (updateLocalDb: any, state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                //todo-0: temporary hack for testing usr pwd loss. 
-                let usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
-                let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
-                debugger;
-
                 if (state.isAnonUser) {
                     return;
                 }
@@ -159,12 +153,10 @@ export class User implements UserIntf {
         state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                debugger;
                 if (S.util.checkSuccess("Login", res)) {
 
                     if (usr !== J.PrincipalName.ANON) {
                         if (usr) {
-                            debugger;
                             await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
                         }
 

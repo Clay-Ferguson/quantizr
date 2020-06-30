@@ -56,7 +56,7 @@ export class LoginDlg extends DialogBase {
         this.whenElm(async (elm: HTMLElement) => {
             let usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
             let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
-            debugger;
+            
             this.userTextField.setValue(usr);
             this.passwordTextField.setValue(pwd);
         });

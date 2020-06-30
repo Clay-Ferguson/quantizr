@@ -35,9 +35,7 @@ export class UserFeedTypeHandler extends TypeBase {
                 return true;
         }
     }
-
-    //todo-0: for node types FriendList and UserFeed need to remove buttons during edit mode for
-    //'new', 'edit', 'cut'
+    
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
 
         let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);

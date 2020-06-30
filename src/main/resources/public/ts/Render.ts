@@ -179,6 +179,11 @@ export class Render implements RenderIntf {
 
                     s.idToNodeMap = {};
                     if (res) S.meta64.updateNodeMap(res.node, s);
+
+                    if (targetNodeId) {
+                        S.render.fadeInId = targetNodeId;
+                    }
+
                     s.selectedNodes = {};
 
                     if (s.node) {
@@ -276,23 +281,18 @@ export class Render implements RenderIntf {
             title: "Insert new node here"
         }, "btn-sm");
 
-        let buttonBar = new ButtonBar([pasteInlineButton, newNodeButton],
-            null, "float-right " + (isFirst ? "marginTop" : ""));
+        let buttonBar = new Span(null, {
+            className: "float-right"
+        }, [pasteInlineButton, newNodeButton]);
 
-        return buttonBar;
-
-        // I experimented with ability to edit between rows and I don't really like
-        // the usability. I'm still designing and thinking about how/if I want any non-EditBox
-        // based editing of nodes to take place.
-        // let buttonBar = new Span(null, {
-        //     className: "float-right"
-        // }, [pasteInlineButton, newNodeButton]);
-        //     //null, "float-right " + (isFirst ? "marginTop" : ""));
-
-        // return new Div(null, {
-        //     className: "betweenRowsContainer"
-        // },
-        //     [new QuickEditField(node, isFirst, state), buttonBar/*, new Div(null, { className: "clearfix" })*/]);
+        return new Div(null, {
+            className: "betweenRowsContainer row",
+        }, [
+            new QuickEditField(node, isFirst, state),
+            new Span(null, {
+                className: "col"
+            }, [buttonBar])
+        ]);
     }
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo): string => {
