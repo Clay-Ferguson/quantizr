@@ -24,7 +24,7 @@ export class QuickEditField extends Span {
 
     constructor(private node: J.NodeInfo, private isFirst: boolean, private appState: AppState) {
         super();
-        this.attribs.className = "quickEditSpan col-10";
+        this.attribs.className = "quickEditSpan col-11";
         let isEditing = QuickEditField.editingId == node.id && QuickEditField.editingIsFirst == isFirst;
 
         this.mergeState({
@@ -44,7 +44,7 @@ export class QuickEditField extends Span {
         QuickEditField.editingId = this.node.id;
         QuickEditField.editingVal = "";
         QuickEditField.editingIsFirst = this.isFirst;
-        
+
         this.mergeState({
             isEditing: true
         });
@@ -73,7 +73,7 @@ export class QuickEditField extends Span {
                         quickEditVal: val
                     });
                 }
-            }, "quickEditTextArea");
+            }, "form-control pre-textarea quickEditTextArea");
 
             let buttonBar = new ButtonBar([
                 new Button("Save", this.saveEdit, null, "btn-primary"),
@@ -109,7 +109,7 @@ export class QuickEditField extends Span {
         }, (res) => {
             //todo-0: this timeout is required, to see the new data, and I don'w know why unless it's mongo not being able to commit fast enough ?
             setTimeout(() => {
-                S.view.refreshTree(this.appState.node.id, false, res.newNode.id, false, false, false, true, this.appState);
+                S.view.refreshTree(this.appState.node.id, false, res.newNode.id, false, false, true, false, this.appState);
             }, 250);
         });
     }

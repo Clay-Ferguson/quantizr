@@ -79,10 +79,11 @@ export class NodeCompTableRowLayout extends Div {
                 }
 
                 if (allowInsert && rowCount == 0 && state.userPreferences.editMode && this.level == 1) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
+                    // comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
+                    // //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                    // comps.push(new Div(null, { className: "clearfix" }));
 
-                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                    comps.push(new Div(null, { className: "clearfix" }));
+                    children.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
                 }
 
                 let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove);

@@ -182,6 +182,10 @@ export class Render implements RenderIntf {
 
                     if (targetNodeId) {
                         S.render.fadeInId = targetNodeId;
+                        allowScroll = true;
+
+                        //this is new. not fully vetted.
+                        state.pendingLocationHash = null;
                     }
 
                     s.selectedNodes = {};
@@ -282,11 +286,11 @@ export class Render implements RenderIntf {
         }, "btn-sm");
 
         let buttonBar = new Span(null, {
-            className: "float-right"
+            className: "float-right microMarginTop"
         }, [pasteInlineButton, newNodeButton]);
 
         return new Div(null, {
-            className: "betweenRowsContainer row",
+            className: "betweenRowsContainer row no-gutters",
         }, [
             new QuickEditField(node, isFirst, state),
             new Span(null, {

@@ -50,6 +50,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let replyButton: Button;
         let deleteNodeButton: Button;
         let pasteInsideButton: Button;
+        let upLevelButton: NavBarIconButton;
         let prevButton: NavBarIconButton;
         let nextButton: NavBarIconButton;
         let searchButton: NavBarIconButton;
@@ -58,6 +59,15 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let isPageRootNode = state.node && this.node.id == state.node.id;
 
         if (state.node && this.node.id == state.node.id) {
+            if (S.nav.parentVisibleToUser(state)) {
+                upLevelButton = new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
+                    /* For onclick functions I need a new approach for some (not all) where I can get by 
+                    with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
+                    directly off the DOM */
+                    onClick: S.nav.navUpLevel,
+                    title: "Go to Parent Node"
+                });
+            }
 
             if (!S.nav.displayingRepositoryRoot(state)) {
                 prevButton = new NavBarIconButton("fa-chevron-circle-left", null, {
@@ -234,7 +244,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let navButtonBar;
 
         if (isPageRootNode) {
-            navButtonBar = new ButtonBar([searchButton, timelineButton, prevButton, nextButton],
+            navButtonBar = new ButtonBar([searchButton, timelineButton, upLevelButton, prevButton, nextButton],
                 null, "float-right marginTop marginBottom");
             if (!navButtonBar.childrenExist()) {
                 navButtonBar = null;

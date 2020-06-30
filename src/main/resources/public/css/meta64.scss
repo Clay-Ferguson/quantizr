@@ -44,6 +44,7 @@ $listBackgroundColor: lightGray;
 
 $smallGap: 12px;
 $tinyGap: 8px;
+$microGap: 4px;
 
 $lightenRowFactor: 1.75;
 
@@ -516,6 +517,10 @@ input[type="radio"] {
 
 .marginTop {
     margin-top: $smallGap;
+}
+
+.microMarginTop {
+    margin-top: $microGap;
 }
 
 .marginBottom {
@@ -1167,8 +1172,8 @@ i'm backing out for now
 
 .quickEditTextArea {
     width: 100%;
-    background-color: transparent;
-    color: white;
+    //background-color: transparent;
+    //color: white;
 }
 
 .clickToEdit {
@@ -1184,10 +1189,11 @@ i'm backing out for now
 }
 
 .quickEditFormArea {
+    background-color: $modal-content-bg;
+    border: 2px solid $modal-content-border-color;
     border-radius: $borderRadiusLarge;
     padding: $smallGap;
     margin-top: $smallGap;
-    border: 3px solid $nodeBorderBottomColor;
 }
 
 /************************************************************** 
