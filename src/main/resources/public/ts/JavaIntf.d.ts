@@ -118,6 +118,7 @@ export interface InsertNodeRequest extends RequestBase {
     targetOrdinal: number;
     newNodeName: string;
     typeName: string;
+    initialValue: string;
 }
 
 export interface LoginRequest extends RequestBase {

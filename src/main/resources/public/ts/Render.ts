@@ -1,7 +1,6 @@
 import * as J from "./JavaIntf";
 import { Comp } from "./widget/base/Comp";
 import { Button } from "./widget/Button";
-import { ButtonBar } from "./widget/ButtonBar";
 import { Img } from "./widget/Img";
 import { Constants as C } from "./Constants";
 import { RenderIntf } from "./intf/RenderIntf";
@@ -16,6 +15,10 @@ import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";
 import { AppState } from "./AppState";
 import { dispatch } from "./AppRedux";
 import { NodeActionType } from "./enums/NodeActionType";
+import { QuickEditField } from "./widget/QuickEditField";
+import { Div } from "./widget/Div";
+import { Span } from "./widget/Span";
+import { ButtonBar } from "./widget/ButtonBar";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -244,6 +247,7 @@ export class Render implements RenderIntf {
     
     The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
     */
+
     createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, state: AppState): Comp => {
         let pasteInlineButton: Button = null;
 
@@ -276,6 +280,19 @@ export class Render implements RenderIntf {
             null, "float-right " + (isFirst ? "marginTop" : ""));
 
         return buttonBar;
+
+        // I experimented with ability to edit between rows and I don't really like
+        // the usability. I'm still designing and thinking about how/if I want any non-EditBox
+        // based editing of nodes to take place.
+        // let buttonBar = new Span(null, {
+        //     className: "float-right"
+        // }, [pasteInlineButton, newNodeButton]);
+        //     //null, "float-right " + (isFirst ? "marginTop" : ""));
+
+        // return new Div(null, {
+        //     className: "betweenRowsContainer"
+        // },
+        //     [new QuickEditField(node, isFirst, state), buttonBar/*, new Div(null, { className: "clearfix" })*/]);
     }
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo): string => {

@@ -10,6 +10,7 @@ public class InsertNodeRequest extends RequestBase {
 	private Long targetOrdinal;
 	private String newNodeName;
 	private String typeName;
+	private String initialValue;
 
 	public String getParentId() {
 		return parentId;
@@ -41,5 +42,13 @@ public class InsertNodeRequest extends RequestBase {
 
 	public void setTargetOrdinal(Long targetOrdinal) {
 		this.targetOrdinal = targetOrdinal;
+	}
+
+	public String getInitialValue() {
+		return initialValue;
+	}
+
+	public void setInitialValue(String initialValue) {
+		this.initialValue = initialValue;
 	}
 }

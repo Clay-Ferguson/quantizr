@@ -13,10 +13,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Textarea extends Comp implements I.TextEditorIntf {
 
-    constructor(private label: string, attribs: any = null, private defaultValue: string = null, private valueIntf: ValueIntf = null) {
+    constructor(private label: string, attribs: any = null, private defaultValue: string = null, private valueIntf: ValueIntf = null, customClass: string=null) {
         super(attribs);
         S.util.mergeProps(this.attribs, {
-            className: "form-control pre-textarea"
+            className: customClass || "form-control pre-textarea"
         });
 
         if (!this.attribs.rows) {
@@ -113,7 +113,9 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         _attribs.style = { fontFamily: "monospace" };
 
         children.push(S.e('textarea', _attribs));
-        return S.e("div", {
+
+        //changing from div to span is very new 6/30/2020. not fully vetted.
+        return S.e("span" /* "div" */, {
             id: this.getId() + "_textfield",
             key: this.getId() + "_textfield",
             //NOTE: Yes we set font on the PARENT and then use 'inherit' to get it

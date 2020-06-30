@@ -154,7 +154,8 @@ export class Edit implements EditIntf {
                 parentId: parentNode.id,
                 targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
                 newNodeName: "",
-                typeName: typeName ? typeName : "u"
+                typeName: typeName ? typeName : "u",
+                initialValue: ""
             }, (res) => { this.insertNodeResponse(res, state); });
         } else {
             S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {

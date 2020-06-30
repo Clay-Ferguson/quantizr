@@ -73,7 +73,7 @@ public class NodeEditService {
 
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
-	
+
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request.
 	 */
@@ -200,14 +200,22 @@ public class NodeEditService {
 
 		SubNode newNode = api.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
 				CreateNodeLocation.ORDINAL);
-		newNode.setContent("");
 
-		/*
-		 * When a user creates a new node we use "ModTime==0" (never modified) as a way
-		 * to indicate the node is in 'draft mode', and should not be visible to other
-		 * users until "Save" is clicked.
-		 */
-		MongoThreadLocal.setAutoTimestampDisabled(true);
+		if (req.getInitialValue() != null) {
+			newNode.setContent(req.getInitialValue());
+			
+			//NOTE: we don't call setAutoTimestampDisabled here because this kind of initial value insert needs to consider the node 
+			//edited and ready to display.
+		} else {
+			newNode.setContent("");
+
+			/*
+			 * When a user creates a new node we use "ModTime==0" (never modified) as a way
+			 * to indicate the node is in 'draft mode', and should not be visible to other
+			 * users until "Save" is clicked.
+			 */
+			MongoThreadLocal.setAutoTimestampDisabled(true);
+		}
 
 		api.save(session, newNode);
 		res.setNewNode(
@@ -315,7 +323,8 @@ public class NodeEditService {
 			// api.saveSession(session); //shouldn't be necessar
 		}
 
-		//todo-0: eventually we need a plugin-type architecture to decouple this kind of type-specific code from the general node saving.
+		// todo-0: eventually we need a plugin-type architecture to decouple this kind
+		// of type-specific code from the general node saving.
 		if (node.getType().equals(NodeType.FRIEND.s())) {
 			String userNodeId = node.getStringProp(NodeProp.USER_NODE_ID.s());
 
@@ -340,7 +349,7 @@ public class NodeEditService {
 						node.setProp(NodeProp.USER_NODE_ID.s(), userNodeId);
 					}
 				}
-			} 
+			}
 		}
 
 		res.setSuccess(true);

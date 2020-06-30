@@ -1127,38 +1127,54 @@ i'm backing out for now
 
 .priorityTag {
     border-radius: 1em;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 500;
-    line-height: 1.2;
-    padding: 5px;
+    line-height: 1;
+    padding: 4px;
     margin-left: 5px;
 }
 
 .priorityTag1 {
     @extend .priorityTag;
-    border: 3px solid red;
+    border: 5px solid red;
 }
 
 .priorityTag2 {
     @extend .priorityTag;
-    border: 3px solid orangered;
+    border: 5px solid orange;
 }
 
 .priorityTag3 {
     @extend .priorityTag;
-    border: 3px solid yellow;
+    border: 5px solid yellow;
 }
 
 .priorityTag4 {
     @extend .priorityTag;
-    border: 3px solid green;
+    border: 5px solid green;
 }
 
 .priorityTag5 {
     @extend .priorityTag;
-    border: 3px solid blueviolet;
+    border: 5px solid blueviolet;
 }
 
+.betweenRowsContainer {
+    //border: 1px solid red;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.quickEditField {
+    width: 90%;
+}
+
+.quickEditTextArea {
+    //border: 1px solid green;
+    width: 90%;
+    background-color: transparent;
+    color: white;
+}
 
 /************************************************************** 
 Media Queries below are per Bootstap 4 standard */
