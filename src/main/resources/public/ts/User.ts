@@ -153,7 +153,6 @@ export class User implements UserIntf {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 if (S.util.checkSuccess("Login", res)) {
-
                     if (usr !== J.PrincipalName.ANON) {
                         if (usr) {
                             await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);

@@ -241,7 +241,7 @@ public class AppController {
 
 		if (id != null) {
 			ValContainer<String> vcId = new ValContainer<String>(id);
-			log.debug("ID specified on url: " + id);
+			log.debug("ID specified on url=" + id);
 			String _id = id;
 			adminRunner.run(mongoSession -> {
 				// we don't check ownership of node at this time, but merely check sanity of

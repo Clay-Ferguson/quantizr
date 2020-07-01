@@ -3,6 +3,7 @@ package org.subnode.mongo;
 import java.util.Date;
 
 import org.subnode.config.NodeName;
+import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
@@ -31,6 +32,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Autowired
 	private UserFeedService userFeedService;
+
+	@Autowired
+	private SessionContext sessionContext;
 
 	/*
 	 * todo-2: This is a temporary hack to allow our ExportJsonService.resetNode
@@ -122,16 +126,30 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		/* Node name not allowed to contain : or ~ */
 		String nodeName = node.getName();
-		if (nodeName != null && nodeName.contains(":")) {
-			nodeName = nodeName.replaceAll(":", "-");
-			dbObj.put(SubNode.FIELD_NAME, nodeName);
-			node.setName(nodeName);
-		}
+		if (nodeName != null) {
 
-		if (nodeName != null && nodeName.contains("~")) {
+			nodeName = nodeName.replaceAll(":", "-");
 			nodeName = nodeName.replaceAll("~", "-");
-			dbObj.put(SubNode.FIELD_NAME, nodeName);
-			node.setName(nodeName);
+
+			// If not an admin user then we enforce that their username be prefixed onto the
+			// node name.
+			if (!sessionContext.isAdmin()) {
+				if (!nodeName.startsWith(sessionContext.getUserName() + "--")) {
+
+					//if user tried to use "--" in their name just change it to "-" for them. The "--" is only allows after the user name.
+					nodeName = nodeName.replaceAll("--", "-");
+
+					//now add the username prefix.
+					nodeName = sessionContext.getUserName() + "--" + nodeName;
+				}
+			}
+
+			// Warning: this is not a redundant null check. Some code in this block CAN set
+			// to null.
+			if (nodeName != null) {
+				dbObj.put(SubNode.FIELD_NAME, nodeName);
+				node.setName(nodeName);
+			}
 		}
 
 		Date now = new Date();

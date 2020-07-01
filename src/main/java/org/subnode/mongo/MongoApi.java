@@ -1249,13 +1249,8 @@ public class MongoApi {
 
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
 
-		/*
-		 * todo-1: A future enhancement will probably be to use the event listener to
-		 * make it so that when anyone other than admin tries to set the name on a node,
-		 * their username (node ID) will automatically get prefixed onto the front of it
-		 * so that each user will basically have their own namespace to use for node
-		 * naming uniqueness constraint.
-		 */
+		/* NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the user.
+		That is, prefixed by their username followed by two dashes */
 		createIndex(session, SubNode.class, SubNode.FIELD_NAME);
 
 		createIndex(session, SubNode.class, SubNode.FIELD_ORDINAL);
