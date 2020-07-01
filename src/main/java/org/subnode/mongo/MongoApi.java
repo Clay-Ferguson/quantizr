@@ -774,17 +774,18 @@ public class MongoApi {
 	}
 
 	/**
-	 * Gets a node using any of the three naming types:
+	 * Gets a node using any of the 4 naming types:
 	 * 
 	 * <pre>
 	 * 1) ID (hex string, no special prefix)
 	 * 2) path (starts with slash), 
 	 * 3) name (starts with colon)
 	 * 4) special named location, like '~sn:inbox' (starts with tilde)
+	 *    (we support just '~inbox' also as a type shorthand where the sn: is missing)
 	 * </pre>
 	 */
-	public SubNode getNode(MongoSession session, String searchArg, boolean allowAuth) {
-		if (searchArg.equals("/")) {
+	public SubNode getNode(MongoSession session, String identifier, boolean allowAuth) {
+		if (identifier.equals("/")) {
 			throw new RuntimeEx(
 					"SubNode doesn't implement the root node. Root is implicit and never needs an actual node to represent it.");
 		}
@@ -792,20 +793,24 @@ public class MongoApi {
 		SubNode ret = null;
 
 		//inbox, friend_list, and user_feed need to be passed as type instead, prefixed with tilde.
-		if (searchArg.startsWith("~")) {
-			ret = getSpecialNode(session, session.getUser(), null, null, searchArg.substring(1));
+		if (identifier.startsWith("~")) {
+			String typeName = identifier.substring(1);
+			if (!typeName.startsWith("sn:")) {
+				typeName = "sn:"+typeName;
+			}
+			ret = getSpecialNode(session, session.getUser(), null, null, typeName);
 		}
 		// Node name lookups are done by prefixing the search with a colon (:)
-		else if (searchArg.startsWith(":")) {
-			ret = getNodeByName(session, searchArg.substring(1), allowAuth);
+		else if (identifier.startsWith(":")) {
+			ret = getNodeByName(session, identifier.substring(1), allowAuth);
 		}
 		// If search doesn't start with a slash then it's a nodeId and not a path
-		else if (!searchArg.startsWith("/")) {
-			ret = getNode(session, new ObjectId(searchArg), allowAuth);
+		else if (!identifier.startsWith("/")) {
+			ret = getNode(session, new ObjectId(identifier), allowAuth);
 		} else {
-			searchArg = XString.stripIfEndsWith(searchArg, "/");
+			identifier = XString.stripIfEndsWith(identifier, "/");
 			Query query = new Query();
-			query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(searchArg));
+			query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(identifier));
 			saveSession(session);
 			ret = ops.findOne(query, SubNode.class);
 		}
@@ -1408,9 +1413,7 @@ public class MongoApi {
 
 
 
-	/*
-	 * Returns Inbox node for the specified user, and automatically creates it if
-	 * not already existing
+	/* todo-0: need to rename this: It's not a 'special' lookup it's a 'type' lookup
 	 * 
 	 * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
 	 * userNode if you know it, to save cycles

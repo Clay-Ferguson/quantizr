@@ -169,9 +169,13 @@ export class User implements UserIntf {
                     /* set ID to be the page we want to show user right after login */
                     let id: string = null;
                     let childId: string = null;
+                    let renderLeafIfParent = true;
 
                     if (res.homeNodeOverride) {
                         id = res.homeNodeOverride;
+                        if (id.startsWith("~")) {
+                            renderLeafIfParent = false;
+                        }
                     } //
                     else {
                         let lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
@@ -184,7 +188,7 @@ export class User implements UserIntf {
                         }
                     }
 
-                    S.view.refreshTree(id, true, childId, true, false, true, true, state);
+                    S.view.refreshTree(id, renderLeafIfParent, childId, true, false, true, true, state);
 
                     setTimeout(() => {
                         S.encryption.initKeys();

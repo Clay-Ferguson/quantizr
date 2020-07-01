@@ -267,6 +267,16 @@ export class Meta64 implements Meta64Intf {
         }
     }
 
+    getNodeByName = (node: J.NodeInfo, name: string, state: AppState): J.NodeInfo => {
+        if (!node) return null;
+        if (node.name==name) return node;
+
+        if (node.children) {
+            return state.node.children.find(node => node.name == name);
+        }
+        return null;
+    }
+
     initApp = async (): Promise<void> => {
 
         return new Promise<void>(async (resolve, reject) => {

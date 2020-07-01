@@ -27,7 +27,6 @@ import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.MailSender;
-import org.subnode.model.client.NodeType;
 import org.subnode.mongo.AclService;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.RunAsMongoAdmin;
@@ -220,8 +219,10 @@ public class AppController {
 	 * 
 	 * passCode is an auth code for a password reset
 	 */
-	@RequestMapping(value = "/")
+	@RequestMapping(value = { "/", "/n/{namePathParam}", "/u/{userIdentity}" })
 	public String index(//
+			@PathVariable(value = "namePathParam", required = false) String namePathParam, //
+			@PathVariable(value = "userIdentity", required = false) String userIdentity, //
 			@RequestParam(value = "id", required = false) String id, //
 			@RequestParam(value = "n", required = false) String name, //
 			@RequestParam(value = "signupCode", required = false) String signupCode, //
@@ -234,8 +235,12 @@ public class AppController {
 			userManagerService.processSignupCode(signupCode, model);
 		}
 
+		if (!StringUtils.isEmpty(namePathParam)) {
+			name = namePathParam;
+		}
+
 		// A 'name' param is handled just like an identifier with ":" prefix
-		if (!StringUtils.isEmpty(name)) {
+		else if (!StringUtils.isEmpty(name)) {
 			id = ":" + name;
 		}
 
@@ -263,20 +268,6 @@ public class AppController {
 			return "forward:/index.html?passCode=" + passCode;
 		}
 
-		return "forward:/index.html";
-	}
-
-	/*
-	 * This is the actual app page loading request, for his SPA (Single Page
-	 * Application) this is the request to load the page.
-	 * 
-	 * ID is optional url parameter that user can specify to access a specific node
-	 * 
-	 * passCode is an auth code for a password reset
-	 */
-	@RequestMapping(value = "/inbox")
-	public String inbox(Model model) {
-		sessionContext.setUrlId("~"+NodeType.INBOX.s());
 		return "forward:/index.html";
 	}
 
@@ -899,8 +890,8 @@ public class AppController {
 			synchronized (MailSender.getLock()) {
 				try {
 					mailSender.init();
-					mailSender.sendMail("wclayf@gmail.com", null,
-							"<h1>Hello from Quanta! Time=" + timeString + "</h1>", "Test Subject");
+					mailSender.sendMail("wclayf@gmail.com", null, "<h1>Hello from Quanta! Time=" + timeString + "</h1>",
+							"Test Subject");
 				} finally {
 					mailSender.close();
 				}

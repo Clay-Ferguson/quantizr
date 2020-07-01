@@ -60,14 +60,12 @@ public class AppConfiguration implements WebMvcConfigurer {
 		return new ConcurrentTaskScheduler(); // single threaded by default
 	}
 
-	@Override
-	public void addViewControllers(ViewControllerRegistry registry) {
-		ViewControllerRegistration reg = registry.addViewController("/");
-		reg.setViewName("forward:/index.html");
-
-		ViewControllerRegistration reg2 = registry.addViewController("/r/**");
-		reg2.setViewName("forward:/index.html");
-	}
+	// Turns out we don't need this.
+	// @Override
+	// public void addViewControllers(ViewControllerRegistry registry) {
+	// 	ViewControllerRegistration reg = registry.addViewController("/");
+	// 	reg.setViewName("forward:/index.html");
+	// }
 
 	// DO NOT DELETE.
 	// Leave as another way to show how to provide a bean by name in the spring
