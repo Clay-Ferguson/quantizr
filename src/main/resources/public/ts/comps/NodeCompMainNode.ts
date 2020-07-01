@@ -46,7 +46,7 @@ export class NodeCompMainNode extends Div {
         S.render.setNodeDropHandler(this, node, state);
 
         let header: CompIntf = null;
-        if (state.showMetaData) {
+        if (state.userPreferences.showMetaData) {
             header = new NodeCompRowHeader(node, false);
         }
 

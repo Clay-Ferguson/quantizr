@@ -567,15 +567,6 @@ export class Meta64 implements Meta64Intf {
 
         state.userPreferences = res.userPreferences;
 
-        //todo-1: admin user had bug where it wasn't loading this at login, so i did this hack for now to make admin logins
-        //always set to what settings i prefer.
-        if (state.isAdminUser) {
-            state.showMetaData = false;
-        }
-        else {
-            state.showMetaData = res.userPreferences.showMetaData;
-        }
-
         var title = "";
         if (!state.isAnonUser) {
             title += "User: " + res.userName;

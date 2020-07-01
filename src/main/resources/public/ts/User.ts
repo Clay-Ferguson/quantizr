@@ -94,7 +94,6 @@ export class User implements UserIntf {
                         tzOffset: new Date().getTimezoneOffset(),
                         dst: S.util.daylightSavingsTime
                     }, (res: J.LoginResponse) => {
-
                         if (usingCredentials) {
                             this.loginResponse(res, callUsr, callPwd, false, state);
                         } else {

@@ -64,9 +64,6 @@ export class AppState {
      */
     showProperties: boolean;
 
-    /* Flag that indicates if we are rendering owner, modTime, etc. on each row */
-    showMetaData: boolean;
-
     allowFileSystemSearch: boolean;
     anonUserLandingPageNode: any;
 

@@ -28,7 +28,7 @@ export class PrefsDlg extends DialogBase {
         return [
             new Form(null, [
                 new FormGroup(null, [
-                    this.showMetadataCheckBox = new Checkbox("Show Metadata", this.appState.showMetaData),
+                    this.showMetadataCheckBox = new Checkbox("Show Metadata", this.appState.userPreferences.showMetaData),
                 ]),
                 new ButtonBar([
                     new Button("Save", this.savePreferences, null, "btn-primary"),
@@ -45,15 +45,14 @@ export class PrefsDlg extends DialogBase {
     }
 
     savePreferences = (): void => {
-        this.appState.showMetaData = this.showMetadataCheckBox.getChecked();
+        this.appState.userPreferences.showMetaData = this.showMetadataCheckBox.getChecked();
 
         S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
-            //todo-2: both of these options should come from meta64.userPrefernces, and not be stored directly on meta64 scope.
             "userPreferences": {
                 editMode: this.appState.userPreferences.editMode,
                 importAllowed: false,
                 exportAllowed: false,
-                showMetaData: this.appState.showMetaData,
+                showMetaData: this.appState.userPreferences.showMetaData,
                 maxUploadFileSize: -1,
             }
         }, this.savePreferencesResponse);
