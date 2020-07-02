@@ -826,7 +826,7 @@ public class MongoApi {
 			if (!typeName.startsWith("sn:")) {
 				typeName = "sn:" + typeName;
 			}
-			ret = getSpecialNode(session, session.getUser(), null, null, typeName);
+			ret = getUserNodeByType(session, session.getUser(), null, null, typeName);
 		}
 		// Node name lookups are done by prefixing the search with a colon (:)
 		else if (identifier.startsWith(":")) {
@@ -1448,7 +1448,7 @@ public class MongoApi {
 	 * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
 	 * userNode if you know it, to save cycles
 	 */
-	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode, String nodeName, String type) {
+	public SubNode getUserNodeByType(MongoSession session, String user, SubNode userNode, String nodeName, String type) {
 		if (userNode == null) {
 			userNode = getUserNodeByUserName(session, user);
 		}

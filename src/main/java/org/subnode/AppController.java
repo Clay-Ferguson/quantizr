@@ -245,14 +245,13 @@ public class AppController {
 			userManagerService.processSignupCode(signupCode, model);
 		}
 
+		//Node Names are identified using a colon in front of it, to make it detectable
 		if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
 			id = ":" + userName + ":" + nameOnUserNode;
 		}
 		else if (!StringUtils.isEmpty(nameOnAdminNode)) {
 			id = ":" + nameOnAdminNode;
 		}
-		// A 'name' param is handled just like an identifier with ":" prefix,
-		//todo-0: name param can eventually be removed.
 		else if (!StringUtils.isEmpty(name)) {
 			id = ":" + name;
 		}
@@ -283,8 +282,8 @@ public class AppController {
 		return "forward:/index.html";
 	}
 
-	// //this didn't work. circle back later. todo-0 this actually stopped the server from even startig because somewhere else
-	// somehoe 'error' is already defined
+	// this didn't work. will circle back later. this actually stopped the server from even startig because somewhere else
+	// somehowe 'error' is already defined, according to the error message
 	// @RequestMapping(value = { "/error" })
 	// public String error() {
 	// 	//todo-0: need to put a message into the session to tell user the requested url was not found.

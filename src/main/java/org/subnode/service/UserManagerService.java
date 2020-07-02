@@ -185,7 +185,7 @@ public class UserManagerService {
 			return null;
 
 		String ret = null;
-		SubNode userInbox = api.getSpecialNode(session, null, userNode, "### Inbox", NodeType.INBOX.s());
+		SubNode userInbox = api.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s());
 
 		Date now = new Date();
 		long lastInboxNotifyTime = userNode.getIntProp(NodeProp.LAST_INBOX_NOTIFY_TIME.s());

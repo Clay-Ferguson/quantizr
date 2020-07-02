@@ -182,10 +182,8 @@ export class Render implements RenderIntf {
                     if (res) S.meta64.updateNodeMap(res.node, s);
 
                     if (targetNodeId) {
-                        //If you enter n=adam--myNodeName for node name, we get here with highlightId being the name and not the ID
-                        //so when renderPageFromData is running it's can't find that hightlightId and fails to scroll to and highlight the node
-                        //because of that
-                        //todo-0: I'll circle back and decide later if this is good design here or not. It's a bit tricky.
+                        //If you access /n/myNodeName we get here with targetNodeId being the name (and not the ID)
+                        //so we have to call getNodeByName() to get the 'id' that goes with that node name.
                         if (targetNodeId.startsWith(":")) {
                             targetNodeId = targetNodeId.substring(1);
                             let foundNode: J.NodeInfo = S.meta64.getNodeByName(res.node, targetNodeId, s);
