@@ -218,13 +218,23 @@ public class AppController {
 	 * ID is optional url parameter that user can specify to access a specific node
 	 * 
 	 * passCode is an auth code for a password reset
+	 *
 	 */
-	@RequestMapping(value = { "/", "/n/{namePathParam}", "/u/{userIdentity}" })
+	@RequestMapping(value = { "/", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}" })
 	public String index(//
-			@PathVariable(value = "namePathParam", required = false) String namePathParam, //
-			@PathVariable(value = "userIdentity", required = false) String userIdentity, //
+
+			//node name on 'admin' account. Non-admin named nodes use url "/u/userName/nodeName"
+			@PathVariable(value = "nameOnAdminNode", required = false) String nameOnAdminNode, //
+
+			@PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode, //
+			@PathVariable(value = "userName", required = false) String userName, //
+
 			@RequestParam(value = "id", required = false) String id, //
+			
+			//be careful removing this, clicking on a node updates the browser history to an 'n=' style url if this node is named
+			//so we will need to change that to the path format.
 			@RequestParam(value = "n", required = false) String name, //
+
 			@RequestParam(value = "signupCode", required = false) String signupCode, //
 			@RequestParam(value = "passCode", required = false) String passCode, //
 			Model model) {
@@ -235,17 +245,20 @@ public class AppController {
 			userManagerService.processSignupCode(signupCode, model);
 		}
 
-		if (!StringUtils.isEmpty(namePathParam)) {
-			name = namePathParam;
+		if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
+			id = ":" + userName + ":" + nameOnUserNode;
 		}
-
-		// A 'name' param is handled just like an identifier with ":" prefix
+		else if (!StringUtils.isEmpty(nameOnAdminNode)) {
+			id = ":" + nameOnAdminNode;
+		}
+		// A 'name' param is handled just like an identifier with ":" prefix,
+		//todo-0: name param can eventually be removed.
 		else if (!StringUtils.isEmpty(name)) {
 			id = ":" + name;
 		}
 
 		if (id != null) {
-			ValContainer<String> vcId = new ValContainer<String>(id);
+			sessionContext.setUrlId(id);
 			log.debug("ID specified on url=" + id);
 			String _id = id;
 			adminRunner.run(mongoSession -> {
@@ -254,12 +267,11 @@ public class AppController {
 				SubNode node = api.getNode(mongoSession, _id);
 				if (node == null) {
 					log.debug("Node did not exist.");
-					vcId.setVal(null);
+					sessionContext.setUrlId(null);
 				} else {
 					log.debug("Node exists.");
 				}
 			});
-			sessionContext.setUrlId(vcId.getVal());
 		} else {
 			sessionContext.setUrlId(null);
 		}
@@ -270,6 +282,14 @@ public class AppController {
 
 		return "forward:/index.html";
 	}
+
+	// //this didn't work. circle back later. todo-0 this actually stopped the server from even startig because somewhere else
+	// somehoe 'error' is already defined
+	// @RequestMapping(value = { "/error" })
+	// public String error() {
+	// 	//todo-0: need to put a message into the session to tell user the requested url was not found.
+	// 	return "forward:/index.html";
+	// }
 
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
 	public @ResponseBody Object signup(@RequestBody SignupRequest req, HttpSession session) {

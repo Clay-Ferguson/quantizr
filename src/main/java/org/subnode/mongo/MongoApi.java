@@ -88,6 +88,8 @@ public class MongoApi {
 	@Autowired
 	private UserFeedService userFeedService;
 
+	public static SubNode systemRootNode;
+
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
 
@@ -757,9 +759,33 @@ public class MongoApi {
 		return getNodeByName(session, name, true);
 	}
 
+	/*
+	 * The name can have either of two different formats: 1) "globalName" (admin
+	 * owned node) 2) "userName:nodeName" (a named node some user has created)
+	 * 
+	 * NOTE: It's a bit confusing but also either 1 or 2 above will be prefixed with
+	 * ":" before send into this method and this 'name', but any leading colon is
+	 * stripped before it's passed into this method.
+	 */
 	public SubNode getNodeByName(MongoSession session, String name, boolean allowAuth) {
 		Query query = new Query();
-		query.addCriteria(Criteria.where(SubNode.FIELD_NAME).is(name));
+
+		ObjectId nodeOwnerId;
+		int colonIdx = -1;
+		if ((colonIdx = name.indexOf(":")) == -1) {
+			nodeOwnerId = systemRootNode.getOwner();
+		} else {
+			String userName = name.substring(0, colonIdx);
+
+			//pass a null session here to cause adminSession to be used which is required to get a user node, but 
+			//it always safe to get this node this way here.
+			SubNode userNode = getUserNodeByUserName(null, userName);
+			nodeOwnerId = userNode.getOwner();
+			name = name.substring(colonIdx+1);
+		}
+
+		query.addCriteria(Criteria.where(SubNode.FIELD_NAME).is(name)//
+				.and(SubNode.FIELD_OWNER).is(nodeOwnerId));
 		saveSession(session);
 		SubNode ret = ops.findOne(query, SubNode.class);
 
@@ -774,13 +800,14 @@ public class MongoApi {
 	}
 
 	/**
-	 * Gets a node using any of the 4 naming types:
+	 * Gets a node using any of the 5 naming types:
 	 * 
 	 * <pre>
 	 * 1) ID (hex string, no special prefix)
 	 * 2) path (starts with slash), 
-	 * 3) name (starts with colon)
-	 * 4) special named location, like '~sn:inbox' (starts with tilde)
+	 * 3) global name (name of admin owned node, starts with colon, and only contains one colon)
+	 * 4) name of user owned node fomratted as (":userName:nodeName")
+	 * 5) special named location, like '~sn:inbox' (starts with tilde)
 	 *    (we support just '~inbox' also as a type shorthand where the sn: is missing)
 	 * </pre>
 	 */
@@ -792,11 +819,12 @@ public class MongoApi {
 
 		SubNode ret = null;
 
-		//inbox, friend_list, and user_feed need to be passed as type instead, prefixed with tilde.
+		// inbox, friend_list, and user_feed need to be passed as type instead, prefixed
+		// with tilde.
 		if (identifier.startsWith("~")) {
 			String typeName = identifier.substring(1);
 			if (!typeName.startsWith("sn:")) {
-				typeName = "sn:"+typeName;
+				typeName = "sn:" + typeName;
 			}
 			ret = getSpecialNode(session, session.getUser(), null, null, typeName);
 		}
@@ -1254,8 +1282,11 @@ public class MongoApi {
 
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
 
-		/* NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the user.
-		That is, prefixed by their username followed by two dashes */
+		/*
+		 * NOTE: Every non-admin owned noded must have only names that are prefixed with
+		 * "UserName--" of the user. That is, prefixed by their username followed by two
+		 * dashes
+		 */
 		createIndex(session, SubNode.class, SubNode.FIELD_NAME);
 
 		createIndex(session, SubNode.class, SubNode.FIELD_ORDINAL);
@@ -1411,15 +1442,13 @@ public class MongoApi {
 		return userNode;
 	}
 
-
-
-	/* todo-0: need to rename this: It's not a 'special' lookup it's a 'type' lookup
+	/*
+	 * todo-0: need to rename this: It's not a 'special' lookup it's a 'type' lookup
 	 * 
 	 * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
 	 * userNode if you know it, to save cycles
 	 */
-	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode, String nodeName,
-			String type) {
+	public SubNode getSpecialNode(MongoSession session, String user, SubNode userNode, String nodeName, String type) {
 		if (userNode == null) {
 			userNode = getUserNodeByUserName(session, user);
 		}
@@ -1477,7 +1506,6 @@ public class MongoApi {
 		}
 		return node;
 	}
-
 
 	public SubNode getUserNodeByUserName(MongoSession session, String user) {
 		if (session == null) {
@@ -1582,6 +1610,10 @@ public class MongoApi {
 			}
 		}
 		return session;
+	}
+
+	public void initSystemRootNode() {
+		systemRootNode = getNode(adminSession, "/r");
 	}
 
 	/*

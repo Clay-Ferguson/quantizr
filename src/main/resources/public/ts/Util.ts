@@ -1084,9 +1084,10 @@ export class Util implements UtilIntf {
             return;
         }
         let url, title, state;
-
         if (node.name) {
-            url = window.location.origin + "?n=" + node.name;
+            let queryPath = this.getPathPartForNamedNode(node);
+            url = window.location.origin + queryPath;
+
             if (childNode && childNode.id != node.id) {
                 url += "#" + childNode.id;
             }
@@ -1110,6 +1111,17 @@ export class Util implements UtilIntf {
 
         //console.log("PUSHSTATE: url: " + url + ", state: " + JSON.stringify(state));
         history.pushState(state, title, url);
+    }
+
+    getPathPartForNamedNode = (node: J.NodeInfo): string => {
+        if (!node.name) return null;
+        
+        if (node.owner == "admin") {
+            return "/n/" + node.name;
+        }
+        else {
+            return "/u/" + node.owner + "/" + node.name;
+        }
     }
 
     // DO NOT DELETE: THIS CODE WORKS FINE

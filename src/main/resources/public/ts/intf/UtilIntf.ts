@@ -110,4 +110,5 @@ export interface UtilIntf {
     getBrowserMemoryInfo(): string;
     perfStart(): number;
     perfEnd(message: string, startTime: number): void;
+    getPathPartForNamedNode(node: J.NodeInfo): string;
 }

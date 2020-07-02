@@ -134,7 +134,8 @@ export class Render implements RenderIntf {
 
         let message: string = "ID-based Node URL: \n" + window.location.origin + "?id=" + node.id;
         if (node.name) {
-            message += "\n\nName-based Node URL: \n" + window.location.origin + "?n=" + node.name;
+            let queryPath = S.util.getPathPartForNamedNode(node);
+            message += "\n\nName-based Node URL: \n" + window.location.origin + queryPath;
         }
 
         let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
@@ -265,7 +266,7 @@ export class Render implements RenderIntf {
     }
 
     /* This is the button bar displayed between all nodes to let nodes be inserted at specific locations 
-    
+     
     The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
     */
 

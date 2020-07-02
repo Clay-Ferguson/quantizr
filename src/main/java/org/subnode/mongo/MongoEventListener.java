@@ -130,19 +130,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 			nodeName = nodeName.replaceAll(":", "-");
 			nodeName = nodeName.replaceAll("~", "-");
-
-			// If not an admin user then we enforce that their username be prefixed onto the
-			// node name.
-			if (!sessionContext.isAdmin()) {
-				if (!nodeName.startsWith(sessionContext.getUserName() + "--")) {
-
-					//if user tried to use "--" in their name just change it to "-" for them. The "--" is only allows after the user name.
-					nodeName = nodeName.replaceAll("--", "-");
-
-					//now add the username prefix.
-					nodeName = sessionContext.getUserName() + "--" + nodeName;
-				}
-			}
+			nodeName = nodeName.replaceAll("/", "-");
 
 			// Warning: this is not a redundant null check. Some code in this block CAN set
 			// to null.

@@ -115,6 +115,8 @@ public class MongoRepository {
 			api.createAdminUser(adminSession);
 			repoUtil.createTestAccounts();
 
+			api.initSystemRootNode();
+
 			if (appProp.getReSaveAll()) {
 				api.reSaveAll(adminSession);
 			}
