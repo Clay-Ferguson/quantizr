@@ -212,8 +212,9 @@ public class AttachmentService {
 		 */
 		if (addAsChild) {
 			try {
+				MongoThreadLocal.setAutoTimestampDisabled(false);
 				SubNode newNode = api.createNode(session, node, null, null, null, CreateNodeLocation.LAST);
-				newNode.setContent("### " + fileName);
+				newNode.setContent(fileName);
 
 				/*
 				 * todo-1: saving multiple uploads isn't working right now. It's a work in

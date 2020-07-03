@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.util.ThreadLocals;
+import org.subnode.util.XString;
 
 /**
  * This is Web Filter to measure basic application statistics (number of users,
@@ -61,7 +62,7 @@ public class AppFilter extends GenericFilterBean {
 			if (logRequests) {
 				String url = "REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString="
 						+ queryString;
-				log.debug(url);
+				log.debug(url +"\nParameters: "+XString.prettyPrint(httpReq.getParameterMap()));
 			}
 
 			updateHitCounter(httpReq);

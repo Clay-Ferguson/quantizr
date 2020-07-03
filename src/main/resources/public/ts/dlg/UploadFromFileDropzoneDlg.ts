@@ -46,7 +46,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     //storing this in a var was a quick convenient hack, but I need to get it probably from parmaeters closer to the fucntions using the value.
     ipfsFile: File;
 
-    maxFiles: number = 1;
+    maxFiles: number = 50;
 
     constructor(private nodeId: string, private node: J.NodeInfo, toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
         super(importMode ? "Import File" : "Upload File", null, false, state);
@@ -242,11 +242,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             autoProcessQueue: false,
             paramName: (state.toIpfs && dlg.toTemporal) ? "file" : "files",
             maxFilesize: maxFileSize,
-            parallelUploads: 2,
+            parallelUploads: 50,
 
-            /* Not sure what's this is for, but the 'files' parameter on the server is always NULL, unless
-            the uploadMultiple is false */
-            uploadMultiple: false,
+            //Without this the client will make multiple calls to the server to upload
+            //each file instead of streaming them all at once in an array of files.
+            uploadMultiple: true,
 
             maxFiles: this.maxFiles,
 
@@ -282,6 +282,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     /* If Uploading DIRECTLY to Temporal.cloud */
                     if (state.toIpfs && dlg.toTemporal) {
                         dlg.ipfsFile = file;
+                        //todo-0: check if temporal supports multiple uploads?
                         formData.append("file", file);
                         formData.append("hold_time", "1");
 
@@ -291,9 +292,17 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }
                     /* Else we'll be uploading onto Quanta and saving to ipfs based on the 'ipfs' flag */
                     else {
-                        formData.append("nodeId", dlg.nodeId);
-                        formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
-                        formData.append("ipfs", state.toIpfs ? "true" : "false");
+                        console.log("Sending File: " + file.name);
+                        formData.append("files", file);
+
+                        //It's important to check before calling append on this formData, because when uploading multiple files
+                        //when this runs for the second, third, etc file it ends up createing 
+                        //nodeId as a comma delimted list which is wrong.
+                        if (!formData.has("nodeId")) {
+                            formData.append("nodeId", dlg.nodeId);
+                            formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
+                            formData.append("ipfs", state.toIpfs ? "true" : "false");
+                        }
                     }
                     dlg.zipQuestionAnswered = false;
                 });

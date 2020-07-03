@@ -107,7 +107,7 @@ export class QuickEditField extends Span {
             typeName: "u",
             initialValue: val
         }, (res) => {
-            //todo-0: this timeout is required, to see the new data, and I don'w know why unless it's mongo not being able to commit fast enough ?
+            //todo-1: this timeout is required, to see the new data, and I don't know why unless it's mongo not being able to commit fast enough ?
             setTimeout(() => {
                 S.view.refreshTree(this.appState.node.id, false, res.newNode.id, false, false, true, false, this.appState);
             }, 250);

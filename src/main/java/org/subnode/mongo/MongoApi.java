@@ -1443,8 +1443,6 @@ public class MongoApi {
 	}
 
 	/*
-	 * todo-0: need to rename this: It's not a 'special' lookup it's a 'type' lookup
-	 * 
 	 * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
 	 * userNode if you know it, to save cycles
 	 */
