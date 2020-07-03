@@ -239,6 +239,7 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
         S.util.addAllToSet(this.allBinaryProps, [ //
             J.NodeProp.IMG_WIDTH,//
             J.NodeProp.IMG_HEIGHT, //
+            J.NodeProp.IMG_SIZE, //
             J.NodeProp.BIN_MIME, //
             J.NodeProp.BIN, //
 

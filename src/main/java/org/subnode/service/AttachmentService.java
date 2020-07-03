@@ -281,29 +281,35 @@ public class AttachmentService {
 		/* Clear out any leftover binary properties */
 		deleteAllBinaryProperties(node);
 
-		if (calcImageSize && ImageUtil.isImageMime(mimeType)) {
-			LimitedInputStream is = null;
-			try {
-				is = new LimitedInputStreamEx(inputStream, maxFileSize);
-				imageBytes = IOUtils.toByteArray(is);
-				isTemp = new ByteArrayInputStream(imageBytes);
-				bufImg = ImageIO.read(isTemp);
+		if (ImageUtil.isImageMime(mimeType)) {
 
+			//default image to be 100% size so it always fits right into the width of the display row.
+			node.setProp(NodeProp.IMG_SIZE.s(), "100%");
+
+			if (calcImageSize) {
+				LimitedInputStream is = null;
 				try {
-					node.setProp(NodeProp.IMG_WIDTH.s(), bufImg.getWidth());
-					node.setProp(NodeProp.IMG_HEIGHT.s(), bufImg.getHeight());
+					is = new LimitedInputStreamEx(inputStream, maxFileSize);
+					imageBytes = IOUtils.toByteArray(is);
+					isTemp = new ByteArrayInputStream(imageBytes);
+					bufImg = ImageIO.read(isTemp);
+
+					try {
+						node.setProp(NodeProp.IMG_WIDTH.s(), bufImg.getWidth());
+						node.setProp(NodeProp.IMG_HEIGHT.s(), bufImg.getHeight());
+					} catch (Exception e) {
+						/*
+						 * reading files from IPFS caused this exception, and I didn't investigate why
+						 * yet, because I don't think it's a bug in my code, but something in IPFS.
+						 */
+						log.error("Failed to get image length.", e);
+					}
 				} catch (Exception e) {
-					/*
-					 * reading files from IPFS caused this exception, and I didn't investigate why
-					 * yet, because I don't think it's a bug in my code, but something in IPFS.
-					 */
-					log.error("Failed to get image length.", e);
-				}
-			} catch (Exception e) {
-				throw new RuntimeEx(e);
-			} finally {
-				if (closeStream) {
-					StreamUtil.close(is, isTemp);
+					throw new RuntimeEx(e);
+				} finally {
+					if (closeStream) {
+						StreamUtil.close(is, isTemp);
+					}
 				}
 			}
 		}
@@ -345,6 +351,7 @@ public class AttachmentService {
 			}
 		}
 
+		//log.debug("Saving node with upload: "+XString.prettyPrint(node));
 		api.save(session, node);
 	}
 
@@ -750,7 +757,7 @@ public class AttachmentService {
 		 * editing needs to ever trigger timestamp update on the node
 		 */
 		MongoThreadLocal.setAutoTimestampDisabled(true);
-		
+
 		UploadFromUrlResponse res = new UploadFromUrlResponse();
 		readFromUrl(session, req.getSourceUrl(), req.getNodeId(), null, 0);
 		res.setSuccess(true);
