@@ -223,72 +223,72 @@ public class AppController {
 	@RequestMapping(value = { "/", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}" })
 	public String index(//
 
-			//node name on 'admin' account. Non-admin named nodes use url "/u/userName/nodeName"
+			// node name on 'admin' account. Non-admin named nodes use url
+			// "/u/userName/nodeName"
 			@PathVariable(value = "nameOnAdminNode", required = false) String nameOnAdminNode, //
 
 			@PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode, //
 			@PathVariable(value = "userName", required = false) String userName, //
 
 			@RequestParam(value = "id", required = false) String id, //
-			
-			//be careful removing this, clicking on a node updates the browser history to an 'n=' style url if this node is named
-			//so we will need to change that to the path format.
+
+			// be careful removing this, clicking on a node updates the browser history to
+			// an 'n=' style url if this node is named
+			// so we will need to change that to the path format.
 			@RequestParam(value = "n", required = false) String name, //
 
 			@RequestParam(value = "signupCode", required = false) String signupCode, //
 			@RequestParam(value = "passCode", required = false) String passCode, //
 			Model model) {
 
-		log.debug("AppController.index");
+		try {
+			log.debug("AppController.index");
 
-		if (signupCode != null) {
-			userManagerService.processSignupCode(signupCode, model);
-		}
+			if (signupCode != null) {
+				userManagerService.processSignupCode(signupCode, model);
+			}
 
-		//Node Names are identified using a colon in front of it, to make it detectable
-		if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
-			id = ":" + userName + ":" + nameOnUserNode;
-		}
-		else if (!StringUtils.isEmpty(nameOnAdminNode)) {
-			id = ":" + nameOnAdminNode;
-		}
-		else if (!StringUtils.isEmpty(name)) {
-			id = ":" + name;
-		}
+			// Node Names are identified using a colon in front of it, to make it detectable
+			if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
+				id = ":" + userName + ":" + nameOnUserNode;
+			} else if (!StringUtils.isEmpty(nameOnAdminNode)) {
+				id = ":" + nameOnAdminNode;
+			} else if (!StringUtils.isEmpty(name)) {
+				id = ":" + name;
+			}
 
-		if (id != null) {
-			sessionContext.setUrlId(id);
-			log.debug("ID specified on url=" + id);
-			String _id = id;
-			adminRunner.run(mongoSession -> {
-				// we don't check ownership of node at this time, but merely check sanity of
-				// whether this ID is even existing or not.
-				SubNode node = api.getNode(mongoSession, _id);
-				if (node == null) {
-					log.debug("Node did not exist.");
-					sessionContext.setUrlId(null);
-				} else {
-					log.debug("Node exists.");
-				}
-			});
-		} else {
-			sessionContext.setUrlId(null);
-		}
+			if (id != null) {
+				sessionContext.setUrlId(id);
+				log.debug("ID specified on url=" + id);
+				String _id = id;
+				adminRunner.run(mongoSession -> {
+					// we don't check ownership of node at this time, but merely check sanity of
+					// whether this ID is even existing or not.
+					SubNode node = api.getNode(mongoSession, _id);
+					if (node == null) {
+						log.debug("Node did not exist.");
+						sessionContext.setUrlId(null);
+					} else {
+						log.debug("Node exists.");
+					}
+				});
+			} else {
+				sessionContext.setUrlId(null);
+			}
 
-		if (passCode != null) {
-			return "forward:/index.html?passCode=" + passCode;
+			if (passCode != null) {
+				return "forward:/index.html?passCode=" + passCode;
+			}
+
+			throw new RuntimeException("oopsey");
+		} catch (Exception e) {
+			//need to add some kind of message to exception to indicate to user something with the arguments went wrong.
+			ExUtil.error(log, "exception in call processor", e);
 		}
 
 		return "forward:/index.html";
 	}
 
-	// this didn't work. will circle back later. this actually stopped the server from even startig because somewhere else
-	// somehowe 'error' is already defined, according to the error message
-	// @RequestMapping(value = { "/error" })
-	// public String error() {
-	// 	//todo-0: need to put a message into the session to tell user the requested url was not found.
-	// 	return "forward:/index.html";
-	// }
 
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
 	public @ResponseBody Object signup(@RequestBody SignupRequest req, HttpSession session) {
