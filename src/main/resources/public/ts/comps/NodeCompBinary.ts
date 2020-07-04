@@ -76,14 +76,11 @@ export class NodeCompBinary extends Div {
         if (this.isEditorEmbed) return;
         let state = appState();
 
-        //todo-0: this was part of a test. remove.
-        let thiz = this;
-
         dispatch({
             type: "Action_ClickImage", state,
             update: (s: AppState): void => {
 
-                if (s.fullScreenViewId && thiz.isFullScreenEmbed) {
+                if (s.fullScreenViewId && this.isFullScreenEmbed) {
                     s.fullScreenImageSize = s.fullScreenImageSize ? "" : "100%";
                 }
 

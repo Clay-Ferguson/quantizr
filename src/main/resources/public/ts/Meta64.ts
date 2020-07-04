@@ -47,11 +47,7 @@ export class Meta64 implements Meta64Intf {
 
     private static lastKeyDownTime: number = 0;
 
-    /* Creates/Access a function that does operation 'name' on a node identified by 'id' 
-    
-    The problem with this approach is that when you use the same component in multiple different ways the lookup key 'op' is tricky
-    so I think maybe I need to phase this out, (todo-0)
-    */
+    /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
     getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {
         let k = op + "_" + id;
         if (!this.fc[k]) {

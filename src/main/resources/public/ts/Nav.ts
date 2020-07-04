@@ -374,8 +374,6 @@ export class Nav implements NavIntf {
 
         //First detect if page root node is selected, before doing a child search
         if (state.fullScreenViewId == state.node.id) {
-            //todo-0: make sure next and prev buttons don't even show up when the node we're viewing is the root page one.
-            //not supporting this, we limit to children of current parent node.
             return null;
         }
         else if (state.node.children && state.node.children.length > 0) {
