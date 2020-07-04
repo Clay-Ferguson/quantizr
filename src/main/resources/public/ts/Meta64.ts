@@ -47,7 +47,11 @@ export class Meta64 implements Meta64Intf {
 
     private static lastKeyDownTime: number = 0;
 
-    /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
+    /* Creates/Access a function that does operation 'name' on a node identified by 'id' 
+    
+    The problem with this approach is that when you use the same component in multiple different ways the lookup key 'op' is tricky
+    so I think maybe I need to phase this out, (todo-0)
+    */
     getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {
         let k = op + "_" + id;
         if (!this.fc[k]) {
@@ -269,7 +273,7 @@ export class Meta64 implements Meta64Intf {
 
     getNodeByName = (node: J.NodeInfo, name: string, state: AppState): J.NodeInfo => {
         if (!node) return null;
-        if (node.name==name) return node;
+        if (node.name == name) return node;
 
         if (node.children) {
             return state.node.children.find(node => node.name == name);
@@ -330,38 +334,51 @@ export class Meta64 implements Meta64Intf {
             // WARNING: even with tabIndex added none of the other DIVS react renders seem to be able to accept an onKeyDown event.
             // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs re Open, because this WILL 
             // capture events going to dialogs / edit fields
-            // document.body.addEventListener("keydown", (event: KeyboardEvent) => {
-            //     console.log("keydown: "+event.code);
-            //     let state: AppState = null;
-            //     if (event.ctrlKey) {
-            //         switch (event.code) {
-            //             case "ArrowDown": 
-            //                 if (this.keyDebounce()) return;
-            //                 state = store.getState();
-            //                 S.view.scrollRelativeToNode("down", state);
-            //                 break;
+            document.body.addEventListener("keydown", (event: KeyboardEvent) => {
+                console.log("keydown: " + event.code);
+                let state: AppState = store.getState();
+                //if (event.ctrlKey) {
 
-            //             case "ArrowUp":
-            //                 if (this.keyDebounce()) return;
-            //                 state = store.getState();
-            //                 S.view.scrollRelativeToNode("up", state);
-            //                 break;
+                switch (event.code) {
+                    case "Escape":
+                        if (state.fullScreenViewId) {
+                            S.nav.closeFullScreenViewer(state);
+                        }
+                        break;
 
-            //             case "ArrowLeft":
-            //                 if (this.keyDebounce()) return;
-            //                 S.nav.navUpLevel();
-            //                 break;
+                    // case "ArrowDown": 
+                    //     if (this.keyDebounce()) return;
+                    //     state = store.getState();
+                    //     S.view.scrollRelativeToNode("down", state);
+                    //     break;
 
-            //             case "ArrowRight":
-            //                 if (this.keyDebounce()) return;
-            //                 state = store.getState();
-            //                 S.nav.navOpenSelectedNode(state);
-            //                 break;
+                    // case "ArrowUp":
+                    //     if (this.keyDebounce()) return;
+                    //     state = store.getState();
+                    //     S.view.scrollRelativeToNode("up", state);
+                    //     break;
 
-            //             default: break;
-            //         }
-            //     }
-            // });
+                    case "ArrowLeft":
+                        if (this.keyDebounce()) return;
+                        //S.nav.navUpLevel();
+                        if (state.fullScreenViewId) {
+                            S.nav.prevFullScreenViewer(state);
+                        }
+                        break;
+
+                    case "ArrowRight":
+                        if (this.keyDebounce()) return;
+                        state = store.getState();
+                        //S.nav.navOpenSelectedNode(state);
+                        if (state.fullScreenViewId) {
+                            S.nav.nextFullScreenViewer(state);
+                        }
+                        break;
+
+                    default: break;
+                }
+                //}
+            });
 
             if (this.appInitialized)
                 return;
@@ -538,7 +555,7 @@ export class Meta64 implements Meta64Intf {
         console.log("loadAnonPageHome()");
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null,
             (res: J.RenderNodeResponse): void => {
-                if (!res.success || res.exceptionType=="auth") {
+                if (!res.success || res.exceptionType == "auth") {
                     S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
                 }
                 S.render.renderPageFromData(res, false, null, true, true, state);

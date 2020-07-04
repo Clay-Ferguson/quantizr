@@ -345,7 +345,7 @@ export class EditNodeDlg extends DialogBase {
 
             binarySection = new LayoutRow([
                 new Div(null, { className: "col-4 editBinaryContainer" }, [
-                    new NodeCompBinary(state.node, true),
+                    new NodeCompBinary(state.node, true, false),
                 ]),
 
                 new Div(null, {

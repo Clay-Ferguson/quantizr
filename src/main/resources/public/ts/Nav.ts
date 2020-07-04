@@ -294,7 +294,7 @@ export class Nav implements NavIntf {
     }
 
     navFeed = (state: AppState): void => {
-        S.srch.feed("~"+J.NodeType.FRIEND_LIST);
+        S.srch.feed("~" + J.NodeType.FRIEND_LIST);
     }
 
     navHome = (state: AppState): void => {
@@ -330,6 +330,86 @@ export class Nav implements NavIntf {
         let state = appState();
         this.cached_clickNodeRow(state.node.id);
         S.srch.timeline("mtm", state);
+    }
+
+    closeFullScreenViewer = (appState: AppState): void => {
+        dispatch({
+            type: "Action_CloseFullScreenViewer",
+            update: (s: AppState): void => {
+                s.fullScreenViewId = null;
+            },
+        });
+    }
+
+    prevFullScreenViewer = (appState: AppState): void => {
+        let prevNode: J.NodeInfo = this.getAdjacentNode("prev", appState);
+
+        if (prevNode) {
+            dispatch({
+                type: "Action_PrevFullScreenViewer",
+                update: (s: AppState): void => {
+                    s.fullScreenViewId = prevNode.id;
+                },
+            });
+        }
+    }
+
+    nextFullScreenViewer = (appState: AppState): void => {
+        let nextNode: J.NodeInfo = this.getAdjacentNode("next", appState);
+
+        if (nextNode) {
+            dispatch({
+                type: "Action_NextFullScreenViewer",
+                update: (s: AppState): void => {
+                    s.fullScreenViewId = nextNode.id;
+                },
+            });
+        }
+    }
+
+    //todo-1: need to make view.scrollRelativeToNode use this function instead of embedding all the same logic.
+    getAdjacentNode = (dir: string, state: AppState): J.NodeInfo => {
+
+        let newNode: J.NodeInfo = null;
+
+        //First detect if page root node is selected, before doing a child search
+        if (state.fullScreenViewId == state.node.id) {
+            //todo-0: make sure next and prev buttons don't even show up when the node we're viewing is the root page one.
+            //not supporting this, we limit to children of current parent node.
+            return null;
+        }
+        else if (state.node.children && state.node.children.length > 0) {
+            let prevChild = null;
+            let nodeFound = false;
+
+            state.node.children.some((child: J.NodeInfo) => {
+                let ret = false;
+                let isAnAccountNode = child.ownerId && child.id == child.ownerId;
+
+                if (S.props.hasBinary(child) && !isAnAccountNode) {
+
+                    if (nodeFound && dir === "next") {
+                        ret = true;
+                        newNode = child;
+                    }
+
+                    if (child.id == state.fullScreenViewId) {
+                        if (dir === "prev") {
+                            if (prevChild) {
+                                ret = true;
+                                newNode = prevChild;
+                            }
+                        }
+                        nodeFound = true;
+                    }
+                    prevChild = child;
+                }
+                //NOTE: returning true stops the iteration.
+                return ret;
+            });
+        }
+
+        return newNode;
     }
 }
 

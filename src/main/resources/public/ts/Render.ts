@@ -360,12 +360,6 @@ export class Render implements RenderIntf {
             //     dispatch({
             //         type: "Action_ClickImage", state,
             //         update: (s: AppState): void => {
-            //             if (s.expandedImages[key]) {
-            //                 delete s.expandedImages[key];
-            //             }
-            //             else {
-            //                 s.expandedImages[key] = "y";
-            //             }
             //         },
             //     });
             // }

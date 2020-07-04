@@ -33,6 +33,11 @@ export class AppState {
 
     activeTab: string = null; 
 
+    //When the user clicks an image, we switch to a fullscreen viewer for that image, ad max size of the display, and any time
+    //this node is null we are displaying that FullScreenView comp, which occupies everything below the toolbar.
+    fullScreenViewId: string = null;
+    fullScreenImageSize: string = "100%";
+
     userPreferences: J.UserPreferences = {
         editMode: false,
         importAllowed: false,
@@ -71,9 +76,6 @@ export class AppState {
     homeNodePath: string;
 
     pendingLocationHash: string;
-
-    /* Keeds track of which nodes the user has clicked to expand */
-    expandedImages = {};
 
     //Rss feeds
     feedCache = {};

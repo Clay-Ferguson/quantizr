@@ -4,7 +4,6 @@ import { PubSub } from "../PubSub";
 import { Ul } from "./Ul";
 import { Li } from "./Li";
 import { NavTag } from "./NavTag";
-import { NavBarButton } from "./NavBarButton";
 import { ButtonTag } from "./ButtonTag";
 import { Span } from "./Span";
 import { NavBarIconButton } from "./NavBarIconButton";
@@ -58,7 +57,40 @@ export class MainNavPanel extends NavTag {
             ]));
         }
 
-        if (!clientInfo.isMobile) {
+        if (state.fullScreenViewId) {
+
+            if (S.nav.getAdjacentNode("prev", state)) {
+                buttons.push(new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-angle-left fa-lg", "", {
+                        onClick: e => { S.nav.prevFullScreenViewer(state); },
+                        title: "View Previous Node (or left arrow key)"
+                    }, "nav-link", "off")
+                ]));
+            }
+
+            if (S.nav.getAdjacentNode("next", state)) {
+                buttons.push(new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-angle-right fa-lg", "", {
+                        onClick: e => { S.nav.nextFullScreenViewer(state); },
+                        title: "View Next Node (or right arrow key)"
+                    }, "nav-link", "off")
+                ]));
+            }
+
+            buttons.push(new Li(null, {
+                className: "nav-item"
+            }, [
+                new NavBarIconButton("fa-window-close fa-lg", "Close", {
+                    onClick: e => { S.nav.closeFullScreenViewer(state); },
+                    title: "Close Viewer (or escape key)"
+                }, "nav-link", "off")
+            ]));
+        }
+        else if (!clientInfo.isMobile) {
             if (!state.isAnonUser) {
                 buttons.push(new Li(null, {
                     className: "nav-item"
@@ -113,26 +145,28 @@ export class MainNavPanel extends NavTag {
             }
         }
 
-        if (state.isAnonUser) {
-            buttons.push(new Li(null, {
-                className: "nav-item"
-            }, [
-                new NavBarIconButton("fa-sign-in", "Login", {
-                    onClick: e => { S.nav.login(state); },
-                    title: "Login to Quanta"
-                }, "nav-link", "off")
-            ]));
-        }
+        if (!state.fullScreenViewId) {
+            if (state.isAnonUser) {
+                buttons.push(new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-sign-in", "Login", {
+                        onClick: e => { S.nav.login(state); },
+                        title: "Login to Quanta"
+                    }, "nav-link", "off")
+                ]));
+            }
 
-        if (!state.isAnonUser) {
-            buttons.push(new Li(null, {
-                className: "nav-item"
-            }, [
-                new NavBarIconButton("fa-sign-out", null, {
-                    onClick: e => { S.nav.logout(state); },
-                    title: "Logout"
-                }, "nav-link", "off")
-            ]));
+            if (!state.isAnonUser) {
+                buttons.push(new Li(null, {
+                    className: "nav-item"
+                }, [
+                    new NavBarIconButton("fa-sign-out", null, {
+                        onClick: e => { S.nav.logout(state); },
+                        title: "Logout"
+                    }, "nav-link", "off")
+                ]));
+            }
         }
 
         //example of a dropdown menu would go here.

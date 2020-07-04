@@ -24,14 +24,23 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class NodeCompBinary extends Div {
 
     /* editorEmbed is true when this component is inside the node editor dialog */
-    constructor(public node: J.NodeInfo, private isEditorEmbed: boolean) {
+    constructor(public node: J.NodeInfo, private isEditorEmbed: boolean, private isFullScreenEmbed: boolean) {
         super();
     }
 
-    makeImageTag(node: J.NodeInfo, state: AppState): Img {
+    makeImageTag = (node: J.NodeInfo, state: AppState): Img => {
         let src: string = S.render.getUrlForNodeAttachment(node);
 
-        let imgSize = this.isEditorEmbed ? "200px" : S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
+        let imgSize = "";
+        if (this.isFullScreenEmbed) {
+            imgSize = state.fullScreenImageSize;
+        }
+        else if (this.isEditorEmbed) {
+            imgSize = "200px"
+        }
+        else {
+            imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
+        }
         let style: any = {};
 
         if (!imgSize || imgSize == "0") {
@@ -54,26 +63,31 @@ export class NodeCompBinary extends Div {
             src,
             className: this.isEditorEmbed ? "attached-img-in-editor" : "attached-img-in-row",
             style,
+
             title: "Click image to enlarge/reduce",
-            onClick: S.meta64.getNodeFunc(this.cached_clickOnImage, "NodeCompBinary.clickOnImage", node.id),
+            onClick: () => {
+                this.cached_clickOnImage(node.id);
+            }
         });
         return img;
     }
 
     cached_clickOnImage = (nodeId: string) => {
         if (this.isEditorEmbed) return;
-
         let state = appState();
+
+        //todo-0: this was part of a test. remove.
+        let thiz = this;
 
         dispatch({
             type: "Action_ClickImage", state,
             update: (s: AppState): void => {
-                if (s.expandedImages[nodeId]) {
-                    delete s.expandedImages[nodeId];
+
+                if (s.fullScreenViewId && thiz.isFullScreenEmbed) {
+                    s.fullScreenImageSize = s.fullScreenImageSize ? "" : "100%";
                 }
-                else {
-                    s.expandedImages[nodeId] = "y";
-                }
+
+                s.fullScreenViewId = nodeId;
             },
         });
     }
