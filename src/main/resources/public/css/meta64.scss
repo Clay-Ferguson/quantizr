@@ -875,7 +875,7 @@ which it will do by default. */
 }
 
 .editing-border {
-    border-bottom: 3px dotted lightslategray;
+    border-bottom: 3px dotted $nodeBorderBottomColor;
 }
 
 .non-editing-border {
@@ -1182,6 +1182,16 @@ i'm backing out for now
     //a span inside a div won't utilize it's 100% width unless it has display block.
     display: block;
     cursor: pointer;
+    border-left: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+    border-right: 3px solid transparent;
+}
+
+.clickToEdit:hover {
+    @extend .clickToEdit;
+    border-left: 3px dotted $nodeBorderBottomColor;
+    border-bottom: 3px dotted $nodeBorderBottomColor;
+    border-right: 3px dotted $nodeBorderBottomColor;
 }
 
 .quickEditSpan {

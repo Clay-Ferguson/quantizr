@@ -193,7 +193,6 @@ export class Render implements RenderIntf {
                         }
 
                         S.render.fadeInId = targetNodeId;
-                        allowScroll = true;
 
                         //this is new. not fully vetted.
                         state.pendingLocationHash = null;

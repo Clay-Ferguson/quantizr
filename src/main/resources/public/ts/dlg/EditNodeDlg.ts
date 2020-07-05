@@ -193,15 +193,6 @@ export class EditNodeDlg extends DialogBase {
                     this.propertyEditFieldContainer = new Div("", {
                     }),
                 ]),
-                // this.buttonBar = new ButtonBar([
-                //     this.saveNodeButton = new Button("Save", () => {
-                //         this.saveNode();
-                //         this.close();
-                //     }, null, "btn-primary"),
-
-                //     this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
-                //     this.shareButton = allowShare ? new Button("Share", this.share) : null,
-
                 //     //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
                 //     this.cancelButton = new Button("Cancel", this.cancelEdit)
                 // ])
