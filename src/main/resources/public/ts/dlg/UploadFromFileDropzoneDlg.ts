@@ -48,6 +48,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     maxFiles: number = 50;
 
+    //this varible gets set if anything is detected wrong during the upload
+    uploadFailed: boolean = false;
+    errorShown: boolean = false;
+
     constructor(private nodeId: string, private node: J.NodeInfo, toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
         super(importMode ? "Import File" : "Upload File", null, false, state);
         this.mergeState({ toIpfs });
@@ -260,6 +264,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             // 'this' that is in scope during each call must be left as is.
             init: function () {
                 this.on("addedfile", function (file) {
+                    dlg.uploadFailed = false;
+                    dlg.errorShown = false;
                     if (!dlg.toTemporal && (file.size > maxUploadSize * Constants.ONE_MB)) {
                         S.util.showMessage("File is too large. Max Size=" + maxUploadSize + "MB", "Warning");
                         return;
@@ -309,14 +315,19 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("error", function (param1, param2, param3) {
                     if (dlg.sent) {
+                        dlg.uploadFailed = true;
                         S.util.showMessage("Upload failed.", "Warning");
                     }
                 });
 
                 this.on("success", function (param1, resp, param3) {
-                    //todo-1: get rid of the tight coupling to an exception class name here. This was a quick fix/hack
+                    //todo-0: get rid of the tight coupling to an exception class name here. This was a quick fix/hack
                     if (!resp.succese && resp.exceptionClass && resp.exceptionClass.endsWith(".OutOfSpaceException")) {
-                        S.util.showMessage("Upload failed. You're out of storage space on the server. Consider uploading to IPFS using Temporal (https://temporal.cloud)", "Warning");
+                        if (!dlg.errorShown) {
+                            dlg.errorShown = true;
+                            dlg.uploadFailed = true;
+                            S.util.showMessage("Upload failed. You're out of storage space on the server. \n\nConsider uploading to IPFS using Temporal (https://temporal.cloud)", "Warning");
+                        }
                         return;
                     }
                     //console.log("Uploaded to Hash: " + ipfsHash);
@@ -344,7 +355,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.on("queuecomplete", function (arg) {
                     if (dlg.sent) {
                         if (dlg.fileList && dlg.fileList.length > 1) {
-                            S.util.showMessage("The "+dlg.fileList.length+" uploads were added as sub-nodes of the current node. Open this node to view them.", "Note"); 
+                            if (!dlg.uploadFailed) {
+                                S.util.showMessage("The " + dlg.fileList.length + " uploads were added as sub-nodes of the current node. Open this node to view them.", "Note");
+                            }
                         }
 
                         dlg.close();

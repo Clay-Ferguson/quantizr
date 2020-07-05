@@ -28,6 +28,7 @@ import org.subnode.config.NodeName;
 import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
 import org.subnode.config.SpringContextUtil;
+import org.subnode.exception.OutOfSpaceException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.image.ImageUtil;
 import org.subnode.mongo.CreateNodeLocation;
@@ -154,11 +155,54 @@ public class AttachmentService {
 			api.auth(session, node, PrivilegeType.WRITE);
 
 			boolean addAsChildren = uploadFiles.length > 1;
+
+			// todo-0: now that we have user quotas we probably don't need a max file size,
+			// becasue the size of any individual files doesn't matter.
 			int maxFileSize = session.getMaxUploadSize();
+			int imageCount = 0;
+
+			/*
+			 * if uploading multiple files check quota first, to make sure there's space for
+			 * all files before we start uploading any of them If there's only one file, the
+			 * normal flow will catch an out of space problem, so we don't need to do it in
+			 * advance in here as we do for multiple file uploads only
+			 */
+			if (uploadFiles.length > 1) {
+				SubNode userNode = api.getUserNodeByUserName(null, null);
+
+				// get how many bytes of storage the user currently holds
+				Long binTotal = userNode.getIntProp(NodeProp.BIN_TOTAL.s());
+				if (binTotal == null) {
+					binTotal = 0L;
+				}
+
+				// get max amount user is allowed
+				Long userQuota = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
+
+				// todo-0: need to check user storage quota BEFORE uploading is allowed to start
+				for (MultipartFile uploadFile : uploadFiles) {
+					binTotal += uploadFile.getSize();
+
+					// check if user went over max and fail the API call if so.
+					if (binTotal > userQuota) {
+						throw new OutOfSpaceException();
+					}
+				}
+
+				// do not delete.
+				// NOTE: A future enhancement would be to update total quota here, but then we
+				// need to implement some kind of
+				// rollback in case half the files fail, which would leavel the quota of the
+				// user unfairly lower than it should be.
+				// userManagerService.addBytesToUserNodeBytes(totalSize, null, 1);
+			}
 
 			for (MultipartFile uploadFile : uploadFiles) {
 				String fileName = uploadFile.getOriginalFilename();
 				String contentType = uploadFile.getContentType();
+				if (contentType.startsWith("image/")) {
+					imageCount++;
+				}
 
 				long size = uploadFile.getSize();
 				if (!StringUtils.isEmpty(fileName)) {
@@ -181,6 +225,18 @@ public class AttachmentService {
 							addAsChildren, explodeZips, toIpfs, true, false, true);
 				}
 			}
+
+			// if we have enough images to lay it out into a square of 3 cols switch to that
+			// layout
+			if (imageCount >= 9) {
+				node.setProp(NodeProp.LAYOUT.s(), "c3");
+			}
+			// otherwise, if we have enough images to lay it out into a square of 2 cols
+			// switch to that layout.
+			else if (imageCount >= 4) {
+				node.setProp(NodeProp.LAYOUT.s(), "c2");
+			}
+
 			api.saveSession(session);
 		} catch (Exception e) {
 			throw ExUtil.wrapEx(e);
@@ -283,7 +339,8 @@ public class AttachmentService {
 
 		if (ImageUtil.isImageMime(mimeType)) {
 
-			//default image to be 100% size so it always fits right into the width of the display row.
+			// default image to be 100% size so it always fits right into the width of the
+			// display row.
 			node.setProp(NodeProp.IMG_SIZE.s(), "100%");
 
 			if (calcImageSize) {
@@ -351,7 +408,7 @@ public class AttachmentService {
 			}
 		}
 
-		//log.debug("Saving node with upload: "+XString.prettyPrint(node));
+		// log.debug("Saving node with upload: "+XString.prettyPrint(node));
 		api.save(session, node);
 	}
 
@@ -963,6 +1020,8 @@ public class AttachmentService {
 
 		long streamCount = stream.getCount();
 		// log.debug("upload streamCount=" + streamCount);
+
+		// update the user quota which enforces their total storage limit
 		if (!session.isAdmin()) {
 			userManagerService.addBytesToUserNodeBytes(streamCount, userNode, 1);
 		}

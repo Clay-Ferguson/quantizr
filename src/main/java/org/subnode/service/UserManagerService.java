@@ -266,15 +266,18 @@ public class UserManagerService {
 		}
 	}
 
+	/* We have 'sign' so we can use this method to either deduct from or add to the user's total usage amount */
 	public void addBytesToUserNodeBytes(long binSize, SubNode userNode, int sign) {
 		if (userNode == null) {
 			userNode = api.getUserNodeByUserName(null, null);
 		}
-		// get the current binTotal on the user account
+
+		// get the current binTotal on the user account (max they are allowed to upload)
 		Long binTotal = userNode.getIntProp(NodeProp.BIN_TOTAL.s());
 		if (binTotal == null) {
 			binTotal = 0L;
 		}
+
 		// log.debug("before binTotal=" + binTotal);
 		binTotal += sign * binSize;
 		if (binTotal < 0) {
