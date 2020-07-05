@@ -7,7 +7,5 @@ public class Const {
 
 	public static final String IPFS_GATEWAY = "https://gateway.temporal.cloud/ipfs/";
 
-	public static final int DEFAULT_MAX_FILE_SIZE = 20 * ONE_MB;
-
 	public static final String FAKE_USER_AGENT = "Mozilla/5.0";
 }

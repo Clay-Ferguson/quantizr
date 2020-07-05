@@ -288,7 +288,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     /* If Uploading DIRECTLY to Temporal.cloud */
                     if (state.toIpfs && dlg.toTemporal) {
                         dlg.ipfsFile = file;
-                        //todo-0: check if temporal supports multiple uploads?
+                        //todo-0: check if temporal supports multiple uploads? 
                         formData.append("file", file);
                         formData.append("hold_time", "1");
 

@@ -46,7 +46,6 @@ public class SubNodeUtil {
 		nonSavableProperties.add(NodeProp.BIN.s());
 		nonSavableProperties.add(NodeProp.BIN_TOTAL.s());
 		nonSavableProperties.add(NodeProp.BIN_QUOTA.s());
-		nonSavableProperties.add(NodeProp.BIN_MAX_UPLOAD_SIZE.s());
 	}
 
 	/*

@@ -608,7 +608,6 @@ export const enum NodeProp {
     LAST_LOGIN_TIME = "sn:lastLogin",
     LAST_INBOX_NOTIFY_TIME = "sn:lastInboxNotify",
     BIN_QUOTA = "sn:binQuota",
-    BIN_MAX_UPLOAD_SIZE = "sn:maxUploadSize",
     INLINE_CHILDREN = "inlineChildren",
     PRIORITY = "priority",
     LAYOUT = "layout",

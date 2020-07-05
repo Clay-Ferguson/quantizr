@@ -569,9 +569,9 @@ public class UserManagerService {
 			userPrefs.setImportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_IMPORT_ALLOWED.s()));
 			userPrefs.setExportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_EXPORT_ALLOWED.s()));
 
-			long maxFileSize = prefsNode.getIntProp(NodeProp.BIN_MAX_UPLOAD_SIZE.s());
+			long maxFileSize = prefsNode.getIntProp(NodeProp.BIN_QUOTA.s());
 			if (maxFileSize == 0) {
-				maxFileSize = Const.DEFAULT_MAX_FILE_SIZE;
+				maxFileSize = Const.DEFAULT_USER_QUOTA;
 			}
 			userPrefs.setMaxUploadFileSize(maxFileSize);
 		});

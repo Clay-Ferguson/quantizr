@@ -155,9 +155,6 @@ public class AttachmentService {
 			api.auth(session, node, PrivilegeType.WRITE);
 
 			boolean addAsChildren = uploadFiles.length > 1;
-
-			// todo-0: now that we have user quotas we probably don't need a max file size,
-			// becasue the size of any individual files doesn't matter.
 			int maxFileSize = session.getMaxUploadSize();
 			int imageCount = 0;
 
@@ -179,7 +176,6 @@ public class AttachmentService {
 				// get max amount user is allowed
 				Long userQuota = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
 
-				// todo-0: need to check user storage quota BEFORE uploading is allowed to start
 				for (MultipartFile uploadFile : uploadFiles) {
 					binTotal += uploadFile.getSize();
 

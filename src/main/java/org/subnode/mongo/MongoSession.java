@@ -59,11 +59,11 @@ public class MongoSession {
 
 	public int getMaxUploadSize() {
 		if (userNode == null) {
-			return Const.DEFAULT_MAX_FILE_SIZE;
+			return Const.DEFAULT_USER_QUOTA;
 		}
-		long ret = userNode.getIntProp(NodeProp.BIN_MAX_UPLOAD_SIZE.s());
+		long ret = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
 		if (ret == 0) {
-			return Const.DEFAULT_MAX_FILE_SIZE;
+			return Const.DEFAULT_USER_QUOTA;
 		}
 		return (int)ret;
 	}
