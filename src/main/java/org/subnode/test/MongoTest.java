@@ -13,7 +13,6 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.service.AttachmentService;
-import org.subnode.util.Const;
 import org.subnode.util.LimitedInputStreamEx;
 
 import org.apache.commons.io.FileUtils;

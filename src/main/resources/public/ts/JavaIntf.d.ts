@@ -34,6 +34,8 @@ export interface CreateSubNodeRequest extends RequestBase {
     typeName: string;
     createAtTop: boolean;
     typeLock: boolean;
+    properties: PropertyInfo[];
+    immediateTimestamp: boolean;
 }
 
 export interface DeleteAttachmentRequest extends RequestBase {
@@ -494,6 +496,11 @@ export interface ResponseBase {
     exceptionType: string;
 }
 
+export interface PropertyInfo {
+    name: string;
+    value: string;
+}
+
 export interface NodeInfo {
     id: string;
     name: string;
@@ -549,11 +556,6 @@ export interface WebFingerLink {
     rel: string;
     type: string;
     href: string;
-}
-
-export interface PropertyInfo {
-    name: string;
-    value: string;
 }
 
 export interface PrivilegeInfo {

@@ -42,7 +42,7 @@ export class MenuPanel extends Div {
         let exportFeatureEnabled = state.isAdminUser || state.userPreferences.exportAllowed;
 
         let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, highlightNode);
-        let allowNodeMove: boolean = !orderByProp;
+        let allowNodeMove: boolean = !orderByProp && S.edit.isInsertAllowed(state.node, state);
         let isPageRootNode = state.node && highlightNode && state.node.id==highlightNode.id;
 
         let canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.firstChild);

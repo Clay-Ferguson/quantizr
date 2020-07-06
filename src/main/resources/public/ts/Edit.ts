@@ -124,6 +124,10 @@ export class Edit implements EditIntf {
             owner = "admin";
         }
 
+        //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to 
+        //make nodes editable by any other user.
+        if (owner=="admin" && !state.isAdminUser) return false;
+
         return state.userPreferences.editMode &&
             (state.isAdminUser || state.userName == owner);
         // /*
@@ -134,6 +138,17 @@ export class Edit implements EditIntf {
     }
 
     isInsertAllowed = (node: J.NodeInfo, state: AppState): boolean => {
+        let owner: string = node.owner;
+
+        // if we don't know who owns this node assume the admin owns it.
+        if (!owner) {
+            owner = "admin";
+        }
+
+         //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to 
+        //make nodes editable by any other user.
+        if (owner=="admin" && !state.isAdminUser) return false;
+
         //right now, for logged in users, we enable the 'new' button because the CPU load for determining it's enablement is too much, so
         //we throw an exception if they cannot. todo-1: need to make this work better.
         //however we CAN check if this node is an "admin" node and at least disallow any inserts under admin-owned nodess
@@ -149,6 +164,11 @@ export class Edit implements EditIntf {
     * creating in a 'create under parent' mode, versus non-null meaning 'insert inline' type of insert.
     */
     startEditingNewNode = (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, nodeInsertTarget: J.NodeInfo, ordinalOffset: number, state: AppState): void => {
+        if (!this.isInsertAllowed(parentNode, state)) {
+            console.log("Rejecting request to edit. Not authorized");
+            return;
+        }
+
         if (nodeInsertTarget) {
             S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                 parentId: parentNode.id,
@@ -162,9 +182,11 @@ export class Edit implements EditIntf {
                 nodeId: parentNode.id,
                 newNodeName: "",
                 typeName: typeName ? typeName : "u",
-                createAtTop: createAtTop,
+                createAtTop,
                 content: null,
-                typeLock: false
+                typeLock: false,
+                properties: null,
+                immediateTimestamp: false
             }, (res) => {
                 this.createSubNodeResponse(res, state);
             });
@@ -643,7 +665,9 @@ export class Edit implements EditIntf {
                     typeName: "u",
                     createAtTop: true,
                     content: clipText,
-                    typeLock: false
+                    typeLock: false,
+                    properties: null,
+                    immediateTimestamp: false
                 },
                     () => {
                         S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
@@ -684,7 +708,9 @@ export class Edit implements EditIntf {
             typeName: J.NodeType.NONE,
             createAtTop: false,
             content: null,
-            typeLock: false
+            typeLock: false,
+            properties: null,
+            immediateTimestamp: false
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });
@@ -699,7 +725,9 @@ export class Edit implements EditIntf {
             typeName: J.NodeType.FRIEND,
             createAtTop: true,
             content: null,
-            typeLock: true
+            typeLock: true,
+            properties: null,
+            immediateTimestamp: false
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });

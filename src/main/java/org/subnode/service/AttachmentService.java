@@ -126,7 +126,7 @@ public class AttachmentService {
 	 * from user machine
 	 */
 	public ResponseEntity<?> uploadMultipleFiles(MongoSession session, String nodeId, MultipartFile[] uploadFiles,
-			boolean explodeZips, boolean toIpfs) {
+			boolean explodeZips, boolean toIpfs, boolean addAsChildren) {
 		if (nodeId == null) {
 			throw ExUtil.wrapEx("target nodeId not provided");
 		}
@@ -147,14 +147,12 @@ public class AttachmentService {
 			 * just upload UNDERNEATH this current node.
 			 */
 			SubNode node = api.getNode(session, nodeId);
-
 			if (node == null) {
 				throw ExUtil.wrapEx("Node not found.");
 			}
 
 			api.auth(session, node, PrivilegeType.WRITE);
 
-			boolean addAsChildren = uploadFiles.length > 1;
 			int maxFileSize = session.getMaxUploadSize();
 			int imageCount = 0;
 
@@ -265,7 +263,7 @@ public class AttachmentService {
 		if (addAsChild) {
 			try {
 				MongoThreadLocal.setAutoTimestampDisabled(false);
-				SubNode newNode = api.createNode(session, node, null, null, null, CreateNodeLocation.LAST);
+				SubNode newNode = api.createNode(session, node, null, null, null, CreateNodeLocation.LAST, null);
 				newNode.setContent(fileName);
 
 				/*

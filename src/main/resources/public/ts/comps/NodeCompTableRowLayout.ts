@@ -55,7 +55,7 @@ export class NodeCompTableRowLayout extends Div {
             }
         }
 
-        let allowInsert = true;
+        let allowInsert = S.edit.isInsertAllowed(this.node, state);
 
         /* We have this hack (until the privileges are more nuanced, or updated) which verifies if someone is 
 		inserting under a USER_FEED node we don't allow it unless its' the person who OWNS the USER_FEED, and we have this check
@@ -63,8 +63,8 @@ export class NodeCompTableRowLayout extends Div {
         
         NOTE: Server also enforces this check if it gets by the client.
         */
-        if (typeHandler) {
-            allowInsert =  state.isAdminUser || typeHandler.allowAction(NodeActionType.addChild, this.node, state);
+        if (allowInsert && typeHandler) {
+            allowInsert = state.isAdminUser || typeHandler.allowAction(NodeActionType.addChild, this.node, state);
         }
 
         let curCols = 0;
@@ -78,7 +78,7 @@ export class NodeCompTableRowLayout extends Div {
                     console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
                 }
 
-                if (allowInsert && rowCount == 0 && state.userPreferences.editMode && this.level == 1) {
+                if (state.userPreferences.editMode && allowInsert && rowCount == 0 && state.userPreferences.editMode && this.level == 1) {
                     // comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
                     // //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     // comps.push(new Div(null, { className: "clearfix" }));
@@ -98,7 +98,7 @@ export class NodeCompTableRowLayout extends Div {
                     comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
                 }
 
-                if (allowInsert && state.userPreferences.editMode && this.level == 1) {
+                if (state.userPreferences.editMode && allowInsert && state.userPreferences.editMode && this.level == 1) {
                     comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay, state));
 
                     //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space

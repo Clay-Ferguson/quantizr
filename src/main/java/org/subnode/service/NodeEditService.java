@@ -115,7 +115,12 @@ public class NodeEditService {
 		SubNode newNode = null;
 
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
-		newNode = api.createNode(session, node, null, req.getTypeName(), 0L, createLoc);
+
+		if (req.isImmediateTimestamp()) {
+			MongoThreadLocal.setAutoTimestampDisabled(false);
+		}
+
+		newNode = api.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties());
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
 
 		if (req.isTypeLock()) {
@@ -158,7 +163,8 @@ public class NodeEditService {
 			return null;
 		}
 
-		SubNode newNode = api.createNode(session, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
+		SubNode newNode = api.createNode(session, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST,
+				null);
 
 		String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
 		String content = title != null ? "#### " + title + "\n" : "";
@@ -199,13 +205,14 @@ public class NodeEditService {
 		}
 
 		SubNode newNode = api.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
-				CreateNodeLocation.ORDINAL);
+				CreateNodeLocation.ORDINAL, null);
 
 		if (req.getInitialValue() != null) {
 			newNode.setContent(req.getInitialValue());
-			
-			//NOTE: we don't call setAutoTimestampDisabled here because this kind of initial value insert needs to consider the node 
-			//edited and ready to display.
+
+			// NOTE: we don't call setAutoTimestampDisabled here because this kind of
+			// initial value insert needs to consider the node
+			// edited and ready to display.
 		} else {
 			newNode.setContent("");
 

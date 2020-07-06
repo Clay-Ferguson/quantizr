@@ -21,6 +21,7 @@ import org.subnode.image.ImageSize;
 import org.subnode.image.ImageUtil;
 import org.subnode.model.AccessControlInfo;
 import org.subnode.model.PrivilegeInfo;
+import org.subnode.model.PropertyInfo;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
@@ -354,7 +355,7 @@ public class MongoApi {
 
 	public SubNode createNode(MongoSession session, SubNode parent, String type, Long ordinal,
 			CreateNodeLocation location) {
-		return createNode(session, parent, null, type, ordinal, location);
+		return createNode(session, parent, null, type, ordinal, location, null);
 	}
 
 	public SubNode createNode(MongoSession session, String path) {
@@ -390,7 +391,7 @@ public class MongoApi {
 	 * relPath can be null if no path is known
 	 */
 	public SubNode createNode(MongoSession session, SubNode parent, String relPath, String type, Long ordinal,
-			CreateNodeLocation location) {
+			CreateNodeLocation location, List<PropertyInfo> properties) {
 		if (relPath == null) {
 			/*
 			 * Adding a node ending in '?' will trigger for the system to generate a leaf
@@ -415,6 +416,13 @@ public class MongoApi {
 		}
 
 		SubNode node = new SubNode(ownerId, path, type, ordinal);
+
+		if (properties != null) {
+			for (PropertyInfo propInfo : properties) {
+				node.setProp(propInfo.getName(), propInfo.getValue());
+			}
+		}
+
 		return node;
 	}
 
@@ -777,11 +785,12 @@ public class MongoApi {
 		} else {
 			String userName = name.substring(0, colonIdx);
 
-			//pass a null session here to cause adminSession to be used which is required to get a user node, but 
-			//it always safe to get this node this way here.
+			// pass a null session here to cause adminSession to be used which is required
+			// to get a user node, but
+			// it always safe to get this node this way here.
 			SubNode userNode = getUserNodeByUserName(null, userName);
 			nodeOwnerId = userNode.getOwner();
-			name = name.substring(colonIdx+1);
+			name = name.substring(colonIdx + 1);
 		}
 
 		query.addCriteria(Criteria.where(SubNode.FIELD_NAME).is(name)//
@@ -1446,7 +1455,8 @@ public class MongoApi {
 	 * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
 	 * userNode if you know it, to save cycles
 	 */
-	public SubNode getUserNodeByType(MongoSession session, String user, SubNode userNode, String nodeName, String type) {
+	public SubNode getUserNodeByType(MongoSession session, String user, SubNode userNode, String nodeName,
+			String type) {
 		if (userNode == null) {
 			userNode = getUserNodeByUserName(session, user);
 		}
@@ -1460,7 +1470,7 @@ public class MongoApi {
 		SubNode node = findTypedNodeUnderPath(session, path, type);
 
 		if (node == null) {
-			node = createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST);
+			node = createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST, null);
 			node.setOwner(userNode.getId());
 			node.setContent(nodeName);
 
@@ -1498,7 +1508,7 @@ public class MongoApi {
 		SubNode node = getNode(session, path);
 
 		if (node == null) {
-			node = createNode(session, userNode, NodeName.TRASH, NodeType.TRASH_BIN.s(), 0L, CreateNodeLocation.LAST);
+			node = createNode(session, userNode, NodeName.TRASH, NodeType.TRASH_BIN.s(), 0L, CreateNodeLocation.LAST, null);
 			node.setOwner(userNode.getId());
 			save(session, node);
 		}

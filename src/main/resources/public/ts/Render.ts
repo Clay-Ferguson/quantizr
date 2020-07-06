@@ -310,26 +310,30 @@ export class Render implements RenderIntf {
     }
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo): string => {
-        let filePart = S.props.getNodePropVal(J.NodeProp.BIN, node);
-
-        if (!filePart) {
-            filePart = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
-            if (filePart) {
-                return C.IPFS_GATEWAY + filePart;
-            }
+        let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+        if (ipfsLink) {
+            return C.IPFS_GATEWAY + ipfsLink;
         }
 
-        let ret = S.util.getRpcPath() + urlPart + "/" + filePart + "?nodeId=" + node.id;
-        return ret;
+        let bin = S.props.getNodePropVal(J.NodeProp.BIN, node);
+        if (bin) {
+            return S.util.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + node.id;
+        }
+        
+        return null;
     }
 
     getUrlForNodeAttachment = (node: J.NodeInfo): string => {
+        let ret = null;
         if (node.dataUrl) {
-            return node.dataUrl;
+            ret = node.dataUrl;
+            //console.log("getUrlForNodeAttachment: id="+node.id+" url="+ret+" from dataUrl");
         }
         else {
-            return this.getAttachmentUrl("bin", node);
+            ret = this.getAttachmentUrl("bin", node);
+            console.log("getUrlForNodeAttachment: id="+node.id+" url="+ret+" from bin");
         }
+        return ret;
     }
 
     getStreamUrlForNodeAttachment = (node: J.NodeInfo): string => {

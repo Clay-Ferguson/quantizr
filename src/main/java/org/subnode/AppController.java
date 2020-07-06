@@ -279,8 +279,6 @@ public class AppController {
 			if (passCode != null) {
 				return "forward:/index.html?passCode=" + passCode;
 			}
-
-			throw new RuntimeException("oopsey");
 		} catch (Exception e) {
 			//need to add some kind of message to exception to indicate to user something with the arguments went wrong.
 			ExUtil.error(log, "exception in call processor", e);
@@ -288,7 +286,6 @@ public class AppController {
 
 		return "forward:/index.html";
 	}
-
 
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
 	public @ResponseBody Object signup(@RequestBody SignupRequest req, HttpSession session) {
@@ -668,12 +665,13 @@ public class AppController {
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
 			@RequestParam(value = "explodeZips", required = true) String explodeZips, //
 			@RequestParam(value = "ipfs", required = true) String ipfs, //
+			@RequestParam(value = "createAsChildren", required = true) String createAsChildren, //
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
 			HttpSession session) {
 		return callProc.run("upload", null, session, ms -> {
 			// log.debug("Uploading as user: "+ms.getUser());
 			return attachmentService.uploadMultipleFiles(ms, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
-					"true".equalsIgnoreCase(ipfs));
+					"true".equalsIgnoreCase(ipfs),"true".equalsIgnoreCase(createAsChildren));
 		});
 	}
 

@@ -81,7 +81,8 @@ export class Factory {
             //     }
             //     return React.createElement(func, props, ...children);
             // }
-            e: React.createElement
+            e: React.createElement,
+            log: console.log
         };
 
         PubSub.pub(C.PUBSUB_SingletonsReady, this.singletons);

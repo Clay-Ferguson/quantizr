@@ -24,7 +24,6 @@ declare var Dropzone;
 
 export class UploadFromFileDropzoneDlg extends DialogBase {
 
-    //TEMPORAL_HOST: string = "https://dev.api.temporal.cloud";
     TEMPORAL_HOST: string = "https://api.temporal.cloud";
 
     hiddenInputContainer: Div;
@@ -42,15 +41,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     temporalToken: string = null;
     temporalUsr: string;
     temporalPwd: string;
-
-    //storing this in a var was a quick convenient hack, but I need to get it probably from parmaeters closer to the fucntions using the value.
-    ipfsFile: File;
-
     maxFiles: number = 50;
 
     //this varible gets set if anything is detected wrong during the upload
     uploadFailed: boolean = false;
     errorShown: boolean = false;
+    numFiles: number = 0;
 
     constructor(private nodeId: string, private node: J.NodeInfo, toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
         super(importMode ? "Import File" : "Upload File", null, false, state);
@@ -71,8 +67,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
-                    new Button("Upload from URL", this.uploadFromUrl,
-                        state.toIpfs ? new Button("IPFS Credentials", () => { this.getTemporalCredentials(true); }, null, "btn-primary") : null),
+                    new Button("Upload from URL", this.uploadFromUrl),
+                    state.toIpfs ? new Button("IPFS Credentials", () => { this.getTemporalCredentials(true); }) : null,
                     new Button("Close", () => {
                         this.close();
                     }),
@@ -127,7 +123,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     //Why is this checking for expire ? (this came from the Temporal.cloud example)
                     if (response.expire) {
                         this.temporalToken = response.token;
-                        console.log(response.token.toString());
+                        S.log(response.token.toString());
                         resolve(true);
                     }
                     // Error handling here.
@@ -169,8 +165,22 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 if (allowUpload) {
                     //this.uploadToTemporal(); //<--- original upload prototype (works)
-                    this.dropzone.processQueue();
-                    this.close();
+
+                    const files = this.dropzone.getAcceptedFiles();
+                    this.numFiles = files.length;
+
+                    //NOTE: Either the for loop OR the processQueue will always for actually for non-ipfs uploads, but for uploading to 
+                    //IPFS we know we do need to manually force it to process one file at a time to comply with what temporal.cloud allows.
+                    if (state.toIpfs) {
+                        if (files.length > 0) {
+                            files.forEach((file: File) => {
+                                //S.log("Dropzone Processing File: " + file.name);
+                                this.dropzone.processFile(file)
+                            });
+                        }
+                    } else {
+                        this.dropzone.processQueue();
+                    }
                 }
             }
             resolve(true);
@@ -199,11 +209,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
         xhr.addEventListener("readystatechange", function () {
             if (xhr.readyState === 4) {
-                console.log(S.util.prettyPrint(xhr));
+                //S.log(S.util.prettyPrint(xhr));
                 let result = JSON.parse(xhr.responseText);
 
                 if (result.code === 200) {
-                    console.log("Upload Result: " + result);
+                    S.log("Upload Result: " + result);
                 }
                 else {
                     // Error handling.
@@ -246,11 +256,13 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             autoProcessQueue: false,
             paramName: (state.toIpfs && dlg.toTemporal) ? "file" : "files",
             maxFilesize: maxFileSize,
-            parallelUploads: 50,
 
-            //Without this the client will make multiple calls to the server to upload
-            //each file instead of streaming them all at once in an array of files.
-            uploadMultiple: true,
+            //sets max number to send in each request, to keep from overloading server when large numbers are being sent
+            //to break up the upload into batches, but still sends each batch as a multi-file post.
+            parallelUploads: state.toIpfs ? 1 : 20,
+
+            //Flag tells server to upload multiple files using multi-post requests so more than one file is allowed for each post it makes.
+            uploadMultiple: true, 
 
             maxFiles: this.maxFiles,
 
@@ -285,10 +297,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("sending", function (file: File, xhr, formData) {
                     dlg.sent = true;
+
                     /* If Uploading DIRECTLY to Temporal.cloud */
                     if (state.toIpfs && dlg.toTemporal) {
-                        dlg.ipfsFile = file;
-                        //todo-0: check if temporal supports multiple uploads? 
                         formData.append("file", file);
                         formData.append("hold_time", "1");
 
@@ -298,7 +309,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }
                     /* Else we'll be uploading onto Quanta and saving to ipfs based on the 'ipfs' flag */
                     else {
-                        console.log("Sending File: " + file.name);
+                        S.log("Sending File: " + file.name);
                         formData.append("files", file);
 
                         //It's important to check before calling append on this formData, because when uploading multiple files
@@ -307,7 +318,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         if (!formData.has("nodeId")) {
                             formData.append("nodeId", dlg.nodeId);
                             formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
+
+                            //NOTE: This ipfs flag is *not* for the Temporal.cloud upload but is for the currently unused capability 
+                            //Quanta platform has to run it's own gateway IPFS-GO instance (but currently we aren't running it)
                             formData.append("ipfs", state.toIpfs ? "true" : "false");
+
+                            formData.append("createAsChildren", dlg.numFiles > 1 ? "true" : "false");
                         }
                     }
                     dlg.zipQuestionAnswered = false;
@@ -320,9 +336,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }
                 });
 
-                this.on("success", function (param1, resp, param3) {
-                    //todo-0: get rid of the tight coupling to an exception class name here. This was a quick fix/hack
-                    if (!resp.succese && resp.exceptionClass && resp.exceptionClass.endsWith(".OutOfSpaceException")) {
+                this.on("success", function (file: File, resp: any, evt: ProgressEvent) {
+                    //S.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
+        
+                    //todo-1: get rid of the tight coupling to an exception class name here. This was a quick fix/hack
+                    if (!resp.success && resp.exceptionClass && resp.exceptionClass.endsWith(".OutOfSpaceException")) {
                         if (!dlg.errorShown) {
                             dlg.errorShown = true;
                             dlg.uploadFailed = true;
@@ -330,34 +348,60 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         }
                         return;
                     }
-                    //console.log("Uploaded to Hash: " + ipfsHash);
+                    //S.log("Uploaded to Hash: " + ipfsHash);
 
                     //https://developer.mozilla.org/en-US/docs/Web/API/File
-                    if (dlg.ipfsFile) {
+                    if (dlg.getState().toIpfs) {
                         let ipfsHash = resp.response;
 
-                        /* delete the BIN property if it's there. Can't have BIN and IPFS_LINK at same time. */
-                        S.props.setNodePropVal(J.NodeProp.BIN, dlg.node, "[null]");
+                        //If we're uploading multipe files they all go in as children of the current node
+                        //it's too late to check the count here. it may be down to one. need to get mutiFlag right when processing starts
+                        if (dlg.numFiles > 1) {
+                            let properties: J.PropertyInfo[] = [
+                                { "name": J.NodeProp.BIN, value: "[null]" },
+                                { "name": J.NodeProp.IPFS_LINK, value: ipfsHash },
+                                { "name": J.NodeProp.BIN_MIME, value: file.type },
+                                { "name": J.NodeProp.BIN_SIZE, value: `${file.size}` },
+                                { "name": J.NodeProp.BIN_FILENAME, value: file.name },
+                                { "name": J.NodeProp.IMG_SIZE, value: "100%"} //<------ this seemed to get ignored. retest later todo-0
+                            ];
 
-                        S.props.setNodePropVal(J.NodeProp.IPFS_LINK, dlg.node, ipfsHash);
-                        S.props.setNodePropVal(J.NodeProp.BIN_MIME, dlg.node, dlg.ipfsFile.type);
-                        S.props.setNodePropVal(J.NodeProp.BIN_SIZE, dlg.node, `${dlg.ipfsFile.size}`);
-                        S.props.setNodePropVal(J.NodeProp.BIN_FILENAME, dlg.node, dlg.ipfsFile.name);
+                            S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                                nodeId: dlg.node.id,
+                                newNodeName: "",
+                                typeName: "u",
+                                createAtTop: false,
+                                content: file.name,
+                                typeLock: false,
+                                properties,
+                                immediateTimestamp: true
+                            }, (res) => {
+                                //nothing to be done here.
+                            });
+                        }
+                        /* Otherwise add all the properties to this node to update it for the upload */
+                        else {
+                            /* delete the BIN property if it's there. Can't have BIN and IPFS_LINK at same time. */
+                            S.props.setNodePropVal(J.NodeProp.BIN, dlg.node, "[null]");
+                            S.props.setNodePropVal(J.NodeProp.IPFS_LINK, dlg.node, ipfsHash);
+                            S.props.setNodePropVal(J.NodeProp.BIN_MIME, dlg.node, file.type);
+                            S.props.setNodePropVal(J.NodeProp.BIN_SIZE, dlg.node, `${file.size}`);
+                            S.props.setNodePropVal(J.NodeProp.BIN_FILENAME, dlg.node, file.name);
+                            S.props.setNodePropVal(J.NodeProp.IMG_SIZE, dlg.node, "100%");
 
-                        S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-                            node: dlg.node
-                        }, (res) => {
-                            S.edit.saveNodeResponse(dlg.node, res, dlg.appState);
-                        });
+                            S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
+                                node: dlg.node
+                            }, (res) => {
+                                S.edit.saveNodeResponse(dlg.node, res, dlg.appState);
+                            });
+                        }
                     }
                 });
 
                 this.on("queuecomplete", function (arg) {
                     if (dlg.sent) {
-                        if (dlg.fileList && dlg.fileList.length > 1) {
-                            if (!dlg.uploadFailed) {
-                                S.util.showMessage("The " + dlg.fileList.length + " uploads were added as sub-nodes of the current node. Open this node to view them.", "Note");
-                            }
+                        if (dlg.numFiles > 1 && !dlg.uploadFailed) {
+                            S.util.showMessage("The " + dlg.fileList.length + " uploads were added as sub-nodes of the current node. Open this node to view them.", "Note");
                         }
 
                         dlg.close();
