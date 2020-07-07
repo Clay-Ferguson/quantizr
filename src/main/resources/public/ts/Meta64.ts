@@ -331,7 +331,7 @@ export class Meta64 implements Meta64Intf {
             // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs re Open, because this WILL 
             // capture events going to dialogs / edit fields
             document.body.addEventListener("keydown", (event: KeyboardEvent) => {
-                console.log("keydown: " + event.code);
+                //console.log("keydown: " + event.code);
                 let state: AppState = store.getState();
                 //if (event.ctrlKey) {
 

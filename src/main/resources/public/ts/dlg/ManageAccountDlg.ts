@@ -26,7 +26,7 @@ export class ManageAccountDlg extends DialogBase {
         let children = [
             this.message = new TextContent("loading...", null, true),
 
-            new CollapsiblePanel("More...", null, [
+            new CollapsiblePanel(null, null, null, [
                 new Button("Close Account", this.closeAccount),
             ], false, null, false, "float-right"),
 
