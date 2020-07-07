@@ -3,6 +3,7 @@ import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Div } from "./Div";
+import { Span } from "./Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -28,7 +29,11 @@ export class ListBoxRow extends Div {
     }
 
     preRender(): void {
-        this.attribs.className = "list-group-item list-group-item-action listBoxRow" +
-            ((this.isSelectedFunc && this.isSelectedFunc(this)) ? " selectedListItem" : "");
+        let state = this.getState();
+        this.setChildren([
+            new Span(state.content, {
+                className: (this.isSelectedFunc && this.isSelectedFunc(this)) ? "selectedListItem" : "unselectedListItem",
+            })
+        ]);
     }
 }

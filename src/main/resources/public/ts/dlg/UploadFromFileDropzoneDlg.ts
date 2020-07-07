@@ -363,7 +363,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                                 { "name": J.NodeProp.BIN_MIME, value: file.type },
                                 { "name": J.NodeProp.BIN_SIZE, value: `${file.size}` },
                                 { "name": J.NodeProp.BIN_FILENAME, value: file.name },
-                                { "name": J.NodeProp.IMG_SIZE, value: "100%"} //<------ this seemed to get ignored. retest later todo-0
+                                { "name": J.NodeProp.IMG_SIZE, value: "100%"} 
                             ];
 
                             S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {

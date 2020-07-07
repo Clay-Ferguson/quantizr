@@ -34,7 +34,7 @@ export class NodeTypeListBoxRow extends ListBoxRow {
             new HorizontalLayout([
                 icon,
                 new Span(this.typeHandler.getName())
-            ])
+            ], (this.isSelectedFunc && this.isSelectedFunc(this)) ? "selectedListItem" : "unselectedListItem")
         ]);
     }
 }

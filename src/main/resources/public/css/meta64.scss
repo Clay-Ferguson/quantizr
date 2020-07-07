@@ -533,18 +533,35 @@ input[type="radio"] {
 
 .listBoxRow {
     cursor: pointer;
-}
-
-.listBoxRow:hover {
-    cursor: pointer;
-    background-color: $menuItemHoverBackgroundColor;
+    margin: 0px;
+    padding: 0px;
 }
 
 .selectedListItem {
+    cursor: pointer;
     background-color: $secondary;
-    border-radius: .6em;
+    width: 100%;
     border: 2px solid $gray-400;
+    padding: 8px;
 }
+
+.unselectedListItem {
+    cursor: pointer;
+    width: 100%;
+    border: 2px solid transparent;
+    padding: 8px;
+}
+
+.selectedListItem:hover {
+    @extend .selectedListItem;
+    background-color: $menuItemHoverBackgroundColor;
+}
+
+.unselectedListItem:hover {
+    @extend .unselectedListItem;
+    background-color: $menuItemHoverBackgroundColor;
+}
+
 
 .small-padding {
     margin-top: 7px;
