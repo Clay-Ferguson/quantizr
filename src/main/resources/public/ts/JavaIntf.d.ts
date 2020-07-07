@@ -238,6 +238,7 @@ export interface SignupRequest extends RequestBase {
     userName: string;
     password: string;
     email: string;
+    reCaptchaToken: string;
 }
 
 export interface SplitNodeRequest extends RequestBase {

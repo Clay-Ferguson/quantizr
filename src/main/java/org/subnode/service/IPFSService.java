@@ -116,7 +116,7 @@ public class IPFSService {
 
             ret = new String(result.getBody(), "UTF-8");
         } catch (Exception e) {
-            // log.error("Failed in restTemplate.exchange", e);
+            // log.error("Failed in restTemplate.getForEntity", e);
         }
         return ret;
     }
@@ -149,7 +149,7 @@ public class IPFSService {
             }
 
         } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
+            log.error("Failed in restTemplate.getForEntity", e);
         }
         return ret;
     }
@@ -175,7 +175,7 @@ public class IPFSService {
                 log.debug("RAW BODY: " + result.getBody());
             }
         } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
+            log.error("Failed in restTemplate.getForEntity", e);
         }
         return ret;
     }

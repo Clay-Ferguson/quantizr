@@ -73,6 +73,8 @@ services:
             #runTests: "IPFSTest"
             
             mongoAdminPassword: "${subnodePassword}"
+            reCaptcha3SiteKey: "${reCaptcha3SiteKey}"
+            reCaptcha3SecretKey: "${reCaptcha3SecretKey}" 
             mongoSecurity: "true"
             testUserAccounts: "adam:${testPassword}:${devEmail},bob:${testPassword}:${devEmail},cory:${testPassword}:${devEmail},dan:${testPassword}:${devEmail}" 
             resourcesBaseFolder: "file:///dev-resource-base/" 

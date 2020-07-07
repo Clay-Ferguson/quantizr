@@ -4,7 +4,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.subnode.config.AppProp;
 import org.subnode.config.ConstantsProvider;
@@ -49,6 +53,7 @@ import org.subnode.util.Const;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
+import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 import org.subnode.util.Validator;
 import org.subnode.util.XString;
@@ -58,8 +63,13 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Service methods for processing user management functions. Login, logout,
@@ -94,6 +104,14 @@ public class UserManagerService {
 
 	@Autowired
 	private Validator validator;
+
+	/*
+	 * RestTempalte is thread-safe and reusable, and has no state, so we need only
+	 * one final static instance ever
+	 */
+	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
+
+	private static final ObjectMapper mapper = new ObjectMapper();
 
 	/*
 	 * Login mechanism is a bit tricky because the CallProcessor detects the
@@ -266,7 +284,10 @@ public class UserManagerService {
 		}
 	}
 
-	/* We have 'sign' so we can use this method to either deduct from or add to the user's total usage amount */
+	/*
+	 * We have 'sign' so we can use this method to either deduct from or add to the
+	 * user's total usage amount
+	 */
 	public void addBytesToUserNodeBytes(long binSize, SubNode userNode, int sign) {
 		if (userNode == null) {
 			userNode = api.getUserNodeByUserName(null, null);
@@ -373,6 +394,12 @@ public class UserManagerService {
 		final String password = req.getPassword().trim();
 		final String email = req.getEmail();
 
+		if (!verifyCaptcha(req.getReCaptchaToken())) {
+			res.setMessage("Sorry, reCaptcha scored too low.");
+			res.setSuccess(false);
+			return res;
+		}
+
 		log.debug("Signup: userName=" + userName + " email=" + email);
 
 		/* throw exceptions of the username or password are not valid */
@@ -389,6 +416,44 @@ public class UserManagerService {
 		res.setMessage("success");
 		res.setSuccess(true);
 		return res;
+	}
+
+	private boolean verifyCaptcha(String reCaptchaToken) {
+		boolean ret = false;
+		try {
+			String secretKey = appProp.getReCaptcha3SecretKey();
+
+			//if secret key not configured, bypass check.
+			if (StringUtils.isEmpty(secretKey)) {
+				return true;
+			}
+			String url = "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response="
+					+ reCaptchaToken;
+
+			HttpHeaders headers = new HttpHeaders();
+			HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
+
+			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+			//log.debug("RAW RESULT: " + response.getBody());
+
+			Map<String, Object> respMap = mapper.readValue(response.getBody(),
+					new TypeReference<Map<String, Object>>() {
+					});
+			//log.debug(XString.prettyPrint(respMap));
+
+			Boolean success = (Boolean) respMap.get("success");
+			Double score = (Double) respMap.get("score");
+
+			//Google recommends 0.5 as default threshold: https://developers.google.com/recaptcha/docs/v3
+			if (success.booleanValue() && score.doubleValue() >= 0.5) {
+				//log.debug("Success=" + success + " score=" + score);
+				ret = true;
+			}
+
+		} catch (Exception e) {
+			log.error("Failed in restTemplate.exchange", e);
+		}
+		return ret;
 	}
 
 	/*
@@ -516,20 +581,20 @@ public class UserManagerService {
 			// DO NOT DELETE: This is temporaryly disabled (no ability to edit userNaem)
 			// If userName is changing, validate it first.
 			// if (!req.getUserName().equals(userName)) {
-			// 	validator.checkUserName(req.getUserName());
+			// validator.checkUserName(req.getUserName());
 
-			// 	SubNode nodeFound = api.getUserNodeByUserName(session, req.getUserName());
-			// 	if (nodeFound != null) {
-			// 		res.setMessage("User already exists.");
-			// 		res.setSuccess(false);
-			// 		failed = true;
-			// 	}
+			// SubNode nodeFound = api.getUserNodeByUserName(session, req.getUserName());
+			// if (nodeFound != null) {
+			// res.setMessage("User already exists.");
+			// res.setSuccess(false);
+			// failed = true;
+			// }
 			// }
 
 			if (!failed) {
-				//userNode.setProp(NodeProp.USER.s(), req.getUserName());
+				// userNode.setProp(NodeProp.USER.s(), req.getUserName());
 				userNode.setProp(NodeProp.USER_BIO.s(), req.getUserBio());
-				//sessionContext.setUserName(req.getUserName());
+				// sessionContext.setUserName(req.getUserName());
 				api.save(session, userNode);
 				res.setSuccess(true);
 			}

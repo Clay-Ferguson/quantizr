@@ -109,6 +109,14 @@ public class AppProp /* implements EnvironmentAware */ {
 		return "true".equals(env.getProperty("mongoSecurity"));
 	}
 
+	public String getReCaptcha3SiteKey() {
+		return env.getProperty("reCaptcha3SiteKey");
+	}
+
+	public String getReCaptcha3SecretKey() {
+		return env.getProperty("reCaptcha3SecretKey");
+	}
+
 	public String getMongoAdminPassword() {
 		return env.getProperty("mongoAdminPassword");
 	}

@@ -11,6 +11,9 @@ import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
 
+declare var grecaptcha;
+declare var reCaptcha3SiteKey;
+
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
@@ -51,6 +54,14 @@ export class SignupDlg extends DialogBase {
     }
 
     signup = (): void => {
+        grecaptcha.ready(() => {
+            grecaptcha.execute(reCaptcha3SiteKey, { action: 'submit' }).then((token) => {
+                this.signupNow(token);
+            });
+        });
+    }
+
+    signupNow = (reCaptchaToken: string): void => {
         let userName = this.userTextField.getValue();
         let password = this.passwordTextField.getValue();
         let email = this.emailTextField.getValue();
@@ -86,7 +97,8 @@ export class SignupDlg extends DialogBase {
         S.util.ajax<J.SignupRequest, J.SignupResponse>("signup", {
             userName,
             password,
-            email
+            email,
+            reCaptchaToken
         }, this.signupResponse);
 
         this.close();

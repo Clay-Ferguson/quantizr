@@ -68,7 +68,10 @@ module.exports = {
             template: './html/index.html',
             filename: 'index.html',
             hash: true,
-            cachebuster: '' + new Date().getTime()
+            cachebuster: '' + new Date().getTime(),
+
+            //todo-0: need to pull this from a bash variable, and not have hard-coded here.
+            reCaptcha3SiteKey: "6LeGyK4ZAAAAAPbF4hI0rtRwSveBdDVXnmhOsfff"
         }),
     ]
 };
