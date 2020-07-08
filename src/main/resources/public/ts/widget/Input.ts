@@ -25,11 +25,13 @@ export class Input extends Comp {
         this.mergeState({ value: evt.target.value });
     }
 
+    /* This method is never used because we ended up always passing Input params into a new Input object
+    in all circumstances, but I leave it here for future reference. It's still a legit function. */
     _toggleType = (): void => {
         let state = this.getState();
         this.mergeState({
             type: state.type == "password" ? "text" : "password"
-        })
+        });
     }
 
     compRender(): ReactNode {

@@ -382,6 +382,7 @@ export abstract class Comp implements CompIntf {
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
     _render = (props: any): ReactNode => {
+        //console.log("render(): " + this.jsClassName);
         this.rendered = true;
 
         let ret: ReactNode = null;
@@ -479,7 +480,7 @@ export abstract class Comp implements CompIntf {
 
             Comp.renderCounter++;
             if (this.debug) {
-                console.log("rendering: " + this.jsClassName + " counter=" + Comp.renderCounter); //+ " PROPS=" + S.util.prettyPrint(props));
+                console.log("calling compRender: " + this.jsClassName + " counter=" + Comp.renderCounter); //+ " PROPS=" + S.util.prettyPrint(props));
             }
 
             ret = this.compRender();
