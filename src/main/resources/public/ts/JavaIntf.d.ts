@@ -607,6 +607,7 @@ export const enum NodeProp {
     IMG_WIDTH = "sn:imgWidth",
     IMG_HEIGHT = "sn:imgHeight",
     IMG_SIZE = "sn:imgSize",
+    CHILDREN_IMG_SIZES = "sn:childrenImgSizes",
     BIN_TOTAL = "sn:binTot",
     LAST_LOGIN_TIME = "sn:lastLogin",
     LAST_INBOX_NOTIFY_TIME = "sn:lastInboxNotify",

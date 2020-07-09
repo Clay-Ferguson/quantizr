@@ -24,6 +24,7 @@ export class NodeCompTableRowLayout extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
+        let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
         let nodesToMove = state.nodesToMove;
         let curRow = new Div(null, { className: 'node-grid-row' });
@@ -86,7 +87,8 @@ export class NodeCompTableRowLayout extends Div {
                     children.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
                 }
 
-                let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove);
+                let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
+                let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove, childrenImgSizes);
                 // console.log("row[" + rowCount + "]=" + row);
                 comps.push(row);
                 rowCount++;

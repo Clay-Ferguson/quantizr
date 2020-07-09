@@ -43,7 +43,7 @@ public enum NodeProp {
 
     FILE_SYNC_LINK("fs:link", "s"), //
 
-    //Goes on 'Friend' nodes, and is added automatically by server (not user)
+    // Goes on 'Friend' nodes, and is added automatically by server (not user)
     USER_NODE_ID("sn:userNodeId", "s"), //
 
     // this pre-existed when i created FS_FILENAME (may be unused?)
@@ -78,8 +78,11 @@ public enum NodeProp {
     BIN_FILENAME("sn:fileName", "s"), //
     BIN_SIZE("sn:size", "s"), //
 
-    /* if this is present it indicates we have a "data:" url stored here which means we hava an image (for example) with data encoded inline,
-    and this data url will be stored as text in the 'attachment' of the node */
+    /*
+     * if this is present it indicates we have a "data:" url stored here which means
+     * we hava an image (for example) with data encoded inline, and this data url
+     * will be stored as text in the 'attachment' of the node
+     */
     BIN_DATA_URL("sn:dataUrl", "s"), //
 
     // This is for bash script names to whow up when browing on the tree
@@ -95,21 +98,21 @@ public enum NodeProp {
 
     IMG_WIDTH("sn:imgWidth", "s"), //
     IMG_HEIGHT("sn:imgHeight", "s"), //
-    IMG_SIZE("sn:imgSize", "s"),//
+    IMG_SIZE("sn:imgSize", "s"), //
+    CHILDREN_IMG_SIZES("sn:childrenImgSizes", "s"), //
 
-    BIN_TOTAL("sn:binTot", "s"),//
-    LAST_LOGIN_TIME("sn:lastLogin", "s"),//
-    LAST_INBOX_NOTIFY_TIME("sn:lastInboxNotify", "s"),//
+    BIN_TOTAL("sn:binTot", "s"), //
+    LAST_LOGIN_TIME("sn:lastLogin", "s"), //
+    LAST_INBOX_NOTIFY_TIME("sn:lastInboxNotify", "s"), //
 
-    //amount of bytes the user is ALLOWED to save.
-    BIN_QUOTA("sn:binQuota", "s"),//
+    // amount of bytes the user is ALLOWED to save.
+    BIN_QUOTA("sn:binQuota", "s"), //
 
     // todo-1: add sn:prefix
     INLINE_CHILDREN("inlineChildren", "s"), //
     PRIORITY("priority", "s"), //
-    LAYOUT("layout", "s"),
-    ORDER_BY("orderBy", "s"),
-    
+    LAYOUT("layout", "s"), ORDER_BY("orderBy", "s"),
+
     TYPE_LOCK("sn:typLoc", "s");
 
     @JsonValue

@@ -36,7 +36,7 @@ export class MainTabComp extends Div {
         }
 
         this.setChildren([
-            new NodeCompMainNode(state),
+            new NodeCompMainNode(state, null),
             new NodeCompMainList()
         ]);
     }

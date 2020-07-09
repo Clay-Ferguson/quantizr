@@ -24,7 +24,7 @@ export class NodeCompContent extends Div {
 
     domPreUpdateFunc: Function;
 
-    constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix?: string, public isFeed?: boolean) {
+    constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix?: string, public isFeed?: boolean, public imgSizeOverride?: string) {
         super(null, {
             id: (idPrefix ? idPrefix : "c") + node.id
         });
@@ -45,7 +45,6 @@ export class NodeCompContent extends Div {
 
         let children: Comp[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-
 
         if (state.showProperties) {
             let propTable = S.props.renderProperties(node.properties);
@@ -71,7 +70,7 @@ export class NodeCompContent extends Div {
         let isAnAccountNode = node.ownerId && node.id == node.ownerId;
 
         if (S.props.hasBinary(node) && !isAnAccountNode) {
-            let binary = new NodeCompBinary(node, false, false);
+            let binary = new NodeCompBinary(node, false, false, this.imgSizeOverride);
 
             //todo-1: bring this back. I already needed it again.
             /*

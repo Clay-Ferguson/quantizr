@@ -58,12 +58,12 @@ export class Selection extends Comp {
             }, this.label));
         }
 
-        children.push(this.tagRender('select', null, this.attribs));
+        children.push(this.tagRender("select", null, this.attribs));
 
         return S.e("div", {
             id: this.getId()+"_sel",
             key: this.getId()+"_sel",
-            className: "form-group" //mr-2"
+            className: "form-group" 
         }, children);
     }
 }

@@ -24,7 +24,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class NodeCompBinary extends Div {
 
     /* editorEmbed is true when this component is inside the node editor dialog */
-    constructor(public node: J.NodeInfo, private isEditorEmbed: boolean, private isFullScreenEmbed: boolean) {
+    constructor(public node: J.NodeInfo, private isEditorEmbed: boolean, private isFullScreenEmbed: boolean, public imgSizeOverride: string) {
         super();
     }
 
@@ -39,7 +39,7 @@ export class NodeCompBinary extends Div {
             imgSize = "200px"
         }
         else {
-            imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
+            imgSize = (this.imgSizeOverride && this.imgSizeOverride != "n") ? this.imgSizeOverride : S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
         }
         let style: any = {};
 

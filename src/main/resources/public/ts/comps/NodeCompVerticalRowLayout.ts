@@ -75,7 +75,8 @@ export class NodeCompVerticalRowLayout extends Div {
                     comps.push(new Div(null, { className: "clearfix" }));
                 }
 
-                let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove);
+                let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
+                let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove, childrenImgSizes);
                 comps.push(row);
 
                 S.render.lastOwner = this.node.owner;

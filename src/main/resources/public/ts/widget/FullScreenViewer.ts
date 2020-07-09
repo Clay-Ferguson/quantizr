@@ -27,7 +27,7 @@ export class FullScreenViewer extends Main {
         let children = [];
 
         if (S.props.hasBinary(node) && !isAnAccountNode) {
-            let binary = new NodeCompBinary(node, false, true);
+            let binary = new NodeCompBinary(node, false, true, null);
             children.push(binary);
         }
 

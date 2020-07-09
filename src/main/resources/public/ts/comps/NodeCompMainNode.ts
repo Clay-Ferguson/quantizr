@@ -18,7 +18,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMainNode extends Div {
 
-    constructor(state: AppState) {
+    constructor(state: AppState, public imgSizeOverride: string) {
         super(null, {
             id: "row_" + state.node.id
         });
@@ -57,7 +57,7 @@ export class NodeCompMainNode extends Div {
                 className: "clearfix",
                 id: "button_bar_clearfix_" + node.id
             }),
-            new NodeCompContent(node, false, true)
+            new NodeCompContent(node, false, true, null, null, this.imgSizeOverride)
         ]);
     }
 }

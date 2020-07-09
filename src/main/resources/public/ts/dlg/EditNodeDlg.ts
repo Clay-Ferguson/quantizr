@@ -48,6 +48,7 @@ export class EditNodeDlg extends DialogBase {
     layoutSelection: Selection;
     prioritySelection: Selection;
     imgSizeSelection: Selection;
+    childrenImgSizeSelection: Selection;
     //help: TextContent;
     propertyEditFieldContainer: Div;
 
@@ -110,10 +111,16 @@ export class EditNodeDlg extends DialogBase {
         return selection;
     }
 
-    createImgSizeSelection = (): Selection => {
-        let selection: Selection = new Selection({
-            defaultValue: "0"
-        }, "Image Size", [
+    createImgSizeSelection = (label: string, allowNone: boolean): Selection => {
+        let options = [];
+
+        if (allowNone) {
+            //none means we would ignore the option during rendering, slightly different from "Actual" in cases
+            //where this is an override that we don't want to override with. 'none' means don't override.
+            options.push({ key: "n", val: "None" },)
+        }
+
+        options = options.concat([
             { key: "0", val: "Actual" },
             { key: "15%", val: "15%" },
             { key: "25%", val: "25%" },
@@ -126,8 +133,11 @@ export class EditNodeDlg extends DialogBase {
             { key: "400px", val: "400px" },
             { key: "800px", val: "800px" },
             { key: "1000px", val: "1000px" },
+        ]);
 
-        ], "m-2 w-25"); // "w-25 m-2");
+        let selection: Selection = new Selection({
+            defaultValue: "0"
+        }, label, options, "m-2"); // w-25");
         return selection;
     }
 
@@ -211,13 +221,15 @@ export class EditNodeDlg extends DialogBase {
             this.inlineChildrenCheckBox = state.node.hasChildren ? new Checkbox("Inline Children", false) : null
         ]);
 
+        this.childrenImgSizeSelection = state.node.hasChildren ? this.createImgSizeSelection("Images", true) : null;
+
         let selectionsBar = new FormInline(null, [
-            this.setTypeButton = !typeLocked ? new Button("Set Type", this.openChangeNodeTypeDlg) : null,
-            this.encryptionButton = !customProps ? new Button("Encryption", this.openEncryptionDlg, null, "btn-secondary marginRight") : null,
             this.layoutSelection = state.node.hasChildren ? this.createLayoutSelection() : null,
+            this.childrenImgSizeSelection,
             this.prioritySelection = this.createPrioritySelection(),
         ]);
-        this.imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection() : null
+
+        this.imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false) : null;
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
         let propsTable = null;
@@ -284,6 +296,13 @@ export class EditNodeDlg extends DialogBase {
                     return;
                 }
 
+                if (prop.name == J.NodeProp.CHILDREN_IMG_SIZES) {
+                    if (this.childrenImgSizeSelection) {
+                        this.childrenImgSizeSelection.setSelection(prop.value);
+                    }
+                    return;
+                }
+
                 if (prop.name == J.NodeProp.INLINE_CHILDREN) {
                     if (this.inlineChildrenCheckBox) {
                         this.inlineChildrenCheckBox.setChecked(true);
@@ -321,7 +340,6 @@ export class EditNodeDlg extends DialogBase {
             ]);
 
             this.deletePropButton.setEnabled(false);
-
             propsParent.addChild(this.propsButtonBar);
         }
 
@@ -336,7 +354,7 @@ export class EditNodeDlg extends DialogBase {
 
             binarySection = new LayoutRow([
                 new Div(null, { className: "col-4 editBinaryContainer" }, [
-                    new NodeCompBinary(state.node, true, false),
+                    new NodeCompBinary(state.node, true, false, null),
                 ]),
 
                 new Div(null, {
@@ -364,9 +382,9 @@ export class EditNodeDlg extends DialogBase {
         let hasAttachment: boolean = S.props.hasBinary(state.node);
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
-        //let customProps: string[] = null;
+        let customProps: string[] = null;
         if (typeHandler) {
-            //customProps = typeHandler.getCustomProperties();
+            customProps = typeHandler.getCustomProperties();
             typeHandler.ensureDefaultProperties(state.node);
         }
 
@@ -382,6 +400,7 @@ export class EditNodeDlg extends DialogBase {
         let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
         let allowShare = true;
 
+        let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
         return this.buttonBar = new ButtonBar([
             this.saveNodeButton = new Button("Save", () => {
@@ -391,6 +410,9 @@ export class EditNodeDlg extends DialogBase {
 
             this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
             this.shareButton = allowShare ? new Button("Share", this.share) : null,
+
+            this.setTypeButton = !typeLocked ? new Button("Type", this.openChangeNodeTypeDlg) : null,
+            this.encryptionButton = !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
 
             //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
             this.cancelButton = new Button("Cancel", this.cancelEdit)
@@ -562,6 +584,11 @@ export class EditNodeDlg extends DialogBase {
                 if (this.imgSizeSelection) {
                     let imgSize = this.imgSizeSelection.getSelection();
                     S.props.setNodePropVal(J.NodeProp.IMG_SIZE, state.node, imgSize);
+                }
+
+                if (this.childrenImgSizeSelection) {
+                    let imgSize = this.childrenImgSizeSelection.getSelection();
+                    S.props.setNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, state.node, imgSize);
                 }
             }
 

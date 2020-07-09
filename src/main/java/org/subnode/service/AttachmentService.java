@@ -227,7 +227,7 @@ public class AttachmentService {
 			}
 			// otherwise, if we have enough images to lay it out into a square of 2 cols
 			// switch to that layout.
-			else if (imageCount >= 4) {
+			else if (imageCount >= 2) {
 				node.setProp(NodeProp.LAYOUT.s(), "c2");
 			}
 

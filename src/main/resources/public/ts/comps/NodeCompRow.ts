@@ -22,7 +22,8 @@ export class NodeCompRow extends Div {
     /* we have this flag so we can turn off buttons to troubleshoot performance. */
     static showButtonBar: boolean = true;
 
-    constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number, public layoutClass: string, public allowNodeMove: boolean) {
+    constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number, 
+        public layoutClass: string, public allowNodeMove: boolean, public imgSizeOverride: string) {
         super(null, {
             id: "row_" + node.id
         });
@@ -69,7 +70,7 @@ export class NodeCompRow extends Div {
                 className: "clearfix",
                 id: "button_bar_clearfix_" + node.id
             }) : null,
-            new NodeCompContent(node, true, true)
+            new NodeCompContent(node, true, true, null, null, this.imgSizeOverride)
         ]);
 
         S.render.setNodeDropHandler(this, node, state);

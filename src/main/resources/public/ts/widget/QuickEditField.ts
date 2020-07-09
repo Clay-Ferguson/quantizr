@@ -24,7 +24,7 @@ export class QuickEditField extends Span {
 
     constructor(private node: J.NodeInfo, private isFirst: boolean, private appState: AppState) {
         super();
-        this.attribs.className = "quickEditSpan col-11";
+        this.attribs.className = "quickEditSpan col-9";
         let isEditing = QuickEditField.editingId == node.id && QuickEditField.editingIsFirst == isFirst;
 
         this.mergeState({

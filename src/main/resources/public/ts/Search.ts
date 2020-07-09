@@ -139,7 +139,7 @@ export class Search implements SearchIntf {
 
         let cssId = this._UID_ROWID_PREFIX + node.id;
         let buttonBar = this.makeButtonBarHtml(node, allowAvatar, state);
-        let content = new NodeCompContent(node, true, true, prefix, true);
+        let content = new NodeCompContent(node, true, true, prefix, true, null);
 
         let clazz = "node-table-row";
         //if (state.userPreferences.editMode) {
