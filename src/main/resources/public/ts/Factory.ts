@@ -35,6 +35,7 @@ import * as React from "react";
 import { ServerPush } from "./ServerPush";
 import { LocalDB } from "./LocalDB";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
+import { IPFSUtil } from "./IPFSUtil";
 
 export class Factory {
     /* 
@@ -54,6 +55,7 @@ export class Factory {
             meta64: new Meta64(),
             plugin: new PluginMgr(),
             util: new Util(),
+            ipfsUtil: new IPFSUtil(),
             push: new ServerPush(),
             edit: new Edit(),
             attachment: new Attachment(),

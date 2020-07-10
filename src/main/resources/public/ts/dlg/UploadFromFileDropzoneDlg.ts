@@ -8,7 +8,6 @@ import { Form } from "../widget/Form";
 import { Constants as C, Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { EditCredentialsDlg } from "./EditCredentialsDlg";
 import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
@@ -24,8 +23,6 @@ declare var Dropzone;
 
 export class UploadFromFileDropzoneDlg extends DialogBase {
 
-    TEMPORAL_HOST: string = "https://api.temporal.cloud";
-
     hiddenInputContainer: Div;
     uploadButton: Button;
 
@@ -38,9 +35,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     /* If this is true we upload directly to temporal rather than routing thru Quanta */
     toTemporal: boolean = true;
-    temporalToken: string = null;
-    temporalUsr: string;
-    temporalPwd: string;
     maxFiles: number = 50;
 
     //this varible gets set if anything is detected wrong during the upload
@@ -68,7 +62,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Upload from URL", this.uploadFromUrl),
-                    state.toIpfs ? new Button("IPFS Credentials", () => { this.getTemporalCredentials(true); }) : null,
+                    state.toIpfs ? new Button("IPFS Credentials", () => { S.ipfsUtil.getTemporalCredentials(true); }) : null,
                     new Button("Close", () => {
                         this.close();
                     }),
@@ -93,48 +87,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         });
     }
 
-    //ref: https://gateway.temporal.cloud/ipfs/Qma4DNFSRR9eGqwm93zMUtqywLFpTRQji4Nnu37MTmNntM/account.html#account-api
-    temporalLogin = async (): Promise<boolean> => {
-        return new Promise<boolean>(async (resolve, reject) => {
-            if (!this.temporalUsr || !this.temporalPwd) {
-                console.error("No temporal credentials available.");
-                return;
-            }
-
-            fetch(this.TEMPORAL_HOST + '/v2/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'text/plain'
-                },
-                body: JSON.stringify({
-                    username: this.temporalUsr,
-                    password: this.temporalPwd
-                })
-            })//
-                .then(res => res.json())//
-                .catch(error => {
-                    console.error(error);
-                    resolve(false);
-                    if (error) {
-                        throw error;
-                    }
-                })//
-                .then(response => {
-                    //Why is this checking for expire ? (this came from the Temporal.cloud example)
-                    if (response.expire) {
-                        this.temporalToken = response.token;
-                        S.log(response.token.toString());
-                        resolve(true);
-                    }
-                    // Error handling here.
-                })//
-                .catch(error => {
-                    console.error('#' + error)
-                    resolve(false);
-                });
-        });
-    }
-
     uploadFromUrl = (): void => {
         let state = this.getState();
         S.attachment.openUploadFromUrlDlg(this.node, null, () => {
@@ -153,11 +105,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 let allowUpload = true;
 
                 if (state.toIpfs && this.toTemporal) {
-                    let credsOk = await this.getTemporalCredentials(false);
+                    let credsOk = await S.ipfsUtil.getTemporalCredentials(false);
                     if (!credsOk) {
                         resolve(false);
                     }
-                    let loginOk = await this.temporalLogin();
+                    let loginOk = await S.ipfsUtil.temporalLogin();
                     if (!loginOk) {
                         allowUpload = false;
                     }
@@ -187,47 +139,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         });
     }
 
-    //ref: https://gateway.temporal.cloud/ipns/docs.api.temporal.cloud/ipfs.html#example
-    /**
-     * DEAD CODE (method) - But leave this here.
-     * 
-     * I'm leaving this method here, for future reference, or examples, and it was the first working code I had
-     * before integrating these upload parameters into the Dropzone config to let dropzone do the uploaing to Temporal.
-     */
-    uploadToTemporal = (): void => {
-        if (this.temporalToken) {
-            console.error("Temporal login never completed.");
-        }
-
-        let file = this.fileList[0];
-        let data = new FormData();
-        data.append("file", file);
-        data.append("hold_time", "1");
-
-        let xhr = new XMLHttpRequest();
-        xhr.withCredentials = false;
-
-        xhr.addEventListener("readystatechange", function () {
-            if (xhr.readyState === 4) {
-                //S.log(S.util.prettyPrint(xhr));
-                let result = JSON.parse(xhr.responseText);
-
-                if (result.code === 200) {
-                    S.log("Upload Result: " + result);
-                }
-                else {
-                    // Error handling.
-                    console.error("upload failed.");
-                }
-            }
-        }.bind(this));
-
-        xhr.open("POST", this.TEMPORAL_HOST + "/v2/ipfs/public/file/add");
-        xhr.setRequestHeader("Cache-Control", "no-cache");
-        xhr.setRequestHeader("Authorization", "Bearer " + this.temporalToken);
-        xhr.send(data);
-    }
-
     configureDropZone = (): void => {
         let state = this.getState();
         let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
@@ -240,7 +151,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             action = S.util.getRpcPath() + "streamImport";
         }
         else {
-            action = (state.toIpfs && this.toTemporal) ? (this.TEMPORAL_HOST + "/v2/ipfs/public/file/add") :
+            action = (state.toIpfs && this.toTemporal) ? (C.TEMPORAL_HOST + "/v2/ipfs/public/file/add") :
                 S.util.getRpcPath() + "upload";
         }
         let url = action;
@@ -262,7 +173,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             parallelUploads: state.toIpfs ? 1 : 20,
 
             //Flag tells server to upload multiple files using multi-post requests so more than one file is allowed for each post it makes.
-            uploadMultiple: true, 
+            uploadMultiple: true,
 
             maxFiles: this.maxFiles,
 
@@ -305,7 +216,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                         xhr.withCredentials = false;
                         xhr.setRequestHeader("Cache-Control", "no-cache");
-                        xhr.setRequestHeader("Authorization", "Bearer " + dlg.temporalToken);
+                        xhr.setRequestHeader("Authorization", "Bearer " + S.ipfsUtil.temporalToken);
                     }
                     /* Else we'll be uploading onto Quanta and saving to ipfs based on the 'ipfs' flag */
                     else {
@@ -338,7 +249,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("success", function (file: File, resp: any, evt: ProgressEvent) {
                     //S.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
-        
+
                     //todo-1: get rid of the tight coupling to an exception class name here. This was a quick fix/hack
                     if (!resp.success && resp.exceptionClass && resp.exceptionClass.endsWith(".OutOfSpaceException")) {
                         if (!dlg.errorShown) {
@@ -363,7 +274,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                                 { "name": J.NodeProp.BIN_MIME, value: file.type },
                                 { "name": J.NodeProp.BIN_SIZE, value: `${file.size}` },
                                 { "name": J.NodeProp.BIN_FILENAME, value: file.name },
-                                { "name": J.NodeProp.IMG_SIZE, value: "100%"} 
+                                { "name": J.NodeProp.IMG_SIZE, value: "100%" }
                             ];
 
                             S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
@@ -485,21 +396,5 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
         //todo-1: why does setEnabled work just fine but setVisible doesn't work?
         this.uploadButton.setEnabled(valid);
-    }
-
-    getTemporalCredentials = async (forceEdit: boolean): Promise<boolean> => {
-        return new Promise<boolean>(async (resolve, reject) => {
-            this.temporalUsr = await S.localDB.getVal(Constants.LOCALDB_TEMPORAL_USR);
-            this.temporalPwd = await S.localDB.getVal(Constants.LOCALDB_TEMPORAL_PWD);
-
-            if (forceEdit || (!this.temporalUsr || !this.temporalPwd)) {
-                let dlg = new EditCredentialsDlg(forceEdit ? "Temporal Credentials" : "Temporal Account Login",
-                    Constants.LOCALDB_TEMPORAL_USR, Constants.LOCALDB_TEMPORAL_PWD, this.appState);
-                await dlg.open();
-                this.temporalUsr = dlg.usr;
-                this.temporalPwd = dlg.pwd;
-            }
-            resolve(!!this.temporalUsr && !!this.temporalPwd);
-        });
     }
 }

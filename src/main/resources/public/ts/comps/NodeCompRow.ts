@@ -23,25 +23,26 @@ export class NodeCompRow extends Div {
     static showButtonBar: boolean = true;
 
     constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number,
-        public layoutClass: string, public allowNodeMove: boolean, public imgSizeOverride: string) {
+        public layoutClass: string, public allowNodeMove: boolean, public imgSizeOverride: string, appState: AppState) {
         super(null, {
-            id: "row_" + node.id,
+            id: S.nav._UID_ROWID_PREFIX + node.id,
         });
 
-        this.attribs.draggable = "true";
-        this.attribs.onDragStart = this.dragStart;
-        this.attribs.onDragEnd = this.dragEnd;
+        /* If we're in edit mode allow dragging */
+        if (appState.userPreferences.editMode) {
+            this.attribs.draggable = "true";
+            this.attribs.onDragStart = this.dragStart;
+            this.attribs.onDragEnd = this.dragEnd;
+        }
     }
 
     dragStart(ev): void {
         ev.target.style.borderLeft = "6px dotted green";
         ev.dataTransfer.setData("text", ev.target.id);
-        //console.log("dragStart: id=" + ev.target.id);
     }
 
     dragEnd(ev): void {
         ev.target.style.borderLeft = "6px solid transparent";
-        //console.log("dragEnd: id=" + ev.target.id);
     }
 
     preRender(): void {

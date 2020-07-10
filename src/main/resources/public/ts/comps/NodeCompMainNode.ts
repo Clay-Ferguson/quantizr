@@ -20,7 +20,7 @@ export class NodeCompMainNode extends Div {
 
     constructor(state: AppState, public imgSizeOverride: string) {
         super(null, {
-            id: "row_" + state.node.id
+            id: S.nav._UID_ROWID_PREFIX + state.node.id
         });
     }
 

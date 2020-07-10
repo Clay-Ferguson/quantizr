@@ -2,7 +2,6 @@ import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { AppState } from "../AppState";
 import { AxiosPromise } from "axios";
-import { CompIntf } from "../widget/base/CompIntf";
 
 export interface UtilIntf {
     logAjax: boolean;

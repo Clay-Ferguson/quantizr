@@ -18,8 +18,6 @@ import { NodeActionType } from "./enums/NodeActionType";
 import { QuickEditField } from "./widget/QuickEditField";
 import { Div } from "./widget/Div";
 import { Span } from "./widget/Span";
-import { CompIntf } from "./widget/base/CompIntf";
-import { NodeCompRow } from "./comps/NodeCompRow";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -106,7 +104,7 @@ export class Render implements RenderIntf {
                             S.attachment.openUploadFromUrlDlg(node, s, null, state);
                         }
                         /* this is the case where a user is moving a node by dragging it over another node */
-                        else if (s.startsWith("row_")) {
+                        else if (s.startsWith(S.nav._UID_ROWID_PREFIX)) {
                             S.edit.moveNodeByDrop(node.id, s.substring(4), isFirst);
                             return;
                         }

@@ -1246,5 +1246,4 @@ export class Util implements UtilIntf {
             func(event);
         };
     }
-
 }

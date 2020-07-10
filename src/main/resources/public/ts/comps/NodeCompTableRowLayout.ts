@@ -24,7 +24,6 @@ export class NodeCompTableRowLayout extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
         let nodesToMove = state.nodesToMove;
         let curRow = new Div(null, { className: 'node-grid-row' });
@@ -80,20 +79,13 @@ export class NodeCompTableRowLayout extends Div {
                 }
 
                 if (state.userPreferences.editMode && allowInsert && rowCount == 0 && state.userPreferences.editMode && this.level == 1) {
-                    // comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
-                    // //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                    // comps.push(new Div(null, { className: "clearfix" }));
-
                     children.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
                 }
 
                 let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
-                let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove, childrenImgSizes);
-                // console.log("row[" + rowCount + "]=" + row);
+                let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove, childrenImgSizes, state);
                 comps.push(row);
                 rowCount++;
-
-                //console.log("lastOwner (child level " + level + ")=" + n.owner);
                 S.render.lastOwner = n.owner;
 
                 if (n.children) {
