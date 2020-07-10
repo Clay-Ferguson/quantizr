@@ -35,6 +35,8 @@ export class QuickEditField extends Span {
         this.startEditing = this.startEditing.bind(this);
         this.saveEdit = this.saveEdit.bind(this);
         this.cancelEdit = this.cancelEdit.bind(this);
+
+        S.render.setNodeDropHandler(this.attribs, node, isFirst, appState);
     }
 
     startEditing(): void {

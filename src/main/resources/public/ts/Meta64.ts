@@ -19,11 +19,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Meta64 implements Meta64Intf {
 
     app: CompIntf;
-
     navBarHeight: number = 0;
-
     appInitialized: boolean = false;
-
     curUrlPath: string = window.location.pathname + window.location.search;
 
     /* screen capabilities */

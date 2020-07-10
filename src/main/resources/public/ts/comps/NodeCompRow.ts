@@ -22,11 +22,26 @@ export class NodeCompRow extends Div {
     /* we have this flag so we can turn off buttons to troubleshoot performance. */
     static showButtonBar: boolean = true;
 
-    constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number, 
+    constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number,
         public layoutClass: string, public allowNodeMove: boolean, public imgSizeOverride: string) {
         super(null, {
-            id: "row_" + node.id
+            id: "row_" + node.id,
         });
+
+        this.attribs.draggable = "true";
+        this.attribs.onDragStart = this.dragStart;
+        this.attribs.onDragEnd = this.dragEnd;
+    }
+
+    dragStart(ev): void {
+        ev.target.style.borderLeft = "6px dotted green";
+        ev.dataTransfer.setData("text", ev.target.id);
+        //console.log("dragStart: id=" + ev.target.id);
+    }
+
+    dragEnd(ev): void {
+        ev.target.style.borderLeft = "6px solid transparent";
+        //console.log("dragEnd: id=" + ev.target.id);
     }
 
     preRender(): void {
@@ -51,7 +66,7 @@ export class NodeCompRow extends Div {
         let selected: boolean = (focusNode && focusNode.id === id);
         this.attribs.className = (this.layoutClass || "") + (selected ? " active-row" : " inactive-row");
 
-        if (S.render.fadeInId == node.id) { 
+        if (S.render.fadeInId == node.id) {
             S.render.fadeInId = null;
             this.attribs.className += " fadeInRowBkgClz";
         }
@@ -72,8 +87,6 @@ export class NodeCompRow extends Div {
             }) : null,
             new NodeCompContent(node, true, true, null, null, this.imgSizeOverride)
         ]);
-
-        S.render.setNodeDropHandler(this, node, state);
     }
 
     /* Return an object such that, if this object changes, we must render, or else we don't need to render 

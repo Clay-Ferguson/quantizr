@@ -10,7 +10,7 @@ export interface RenderIntf {
     lastOwner: string;
     fadeInId: string;
 
-    setNodeDropHandler(rowDiv: Comp, node: J.NodeInfo, state: AppState): void;
+    setNodeDropHandler(attribs: any, node: J.NodeInfo, isFirst: boolean, state: AppState): void;
     initMarkdown(): void;
     injectSubstitutions(content: string): string;
     showNodeUrl(node: J.NodeInfo, state: AppState): void;

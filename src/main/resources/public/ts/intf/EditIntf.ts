@@ -1,6 +1,7 @@
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { AppState } from "../AppState";
+import { CompIntf } from "../widget/base/CompIntf";
 
 export interface EditIntf {
     showReadOnlyProperties: boolean;
@@ -46,5 +47,6 @@ export interface EditIntf {
     cached_newSubNode(id: any);
     addComment(node: J.NodeInfo, state: AppState): void;
     addFriend(node: J.NodeInfo, state: AppState): void;
+    moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): void;
 }
 

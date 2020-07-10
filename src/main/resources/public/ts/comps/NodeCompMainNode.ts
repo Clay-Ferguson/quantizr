@@ -43,7 +43,6 @@ export class NodeCompMainNode extends Div {
         }
 
         this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
-        S.render.setNodeDropHandler(this, node, state);
 
         let header: CompIntf = null;
         if (state.userPreferences.showMetaData) {

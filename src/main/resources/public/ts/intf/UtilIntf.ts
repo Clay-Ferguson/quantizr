@@ -2,6 +2,7 @@ import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { AppState } from "../AppState";
 import { AxiosPromise } from "axios";
+import { CompIntf } from "../widget/base/CompIntf";
 
 export interface UtilIntf {
     logAjax: boolean;
@@ -111,4 +112,5 @@ export interface UtilIntf {
     perfStart(): number;
     perfEnd(message: string, startTime: number): void;
     getPathPartForNamedNode(node: J.NodeInfo): string;
+    setDropHandler(attribs: any, func: (elm: any) => void): void;
 }

@@ -18,7 +18,8 @@ import { NodeActionType } from "./enums/NodeActionType";
 import { QuickEditField } from "./widget/QuickEditField";
 import { Div } from "./widget/Div";
 import { Span } from "./widget/Span";
-import { ButtonBar } from "./widget/ButtonBar";
+import { CompIntf } from "./widget/base/CompIntf";
+import { NodeCompRow } from "./comps/NodeCompRow";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -83,11 +84,11 @@ export class Render implements RenderIntf {
         });
     }
 
-    setNodeDropHandler = (rowDiv: Comp, node: J.NodeInfo, state: AppState): void => {
-        if (!node || !rowDiv) return;
+    setNodeDropHandler = (attribs: any, node: J.NodeInfo, isFirst: boolean, state: AppState): void => {
+        if (!node) return;
+        //console.log("Setting drop handler: id="+node.id);
 
-        //use cached function here.
-        rowDiv.setDropHandler((evt: DragEvent) => {
+        S.util.setDropHandler(attribs, (evt: DragEvent) => {
             let data = evt.dataTransfer.items;
 
             //todo-1: right now we only actually support one file being dragged. Would be nice to support multiples
@@ -95,18 +96,24 @@ export class Render implements RenderIntf {
                 let d = data[i];
                 console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
 
-                if (d.kind == 'string' && d.type.match('^text/uri-list')) {
+                if (d.kind == 'string') {
                     d.getAsString((s) => {
-                        /* Disallow dropping from our app onto our app */
-                        if (s.startsWith(location.protocol + '//' + location.hostname)) {
+                        if (d.type.match('^text/uri-list')) {
+                            /* Disallow dropping from our app onto our app */
+                            if (s.startsWith(location.protocol + '//' + location.hostname)) {
+                                return;
+                            }
+                            S.attachment.openUploadFromUrlDlg(node, s, null, state);
+                        }
+                        /* this is the case where a user is moving a node by dragging it over another node */
+                        else if (s.startsWith("row_")) {
+                            S.edit.moveNodeByDrop(node.id, s.substring(4), isFirst);
                             return;
                         }
-                        S.attachment.openUploadFromUrlDlg(node, s, null, state);
                     });
                     return;
                 }
                 else if (d.kind == 'string' && d.type.match('^text/html')) {
-
                 }
                 else if (d.kind == 'file' /* && d.type.match('^image/') */) {
                     let file: File = data[i].getAsFile();
@@ -319,7 +326,7 @@ export class Render implements RenderIntf {
         if (bin) {
             return S.util.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + node.id;
         }
-        
+
         return null;
     }
 
@@ -331,7 +338,7 @@ export class Render implements RenderIntf {
         }
         else {
             ret = this.getAttachmentUrl("bin", node);
-            console.log("getUrlForNodeAttachment: id="+node.id+" url="+ret+" from bin");
+            //console.log("getUrlForNodeAttachment: id=" + node.id + " url=" + ret + " from bin");
         }
         return ret;
     }

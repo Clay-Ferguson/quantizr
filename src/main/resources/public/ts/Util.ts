@@ -8,6 +8,7 @@ import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 import { AppState } from "./AppState";
+import { CompIntf } from "./widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -1115,7 +1116,7 @@ export class Util implements UtilIntf {
 
     getPathPartForNamedNode = (node: J.NodeInfo): string => {
         if (!node.name) return null;
-        
+
         if (node.owner == "admin") {
             return "/n/" + node.name;
         }
@@ -1212,4 +1213,38 @@ export class Util implements UtilIntf {
         const endTime = performance.now();
         console.log(message + " Time=" + (endTime - startTime));
     }
+
+    //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
+    setDropHandler = (attribs: any, func: (elm: any) => void): void => {
+
+        let nonDragBorder = ""; 
+
+        attribs.onDragEnter = function (event) {
+            //console.log("onDragEnter: id="+event.target.id);
+            event.preventDefault();
+        };
+
+        attribs.onDragOver = function (event) {
+            //console.log("onDragOver: id="+event.target.id);
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
+
+            /* warning: this 9px should match the $fatBorderSize in the scss file */
+            event.target.style.border = "4px solid green";
+        };
+
+        attribs.onDragLeave = function (event) {
+            event.preventDefault();
+            event.target.style.border = nonDragBorder;
+        };
+
+        attribs.onDrop = function (event) {
+            //console.log("onDrop: id="+event.target.id);
+            event.stopPropagation();
+            event.preventDefault();
+            event.target.style.border = nonDragBorder;
+            func(event);
+        };
+    }
+
 }

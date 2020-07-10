@@ -13,6 +13,7 @@ import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { AppState } from "./AppState";
 import { dispatch, appState, store } from "./AppRedux";
 import { ProfileDlg } from "./dlg/ProfileDlg";
+import { CompIntf } from "./widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -96,7 +97,8 @@ export class Edit implements EditIntf {
         }
     }
 
-    private moveNodesResponse = (res: J.MoveNodesResponse, state: AppState): void => {
+    /* nodeId is optional and represents what to highlight after the paste if anything */
+    private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, state: AppState): void => {
         if (S.util.checkSuccess("Move nodes", res)) {
             dispatch({
                 type: "Action_SetNodesToMove", state,
@@ -105,7 +107,7 @@ export class Edit implements EditIntf {
                 },
             });
 
-            S.view.refreshTree(null, false, null, false, false, true, true, state);
+            S.view.refreshTree(null, false, nodeId, false, false, true, true, state);
         }
     }
 
@@ -126,7 +128,7 @@ export class Edit implements EditIntf {
 
         //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to 
         //make nodes editable by any other user.
-        if (owner=="admin" && !state.isAdminUser) return false;
+        if (owner == "admin" && !state.isAdminUser) return false;
 
         return state.userPreferences.editMode &&
             (state.isAdminUser || state.userName == owner);
@@ -145,9 +147,9 @@ export class Edit implements EditIntf {
             owner = "admin";
         }
 
-         //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to 
+        //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to 
         //make nodes editable by any other user.
-        if (owner=="admin" && !state.isAdminUser) return false;
+        if (owner == "admin" && !state.isAdminUser) return false;
 
         //right now, for logged in users, we enable the 'new' button because the CPU load for determining it's enablement is too much, so
         //we throw an exception if they cannot. todo-1: need to make this work better.
@@ -612,7 +614,7 @@ export class Edit implements EditIntf {
             nodeIds: state.nodesToMove,
             location
         }, (res) => {
-            this.moveNodesResponse(res, state);
+            this.moveNodesResponse(res, null, state);
         });
     }
 
@@ -730,6 +732,25 @@ export class Edit implements EditIntf {
             immediateTimestamp: false
         }, (res) => {
             this.createSubNodeResponse(res, state);
+        });
+    }
+
+    moveNodeByDrop = (targetNodeId: string, sourceNodeId: string, isFirst: boolean): void => {
+        /* if node being dropped on itself, then ignore */
+        if (targetNodeId == sourceNodeId) {
+            return;
+        }
+
+        //console.log("Moving node[" + targetNodeId + "] into position of node[" + sourceNodeId + "]");
+        let state = appState(null);
+
+        S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
+            targetNodeId,
+            nodeIds: [sourceNodeId],
+            location: isFirst ? "inline-above" : "inline"
+        }, (res) => {
+            S.render.fadeInId = sourceNodeId;
+            this.moveNodesResponse(res, sourceNodeId, state);
         });
     }
 }

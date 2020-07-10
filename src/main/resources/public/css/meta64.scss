@@ -43,6 +43,7 @@ $createdByAnotherTextColor: white;
 $listBackgroundColor: lightGray;
 
 $smallGap: 12px;
+$bigGap: 24px;
 $tinyGap: 8px;
 $microGap: 4px;
 
@@ -517,6 +518,10 @@ input[type="radio"] {
 
 .marginTop {
     margin-top: $smallGap;
+}
+
+.bigMarginRight {
+    margin-right: $bigGap; 
 }
 
 .microMarginTop {

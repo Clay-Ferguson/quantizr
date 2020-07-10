@@ -541,40 +541,4 @@ export abstract class Comp implements CompIntf {
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state
     // manageent aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
     abstract compRender(): ReactNode;
-
-    //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
-
-    //todo-1: move this out into a utilities class.
-    setDropHandler = (func: (elm: any) => void): void => {
-
-        this.whenElm((elm: HTMLElement) => {
-            if (!elm) return;
-
-            let nonDragBorder = elm.style.borderLeft;
-
-            elm.addEventListener("dragenter", function (event) {
-                event.preventDefault();
-            });
-
-            elm.addEventListener("dragover", function (event) {
-                event.preventDefault();
-                event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
-
-                /* warning: this 9px should match the $fatBorderSize in the scss file */
-                elm.style.borderLeft = "9px dotted green";
-            });
-
-            elm.addEventListener("dragleave", function (event) {
-                event.preventDefault();
-                elm.style.borderLeft = nonDragBorder;
-            });
-
-            elm.addEventListener("drop", function (event) {
-                event.stopPropagation();
-                event.preventDefault();
-                elm.style.borderLeft = nonDragBorder;
-                func(event);
-            });
-        });
-    }
 }

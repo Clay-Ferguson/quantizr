@@ -408,6 +408,8 @@ export class EditNodeDlg extends DialogBase {
                 this.close();
             }, null, "btn-primary"),
 
+            this.cancelButton = new Button("Cancel", this.cancelEdit, null, "btn-secondary bigMarginRight"),
+
             this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
             this.shareButton = allowShare ? new Button("Share", this.share) : null,
 
@@ -415,7 +417,6 @@ export class EditNodeDlg extends DialogBase {
             this.encryptionButton = !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
 
             //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
-            this.cancelButton = new Button("Cancel", this.cancelEdit)
         ])
     }
 
