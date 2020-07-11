@@ -13,8 +13,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Checkbox extends Comp implements I.CheckboxIntf {
 
-    //todo-0: for checkbox, textfield, adn textarea I think i want new logic where there is no default value allowed to be passed
-    //and its' just required that every instantiator provide it's own accessor ValueIntf always. Everything is so much cleaner that way.
     constructor(public label: string = null, _attribs: Object = null, private valueIntf: ValueIntf = null) {
         super(_attribs);
 

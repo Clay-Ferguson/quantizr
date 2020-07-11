@@ -20,6 +20,8 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     input: Input;
     icon: ToggleIcon;
 
+     //todo-0: shouldn't we just required that every instantiator provide it's own accessor ValueIntf always? Everything is so much cleaner that way,
+    //and it means 'defaultValue' is never passed in itself
     constructor(public label: string = null, private defaultVal: string = "", private isPassword: boolean = false,
         private onEnterKey: () => void = null, private valueIntf: ValueIntf = null) {
         super(null);

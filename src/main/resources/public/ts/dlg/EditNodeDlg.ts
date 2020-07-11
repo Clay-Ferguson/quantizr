@@ -519,10 +519,6 @@ export class EditNodeDlg extends DialogBase {
 
             /* awaits until dialog is closed */
             await dlg.open();
-            encrypted = dlg.encrypted;
-            
-            //todo-0: encryption appears to be no longer working.
-            //console.log("ENCRYPTED: " + encrypted);
 
             if (dlg.encrypted && S.props.isPublic(state.node)) {
                 S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
@@ -573,15 +569,6 @@ export class EditNodeDlg extends DialogBase {
                 this.mergeState(state);
             }
         });
-    }
-
-    //todo-0: this should no longer be used now that the checkbox constructor accepts a ValueIntf.
-    saveCheckboxVal = (checkbox: Checkbox, propName: string, invert: boolean = false): void => {
-        let val = checkbox.getChecked() ? "1" : null;
-        if (invert) {
-            val = (val == "1" ? null : "1");
-        }
-        S.props.setNodePropVal(propName, this.getState().node, val);
     }
 
     saveNode = async (): Promise<void> => {
