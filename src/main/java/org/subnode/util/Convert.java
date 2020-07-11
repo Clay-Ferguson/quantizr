@@ -126,7 +126,7 @@ public class Convert {
 			}
 		}
 
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getName(), node.getContent(), owner, ownerId,
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), owner, ownerId,
 				node.getOrdinal(), //
 				node.getModifyTime(), propList, acList, hasChildren, //
 				imageSize != null ? imageSize.getWidth() : 0, //

@@ -504,6 +504,7 @@ export interface PropertyInfo {
 
 export interface NodeInfo {
     id: string;
+    path: string;
     name: string;
     content: string;
     lastModified: Date;
@@ -589,6 +590,8 @@ export const enum NodeProp {
     FILENAME = "sn:fileName",
     NAME = "sn:name",
     IPFS_LINK = "ipfs:link",
+    JSON_HASH = "ipfs:json",
+    SAVE_TO_IPFS = "sn:saveToIpfs",
     IPFS_LINK_NAME = "ipfs:linkName",
     FS_LINK = "fs:link",
     IPFS_OK = "ipfs:ok",

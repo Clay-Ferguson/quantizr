@@ -10,7 +10,7 @@ export class AppState {
     feedDirty: boolean = false;
 
     //for testing in AppDemo
-    counter: number = 0; 
+    counter: number = 0;
     compDemoIdActive: number = -1;
 
     /* name of currently logged in user */
@@ -31,7 +31,7 @@ export class AppState {
     /* Node Ids to move */
     nodesToMove: string[];
 
-    activeTab: string = null; 
+    activeTab: string = null;
 
     //When the user clicks an image, we switch to a fullscreen viewer for that image, ad max size of the display, and any time
     //this node is null we are displaying that FullScreenView comp, which occupies everything below the toolbar.
@@ -53,6 +53,7 @@ export class AppState {
        console.log(el * 2);
    });
     */
+    //todo-0: implement this as Set<string>
     selectedNodes: any = {};
 
     /* maps node.id values to NodeInfo.java objects 

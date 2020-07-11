@@ -48,5 +48,6 @@ export interface EditIntf {
     addComment(node: J.NodeInfo, state: AppState): void;
     addFriend(node: J.NodeInfo, state: AppState): void;
     moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): void;
+    updateIpfsNodeJson(node: J.NodeInfo, state: AppState): Promise<void>;
 }
 

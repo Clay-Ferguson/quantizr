@@ -19,12 +19,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class TransferNodeDlg extends DialogBase {
 
-    recursiveCheckBox: Checkbox;
     fromTextField: TextField;
     toTextField: TextField;
 
     constructor(state: AppState) {
         super("Transfer Node", "app-modal-content-narrow-width", false, state);
+        this.mergeState({recursive: false});
     }
 
     renderDlg(): CompIntf[] {
@@ -35,7 +35,14 @@ export class TransferNodeDlg extends DialogBase {
                     this.toTextField = new TextField("To User"),
                 ]),
                 new FormGroup(null, [
-                    this.recursiveCheckBox = new Checkbox("Include Sub-Nodes"),
+                    new Checkbox("Include Sub-Nodes", null, {
+                        setValue: (checked: boolean): void => {
+                            this.mergeState({recursive: checked});
+                        },
+                        getValue: (): boolean => {
+                            return this.getState().recursive;
+                        }
+                    }),
                 ]),
                 new ButtonBar([
                     new Button("Transfer", this.transfer, null, "btn-primary"),
@@ -63,8 +70,8 @@ export class TransferNodeDlg extends DialogBase {
             S.util.showMessage("No node was selected.", "Warning");
             return;
         }
-        let recursive = this.recursiveCheckBox.getChecked();
-        S.user.transferNode(recursive, node.id, fromUser, toUser, this.appState);
+       
+        S.user.transferNode(this.getState().recursive, node.id, fromUser, toUser, this.appState);
         this.close();
     }
 }

@@ -23,8 +23,6 @@ export class SearchContentDlg extends DialogBase {
 
     static defaultSearchText: string = "";
     searchTextField: TextField;
-    fuzzyCheckbox: Checkbox;
-    caseSensitiveCheckbox: Checkbox;
   
     constructor(state: AppState) {
         super("Search Content", "app-modal-content-medium-width", null, state);
@@ -32,6 +30,11 @@ export class SearchContentDlg extends DialogBase {
         this.whenElm((elm: HTMLSelectElement) => {
             this.searchTextField.focus();
         });
+
+        this.mergeState({
+            fuzzy: false,
+            caseSensitive: false
+        })
     }
 
     renderDlg(): CompIntf[] {
@@ -40,8 +43,22 @@ export class SearchContentDlg extends DialogBase {
                 new TextContent("All sub-nodes under the selected node will be searched."),
                 this.searchTextField = new TextField("Search", SearchContentDlg.defaultSearchText, false, this.search),
                 new HorizontalLayout([
-                    this.fuzzyCheckbox = new Checkbox("Fuzzy Search (slower)"),
-                    this.caseSensitiveCheckbox = new Checkbox("Case Sensitive")
+                    new Checkbox("Fuzzy Search (slower)", null, {
+                        setValue: (checked: boolean): void => {
+                            this.mergeState({fuzzy: checked});
+                        },
+                        getValue: (): boolean => {
+                            return this.getState().fuzzy;
+                        }
+                    }),
+                    new Checkbox("Case Sensitive", null, {
+                        setValue: (checked: boolean): void => {
+                            this.mergeState({caseSensitive: checked});
+                        },
+                        getValue: (): boolean => {
+                            return this.getState().caseSensitive;
+                        }
+                    })
                 ], "marginBottom"),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
@@ -80,17 +97,14 @@ export class SearchContentDlg extends DialogBase {
 
         SearchContentDlg.defaultSearchText = searchText;
 
-        let fuzzy = this.fuzzyCheckbox.getChecked();
-        let caseSensitive = this.caseSensitiveCheckbox.getChecked();
-
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             nodeId: node.id,
             searchText,
             sortDir: "",
             sortField: "",
             searchProp: "",
-            fuzzy: fuzzy,
-            caseSensitive,
+            fuzzy: this.getState().fuzzy,
+            caseSensitive: this.getState().caseSensitive,
             searchDefinition: ""
         }, this.searchNodesResponse);
     }

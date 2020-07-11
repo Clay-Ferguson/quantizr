@@ -242,15 +242,6 @@ export class Nav implements NavIntf {
         }
     }
 
-    cached_toggleNodeSel = (id: string, state: AppState): void => {
-        state = appState(state);
-        if (state.selectedNodes[id]) {
-            delete state.selectedNodes[id];
-        } else {
-            state.selectedNodes[id] = true;
-        }
-    }
-
     setNodeSel = (selected: boolean, id: string, state: AppState): void => {
         state = appState(state);
         if (selected) {

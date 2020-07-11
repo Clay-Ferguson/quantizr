@@ -9,6 +9,6 @@ export interface IPFSUtilIntf {
     temporalToken: string;
 
     temporalLogin(): Promise<boolean>;
-    uploadToTemporal(file: File, jsonObj: any): void;
+    uploadToTemporal(file: File, jsonObj: any): Promise<string>;
     getTemporalCredentials(forceEdit: boolean): Promise<boolean>;
 }

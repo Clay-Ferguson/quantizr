@@ -22,7 +22,6 @@ export interface NavIntf {
     getSelectedDomElement(state: AppState): HTMLElement;
     cached_clickNodeRow(nodeId: string, state?: AppState): void;
     cached_openNodeById(id: string, state?: AppState): void;
-    cached_toggleNodeSel(id: string, state?: AppState): void;
     setNodeSel(selected: boolean, id: string, state: AppState): void;
     navPageNodeResponse(res: J.RenderNodeResponse, state: AppState): void;
     navHome(state: AppState): void;

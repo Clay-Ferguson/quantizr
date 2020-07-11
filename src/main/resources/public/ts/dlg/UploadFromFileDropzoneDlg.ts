@@ -52,8 +52,14 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let children = [
             new Form(null, [
                 new HorizontalLayout([
-                    new Checkbox("Save to IPFS", state.toIpfs, {
-                        onClick: this.toggleIpfs,
+                    //todo-0: because of this new checkbox edit with getVal,setVal we need to retest saving to ipfs.
+                    new Checkbox("Save to IPFS", null, {
+                        setValue: (checked: boolean): void => {
+                            this.mergeState({toIpfs: checked});
+                        },
+                        getValue: (): boolean => {
+                            return this.getState().toIpfs;
+                        }
                     })
                 ]),
                 state.toIpfs ? new TextContent("NOTE: IPFS Uploads assume you have a Temporal Account (https://temporal.cloud) which will be the service that hosts your IPFS data. You'll be prompted for the Temporal password when the upload begins.") : null,
@@ -80,13 +86,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         return null;
     }
 
-    toggleIpfs = (): void => {
-        let state = this.getState();
-        this.mergeState({
-            toIpfs: !state.toIpfs
-        });
-    }
-
     uploadFromUrl = (): void => {
         let state = this.getState();
         S.attachment.openUploadFromUrlDlg(this.node, null, () => {
@@ -105,10 +104,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 let allowUpload = true;
 
                 if (state.toIpfs && this.toTemporal) {
-                    let credsOk = await S.ipfsUtil.getTemporalCredentials(false);
-                    if (!credsOk) {
-                        resolve(false);
-                    }
                     let loginOk = await S.ipfsUtil.temporalLogin();
                     if (!loginOk) {
                         allowUpload = false;
@@ -116,8 +111,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 }
 
                 if (allowUpload) {
-                    //this.uploadToTemporal(); //<--- original upload prototype (works)
-
                     const files = this.dropzone.getAcceptedFiles();
                     this.numFiles = files.length;
 
@@ -302,7 +295,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                                 node: dlg.node
-                            }, (res) => {
+                            }, async (res) => {
+                                await S.edit.updateIpfsNodeJson(dlg.node, dlg.appState);
+                                //S.log("node after IPFS hash added: "+S.util.prettyPrint(dlg.node));
                                 S.edit.saveNodeResponse(dlg.node, res, dlg.appState);
                             });
                         }

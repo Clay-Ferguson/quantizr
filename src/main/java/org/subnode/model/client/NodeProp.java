@@ -55,6 +55,8 @@ public enum NodeProp {
     // FS_LUCENE("fs:lucene"), //
 
     IPFS_LINK("ipfs:link", "s"), //
+    JSON_HASH("ipfs:json", "s"), //
+    SAVE_TO_IPFS("sn:saveToIpfs", "s"), //
     IPFS_LINK_NAME("ipfs:linkName", "s"), //
 
     FS_LINK("fs:link", "s"), //

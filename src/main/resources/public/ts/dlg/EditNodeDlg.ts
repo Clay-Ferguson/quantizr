@@ -65,9 +65,10 @@ export class EditNodeDlg extends DialogBase {
     deletePropButton: Button;
     cancelButton: Button;
 
+    saveToIpfsCheckBox: Checkbox;
+
     //maps the DOM ids of dom elements the property that DOM element is editing.
     compIdToPropMap: { [key: string]: J.PropertyInfo } = {};
-    propCheckBoxes: Checkbox[];
 
     nodeNameTextField: TextField;
     contentEditor: I.TextEditorIntf;
@@ -81,7 +82,12 @@ export class EditNodeDlg extends DialogBase {
 
     constructor(node: J.NodeInfo, state: AppState) {
         super("Edit", "app-modal-content", false, state);
-        this.mergeState({ node });
+        this.mergeState({
+            node,
+
+            //selected props is used as a set of all 'selected' (via checkbox) property names
+            selectedProps: new Set<string>()
+        });
     }
 
     createLayoutSelection = (): Selection => {
@@ -210,15 +216,26 @@ export class EditNodeDlg extends DialogBase {
         ];
 
         let optionsBar = new Div("", null, [
-            this.wordWrapCheckBox = new Checkbox("Word Wrap", true, {
+            this.wordWrapCheckBox = new Checkbox("Word Wrap", {
                 className: "marginRight",
-                onChange: (evt: any) => {
+            }, {
+                setValue: (checked: boolean): void => {
+                    //this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
+                    S.props.setNodePropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
                     if (this.contentEditor) {
-                        this.contentEditor.setWordWrap(evt.target.checked);
+                        this.contentEditor.setWordWrap(checked);
                     }
+                },
+                getValue: (): boolean => {
+                    return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) != "1";
                 }
             }),
-            this.inlineChildrenCheckBox = state.node.hasChildren ? new Checkbox("Inline Children", false) : null
+            this.saveToIpfsCheckBox = new Checkbox("Save To IPFS", {
+                className: "marginRight",
+            }, this.makeCheckboxPropValueHandler(J.NodeProp.SAVE_TO_IPFS)),
+
+            this.inlineChildrenCheckBox = state.node.hasChildren ? new Checkbox("Inline Children", null,
+                this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null
         ]);
 
         this.childrenImgSizeSelection = state.node.hasChildren ? this.createImgSizeSelection("Images", true) : null;
@@ -253,7 +270,6 @@ export class EditNodeDlg extends DialogBase {
         let propsParent: CompIntf = customProps ? mainPropsTable : propsTable;
 
         let isWordWrap = !S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node);
-        this.wordWrapCheckBox.setChecked(isWordWrap);
 
         if (!customProps) {
             this.nodeNameTextField = new TextField("Node Name", state.node.name);
@@ -272,8 +288,6 @@ export class EditNodeDlg extends DialogBase {
                 this.contentEditor.setWordWrap(isWordWrap);
             }
         }
-
-        this.propCheckBoxes = [];
 
         if (state.node.properties) {
             state.node.properties.forEach((prop: J.PropertyInfo) => {
@@ -299,13 +313,6 @@ export class EditNodeDlg extends DialogBase {
                 if (prop.name == J.NodeProp.CHILDREN_IMG_SIZES) {
                     if (this.childrenImgSizeSelection) {
                         this.childrenImgSizeSelection.setSelection(prop.value);
-                    }
-                    return;
-                }
-
-                if (prop.name == J.NodeProp.INLINE_CHILDREN) {
-                    if (this.inlineChildrenCheckBox) {
-                        this.inlineChildrenCheckBox.setChecked(true);
                     }
                     return;
                 }
@@ -374,6 +381,17 @@ export class EditNodeDlg extends DialogBase {
 
         this.propertyEditFieldContainer.setChildren([mainPropsTable, binarySection, collapsiblePanel]);
         return children;
+    }
+
+    makeCheckboxPropValueHandler(propName: string): I.ValueIntf {
+        return {
+            setValue: (checked: boolean): void => {
+                S.props.setNodePropVal(propName, this.getState().node, checked ? "1" : null);
+            },
+            getValue: (): boolean => {
+                return S.props.getNodePropVal(propName, this.getState().node) == "1";
+            }
+        };
     }
 
     renderButtons(): CompIntf {
@@ -501,6 +519,10 @@ export class EditNodeDlg extends DialogBase {
 
             /* awaits until dialog is closed */
             await dlg.open();
+            encrypted = dlg.encrypted;
+            
+            //todo-0: encryption appears to be no longer working.
+            //console.log("ENCRYPTED: " + encrypted);
 
             if (dlg.encrypted && S.props.isPublic(state.node)) {
                 S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
@@ -553,6 +575,7 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
+    //todo-0: this should no longer be used now that the checkbox constructor accepts a ValueIntf.
     saveCheckboxVal = (checkbox: Checkbox, propName: string, invert: boolean = false): void => {
         let val = checkbox.getChecked() ? "1" : null;
         if (invert) {
@@ -564,14 +587,7 @@ export class EditNodeDlg extends DialogBase {
     saveNode = async (): Promise<void> => {
         let state = this.getState();
         return new Promise<void>(async (resolve, reject) => {
-            let allowEditAllProps: boolean = this.appState.isAdminUser;
-
             if (state.node) {
-                if (this.inlineChildrenCheckBox) {
-                    this.saveCheckboxVal(this.inlineChildrenCheckBox, J.NodeProp.INLINE_CHILDREN);
-                }
-                this.saveCheckboxVal(this.wordWrapCheckBox, J.NodeProp.NOWRAP, true);
-
                 /* Get state of the 'layout' dropdown */
                 if (this.layoutSelection) {
                     let layout = this.layoutSelection.getSelection();
@@ -619,6 +635,9 @@ export class EditNodeDlg extends DialogBase {
 
             state.node.content = content;
 
+            //todo-0: removed temporarily while I fix checkbox bug
+            //await S.edit.updateIpfsNodeJson(state.node, this.appState);
+
             //console.log("calling saveNode(). PostData=" + S.util.toJson(state.node));
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                 node: state.node
@@ -659,10 +678,21 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             if (allowCheckbox) {
-                let checkbox: Checkbox = new Checkbox(label, false, {
-                    onClick: this.propertyCheckboxChanged
+                let checkbox: Checkbox = new Checkbox(label, null, {
+                    setValue: (checked: boolean): void => {
+                        let state = this.getState();
+                        if (checked) {
+                            state.selectedProps.add(propEntry.name);
+                        }
+                        else {
+                            state.selectedProps.delete(propEntry.name);
+                        }
+                        this.deletePropButton.setEnabled(state.selectedProps.size > 0);
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().selectedProps.has(propEntry.name);
+                    }
                 });
-                this.propCheckBoxes.push(checkbox);
 
                 this.compIdToPropMap[checkbox.getId()] = propEntry;
                 formGroup.addChild(checkbox);
@@ -791,31 +821,6 @@ export class EditNodeDlg extends DialogBase {
         return formGroup;
     }
 
-    propertyCheckboxChanged = (): void => {
-        if (this.areAnyPropsChecked()) {
-            this.deletePropButton.setEnabled(true);
-        }
-        else {
-            this.deletePropButton.setEnabled(false);
-        }
-    }
-
-    areAnyPropsChecked = (): boolean => {
-        let ret = false;
-
-        /* Iterate over all property checkboxes */
-        this.propCheckBoxes.forEach(function (checkbox: Checkbox) {
-            if (checkbox.getChecked()) {
-                ret = true;
-                //return false to stop iterating.
-                return false;
-            }
-        });
-
-        return ret;
-    }
-
-    //todo-1 modify to support multiple delete of props.
     deletePropertyButtonClick = (): void => {
         new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
             () => {
@@ -825,13 +830,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     deleteSelectedProperties = (): void => {
-        /* Iterate over all property checkboxes */
-        this.propCheckBoxes.forEach(function (checkbox: Checkbox) {
-            if (checkbox.getChecked()) {
-                let prop: J.PropertyInfo = this.compIdToPropMap[checkbox.getId()];
-                this.deleteProperty(prop.name);
-            }
-        }, this);
+        this.getState().selectedProps.forEach(propName => this.deleteProperty(propName), this);
     }
 
     cancelEdit = (): void => {

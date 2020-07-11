@@ -155,14 +155,22 @@ export class NodeCompButtonBar extends HorizontalLayout {
         if (state.userPreferences.editMode) {
             // console.log("Editing allowed: " + nodeId);
 
-            let selected: boolean = state.selectedNodes[node.id] ? true : false;
-
             if (editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, node, state)) &&
                 //no need to ever select home node
                 node.id != state.homeNodeId) {
-                selButton = new Checkbox(null, selected, {
-                    onChange: S.meta64.getNodeFunc(S.nav.cached_toggleNodeSel, "S.nav.toggleNodeSel", node.id),
+                selButton = new Checkbox(null, {
                     title: "Select Node for multi-node functions."
+                }, {
+                    setValue: (checked: boolean): void => {
+                        if (checked) {
+                            state.selectedNodes[node.id] = true;
+                        } else {
+                            delete state.selectedNodes[node.id];
+                        }
+                    },
+                    getValue: (): boolean => {
+                        return !!state.selectedNodes[node.id];
+                    }
                 });
             }
 

@@ -19,9 +19,18 @@ export class IPFSUtil implements IPFSUtilIntf {
     //ref: https://gateway.temporal.cloud/ipfs/Qm[hash]/account.html#account-api
     temporalLogin = async (): Promise<boolean> => {
         return new Promise<boolean>(async (resolve, reject) => {
-            if (!this.temporalUsr || !this.temporalPwd) {
-                console.error("No temporal credentials available.");
+
+            /* If we already logged in and have the token, just return true here */
+            if (this.temporalToken) {
+                resolve(true);
                 return;
+            }
+
+            if (!this.temporalUsr || !this.temporalPwd) {
+                let credsOk = await S.ipfsUtil.getTemporalCredentials(false);
+                if (!credsOk) {
+                    resolve(false);
+                }
             }
 
             fetch(C.TEMPORAL_HOST + '/v2/auth/login', {
@@ -59,47 +68,55 @@ export class IPFSUtil implements IPFSUtilIntf {
     }
 
     //ref: https://gateway.temporal.cloud/ipns/docs.api.temporal.cloud/ipfs.html#example
-    uploadToTemporal = (file: File, jsonObj: any): void => {
-        if (this.temporalToken) {
-            console.error("Temporal login never completed.");
-            return;
-        }
-
-        let xhr = new XMLHttpRequest();
-        xhr.withCredentials = false;
-
-        let data = new FormData();
-        if (file) {
-            data.append("file", file);
-        }
-        else if (jsonObj) {
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.send(JSON.stringify(jsonObj));
-        }
-        else {
-            throw Error("nothing to send.");
-        }
-        data.append("hold_time", "1");
-
-        xhr.addEventListener("readystatechange", () => {
-            if (xhr.readyState === 4) {
-                //S.log(S.util.prettyPrint(xhr));
-                let result = JSON.parse(xhr.responseText);
-
-                if (result.code === 200) {
-                    S.log("Upload Result: " + result);
-                }
-                else {
-                    // Error handling.
-                    console.error("upload failed.");
-                }
+    uploadToTemporal = async (file: File, jsonObj: any): Promise<string> => {
+        return new Promise<string>(async (resolve, reject) => {
+            let loginSuccess = await this.temporalLogin();
+            if (!loginSuccess) {
+                resolve(null);
+                return;
             }
-        });
 
-        xhr.open("POST", C.TEMPORAL_HOST + "/v2/ipfs/public/file/add");
-        xhr.setRequestHeader("Cache-Control", "no-cache");
-        xhr.setRequestHeader("Authorization", "Bearer " + this.temporalToken);
-        xhr.send(data);
+            let xhr = new XMLHttpRequest();
+            xhr.withCredentials = false;
+
+            let data = new FormData();
+            if (file) {
+                data.append("file", file);
+            }
+            else if (jsonObj) {
+                data.append("file", new Blob([JSON.stringify(jsonObj)], {type : "application/json;charset=UTF-8"}));
+                // xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                // xhr.send(JSON.stringify(jsonObj));
+            }
+            else {
+                throw Error("nothing to send.");
+            }
+            data.append("hold_time", "1");
+
+            xhr.addEventListener("readystatechange", () => {
+                if (xhr.readyState === 4) {
+                    S.log(S.util.prettyPrint(xhr));
+                    let result = JSON.parse(xhr.responseText);
+
+                    if (result.code === 200) {
+                        //S.log("Upload Result: " + result);
+
+                        //This result.response will be the IPFS hash of the uploaded data.
+                        resolve(result.response);
+                    }
+                    else {
+                        // Error handling.
+                        console.error("upload failed.");
+                        resolve(null);
+                    }
+                }
+            });
+
+            xhr.open("POST", C.TEMPORAL_HOST + "/v2/ipfs/public/file/add");
+            xhr.setRequestHeader("Cache-Control", "no-cache");
+            xhr.setRequestHeader("Authorization", "Bearer " + this.temporalToken);
+            xhr.send(data);
+        });
     }
 
     getTemporalCredentials = async (forceEdit: boolean): Promise<boolean> => {

@@ -18,8 +18,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class PrefsDlg extends DialogBase {
 
-    showMetadataCheckBox: Checkbox;
-
     constructor(state: AppState) {
         super("Preferences", null, false, state);
     }
@@ -28,7 +26,14 @@ export class PrefsDlg extends DialogBase {
         return [
             new Form(null, [
                 new FormGroup(null, [
-                    this.showMetadataCheckBox = new Checkbox("Show Metadata", this.appState.userPreferences.showMetaData),
+                    new Checkbox("Show Metadata", null, {
+                        setValue: (checked: boolean): void => {
+                            this.appState.userPreferences.showMetaData = checked;
+                        },
+                        getValue: (): boolean => {
+                            return this.appState.userPreferences.showMetaData;
+                        }
+                    })
                 ]),
                 new ButtonBar([
                     new Button("Save", this.savePreferences, null, "btn-primary"),
@@ -45,8 +50,6 @@ export class PrefsDlg extends DialogBase {
     }
 
     savePreferences = (): void => {
-        this.appState.userPreferences.showMetaData = this.showMetadataCheckBox.getChecked();
-
         S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
             "userPreferences": {
                 editMode: this.appState.userPreferences.editMode,

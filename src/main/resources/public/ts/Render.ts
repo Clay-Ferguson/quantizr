@@ -137,16 +137,20 @@ export class Render implements RenderIntf {
             return;
         }
 
-        let message: string = "ID-based Node URL: \n" + window.location.origin + "?id=" + node.id;
+        //todo-1: need copy-to-clipboard links here!
+        let message: string = "ID-based Node: \n" + window.location.origin + "?id=" + node.id;
         if (node.name) {
-            let queryPath = S.util.getPathPartForNamedNode(node);
-            message += "\n\nName-based Node URL: \n" + window.location.origin + queryPath;
+            message += "\n\nName-based Node: \n" + window.location.origin + S.util.getPathPartForNamedNode(node);
         }
 
-        let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
-        if (ipfsLink) {
-            let ipfsUrl = S.render.getUrlForNodeAttachment(node);
-            message += "\n\nIPFS Attachment URL: \n" + ipfsUrl;
+        let attachmentIpfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+        if (attachmentIpfsLink) {
+            message += "\n\nIPFS File Attachment: \n" + S.render.getUrlForNodeAttachment(node);
+        }
+
+        let jsonIpfsLink = S.props.getNodePropVal(J.NodeProp.JSON_HASH, node);
+        if (jsonIpfsLink) {
+            message += "\n\nIPFS Node JSON: \n" + C.IPFS_GATEWAY + jsonIpfsLink;
         }
 
         S.util.showMessage(message, "URL", true);
@@ -376,7 +380,7 @@ export class Render implements RenderIntf {
         return img;
     }
 
-    /* Returns true of the logged in user and the type of node allow the property to be edited by the user */
+    /* Returns true if the logged in user and the type of node allow the property to be edited by the user */
     allowPropertyEdit = (node: J.NodeInfo, propName: string, state: AppState): boolean => {
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
         return typeHandler ? typeHandler.allowPropertyEdit(propName, state) : true;

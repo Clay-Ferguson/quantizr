@@ -18,6 +18,7 @@ public class NodeInfo {
 	private static final Logger log = LoggerFactory.getLogger(NodeInfo.class);
 
 	private String id;	
+	private String path;
 	private String name;
 	private String content;
 	private Date lastModified;
@@ -63,11 +64,12 @@ public class NodeInfo {
 	public NodeInfo() {
 	}
 
-	public NodeInfo(String id, String name, String content, String owner, String ownerId, Long ordinal, Date lastModified,
+	public NodeInfo(String id, String path, String name, String content, String owner, String ownerId, Long ordinal, Date lastModified,
 			List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
 		 int width, int height, String type, long logicalOrdinal,
 			boolean firstChild, boolean lastChild, String cipherKey, String dataUrl, boolean deleted, String avatarVer) {
 		this.id = id;
+		this.path = path;
 		this.name = name;
 		this.content = content;
 		this.lastModified = lastModified;
@@ -272,5 +274,13 @@ public class NodeInfo {
 
 	public void setParent(NodeInfo parent) {
 		this.parent = parent;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 }

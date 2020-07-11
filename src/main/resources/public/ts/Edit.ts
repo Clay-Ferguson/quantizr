@@ -13,7 +13,6 @@ import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { AppState } from "./AppState";
 import { dispatch, appState, store } from "./AppRedux";
 import { ProfileDlg } from "./dlg/ProfileDlg";
-import { CompIntf } from "./widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -213,6 +212,23 @@ export class Edit implements EditIntf {
                 this.cached_runEditNode(res.newNode.id, state);
             }
         }
+    }
+
+    /* Checks if this 'node' is stored to IPFS and if so pushes the update to IPFS */
+    updateIpfsNodeJson = async (node: J.NodeInfo, state: AppState): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+
+            let saveToIpfsProp = S.props.getNodePropVal(J.NodeProp.SAVE_TO_IPFS, node);
+            if (saveToIpfsProp) {
+                //S.log("Updating node to temporal: nodeId=" + node.id);
+                let ipfsHash = await S.ipfsUtil.uploadToTemporal(null, state.node);
+                if (ipfsHash) {
+                    //S.log("IPFS Hash of JSON (in EditNodeDlg.saveNode): " + ipfsHash);
+                    S.props.setNodePropVal(J.NodeProp.JSON_HASH, state.node, ipfsHash);
+                }
+            }
+            resolve();
+        });
     }
 
     saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, state: AppState): Promise<void> => {
