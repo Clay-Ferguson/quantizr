@@ -77,11 +77,6 @@ export class MenuPanel extends Div {
             //new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
             new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !state.isAnonUser && !!state.nodesToMove), //
 
-            /*
-            I have this feature 90% complete but near the end i realized i have a problem with id v.s. uid, because uid
-            is only a client-side assigned thing, so i will need to convert my entire 'selectedNodes' over to store
-            actual node 'ids' (that long hex value string) to finish this which will take some time.
-            */
             //new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
             new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state), !state.isAnonUser && selNodeCount > 0), //

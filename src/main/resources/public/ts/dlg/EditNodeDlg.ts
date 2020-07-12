@@ -622,10 +622,9 @@ export class EditNodeDlg extends DialogBase {
 
             state.node.content = content;
 
-            //todo-0: removed temporarily while I fix checkbox bug
-            //await S.edit.updateIpfsNodeJson(state.node, this.appState);
-
             //console.log("calling saveNode(). PostData=" + S.util.toJson(state.node));
+            await S.edit.updateIpfsNodeJson(state.node, this.appState);
+
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                 node: state.node
             }, (res) => {

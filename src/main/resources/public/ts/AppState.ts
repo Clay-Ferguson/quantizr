@@ -53,7 +53,7 @@ export class AppState {
        console.log(el * 2);
    });
     */
-    //todo-0: implement this as Set<string>
+    //todo-1: implement this as Set<string>
     selectedNodes: any = {};
 
     /* maps node.id values to NodeInfo.java objects 

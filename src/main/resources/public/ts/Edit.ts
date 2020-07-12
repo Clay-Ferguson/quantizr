@@ -214,7 +214,7 @@ export class Edit implements EditIntf {
         }
     }
 
-    /* Checks if this 'node' is stored to IPFS and if so pushes the update to IPFS */
+    /* Checks if this 'node' is stored to IPFS and if so pushes the current JSON of the node to IPFS */
     updateIpfsNodeJson = async (node: J.NodeInfo, state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
 
