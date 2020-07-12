@@ -56,7 +56,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     //todo-0: because of this new checkbox edit with getVal,setVal we need to retest saving to ipfs.
                     new Checkbox("Save to IPFS", null, {
                         setValue: (checked: boolean): void => {
-                            this.mergeState({toIpfs: checked});
+                            this.mergeState({ toIpfs: checked });
                         },
                         getValue: (): boolean => {
                             return this.getState().toIpfs;
@@ -69,6 +69,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Upload from URL", this.uploadFromUrl),
+                    new Button("Upload from Clipboard", this.uploadFromClipboard),
                     state.toIpfs ? new Button("IPFS Credentials", () => { S.ipfsUtil.getTemporalCredentials(true); }) : null,
                     new Button("Close", () => {
                         this.close();
@@ -96,6 +97,30 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.afterUploadFunc();
             }
         }, state);
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read
+    // https://web.dev/image-support-for-async-clipboard/
+    // Linux Ubuntu note: Shift + Ctrl + PrtSc -> Copy the screenshot of a specific region to the clipboard.
+    // todo-1: I have a feature that pastes from clipboard to a node as text, but it needs to detect images and if image is in
+    // clipboard create a node and put that image in it.
+    uploadFromClipboard = (): void => {
+        (navigator as any).clipboard.read().then(async (data) => {
+            for (const clipboardItem of data) {
+                for (const type of clipboardItem.types) {
+                    const blob = await clipboardItem.getType(type);
+                    //console.log(URL.createObjectURL(blob));
+
+                    // DO NOT DELETE: The 'addedfile' emit may be the better way ? not sure yet. addFile() does work.
+                    // this.dropzone.emit("addedfile", blob);
+                    // //myDropzone.emit("thumbnail", existingFiles[i], "/image/url");
+                    // this.dropzone.emit("complete", blob);
+
+                    this.dropzone.addFile(blob);
+                    this.runButtonEnablement();
+                }
+            }
+        });
     }
 
     upload = async (): Promise<boolean> => {
@@ -381,7 +406,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     hasAnyZipFiles = (): boolean => {
         let ret: boolean = false;
         for (let file of this.fileList) {
-            if (S.util.endsWith(file["name"].toLowerCase(), ".zip")) {
+            let fileName = file["name"]; //todo-0: can't this just be 'file.name'?
+            if (fileName && S.util.endsWith(fileName.toLowerCase(), ".zip")) {
                 return true;
             }
         }

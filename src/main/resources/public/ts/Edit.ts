@@ -679,6 +679,7 @@ export class Edit implements EditIntf {
     }
 
     saveClipboardToNode = (): void => {
+
         (navigator as any).clipboard.readText().then(
             clipText => {
                 if (clipText) {
