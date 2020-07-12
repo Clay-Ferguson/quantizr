@@ -1,6 +1,7 @@
 package org.subnode.service;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
@@ -13,7 +14,6 @@ import org.subnode.model.PropertyInfo;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AppDropRequest;
@@ -83,8 +83,6 @@ public class NodeEditService {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		MongoThreadLocal.setAutoTimestampDisabled(true);
-
 		String nodeId = req.getNodeId();
 		SubNode node = null;
 		if (nodeId.equals("~notes")) {
@@ -116,9 +114,7 @@ public class NodeEditService {
 
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
-		if (req.isImmediateTimestamp()) {
-			MongoThreadLocal.setAutoTimestampDisabled(false);
-		}
+		//todo-0: check if req.isImmediateTimestamp is still used?
 
 		newNode = api.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties());
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
@@ -209,19 +205,13 @@ public class NodeEditService {
 
 		if (req.getInitialValue() != null) {
 			newNode.setContent(req.getInitialValue());
-
-			// NOTE: we don't call setAutoTimestampDisabled here because this kind of
-			// initial value insert needs to consider the node
-			// edited and ready to display.
 		} else {
 			newNode.setContent("");
+		}
 
-			/*
-			 * When a user creates a new node we use "ModTime==0" (never modified) as a way
-			 * to indicate the node is in 'draft mode', and should not be visible to other
-			 * users until "Save" is clicked.
-			 */
-			MongoThreadLocal.setAutoTimestampDisabled(true);
+		if (req.isUpdateModTime()) {
+			Calendar lastModified = Calendar.getInstance();
+			newNode.setModifyTime(lastModified.getTime());
 		}
 
 		api.save(session, newNode);
@@ -315,8 +305,10 @@ public class NodeEditService {
 				res.setAclEntries(api.getAclEntries(session, node));
 			}
 
-			Calendar lastModified = Calendar.getInstance();
-			node.setModifyTime(lastModified.getTime());
+			if (req.isUpdateModTime()) {
+				Calendar lastModified = Calendar.getInstance();
+				node.setModifyTime(lastModified.getTime());
+			}
 
 			if (!StringUtils.isEmpty(node.getContent()) //
 					// don't evern send notifications when 'admin' is the one doing the editing.

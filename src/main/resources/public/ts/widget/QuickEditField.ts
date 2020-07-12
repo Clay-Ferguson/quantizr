@@ -103,6 +103,7 @@ export class QuickEditField extends Span {
         let val = this.getState().quickEditVal;
 
         S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+            updateModTime: true,
             parentId: this.appState.node.id,
             targetOrdinal: this.node.ordinal + (this.isFirst ? 0 : 1),
             newNodeName: "",

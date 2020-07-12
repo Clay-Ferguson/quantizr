@@ -68,7 +68,7 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         //convert that to exactly the value 'true' or else React itself (internal to React) will fail
         _attribs.checked = !!this.valueIntf.getValue();
 
-        console.log("Rendering checkbox: [" + this.label + "] attribs=" + S.util.prettyPrint(_attribs));
+        //console.log("Rendering checkbox: [" + this.label + "] attribs=" + S.util.prettyPrint(_attribs));
 
         if (this.label) {
             return S.e("span", { key: _attribs.id + "_span" }, S.e("input", _attribs),

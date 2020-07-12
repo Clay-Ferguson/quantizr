@@ -12,7 +12,6 @@ export interface ViewIntf {
     scrollRelativeToNode(dir: string, state: AppState): void;
     scrollToSelectedNode(state: AppState): void;
     scrollToTop(afterFunc?: Function): Promise<void>;
-    getPathDisplay(node: J.NodeInfo, delim: string): string;
     runServerCommand(command: string, state: AppState): any;
     graphDisplayTest(state: AppState): any;
     displayNotifications(command: string, state: AppState): any;

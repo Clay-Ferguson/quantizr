@@ -172,6 +172,7 @@ export class Edit implements EditIntf {
 
         if (nodeInsertTarget) {
             S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                updateModTime: false,
                 parentId: parentNode.id,
                 targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
                 newNodeName: "",

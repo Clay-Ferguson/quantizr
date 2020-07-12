@@ -216,28 +216,6 @@ export class View implements ViewIntf {
         });
     }
 
-    getPathDisplay = (node: J.NodeInfo): string => {
-        if (node == null) return "";
-        var path = "ID: " + node.id;
-
-        if (node.lastModified) {
-            if (path) {
-                path += "  ";
-            }
-            let lastModStr = S.util.formatDate(new Date(node.lastModified));
-            path += "(Mod: " + lastModStr + ")";
-        }
-
-        //todo-1: nt:unstructured is included just for legacy support unless/until I put into DB converter.
-        if (node.type && node.type != J.NodeType.NONE && node.type != "nt:unstructured") {
-            if (path) {
-                path += "  ";
-            }
-            path += "Type: " + node.type;
-        }
-        return path;
-    }
-
     graphDisplayTest = (state: AppState) => {
         let dlg = new GraphDisplayDlg(state);
         dlg.open();

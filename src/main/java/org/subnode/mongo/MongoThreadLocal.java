@@ -17,8 +17,6 @@ public class MongoThreadLocal {
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<HashMap<ObjectId, SubNode>>();
 
-	private static final ThreadLocal<Boolean> autoTimestampDisabled = new ThreadLocal<Boolean>();
-
 	/*
 	 * Because ACL checking is an expensive operation, we cache the results of any
 	 * ACL computations, during the course of any single HTTP Request (i.e. per
@@ -30,7 +28,6 @@ public class MongoThreadLocal {
 	public static void removeAll() {
 		getDirtyNodes().clear();
 		getAclResults().clear();
-		autoTimestampDisabled.remove();
 	}
 
 	public static HashMap<ObjectId, SubNode> getDirtyNodes() {
@@ -72,16 +69,5 @@ public class MongoThreadLocal {
 			aclResults.set(new HashMap<String, Boolean>());
 		}
 		return aclResults.get();
-	}
-
-	public static void setAutoTimestampDisabled(Boolean val) {
-		autoTimestampDisabled.set(val);
-	}
-
-	public static Boolean getAutoTimestampDisabled() {
-		if (autoTimestampDisabled.get() == null) {
-			return false;
-		}
-		return autoTimestampDisabled.get();
 	}
 }

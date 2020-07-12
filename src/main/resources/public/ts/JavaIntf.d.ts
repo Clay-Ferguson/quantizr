@@ -116,6 +116,7 @@ export interface InsertBookRequest extends RequestBase {
 }
 
 export interface InsertNodeRequest extends RequestBase {
+    updateModTime: boolean;
     parentId: string;
     targetOrdinal: number;
     newNodeName: string;
@@ -197,6 +198,7 @@ export interface ResetPasswordRequest extends RequestBase {
 }
 
 export interface SaveNodeRequest extends RequestBase {
+    updateModTime: boolean;
     node: NodeInfo;
 }
 

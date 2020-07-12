@@ -295,6 +295,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                             S.props.setNodePropVal(J.NodeProp.IMG_SIZE, dlg.node, "100%");
 
                             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
+                                updateModTime: true,
                                 node: dlg.node
                             }, async (res: J.SaveNodeResponse) => {
                                 await S.edit.updateIpfsNodeJson(dlg.node, dlg.appState);

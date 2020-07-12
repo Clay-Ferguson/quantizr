@@ -6,6 +6,7 @@ import org.subnode.request.base.RequestBase;
  * to the end of the child list, or may even be the first (i.e. only) child.
  */
 public class InsertNodeRequest extends RequestBase {
+	private boolean updateModTime;
 	private String parentId;
 	private Long targetOrdinal;
 	private String newNodeName;
@@ -50,5 +51,13 @@ public class InsertNodeRequest extends RequestBase {
 
 	public void setInitialValue(String initialValue) {
 		this.initialValue = initialValue;
+	}
+
+	public boolean isUpdateModTime() {
+		return updateModTime;
+	}
+
+	public void setUpdateModTime(boolean updateModTime) {
+		this.updateModTime = updateModTime;
 	}
 }

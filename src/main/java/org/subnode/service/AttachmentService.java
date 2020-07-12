@@ -204,16 +204,6 @@ public class AttachmentService {
 
 					LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
 
-					/*
-					 * User might still be editing the node, and is uploading before ever clicking
-					 * 'save' so we just disallow uploads to ever update the timestamp, because the
-					 * timesamp existance is what makes the node become visible to the rest of the
-					 * world if shared, and so we don't update that timestamp, and also really the
-					 * time that an attachment is added is usually not important and only content
-					 * editing needs to ever trigger timestamp update on the node
-					 */
-					MongoThreadLocal.setAutoTimestampDisabled(true);
-
 					// attaches AND closes the stream.
 					attachBinaryFromStream(session, node, nodeId, fileName, size, limitedIs, contentType, -1, -1,
 							addAsChildren, explodeZips, toIpfs, true, false, true);
@@ -262,7 +252,6 @@ public class AttachmentService {
 		 */
 		if (addAsChild) {
 			try {
-				MongoThreadLocal.setAutoTimestampDisabled(false);
 				SubNode newNode = api.createNode(session, node, null, null, null, CreateNodeLocation.LAST, null);
 				newNode.setContent(fileName);
 
@@ -414,15 +403,6 @@ public class AttachmentService {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
-		/*
-		 * User might still be editing the node, and is uploading before ever clicking
-		 * 'save' so we just disallow uploads editing to ever update the timestamp,
-		 * because the timesamp existance is what makes the node become visible to the
-		 * rest of the world if shared, and so we don't update that timestamp, and also
-		 * really the time that an attachment is added is usually not important and only
-		 * content editing needs to ever trigger timestamp update on the node
-		 */
-		MongoThreadLocal.setAutoTimestampDisabled(true);
 
 		String nodeId = req.getNodeId();
 		SubNode node = api.getNode(session, nodeId);
@@ -799,16 +779,6 @@ public class AttachmentService {
 	 * or any other kind of content actually.
 	 */
 	public UploadFromUrlResponse readFromUrl(MongoSession session, UploadFromUrlRequest req) {
-		/*
-		 * User might still be editing the node, and is uploading before ever clicking
-		 * 'save' so we just disallow uploads to ever update the timestamp, because the
-		 * timesamp existance is what makes the node become visible to the rest of the
-		 * world if shared, and so we don't update that timestamp, and also really the
-		 * time that an attachment is added is usually not important and only content
-		 * editing needs to ever trigger timestamp update on the node
-		 */
-		MongoThreadLocal.setAutoTimestampDisabled(true);
-
 		UploadFromUrlResponse res = new UploadFromUrlResponse();
 		readFromUrl(session, req.getSourceUrl(), req.getNodeId(), null, 0);
 		res.setSuccess(true);
