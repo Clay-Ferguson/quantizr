@@ -452,15 +452,16 @@ export class EditNodeDlg extends DialogBase {
         let dlg = new EditPropertyDlg(state.node, this.appState);
         await dlg.open();
 
-        if (!state.node.properties) {
-            state.node.properties = [];
+        if (dlg.name) {
+            if (!state.node.properties) {
+                state.node.properties = [];
+            }
+            state.node.properties.push({
+                name: dlg.name,
+                value: ""
+            });
+            this.mergeState({ state });
         }
-        state.node.properties.push({
-            name: dlg.name,
-            value: ""
-        });
-        this.mergeState({ state });
-
         //we don't need to return an actual promise here
         return null;
     }

@@ -259,7 +259,8 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
             J.NodeProp.BIN_MIME, //
             J.NodeProp.BIN_SIZE, //
             J.NodeProp.BIN_FILENAME, //
-            J.NodeProp.JSON_HASH
+            J.NodeProp.JSON_HASH, //
+            J.NodeProp.IPFS_LINK
         ]);
 
         S.util.addAllToSet(this.controlBasedPropertyList, [ //
