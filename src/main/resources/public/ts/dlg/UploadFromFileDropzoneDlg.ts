@@ -49,6 +49,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         let state = this.getState();
+        //S.log("upload.renderDlg: state.toIpfs="+state.toIpfs);
         let children = [
             new Form(null, [
                 new HorizontalLayout([

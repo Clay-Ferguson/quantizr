@@ -524,6 +524,15 @@ input[type="radio"] {
     margin-right: $bigGap; 
 }
 
+.bigMarginBottom {
+    margin-bottom: $bigGap; 
+}
+
+.anchorBigMarginBottom {
+    display: inline-block;
+    margin-bottom: $bigGap; 
+}
+
 .microMarginTop {
     margin-top: $microGap;
 }
@@ -566,7 +575,6 @@ input[type="radio"] {
     @extend .unselectedListItem;
     background-color: $menuItemHoverBackgroundColor;
 }
-
 
 .small-padding {
     margin-top: 7px;

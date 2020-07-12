@@ -22,19 +22,23 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         }
 
         this.attribs.onChange = (evt: any) => {
-            Comp.renderCachedChildren = true;
 
-            try {
-                //console.log("e.target.checked=" + evt.target.checked);
-                this.updateValFunc(evt.target.checked);
-            }
-            finally {
-                /* React doesn't have a 'global' way to know when all rendering that's about to be done HAS been done, so all we can do here, is
-                use a timeout */
-                setTimeout(() => {
-                    Comp.renderCachedChildren = false;
-                }, 250);
-            }
+            this.updateValFunc(evt.target.checked);
+            
+            // oops the renderCachedChildren is only for text input! where we KNOW we don't want the rest of the page rendering while user is typing.
+            // and if you use this technique it WILL stop any other page updates from happening inside here, before the timer completes.
+            // Comp.renderCachedChildren = true;
+            // try {
+            //     //console.log("e.target.checked=" + evt.target.checked);
+            //     this.updateValFunc(evt.target.checked);
+            // }
+            // finally {
+            //     /* React doesn't have a 'global' way to know when all rendering that's about to be done HAS been done, so all we can do here, is
+            //     use a timeout */
+            //     setTimeout(() => {
+            //         Comp.renderCachedChildren = false;
+            //     }, 250);
+            // }
         }
     }
 
@@ -59,9 +63,12 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
 
     compRender(): ReactNode {
         let _attribs = this.attribs; //todo-0: remove unnecessary varible.
-        _attribs.checked = this.valueIntf.getValue();
 
-        //console.log("Rendering checkbox: [" + this.label + "] checked=" + _attribs.checked);
+        //double-bang is important here becasue we do need to support the 'getvalue' comming back as null, or undefined, and in all cases
+        //convert that to exactly the value 'true' or else React itself (internal to React) will fail
+        _attribs.checked = !!this.valueIntf.getValue();
+
+        console.log("Rendering checkbox: [" + this.label + "] attribs=" + S.util.prettyPrint(_attribs));
 
         if (this.label) {
             return S.e("span", { key: _attribs.id + "_span" }, S.e("input", _attribs),

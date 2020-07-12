@@ -25,8 +25,9 @@ export class MessageDlg extends DialogBase {
     }
 
     renderDlg = (): CompIntf[] => {
+
         return [
-            new TextContent(this.message, null, this.preformatted),
+            this.message ? new TextContent(this.message, null, this.preformatted) : null,
             this.customWidget,
             this.flashTimeout == 0 ? new ButtonBar([
                 new Button("Ok", () => {

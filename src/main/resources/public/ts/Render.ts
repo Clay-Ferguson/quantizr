@@ -18,6 +18,9 @@ import { NodeActionType } from "./enums/NodeActionType";
 import { QuickEditField } from "./widget/QuickEditField";
 import { Div } from "./widget/Div";
 import { Span } from "./widget/Span";
+import { MessageDlg } from "./dlg/MessageDlg";
+import { Anchor } from "./widget/Anchor";
+import { Heading } from "./widget/Heading";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -137,24 +140,48 @@ export class Render implements RenderIntf {
             return;
         }
 
+        let children = [];
+
         //todo-1: need copy-to-clipboard links here!
-        //todo-0: make these anchor tags that can be clicked to view.
-        let message: string = "ID-based Node: \n" + window.location.origin + "?id=" + node.id;
+       
+        let url = window.location.origin + "?id=" + node.id;
+        children.push(new Heading(5, "ID-based Node"));
+        children.push(new Anchor(url, url, {
+            target: "_blank",
+            className: "anchorBigMarginBottom"
+        }));
+
         if (node.name) {
-            message += "\n\nName-based Node: \n" + window.location.origin + S.util.getPathPartForNamedNode(node);
+            url = window.location.origin + S.util.getPathPartForNamedNode(node);
+            children.push(new Heading(5, "Name-based Node"));
+            children.push(new Anchor(url, url, {
+                target: "_blank",
+                className: "anchorBigMarginBottom"
+            }));
         }
 
         let attachmentIpfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
         if (attachmentIpfsLink) {
-            message += "\n\nIPFS File Attachment: \n" + S.render.getUrlForNodeAttachment(node);
+            url = S.render.getUrlForNodeAttachment(node);
+            children.push(new Heading(5, "IPFS File Attachment"));
+            children.push(new Anchor(url, url, {
+                target: "_blank",
+                className: "anchorBigMarginBottom"
+            }));
         }
 
         let jsonIpfsLink = S.props.getNodePropVal(J.NodeProp.JSON_HASH, node);
         if (jsonIpfsLink) {
-            message += "\n\nIPFS Node JSON: \n" + C.IPFS_GATEWAY + jsonIpfsLink;
+            url = C.IPFS_GATEWAY + jsonIpfsLink;
+            children.push(new Heading(5, "IPFS Node JSON"));
+            children.push(new Anchor(url, url, {
+                target: "_blank",
+                className: "anchorBigMarginBottom"
+            }));
         }
 
-        S.util.showMessage(message, "URL", true);
+        let linksDiv = new Div(null, null, children);
+        new MessageDlg(null, "URL", null, linksDiv, false, 0, null).open();
     }
 
     allowAction = (typeHandler: TypeHandlerIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean => {
