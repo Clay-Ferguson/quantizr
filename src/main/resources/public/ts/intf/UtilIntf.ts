@@ -15,7 +15,7 @@ export interface UtilIntf {
     isAudioFileName(fileName: string): boolean;
     isVideoFileName(fileName: string): boolean;
     isEditableFile(fileName: string): boolean;
-    prettyPrint(obj: Object): void;
+    prettyPrint(obj: Object): string;
     buf2hex(arr: Uint8Array): string;
     hex2buf(str: string): Uint8Array;
     escapeRegExp(s: string): string;

@@ -26,15 +26,7 @@ export class Meta64 implements Meta64Intf {
     /* screen capabilities */
     deviceWidth: number = 0;
     deviceHeight: number = 0;
-
-    /*
-    * Under any given node, there can be one active 'selected' node that has the highlighting, and will be scrolled
-    * to whenever the page with that child is re-visited, and parentIdToFocusNodeMap holds the map of "parent id to
-    * selected node (NodeInfo object)", where the key is the parent node id, and the value is the currently
-    * selected node within that parent. Note this 'selection state' is only significant on the client, and only for
-    * being able to scroll to the node during navigating around on the tree.
-    */
-    parentIdToFocusNodeMap: { [key: string]: J.NodeInfo } = {};
+    parentIdToFocusNodeMap: { [key: string]: string } = {};
     curHighlightNodeCompRow: CompIntf = null;
 
     // Function cache: Creating NEW functions (like "let a = () => {...do something}"), is an expensive operation (performance) so we have this
@@ -195,7 +187,11 @@ export class Meta64 implements Meta64Intf {
     getHighlightedNode = (state: AppState = null): J.NodeInfo => {
         state = appState(state);
         if (!state.node) return null;
-        return S.meta64.parentIdToFocusNodeMap[state.node.id];
+        let id: string = S.meta64.parentIdToFocusNodeMap[state.node.id];
+        if (id) {
+            return state.idToNodeMap[id];
+        }
+        return null;
     }
 
     highlightRowById = (id: string, scroll: boolean, state: AppState): void => {
@@ -223,15 +219,13 @@ export class Meta64 implements Meta64Intf {
             return;
         }
 
-        let id = state.node.id;
-
         /* for best performance (user experience), do this async */
         setTimeout(() => {
-            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, id);
+            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, state.node.id);
             S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
         }, 250);
 
-        S.meta64.parentIdToFocusNodeMap[id] = node;
+        S.meta64.parentIdToFocusNodeMap[state.node.id] = node.id;
 
         if (scroll) {
             S.view.scrollToSelectedNode(state);

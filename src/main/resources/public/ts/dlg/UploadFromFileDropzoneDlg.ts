@@ -295,7 +295,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                                 node: dlg.node
-                            }, async (res) => {
+                            }, async (res: J.SaveNodeResponse) => {
                                 await S.edit.updateIpfsNodeJson(dlg.node, dlg.appState);
                                 //S.log("node after IPFS hash added: "+S.util.prettyPrint(dlg.node));
                                 S.edit.saveNodeResponse(dlg.node, res, dlg.appState);

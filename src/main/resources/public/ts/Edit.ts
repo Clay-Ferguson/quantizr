@@ -217,14 +217,25 @@ export class Edit implements EditIntf {
     /* Checks if this 'node' is stored to IPFS and if so pushes the current JSON of the node to IPFS */
     updateIpfsNodeJson = async (node: J.NodeInfo, state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-
+            //S.log("Saving to ipfs: content=" + node.content);
             let saveToIpfsProp = S.props.getNodePropVal(J.NodeProp.SAVE_TO_IPFS, node);
             if (saveToIpfsProp) {
                 //S.log("Updating node to temporal: nodeId=" + node.id);
-                let ipfsHash = await S.ipfsUtil.uploadToTemporal(null, state.node);
-                if (ipfsHash) {
-                    //S.log("IPFS Hash of JSON (in EditNodeDlg.saveNode): " + ipfsHash);
-                    S.props.setNodePropVal(J.NodeProp.JSON_HASH, state.node, ipfsHash);
+
+                //save off some things we don't need stored:
+                let _children = node.children;
+
+                try {
+                    node.children = null;
+
+                    let ipfsHash = await S.ipfsUtil.uploadToTemporal(null, node);
+                    if (ipfsHash) {
+                        S.log("IPFS Hash of JSON (in EditNodeDlg.saveNode): " + ipfsHash);
+                        S.props.setNodePropVal(J.NodeProp.JSON_HASH, node, ipfsHash);
+                    }
+                }
+                finally {
+                    node.children = _children;
                 }
             }
             resolve();

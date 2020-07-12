@@ -138,6 +138,7 @@ export class Render implements RenderIntf {
         }
 
         //todo-1: need copy-to-clipboard links here!
+        //todo-0: make these anchor tags that can be clicked to view.
         let message: string = "ID-based Node: \n" + window.location.origin + "?id=" + node.id;
         if (node.name) {
             message += "\n\nName-based Node: \n" + window.location.origin + S.util.getPathPartForNamedNode(node);

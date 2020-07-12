@@ -296,12 +296,12 @@ export class Util implements UtilIntf {
         }
     }
 
-    toJson = (obj: Object) => {
+    toJson = (obj: Object): string => {
         return JSON.stringify(obj, null, 4);
     }
 
     /* I'm duplicating toJson for now, because i always expect "prettyPrint", so i need to refactor to be all prettyPrint */
-    prettyPrint = (obj: Object) => {
+    prettyPrint = (obj: Object): string => {
         if (!obj) return "null";
         return JSON.stringify(obj, null, 4);
     }
@@ -1217,7 +1217,7 @@ export class Util implements UtilIntf {
     //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
     setDropHandler = (attribs: any, func: (elm: any) => void): void => {
 
-        let nonDragBorder = ""; 
+        let nonDragBorder = "";
 
         attribs.onDragEnter = function (event) {
             //console.log("onDragEnter: id="+event.target.id);

@@ -84,7 +84,7 @@ export class IPFSUtil implements IPFSUtilIntf {
                 data.append("file", file);
             }
             else if (jsonObj) {
-                data.append("file", new Blob([JSON.stringify(jsonObj)], {type : "application/json;charset=UTF-8"}));
+                data.append("file", new Blob([S.util.prettyPrint(jsonObj)], {type : "application/json;charset=UTF-8"}));
                 // xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 // xhr.send(JSON.stringify(jsonObj));
             }
@@ -97,7 +97,6 @@ export class IPFSUtil implements IPFSUtilIntf {
                 if (xhr.readyState === 4) {
                     S.log(S.util.prettyPrint(xhr));
                     let result = JSON.parse(xhr.responseText);
-
                     if (result.code === 200) {
                         //S.log("Upload Result: " + result);
 

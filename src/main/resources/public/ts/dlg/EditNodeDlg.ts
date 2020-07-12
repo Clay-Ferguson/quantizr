@@ -65,8 +65,6 @@ export class EditNodeDlg extends DialogBase {
     deletePropButton: Button;
     cancelButton: Button;
 
-    saveToIpfsCheckBox: Checkbox;
-
     //maps the DOM ids of dom elements the property that DOM element is editing.
     compIdToPropMap: { [key: string]: J.PropertyInfo } = {};
 
@@ -230,7 +228,7 @@ export class EditNodeDlg extends DialogBase {
                     return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) != "1";
                 }
             }),
-            this.saveToIpfsCheckBox = new Checkbox("Save To IPFS", {
+            new Checkbox("Save To IPFS", {
                 className: "marginRight",
             }, this.makeCheckboxPropValueHandler(J.NodeProp.SAVE_TO_IPFS)),
 
@@ -616,15 +614,13 @@ export class EditNodeDlg extends DialogBase {
                 if (!nodeName) {
                     nodeName = "";
                 }
-
                 state.node.name = nodeName;
             }
 
             state.node.content = content;
-
-            //console.log("calling saveNode(). PostData=" + S.util.toJson(state.node));
             await S.edit.updateIpfsNodeJson(state.node, this.appState);
 
+            //console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                 node: state.node
             }, (res) => {

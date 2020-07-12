@@ -14,7 +14,8 @@ export interface Meta64Intf {
     deviceHeight: number;
 
     navBarHeight: number;
-    parentIdToFocusNodeMap: { [key: string]: J.NodeInfo };
+    //todo-0: convert this to a TypeScript Map<string,string>
+    parentIdToFocusNodeMap: { [key: string]: string };
     curHighlightNodeCompRow: CompIntf;
 
     //function cache accessor

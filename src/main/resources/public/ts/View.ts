@@ -49,6 +49,7 @@ export class View implements ViewIntf {
             if (res.offsetOfNodeFound > -1) {
                 S.nav.mainOffset = res.offsetOfNodeFound;
             }
+
             S.render.renderPageFromData(res, false, highlightId, setTab, allowScroll, state);
         });
     }
