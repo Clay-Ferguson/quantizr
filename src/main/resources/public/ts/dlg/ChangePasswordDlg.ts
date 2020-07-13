@@ -11,6 +11,7 @@ import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { ValueHolder } from "../ValueHolder";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,7 +21,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ChangePasswordDlg extends DialogBase {
 
     passwordField: TextField;
-    pwd: string;
     private passCode: string;
 
     constructor(args: Object, state: AppState) {
@@ -35,7 +35,7 @@ export class ChangePasswordDlg extends DialogBase {
         let children = [
             new Form(null, [
                 new TextContent("Enter your new password below..."),
-                this.passwordField = new TextField("New Password", null, true),
+                this.passwordField = new TextField("New Password", null, true, null, new ValueHolder<string>(this, "pwd")),
                 new ButtonBar([
                     new Button("Change Password", () => {
                         this.changePassword();
@@ -60,11 +60,11 @@ export class ChangePasswordDlg extends DialogBase {
      * user.
      */
     changePassword = (): void => {
-        this.pwd = this.passwordField.getValue();
+        let pwd = this.getState().pwd;
 
-        if (this.pwd && this.pwd.length >= 4) {
+        if (pwd && pwd.length >= 4) {
             S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {
-                newPassword: this.pwd,
+                newPassword: pwd,
                 passCode: this.passCode
             }, this.changePasswordResponse);
         } else {

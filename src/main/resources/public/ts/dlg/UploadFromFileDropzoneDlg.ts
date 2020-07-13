@@ -53,7 +53,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let children = [
             new Form(null, [
                 new HorizontalLayout([
-                    //todo-0: because of this new checkbox edit with getVal,setVal we need to retest saving to ipfs.
                     new Checkbox("Save to IPFS", null, {
                         setValue: (checked: boolean): void => {
                             this.mergeState({ toIpfs: checked });
@@ -406,8 +405,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     hasAnyZipFiles = (): boolean => {
         let ret: boolean = false;
         for (let file of this.fileList) {
-            let fileName = file["name"]; //todo-0: can't this just be 'file.name'?
-            if (fileName && S.util.endsWith(fileName.toLowerCase(), ".zip")) {
+            if (file.name && S.util.endsWith(file.name.toLowerCase(), ".zip")) {
                 return true;
             }
         }

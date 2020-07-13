@@ -29,9 +29,9 @@ export class EditCredentialsDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        this.userTextField = new TextField("User"),
-            this.passwordTextField = new TextField("Password", null, true),
-            this.populateFromLocalDb();
+        this.userTextField = new TextField("User");
+        this.passwordTextField = new TextField("Password", null, true);
+        this.populateFromLocalDb();
 
         return [
             new TextContent("Quanta uses Temporal (https://temporal.cloud) as the storage provider for IPFS content, so you can enter your Temporal" +

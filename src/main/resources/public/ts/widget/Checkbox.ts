@@ -62,24 +62,20 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
     }
 
     compRender(): ReactNode {
-        let _attribs = this.attribs; //todo-0: remove unnecessary varible.
-
         //double-bang is important here becasue we do need to support the 'getvalue' comming back as null, or undefined, and in all cases
         //convert that to exactly the value 'true' or else React itself (internal to React) will fail
-        _attribs.checked = !!this.valueIntf.getValue();
-
-        //console.log("Rendering checkbox: [" + this.label + "] attribs=" + S.util.prettyPrint(_attribs));
+        this.attribs.checked = !!this.valueIntf.getValue();
 
         if (this.label) {
-            return S.e("span", { key: _attribs.id + "_span" }, S.e("input", _attribs),
+            return S.e("span", { key: this.attribs.id + "_span" }, S.e("input", this.attribs),
                 S.e("label", {
-                    key: _attribs.id + "_label",
+                    key: this.attribs.id + "_label",
                     className: "checkbox-label",
-                    htmlFor: _attribs.id
+                    htmlFor: this.attribs.id
                 }, this.label));
         }
         else {
-            return S.e("span", { key: _attribs.id + "_span" }, S.e("input", _attribs));
+            return S.e("span", { key: this.attribs.id + "_span" }, S.e("input", this.attribs));
         }
     }
 }
