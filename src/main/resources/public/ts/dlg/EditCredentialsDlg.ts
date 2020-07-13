@@ -10,6 +10,7 @@ import { DialogBase } from "../DialogBase";
 import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { ValueHolder } from "../ValueHolder";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -18,39 +19,27 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class EditCredentialsDlg extends DialogBase {
 
-    userTextField: TextField;
-    passwordTextField: TextField;
-
-    usr: string;
-    pwd: string;
-
     constructor(title2: string, private usrDbProp: string, private pwdDbProp: string, state: AppState) {
         super(title2, "app-modal-content-narrow-width", false, state);
+        this.populateFromLocalDb();
     }
 
     renderDlg(): CompIntf[] {
-        this.userTextField = new TextField("User");
-        this.passwordTextField = new TextField("Password", null, true);
-        this.populateFromLocalDb();
-
         return [
             new TextContent("Quanta uses Temporal (https://temporal.cloud) as the storage provider for IPFS content, so you can enter your Temporal" +
                 " credentials here to enable saving files permanently to IPFS."),
             new Form(null, [
-                new FormGroup(null,
-                    [
-                        this.userTextField,
-                        this.passwordTextField,
-                    ]
+                new FormGroup(null, [
+                    new TextField("User", null, false, null, new ValueHolder<string>(this, "user")),
+                    new TextField("Password", null, true, null, new ValueHolder<string>(this, "password"))
+                ]
                 ),
-                new ButtonBar(
-                    [
-                        new Button("Save", this.saveCreds, null, "btn-primary"),
-                        new Button("Cancel", () => {
-                            this.close();
-                        })
-                    ])
-
+                new ButtonBar([
+                    new Button("Save", this.saveCreds, null, "btn-primary"),
+                    new Button("Cancel", () => {
+                        this.close();
+                    })
+                ])
             ])
         ];
     }
@@ -59,22 +48,16 @@ export class EditCredentialsDlg extends DialogBase {
         return null;
     }
 
-    populateFromLocalDb = (): void => {
-        this.whenElm(async (elm: HTMLElement) => {
-            this.userTextField.setValue(this.usr = await S.localDB.getVal(this.usrDbProp));
-            this.passwordTextField.setValue(this.pwd = await S.localDB.getVal(this.pwdDbProp));
-        });
+    populateFromLocalDb = async () => {
+        this.mergeState({
+            user: await S.localDB.getVal(this.usrDbProp),
+            password: await S.localDB.getVal(this.pwdDbProp)
+        })
     }
 
-    saveCreds = async (): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            this.usr = this.userTextField.getValue();
-            this.pwd = this.passwordTextField.getValue();
-
-            await S.localDB.setVal(this.usrDbProp, this.usr);
-            await S.localDB.setVal(this.pwdDbProp, this.pwd);
-            resolve();
-            this.close();
-        });
+    saveCreds = async () => {
+        await S.localDB.setVal(this.usrDbProp, this.getState().user);
+        await S.localDB.setVal(this.pwdDbProp, this.getState().password);
+        this.close();
     }
 }

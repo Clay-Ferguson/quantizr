@@ -13,7 +13,7 @@ import { Provider } from 'react-redux';
 import { AppState } from "../../AppState";
 import { useSelector, useDispatch } from "react-redux";
 
-//tip: merging states: this.state = { ...this.state, ...moreState };
+//tip: merging two objects: this.state = { ...this.state, ...moreState };
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -25,6 +25,9 @@ declare var PROFILE;
 /**
  * This base class is a hybrid that can render React components or can be used to render plain HTML to be used in innerHTML of elements.
  * The innerHTML approach is being phased out in order to transition fully over to normal ReactJS. 
+ * 
+ * todo-0: should we make Comp a generic class that takes a type for it's State, *or* should we totally decouple state away from Comp, and just
+ * use something similar to a ValueIntf in here?
  */
 export abstract class Comp implements CompIntf {
     static renderCounter: number = 0;

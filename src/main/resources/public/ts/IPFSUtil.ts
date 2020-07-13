@@ -128,8 +128,8 @@ export class IPFSUtil implements IPFSUtilIntf {
                 let dlg = new EditCredentialsDlg(forceEdit ? "Temporal Credentials" : "Temporal Account Login",
                     C.LOCALDB_TEMPORAL_USR, C.LOCALDB_TEMPORAL_PWD, appState);
                 await dlg.open();
-                this.temporalUsr = dlg.usr;
-                this.temporalPwd = dlg.pwd;
+                this.temporalUsr = dlg.getState().user;
+                this.temporalPwd = dlg.getState().password;
             }
             resolve(!!this.temporalUsr && !!this.temporalPwd);
         });
