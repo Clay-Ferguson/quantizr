@@ -109,7 +109,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "3", val: "Medium" },
             { key: "4", val: "Low" },
             { key: "5", val: "Backlog" }
-        ], "m-2 w-25", new PropValueHolder(this.getState().node, J.NodeProp.PRIORITY, "0")); 
+        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.PRIORITY, "0")); 
         return selection;
     }
 

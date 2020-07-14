@@ -10,6 +10,7 @@ import { Singletons } from "../Singletons";
 import { TextField } from "../widget/TextField";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { CompValueHolder } from "../CompValueHolder";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,8 +22,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
  */
 export class EditPropertyDlg extends DialogBase {
 
-    propertyNameTextarea: TextField;
-
     /* name endered by user. We get the results of this dialog by reading this var */
     name: string;
 
@@ -33,7 +32,7 @@ export class EditPropertyDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
-                this.propertyNameTextarea = new TextField("Name"),
+                new TextField("Name", null, false, null, new CompValueHolder<string>(this, "propName")),
             ]),
 
             new ButtonBar([
@@ -50,7 +49,7 @@ export class EditPropertyDlg extends DialogBase {
     }
 
     save = (): void => {
-        this.name = this.propertyNameTextarea.getValue();
+        this.name = this.getState().propName;
 
         /* verify first that this property doesn't already exist */
         if (!!S.props.getNodeProp(name, this.editNode)) {
