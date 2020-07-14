@@ -5,7 +5,7 @@ import { Action } from "redux";
 /* These are Client-side only models, and are not seen on the server side ever */
 
 export interface ValueIntf {
-    getValue();
+    getValue(): any;
     setValue(val: any);
 }
 

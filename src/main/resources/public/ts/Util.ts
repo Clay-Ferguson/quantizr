@@ -230,6 +230,8 @@ export class Util implements UtilIntf {
     }
 
     arrayClone(a: any[]): any[] {
+        if (a == null) return null;
+        if (a.length == 0) return [];
         return a.slice(0);
     };
 

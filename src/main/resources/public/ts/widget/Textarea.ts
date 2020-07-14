@@ -13,7 +13,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Textarea extends Comp implements I.TextEditorIntf {
 
-    //todo-0: shouldn't we just required that every instantiator provide it's own accessor ValueIntf always? Everything is so much cleaner that way,
+    //todo-td: shouldn't we just required that every instantiator provide it's own accessor ValueIntf always? Everything is so much cleaner that way,
     //and it means 'defaultValue' is never passed in itself
     constructor(private label: string, attribs: any = null, private defaultValue: string = null, private valueIntf: ValueIntf = null, customClass: string=null) {
         super(attribs);

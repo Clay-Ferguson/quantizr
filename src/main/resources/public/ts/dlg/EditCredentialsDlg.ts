@@ -10,14 +10,22 @@ import { DialogBase } from "../DialogBase";
 import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
-import { CompValueHolder } from "../CompValueHolder";
+import { BaseCompState } from "../widget/base/BaseCompState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class EditCredentialsDlg extends DialogBase {
+/* todo-td: This class is the prototype/example for how to do perfectly type-safe editing where a component has a typed state object
+bound to it all they way to the core Comp.state */
+
+interface EditCredentialsDlgState extends BaseCompState {
+    user?: string;
+    password?: string;
+}
+
+export class EditCredentialsDlg extends DialogBase<EditCredentialsDlgState> {
 
     constructor(title2: string, private usrDbProp: string, private pwdDbProp: string, state: AppState) {
         super(title2, "app-modal-content-narrow-width", false, state);
@@ -30,8 +38,22 @@ export class EditCredentialsDlg extends DialogBase {
                 " credentials here to enable saving files permanently to IPFS."),
             new Form(null, [
                 new FormGroup(null, [
-                    new TextField("User", null, false, null, new CompValueHolder<string>(this, "user")),
-                    new TextField("Password", null, true, null, new CompValueHolder<string>(this, "password"))
+                    new TextField("User", null, false, null, {
+                        getValue: (): string => {
+                            return this.getState().user;
+                        },
+                        setValue: (val: string): void => {
+                            this.mergeState({user: val});
+                        }
+                    }),
+                    new TextField("Password", null, true, null, {
+                        getValue: (): string => {
+                            return this.getState().password;
+                        },
+                        setValue: (val: string): void => {
+                            this.mergeState({password: val});
+                        }
+                    })
                 ]),
                 new ButtonBar([
                     new Button("Save", this.saveCreds, null, "btn-primary"),

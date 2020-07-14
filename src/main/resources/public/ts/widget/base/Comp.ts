@@ -12,7 +12,7 @@ import { ReactNode, ReactElement, useState, useEffect, useLayoutEffect } from "r
 import { Provider } from 'react-redux';
 import { AppState } from "../../AppState";
 import { useSelector, useDispatch } from "react-redux";
-import { StateHolder } from "../../StateHolder";
+import { BaseCompState } from "./BaseCompState";
 
 //tip: merging two objects: this.state = { ...this.state, ...moreState };
 
@@ -26,11 +26,8 @@ declare var PROFILE;
 /**
  * This base class is a hybrid that can render React components or can be used to render plain HTML to be used in innerHTML of elements.
  * The innerHTML approach is being phased out in order to transition fully over to normal ReactJS. 
- * 
- * todo-0: should we make Comp a generic class that takes a type for it's State, *or* should we totally decouple state away from Comp, and just
- * use something similar to a ValueIntf in here?
  */
-export abstract class Comp implements CompIntf {
+export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     static renderCounter: number = 0;
     public rendered: boolean = false;
     public debug: boolean = false;
@@ -43,8 +40,7 @@ export abstract class Comp implements CompIntf {
     //So reuseChildren tells the component keep children if they exist. (mainly only functional in Dialogs currently)
     static renderCachedChildren: boolean = false;
 
-    //todo-0: this 'any'should be seen some instance of BaseCompState right?
-    stateHolder: StateHolder<any> = new StateHolder<any>();
+    state: S = {} as any;
     attribs: any;
 
     /* this is a more powerful of doing what React.memo can do but supports keys in a better way than React.memo, because
@@ -145,11 +141,11 @@ export abstract class Comp implements CompIntf {
     }
 
     setVisible(visible: boolean) {
-        this.mergeState({ visible });
+        this.mergeState({ visible } as any);
     }
 
     setEnabled(enabled: boolean) {
-        this.mergeState({ enabled });
+        this.mergeState({ enabled } as any);
     }
 
     setClass(clazz: string): void {
@@ -284,13 +280,12 @@ export abstract class Comp implements CompIntf {
     }
 
     updateVisAndEnablement() {
-        let state = this.stateHolder.get();
-        if (state.enabled === undefined) {
-            state.enabled = true;
+        if (this.state.enabled === undefined) {
+            this.state.enabled = true;
         }
 
-        if (state.visible === undefined) {
-            state.visible = true;
+        if (this.state.visible === undefined) {
+            this.state.visible = true;
         }
     }
 
@@ -328,24 +323,23 @@ export abstract class Comp implements CompIntf {
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
        both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact
        */
-    mergeState(moreState: any): any {
+    mergeState(moreState: S): any {
         this.setStateEx((state: any) => {
-            this.stateHolder.set({ ...state, ...moreState });
+            this.state = { ...state, ...moreState };
             if (this.debugState) {
-                console.log("mergeState final[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.stateHolder.get()));
+                console.log("mergeState final[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.state));
             }
-            return this.stateHolder.get();
+            return this.state;
         });
     }
 
     forceRender() {
-        this.mergeState({ forceRender: Comp.nextGuid() });
+        this.mergeState({ forceRender: Comp.nextGuid() } as any);
     }
 
     setState = (newState: any): any => {
         this.setStateEx((state: any) => {
-            this.stateHolder.set({ ...newState });
-            return this.stateHolder.get();
+            return this.state = { ...newState };
         });
     }
 
@@ -364,19 +358,19 @@ export abstract class Comp implements CompIntf {
             state = {};
         }
         if (typeof state == "function") {
-            this.stateHolder.set(state(this.stateHolder.get()));
+            this.state = state(this.state);
         }
         else {
-            this.stateHolder.set(state);
+            this.state = state;
         }
 
         if (this.debugState) {
-            console.log("setStateEx[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.stateHolder.get()));
+            console.log("setStateEx[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.state));
         }
     }
 
-    getState(): any {
-        return this.stateHolder.get();
+    getState(): S {
+        return this.state;
     }
 
     /* Derived classes can implement this to perform something similar to "React.memo" were we memoize based on wether the object
@@ -392,13 +386,13 @@ export abstract class Comp implements CompIntf {
 
         let ret: ReactNode = null;
         try {
-            const [state, setStateEx] = useState(this.stateHolder.get());
+            const [state, setStateEx] = useState(this.state);
 
             //#memoReq
             //const [isMounted, setIsMounted] = useState<boolean>(false);
 
             //console.warn("Component state was null in render for: " + this.jsClassName);
-            this.stateHolder.set(state);
+            this.state = state;
 
             this.setStateEx = setStateEx.bind(this);
             // #memoReq

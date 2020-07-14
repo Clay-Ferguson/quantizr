@@ -18,7 +18,7 @@ export class CollapsiblePanel extends Comp {
         this.setChildren(initialChildren);
         this.collapsedButtonText = collapsedButtonText || "More...";
         this.expandedButtonText = expandedButtonText || "Less...";
-        this.stateHolder.get().expanded = expanded;
+        this.mergeState({expanded});
     }
 
     setExpanded(expanded: boolean) {

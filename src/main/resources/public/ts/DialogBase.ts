@@ -11,13 +11,14 @@ import { AppState } from "./AppState";
 import { Provider } from 'react-redux';
 import { store } from "./AppRedux";
 import clientInfo from "./ClientInfo";
+import { BaseCompState } from "./widget/base/BaseCompState";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export abstract class DialogBase extends Div implements DialogBaseImpl {
+export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> implements DialogBaseImpl {
 
     //ref counter that allows multiple dialogs to be opened on top of each other and only
     //when the final one closes out do we go back to enabling scrolling on body again.
