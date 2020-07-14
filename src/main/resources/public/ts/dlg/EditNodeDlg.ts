@@ -76,6 +76,10 @@ export class EditNodeDlg extends DialogBase {
     //if user uploads or deletes an upload we set this, to force refresh when dialog closes even if they don't click save.
     binaryDirty: boolean = false;
 
+    /* Since some of our property editing (the Selection components) modify properties 'in-place' in the node we have
+    this initialProps clone so we can 'rollback' properties if use clicks cancel */
+    initialProps: J.PropertyInfo[];
+
     constructor(node: J.NodeInfo, state: AppState) {
         super("Edit", "app-modal-content", false, state);
         this.mergeState({
@@ -84,6 +88,7 @@ export class EditNodeDlg extends DialogBase {
             //selected props is used as a set of all 'selected' (via checkbox) property names
             selectedProps: new Set<string>()
         });
+        this.initialProps = S.util.arrayClone(node.properties);
     }
 
     createLayoutSelection = (): Selection => {
@@ -771,6 +776,9 @@ export class EditNodeDlg extends DialogBase {
 
     cancelEdit = (): void => {
         this.close();
+
+        //rollback properties.
+        this.getState().node.properties = this.initialProps;
 
         if (this.binaryDirty) {
             S.meta64.refresh(this.appState);
