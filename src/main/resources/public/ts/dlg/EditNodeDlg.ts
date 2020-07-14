@@ -66,7 +66,6 @@ export class EditNodeDlg extends DialogBase {
     //maps the DOM ids of dom elements the property that DOM element is editing.
     compIdToPropMap: { [key: string]: J.PropertyInfo } = {};
 
-    nodeNameTextField: TextField;
     contentEditor: I.TextEditorIntf;
 
     static morePanelExpanded: boolean = false;
@@ -93,28 +92,24 @@ export class EditNodeDlg extends DialogBase {
 
     createLayoutSelection = (): Selection => {
         //todo-1: these columns need to auto-space and not go past allowed width of page display
-        let selection: Selection = new Selection({
-            defaultValue: "v"
-        }, "Layout", [
+        let selection: Selection = new Selection(null, "Layout", [
             { key: "v", val: "Vertical" },
             { key: "c2", val: "2 Columns" },
             { key: "c3", val: "3 Columns" },
             { key: "c4", val: "4 Columns" }
-        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT)); // "w-25 m-2");
+        ], "m-2 w-25", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v")); 
         return selection;
     }
 
     createPrioritySelection = (): Selection => {
-        let selection: Selection = new Selection({
-            defaultValue: "0"
-        }, "Priority", [
+        let selection: Selection = new Selection(null, "Priority", [
             { key: "0", val: "none" },
             { key: "1", val: "Top" },
             { key: "2", val: "High" },
             { key: "3", val: "Medium" },
             { key: "4", val: "Low" },
             { key: "5", val: "Backlog" }
-        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.PRIORITY)); // "w-25 m-2");
+        ], "m-2 w-25", new PropValueHolder(this.getState().node, J.NodeProp.PRIORITY, "0")); 
         return selection;
     }
 
@@ -142,9 +137,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "1000px", val: "1000px" },
         ]);
 
-        let selection: Selection = new Selection({
-            defaultValue: "0"
-        }, label, options, "m-2", valueIntf); // w-25");
+        let selection: Selection = new Selection(null, label, options, "m-2 w-25", valueIntf); 
         return selection;
     }
 
@@ -242,12 +235,12 @@ export class EditNodeDlg extends DialogBase {
         let selectionsBar = new FormInline(null, [
             state.node.hasChildren ? this.createLayoutSelection() : null,
             state.node.hasChildren ? this.createImgSizeSelection("Images", true, //
-                new PropValueHolder(this.getState().node, J.NodeProp.CHILDREN_IMG_SIZES)) : null,
+                new PropValueHolder(this.getState().node, J.NodeProp.CHILDREN_IMG_SIZES, "0")) : null,
             this.createPrioritySelection(),
         ]);
 
         let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, //
-            new PropValueHolder(this.getState().node, J.NodeProp.IMG_SIZE)) : null;
+            new PropValueHolder(this.getState().node, J.NodeProp.IMG_SIZE, "0")) : null;
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
         let propsTable = null;
@@ -269,11 +262,20 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let propsParent: CompIntf = customProps ? mainPropsTable : propsTable;
-
         let isWordWrap = !S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node);
 
+        let nodeNameTextField = null;
         if (!customProps) {
-            this.nodeNameTextField = new TextField("Node Name", state.node.name);
+            nodeNameTextField = new TextField("Node Name", null, false, null, {
+                setValue: (val: string): void => {
+                    this.getState().node.name = val || "";
+                    nodeNameTextField.forceRender();
+                },
+
+                getValue: (): string => {
+                    return this.getState().node.name;
+                }
+            });
         }
 
         if (allowContentEdit) {
@@ -326,7 +328,7 @@ export class EditNodeDlg extends DialogBase {
             propsParent.addChild(this.propsButtonBar);
         }
 
-        let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [optionsBar, selectionsBar, propsTable, this.nodeNameTextField], false,
+        let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [optionsBar, selectionsBar, propsTable, nodeNameTextField], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
             }, EditNodeDlg.morePanelExpanded, "float-right") : null;
@@ -564,17 +566,6 @@ export class EditNodeDlg extends DialogBase {
                     content = J.Constant.ENC_TAG + content;
                 }
             }
-
-            if (this.nodeNameTextField) {
-                let nodeName = this.nodeNameTextField.getValue();
-
-                //convert any empty string to null here to be sure DB storage is least amount.
-                if (!nodeName) {
-                    nodeName = "";
-                }
-                state.node.name = nodeName;
-            }
-
             state.node.content = content;
             await S.edit.updateIpfsNodeJson(state.node, this.appState);
 

@@ -10,7 +10,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 //encapsulates setting and getting a component state variable on behalf of a component
-export class ValueHolder<T> implements ValueIntf {
+export class CompValueHolder<T> implements ValueIntf {
 
     constructor(private comp: CompIntf, public propName: string) {
     }

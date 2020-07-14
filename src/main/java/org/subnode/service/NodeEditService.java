@@ -253,8 +253,11 @@ public class NodeEditService {
 		node.setContent(nodeInfo.getContent());
 		node.setType(nodeInfo.getType());
 
+		if (StringUtils.isEmpty(nodeInfo.getName())) {
+			node.setName(null);
+		}
 		// if we're setting node name to a different node name
-		if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0
+		else if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0
 				&& !nodeInfo.getName().equals(node.getName())) {
 
 			/*

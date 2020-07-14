@@ -12,7 +12,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 /* encapsulates setting and getting a state variable property on behalf of a node */
 export class PropValueHolder implements ValueIntf {
 
-    constructor(private node: NodeInfo, private propName: string) {
+    constructor(private node: NodeInfo, private propName: string, defaultVal: string) {
+        if (!this.getValue()) {
+            this.setValue(defaultVal);
+        }
     }
 
     setValue(val: string): void {

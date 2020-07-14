@@ -10,7 +10,7 @@ import { DialogBase } from "../DialogBase";
 import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
-import { ValueHolder } from "../ValueHolder";
+import { CompValueHolder } from "../CompValueHolder";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -30,8 +30,8 @@ export class EditCredentialsDlg extends DialogBase {
                 " credentials here to enable saving files permanently to IPFS."),
             new Form(null, [
                 new FormGroup(null, [
-                    new TextField("User", null, false, null, new ValueHolder<string>(this, "user")),
-                    new TextField("Password", null, true, null, new ValueHolder<string>(this, "password"))
+                    new TextField("User", null, false, null, new CompValueHolder<string>(this, "user")),
+                    new TextField("Password", null, true, null, new CompValueHolder<string>(this, "password"))
                 ]),
                 new ButtonBar([
                     new Button("Save", this.saveCreds, null, "btn-primary"),
