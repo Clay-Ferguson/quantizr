@@ -12,6 +12,7 @@ import { ReactNode, ReactElement, useState, useEffect, useLayoutEffect } from "r
 import { Provider } from 'react-redux';
 import { AppState } from "../../AppState";
 import { useSelector, useDispatch } from "react-redux";
+import { StateHolder } from "../../StateHolder";
 
 //tip: merging two objects: this.state = { ...this.state, ...moreState };
 
@@ -42,8 +43,8 @@ export abstract class Comp implements CompIntf {
     //So reuseChildren tells the component keep children if they exist. (mainly only functional in Dialogs currently)
     static renderCachedChildren: boolean = false;
 
-    //todo-1: make this private? I think private is better, because accidental uses of 'this.state' can be wrong.
-    public state: any = {};
+    //todo-0: this 'any'should be seen some instance of BaseCompState right?
+    stateHolder: StateHolder<any> = new StateHolder<any>();
     attribs: any;
 
     /* this is a more powerful of doing what React.memo can do but supports keys in a better way than React.memo, because
@@ -283,12 +284,13 @@ export abstract class Comp implements CompIntf {
     }
 
     updateVisAndEnablement() {
-        if (this.state.enabled === undefined) {
-            this.state.enabled = true;
+        let state = this.stateHolder.get();
+        if (state.enabled === undefined) {
+            state.enabled = true;
         }
 
-        if (this.state.visible === undefined) {
-            this.state.visible = true;
+        if (state.visible === undefined) {
+            state.visible = true;
         }
     }
 
@@ -328,11 +330,11 @@ export abstract class Comp implements CompIntf {
        */
     mergeState(moreState: any): any {
         this.setStateEx((state: any) => {
-            this.state = { ...state, ...moreState };
+            this.stateHolder.set({ ...state, ...moreState });
             if (this.debugState) {
-                console.log("mergeState final[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.state));
+                console.log("mergeState final[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.stateHolder.get()));
             }
-            return this.state;
+            return this.stateHolder.get();
         });
     }
 
@@ -342,8 +344,8 @@ export abstract class Comp implements CompIntf {
 
     setState = (newState: any): any => {
         this.setStateEx((state: any) => {
-            this.state = { ...newState };
-            return this.state;
+            this.stateHolder.set({ ...newState });
+            return this.stateHolder.get();
         });
     }
 
@@ -362,19 +364,19 @@ export abstract class Comp implements CompIntf {
             state = {};
         }
         if (typeof state == "function") {
-            this.state = state(this.state);
+            this.stateHolder.set(state(this.stateHolder.get()));
         }
         else {
-            this.state = state;
+            this.stateHolder.set(state);
         }
 
         if (this.debugState) {
-            console.log("setStateEx[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.state));
+            console.log("setStateEx[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.stateHolder.get()));
         }
     }
 
     getState(): any {
-        return this.state;
+        return this.stateHolder.get();
     }
 
     /* Derived classes can implement this to perform something similar to "React.memo" were we memoize based on wether the object
@@ -390,13 +392,13 @@ export abstract class Comp implements CompIntf {
 
         let ret: ReactNode = null;
         try {
-            const [state, setStateEx] = useState(this.state);
+            const [state, setStateEx] = useState(this.stateHolder.get());
 
             //#memoReq
             //const [isMounted, setIsMounted] = useState<boolean>(false);
 
             //console.warn("Component state was null in render for: " + this.jsClassName);
-            this.state = state;
+            this.stateHolder.set(state);
 
             this.setStateEx = setStateEx.bind(this);
             // #memoReq

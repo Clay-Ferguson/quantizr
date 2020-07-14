@@ -35,6 +35,8 @@ import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg"
 import { LayoutRow } from "../widget/LayoutRow";
 import { NodeActionType } from "../enums/NodeActionType";
+import { ValueIntf } from "../Interfaces";
+import { PropValueHolder } from "../PropValueHolder";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -45,10 +47,6 @@ export class EditNodeDlg extends DialogBase {
     header: Header;
     buttonBar: ButtonBar;
     propsButtonBar: ButtonBar;
-    layoutSelection: Selection;
-    prioritySelection: Selection;
-    imgSizeSelection: Selection;
-    childrenImgSizeSelection: Selection;
     //help: TextContent;
     propertyEditFieldContainer: Div;
 
@@ -97,7 +95,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "c2", val: "2 Columns" },
             { key: "c3", val: "3 Columns" },
             { key: "c4", val: "4 Columns" }
-        ], "m-2"); // "w-25 m-2");
+        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT)); // "w-25 m-2");
         return selection;
     }
 
@@ -111,17 +109,17 @@ export class EditNodeDlg extends DialogBase {
             { key: "3", val: "Medium" },
             { key: "4", val: "Low" },
             { key: "5", val: "Backlog" }
-        ], "m-2"); // "w-25 m-2");
+        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.PRIORITY)); // "w-25 m-2");
         return selection;
     }
 
-    createImgSizeSelection = (label: string, allowNone: boolean): Selection => {
+    createImgSizeSelection = (label: string, allowNone: boolean, valueIntf: ValueIntf): Selection => {
         let options = [];
 
         if (allowNone) {
             //none means we would ignore the option during rendering, slightly different from "Actual" in cases
             //where this is an override that we don't want to override with. 'none' means don't override.
-            options.push({ key: "n", val: "None" },)
+            options.push({ key: "n", val: "None" })
         }
 
         options = options.concat([
@@ -141,7 +139,7 @@ export class EditNodeDlg extends DialogBase {
 
         let selection: Selection = new Selection({
             defaultValue: "0"
-        }, label, options, "m-2"); // w-25");
+        }, label, options, "m-2", valueIntf); // w-25");
         return selection;
     }
 
@@ -236,15 +234,15 @@ export class EditNodeDlg extends DialogBase {
                 this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null
         ]);
 
-        this.childrenImgSizeSelection = state.node.hasChildren ? this.createImgSizeSelection("Images", true) : null;
-
         let selectionsBar = new FormInline(null, [
-            this.layoutSelection = state.node.hasChildren ? this.createLayoutSelection() : null,
-            this.childrenImgSizeSelection,
-            this.prioritySelection = this.createPrioritySelection(),
+            state.node.hasChildren ? this.createLayoutSelection() : null,
+            state.node.hasChildren ? this.createImgSizeSelection("Images", true, //
+                new PropValueHolder(this.getState().node, J.NodeProp.CHILDREN_IMG_SIZES)) : null,
+            this.createPrioritySelection(),
         ]);
 
-        this.imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false) : null;
+        let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, //
+            new PropValueHolder(this.getState().node, J.NodeProp.IMG_SIZE)) : null;
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
         let propsTable = null;
@@ -289,31 +287,6 @@ export class EditNodeDlg extends DialogBase {
 
         if (state.node.properties) {
             state.node.properties.forEach((prop: J.PropertyInfo) => {
-                if (prop.name == J.NodeProp.LAYOUT) {
-                    if (this.layoutSelection) {
-                        this.layoutSelection.setSelection(prop.value);
-                    }
-                    return;
-                }
-
-                if (prop.name == J.NodeProp.PRIORITY) {
-                    this.prioritySelection.setSelection(prop.value);
-                    return;
-                }
-
-                if (prop.name == J.NodeProp.IMG_SIZE) {
-                    if (this.imgSizeSelection) {
-                        this.imgSizeSelection.setSelection(prop.value);
-                    }
-                    return;
-                }
-
-                if (prop.name == J.NodeProp.CHILDREN_IMG_SIZES) {
-                    if (this.childrenImgSizeSelection) {
-                        this.childrenImgSizeSelection.setSelection(prop.value);
-                    }
-                    return;
-                }
 
                 if (!allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
                     console.log("Hiding property: " + prop.name);
@@ -365,7 +338,7 @@ export class EditNodeDlg extends DialogBase {
                 new Div(null, {
                     className: "col-8"
                 }, [
-                    this.imgSizeSelection,
+                    imgSizeSelection,
                     new ButtonBar([
                         this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
                         this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
@@ -573,27 +546,6 @@ export class EditNodeDlg extends DialogBase {
     saveNode = async (): Promise<void> => {
         let state = this.getState();
         return new Promise<void>(async (resolve, reject) => {
-            if (state.node) {
-                /* Get state of the 'layout' dropdown */
-                if (this.layoutSelection) {
-                    let layout = this.layoutSelection.getSelection();
-                    S.props.setNodePropVal(J.NodeProp.LAYOUT, state.node, layout);
-                }
-
-                /* Get state of the 'priority' dropdown */
-                let priority = this.prioritySelection.getSelection();
-                S.props.setNodePropVal(J.NodeProp.PRIORITY, state.node, priority);
-
-                if (this.imgSizeSelection) {
-                    let imgSize = this.imgSizeSelection.getSelection();
-                    S.props.setNodePropVal(J.NodeProp.IMG_SIZE, state.node, imgSize);
-                }
-
-                if (this.childrenImgSizeSelection) {
-                    let imgSize = this.childrenImgSizeSelection.getSelection();
-                    S.props.setNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, state.node, imgSize);
-                }
-            }
 
             let content: string;
             if (this.contentEditor) {

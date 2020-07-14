@@ -13,7 +13,10 @@ export class MenuItem extends Div {
 
     constructor(public name: string, public clickFunc: Function, enabled: boolean=true) {
         super(name);
-        this.state.content = name;
+        
+        //todo-0: isn't this done in base class Div?
+        this.stateHolder.get().content = name;
+
         this.onClick = this.onClick.bind(this);
         this.setEnabled(enabled);
     }

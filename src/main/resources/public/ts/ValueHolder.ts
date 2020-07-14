@@ -9,7 +9,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-//todo-0: Implement this for every TextField, and then also make it work in Textarea
+//encapsulates setting and getting a component state variable on behalf of a component
 export class ValueHolder<T> implements ValueIntf {
 
     constructor(private comp: CompIntf, public propName: string) {

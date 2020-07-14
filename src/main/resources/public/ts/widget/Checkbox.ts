@@ -13,13 +13,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Checkbox extends Comp implements I.CheckboxIntf {
 
-    constructor(public label: string = null, _attribs: Object = null, private valueIntf: ValueIntf = null) {
+    constructor(public label: string = null, _attribs: Object = null, private valueIntf: ValueIntf) {
         super(_attribs);
 
         this.attribs.type = "checkbox";
-        if (!valueIntf) {
-            throw new Error("valueIntf is required in Checkbox class");
-        }
 
         this.attribs.onChange = (evt: any) => {
 

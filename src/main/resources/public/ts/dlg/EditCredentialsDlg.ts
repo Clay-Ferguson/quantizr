@@ -32,8 +32,7 @@ export class EditCredentialsDlg extends DialogBase {
                 new FormGroup(null, [
                     new TextField("User", null, false, null, new ValueHolder<string>(this, "user")),
                     new TextField("Password", null, true, null, new ValueHolder<string>(this, "password"))
-                ]
-                ),
+                ]),
                 new ButtonBar([
                     new Button("Save", this.saveCreds, null, "btn-primary"),
                     new Button("Cancel", () => {
