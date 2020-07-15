@@ -519,6 +519,10 @@ input[type="radio"] {
     margin-right: $smallGap;
 }
 
+.microMarginTop {
+    margin-top: $microGap;
+}
+
 .marginTop {
     margin-top: $smallGap;
 }
@@ -843,7 +847,7 @@ which it will do by default. */
 .header-text {
     font-size: small;
     margin-left: 16px;
-    padding-top: 10px;
+    padding-top: $microGap;
 }
 
 .nodeName {

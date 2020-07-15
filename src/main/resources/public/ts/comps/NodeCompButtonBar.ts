@@ -23,7 +23,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class NodeCompButtonBar extends HorizontalLayout {
 
     constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean) {
-        super(null, "marginLeft", {
+        super(null, "marginLeft microMarginTop", {
             id: "NodeCompButtonBar_" + node.id,
         });
     }
