@@ -97,7 +97,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "c2", val: "2 Columns" },
             { key: "c3", val: "3 Columns" },
             { key: "c4", val: "4 Columns" }
-        ], "m-2 w-25", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v")); 
+        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v"));  //w-25
         return selection;
     }
 
@@ -137,7 +137,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "1000px", val: "1000px" },
         ]);
 
-        let selection: Selection = new Selection(null, label, options, "m-2 w-25", valueIntf); 
+        let selection: Selection = new Selection(null, label, options, "m-2", valueIntf); 
         return selection;
     }
 

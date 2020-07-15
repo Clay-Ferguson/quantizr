@@ -61,8 +61,9 @@ export class TransferNodeDlg extends DialogBase {
     transfer = (): void => {
         let fromUser = this.fromTextField.getValue();
         let toUser = this.toTextField.getValue();
-        if (!fromUser || !toUser) {
-            S.util.showMessage("To and From user names are required.", "Warning");
+        //if fromUser is left blank that's how to take ownership of any nodes regardless of current ownership
+        if (/*!fromUser ||*/ !toUser) {
+            S.util.showMessage("To user name is required.", "Warning");
             return;
         }
         let node: J.NodeInfo = S.meta64.getHighlightedNode(this.appState);

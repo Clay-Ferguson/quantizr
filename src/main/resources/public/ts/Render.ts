@@ -309,11 +309,10 @@ export class Render implements RenderIntf {
 
         if (!state.isAnonUser && !!state.nodesToMove && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
 
+            console.log("pasteSelButton: node.id="+node.id+" isFirst="+isFirst);
+
             let func: Function = null;
-            if (state.endReached) {
-                func = S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_InlineEnd, "S.edit.pasteSelNodes_InlineEnd", node.id);
-            }
-            else if (isFirst) {
+            if (isFirst) {
                 func = S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_InlineAbove, "S.edit.pasteSelNodes_InlineAbove", node.id);
             }
             else {

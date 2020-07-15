@@ -646,10 +646,6 @@ export class Edit implements EditIntf {
         });
     }
 
-    cached_pasteSelNodes_InlineEnd = (nodeId: string) => {
-        this.pasteSelNodes(nodeId, "inline-end");
-    }
-
     cached_pasteSelNodes_InlineAbove = (nodeId: string) => {
         this.pasteSelNodes(nodeId, "inline-above");
     }

@@ -269,7 +269,8 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
             J.NodeProp.SAVE_TO_IPFS, //
             J.NodeProp.LAYOUT, //
             J.NodeProp.PRIORITY, //
-            J.NodeProp.IMG_SIZE
+            J.NodeProp.IMG_SIZE,
+            J.NodeProp.CHILDREN_IMG_SIZES
         ]);
     }
 

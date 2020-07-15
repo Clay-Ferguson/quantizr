@@ -778,10 +778,13 @@ public class MongoApi {
 	public SubNode getNodeByName(MongoSession session, String name, boolean allowAuth) {
 		Query query = new Query();
 
+		//log.debug("getNodeByName: " + name);
+
 		ObjectId nodeOwnerId;
 		int colonIdx = -1;
 		if ((colonIdx = name.indexOf(":")) == -1) {
 			nodeOwnerId = systemRootNode.getOwner();
+			//log.debug("no leading colon, so this is expected to have admin owner=" + nodeOwnerId.toHexString());
 		} else {
 			String userName = name.substring(0, colonIdx);
 
@@ -797,6 +800,10 @@ public class MongoApi {
 				.and(SubNode.FIELD_OWNER).is(nodeOwnerId));
 		saveSession(session);
 		SubNode ret = ops.findOne(query, SubNode.class);
+
+		// if (ret != null) {
+		// 	log.debug("Node found: id=" + ret.getId().toHexString());
+		// }
 
 		if (allowAuth) {
 			auth(session, ret, PrivilegeType.READ);
@@ -1508,7 +1515,8 @@ public class MongoApi {
 		SubNode node = getNode(session, path);
 
 		if (node == null) {
-			node = createNode(session, userNode, NodeName.TRASH, NodeType.TRASH_BIN.s(), 0L, CreateNodeLocation.LAST, null);
+			node = createNode(session, userNode, NodeName.TRASH, NodeType.TRASH_BIN.s(), 0L, CreateNodeLocation.LAST,
+					null);
 			node.setOwner(userNode.getId());
 			save(session, node);
 		}

@@ -62,13 +62,25 @@ export class NodeCompRowHeader extends Div {
                 }));
             }
 
-            children.push(new Span(
-                (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") //
-            ));
+            //only for admin user do we show ID, ordinal, and type as a string
+            if (state.isAdminUser) {
+                children.push(new Span(
+                    "ID:" + node.id + " " + //
+                    ((node.logicalOrdinal != -1) ? ("[" + node.logicalOrdinal + "] ") : " ") + //
+                    node.type + //
+                    (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") //
+                ));
+            }
+            //if not admin user just show mod time here.
+            else {
+                children.push(new Span(
+                    (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") //
+                ));
+            }
 
             if (priority) {
                 children.push(new Span(priority, {
-                    className: "priorityTag"+priorityVal
+                    className: "priorityTag" + priorityVal
                 }));
             }
         }

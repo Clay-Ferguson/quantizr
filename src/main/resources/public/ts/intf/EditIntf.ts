@@ -38,7 +38,6 @@ export interface EditIntf {
     undoCutSelNodes(state: AppState): void;
     cached_pasteSelNodesInside(nodeId: string);
     pasteSelNodes(nodeId: string, location: string, state?: AppState): void;
-    cached_pasteSelNodes_InlineEnd(nodeId: string);
     cached_pasteSelNodes_InlineAbove(nodeId: string);
     cached_pasteSelNodes_Inline(nodeId: string);
     insertBookWarAndPeace(state: AppState): void;

@@ -144,7 +144,7 @@ public class NodeMoveService {
 			if (session == null) {
 				session = ThreadLocals.getMongoSession();
 			}
-		
+
 			SubNode trashNode = api.getTrashNode(session, session.getUser(), null);
 			moveNodesInternal(session, "inside", trashNode.getId().toHexString(), req.getNodeIds());
 			res.setSuccess(true);
@@ -204,7 +204,7 @@ public class NodeMoveService {
 	 */
 	private void moveNodesInternal(MongoSession session, String location, String targetId, List<String> nodeIds) {
 
-		// log.debug("moveNodesInternal: targetId=" + targetId);
+		log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
 		SubNode targetNode = api.getNode(session, targetId);
 
 		SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode
@@ -217,7 +217,7 @@ public class NodeMoveService {
 
 		// location==inside
 		if (location.equalsIgnoreCase("inside")) {
-			curTargetOrdinal = targetNode.getMaxChildOrdinal() == null ? 0 : targetNode.getMaxChildOrdinal();
+			curTargetOrdinal = targetNode.getMaxChildOrdinal() == null ? 0 : targetNode.getMaxChildOrdinal() + 1;
 		}
 		// location==inline (todo-1: rename this to inline-below)
 		else if (location.equalsIgnoreCase("inline")) {
@@ -228,11 +228,6 @@ public class NodeMoveService {
 		else if (location.equalsIgnoreCase("inline-above")) {
 			curTargetOrdinal = targetNode.getOrdinal();
 			api.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, nodeIds.size());
-		}
-		// location==inline-end
-		else if (location.equalsIgnoreCase("inline-end")) {
-			curTargetOrdinal = api.getMaxChildOrdinal(session, parentToPasteInto) + 1L;
-			parentToPasteInto.setMaxChildOrdinal(curTargetOrdinal + nodeIds.size());
 		}
 
 		for (String nodeId : nodeIds) {

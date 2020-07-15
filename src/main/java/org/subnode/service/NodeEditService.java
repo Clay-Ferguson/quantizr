@@ -114,7 +114,7 @@ public class NodeEditService {
 
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
-		//todo-0: check if req.isImmediateTimestamp is still used?
+		// todo-0: check if req.isImmediateTimestamp is still used?
 
 		newNode = api.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties());
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
@@ -469,12 +469,22 @@ public class NodeEditService {
 			throw new RuntimeEx("User not found: " + req.getToUser());
 		}
 
-		SubNode fromUserNode = api.getUserNodeByUserName(api.getAdminSession(), req.getFromUser());
-		if (fromUserNode == null) {
-			throw new RuntimeEx("User not found: " + req.getFromUser());
+		SubNode fromUserNode = null;
+		if (!StringUtils.isEmpty(req.getFromUser())) {
+			fromUserNode = api.getUserNodeByUserName(api.getAdminSession(), req.getFromUser());
+			if (fromUserNode == null) {
+				throw new RuntimeEx("User not found: " + req.getFromUser());
+			}
 		}
-		if (transferNode(session, node, fromUserNode.getOwner(), toUserNode.getOwner())) {
+
+		// if user doesn't specify a 'from' then we set ownership of ALL nodes.
+		if (fromUserNode == null) {
+			node.setOwner(toUserNode.getOwner());
 			transfers++;
+		} else {
+			if (transferNode(session, node, fromUserNode.getOwner(), toUserNode.getOwner())) {
+				transfers++;
+			}
 		}
 
 		if (req.isRecursive()) {
@@ -485,8 +495,13 @@ public class NodeEditService {
 			 */
 			for (SubNode n : api.getSubGraph(session, node)) {
 				// log.debug("Node: path=" + path + " content=" + n.getContent());
-				if (transferNode(session, n, fromUserNode.getOwner(), toUserNode.getOwner())) {
+				if (fromUserNode == null) {
+					n.setOwner(toUserNode.getOwner());
 					transfers++;
+				} else {
+					if (transferNode(session, n, fromUserNode.getOwner(), toUserNode.getOwner())) {
+						transfers++;
+					}
 				}
 			}
 		}
