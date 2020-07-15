@@ -4,7 +4,7 @@ import { Button } from "../widget/Button";
 import { RadioButton } from "../widget/RadioButton";
 import { RadioButtonGroup } from "../widget/RadioButtonGroup";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { TextField } from "../widget/TextField";
 import { TextContent } from "../widget/TextContent";
@@ -18,15 +18,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class SplitNodeDlg extends DialogBase {
 
-    inlineRadioButton: RadioButton;
-    childrenRadioButton: RadioButton;
-    doubleSpacedRadioButton: RadioButton;
-    tripleSpacedRadioButton: RadioButton;
-    customDelimRadioButton: RadioButton;
-    delimiterTextField: TextField;
-
     constructor(state: AppState) {
         super("Split Node", null, false, state);
+        this.mergeState({
+            splitMode: "double", //can be: custom | double | triple (todo-1: make an enum)
+            splitType: "inline", //can be: inline | children (todo-1: make an enum)
+            delimiter: "{split}"
+        });
     }
 
     renderDlg(): CompIntf[] {
@@ -34,47 +32,78 @@ export class SplitNodeDlg extends DialogBase {
             new TextContent("Split into multiple nodes..."),
 
             new RadioButtonGroup([
-                this.childrenRadioButton = new RadioButton("Split into Children", true, "splitTypeGroup"),
-                this.inlineRadioButton = new RadioButton("Split Inline", false, "splitTypeGroup"),
+                new RadioButton("Split Inline", false, "splitTypeGroup", null, {
+                    setValue: (checked: boolean): void => {
+                        if (checked) {
+                            this.mergeState({ splitType: "inline" });
+                        }
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().splitType == "inline";
+                    }
+                }),
+                new RadioButton("Split into Children", true, "splitTypeGroup", null, {
+                    setValue: (checked: boolean): void => {
+                        if (checked) {
+                            this.mergeState({ splitType: "children" });
+                        }
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().splitType == "children";
+                    }
+                })
             ], "form-group-border marginBottom"),
 
             new RadioButtonGroup([
-                this.doubleSpacedRadioButton = new RadioButton("Double Spaced", true, "splitSpacingGroup",
-                    {
-                        onChange: (evt: any) => {
-                            if (evt.target.checked) {
-                                this.delimiterTextField.setVisible(false);
-                            }
+                new RadioButton("Double Spaced", true, "splitSpacingGroup", null, {
+                    setValue: (checked: boolean): void => {
+                        if (checked) {
+                            this.mergeState({ splitMode: "double" });
                         }
-                    }),
-                this.tripleSpacedRadioButton = new RadioButton("Triple Spaced", false, "splitSpacingGroup",
-                    {
-                        onChange: (evt: any) => {
-                            if (evt.target.checked) {
-                                this.delimiterTextField.setVisible(false);
-                            }
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().splitMode == "double";
+                    }
+                }),
+                new RadioButton("Triple Spaced", false, "splitSpacingGroup", null, {
+                    setValue: (checked: boolean): void => {
+                        if (checked) {
+                            this.mergeState({ splitMode: "triple" });
                         }
-                    }),
-                this.customDelimRadioButton = new RadioButton("Custom Delimiter", false, "splitSpacingGroup",
-                    {
-                        onChange: (evt: any) => {
-                            if (evt.target.checked) {
-                                this.delimiterTextField.setVisible(true);
-                            }
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().splitMode == "triple";
+                    }
+                }),
+                new RadioButton("Custom Delimiter", false, "splitSpacingGroup", null, {
+                    setValue: (checked: boolean): void => {
+                        if (checked) {
+                            this.mergeState({ splitMode: "custom" });
                         }
-                    }),
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().splitMode == "custom";
+                    }
+                }),
             ], "form-group-border marginBottom"),
 
-            this.delimiterTextField = new TextField("Delimiter"),
+            (this.getState().splitMode == "custom") ? new TextField("Delimiter", null, false, null, {
+                getValue: (): string => {
+                    return this.getState().delimiter;
+                },
+                setValue: (val: string): void => {
+                    this.mergeState({ delimiter: val });
+                }
+            }) : null,
+
             new ButtonBar([
-                new Button("Ok", this.splitNodes, null, "btn-primary"),
+                new Button("Split Node", this.splitNodes, null, "btn-primary"),
                 new Button("Close", () => {
                     this.close();
                 })
             ])
         ];
 
-        this.delimiterTextField.setVisible(false);
         return children;
     }
 
@@ -83,22 +112,22 @@ export class SplitNodeDlg extends DialogBase {
     }
 
     splitNodes = (): void => {
+        let state = this.getState();
         let highlightNode = S.meta64.getHighlightedNode(this.appState);
         if (highlightNode) {
-            let splitType = this.childrenRadioButton.getChecked() ? "children" : "inline";
 
             let delim = "";
-            if (this.doubleSpacedRadioButton.getChecked()) {
+            if (state.splitMode == "double") {
                 delim = "\n\n";
             }
-            else if (this.tripleSpacedRadioButton.getChecked()) {
+            else if (state.splitMode == "triple") {
                 delim = "\n\n\n";
             }
-            else if (this.customDelimRadioButton.getChecked()) {
-                delim = this.delimiterTextField.getValue();
+            else if (state.splitMode == "custom") {
+                delim = state.delimiter;
             }
 
-            S.edit.splitNode(splitType, delim, this.appState)
+            S.edit.splitNode(state.splitType, delim, this.appState)
         }
         this.close();
     }
