@@ -1243,6 +1243,15 @@ i'm backing out for now
     margin-bottom: $smallGap;
 }
 
+.inlineEditFormArea {
+    background-color: $modal-content-bg;
+    //border: 2px solid $modal-content-border-color;
+    //border-radius: $borderRadiusLarge;
+    //padding: $smallGap;
+    margin-left: $smallGap;
+}
+
+
 /************************************************************** 
 Media Queries below are per Bootstap 4 standard */
 

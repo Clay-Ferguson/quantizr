@@ -114,8 +114,6 @@ public class NodeEditService {
 
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
-		// todo-0: check if req.isImmediateTimestamp is still used?
-
 		newNode = api.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties());
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
 

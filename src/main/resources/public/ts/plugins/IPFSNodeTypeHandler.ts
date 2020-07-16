@@ -41,7 +41,7 @@ export class IPFSNodeTypeHandler extends TypeBase {
             if (link) {
                 ret.push(new Heading(6, "Link: " + link, { className: "ipfs-text" }));
             }
-            ret.push(new NodeCompMarkdown(node));
+            ret.push(new NodeCompMarkdown(node, state));
         }
         else {
             let displayName = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);

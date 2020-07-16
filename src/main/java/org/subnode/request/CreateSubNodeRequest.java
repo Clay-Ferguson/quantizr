@@ -22,12 +22,6 @@ public class CreateSubNodeRequest extends RequestBase {
 	//default properties to add, or null if none
 	private List<PropertyInfo> properties;
 
-	/* without this the node is created without initially having a last modify time, which is how we know not to
-	 to display nodes to other users until the person editing the node is finished editing it. So the lastMod time on the node
-	 being non-null, is the indicator of the node being 'published' and 'saved' if visible to other users, and not still
-	 being in it's initial editing state when user is first creating it */
-	private boolean immediateTimestamp;
-
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -82,13 +76,5 @@ public class CreateSubNodeRequest extends RequestBase {
 
 	public void setProperties(List<PropertyInfo> properties) {
 		this.properties = properties;
-	}
-
-	public boolean isImmediateTimestamp() {
-		return immediateTimestamp;
-	}
-
-	public void setImmediateTimestamp(boolean immediateTimestamp) {
-		this.immediateTimestamp = immediateTimestamp;
 	}
 }

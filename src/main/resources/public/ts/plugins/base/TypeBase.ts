@@ -7,8 +7,8 @@ import { Comp } from "../../widget/base/Comp";
 import { NodeCompMarkdown } from "../../comps/NodeCompMarkdown";
 import { AppState } from "../../AppState";
 import { CompIntf } from "../../widget/base/CompIntf";
-import { store } from "../../AppRedux";
 import { NodeActionType } from "../../enums/NodeActionType";
+import { InlineEditField } from "../../widget/InlineEditField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -65,7 +65,12 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
-        return new NodeCompMarkdown(node);
+        if (state.inlineEditId == node.id) {
+            return new InlineEditField(node, state);
+        }
+        else {
+            return new NodeCompMarkdown(node, state);
+        }
     }
 
     orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {

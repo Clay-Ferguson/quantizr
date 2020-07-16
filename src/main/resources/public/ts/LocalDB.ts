@@ -1,7 +1,24 @@
 import { LocalDBIntf } from "./intf/LocalDBIntf";
 
+import { Singletons } from "./Singletons";
+import { PubSub } from "./PubSub";
+import { Constants as C } from "./Constants";
+
+let S: Singletons;
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
+    S = s;
+});
+
 /* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
 export class LocalDB implements LocalDBIntf {
+
+    //For performance, I think it may be better to just never close the database once opened, but this flag allows
+    //the logic to flow either way if we ever need to (close always or not)
+    keepDbOpen: boolean = true;
+    db: IDBDatabase = null;
+
+    /* Name of logged in user or 'null' if anonymous user not logged in */
+    userName: string;
 
     /* DB and Store names */
     static STORE_NAME = "objstore";
@@ -13,9 +30,8 @@ export class LocalDB implements LocalDBIntf {
     static ACCESS_READWRITE: IDBTransactionMode = "readwrite";
     static ACCESS_READONLY: IDBTransactionMode = "readonly";
     static KEY_NAME = "name";
-    static KEY_VAL_NAME_PREFIX = "kv_";
 
-    openDB = (): IDBOpenDBRequest => {
+    private openDB = (): IDBOpenDBRequest => {
         if (!indexedDB) {
             throw "IndexedDB API not available in browser.";
         }
@@ -28,43 +44,54 @@ export class LocalDB implements LocalDBIntf {
     }
 
     /* Runs a transaction by first opening the database, and then running the transaction */
-    runTrans = (access: IDBTransactionMode, runner: (store: IDBObjectStore) => void) => {
-        let req: IDBOpenDBRequest = this.openDB();
-        req.onsuccess = () => {
-            let db: IDBDatabase = req.result;
-            this.runTransWithDb(db, access, runner);
+    private runTrans = (access: IDBTransactionMode, runner: (store: IDBObjectStore) => void) => {
+
+        if (this.db) {
+            let tx: IDBTransaction = this.db.transaction(LocalDB.STORE_NAME, access);
+            let store: IDBObjectStore = tx.objectStore(LocalDB.STORE_NAME);
+
+            runner(store);
+
+            tx.oncomplete = () => {
+                if (!this.keepDbOpen) {
+                    //todo-1: need to research best practice for this, and see if we should be closing the DB here or if there's
+                    //some better pattern for keeping it open for more transactions.
+                    this.db.close();
+                    this.db = null;
+                }
+            };
         }
-        req.onerror = () => {
-            console.warn("runTrans failed");
-        };
-    }
-
-    /* Runs a transaction on the database provided */
-    runTransWithDb = (db: IDBDatabase, access: IDBTransactionMode, runner: (store: IDBObjectStore) => void) => {
-        let tx: IDBTransaction = db.transaction(LocalDB.STORE_NAME, access);
-        let store: IDBObjectStore = tx.objectStore(LocalDB.STORE_NAME);
-
-        runner(store);
-
-        tx.oncomplete = () => {
-            //todo-1: need to research best practice for this, and see if we should be closing the DB here or if there's
-            //some better pattern for keeping it open for more transactions.
-            db.close();
-        };
+        else {
+            let req: IDBOpenDBRequest = this.openDB();
+            req.onsuccess = () => {
+                //this is a one level recursion, just as a design choice. This isn't inherently a recursive operation.
+                if (req.result) {
+                    this.db = req.result;
+                    this.runTrans(access, runner);
+                }
+            }
+            req.onerror = () => {
+                console.warn("runTrans failed");
+            };
+        }
     }
 
     // gets the value stored under the key (like a simple map/keystore)
-    getVal = (key: string): Promise<any> => {
+    getVal = (key: string, userName: string = null): Promise<any> => {
         return new Promise<any>(async (resolve, reject) => {
-            let obj: any = await this.readObject(LocalDB.KEY_VAL_NAME_PREFIX + key);
+            let keyPrefix = this.getKeyPrefix(userName);
+            let obj: any = await this.readObject(keyPrefix + key);
+            //console.log("LocalDB[" + LocalDB.DB_NAME + "] getVal name=" + keyPrefix + key + " val=" + (!!obj ? obj.val : null));
             resolve(!!obj ? obj.val : null);
         });
     }
 
     // stores the value under this key  (like a simple map/keystore)
-    setVal = (key: string, val: any): Promise<void> => {
+    setVal = (key: string, val: any, userName: string = null): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            await this.writeObject({ name: LocalDB.KEY_VAL_NAME_PREFIX + key, val });
+            let keyPrefix = this.getKeyPrefix(userName);
+            //console.log("LocalDB[" + LocalDB.DB_NAME + "] setVal name=" + keyPrefix + key + " val=" + val);
+            await this.writeObject({ name: keyPrefix + key, val });
             resolve();
         });
     }
@@ -75,6 +102,7 @@ export class LocalDB implements LocalDBIntf {
         return new Promise<void>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READWRITE,
                 (store: IDBObjectStore) => {
+                    //console.log("LocalDB[" + LocalDB.DB_NAME + "] writeObject=" + S.util.prettyPrint(val));
                     store.put(val);
                     resolve();
                 });
@@ -94,10 +122,27 @@ export class LocalDB implements LocalDBIntf {
                         resolve(promise.result);
                     };
                     promise.onerror = () => {
-                        console.warn("readObject failed: name="+name);
+                        console.warn("readObject failed: name=" + name);
                         resolve(null);
                     };
                 });
         });
+    }
+
+    private getKeyPrefix = (userName: string): string => {
+        let prefix;
+
+        //allow parameter userName to override with special case handled for 'anon'
+        if (userName) {
+            if (userName == "anon") {
+                userName = null;
+            }
+            prefix = userName ? (userName + "_") : "kv_";
+        }
+        //else use this.userName
+        else {
+            prefix = this.userName ? (this.userName + "_") : "kv_";
+        }
+        return prefix;
     }
 }

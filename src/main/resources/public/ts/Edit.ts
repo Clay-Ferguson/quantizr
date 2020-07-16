@@ -75,12 +75,11 @@ export class Edit implements EditIntf {
         }
     }
 
-    private initNodeEditResponse = (res: J.InitNodeEditResponse, state: AppState): void => {
+    public initNodeEditResponse = (res: J.InitNodeEditResponse, state: AppState, dialogEditor: boolean): void => {
         if (S.util.checkSuccess("Editing node", res)) {
             let node: J.NodeInfo = res.nodeInfo;
 
             let editingAllowed = this.isEditAllowed(node, state);
-
             if (editingAllowed) {
                 /*
                  * Server will have sent us back the raw text content, that should be markdown instead of any HTML, so
@@ -88,8 +87,19 @@ export class Edit implements EditIntf {
                  */
                 let editNode = res.nodeInfo;
 
-                let dlg = new EditNodeDlg(editNode, state);
-                dlg.open();
+                if (dialogEditor) {
+                    let dlg = new EditNodeDlg(editNode, state);
+                    dlg.open();
+                }
+                else {
+                    dispatch({
+                        type: "Action_InlineEdit",
+                        update: (s: AppState): void => {
+                            s.inlineEditId = node.id;
+                            s.inlineEditVal = node.content;
+                        }
+                    });
+                }
             } else {
                 S.util.showMessage("You cannot edit nodes that you don't own.", "Warning");
             }
@@ -188,7 +198,6 @@ export class Edit implements EditIntf {
                 content: null,
                 typeLock: false,
                 properties: null,
-                immediateTimestamp: false
             }, (res) => {
                 this.createSubNodeResponse(res, state);
             });
@@ -379,7 +388,7 @@ export class Edit implements EditIntf {
         S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: node.id
         }, (res) => {
-            this.initNodeEditResponse(res, state);
+            this.initNodeEditResponse(res, state, true);
         });
     }
 
@@ -693,8 +702,7 @@ export class Edit implements EditIntf {
                     createAtTop: true,
                     content: clipText,
                     typeLock: false,
-                    properties: null,
-                    immediateTimestamp: false
+                    properties: null
                 },
                     () => {
                         S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
@@ -737,7 +745,6 @@ export class Edit implements EditIntf {
             content: null,
             typeLock: false,
             properties: null,
-            immediateTimestamp: false
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });
@@ -754,7 +761,6 @@ export class Edit implements EditIntf {
             content: null,
             typeLock: true,
             properties: null,
-            immediateTimestamp: false
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });

@@ -303,7 +303,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                                 content: file.name,
                                 typeLock: false,
                                 properties,
-                                immediateTimestamp: true
                             }, (res) => {
                                 //nothing to be done here.
                             });

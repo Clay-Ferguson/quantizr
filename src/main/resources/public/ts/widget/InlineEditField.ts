@@ -1,0 +1,89 @@
+import * as J from "../JavaIntf";
+import { Singletons } from "../Singletons";
+import { PubSub } from "../PubSub";
+import { Constants as C } from "../Constants";
+import { Textarea } from "./Textarea";
+import { Span } from "./Span";
+import { AppState } from "../AppState";
+import { Div } from "./Div";
+import { ButtonBar } from "./ButtonBar";
+import { Button } from "./Button";
+import { dispatch } from "../AppRedux";
+
+let S: Singletons;
+PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+    S = ctx;
+});
+
+export class InlineEditField extends Span {
+
+    constructor(private node: J.NodeInfo, private appState: AppState) {
+        super();
+        this.attribs.className = "quickEditSpan col-9";
+
+        //todo-0: this is not the final plae to hold state for this maybe?
+        this.mergeState({
+            inlineEditVal: appState.inlineEditVal
+        });
+
+        this.saveEdit = this.saveEdit.bind(this);
+        this.cancelEdit = this.cancelEdit.bind(this);
+    }
+
+    preRender(): void {
+        let state = this.getState();
+
+        let textarea = new Textarea(null, {
+            rows: 10,
+        }, null, {
+            getValue: () => {
+                return this.getState().inlineEditVal;
+            },
+            setValue: (val: any) => {
+                this.mergeState({
+                    inlineEditVal: val
+                });
+            }
+        }, "form-control pre-textarea quickEditTextArea");
+
+        let buttonBar = new ButtonBar([
+            new Button("Save", this.saveEdit, null, "btn-primary"),
+            new Button("Cancel", this.cancelEdit)
+        ], null, "marginTop");
+
+        let editContainer = new Div(null, {
+            className: "inlineEditFormArea"
+        }, [textarea, buttonBar]);
+
+        textarea.focus();
+
+        this.setChildren([editContainer]);
+    }
+
+    saveEdit(): void {
+        dispatch({
+            type: "Action_InlineEdit",
+            update: (s: AppState): void => {
+                s.inlineEditId = null;
+                this.node.content = this.getState().inlineEditVal;
+
+                S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
+                    updateModTime: true,
+                    node: this.node
+                }, async (res: J.SaveNodeResponse) => {
+                    await S.edit.updateIpfsNodeJson(this.node, this.appState);
+                    S.edit.saveNodeResponse(this.node, res, this.appState);
+                });
+            }
+        });
+    }
+
+    cancelEdit(): void {
+        dispatch({
+            type: "Action_InlineEdit",
+            update: (s: AppState): void => {
+                s.inlineEditId = null;
+            }
+        });
+    }
+}

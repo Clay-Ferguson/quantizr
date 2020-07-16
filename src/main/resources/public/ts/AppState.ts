@@ -9,6 +9,9 @@ export class AppState {
     /* flag that indicates the user can click "Refresh Feed" because there are new changes read */
     feedDirty: boolean = false;
 
+    inlineEditId: string;
+    inlineEditVal: string;
+
     //for testing in AppDemo
     counter: number = 0;
     compDemoIdActive: number = -1;

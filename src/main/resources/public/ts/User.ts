@@ -129,6 +129,8 @@ export class User implements UserIntf {
 
                 if (updateLocalDb) {
                     await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
+                    /* Setting logged in state for non-user also */
+                    await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", "anon");
                 }
 
                 S.util.ajax<J.LogoutRequest, J.LogoutResponse>("logout", {}, this.logoutResponse);
@@ -154,14 +156,20 @@ export class User implements UserIntf {
             try {
                 if (S.util.checkSuccess("Login", res)) {
                     if (usr !== J.PrincipalName.ANON) {
+                        S.localDB.userName = usr;
                         if (usr) {
                             await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
+                            //set this user for the 'anon' case also meaning it'll be default when user it not logged in
+                            await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr, "anon");
                         }
 
                         if (pwd) {
                             await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
+                            //set this pwd for the 'anon' case also meaning it'll be default when user it not logged in
+                            await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd, "anon");
                         }
                         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");
+                        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1", "anon");
                     }
 
                     S.meta64.setStateVarsUsingLoginResponse(res, state);

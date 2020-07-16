@@ -237,7 +237,7 @@ export class Render implements RenderIntf {
 
                     s.selectedNodes = {};
 
-                    if (s.node) {
+                    if (s.node && !state.isAnonUser) {
                         //now that 'redux' is in control and we call this method less directly/often, I need to check to see if
                         //this method is getting called every time it should.
                         S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);

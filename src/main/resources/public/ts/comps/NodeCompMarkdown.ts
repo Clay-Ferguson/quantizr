@@ -6,6 +6,7 @@ import * as marked from 'marked';
 import { MarkdownDiv } from "../widget/MarkdownDiv";
 import { AppState } from "../AppState";
 import { useSelector, useDispatch } from "react-redux";
+import { dispatch } from "../AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -22,9 +23,22 @@ export class NodeCompMarkdown extends MarkdownDiv {
     //UPDATE: turning this ON for now, because for testing 'shared' nodes we don't have editing capability and thus need a way to decrypt
     private immediateDecrypting: boolean = true;
 
-    constructor(public node: J.NodeInfo) {
+    constructor(public node: J.NodeInfo, private appState: AppState) {
         super(null, {
             className: "markdown-content content-narrow markdown-html",
+        });
+
+        this.attribs.onClick = this.clickToEdit;
+    }
+
+    clickToEdit = (): void => {
+        //if already editing inline editing a row ignore this click.
+        if (this.appState.inlineEditId) return;
+        
+        S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
+            nodeId: this.node.id
+        }, (res) => {
+            S.edit.initNodeEditResponse(res, this.appState, false);
         });
     }
 
