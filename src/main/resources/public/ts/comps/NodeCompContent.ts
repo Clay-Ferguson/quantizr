@@ -10,6 +10,7 @@ import { Div } from "../widget/Div";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
+import { InlineEditField } from "../widget/InlineEditField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -52,22 +53,12 @@ export class NodeCompContent extends Div {
                 children.push(propTable);
             }
         } else {
-            /*
-             * Special Rendering for Nodes that have a plugin-renderer
-             */
-           // if (typeHandler) {
-                this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
-                children.push(typeHandler.render(node, this.rowStyling, state));
-            //}
-            //note: this path is obsolete now. always will have a type.
-            // else {
-            //     if (state.inlineEditId == node.id) {
-            //         children.push(new InlineEditField(node, state));
-            //     }
-            //     else {
-            //         children.push(new NodeCompMarkdown(node, state));
-            //     }
-            // }
+            if (!typeHandler) {
+                typeHandler = S.plugin.getTypeHandler(J.NodeType.NONE);
+            }
+
+            this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
+            children.push(typeHandler.render(node, this.rowStyling, state));
         }
 
         /* if node owner matches node id this is someone's account root node, so what we're doing here is not
