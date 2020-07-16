@@ -847,6 +847,8 @@ which it will do by default. */
 .header-text {
     font-size: small;
     margin-left: 16px;
+    margin-top: 8px;
+    margin-bottom: 8px;
     padding-top: $microGap;
 }
 
@@ -872,6 +874,7 @@ which it will do by default. */
     padding-left: 1em;
     padding-right: 1em;
     padding-bottom: .5em;
+    cursor: pointer;
 }
 
 .tags-content {
@@ -1236,11 +1239,11 @@ i'm backing out for now
 
 .quickEditFormArea {
     background-color: $modal-content-bg;
-    border: 2px solid $modal-content-border-color;
-    border-radius: $borderRadiusLarge;
-    padding: $smallGap;
-    margin-top: $smallGap;
-    margin-bottom: $smallGap;
+    //border: 2px solid $modal-content-border-color;
+    //border-radius: $borderRadiusLarge;
+    margin: $smallGap;
+    //margin-top: $smallGap;
+    //margin-bottom: $smallGap;
 }
 
 .inlineEditFormArea {

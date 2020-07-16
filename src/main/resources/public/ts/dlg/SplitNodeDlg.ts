@@ -1,3 +1,4 @@
+import * as J from "../JavaIntf";
 import { DialogBase } from "../DialogBase";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
@@ -18,10 +19,26 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class SplitNodeDlg extends DialogBase {
 
-    constructor(state: AppState) {
+    constructor(private node: J.NodeInfo, state: AppState) {
         super("Split Node", null, false, state);
+
+        if (!this.node) {
+            this.node = S.meta64.getHighlightedNode(this.appState);
+        }
+
+        let splitMode;
+        if (this.node.content.indexOf("\n\n\n") != -1) {
+            splitMode = "triple"
+        }
+        else if (this.node.content.indexOf("\n\n") != -1) {
+            splitMode = "double"
+        }
+        else {
+            splitMode = "custom"
+        }
+
         this.mergeState({
-            splitMode: "double", //can be: custom | double | triple (todo-1: make an enum)
+            splitMode, //can be: custom | double | triple (todo-1: make an enum)
             splitType: "inline", //can be: inline | children (todo-1: make an enum)
             delimiter: "{split}"
         });
@@ -113,22 +130,19 @@ export class SplitNodeDlg extends DialogBase {
 
     splitNodes = (): void => {
         let state = this.getState();
-        let highlightNode = S.meta64.getHighlightedNode(this.appState);
-        if (highlightNode) {
 
-            let delim = "";
-            if (state.splitMode == "double") {
-                delim = "\n\n";
-            }
-            else if (state.splitMode == "triple") {
-                delim = "\n\n\n";
-            }
-            else if (state.splitMode == "custom") {
-                delim = state.delimiter;
-            }
-
-            S.edit.splitNode(state.splitType, delim, this.appState)
+        let delim = "";
+        if (state.splitMode == "double") {
+            delim = "\n\n";
         }
+        else if (state.splitMode == "triple") {
+            delim = "\n\n\n";
+        }
+        else if (state.splitMode == "custom") {
+            delim = state.delimiter;
+        }
+
+        S.edit.splitNode(this.node, state.splitType, delim, this.appState)
         this.close();
     }
 }

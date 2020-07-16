@@ -8,6 +8,7 @@ import { AppState } from "../AppState";
 import { Div } from "./Div";
 import { ButtonBar } from "./ButtonBar";
 import { Button } from "./Button";
+import { SplitNodeDlg } from "../dlg/SplitNodeDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -64,7 +65,7 @@ export class QuickEditField extends Span {
         }
         else {
             let textarea = new Textarea(null, {
-                rows: 5,
+                rows: 6,
             }, null, {
                 getValue: () => {
                     return this.getState().quickEditVal;
@@ -101,6 +102,7 @@ export class QuickEditField extends Span {
         QuickEditField.editingId = null;
         QuickEditField.editingVal = null;
         let val = this.getState().quickEditVal;
+        let askToSplit = val.indexOf("{split}") != -1 || val.indexOf("\n\n\n") != -1;
 
         S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
             updateModTime: true,
@@ -112,8 +114,12 @@ export class QuickEditField extends Span {
         }, (res) => {
             //todo-1: this timeout is required, to see the new data, and I don't know why unless it's mongo not being able to commit fast enough ?
             setTimeout(() => {
-                //need to flash node here....
                 S.view.refreshTree(this.appState.node.id, false, res.newNode.id, false, false, false, false, this.appState);
+            
+                if (askToSplit) {
+                    new SplitNodeDlg(res.newNode, this.appState).open();
+                }
+
             }, 250);
         });
     }

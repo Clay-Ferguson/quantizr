@@ -9,6 +9,7 @@ import { Div } from "./Div";
 import { ButtonBar } from "./ButtonBar";
 import { Button } from "./Button";
 import { dispatch } from "../AppRedux";
+import { SplitNodeDlg } from "../dlg/SplitNodeDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -66,6 +67,8 @@ export class InlineEditField extends Span {
             update: (s: AppState): void => {
                 s.inlineEditId = null;
                 this.node.content = this.getState().inlineEditVal;
+                let askToSplit = this.node.content && (this.node.content.indexOf("{split}") != -1 ||
+                    this.node.content.indexOf("\n\n\n") != -1);
 
                 S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                     updateModTime: true,
@@ -73,6 +76,10 @@ export class InlineEditField extends Span {
                 }, async (res: J.SaveNodeResponse) => {
                     await S.edit.updateIpfsNodeJson(this.node, this.appState);
                     S.edit.saveNodeResponse(this.node, res, this.appState);
+
+                    if (askToSplit) {
+                        new SplitNodeDlg(this.node, this.appState).open();
+                    }
                 });
             }
         });

@@ -80,7 +80,7 @@ export class MenuPanel extends Div {
             //new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
             new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state), !state.isAnonUser && selNodeCount > 0), //
-            new MenuItem("Split Node", () => new SplitNodeDlg(state).open(), !state.isAnonUser && selNodeIsMine), //
+            new MenuItem("Split Node", () => new SplitNodeDlg(null, state).open(), !state.isAnonUser && selNodeIsMine), //
             new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open() }, !state.isAnonUser && selNodeIsMine), //
 
             new MenuItemSeparator(), //

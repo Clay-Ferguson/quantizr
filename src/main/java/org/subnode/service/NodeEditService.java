@@ -387,12 +387,11 @@ public class NodeEditService {
 		}
 		String nodeId = req.getNodeId();
 
-		// log.debug("Splitting node: " + nodeId);
+		//log.debug("Splitting node: " + nodeId);
 		SubNode node = api.getNode(session, nodeId);
 		SubNode parentNode = api.getParent(session, node);
 
 		api.authRequireOwnerOfNode(session, node);
-
 		String content = node.getContent();
 		boolean containsDelim = content.contains(req.getDelimiter());
 
@@ -432,15 +431,20 @@ public class NodeEditService {
 			api.save(session, parentForNewNodes);
 		}
 
+		Date now = new Date();
 		int idx = 0;
 		for (String part : contentParts) {
+			//log.debug("ContentPart[" + idx + "] " + part);
+			part = part.trim();
 			if (idx == 0) {
 				node.setContent(part);
+				node.setModifyTime(now);
 				api.save(session, node);
 			} else {
 				SubNode newNode = api.createNode(session, parentForNewNodes, null, firstOrdinal + idx,
 						CreateNodeLocation.ORDINAL);
 				newNode.setContent(part);
+				newNode.setModifyTime(now);
 				api.save(session, newNode);
 			}
 			idx++;

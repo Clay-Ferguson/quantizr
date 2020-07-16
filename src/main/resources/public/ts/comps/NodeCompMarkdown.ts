@@ -28,13 +28,24 @@ export class NodeCompMarkdown extends MarkdownDiv {
             className: "markdown-content content-narrow markdown-html",
         });
 
-        this.attribs.onClick = this.clickToEdit;
+        if (this.appState.userPreferences.editMode) {
+            this.attribs.onClick = this.clickToEdit;
+
+            // This styling looks nice but too much stuff is already eating up vertical space on screen during edit mode 
+            // so let's not do this.
+            this.attribs.style = {
+                borderTop: "1px solid lightGray",
+                borderRight: "1px solid lightGray",
+                //borderRadius: ".3em",
+                //margin: "8px"
+            };
+        }
     }
 
     clickToEdit = (): void => {
         //if already editing inline editing a row ignore this click.
         if (this.appState.inlineEditId) return;
-        
+
         S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: this.node.id
         }, (res) => {
@@ -46,7 +57,7 @@ export class NodeCompMarkdown extends MarkdownDiv {
         let content = node.content || "";
         let val = "";
 
-        if (node.type==J.NodeType.PLAIN_TEXT) {
+        if (node.type == J.NodeType.PLAIN_TEXT) {
 
             let nowrapProp: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.NOWRAP, node);
             let wordWrap = !(nowrapProp && nowrapProp.value == "1");

@@ -37,6 +37,7 @@ import { LayoutRow } from "../widget/LayoutRow";
 import { NodeActionType } from "../enums/NodeActionType";
 import { ValueIntf } from "../Interfaces";
 import { PropValueHolder } from "../PropValueHolder";
+import { SplitNodeDlg } from "../dlg/SplitNodeDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -109,7 +110,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "3", val: "Medium" },
             { key: "4", val: "Low" },
             { key: "5", val: "Backlog" }
-        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.PRIORITY, "0")); 
+        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.PRIORITY, "0"));
         return selection;
     }
 
@@ -137,7 +138,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "1000px", val: "1000px" },
         ]);
 
-        let selection: Selection = new Selection(null, label, options, "m-2", valueIntf); 
+        let selection: Selection = new Selection(null, label, options, "m-2", valueIntf);
         return selection;
     }
 
@@ -568,6 +569,8 @@ export class EditNodeDlg extends DialogBase {
             }
             state.node.content = content;
             await S.edit.updateIpfsNodeJson(state.node, this.appState);
+            let askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") != -1 ||
+                (state.node as J.NodeInfo).content.indexOf("\n\n\n") != -1);
 
             //console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
@@ -576,6 +579,10 @@ export class EditNodeDlg extends DialogBase {
             }, (res) => {
                 S.render.fadeInId = state.node.id;
                 S.edit.saveNodeResponse(state.node, res, this.appState);
+
+                if (askToSplit) {
+                    new SplitNodeDlg(state.node, this.appState).open();
+                }
             });
 
             resolve();

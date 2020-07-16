@@ -1,13 +1,11 @@
-import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { AppState } from "../AppState";
-import { CompIntf } from "../widget/base/CompIntf";
 
 export interface EditIntf {
     showReadOnlyProperties: boolean;
 
     saveClipboardToNode(): void;
-    splitNode(splitType: string, delimiter: string, state: AppState): void;
+    splitNode(node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): void;
     openProfileDlg(state: AppState): void;
     openChangePasswordDlg(state: AppState): void;
     openManageAccountDlg(state: AppState): void;

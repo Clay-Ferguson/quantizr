@@ -685,42 +685,44 @@ export class Edit implements EditIntf {
 
     saveClipboardToNode = (): void => {
 
-        (navigator as any).clipboard.readText().then(
-            clipText => {
-                if (clipText) {
-                    clipText = clipText.trim();
-                }
-                if (!clipText) {
-                    S.util.flashMessage("Nothing saved clipboard is empty!", "Warning", true);
-                    return;
-                }
+        (navigator as any).clipboard.readText().then(clipText => {
+            if (clipText) {
+                clipText = clipText.trim();
+            }
+            if (!clipText) {
+                S.util.flashMessage("Nothing saved clipboard is empty!", "Warning", true);
+                return;
+            }
 
-                S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                    nodeId: "~" + J.NodeType.NOTES,
-                    newNodeName: "",
-                    typeName: "u",
-                    createAtTop: true,
-                    content: clipText,
-                    typeLock: false,
-                    properties: null
-                },
-                    () => {
-                        S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
-                    }
-                );
-            });
+            S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                nodeId: "~" + J.NodeType.NOTES,
+                newNodeName: "",
+                typeName: "u",
+                createAtTop: true,
+                content: clipText,
+                typeLock: false,
+                properties: null
+            },
+                () => {
+                    S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
+                }
+            );
+        });
     }
 
-    splitNode = (splitType: string, delimiter: string, state: AppState): void => {
-        let highlightNode = S.meta64.getHighlightedNode(state);
-        if (!highlightNode) {
+    splitNode = (node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): void => {
+        if (!node) {
+            node = S.meta64.getHighlightedNode(state);
+        }
+
+        if (!node) {
             S.util.showMessage("You didn't select a node to split.", "Warning");
             return;
         }
 
         S.util.ajax<J.SplitNodeRequest, J.SplitNodeResponse>("splitNode", {
             splitType: splitType,
-            nodeId: highlightNode.id,
+            nodeId: node.id,
             delimiter
         }, (res) => {
             this.splitNodeResponse(res, state);
