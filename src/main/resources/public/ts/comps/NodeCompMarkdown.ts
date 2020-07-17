@@ -26,10 +26,10 @@ export class NodeCompMarkdown extends MarkdownDiv {
     constructor(public node: J.NodeInfo, private appState: AppState) {
         super(null, {
             className: "markdown-content content-narrow markdown-html",
-            title: "Click to edit"
         });
 
-        if (this.appState.userPreferences.editMode) {
+        if (this.appState.userPreferences.editMode && node.owner==appState.userName) {
+            this.attribs.title = "Click to edit";
             this.attribs.onClick = this.clickToEdit;
 
             // This was an experiment to help users know where to click, and it does that, but 

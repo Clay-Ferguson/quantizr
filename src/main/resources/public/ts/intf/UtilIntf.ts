@@ -113,4 +113,5 @@ export interface UtilIntf {
     perfEnd(message: string, startTime: number): void;
     getPathPartForNamedNode(node: J.NodeInfo): string;
     setDropHandler(attribs: any, func: (elm: any) => void): void;
+    resetDropHandler(attribs: any): void;
 }

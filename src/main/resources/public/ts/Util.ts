@@ -1216,6 +1216,13 @@ export class Util implements UtilIntf {
         console.log(message + " Time=" + (endTime - startTime));
     }
 
+    resetDropHandler = (attribs: any) => {
+        delete attribs.onDragEnter;
+        delete attribs.onDragOver;
+        delete attribs.onDragLeave;
+        delete attribs.onDrop;
+    }
+
     //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
     setDropHandler = (attribs: any, func: (elm: any) => void): void => {
 
@@ -1230,9 +1237,7 @@ export class Util implements UtilIntf {
             //console.log("onDragOver: id="+event.target.id);
             event.preventDefault();
             event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
-
-            /* warning: this 9px should match the $fatBorderSize in the scss file */
-            event.target.style.border = "4px solid green";
+            event.target.style.border = "2px solid green";
         };
 
         attribs.onDragLeave = function (event) {

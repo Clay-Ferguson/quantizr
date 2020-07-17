@@ -20,9 +20,9 @@ export class InlineEditField extends Span {
 
     constructor(private node: J.NodeInfo, private appState: AppState) {
         super();
-        this.attribs.className = "quickEditSpan col-9";
+        this.attribs.className = "col-9 quickEditSpan ";
 
-        //todo-0: this is not the final plae to hold state for this maybe?
+        //todo-1: this is not the final plae to hold state for this maybe?
         this.mergeState({
             inlineEditVal: appState.inlineEditVal
         });

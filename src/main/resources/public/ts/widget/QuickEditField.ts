@@ -25,7 +25,7 @@ export class QuickEditField extends Span {
 
     constructor(private node: J.NodeInfo, private isFirst: boolean, private appState: AppState) {
         super();
-        this.attribs.className = "quickEditSpan col-9";
+        this.attribs.className = "col-9 quickEditSpan ";
         let isEditing = QuickEditField.editingId == node.id && QuickEditField.editingIsFirst == isFirst;
 
         this.mergeState({
@@ -36,10 +36,6 @@ export class QuickEditField extends Span {
         this.startEditing = this.startEditing.bind(this);
         this.saveEdit = this.saveEdit.bind(this);
         this.cancelEdit = this.cancelEdit.bind(this);
-
-        if (appState.userPreferences.editMode && !appState.inlineEditId && !QuickEditField.editingId) {
-            S.render.setNodeDropHandler(this.attribs, node, isFirst, appState);
-        }
     }
 
     startEditing(): void {
@@ -57,6 +53,14 @@ export class QuickEditField extends Span {
 
     preRender(): void {
         let state = this.getState();
+
+        if (this.appState.userPreferences.editMode && !this.appState.inlineEditId && !QuickEditField.editingId) {
+            S.render.setNodeDropHandler(this.attribs, this.node, this.isFirst, this.appState);
+        }
+        else {
+            S.util.resetDropHandler(this.attribs);
+        }
+
         if (!state.isEditing) {
             let clickDiv = new Span("", {
                 className: "clickToEdit",
