@@ -37,7 +37,9 @@ export class QuickEditField extends Span {
         this.saveEdit = this.saveEdit.bind(this);
         this.cancelEdit = this.cancelEdit.bind(this);
 
-        S.render.setNodeDropHandler(this.attribs, node, isFirst, appState);
+        if (appState.userPreferences.editMode && !appState.inlineEditId && !QuickEditField.editingId) {
+            S.render.setNodeDropHandler(this.attribs, node, isFirst, appState);
+        }
     }
 
     startEditing(): void {
@@ -115,7 +117,7 @@ export class QuickEditField extends Span {
             //todo-1: this timeout is required, to see the new data, and I don't know why unless it's mongo not being able to commit fast enough ?
             setTimeout(() => {
                 S.view.refreshTree(this.appState.node.id, false, res.newNode.id, false, false, false, false, this.appState);
-            
+
                 if (askToSplit) {
                     new SplitNodeDlg(res.newNode, this.appState).open();
                 }

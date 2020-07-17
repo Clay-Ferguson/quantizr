@@ -26,23 +26,29 @@ export class NodeCompMarkdown extends MarkdownDiv {
     constructor(public node: J.NodeInfo, private appState: AppState) {
         super(null, {
             className: "markdown-content content-narrow markdown-html",
+            title: "Click to edit"
         });
 
         if (this.appState.userPreferences.editMode) {
             this.attribs.onClick = this.clickToEdit;
 
-            // This styling looks nice but too much stuff is already eating up vertical space on screen during edit mode 
-            // so let's not do this.
-            this.attribs.style = {
-                borderTop: "1px solid lightGray",
-                borderRight: "1px solid lightGray",
-                //borderRadius: ".3em",
-                //margin: "8px"
-            };
+            // This was an experiment to help users know where to click, and it does that, but 
+            // also it just clutters the page too much.
+            // this.attribs.style = {
+            //     border: "1px solid rgb(118, 109, 97)",
+            //     borderRadius: ".6em",
+            //     margin: "6px"
+            // };
         }
     }
 
-    clickToEdit = (): void => {
+    clickToEdit = (evt: any): void => {
+
+        //if user clicks an anchor tag inside this markdown we want to ignore that here.
+        if (evt.target.href) {
+            return;
+        }
+
         //if already editing inline editing a row ignore this click.
         if (this.appState.inlineEditId) return;
 

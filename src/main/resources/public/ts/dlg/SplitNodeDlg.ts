@@ -115,7 +115,7 @@ export class SplitNodeDlg extends DialogBase {
 
             new ButtonBar([
                 new Button("Split Node", this.splitNodes, null, "btn-primary"),
-                new Button("Close", () => {
+                new Button("Cancel", () => {
                     this.close();
                 })
             ])

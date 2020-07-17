@@ -10,6 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
+import { QuickEditField } from "../widget/QuickEditField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -29,7 +30,7 @@ export class NodeCompRow extends Div {
         });
 
         /* If we're in edit mode allow dragging */
-        if (appState.userPreferences.editMode) {
+        if (appState.userPreferences.editMode && !appState.inlineEditId && !QuickEditField.editingId) {
             this.attribs.draggable = "true";
             this.attribs.onDragStart = this.dragStart;
             this.attribs.onDragEnd = this.dragEnd;
