@@ -52,6 +52,12 @@ that's used during builds.
 
 			<dependencies>
 				<!--include:org.springframework.boot.xml-->
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
@@ -482,6 +488,12 @@ of the spring configs for security are also perfected.
 
 			<dependencies>
 				<!--include:org.springframework.boot.xml-->
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
@@ -744,6 +756,12 @@ of the spring configs for security are also perfected.
 
 			<dependencies>
 				<!--include:org.springframework.boot.xml-->
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
@@ -1189,6 +1207,12 @@ of the spring configs for security are also perfected.
 
 			<dependencies>
 				<!--include:org.springframework.boot.xml-->
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>

@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -104,7 +105,6 @@ import org.subnode.service.SystemService;
 import org.subnode.service.UserFeedService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.ExUtil;
-import org.subnode.util.ValContainer;
 
 /**
  * Primary Spring MVC controller. All application logic from the browser
@@ -280,11 +280,25 @@ public class AppController {
 				return "forward:/index.html?passCode=" + passCode;
 			}
 		} catch (Exception e) {
-			//need to add some kind of message to exception to indicate to user something with the arguments went wrong.
+			// need to add some kind of message to exception to indicate to user something
+			// with the arguments went wrong.
 			ExUtil.error(log, "exception in call processor", e);
 		}
 
 		return "forward:/index.html";
+	}
+
+	/* This is our only "Thymeleaf Page" ! */
+	@RequestMapping(value = { "/welcome" })
+	public String welcome(Model model) {
+		model.addAttribute("serverTime", new Date().toString());
+		return "welcome";
+	}
+
+	/* Testing here, for how to render plain HTML directly from a string */
+	@GetMapping(value = { "/sp/{systemPage}" }, produces = MediaType.TEXT_HTML_VALUE)
+	@ResponseBody public String systemPage(@PathVariable(value = "systemPage", required = false) String systemPage) {
+		return "<html><body>My Full Page: " + systemPage + "</body></html>";
 	}
 
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
@@ -671,7 +685,7 @@ public class AppController {
 		return callProc.run("upload", null, session, ms -> {
 			// log.debug("Uploading as user: "+ms.getUser());
 			return attachmentService.uploadMultipleFiles(ms, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
-					"true".equalsIgnoreCase(ipfs),"true".equalsIgnoreCase(createAsChildren));
+					"true".equalsIgnoreCase(ipfs), "true".equalsIgnoreCase(createAsChildren));
 		});
 	}
 
