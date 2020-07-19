@@ -28,17 +28,21 @@ export class NodeCompMarkdown extends MarkdownDiv {
             className: "markdown-content content-narrow markdown-html",
         });
 
-        if (this.appState.userPreferences.editMode && node.owner==appState.userName) {
-            this.attribs.title = "Click to edit";
-            this.attribs.onClick = this.clickToEdit;
+        if (this.appState.userPreferences.editMode && node.owner == appState.userName) {
+            let highlightNode = S.meta64.getHighlightedNode(appState);
+            if (highlightNode && highlightNode.id == node.id) {
+                this.attribs.className += " mousePointer";
+                this.attribs.title = "Click to edit";
+                this.attribs.onClick = this.clickToEdit;
 
-            // This was an experiment to help users know where to click, and it does that, but 
-            // also it just clutters the page too much.
-            // this.attribs.style = {
-            //     border: "1px solid rgb(118, 109, 97)",
-            //     borderRadius: ".6em",
-            //     margin: "6px"
-            // };
+                // This was an experiment to help users know where to click, and it does that, but 
+                // also it just clutters the page too much.
+                this.attribs.style = {
+                    border: "1px solid rgb(118, 109, 97)",
+                    borderRadius: ".6em",
+                    margin: "6px"
+                };
+            }
         }
     }
 
