@@ -234,6 +234,25 @@ export class Meta64 implements Meta64Intf {
         }
     }
 
+    /* Find node by looking everywhere we possibly can on local storage for it */
+    findNodeById = (state: AppState, nodeId: string): J.NodeInfo => {
+        //first look in normal tree map for main view.
+        let node: J.NodeInfo = state.idToNodeMap[nodeId];
+
+        if (!node) {
+            node = state.feedResults.find(n => n.id == nodeId);
+        }
+
+        if (!node) {
+            node = state.timelineResults.find(n => n.id == nodeId);
+        }
+
+        if (!node) {
+            node = state.searchResults.find(n => n.id == nodeId);
+        }
+        return node;
+    }
+
     /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */
     getSingleSelectedNode = (state: AppState): J.NodeInfo => {
         let ret = null;

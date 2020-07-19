@@ -48,5 +48,6 @@ export interface Meta64Intf {
     updateNodeMap(node: J.NodeInfo, state: AppState): void;
     removeRedundantFeedItems(feedResults: J.NodeInfo[]): J.NodeInfo[];
     getNodeByName(node: J.NodeInfo, name: string, state: AppState): J.NodeInfo;
+    findNodeById(state: AppState, nodeId: string): J.NodeInfo;
 }
 
