@@ -291,7 +291,7 @@ public class AppController {
 	/* This is our only "Thymeleaf Page" ! */
 	@RequestMapping(value = { "/welcome" })
 	public String welcome(Model model) {
-		model.addAttribute("serverTime", new Date().toString());
+		nodeRenderService.thymeleafRenderNode(model, "pg_welcome");
 		return "welcome";
 	}
 

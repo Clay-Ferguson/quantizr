@@ -61,10 +61,49 @@ html {
     font-family: "Roboto", "Verdana", "Aria";
 } 
 
+// @keyframes animatedBackground {
+// 	from { background-position: 0 0; }
+// 	to { background-position: 100% 0; }
+// }
+
+.myjumbotron {
+    background-image: url(/images/PIA09561_large.jpg);
+    background-position: 0px 0px;
+	background-repeat: repeat-x;
+
+    // animation: animatedBackground 120s linear infinite;
+    // animation-direction: alternate;
+
+    //background-size:100% 100%;
+    height: 100vh;
+    max-width: 100% !important;
+}
+
+.transparentBg {
+    background-color: rgba(0, 0, 0, .6);
+    //opacity: 0.7;
+    border: 2px solid cadetblue;
+    border-radius: $borderRadiusLarge;
+}
+
+.welcome-container {
+    margin-top: 4em;
+}
+
+//todo-0: need to make sure this margin doesn't break the non-welcome page
+.navbar {
+    margin-bottom: 0px;
+}
+
 body {
-    /* This top-padding is how the bootstrap example keept the main content from being covered by the navbar */
     font-family: "Roboto", "Verdana", "Aria";
+
+    background-color: black;
+
+    /* This top-padding is how the bootstrap example keept the main content from being covered by the navbar, but one of their primary examples
+    was using 3.5rem instead. Not sure which is better. */
     padding-top: 4rem;
+
     padding-bottom: 1rem;
 }
 

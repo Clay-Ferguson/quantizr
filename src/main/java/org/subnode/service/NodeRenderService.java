@@ -20,11 +20,13 @@ import org.subnode.response.RenderNodeResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
 
 /**
  * Service for rendering the content of a page. The actual page is not rendered
@@ -101,9 +103,6 @@ public class NodeRenderService {
 			res.setSuccess(true);
 			return res;
 		}
-
-		// boolean showMetaData = userPreferences != null ?
-		// userPreferences.isShowMetaData() : false;
 
 		/*
 		 * If this is true it means we need to keep scanning child nodes until we find
@@ -434,5 +433,49 @@ public class NodeRenderService {
 		req.setNodeId(id);
 
 		return renderNode(session, req);
+	}
+
+	/*
+	 * Reads all subnodes under name 'nodeName' (currently assumed to be an
+	 * admin-owned node and shared to public), and populates them into model,
+	 * recursively building a tree structure as flat property names in 'model' where
+	 * each property is the 'content' of the node.
+	 */
+	public void thymeleafRenderNode(Model model, String nodeName) {
+		MongoSession session = api.getAdminSession();
+
+		SubNode node = api.getNodeByName(session, nodeName, true);
+		if (node != null) {
+			thymeleafProcessChildren(session, node, model, null);
+		} else {
+			// todo-0: do something sensible here, which may be just throw exception ?
+		}
+	}
+
+	/*
+	 * Node name starts out as root name like 'welcome', but as the recursion
+	 * proceeds, it gets appended like, 'welcome.intro', 'welcome.intro.para1' etc.
+	 * whenever the recursion encounters a named node. So the 'dotted properties'
+	 * represent the hiearchy of the node structure.
+	 */
+	public void thymeleafProcessChildren(MongoSession session, SubNode node, Model model, String parentName) {
+		String nodeName;
+
+		if (!StringUtils.isEmpty(node.getName())) {
+			nodeName = parentName != null ? parentName + "__" + node.getName() : node.getName();
+			log.debug("thymeleaf [" + nodeName + "]=" + node.getContent());
+			model.addAttribute(nodeName, node.getContent());
+		}
+		//if this node it not named, skip but process all it's children
+		else {
+			nodeName = parentName;
+		}
+
+		List<SubNode> children = api.getChildrenAsList(session, node, true, null);
+		if (children != null) {
+			for (SubNode child : children) {
+				thymeleafProcessChildren(session, child, model, nodeName);
+			}
+		}
 	}
 }

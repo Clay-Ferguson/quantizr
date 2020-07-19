@@ -4,7 +4,8 @@ import java.io.File;
 import java.util.List;
 
 import org.subnode.util.XString;
-
+// import org.thymeleaf.spring5.SpringTemplateEngine;
+// import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.lang3.StringUtils;
@@ -61,8 +62,8 @@ public class AppConfiguration implements WebMvcConfigurer {
 	// Turns out we don't need this.
 	// @Override
 	// public void addViewControllers(ViewControllerRegistry registry) {
-	// 	ViewControllerRegistration reg = registry.addViewController("/");
-	// 	reg.setViewName("forward:/index.html");
+	// ViewControllerRegistration reg = registry.addViewController("/");
+	// reg.setViewName("forward:/index.html");
 	// }
 
 	// DO NOT DELETE.
@@ -250,4 +251,35 @@ public class AppConfiguration implements WebMvcConfigurer {
 		// httpRequestFactory.setReadTimeout(timeout);
 		return new RestTemplate(httpRequestFactory);
 	}
+
+	///////////////////////////////////////////
+	// If you need to chagne where Thymeleaf reads templates from the following 
+	// code below is probably correct for that, but I never finished testing this because I realized
+	// I can already build the Java source and that's enough for my dev config to pick up changes
+	// to HTML templates in realtime (during development) which was my goal
+
+	// @Bean
+	// public ServletContextTemplateResolver templateResolver() {
+	// 	ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(null);
+	// 	templateResolver.setPrefix("/WEB-INF/views/");
+	// 	templateResolver.setSuffix(".html");
+	// 	templateResolver.setTemplateMode("HTML5");
+	// 	return templateResolver;
+	// }
+
+	// @Bean
+	// public SpringTemplateEngine templateEngine() {
+	// 	SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+	// 	templateEngine.setTemplateResolver(templateResolver());
+	// 	//templateEngine.setTemplateEngineMessageSource(messageSource());
+	// 	return templateEngine;
+	// }
+
+	// @Bean
+	// @Description("Spring Message Resolver")
+	// public ResourceBundleMessageSource messageSource() {
+	// 	ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+	// 	messageSource.setBasename("messages");
+	// 	return messageSource;
+	// }
 }

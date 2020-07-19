@@ -59,7 +59,7 @@ export class Constants {
         border='0' 
         title='PayPal - The safer, easier way to pay online!' 
         alt='Donate with PayPal button'/> 
-    <a/>`;
+    </a>`;
 }
 
 
