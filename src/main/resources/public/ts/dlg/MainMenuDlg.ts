@@ -1,6 +1,6 @@
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { MenuPanel } from "../MenuPanel";
 import { DialogBase } from "../DialogBase";
 import { CompIntf } from "../widget/base/CompIntf";
@@ -18,9 +18,14 @@ export class MainMenuDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        return [
-            new MenuPanel(this.appState)
-        ];
+        if (this.appState.isAnonUser) {
+            //anon users don't get the menu
+            return [];
+        } else {
+            return [
+                new MenuPanel(this.appState)
+            ];
+        }
     }
 
     renderButtons(): CompIntf {

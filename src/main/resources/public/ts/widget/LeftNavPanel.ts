@@ -23,7 +23,7 @@ export class LeftNavPanel extends Div {
         //Haven't figured out yet how I want to deal with scrolling in left
         //panel which seems incompatible with it being 'fixed' positioning.
         let state: AppState = useSelector((state: AppState) => state);
-        if (!clientInfo.isMobile) {
+        if (!state.isAnonUser && !clientInfo.isMobile) {
             this.setChildren([
                 new Div(null, {
                     className: "float-right menuContainer"

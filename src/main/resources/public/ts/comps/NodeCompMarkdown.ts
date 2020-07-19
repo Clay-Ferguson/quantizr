@@ -36,12 +36,13 @@ export class NodeCompMarkdown extends MarkdownDiv {
                 this.attribs.onClick = this.clickToEdit;
 
                 // This was an experiment to help users know where to click, and it does that, but 
-                // also it just clutters the page too much.
-                this.attribs.style = {
-                    border: "1px solid rgb(118, 109, 97)",
-                    borderRadius: ".6em",
-                    margin: "6px"
-                };
+                // the margin makes the web page content 'shift' around when user is only just clicking around
+                // and that is super ugly.
+                // this.attribs.style = {
+                //     border: "1px solid rgb(118, 109, 97)",
+                //     borderRadius: ".6em",
+                //     margin: "6px"
+                // };
             }
         }
     }
