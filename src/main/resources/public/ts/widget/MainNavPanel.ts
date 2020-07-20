@@ -189,8 +189,14 @@ export class MainNavPanel extends NavTag {
                 }, [
                     new NavBarIconButton(clientInfo.isMobile ? "fa-bars" : null, "Quanta", {
                         onClick: e => {
-                            if (clientInfo.isMobile) {
-                                S.nav.showMainMenu(state);
+                            //If user is not logged in this button just takes you back to the landing page.
+                            if (state.isAnonUser || !clientInfo.isMobile) {
+                                window.location.href = window.location.origin;
+                            }
+                            else {
+                                if (clientInfo.isMobile) {
+                                    S.nav.showMainMenu(state);
+                                }
                             }
                         },
                         id: "mainMenu",

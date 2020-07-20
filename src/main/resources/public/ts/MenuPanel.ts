@@ -52,6 +52,7 @@ export class MenuPanel extends Div {
 
         //WARNING: The string 'Navigate' is also in Menu.activeMenu.
         children.push(new Menu("Navigate", [
+            new MenuItem("Welcome", () => {window.location.href = window.location.origin;}),
             new MenuItem("Portal", () => S.meta64.loadAnonPageHome(state)),
             new MenuItem("Home", () => S.nav.navHome(state), !state.isAnonUser),
             new MenuItem("Inbox", () => S.nav.openContentNode("~"+J.NodeType.INBOX, state), !state.isAnonUser),

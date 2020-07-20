@@ -41,7 +41,7 @@ export class ChangePasswordDlg extends DialogBase {
                         this.changePassword();
                         this.close();
                     }, null, "btn-primary"),
-                    new Button("Close", () =>{
+                    new Button("Close", () => {
                         this.close();
                     })
                 ])
@@ -83,7 +83,7 @@ export class ChangePasswordDlg extends DialogBase {
             let dlg = new MessageDlg(msg, "Password Change",
                 () => {
                     if (this.passCode) {
-                        window.location.href = window.location.origin;
+                        window.location.href = window.location.origin + "/app";
                     }
                 }, null, false, 0, this.appState
             );

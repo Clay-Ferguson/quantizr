@@ -18,7 +18,7 @@ it might finally work now.
 */
 export class RadioButton extends Comp {
 
-    constructor(public label: string, public checked: boolean, groupName: string, _attribs: any=null, private valueIntf: ValueIntf=null) {
+    constructor(public label: string, public checked: boolean, groupName: string, _attribs: any, private valueIntf: ValueIntf) {
         super(_attribs); 
 
         this.attribs.onChange = (evt: any) => {

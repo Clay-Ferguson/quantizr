@@ -13,44 +13,49 @@
     <link rel="stylesheet" href="/css/meta64.css" />
 </head>
 
-<body>
+<body class="welcome-body customScrollbar">
 
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <a class="navbar-brand" href="#">Quanta.wiki</a>
+        <a class="navbar-brand" href="/app">Quanta.wiki</a>
 
-        <!--
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
             aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav ml-auto">
+
+                <!-- todo-0: eed to add this: developer node isn't created yet 
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="/n/developers">Developers</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
+                -->
+
+                <li class="nav-item active">
+                    <a class="nav-link" href="https://github.com/Clay-Ferguson/quantizr">
+                        GitHub
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#">Disabled</a>
-                </li>
-                <li class="nav-item dropdown">
+                <!-- <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">Dropdown</a>
                     <div class="dropdown-menu" aria-labelledby="dropdown01">
                         <a class="dropdown-item" href="#">Action</a>
                         <a class="dropdown-item" href="#">Another action</a>
                         <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
+                    </div> 
+                
                 </li>
+            -->
             </ul>
-            <form class="form-inline my-2 my-lg-0">
+
+            <!-- <form class="form-inline my-2 my-lg-0">
                 <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
+            </form> -->
         </div>
-        -->
+
     </nav>
 
     <main role="main">
@@ -63,7 +68,7 @@
                         <p th:text="${pg_welcome__intro1}"></p>
                         <p th:text="${pg_welcome__intro2}"></p>
                         <p th:text="${pg_welcome__intro3}"></p>
-                        <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+                        <p><a class="btn btn-outline-success btn-lg" href="/app" role="button">Enter &raquo;</a></p>
                     </div>
                 </div>
             </div>

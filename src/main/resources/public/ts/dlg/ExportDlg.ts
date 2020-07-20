@@ -21,22 +21,45 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ExportDlg extends DialogBase {
 
-    zipRadioButton: RadioButton;
-    tarRadioButton: RadioButton;
-    tarGzRadioButton: RadioButton;
-    pdfRadioButton: RadioButton;
-
     constructor(state: AppState) {
         super("Export", null, false, state);
+        this.mergeState({ exportType: "zip" });
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Header("Export node content to file..."),
             new RadioButtonGroup([
-                this.zipRadioButton = new RadioButton("ZIP", false, "exportTypeGroup"),
-                this.tarRadioButton = new RadioButton("TAR", false, "exportTypeGroup"),
-                this.tarGzRadioButton = new RadioButton("TAR.GZ", false, "exportTypeGroup"),
+                new RadioButton("ZIP", false, "exportTypeGroup", null, {
+                    setValue: (checked: boolean): void => {
+                        if (checked) {
+                            this.mergeState({ exportType: "zip" });
+                        }
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().exportType == "zip";
+                    }
+                }),
+                new RadioButton("TAR", false, "exportTypeGroup", null, {
+                    setValue: (checked: boolean): void => {
+                        if (checked) {
+                            this.mergeState({ exportType: "tar" });
+                        }
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().exportType == "tar";
+                    }
+                }),
+                new RadioButton("TAR.GZ", false, "exportTypeGroup", null, {
+                    setValue: (checked: boolean): void => {
+                        if (checked) {
+                            this.mergeState({ exportType: "tar.gz" });
+                        }
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().exportType == "tar.gz";
+                    }
+                }),
 
                 // had to disable PDF, because PDFBox hangs in Java, and until they fix that bug
                 // there's nothing i can do other than ditch PDF box completely, which i'm not ready to do yet.
@@ -56,37 +79,18 @@ export class ExportDlg extends DialogBase {
     }
 
     exportNodes = (): void => {
+        let state = this.getState();
         let highlightNode = S.meta64.getHighlightedNode(this.appState);
         if (highlightNode) {
 
-            let format = this.getSelectedFormat();
-
             S.util.ajax<J.ExportRequest, J.ExportResponse>("export", {
                 nodeId: highlightNode.id,
-                exportExt: format
+                exportExt: state.exportType,
             }, (res: J.ExportResponse) => {
                 this.exportResponse(res);
             });
         }
         this.close();
-    }
-
-    getSelectedFormat = (): string => {
-        let ret = "zip";
-
-        if (this.zipRadioButton.getChecked()) {
-            ret = "zip";
-        }
-        else if (this.tarRadioButton.getChecked()) {
-            ret = "tar";
-        }
-        else if (this.tarGzRadioButton.getChecked()) {
-            ret = "tar.gz";
-        }
-        else if (this.pdfRadioButton.getChecked()) {
-            ret = "pdf";
-        }
-        return ret;
     }
 
     exportResponse = (res: J.ExportResponse): void => {

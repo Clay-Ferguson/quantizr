@@ -1101,7 +1101,7 @@ export class Util implements UtilIntf {
             title = node.name;
         }
         else {
-            url = window.location.origin + "?id=" + node.id;
+            url = window.location.origin + "/app?id=" + node.id;
             if (childNode && childNode.id != node.id) {
                 url += "#" + childNode.id;
             }

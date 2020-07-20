@@ -448,6 +448,7 @@ public class NodeRenderService {
 		if (node != null) {
 			thymeleafProcessChildren(session, node, model, null);
 		} else {
+			log.debug("unable to find node named: " + nodeName);
 			// todo-0: do something sensible here, which may be just throw exception ?
 		}
 	}
@@ -466,7 +467,7 @@ public class NodeRenderService {
 			log.debug("thymeleaf [" + nodeName + "]=" + node.getContent());
 			model.addAttribute(nodeName, node.getContent());
 		}
-		//if this node it not named, skip but process all it's children
+		// if this node it not named, skip but process all it's children
 		else {
 			nodeName = parentName;
 		}

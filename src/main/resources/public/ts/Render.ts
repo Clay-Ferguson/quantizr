@@ -144,8 +144,8 @@ export class Render implements RenderIntf {
 
         //todo-1: need copy-to-clipboard links here!
        
-        let url = window.location.origin + "?id=" + node.id;
-        children.push(new Heading(5, "ID-based Node"));
+        let url = window.location.origin + "/app?id=" + node.id;
+        children.push(new Heading(5, "By ID"));
         children.push(new Anchor(url, url, {
             target: "_blank",
             className: "anchorBigMarginBottom"
@@ -153,7 +153,7 @@ export class Render implements RenderIntf {
 
         if (node.name) {
             url = window.location.origin + S.util.getPathPartForNamedNode(node);
-            children.push(new Heading(5, "Name-based Node"));
+            children.push(new Heading(5, "By Name"));
             children.push(new Anchor(url, url, {
                 target: "_blank",
                 className: "anchorBigMarginBottom"

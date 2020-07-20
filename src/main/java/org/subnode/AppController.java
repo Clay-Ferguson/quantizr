@@ -220,7 +220,7 @@ public class AppController {
 	 * passCode is an auth code for a password reset
 	 *
 	 */
-	@RequestMapping(value = { "/", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}" })
+	@RequestMapping(value = { "/app", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}" })
 	public String index(//
 
 			// node name on 'admin' account. Non-admin named nodes use url
@@ -241,7 +241,7 @@ public class AppController {
 			@RequestParam(value = "passCode", required = false) String passCode) {
 
 		try {
-			log.debug("AppController.index");
+			//log.debug("AppController.index: sessionUser=" + sessionContext.getUserName());
 
 			if (signupCode != null) {
 				userManagerService.processSignupCode(signupCode);
@@ -288,7 +288,7 @@ public class AppController {
 	}
 
 	/* This is our only "Thymeleaf Page" ! */
-	@RequestMapping(value = { "/welcome" })
+	@RequestMapping(value = { "/" })
 	public String welcome(Model model) {
 		nodeRenderService.thymeleafRenderNode(model, "pg_welcome");
 		return "welcome";
@@ -296,7 +296,7 @@ public class AppController {
 
 	/* Testing here, for how to render plain HTML directly from a string */
 	@GetMapping(value = { "/sp/{systemPage}" }, produces = MediaType.TEXT_HTML_VALUE)
-	@ResponseBody public String systemPage(@PathVariable(value = "systemPage", required = false) String systemPage) {
+	public @ResponseBody String systemPage(@PathVariable(value = "systemPage", required = false) String systemPage) {
 		return "<html><body>My Full Page: " + systemPage + "</body></html>";
 	}
 
