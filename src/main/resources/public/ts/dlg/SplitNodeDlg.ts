@@ -72,7 +72,7 @@ export class SplitNodeDlg extends DialogBase {
             ], "form-group-border marginBottom"),
 
             new RadioButtonGroup([
-                new RadioButton("Double Spaced", true, "splitSpacingGroup", null, {
+                new RadioButton("Single Blank Line", true, "splitSpacingGroup", null, {
                     setValue: (checked: boolean): void => {
                         if (checked) {
                             this.mergeState({ splitMode: "double" });
@@ -82,7 +82,7 @@ export class SplitNodeDlg extends DialogBase {
                         return this.getState().splitMode == "double";
                     }
                 }),
-                new RadioButton("Triple Spaced", false, "splitSpacingGroup", null, {
+                new RadioButton("Double Blank Line", false, "splitSpacingGroup", null, {
                     setValue: (checked: boolean): void => {
                         if (checked) {
                             this.mergeState({ splitMode: "triple" });

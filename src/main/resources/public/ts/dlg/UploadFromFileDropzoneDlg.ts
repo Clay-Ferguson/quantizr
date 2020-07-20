@@ -323,7 +323,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                             }, async (res: J.SaveNodeResponse) => {
                                 await S.edit.updateIpfsNodeJson(dlg.node, dlg.appState);
                                 //S.log("node after IPFS hash added: "+S.util.prettyPrint(dlg.node));
-                                S.edit.saveNodeResponse(dlg.node, res, dlg.appState);
+                                S.edit.saveNodeResponse(dlg.node, res, true, dlg.appState);
                             });
                         }
                     }

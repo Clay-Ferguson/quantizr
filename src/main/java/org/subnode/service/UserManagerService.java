@@ -320,7 +320,7 @@ public class UserManagerService {
 	 * verification, and they are sending in a signupCode that will turn on their
 	 * account and actually create their account.
 	 */
-	public void processSignupCode(final String signupCode, final Model model) {
+	public void processSignupCode(final String signupCode /*, final Model model*/) {
 		log.debug("User is trying signupCode: " + signupCode);
 		adminRunner.run(session -> {
 			SubNode node = api.getNode(session, signupCode);
@@ -354,7 +354,7 @@ public class UserManagerService {
 				 * allow JavaScript to detect all it needs to detect which is to display a
 				 * message to user saying the signup is complete.
 				 */
-				model.addAttribute("signupCode", "ok");
+				//model.addAttribute("signupCode", "ok");
 
 				node.deleteProp(NodeProp.SIGNUP_PENDING.s());
 				api.save(session, node);

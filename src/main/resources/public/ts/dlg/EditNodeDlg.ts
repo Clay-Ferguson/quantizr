@@ -329,7 +329,9 @@ export class EditNodeDlg extends DialogBase {
             propsParent.addChild(this.propsButtonBar);
         }
 
-        let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [optionsBar, selectionsBar, propsTable, nodeNameTextField], false,
+        let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
+            nodeNameTextField, optionsBar, selectionsBar, propsTable
+        ], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
             }, EditNodeDlg.morePanelExpanded, "float-right") : null;
@@ -578,7 +580,7 @@ export class EditNodeDlg extends DialogBase {
                 node: state.node
             }, (res) => {
                 S.render.fadeInId = state.node.id;
-                S.edit.saveNodeResponse(state.node, res, this.appState);
+                S.edit.saveNodeResponse(state.node, res, true, this.appState);
 
                 if (askToSplit) {
                     new SplitNodeDlg(state.node, this.appState).open();

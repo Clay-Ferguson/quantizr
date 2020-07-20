@@ -238,14 +238,13 @@ public class AppController {
 			@RequestParam(value = "n", required = false) String name, //
 
 			@RequestParam(value = "signupCode", required = false) String signupCode, //
-			@RequestParam(value = "passCode", required = false) String passCode, //
-			Model model) {
+			@RequestParam(value = "passCode", required = false) String passCode) {
 
 		try {
 			log.debug("AppController.index");
 
 			if (signupCode != null) {
-				userManagerService.processSignupCode(signupCode, model);
+				userManagerService.processSignupCode(signupCode);
 			}
 
 			// Node Names are identified using a colon in front of it, to make it detectable

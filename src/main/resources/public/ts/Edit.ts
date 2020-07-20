@@ -252,11 +252,11 @@ export class Edit implements EditIntf {
         });
     }
 
-    saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, state: AppState): Promise<void> => {
+    saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean, state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             if (S.util.checkSuccess("Save node", res)) {
                 await this.distributeKeys(node, res.aclEntries);
-                S.view.refreshTree(null, false, node.id, false, false, false, false, state);
+                S.view.refreshTree(null, false, node.id, false, false, allowScroll, false, state);
                 resolve();
             }
         });

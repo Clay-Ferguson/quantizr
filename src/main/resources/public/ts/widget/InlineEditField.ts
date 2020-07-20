@@ -75,7 +75,7 @@ export class InlineEditField extends Span {
                     node: this.node
                 }, async (res: J.SaveNodeResponse) => {
                     await S.edit.updateIpfsNodeJson(this.node, this.appState);
-                    S.edit.saveNodeResponse(this.node, res, this.appState);
+                    S.edit.saveNodeResponse(this.node, res, false, this.appState);
 
                     if (askToSplit) {
                         new SplitNodeDlg(this.node, this.appState).open();
