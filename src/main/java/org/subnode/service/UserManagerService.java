@@ -394,11 +394,15 @@ public class UserManagerService {
 		final String password = req.getPassword().trim();
 		final String email = req.getEmail();
 
-		if (!verifyCaptcha(req.getReCaptchaToken())) {
-			res.setMessage("Sorry, reCaptcha scored too low.");
-			res.setSuccess(false);
-			return res;
-		}
+		// Recaptcha was creating some VERY bizarre rendering problems. Apparenty they way it tries to inject itself into 
+		// the webpage is flawed in some way and I really don't want that anyway. Perhaps I can render the 'signup' page ONLY
+		// with recaptcha enabled, and for every other page in the system have it completely removed from any HTML/JS. (todo-1)
+		// #recaptcha-disabled
+		// if (!verifyCaptcha(req.getReCaptchaToken())) {
+		// 	res.setMessage("Sorry, reCaptcha scored too low.");
+		// 	res.setSuccess(false);
+		// 	return res;
+		// }
 
 		log.debug("Signup: userName=" + userName + " email=" + email);
 

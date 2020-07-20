@@ -11,8 +11,9 @@ import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
 
-declare var grecaptcha;
-declare var reCaptcha3SiteKey;
+// #recaptcha-disabled
+//declare var grecaptcha;
+//declare var reCaptcha3SiteKey;
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -54,11 +55,13 @@ export class SignupDlg extends DialogBase {
     }
 
     signup = (): void => {
-        grecaptcha.ready(() => {
-            grecaptcha.execute(reCaptcha3SiteKey, { action: 'submit' }).then((token) => {
-                this.signupNow(token);
-            });
-        });
+        // #recaptcha-disabled
+        // grecaptcha.ready(() => {
+        //     grecaptcha.execute(reCaptcha3SiteKey, { action: 'submit' }).then((token) => {
+        //         this.signupNow(token);
+        //     });
+        // });
+        this.signupNow(null);
     }
 
     signupNow = (reCaptchaToken: string): void => {

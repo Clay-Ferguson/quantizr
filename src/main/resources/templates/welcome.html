@@ -115,66 +115,66 @@
 
                 <div th:replace="fragments/components 
                     :: featureInfo(title='IPFS/Web3', content=${pg_welcome__web3})">
+                </div>
+
             </div>
 
-        </div>
+            <div class="row">
 
-        <div class="row">
-
-            <div th:replace="fragments/components 
+                <div th:replace="fragments/components 
                     :: featureInfo(title='Video/Audio Player', content=${pg_welcome__audioVideo})">
-            </div>
+                </div>
 
-            <div th:replace="fragments/components 
+                <div th:replace="fragments/components 
                     :: featureInfo(title='RSS/Podcasts', content=${pg_welcome__rss})">
-            </div>
+                </div>
 
-            <div th:replace="fragments/components 
+                <div th:replace="fragments/components 
                     :: featureInfo(title='File Sharing', content=${pg_welcome__fileSharing})">
+                </div>
+
             </div>
 
-        </div>
+            <div class="row">
 
-        <div class="row">
-
-            <div th:replace="fragments/components 
+                <div th:replace="fragments/components 
                     :: featureInfo(title='Drag-n-Drop', content=${pg_welcome__dragAndDrop})">
-            </div>
+                </div>
 
-            <div th:replace="fragments/components 
+                <div th:replace="fragments/components 
                     :: featureInfo(title='Markdown', content=${pg_welcome__markdown})">
-            </div>
+                </div>
 
-            <div th:replace="fragments/components 
+                <div th:replace="fragments/components 
                     :: featureInfo(title='Math Formulas', content=${pg_welcome__math})">
+                </div>
+
             </div>
 
-        </div>
+            <div class="row">
 
-        <div class="row">
-
-            <div th:replace="fragments/components 
+                <div th:replace="fragments/components 
                     :: featureInfo(title='Custom URLs', content=${pg_welcome__customUrls})">
-            </div>
+                </div>
 
-            <div th:replace="fragments/components 
+                <div th:replace="fragments/components 
                 :: featureInfo(title='Access Controls', content=${pg_welcome__acl})">
-            </div>
+                </div>
 
-            <div th:replace="fragments/components 
+                <div th:replace="fragments/components 
                     :: featureInfo(title='Secure Messaging', content=${pg_welcome__secureMessaging})">
+                </div>
+
             </div>
 
-        </div>
+            <div class="row">
 
-        <div class="row">
-
-            <div th:replace="fragments/components 
+                <div th:replace="fragments/components 
                     :: featureInfo(title='Open Source', content=${pg_welcome__openSource})">
-            </div>
+                </div>
 
-        </div>
-        <hr>
+            </div>
+            <hr>
 
         </div>
     </main>
@@ -184,10 +184,17 @@
         <div class="col-6 mx-auto text-center">
             <p>Open Source - MIT License</p>
 
-            <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YD984BLHTSZYL&currency_code=USD&source=url"
-                target="_blank">
-                <img src='/images/btn_donateCC_LG.gif' title='PayPal - The safer, easier way to pay online!'
-                    alt='Donate with PayPal button' />
+            <p>
+                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YD984BLHTSZYL&currency_code=USD&source=url"
+                    target="_blank">
+                    <img src='/images/btn_donateCC_LG.gif' title='PayPal - The safer, easier way to pay online!'
+                        alt='Donate with PayPal button' />
+                </a>
+            </p>
+
+            <a href="https://github.com/Clay-Ferguson/quantizr">
+                <p>GitHub: Source Code (Project Quantizr)</p>
+                <img src="/images/GitHub-Mark-Light-32px.png"></img>
             </a>
         </div>
 
