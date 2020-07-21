@@ -1,6 +1,7 @@
 package org.subnode;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.MailSender;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.AclService;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.RunAsMongoAdmin;
@@ -137,6 +139,9 @@ public class AppController {
 
 	public static final String API_PATH = "/mobile/api";
 
+	private static HashMap<String, String> welcomeMap = null;
+	private static final Object welcomeMapLock = new Object();
+
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
 
@@ -241,7 +246,8 @@ public class AppController {
 			@RequestParam(value = "passCode", required = false) String passCode) {
 
 		try {
-			//log.debug("AppController.index: sessionUser=" + sessionContext.getUserName());
+			// log.debug("AppController.index: sessionUser=" +
+			// sessionContext.getUserName());
 
 			if (signupCode != null) {
 				userManagerService.processSignupCode(signupCode);
@@ -290,7 +296,14 @@ public class AppController {
 	/* This is our only "Thymeleaf Page" ! */
 	@RequestMapping(value = { "/" })
 	public String welcome(Model model) {
-		nodeRenderService.thymeleafRenderNode(model, "pg_welcome");
+		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
+			synchronized (welcomeMapLock) {
+				HashMap<String,String> newMap = new HashMap<String, String>();
+				nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
+				welcomeMap = newMap;
+			}
+		}
+		model.addAllAttributes(welcomeMap);
 		return "welcome";
 	}
 

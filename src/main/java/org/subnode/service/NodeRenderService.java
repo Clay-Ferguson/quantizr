@@ -1,5 +1,6 @@
 package org.subnode.service;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -441,7 +442,7 @@ public class NodeRenderService {
 	 * recursively building a tree structure as flat property names in 'model' where
 	 * each property is the 'content' of the node.
 	 */
-	public void thymeleafRenderNode(Model model, String nodeName) {
+	public void thymeleafRenderNode(HashMap<String,String> model, String nodeName) {
 		MongoSession session = api.getAdminSession();
 
 		SubNode node = api.getNodeByName(session, nodeName, true);
@@ -459,13 +460,13 @@ public class NodeRenderService {
 	 * whenever the recursion encounters a named node. So the 'dotted properties'
 	 * represent the hiearchy of the node structure.
 	 */
-	public void thymeleafProcessChildren(MongoSession session, SubNode node, Model model, String parentName) {
+	public void thymeleafProcessChildren(MongoSession session, SubNode node, HashMap<String,String> model, String parentName) {
 		String nodeName;
 
 		if (!StringUtils.isEmpty(node.getName())) {
 			nodeName = parentName != null ? parentName + "__" + node.getName() : node.getName();
 			log.debug("thymeleaf [" + nodeName + "]=" + node.getContent());
-			model.addAttribute(nodeName, node.getContent());
+			model.put(nodeName, node.getContent());
 		}
 		// if this node it not named, skip but process all it's children
 		else {
