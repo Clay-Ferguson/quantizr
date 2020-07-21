@@ -31,6 +31,11 @@ public class ImportTarService extends ImportArchiveBase {
 		}
 		used = true;
 
+		SubNode userNode = api.getUserNodeByUserName(api.getAdminSession(), sessionContext.getUserName());
+		if (userNode == null) {
+			throw new RuntimeEx("UserNode not found: " + sessionContext.getUserName());
+		}
+
 		if (!isNonRequestThread) {
 			UserPreferences userPreferences = sessionContext.getUserPreferences();
 			boolean importAllowed = userPreferences != null ? userPreferences.isImportAllowed() : false;
@@ -47,7 +52,7 @@ public class ImportTarService extends ImportArchiveBase {
 			TarArchiveEntry entry;
 			while ((entry = zis.getNextTarEntry()) != null) {
 				if (!entry.isDirectory()) {
-					processFile(entry, zis);
+					processFile(entry, zis, userNode.getOwner());
 				}
 			}
 		} catch (Exception ex) {

@@ -8,14 +8,13 @@ import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.XString;
 
 import org.apache.commons.io.IOUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +60,7 @@ public abstract class ImportArchiveBase {
 
 	public HashMap<String, String> oldIdToNewIdMap = new HashMap<String, String>();
 
-	public void processFile(ArchiveEntry entry, InputStream zis) {
+	public void processFile(ArchiveEntry entry, InputStream zis, ObjectId ownerId) {
 		String name = entry.getName();
 		int lastSlashIdx = name.lastIndexOf("/");
 		String fileName = name.substring(lastSlashIdx + 1);
@@ -82,13 +81,15 @@ public abstract class ImportArchiveBase {
 				node.setPath(targetPath + node.getPath());
 				String oldId = node.getId().toHexString();
 
-				// delete the BIN prop now, because it will have to be added during this import,
-				// and the existing BIN id will
-				// no longer apply
+				/*
+				 * delete the BIN prop now, because it will have to be added during this import,
+				 * and the existing BIN id will no longer apply
+				 */
 				node.deleteProp(NodeProp.BIN.s());
 
 				// we must nullify the node ID so that it creates a new node when saved.
 				node.setId(null);
+				node.setOwner(ownerId);
 				api.save(session, node);
 
 				oldIdToNewIdMap.put(oldId, node.getId().toHexString());
@@ -149,7 +150,7 @@ public abstract class ImportArchiveBase {
 
 			int maxFileSize = session.getMaxUploadSize();
 			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, maxFileSize);
-			log.debug("Attaching binary to nodeId: "+node.getId().toHexString());
+			//log.debug("Attaching binary to nodeId: " + node.getId().toHexString());
 			attachmentService.attachBinaryFromStream(session, node, null, fileName, length, lzis, mimeType, -1, -1,
 					false, false, false, true, false, false);
 		} else {
