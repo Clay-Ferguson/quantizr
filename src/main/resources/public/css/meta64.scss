@@ -72,9 +72,10 @@ html {
 // }
 
 .myjumbotron {
+    background-size: 100% auto;
     background-image: url(/images/PIA09561_large.jpg);
-    background-position: 0px 0px;
-	background-repeat: repeat-x;
+
+    //This 100 and auto makes the image fill horizontally but not alter it's aspect ratio
 
     //background-size:100% 100%;
     height: 100vh;
@@ -86,10 +87,15 @@ html {
 // }
 
 .transparentBg {
-    background-color: rgba(0, 0, 0, .6);
+    background-color: rgba(0, 0, 0, .7);
     //opacity: 0.7;
     border: 2px solid cadetblue;
     border-radius: $borderRadiusLarge;
+}
+
+.infoBlock {
+    margin-bottom: 3em;
+    padding-right: 2em;
 }
 
 .welcome-container {
@@ -101,8 +107,13 @@ html {
     margin-bottom: 0px;
 }
 
+.navbar-font {
+    font-size: 1.4rem;
+    font-weight: 400;
+}
+
 .app-body {
-    font-family: "Roboto", "Verdana", "Aria";
+    font-family: 'Roboto','Helvetica','Arial', sans-serif;
 
     /* This top-padding is how the bootstrap example keept the main content from being covered by the navbar, but one of their primary examples
     was using 3.5rem instead. Not sure which is better. */
@@ -112,7 +123,10 @@ html {
 }
 
 .welcome-body {
-    font-family: "Roboto", "Verdana", "Aria";
+    font-family: 'Roboto','Helvetica','Arial', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    line-height: 1.5;
 
     /* This top-padding is how the bootstrap example keept the main content from being covered by the navbar, but one of their primary examples
     was using 3.5rem instead. Not sure which is better. */

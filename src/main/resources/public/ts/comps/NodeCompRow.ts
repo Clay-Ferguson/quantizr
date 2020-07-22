@@ -56,7 +56,7 @@ export class NodeCompRow extends Div {
 
         //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
         let buttonBar: Comp = null;
-        if (NodeCompRow.showButtonBar) {
+        if (NodeCompRow.showButtonBar && !state.inlineEditId) {
             let allowAvatar = node.owner != S.render.lastOwner;
             buttonBar = new NodeCompButtonBar(node, allowAvatar, this.allowNodeMove);
         }

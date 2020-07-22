@@ -51,7 +51,7 @@ export class NodeCompMainNode extends Div {
 
         this.setChildren([
             header,
-            new NodeCompButtonBar(node, true, false),
+            !state.inlineEditId ? new NodeCompButtonBar(node, true, false) : null,
             new Div(null, {
                 className: "clearfix",
                 id: "button_bar_clearfix_" + node.id

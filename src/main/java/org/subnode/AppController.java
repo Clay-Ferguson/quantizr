@@ -298,13 +298,25 @@ public class AppController {
 	public String welcome(Model model) {
 		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 			synchronized (welcomeMapLock) {
-				HashMap<String,String> newMap = new HashMap<String, String>();
+				HashMap<String, String> newMap = new HashMap<String, String>();
 				nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
 				welcomeMap = newMap;
 			}
 		}
-		model.addAllAttributes(welcomeMap);
-		return "welcome";
+
+		/*
+		 * if welcomeMap is empty that likely means the "pg_welcome" node hasn't yet
+		 * been created on this instanace so we bypass the landing page and go to
+		 * index.html instead.
+		 */
+		if (welcomeMap.size() == 0) {
+			return "forward:/index.html";
+		}
+		/* otherwise rener the landing page */
+		else {
+			model.addAllAttributes(welcomeMap);
+			return "welcome";
+		}
 	}
 
 	/* Testing here, for how to render plain HTML directly from a string */

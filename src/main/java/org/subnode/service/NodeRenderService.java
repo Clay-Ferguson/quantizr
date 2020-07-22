@@ -450,7 +450,6 @@ public class NodeRenderService {
 			thymeleafProcessChildren(session, node, model, null);
 		} else {
 			log.debug("unable to find node named: " + nodeName);
-			// todo-0: do something sensible here, which may be just throw exception ?
 		}
 	}
 

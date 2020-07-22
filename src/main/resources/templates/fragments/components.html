@@ -6,7 +6,15 @@
         <h1>Thymeleaf Fragments sample</h1>
     </div>
 
-    <div th:fragment="featureInfo(title,content)" class="col-md-4">
+    <div th:fragment="featureInfoL(title,content)" class="col-md-4 offset-md-2 infoBlock">
+        <h2 th:text="${title}"></h2>
+        <p th:text="${content}"></p>
+        <!-- 
+        <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
+        -->
+    </div>
+
+    <div th:fragment="featureInfoR(title,content)" class="col-md-4 infoBlock">
         <h2 th:text="${title}"></h2>
         <p th:text="${content}"></p>
         <!-- 
