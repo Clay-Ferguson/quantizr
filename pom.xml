@@ -429,7 +429,7 @@ of the spring configs for security are also perfected.
 									<goal>install-node-and-npm</goal>
 								</goals>
 								<configuration>
-									<nodeVersion>v8.10.0</nodeVersion>
+									<nodeVersion>v10.19.0</nodeVersion>
 
 									<!-- optional: with node version greater than 4.0.0 will use npm provided by node distribution 
 									<npmVersion>5.8.0</npmVersion>
@@ -1193,7 +1193,7 @@ of the spring configs for security are also perfected.
 									<goal>install-node-and-npm</goal>
 								</goals>
 								<configuration>
-									<nodeVersion>v8.10.0</nodeVersion>
+									<nodeVersion>v10.19.0</nodeVersion>
 
 									<!-- optional: with node version greater than 4.0.0 will use npm provided by node distribution 
 									<npmVersion>5.8.0</npmVersion>
@@ -1607,7 +1607,7 @@ of the spring configs for security are also perfected.
 									<goal>install-node-and-npm</goal>
 								</goals>
 								<configuration>
-									<nodeVersion>v8.10.0</nodeVersion>
+									<nodeVersion>v10.19.0</nodeVersion>
 
 									<!-- optional: with node version greater than 4.0.0 will use npm provided by node distribution 
 							<npmVersion>5.8.0</npmVersion>

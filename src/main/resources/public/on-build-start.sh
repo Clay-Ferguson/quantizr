@@ -7,6 +7,10 @@ echo "Running on-build-start.sh"
 # We don't bundle our (using sass-loader + webpack) because for performance in PROD we want browsers to 
 # be able to simultaneously download the JS bundle file and the CSS file(s). 
 # NOTE: our css output here does include all of bootstrap, because we include bootstrap source into our SASS compile.
+
+# NOTE: If something goes wrong here check that the internal version of npm/node specified
+# in the pom-main.xml is the same as the version installed on the system.
+
 node-sass ./css/meta64.scss ./css/meta64.css --output-style compressed
 
 if [ $? -eq 0 ]

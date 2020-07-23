@@ -1,8 +1,9 @@
+/* Graph code is temporarily disabled */
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 
-import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
+//import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
 import { Div } from "./Div";
 
 // https://github.com/visjs/vis-network
@@ -15,7 +16,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class GraphPanel extends Div {
 
-    network: Network;
+    //temporarily removed
+    //network: Network;
 
     constructor() {
         super(null, { style: { width: "100%", height: "600px", border: "1px solid gray" } });
@@ -51,17 +53,18 @@ export class GraphPanel extends Div {
     }
 
     setGraphData(data: any): void {
-        this.whenElm((elm: HTMLElement) => {
+        //vis library temporarily removed.
+        // this.whenElm((elm: HTMLElement) => {
 
-            // Lazy create network, and populate with data.
-            if (!this.network) {
-                var options = {};
-                this.network = new Network(elm, data, options);
-            }
-            else {
-                this.network.setData(data);
-            }
-        });
+        //     // Lazy create network, and populate with data.
+        //     if (!this.network) {
+        //         var options = {};
+        //         this.network = new Network(elm, data, options);
+        //     }
+        //     else {
+        //         this.network.setData(data);
+        //     }
+        // });
     }
 
     preRender(): void {

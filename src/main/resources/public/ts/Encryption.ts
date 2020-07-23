@@ -5,6 +5,10 @@ import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 
+/* todo-0: Encryption needs to be retested after making some minor syntax
+ updates to correct the TSC compiler errors that came up in here after 
+ installing Ubuntu 20.04 and refreshing lots of versions of many utilities and libs */
+
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
@@ -62,9 +66,9 @@ export class Encryption implements EncryptionIntf {
         hash: "SHA-256",
     };
 
-    OP_ENC_DEC = ["encrypt", "decrypt"];
-    OP_ENC: string[] = ["encrypt"];
-    OP_DEC: string[] = ["decrypt"];
+    OP_ENC_DEC: KeyUsage[] = ["encrypt", "decrypt"];
+    OP_ENC: KeyUsage[] = ["encrypt"];
+    OP_DEC: KeyUsage[] = ["decrypt"];
 
     vector: Uint8Array = null;
 
@@ -137,14 +141,15 @@ export class Encryption implements EncryptionIntf {
             let obj: any = await S.localDB.readObject(this.STORE_SYMKEY);
             if (obj) {
                 // simple encrypt/decrypt
-                let key = obj.val;
+                let key: CryptoKey = obj.val;
                 let encHex = await this.symEncryptString(key, clearText);
                 let unencText = await this.symDecryptString(key, encHex);
                 S.util.assert(clearText === unencText, "Symmetric decrypt");
 
                 // test symetric key export/import
-                let keyDat = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, key);
-                let key2: CryptoKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, keyDat, this.SYM_ALGO, true, this.OP_ENC_DEC);
+                let keyDat: JsonWebKey = await crypto.subtle.exportKey(this.KEY_SAVE_FORMAT, key) as JsonWebKey;
+            
+                let key2: CryptoKey = await crypto.subtle.importKey(this.KEY_SAVE_FORMAT, keyDat, this.SYM_ALGO /*as AlgorithmIdentifier*/, true, this.OP_ENC_DEC as KeyUsage[]);
 
                 let encHex2 = await this.symEncryptString(key2, clearText);
                 let unencText2 = await this.symDecryptString(key2, encHex2);
@@ -207,7 +212,7 @@ export class Encryption implements EncryptionIntf {
         console.log("runConversionTest OK.");
     }
 
-    importKey = async (key: JsonWebKey, algos: any, extractable: boolean, keyUsages: string[]): Promise<CryptoKey> => {
+    importKey = async (key: JsonWebKey, algos: any, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKey> => {
         return crypto.subtle.importKey(S.encryption.KEY_SAVE_FORMAT, key, algos, extractable, keyUsages);
     }
 
