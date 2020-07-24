@@ -115,6 +115,11 @@ public class NodeEditService {
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
 		newNode = api.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties());
+
+		if (!req.isUpdateModTime()) {
+			newNode.setModifyTime(null);
+		}
+
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
 
 		if (req.isTypeLock()) {
@@ -207,11 +212,10 @@ public class NodeEditService {
 			newNode.setContent("");
 		}
 
-		if (req.isUpdateModTime()) {
-			Calendar lastModified = Calendar.getInstance();
-			newNode.setModifyTime(lastModified.getTime());
+		if (!req.isUpdateModTime()) {
+			newNode.setModifyTime(null);
 		}
-
+	
 		api.save(session, newNode);
 		res.setNewNode(
 				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false, false));
@@ -306,9 +310,8 @@ public class NodeEditService {
 				res.setAclEntries(api.getAclEntries(session, node));
 			}
 
-			if (req.isUpdateModTime()) {
-				Calendar lastModified = Calendar.getInstance();
-				node.setModifyTime(lastModified.getTime());
+			if (!req.isUpdateModTime()) {
+				node.setModifyTime(null);
 			}
 
 			if (!StringUtils.isEmpty(node.getContent()) //
@@ -444,7 +447,6 @@ public class NodeEditService {
 				SubNode newNode = api.createNode(session, parentForNewNodes, null, firstOrdinal + idx,
 						CreateNodeLocation.ORDINAL);
 				newNode.setContent(part);
-				newNode.setModifyTime(now);
 				api.save(session, newNode);
 			}
 			idx++;

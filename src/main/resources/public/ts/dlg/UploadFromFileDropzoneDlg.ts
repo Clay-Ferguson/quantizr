@@ -296,6 +296,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                             ];
 
                             S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                                updateModTime: true,
                                 nodeId: dlg.node.id,
                                 newNodeName: "",
                                 typeName: "u",

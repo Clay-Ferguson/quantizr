@@ -142,7 +142,7 @@ public class OutboxMgr {
 		SubNode userInbox = api.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s());
 
 		if (userInbox != null) {
-			//log.debug("userInbox id=" + userInbox.getId().toHexString());
+			// log.debug("userInbox id=" + userInbox.getId().toHexString());
 
 			/*
 			 * First look to see if there is a target node already existing in this persons
@@ -151,9 +151,13 @@ public class OutboxMgr {
 			SubNode notifyNode = api.findSubNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(),
 					node.getId().toHexString());
 
-			/* If there's no notification for this node already in the user's inbox then add one */		
+			/*
+			 * If there's no notification for this node already in the user's inbox then add
+			 * one
+			 */
 			if (notifyNode == null) {
-				notifyNode = api.createNode(session, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L, CreateNodeLocation.FIRST, null);
+				notifyNode = api.createNode(session, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L,
+						CreateNodeLocation.FIRST, null);
 
 				// trim to 280 like twitter.
 				String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
@@ -167,8 +171,9 @@ public class OutboxMgr {
 				notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getId().toHexString());
 				api.save(session, notifyNode);
 			}
-			
-			//and then always send out a push notification so the user sees live there's a new share comming in or being re-added even.
+
+			// and then always send out a push notification so the user sees live there's a
+			// new share comming in or being re-added even.
 			userFeedService.sendServerPushInfo(recieverUserName, new InboxPushInfo(node.getId().toHexString()));
 
 			SubNode recieverAccountNode = api.getUserNodeByUserName(session, recieverUserName);

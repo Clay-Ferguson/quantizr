@@ -462,6 +462,7 @@ public class NodeRenderService {
 	public void thymeleafProcessChildren(MongoSession session, SubNode node, HashMap<String,String> model, String parentName) {
 		String nodeName;
 
+		/* If this node has a name, create a model map entry based on the name that contains the content of  the node */
 		if (!StringUtils.isEmpty(node.getName())) {
 			nodeName = parentName != null ? parentName + "__" + node.getName() : node.getName();
 			log.debug("thymeleaf [" + nodeName + "]=" + node.getContent());

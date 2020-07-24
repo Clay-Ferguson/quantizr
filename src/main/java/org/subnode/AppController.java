@@ -142,6 +142,8 @@ public class AppController {
 	private static HashMap<String, String> welcomeMap = null;
 	private static final Object welcomeMapLock = new Object();
 
+	private static final String cacheBuster = String.valueOf(new Date().getTime());
+
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
 
@@ -293,13 +295,17 @@ public class AppController {
 		return "forward:/index.html";
 	}
 
-	/* This is our only "Thymeleaf Page" ! */
+	/* This is our only "Thymeleaf Page" ! 
+	
+	https://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html
+	*/
 	@RequestMapping(value = { "/" })
 	public String welcome(Model model) {
 		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 			synchronized (welcomeMapLock) {
 				HashMap<String, String> newMap = new HashMap<String, String>();
 				nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
+				newMap.put("cacheBuster", cacheBuster);
 				welcomeMap = newMap;
 			}
 		}

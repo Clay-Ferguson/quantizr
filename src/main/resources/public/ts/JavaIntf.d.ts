@@ -35,6 +35,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     createAtTop: boolean;
     typeLock: boolean;
     properties: PropertyInfo[];
+    updateModTime: boolean;
 }
 
 export interface DeleteAttachmentRequest extends RequestBase {

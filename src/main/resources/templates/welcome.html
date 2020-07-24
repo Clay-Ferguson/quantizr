@@ -10,8 +10,9 @@
     <meta name="author" content="">
 
     <title>Quanta</title>
-    <!-- todo-0: need genuine cachebuster here! -->
-    <link rel="stylesheet" href="/css/meta64.css?v=4" />
+    <!-- todo-0: this cache buster could be improved by making it actually a hash of the file itself, because with the current
+    algorithm every time there is a server restart it forces user to download new CSS -->
+    <link rel="stylesheet" th:href="'/css/meta64.css?v='+${cacheBuster}" />
 </head>
 
 <body class="welcome-body customScrollbar">

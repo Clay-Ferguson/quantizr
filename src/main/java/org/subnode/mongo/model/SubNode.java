@@ -1,5 +1,6 @@
 package org.subnode.mongo.model;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -140,6 +141,9 @@ public class SubNode {
 
 	@PersistenceConstructor
 	public SubNode() {
+		Date now = Calendar.getInstance().getTime();
+		setModifyTime(now);
+		setCreateTime(now);
 	}
 
 	public SubNode(ObjectId owner, String path, String type, Long ordinal) {
@@ -149,6 +153,9 @@ public class SubNode {
 
 		// always user setter, because we are taking a hash of this
 		setPath(path);
+		Date now = Calendar.getInstance().getTime();
+		setModifyTime(now);
+		setCreateTime(now);
 	}
 
 	// we don't annotate this because we have a custom getter.

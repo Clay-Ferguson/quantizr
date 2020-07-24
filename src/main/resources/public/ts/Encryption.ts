@@ -320,8 +320,6 @@ export class Encryption implements EncryptionIntf {
         });
     }
 
-    //todo-0: compiler showing lots of syntax errors here in crypto api?
-    //Check the official browser spect to find out what's toing on.
     genSymKey = async (): Promise<CryptoKey> => {
         let key: CryptoKey = await window.crypto.subtle.generateKey({
             name: this.SYM_ALGO,

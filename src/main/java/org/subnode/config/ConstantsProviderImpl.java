@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 /**
  * Constants Provider implementation
  * 
- * I'm using this class to inject strings into the HTML using thymleaf and using properties file as
+ * I'm using this class to inject strings into the HTML using thymeleaf and using properties file as
  * the source of the strings to inject. There is a way to inject directly from a properties file
- * into thymleaf, but it looks more complex and less powerful than this approach. Using the
+ * into thymeleaf, but it looks more complex and less powerful than this approach. Using the
  * constantsProvider we get access to properties in a way were we can actually process them if we
  * need to before handing them to spring, because we are implementing the getters here.
  */

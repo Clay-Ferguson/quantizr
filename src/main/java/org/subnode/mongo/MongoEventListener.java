@@ -140,12 +140,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 		}
 
-		Date now = new Date();
-		if (node.getCreateTime() == null) {
-			dbObj.put(SubNode.FIELD_CREATE_TIME, now);
-			node.setCreateTime(now);
-		}
-
 		removeDefaultProps(node);
 
 		if (node.isDeleted()) {

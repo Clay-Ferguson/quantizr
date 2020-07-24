@@ -92,6 +92,21 @@ Then install the Java Debugger and Java development plugins into it from Redhat 
 
 If you do use VSCode you will be able to use the file */.vscode/tasks.json* to run build scripts.
 
+### VSCode Java plugins expect you to download your own JDK and configure it manually
+
+   sudo nano /etc/environment
+
+   add these lines at top:
+
+   JAVA_HOME="/home/clay/jdk-11.0.8+10"
+   JDK_HOME="/home/clay/jdk-11.0.8+10"
+
+   Then reboot.
+
+Also with VSCode when prompted to import the "Java" after you install the 
+"Red Hat Java Plugin" you should say "yes" or else you won't get any of the 
+Java language features.
+
 # Maven Build
 
 WARNING: Before you run 'build-dev.sh' (or 'build-test.sh') you will need to read and understand the 'setenv.sh' variables and set up your own folders for those. Unfortunately this application is not something you can just download, and build, and run in a matter of a few minutes, because there are several paths that you will need to understand and several moving parts involving the app itself, MongoDB (maybe IPFS if you are enabling that), and how it all is connected and run via Docker setup. The good news is that the *only* paths you need to set are all contained in 'setenv.sh' and each one is docmented as to what it is. However, in general before truing to run a build or run the app, you should open and read every "*.sh" script in the project root. If you don't understand what's going on in those you should probably not even consider building/running the app until you know those things.

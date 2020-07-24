@@ -191,6 +191,7 @@ export class Edit implements EditIntf {
             }, (res) => { this.insertNodeResponse(res, state); });
         } else {
             S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                updateModTime: false,
                 nodeId: parentNode.id,
                 newNodeName: "",
                 typeName: typeName ? typeName : "u",
@@ -695,6 +696,7 @@ export class Edit implements EditIntf {
             }
 
             S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                updateModTime: true,
                 nodeId: "~" + J.NodeType.NOTES,
                 newNodeName: "",
                 typeName: "u",
@@ -740,6 +742,7 @@ export class Edit implements EditIntf {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+            updateModTime: true,
             nodeId: node.id,
             newNodeName: "",
             typeName: J.NodeType.NONE,
@@ -756,6 +759,7 @@ export class Edit implements EditIntf {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+            updateModTime: true,
             nodeId: node.id,
             newNodeName: "",
             typeName: J.NodeType.FRIEND,

@@ -22,6 +22,8 @@ public class CreateSubNodeRequest extends RequestBase {
 	//default properties to add, or null if none
 	private List<PropertyInfo> properties;
 
+	private boolean updateModTime;
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -76,5 +78,13 @@ public class CreateSubNodeRequest extends RequestBase {
 
 	public void setProperties(List<PropertyInfo> properties) {
 		this.properties = properties;
+	}
+
+	public boolean isUpdateModTime() {
+		return updateModTime;
+	}
+
+	public void setUpdateModTime(boolean updateModTime) {
+		this.updateModTime = updateModTime;
 	}
 }
