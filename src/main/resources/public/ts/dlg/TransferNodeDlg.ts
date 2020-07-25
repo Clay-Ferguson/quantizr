@@ -33,8 +33,8 @@ export class TransferNodeDlg extends DialogBase {
         return [
             new Form(null, [
                 new FormGroup(null, [
-                    new TextField("From User", null, null, null, new CompValueHolder<string>(this, "fromUser")),
-                    new TextField("To User", null, null, null, new CompValueHolder<string>(this, "toUser")),
+                    new TextField("From User", null, null, new CompValueHolder<string>(this, "fromUser")),
+                    new TextField("To User", null, null, new CompValueHolder<string>(this, "toUser")),
                 ]),
                 new FormGroup(null, [
                     new Checkbox("Include Sub-Nodes", null, {

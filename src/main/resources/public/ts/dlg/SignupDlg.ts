@@ -29,9 +29,9 @@ export class SignupDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         let children = [
             new Form(null, [
-                new TextField("User", null, false, null, new CompValueHolder<string>(this, "user")),
-                new TextField("Password", null, true, null, new CompValueHolder<string>(this, "password")),
-                new TextField("Email", null, false, null, new CompValueHolder<string>(this, "email")),
+                new TextField("User", false, null, new CompValueHolder<string>(this, "user")),
+                new TextField("Password", true, null, new CompValueHolder<string>(this, "password")),
+                new TextField("Email", false, null, new CompValueHolder<string>(this, "email")),
                 new ButtonBar([
                     new Button("Create Account", this.signup, null, "btn-primary"),
                     new Button("Cancel", this.close)

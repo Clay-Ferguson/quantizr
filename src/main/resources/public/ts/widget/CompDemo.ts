@@ -30,6 +30,13 @@ export class CompDemo extends Div {
 
         children.push(this.textarea = new Textarea("Textarea", {
             rows: "4"
+        }, {
+            getValue: () => {
+                return this.getState().textVal;
+            },
+            setValue: (val: any) => {
+                this.mergeState({ textVal: val });
+            }
         }));
 
         children.push(new Button("Set Textarea", () => {

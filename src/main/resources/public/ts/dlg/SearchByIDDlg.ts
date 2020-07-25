@@ -28,13 +28,17 @@ export class SearchByIDDlg extends DialogBase {
         this.whenElm((elm: HTMLSelectElement) => {
             this.searchTextField.focus();
         });
+        
+        this.mergeState({
+            searchText: SearchByIDDlg.defaultSearchText
+        });
     }
 
     renderDlg(): CompIntf[] {
         let children = [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                this.searchTextField = new TextField("Node ID", SearchByIDDlg.defaultSearchText, false, this.search,
+                this.searchTextField = new TextField("Node ID", false, this.search,
                     new CompValueHolder<string>(this, "searchText")),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),

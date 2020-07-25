@@ -20,14 +20,15 @@ export class UploadFromUrlDlg extends DialogBase {
 
     uploadButton: Button;
 
-    constructor(private node: J.NodeInfo, private defaultUrl: string, private onUploadFunc: Function, state: AppState) {
+    constructor(private node: J.NodeInfo, private url: string, private onUploadFunc: Function, state: AppState) {
         super("Upload File", null, false, state);
+        this.mergeState({url});
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new TextField("Upload from URL", this.defaultUrl, false, null, new CompValueHolder<string>(this, "url")),
+                new TextField("Upload from URL", false, null, new CompValueHolder<string>(this, "url")),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Close", () => {

@@ -34,15 +34,16 @@ export class SearchContentDlg extends DialogBase {
 
         this.mergeState({
             fuzzy: false,
-            caseSensitive: false
-        })
+            caseSensitive: false,
+            searchText: SearchContentDlg.defaultSearchText
+        });
     }
 
     renderDlg(): CompIntf[] {
         let children = [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                this.searchTextField = new TextField("Search", SearchContentDlg.defaultSearchText, false, this.search,
+                this.searchTextField = new TextField("Search", false, this.search,
                     new CompValueHolder<string>(this, "searchText")),
                 new HorizontalLayout([
                     new Checkbox("Fuzzy Search (slower)", null, {

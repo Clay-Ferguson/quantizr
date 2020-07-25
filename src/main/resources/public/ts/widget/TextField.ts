@@ -21,8 +21,8 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     icon: ToggleIcon;
 
     //todo-0: for this and Textarea need to REQUIRE the valueIntf function ALWAYS. Without it there can be 'state-related' bugs.
-    constructor(public label: string = null, private defaultVal: string = "", private isPassword: boolean = false,
-        private onEnterKey: () => void = null, private valueIntf: ValueIntf = null) {
+    constructor(public label: string, private isPassword: boolean,
+        private onEnterKey: () => void, private valueIntf: ValueIntf) {
         super(null);
         S.util.mergeProps(this.attribs, {
             name: this.getId(),
@@ -33,30 +33,6 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
             inputType: isPassword ? "password" : "text"
         });
 
-        /* If we weren't passed a delegated value interface, then construct one. */
-        if (!this.valueIntf) {
-            this.valueIntf = {
-                setValue: (val: string): void => {
-                    this.mergeState({ value: val || "" });
-                },
-
-                getValue: (): string => {
-                    return this.getState().value;
-                }
-            };
-
-            //WARNING: It's ok to call setValue inside the constructor when we created our own valueIntf object, because we know
-            //it cannot go into infinite recursion, but if valueIntf was passed in, it would be dangerous, and also wouldn't make any sense
-            //because we'd expect the passed valueIntf to be in control and no defaultVal param would need to be passed in
-            //
-            //NOTE: "!=null" is important here, don't switch to !!defaultVal or even just 'defaultVal'. We mean litterally 
-            //every value other than null here. is this identical thing needed in "Textarea" also ? 
-            if (defaultVal != null) {
-                this.valueIntf.setValue(defaultVal);
-            }
-        }
-
-        // todo-1: need this on ACE editor and also TextField (same with updateValFunc)
         this.attribs.onChange = (evt: any) => {
             Comp.renderCachedChildren = true;
 

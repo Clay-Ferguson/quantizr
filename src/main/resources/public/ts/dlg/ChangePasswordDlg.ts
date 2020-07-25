@@ -35,7 +35,7 @@ export class ChangePasswordDlg extends DialogBase {
         let children = [
             new Form(null, [
                 new TextContent("Enter your new password below..."),
-                this.passwordField = new TextField("New Password", null, true, null, new CompValueHolder<string>(this, "pwd")),
+                this.passwordField = new TextField("New Password", true, null, new CompValueHolder<string>(this, "pwd")),
                 new ButtonBar([
                     new Button("Change Password", () => {
                         this.changePassword();

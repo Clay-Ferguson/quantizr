@@ -72,7 +72,7 @@ export class QuickEditField extends Span {
         else {
             let textarea = new Textarea(null, {
                 rows: 6,
-            }, null, {
+            }, {
                 getValue: () => {
                     return this.getState().quickEditVal;
                 },

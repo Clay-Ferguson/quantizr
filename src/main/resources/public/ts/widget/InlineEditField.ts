@@ -36,7 +36,7 @@ export class InlineEditField extends Span {
 
         let textarea = new Textarea(null, {
             rows: 10,
-        }, null, {
+        }, {
             getValue: () => {
                 return this.getState().inlineEditVal;
             },

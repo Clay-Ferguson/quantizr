@@ -267,7 +267,7 @@ export class EditNodeDlg extends DialogBase {
 
         let nodeNameTextField = null;
         if (!customProps) {
-            nodeNameTextField = new TextField("Node Name", null, false, null, {
+            nodeNameTextField = new TextField("Node Name", false, null, {
                 setValue: (val: string): void => {
                     this.getState().node.name = val || "";
                     nodeNameTextField.forceRender();
@@ -613,7 +613,15 @@ export class EditNodeDlg extends DialogBase {
             let textarea = new Textarea(label + " (read-only)", {
                 readOnly: "readOnly",
                 disabled: "disabled"
-            }, propValStr);
+            }, {
+                getValue: () => {
+                    //read-only. always return original value.
+                   return propValStr;
+                },
+                setValue: (val: any) => {
+                    //this is a read-only field
+                }
+            });
 
             formGroup.addChild(textarea);
         }
@@ -645,6 +653,20 @@ export class EditNodeDlg extends DialogBase {
             let valEditor: I.TextEditorIntf = null;
             let multiLine = false;
 
+            let valueIntf = {
+                getValue: (): string => {
+                    let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
+                    //console.log("getValue["+propEntry.name+"]=" + val);
+                    return val;
+                },
+                setValue: (val: any) => {
+                    //console.log("settingValue[" + propEntry.name + "]=" + val);
+                    let state = this.getState();
+                    S.props.setNodePropVal(propEntry.name, this.getState().node, val);
+                    this.mergeState(state);
+                }
+            };
+
             if (multiLine) {
                 if (C.ENABLE_ACE_EDITOR) {
                     valEditor = new AceEditPropTextarea(propEntry.value, "25em", null, false);
@@ -652,26 +674,15 @@ export class EditNodeDlg extends DialogBase {
                 else {
                     valEditor = new Textarea(null, {
                         rows: "20",
-                    }, propEntry.value);
-                    valEditor.focus();
+                    }, valueIntf);
+
+                    //todo-0: come back to this. removing it because i see it called during render, which is not good.
+                    //valEditor.focus();
                 }
             }
             else {
                 //console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
-
-                valEditor = new TextField(null, null, false, null, {
-                    getValue: (): string => {
-                        let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
-                        //console.log("getValue["+propEntry.name+"]=" + val);
-                        return val;
-                    },
-                    setValue: (val: any) => {
-                        //console.log("settingValue[" + propEntry.name + "]=" + val);
-                        let state = this.getState();
-                        S.props.setNodePropVal(propEntry.name, this.getState().node, val);
-                        this.mergeState(state);
-                    }
-                });
+                valEditor = new TextField(null, false, null, valueIntf);
             }
 
             formGroup.addChild(valEditor as any as Comp);
@@ -712,7 +723,9 @@ export class EditNodeDlg extends DialogBase {
                         }
 
                         clearInterval(timer);
-                        (this.contentEditor as AceEditPropTextarea).getAceEditor().focus();
+
+                        //todo-0: don't call during render.
+                        //(this.contentEditor as AceEditPropTextarea).getAceEditor().focus();
                     }
                 }, 250);
             });
@@ -720,8 +733,7 @@ export class EditNodeDlg extends DialogBase {
         else {
             this.contentEditor = new Textarea(null, {
                 rows,
-                //defaultValue: encrypted ? "" : value
-            }, null, {
+            }, {
                 getValue: () => {
                     let ret = this.getState().node.content;
                     if (ret.startsWith(J.Constant.ENC_TAG)) {
@@ -755,7 +767,8 @@ export class EditNodeDlg extends DialogBase {
                 }
             });
 
-            this.contentEditor.focus();
+            //todo-0: removing. don't call during render.
+            //this.contentEditor.focus();
         }
 
         formGroup.addChild(this.contentEditor as any as Comp);
