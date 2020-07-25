@@ -9,6 +9,7 @@ import { PubSub } from "../PubSub";
 import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { CompValueHolder } from "../CompValueHolder";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -17,7 +18,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class UploadFromUrlDlg extends DialogBase {
 
-    uploadFromUrlTextField: TextField;
     uploadButton: Button;
 
     constructor(private node: J.NodeInfo, private defaultUrl: string, private onUploadFunc: Function, state: AppState) {
@@ -27,8 +27,7 @@ export class UploadFromUrlDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                //todo-0: use CompValueHolder
-                this.uploadFromUrlTextField = new TextField("Upload from URL", this.defaultUrl),
+                new TextField("Upload from URL", this.defaultUrl, false, null, new CompValueHolder<string>(this, "url")),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Close", () => {
@@ -44,7 +43,7 @@ export class UploadFromUrlDlg extends DialogBase {
     }
 
     upload = (): void => {
-        let sourceUrl = this.uploadFromUrlTextField.getValue();
+        let sourceUrl = this.getState().url;
 
         if (sourceUrl) {
             S.util.ajax<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
