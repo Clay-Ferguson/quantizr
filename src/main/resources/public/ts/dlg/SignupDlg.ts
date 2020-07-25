@@ -7,9 +7,9 @@ import { PubSub } from "../PubSub";
 import { Constants as C} from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
-import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { CompValueHolder } from "../CompValueHolder";
 
 // #recaptcha-disabled
 //declare var grecaptcha;
@@ -22,24 +22,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class SignupDlg extends DialogBase {
 
-    userTextField: TextField;
-    passwordTextField: TextField;
-    emailTextField: TextField;
-
     constructor(state: AppState) {
         super("Create Account", "app-modal-content-medium-width", null, state);
-        this.whenElm((elm: HTMLSelectElement) => {
-            this.userTextField.focus();
-        });
     }
     
     renderDlg(): CompIntf[] {
         let children = [
             new Form(null, [
-                //todo-0: use CompValueHolder
-                this.userTextField = new TextField("User"),
-                this.passwordTextField = new TextField("Password", null, true),
-                this.emailTextField = new TextField("Email"),
+                new TextField("User", null, false, null, new CompValueHolder<string>(this, "user")),
+                new TextField("Password", null, true, null, new CompValueHolder<string>(this, "password")),
+                new TextField("Email", null, false, null, new CompValueHolder<string>(this, "email")),
                 new ButtonBar([
                     new Button("Create Account", this.signup, null, "btn-primary"),
                     new Button("Cancel", this.close)
@@ -47,7 +39,6 @@ export class SignupDlg extends DialogBase {
             ])
         ];
         
-        this.pageInitSignupPg();
         return children;
     }
 
@@ -66,9 +57,10 @@ export class SignupDlg extends DialogBase {
     }
 
     signupNow = (reCaptchaToken: string): void => {
-        let userName = this.userTextField.getValue();
-        let password = this.passwordTextField.getValue();
-        let email = this.emailTextField.getValue();
+        let state = this.getState();
+        let userName = state.user
+        let password = state.password;
+        let email = state.email;
 
         /* no real validation yet, other than non-empty */
         if (!userName || userName.length == 0 || //
@@ -118,8 +110,5 @@ export class SignupDlg extends DialogBase {
                 "User Information Accepted.<p/><p/>Check your email for account verification.", "Note"
             );
         }
-    }
-
-    pageInitSignupPg = (): void => {
     }
 }
