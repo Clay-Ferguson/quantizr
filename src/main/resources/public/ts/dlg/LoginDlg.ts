@@ -90,7 +90,7 @@ export class LoginDlg extends DialogBase {
             "Confirm",
             () => {
                 this.close();
-                new ResetPasswordDlg({ "user": usr }, this.appState).open();
+                new ResetPasswordDlg(usr, this.appState).open();
             }, null, null, null, this.appState
         ).open();
     }
