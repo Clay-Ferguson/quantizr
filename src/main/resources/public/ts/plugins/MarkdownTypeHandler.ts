@@ -3,6 +3,7 @@ import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { TypeBase } from "./base/TypeBase";
+import { store } from "../AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -12,7 +13,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* Type for 'untyped' types. That is, if the user has not set a type explicitly this type will be the default */
 export class MarkdownTypeHandler extends TypeBase {
     constructor() {
-        //we don't assign an icon to markdown types because that clutters the page. Most everything is markdown.
-        super(J.NodeType.NONE, "Markdown", null, /* "fa-align-left" */ true);
+        super(J.NodeType.NONE, "Markdown", "fa-align-left", true);
+    }
+
+    /* don't show this icon unless we are in edit mode, because since most everything is markdown 
+    type it would be too verbose. */
+    getIconClass(): string {
+        let appState = store.getState();
+        return appState.userPreferences.editMode ? super.getIconClass() : null;
     }
 }

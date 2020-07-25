@@ -102,7 +102,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
             if (iconClass) {
                 typeIcon = new Icon({
                     className: iconClass + " rowIcon",
-                    title: "Node Type: " + typeHandler.getName()
+                    title: "Node Type: " + typeHandler.getName(),
+                    onMouseOver: () => {S.meta64.draggableId = node.id;},
+                    onMouseOut: () => {S.meta64.draggableId = null;}
                 });
             }
         }

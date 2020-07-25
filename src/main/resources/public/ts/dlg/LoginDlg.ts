@@ -31,6 +31,7 @@ export class LoginDlg extends DialogBase {
         let children = [
             new Form(null, [
                 new FormGroup(null, [
+                    //todo-0: use CompValueHolder
                     this.userTextField = new TextField("User", null, false, this.login),
                     this.passwordTextField = new TextField("Password", null, true, this.login)
                 ]),

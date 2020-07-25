@@ -27,6 +27,7 @@ export class UploadFromUrlDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
+                //todo-0: use CompValueHolder
                 this.uploadFromUrlTextField = new TextField("Upload from URL", this.defaultUrl),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),

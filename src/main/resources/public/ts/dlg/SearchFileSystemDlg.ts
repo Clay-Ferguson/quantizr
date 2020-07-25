@@ -32,6 +32,7 @@ export class SearchFileSystemDlg extends DialogBase {
         let children = [
             new Form(null, [
                 new TextContent("Enter text to find. Only content text will be searched. All sub-nodes under the selected node are included in the search."),
+                //todo-0: use CompValueHolder
                 this.searchTextField = new TextField("Search", SearchFileSystemDlg.defaultSearchText, null, () => this.searchNodes(this.appState)),
                 new ButtonBar([
                     new Button("Search", this.searchNodes),

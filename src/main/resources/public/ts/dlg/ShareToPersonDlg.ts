@@ -30,6 +30,7 @@ export class ShareToPersonDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Enter the user name of the person you want to share this node with:"),
+                //todo-0: use CompValueHolder
                 this.shareToUserTextField = new TextField("User to share with", null, false, this.shareNodeToPerson),
                 new ButtonBar([
 

@@ -16,7 +16,7 @@ export class User implements UserIntf {
 
     private logoutResponse = (res: J.LogoutResponse): void => {
         /* reloads browser with the query parameters stripped off the path */
-        window.location.href = window.location.origin;
+        window.location.href = window.location.origin + "/app";
     }
 
     closeAccountResponse = (res: J.CloseAccountResponse): void => {

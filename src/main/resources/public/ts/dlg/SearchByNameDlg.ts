@@ -33,6 +33,7 @@ export class SearchByNameDlg extends DialogBase {
         let children = [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
+                //todo-0: use CompValueHolder
                 this.searchTextField = new TextField("Node Name", SearchByNameDlg.defaultSearchText, false, this.search),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),

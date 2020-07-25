@@ -18,6 +18,8 @@ export interface Meta64Intf {
     parentIdToFocusNodeMap: { [key: string]: string };
     curHighlightNodeCompRow: CompIntf;
 
+    draggableId: string;
+
     //function cache accessor
     getNodeFunc(func: (id: string) => void, name: string, id: string): () => void;
 

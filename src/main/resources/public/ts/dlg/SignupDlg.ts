@@ -36,6 +36,7 @@ export class SignupDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         let children = [
             new Form(null, [
+                //todo-0: use CompValueHolder
                 this.userTextField = new TextField("User"),
                 this.passwordTextField = new TextField("Password", null, true),
                 this.emailTextField = new TextField("Email"),

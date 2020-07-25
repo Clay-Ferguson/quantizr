@@ -20,9 +20,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     input: Input;
     icon: ToggleIcon;
 
-     //todo-td: shouldn't we just required that every instantiator provide it's own accessor ValueIntf always? Everything is so much cleaner that way,
-    //and it means 'defaultValue' is never passed in itself.
-    //need to finish this on all TextFields and Textareas 
+    //todo-0: for this and Textarea need to REQUIRE the valueIntf function ALWAYS. Without it there can be 'state-related' bugs.
     constructor(public label: string = null, private defaultVal: string = "", private isPassword: boolean = false,
         private onEnterKey: () => void = null, private valueIntf: ValueIntf = null) {
         super(null);

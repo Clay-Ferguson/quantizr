@@ -11,6 +11,7 @@ import { DialogBase } from "../DialogBase";
 import { Checkbox } from "../widget/Checkbox";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { CompValueHolder } from "../CompValueHolder";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -19,20 +20,21 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class TransferNodeDlg extends DialogBase {
 
-    fromTextField: TextField;
-    toTextField: TextField;
-
     constructor(state: AppState) {
         super("Transfer Node", "app-modal-content-narrow-width", false, state);
-        this.mergeState({recursive: false});
+        this.mergeState({
+            recursive: false,
+            fromUser: null,
+            toUser: null
+        });
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
                 new FormGroup(null, [
-                    this.fromTextField = new TextField("From User"),
-                    this.toTextField = new TextField("To User"),
+                    new TextField("From User", null, null, null, new CompValueHolder<string>(this, "fromUser")),
+                    new TextField("To User", null, null, null, new CompValueHolder<string>(this, "toUser")),
                 ]),
                 new FormGroup(null, [
                     new Checkbox("Include Sub-Nodes", null, {
@@ -59,10 +61,10 @@ export class TransferNodeDlg extends DialogBase {
     }
 
     transfer = (): void => {
-        let fromUser = this.fromTextField.getValue();
-        let toUser = this.toTextField.getValue();
+        let state = this.getState();
+        
         //if fromUser is left blank that's how to take ownership of any nodes regardless of current ownership
-        if (/*!fromUser ||*/ !toUser) {
+        if (/*!fromUser ||*/ !state.toUser) {
             S.util.showMessage("To user name is required.", "Warning");
             return;
         }
@@ -72,7 +74,7 @@ export class TransferNodeDlg extends DialogBase {
             return;
         }
        
-        S.user.transferNode(this.getState().recursive, node.id, fromUser, toUser, this.appState);
+        S.user.transferNode(this.getState().recursive, node.id, state.fromUser, state.toUser, this.appState);
         this.close();
     }
 }

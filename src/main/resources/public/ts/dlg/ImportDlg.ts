@@ -10,6 +10,7 @@ import { Singletons } from "../Singletons";
 import { AppState } from "../AppState";
 import { store } from "../AppRedux";
 import { CompIntf } from "../widget/base/CompIntf";
+import { CompValueHolder } from "../CompValueHolder";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -18,15 +19,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ImportDlg extends DialogBase {
 
-  importFromFileNameTextField: TextField;
-
     constructor(state: AppState) {
         super("Import from XML", null, false, state);
+        this.mergeState({
+            fileName: null
+        });
     }
     
     renderDlg(): CompIntf[] {
         return [
-            this.importFromFileNameTextField = new TextField("File Name to Import"),
+            new TextField("File Name to Import", null, null, null, new CompValueHolder<string>(this, "fileName")),
             new ButtonBar([
                 new Button("Import", this.importNodes, null, "btn-primary"),
                 new Button("Close", () => {
@@ -41,10 +43,10 @@ export class ImportDlg extends DialogBase {
     }
 
     importNodes = (): void => {
-        var highlightNode = S.meta64.getHighlightedNode(this.appState);
-        var sourceFileName = this.importFromFileNameTextField.getValue();
+        let highlightNode = S.meta64.getHighlightedNode(this.appState);
+        let state = this.getState();
 
-        if (!sourceFileName) {
+        if (!state.fileName) {
             new MessageDlg("Please enter a name for the import file.", "Import", null, null, false, 0, this.appState).open();
             return;
         }
@@ -52,7 +54,7 @@ export class ImportDlg extends DialogBase {
         if (highlightNode) {
             S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
                 nodeId: highlightNode.id,
-                sourceFileName: sourceFileName
+                sourceFileName: state.fileName
             }, this.importResponse);
         }
         this.close();

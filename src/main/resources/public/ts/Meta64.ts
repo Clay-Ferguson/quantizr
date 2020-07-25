@@ -36,6 +36,11 @@ export class Meta64 implements Meta64Intf {
 
     private static lastKeyDownTime: number = 0;
 
+    /* We want to only be able to drag nodes by clicking on their TYPE ICON, and we accomplish that by using the mouseover/mouseout
+    on those icons to detect an 'is mouse over' condition any time a drag attempt is started on a row and only allow it if mouse 
+    is over the icon */
+    public draggableId: string = null;
+
     /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
     getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {
         let k = op + "_" + id;

@@ -31,6 +31,7 @@ export class ResetPasswordDlg extends DialogBase {
         let children = [
             new Form(null, [
                 new TextContent("Enter your user name and email address and a change-password link will be sent to you"),
+                //todo-0: use CompValueHolder
                 this.userTextField = new TextField("User Name"),
                 this.emailTextField = new TextField("Email Address"),
                 new ButtonBar([
