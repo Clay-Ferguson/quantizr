@@ -11,6 +11,7 @@ import { Form } from "../widget/Form";
 import { MessageDlg } from "./MessageDlg";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { CompValueHolder } from "../CompValueHolder";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -28,14 +29,13 @@ export class SearchByIDDlg extends DialogBase {
             this.searchTextField.focus();
         });
     }
-    
+
     renderDlg(): CompIntf[] {
         let children = [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                //todo-0: use CompValueHolder
-                this.searchTextField = new TextField("Node ID", SearchByIDDlg.defaultSearchText, false, this.search
-                ),
+                this.searchTextField = new TextField("Node ID", SearchByIDDlg.defaultSearchText, false, this.search,
+                    new CompValueHolder<string>(this, "searchText")),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", () => {
@@ -64,7 +64,7 @@ export class SearchByIDDlg extends DialogBase {
         }
 
         // until better validation, just check for empty
-        let searchText = this.searchTextField.getValue();
+        let searchText = this.getState().searchText;
         if (!searchText) {
             S.util.showMessage("Enter search text.", "Warning");
             return;

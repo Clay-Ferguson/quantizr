@@ -12,6 +12,7 @@ import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { store } from "../AppRedux";
 import { FriendsDlg } from "./FriendsDlg";
+import { CompValueHolder } from "../CompValueHolder";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -19,8 +20,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class ShareToPersonDlg extends DialogBase {
-
-    shareToUserTextField: TextField;
 
     constructor(private node: J.NodeInfo, private sharedNodeFunc: Function, state: AppState) {
         super("Share Node to Person", "app-modal-content-medium-width", false, state);
@@ -30,8 +29,8 @@ export class ShareToPersonDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Enter the user name of the person you want to share this node with:"),
-                //todo-0: use CompValueHolder
-                this.shareToUserTextField = new TextField("User to share with", null, false, this.shareNodeToPerson),
+                new TextField("User to share with", null, false, this.shareNodeToPerson,
+                    new CompValueHolder<string>(this, "userName")),
                 new ButtonBar([
 
                     new Button("Share", () => {
@@ -47,7 +46,7 @@ export class ShareToPersonDlg extends DialogBase {
                             this.shareToPersonImmediate(friendsDlg.selectedName);
                         }
                     }, null, "btn-primary"),
-                    
+
                     new Button("Close", () => {
                         this.close();
                     })
@@ -61,7 +60,7 @@ export class ShareToPersonDlg extends DialogBase {
     }
 
     shareNodeToPerson = (): void => {
-        let targetUser = this.shareToUserTextField.getValue();
+        let targetUser = this.getState().userName;
         if (!targetUser) {
             S.util.showMessage("Please enter a username", "Warning");
             return;

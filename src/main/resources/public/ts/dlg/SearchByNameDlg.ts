@@ -5,14 +5,15 @@ import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
 import { TextContent } from "../widget/TextContent";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { MessageDlg } from "./MessageDlg";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { CompValueHolder } from "../CompValueHolder";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
@@ -21,7 +22,7 @@ export class SearchByNameDlg extends DialogBase {
 
     static defaultSearchText: string = "";
     searchTextField: TextField;
-  
+
     constructor(state: AppState) {
         super("Search by Node Name", "app-modal-content-medium-width", false, state);
         this.whenElm((elm: HTMLSelectElement) => {
@@ -33,8 +34,8 @@ export class SearchByNameDlg extends DialogBase {
         let children = [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                //todo-0: use CompValueHolder
-                this.searchTextField = new TextField("Node Name", SearchByNameDlg.defaultSearchText, false, this.search),
+                this.searchTextField = new TextField("Node Name", SearchByNameDlg.defaultSearchText, false, this.search,
+                    new CompValueHolder<string>(this, "searchText")),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", () => {
@@ -63,7 +64,7 @@ export class SearchByNameDlg extends DialogBase {
         }
 
         // until better validation, just check for empty
-        let searchText = this.searchTextField.getValue();
+        let searchText = this.getState().searchText;
         if (!searchText) {
             S.util.showMessage("Enter search text.", "Warning");
             return;

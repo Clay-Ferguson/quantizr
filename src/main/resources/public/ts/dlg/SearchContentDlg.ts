@@ -5,7 +5,7 @@ import { Button } from "../widget/Button";
 import { TextField } from "../widget/TextField";
 import { TextContent } from "../widget/TextContent";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
+import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
 import { Form } from "../widget/Form";
 import { MessageDlg } from "./MessageDlg";
@@ -13,8 +13,9 @@ import { Checkbox } from "../widget/Checkbox";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { CompValueHolder } from "../CompValueHolder";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
@@ -23,7 +24,7 @@ export class SearchContentDlg extends DialogBase {
 
     static defaultSearchText: string = "";
     searchTextField: TextField;
-  
+
     constructor(state: AppState) {
         super("Search Content", "app-modal-content-medium-width", null, state);
         S.srch.searchText = null;
@@ -41,12 +42,12 @@ export class SearchContentDlg extends DialogBase {
         let children = [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                //todo-0: use CompValueHolder
-                this.searchTextField = new TextField("Search", SearchContentDlg.defaultSearchText, false, this.search),
+                this.searchTextField = new TextField("Search", SearchContentDlg.defaultSearchText, false, this.search,
+                    new CompValueHolder<string>(this, "searchText")),
                 new HorizontalLayout([
                     new Checkbox("Fuzzy Search (slower)", null, {
                         setValue: (checked: boolean): void => {
-                            this.mergeState({fuzzy: checked});
+                            this.mergeState({ fuzzy: checked });
                         },
                         getValue: (): boolean => {
                             return this.getState().fuzzy;
@@ -54,7 +55,7 @@ export class SearchContentDlg extends DialogBase {
                     }),
                     new Checkbox("Case Sensitive", null, {
                         setValue: (checked: boolean): void => {
-                            this.mergeState({caseSensitive: checked});
+                            this.mergeState({ caseSensitive: checked });
                         },
                         getValue: (): boolean => {
                             return this.getState().caseSensitive;
@@ -89,7 +90,7 @@ export class SearchContentDlg extends DialogBase {
         }
 
         // until better validation, just check for empty
-        let searchText = this.searchTextField.getValue();
+        let searchText = this.getState().searchText;
         S.srch.searchText = searchText;
         if (!searchText) {
             S.util.showMessage("Enter search text.", "Warning");
