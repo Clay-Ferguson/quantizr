@@ -94,7 +94,7 @@ services:
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/subnode-tmp" 
             mail.port: ""
-            mail.user: "postmaster@quantizr.com" 
+            mail.user: "postmaster@quanta.wiki" 
             mail.password: "${emailPassword}" 
             mail.host: "smtp.mailgun.org" 
             mail.from: "admin@quanta.wiki"

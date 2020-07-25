@@ -11,8 +11,6 @@ public interface ConstantsProvider {
 
 	public String getBrandingMetaContent();
 
-	public String getCacheVersion();
-
 	public String getProfileName();
 
 	public String getHostAndPort();

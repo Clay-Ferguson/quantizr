@@ -18,25 +18,14 @@ public class ConstantsProviderImpl implements ConstantsProvider {
 	@Autowired
 	private AppProp appProp;
 
-	public static String cacheVersion;
-
 	@Override
 	public String getHostAndPort() {
 		return appProp.getHttpProtocol()+"://" + appProp.getMetaHost() + ":" + appProp.getServerPort();
 	}
 
 	@Override
-	public String getCacheVersion() {
-		return cacheVersion;
-	}
-
-	@Override
 	public String getProfileName() {
 		return appProp.getProfileName();
-	}
-
-	public static void setCacheVersion(String v) {
-		cacheVersion = v;
 	}
 
 	@Override

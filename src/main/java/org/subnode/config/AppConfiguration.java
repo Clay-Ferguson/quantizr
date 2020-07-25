@@ -256,10 +256,11 @@ public class AppConfiguration implements WebMvcConfigurer {
 
 	///////////////////////////////
 	// Thymeleaf
-	/*
-	 * - ClassLoaderTemplateResolver - FileTemplateResolver -
-	 * ServletContextTemplateResolver - UrlTemplateResolver
-	 */
+	// available resolver types
+	// -ClassLoaderTemplateResolver
+	// -FileTemplateResolver 
+	// -ServletContextTemplateResolver
+	// -UrlTemplateResolver
 	///////////////////////////////
 
 	// @Bean
@@ -294,9 +295,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	public ClassLoaderTemplateResolver templateResolver() {
 		ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
 		templateResolver.setPrefix("templates/");
-
-		//todo-0: need to investigate this cachable setting.
-		templateResolver.setCacheable(true);
+		templateResolver.setCacheable(!"dev".equals(appProp.getProfileName()));
 		templateResolver.setSuffix(".html");
 		templateResolver.setTemplateMode("HTML5");
 		templateResolver.setCharacterEncoding("UTF-8");
