@@ -12,6 +12,7 @@ import { PubSub } from "../PubSub";
 import { DialogBase } from "../DialogBase";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { CompValueHolder } from "../CompValueHolder";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,20 +21,20 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class LoginDlg extends DialogBase {
 
-    userTextField: TextField;
-    passwordTextField: TextField;
-
     constructor(paramsTest: Object, state: AppState) {
         super("Login", "app-modal-content-narrow-width", false, state);
+
+        //todo-0: CHECK ALL OTHER DIALOGS FOR THIS TYPE OF MISTAKE.
+        //beware: don't put this in a RENDER method. That will cause a massive problem (infinite loop, or hang in rendering)
+        this.populateFromLocalDb();
     }
 
     renderDlg(): CompIntf[] {
         let children = [
             new Form(null, [
                 new FormGroup(null, [
-                    //todo-0: use CompValueHolder
-                    this.userTextField = new TextField("User", null, false, this.login),
-                    this.passwordTextField = new TextField("Password", null, true, this.login)
+                    new TextField("User", null, false, this.login, new CompValueHolder<string>(this, "user")),
+                    new TextField("Password", null, true, this.login, new CompValueHolder<string>(this, "password"))
                 ]),
                 new ButtonBar([
                     new Button("Login", this.login, null, "btn-primary"),
@@ -45,7 +46,7 @@ export class LoginDlg extends DialogBase {
 
             ])
         ];
-        this.populateFromLocalDb();
+
         return children;
     }
 
@@ -53,20 +54,22 @@ export class LoginDlg extends DialogBase {
         return null;
     }
 
-    populateFromLocalDb = (): void => {
-        this.whenElm(async (elm: HTMLElement) => {
-            let usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
-            let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
-            
-            this.userTextField.setValue(usr);
-            this.passwordTextField.setValue(pwd);
-        });
+    populateFromLocalDb = async (): Promise<void> => {
+        let user = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
+        let password = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
+
+        this.mergeState({
+            user,
+            password
+        })
+       
+        return null;
     }
 
     login = (): void => {
-        let usr = this.userTextField.getValue();
-        let pwd = this.passwordTextField.getValue();
-        
+        let usr = this.getState().user;
+        let pwd = this.getState().password;
+
         if (usr && pwd) {
             S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
                 userName: usr,
@@ -81,7 +84,7 @@ export class LoginDlg extends DialogBase {
     }
 
     resetPassword = (): any => {
-        let usr = this.userTextField.getValue();
+        let usr = this.getState().user;
 
         new ConfirmDlg("Reset your password ?",
             "Confirm",
