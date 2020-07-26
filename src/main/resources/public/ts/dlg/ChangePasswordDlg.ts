@@ -32,7 +32,7 @@ export class ChangePasswordDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let children = [
+        return [
             new Form(null, [
                 new TextContent("Enter your new password below..."),
                 this.passwordField = new TextField("New Password", true, null, new CompValueHolder<string>(this, "pwd")),
@@ -47,7 +47,6 @@ export class ChangePasswordDlg extends DialogBase {
                 ])
             ])
         ];
-        return children;
     }
 
     renderButtons(): CompIntf {

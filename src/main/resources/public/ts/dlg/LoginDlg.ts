@@ -30,7 +30,7 @@ export class LoginDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let children = [
+        return [
             new Form(null, [
                 new FormGroup(null, [
                     new TextField("User", false, this.login, new CompValueHolder<string>(this, "user")),
@@ -43,11 +43,8 @@ export class LoginDlg extends DialogBase {
                         this.close();
                     })
                 ])
-
             ])
         ];
-
-        return children;
     }
 
     renderButtons(): CompIntf {

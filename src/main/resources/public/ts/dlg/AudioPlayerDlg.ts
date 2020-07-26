@@ -73,6 +73,7 @@ export class AudioPlayerDlg extends DialogBase {
             ])
         ];
 
+        //todo-0: this is obsolete. do this using normal react state.
         this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
             S.podcast.player = elm;
             setTimeout(this.updatePlayButtonText, 1000);
@@ -112,6 +113,7 @@ export class AudioPlayerDlg extends DialogBase {
     updatePlayButtonText = (): void => {
         let player = this.audioPlayer.getAudioElement();
         if (player) {
+            //todo-0: need this in the 'state' so it renders in a conventional way.
             this.playButton.setText(player.paused || player.ended ? "Play" : "Pause");
         }
     }

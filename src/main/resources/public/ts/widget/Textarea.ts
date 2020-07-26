@@ -13,7 +13,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Textarea extends Comp implements I.TextEditorIntf {
 
-    //todo-0: isn't defaultValue now unused here AND TextField also ?
     constructor(private label: string, attribs: any, private valueIntf: ValueIntf, customClass: string=null) {
         super(attribs);
         S.util.mergeProps(this.attribs, {

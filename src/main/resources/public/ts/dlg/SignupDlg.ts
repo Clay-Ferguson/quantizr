@@ -27,7 +27,7 @@ export class SignupDlg extends DialogBase {
     }
     
     renderDlg(): CompIntf[] {
-        let children = [
+        return [
             new Form(null, [
                 new TextField("User", false, null, new CompValueHolder<string>(this, "user")),
                 new TextField("Password", true, null, new CompValueHolder<string>(this, "password")),
@@ -38,8 +38,6 @@ export class SignupDlg extends DialogBase {
                 ])
             ])
         ];
-        
-        return children;
     }
 
     renderButtons(): CompIntf {

@@ -19,6 +19,9 @@ export class ManageEncryptionKeysDlg extends DialogBase {
 
     constructor(state: AppState) {
         super("Encryption Keys", null, false, state);
+
+        //todo-0: need to retest after moving out of renderDlg
+        //this.refreshKeyInfo();
     }
 
     renderDlg(): CompIntf[] {

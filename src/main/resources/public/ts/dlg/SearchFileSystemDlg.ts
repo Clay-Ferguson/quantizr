@@ -31,7 +31,7 @@ export class SearchFileSystemDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let children = [
+        return [
             new Form(null, [
                 new TextContent("Enter text to find. Only content text will be searched. All sub-nodes under the selected node are included in the search."),
                 this.searchTextField = new TextField("Search", null, () => this.searchNodes(this.appState),
@@ -44,7 +44,6 @@ export class SearchFileSystemDlg extends DialogBase {
                 ])
             ])
         ];
-        return children;
     }
 
     renderButtons(): CompIntf {

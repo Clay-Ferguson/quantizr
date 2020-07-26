@@ -29,7 +29,6 @@ export class ChangeNodeTypeDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                //todo-p2: need to make this default to the right type.
                 this.nodeTypeListBox = new NodeTypeListBox(this.selType, true, this.appState),
                 new ButtonBar([
                     new Button("Set Type", () => {

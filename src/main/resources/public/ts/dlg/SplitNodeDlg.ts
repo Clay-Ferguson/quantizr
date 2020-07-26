@@ -26,7 +26,7 @@ export class SplitNodeDlg extends DialogBase {
             this.node = S.meta64.getHighlightedNode(this.appState);
         }
 
-        let splitMode;
+        let splitMode: string;
         if (this.node.content.indexOf("\n\n\n") != -1) {
             splitMode = "triple"
         }
@@ -45,7 +45,7 @@ export class SplitNodeDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let children = [
+        return [
             new TextContent("Split into multiple nodes..."),
 
             new RadioButtonGroup([
@@ -120,8 +120,6 @@ export class SplitNodeDlg extends DialogBase {
                 })
             ])
         ];
-
-        return children;
     }
 
     renderButtons(): CompIntf {

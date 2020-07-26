@@ -25,7 +25,7 @@ export class ResetPasswordDlg extends DialogBase {
     }
     
     renderDlg(): CompIntf[] {
-        let children = [
+        return [
             new Form(null, [
                 new TextContent("Enter your user name and email address and a change-password link will be sent to you"),
     
@@ -39,8 +39,6 @@ export class ResetPasswordDlg extends DialogBase {
                 ])
             ])
         ];
-       
-        return children;
     }
 
     renderButtons(): CompIntf {

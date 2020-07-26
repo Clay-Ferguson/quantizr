@@ -35,7 +35,7 @@ export class SearchByIDDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let children = [
+        return [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
                 this.searchTextField = new TextField("Node ID", false, this.search,
@@ -48,7 +48,6 @@ export class SearchByIDDlg extends DialogBase {
                 ])
             ])
         ];
-        return children;
     }
 
     renderButtons(): CompIntf {

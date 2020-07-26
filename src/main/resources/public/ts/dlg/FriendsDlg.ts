@@ -21,6 +21,9 @@ export class FriendsDlg extends DialogBase {
     
     constructor(state: AppState) {
         super("Friends", "app-modal-content-medium-width", null, state);
+
+        //todo-0: need to retest this after moving out of render method below
+        //this.reload();
     }
 
     renderDlg(): CompIntf[] {

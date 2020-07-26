@@ -20,6 +20,9 @@ export class ManageAccountDlg extends DialogBase {
 
     constructor(state: AppState) {
         super("Manage Account", null, false, state);
+
+        //todo-0: need to retest after moving this out of renderDlg
+        //this.init();
     }
 
     renderDlg(): CompIntf[] {

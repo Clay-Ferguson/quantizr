@@ -45,6 +45,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     constructor(private nodeId: string, private node: J.NodeInfo, toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
         super(importMode ? "Import File" : "Upload File", null, false, state);
         this.mergeState({ toIpfs });
+
+        //todo-0: need to retest after moving this stuff here, and also the button visibility and enablement should happen normally
+        //via state during render, and not be called in methods like two of these 3 lines are doing.
+        // this.uploadButton.setVisible(false);
+        // this.configureDropZone();
+        // this.runButtonEnablement();
     }
 
     renderDlg(): CompIntf[] {
@@ -80,6 +86,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         this.uploadButton.setVisible(false);
         this.configureDropZone();
         this.runButtonEnablement();
+
         return children;
     }
 

@@ -27,7 +27,7 @@ export class SharingDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let children = [
+        return [
             new Form(null, [
                 this.privsTable = new EditPrivsTable(this.nodePrivsInfo, this.removePrivilege),
                 new ButtonBar([
@@ -40,8 +40,6 @@ export class SharingDlg extends DialogBase {
                 ])
             ])
         ];
-
-        return children;
     }
 
     renderButtons(): CompIntf {

@@ -20,7 +20,6 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     input: Input;
     icon: ToggleIcon;
 
-    //todo-0: for this and Textarea need to REQUIRE the valueIntf function ALWAYS. Without it there can be 'state-related' bugs.
     constructor(public label: string, private isPassword: boolean,
         private onEnterKey: () => void, private valueIntf: ValueIntf) {
         super(null);

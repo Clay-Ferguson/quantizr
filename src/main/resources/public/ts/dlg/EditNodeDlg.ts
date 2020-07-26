@@ -616,7 +616,7 @@ export class EditNodeDlg extends DialogBase {
             }, {
                 getValue: () => {
                     //read-only. always return original value.
-                   return propValStr;
+                    return propValStr;
                 },
                 setValue: (val: any) => {
                     //this is a read-only field
@@ -675,9 +675,6 @@ export class EditNodeDlg extends DialogBase {
                     valEditor = new Textarea(null, {
                         rows: "20",
                     }, valueIntf);
-
-                    //todo-0: come back to this. removing it because i see it called during render, which is not good.
-                    //valEditor.focus();
                 }
             }
             else {
@@ -696,6 +693,9 @@ export class EditNodeDlg extends DialogBase {
         let value = node.content || "";
         let formGroup = new FormGroup();
         let encrypted = value.startsWith(J.Constant.ENC_TAG);
+
+        //if this is the first pass thru here (not a re-render) then allow focus() to get called
+        let allowFocus = !this.contentEditor;
 
         value = S.util.escapeForAttrib(value);
         //console.log("making field editor for val[" + value + "]");
@@ -724,8 +724,9 @@ export class EditNodeDlg extends DialogBase {
 
                         clearInterval(timer);
 
-                        //todo-0: don't call during render.
-                        //(this.contentEditor as AceEditPropTextarea).getAceEditor().focus();
+                        if (allowFocus) {
+                            (this.contentEditor as AceEditPropTextarea).getAceEditor().focus();
+                        }
                     }
                 }, 250);
             });
@@ -767,8 +768,9 @@ export class EditNodeDlg extends DialogBase {
                 }
             });
 
-            //todo-0: removing. don't call during render.
-            //this.contentEditor.focus();
+            if (allowFocus) {
+                this.contentEditor.focus();
+            }
         }
 
         formGroup.addChild(this.contentEditor as any as Comp);

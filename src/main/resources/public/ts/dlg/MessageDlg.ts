@@ -25,7 +25,6 @@ export class MessageDlg extends DialogBase {
     }
 
     renderDlg = (): CompIntf[] => {
-
         return [
             this.message ? new TextContent(this.message, null, this.preformatted) : null,
             this.customWidget,
