@@ -47,6 +47,9 @@ export class ChangeNodeTypeDlg extends DialogBase {
         return null;
     }
 
+    /* todo-0: need to use the ValueHandler (ValueIntf?) class to handle setting values in this list box, to delegate
+    the state management to the actual dialog box. Look at the dropdown implementatin perhaps or inspiration bc i THINK it's 
+    currently using the latest approach to this */
     setNodeType = (): void => {
         this.selCallback(this.nodeTypeListBox.getState().selectedPayload); 
     }

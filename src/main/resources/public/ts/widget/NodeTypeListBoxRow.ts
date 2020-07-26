@@ -13,6 +13,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+
+/* todo-0: need to check all classes that extend ListBoxRow, because the isSelectedFunc was found to be not working on some */
 export class NodeTypeListBoxRow extends ListBoxRow {
 
     constructor(listBox: ListBox, public typeHandler: TypeHandlerIntf) { 

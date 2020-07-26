@@ -1,5 +1,4 @@
 import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Button } from "../widget/Button";
 import { PubSub } from "../PubSub";
@@ -16,23 +15,20 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class FriendsDlg extends DialogBase {
-    friendsTable: FriendsTable;
     selectedName: string;
     
     constructor(state: AppState) {
         super("Friends", "app-modal-content-medium-width", null, state);
-
-        //todo-0: need to retest this after moving out of render method below
-        //this.reload();
     }
 
     renderDlg(): CompIntf[] {
-        let children = [
+        return [
             new Form(null, [
-                this.friendsTable = new FriendsTable(null),
+                new FriendsTable(),
                 new ButtonBar([
                     new Button("Choose", () => {
-                        this.selectedName = this.friendsTable.getState().selectedPayload;
+                        //the selection ability and rendering of seleclted row, on this dialog is broken (todo-0)
+                        //this.selectedName = this.friendsTable.getState().selectedPayload;
                         this.close();
                     }, null, "btn-primary"),
                     new Button("Close", () => {
@@ -41,18 +37,9 @@ export class FriendsDlg extends DialogBase {
                 ])
             ])
         ];
-        this.reload();
-        return children;
     }
 
     renderButtons(): CompIntf {
         return null;
-    }
-
-    reload = (): void => {
-        S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends", {
-        },  (res: J.GetFriendsResponse): void => {
-            this.friendsTable.mergeState({friends: res.friends});
-        });
     }
 }

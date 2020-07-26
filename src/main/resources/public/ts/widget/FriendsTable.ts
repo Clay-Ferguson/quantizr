@@ -4,6 +4,7 @@ import { PubSub } from "../PubSub";
 import { FriendInfo } from "../JavaIntf";
 import { FriendsTableRow } from "./FriendsTableRow";
 import { ListBox } from "./ListBox";
+import * as J from "../JavaIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -12,11 +13,15 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FriendsTable extends ListBox {
 
-    constructor(private friends: FriendInfo[]) {
+    constructor() {
         super();
-        this.mergeState({
-            selectedPayload: null,
-            friends
+
+        S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends", {
+        }, (res: J.GetFriendsResponse): void => {
+            this.mergeState({
+                selectedPayload: null,
+                friends: res.friends
+            });
         });
     }
 
