@@ -10,7 +10,7 @@ export interface UtilIntf {
     pgrsDlg: any;
 
     validUsername(inputtxt: string): boolean;
-    hashOfString(s: string): number;
+    hashOfString(s: string): string;
     hashOfObject(obj: Object);
     isImageFileName(fileName: string): boolean;
     isAudioFileName(fileName: string): boolean;

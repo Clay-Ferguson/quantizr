@@ -3,7 +3,6 @@ import { AttachmentIntf } from "./intf/AttachmentIntf";
 import { EditIntf } from "./intf/EditIntf";
 import { EncryptionIntf } from "./intf/EncryptionIntf";
 import { NavIntf } from "./intf/NavIntf";
-import { PodcastIntf } from "./intf/PodcastIntf";
 import { PropsIntf } from "./intf/PropsIntf";
 import { RenderIntf } from "./intf/RenderIntf";
 import { SearchIntf } from "./intf/SearchIntf";
@@ -41,7 +40,6 @@ export interface Singletons {
     user: UserIntf;
     view: ViewIntf;
     activityPub: ActivityPubIntf;
-    podcast: PodcastIntf;
     rssReader: RSSReaderIntf;
     localDB: LocalDBIntf;
     mainMenu: DialogBaseImpl;

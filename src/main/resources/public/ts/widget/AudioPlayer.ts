@@ -12,18 +12,15 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 //references:
 //http://www.w3schools.com/tags/ref_av_dom.asp
 //https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API
+//https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement
+//Creates an HTMLAudioElement
 export class AudioPlayer extends Comp {
 
     constructor(attribs: Object) {
         super(attribs);
     }
-
-    getAudioElement(): HTMLAudioElement {
-        return <HTMLAudioElement>this.getElement();
-    }
     
     compRender(): ReactNode {
-        let elm = S.e("audio", this.attribs);
-        return elm;
+        return S.e("audio", this.attribs);
     }
 }

@@ -18,6 +18,7 @@ import { dispatch } from "../AppRedux";
 import { TypeBase } from "./base/TypeBase";
 import { CompIntf } from "../widget/base/CompIntf";
 import { NodeActionType } from "../enums/NodeActionType";
+import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -172,7 +173,7 @@ export class RssTypeHandler extends TypeBase {
             entry.enclosure.type.indexOf("audio/") != -1) {
             let audioButton = new Button("Play Audio", //
                 () => {
-                    S.podcast.openPlayerDialog(entry.enclosure.url, entry.title, state);
+                    new AudioPlayerDlg(entry.enclosure.url, state).open();
                 });
             children.push(new Div(null, {
                 style: {

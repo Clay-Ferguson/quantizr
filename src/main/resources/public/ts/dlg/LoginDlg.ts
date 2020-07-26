@@ -23,9 +23,6 @@ export class LoginDlg extends DialogBase {
 
     constructor(paramsTest: Object, state: AppState) {
         super("Login", "app-modal-content-narrow-width", false, state);
-
-        //todo-0: CHECK ALL OTHER DIALOGS FOR THIS TYPE OF MISTAKE.
-        //beware: don't put this in a RENDER method. That will cause a massive problem (infinite loop, or hang in rendering)
         this.populateFromLocalDb();
     }
 

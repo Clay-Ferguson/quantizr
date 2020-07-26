@@ -77,10 +77,6 @@ export class VideoPlayerDlg extends DialogBase {
         this.superClose();
     }
 
-    closeEvent = (): void => {
-        this.destroyPlayer();
-    }
-
     destroyPlayer = (): void => {
         let player = this.videoPlayer ? this.videoPlayer.getVideoElement() : null;
         if (player) {
@@ -89,11 +85,5 @@ export class VideoPlayerDlg extends DialogBase {
             this.videoPlayer = null;
             this.close();
         }
-    }
-
-    init = (): void => {
-        // this.videoPlayer.whenElm((elm: HTMLElement) => {
-        //     //S.podcast.player = elm;
-        // });
     }
 }

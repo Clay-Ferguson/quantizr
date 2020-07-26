@@ -19,7 +19,6 @@ import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
 import { Constants as C } from "./Constants";
 import { Nav } from "./Nav";
-import { Podcast } from "./Podcast";
 import { Props } from "./Props";
 import { Render } from "./Render";
 import { RSSReader } from "./RSSReader";
@@ -69,7 +68,6 @@ export class Factory {
             share: new Share(),
             user: new User(),
             view: new View(),
-            podcast: new Podcast(),
             rssReader: new RSSReader(),
             localDB: new LocalDB(),
             mainMenu: new MainMenuDlg(),
