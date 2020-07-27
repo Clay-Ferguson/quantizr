@@ -5,6 +5,7 @@ import { ListBox } from "./ListBox";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { NodeTypeListBoxRow } from "./NodeTypeListBoxRow";
 import { AppState } from "../AppState";
+import { ValueIntf } from "../Interfaces";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -13,15 +14,19 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class NodeTypeListBox extends ListBox {
 
-    constructor(defaultSel: string, allowFileSysCreate: boolean, appState: AppState) {
-        super();
-        this.mergeState({ selectedPayload: defaultSel });
+    constructor(valueIntf: ValueIntf, public appState: AppState) {
+        super(valueIntf);
+    }
+
+    preRender(): void {
         let children = [];
 
         let typeHandlers = S.plugin.getAllTypeHandlers();
         S.util.forEachProp(typeHandlers, (k, typeHandler: TypeHandlerIntf): boolean => {
-            if (appState.isAdminUser || typeHandler.getAllowUserSelect()) {
-                children.push(new NodeTypeListBoxRow(this, typeHandler)); 
+            if (this.appState.isAdminUser || typeHandler.getAllowUserSelect()) {
+                children.push(new NodeTypeListBoxRow(typeHandler, () => {
+                    this.updateValFunc(typeHandler.getTypeName());
+                }, this.valueIntf.getValue()==typeHandler.getTypeName()));
             }
             return true;
         });

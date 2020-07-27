@@ -1,8 +1,8 @@
-import { ListBoxRow } from "./ListBoxRow";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
 import { Div } from "./Div";
+import { ValueIntf } from "../Interfaces";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -11,26 +11,24 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ListBox extends Div {
 
-    constructor() {
+    constructor(public valueIntf: ValueIntf) {
         super();
         this.setClass("list-group marginBottom");
-        this.mergeState({ selectedPayload: null });
-
-        this.rowClick = this.rowClick.bind(this);
-        this.isSelectedFunc = this.isSelectedFunc.bind(this);
     }
 
-    rowClick(row: ListBoxRow): void {
-        //console.log("Merging state with selectedPayload="+row.payload);
-        this.mergeState({
-            selectedPayload: row.payload
-        });
-    }
+    //Handler to update state
+    updateValFunc(value: string): void {
+        /* For list boxes that just present a list and don't have the goal of letting the user 'choose' one, we won't have a valueIntf */
+        if (!this.valueIntf) {
+            return;
+        }
 
-    isSelectedFunc(row: ListBoxRow): boolean {
-        let state = this.getState();
-        let ret = state.selectedPayload == row.payload;
-        //console.log("isSelectedFunc: state.selectedPayload=" + state.selectedPayload + " row.id=[" + row.getId() + "] SELECTED=" + ret);
-        return ret;
+        if (value != this.valueIntf.getValue()) {
+            this.valueIntf.setValue(value);
+
+            //needing this line took a while to figure out. If nothing is setting any actual detectable state change
+            //during his call we have to do this here.
+            this.forceRender();
+        }
     }
 }

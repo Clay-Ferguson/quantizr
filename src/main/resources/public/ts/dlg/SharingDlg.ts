@@ -1,5 +1,4 @@
 import { DialogBase } from "../DialogBase";
-import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { ShareToPersonDlg } from "./ShareToPersonDlg";
 import { ButtonBar } from "../widget/ButtonBar";
@@ -18,21 +17,20 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class SharingDlg extends DialogBase {
-    privsTable: EditPrivsTable;
-    nodePrivsInfo: I.NodePrivilegesInfo;
     dirty: boolean = false;
 
     constructor(private node: J.NodeInfo, state: AppState) {
         super("Node Sharing", "app-modal-content-medium-width", null, state);
+        this.mergeState({nodePrivsInfo: null});
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                this.privsTable = new EditPrivsTable(this.nodePrivsInfo, this.removePrivilege),
+                new EditPrivsTable(this.getState().nodePrivsInfo, this.removePrivilege),
                 new ButtonBar([
-                    new Button("Share with Person", this.shareToPersonDlg, null, "btn-primary"),
-                    new Button("Share to Public", this.shareNodeToPublic, null, "btn-primary"),
+                    new Button("Add Person", this.shareToPersonDlg, null, "btn-primary"),
+                    new Button("Make Public", this.shareNodeToPublic, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
                         S.meta64.refresh(this.appState);
@@ -62,8 +60,7 @@ export class SharingDlg extends DialogBase {
             includeAcl: true,
             includeOwners: true
         }, (res: J.GetNodePrivilegesResponse): void => {
-            //console.log("populating with: res="+S.util.prettyPrint(res));
-            this.privsTable.setState(res);
+            this.mergeState({nodePrivsInfo: res});
         });
     }
 
@@ -81,8 +78,7 @@ export class SharingDlg extends DialogBase {
             includeAcl: true,
             includeOwners: true
         }, (res: J.GetNodePrivilegesResponse): void => {
-            //console.log("populating with: res="+S.util.prettyPrint(res));
-            this.privsTable.setState(res);
+            this.mergeState({nodePrivsInfo: res});
         });
     }
 
@@ -100,8 +96,6 @@ export class SharingDlg extends DialogBase {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
             return;
         }
-
-        console.log("Sharing node to public.");
 
         /*
          * Add privilege and then reload share nodes dialog from scratch doing another callback to server

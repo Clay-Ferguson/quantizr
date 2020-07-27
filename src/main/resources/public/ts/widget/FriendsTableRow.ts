@@ -1,7 +1,6 @@
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
-import { Heading } from "./Heading";
 import { FriendInfo } from "../JavaIntf";
 import { ListBoxRow } from "./ListBoxRow";
 import { ListBox } from "./ListBox";
@@ -14,15 +13,14 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FriendsTableRow extends ListBoxRow {
 
-    constructor(listBox: ListBox, public friend: FriendInfo) {
-        super(listBox, null, friend.userName, listBox.isSelectedFunc);
+    constructor(public friend: FriendInfo, onClickFunc: Function, public isSelected: boolean) {
+        super(null, onClickFunc);
     }
 
     preRender(): void {
-        super.preRender();
         this.setChildren([
             new Div(this.friend.userName, {
-                className: "heading5"
+                className: "heading5" + (this.isSelected ? " selectedListItem" : " unselectedListItem")
             }),
         ]);
     }

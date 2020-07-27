@@ -1,7 +1,6 @@
 import * as J from "../JavaIntf";
 import { Div } from "./Div";
 import { Button } from "./Button";
-import { TextContent } from "./TextContent";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
@@ -33,8 +32,8 @@ export class EditPrivsTableRow extends ListBoxRow {
                         new Button("Remove", () => {
                             this.removePrivilege(aclEntry.principalNodeId, privilege.privilegeName);
                         })
-                    ], null, "float-right marginBottom")
-                ])
+                    ], null, "float-right")
+                ], "marginAll")
             );
         }, this);
 

@@ -13,27 +13,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ListBoxRow extends Div {
 
     /* The isSelectedFunc is a way of delegating the state holding which row is selected to to the parent ListBox itself */
-    constructor(private listBox: ListBox = null, content: string = null, public payload: any = null, public isSelectedFunc: (row: ListBoxRow) => boolean = null) {
+    constructor(content: string = null, onClickFunc: Function=null) {
         super(content, {
             className: "list-group-item list-group-item-action listBoxRow",
         });
 
-        this.onClick = this.onClick.bind(this);
-        this.attribs.onClick = this.onClick;
-    }
-
-    onClick() {
-        if (this.listBox) {
-            this.listBox.rowClick(this);
+        if (onClickFunc) {
+            this.attribs.onClick = onClickFunc;
         }
-    }
-
-    preRender(): void {
-        let state = this.getState();
-        this.setChildren([
-            new Span(state.content, {
-                className: (this.isSelectedFunc && this.isSelectedFunc(this)) ? "selectedListItem" : "unselectedListItem",
-            })
-        ]);
     }
 }

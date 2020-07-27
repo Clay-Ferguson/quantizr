@@ -456,8 +456,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     openChangeNodeTypeDlg = (): void => {
-        let dlg = new ChangeNodeTypeDlg(this.setNodeType, this.appState);
-        dlg.open();
+        new ChangeNodeTypeDlg(this.getState().node.type, this.setNodeType, this.appState).open();
     }
 
     share = (): void => {

@@ -4,7 +4,7 @@ import { PubSub } from "../PubSub";
 import { FriendInfo } from "../JavaIntf";
 import { FriendsTableRow } from "./FriendsTableRow";
 import { ListBox } from "./ListBox";
-import * as J from "../JavaIntf";
+import { ValueIntf } from "../Interfaces";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -13,28 +13,20 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FriendsTable extends ListBox {
 
-    constructor() {
-        super();
-
-        S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends", {
-        }, (res: J.GetFriendsResponse): void => {
-            this.mergeState({
-                selectedPayload: null,
-                friends: res.friends
-            });
-        });
+    constructor(public friends: FriendInfo[], valueIntf: ValueIntf) {
+        super(valueIntf);
     }
 
     preRender(): void {
-        this.setChildren([]);
+        let children = [];
 
-        let friends: FriendInfo[] = this.getState().friends;
-        //console.log("compRender[" + this.jsClassName + "] STATE: " + S.util.prettyPrint(nodePrivsInfo));
-
-        if (friends) {
-            friends.forEach(function (friend) {
-                this.addChild(new FriendsTableRow(this, friend));
-            }, this);
+        if (this.friends) {
+            this.friends.forEach((friend: FriendInfo) => {
+                children.push(new FriendsTableRow(friend, () => {
+                    this.updateValFunc(friend.userName);
+                }, this.valueIntf.getValue() == friend.userName));
+            });
         }
+        this.setChildren(children);
     }
 }

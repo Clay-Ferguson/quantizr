@@ -13,16 +13,14 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-
-/* todo-0: need to check all classes that extend ListBoxRow, because the isSelectedFunc was found to be not working on some */
+/* NOTE: This class doesn't hold any state and is re-rendered when the state in the parent owning it is rendered. */
 export class NodeTypeListBoxRow extends ListBoxRow {
 
-    constructor(listBox: ListBox, public typeHandler: TypeHandlerIntf) { 
-        super(listBox, null, typeHandler.getTypeName(), listBox.isSelectedFunc);
+    constructor(public typeHandler: TypeHandlerIntf, onClickFunc: Function, public isSelected: boolean) {
+        super(null, onClickFunc);
     }
 
     preRender(): void {
-        super.preRender();
         let icon: Icon = null;
         let iconClass = this.typeHandler.getIconClass();
         if (iconClass) {
@@ -36,7 +34,7 @@ export class NodeTypeListBoxRow extends ListBoxRow {
             new HorizontalLayout([
                 icon,
                 new Span(this.typeHandler.getName())
-            ], (this.isSelectedFunc && this.isSelectedFunc(this)) ? "selectedListItem" : "unselectedListItem")
+            ], this.isSelected ? "selectedListItem" : "unselectedListItem")
         ]);
     }
 }

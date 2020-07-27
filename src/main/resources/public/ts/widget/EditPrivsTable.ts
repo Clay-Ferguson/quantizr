@@ -12,9 +12,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class EditPrivsTable extends ListBox {
 
-    constructor(nodePrivsInfo: I.NodePrivilegesInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
-        super();
-        this.mergeState(nodePrivsInfo);
+    constructor(public nodePrivsInfo: I.NodePrivilegesInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
+        super(null);
 
         //let width = window.innerWidth * 0.6;
         //let height = window.innerHeight * 0.4;
@@ -22,15 +21,13 @@ export class EditPrivsTable extends ListBox {
     }
 
     preRender(): void {
-        this.setChildren([]);
+        let children = [];
 
-        let nodePrivsInfo: I.NodePrivilegesInfo = this.getState();
-        //console.log("compRender[" + this.jsClassName + "] STATE: " + S.util.prettyPrint(nodePrivsInfo));
-
-        if (nodePrivsInfo.aclEntries) {
-            nodePrivsInfo.aclEntries.forEach(function(aclEntry) {
-                this.addChild(new EditPrivsTableRow(aclEntry, this.removePrivilege));
+        if (this.nodePrivsInfo && this.nodePrivsInfo.aclEntries) {
+            this.nodePrivsInfo.aclEntries.forEach(function(aclEntry) {
+                children.push(new EditPrivsTableRow(aclEntry, this.removePrivilege));
             }, this);
         }
+        this.setChildren(children);
     }
 }

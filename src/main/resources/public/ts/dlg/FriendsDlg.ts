@@ -8,6 +8,8 @@ import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { FriendsTable } from "../widget/FriendsTable";
+import { ValueIntf } from "../Interfaces";
+import * as J from "../JavaIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -15,20 +17,36 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class FriendsDlg extends DialogBase {
-    selectedName: string;
+    
+    selectionValueIntf: ValueIntf;
     
     constructor(state: AppState) {
         super("Friends", "app-modal-content-medium-width", null, state);
+
+        this.selectionValueIntf = {
+            setValue: (val: string): void => {
+                this.mergeState({ selectedName: val });
+            },
+
+            getValue: (): string => {
+                return this.getState().selectedName;
+            }
+        };
+
+        S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends", {
+        }, (res: J.GetFriendsResponse): void => {
+            this.mergeState({
+                friends: res.friends
+            });
+        });
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new FriendsTable(),
+                new FriendsTable(this.getState().friends, this.selectionValueIntf),
                 new ButtonBar([
                     new Button("Choose", () => {
-                        //the selection ability and rendering of seleclted row, on this dialog is broken (todo-0)
-                        //this.selectedName = this.friendsTable.getState().selectedPayload;
                         this.close();
                     }, null, "btn-primary"),
                     new Button("Close", () => {
