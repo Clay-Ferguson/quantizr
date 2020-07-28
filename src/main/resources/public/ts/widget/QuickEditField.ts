@@ -64,7 +64,7 @@ export class QuickEditField extends Span {
         if (!state.isEditing) {
             let clickDiv = new Span("", {
                 className: "clickToEdit",
-                title: "Click here to insert",
+                title: "Insert new node",
                 onClick: this.startEditing
             });
             this.setChildren([clickDiv]);

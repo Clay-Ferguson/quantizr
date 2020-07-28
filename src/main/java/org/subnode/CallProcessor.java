@@ -46,9 +46,11 @@ public class CallProcessor {
 		ThreadLocals.setHttpSession(httpSession);
 		logRequest(command, req, httpSession);
 
-		
-		/* Instantiating this, runs its constructor and ensures our threadlocal at least has an object, but most (not all) implenentations of methods end up instantiating
-		their own which overwrites this */
+		/*
+		 * Instantiating this, runs its constructor and ensures our threadlocal at least
+		 * has an object, but most (not all) implenentations of methods end up
+		 * instantiating their own which overwrites this
+		 */
 		new ResponseBase();
 
 		if (AppServer.isShuttingDown()) {
@@ -78,7 +80,7 @@ public class CallProcessor {
 			 * that some RPC call is attempted.
 			 */
 			if (!(req instanceof LoginRequest) && //
-					//!(req instanceof AnonPageLoadRequest) && //
+			// !(req instanceof AnonPageLoadRequest) && //
 					!(req instanceof SignupRequest) && //
 					!(req instanceof ResetPasswordRequest) && //
 					!(req instanceof ChangePasswordRequest) && //
@@ -142,15 +144,19 @@ public class CallProcessor {
 			// mutexCounter--;
 			// log.debug("Exit: mutexCounter: "+String.valueOf(mutexCounter));
 
-			/* cleanup this thread, servers reuse threads */
-			ThreadLocals.setMongoSession(null);
-			ThreadLocals.setResponse(null);
+			try {
+				/* cleanup this thread, servers reuse threads */
+				ThreadLocals.setMongoSession(null);
+				ThreadLocals.setResponse(null);
 
-			if (sessionContext != null) {
-				if (sessionContext.getHttpSessionToInvalidate() != null) {
-					sessionContext.getHttpSessionToInvalidate().invalidate();
-					sessionContext.setHttpSessionToInvalidate(null);
+				if (sessionContext != null) {
+					if (sessionContext.getHttpSessionToInvalidate() != null) {
+						sessionContext.getHttpSessionToInvalidate().invalidate();
+						sessionContext.setHttpSessionToInvalidate(null);
+					}
 				}
+			} catch (Exception e) {
+				ExUtil.error(log, "exception in call processor finally block. ignoring.", e);
 			}
 		}
 

@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.subnode.config.ConstantsProvider;
 import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
@@ -134,7 +136,7 @@ import org.subnode.util.ExUtil;
  */
 @Controller
 @CrossOrigin
-public class AppController {
+public class AppController implements ErrorController {
 	private static final Logger log = LoggerFactory.getLogger(AppController.class);
 
 	public static final String API_PATH = "/mobile/api";
@@ -214,10 +216,28 @@ public class AppController {
 	@Autowired
 	private UserFeedService userFeedService;
 
+	@Autowired
+	private ConstantsProvider constProvider;
+
 	private static final boolean logRequests = false;
 
 	// private final CopyOnWriteArrayList<SseEmitter> emitters = new
 	// CopyOnWriteArrayList<>();
+
+	private static final String ERROR_MAPPING = "/error";
+
+	@RequestMapping(value = ERROR_MAPPING)
+	public String error(Model model) {
+		model.addAttribute("hostAndPort", constProvider.getHostAndPort());
+		model.addAttribute("cacheBuster", cacheBuster);
+		// pulls up error.html
+		return "error";
+	}
+
+	@Override
+	public String getErrorPath() {
+		return ERROR_MAPPING;
+	}
 
 	/*
 	 * This is the actual app page loading request, for his SPA (Single Page
@@ -296,10 +316,11 @@ public class AppController {
 		return "forward:/index.html";
 	}
 
-	/* This is our only "Thymeleaf Page" ! 
-	
-	https://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html
-	*/
+	/*
+	 * This is our only "Thymeleaf Page" !
+	 * 
+	 * https://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html
+	 */
 	@RequestMapping(value = { "/" })
 	public String welcome(Model model) {
 		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {

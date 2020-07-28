@@ -43,7 +43,7 @@ public class AppSessionListener implements HttpSessionListener {
 	public void sessionDestroyed(HttpSessionEvent se) {
 		se.getSession().removeAttribute(WebUtils.SESSION_MUTEX_ATTRIBUTE);
 		sessionCounter--;
-		log.debug("Session Destroyed");
+		log.debug("Session Destroyed: "+se.getSession().getId());
 	}
 
 	public static int getSessionCounter() {

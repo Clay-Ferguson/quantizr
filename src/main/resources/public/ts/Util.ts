@@ -484,6 +484,8 @@ export class Util implements UtilIntf {
                             // window.onbeforeunload = null;
                             // window.location.href = window.location.origin;
                             // await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
+
+                            //NOTE: This opens the login dialog. Requires user to click login before attempting a login.
                             S.nav.login(null);
                         }, 200);
                         return;
