@@ -15,23 +15,18 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ManageEncryptionKeysDlg extends DialogBase {
 
-    textContent: TextContent;
-
     constructor(state: AppState) {
         super("Encryption Keys", null, false, state);
-
-        //todo-0: need to retest after moving out of renderDlg
-        //this.refreshKeyInfo();
     }
 
     renderDlg(): CompIntf[] {
-        let children = [
-            this.textContent = new TextContent("Getting key info...", "tallTextContent", true),
+        return [
+            new TextContent(this.getState().keyJson, "tallTextContent", true),
             new ButtonBar([
                 //both of these operations need some kind of confirmation dialog to come up after
                 new Button("Generate New Keys", async () => {
                     await S.encryption.initKeys(true);
-                    this.refreshKeyInfo();
+                    this.queryServer();
                 }),
                 new Button("Re-Publish Keys", async () => {
                     await S.encryption.initKeys(false, true);
@@ -41,17 +36,18 @@ export class ManageEncryptionKeysDlg extends DialogBase {
                 })
             ])
         ];
-
-        this.refreshKeyInfo();
-        return children;
     }
 
     renderButtons(): CompIntf {
         return null;
     }
 
-    refreshKeyInfo = async () => {
-        let keyJson: string = await S.encryption.exportKeys();
-        this.textContent.setText(keyJson);
+    //@Override
+    queryServer(): Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+            let keyJson: string = await S.encryption.exportKeys();
+            this.mergeState({keyJson});
+            resolve();
+        });
     }
 }

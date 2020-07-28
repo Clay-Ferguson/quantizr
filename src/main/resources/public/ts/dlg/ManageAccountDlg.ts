@@ -16,18 +16,14 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class ManageAccountDlg extends DialogBase {
-    message: TextContent;
 
     constructor(state: AppState) {
         super("Manage Account", null, false, state);
-
-        //todo-0: need to retest after moving this out of renderDlg
-        //this.init();
     }
 
     renderDlg(): CompIntf[] {
-        let children = [
-            this.message = new TextContent("loading...", null, true),
+        return [
+            new TextContent(this.getState().info, null, true),
 
             new CollapsiblePanel(null, null, null, [
                 new Button("Close Account", this.closeAccount),
@@ -39,37 +35,38 @@ export class ManageAccountDlg extends DialogBase {
                 })
             ])
         ];
-        this.init();
-        return children;
     }
 
     renderButtons(): CompIntf {
         return null;
     }
 
-    init = (): void => {
-        S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,
-            (res: J.GetUserAccountInfoResponse) => {
-                let used = "";
-                if (res.binQuota <= 0) {
-                    res.binQuota = 20 * 1024 * 1024;
-                }
-                if (res.binQuota > 0) {
-                    if (res.binTotal < 10) {
-                        used = "0%";
+    queryServer(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,
+                (res: J.GetUserAccountInfoResponse) => {
+                    let used = "";
+                    if (res.binQuota <= 0) {
+                        res.binQuota = 20 * 1024 * 1024;
                     }
-                    else {
-                        used = (res.binTotal * 100 / res.binQuota).toFixed(1) + "%";
+                    if (res.binQuota > 0) {
+                        if (res.binTotal < 10) {
+                            used = "0%";
+                        }
+                        else {
+                            used = (res.binTotal * 100 / res.binQuota).toFixed(1) + "%";
+                        }
                     }
-                }
 
-                let info = //
-                    "Your Storage Quota: " + S.util.formatMemory(res.binQuota) + "\n" +//
-                    "Storage Used: " + S.util.formatMemory(res.binTotal) + "\n" +//
-                    "Percent Used: " + used //
+                    let info = //
+                        "Your Storage Quota: " + S.util.formatMemory(res.binQuota) + "\n" +//
+                        "Storage Used: " + S.util.formatMemory(res.binTotal) + "\n" +//
+                        "Percent Used: " + used //
 
-                this.message.setText(info);
-            });
+                    this.mergeState({ info });
+                    resolve();
+                });
+        });
     }
 
     closeAccount = (state: AppState): void => {
