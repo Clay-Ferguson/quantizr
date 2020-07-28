@@ -22,8 +22,6 @@ export class FriendTypeHandler extends TypeBase {
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
-            //todo-0: without true for 'editNode' the delete button will be missing. So we need an action type specifically for 'delete' and other things.
-            //todo-0: also what other 'types' are currently broken because of how this completely disables things?
             case NodeActionType.editNode:
                 return true;
             default:

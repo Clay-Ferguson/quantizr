@@ -143,6 +143,7 @@ public class AppController {
 	private static final Object welcomeMapLock = new Object();
 
 	private static final String cacheBuster = String.valueOf(new Date().getTime());
+	private static boolean welcomePagePresent;
 
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
@@ -304,7 +305,7 @@ public class AppController {
 		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 			synchronized (welcomeMapLock) {
 				HashMap<String, String> newMap = new HashMap<String, String>();
-				nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
+				welcomePagePresent = nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
 				newMap.put("cacheBuster", cacheBuster);
 				welcomeMap = newMap;
 			}
@@ -315,7 +316,7 @@ public class AppController {
 		 * been created on this instanace so we bypass the landing page and go to
 		 * index.html instead.
 		 */
-		if (welcomeMap.size() == 0) {
+		if (!welcomePagePresent) {
 			return "forward:/index.html";
 		}
 		/* otherwise rener the landing page */

@@ -64,13 +64,15 @@ module.exports = {
                 }
             }
         }),
+        //todo-0: with thymeleaf enabled, we can probably get rid of all webpack processing of the index.html right ?
         new HtmlWebpackPlugin({
             template: './html/index.html',
             filename: 'index.html',
             hash: true,
             cachebuster: '' + new Date().getTime(),
 
-            //todo-0: need to pull this from a bash variable, and not have hard-coded here.
+            // todo-1: need to pull this from a bash variable, and not have hard-coded here, alghough this is not a 
+            // security risk, and is public not secret, and safe to check into Github.
             reCaptcha3SiteKey: "6LeGyK4ZAAAAAPbF4hI0rtRwSveBdDVXnmhOsfff"
         }),
     ]
