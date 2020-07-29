@@ -31,12 +31,12 @@ import org.subnode.request.CloseAccountRequest;
 import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetUserAccountInfoRequest;
 import org.subnode.request.GetUserProfileRequest;
-import org.subnode.request.LoginRequest;
 import org.subnode.request.ResetPasswordRequest;
 import org.subnode.request.SavePublicKeyRequest;
 import org.subnode.request.SaveUserPreferencesRequest;
 import org.subnode.request.SaveUserProfileRequest;
 import org.subnode.request.SignupRequest;
+import org.subnode.request.base.RequestBase;
 import org.subnode.response.ChangePasswordResponse;
 import org.subnode.response.CloseAccountResponse;
 import org.subnode.response.FriendInfo;
@@ -68,7 +68,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.Model;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -113,13 +112,14 @@ public class UserManagerService {
 
 	private static final ObjectMapper mapper = new ObjectMapper();
 
+
 	/*
 	 * Login mechanism is a bit tricky because the CallProcessor detects the
 	 * LoginRequest and performs authentication BEFORE this 'login' method even gets
 	 * called, so by the time we are in this method we can safely assume the
 	 * userName and password resulted in a successful login.
 	 */
-	public LoginResponse login(MongoSession session, LoginRequest req) {
+	public LoginResponse login(MongoSession session, RequestBase req) {
 		LoginResponse res = new LoginResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
@@ -134,7 +134,7 @@ public class UserManagerService {
 		 * times on all nodes always show up in their precise local time!
 		 */
 		sessionContext.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
-		sessionContext.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.isDst()));
+		sessionContext.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
 
 		if (userName.equals("")) {
 			userName = sessionContext.getUserName();

@@ -3,44 +3,7 @@ package org.subnode.request;
 import org.subnode.request.base.RequestBase;
 
 public class LoginRequest extends RequestBase {
-	private String userName;
-	private String password;
 
-	/* timezone offset */
-	private int tzOffset;
-
-	/* daylight savings time */
-	private boolean dst;
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public int getTzOffset() {
-		return tzOffset;
-	}
-
-	public void setTzOffset(int tzOffset) {
-		this.tzOffset = tzOffset;
-	}
-
-	public boolean isDst() {
-		return dst;
-	}
-
-	public void setDst(boolean dst) {
-		this.dst = dst;
-	}
+	//RequestBase contains everything we need for a login, and this is done so that any timeout that happens on the server
+	//gets auto-repaired by logging in again automatically as needed.	
 }

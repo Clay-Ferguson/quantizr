@@ -52,7 +52,7 @@ export interface UtilIntf {
     getRemoteHost(): string;
 
     //todo-1: need to make all calls to these functions use promises (be careful about failure case)
-    ajax<RequestType, ResponseType>(postName: string, postData: RequestType,
+    ajax<RequestBase, ResponseType>(postName: string, postData: RequestBase,
         callback?: (response: ResponseType) => void,
         failCallback?: (response: string) => void): AxiosPromise<any>;
     logAndThrow(message: string);

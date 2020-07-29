@@ -386,6 +386,9 @@ that's used during builds.
 							</execution>
 						</executions>
 						<configuration>
+							<optionalAnnotations>
+        						<annotation>javax.annotation.Nullable</annotation>
+    						</optionalAnnotations>
 							<jsonLibrary>jackson2</jsonLibrary>
 
 							<!-- Supposedly this will allow @JsonProperty(required = false) in the java to put a '?' after the param

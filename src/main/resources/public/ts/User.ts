@@ -170,6 +170,9 @@ export class User implements UserIntf {
                         }
                         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");
                         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1", "anon");
+
+                        S.meta64.userName = usr;
+                        S.meta64.password = pwd;
                     }
 
                     S.meta64.setStateVarsUsingLoginResponse(res, state);

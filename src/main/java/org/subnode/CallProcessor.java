@@ -18,6 +18,7 @@ import org.subnode.request.SignupRequest;
 import org.subnode.request.base.RequestBase;
 import org.subnode.response.LoginResponse;
 import org.subnode.response.base.ResponseBase;
+import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
 import org.subnode.util.MongoRunnableEx;
 import org.subnode.util.ThreadLocals;
@@ -87,7 +88,26 @@ public class CallProcessor {
 					!ThreadLocals.getInitialSessionExisted()) {
 				log.debug(
 						"Ignoring attempt to process req class " + req.getClass().getName() + " when not logged in .");
-				throw new NotLoggedInException();
+
+				/* All requests contain credentials, from the BaseRequest, so if we detect a case where the session has expired
+				we can attempt to seamlessly re-login the user again, and they never realize their session had timed out. This little
+				try block is replicated code from the main login and later someday I can 'dry' this up. */		
+				boolean success = false;
+				try {
+					MongoSession session = api.login(req.getUserName(), req.getPassword());
+					sessionContext.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
+					sessionContext.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
+					sessionContext.setUserName(req.getUserName());
+					sessionContext.setPassword(req.getPassword());
+
+					success = true;
+				} catch (Exception e) {
+				}
+
+				// LoginResponse loginResponse = userManagerService.login(null, req);
+				if (!success) {
+					throw new NotLoggedInException();
+				}
 			}
 
 			mongoSession = login(req, sessionContext);
@@ -203,6 +223,7 @@ public class CallProcessor {
 			if (userName == null) {
 				userName = PrincipalName.ANON.s();
 			}
+
 			if (password == null) {
 				password = PrincipalName.ANON.s();
 			}

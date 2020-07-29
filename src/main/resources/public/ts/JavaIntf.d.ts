@@ -125,10 +125,6 @@ export interface InsertNodeRequest extends RequestBase {
 }
 
 export interface LoginRequest extends RequestBase {
-    userName: string;
-    password: string;
-    tzOffset: number;
-    dst: boolean;
 }
 
 export interface LogoutRequest extends RequestBase {
@@ -262,6 +258,10 @@ export interface UploadFromUrlRequest extends RequestBase {
 }
 
 export interface RequestBase {
+    userName?: string;
+    password?: string;
+    tzOffset?: number;
+    dst?: boolean;
 }
 
 export interface ActivityPubPostResponse extends ResponseBase {

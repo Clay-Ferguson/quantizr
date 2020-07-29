@@ -373,10 +373,15 @@ export class Util implements UtilIntf {
         return this.getRemoteHost() + "/mobile/api/";
     }
 
-    ajax = <RequestType, ResponseType>(postName: string, postData: RequestType, //
+    ajax = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType, //
         callback?: (response: ResponseType) => void, //
         failCallback?: (info: string) => void): AxiosPromise<any> => {
         postData = postData || {} as RequestType;
+        postData.userName = postData.userName || S.meta64.userName;
+        postData.password = postData.password || S.meta64.password;
+        postData.tzOffset = postData.tzOffset || new Date().getTimezoneOffset();
+        postData.dst = postData.dst || S.util.daylightSavingsTime;
+
         let axiosRequest;
 
         try {

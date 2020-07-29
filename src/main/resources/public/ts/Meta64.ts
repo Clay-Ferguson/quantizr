@@ -41,6 +41,11 @@ export class Meta64 implements Meta64Intf {
     is over the icon */
     public draggableId: string = null;
 
+    /* We save userName+password in these vars to pass in every request
+    so that we can log back in again silently after any session timeout */
+    userName: string;
+    password: string;
+
     /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
     getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {
         let k = op + "_" + id;

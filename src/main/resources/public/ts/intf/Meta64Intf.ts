@@ -20,6 +20,10 @@ export interface Meta64Intf {
 
     draggableId: string;
 
+    /* doesn't need to be in state */
+    userName: string;
+    password: string;
+
     //function cache accessor
     getNodeFunc(func: (id: string) => void, name: string, id: string): () => void;
 
