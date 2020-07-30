@@ -266,11 +266,13 @@ public class AppController implements ErrorController {
 			@RequestParam(value = "n", required = false) String name, //
 
 			@RequestParam(value = "signupCode", required = false) String signupCode, //
-			@RequestParam(value = "passCode", required = false) String passCode) {
+			@RequestParam(value = "passCode", required = false) String passCode,
+			Model model) {
 
 		try {
 			// log.debug("AppController.index: sessionUser=" +
 			// sessionContext.getUserName());
+			model.addAttribute("cacheBuster", cacheBuster);
 
 			if (signupCode != null) {
 				userManagerService.processSignupCode(signupCode);
@@ -305,6 +307,7 @@ public class AppController implements ErrorController {
 			}
 
 			if (passCode != null) {
+				//todo-0: need to update this to work with thymleleaf. it may still work. just test.
 				return "forward:/index.html?passCode=" + passCode;
 			}
 		} catch (Exception e) {
@@ -313,7 +316,7 @@ public class AppController implements ErrorController {
 			ExUtil.error(log, "exception in call processor", e);
 		}
 
-		return "forward:/index.html";
+		return "index"; 
 	}
 
 	/*
@@ -338,7 +341,8 @@ public class AppController implements ErrorController {
 		 * index.html instead.
 		 */
 		if (!welcomePagePresent) {
-			return "forward:/index.html";
+			model.addAttribute("cacheBuster", cacheBuster);
+			return "index"; //"forward:/index.html";
 		}
 		/* otherwise rener the landing page */
 		else {

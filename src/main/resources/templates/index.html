@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <!-- because of possible forwarding we need to enforce our base path here -->
     <base href="/"/>
 
     <meta charset="utf-8" />
@@ -12,6 +11,12 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="application-name" content="Quanta" />
 
+    <!-- work in progress (todo-0)
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:title" th:attr="content='My Title'"/>
+    <meta name="twitter:description" th:attr="content='My Description'"/> 
+    -->
+
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=3" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=3" />
@@ -19,24 +24,29 @@
 
     <link rel="stylesheet" href="/font-awesome-4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="/js/dropzone/dropzone.css?v=dz7" />
-    <link rel="stylesheet" href="/css/meta64.css?<%=htmlWebpackPlugin.options.cachebuster%>" />
+    <link rel="stylesheet" th:href="'/css/meta64.css?v='+${cacheBuster}" />
     <link rel="stylesheet" href="/css/highlightjs/darcula.css" />
 
-    <script>
+    <script th:inline="none">
+        /*<![CDATA[*/
         MathJax = {
             tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']]
+                //warning: don't remove the space between the squar braces here or that will trigger thymeleaf to pick up 
+                //the string and try to interpret it. Also the "th:inline: none" all by itself can fix this too, which we do use.
+                inlineMath: [ ['$', '$'], ['\\(', '\\)'] ]
             }
         };
+        /*]]>*/
     </script>
     <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 
     <!-- #recaptcha-disabled
     <script src="https://www.google.com/recaptcha/api.js?render=<%=htmlWebpackPlugin.options.reCaptcha3SiteKey%>"></script>
-    -->
+    
     <script>
         var reCaptcha3SiteKey = "<%=htmlWebpackPlugin.options.reCaptcha3SiteKey%>";
     </script>
+    -->
 
     <title>Quanta</title>
 </head>
@@ -91,8 +101,9 @@
     <script src="/js/dropzone/dropzone.js?dz8"></script>
     <script src="/js/ace/src-noconflict/ace.js?v=141"></script>
 
-    <!-- IMPORTANT: WebPack modified this file, and makes a copy that it puts in public root folder. -->
     <div id="overlayDiv" class="overlay"></div>
+
+    <script type="text/javascript" th:src="'bundle.js?v='+${cacheBuster}"></script>
 
 </body>
 
