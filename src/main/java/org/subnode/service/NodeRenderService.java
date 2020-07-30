@@ -62,7 +62,7 @@ public class NodeRenderService {
 	private IPFSSyncService ipfsSyncService;
 
 	/* Note: this MUST match nav.ROWS_PER_PAGE variable in TypeScript */
-	private static int ROWS_PER_PAGE = 25;
+	private static int ROWS_PER_PAGE = 5;
 
 	/*
 	 * This is the call that gets all the data to show on a page. Whenever user is

@@ -30,43 +30,49 @@ export class NodeCompMainList extends Div {
             this.setChildren(null);
             return;
         }
-        let output: Comp[] = [];
+        let children: Comp[] = [];
 
-        if (S.nav.mainOffset > 0) {
-            let firstButton: Comp = new Button("First Page", () => S.view.firstPage(state),
-                {
-                    id: "firstPageButton",
-                    iconclass: "fa fa-angle-double-left fa-lg"
-                });
-            let prevButton: Comp = new Button("Prev Page", () => S.view.prevPage(state),
-                {
-                    id: "prevPageButton",
-                    iconclass: "fa fa-angle-left fa-lg"
-                });
-            output.push(new ButtonBar([firstButton, prevButton], "text-center marginTop"));
-        }
-
-        output.push(new Div(null, { className: "clearfix" }));
-        //this.lastOwner = rootNode.owner;
+        this.addPaginationButtons(children, endReached, state);
 
         if (rootNode.children) {
             let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, rootNode);
             let allowNodeMove: boolean = !orderByProp;
-            output.push(S.render.renderChildren(rootNode, 1, allowNodeMove));
+            children.push(S.render.renderChildren(rootNode, 1, allowNodeMove));
+        }
+
+        this.addPaginationButtons(children, endReached, state);
+        this.setChildren(children);
+    }
+
+    addPaginationButtons = (children: Comp[], endReached: boolean, state: AppState) => {
+        let firstButton: Comp;
+        let prevButton: Comp;
+        let nextButton: Comp;
+
+        if (S.nav.mainOffset > 0) {
+            firstButton = new Button(null, () => S.view.firstPage(state), {
+                title: "First Page",
+                id: "firstPageButton",
+                iconclass: "fa fa-angle-double-left fa-lg"
+            });
+            prevButton = new Button(null, () => S.view.prevPage(state), {
+                title: "Previous Page",
+                id: "prevPageButton",
+                iconclass: "fa fa-angle-left fa-lg"
+            });
         }
 
         if (!endReached) {
-            let nextButton = new Button("Next Page", () => S.view.nextPage(state),
-                {
-                    id: "nextPageButton",
-                    iconclass: "fa fa-angle-right fa-lg"
-                });
-
-            //todo-1: last page button disabled pending refactoring
-            //let lastButton = this.makeButton("Last Page", "lastPageButton", () => this.lastPage(state));
-            output.push(new ButtonBar([nextButton], "text-center marginTop"));
+            nextButton = new Button(null, () => S.view.nextPage(state), {
+                title: "Next Page",
+                id: "nextPageButton",
+                iconclass: "fa fa-angle-right fa-lg"
+            });
         }
 
-        this.setChildren(output);
+        if (firstButton || prevButton || nextButton) {
+            children.push(new ButtonBar([firstButton, prevButton, nextButton], "text-center marginTop"));
+            children.push(new Div(null, { className: "clearfix" }));
+        }
     }
 }
