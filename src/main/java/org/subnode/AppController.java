@@ -307,8 +307,7 @@ public class AppController implements ErrorController {
 			}
 
 			if (passCode != null) {
-				//todo-0: need to update this to work with thymleleaf. it may still work. just test.
-				return "forward:/index.html?passCode=" + passCode;
+				return "index"; 
 			}
 		} catch (Exception e) {
 			// need to add some kind of message to exception to indicate to user something

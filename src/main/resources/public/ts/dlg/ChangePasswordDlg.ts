@@ -23,6 +23,7 @@ export class ChangePasswordDlg extends DialogBase {
     passwordField: TextField;
     private passCode: string;
 
+    /* todo-0: remove "Object" args, and just pass actual parameters */
     constructor(args: Object, state: AppState) {
         super((<any>args).passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width", false, state);
         this.passCode = (<any>args).passCode;
@@ -62,6 +63,7 @@ export class ChangePasswordDlg extends DialogBase {
         let pwd = this.getState().pwd;
 
         if (pwd && pwd.length >= 4) {
+            debugger;
             S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {
                 newPassword: pwd,
                 passCode: this.passCode

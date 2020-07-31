@@ -71,7 +71,7 @@ public class MailSender implements TransportListener {
 
 			log.trace("Connecting to mailHost " + mailHost);
 			transport.connect(mailHost, mailUser, mailPassword);
-			log.trace("connected");
+			log.trace("connected ok");
 
 		} catch (Exception e) {
 			throw ExUtil.wrapEx(e);
@@ -85,6 +85,7 @@ public class MailSender implements TransportListener {
 	public void close() {
 		if (transport != null) {
 			try {
+				log.trace("closing transport");
 				transport.close();
 			} catch (Exception e) {
 				throw ExUtil.wrapEx(e);

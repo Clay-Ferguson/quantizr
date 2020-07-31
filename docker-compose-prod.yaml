@@ -85,7 +85,7 @@ services:
             server.ssl.keyAlias: "tomcat" 
 
             mail.port: ""
-            mail.user: "postmaster@quanta.wiki" 
+            mail.user: "postmaster@quantizr.com"
             mail.password: "${emailPassword}" 
             mail.host: "smtp.mailgun.org" 
             mail.from: "admin@quanta.wiki"
