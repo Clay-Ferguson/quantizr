@@ -5,11 +5,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.subnode.AppController;
 import org.subnode.config.AppProp;
+import org.subnode.config.ConstantsProvider;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.NodeInfo;
+import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
@@ -18,9 +21,11 @@ import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.RenderNodeRequest;
 import org.subnode.response.InitNodeEditResponse;
 import org.subnode.response.RenderNodeResponse;
+import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
+import org.subnode.util.XString;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +65,9 @@ public class NodeRenderService {
 
 	@Autowired
 	private IPFSSyncService ipfsSyncService;
+
+	@Autowired
+	private ConstantsProvider constProvider;
 
 	/* Note: this MUST match nav.ROWS_PER_PAGE variable in TypeScript */
 	private static int ROWS_PER_PAGE = 25;
@@ -444,7 +452,7 @@ public class NodeRenderService {
 	 * 
 	 * Returns true if there was a node at 'nodeName' and false otherwise.
 	 */
-	public boolean thymeleafRenderNode(HashMap<String,String> model, String nodeName) {
+	public boolean thymeleafRenderNode(HashMap<String, String> model, String nodeName) {
 		MongoSession session = api.getAdminSession();
 		boolean ret = false;
 
@@ -464,10 +472,14 @@ public class NodeRenderService {
 	 * whenever the recursion encounters a named node. So the 'dotted properties'
 	 * represent the hiearchy of the node structure.
 	 */
-	public void thymeleafProcessChildren(MongoSession session, SubNode node, HashMap<String,String> model, String parentName) {
+	public void thymeleafProcessChildren(MongoSession session, SubNode node, HashMap<String, String> model,
+			String parentName) {
 		String nodeName;
 
-		/* If this node has a name, create a model map entry based on the name that contains the content of  the node */
+		/*
+		 * If this node has a name, create a model map entry based on the name that
+		 * contains the content of the node
+		 */
 		if (!StringUtils.isEmpty(node.getName())) {
 			nodeName = parentName != null ? parentName + "__" + node.getName() : node.getName();
 			log.debug("thymeleaf [" + nodeName + "]=" + node.getContent());
@@ -484,5 +496,51 @@ public class NodeRenderService {
 				thymeleafProcessChildren(session, child, model, nodeName);
 			}
 		}
+	}
+
+	public void populateSocialCardProps(SubNode node, Model model) {
+		String ogTitle = "";
+		String ogDescription = "";
+		String ogImage = "";
+		String ogUrl = "";
+
+		if (node != null) {
+			String content = node.getContent();
+			int newLineIdx = content.indexOf("\n");
+			if (newLineIdx != -1) {
+				ogTitle = content.substring(0, newLineIdx).trim();
+
+				// remove leading hash marks which will be there if this is a markdown heading.
+				while (ogTitle.startsWith("#")) {
+					ogTitle = XString.stripIfStartsWith(ogTitle, "#");
+				}
+				ogTitle = ogTitle.trim();
+				ogDescription = content.substring(newLineIdx + 1).trim();
+			} else {
+				ogDescription = content;
+			}
+
+			ogImage = getImageUrl(node);
+			ogUrl = constProvider.getHostAndPort() + "/app?id=" + node.getId().toHexString();
+		}
+
+		model.addAttribute("ogTitle", ogTitle);
+		model.addAttribute("ogDescription", ogDescription);
+		model.addAttribute("ogImage", ogImage);
+		model.addAttribute("ogUrl", ogUrl);
+	}
+
+	public String getImageUrl(SubNode node) {
+		String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK);
+		if (ipfsLink != null) {
+			return Const.IPFS_GATEWAY + ipfsLink;
+		}
+
+		String bin = node.getStringProp(NodeProp.BIN);
+		if (bin != null) {
+			return constProvider.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId="
+					+ node.getId().toHexString();
+		}
+		return null;
 	}
 }

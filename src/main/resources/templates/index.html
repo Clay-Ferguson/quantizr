@@ -11,11 +11,19 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="application-name" content="Quanta" />
 
-    <!-- work in progress (todo-0)
-    <meta name="twitter:card" content="summary"/>
-    <meta name="twitter:title" th:attr="content='My Title'"/>
-    <meta name="twitter:description" th:attr="content='My Description'"/> 
-    -->
+    <meta property="og:type" th:if="${not #strings.isEmpty(ogDescription)}" content="website"/>
+    <meta property="og:title" th:if="${not #strings.isEmpty(ogTitle)}" th:attr="content=${ogTitle}"/>
+    <!-- <meta property="og:site_name" content="${ogSiteName}"/> -->
+    <meta property="og:description" th:if="${not #strings.isEmpty(ogDescription)}" th:attr="content=${ogDescription}"/>
+    <meta property="og:image" th:if="${not #strings.isEmpty(ogImage)}" th:attr="content=${ogImage}"/>
+    <meta property="og:url" th:if="${not #strings.isEmpty(ogUrl)}" th:attr="content=${ogUrl}"/>
+    
+    <meta name="twitter:card" th:if="${not #strings.isEmpty(ogDescription)}" content="summary_large_image"/>
+    <!-- <meta name="twitter:site" content="@yourwebsite"/>
+    <meta name="twitter:creator" content="@yourtwitterhandle"/> -->
+    <meta name="twitter:title" th:if="${not #strings.isEmpty(ogTitle)}" th:attr="content=${ogTitle}"/>
+    <meta name="twitter:description" th:if="${not #strings.isEmpty(ogDescription)}" th:attr="content=${ogDescription}"/>
+    <meta name="twitter:image" th:if="${not #strings.isEmpty(ogImage)}" th:attr="content=${ogImage}"/>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=3" />

@@ -266,7 +266,7 @@ public class AppController implements ErrorController {
 			@RequestParam(value = "n", required = false) String name, //
 
 			@RequestParam(value = "signupCode", required = false) String signupCode, //
-			@RequestParam(value = "passCode", required = false) String passCode,
+			@RequestParam(value = "passCode", required = false) String passCode, //
 			Model model) {
 
 		try {
@@ -289,12 +289,13 @@ public class AppController implements ErrorController {
 
 			if (id != null) {
 				sessionContext.setUrlId(id);
-				log.debug("ID specified on url=" + id);
+				//log.debug("ID specified on url=" + id);
 				String _id = id;
 				adminRunner.run(mongoSession -> {
 					// we don't check ownership of node at this time, but merely check sanity of
 					// whether this ID is even existing or not.
 					SubNode node = api.getNode(mongoSession, _id);
+					nodeRenderService.populateSocialCardProps(node, model);
 					if (node == null) {
 						log.debug("Node did not exist.");
 						sessionContext.setUrlId(null);
@@ -306,16 +307,13 @@ public class AppController implements ErrorController {
 				sessionContext.setUrlId(null);
 			}
 
-			if (passCode != null) {
-				return "index"; 
-			}
 		} catch (Exception e) {
 			// need to add some kind of message to exception to indicate to user something
 			// with the arguments went wrong.
 			ExUtil.error(log, "exception in call processor", e);
 		}
 
-		return "index"; 
+		return "index";
 	}
 
 	/*
@@ -341,7 +339,7 @@ public class AppController implements ErrorController {
 		 */
 		if (!welcomePagePresent) {
 			model.addAttribute("cacheBuster", cacheBuster);
-			return "index"; //"forward:/index.html";
+			return "index"; 
 		}
 		/* otherwise rener the landing page */
 		else {
