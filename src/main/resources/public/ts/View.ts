@@ -55,22 +55,22 @@ export class View implements ViewIntf {
     }
 
     firstPage = (state: AppState): void => {
-        console.log("Running firstPage Query");
         S.nav.mainOffset = 0;
         this.loadPage(false, state);
     }
 
     prevPage = (state: AppState): void => {
-        console.log("Running prevPage Query");
         S.nav.mainOffset -= S.nav.ROWS_PER_PAGE;
-        if (S.nav.mainOffset < 0) {
+
+        //This should be "< 0" instead of "<= 1" here, but there is a bug where the back button will not land you
+        //at the exact first page in all cases, and this is just a compensation for that somewhat harmless bug, until I fix it. todo-1
+        if (S.nav.mainOffset <= 1) {
             S.nav.mainOffset = 0;
         }
         this.loadPage(false, state);
     }
 
     nextPage = (state: AppState): void => {
-        console.log("Running nextPage Query");
         S.nav.mainOffset += S.nav.ROWS_PER_PAGE;
         this.loadPage(false, state);
     }

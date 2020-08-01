@@ -143,7 +143,7 @@ export class Render implements RenderIntf {
         let children = [];
 
         //todo-1: need copy-to-clipboard links here!
-       
+
         let url = window.location.origin + "/app?id=" + node.id;
         children.push(new Heading(5, "By ID"));
         children.push(new Anchor(url, url, {
@@ -309,7 +309,7 @@ export class Render implements RenderIntf {
 
         if (!state.isAnonUser && !!state.nodesToMove && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
 
-            console.log("pasteSelButton: node.id="+node.id+" isFirst="+isFirst);
+            //console.log("pasteSelButton: node.id=" + node.id + " isFirst=" + isFirst);
 
             let func: Function = null;
             if (isFirst) {

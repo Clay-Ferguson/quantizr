@@ -135,7 +135,6 @@ export class Nav implements NavIntf {
             return;
         }
 
-        this.mainOffset = 0;
         let res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: state.node.id,
             upLevel: 1,
@@ -148,6 +147,7 @@ export class Nav implements NavIntf {
         },
             //success callback
             (res: J.RenderNodeResponse) => {
+                this.mainOffset = res.offsetOfNodeFound;
                 this.upLevelResponse(res, state.node.id, false, state);
             },
             //fail callback
