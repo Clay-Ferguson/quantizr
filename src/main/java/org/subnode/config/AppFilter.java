@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.util.ThreadLocals;
+import org.subnode.util.Util;
 import org.subnode.util.XString;
 
 /**
@@ -31,6 +32,10 @@ public class AppFilter extends GenericFilterBean {
 	private static int reqId = 0;
 	private static boolean logRequests = false;
 	private static boolean logResponses = false;
+
+	//if non-zero this is used to put a millisecond delay (determined by its value) onto every request
+	//that comes thru as an API call.
+	private static int simulateSlowServer = 0;
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -58,6 +63,10 @@ public class AppFilter extends GenericFilterBean {
 			}
 			ThreadLocals.setHttpSession(session);
 			String queryString = httpReq.getQueryString();
+
+			if (simulateSlowServer > 0 && httpReq.getRequestURI().contains("/mobile/api/")) {
+				Util.sleep(simulateSlowServer);
+			}
 
 			if (logRequests) {
 				String url = "REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString="

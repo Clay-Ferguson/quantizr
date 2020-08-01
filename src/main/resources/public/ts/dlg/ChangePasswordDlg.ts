@@ -63,7 +63,6 @@ export class ChangePasswordDlg extends DialogBase {
         let pwd = this.getState().pwd;
 
         if (pwd && pwd.length >= 4) {
-            debugger;
             S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {
                 newPassword: pwd,
                 passCode: this.passCode

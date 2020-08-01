@@ -8,6 +8,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { useSelector, useDispatch } from "react-redux";
 import { AppState } from "../AppState";
+import { NavBarIconButton } from "../widget/NavBarIconButton";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -51,24 +52,22 @@ export class NodeCompMainList extends Div {
         let nextButton: Comp;
 
         if (S.nav.mainOffset > 0) {
-            firstButton = new Button(null, () => S.view.firstPage(state), {
+            firstButton = new NavBarIconButton("fa fa-angle-double-left fa-lg", null, {
+                onClick: () => S.view.firstPage(state),
                 title: "First Page",
-                id: "firstPageButton",
-                iconclass: "fa fa-angle-double-left fa-lg"
-            });
-            prevButton = new Button(null, () => S.view.prevPage(state), {
+            }, "btn-lg");
+
+            prevButton = new NavBarIconButton("fa fa-angle-left fa-lg", null, {
+                onClick: () => S.view.prevPage(state),
                 title: "Previous Page",
-                id: "prevPageButton",
-                iconclass: "fa fa-angle-left fa-lg"
-            });
+            }, "btn-lg");
         }
 
         if (!endReached) {
-            nextButton = new Button(null, () => S.view.nextPage(state), {
+            nextButton = new NavBarIconButton("fa fa-angle-right fa-lg", null, {
+                onClick: () => S.view.nextPage(state),
                 title: "Next Page",
-                id: "nextPageButton",
-                iconclass: "fa fa-angle-right fa-lg"
-            });
+            }, "btn-lg");
         }
 
         if (firstButton || prevButton || nextButton) {

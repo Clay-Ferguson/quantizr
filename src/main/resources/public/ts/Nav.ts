@@ -231,6 +231,8 @@ export class Nav implements NavIntf {
     }
 
     cached_openNodeById = (id: string, state: AppState): void => {
+        this.mainOffset = 0;
+
         state = appState(state);
         let node: J.NodeInfo = state.idToNodeMap[id];
         S.meta64.highlightNode(node, false, state);
