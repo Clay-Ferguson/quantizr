@@ -9,7 +9,7 @@ import { PubSub } from "./PubSub";
 import * as marked from 'marked';
 import * as highlightjs from 'highlightjs';
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
-import { NavBarIconButton } from "./widget/NavBarIconButton";
+import { IconButton } from "./widget/IconButton";
 import { NodeCompVerticalRowLayout } from "./comps/NodeCompVerticalRowLayout";
 import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";
 import { AppState } from "./AppState";
@@ -324,7 +324,7 @@ export class Render implements RenderIntf {
             });
         }
 
-        let newNodeButton = new NavBarIconButton("fa-plus", null, {
+        let newNodeButton = new IconButton("fa-plus", null, {
             onClick: e => {
                 S.edit.insertNode(node.id, "u", isFirst ? 0 : 1, state);
             },

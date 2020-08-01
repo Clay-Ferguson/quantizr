@@ -6,7 +6,7 @@ import { Li } from "./Li";
 import { NavTag } from "./NavTag";
 import { ButtonTag } from "./ButtonTag";
 import { Span } from "./Span";
-import { NavBarIconButton } from "./NavBarIconButton";
+import { IconButton } from "./IconButton";
 import { Div } from "./Div";
 import { ReactNode } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -34,7 +34,7 @@ export class MainNavPanel extends NavTag {
         let allowEditMode = state.node && !state.isAnonUser;
 
         // if (S.nav.parentVisibleToUser(state)) {
-        //     buttons.push(new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
+        //     buttons.push(new IconButton("fa-chevron-circle-up", "Up Level", {
         //         /* For onclick functions I need a new approach for some (not all) where I can get by 
         //         with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
         //         directly off the DOM */
@@ -50,7 +50,7 @@ export class MainNavPanel extends NavTag {
             buttons.push(new Li(null, {
                 className: "nav-item"
             }, [
-                new NavBarIconButton("fa-clipboard", null, {
+                new IconButton("fa-clipboard", null, {
                     onClick: e => { S.edit.saveClipboardToNode(); },
                     title: "Save Clipboard text to a Note"
                 }, "nav-link", "off")
@@ -63,7 +63,7 @@ export class MainNavPanel extends NavTag {
                 buttons.push(new Li(null, {
                     className: "nav-item"
                 }, [
-                    new NavBarIconButton("fa-angle-left fa-lg", "", {
+                    new IconButton("fa-angle-left fa-lg", "", {
                         onClick: e => { S.nav.prevFullScreenViewer(state); },
                         title: "View Previous Node (or left arrow key)"
                     }, "nav-link", "off")
@@ -74,7 +74,7 @@ export class MainNavPanel extends NavTag {
                 buttons.push(new Li(null, {
                     className: "nav-item"
                 }, [
-                    new NavBarIconButton("fa-angle-right fa-lg", "", {
+                    new IconButton("fa-angle-right fa-lg", "", {
                         onClick: e => { S.nav.nextFullScreenViewer(state); },
                         title: "View Next Node (or right arrow key)"
                     }, "nav-link", "off")
@@ -84,7 +84,7 @@ export class MainNavPanel extends NavTag {
             buttons.push(new Li(null, {
                 className: "nav-item"
             }, [
-                new NavBarIconButton("fa-window-close fa-lg", "Close", {
+                new IconButton("fa-window-close fa-lg", "Close", {
                     onClick: e => { S.nav.closeFullScreenViewer(state); },
                     title: "Close Viewer (or escape key)"
                 }, "nav-link", "off")
@@ -95,7 +95,7 @@ export class MainNavPanel extends NavTag {
                 buttons.push(new Li(null, {
                     className: "nav-item"
                 }, [
-                    new NavBarIconButton("fa-database", null, {
+                    new IconButton("fa-database", null, {
                         onClick: e => { S.nav.navHome(state); },
                         title: "Go to Your Root Node"
                     }, "nav-link", "off")
@@ -105,7 +105,7 @@ export class MainNavPanel extends NavTag {
             buttons.push(new Li(null, {
                 className: "nav-item"
             }, [
-                new NavBarIconButton("fa-home", null, {
+                new IconButton("fa-home", null, {
                     onClick: e => { S.meta64.loadAnonPageHome(state); },
                     title: "Go to Portal Root Node"
                 }, "nav-link", "off")
@@ -115,7 +115,7 @@ export class MainNavPanel extends NavTag {
                 buttons.push(new Li(null, {
                     className: "nav-item"
                 }, [
-                    new NavBarIconButton("fa-gear", null, {
+                    new IconButton("fa-gear", null, {
                         onClick: e => { S.edit.editPreferences(state); },
                         title: "Edit Preferences"
                     }, "nav-link", "off")
@@ -126,7 +126,7 @@ export class MainNavPanel extends NavTag {
                 buttons.push(new Li(null, {
                     className: "nav-item"
                 }, [
-                    new NavBarIconButton("fa-pencil", null, {
+                    new IconButton("fa-pencil", null, {
                         onClick: e => { S.edit.toggleEditMode(state); },
                         title: "Toggle Edit Mode on/off"
                     }, "nav-link", state.userPreferences.editMode ? "on" : "off"),
@@ -137,7 +137,7 @@ export class MainNavPanel extends NavTag {
                 buttons.push(new Li(null, {
                     className: "nav-item"
                 }, [
-                    new NavBarIconButton("fa-user-plus", "Signup", {
+                    new IconButton("fa-user-plus", "Signup", {
                         onClick: e => { S.nav.signup(state); },
                         title: "Create new Account"
                     }, "nav-link", "off")
@@ -150,7 +150,7 @@ export class MainNavPanel extends NavTag {
                 buttons.push(new Li(null, {
                     className: "nav-item"
                 }, [
-                    new NavBarIconButton("fa-sign-in", "Login", {
+                    new IconButton("fa-sign-in", "Login", {
                         onClick: e => { S.nav.login(state); },
                         title: "Login to Quanta"
                     }, "nav-link", "off")
@@ -161,7 +161,7 @@ export class MainNavPanel extends NavTag {
                 buttons.push(new Li(null, {
                     className: "nav-item"
                 }, [
-                    new NavBarIconButton("fa-sign-out", null, {
+                    new IconButton("fa-sign-out", null, {
                         onClick: e => { S.nav.logout(state); },
                         title: "Logout"
                     }, "nav-link", "off")
@@ -187,7 +187,7 @@ export class MainNavPanel extends NavTag {
                 new Li(null, {
                     className: "nav-item"
                 }, [
-                    new NavBarIconButton(clientInfo.isMobile ? "fa-bars" : null, "Quanta", {
+                    new IconButton(clientInfo.isMobile ? "fa-bars" : null, "Quanta", {
                         onClick: e => {
                             //If user is not logged in this button just takes you back to the landing page.
                             if (state.isAnonUser || !clientInfo.isMobile) {

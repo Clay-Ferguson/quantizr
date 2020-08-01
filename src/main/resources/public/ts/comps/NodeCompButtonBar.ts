@@ -9,7 +9,7 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { Img } from "../widget/Img";
 import { ButtonBar } from "../widget/ButtonBar";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
-import { NavBarIconButton } from "../widget/NavBarIconButton";
+import { IconButton } from "../widget/IconButton";
 import { AppState } from "../AppState";
 import { useSelector, useDispatch } from "react-redux";
 import { NodeActionType } from "../enums/NodeActionType";
@@ -50,17 +50,17 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let replyButton: Button;
         let deleteNodeButton: Button;
         let pasteInsideButton: Button;
-        let upLevelButton: NavBarIconButton;
-        let prevButton: NavBarIconButton;
-        let nextButton: NavBarIconButton;
-        let searchButton: NavBarIconButton;
-        let timelineButton: NavBarIconButton;
+        let upLevelButton: IconButton;
+        let prevButton: IconButton;
+        let nextButton: IconButton;
+        let searchButton: IconButton;
+        let timelineButton: IconButton;
 
         let isPageRootNode = state.node && this.node.id == state.node.id;
 
         if (state.node && this.node.id == state.node.id) {
             if (S.nav.parentVisibleToUser(state)) {
-                upLevelButton = new NavBarIconButton("fa-chevron-circle-up", "Up Level", {
+                upLevelButton = new IconButton("fa-chevron-circle-up", "Up Level", {
                     /* For onclick functions I need a new approach for some (not all) where I can get by 
                     with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
                     directly off the DOM */
@@ -70,25 +70,25 @@ export class NodeCompButtonBar extends HorizontalLayout {
             }
 
             if (!S.nav.displayingRepositoryRoot(state)) {
-                prevButton = new NavBarIconButton("fa-chevron-circle-left", null, {
+                prevButton = new IconButton("fa-chevron-circle-left", null, {
                     onClick: S.nav.navToPrev,
                     title: "Go to Previous Node"
                 });
 
-                nextButton = new NavBarIconButton("fa-chevron-circle-right", null, {
+                nextButton = new IconButton("fa-chevron-circle-right", null, {
                     onClick: S.nav.navToNext,
                     title: "Go to Next Node"
                 });
             }
 
             if (!state.isAnonUser) {
-                searchButton = new NavBarIconButton("fa-search", null, {
+                searchButton = new IconButton("fa-search", null, {
                     onClick: S.nav.runSearch,
                     title: "Search underneath Node"
                 });
 
 
-                timelineButton = new NavBarIconButton("fa-clock-o", null, {
+                timelineButton = new IconButton("fa-clock-o", null, {
                     onClick: S.nav.runTimeline,
                     title: "View Timeline underneath Node (by Mod Time)"
                 });
