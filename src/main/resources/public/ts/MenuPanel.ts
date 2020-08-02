@@ -232,7 +232,7 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", state)), //
                 new MenuItem("Reset Public Node", () => S.view.runServerCommand("initializeAppContent", state)), //
-                new MenuItem("Insert Book: War and Peace", S.edit.insertBookWarAndPeace),
+                new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(state)),
 
                 new MenuItem("Rebuild Indexes", () => S.meta64.rebuildIndexes()),
                 new MenuItem("Shutdown Server Node", () => S.meta64.shutdownServerNode(state)),

@@ -70,7 +70,7 @@ public class NodeRenderService {
 	private ConstantsProvider constProvider;
 
 	/* Note: this MUST match nav.ROWS_PER_PAGE variable in TypeScript */
-	private static int ROWS_PER_PAGE = 25;
+	private static int ROWS_PER_PAGE = 25; //todo-0: do more testing with this at 5
 
 	/*
 	 * This is the call that gets all the data to show on a page. Whenever user is
@@ -86,7 +86,7 @@ public class NodeRenderService {
 
 		String targetId = req.getNodeId();
 
-		// log.debug("renderNode targetId:" + targetId);
+		//log.debug("$$$$$$$$$$$$$$$$$$$$$$$$ renderNode: \nreq=" + XString.prettyPrint(req));
 		SubNode node = null;
 		try {
 			node = api.getNode(session, targetId);
@@ -199,12 +199,14 @@ public class NodeRenderService {
 		return res;
 	}
 
+	/*
+	 * todo-0: This entire thing needs to be checked over. All pagination aspects,
+	 * offset, limit, scanToNode, is all due for full resting
+	 */
 	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res,
 			final SubNode node, boolean scanToNode, String scanToPath, int ordinal, int level) {
 
-		// log.debug(
-		// "RENDER: " + node.getPath() /* XString.prettyPrint(node) */ + " ordinal=" +
-		// ordinal + "level=" + level);
+		//log.debug("RENDER nodeId: " + node.getId().toHexString()); // .prettyPrint(node));
 		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, ordinal, level > 0,
 				false, false);
 
@@ -226,6 +228,8 @@ public class NodeRenderService {
 		 */
 		int queryLimit = scanToNode ? 1000 : offset + ROWS_PER_PAGE + 1;
 
+		//log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode=" + scanToNode);
+
 		/*
 		 * we request ROWS_PER_PAGE+1, because that is enough to trigger 'endReached'
 		 * logic to be set correctly
@@ -242,6 +246,9 @@ public class NodeRenderService {
 		Iterator<SubNode> iterator = nodeIter.iterator();
 
 		int idx = 0, count = 0, idxOfNodeFound = -1;
+
+		// this should only get set to true if we run out of records, because we reached
+		// the true end of records and not related to a queryLimit
 		boolean endReached = false;
 
 		if (req.isGoToLastPage()) {
@@ -267,6 +274,7 @@ public class NodeRenderService {
 		 * the initial query.
 		 */
 		if (!scanToNode && offset > 0) {
+			//log.debug("Skipping the first " + offset + " records in the resultset.");
 			idx = api.skip(iterator, offset);
 		}
 
@@ -291,13 +299,13 @@ public class NodeRenderService {
 		 */
 		while (true) {
 			if (!iterator.hasNext()) {
+				//log.debug("End reached.");
 				endReached = true;
 				break;
 			}
 			SubNode n = iterator.next();
-			// log.debug("NodeFound: node: "+ XString.prettyPrint(n));
-
 			idx++;
+			//log.debug("NodeFound[" + idx + "]: nodeId" + n.getId().toHexString());
 			if (idx > offset) {
 
 				if (scanToNode) {
@@ -375,6 +383,7 @@ public class NodeRenderService {
 						endReached = true;
 					}
 					/* break out of while loop, we have enough children to send back */
+					//log.debug("Full page is ready. Exiting loop.");
 					break;
 				}
 			}
@@ -392,6 +401,7 @@ public class NodeRenderService {
 			ninfo.setLastChild(true);
 		}
 
+		//log.debug("Setting endReached="+endReached);
 		res.setEndReached(endReached);
 		return nodeInfo;
 	}
