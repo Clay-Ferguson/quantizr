@@ -517,7 +517,11 @@ public class AttachmentService {
 		}
 	}
 
-	public void getBinary(MongoSession session, String nodeId, HttpServletResponse response) {
+	/*
+	 * If 'download' is true we send back a "Content-Disposition: attachment;"
+	 * rather than the default of "inline" by omitting it
+	 */
+	public void getBinary(MongoSession session, String nodeId, boolean download, HttpServletResponse response) {
 		BufferedInputStream inStream = null;
 		BufferedOutputStream outStream = null;
 
@@ -585,7 +589,10 @@ public class AttachmentService {
 					response.setContentLength((int) size);
 				}
 			}
-			response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+
+			if (download) {
+				response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+			}
 			response.setHeader("Cache-Control", "public, max-age=31536000");
 
 			inStream = new BufferedInputStream(is);

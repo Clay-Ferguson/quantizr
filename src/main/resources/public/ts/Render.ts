@@ -162,7 +162,7 @@ export class Render implements RenderIntf {
 
         let attachmentIpfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
         if (attachmentIpfsLink) {
-            url = S.render.getUrlForNodeAttachment(node);
+            url = S.render.getUrlForNodeAttachment(node, true);
             children.push(new Heading(5, "IPFS File Attachment"));
             children.push(new Anchor(url, url, {
                 target: "_blank",
@@ -345,7 +345,7 @@ export class Render implements RenderIntf {
         ]);
     }
 
-    getAttachmentUrl = (urlPart: string, node: J.NodeInfo): string => {
+    getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
         let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
         if (ipfsLink) {
             return C.IPFS_GATEWAY + ipfsLink;
@@ -353,27 +353,31 @@ export class Render implements RenderIntf {
 
         let bin = S.props.getNodePropVal(J.NodeProp.BIN, node);
         if (bin) {
-            return S.util.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + node.id;
+            let ret: string = S.util.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + node.id;
+            if (downloadLink) {
+                ret += "&download=true";
+            }
+            return ret;
         }
 
         return null;
     }
 
-    getUrlForNodeAttachment = (node: J.NodeInfo): string => {
+    getUrlForNodeAttachment = (node: J.NodeInfo, downloadLink: boolean): string => {
         let ret = null;
         if (node.dataUrl) {
             ret = node.dataUrl;
             //console.log("getUrlForNodeAttachment: id="+node.id+" url="+ret+" from dataUrl");
         }
         else {
-            ret = this.getAttachmentUrl("bin", node);
+            ret = this.getAttachmentUrl("bin", node, downloadLink);
             //console.log("getUrlForNodeAttachment: id=" + node.id + " url=" + ret + " from bin");
         }
         return ret;
     }
 
     getStreamUrlForNodeAttachment = (node: J.NodeInfo): string => {
-        return this.getAttachmentUrl("stream", node);
+        return this.getAttachmentUrl("stream", node, false);
     }
 
     getAvatarImgUrl = (ownerId: string, avatarVer: string) => {

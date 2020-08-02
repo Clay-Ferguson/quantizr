@@ -289,7 +289,7 @@ public class AppController implements ErrorController {
 
 			if (id != null) {
 				sessionContext.setUrlId(id);
-				//log.debug("ID specified on url=" + id);
+				// log.debug("ID specified on url=" + id);
 				String _id = id;
 				adminRunner.run(mongoSession -> {
 					// we don't check ownership of node at this time, but merely check sanity of
@@ -339,7 +339,7 @@ public class AppController implements ErrorController {
 		 */
 		if (!welcomePagePresent) {
 			model.addAttribute("cacheBuster", cacheBuster);
-			return "index"; 
+			return "index";
 		}
 		/* otherwise rener the landing page */
 		else {
@@ -620,10 +620,12 @@ public class AppController implements ErrorController {
 	}
 
 	@RequestMapping(value = API_PATH + "/bin/{fileName}", method = RequestMethod.GET)
-	public void getBinary(@PathVariable("fileName") String fileName, @RequestParam("nodeId") String nodeId,
+	public void getBinary(@PathVariable("fileName") String fileName, //
+			@RequestParam("nodeId") String nodeId, //
+			@RequestParam(value = "download", required = false) String download, //
 			HttpSession session, HttpServletResponse response) {
 		callProc.run("bin", null, session, ms -> {
-			attachmentService.getBinary(null, nodeId, response);
+			attachmentService.getBinary(null, nodeId, download != null, response);
 			return null;
 		});
 	}

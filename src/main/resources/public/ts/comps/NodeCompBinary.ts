@@ -29,7 +29,7 @@ export class NodeCompBinary extends Div {
     }
 
     makeImageTag = (node: J.NodeInfo, state: AppState): Img => {
-        let src: string = S.render.getUrlForNodeAttachment(node);
+        let src: string = S.render.getUrlForNodeAttachment(node, false);
 
         let imgSize = "";
         if (this.isFullScreenEmbed) {
@@ -107,7 +107,7 @@ export class NodeCompBinary extends Div {
                 }),
                 new Div("", {
                     className: "videoDownloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(this.node), "[Download Video]")])
+                }, [new Anchor(S.render.getUrlForNodeAttachment(this.node, true), "[Download Video]")])
             ], "marginAll")]);
         }
         else if (S.props.hasAudio(this.node)) {
@@ -117,7 +117,7 @@ export class NodeCompBinary extends Div {
                 }),
                 new Div("", {
                     className: "audioDownloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(this.node), "[Download Audio]")])
+                }, [new Anchor(S.render.getUrlForNodeAttachment(this.node, true), "[Download Audio]")])
             ], "marginAll")]);
         }
         /*
@@ -130,7 +130,7 @@ export class NodeCompBinary extends Div {
 
             let viewFileLink: Anchor = null;
             if (fileType == "application/pdf" || fileType.startsWith("text/")) {
-                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(this.node), "[View]", {
+                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(this.node, false), "[View]", {
                     target: "_blank",
                     className: "marginLeft"
                 });
@@ -147,7 +147,7 @@ export class NodeCompBinary extends Div {
                 new Span(fileName, {
                     className: "normalText marginRight"
                 }),
-                new Anchor(S.render.getUrlForNodeAttachment(this.node), "[Download]"),
+                new Anchor(S.render.getUrlForNodeAttachment(this.node, true), "[Download]"),
                 viewFileLink
             ])]);
         }

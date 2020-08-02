@@ -15,7 +15,7 @@ export interface RenderIntf {
     injectSubstitutions(content: string): string;
     showNodeUrl(node: J.NodeInfo, state: AppState): void;
     renderPageFromData(data: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean, allowScroll: boolean, state: AppState): void; 
-    getUrlForNodeAttachment(node: J.NodeInfo): string;
+    getUrlForNodeAttachment(node: J.NodeInfo, downloadLink: boolean): string;
     getStreamUrlForNodeAttachment(node: J.NodeInfo): string;
     makeAvatarImage(node: J.NodeInfo, state: AppState): Img;
     allowPropertyEdit(node: J.NodeInfo, propName: string, state: AppState): boolean;
