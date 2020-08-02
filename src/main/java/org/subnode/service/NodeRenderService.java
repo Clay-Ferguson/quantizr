@@ -168,7 +168,11 @@ public class NodeRenderService {
 						}
 						// log.trace(" upLevel to nodeid: " + node.getPath());
 						levelsUpRemaining--;
-					} catch (Exception e) {
+					} 
+					catch (NodeAuthFailedException e) {
+						throw e;
+					}
+					catch (Exception e) {
 						/*
 						 * UPDATE: It's never actually a render problem if we can't grab the parent in
 						 * cases where we tried to. Always just allow it to render 'node' itself.

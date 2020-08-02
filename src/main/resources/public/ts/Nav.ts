@@ -116,6 +116,7 @@ export class Nav implements NavIntf {
 
     navUpLevel = (event: any = null): void => {
         let state = appState();
+        debugger;
         if (!state.node) return null;
 
         //Always just scroll to the top before doing an actual 'upLevel' to parent.
@@ -131,6 +132,7 @@ export class Nav implements NavIntf {
         }
 
         if (!this.parentVisibleToUser(state)) {
+            S.util.showMessage("The parent of this node isn't shared to you.", "Warning");
             // Already at root. Can't go up.
             return;
         }
@@ -152,7 +154,9 @@ export class Nav implements NavIntf {
             },
             //fail callback
             (res: string) => {
-                this.navHome(state);
+                //Navigating home was a bad idea. If someone tries to uplevel and cannot, we don't want to change them away from
+                //whatever page they're on. Just show the error and stay on same node.
+                //this.navHome(state);
             });
     }
 
