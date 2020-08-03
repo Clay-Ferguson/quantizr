@@ -24,9 +24,12 @@ export class NodeCompMarkdown extends MarkdownDiv {
     private immediateDecrypting: boolean = true;
 
     constructor(public node: J.NodeInfo, private appState: AppState) {
-        super(null, {
-            className: "markdown-content content-narrow markdown-html",
-        });
+        super();
+
+        //Set the content display to wider if there is a code block. This makes the non-code text also wrap at a wider
+        //width but we have to tolerate that for now, becasue there's not a cleaner 'easy' solution.
+        let widthStyle = node.content && node.content.indexOf("```") != 1 ? "content-medium" : "content-narrow";
+        this.attribs.className = "markdown-content markdown-html " + widthStyle;
 
         if (this.appState.userPreferences.editMode && node.owner == appState.userName) {
             let highlightNode = S.meta64.getHighlightedNode(appState);
