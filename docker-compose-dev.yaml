@@ -33,6 +33,11 @@ services:
             routing: "dhtclient" 
             IPFS_PROFILE: "server"
             IPFS_PATH: "/ipfsdata"
+        expose:
+            - '4001'
+            - '8080'
+            - '8081'
+            - '5001'
         volumes:
             - '${ipfs_staging}:/export'
             - '${ipfs_data}:/ipfsdata'
