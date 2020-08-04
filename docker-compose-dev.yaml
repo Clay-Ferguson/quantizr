@@ -27,28 +27,31 @@ services:
         # and we don't want that happening unexpectedly
         image: mongo:4.0
 
+    # https://hub.docker.com/r/ipfs/go-ipfs/
     ipfs: 
-        container_name: ipfs_host_dev 
+        container_name: ipfs 
         environment:
+            # I think some of these env options may be obsolete now?
             routing: "dhtclient" 
             IPFS_PROFILE: "server"
-            IPFS_PATH: "/ipfsdata"
-        expose:
-            - '4001'
-            - '8080'
-            - '8081'
-            - '5001'
+            IPFS_PATH: "/data/ipfs"
+            # LIBP2P_FORCE_PNET: 1
+        # expose:
+        #    # do we need 4001. it's for swarm right?
+        #     - '4001'
+        #     - '8080'
+        #     - '5001'
         volumes:
             - '${ipfs_staging}:/export'
-            - '${ipfs_data}:/ipfsdata'
+            - '${ipfs_data}:/data/ipfs'
+            # Note: I saw an example online using :/data/ipfs here instead.
         ports:
             - "4001:4001"
             - "8080:8080"
-            - "8081:8081"
             - "5001:5001"
         networks:
             - net-dev
-        image: ipfs/go-ipfs:latest
+        image: ipfs/go-ipfs:release
 
     subnode-dev:
         build: 

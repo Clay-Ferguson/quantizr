@@ -225,9 +225,11 @@ export class EditNodeDlg extends DialogBase {
                     return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) != "1";
                 }
             }),
-            new Checkbox("Save To IPFS", {
-                className: "marginRight",
-            }, this.makeCheckboxPropValueHandler(J.NodeProp.SAVE_TO_IPFS)),
+
+            // todo-1: temporarily disabling since Quanta will have it's own Gateway from now on.
+            // new Checkbox("Save To IPFS", {
+            //     className: "marginRight",
+            // }, this.makeCheckboxPropValueHandler(J.NodeProp.SAVE_TO_IPFS)),
 
             this.inlineChildrenCheckBox = state.node.hasChildren ? new Checkbox("Inline Children", null,
                 this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null
@@ -354,7 +356,7 @@ export class EditNodeDlg extends DialogBase {
                         this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
                         ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null,
                     ]),
-                    ipfsLink ? new Div("Stored on IPFS (https://temporal.cloud)", { className: "marginTop" }) : null,
+                    ipfsLink ? new Div("Stored on IPFS", { className: "marginTop" }) : null,
                 ]),
 
             ], "binaryEditorSection")

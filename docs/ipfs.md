@@ -12,6 +12,10 @@ Quanta uses MongoDB for all it's own data storage, and that is actually a good t
 
 That is, the Quanta app will be able to "crawl" IPFS trees (MerkleDAGs), and index the data as it goes along by caching in it's own local MongoDB. The the actual search requests, and/or future browsing of the same content will then come directly out of the MongoDB. So think of Quanta also as the final top layer of caching for IPFS data, where it can be rapidly surfaced to the Quanta front-end even without accessing IPFS for every access.
 
+## Note
+
+See file named `ipfs-quanta-testing.md` for info regarding technical specifics involved in running an IPFS Gateway instance inside the Quanta Docker compose and doing a very simple 'end-to-end' test of the IPFS Gateway, from the GUI.
+
 ## Quanta: The IPFS Browser
 
 Quanta has a very rudimentary experimental IPFS Browsing capability, that's capable of letting users browse the IPFS Web exactly as if that web were just a branch on the Quanta tree.
@@ -42,6 +46,12 @@ After doing this Quanta will automatically read the content from the IPFS Web, a
 
 # IPFS Hashes
 
+Gateway URL Examples: 
+
+http://localhost:8080/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme
+
+https://gateway.ipfs.io/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme
+
 These are just various test nodes that the developers of IPFS have put out and made available
 for basic testing
 
@@ -58,6 +68,8 @@ Images:
     QmZpc3HvfjEXvLWGQPWbHk3AjD5j8NEN4gmFN8Jmrd5g83/cs
 
 # IPFS Links and Info
+
+https://ipfs.github.io/public-gateway-checker/
 
 https://ipfs.io
 https://discuss.ipfs.io

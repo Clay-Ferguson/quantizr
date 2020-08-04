@@ -42,10 +42,6 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-/**
- * Right now exception handling in here is just temporary (not final) because
- * I'm just throwing together quick proof-of-concept IPFS browser capability.
- */
 @Component
 public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);

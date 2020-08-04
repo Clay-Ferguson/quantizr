@@ -34,7 +34,6 @@ import org.subnode.image.ImageUtil;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;

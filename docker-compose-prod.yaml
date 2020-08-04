@@ -17,23 +17,28 @@ services:
         # and we don't want that happening unexpectedly
         image: mongo:4.0
 
+    # https://hub.docker.com/r/ipfs/go-ipfs/
     ipfs: 
-        container_name: ipfs_host_prod 
+        container_name: ipfs 
         environment:
             routing: "dhtclient" 
             IPFS_PROFILE: "server"
-            IPFS_PATH: "/ipfsdata"
+            IPFS_PATH: "/data/ipfs"
+        # expose:
+        #    # do we need 4001. it's for swarm right?
+        #     - '4001'
+        #     - '8080'
+        #     - '5001'
         volumes:
-            - '${ipfs_staging}:/export'
-            - '${ipfs_data}:/ipfsdata'
+           - '${ipfs_staging}:/export'
+            - '${ipfs_data}:/data/ipfs'
         ports:
             - "4001:4001"
             - "8080:8080"
-            - "8081:8081"
             - "5001:5001"
         networks:
             - net-prod
-        image: ipfs/go-ipfs:latest
+        image: ipfs/go-ipfs:release
 
     subnode-prod:
         build: 

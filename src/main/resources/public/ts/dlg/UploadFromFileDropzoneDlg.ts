@@ -34,7 +34,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     sent: boolean = false;
 
     /* If this is true we upload directly to temporal rather than routing thru Quanta */
-    toTemporal: boolean = true;
+    toTemporal: boolean = false;
     maxFiles: number = 50;
 
     //this varible gets set if anything is detected wrong during the upload
@@ -73,7 +73,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Upload from URL", this.uploadFromUrl),
                     new Button("Upload from Clipboard", this.uploadFromClipboard),
-                    state.toIpfs ? new Button("IPFS Credentials", () => { S.ipfsUtil.getTemporalCredentials(true); }) : null,
+                    (state.toIpfs && this.toTemporal) ? new Button("IPFS Credentials", () => { S.ipfsUtil.getTemporalCredentials(true); }) : null,
                     new Button("Close", () => {
                         this.close();
                     }),
@@ -160,7 +160,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let state = this.getState();
         let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
 
-        /* Allow 20MB for Quanta uploads or 20GB for IPFS */
+        /* Limit based on user quota for Quanta accounts or else leave unlimited for temporal and let temporal worry about it */
         let maxFileSize = (state.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
         //console.log("configureDropZone: maxFileSize="+maxUploadSize);
 
@@ -267,9 +267,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 // not needed (this does work however)
-                // this.on("uploadprogress", function (file, progress) {
-                //     console.log("File progress", progress);
-                //   });
+                this.on("uploadprogress", function (file, progress) {
+                    console.log("File progress", progress);
+                });
 
                 this.on("success", function (file: File, resp: any, evt: ProgressEvent) {
                     //S.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
