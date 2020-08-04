@@ -43,6 +43,8 @@ services:
         expose:
             - '443'
             - '80'
+            # Uncomment for debugging...
+            #- '8000'
         volumes:
             - '/home/clay/quanta-data/docs:/docs'
             - '/home/clay/quanta-data/tmp:/subnode-tmp'
@@ -51,6 +53,8 @@ services:
         ports:
             - '443:443'
             - '80:80'
+            # Uncomment for debugging...
+            #- '8000:8000'
         networks:
             - net-prod
         environment:
@@ -69,11 +73,12 @@ services:
             reSaveAll: "false"
             allowFileSystemSearch: "false" 
             forceIndexRebuild: "false"
-            spring.http.multipart.max-file-size: "5MB" 
-            spring.http.multipart.max-request-size: "5MB" 
-            spring.servlet.multipart.max-file-size: "5MB"
-            spring.servlet.multipart.max-request-size: "5MB"
+            spring.http.multipart.max-file-size: "200MB" 
+            spring.http.multipart.max-request-size: "200MB" 
+            spring.servlet.multipart.max-file-size: "200MB"
+            spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/subnode-tmp" 
+            # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
             ipfs.host: "http://ipfs:5001"
             enableRssDaemon: "false"

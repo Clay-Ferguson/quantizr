@@ -143,19 +143,13 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 if (allowUpload) {
                     const files = this.dropzone.getAcceptedFiles();
                     this.numFiles = files.length;
-
-                    //NOTE: Either the for loop OR the processQueue will always for actually for non-ipfs uploads, but for uploading to 
-                    //IPFS we know we do need to manually force it to process one file at a time to comply with what temporal.cloud allows.
-                    if (state.toIpfs) {
+                   
                         if (files.length > 0) {
                             files.forEach((file: File) => {
-                                //S.log("Dropzone Processing File: " + file.name);
+                                S.log("Dropzone Processing File: " + file.name);
                                 this.dropzone.processFile(file)
                             });
                         }
-                    } else {
-                        this.dropzone.processQueue();
-                    }
                 }
             }
             resolve(true);
@@ -168,6 +162,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
         /* Allow 20MB for Quanta uploads or 20GB for IPFS */
         let maxFileSize = (state.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
+        //console.log("configureDropZone: maxFileSize="+maxUploadSize);
 
         let action;
         if (this.importMode) {
@@ -231,6 +226,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("sending", function (file: File, xhr, formData) {
                     dlg.sent = true;
+                    //console.log("sending file: "+file.name);
 
                     /* If Uploading DIRECTLY to Temporal.cloud */
                     if (state.toIpfs && dlg.toTemporal) {
@@ -269,6 +265,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         S.util.showMessage("Upload failed.", "Warning");
                     }
                 });
+
+                // not needed (this does work however)
+                // this.on("uploadprogress", function (file, progress) {
+                //     console.log("File progress", progress);
+                //   });
 
                 this.on("success", function (file: File, resp: any, evt: ProgressEvent) {
                     //S.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
@@ -398,6 +399,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
         let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
         let maxFileSizeMb = (state.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
+        //console.log("filesAreValid: maxFileSize="+maxUploadSize);
 
         for (let file of this.fileList) {
             if (file.size > maxFileSizeMb * Constants.ONE_MB) {

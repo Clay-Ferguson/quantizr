@@ -95,6 +95,16 @@ html {
 //     animation: animatedBackground 2s ease-in;
 // }
 
+.myFooterText {
+    font-size: 80%;
+}
+
+.mainLogoImg {
+    /* this margin and display is for making the logo horizontally centered */
+    margin: auto;    
+    display: block;
+}
+
 .transparentBg {
     background-color: rgba(0, 0, 0, .7);
     //opacity: 0.7;
