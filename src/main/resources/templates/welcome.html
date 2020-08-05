@@ -65,6 +65,8 @@
                 <div class="col-xs-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 mx-auto">
                     <div class="jumbotron transparentBg">
 
+                        <h4 class="alert alert-info justify-content-center" th:if="${not #strings.isEmpty(signupResponse)}" th:text="${signupResponse}"></h4> 
+
                         <img class="mainLogoImg" src="/images/eagle-logo-250px-tr.jpg"></img>
 
                         <p th:text="${pg_welcome__intro1}"></p>

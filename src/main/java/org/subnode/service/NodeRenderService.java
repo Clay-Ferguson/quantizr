@@ -169,9 +169,11 @@ public class NodeRenderService {
 						// log.trace(" upLevel to nodeid: " + node.getPath());
 						levelsUpRemaining--;
 					} 
-					catch (NodeAuthFailedException e) {
-						throw e;
-					}
+					// this was added too hastily and creates problems. this was indended for case where 'upLevel' button was clicked by user
+					// but ends up failing at other times. Like if user is freshly signed up and just logging in! fix. todo-0
+					// catch (NodeAuthFailedException e) {
+					// 	throw e;
+					// }
 					catch (Exception e) {
 						/*
 						 * UPDATE: It's never actually a render problem if we can't grab the parent in
@@ -496,7 +498,7 @@ public class NodeRenderService {
 		 */
 		if (!StringUtils.isEmpty(node.getName())) {
 			nodeName = parentName != null ? parentName + "__" + node.getName() : node.getName();
-			log.debug("thymeleaf [" + nodeName + "]=" + node.getContent());
+			//log.debug("thymeleaf [" + nodeName + "]=" + node.getContent());
 			model.put(nodeName, node.getContent());
 		}
 		// if this node it not named, skip but process all it's children

@@ -93,7 +93,11 @@ export class User implements UserIntf {
                         password: callPwd,
                         tzOffset: new Date().getTimezoneOffset(),
                         dst: S.util.daylightSavingsTime
-                    }, (res: J.LoginResponse) => {
+                    }, async (res: J.LoginResponse) => {
+                        if (res && !res.success) {
+                            await S.user.deleteAllUserLocalDbEntries();
+                        }
+
                         if (usingCredentials) {
                             this.loginResponse(res, callUsr, callPwd, false, state);
                         } else {
@@ -105,8 +109,7 @@ export class User implements UserIntf {
                         }
                     },
                         async (error: string) => {
-                            //S.user.deleteAllUserLocalDbEntries();
-                            await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null);
+                            await S.user.deleteAllUserLocalDbEntries();
                             S.meta64.loadAnonPageHome(state);
                         });
                 }
@@ -145,7 +148,7 @@ export class User implements UserIntf {
     deleteAllUserLocalDbEntries = (): Promise<any> => {
         return Promise.all([
             //S.localDB.setVal(C.LOCALDB_LOGIN_USR, null),
-            //S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null),
+            S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null),
             S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null)
         ]);
     }
@@ -207,16 +210,13 @@ export class User implements UserIntf {
                 } else {
                     console.log("LocalDb login failed.");
 
+                    //if we tried a login and it wasn't from a login dialog then just blow away the login state
+                    //so that any kind of page refresh is guaranteed to just show login dialog and not try to login                    
+                    await this.deleteAllUserLocalDbEntries();
+
                     //location.reload();
                     if (!calledFromLoginDlg) {
-                        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null);
                         S.nav.login(state);
-                    }
-                    else {
-                        //if we tried a login and it wasn't from a login dialog then just blow away the login state
-                        //so that any kind of page refresh is guaranteed to just show login dialog and not try to login
-                        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null);
-                        //await this.deleteAllUserLocalDbEntries();
                     }
                 }
             }

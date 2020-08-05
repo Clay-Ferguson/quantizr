@@ -264,8 +264,6 @@ public class AppController implements ErrorController {
 			// an 'n=' style url if this node is named
 			// so we will need to change that to the path format.
 			@RequestParam(value = "n", required = false) String name, //
-
-			@RequestParam(value = "signupCode", required = false) String signupCode, //
 			@RequestParam(value = "passCode", required = false) String passCode, //
 			Model model) {
 
@@ -273,10 +271,6 @@ public class AppController implements ErrorController {
 			// log.debug("AppController.index: sessionUser=" +
 			// sessionContext.getUserName());
 			model.addAttribute("cacheBuster", cacheBuster);
-
-			if (signupCode != null) {
-				userManagerService.processSignupCode(signupCode);
-			}
 
 			// Node Names are identified using a colon in front of it, to make it detectable
 			if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
@@ -322,7 +316,8 @@ public class AppController implements ErrorController {
 	 * https://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html
 	 */
 	@RequestMapping(value = { "/" })
-	public String welcome(Model model) {
+	public String welcome(@RequestParam(value = "signupCode", required = false) String signupCode, //
+			Model model) {
 		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 			synchronized (welcomeMapLock) {
 				HashMap<String, String> newMap = new HashMap<String, String>();
@@ -330,6 +325,11 @@ public class AppController implements ErrorController {
 				newMap.put("cacheBuster", cacheBuster);
 				welcomeMap = newMap;
 			}
+		}
+
+		if (signupCode != null) {
+			String signupResponse = userManagerService.processSignupCode(signupCode);
+			model.addAttribute("signupResponse", signupResponse);
 		}
 
 		/*
@@ -889,11 +889,6 @@ public class AppController implements ErrorController {
 		return callProc.run("getNotifications", req, session, ms -> {
 			GetServerInfoResponse res = new GetServerInfoResponse();
 			res.setMessages(new LinkedList<InfoMessage>());
-
-			if (sessionContext.getSignupSuccessMessage() != null) {
-				res.getMessages().add(new InfoMessage(sessionContext.getSignupSuccessMessage(), null));
-				sessionContext.setSignupSuccessMessage(null);
-			}
 
 			if (sessionContext.getError() != null) {
 				res.getMessages().add(new InfoMessage(sessionContext.getError(), null));

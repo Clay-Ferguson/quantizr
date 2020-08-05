@@ -54,8 +54,6 @@ public class SessionContext {
 
 	private UserPreferences userPreferences;
 
-	private String signupSuccessMessage;
-
 	/* Note: this object is Session-specific to the timezone will be per user */
 	private SimpleDateFormat dateFormat;
 
@@ -206,14 +204,6 @@ public class SessionContext {
 
 	public void setHttpSessionToInvalidate(HttpSession httpSessionToInvalidate) {
 		this.httpSessionToInvalidate = httpSessionToInvalidate;
-	}
-
-	public String getSignupSuccessMessage() {
-		return signupSuccessMessage;
-	}
-
-	public void setSignupSuccessMessage(String signupSuccessMessage) {
-		this.signupSuccessMessage = signupSuccessMessage;
 	}
 
 	public String getError() {

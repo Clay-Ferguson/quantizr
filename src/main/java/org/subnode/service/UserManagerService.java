@@ -319,51 +319,40 @@ public class UserManagerService {
 	 * means user has clicked the link they were sent during the signup email
 	 * verification, and they are sending in a signupCode that will turn on their
 	 * account and actually create their account.
+	 * 
+	 * We return whatever a message would be to the user that just says if the signupCode
+	 * was accepted or not and it's displayed on welcome.html only.
 	 */
-	public void processSignupCode(final String signupCode /*, final Model model*/) {
+	public String processSignupCode(final String signupCode) {
 		log.debug("User is trying signupCode: " + signupCode);
+		final ValContainer<String> valContainer = new ValContainer<String>(null);
 		adminRunner.run(session -> {
+			// signupCode is just the new account node id? I guess that's secure, if user has this value it's the only user
+			// who could possibly know this unguessable value.
 			SubNode node = api.getNode(session, signupCode);
 
 			if (node != null) {
 				if (!node.getBooleanProp(NodeProp.SIGNUP_PENDING.s())) {
-					throw ExUtil.wrapEx("Signup was already completed.");
+					valContainer.setVal("Signup Complete. You may login now.");
+					return;
 				}
 
 				String userName = node.getStringProp(NodeProp.USER.s());
 
 				if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName)) {
-					throw new RuntimeEx("processSignupCode should not be called fror admin user.");
+					valContainer.setVal("processSignupCode should not be called for admin user.");
+					return;
 				}
-
-				// // Currently we just store password on server in cleartext (security isn't a
-				// priority yet on the platform),
-				// // and we will never go back to even encrypting the password. The modern best
-				// practice for this is to store
-				// // a hash of the password only so that even the server itself doesn't know
-				// what the actual password is.
-				// // password = encryptor.decrypt(password);
-
-				// String email = node.getStringProp(NodeProp.EMAIL);
-
-				// I'm leaving this here commented, but it was the bug where two user nodes
-				// got created!
-				// initNewUser(session, userName, password, email, false);
-
-				/*
-				 * allow JavaScript to detect all it needs to detect which is to display a
-				 * message to user saying the signup is complete.
-				 */
-				//model.addAttribute("signupCode", "ok");
 
 				node.deleteProp(NodeProp.SIGNUP_PENDING.s());
 				api.save(session, node);
 
-				sessionContext.setSignupSuccessMessage("Signup Successful. You may login now.");
+				valContainer.setVal("Signup Successful. You may login now.");
 			} else {
-				throw ExUtil.wrapEx("Signup Code is invalid.");
+				valContainer.setVal("Signup Code is invalid.");
 			}
 		});
+		return valContainer.getVal();
 	}
 
 	public void initNewUser(MongoSession session, String userName, String password, String email, boolean automated) {
