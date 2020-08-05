@@ -1,11 +1,15 @@
 package org.subnode.mongo;
 
 import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.bson.types.ObjectId;
 import org.subnode.mongo.model.SubNode;
 
 public class MongoThreadLocal {
+	private static final Logger log = LoggerFactory.getLogger(MongoThreadLocal.class);
+
 	/*
 	 * This is where we can accumulate a series of nodes that will all be updated
 	 * after processing is done using the api.sessionSave() call. This is not true
@@ -14,6 +18,10 @@ public class MongoThreadLocal {
 	 * is because we can use a pattern that wraps the 'api.sessionSave()' in a
 	 * finally block somewhere and use that to make sure all work ever done (Node
 	 * property updates, etc) gets 'committed'
+	 * 
+	 * update: todo-0: this is not work able, because of the potentiality of that
+	 * "last saved node wins" issue where multiple copies of same node CAN be in
+	 * memory and then if saved in wrong order that's a bug.
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<HashMap<ObjectId, SubNode>>();
 
@@ -26,6 +34,7 @@ public class MongoThreadLocal {
 	private static final ThreadLocal<HashMap<String, Boolean>> aclResults = new ThreadLocal<HashMap<String, Boolean>>();
 
 	public static void removeAll() {
+		//log.debug("Clear Dirty Nodes.");
 		getDirtyNodes().clear();
 		getAclResults().clear();
 	}
@@ -47,16 +56,27 @@ public class MongoThreadLocal {
 	 * dirty, because this would be a BUG always. The last one written would
 	 * overwrite, so this means if we are working on updating two object instances
 	 * of the same 'node id' at once that is a BUG for sure.
+	 * 
+	 * todo-1: Welp. 8/4/2020 it just happened.
 	 */
 	public static void dirty(SubNode node) {
 		if (node.getId() == null) {
 			return;
 		}
+
+		// this needs thought. was temporary, will keep. todo-0
+		// SubNode nodeFound = getDirtyNodes().get(node.getId());
+		// if (nodeFound != null && nodeFound.hashCode() != node.hashCode()) {
+		// 	log.debug("*************** oops multiple instance of object:" + node.getId().toHexString()
+		// 			+ " are apparently in memory. Ignoring attempt to set the second one to dirty");
+		// 	return;
+		// }
 		getDirtyNodes().put(node.getId(), node);
 	}
 
 	/* Opposite of dirty */
 	public static void clean(SubNode node) {
+		//log.debug("Removing from Dirty: " + node.getId().toHexString());
 		getDirtyNodes().remove(node.getId());
 	}
 

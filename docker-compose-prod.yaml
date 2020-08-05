@@ -30,7 +30,7 @@ services:
         #     - '8080'
         #     - '5001'
         volumes:
-           - '${ipfs_staging}:/export'
+            - '${ipfs_staging}:/export'
             - '${ipfs_data}:/data/ipfs'
         ports:
             - "4001:4001"
@@ -83,8 +83,10 @@ services:
             spring.servlet.multipart.max-file-size: "200MB"
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/subnode-tmp" 
+            
             # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+            
             ipfs.host: "http://ipfs:5001"
             enableRssDaemon: "false"
 

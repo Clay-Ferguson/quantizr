@@ -70,8 +70,8 @@ public class IPFSService {
     private AttachmentService attachmentService;
 
     /**
-     * Looks up quanta node by 'nodeId', and gets the 'ipfs:link' property, which
-     * is used to retrieve the MerkleNode (as JSON), and then pretty prints it and
+     * Looks up quanta node by 'nodeId', and gets the 'ipfs:link' property, which is
+     * used to retrieve the MerkleNode (as JSON), and then pretty prints it and
      * returns it.
      */
     public final String getNodeInfo(MongoSession session, String nodeId) {
@@ -176,7 +176,8 @@ public class IPFSService {
         return ret;
     }
 
-    public String addFromStream(MongoSession session, InputStream stream, String mimeType, ValContainer<Integer> streamSize) {
+    public String addFromStream(MongoSession session, InputStream stream, String mimeType,
+            ValContainer<Integer> streamSize) {
         String hash = null;
         try {
             // https://docs-beta.ipfs.io/reference/http/api
@@ -198,8 +199,10 @@ public class IPFSService {
                     new TypeReference<Map<String, Object>>() {
                     });
 
+            //log.debug("respMap=" + XString.prettyPrint(respMap));
+
             hash = (String) respMap.get("Hash");
-            streamSize.setVal((int)lis.getCount());
+            streamSize.setVal((int) lis.getCount());
             // the following other values are supposedly in the return...
             // {
             // "Bytes": "<int64>",
@@ -229,8 +232,9 @@ public class IPFSService {
 
             request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
             HttpResponse response = client.execute(request);
-            //log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
-            //        + response.getStatusLine().getReasonPhrase());
+            // log.debug("Response Code: " + response.getStatusLine().getStatusCode() + "
+            // reason="
+            // + response.getStatusLine().getReasonPhrase());
             InputStream is = response.getEntity().getContent();
             return is;
         } catch (Exception e) {

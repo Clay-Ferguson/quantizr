@@ -52,6 +52,7 @@ import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
+import org.subnode.util.XString;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -390,7 +391,7 @@ public class AttachmentService {
 			}
 		}
 
-		// log.debug("Saving node with upload: "+XString.prettyPrint(node));
+		//log.debug("Saving node with upload: "+XString.prettyPrint(node));
 		api.save(session, node);
 	}
 
@@ -1011,7 +1012,7 @@ public class AttachmentService {
 		api.auth(session, node, PrivilegeType.WRITE);
 		ValContainer<Integer> streamSize = new ValContainer<Integer>();
 		String ipfsHash = ipfsService.addFromStream(session, stream, mimeType, streamSize);
-		node.setProp(NodeProp.IPFS_LINK.s(), new SubNodePropVal(ipfsHash));
+		node.setProp(NodeProp.IPFS_LINK.s(), ipfsHash); 
 		node.setProp(NodeProp.BIN_SIZE.s(), streamSize.getVal());
 	}
 

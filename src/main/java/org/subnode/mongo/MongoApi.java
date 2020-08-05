@@ -345,6 +345,7 @@ public class MongoApi {
 				}
 
 				for (SubNode node : nodes) {
+					//log.debug("saveSession: Saving Dirty. nodeId=" + node.getId().toHexString());
 					save(session, node, false);
 				}
 			}
@@ -778,13 +779,14 @@ public class MongoApi {
 	public SubNode getNodeByName(MongoSession session, String name, boolean allowAuth) {
 		Query query = new Query();
 
-		//log.debug("getNodeByName: " + name);
+		// log.debug("getNodeByName: " + name);
 
 		ObjectId nodeOwnerId;
 		int colonIdx = -1;
 		if ((colonIdx = name.indexOf(":")) == -1) {
 			nodeOwnerId = systemRootNode.getOwner();
-			//log.debug("no leading colon, so this is expected to have admin owner=" + nodeOwnerId.toHexString());
+			// log.debug("no leading colon, so this is expected to have admin owner=" +
+			// nodeOwnerId.toHexString());
 		} else {
 			String userName = name.substring(0, colonIdx);
 
@@ -802,7 +804,7 @@ public class MongoApi {
 		SubNode ret = ops.findOne(query, SubNode.class);
 
 		// if (ret != null) {
-		// 	log.debug("Node found: id=" + ret.getId().toHexString());
+		// log.debug("Node found: id=" + ret.getId().toHexString());
 		// }
 
 		if (allowAuth) {

@@ -160,15 +160,16 @@ export class Render implements RenderIntf {
             }));
         }
 
-        let attachmentIpfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
-        if (attachmentIpfsLink) {
-            url = S.render.getUrlForNodeAttachment(node, true);
-            children.push(new Heading(5, "IPFS File Attachment"));
-            children.push(new Anchor(url, url, {
-                target: "_blank",
-                className: "anchorBigMarginBottom"
-            }));
-        }
+        // Disabling this for now since the Quanta server doesn't directly expose it's Gateway to the outside world.
+        // let attachmentIpfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+        // if (attachmentIpfsLink) {
+        //     url = S.render.getUrlForNodeAttachment(node, true);
+        //     children.push(new Heading(5, "IPFS File Attachment"));
+        //     children.push(new Anchor(url, url, {
+        //         target: "_blank",
+        //         className: "anchorBigMarginBottom"
+        //     }));
+        // }
 
         let jsonIpfsLink = S.props.getNodePropVal(J.NodeProp.JSON_HASH, node);
         if (jsonIpfsLink) {

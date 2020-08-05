@@ -1,7 +1,5 @@
 package org.subnode.mongo;
 
-import java.util.Date;
-
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
@@ -58,8 +56,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	 */
 	@Override
 	public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
-		// log.debug("MONGO SAVE EVENT.");
 		SubNode node = event.getSource();
+		//log.debug("MONGO SAVE EVENT: "+XString.prettyPrint(node));
 
 		Document dbObj = event.getDocument();
 		ObjectId id = node.getId();

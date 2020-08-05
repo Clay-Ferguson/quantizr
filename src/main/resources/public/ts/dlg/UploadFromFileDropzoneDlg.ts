@@ -8,7 +8,6 @@ import { Form } from "../widget/Form";
 import { Constants as C, Constants } from "../Constants";
 import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
-import { TextContent } from "../widget/TextContent";
 import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Checkbox } from "../widget/Checkbox";
@@ -66,7 +65,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         }
                     })
                 ]),
-                state.toIpfs ? new TextContent("NOTE: IPFS Uploads assume you have a Temporal Account (https://temporal.cloud) which will be the service that hosts your IPFS data. You'll be prompted for the Temporal password when the upload begins.") : null,
+                //sorry Temporal guys no longer needing you.
+                //state.toIpfs ? new TextContent("NOTE: IPFS Uploads assume you have a Temporal Account (https://temporal.cloud) which will be the service that hosts your IPFS data. You'll be prompted for the Temporal password when the upload begins.") : null,
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 new ButtonBar([
@@ -285,8 +285,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }
                     //S.log("Uploaded to Hash: " + ipfsHash);
 
+                    //todo-0: case with IPFS (via Quanta Gateway) and multiple files needs testing and is likely not functional.
+
                     //https://developer.mozilla.org/en-US/docs/Web/API/File
-                    if (dlg.getState().toIpfs) {
+                    if (dlg.getState().toIpfs && this.toTemporal) {
                         let ipfsHash = resp.response;
 
                         //If we're uploading multipe files they all go in as children of the current node
