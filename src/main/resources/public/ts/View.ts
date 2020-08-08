@@ -3,7 +3,6 @@ import { Singletons } from "./Singletons";
 import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import { ViewIntf } from "./intf/ViewIntf";
-import { GraphDisplayDlg } from "./dlg/GraphDisplayDlg";
 import { AppState } from "./AppState";
 import { fastDispatch } from "./AppRedux";
 import { InboxNotifyDlg } from "./dlg/InboxNotifyDlg";
@@ -214,11 +213,6 @@ export class View implements ViewIntf {
                 resolve();
             }, 250);
         });
-    }
-
-    graphDisplayTest = (state: AppState) => {
-        let dlg = new GraphDisplayDlg(state);
-        dlg.open();
     }
 
     runServerCommand = (command: string, dlgTitle: string, dlgDescription: string, state: AppState) => {

@@ -13,6 +13,5 @@ export interface ViewIntf {
     scrollToSelectedNode(state: AppState): void;
     scrollToTop(afterFunc?: Function): Promise<void>;
     runServerCommand(command: string, dlgTitle: string, dlgDescription: string, state: AppState): any;
-    graphDisplayTest(state: AppState): any;
     displayNotifications(command: string, state: AppState): any;
 }

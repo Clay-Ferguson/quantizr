@@ -21,12 +21,5 @@ export class ActivityPub implements ActivityPubIntf {
     }
 
     private activityPubPostResponse = (res: J.ActivityPubPostResponse): void => {
-        //console.log("ExecuteNodeResponse running.");
-
-        // S.util.checkSuccess("Execute Node", res);
-        // S.util.showMessage(res.output, true, "modal-lg");
-        // S.view.refreshTree(null, false, null, false, false, null);
-        // S.meta64.selectTab("mainTab");
-        // S.view.scrollToSelectedNode(null);
     }
 }

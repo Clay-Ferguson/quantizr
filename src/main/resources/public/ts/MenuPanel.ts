@@ -108,13 +108,6 @@ export class MenuPanel extends Div {
             // new MenuItem("Edit Node Sharing", () => S.share.editNodeSharing(state), //
             //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
 
-            // new MenuItem("Post Node", () => { S.activityPub.postNode(); },//
-            //     () => {
-            //         return "ramrod" == S.meta64.userName.toLowerCase() ||
-            //             "admin" == S.meta64.userName.toLowerCase();
-            //         //!state.isAnonUser && highlightNode != null && selNodeIsMine 
-            //     }),
-
             new MenuItem("Show All Shares", () => S.share.findSharedNodes(state, null), //
                 !state.isAnonUser && !!highlightNode),
 
@@ -226,7 +219,6 @@ export class MenuPanel extends Div {
 
         if (state.isAdminUser) {
             children.push(new Menu("Admin", [
-                //new MenuItem("Graph Display Test", () => {S.view.graphDisplayTest()}), //
                 new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", "Server Info", null, state)), //
                 new MenuItem("Compact DB", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
 

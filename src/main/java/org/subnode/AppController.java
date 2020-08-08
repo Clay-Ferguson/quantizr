@@ -198,9 +198,6 @@ public class AppController implements ErrorController {
 	@Autowired
 	private LuceneService luceneService;
 
-	// @Autowired
-	// private ActivityPubService actPubService;
-
 	@Autowired
 	private IPFSService ipfsService;
 
@@ -988,26 +985,6 @@ public class AppController implements ErrorController {
 			return nodeEditService.splitNode(ms, req);
 		});
 	}
-
-	// Work on ActivityPub is 'on hold' for now.
-	// @RequestMapping(value = API_PATH + "/activityPubPost", method =
-	// RequestMethod.POST)
-	// public @ResponseBody ResponseBase activityPubPost(@RequestBody
-	// ActivityPubPostRequest req, HttpSession session) {
-	// return (ResponseBase) callProc.run("activityPubPost", req, session, ms -> {
-	// ActivityPubPostResponse res = new ActivityPubPostResponse();
-	// String nodeId = req.getNodeId();
-	// SubNode node = api.getNode(ms, nodeId);
-	// if (node != null) {
-	// log.debug("found node to post: " + nodeId);
-	// String content = node.getStringProp(NodeProp.CONTENT);
-	// String destination = node.getStringProp("apdest");
-
-	// actPubService.sendMessage(content, destination);
-	// }
-	// return res;
-	// });
-	// }
 
 	//
 	// @RequestMapping(value = API_PATH + "/openSystemFile", method =

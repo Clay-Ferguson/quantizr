@@ -486,11 +486,6 @@ export interface TransferNodeResponse extends ResponseBase {
 export interface UploadFromUrlResponse extends ResponseBase {
 }
 
-export interface WebFingerAcctResourceResponse {
-    subject: string;
-    links: WebFingerLink[];
-}
-
 export interface ResponseBase {
     success: boolean;
     message: string;
@@ -554,12 +549,6 @@ export interface GraphNode {
 export interface GraphEdge {
     to: string;
     from: string;
-}
-
-export interface WebFingerLink {
-    rel: string;
-    type: string;
-    href: string;
 }
 
 export interface PrivilegeInfo {
