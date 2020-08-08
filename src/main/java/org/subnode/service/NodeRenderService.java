@@ -549,7 +549,7 @@ public class NodeRenderService {
 	public String getImageUrl(SubNode node) {
 		String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK);
 		if (ipfsLink != null) {
-			return Const.IPFS_GATEWAY + ipfsLink;
+			return Const.IPFS_IO_GATEWAY + ipfsLink;
 		}
 
 		String bin = node.getStringProp(NodeProp.BIN);

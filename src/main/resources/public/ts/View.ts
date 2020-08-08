@@ -221,7 +221,7 @@ export class View implements ViewIntf {
         dlg.open();
     }
 
-    runServerCommand = (command: string, state: AppState) => {
+    runServerCommand = (command: string, dlgTitle: string, dlgDescription: string, state: AppState) => {
         let node = S.meta64.getHighlightedNode(state);
 
         S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
@@ -239,7 +239,13 @@ export class View implements ViewIntf {
                             m.message += "<br>Build Time: " + BUILDTIME;
                             m.message += "<br>Profile: " + PROFILE;
                         }
-                        S.util.showMessage(m.message, "Command Complete", true);
+                        
+                        /* For now just prefix description onto the text. This will be made 'prettier' later todo-1 */
+                        if (dlgDescription) {
+                            m.message = dlgDescription + "\n\n" + m.message;
+                        }
+
+                        S.util.showMessage(m.message, dlgTitle || "Server Reply", true);
                     });
                 }
             });

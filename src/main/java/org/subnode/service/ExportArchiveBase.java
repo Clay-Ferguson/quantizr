@@ -256,7 +256,7 @@ public abstract class ExportArchiveBase {
 				 * fullsize
 				 */
 				imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + nodeId + "-" + binFileNameStr)
-						: (Const.IPFS_GATEWAY + ipfsLink);
+						: (Const.IPFS_IO_GATEWAY + ipfsLink);
 			}
 
 			if (imgUrl != null) {

@@ -10,6 +10,8 @@ export class Constants {
 
     //note: this constant is in a Java class also
     static readonly IPFS_GATEWAY: string = "https://gateway.temporal.cloud/ipfs/";
+
+    static readonly IPFS_IO_GATEWAY: string = "https://gateway.ipfs.io/ipfs/";
     
     static readonly TEMPORAL_HOST: string = "https://api.temporal.cloud";
 

@@ -158,7 +158,7 @@ export class MenuPanel extends Div {
 
             new MenuItem("Show URL", () => S.render.showNodeUrl(null, state), !!highlightNode), //
 
-            new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", state), //
+            new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", state), //
                 !state.isAnonUser && selNodeIsMine), //
         ]));
         //need to make export safe for end users to use (recarding file sizes)
@@ -202,7 +202,7 @@ export class MenuPanel extends Div {
         if (state.isAdminUser) {
             children.push(new Menu("IPFS", [
 
-                new MenuItem("Display Node Info", () => S.view.runServerCommand("ipfsGetNodeInfo", state), //
+                new MenuItem("Display Node Info", () => S.view.runServerCommand("ipfsGetNodeInfo", "IPFS Node Info", null, state), //
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)),
 
                 new MenuItem("Force Refresh", () => {
@@ -220,18 +220,18 @@ export class MenuPanel extends Div {
                 //     () => { return state.isAdminUser },
                 //     () => { return state.isAdminUser }
                 // ),
-                new MenuItem("Refresh Index", () => S.view.runServerCommand("refreshLuceneIndex", state)),
+                new MenuItem("Refresh Index", () => S.view.runServerCommand("refreshLuceneIndex", null, null, state)),
             ]));
         }
 
         if (state.isAdminUser) {
             children.push(new Menu("Admin", [
                 //new MenuItem("Graph Display Test", () => {S.view.graphDisplayTest()}), //
-                new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", state)), //
-                new MenuItem("Compact DB", () => S.view.runServerCommand("compactDb", state)), //
+                new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", "Server Info", null, state)), //
+                new MenuItem("Compact DB", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
 
-                new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", state)), //
-                new MenuItem("Reset Public Node", () => S.view.runServerCommand("initializeAppContent", state)), //
+                new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
+                new MenuItem("Reset Public Node", () => S.view.runServerCommand("initializeAppContent", null, null, state)), //
                 new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(state)),
 
                 new MenuItem("Rebuild Indexes", () => S.meta64.rebuildIndexes()),

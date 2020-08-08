@@ -173,7 +173,7 @@ export class Render implements RenderIntf {
 
         let jsonIpfsLink = S.props.getNodePropVal(J.NodeProp.JSON_HASH, node);
         if (jsonIpfsLink) {
-            url = C.IPFS_GATEWAY + jsonIpfsLink;
+            url = C.IPFS_IO_GATEWAY + jsonIpfsLink;
             children.push(new Heading(5, "IPFS Node JSON"));
             children.push(new Anchor(url, url, {
                 target: "_blank",
@@ -349,7 +349,7 @@ export class Render implements RenderIntf {
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
         let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
         if (ipfsLink) {
-            return C.IPFS_GATEWAY + ipfsLink;
+            return C.IPFS_IO_GATEWAY + ipfsLink;
         }
 
         let bin = S.props.getNodePropVal(J.NodeProp.BIN, node);
