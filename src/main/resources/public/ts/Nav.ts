@@ -334,6 +334,7 @@ export class Nav implements NavIntf {
             type: "Action_CloseFullScreenImgViewer",
             update: (s: AppState): void => {
                 s.fullScreenViewId = null;
+                s.fullScreenGraphId = null;
             },
         });
     }

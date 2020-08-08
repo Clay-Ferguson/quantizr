@@ -57,28 +57,30 @@ export class MainNavPanel extends NavTag {
             ]));
         }
 
-        if (state.fullScreenViewId) {
+        if (state.fullScreenViewId || state.fullScreenGraphId) {
 
-            if (S.nav.getAdjacentNode("prev", state)) {
-                buttons.push(new Li(null, {
-                    className: "nav-item"
-                }, [
-                    new IconButton("fa-angle-left fa-lg", "", {
-                        onClick: e => { S.nav.prevFullScreenImgViewer(state); },
-                        title: "View Previous Node (or left arrow key)"
-                    }, "nav-link", "off")
-                ]));
-            }
+            if (state.fullScreenViewId) {
+                if (S.nav.getAdjacentNode("prev", state)) {
+                    buttons.push(new Li(null, {
+                        className: "nav-item"
+                    }, [
+                        new IconButton("fa-angle-left fa-lg", "", {
+                            onClick: e => { S.nav.prevFullScreenImgViewer(state); },
+                            title: "View Previous Node (or left arrow key)"
+                        }, "nav-link", "off")
+                    ]));
+                }
 
-            if (S.nav.getAdjacentNode("next", state)) {
-                buttons.push(new Li(null, {
-                    className: "nav-item"
-                }, [
-                    new IconButton("fa-angle-right fa-lg", "", {
-                        onClick: e => { S.nav.nextFullScreenImgViewer(state); },
-                        title: "View Next Node (or right arrow key)"
-                    }, "nav-link", "off")
-                ]));
+                if (S.nav.getAdjacentNode("next", state)) {
+                    buttons.push(new Li(null, {
+                        className: "nav-item"
+                    }, [
+                        new IconButton("fa-angle-right fa-lg", "", {
+                            onClick: e => { S.nav.nextFullScreenImgViewer(state); },
+                            title: "View Next Node (or right arrow key)"
+                        }, "nav-link", "off")
+                    ]));
+                }
             }
 
             buttons.push(new Li(null, {

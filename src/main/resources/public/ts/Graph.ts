@@ -29,6 +29,6 @@ export class Graph implements GraphIntf {
 
         //graphPanel var went away. This will have to be done with AppState now.
         //S.meta64.graphPanel.setGraphData({nodes: res.nodes, edges: res.edges});
-        S.meta64.selectTab("graphTab");
+        //S.meta64.selectTab("graphTab");
     }
 }

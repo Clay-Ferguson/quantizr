@@ -11,6 +11,8 @@ import clientInfo from "../ClientInfo";
 import { AppState } from "../AppState";
 import { useSelector, useDispatch } from "react-redux";
 import { FullScreenImgViewer } from "./FullScreenImgViewer";
+import { Comp } from "./base/Comp";
+import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
 
 //todo-1: everywhere in the app that calls 'store.getState()' is highly suspicious becasue userSelector should be used most of the time
 
@@ -40,13 +42,19 @@ export class App extends Div {
             return;
         }
 
+        let fullScreenViewer: Comp = null;
+        if (appState.fullScreenViewId) {
+            fullScreenViewer = new FullScreenImgViewer();
+        }
+        else if (appState.fullScreenGraphId) {
+            fullScreenViewer = new FullScreenGraphViewer();
+        }
+
         this.setChildren([
             new Div(null, { role: "toolbar" }, [new MainNavPanel(null)]),
             //For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
             //both get sized right with no overlapping.
-            appState.fullScreenViewId ? //
-
-            new FullScreenImgViewer() :
+            fullScreenViewer ||
             new Main({ role: "main", className: clientInfo.isMobile ? "container" : "container-fluid" }, [
                 new Div(null, {
                     className: "row",

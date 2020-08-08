@@ -129,17 +129,6 @@ export class TabPanel extends Div {
                         }
                     })]
                 ),
-
-                    // This works perfectly, but isn't ready to deploy yet.
-                    // new Li(null, {
-                    //     className: "nav-item",
-                    // },
-                    //     [new Anchor("#graphTab", "Graph", {
-                    //         "data-toggle": "tab",
-                    //         className: "nav-link",
-                    //         onClick: () => S.meta64.rebuildTab("graphTab")
-                    //     })]
-                    // )
                 ]
             )]
         );
@@ -154,19 +143,7 @@ export class TabPanel extends Div {
             new SearchView(),
             new TimelineView(),
             new FeedView(),
-
-            // This works perfectly, but isn't ready to deploy yet.
-            // //GRAPH TAB
-            // //------------
-            // new Div(null, {
-            //     id: "graphTab",
-            //     className: "tab-pane fade"
-            // }, [
-            //         new GraphPanel()
-            //     ]
-            // )
-        ]
-        );
+        ]);
 
         this.setChildren([
             tabButtons, tabContent
