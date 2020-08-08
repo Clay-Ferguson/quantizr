@@ -64,7 +64,7 @@ export class MainNavPanel extends NavTag {
                     className: "nav-item"
                 }, [
                     new IconButton("fa-angle-left fa-lg", "", {
-                        onClick: e => { S.nav.prevFullScreenViewer(state); },
+                        onClick: e => { S.nav.prevFullScreenImgViewer(state); },
                         title: "View Previous Node (or left arrow key)"
                     }, "nav-link", "off")
                 ]));
@@ -75,7 +75,7 @@ export class MainNavPanel extends NavTag {
                     className: "nav-item"
                 }, [
                     new IconButton("fa-angle-right fa-lg", "", {
-                        onClick: e => { S.nav.nextFullScreenViewer(state); },
+                        onClick: e => { S.nav.nextFullScreenImgViewer(state); },
                         title: "View Next Node (or right arrow key)"
                     }, "nav-link", "off")
                 ]));
@@ -85,7 +85,7 @@ export class MainNavPanel extends NavTag {
                 className: "nav-item"
             }, [
                 new IconButton("fa-window-close fa-lg", "Close", {
-                    onClick: e => { S.nav.closeFullScreenViewer(state); },
+                    onClick: e => { S.nav.closeFullScreenImgViewer(state); },
                     title: "Close Viewer (or escape key)"
                 }, "nav-link", "off")
             ]));

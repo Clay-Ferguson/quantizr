@@ -329,21 +329,21 @@ export class Nav implements NavIntf {
         S.srch.timeline("mtm", state);
     }
 
-    closeFullScreenViewer = (appState: AppState): void => {
+    closeFullScreenImgViewer = (appState: AppState): void => {
         dispatch({
-            type: "Action_CloseFullScreenViewer",
+            type: "Action_CloseFullScreenImgViewer",
             update: (s: AppState): void => {
                 s.fullScreenViewId = null;
             },
         });
     }
 
-    prevFullScreenViewer = (appState: AppState): void => {
+    prevFullScreenImgViewer = (appState: AppState): void => {
         let prevNode: J.NodeInfo = this.getAdjacentNode("prev", appState);
 
         if (prevNode) {
             dispatch({
-                type: "Action_PrevFullScreenViewer",
+                type: "Action_PrevFullScreenImgViewer",
                 update: (s: AppState): void => {
                     s.fullScreenViewId = prevNode.id;
                 },
@@ -351,12 +351,12 @@ export class Nav implements NavIntf {
         }
     }
 
-    nextFullScreenViewer = (appState: AppState): void => {
+    nextFullScreenImgViewer = (appState: AppState): void => {
         let nextNode: J.NodeInfo = this.getAdjacentNode("next", appState);
 
         if (nextNode) {
             dispatch({
-                type: "Action_NextFullScreenViewer",
+                type: "Action_NextFullScreenImgViewer",
                 update: (s: AppState): void => {
                     s.fullScreenViewId = nextNode.id;
                 },

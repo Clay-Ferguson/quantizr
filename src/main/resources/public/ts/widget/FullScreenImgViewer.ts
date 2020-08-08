@@ -12,7 +12,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class FullScreenViewer extends Main {
+
+export class FullScreenImgViewer extends Main {
 
     constructor() {
         super();

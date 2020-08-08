@@ -10,7 +10,7 @@ import { RightNavPanel } from "./RightNavPanel";
 import clientInfo from "../ClientInfo";
 import { AppState } from "../AppState";
 import { useSelector, useDispatch } from "react-redux";
-import { FullScreenViewer } from "./FullScreenViewer";
+import { FullScreenImgViewer } from "./FullScreenImgViewer";
 
 //todo-1: everywhere in the app that calls 'store.getState()' is highly suspicious becasue userSelector should be used most of the time
 
@@ -45,7 +45,8 @@ export class App extends Div {
             //For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
             //both get sized right with no overlapping.
             appState.fullScreenViewId ? //
-            new FullScreenViewer() :
+
+            new FullScreenImgViewer() :
             new Main({ role: "main", className: clientInfo.isMobile ? "container" : "container-fluid" }, [
                 new Div(null, {
                     className: "row",

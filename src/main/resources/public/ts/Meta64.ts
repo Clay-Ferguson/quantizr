@@ -360,7 +360,7 @@ export class Meta64 implements Meta64Intf {
                 switch (event.code) {
                     case "Escape":
                         if (state.fullScreenViewId) {
-                            S.nav.closeFullScreenViewer(state);
+                            S.nav.closeFullScreenImgViewer(state);
                         }
                         break;
 
@@ -380,7 +380,7 @@ export class Meta64 implements Meta64Intf {
                         if (this.keyDebounce()) return;
                         //S.nav.navUpLevel();
                         if (state.fullScreenViewId) {
-                            S.nav.prevFullScreenViewer(state);
+                            S.nav.prevFullScreenImgViewer(state);
                         }
                         break;
 
@@ -389,7 +389,7 @@ export class Meta64 implements Meta64Intf {
                         state = store.getState();
                         //S.nav.navOpenSelectedNode(state);
                         if (state.fullScreenViewId) {
-                            S.nav.nextFullScreenViewer(state);
+                            S.nav.nextFullScreenImgViewer(state);
                         }
                         break;
 
