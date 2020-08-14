@@ -162,7 +162,7 @@ public class OutboxMgr {
 				// trim to 280 like twitter.
 				String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
 
-				String content = String.format("#### **%s** " + notifyMessage + "\n\n%s?id=%s\n\n%s",
+				String content = String.format("#### **%s** " + notifyMessage + "\n\n%s/app?id=%s\n\n%s",
 						sessionContext.getUserName(), constProvider.getHostAndPort(), node.getId().toHexString(),
 						shortContent);
 
@@ -190,7 +190,7 @@ public class OutboxMgr {
 		log.debug("sending email to: " + email + " because his node was appended under.");
 
 		String content = String.format("User '%s' replied to you.<p>\n\n" + //
-				"%s?id=%s", userName, constProvider.getHostAndPort(), node.getId().toHexString());
+				"%s/app?id=%s", userName, constProvider.getHostAndPort(), node.getId().toHexString());
 
 		queueMailUsingAdminSession(session, email, "New SubNode Notification", content);
 	}

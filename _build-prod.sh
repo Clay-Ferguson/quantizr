@@ -1,4 +1,12 @@
 #!/bin/bash
+
+if [ -z "$quanta_domain" ]
+then
+      echo "\$quanta_domain is empty. Don't run this batch file directly. It's run from other files."
+      sleep 6
+      exit
+fi
+
 clear
 source ./setenv.sh
 source ./define-functions.sh
@@ -16,15 +24,11 @@ cd $PRJROOT
 docker-compose -f docker-compose-dev.yaml down --remove-orphans
 verifySuccess "Docker Compose (dev): down"
 
-cp ./docker-compose-prod.yaml ~/ferguson/scripts/linode/docker-compose-prod.yaml
-cp ./dockerfile-prod          ~/ferguson/scripts/linode/dockerfile-prod
-
-# Wipe some existing stuff to ensure it gets rebuilt
-rm -rf ~/ferguson/scripts/linode/subnode-prod.tar
+# Wipe some existing stuff to ensure with certainty it gets rebuilt
+rm -rf ~/ferguson/scripts/linode/${quanta_domain}/subnode-prod.tar
 rm -rf $PRJROOT/target/*
 rm -rf $PRJROOT/bin/*
 rm -rf $PRJROOT/src/main/resources/public/bundle.js
-rm -rf $PRJROOT/src/main/resources/public/index.html
 
 # Run ignore-scripts for some security from NodeJS
 cd $PRJROOT/src/main/resources/public
@@ -78,5 +82,7 @@ verifySuccess "Docker Compose: build"
 # which can then on the remote server be loaded into registry for user on that host using the following command:
 #     docker load -i <path to image tar file>
 #
-docker save -o ~/ferguson/scripts/linode/subnode-prod.tar subnode-prod
+docker save -o ~/ferguson/scripts/linode/${quanta_domain}/subnode-prod.tar subnode-prod
 verifySuccess "Docker Save"
+
+read -p "Build Complete."

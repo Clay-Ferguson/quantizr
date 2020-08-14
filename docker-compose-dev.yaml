@@ -21,6 +21,8 @@ services:
         #entrypoint: ["mongod","--config","/etc/mongod.conf"]
         ports:
             - '27016:27016'
+        env_file: 
+            - '/home/clay/quanta/secrets/mongo.env'
         networks:
            - net-dev
         # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
@@ -32,6 +34,9 @@ services:
         container_name: ipfs 
         environment:
             # I think some of these env options may be obsolete now?
+            # From go-ipfs github developer: 
+            #    Enabling the "lowpower" profile should help. That will disable background data reproviding, set really 
+            #    low connection manager limits, and put your node into dhtclient mode.
             routing: "dhtclient" 
             IPFS_PROFILE: "server"
             IPFS_PATH: "/data/ipfs"
@@ -78,7 +83,7 @@ services:
             - net-dev
         environment:
             # Can be a comma-delimited list of TestIntf-derived tests to run
-            #runTests: "IPFSTest"
+            # runTests: "ActPubTest"
             
             mongoAdminPassword: "${subnodePassword}"
             reCaptcha3SiteKey: "${reCaptcha3SiteKey}"

@@ -40,16 +40,17 @@ public class AppConfiguration implements WebMvcConfigurer {
 	@Autowired
 	private AppProp appProp;
 
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurer() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**")
-						.allowedOrigins("https://" + appProp.getMetaHost() + ":" + appProp.getServerPort());
-			}
-		};
-	}
+	// todo-0: turned off to test ActivityPub
+	// @Bean
+	// public WebMvcConfigurer corsConfigurer() {
+	// 	return new WebMvcConfigurer() {
+	// 		@Override
+	// 		public void addCorsMappings(CorsRegistry registry) {
+	// 			registry.addMapping("/**")
+	// 					.allowedOrigins("https://" + appProp.getMetaHost() + ":" + appProp.getServerPort());
+	// 		}
+	// 	};
+	// }
 
 	/*
 	 * To avoid error message during startup

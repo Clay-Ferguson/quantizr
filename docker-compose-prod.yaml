@@ -6,11 +6,13 @@ services:
         volumes:
             - '/var/lib/mongodb:/data/db'
             - '/home/clay/quanta-data/mongo-dumps:/mongo-dumps'
-            - '/home/clay/quanta-data/mongo-scripts:/mongo-scripts'
-            - '/home/clay/quanta-data/mongo-conf/mongod.conf:/etc/mongod.conf'
+            - '/home/clay/quanta/mongo-scripts:/mongo-scripts'
+            - '/home/clay/quanta/mongod.conf:/etc/mongod.conf'
         command: mongod --config /etc/mongod.conf
         ports:
             - '27017:27017'
+        env_file: 
+            - '/home/clay/quanta/secrets/mongo.env'
         networks:
             - net-prod
         # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
@@ -21,6 +23,9 @@ services:
     ipfs: 
         container_name: ipfs 
         environment:
+            # From go-ipfs github developer: 
+            #    Enabling the "lowpower" profile should help. That will disable background data reproviding, set really 
+            #    low connection manager limits, and put your node into dhtclient mode.
             routing: "dhtclient" 
             IPFS_PROFILE: "server"
             IPFS_PATH: "/data/ipfs"
@@ -48,16 +53,18 @@ services:
         expose:
             - '443'
             - '80'
+            
             # Uncomment for debugging...
             #- '8000'
         volumes:
             - '/home/clay/quanta-data/docs:/docs'
             - '/home/clay/quanta-data/tmp:/subnode-tmp'
             - '/home/clay/quanta-data/log:/subnode-log'
-            - '/etc/letsencrypt/live/quanta.wiki:/letsencrypt'
+            - '/etc/letsencrypt/live/${quanta_domain}:/letsencrypt'
         ports:
             - '443:443'
             - '80:80'
+
             # Uncomment for debugging...
             #- '8000:8000'
         networks:
@@ -74,7 +81,7 @@ services:
             profileName: "prod" 
             server.port: "443" 
             httpProtocol: "https" 
-            metaHost: "quanta.wiki" 
+            metaHost: "${quanta_domain}" 
             reSaveAll: "false"
             allowFileSystemSearch: "false" 
             forceIndexRebuild: "false"

@@ -70,7 +70,7 @@ public class NodeRenderService {
 	private ConstantsProvider constProvider;
 
 	/* Note: this MUST match nav.ROWS_PER_PAGE variable in TypeScript */
-	private static int ROWS_PER_PAGE = 25; //todo-0: do more testing with this at 5
+	private static int ROWS_PER_PAGE = 25; // todo-0: do more testing with this at 5
 
 	/*
 	 * This is the call that gets all the data to show on a page. Whenever user is
@@ -86,7 +86,7 @@ public class NodeRenderService {
 
 		String targetId = req.getNodeId();
 
-		//log.debug("$$$$$$$$$$$$$$$$$$$$$$$$ renderNode: \nreq=" + XString.prettyPrint(req));
+		// log.debug("renderNode: \nreq=" + XString.prettyPrint(req));
 		SubNode node = null;
 		try {
 			node = api.getNode(session, targetId);
@@ -97,6 +97,11 @@ public class NodeRenderService {
 			log.error("error", e);
 			// throw e;
 			return res;
+		}
+
+		if (node == null) {
+			log.debug("nodeId not found: " + targetId + " seding user to :public instead");
+			node = api.getNode(session, appProp.getUserLandingPageNode()); //"/r/public/home"); //todo-0: get from properties.
 		}
 
 		if (node == null) {
@@ -168,11 +173,13 @@ public class NodeRenderService {
 						}
 						// log.trace(" upLevel to nodeid: " + node.getPath());
 						levelsUpRemaining--;
-					} 
-					// this was added too hastily and creates problems. this was indended for case where 'upLevel' button was clicked by user
-					// but ends up failing at other times. Like if user is freshly signed up and just logging in! fix. todo-0
+					}
+					// this was added too hastily and creates problems. this was indended for case
+					// where 'upLevel' button was clicked by user
+					// but ends up failing at other times. Like if user is freshly signed up and
+					// just logging in! fix. todo-0
 					// catch (NodeAuthFailedException e) {
-					// 	throw e;
+					// throw e;
 					// }
 					catch (Exception e) {
 						/*
@@ -212,7 +219,8 @@ public class NodeRenderService {
 	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res,
 			final SubNode node, boolean scanToNode, String scanToPath, int ordinal, int level) {
 
-		//log.debug("RENDER nodeId: " + node.getId().toHexString()); // .prettyPrint(node));
+		// log.debug("RENDER nodeId: " + node.getId().toHexString()); //
+		// .prettyPrint(node));
 		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, ordinal, level > 0,
 				false, false);
 
@@ -234,7 +242,8 @@ public class NodeRenderService {
 		 */
 		int queryLimit = scanToNode ? 1000 : offset + ROWS_PER_PAGE + 1;
 
-		//log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode=" + scanToNode);
+		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode="
+		// + scanToNode);
 
 		/*
 		 * we request ROWS_PER_PAGE+1, because that is enough to trigger 'endReached'
@@ -280,7 +289,7 @@ public class NodeRenderService {
 		 * the initial query.
 		 */
 		if (!scanToNode && offset > 0) {
-			//log.debug("Skipping the first " + offset + " records in the resultset.");
+			// log.debug("Skipping the first " + offset + " records in the resultset.");
 			idx = api.skip(iterator, offset);
 		}
 
@@ -305,13 +314,13 @@ public class NodeRenderService {
 		 */
 		while (true) {
 			if (!iterator.hasNext()) {
-				//log.debug("End reached.");
+				// log.debug("End reached.");
 				endReached = true;
 				break;
 			}
 			SubNode n = iterator.next();
 			idx++;
-			//log.debug("NodeFound[" + idx + "]: nodeId" + n.getId().toHexString());
+			// log.debug("NodeFound[" + idx + "]: nodeId" + n.getId().toHexString());
 			if (idx > offset) {
 
 				if (scanToNode) {
@@ -389,7 +398,7 @@ public class NodeRenderService {
 						endReached = true;
 					}
 					/* break out of while loop, we have enough children to send back */
-					//log.debug("Full page is ready. Exiting loop.");
+					// log.debug("Full page is ready. Exiting loop.");
 					break;
 				}
 			}
@@ -407,7 +416,7 @@ public class NodeRenderService {
 			ninfo.setLastChild(true);
 		}
 
-		//log.debug("Setting endReached="+endReached);
+		// log.debug("Setting endReached="+endReached);
 		res.setEndReached(endReached);
 		return nodeInfo;
 	}
@@ -498,7 +507,7 @@ public class NodeRenderService {
 		 */
 		if (!StringUtils.isEmpty(node.getName())) {
 			nodeName = parentName != null ? parentName + "__" + node.getName() : node.getName();
-			//log.debug("thymeleaf [" + nodeName + "]=" + node.getContent());
+			// log.debug("thymeleaf [" + nodeName + "]=" + node.getContent());
 			model.put(nodeName, node.getContent());
 		}
 		// if this node it not named, skip but process all it's children

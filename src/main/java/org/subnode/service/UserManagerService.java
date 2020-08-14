@@ -1,5 +1,8 @@
 package org.subnode.service;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -57,7 +60,6 @@ import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 import org.subnode.util.Validator;
 import org.subnode.util.XString;
-
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -111,7 +113,6 @@ public class UserManagerService {
 	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
 
 	private static final ObjectMapper mapper = new ObjectMapper();
-
 
 	/*
 	 * Login mechanism is a bit tricky because the CallProcessor detects the
@@ -172,6 +173,9 @@ public class UserManagerService {
 			Date now = new Date();
 			sessionContext.setLastLoginTime(now.getTime());
 			userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), now.getTime());
+
+			ensureValidCryptoKeys(userNode);
+
 			api.save(session, userNode);
 
 			res.setSuccess(true);
@@ -191,6 +195,28 @@ public class UserManagerService {
 		}
 
 		return res;
+	}
+
+	/* Creates crypto key properties if not already existing */
+	public void ensureValidCryptoKeys(SubNode userNode) {
+		try {
+			String publicKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
+			if (publicKey == null) {
+				KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+				kpg.initialize(2048);
+				KeyPair pair = kpg.generateKeyPair();
+
+				// publicKey = Hex.encodeHexString(pair.getPublic().getEncoded());
+				// String privateKey = Hex.encodeHexString(pair.getPrivate().getEncoded());
+				publicKey = Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
+				String privateKey = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
+
+				userNode.setProp(NodeProp.CRYPTO_KEY_PUBLIC.s(), publicKey);
+				userNode.setProp(NodeProp.CRYPTO_KEY_PRIVATE.s(), privateKey);
+			}
+		} catch (Exception e) {
+			// todo-0: handle.
+		}
 	}
 
 	public String getInboxNotification(MongoSession session) {
@@ -320,14 +346,15 @@ public class UserManagerService {
 	 * verification, and they are sending in a signupCode that will turn on their
 	 * account and actually create their account.
 	 * 
-	 * We return whatever a message would be to the user that just says if the signupCode
-	 * was accepted or not and it's displayed on welcome.html only.
+	 * We return whatever a message would be to the user that just says if the
+	 * signupCode was accepted or not and it's displayed on welcome.html only.
 	 */
 	public String processSignupCode(final String signupCode) {
 		log.debug("User is trying signupCode: " + signupCode);
 		final ValContainer<String> valContainer = new ValContainer<String>(null);
 		adminRunner.run(session -> {
-			// signupCode is just the new account node id? I guess that's secure, if user has this value it's the only user
+			// signupCode is just the new account node id? I guess that's secure, if user
+			// has this value it's the only user
 			// who could possibly know this unguessable value.
 			SubNode node = api.getNode(session, signupCode);
 
@@ -383,14 +410,17 @@ public class UserManagerService {
 		final String password = req.getPassword().trim();
 		final String email = req.getEmail();
 
-		// Recaptcha was creating some VERY bizarre rendering problems. Apparenty they way it tries to inject itself into 
-		// the webpage is flawed in some way and I really don't want that anyway. Perhaps I can render the 'signup' page ONLY
-		// with recaptcha enabled, and for every other page in the system have it completely removed from any HTML/JS. (todo-1)
+		// Recaptcha was creating some VERY bizarre rendering problems. Apparenty they
+		// way it tries to inject itself into
+		// the webpage is flawed in some way and I really don't want that anyway.
+		// Perhaps I can render the 'signup' page ONLY
+		// with recaptcha enabled, and for every other page in the system have it
+		// completely removed from any HTML/JS. (todo-1)
 		// #recaptcha-disabled
 		// if (!verifyCaptcha(req.getReCaptchaToken())) {
-		// 	res.setMessage("Sorry, reCaptcha scored too low.");
-		// 	res.setSuccess(false);
-		// 	return res;
+		// res.setMessage("Sorry, reCaptcha scored too low.");
+		// res.setSuccess(false);
+		// return res;
 		// }
 
 		log.debug("Signup: userName=" + userName + " email=" + email);
@@ -416,7 +446,7 @@ public class UserManagerService {
 		try {
 			String secretKey = appProp.getReCaptcha3SecretKey();
 
-			//if secret key not configured, bypass check.
+			// if secret key not configured, bypass check.
 			if (StringUtils.isEmpty(secretKey)) {
 				return true;
 			}
@@ -427,19 +457,20 @@ public class UserManagerService {
 			HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
 
 			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-			//log.debug("RAW RESULT: " + response.getBody());
+			// log.debug("RAW RESULT: " + response.getBody());
 
 			Map<String, Object> respMap = mapper.readValue(response.getBody(),
 					new TypeReference<Map<String, Object>>() {
 					});
-			//log.debug(XString.prettyPrint(respMap));
+			// log.debug(XString.prettyPrint(respMap));
 
 			Boolean success = (Boolean) respMap.get("success");
 			Double score = (Double) respMap.get("score");
 
-			//Google recommends 0.5 as default threshold: https://developers.google.com/recaptcha/docs/v3
+			// Google recommends 0.5 as default threshold:
+			// https://developers.google.com/recaptcha/docs/v3
 			if (success.booleanValue() && score.doubleValue() >= 0.5) {
-				//log.debug("Success=" + success + " score=" + score);
+				// log.debug("Success=" + success + " score=" + score);
 				ret = true;
 			}
 

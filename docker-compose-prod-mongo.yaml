@@ -1,0 +1,35 @@
+
+version: '3.7'
+services:
+
+    mongo-prod: 
+        container_name: mongo-prod
+        volumes:
+            - '/var/lib/mongodb:/data/db'
+            - '/home/clay/quanta-data/mongo-dumps:/mongo-dumps'
+            - '/home/clay/quanta/mongo-scripts:/mongo-scripts'
+            - '/home/clay/quanta/mongod.conf:/etc/mongod.conf'
+        command: mongod --config /etc/mongod.conf
+        ports:
+            - '27017:27017'
+        env_file: 
+            - '/home/clay/quanta/secrets/mongo.env'
+        networks:
+            - net-prod
+        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
+        # and we don't want that happening unexpectedly
+        image: mongo:4.0
+
+# https://docs.docker.com/compose/networking/
+
+networks:
+  net-prod:
+    driver: bridge
+    external: false
+    name: net-prod
+
+# To force compose to use an externally pre-created network outside this compose file you can do this
+# networks:
+#   default:
+#     external:
+#       name: my-pre-existing-network

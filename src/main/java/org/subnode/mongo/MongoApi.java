@@ -345,7 +345,7 @@ public class MongoApi {
 				}
 
 				for (SubNode node : nodes) {
-					//log.debug("saveSession: Saving Dirty. nodeId=" + node.getId().toHexString());
+					// log.debug("saveSession: Saving Dirty. nodeId=" + node.getId().toHexString());
 					save(session, node, false);
 				}
 			}
@@ -1674,6 +1674,16 @@ public class MongoApi {
 			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(),
 					Arrays.asList(PrivilegeType.READ.s()), null);
 		}
+
+		//todo-0: update docs to say that admin is supposed to do something to initialize 
+		//these two nodes (landing page, and userguide)
+		created = new ValContainer<>();
+		apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "home", "Public Home", null,
+				true, null, created);
+
+		created = new ValContainer<>();
+		apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "userguide", "User Guide", null,
+				true, null, created);
 
 		/* Ensure Content folder is created and synced to file system */
 		// SubNodePropertyMap props = new SubNodePropertyMap();

@@ -49,7 +49,7 @@ source ${SECRET_SCRIPT}
 cd $PRJROOT
 
 # Remove all prior existing log files
-rm -f ${SUBNODE_LOG_FOLDER}/*
+sudo rm -f /home/clay/quantizr-tmp/log/*
 
 #
 # NOTE: The 'dev-resource-base' in the run command below sets up a property (resourceBaseFolder)
