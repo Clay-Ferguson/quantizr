@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-source ./setenv.sh
+
 source ./define-functions.sh
 
 # go back to folder with this script in it. sort of 'home' for this script

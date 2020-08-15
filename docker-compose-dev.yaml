@@ -12,7 +12,7 @@ services:
     mongo-dev: 
         container_name: mongo-dev 
         volumes:
-            - '${hostMongoDbPath}:/data/db'
+            - '/home/clay/ferguson/mongodb-data-dev:/data/db'
             - '/home/clay/ferguson/mongo-dumps-dev:/mongo-dumps'
             - '/home/clay/ferguson/mongo-scripts-dev:/mongo-scripts'
             - '/home/clay/ferguson/mongo-conf-dev/mongod.conf:/etc/mongod.conf'
@@ -67,9 +67,9 @@ services:
             - '8182'
             - '8000'
         volumes:
-            - '${SUBNODE_TMP_FOLDER}:/subnode-tmp'
-            - '${SUBNODE_LOG_FOLDER}:/subnode-log'
-            - '${SUBNODE_LUCENE_FOLDER}:/subnode-lucene'
+            - '/home/clay/quantizr-tmp/tmp:/subnode-tmp'
+            - '/home/clay/quantizr-tmp/log:/subnode-log'
+            - '/home/clay/quantizr-tmp/lucene:/subnode-lucene'
             # Now that 'loader-path' is here, we don't need /dev-resource-base !!
             # (So I will be mothballing resourcesBaseFolder approach soon)
             # UPDATE: loader-path seems to have lost it's ability to load Javascript...switching back to using dev-resource-base for now (todo-0)

@@ -5,7 +5,7 @@ services:
     mongo-dev: 
         container_name: mongo-dev 
         volumes:
-            - '${hostMongoDbPath}:/data/db'
+            - '/home/clay/ferguson/mongodb-data-dev:/data/db'
             - '/home/clay/ferguson/mongo-dumps-dev:/mongo-dumps'
             - '/home/clay/ferguson/mongo-scripts-dev:/mongo-scripts'
             - '/home/clay/ferguson/mongo-conf-dev/mongod.conf:/etc/mongod.conf'

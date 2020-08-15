@@ -138,3 +138,19 @@ builder is doing this also (i.e. running the TypeScript generator maven build ri
 
     mvn package -DskipTests -Pdev-vscode
 
+
+# todo-0: this entire doc needs to be reviewed.
+
+this info needs to be added
+
+secrets.sh must be the name of a file that exports the following variable values
+    export emailPassword=
+    export devEmail=
+    export testPassword=
+    export hostMongoDbPath=
+    export subnodePassword=
+    export prodKeyStorePassword=
+    export reCaptcha3SiteKey=
+    export reCaptcha3SecretKey=
+in all build scripts named 'build--*.sh'
+source /home/clay/ferguson/meta64Oak-private/secrets.sh

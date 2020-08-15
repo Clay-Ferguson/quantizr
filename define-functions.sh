@@ -9,3 +9,13 @@ verifySuccess () {
         exit $?
     fi
 }
+export -f verifySuccess
+
+dockerCheck () {
+    if docker ps | grep $1; then
+        echo "$1 started ok"
+    else
+        read -p "$1 failed to start"
+    fi
+}
+export -f dockerCheck

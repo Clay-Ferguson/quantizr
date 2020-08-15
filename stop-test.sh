@@ -1,8 +1,7 @@
 #!/bin/bash
 clear
-source ./setenv.sh
 source ./define-functions.sh
-source ${SECRET_SCRIPT}
+source /home/clay/ferguson/meta64Oak-private/secrets.sh
 
 cd $PRJROOT
 # Warning: removing orphans will kill ALL docker instances running on the host basically.

@@ -3,10 +3,9 @@
 # whenever we need to troubleshoot it.
 
 clear
-source ./setenv.sh
 source ./define-functions.sh
 
-source ${SECRET_SCRIPT}
+source /home/clay/ferguson/meta64Oak-private/secrets.sh
 cd $PRJROOT
 
 docker-compose -f docker-compose-dev-mongo.yaml up -d
