@@ -6,12 +6,12 @@ source ./define-functions.sh
 cd /home/clay/ferguson/subnode-run
 sudo ./stop.sh
 
-cd $PRJROOT
+cd ${PRJROOT}
 docker-compose -f docker-compose-test.yaml down --remove-orphans
 verifySuccess "Docker Compose (test): down"
 
-cd $PRJROOT
-docker-compose -f docker-compose-dev.yaml down --remove-orphans
+cd ${PRJROOT}
+docker-compose -f docker-compose-test.yaml down --remove-orphans
 verifySuccess "Docker Compose (dev): down"
 
 # Ensure output folder for out docir images exists
@@ -19,23 +19,24 @@ mkdir -p ${ipfs_staging}
 
 # Wipe some existing stuff to ensure it gets rebuilt
 rm -rf ${TAR_OUTPUT_FOLDER}/subnode-test.tar
-rm -rf $PRJROOT/target/*
-rm -rf $PRJROOT/bin/*
-rm -rf $PRJROOT/src/main/resources/public/bundle.js
-rm -rf $PRJROOT/src/main/resources/public/index.html
+rm -rf ${PRJROOT}/target/*
+rm -rf ${PRJROOT}/bin/*
+rm -rf ${PRJROOT}/src/main/resources/public/bundle.js
+rm -rf ${PRJROOT}/src/main/resources/public/index.html
 
 # Run ignore-scripts for some security from NodeJS
-cd $PRJROOT/src/main/resources/public
+cd ${PRJROOT}/src/main/resources/public
 npm config set ignore-scripts true
 
 # go back to folder with this script in it. sort of 'home' for this script
-cd $PRJROOT
+cd ${PRJROOT}
 
 # These aren't normally needed, so I'll just keep commented out most of time. 
 # mvn dependency:sources
 # mvn dependency:resolve -Dclassifier=javadoc
 # mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
 
+# Generate 'pom.xml' dynamically from file parts
 ./pom-generate.sh
 
 # This run is required only to ensure TypeScript generated files are up to date.

@@ -5,9 +5,9 @@ services:
         container_name: mongo-prod
         volumes:
             - '/var/lib/mongodb:/data/db'
-            - '/home/clay/quanta-data/mongo-dumps:/mongo-dumps'
-            - '/home/clay/quanta/mongo-scripts:/mongo-scripts'
-            - '/home/clay/quanta/mongod.conf:/etc/mongod.conf'
+            - '${DATA_FOLDER}/mongo-dumps:/mongo-dumps'
+            - '${INSTANCE_FOLDER}/mongo-scripts:/mongo-scripts'
+            - '${INSTANCE_FOLDER}/mongod.conf:/etc/mongod.conf'
         command: mongod --config /etc/mongod.conf
         ports:
             - '27017:27017'
@@ -57,9 +57,9 @@ services:
             # Uncomment for debugging...
             #- '8000'
         volumes:
-            - '/home/clay/quanta-data/docs:/docs'
-            - '/home/clay/quanta-data/tmp:/subnode-tmp'
-            - '/home/clay/quanta-data/log:/subnode-log'
+            - '${DATA_FOLDER}/docs:/docs'
+            - '${DATA_FOLDER}/tmp:/subnode-tmp'
+            - '${DATA_FOLDER}/log:/subnode-log'
             - '/etc/letsencrypt/live/${quanta_domain}:/letsencrypt'
         ports:
             - '443:443'

@@ -6,30 +6,30 @@ source ./define-functions.sh
 # IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
 CLEAN=true
 
-# Ensure output folder for out docier images exists
 mkdir -p ${ipfs_staging}
 
 # Wipe some existing stuff to ensure it gets rebuilt
 if [ "$CLEAN" == "true" ]; then
-    rm -rf $PRJROOT/target/*
-    rm -rf $PRJROOT/bin/*
+    rm -rf ${PRJROOT}/target/*
+    rm -rf ${PRJROOT}/bin/*
 fi
 
-rm -rf $PRJROOT/src/main/resources/public/bundle.js
-rm -rf $PRJROOT/src/main/resources/public/index.html
+rm -rf ${PRJROOT}/src/main/resources/public/bundle.js
+rm -rf ${PRJROOT}/src/main/resources/public/index.html
 
 # Run ignore-scripts for some security from NodeJS
-cd $PRJROOT/src/main/resources/public
+cd ${PRJROOT}/src/main/resources/public
 npm config set ignore-scripts true
 
 # go back to folder with this script in it. sort of 'home' for this script
-cd $PRJROOT
+cd ${PRJROOT}
 
 # These aren't normally needed, so I'll just keep commented out most of time. 
 # mvn dependency:sources
 # mvn dependency:resolve -Dclassifier=javadoc
 # mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
 
+# Generate 'pom.xml' dynamically from file parts
 ./pom-generate.sh
 
 # This build command creates the SpringBoot fat jar in the /target/ folder.
@@ -46,10 +46,10 @@ verifySuccess "Maven Build"
 
 # Note: This 'secrets.sh' script is my way of setting ${subnodePassword} environment varible from a secure location
 source ${SECRET_SCRIPT}
-cd $PRJROOT
+cd ${PRJROOT}
 
-# Remove all prior existing log files
-sudo rm -f /home/clay/quantizr-tmp/log/*
+# Remove all prior existing log files (todo-0: put this somewhere else. No hardcoded folders should be here)
+# sudo rm -f /home/clay/quantizr-tmp/log/*
 
 #
 # NOTE: The 'dev-resource-base' in the run command below sets up a property (resourceBaseFolder)

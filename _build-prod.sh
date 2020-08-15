@@ -16,32 +16,33 @@ source ${SECRET_SCRIPT}
 cd /home/clay/ferguson/subnode-run
 sudo ./stop.sh
 
-cd $PRJROOT
+cd ${PRJROOT}
 docker-compose -f docker-compose-test.yaml down --remove-orphans
 verifySuccess "Docker Compose (test): down"
 
-cd $PRJROOT
+cd ${PRJROOT}
 docker-compose -f docker-compose-dev.yaml down --remove-orphans
 verifySuccess "Docker Compose (dev): down"
 
 # Wipe some existing stuff to ensure with certainty it gets rebuilt
 rm -rf ~/ferguson/scripts/linode/${quanta_domain}/subnode-prod.tar
-rm -rf $PRJROOT/target/*
-rm -rf $PRJROOT/bin/*
-rm -rf $PRJROOT/src/main/resources/public/bundle.js
+rm -rf ${PRJROOT}/target/*
+rm -rf ${PRJROOT}/bin/*
+rm -rf ${PRJROOT}/src/main/resources/public/bundle.js
 
 # Run ignore-scripts for some security from NodeJS
-cd $PRJROOT/src/main/resources/public
+cd ${PRJROOT}/src/main/resources/public
 npm config set ignore-scripts true
 
 # go back to folder with this script in it. sort of 'home' for this script
-cd $PRJROOT
+cd ${PRJROOT}
 
 # These aren't normally needed, so I'll just keep commented out most of time. 
 # mvn dependency:sources
 # mvn dependency:resolve -Dclassifier=javadoc
 # mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
 
+# Generate 'pom.xml' dynamically from file parts
 ./pom-generate.sh
 
 # This run is required only to ensure TypeScript generated files are up to date.

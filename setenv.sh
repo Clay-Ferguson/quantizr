@@ -25,6 +25,9 @@ export TAR_OUTPUT_FOLDER=~/ferguson/subnode-run
 export ipfs_data=/home/clay/.ipfs
 export ipfs_staging=/home/clay/.ipfs/staging
 
+export INSTANCE_FOLDER=/home/clay/quanta
+export DATA_FOLDER=/home/clay/quanta-data
+
 # These two password variables need to put into your environment
 # like by editing '/etc/environment' on linux which are the following:
 #    subnodePassword
