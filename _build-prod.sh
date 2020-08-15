@@ -10,7 +10,7 @@ fi
 clear
 source ./setenv.sh
 source ./define-functions.sh
-# Note: This 'secrets.sh' script is my way of setting password environment varible from a secure location
+# Note: This 'secrets.sh' script is for setting password environment varible from a secure location
 source ${SECRET_SCRIPT}
 
 cd /home/clay/ferguson/subnode-run

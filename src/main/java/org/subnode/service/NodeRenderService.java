@@ -101,7 +101,7 @@ public class NodeRenderService {
 
 		if (node == null) {
 			log.debug("nodeId not found: " + targetId + " seding user to :public instead");
-			node = api.getNode(session, appProp.getUserLandingPageNode()); //"/r/public/home"); //todo-0: get from properties.
+			node = api.getNode(session, appProp.getUserLandingPageNode()); //"/r/public/home"); //todo-0: test.
 		}
 
 		if (node == null) {

@@ -22,7 +22,7 @@ services:
         ports:
             - '27016:27016'
         env_file: 
-            - '/home/clay/quanta/secrets/mongo.env'
+            - '../secrets/mongo.env'
         networks:
            - net-dev
         # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved

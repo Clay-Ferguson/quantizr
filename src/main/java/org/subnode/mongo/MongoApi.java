@@ -834,7 +834,7 @@ public class MongoApi {
 			throw new RuntimeEx(
 					"SubNode doesn't implement the root node. Root is implicit and never needs an actual node to represent it.");
 		}
-
+		//log.debug("getNode identifier=" + identifier);
 		SubNode ret = null;
 
 		// inbox, friend_list, and user_feed need to be passed as type instead, prefixed
@@ -854,11 +854,17 @@ public class MongoApi {
 		else if (!identifier.startsWith("/")) {
 			ret = getNode(session, new ObjectId(identifier), allowAuth);
 		} else {
+			//log.debug("getNode identifier is path. doing path find.");
 			identifier = XString.stripIfEndsWith(identifier, "/");
 			Query query = new Query();
 			query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(identifier));
 			saveSession(session);
 			ret = ops.findOne(query, SubNode.class);
+			// if (ret == null) {
+			// 	log.debug("nope. path not found.");
+			// } else {
+			// 	log.debug("Path found: " + identifier);
+			// }
 		}
 
 		if (allowAuth) {
@@ -1643,6 +1649,7 @@ public class MongoApi {
 	 * by the definition of they way security is inheritive.
 	 */
 	public void createAdminUser(MongoSession session) {
+		//log.debug("Creating AdminUser");
 		String adminUser = appProp.getMongoAdminUserName();
 
 		SubNode adminNode = getUserNodeByUserName(getAdminSession(), adminUser);
@@ -1666,6 +1673,7 @@ public class MongoApi {
 	}
 
 	public void createPublicNodes(MongoSession session) {
+		log.debug("creating PublicNodes");
 		ValContainer<Boolean> created = new ValContainer<>();
 		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, "Public", null,
 				true, null, created);
@@ -1675,15 +1683,18 @@ public class MongoApi {
 					Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 
-		//todo-0: update docs to say that admin is supposed to do something to initialize 
-		//these two nodes (landing page, and userguide)
+		// todo-0: update docs to say that admin is supposed to do something to
+		// initialize
+		// these two nodes (landing page, and userguide)
 		created = new ValContainer<>();
-		apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "home", "Public Home", null,
-				true, null, created);
+		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "home",
+				"Public Home", null, true, null, created);
+		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 
 		created = new ValContainer<>();
-		apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "userguide", "User Guide", null,
-				true, null, created);
+		SubNode userGuide = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "userguide",
+				"User Guide", null, true, null, created);
+		log.debug("UserGuide Node exists at id: " + userGuide.getId());
 
 		/* Ensure Content folder is created and synced to file system */
 		// SubNodePropertyMap props = new SubNodePropertyMap();

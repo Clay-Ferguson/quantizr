@@ -36,6 +36,7 @@ public class AppServer {
 
 	/* Java Main entry point for Quanta application */
 	public static void main(String[] args) {
+		log.debug("Version Time: Aug 14, 7:27pm");
 		log.trace("main() trace log test.");
 		/*
 		 * If we are running AppServer then enableScheduling, otherwise we may be
