@@ -101,7 +101,7 @@ public class NodeRenderService {
 
 		if (node == null) {
 			log.debug("nodeId not found: " + targetId + " seding user to :public instead");
-			node = api.getNode(session, appProp.getUserLandingPageNode()); //"/r/public/home"); //todo-0: test.
+			node = api.getNode(session, appProp.getUserLandingPageNode());
 		}
 
 		if (node == null) {
@@ -174,10 +174,12 @@ public class NodeRenderService {
 						// log.trace(" upLevel to nodeid: " + node.getPath());
 						levelsUpRemaining--;
 					}
-					// this was added too hastily and creates problems. this was indended for case
-					// where 'upLevel' button was clicked by user
-					// but ends up failing at other times. Like if user is freshly signed up and
-					// just logging in! fix. todo-0
+
+					/*
+					 * this was added too hastily and creates problems. this was indended for case
+					 * where 'upLevel' button was clicked by user but ends up failing at other
+					 * times. Like if user is freshly signed up and just logging in! fix. todo-0
+					 */
 					// catch (NodeAuthFailedException e) {
 					// throw e;
 					// }

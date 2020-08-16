@@ -1,20 +1,31 @@
 # Building the App
 
-This app uses maven as the builder (see pom.xml), and the languages involved are Java and TypeScript. The build generates a 'fat jar' containing Tomcat and the WebApp itself, and is a free-standing Java JAR that contains everything needed at runtime except for the MongoDB database. The way MongoDB is normally integrated into the runtime is by having a docker instance that contains both the MongoDB and the App fat JAR deployed.
+## Build Basics
 
-There are two build scripts in the root of the project: build-dev.sh, and build-test.sh. The 'build-dev.sh' is for running locally during development and will startup a debuggable instance of the docker containers when run. The build-test.sh builds and saves the docker containers into a TAR file for deploying into a test environment.
+You should have a working knowledge of the following things before you try to build Quanta (at least if you want to understand it): 
+
+Maven, Docker, Docker Compose, Linux Bash Scripts, Java, TypeScript, WebPack, MongoDB
+
+# Build Scripts
+
+The bash shell scripts for building the code are named 'build--*.sh' in the project root. There are 4 of them for various kinds of deployments. Each one has notes in the top saying what it's for.
+
+# About the Builder
+
+This app uses maven as the builder (see pom.xml), and the languages involved are Java and TypeScript. The build generates a 'fat jar' containing Tomcat and the WebApp itself, and is a free-standing Java JAR that contains everything, all the code. This fat jar is turned into a docker image, for deploying in a 'docker compose' container.
+
+The way MongoDB is integrated into the runtime is by having a docker instance that contains both the MongoDB and the App fat JAR deployed.
 
 # Prerequisites
 
-If you are running Linux (18.04 as of 4/5/2019, when this is being written) here are the things to run before building and also I'm including the actual commands to install all these things:
-
-Linode Config: 4GB RAM, 2CPU, 80GB Storage
+If you're running Linux the following will need to be installed before running a build:
 
 ## Install Java
 
 You should use only Java11 or later.
  
 https://www.linode.com/docs/development/java/install-java-on-ubuntu-18-04/
+
 https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-on-ubuntu-20-04
 
 ## Install Maven
@@ -39,11 +50,7 @@ I realize you can setup 'parent poms' and change the entire structuring of the p
 
 ## Install Docker
 
-Docker install commands are all inside docker-install.sh (in this same folder), so you would need to just uncomment all the non-comments (i.e. all commands you see in that entire file), and then run them all in the order they appear in that file, to install docker. That script is not 'guaranteed' to work but should be complete however, and serves as a good hint at how to get things installed.
-
-```
-./docker-install.sh
-```
+Instructions for how to install docker are in ./docker-install.md
 
 ## Install NodeJS + NPM
 
@@ -57,8 +64,7 @@ npm install webpack-dev-server --save-dev
 ```
 
 IMPORTANT!!!
-You need to check the 'nodeVersion' in the 'pom-main.xml' file and make sure it matches that's on your system, meaning the same
-thing you get when you run 'node --version' because if you don't things will not work, when various versions on things are outta wack.
+You need to check the 'nodeVersion' in the 'pom-main.xml' file and make sure it matches what's on your system, meaning the same thing you get when you run 'node --version' because if you don't things will not work.
 
 ## Install Node SASS (SCSS support)
 
@@ -72,8 +78,7 @@ sudo npm install --save-dev --unsafe-perm -g node-sass
 
 To ensure everything with npm is ok, delete the 'node_modules' folders completely.
 
-Then run 'npm install' from the folder that contains he 'package.json' file. You can manually edit the 'package.json'
-before running 'npm install' if you need to update something.
+Then run 'npm install' from the folder that contains he 'package.json' file. 
 
 ## Upgrading NPM Versions (optional)
 
@@ -83,7 +88,7 @@ Run 'npm update' to get to the newest 'sub-releases' which is new packages but n
 
 ## Install VSCode (Optional)
 
-All the info above, in this file, is a genuine requirement to build and run the app, but VSCode is just my personal recommendation, especially because this app uses TypeScript for all client-side code. 
+All the info above, in this file, is a requirement to build and run the app, but VSCode is just a personal recommendation, especially because this app uses TypeScript for all client-side code. 
 
 From here:
 https://code.visualstudio.com/
@@ -91,25 +96,6 @@ https://code.visualstudio.com/
 Then install the Java Debugger and Java development plugins into it from Redhat and Microsoft. 
 
 If you do use VSCode you will be able to use the file */.vscode/tasks.json* to run build scripts.
-
-### VSCode Java plugins expect you to download your own JDK and configure it manually
-
-   sudo nano /etc/environment
-
-   add these lines at top:
-
-   JAVA_HOME="/home/clay/jdk-11.0.8+10"
-   JDK_HOME="/home/clay/jdk-11.0.8+10"
-
-   Then reboot.
-
-Also with VSCode when prompted to import the "Java" after you install the 
-"Red Hat Java Plugin" you should say "yes" or else you won't get any of the 
-Java language features.
-
-# Maven Build
-
-WARNING: Before you run 'build-dev.sh' (or 'build-test.sh') you will need to read and understand the 'setenv.sh' variables and set up your own folders for those. Unfortunately this application is not something you can just download, and build, and run in a matter of a few minutes, because there are several paths that you will need to understand and several moving parts involving the app itself, MongoDB (maybe IPFS if you are enabling that), and how it all is connected and run via Docker setup. The good news is that the *only* paths you need to set are all contained in 'setenv.sh' and each one is docmented as to what it is. However, in general before truing to run a build or run the app, you should open and read every "*.sh" script in the project root. If you don't understand what's going on in those you should probably not even consider building/running the app until you know those things.
 
 # Maven 'dev' Profile
 
@@ -123,27 +109,11 @@ However if you have the app deployed already and have only just edited client si
 
 The `dev` maven profile (see build-dev.sh) also is configured to deploy to docker in a way where the classpath is overridden to load classes directly from the `${PRJROOT}/target/classes` at runtime. For a full description of how this works, or how to stop doing that, see ./how-to-redeploy-java-classes.md
 
-# Before you run 'dev' Profile 
+# Configure secrets.sh and ENV vars before you Build!
 
-The following maven profile will need to be run in order to update the generated TypeScript. We use this plugin:
+In file `setenv-common.sh` you'll see a `secrets.sh` file. You must provide this file yourself and all it should be is a shell script with the following exports defined.
 
-    <plugin>
-        <groupId>cz.habarta.typescript-generator</groupId>
-        <artifactId>typescript-generator-maven-plugin</artifactId>
-    ...
-
-...to generate a single TypeScrypt type file named "JavaIntf.d.ts", and this file contains all the interfaces from the Java code so we
-don't have to manually create those for TypeScript, but they're generated instead. If you look in build-dev.sh you can see that
-builder is doing this also (i.e. running the TypeScript generator maven build right before running the 'real' build.)
-
-    mvn package -DskipTests -Pdev-vscode
-
-
-# todo-0: this entire doc needs to be reviewed.
-
-this info needs to be added
-
-secrets.sh must be the name of a file that exports the following variable values
+    #!/bin/bash
     export emailPassword=
     export devEmail=
     export testPassword=
@@ -152,5 +122,5 @@ secrets.sh must be the name of a file that exports the following variable values
     export prodKeyStorePassword=
     export reCaptcha3SiteKey=
     export reCaptcha3SecretKey=
-in all build scripts named 'build--*.sh'
-source /home/clay/ferguson/meta64Oak-private/secrets.sh
+
+Also you'll need to edit any of the `setenv-*.sh` scripts to put in your own paths before you run a build. There are only a couple of paths that you'll need to provide, but they are critical/required. The builder won't run without them set correctly. 

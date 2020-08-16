@@ -1,35 +1,20 @@
 #!/bin/bash
+###############################################################################
+# This script builds a deployable subnode-test.tar, which is able to be 
+# deployed stand-alone at https://quantizr.com. This is the production builder
+# for Quantizr.com, which is a domain used only for testing and development
+# of certain specific features like ActivityPub (Mastodon connectivity, etc.)
+# that require a domain name on the public internet with HTTPS enabled.
+###############################################################################
+
 clear
 # show commands as they are run.
 # set -x
 source ./define-functions.sh
-
-export ipfs_data=/home/clay/.ipfs
-export ipfs_staging=/home/clay/.ipfs/staging
-
-source /home/clay/ferguson/secrets/secrets.sh
-
-# Directory that contains the SubNode project (pom.xml is here, for example). This is the only
-# hard-coded path, in the bash scripts
-export PRJROOT=/home/clay/ferguson/Quantizr
-
-export quanta_domain=quantizr.com
-
-# INSTANCE_FOLDER tells docker yaml volume where to find mongo-scripts folder and mongod.conf file.
-export INSTANCE_FOLDER=/home/clay/quanta
-
-# DATA_FOLDER tells docker yaml volume where to find mongo-dumps folder
-export DATA_FOLDER=/home/clay/quanta-data
-
-# IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
-export CLEAN=true
-
-export docker_compose_yaml=docker-compose-prod.yaml
-
-export mvn_profile=prod
+source ./setenv--quantizr.com.sh
 
 # Wipe some existing stuff to ensure with certainty it gets rebuilt
-rm -rf ~/ferguson/scripts/linode/${quanta_domain}/subnode-prod.tar
+rm -rf ${PROD_DEPLOYER_BASE}/${quanta_domain}/subnode-prod.tar
 
 cd ${PRJROOT}
 . ./_build.sh
@@ -38,7 +23,7 @@ cd ${PRJROOT}
 # which can then on the remote server be loaded into registry for user on that host using the following command:
 #     docker load -i <path to image tar file>
 #
-docker save -o ~/ferguson/scripts/linode/${quanta_domain}/subnode-prod.tar subnode-prod
+docker save -o ${PROD_DEPLOYER_BASE}/${quanta_domain}/subnode-prod.tar subnode-prod
 verifySuccess "Docker Save"
 
 read -p "Build Complete. press a key"

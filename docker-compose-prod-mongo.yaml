@@ -3,6 +3,7 @@ services:
 
     mongo-prod: 
         container_name: mongo-prod
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
             - '/var/lib/mongodb:/data/db'
             - '${DATA_FOLDER}/mongo-dumps:/mongo-dumps'

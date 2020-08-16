@@ -3,18 +3,19 @@ services:
 
     mongo-test: 
         container_name: mongo-test 
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
-            - '/home/clay/ferguson/subnode-run/data:/data/db'
-            - '/home/clay/ferguson/subnode-run/dumps:/mongo-dumps'
+            - "${DEPLOY_TARGET}/data:/data/db"
+            - "${DEPLOY_TARGET}/dumps:/mongo-dumps"
         ports:
-            - '27017:27017'
+            - "27017:27017"
         networks:
             - net-test
         # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
         # and we don't want that happening unexpectedly
         image: mongo:4.0
 
-    # IPFS is fully functional, but commented out for now just to save CPU+Bandwidth
+    # IPFS is fully functional, but commented out for now because it's not needed for the 'test' instance.
     # ipfs: 
     #     container_name: ipfs_host_test 
     #     environment:
@@ -39,12 +40,13 @@ services:
             dockerfile: dockerfile-test
         container_name: subnode-test
         expose:
-            - '8181'
+            - "8181"
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
-            - '/home/clay/ferguson/subnode-run/tmp:/subnode-tmp'
-            - '/home/clay/ferguson/subnode-run/log:/subnode-log'
+            - "${DEPLOY_TARGET}/tmp:/subnode-tmp"
+            - "${DEPLOY_TARGET}/log:/subnode-log"
         ports:
-            - '8181:8181'
+            - "8181:8181"
         networks:
             - net-test
         environment:

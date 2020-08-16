@@ -9,7 +9,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-/* todo-0: rename this to IconButton */
 export class IconButton extends Comp {
 
     constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private specialClasses: string = "", private toggle: string = "") {

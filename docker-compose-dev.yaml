@@ -11,11 +11,12 @@ services:
     # NOTE: Minimal requirements for the mongod.conf is to have the port set as 27016, and the data db set
     mongo-dev: 
         container_name: mongo-dev 
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
-            - '/home/clay/ferguson/mongodb-data-dev:/data/db'
-            - '/home/clay/ferguson/mongo-dumps-dev:/mongo-dumps'
-            - '/home/clay/ferguson/mongo-scripts-dev:/mongo-scripts'
-            - '/home/clay/ferguson/mongo-conf-dev/mongod.conf:/etc/mongod.conf'
+            - '${MONGO_BASE}/mongodb-data-dev:/data/db'
+            - '${MONGO_BASE}/mongo-dumps-dev:/mongo-dumps'
+            - '${MONGO_BASE}/mongo-scripts-dev:/mongo-scripts'
+            - '${MONGO_BASE}/mongo-conf-dev/mongod.conf:/etc/mongod.conf'
         #NOTE: This 'command' property is only needed when we want to start mongod on a port other than 27017    
         command: mongod --config /etc/mongod.conf
         #entrypoint: ["mongod","--config","/etc/mongod.conf"]
@@ -46,6 +47,7 @@ services:
         #     - '4001'
         #     - '8080'
         #     - '5001'
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
             - '${ipfs_staging}:/export'
             - '${ipfs_data}:/data/ipfs'
@@ -67,12 +69,12 @@ services:
             - '8182'
             - '8000'
         volumes:
-            - '/home/clay/quantizr-tmp/tmp:/subnode-tmp'
-            - '/home/clay/quantizr-tmp/log:/subnode-log'
-            - '/home/clay/quantizr-tmp/lucene:/subnode-lucene'
+            - '${QUANTA_BASE}/tmp:/subnode-tmp'
+            - '${QUANTA_BASE}/log:/subnode-log'
+            - '${QUANTA_BASE}/lucene:/subnode-lucene'
             # Now that 'loader-path' is here, we don't need /dev-resource-base !!
             # (So I will be mothballing resourcesBaseFolder approach soon)
-            # UPDATE: loader-path seems to have lost it's ability to load Javascript...switching back to using dev-resource-base for now (todo-0)
+            # UPDATE: loader-path seems to have lost it's ability to load Javascript...switching back to using dev-resource-base for now (todo-1)
             - '${PRJROOT}/src/main/resources/public:/dev-resource-base'
             - '${PRJROOT}/target/classes:/loader-path'
         ports:

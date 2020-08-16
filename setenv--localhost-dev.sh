@@ -3,11 +3,7 @@
 export ipfs_data=/home/clay/.ipfs
 export ipfs_staging=/home/clay/.ipfs/staging
 
-source /home/clay/ferguson/secrets/secrets.sh
-
-# Directory that contains the SubNode project (pom.xml is here, for example). This is the only
-# hard-coded path, in the bash scripts
-export PRJROOT=/home/clay/ferguson/Quantizr
+source ./setenv-common.sh
 
 export quanta_domain=localhost
 
@@ -16,3 +12,7 @@ export CLEAN=true
 
 export docker_compose_yaml=docker-compose-dev.yaml
 export mvn_profile=dev
+
+export MONGO_BASE=/home/clay/ferguson
+export QUANTA_BASE=/home/clay/quantizr-tmp
+

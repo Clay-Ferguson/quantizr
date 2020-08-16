@@ -18,10 +18,6 @@ public class MongoThreadLocal {
 	 * is because we can use a pattern that wraps the 'api.sessionSave()' in a
 	 * finally block somewhere and use that to make sure all work ever done (Node
 	 * property updates, etc) gets 'committed'
-	 * 
-	 * update: todo-0: this is not work able, because of the potentiality of that
-	 * "last saved node wins" issue where multiple copies of same node CAN be in
-	 * memory and then if saved in wrong order that's a bug.
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<HashMap<ObjectId, SubNode>>();
 
@@ -51,26 +47,24 @@ public class MongoThreadLocal {
 	}
 
 	/*
-	 * todo-1: Nice enhancement would be if a node is getting flagged as dirty make
+	 * todo-0: Nice enhancement would be if a node is getting flagged as dirty make
 	 * sure there isn't already a DIFFERENT instance of the same node ID flagged as
 	 * dirty, because this would be a BUG always. The last one written would
 	 * overwrite, so this means if we are working on updating two object instances
 	 * of the same 'node id' at once that is a BUG for sure.
-	 * 
-	 * todo-1: Welp. 8/4/2020 it just happened.
 	 */
 	public static void dirty(SubNode node) {
 		if (node.getId() == null) {
 			return;
 		}
 
-		// this needs thought. was temporary, will keep. todo-0
-		// SubNode nodeFound = getDirtyNodes().get(node.getId());
-		// if (nodeFound != null && nodeFound.hashCode() != node.hashCode()) {
-		// 	log.debug("*************** oops multiple instance of object:" + node.getId().toHexString()
-		// 			+ " are apparently in memory. Ignoring attempt to set the second one to dirty");
-		// 	return;
-		// }
+		SubNode nodeFound = getDirtyNodes().get(node.getId());
+		if (nodeFound != null && nodeFound.hashCode() != node.hashCode()) {
+			log.debug("*************** oops multiple instance of object:" + node.getId().toHexString()
+					+ " are in memory. Ignoring attempt to set the second one to dirty");
+			return;
+		}
+
 		getDirtyNodes().put(node.getId(), node);
 	}
 

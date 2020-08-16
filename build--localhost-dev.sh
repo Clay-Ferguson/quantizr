@@ -1,4 +1,13 @@
 #!/bin/bash
+
+###############################################################################
+# This script is for normal localhost development. After running this script 
+# you should have an instance running at http://localhost:8182
+# In this deploy no docker TAR image containing the deployment is ever
+# generated, because everything's run 'in place' rather than generating a 
+# deployment that can be moved to some other machine.
+###############################################################################
+
 clear
 # show commands as they are run.
 # set -x
