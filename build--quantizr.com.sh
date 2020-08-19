@@ -26,4 +26,7 @@ cd ${PRJROOT}
 docker save -o ${PROD_DEPLOYER_BASE}/${quanta_domain}/subnode-prod.tar subnode-prod
 verifySuccess "Docker Save"
 
-read -p "Build Complete. press a key"
+echo "Build Complete."
+sleep 5
+
+# read -p "Build Complete. press a key"
