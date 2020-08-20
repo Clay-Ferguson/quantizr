@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -112,7 +113,9 @@ public abstract class ExportArchiveBase {
 			SubNode node = api.getNode(session, nodeId);
 			rootPathParent = node.getParentPath();
 			api.authRequireOwnerOfNode(session, node);
-			recurseNode("../", "", node, 0, null, null);
+			ArrayList<SubNode> nodeStack = new ArrayList<SubNode>();
+			nodeStack.add(node);
+			recurseNode("../", "", node, nodeStack, 0, null, null);
 			res.setFileName(shortFileName);
 			success = true;
 		} catch (Exception ex) {
@@ -160,8 +163,8 @@ public abstract class ExportArchiveBase {
 		}
 	}
 
-	private void recurseNode(String rootPath, String parentFolder, SubNode node, int level, String parentHtmlFile,
-			String parentId) {
+	private void recurseNode(String rootPath, String parentFolder, SubNode node, ArrayList<SubNode> nodeStack,
+			int level, String parentHtmlFile, String parentId) {
 		if (node == null)
 			return;
 
@@ -177,6 +180,27 @@ public abstract class ExportArchiveBase {
 
 		html.append("<body>\n");
 
+		// breadcrumbs at the top of each page.
+		if (nodeStack.size() > 1) {
+			StringBuilder sb = new StringBuilder();
+			int max = nodeStack.size()-1;
+			int count = 0;
+			for (SubNode bcNode : nodeStack) {
+				if (sb.length() > 0) {
+					sb.append(" / ");
+				}
+				String friendlyName = generateFileNameFromNode(bcNode);
+				if (friendlyName != null) {
+					sb.append(friendlyName);
+				}
+				count++;
+				if (count >= max) {
+					break;
+				}
+			}
+			html.append("<div class='breadcrumbs'>" + sb.toString() + "</div>");
+		}
+
 		if (parentHtmlFile != null) {
 			html.append("<a href='" + parentHtmlFile + (parentId != null ? "#" + parentId : "")
 					+ "'><button class='uplevel-button'>Up Level</button></a><br style='height:20px;'>");
@@ -189,7 +213,14 @@ public abstract class ExportArchiveBase {
 				null);
 		List<SubNode> children = api.iterateToList(iter);
 
-		String folder = processNodeExport(session, parentFolder, node, html, true, fileName);
+		/*
+		 * This is the header row at the top of the page. The rest of the page is
+		 * children of this node
+		 */
+		html.append("<div class='top-row'/>");
+		processNodeExport(session, parentFolder, node, nodeStack, html, true, fileName);
+		html.append("</div>");
+		String folder = node.getId().toHexString();
 
 		if (children != null) {
 			int childCount = 0;
@@ -199,12 +230,11 @@ public abstract class ExportArchiveBase {
 			 * the current page
 			 */
 			for (SubNode n : children) {
-				if (childCount == 0) {
-					html.append("<hr style='height:10px; background-color: lightGray;'/>");
-				} else {
-					html.append("<hr style='height:3px; background-color: lightGray;'/>");
+				if (childCount > 0) {
+					html.append("<hr class='hr-row'/>");
 				}
-				processNodeExport(session, parentFolder, n, html, false, null);
+
+				processNodeExport(session, parentFolder, n, nodeStack, html, false, null);
 				childCount++;
 			}
 		}
@@ -221,8 +251,10 @@ public abstract class ExportArchiveBase {
 		if (children != null) {
 			/* Second pass over children is the actual recursion down into the tree */
 			for (SubNode n : children) {
-				recurseNode(rootPath + "../", parentFolder + "/" + folder, n, level + 1, relParent,
+				nodeStack.add(n);
+				recurseNode(rootPath + "../", parentFolder + "/" + folder, n, nodeStack, level + 1, relParent,
 						n.getId().toHexString());
+				nodeStack.remove(n);
 			}
 		}
 	}
@@ -236,21 +268,13 @@ public abstract class ExportArchiveBase {
 	 * fileNameCont is an output parameter that has the complete filename minus the
 	 * period and extension.
 	 */
-	private String processNodeExport(MongoSession session, String parentFolder, SubNode node,
-			StringBuilder html, boolean writeFile, ValContainer<String> fileNameCont) {
+	private void processNodeExport(MongoSession session, String parentFolder, SubNode node,
+			ArrayList<SubNode> nodeStack, StringBuilder html, boolean writeFile, ValContainer<String> fileNameCont) {
 		try {
 			// log.debug("Processing Node: " + node.getPath());
 
 			String nodeId = node.getId().toHexString();
 			String fileName = nodeId;
-
-			// todo-0: use this to generate a breadcrumb effect, at the top of each page.
-			//String friendlyName = generateFileNameFromNode(node);
-			// if (writeFile) {
-			// 	if (friendlyName != null) {
-			// 		html.append("<div>" + friendlyName + "</div>");
-			// 	}
-			// }
 
 			html.append("<div href='#" + nodeId + "' class='row-div' id='" + nodeId + "'>");
 
@@ -377,10 +401,6 @@ public abstract class ExportArchiveBase {
 						StreamUtil.close(is);
 					}
 				}
-
-				return fileName;
-			} else {
-				return null;
 			}
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
