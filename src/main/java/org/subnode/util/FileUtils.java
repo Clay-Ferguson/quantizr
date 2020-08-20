@@ -2,6 +2,7 @@ package org.subnode.util;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -67,7 +68,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * input: /home/clay/path/file.txt 
+	 * input: /home/clay/path/file.txt
 	 * 
 	 * output: file.txt
 	 */
@@ -120,6 +121,17 @@ public class FileUtils {
 			return new String(encoded, StandardCharsets.UTF_8);
 		} catch (Exception e) {
 			throw new RuntimeEx("unable to read file: " + path, e);
+		}
+	}
+
+	public static String getResourceFileString(String fileName) {
+		try {
+			ClassLoader classLoader = FileUtils.class.getClassLoader();
+			InputStream inputStream = classLoader.getResourceAsStream(fileName);
+			String val = XString.getStringFromStream(inputStream);
+			return val;
+		} catch (Exception e) {
+			throw new RuntimeEx("unable to read resource file: " + fileName, e);
 		}
 	}
 

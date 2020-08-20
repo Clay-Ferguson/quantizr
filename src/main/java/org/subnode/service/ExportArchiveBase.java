@@ -9,7 +9,9 @@ import java.util.List;
 
 import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
 import org.subnode.config.SessionContext;
+import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.UserPreferences;
 import org.subnode.mongo.MongoApi;
@@ -33,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
 
 /**
@@ -104,11 +107,12 @@ public abstract class ExportArchiveBase {
 		boolean success = false;
 		try {
 			openOutputStream(fullFileName);
+			writeRootFiles();
 
 			SubNode node = api.getNode(session, nodeId);
 			rootPathParent = node.getParentPath();
 			api.authRequireOwnerOfNode(session, node);
-			recurseNode("", node, 0, null);
+			recurseNode("../", "", node, 0, null, null);
 			res.setFileName(shortFileName);
 			success = true;
 		} catch (Exception ex) {
@@ -134,17 +138,48 @@ public abstract class ExportArchiveBase {
 
 	public abstract void addEntry(String fileName, InputStream stream, long length);
 
-	private void recurseNode(String parentFolder, SubNode node, int level, String parentHtmlFile) {
+	private void writeRootFiles() {
+		writeRootFiles("exported.js");
+		writeRootFiles("marked.min.js");
+		writeRootFiles("exported.css");
+		writeRootFiles("darcula.css");
+	}
+
+	private void writeRootFiles(String fileName) {
+		InputStream is = null;
+		String resourceName = "classpath:/public/export-includes/" + fileName;
+		try {
+			Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
+			is = resource.getInputStream();
+			byte[] targetArray = IOUtils.toByteArray(is);
+			addFileEntry(fileName, targetArray);
+		} catch (Exception e) {
+			throw new RuntimeEx("Unable to write resource: " + resourceName, e);
+		} finally {
+			StreamUtil.close(is);
+		}
+	}
+
+	private void recurseNode(String rootPath, String parentFolder, SubNode node, int level, String parentHtmlFile,
+			String parentId) {
 		if (node == null)
 			return;
 
 		log.debug("recurseNode: " + node.getContent() + " parentHtmlFile=" + parentHtmlFile);
 
 		StringBuilder html = new StringBuilder();
-		html.append("<html><body>");
+		html.append("<html>");
+
+		html.append("<head>\n");
+		html.append("<link rel='stylesheet' href='" + rootPath + "exported.css' />");
+		html.append("<link rel='stylesheet' href='" + rootPath + "darcula.css' />");
+		html.append("</head>\n");
+
+		html.append("<body>\n");
 
 		if (parentHtmlFile != null) {
-			html.append("<a href='" + parentHtmlFile + "'><button>Up Level</button></a><br style='height:20px;'>");
+			html.append("<a href='" + parentHtmlFile + (parentId != null ? "#" + parentId : "")
+					+ "'><button class='uplevel-button'>Up Level</button></a><br style='height:20px;'>");
 		}
 
 		/* process the current node */
@@ -174,6 +209,9 @@ public abstract class ExportArchiveBase {
 			}
 		}
 
+		html.append("<script src='" + rootPath + "marked.min.js'></script>");
+		html.append("<script src='" + rootPath + "exported.js'></script>");
+
 		html.append("</body></html>");
 		String htmlFile = fileName.getVal() + ".html";
 		addFileEntry(htmlFile, html.toString().getBytes(StandardCharsets.UTF_8));
@@ -183,7 +221,8 @@ public abstract class ExportArchiveBase {
 		if (children != null) {
 			/* Second pass over children is the actual recursion down into the tree */
 			for (SubNode n : children) {
-				recurseNode(parentFolder + "/" + folder, n, level + 1, relParent);
+				recurseNode(rootPath + "../", parentFolder + "/" + folder, n, level + 1, relParent,
+						n.getId().toHexString());
 			}
 		}
 	}
@@ -197,13 +236,25 @@ public abstract class ExportArchiveBase {
 	 * fileNameCont is an output parameter that has the complete filename minus the
 	 * period and extension.
 	 */
-	private String processNodeExport(MongoSession session, String parentFolder, SubNode node, StringBuilder html,
-			boolean writeFile, ValContainer<String> fileNameCont) {
+	private String processNodeExport(MongoSession session, String parentFolder, SubNode node,
+			StringBuilder html, boolean writeFile, ValContainer<String> fileNameCont) {
 		try {
 			// log.debug("Processing Node: " + node.getPath());
 
-			String fileName = generateFileNameFromNode(node);
 			String nodeId = node.getId().toHexString();
+			String fileName = nodeId;
+
+			// todo-0: use this to generate a breadcrumb effect, at the top of each page.
+			//String friendlyName = generateFileNameFromNode(node);
+			// if (writeFile) {
+			// 	if (friendlyName != null) {
+			// 		html.append("<div>" + friendlyName + "</div>");
+			// 	}
+			// }
+
+			html.append("<div href='#" + nodeId + "' class='row-div' id='" + nodeId + "'>");
+
+			html.append("<div class='meta-info'>" + nodeId + "</div>");
 
 			/*
 			 * If we aren't writing the file we know we need the text appended to include a
@@ -219,7 +270,7 @@ public abstract class ExportArchiveBase {
 				long childCount = api.getChildCount(session, node);
 				if (childCount > 0) {
 					String htmlFile = "./" + fileName + "/" + fileName + ".html";
-					html.append("<a href='" + htmlFile + "'><button>Open</button></a><br>");
+					html.append("<a href='" + htmlFile + "'><button class='open-button'>Open</button></a><br>");
 				}
 			}
 
@@ -227,7 +278,11 @@ public abstract class ExportArchiveBase {
 			content = content.trim();
 
 			String escapedContent = StringEscapeUtils.escapeHtml4(content);
-			html.append("\n<pre>" + escapedContent + "\n</pre>");
+			if (node.getType().equals(NodeType.PLAIN_TEXT.s())) {
+				html.append("\n<pre>" + escapedContent + "\n</pre>");
+			} else {
+				html.append("\n<div class='markdown container'>" + escapedContent + "\n</div>");
+			}
 
 			String binFileNameProp = node.getStringProp(NodeProp.BIN_FILENAME.s());
 			String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
@@ -238,7 +293,10 @@ public abstract class ExportArchiveBase {
 
 			String imgUrl = null;
 
-			/* if this is a 'data:' encoded image read it from binary storage and put that directly in url src */
+			/*
+			 * if this is a 'data:' encoded image read it from binary storage and put that
+			 * directly in url src
+			 */
 			String dataUrl = node.getStringProp(NodeProp.BIN_DATA_URL.s());
 			if ("t".equals(dataUrl)) {
 				imgUrl = attachmentService.getStringByNode(session, node);
@@ -247,8 +305,8 @@ public abstract class ExportArchiveBase {
 				if (!imgUrl.startsWith("data:")) {
 					imgUrl = null;
 				}
-			} 
-			//Otherwise if this is an ordinary binary image, encode the link to it.
+			}
+			// Otherwise if this is an ordinary binary image, encode the link to it.
 			else if (mimeType != null && mimeType.startsWith("image/")) {
 				String relImgPath = writeFile ? "" : (fileName + "/");
 				/*
@@ -264,6 +322,8 @@ public abstract class ExportArchiveBase {
 						"<br><img id='img_" + nodeId + "' style='width:400px' onclick='document.getElementById(\"img_"
 								+ nodeId + "\").style.width=\"\"' src='" + imgUrl + "'/>");
 			}
+
+			html.append("</div>");
 
 			if (writeFile) {
 				fileNameCont.setVal(parentFolder + "/" + fileName + "/" + fileName);
@@ -396,8 +456,7 @@ public abstract class ExportArchiveBase {
 
 		log.debug(" nodePath=[" + node.getPath() + "] fileName=[" + fileName + "]");
 
-		fileName = XString.addLeadingZeroes(String.valueOf(node.getOrdinal()), 5) + "--"
-				+ XString.trimToMaxLen(fileName, 40);
+		fileName = XString.trimToMaxLen(fileName, 40);
 		return fileName;
 	}
 }

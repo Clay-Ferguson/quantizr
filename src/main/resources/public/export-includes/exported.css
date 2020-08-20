@@ -1,0 +1,75 @@
+body { 
+    background-color: darken(rgb(32, 34, 36), 7%);
+    color: white;
+}
+
+html {
+    font-family: "Roboto", "Verdana", "Aria";
+} 
+
+pre {
+    width: 100%;
+}
+
+.row-div {
+    border-left: 10px solid transparent;
+    padding-left: 8px;
+}
+
+.open-button {
+    background-color: green;
+    color: white;
+    padding: 8px;
+}
+
+.uplevel-button {
+    background-color: gray;
+    color: black;
+    padding: 8px;
+}
+
+.meta-info {
+    float: right;
+}
+
+
+/************************************************************** 
+Media Queries below are per Bootstap 4 standard */
+
+/* Small devices (tiny, 320px and up) */
+
+/* Small devices (portrait phones?, 576px and up) */
+@media (min-width: 576px) {
+    .container{
+        max-width: 500px;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .container{
+        max-width: 700px;
+    }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    .container{
+        max-width: 800px;
+    }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+
+@media (min-width: 1200px) {
+    .container{
+        max-width: 1000px;
+    }
+}
+
+//this size is non-standard and larger than anything bootstrap considers.
+@media (min-width: 1500px) {
+    .container{
+        max-width: 1400px;
+    }
+}

@@ -2,7 +2,10 @@ package org.subnode.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +16,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.subnode.config.SpringContextUtil;
-
+import org.subnode.exception.base.RuntimeEx;
+import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.Resource;
 
 /**
@@ -32,6 +36,17 @@ public class XString {
 			return jsonPrettyWriter.writeValueAsString(obj);
 		} catch (JsonProcessingException e) {
 			return "";
+		}
+	}
+
+	public static String getStringFromStream(InputStream inputStream) {
+		try {
+			StringWriter writer = new StringWriter();
+			String encoding = StandardCharsets.UTF_8.name();
+			IOUtils.copy(inputStream, writer, encoding);
+			return writer.toString();
+		} catch (Exception e) {
+			throw new RuntimeEx("getStringFromStream failed.", e);
 		}
 	}
 
