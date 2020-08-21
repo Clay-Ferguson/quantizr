@@ -23,7 +23,7 @@ public class AppSessionListener implements HttpSessionListener {
 	public void sessionCreated(HttpSessionEvent se) {
 		HttpSession session = se.getSession();
 
-		// Using this to test timeout behavior. DO NOT CHECK INTO PROD
+		// Use this to test timeout behavior.
 		// session.setMaxInactiveInterval(10);
 
 		/*

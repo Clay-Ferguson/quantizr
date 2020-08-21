@@ -25,13 +25,17 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
+ * 
+ * There's a lot of commented code in here, but most of it I'm keeping just for
+ * future reference, because there's always numerous different ways to do
+ * things, and I want to keep all that stuff as FYI, and to remind the other
+ * ways of doing things.
  */
 @Configuration
 public class AppConfiguration implements WebMvcConfigurer {
@@ -43,13 +47,14 @@ public class AppConfiguration implements WebMvcConfigurer {
 	// todo-0: turned off to test ActivityPub
 	// @Bean
 	// public WebMvcConfigurer corsConfigurer() {
-	// 	return new WebMvcConfigurer() {
-	// 		@Override
-	// 		public void addCorsMappings(CorsRegistry registry) {
-	// 			registry.addMapping("/**")
-	// 					.allowedOrigins("https://" + appProp.getMetaHost() + ":" + appProp.getServerPort());
-	// 		}
-	// 	};
+	// return new WebMvcConfigurer() {
+	// @Override
+	// public void addCorsMappings(CorsRegistry registry) {
+	// registry.addMapping("/**")
+	// .allowedOrigins("https://" + appProp.getMetaHost() + ":" +
+	// appProp.getServerPort());
+	// }
+	// };
 	// }
 
 	/*
@@ -62,7 +67,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 		return new ConcurrentTaskScheduler(); // single threaded by default
 	}
 
-	// Turns out we don't need this.
+	// we don't need this.
 	// @Override
 	// public void addViewControllers(ViewControllerRegistry registry) {
 	// ViewControllerRegistration reg = registry.addViewController("/");
@@ -259,7 +264,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	// Thymeleaf
 	// available resolver types
 	// -ClassLoaderTemplateResolver
-	// -FileTemplateResolver 
+	// -FileTemplateResolver
 	// -ServletContextTemplateResolver
 	// -UrlTemplateResolver
 	///////////////////////////////

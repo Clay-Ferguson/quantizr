@@ -21,13 +21,6 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
-/**
- * Service for searching the repository. This searching is currently very basic,
- * and just grabs the first 100 results. Despite it being basic right now, it is
- * however EXTREMELY high performance and leverages the full and best search
- * performance that can be gotten out of Lucene, which beats any other
- * technology in the world in it's power.
- */
 @Component
 public class GraphNodesService {
 	private static final Logger log = LoggerFactory.getLogger(GraphNodesService.class);

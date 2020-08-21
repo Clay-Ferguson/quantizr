@@ -1,5 +1,6 @@
 package org.subnode.config;
 
+//todo-0: why did I remove this?
 public class GracefulShutdown {
 /*
 implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent> {

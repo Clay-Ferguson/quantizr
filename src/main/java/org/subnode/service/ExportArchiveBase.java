@@ -192,7 +192,7 @@ public abstract class ExportArchiveBase {
 
 		if (parentHtmlFile != null) {
 			html.append("<a href='" + parentHtmlFile + (parentId != null ? "#" + parentId : "")
-					+ "'><button class='uplevel-button'>Up Level</button></a><br style='height:20px;'>");
+					+ "'><button class='uplevel-button'>Up Level</button></a>");
 		}
 
 		/* process the current node */
@@ -206,25 +206,27 @@ public abstract class ExportArchiveBase {
 		 * This is the header row at the top of the page. The rest of the page is
 		 * children of this node
 		 */
-		html.append("<div class='top-row'/>");
-		processNodeExport(session, parentFolder, node, nodeStack, html, true, fileName);
-		html.append("</div>");
+		html.append("<div class='top-row'/>\n");
+		processNodeExport(session, parentFolder, "", node, html, true, fileName, true, 0, true);
+		html.append("</div>\n");
 		String folder = node.getId().toHexString();
 
 		if (children != null) {
-			int childCount = 0;
-
 			/*
 			 * First pass over children is to embed their content onto the child display on
 			 * the current page
 			 */
 			for (SubNode n : children) {
-				if (childCount > 0) {
-					html.append("<hr class='hr-row'/>");
-				}
+				String inlineChildren = n.getStringProp(NodeProp.INLINE_CHILDREN.s());
+				boolean allowOpenButton = !"1".equals(inlineChildren);
 
-				processNodeExport(session, parentFolder, n, nodeStack, html, false, null);
-				childCount++;
+				processNodeExport(session, parentFolder, "", n, html, false, null, allowOpenButton, 0, false);
+
+				if ("1".equals(inlineChildren)) {
+					String subFolder = n.getId().toHexString();
+					//log.debug("Inline Node: "+node.getContent()+" subFolder="+subFolder);
+					inlineChildren(html, n, parentFolder, subFolder + "/", 1);
+				}
 			}
 		}
 
@@ -248,6 +250,31 @@ public abstract class ExportArchiveBase {
 		}
 	}
 
+	private void inlineChildren(StringBuilder html, SubNode node, String parentFolder, String deeperPath, int level) {
+		Iterable<SubNode> iter = api.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL),
+				null);
+		List<SubNode> children = api.iterateToList(iter);
+
+		if (children != null) {
+			/*
+			 * First pass over children is to embed their content onto the child display on
+			 * the current page
+			 */
+			for (SubNode n : children) {
+				String inlineChildren = n.getStringProp(NodeProp.INLINE_CHILDREN.s());
+				boolean allowOpenButton = !"1".equals(inlineChildren);
+				String folder = n.getId().toHexString();
+
+				processNodeExport(session, parentFolder, deeperPath, n, html, false, null, allowOpenButton, level,
+						false);
+
+				if ("1".equals(inlineChildren)) {
+					inlineChildren(html, n, parentFolder, deeperPath + folder + "/", level + 1);
+				}
+			}
+		}
+	}
+
 	/*
 	 * NOTE: It's correct that there's no finally block in here enforcing the
 	 * closeEntry, becasue we let exceptions bubble all the way up to abort and even
@@ -257,23 +284,29 @@ public abstract class ExportArchiveBase {
 	 * fileNameCont is an output parameter that has the complete filename minus the
 	 * period and extension.
 	 */
-	private void processNodeExport(MongoSession session, String parentFolder, SubNode node,
-			ArrayList<SubNode> nodeStack, StringBuilder html, boolean writeFile, ValContainer<String> fileNameCont) {
+	private void processNodeExport(MongoSession session, String parentFolder, String deeperPath, SubNode node, StringBuilder html,
+			boolean writeFile, ValContainer<String> fileNameCont, boolean allowOpenButton, int level,
+			boolean isTopRow) {
 		try {
-			// log.debug("Processing Node: " + node.getPath());
+			//log.debug("Processing Node: " + node.getContent()+" parentFolder: "+parentFolder);
 
 			String nodeId = node.getId().toHexString();
 			String fileName = nodeId;
+			String rowClass = isTopRow ? "" : "class='row-div'";
 
-			html.append("<div href='#" + nodeId + "' class='row-div' id='" + nodeId + "'>");
+			String indenter = "";
+			if (level > 0) {
+				indenter = " style='margin-left:" + String.valueOf(level * 30) + "px'";
+			}
+			html.append("<div href='#" + nodeId + "' " + rowClass + " id='" + nodeId + "' " + indenter + ">\n");
 
-			html.append("<div class='meta-info'>" + nodeId + "</div>");
+			html.append("<div class='meta-info'>" + nodeId + "</div>\n");
 
 			/*
 			 * If we aren't writing the file we know we need the text appended to include a
 			 * link to open the content
 			 */
-			if (!writeFile) {
+			if (!writeFile && allowOpenButton) {
 				/*
 				 * This is a slight ineffeciency for now, to call getChildCount, because
 				 * eventually we will be trying to get the children for all nodes we encounter,
@@ -282,8 +315,8 @@ public abstract class ExportArchiveBase {
 				 */
 				long childCount = api.getChildCount(session, node);
 				if (childCount > 0) {
-					String htmlFile = "./" + fileName + "/" + fileName + ".html";
-					html.append("<a href='" + htmlFile + "'><button class='open-button'>Open</button></a><br>");
+					String htmlFile = "./" + deeperPath + fileName + "/" + fileName + ".html";
+					html.append("<a href='" + htmlFile + "'><button class='open-button'>Open</button></a>");
 				}
 			}
 
@@ -341,16 +374,16 @@ public abstract class ExportArchiveBase {
 			}
 
 			if (imgUrl != null) {
-				html.append("<br><img title='" + binFileNameStr + "' id='img_" + nodeId
-						+ "' style='width:400px' onclick='document.getElementById(\"img_" + nodeId
+				html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
+						+ "' style='width:30%' onclick='document.getElementById(\"img_" + nodeId
 						+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
 			} //
 			else if (attachmentUrl != null) {
-				html.append(
-						"<br><a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: " + binFileNameStr + "</a>");
+				html.append("<a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: "
+						+ binFileNameStr + "</a>");
 			}
 
-			html.append("</div>");
+			html.append("</div>\n");
 
 			if (writeFile) {
 				fileNameCont.setVal(parentFolder + "/" + fileName + "/" + fileName);

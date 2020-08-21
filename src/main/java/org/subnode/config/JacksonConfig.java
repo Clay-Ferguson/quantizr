@@ -13,7 +13,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
  * spring.jackson.serialization.indent_output=true
  */
 @Configuration
-public class JacksonPrettyPrintConfiguration {
+public class JacksonConfig {
 
     // NOTE: I never got this class working with WebMvcConfigurationSupport, because it always disables the app
     // because something in Spring MVC is broken in it and even the index.html

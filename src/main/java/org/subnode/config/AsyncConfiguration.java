@@ -1,11 +1,15 @@
 package org.subnode.config;
 
-//This class is commented out because the application.property as follows appears to be enough, to make video streaming not timeout after a minute or so, which is
-//all I wa stying to accomplish, so the code posted here
+//This class is commented out because the application.property as follows appears to be enough, to make video streaming not 
+//timeout after a minute or so, which is
+//all I was trying to accomplish, so the code posted here
 //https://stackoverflow.com/questions/42877498/async-timeout-downloading-a-large-file-using-streamingresponsebody-on-spring-boo
 //is not needed but only this property is required (at least for spring-boot):
-//spring.mvc.async.request-timeout = 3600000
-
+//
+//    spring.mvc.async.request-timeout = 3600000
+//
+// DO NOT DELETE: Keep all this code for future reference.
+//
 // @Configuration
 // @EnableAsync
 // @EnableScheduling

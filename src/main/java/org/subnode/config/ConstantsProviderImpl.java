@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
  * into thymeleaf, but it looks more complex and less powerful than this approach. Using the
  * constantsProvider we get access to properties in a way were we can actually process them if we
  * need to before handing them to spring, because we are implementing the getters here.
+ * 
+ * todo-0: merge this into AppProp ?
  */
 @Component("constantsProvider")
 public class ConstantsProviderImpl implements ConstantsProvider {

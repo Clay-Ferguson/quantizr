@@ -23,9 +23,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
- * Wrapper for holding variables that we need to maintain server state of for a
- * session. Basic session state storage is all collected here.
- * 
  * The ScopedProxyMode.TARGET_CLASS annotation allows this session bean to be
  * available on singletons or other beans that are not themselves session
  * scoped.
@@ -41,7 +38,6 @@ public class SessionContext {
 	private String error;
 
 	/* Identification of user's account root node */
-	// private Ref_Info rootRef_Info;
 	private String rootId;
 
 	private String userName;
@@ -107,6 +103,8 @@ public class SessionContext {
 	/*
 	 * NOTE: Not a generic formatTime utility function. This is initialized PER user
 	 * (via their timezone)
+	 * 
+	 * todo-0: move to utilities class
 	 */
 	public String formatTime(Date date) {
 		if (date == null)
