@@ -40,14 +40,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
 
 /**
- * Base class for exporting to archives. Two superclasses will exist:
- * 
- * 1) Zip Export
- * 
- * 2) TAR export
+ * Base class for exporting to archives (ZIP and TAR).
  * 
  * NOTE: Derived classes are expected to be 'prototype' scope so we can keep
- * state in this object on a per-export basis.
+ * state in this object on a per-export basis. That is, each time a user does an
+ * export, a new instance of this class is created that is dedicated just do
+ * doing that one export and so any member varibles in this class have just that
+ * one export as their 'scope'
  */
 public abstract class ExportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
@@ -131,24 +130,14 @@ public abstract class ExportArchiveBase {
 		res.setSuccess(true);
 	}
 
-	public abstract String getFileExtension();
-
-	public abstract void openOutputStream(String fileName);
-
-	public abstract void closeOutputStream();
-
-	public abstract void addEntry(String fileName, byte[] bytes);
-
-	public abstract void addEntry(String fileName, InputStream stream, long length);
-
 	private void writeRootFiles() {
-		writeRootFiles("exported.js");
-		writeRootFiles("marked.min.js");
-		writeRootFiles("exported.css");
-		writeRootFiles("darcula.css");
+		writeRootFile("exported.js");
+		writeRootFile("marked.min.js");
+		writeRootFile("exported.css");
+		writeRootFile("darcula.css");
 	}
 
-	private void writeRootFiles(String fileName) {
+	private void writeRootFile(String fileName) {
 		InputStream is = null;
 		String resourceName = "classpath:/public/export-includes/" + fileName;
 		try {
@@ -183,7 +172,7 @@ public abstract class ExportArchiveBase {
 		// breadcrumbs at the top of each page.
 		if (nodeStack.size() > 1) {
 			StringBuilder sb = new StringBuilder();
-			int max = nodeStack.size()-1;
+			int max = nodeStack.size() - 1;
 			int count = 0;
 			for (SubNode bcNode : nodeStack) {
 				if (sb.length() > 0) {
@@ -316,6 +305,7 @@ public abstract class ExportArchiveBase {
 			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 
 			String imgUrl = null;
+			String attachmentUrl = null;
 
 			/*
 			 * if this is a 'data:' encoded image read it from binary storage and put that
@@ -336,15 +326,28 @@ public abstract class ExportArchiveBase {
 				/*
 				 * embeds an image that's 400px wide until you click it which makes it go
 				 * fullsize
+				 * 
 				 */
 				imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + nodeId + "-" + binFileNameStr)
+						: (Const.IPFS_IO_GATEWAY + ipfsLink);
+			} else if (mimeType != null) {
+				String relPath = writeFile ? "" : (fileName + "/");
+				/*
+				 * embeds an image that's 400px wide until you click it which makes it go
+				 * fullsize
+				 */
+				attachmentUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relPath + nodeId + "-" + binFileNameStr)
 						: (Const.IPFS_IO_GATEWAY + ipfsLink);
 			}
 
 			if (imgUrl != null) {
+				html.append("<br><img title='" + binFileNameStr + "' id='img_" + nodeId
+						+ "' style='width:400px' onclick='document.getElementById(\"img_" + nodeId
+						+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
+			} //
+			else if (attachmentUrl != null) {
 				html.append(
-						"<br><img id='img_" + nodeId + "' style='width:400px' onclick='document.getElementById(\"img_"
-								+ nodeId + "\").style.width=\"\"' src='" + imgUrl + "'/>");
+						"<br><a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: " + binFileNameStr + "</a>");
 			}
 
 			html.append("</div>");
@@ -382,11 +385,11 @@ public abstract class ExportArchiveBase {
 						is = attachmentService.getStream(session, node, false, false);
 						BufferedInputStream bis = new BufferedInputStream(is);
 						long length = node.getIntProp(NodeProp.BIN_SIZE.s());
+						String binFileName = parentFolder + "/" + fileName + "/" + nodeId + "-" + binFileNameStr;
 
 						if (length > 0) {
 							/* NOTE: the archive WILL fail if no length exists in this codepath */
-							addFileEntry(parentFolder + "/" + fileName + "/" + nodeId + "-" + binFileNameStr, bis,
-									length);
+							addFileEntry(binFileName, bis, length);
 						} else {
 							/*
 							 * This *should* never happen that we fall back to writing as an array from the
@@ -394,8 +397,7 @@ public abstract class ExportArchiveBase {
 							 * node. But re are trying to be as resilient as possible here falling back to
 							 * this rather than failing the entire export
 							 */
-							addFileEntry(parentFolder + "/" + fileName + "/" + nodeId + "-" + binFileNameStr,
-									IOUtils.toByteArray(bis));
+							addFileEntry(binFileName, IOUtils.toByteArray(bis));
 						}
 					} finally {
 						StreamUtil.close(is);
@@ -479,4 +481,14 @@ public abstract class ExportArchiveBase {
 		fileName = XString.trimToMaxLen(fileName, 40);
 		return fileName;
 	}
+
+	public abstract String getFileExtension();
+
+	public abstract void openOutputStream(String fileName);
+
+	public abstract void closeOutputStream();
+
+	public abstract void addEntry(String fileName, byte[] bytes);
+
+	public abstract void addEntry(String fileName, InputStream stream, long length);
 }

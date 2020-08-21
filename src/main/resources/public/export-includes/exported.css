@@ -3,6 +3,10 @@ body {
     color: white;
 }
 
+.link { 
+    color: cyan; 
+}
+
 html {
     font-family: "Roboto", "Verdana", "Aria";
 } 
