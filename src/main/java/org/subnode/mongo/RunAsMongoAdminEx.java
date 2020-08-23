@@ -1,6 +1,5 @@
 package org.subnode.mongo;
 
-import org.subnode.util.MongoRunnable;
 import org.subnode.util.MongoRunnableEx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +30,6 @@ public class RunAsMongoAdminEx<T> {
 		catch (Exception ex) {
 			log.error("error", ex);
 			throw ex;
-		}
-		finally {
 		}
 		return (T)ret;
 	}

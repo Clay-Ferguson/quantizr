@@ -61,12 +61,6 @@ public class NodeRenderService {
 	private SessionContext sessionContext;
 
 	@Autowired
-	private FileSyncService fileSyncService;
-
-	@Autowired
-	private IPFSSyncService ipfsSyncService;
-
-	@Autowired
 	private ConstantsProvider constProvider;
 
 	/* Note: this MUST match nav.ROWS_PER_PAGE variable in TypeScript */
@@ -192,19 +186,6 @@ public class NodeRenderService {
 						break;
 					}
 				}
-			}
-		}
-
-		/*
-		 * For IPFS Proof-of-Concept work we just code the call right here, rather than
-		 * having a plugin-based polymorphic interface we can call to fully decouple the
-		 * IPFS from this rener service.
-		 */
-		if (session.isAdmin()) {
-			if (node.isType(NodeType.FS_FOLDER)) {
-				fileSyncService.syncFolder(session, node, false, null);
-			} else if (node.isType(NodeType.IPFS_NODE)) {
-				ipfsSyncService.syncNode(session, node, false, null, req.isForceIPFSRefresh());
 			}
 		}
 

@@ -43,27 +43,6 @@ public class SystemService {
 	@Autowired
 	private AttachmentService attachmentService;
 
-	public String backupDb() {
-		ValContainer<String> ret = new ValContainer<String>("");
-		adminRunner.run(session -> {
-			/*
-			 * What we are doing here is exporting the '/r/public' data into a set of files
-			 * which we can then include in the build right inside the WAR, and then use the
-			 * 'initializeAppContent()' function to be able to reimport this at any time to
-			 * initializa any existing instance of SubNode, app so long as we pre-create the
-			 * '/r/public' target node and have that node clean/empty prior to running
-			 * initializeAppContent.
-			 */
-			ret.setVal(ret.getVal() + exportJsonService.dumpAllNodes(session, "/r/public/", "public"));
-			// ret.setVal(ret.getVal()+exportJsonService.dumpAllNodes(session, "/r/books/",
-			// "books"));
-			ret.setVal(ret.getVal() + exportJsonService.dumpAllNodes(session, "/r/private/", "private"));
-			ret.setVal(ret.getVal() + exportJsonService.dumpAllNodes(session, "/r/rss/", "rss"));
-		});
-
-		return ret.getVal();
-	}
-
 	public String initializeAppContent() {
 		ValContainer<String> ret = new ValContainer<String>();
 		adminRunner.run(session -> {

@@ -161,8 +161,7 @@ public class SubNodeUtil {
 		for (int i = 0; i < len; i += 2) {
 			char c = uid.charAt(i);
 			if (c == '-') {
-				i--;// account for the fact we jump by tow, and start just after
-				// dash.
+				i--;
 			} else {
 				sb.append(c);
 			}

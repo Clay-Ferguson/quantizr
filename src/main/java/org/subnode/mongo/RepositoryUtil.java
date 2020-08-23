@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.SignupRequest;
-import org.subnode.response.SignupResponse;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.XString;

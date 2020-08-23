@@ -71,16 +71,4 @@ public class MimeTypeUtils {
         }
         return ret;
     }
-
-    // public static String getFileNameExtension(String fileName) {
-    // File f = new File(fileName);
-    // String shortName = f.getName();
-    // int index = shortName.lastIndexOf(".");
-    // String ext = "";
-    // if (index != -1) {
-    // ext = shortName.substring(index + 1);
-    // }
-    // return ext;
-    // }
-
 }

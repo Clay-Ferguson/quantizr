@@ -95,7 +95,6 @@ import org.subnode.service.AttachmentService;
 import org.subnode.service.BashService;
 import org.subnode.service.ExportTarService;
 import org.subnode.service.ExportZipService;
-import org.subnode.service.GraphNodesService;
 import org.subnode.service.IPFSService;
 import org.subnode.service.ImportBookService;
 import org.subnode.service.ImportService;
@@ -104,7 +103,6 @@ import org.subnode.service.NodeEditService;
 import org.subnode.service.NodeMoveService;
 import org.subnode.service.NodeRenderService;
 import org.subnode.service.NodeSearchService;
-import org.subnode.service.SolrSearchService;
 import org.subnode.service.SystemService;
 import org.subnode.service.UserFeedService;
 import org.subnode.service.UserManagerService;
@@ -193,16 +191,10 @@ public class AppController implements ErrorController {
 	private SystemService systemService;
 
 	@Autowired
-	private SolrSearchService solrSearchService;
-
-	@Autowired
 	private LuceneService luceneService;
 
 	@Autowired
 	private IPFSService ipfsService;
-
-	@Autowired
-	private GraphNodesService graphNodesService;
 
 	// @Autowired
 	// private ApplicationEventPublisher eventPublisher;
@@ -776,13 +768,6 @@ public class AppController implements ErrorController {
 		});
 	}
 
-	@RequestMapping(value = API_PATH + "/graphNodes", method = RequestMethod.POST)
-	public @ResponseBody Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
-		return callProc.run("nodeSearch", req, session, ms -> {
-			return graphNodesService.graphNodes(ms, req);
-		});
-	}
-
 	@RequestMapping(value = API_PATH + "/getSharedNodes", method = RequestMethod.POST)
 	public @ResponseBody Object getSharedNodes(@RequestBody GetSharedNodesRequest req, HttpSession session) {
 		return callProc.run("getSharedNodes", req, session, ms -> {
@@ -836,8 +821,6 @@ public class AppController implements ErrorController {
 				res.getMessages().add(new InfoMessage(ipfsService.getNodeInfo(ms, req.getNodeId()), null));
 			} else if (req.getCommand().equalsIgnoreCase("compactDb")) {
 				res.getMessages().add(new InfoMessage(systemService.compactDb(), null));
-			} else if (req.getCommand().equalsIgnoreCase("backupDb")) {
-				res.getMessages().add(new InfoMessage(systemService.backupDb(), null));
 			} else if (req.getCommand().equalsIgnoreCase("initializeAppContent")) {
 				log.error("initializeAppContent is obsolet, and was also refactored without being retested");
 				// res.setServerInfo(systemService.initializeAppContent());

@@ -3,6 +3,16 @@ body {
     color: white;
 }
 
+.markdown kbd,
+.markdown pre,
+.markdown samp {    
+    width: 100%; 
+    border: 2px dotted green;
+    padding: 8px;
+    background-color: black;
+    color: green;
+}
+
 a:link, a:visited {
     color: lightGray;
 }

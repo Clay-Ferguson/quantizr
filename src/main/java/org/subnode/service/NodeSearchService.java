@@ -49,12 +49,6 @@ public class NodeSearchService {
 	@Autowired
 	private SessionContext sessionContext;
 
-	@Autowired
-	private RunAsMongoAdmin adminRunner;
-
-	@Autowired
-	private UserFeedService userFeedService;
-
 	public NodeSearchResponse search(MongoSession session, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();
 		if (session == null) {

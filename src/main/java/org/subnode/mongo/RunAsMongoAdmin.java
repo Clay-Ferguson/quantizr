@@ -32,7 +32,5 @@ public class RunAsMongoAdmin {
 			log.error("error", ex);
 			throw ex;
 		}
-		finally {
-		}
 	}
 }

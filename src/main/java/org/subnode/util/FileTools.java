@@ -16,6 +16,7 @@ import java.util.Set;
 /**
  * Tools related to file management. Creating, deleting files, etc.
  *
+ * todo-0: merg all this into FileUtils
  */
 public class FileTools {
 	private static final Logger log = LoggerFactory.getLogger(FileTools.class);

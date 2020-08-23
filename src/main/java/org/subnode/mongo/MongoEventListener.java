@@ -1,7 +1,6 @@
 package org.subnode.mongo;
 
 import org.subnode.config.NodeName;
-import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
@@ -30,9 +29,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Autowired
 	private UserFeedService userFeedService;
-
-	@Autowired
-	private SessionContext sessionContext;
 
 	/*
 	 * todo-2: This is a temporary hack to allow our ExportJsonService.resetNode

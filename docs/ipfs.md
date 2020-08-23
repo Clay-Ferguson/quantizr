@@ -27,8 +27,6 @@ The Quanta back end allows nodes to be created by the end user and then configur
 Below are links to the main IPFS code in Quanta that caches IPFS into MongoDB:
 
 https://github.com/Clay-Ferguson/Quanta/blob/master/src/main/java/org/subnode/service/IPFSService.java
-https://github.com/Clay-Ferguson/Quanta/blob/master/src/main/java/org/subnode/service/IPFSSyncService.java
-
 
 # IPFS Crawler (IPFS Search Engine)
 

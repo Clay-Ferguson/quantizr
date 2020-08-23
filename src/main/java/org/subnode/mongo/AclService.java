@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.subnode.model.client.PrincipalName;
-import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.model.client.NodeProp;

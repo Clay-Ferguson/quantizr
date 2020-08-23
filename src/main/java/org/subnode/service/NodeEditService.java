@@ -1,6 +1,5 @@
 package org.subnode.service;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import org.subnode.model.client.NodeProp;
@@ -60,9 +59,6 @@ public class NodeEditService {
 	private MongoApi api;
 
 	@Autowired
-	private SubNodeUtil apiUtil;
-
-	@Autowired
 	private SessionContext sessionContext;
 
 	@Autowired
@@ -110,11 +106,9 @@ public class NodeEditService {
 			return res;
 		}
 
-		SubNode newNode = null;
-
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
-		newNode = api.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties());
+		SubNode newNode = api.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties());
 
 		if (!req.isUpdateModTime()) {
 			newNode.setModifyTime(null);

@@ -28,9 +28,6 @@ public class GraphNodesService {
 	@Autowired
 	private MongoApi api;
 
-	@Autowired
-	private SessionContext sessionContext;
-
 	private static final int MAX_NODES = 500;
 
 	class GenerateContext {

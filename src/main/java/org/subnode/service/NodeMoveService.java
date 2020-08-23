@@ -2,9 +2,7 @@ package org.subnode.service;
 
 import java.util.List;
 
-import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -39,9 +37,6 @@ public class NodeMoveService {
 
 	@Autowired
 	private UserManagerService userManagerService;
-
-	@Autowired
-	private AttachmentService attachmentService;
 
 	/*
 	 * Moves the the node to a new ordinal/position location (relative to parent)
