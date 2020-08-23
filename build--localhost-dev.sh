@@ -14,6 +14,8 @@ clear
 source ./define-functions.sh
 source ./setenv--localhost-dev.sh
 
+sudo chown 999:999 ../secrets/mongod--localhost-dev.conf
+
 sudo rm -f /home/clay/quantizr-tmp/log/*
 mkdir -p ${ipfs_staging}
 

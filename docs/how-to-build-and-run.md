@@ -117,7 +117,6 @@ In file `setenv-common.sh` you'll see a `secrets.sh` file. You must provide this
     export emailPassword=
     export devEmail=
     export testPassword=
-    export hostMongoDbPath=
     export subnodePassword=
     export prodKeyStorePassword=
     export reCaptcha3SiteKey=

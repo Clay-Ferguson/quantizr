@@ -5,6 +5,8 @@
 # (see file `build--localhost-test.sh`)
 ###############################################################################
 
+cd /home/clay/ferguson/subnode-run
+
 source ./define-functions.sh
 source ./setenv--localhost-test.sh
 

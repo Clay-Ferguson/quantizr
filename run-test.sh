@@ -8,13 +8,15 @@
 # (see file `build--localhost-test.sh`)
 ###############################################################################
 
+cd /home/clay/ferguson/subnode-run
+
 source ./define-functions.sh
 source ./setenv--localhost-test.sh
 
 docker-compose -f ${docker_compose_yaml} down --remove-orphans
 verifySuccess "Docker Compose: down"
 
-sudo chown 999:999 ./mongod.conf
+sudo chown 999:999 ./mongod--localhost-test.conf
 
 # sudo docker ps
 # read -p "Verify no instances up. Press any key."

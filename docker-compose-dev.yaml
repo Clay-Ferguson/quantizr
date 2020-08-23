@@ -16,7 +16,7 @@ services:
             - '${MONGO_BASE}/mongodb-data-dev:/data/db'
             - '${MONGO_BASE}/mongo-dumps-dev:/mongo-dumps'
             - '${MONGO_BASE}/mongo-scripts-dev:/mongo-scripts'
-            - '${MONGO_BASE}/mongo-conf-dev/mongod.conf:/etc/mongod.conf'
+            - '${MONGO_BASE}/secrets/mongod--localhost-dev.conf:/etc/mongod.conf'
         #NOTE: This 'command' property is only needed when we want to start mongod on a port other than 27017    
         command: mongod --config /etc/mongod.conf
         #entrypoint: ["mongod","--config","/etc/mongod.conf"]
