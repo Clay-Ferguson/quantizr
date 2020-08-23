@@ -29,7 +29,7 @@ import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
-
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -224,7 +224,7 @@ public abstract class ExportArchiveBase {
 
 				if ("1".equals(inlineChildren)) {
 					String subFolder = n.getId().toHexString();
-					//log.debug("Inline Node: "+node.getContent()+" subFolder="+subFolder);
+					// log.debug("Inline Node: "+node.getContent()+" subFolder="+subFolder);
 					inlineChildren(html, n, parentFolder, subFolder + "/", 1);
 				}
 			}
@@ -284,11 +284,12 @@ public abstract class ExportArchiveBase {
 	 * fileNameCont is an output parameter that has the complete filename minus the
 	 * period and extension.
 	 */
-	private void processNodeExport(MongoSession session, String parentFolder, String deeperPath, SubNode node, StringBuilder html,
-			boolean writeFile, ValContainer<String> fileNameCont, boolean allowOpenButton, int level,
-			boolean isTopRow) {
+	private void processNodeExport(MongoSession session, String parentFolder, String deeperPath, SubNode node,
+			StringBuilder html, boolean writeFile, ValContainer<String> fileNameCont, boolean allowOpenButton,
+			int level, boolean isTopRow) {
 		try {
-			//log.debug("Processing Node: " + node.getContent()+" parentFolder: "+parentFolder);
+			// log.debug("Processing Node: " + node.getContent()+" parentFolder:
+			// "+parentFolder);
 
 			String nodeId = node.getId().toHexString();
 			String fileName = nodeId;
@@ -330,7 +331,14 @@ public abstract class ExportArchiveBase {
 				html.append("\n<div class='markdown container'>" + escapedContent + "\n</div>");
 			}
 
+			String ext = null;
 			String binFileNameProp = node.getStringProp(NodeProp.BIN_FILENAME.s());
+			if (binFileNameProp != null) {
+				ext = FilenameUtils.getExtension(binFileNameProp);
+				if (!StringUtils.isEmpty(ext)) {
+					ext = "." + ext;
+				}
+			}
 			String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
 
 			String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK.s());
@@ -339,12 +347,14 @@ public abstract class ExportArchiveBase {
 
 			String imgUrl = null;
 			String attachmentUrl = null;
+			boolean embeddedImage = false;
 
 			/*
 			 * if this is a 'data:' encoded image read it from binary storage and put that
 			 * directly in url src
 			 */
 			String dataUrl = node.getStringProp(NodeProp.BIN_DATA_URL.s());
+
 			if ("t".equals(dataUrl)) {
 				imgUrl = attachmentService.getStringByNode(session, node);
 
@@ -352,35 +362,40 @@ public abstract class ExportArchiveBase {
 				if (!imgUrl.startsWith("data:")) {
 					imgUrl = null;
 				}
-			}
-			// Otherwise if this is an ordinary binary image, encode the link to it.
-			else if (mimeType != null && mimeType.startsWith("image/")) {
-				String relImgPath = writeFile ? "" : (fileName + "/");
-				/*
-				 * embeds an image that's 400px wide until you click it which makes it go
-				 * fullsize
-				 * 
-				 */
-				imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + nodeId + "-" + binFileNameStr)
-						: (Const.IPFS_IO_GATEWAY + ipfsLink);
-			} else if (mimeType != null) {
-				String relPath = writeFile ? "" : (fileName + "/");
-				/*
-				 * embeds an image that's 400px wide until you click it which makes it go
-				 * fullsize
-				 */
-				attachmentUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relPath + nodeId + "-" + binFileNameStr)
-						: (Const.IPFS_IO_GATEWAY + ipfsLink);
+				else {
+					embeddedImage = true;
+					html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
+							+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId
+							+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
+				}
 			}
 
-			if (imgUrl != null) {
-				html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
-						+ "' style='width:30%' onclick='document.getElementById(\"img_" + nodeId
-						+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
-			} //
-			else if (attachmentUrl != null) {
-				html.append("<a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: "
-						+ binFileNameStr + "</a>");
+			if (!embeddedImage && mimeType != null) {
+				// Otherwise if this is an ordinary binary image, encode the link to it.
+				if (imgUrl == null && mimeType.startsWith("image/")) {
+					String relImgPath = writeFile ? "" : (fileName + "/");
+					/*
+					 * embeds an image that's 400px wide until you click it which makes it go
+					 * fullsize
+					 * 
+					 */
+					imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + nodeId + ext)
+							: (Const.IPFS_IO_GATEWAY + ipfsLink);
+
+					html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
+							+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId
+							+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
+				} else {
+					String relPath = writeFile ? "" : (fileName + "/");
+					/*
+					 * embeds an image that's 400px wide until you click it which makes it go
+					 * fullsize
+					 */
+					attachmentUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relPath + nodeId + ext)
+							: (Const.IPFS_IO_GATEWAY + ipfsLink);
+					html.append("<a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: "
+							+ binFileNameStr + "</a>");
+				}
 			}
 
 			html.append("</div>\n");
@@ -411,14 +426,14 @@ public abstract class ExportArchiveBase {
 				 * If we had a binary property on this node we write the binary file into a
 				 * separate file, but for ipfs links we do NOT do this
 				 */
-				if (mimeType != null && StringUtils.isEmpty(ipfsLink)) {
+				if (!embeddedImage && mimeType != null && StringUtils.isEmpty(ipfsLink)) {
 
 					InputStream is = null;
 					try {
 						is = attachmentService.getStream(session, node, false, false);
 						BufferedInputStream bis = new BufferedInputStream(is);
 						long length = node.getIntProp(NodeProp.BIN_SIZE.s());
-						String binFileName = parentFolder + "/" + fileName + "/" + nodeId + "-" + binFileNameStr;
+						String binFileName = parentFolder + "/" + fileName + "/" + nodeId + ext;
 
 						if (length > 0) {
 							/* NOTE: the archive WILL fail if no length exists in this codepath */

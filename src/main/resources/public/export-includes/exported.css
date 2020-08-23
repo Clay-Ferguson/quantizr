@@ -3,8 +3,12 @@ body {
     color: white;
 }
 
-.link { 
-    color: cyan; 
+a:link, a:visited {
+    color: lightGray;
+}
+  
+a:hover, a:active {
+    color: cyan;
 }
 
 html {

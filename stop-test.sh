@@ -1,9 +1,4 @@
 #!/bin/bash
-###############################################################################
-# This script can serve as an example of how to STOP the server.
-#
-# (see file `build--localhost-test.sh`)
-###############################################################################
 
 cd /home/clay/ferguson/subnode-run
 
@@ -13,6 +8,7 @@ source ./setenv--localhost-test.sh
 docker-compose -f ${docker_compose_yaml} down --remove-orphans
 verifySuccess "Docker Compose: down"
 
+# docker ps
 sleep 3
 
 

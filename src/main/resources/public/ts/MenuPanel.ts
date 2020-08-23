@@ -43,7 +43,7 @@ export class MenuPanel extends Div {
 
         let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, highlightNode);
         let allowNodeMove: boolean = !orderByProp && S.edit.isInsertAllowed(state.node, state);
-        let isPageRootNode = state.node && highlightNode && state.node.id==highlightNode.id;
+        let isPageRootNode = state.node && highlightNode && state.node.id == highlightNode.id;
 
         let canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.firstChild);
         let canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.lastChild);
@@ -52,15 +52,15 @@ export class MenuPanel extends Div {
 
         //WARNING: The string 'Navigate' is also in Menu.activeMenu.
         children.push(new Menu("Navigate", [
-            new MenuItem("Welcome", () => {window.location.href = window.location.origin;}),
+            new MenuItem("Welcome", () => { window.location.href = window.location.origin; }),
             new MenuItem("Portal", () => S.meta64.loadAnonPageHome(state)),
             new MenuItem("Home", () => S.nav.navHome(state), !state.isAnonUser),
-            new MenuItem("Inbox", () => S.nav.openContentNode("~"+J.NodeType.INBOX, state), !state.isAnonUser),
-            new MenuItem("Friends", () => S.nav.openContentNode("~"+J.NodeType.FRIEND_LIST, state), !state.isAnonUser),
+            new MenuItem("Inbox", () => S.nav.openContentNode("~" + J.NodeType.INBOX, state), !state.isAnonUser),
+            new MenuItem("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), !state.isAnonUser),
 
             //this appears to be broken for user 'bob' at least. Also "Show Feed" is broken on the feed node
             new MenuItem("Feed", () => S.nav.navFeed(state), !state.isAnonUser),
-            new MenuItem("Post", () => S.nav.openContentNode("~"+J.NodeType.USER_FEED, state), !state.isAnonUser),
+            new MenuItem("Post", () => S.nav.openContentNode("~" + J.NodeType.USER_FEED, state), !state.isAnonUser),
 
             //I'm removing my RSS feeds, for now (mainly to remove any political or interest-specific content from the platform)
             //new MenuItem("Podcast Feeds", () => { S.nav.openContentNode("/r/rss"); }),
@@ -85,14 +85,13 @@ export class MenuPanel extends Div {
             new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open() }, !state.isAnonUser && selNodeIsMine), //
 
             new MenuItemSeparator(), //
-            
+
             new MenuItem("Move to Top", () => S.edit.moveNodeToTop(null, state), canMoveUp), //
             new MenuItem("Move to Bottom", () => S.edit.moveNodeToBottom(null, state), canMoveDown),//
             new MenuItemSeparator(), //
 
             new MenuItem("Permanent Delete", () => S.edit.deleteSelNodes(null, true, state), !state.isAnonUser && selNodeCount > 0 && selNodeIsMine), //
             new MenuItem("Show Trash Bin", () => S.nav.openContentNode(state.homeNodePath + "/d", state), !state.isAnonUser),
-
 
             //todo-1: disabled during mongo conversion
             //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
@@ -143,7 +142,7 @@ export class MenuPanel extends Div {
                 !state.isAnonUser && !!highlightNode), //
         ]));
 
-        children.push(new Menu("View", [
+        children.push(new Menu("Tools", [
             //todo-1: properties toggle really should be a preferences setting i think, and not a menu option here.
 
             //this is broken, so I'm just disabling it for now, since this is low priority. todo-1
@@ -153,26 +152,27 @@ export class MenuPanel extends Div {
 
             new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", state), //
                 !state.isAnonUser && selNodeIsMine), //
+
+            new MenuItemSeparator(), //
+
+            new MenuItem("Import", () => S.edit.openImportDlg(state), //
+                state.isAdminUser && importFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId == highlightNode.id))), //
+
+            new MenuItem("Export", () => S.edit.openExportDlg(state),
+                state.isAdminUser && exportFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId == highlightNode.id))), //
         ]));
-        //need to make export safe for end users to use (recarding file sizes)
-        if (state.isAdminUser) {
-            children.push(new Menu("Admin Tools", [
-
-                new MenuItem("Import", () => S.edit.openImportDlg(state), //
-                    importFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId == highlightNode.id))), //
-
-                new MenuItem("Export", () => S.edit.openExportDlg(state),
-                    exportFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId == highlightNode.id))), //
-
-                //todo-1: disabled during mongo conversion
-                //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
-                //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
-                //    () => { return state.isAdminUser && highlightNode != null }, //
-                //    () => { return state.isAdminUser }, //
-                //    true
-                //), //
-            ]));
-        }
+        // //need to make export safe for end users to use (recarding file sizes)
+        // if (state.isAdminUser) {
+        //     children.push(new Menu("Admin Tools", [
+        //         //todo-1: disabled during mongo conversion
+        //         //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
+        //         //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
+        //         //    () => { return state.isAdminUser && highlightNode != null }, //
+        //         //    () => { return state.isAdminUser }, //
+        //         //    true
+        //         //), //
+        //     ]));
+        // }
 
         // WORK IN PROGRESS (do not delete)
         // let fileSystemMenuItems = //
