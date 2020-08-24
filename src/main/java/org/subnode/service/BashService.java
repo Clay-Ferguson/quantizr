@@ -12,7 +12,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExecuteNodeRequest;
 import org.subnode.response.ExecuteNodeResponse;
 import org.subnode.util.ExUtil;
-import org.subnode.util.FileTools;
+import org.subnode.util.FileUtils;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 
@@ -81,18 +81,18 @@ public class BashService {
 	}
 
 	public void runBashScript(String script, ExecuteNodeResponse res) {
-		if (!FileTools.dirExists(appProp.getAdminDataFolder())) {
+		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist");
 		}
 
 		String shortFileName = "bash-" + util.getGUID() + ".sh";
 		String fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
-		FileTools.writeEntireFile(fullFileName, "#!/bin/bash\n\n" + script);
+		FileUtils.writeEntireFile(fullFileName, "#!/bin/bash\n\n" + script);
 
 		// String shortFileName = "bash-" + util.getGUID() + ".sh";
 		// String fullFileName = appProp.getAdminDataFolder() + File.separator +
 		// shortFileName;
-		// FileTools.writeEntireFile(fullFileName, "#!/bin/bash\n\ngnome-terminal --
+		// FileUtils.writeEntireFile(fullFileName, "#!/bin/bash\n\ngnome-terminal --
 		// /bin/bash -c '"+_fullFileName+"'");
 
 		try {
@@ -108,7 +108,7 @@ public class BashService {
 			 * Executor code below that's commented out could be used, but for now that's
 			 * not the architecture needed.
 			 */
-			FileTools.makeFileRunnable(fullFileName);
+			FileUtils.makeFileRunnable(fullFileName);
 			log.debug("Wrote file: " + fullFileName);
 
 			// The rest of this is commented becasue running in a Docker Container precludes

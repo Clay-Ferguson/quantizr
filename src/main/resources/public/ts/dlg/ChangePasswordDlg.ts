@@ -21,12 +21,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ChangePasswordDlg extends DialogBase {
 
     passwordField: TextField;
-    private passCode: string;
 
-    /* todo-0: remove "Object" args, and just pass actual parameters */
-    constructor(args: Object, state: AppState) {
-        super((<any>args).passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width", false, state);
-        this.passCode = (<any>args).passCode;
+    constructor(private passCode: string, state: AppState) {
+        super(passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width", false, state);
         this.whenElm((elm: HTMLSelectElement) => {
             this.passwordField.focus();
         });

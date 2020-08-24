@@ -20,12 +20,11 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
-import org.subnode.util.FileTools;
+import org.subnode.util.FileUtils;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ValContainer;
 
-import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,12 +72,12 @@ public class ExportJsonService {
 	 */
 	public String dumpAllNodes(MongoSession session, String pathPrefix, String fileName) {
 		try {
-			if (!FileTools.dirExists(appProp.getAdminDataFolder())) {
+			if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
 				throw ExUtil.wrapEx("adminDataFolder does not exist");
 			}
 
 			String targetFolder = appProp.getAdminDataFolder() + File.separator + fileName;
-			FileTools.createDirectory(targetFolder);
+			FileUtils.createDirectory(targetFolder);
 
 			/* This is not a typo, this path will be like ".../fileName/fileName.json" */
 			String fullFileName = targetFolder + File.separator + fileName + ".json";
@@ -173,7 +172,8 @@ public class ExportJsonService {
 			try {
 				String targetFileName = targetFolder + File.separator + node.getId().toHexString() + "-" + binFileName;
 				File targetFile = new File(targetFileName);
-				FileUtils.copyInputStreamToFile(is, targetFile);
+				/* warning: we have our own FileUtils (conflict of name) */
+				org.apache.commons.io.FileUtils.copyInputStreamToFile(is, targetFile);
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {

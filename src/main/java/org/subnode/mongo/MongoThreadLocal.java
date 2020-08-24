@@ -11,13 +11,13 @@ public class MongoThreadLocal {
 	private static final Logger log = LoggerFactory.getLogger(MongoThreadLocal.class);
 
 	/*
-	 * This is where we can accumulate a series of nodes that will all be updated
-	 * after processing is done using the api.sessionSave() call. This is not true
-	 * ACID of course, but a helpful way to not have to worry about doing SAVES on
+	 * This is where we can accumulate the set of nodes that will all be updated
+	 * after processing is done using the api.sessionSave() call. This is not an
+	 * ACID commit, but a helpful way to not have to worry about doing SAVES on
 	 * every object that is touched during the processing of a thread/request. This
 	 * is because we can use a pattern that wraps the 'api.sessionSave()' in a
-	 * finally block somewhere and use that to make sure all work ever done (Node
-	 * property updates, etc) gets 'committed'
+	 * finally block somewhere and use that to make sure all updates ao any node are
+	 * saved.
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<HashMap<ObjectId, SubNode>>();
 
@@ -30,7 +30,7 @@ public class MongoThreadLocal {
 	private static final ThreadLocal<HashMap<String, Boolean>> aclResults = new ThreadLocal<HashMap<String, Boolean>>();
 
 	public static void removeAll() {
-		//log.debug("Clear Dirty Nodes.");
+		// log.debug("Clear Dirty Nodes.");
 		getDirtyNodes().clear();
 		getAclResults().clear();
 	}
@@ -47,11 +47,8 @@ public class MongoThreadLocal {
 	}
 
 	/*
-	 * todo-0: Nice enhancement would be if a node is getting flagged as dirty make
-	 * sure there isn't already a DIFFERENT instance of the same node ID flagged as
-	 * dirty, because this would be a BUG always. The last one written would
-	 * overwrite, so this means if we are working on updating two object instances
-	 * of the same 'node id' at once that is a BUG for sure.
+	 * Sets 'node' to dirty thus guaranteeing any changes made to it, even if made
+	 * later on in the request, are guaranteed to be written out
 	 */
 	public static void dirty(SubNode node) {
 		if (node.getId() == null) {
@@ -59,6 +56,16 @@ public class MongoThreadLocal {
 		}
 
 		SubNode nodeFound = getDirtyNodes().get(node.getId());
+
+		/*
+		 * If we are setting this node to dirty, but we already see another copy of the
+		 * same nodeId in memory, this is a problem and will mean which ever node
+		 * happens to be saved 'last' will overwrite, so this *may* result in data loss.
+		 * 
+		 * todo-1: Should we find a way to be sure this never happens? This is basically
+		 * another way of saying with non-ACID databases transactions don't really
+		 * 'work'
+		 */
 		if (nodeFound != null && nodeFound.hashCode() != node.hashCode()) {
 			log.debug("*************** oops multiple instance of object:" + node.getId().toHexString()
 					+ " are in memory. Ignoring attempt to set the second one to dirty");
@@ -70,7 +77,7 @@ public class MongoThreadLocal {
 
 	/* Opposite of dirty */
 	public static void clean(SubNode node) {
-		//log.debug("Removing from Dirty: " + node.getId().toHexString());
+		// log.debug("Removing from Dirty: " + node.getId().toHexString());
 		getDirtyNodes().remove(node.getId());
 	}
 

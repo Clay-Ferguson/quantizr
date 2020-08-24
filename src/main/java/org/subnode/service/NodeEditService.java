@@ -320,7 +320,7 @@ public class NodeEditService {
 			// api.saveSession(session); //shouldn't be necessar
 		}
 
-		// todo-0: eventually we need a plugin-type architecture to decouple this kind
+		// todo-1: eventually we need a plugin-type architecture to decouple this kind
 		// of type-specific code from the general node saving.
 		if (node.getType().equals(NodeType.FRIEND.s())) {
 			String userNodeId = node.getStringProp(NodeProp.USER_NODE_ID.s());

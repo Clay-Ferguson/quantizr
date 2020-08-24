@@ -544,7 +544,7 @@ export class Meta64 implements Meta64Intf {
         var passCode = S.util.getParameterByName("passCode");
         if (passCode) {
             setTimeout(() => {
-                new ChangePasswordDlg({ "passCode": passCode }, state).open();
+                new ChangePasswordDlg(passCode, state).open();
             }, 100);
         }
     }

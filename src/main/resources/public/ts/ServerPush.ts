@@ -73,7 +73,8 @@ export class ServerPush implements ServerPushIntf {
             //the notification, which is wrong. In other words based on the new 'feed' capability notification can
             //end up being just a redundant annoyance.
             
-            //temporary remove: I was seeing this come up when I replied to someone elses node
+            //temporary remove: I was seeing this come up when I replied to someone ELSES node, or in other words I was getting
+            //a notification about my own node that I creted.
             //todo-0
             //new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
         }, false);

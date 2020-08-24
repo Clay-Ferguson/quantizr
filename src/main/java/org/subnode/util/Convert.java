@@ -306,7 +306,7 @@ public class Convert {
 			boolean initNodeEdit) {
 		try {
 			if (value instanceof Date) {
-				return sessionContext.formatTime((Date) value);
+				return sessionContext.formatTimeForUserTimezone((Date) value);
 			} else {
 				String ret = value.toString();
 

@@ -312,10 +312,7 @@ public class MongoApi {
 	// }
 	// ops.execute();
 	//
-	/*
-	 * Actually this is probably already solved in some sort of BATCHING API already
-	 * written.
-	 */
+
 	public void saveSession(MongoSession session) {
 		if (session == null || session.saving || !MongoThreadLocal.hasDirtyNodes())
 			return;
@@ -325,6 +322,7 @@ public class MongoApi {
 			session.saving = true;
 
 			synchronized (session) {
+				//recheck hasDirtyNodes again after we get inside the lock.
 				if (!MongoThreadLocal.hasDirtyNodes()) {
 					return;
 				}
@@ -1684,7 +1682,7 @@ public class MongoApi {
 		}
 
 		/*
-		 * todo-0: update docs to say that admin is supposed to do something to
+		 * todo-1: update docs to say that admin is supposed to do something to
 		 * initialize these two nodes (landing page, and userguide)
 		 */
 		created = new ValContainer<>();

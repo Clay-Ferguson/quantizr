@@ -22,7 +22,6 @@ import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
-import org.subnode.util.FileTools;
 import org.subnode.util.FileUtils;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.SubNodeUtil;
@@ -95,7 +94,7 @@ public abstract class ExportArchiveBase {
 			throw ExUtil.wrapEx("You are not authorized to export.");
 		}
 
-		if (!FileTools.dirExists(appProp.getAdminDataFolder())) {
+		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist: " + appProp.getAdminDataFolder());
 		}
 
@@ -123,7 +122,7 @@ public abstract class ExportArchiveBase {
 			closeOutputStream();
 
 			if (!success) {
-				FileTools.deleteFile(fullFileName);
+				FileUtils.deleteFile(fullFileName);
 			}
 		}
 
@@ -459,7 +458,7 @@ public abstract class ExportArchiveBase {
 
 	private String cleanupFileName(String fileName) {
 		fileName = fileName.trim();
-		fileName = FileTools.ensureValidFileNameChars(fileName);
+		fileName = FileUtils.ensureValidFileNameChars(fileName);
 		fileName = XString.stripIfStartsWith(fileName, "-");
 		fileName = XString.stripIfEndsWith(fileName, "-");
 		return fileName;

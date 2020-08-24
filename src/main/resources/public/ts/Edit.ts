@@ -28,7 +28,7 @@ export class Edit implements EditIntf {
     }
 
     openChangePasswordDlg = (state: AppState): void => {
-        new ChangePasswordDlg({}, state).open();
+        new ChangePasswordDlg(null, state).open();
     }
 
     openManageAccountDlg = (state: AppState): void => {

@@ -64,7 +64,7 @@ public class NodeRenderService {
 	private ConstantsProvider constProvider;
 
 	/* Note: this MUST match nav.ROWS_PER_PAGE variable in TypeScript */
-	private static int ROWS_PER_PAGE = 25; // todo-0: do more testing with this at 5
+	private static int ROWS_PER_PAGE = 25; 
 
 	/*
 	 * This is the call that gets all the data to show on a page. Whenever user is
@@ -168,15 +168,6 @@ public class NodeRenderService {
 						// log.trace(" upLevel to nodeid: " + node.getPath());
 						levelsUpRemaining--;
 					}
-
-					/*
-					 * this was added too hastily and creates problems. this was indended for case
-					 * where 'upLevel' button was clicked by user but ends up failing at other
-					 * times. Like if user is freshly signed up and just logging in! fix. todo-0
-					 */
-					// catch (NodeAuthFailedException e) {
-					// throw e;
-					// }
 					catch (Exception e) {
 						/*
 						 * UPDATE: It's never actually a render problem if we can't grab the parent in
@@ -195,10 +186,6 @@ public class NodeRenderService {
 		return res;
 	}
 
-	/*
-	 * todo-0: This entire thing needs to be checked over. All pagination aspects,
-	 * offset, limit, scanToNode, is all due for full resting
-	 */
 	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res,
 			final SubNode node, boolean scanToNode, String scanToPath, int ordinal, int level) {
 

@@ -206,8 +206,6 @@ public class UserManagerService {
 				kpg.initialize(2048);
 				KeyPair pair = kpg.generateKeyPair();
 
-				// publicKey = Hex.encodeHexString(pair.getPublic().getEncoded());
-				// String privateKey = Hex.encodeHexString(pair.getPrivate().getEncoded());
 				publicKey = Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
 				String privateKey = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
 
@@ -215,7 +213,7 @@ public class UserManagerService {
 				userNode.setProp(NodeProp.CRYPTO_KEY_PRIVATE.s(), privateKey);
 			}
 		} catch (Exception e) {
-			// todo-0: handle.
+			log.error("failed creating crypto keys", e);
 		}
 	}
 
