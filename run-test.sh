@@ -16,7 +16,7 @@ source ./setenv--localhost-test.sh
 docker-compose -f ${docker_compose_yaml} down --remove-orphans
 verifySuccess "Docker Compose: down"
 
-sudo chown 999:999 ./mongod--localhost-test.conf
+sudo chown 999:999 ./mongod.conf
 
 # sudo docker ps
 # read -p "Verify no instances up. Press any key."

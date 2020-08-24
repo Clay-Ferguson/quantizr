@@ -22,9 +22,9 @@ source ./setenv--localhost-test.sh
 mkdir -p ${DEPLOY_TARGET}
 
 cd ${DEPLOY_TARGET}
-. ./stop.sh
+. ./stop-test.sh
 
-rm -f ${DEPLOY_TARGET}/log/*
+sudo rm -f ${DEPLOY_TARGET}/log/*
 mkdir -p ${ipfs_staging}
 
 # Wipe some existing stuff to ensure with certainty it gets rebuilt
@@ -41,7 +41,10 @@ cd ${PRJROOT}
 cp ${PRJROOT}/docker-compose-test.yaml ${DEPLOY_TARGET}/docker-compose-test.yaml
 cp ${PRJROOT}/dockerfile-test ${DEPLOY_TARGET}/dockerfile-test
 cp ${PRJROOT}/define-functions.sh ${DEPLOY_TARGET}/define-functions.sh
-cp ${PRJROOT}/mongod--localhost-test.conf ${DEPLOY_TARGET}/mongod--localhost-test.conf
+
+# this is a special file we alter the owner of in the run script.
+sudo cp ${PRJROOT}/mongod--localhost-test.conf ${DEPLOY_TARGET}/mongod.conf
+
 cp ${PRJROOT}/setenv--localhost-test.sh ${DEPLOY_TARGET}/setenv--localhost-test.sh
 cp ${PRJROOT}/setenv-common.sh ${DEPLOY_TARGET}/setenv-common.sh
 cp ${PRJROOT}/run-test.sh ${DEPLOY_TARGET}/run-test.sh

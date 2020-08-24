@@ -44,7 +44,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	@Autowired
 	private AppProp appProp;
 
-	// todo-0: turned off to test ActivityPub
+	// turned off to test ActivityPub, and is not longer needed.
 	// @Bean
 	// public WebMvcConfigurer corsConfigurer() {
 	// return new WebMvcConfigurer() {
@@ -207,8 +207,22 @@ public class AppConfiguration implements WebMvcConfigurer {
 	// return connector;
 	// }
 
+	/* another way to do some of the code below, related to the GracefulShutdown */
+	// @Bean
+	// public ConfigurableServletWebServerFactory webServerFactory(final
+	// GracefulShutdown gracefulShutdown) {
+	// TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+	// factory.addConnectorCustomizers(gracefulShutdown);
+	// return factory;
+	// }
+
 	@Bean
-	public ServletWebServerFactory servletContainer(/* final GracefulShutdown gracefulShutdown */) {
+	public GracefulShutdown gracefulShutdown() {
+		return new GracefulShutdown();
+	}
+
+	@Bean
+	public ServletWebServerFactory servletContainer(final GracefulShutdown gracefulShutdown) {
 		TomcatServletWebServerFactory factory = null;
 
 		if ("https".equalsIgnoreCase(appProp.getHttpProtocol())) {
@@ -229,7 +243,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 			factory = new TomcatServletWebServerFactory();
 		}
 
-		// factory.addConnectorCustomizers(gracefulShutdown);
+		factory.addConnectorCustomizers(gracefulShutdown);
 		return factory;
 	}
 
@@ -243,11 +257,6 @@ public class AppConfiguration implements WebMvcConfigurer {
 		connector.setRedirectPort(443);
 		return connector;
 	}
-
-	// @Bean
-	// public GracefulShutdown gracefulShutdown() {
-	// return new GracefulShutdown();
-	// }
 
 	@Bean
 	@Scope("singleton")

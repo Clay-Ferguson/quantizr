@@ -1,25 +1,32 @@
 package org.subnode.config;
+import org.apache.catalina.connector.Connector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-//todo-0: why did I remove this?
-public class GracefulShutdown {
-/*
-implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent> {
+/* see: https://dzone.com/articles/graceful-shutdown-spring-boot-applications */
+
+public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent> {
     private static final Logger log = LoggerFactory.getLogger(GracefulShutdown.class);
-    
     private volatile Connector connector;
+
     @Override
     public void customize(Connector connector) {
         this.connector = connector;
     }
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
-        log.debug("GracefulShutdown ContextClosedEvent. Pausing connector.");
+        log.debug("GracefulShudown: Pausing connector");
         this.connector.pause();
         Executor executor = this.connector.getProtocolHandler().getExecutor();
         if (executor instanceof ThreadPoolExecutor) {
             try {
                 ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
-                log.debug("GracefulShutdown: shutting down thread pool.");
                 threadPoolExecutor.shutdown();
                 if (!threadPoolExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
                     log.warn("Tomcat thread pool did not shut down gracefully within "
@@ -29,6 +36,6 @@ implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent> {
                 Thread.currentThread().interrupt();
             }
         }
+        log.debug("GracefulShudown: complete");
     }
-*/
 }

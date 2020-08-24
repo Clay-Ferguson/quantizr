@@ -1,15 +1,14 @@
 version: '3.7'
 services:
 
-    # todo-0: I can't seem to get this file to work if I provde mongod.conf and mongo.env so those are commented out.
     mongo-test: 
         container_name: mongo-test 
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
             - "${DEPLOY_TARGET}/data:/data/db"
             - "${DEPLOY_TARGET}/dumps:/mongo-dumps"
-            - "${DEPLOY_TARGET}/mongod--localhost-test.conf:/etc/mongod--localhost-test.conf"
-        command: mongod --config /etc/mongod--localhost-test.conf
+            - "${DEPLOY_TARGET}/mongod.conf:/etc/mongod.conf"
+        command: mongod --config /etc/mongod.conf
         ports:
             - "27017:27017"
         env_file: 
