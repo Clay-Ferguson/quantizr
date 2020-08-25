@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.subnode.model.client.PrincipalName;
-import org.subnode.concurrency.LockEx;
+import org.subnode.util.LockEx;
 import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.NotLoggedInException;

@@ -27,7 +27,7 @@ import org.subnode.util.StreamUtil;
  * Searches files indexed by Lucene (i.e. a Lucene Search). This code assumes
  * that Lucene index already exists and we are going to search in it (not
  * indexing any files, just searching in the index)
- * <p>
+ * 
  * Take another look at synchornized blocks in this code. I'm troubleshooting
  * and putting in temporary sync code right now.
  * 

@@ -30,7 +30,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.OutOfSpaceException;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.image.ImageUtil;
+import org.subnode.util.ImageUtil;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
 import org.subnode.mongo.MongoSession;

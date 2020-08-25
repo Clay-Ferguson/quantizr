@@ -13,7 +13,6 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
@@ -270,8 +269,4 @@ public class AuditFilter extends GenericFilterBean {
 
 	public void destroy() {
 	}
-
-	// public void init(FilterConfig filterConfig) {
-	// 	this.filterConfig = filterConfig;
-	// }
 }

@@ -1,4 +1,4 @@
-package org.subnode.image;
+package org.subnode.util;
 
 /**
  * Data encapsulation of width+height

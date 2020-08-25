@@ -27,7 +27,6 @@ import org.springframework.util.CollectionUtils;
  * a thread to send the request. It simply queues up in persistent storage he
  * emails ready to be send and sends them out all in a single mail session all
  * at once. This is the most efficient way for lots of obvious reasons.
- * 
  */
 @Component
 public class NotificationDaemon {

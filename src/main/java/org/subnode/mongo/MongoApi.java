@@ -17,14 +17,15 @@ import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
-import org.subnode.image.ImageSize;
-import org.subnode.image.ImageUtil;
+import org.subnode.util.ImageSize;
+import org.subnode.util.ImageUtil;
 import org.subnode.model.AccessControlInfo;
 import org.subnode.model.PrivilegeInfo;
 import org.subnode.model.PropertyInfo;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.service.AclService;
 import org.subnode.service.AttachmentService;
 import org.subnode.service.UserFeedService;
 import org.subnode.util.Const;
@@ -60,6 +61,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * NOTE: regex test site: http://reg-exp.com/
+ * 
+ * todo-0: this file is just too big. Find some way to break it appart by some kind of category
  */
 @Component
 public class MongoApi {
@@ -322,7 +325,7 @@ public class MongoApi {
 			session.saving = true;
 
 			synchronized (session) {
-				//recheck hasDirtyNodes again after we get inside the lock.
+				// recheck hasDirtyNodes again after we get inside the lock.
 				if (!MongoThreadLocal.hasDirtyNodes()) {
 					return;
 				}
@@ -516,8 +519,6 @@ public class MongoApi {
 	}
 
 	public long getChildCount(MongoSession session, SubNode node) {
-		// log.debug("MongoApi.getChildCount");
-
 		Query query = new Query();
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(node.getPath()));
 		query.addCriteria(criteria);
@@ -624,10 +625,6 @@ public class MongoApi {
 		return ops.findAll(SubNode.class);
 	}
 
-	public void convertDb(MongoSession session) {
-		// log.debug("convertDb() executing.");
-	}
-
 	public String getHashOfPassword(String password) {
 		return Util.getHashOfString(password, 20);
 	}
@@ -649,8 +646,10 @@ public class MongoApi {
 			throw ExUtil.wrapEx(ex);
 		}
 
-		// todo-1: I have a 'formatMemory' written in javascript, and need to do same
-		// here or see if there's an apachie string function for it.
+		/*
+		 * todo-1: I have a 'formatMemory' written in javascript, and need to do same
+		 * here or see if there's an apachie string function for it.
+		 */
 		float kb = totalJsonBytes / 1024f;
 		return "Node Count: " + numDocs + "<br>Total JSON Size: " + kb + " KB";
 	}
@@ -725,8 +724,10 @@ public class MongoApi {
 			return null;
 		}
 
-		// I'd like this to not be created unless needed but that pesky lambda below
-		// needs a 'final' thing to work with.
+		/*
+		 * I'd like this to not be created unless needed but that pesky lambda below
+		 * needs a 'final' thing to work with.
+		 */
 		List<AccessControlInfo> ret = new LinkedList<AccessControlInfo>();
 
 		aclMap.forEach((k, v) -> {
@@ -788,9 +789,10 @@ public class MongoApi {
 		} else {
 			String userName = name.substring(0, colonIdx);
 
-			// pass a null session here to cause adminSession to be used which is required
-			// to get a user node, but
-			// it always safe to get this node this way here.
+			/*
+			 * pass a null session here to cause adminSession to be used which is required
+			 * to get a user node, but it always safe to get this node this way here.
+			 */
 			SubNode userNode = getUserNodeByUserName(null, userName);
 			nodeOwnerId = userNode.getOwner();
 			name = name.substring(colonIdx + 1);
@@ -1647,7 +1649,6 @@ public class MongoApi {
 	 * by the definition of they way security is inheritive.
 	 */
 	public void createAdminUser(MongoSession session) {
-		// log.debug("Creating AdminUser");
 		String adminUser = appProp.getMongoAdminUserName();
 
 		SubNode adminNode = getUserNodeByUserName(getAdminSession(), adminUser);

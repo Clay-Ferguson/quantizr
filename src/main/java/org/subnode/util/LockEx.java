@@ -1,4 +1,4 @@
-package org.subnode.concurrency;
+package org.subnode.util;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;

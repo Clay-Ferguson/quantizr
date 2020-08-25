@@ -16,7 +16,7 @@ public class MongoSession {
 	private SubNode userNode;
 
 	// tiny bit of a hack to detect and avoid recursion in the saveSession
-	// Sine it's very simple and reliable I'm going with this.
+	// Since it's very simple and reliable I'm going with this.
 	public boolean saving = false;
 
 	private MongoSession() {

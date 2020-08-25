@@ -16,11 +16,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMarkdown extends MarkdownDiv {
 
-    //This flag makes the text ALWAYS decrypt and display onscreen if the person owning the content is viewing it, but this
-    //is most likely never wanted, because it's insecure in screen-share context, or when someone can see your screen for any reason.
-    //todo-1: We could make this a user preference so users in a secure location can just view all encrypted data.
-    //
-    //UPDATE: turning this ON for now, because for testing 'shared' nodes we don't have editing capability and thus need a way to decrypt
+    /* 
+    This flag makes the text ALWAYS decrypt and display onscreen if the person owning the content is viewing it, but this
+    is most likely never wanted, because it's insecure in screen-share context, or when someone can see your screen for any reason.
+    todo-1: We could make this a user preference so users in a secure location can just view all encrypted data.
+    
+    UPDATE: turning this ON for now, because for testing 'shared' nodes we don't have editing capability and thus need a way to decrypt
+    */
     private immediateDecrypting: boolean = true;
 
     constructor(public node: J.NodeInfo, private appState: AppState) {
@@ -34,18 +36,20 @@ export class NodeCompMarkdown extends MarkdownDiv {
         if (this.appState.userPreferences.editMode && node.owner == appState.userName) {
             let highlightNode = S.meta64.getHighlightedNode(appState);
             if (highlightNode && highlightNode.id == node.id) {
-                this.attribs.className += " mousePointer";
-                this.attribs.title = "Click to edit";
-                this.attribs.onClick = this.clickToEdit;
+                if (C.clickToEditNodes) {
+                    this.attribs.className += " mousePointer";
+                    this.attribs.title = "Click to edit";
+                    this.attribs.onClick = this.clickToEdit;
 
-                // This was an experiment to help users know where to click, and it does that, but 
-                // the margin makes the web page content 'shift' around when user is only just clicking around
-                // and that is super ugly.
-                // this.attribs.style = {
-                //     border: "1px solid rgb(118, 109, 97)",
-                //     borderRadius: ".6em",
-                //     margin: "6px"
-                // };
+                    // This was an experiment to help users know where to click, and it does that, but 
+                    // the margin makes the web page content 'shift' around when user is only just clicking around
+                    // and that is super ugly.
+                    // this.attribs.style = {
+                    //     border: "1px solid rgb(118, 109, 97)",
+                    //     borderRadius: ".6em",
+                    //     margin: "6px"
+                    // };
+                }
             }
         }
     }

@@ -12,7 +12,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.config.SessionContext;
-import org.subnode.image.ImageSize;
+import org.subnode.util.ImageSize;
 import org.subnode.model.AccessControlInfo;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;

@@ -53,7 +53,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Override
 	public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
 		SubNode node = event.getSource();
-		//log.debug("MONGO SAVE EVENT: "+XString.prettyPrint(node));
+		// log.debug("MONGO SAVE EVENT: "+XString.prettyPrint(node));
 
 		Document dbObj = event.getDocument();
 		ObjectId id = node.getId();
@@ -73,9 +73,10 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// log.debug("onBeforeSave: ID: " + node.getId().toHexString());
 
 		// DO NOT DELETE
-		// If we ever add a unique-index for "Name" (not currently the case), then we'd
-		// need something like this to be sure
-		// each node WOULD have a unique name.
+		/*
+		 * If we ever add a unique-index for "Name" (not currently the case), then we'd
+		 * need something like this to be sure each node WOULD have a unique name.
+		 */
 		// if (StringUtils.isEmpty(node.getName())) {
 		// node.setName(id.toHexString())
 		// }

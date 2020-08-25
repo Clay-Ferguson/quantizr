@@ -1,6 +1,6 @@
 package org.subnode.test;
 
-import org.subnode.concurrency.LockEx;
+import org.subnode.util.LockEx;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

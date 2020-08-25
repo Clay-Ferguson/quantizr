@@ -108,7 +108,6 @@ public class MongoRepository {
 
 			if (appProp.getForceIndexRebuild()) {
 				api.dropAllIndexes(adminSession);
-				api.convertDb(adminSession);
 			}
 
 			api.createAllIndexes(adminSession);

@@ -1,4 +1,4 @@
-package org.subnode.mongo;
+package org.subnode.service;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,6 +12,9 @@ import org.subnode.model.client.PrincipalName;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.MongoPrincipal;
 import org.subnode.mongo.model.SubNode;
@@ -23,7 +26,6 @@ import org.subnode.response.AddPrivilegeResponse;
 import org.subnode.response.GetNodePrivilegesResponse;
 import org.subnode.response.RemovePrivilegeResponse;
 import org.subnode.response.SetCipherKeyResponse;
-import org.subnode.service.UserManagerService;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;

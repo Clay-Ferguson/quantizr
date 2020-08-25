@@ -33,8 +33,10 @@ public class AppFilter extends GenericFilterBean {
 	private static boolean logRequests = false;
 	private static boolean logResponses = false;
 
-	//if non-zero this is used to put a millisecond delay (determined by its value) onto every request
-	//that comes thru as an API call.
+	/*
+	 * if non-zero this is used to put a millisecond delay (determined by its value)
+	 * onto every request that comes thru as an API call.
+	 */
 	private static int simulateSlowServer = 0;
 
 	@Override
@@ -71,7 +73,7 @@ public class AppFilter extends GenericFilterBean {
 			if (logRequests) {
 				String url = "REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString="
 						+ queryString;
-				log.debug(url +"\nParameters: "+XString.prettyPrint(httpReq.getParameterMap()));
+				log.debug(url + "\nParameters: " + XString.prettyPrint(httpReq.getParameterMap()));
 			}
 
 			updateHitCounter(httpReq);

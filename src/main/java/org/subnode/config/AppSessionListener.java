@@ -4,7 +4,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.subnode.concurrency.LockEx;
+import org.subnode.util.LockEx;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

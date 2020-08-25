@@ -5,10 +5,15 @@ export class Constants {
     static mainPanelCols: number = 6;
     static rightNavPanelCols: number = 3;
 
+    /* I have this turned off now, because I like to click nodes to focus them, but could make this optional 
+    or a user setting */
+    static clickToEditNodes: boolean = false;
+
     static readonly ONE_MB = 1048576; // 1024 * 1024;
     static readonly MAX_UPLOAD_MB = 20;
 
-    static readonly IPFS_IO_GATEWAY: string = "https://gateway.ipfs.io/ipfs/";
+
+    static readonly IPFS_IO_GATEWAY: string = "https://gateway.pinata.cloud/ipfs/";
     
     static readonly TEMPORAL_HOST: string = "https://api.temporal.cloud";
 
