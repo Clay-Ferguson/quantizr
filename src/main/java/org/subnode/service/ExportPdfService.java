@@ -23,7 +23,7 @@ package org.subnode.service;
 // import org.subnode.model.client.NodeProp;
 // import org.subnode.config.SessionContext;
 // import org.subnode.model.UserPreferences;
-// import org.subnode.mongo.MongoApi;
+// import org.subnode.mongo.MongoUtil;
 // import org.subnode.mongo.MongoSession;
 // import org.subnode.mongo.model.SubNode;
 // import org.subnode.request.ExportRequest;
@@ -43,7 +43,7 @@ public class ExportPdfService {
 	// private static final Logger log = LoggerFactory.getLogger(ExportPdfService.class);
 
 	// @Autowired
-	// private MongoApi api;
+	// private MongoUtil api;
 
 	// @Autowired
 	// private SubNodeUtil util;

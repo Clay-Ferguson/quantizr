@@ -17,7 +17,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.CreateNodeLocation;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
@@ -59,7 +59,7 @@ public class NodeEditService {
 	private Convert convert;
 
 	@Autowired
-	private MongoApi api;
+	private MongoUtil util;
 
 	@Autowired
 	private MongoCreate create;
@@ -312,7 +312,7 @@ public class NodeEditService {
 			// If removing encryption, remove it from all the ACL entries too.
 			String encKey = node.getStringProp(NodeProp.ENC_KEY.s());
 			if (encKey == null) {
-				api.removeAllEncryptionKeys(node);
+				util.removeAllEncryptionKeys(node);
 			}
 			/* if adding entryption to this node, and the node wasn't currently encrypted */
 			else {

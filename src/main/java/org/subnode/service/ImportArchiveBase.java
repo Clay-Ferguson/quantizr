@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
@@ -41,7 +41,7 @@ public abstract class ImportArchiveBase {
 	public boolean used;
 
 	@Autowired
-	public MongoApi api;
+	public MongoUtil mongoUtil;
 
 	@Autowired
 	public MongoUpdate update;

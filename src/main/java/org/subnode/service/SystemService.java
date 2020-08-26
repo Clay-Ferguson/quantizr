@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppFilter;
 import org.subnode.config.AppSessionListener;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoAppConfig;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -32,7 +32,7 @@ public class SystemService {
 	private MongoAppConfig mac;
 
 	@Autowired
-	private MongoApi api;
+	private MongoUtil util;
 
 	@Autowired
 	private MongoRead read;
@@ -96,7 +96,7 @@ public class SystemService {
 		sb.append(String.format("Server Free Memory: %dMB<br>", freeMem));
 		sb.append(String.format("Session Count: %d<br>", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());
-		sb.append("<p>" + api.getNodeReport());
+		sb.append("<p>" + util.getNodeReport());
 		return sb.toString();
 	}
 

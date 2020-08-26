@@ -32,7 +32,7 @@ public class MongoDelete {
     private MongoAuth auth;
 
     @Autowired
-    private MongoApi api;
+    private MongoUtil util;
 
 	public void deleteNode(MongoSession session, SubNode node) {
 		attachmentService.deleteBinary(session, node);
@@ -67,7 +67,7 @@ public class MongoDelete {
 		 * that we can delete an entire subgraph in one single operation! Nice!
 		 */
 		Query query = new Query();
-		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).regex(api.regexRecursiveChildrenOfPath(node.getPath())));
+		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath())));
 
 		DeleteResult res = ops.remove(query, SubNode.class);
 		log.debug("Num of SubGraph deleted: " + res.getDeletedCount());

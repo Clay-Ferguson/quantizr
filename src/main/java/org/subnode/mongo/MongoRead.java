@@ -58,7 +58,7 @@ public class MongoRead {
     private MongoAuth auth;
 
     @Autowired
-    private MongoApi api;
+    private MongoUtil util;
 
     /**
      * Gets account name from the root node associated with whoever owns 'node'
@@ -106,7 +106,7 @@ public class MongoRead {
 
     public long getChildCount(MongoSession session, SubNode node) {
         Query query = new Query();
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(api.regexDirectChildrenOfPath(node.getPath()));
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);
         update.saveSession(session);
         return ops.count(query, SubNode.class);
@@ -129,7 +129,7 @@ public class MongoRead {
         auth.auth(session, node, PrivilegeType.READ);
         Query query = new Query();
         Criteria criteria = Criteria.where(//
-                SubNode.FIELD_PATH).regex(api.regexDirectChildrenOfPath(node.getPath()))//
+                SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()))//
                 .and(SubNode.FIELD_ORDINAL).is(idx);
         query.addCriteria(criteria);
         update.saveSession(session);
@@ -138,7 +138,7 @@ public class MongoRead {
     }
 
     public void checkParentExists(MongoSession session, SubNode node) {
-        boolean isRootPath = api.isRootPath(node.getPath());
+        boolean isRootPath = util.isRootPath(node.getPath());
         if (node.isDisableParentCheck() || isRootPath)
             return;
 
@@ -176,7 +176,7 @@ public class MongoRead {
         ObjectId nodeOwnerId;
         int colonIdx = -1;
         if ((colonIdx = name.indexOf(":")) == -1) {
-            nodeOwnerId = MongoApi.systemRootNode.getOwner();
+            nodeOwnerId = util.getSystemRootNode().getOwner();
             // log.debug("no leading colon, so this is expected to have admin owner=" +
             // nodeOwnerId.toHexString());
         } else {
@@ -339,7 +339,7 @@ public class MongoRead {
          * 
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-                .regex(api.regexDirectChildrenOfPath(node == null ? "" : node.getPath()));
+                .regex(util.regexDirectChildrenOfPath(node == null ? "" : node.getPath()));
         if (ordered) {
             query.with(Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
         }
@@ -377,7 +377,7 @@ public class MongoRead {
          * below...)
          * 
          */
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(api.regexDirectChildrenOfPath(path));
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(path));
 
         /*
          * This condition ensures that when users create a node and are still editing
@@ -436,7 +436,7 @@ public class MongoRead {
         // todo-2: research if there's a way to query for just one, rather than simply
         // callingfindOne at the end? What's best practice here?
         Query query = new Query();
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(api.regexDirectChildrenOfPath(node.getPath()));
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
         query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
         query.addCriteria(criteria);
 
@@ -454,7 +454,7 @@ public class MongoRead {
         auth.auth(session, node, PrivilegeType.READ);
 
         Query query = new Query();
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(api.regexDirectChildrenOfPath(node.getPath()));
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
         query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
         query.addCriteria(criteria);
 
@@ -472,7 +472,7 @@ public class MongoRead {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query query = new Query();
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(api.regexDirectChildrenOfPath(node.getParentPath()));
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getParentPath()));
         query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
         query.addCriteria(criteria);
 
@@ -494,7 +494,7 @@ public class MongoRead {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query query = new Query();
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(api.regexDirectChildrenOfPath(node.getParentPath()));
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getParentPath()));
         query.with(Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
         query.addCriteria(criteria);
 
@@ -534,7 +534,7 @@ public class MongoRead {
          * before the end of the string. Without the trailing (.+)$ we would be
          * including the node itself in addition to all its children.
          */
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(api.regexRecursiveChildrenOfPath(node.getPath()));
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);
         update.saveSession(session);
         return ops.find(query, SubNode.class);
@@ -557,7 +557,7 @@ public class MongoRead {
          * before the end of the string. Without the trailing (.+)$ we would be
          * including the node itself in addition to all its children.
          */
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(api.regexRecursiveChildrenOfPath(node.getPath()));
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
 
         /*
          * This condition ensures that when users create a node and are still editing
@@ -716,7 +716,7 @@ public class MongoRead {
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
         Criteria criteria = Criteria.where(//
-                SubNode.FIELD_PATH).regex(api.regexDirectChildrenOfPath(NodeName.ROOT_OF_ALL_USERS))//
+                SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(NodeName.ROOT_OF_ALL_USERS))//
                 .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
 
         query.addCriteria(criteria);
@@ -735,7 +735,7 @@ public class MongoRead {
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
         Criteria criteria = Criteria.where(//
-                SubNode.FIELD_PATH).regex(api.regexDirectChildrenOfPath(path))//
+                SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(path))//
                 .and(SubNode.FIELD_TYPE).is(type);
 
         query.addCriteria(criteria);
@@ -754,7 +754,7 @@ public class MongoRead {
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
         Criteria criteria = Criteria.where(//
-                SubNode.FIELD_PATH).regex(api.regexDirectChildrenOfPath(path))//
+                SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(path))//
                 .and(SubNode.FIELD_PROPERTIES + "." + propName + ".value").is(propVal);
 
         query.addCriteria(criteria);

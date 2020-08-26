@@ -24,9 +24,6 @@ public class MongoUpdate {
     @Autowired
     private MongoAuth auth;
 
-    @Autowired
-    private MongoApi api;
-
 	public void save(MongoSession session, SubNode node) {
 		save(session, node, true);
 	}

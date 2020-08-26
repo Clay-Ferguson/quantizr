@@ -34,7 +34,7 @@ public class MongoRepository {
 	// private MongoTest mongoTest;
 
 	@Autowired
-	private MongoApi api;
+	private MongoUtil util;
 
 	@Autowired
 	private UserFeedService userFeedService;
@@ -110,17 +110,17 @@ public class MongoRepository {
 			// }
 
 			if (appProp.getForceIndexRebuild()) {
-				api.dropAllIndexes(adminSession);
+				util.dropAllIndexes(adminSession);
 			}
 
-			api.createAllIndexes(adminSession);
-			api.createAdminUser(adminSession);
+			util.createAllIndexes(adminSession);
+			util.createAdminUser(adminSession);
 			repoUtil.createTestAccounts();
 
-			api.initSystemRootNode();
+			util.initSystemRootNode();
 
 			if (appProp.getReSaveAll()) {
-				api.reSaveAll(adminSession);
+				util.reSaveAll(adminSession);
 			}
 
 			// if (appProp.getMongoTest()) {

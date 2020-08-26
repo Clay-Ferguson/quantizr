@@ -20,7 +20,7 @@ import org.subnode.model.PropertyInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.AccessControl;
@@ -35,7 +35,7 @@ import org.subnode.service.AttachmentService;
 @Component
 public class Convert {
 	@Autowired
-	private MongoApi api;
+	private MongoUtil util;
 
 	@Autowired
 	private MongoRead read;
@@ -60,10 +60,10 @@ public class Convert {
 		String dataUrl = null;
 		String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 		if (mimeType != null) {
-			boolean isImage = api.isImageAttached(node);
+			boolean isImage = util.isImageAttached(node);
 
 			if (isImage) {
-				imageSize = api.getImageSize(node);
+				imageSize = util.getImageSize(node);
 
 				String dataUrlProp = node.getStringProp(NodeProp.BIN_DATA_URL.s());
 				if (dataUrlProp != null) {

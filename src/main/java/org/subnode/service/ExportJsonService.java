@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoEventListener;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
@@ -48,7 +48,7 @@ public class ExportJsonService {
 	private MongoTemplate ops;
 
 	@Autowired
-	private MongoApi api;
+	private MongoUtil util;
 
 	@Autowired
 	private MongoUpdate update;
@@ -91,7 +91,7 @@ public class ExportJsonService {
 			byte[] newLine = "\n,\n".getBytes(StandardCharsets.UTF_8);
 
 			Query query = new Query();
-			Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(api.regexRecursiveChildrenOfPath(pathPrefix));
+			Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathPrefix));
 			query.addCriteria(criteria);
 
 			Iterable<SubNode> iter = ops.find(query, SubNode.class);

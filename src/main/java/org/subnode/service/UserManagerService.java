@@ -35,7 +35,7 @@ import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
@@ -86,7 +86,7 @@ public class UserManagerService {
 	private static final Random rand = new Random();
 
 	@Autowired
-	private MongoApi api;
+	private MongoUtil util;
 
 	@Autowired
 	private MongoAuth auth;
@@ -396,7 +396,7 @@ public class UserManagerService {
 	}
 
 	public void initNewUser(MongoSession session, String userName, String password, String email, boolean automated) {
-		SubNode userNode = api.createUser(session, userName, email, password, automated);
+		SubNode userNode = util.createUser(session, userName, email, password, automated);
 		if (userNode != null) {
 			log.debug("Successful signup complete.");
 		}
@@ -504,7 +504,7 @@ public class UserManagerService {
 			throw new RuntimeEx("User already exists.");
 		}
 
-		SubNode newUserNode = api.createUser(session, userName, email, password, false);
+		SubNode newUserNode = util.createUser(session, userName, email, password, false);
 
 		/*
 		 * It's easiest to use the actua new UserNode ID as the 'signup code' to send to
@@ -727,7 +727,7 @@ public class UserManagerService {
 					throw new RuntimeEx("changePassword should not be called fror admin user.");
 				}
 
-				userNode[0].setProp(NodeProp.PWD_HASH.s(), api.getHashOfPassword(password));
+				userNode[0].setProp(NodeProp.PWD_HASH.s(), util.getHashOfPassword(password));
 				userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 				// note: the adminRunner.run saves the session so we don't do that here.
@@ -745,7 +745,7 @@ public class UserManagerService {
 
 			String password = req.getNewPassword();
 			userName[0] = userNode[0].getStringProp(NodeProp.USER.s());
-			userNode[0].setProp(NodeProp.PWD_HASH.s(), api.getHashOfPassword(password));
+			userNode[0].setProp(NodeProp.PWD_HASH.s(), util.getHashOfPassword(password));
 			userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 			update.save(session, userNode[0]);

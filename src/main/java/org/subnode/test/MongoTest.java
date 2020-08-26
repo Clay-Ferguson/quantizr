@@ -15,7 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoDelete;
@@ -32,7 +32,7 @@ public class MongoTest {
 	private static final Logger log = LoggerFactory.getLogger(MongoTest.class);
 
 	@Autowired
-	private MongoApi api;
+	private MongoUtil util;
 
 	@Autowired
 	private MongoCreate create;
@@ -53,8 +53,8 @@ public class MongoTest {
 	private AttachmentService attachmentService;
 
 	public void wipeDb(MongoSession session) {
-		api.dropAllIndexes(session);
-		api.dropCollection(session, SubNode.class);
+		util.dropAllIndexes(session);
+		util.dropCollection(session, SubNode.class);
 	}
 
 	public void test() {
@@ -92,7 +92,7 @@ public class MongoTest {
 		log.debug("updated first node.");
 
 		String stuffGuyName = "stuffguy";
-		SubNode stuffOwnerNode = api.createUser(adminSession, stuffGuyName, "", "passy", true);
+		SubNode stuffOwnerNode = util.createUser(adminSession, stuffGuyName, "", "passy", true);
 		MongoSession stuffSession = MongoSession.createFromNode(stuffOwnerNode);
 		expectedCount++;
 
@@ -113,8 +113,8 @@ public class MongoTest {
 		// expectedCount++;
 		// log.debug("inserted userPrefs node: " + XString.prettyPrint(userPrefsNode));
 
-		Iterable<SubNode> nodesIter = api.findAllNodes(adminSession);
-		api.dump("Dump check", nodesIter);
+		Iterable<SubNode> nodesIter = util.findAllNodes(adminSession);
+		util.dump("Dump check", nodesIter);
 
 		// UserPreferencesNode userPrefsNode2 = api.getUserPreference(adminSession, userPrefsNode.getPath());
 		// if (userPrefsNode2 == null || !userPrefsNode.getUserPrefString().equals(userPrefsNode2.getUserPrefString())) {
@@ -131,8 +131,8 @@ public class MongoTest {
 		// }
 
 		// ----------Dump current data
-		nodesIter = api.findAllNodes(adminSession);
-		int count1 = api.dump("Dump after first inserts", nodesIter);
+		nodesIter = util.findAllNodes(adminSession);
+		int count1 = util.dump("Dump after first inserts", nodesIter);
 		if (count1 != expectedCount) {
 			throw new RuntimeEx("unable to add first records.");
 		}
@@ -164,8 +164,8 @@ public class MongoTest {
 		expectedCount += childCount;
 
 		// ----------Dump current content before any deletes
-		Iterable<SubNode> nodesIter1 = api.findAllNodes(adminSession);
-		int count = api.dump("Dumping before any deletes", nodesIter1);
+		Iterable<SubNode> nodesIter1 = util.findAllNodes(adminSession);
+		int count = util.dump("Dumping before any deletes", nodesIter1);
 		if (count != expectedCount) {
 			throw new RuntimeEx("unable to add child record.");
 		}
@@ -179,8 +179,8 @@ public class MongoTest {
 		expectedCount -= (1 + childCount);
 
 		// ----------Check that deletion worked
-		Iterable<SubNode> nodesIter2 = api.findAllNodes(adminSession);
-		count = api.dump("Dump after deletes", nodesIter2);
+		Iterable<SubNode> nodesIter2 = util.findAllNodes(adminSession);
+		count = util.dump("Dump after deletes", nodesIter2);
 		if (count != expectedCount) {
 			throw new RuntimeEx("unable to delete record, or count is off");
 		}
@@ -208,7 +208,7 @@ public class MongoTest {
 
 		/* check that we can get all the children */
 		Iterable<SubNode> childrenIter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null);
-		count = api.dump("Dumping ordered children", childrenIter);
+		count = util.dump("Dumping ordered children", childrenIter);
 
 		// ----------Read all ordinals. We don't assume they are all perfectly numbered here. (might
 		// be dupliates or missing ones)

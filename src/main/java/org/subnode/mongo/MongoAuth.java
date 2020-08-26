@@ -47,7 +47,7 @@ public class MongoAuth {
 	private MongoUpdate update;
     
     @Autowired
-    private MongoApi api;
+    private MongoUtil util;
 
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
@@ -287,7 +287,7 @@ public class MongoAuth {
 		 * including the node itself in addition to all its children.
 		 */
 
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(api.regexRecursiveChildrenOfPath(node.getPath())) //
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath())) //
 				.and(SubNode.FIELD_AC).ne(null);
 
 		// examples from online:
@@ -329,7 +329,7 @@ public class MongoAuth {
 					success = true;
 				}
 				// else it's an ordinary user so we check the password against their user node
-				else if (userNode.getStringProp(NodeProp.PWD_HASH.s()).equals(api.getHashOfPassword(password))) {
+				else if (userNode.getStringProp(NodeProp.PWD_HASH.s()).equals(util.getHashOfPassword(password))) {
 					success = true;
 				}
 			}

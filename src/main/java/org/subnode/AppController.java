@@ -32,7 +32,7 @@ import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.MailSender;
 import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
@@ -151,7 +151,7 @@ public class AppController implements ErrorController {
 	private CallProcessor callProc;
 
 	@Autowired
-	private MongoApi api;
+	private MongoUtil mongoUtil;
 
 	@Autowired
 	private MongoRead read;
@@ -903,7 +903,7 @@ public class AppController implements ErrorController {
 			}
 
 			adminRunner.run(mongoSession -> {
-				api.rebuildIndexes(mongoSession);
+				mongoUtil.rebuildIndexes(mongoSession);
 			});
 
 			res.setSuccess(true);
