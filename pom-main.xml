@@ -61,20 +61,10 @@ that's used during builds.
 				</filters>
 
 				<resources>
-					<resource>
-						<directory>src/main/profiles/dev</directory>
-						<includes>
-							<include>*.properties</include>
-						</includes>
-					</resource>
 
 					<resource>
 						<directory>src/main/resources</directory>
-						<!--
-				<includes>
-					<include>log4j.properties</include>
-				</includes>       
-				-->
+						
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
@@ -337,20 +327,10 @@ that's used during builds.
 				</filters>
 
 				<resources>
-					<resource>
-						<directory>src/main/profiles/dev</directory>
-						<includes>
-							<include>*.properties</include>
-						</includes>
-					</resource>
 
 					<resource>
 						<directory>src/main/resources</directory>
-						<!--
-				<includes>
-					<include>log4j.properties</include>
-				</includes>       
-				-->
+			
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
@@ -577,27 +557,10 @@ that's used during builds.
 				</filters>
 
 				<resources>
-					<resource>
-						<directory>src/main/profiles/prod</directory>
-						<includes>
-							<include>*.properties</include>
-						</includes>
-					</resource>
-
-					<resource>
-						<directory>src/main/profiles/${profile.name}</directory>
-						<includes>
-							<include>*.properties</include>
-						</includes>
-					</resource>
 
 					<resource>
 						<directory>src/main/resources</directory>
-						<!--
-				<includes>
-					<include>log4j.properties</include>
-				</includes>       
-				-->
+						
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
@@ -779,20 +742,10 @@ that's used during builds.
 				</filters>
 
 				<resources>
-					<resource>
-						<directory>src/main/profiles/dev</directory>
-						<includes>
-							<include>*.properties</include>
-						</includes>
-					</resource>
 
 					<resource>
 						<directory>src/main/resources</directory>
-						<!--
-				<includes>
-					<include>log4j.properties</include>
-				</includes>       
-				-->
+						
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>

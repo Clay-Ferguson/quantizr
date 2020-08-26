@@ -63,32 +63,32 @@ that's used during builds.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
 
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency> 
 
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
     <exclusions>
-        <exclusion>
+        <!-- <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
+        </exclusion> -->
 
         <!--
         <exclusion>
@@ -105,22 +105,21 @@ that's used during builds.
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-mail</artifactId>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-
-    </exclusions>
+    </exclusions> -->
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
     <exclusions>
-        <exclusion>
+        <!-- <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
+        </exclusion> -->
         <exclusion>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -151,10 +150,10 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-webflux</artifactId>
     <exclusions>
-        <exclusion>
+        <!-- <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
+        </exclusion> -->
         <exclusion>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -165,22 +164,22 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-test</artifactId>
     <scope>test</scope>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency>				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
@@ -288,20 +287,10 @@ of the spring configs for security are also perfected.
 				</filters>
 
 				<resources>
-					<resource>
-						<directory>src/main/profiles/dev</directory>
-						<includes>
-							<include>*.properties</include>
-						</includes>
-					</resource>
 
 					<resource>
 						<directory>src/main/resources</directory>
-						<!--
-				<includes>
-					<include>log4j.properties</include>
-				</includes>       
-				-->
+						
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
@@ -512,32 +501,32 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
 
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency> 
 
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
     <exclusions>
-        <exclusion>
+        <!-- <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
+        </exclusion> -->
 
         <!--
         <exclusion>
@@ -554,22 +543,21 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-mail</artifactId>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-
-    </exclusions>
+    </exclusions> -->
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
     <exclusions>
-        <exclusion>
+        <!-- <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
+        </exclusion> -->
         <exclusion>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -600,10 +588,10 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-webflux</artifactId>
     <exclusions>
-        <exclusion>
+        <!-- <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
+        </exclusion> -->
         <exclusion>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -614,22 +602,22 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-test</artifactId>
     <scope>test</scope>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency>				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
@@ -793,32 +781,32 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
 
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency> 
 
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
     <exclusions>
-        <exclusion>
+        <!-- <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
+        </exclusion> -->
 
         <!--
         <exclusion>
@@ -835,22 +823,21 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-mail</artifactId>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-
-    </exclusions>
+    </exclusions> -->
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
     <exclusions>
-        <exclusion>
+        <!-- <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
+        </exclusion> -->
         <exclusion>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -881,10 +868,10 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-webflux</artifactId>
     <exclusions>
-        <exclusion>
+        <!-- <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
+        </exclusion> -->
         <exclusion>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -895,22 +882,22 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-test</artifactId>
     <scope>test</scope>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency>				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
@@ -1018,20 +1005,10 @@ of the spring configs for security are also perfected.
 				</filters>
 
 				<resources>
-					<resource>
-						<directory>src/main/profiles/dev</directory>
-						<includes>
-							<include>*.properties</include>
-						</includes>
-					</resource>
 
 					<resource>
 						<directory>src/main/resources</directory>
-						<!--
-				<includes>
-					<include>log4j.properties</include>
-				</includes>       
-				-->
+			
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
@@ -1260,32 +1237,32 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
 
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency> 
 
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-aop</artifactId>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
     <exclusions>
-        <exclusion>
+        <!-- <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
+        </exclusion> -->
 
         <!--
         <exclusion>
@@ -1302,22 +1279,21 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-mail</artifactId>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-
-    </exclusions>
+    </exclusions> -->
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
     <exclusions>
-        <exclusion>
+        <!-- <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
+        </exclusion> -->
         <exclusion>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -1348,10 +1324,10 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-webflux</artifactId>
     <exclusions>
-        <exclusion>
+        <!-- <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
+        </exclusion> -->
         <exclusion>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -1362,22 +1338,22 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-test</artifactId>
     <scope>test</scope>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
-    <exclusions>
+    <!-- <exclusions>
         <exclusion>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
-    </exclusions>
+    </exclusions> -->
 </dependency>				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
@@ -1485,27 +1461,10 @@ of the spring configs for security are also perfected.
 				</filters>
 
 				<resources>
-					<resource>
-						<directory>src/main/profiles/prod</directory>
-						<includes>
-							<include>*.properties</include>
-						</includes>
-					</resource>
-
-					<resource>
-						<directory>src/main/profiles/${profile.name}</directory>
-						<includes>
-							<include>*.properties</include>
-						</includes>
-					</resource>
 
 					<resource>
 						<directory>src/main/resources</directory>
-						<!--
-				<includes>
-					<include>log4j.properties</include>
-				</includes>       
-				-->
+						
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
@@ -1687,20 +1646,10 @@ of the spring configs for security are also perfected.
 				</filters>
 
 				<resources>
-					<resource>
-						<directory>src/main/profiles/dev</directory>
-						<includes>
-							<include>*.properties</include>
-						</includes>
-					</resource>
 
 					<resource>
 						<directory>src/main/resources</directory>
-						<!--
-				<includes>
-					<include>log4j.properties</include>
-				</includes>       
-				-->
+						
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
