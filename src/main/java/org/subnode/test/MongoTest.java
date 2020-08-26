@@ -6,15 +6,6 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.subnode.exception.base.RuntimeEx;
-import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.MongoApi;
-import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.SubNodePropVal;
-import org.subnode.service.AttachmentService;
-import org.subnode.util.LimitedInputStreamEx;
-
 import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -22,6 +13,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.subnode.exception.base.RuntimeEx;
+import org.subnode.model.client.PrincipalName;
+import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoAuth;
+import org.subnode.mongo.MongoCreate;
+import org.subnode.mongo.MongoDelete;
+import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.model.SubNode;
+import org.subnode.mongo.model.SubNodePropVal;
+import org.subnode.service.AttachmentService;
+import org.subnode.util.LimitedInputStreamEx;
 
 @Component
 public class MongoTest {
@@ -29,6 +33,21 @@ public class MongoTest {
 
 	@Autowired
 	private MongoApi api;
+
+	@Autowired
+	private MongoCreate create;
+
+	@Autowired
+	private MongoRead read;
+
+	@Autowired
+	private MongoUpdate update;
+
+	@Autowired
+	private MongoDelete delete;
+
+	@Autowired
+	private MongoAuth auth;
 
 	@Autowired
 	private AttachmentService attachmentService;
@@ -43,33 +62,33 @@ public class MongoTest {
 		log.debug("*****************************************************************************************");
 		log.debug("MongoTest Running!");
 
-		MongoSession adminSession = api.getAdminSession();
-		long expectedCount = api.getNodeCount(adminSession);
+		MongoSession adminSession = auth.getAdminSession();
+		long expectedCount = read.getNodeCount(adminSession);
 
-		SubNode adminNode = api.getUserNodeByUserName(adminSession, PrincipalName.ADMIN.s());
+		SubNode adminNode = read.getUserNodeByUserName(adminSession, PrincipalName.ADMIN.s());
 		if (adminNode == null) {
 			throw new RuntimeEx("Unable to find admin user node.");
 		}
 
 		// ----------Insert a test node
-		SubNode node = api.createNode(adminSession, "/usrx");
+		SubNode node = create.createNode(adminSession, "/usrx");
 		node.setProp("testKey", new SubNodePropVal("testVal"));
-		api.save(adminSession, node);
+		update.save(adminSession, node);
 		expectedCount++;
 		log.debug("inserted first node.");
 
-		SubNode nodeFoundById = api.getNode(adminSession, node.getId());
+		SubNode nodeFoundById = read.getNode(adminSession, node.getId());
 		if (nodeFoundById == null) {
 			throw new RuntimeEx("Unable to find node by id.");
 		}
 
-		SubNode nodeFoundByStrId = api.getNode(adminSession, node.getId().toHexString());
+		SubNode nodeFoundByStrId = read.getNode(adminSession, node.getId().toHexString());
 		if (nodeFoundByStrId == null) {
 			throw new RuntimeEx("Unable to find node by id: " + node.getId().toHexString());
 		}
 
 		node.setProp("testKeyA", new SubNodePropVal("tesetValA"));
-		api.save(adminSession, node);
+		update.save(adminSession, node);
 		log.debug("updated first node.");
 
 		String stuffGuyName = "stuffguy";
@@ -77,13 +96,13 @@ public class MongoTest {
 		MongoSession stuffSession = MongoSession.createFromNode(stuffOwnerNode);
 		expectedCount++;
 
-		SubNode stuffrootNode = api.createNode(stuffSession, "/stuffroot");
-		api.save(adminSession, stuffrootNode);
+		SubNode stuffrootNode = create.createNode(stuffSession, "/stuffroot");
+		update.save(adminSession, stuffrootNode);
 		expectedCount++;
 		log.debug("inserted stuffroot node.");
 
-		SubNode stuffNode = api.createNode(stuffSession, "/stuffroot/stuff");
-		api.save(adminSession, stuffNode);
+		SubNode stuffNode = create.createNode(stuffSession, "/stuffroot/stuff");
+		update.save(adminSession, stuffNode);
 		expectedCount++;
 		log.debug("inserted stuff node.");
 
@@ -119,7 +138,7 @@ public class MongoTest {
 		}
 
 		// ----------Verify getParent works
-		SubNode parent = api.getParent(adminSession, stuffNode);
+		SubNode parent = read.getParent(adminSession, stuffNode);
 		if (!parent.getPath().equals("/stuffroot")) {
 			throw new RuntimeEx("getParent failed.");
 		}
@@ -127,8 +146,8 @@ public class MongoTest {
 		// ----------Verify an attempt to write a duplicate 'path' fails
 		boolean uniqueViolationCaught = false;
 		try {
-			SubNode dupNode = api.createNode(adminSession, "/usrx");
-			api.save(adminSession, dupNode);
+			SubNode dupNode = create.createNode(adminSession, "/usrx");
+			update.save(adminSession, dupNode);
 		}
 		catch (Exception e) {
 			uniqueViolationCaught = true;
@@ -154,7 +173,7 @@ public class MongoTest {
 		readAllChildrenOneByOne(adminSession, node, childCount);
 
 		// ---------Delete one node
-		api.delete(adminSession, node);
+		delete.delete(adminSession, node);
 
 		// deleted the node AND all children.
 		expectedCount -= (1 + childCount);
@@ -181,14 +200,14 @@ public class MongoTest {
 		List<String> pathList = new LinkedList<String>();
 
 		/* Make sure we can read the child count from a query */
-		long count = api.getChildCount(session, node);
+		long count = read.getChildCount(session, node);
 		if (count != assertCount) {
 			throw new RuntimeEx("Child count query failed.");
 		}
 		log.debug("child count query successful.");
 
 		/* check that we can get all the children */
-		Iterable<SubNode> childrenIter = api.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null);
+		Iterable<SubNode> childrenIter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null);
 		count = api.dump("Dumping ordered children", childrenIter);
 
 		// ----------Read all ordinals. We don't assume they are all perfectly numbered here. (might
@@ -199,7 +218,7 @@ public class MongoTest {
 
 		// ---------Read all by indexes.
 		for (long i : ordinalList) {
-			SubNode n = api.getChildAt(session, node, i);
+			SubNode n = read.getChildAt(session, node, i);
 			if (n == null) {
 				throw new RuntimeEx("getChildAt " + i + " failed and returned null.");
 			}
@@ -213,7 +232,7 @@ public class MongoTest {
 
 		// ---------Read all by IDs.
 		for (ObjectId id : idList) {
-			SubNode n = api.getNode(session, id);
+			SubNode n = read.getNode(session, id);
 			if (!n.getId().equals(id)) {
 				throw new RuntimeEx("ID " + n.getId() + " found when " + id + " was expected.");
 			}
@@ -222,7 +241,7 @@ public class MongoTest {
 
 		// ---------Read all by Paths.
 		for (String path : pathList) {
-			SubNode n = api.getNode(session, path);
+			SubNode n = read.getNode(session, path);
 			if (!n.getPath().equals(path)) {
 				throw new RuntimeEx("Path " + n.getPath() + " found when " + path + " was expected.");
 			}
@@ -234,11 +253,11 @@ public class MongoTest {
 		log.debug("Running binaries tests.");
 
 		try {
-			SubNode node = api.createNode(session, "/binaries");
-			api.save(session, node);
+			SubNode node = create.createNode(session, "/binaries");
+			update.save(session, node);
 			int maxFileSize = session.getMaxUploadSize(); 
 			attachmentService.writeStream(session, node, new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png");
-			api.save(session, node);
+			update.save(session, node);
 
 			log.debug("inserted root for binary testing.", null, "image/png", null);
 
@@ -254,7 +273,7 @@ public class MongoTest {
 	public void addTestChildren(MongoSession session, SubNode node, long count) {
 		String parentPath = node.getPath();
 		for (int i = 0; i < count; i++) {
-			SubNode newNode = api.createNode(session, parentPath + "/subNode" + i);
+			SubNode newNode = create.createNode(session, parentPath + "/subNode" + i);
 
 			/*
 			 * we invert ordering 'count-i' (reverse order) so that we can be sure our query testing
@@ -262,10 +281,10 @@ public class MongoTest {
 			 * query
 			 */
 			newNode.setOrdinal(count - i - 1);
-			api.save(session, newNode);
+			update.save(session, newNode);
 		}
 
-		Long maxOrdinal = api.getMaxChildOrdinal(session, node);
+		Long maxOrdinal = read.getMaxChildOrdinal(session, node);
 		if (maxOrdinal == null || maxOrdinal.longValue() != count - 1) {
 			throw new RuntimeEx("Expected max ordinal of " + (count - 1) + " but found " + maxOrdinal);
 		}

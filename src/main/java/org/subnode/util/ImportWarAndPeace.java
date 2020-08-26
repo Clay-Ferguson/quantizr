@@ -10,12 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-
 import org.subnode.config.SpringContextUtil;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.CreateNodeLocation;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 
 /**
@@ -28,7 +28,10 @@ public class ImportWarAndPeace {
 	private static final Logger log = LoggerFactory.getLogger(ImportWarAndPeace.class);
 
 	@Autowired
-	private MongoApi api;
+	private MongoCreate create;
+
+	@Autowired
+	private MongoUpdate update;
 
 	private int maxLines = Integer.MAX_VALUE;
 	private int maxBooks = Integer.MAX_VALUE;
@@ -121,9 +124,9 @@ public class ImportWarAndPeace {
 
 			addParagraph();
 
-			curChapter = api.createNode(session, curBook, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
+			curChapter = create.createNode(session, curBook, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
 			curChapter.setContent("C" + String.valueOf(globalChapter) + ". " + line);
-			api.save(session, curChapter);
+			update.save(session, curChapter);
 			return true;
 		}
 
@@ -145,9 +148,9 @@ public class ImportWarAndPeace {
 
 		// line = XString.injectForQuotations(line);
 
-		SubNode paraNode = api.createNode(session, curChapter, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
+		SubNode paraNode = create.createNode(session, curChapter, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
 		paraNode.setContent("VS" + globalVerse + ". " + line);
-		api.save(session, paraNode);
+		update.save(session, paraNode);
 		paragraph.setLength(0);
 		return true;
 	}
@@ -165,9 +168,9 @@ public class ImportWarAndPeace {
 			if (globalBook > maxBooks) return false;
 			addParagraph();
 
-			curBook = api.createNode(session, root, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
+			curBook = create.createNode(session, root, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
 			curBook.setContent("B" + String.valueOf(globalBook) + ". " + line);
-			api.save(session, curBook);
+			update.save(session, curBook);
 			return true;
 		}
 		return false;

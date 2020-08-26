@@ -8,12 +8,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.subnode.model.client.PrincipalName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoApi;
+import org.subnode.model.client.PrincipalName;
+import org.subnode.mongo.MongoAuth;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.MongoPrincipal;
@@ -30,11 +36,6 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 /**
  * Service methods for (ACL): processing security, privileges, and Access
  * Control List information on nodes.
@@ -44,7 +45,13 @@ public class AclService {
 	private static final Logger log = LoggerFactory.getLogger(AclService.class);
 
 	@Autowired
-	private MongoApi api;
+	private MongoRead read;
+
+	@Autowired
+	private MongoUpdate update;
+
+	@Autowired
+	private MongoAuth auth;
 
 	@Autowired
 	private UserManagerService userManagerService;
@@ -65,14 +72,14 @@ public class AclService {
 		}
 
 		String nodeId = req.getNodeId();
-		SubNode node = api.getNode(session, nodeId);
+		SubNode node = read.getNode(session, nodeId);
 
 		if (!req.isIncludeAcl() && !req.isIncludeOwners()) {
 			throw ExUtil.wrapEx("no specific information requested for getNodePrivileges");
 		}
 
 		if (req.isIncludeAcl()) {
-			res.setAclEntries(api.getAclEntries(session, node));
+			res.setAclEntries(auth.getAclEntries(session, node));
 		}
 
 		if (req.isIncludeOwners()) {
@@ -95,8 +102,8 @@ public class AclService {
 		}
 
 		String nodeId = req.getNodeId();
-		SubNode node = api.getNode(session, nodeId);
-		api.authRequireOwnerOfNode(session, node);
+		SubNode node = read.getNode(session, nodeId);
+		auth.authRequireOwnerOfNode(session, node);
 
 		boolean success = addPrivilege(session, node, req.getPrincipal(), req.getPrivileges(), res);
 		res.setSuccess(success);
@@ -113,8 +120,8 @@ public class AclService {
 		}
 
 		String nodeId = req.getNodeId();
-		SubNode node = api.getNode(session, nodeId);
-		api.authRequireOwnerOfNode(session, node);
+		SubNode node = read.getNode(session, nodeId);
+		auth.authRequireOwnerOfNode(session, node);
 
 		String cipherKey = node.getStringProp(NodeProp.ENC_KEY.s());
 		if (cipherKey == null) {
@@ -135,7 +142,7 @@ public class AclService {
 		if (ac != null) {
 			ac.setKey(cipherKey);
 			node.setAc(acl);
-			api.save(session, node);
+			update.save(session, node);
 			ret = true;
 		}
 		return ret;
@@ -163,7 +170,7 @@ public class AclService {
 		 * map key
 		 */
 		else {
-			principalNode = api.getUserNodeByUserName(api.getAdminSession(), principal);
+			principalNode = read.getUserNodeByUserName(auth.getAdminSession(), principal);
 			if (principalNode == null) {
 				if (res != null) {
 					res.setMessage("Unknown user name: " + principal);
@@ -232,7 +239,7 @@ public class AclService {
 			ac.setPrvs(prvs);
 			acl.put(mapKey, ac);
 			node.setAc(acl);
-			api.save(session, node);
+			update.save(session, node);
 
 			if (principalNode != null) {
 				final SubNode _principalNode = principalNode;
@@ -306,7 +313,7 @@ public class AclService {
 				node.setAc(acl);
 			}
 
-			api.save(session, node);
+			update.save(session, node);
 		}
 	}
 
@@ -321,8 +328,8 @@ public class AclService {
 		}
 
 		String nodeId = req.getNodeId();
-		SubNode node = api.getNode(session, nodeId);
-		api.authRequireOwnerOfNode(session, node);
+		SubNode node = read.getNode(session, nodeId);
+		auth.authRequireOwnerOfNode(session, node);
 
 		String principalNodeId = req.getPrincipalNodeId();
 		String privilege = req.getPrivilege();
@@ -350,13 +357,13 @@ public class AclService {
 				 * that (i think). depends on how much ownership info we need to show user.
 				 * ownerSet.add(p.getUserNodeId());
 				 */
-				SubNode userNode = api.getNode(session, p.getUserNodeId());
+				SubNode userNode = read.getNode(session, p.getUserNodeId());
 				String userName = userNode.getStringProp(NodeProp.USER.s());
 				ownerSet.add(userName);
 			}
 
 			if (principals.size() == 0) {
-				node = api.getParent(session, node);
+				node = read.getParent(session, node);
 				if (node == null)
 					break;
 			} else {

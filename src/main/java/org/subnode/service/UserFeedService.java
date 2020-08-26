@@ -1,42 +1,38 @@
 package org.subnode.service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import org.subnode.config.NodeName;
-import org.subnode.config.SessionContext;
-import org.subnode.mail.OutboxMgr;
-import org.subnode.model.NodeInfo;
-import org.subnode.model.UserFeedInfo;
-import org.subnode.model.UserFeedItem;
-import org.subnode.model.client.NodeProp;
-import org.subnode.model.client.NodeType;
-import org.subnode.mongo.MongoApi;
-import org.subnode.mongo.MongoAppConfig;
-import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.RunAsMongoAdmin;
-import org.subnode.mongo.model.SubNode;
-import org.subnode.response.FeedPushInfo;
-import org.subnode.util.Convert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-
+import org.subnode.config.NodeName;
+import org.subnode.config.SessionContext;
+import org.subnode.model.NodeInfo;
+import org.subnode.model.UserFeedInfo;
+import org.subnode.model.UserFeedItem;
+import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
+import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.model.SubNode;
 import org.subnode.request.NodeFeedRequest;
+import org.subnode.response.FeedPushInfo;
 import org.subnode.response.NodeFeedResponse;
 import org.subnode.response.ServerPushInfo;
+import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
 
 /**
@@ -49,16 +45,10 @@ public class UserFeedService {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
 	@Autowired
-	private MongoAppConfig mac;
-
-	@Autowired
-	private MongoApi api;
+	private MongoRead read;
 
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
-
-	@Autowired
-	private OutboxMgr outboxMgr;
 
 	@Autowired
 	private Convert convert;
@@ -92,7 +82,7 @@ public class UserFeedService {
 		userFeedInfoMapByPath.clear();
 
 		adminRunner.run(session -> {
-			Iterable<SubNode> accountNodes = api.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
+			Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
 					null);
 
 			for (SubNode accountNode : accountNodes) {
@@ -119,14 +109,14 @@ public class UserFeedService {
 		userFeedInfo.setUserName(userName);
 
 		if (feedNode == null) {
-			feedNode = api.findTypedNodeUnderPath(session, accountNode.getPath(), NodeType.USER_FEED.s());
+			feedNode = read.findTypedNodeUnderPath(session, accountNode.getPath(), NodeType.USER_FEED.s());
 		}
 
 		if (feedNode != null) {
 			log.debug("Found UserFeed Node to get Timeline of: " + feedNode.getId().toHexString());
 
 			/* Process all the nodes under this user's USER_FEED node */
-			for (SubNode node : api.searchSubGraph(session, feedNode, null, "", SubNode.FIELD_MODIFY_TIME, 25, false,
+			for (SubNode node : read.searchSubGraph(session, feedNode, null, "", SubNode.FIELD_MODIFY_TIME, 25, false,
 					false)) {
 
 				UserFeedItem userFeedItem = new UserFeedItem();
@@ -264,7 +254,7 @@ public class UserFeedService {
 		 * since logging in, otherwise there's nothign to do here
 		 */
 		if (sc.getFeedUserNodeIds() != null && sc.getFeedUserNodeIds().contains(node.getOwner().toHexString())) {
-			//log.debug("USER GETTING A PUSH: " + sc.getUserName());
+			// log.debug("USER GETTING A PUSH: " + sc.getUserName());
 
 			if (nodeInfo == null) {
 				nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false, false);
@@ -348,13 +338,13 @@ public class UserFeedService {
 		int MAX_NODES = 100;
 		int counter = 0;
 
-		SubNode friendListNode = api.getNode(session, req.getNodeId());
+		SubNode friendListNode = read.getNode(session, req.getNodeId());
 		if (friendListNode != null) {
 			if (!friendListNode.getType().equals(NodeType.FRIEND_LIST.s())) {
 				throw new RuntimeException("only FRIEND_LIST type nodes can generate a feed.");
 			}
 
-			Iterable<SubNode> friendNodes = api.getChildrenUnderParentPath(session, friendListNode.getPath(), null,
+			Iterable<SubNode> friendNodes = read.getChildrenUnderParentPath(session, friendListNode.getPath(), null,
 					MAX_NODES);
 
 			List<UserFeedItem> fullFeedList = new LinkedList<UserFeedItem>();
@@ -366,8 +356,10 @@ public class UserFeedService {
 			 */
 			HashSet<String> userNodeIds = new HashSet<String>();
 
-			// We have to add in ourselves here so that we get our own feed updated per our
-			// own posts */
+			/*
+			 * We have to add in ourselves here so that we get our own feed updated per our
+			 * own posts
+			 */
 			userNodeIds.add(sessionContext.getRootId());
 
 			for (SubNode friendNode : friendNodes) {
@@ -536,7 +528,7 @@ public class UserFeedService {
 		 */
 		NodeInfo parentNodeInfo = nodeInfoMapByPath.get(parentPath);
 		if (parentNodeInfo == null) {
-			SubNode parentNode = api.getNode(session, parentPath);
+			SubNode parentNode = read.getNode(session, parentPath);
 			if (parentNode != null) {
 				parentNodeInfo = convert.convertToNodeInfo(sessionContext, session, parentNode, true, false, 0, false,
 						false, false);

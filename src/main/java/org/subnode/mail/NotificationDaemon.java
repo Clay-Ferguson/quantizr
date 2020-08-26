@@ -2,14 +2,6 @@ package org.subnode.mail;
 
 import java.util.List;
 
-import org.subnode.AppServer;
-import org.subnode.config.AppProp;
-import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoApi;
-import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.RunAsMongoAdmin;
-import org.subnode.mongo.model.SubNode;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.subnode.AppServer;
+import org.subnode.config.AppProp;
+import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.MongoDelete;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.model.SubNode;
 
 /**
  * Deamon for sending emails periodically.
@@ -34,7 +33,7 @@ public class NotificationDaemon {
 	private static final Logger log = LoggerFactory.getLogger(NotificationDaemon.class);
 
 	@Autowired
-	private MongoApi api;
+	private MongoDelete delete;
 
 	@Autowired
 	private AppProp appProp;
@@ -109,7 +108,7 @@ public class NotificationDaemon {
 
 							log.debug("Found mail to send to: " + email);
 							mailSender.sendMail(email, null, content, subject);
-							api.delete(session, node);
+							delete.delete(session, node);
 						}
 						else {
 							log.debug("not sending email. Missing some properties. email or subject or content");

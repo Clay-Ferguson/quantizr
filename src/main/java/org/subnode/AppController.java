@@ -33,6 +33,7 @@ import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.MailSender;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddPrivilegeRequest;
@@ -51,7 +52,6 @@ import org.subnode.request.GetServerInfoRequest;
 import org.subnode.request.GetSharedNodesRequest;
 import org.subnode.request.GetUserAccountInfoRequest;
 import org.subnode.request.GetUserProfileRequest;
-import org.subnode.request.GraphRequest;
 import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.InsertBookRequest;
 import org.subnode.request.InsertNodeRequest;
@@ -92,7 +92,6 @@ import org.subnode.response.SendTestEmailResponse;
 import org.subnode.response.ShutdownServerNodeResponse;
 import org.subnode.service.AclService;
 import org.subnode.service.AttachmentService;
-import org.subnode.service.BashService;
 import org.subnode.service.ExportTarService;
 import org.subnode.service.ExportZipService;
 import org.subnode.service.IPFSService;
@@ -155,6 +154,9 @@ public class AppController implements ErrorController {
 	private MongoApi api;
 
 	@Autowired
+	private MongoRead read;
+
+	@Autowired
 	private SessionContext sessionContext;
 
 	@Autowired
@@ -171,9 +173,6 @@ public class AppController implements ErrorController {
 
 	@Autowired
 	private ImportBookService importBookService;
-
-	@Autowired
-	private BashService bashService;
 
 	@Autowired
 	private NodeEditService nodeEditService;
@@ -277,7 +276,7 @@ public class AppController implements ErrorController {
 				adminRunner.run(mongoSession -> {
 					// we don't check ownership of node at this time, but merely check sanity of
 					// whether this ID is even existing or not.
-					SubNode node = api.getNode(mongoSession, _id);
+					SubNode node = read.getNode(mongoSession, _id);
 					nodeRenderService.populateSocialCardProps(node, model);
 					if (node == null) {
 						log.debug("Node did not exist.");

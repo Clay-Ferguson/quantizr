@@ -3,14 +3,21 @@ package org.subnode;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.subnode.model.client.PrincipalName;
-import org.subnode.util.LockEx;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.util.WebUtils;
 import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.NotLoggedInException;
 import org.subnode.model.UserPreferences;
-import org.subnode.mongo.MongoApi;
+import org.subnode.model.client.PrincipalName;
+import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.LoginRequest;
 import org.subnode.request.ResetPasswordRequest;
@@ -20,23 +27,20 @@ import org.subnode.response.LoginResponse;
 import org.subnode.response.base.ResponseBase;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
+import org.subnode.util.LockEx;
 import org.subnode.util.MongoRunnableEx;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
 
 @Component
 public class CallProcessor {
 	private static final Logger log = LoggerFactory.getLogger(CallProcessor.class);
 
 	@Autowired
-	private MongoApi api;
+	private MongoUpdate update;
+
+	@Autowired
+	private MongoAuth auth;
 
 	private static final boolean logRequests = true;
 	// private static int mutexCounter = 0;
@@ -94,7 +98,7 @@ public class CallProcessor {
 				try block is replicated code from the main login and later someday I can 'dry' this up. */		
 				boolean success = false;
 				try {
-					MongoSession session = api.login(req.getUserName(), req.getPassword());
+					MongoSession session = auth.login(req.getUserName(), req.getPassword());
 					sessionContext.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
 					sessionContext.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
 					sessionContext.setUserName(req.getUserName());
@@ -120,7 +124,7 @@ public class CallProcessor {
 			}
 
 			ret = runner.run(mongoSession);
-			api.saveSession(mongoSession);
+			update.saveSession(mongoSession);
 
 		} catch (NotLoggedInException e1) {
 			HttpServletResponse res = ThreadLocals.getServletResponse();
@@ -230,7 +234,7 @@ public class CallProcessor {
 		}
 
 		try {
-			MongoSession session = api.login(userName, password);
+			MongoSession session = auth.login(userName, password);
 			return session;
 		} catch (Exception e) {
 			if (res != null) {

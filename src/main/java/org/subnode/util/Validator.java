@@ -2,14 +2,13 @@ package org.subnode.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoAuth;
 
 @Component
 public class Validator {
 
 	@Autowired
-	private MongoApi api;
+	private MongoAuth auth;
 	
 	/*
 	 * UserName requirements, between 5 and 100 characters (inclusive) long, and only allowing
@@ -19,7 +18,7 @@ public class Validator {
 	 * names, that are used or looking up things about this user.
 	 */
 	public void checkUserName(String userName) {
-		if (!api.isAllowedUserName(userName)) {
+		if (!auth.isAllowedUserName(userName)) {
 			throw ExUtil.wrapEx("Invalid or Illegal user name.");
 		}
 		

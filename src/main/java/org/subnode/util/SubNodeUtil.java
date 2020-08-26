@@ -4,17 +4,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
-import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.CreateNodeLocation;
-import org.subnode.mongo.MongoApi;
-import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.SubNodePropertyMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.CreateNodeLocation;
+import org.subnode.mongo.MongoCreate;
+import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.model.SubNode;
+import org.subnode.mongo.model.SubNodePropertyMap;
 
 /**
  * Assorted general utility functions related to SubNodes.
@@ -34,7 +35,13 @@ public class SubNodeUtil {
 	public static final int PATH_HASH_LEN = 7;
 
 	@Autowired
-	private MongoApi api;
+	private MongoCreate create;
+
+	@Autowired
+	private MongoRead read;
+
+	@Autowired
+	private MongoUpdate update;
 
 	/*
 	 * These are properties we should never allow the client to send back as part of
@@ -59,7 +66,7 @@ public class SubNodeUtil {
 	}
 
 	public boolean hasDisplayableNodes(MongoSession session, boolean isAdvancedEditingMode, SubNode node) {
-		return (api.getChildCount(session, node) > 0);
+		return (read.getChildCount(session, node) > 0);
 	}
 
 	//todo-1: everywhere this is called can we be sure the path is not actually used as a lookup, but instead the node name?
@@ -71,7 +78,7 @@ public class SubNodeUtil {
 		}
 
 		// log.debug("Looking up node by path: "+(parentPath+name));
-		SubNode node = api.getNode(session, fixPath(parentPath + name));
+		SubNode node = read.getNode(session, fixPath(parentPath + name));
 		if (node != null) {
 			if (created != null) {
 				created.setVal(false);
@@ -91,7 +98,7 @@ public class SubNodeUtil {
 		SubNode parent = null;
 
 		if (!parentPath.equals("/")) {
-			parent = api.getNode(session, parentPath);
+			parent = read.getNode(session, parentPath);
 			if (parent == null) {
 				throw ExUtil.wrapEx("Expected parent not found: " + parentPath);
 			}
@@ -102,7 +109,7 @@ public class SubNodeUtil {
 
 			String path = fixPath(parentPath + nameToken);
 			// log.debug("ensuring node exists: parentPath=" + path);
-			node = api.getNode(session, path);
+			node = read.getNode(session, path);
 
 			/*
 			 * if this node is found continue on, using it as current parent to build on
@@ -113,7 +120,7 @@ public class SubNodeUtil {
 				// log.debug("Creating " + nameToken + " node, which didn't exist.");
 
 				/* Note if parent PARAMETER here is null we are adding a root node */
-				parent = api.createNode(session, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null);
+				parent = create.createNode(session, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null);
 
 				if (parent == null) {
 					throw ExUtil.wrapEx("unable to create " + nameToken);
@@ -123,7 +130,7 @@ public class SubNodeUtil {
 				if (defaultContent == null) {
 					parent.setContent("");
 				}
-				api.save(session, parent);
+				update.save(session, parent);
 			}
 			parentPath += nameToken + "/";
 		}
@@ -137,7 +144,7 @@ public class SubNodeUtil {
 		}
 
 		if (saveImmediate && nodesCreated) {
-			api.saveSession(session);
+			update.saveSession(session);
 		}
 		return parent;
 	}

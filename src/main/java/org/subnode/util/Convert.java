@@ -8,26 +8,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.subnode.model.client.NodeProp;
-import org.subnode.model.client.NodeType;
-import org.subnode.model.client.PrincipalName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
 import org.subnode.config.SessionContext;
-import org.subnode.util.ImageSize;
 import org.subnode.model.AccessControlInfo;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;
+import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodePropertyMap;
 import org.subnode.service.AttachmentService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
 
 /**
  * Converting objects from one type to another, and formatting.
@@ -36,6 +36,9 @@ import org.springframework.stereotype.Component;
 public class Convert {
 	@Autowired
 	private MongoApi api;
+
+	@Autowired
+	private MongoRead read;
 
 	@Autowired
 	private AttachmentService attachmentService;
@@ -74,7 +77,7 @@ public class Convert {
 			}
 		}
 
-		boolean hasChildren = (api.getChildCount(session, node) > 0);
+		boolean hasChildren = (read.getChildCount(session, node) > 0);
 		// log.trace("hasNodes=" + hasNodes + " path=" + node.getPath());
 
 		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly, initNodeEdit);
@@ -90,7 +93,7 @@ public class Convert {
 		 * that (i think). depends on how much ownership info we need to show user.
 		 */
 		String nameProp = null;
-		SubNode userNode = api.getNode(session, node.getOwner(), false);
+		SubNode userNode = read.getNode(session, node.getOwner(), false);
 
 		if (userNode == null) {
 			// todo-1: looks like import corrupts the 'owner' (needs research), but the code
@@ -145,7 +148,7 @@ public class Convert {
 
 			//NOTE: Right when the Friend node is first created, before a person has been selected, this WILL be null, and is normal
 			if (friendAccountId != null) {
-				SubNode friendAccountNode = api.getNode(session, friendAccountId, false);
+				SubNode friendAccountNode = read.getNode(session, friendAccountId, false);
 				if (friendAccountNode != null) {
 					String friendAvatarVer = friendAccountNode.getStringProp(NodeProp.BIN.s());
 
@@ -173,7 +176,7 @@ public class Convert {
 		if (allowInlineChildren) {
 			boolean hasInlineChildren = node.getBooleanProp(NodeProp.INLINE_CHILDREN.s());
 			if (hasInlineChildren) {
-				Iterable<SubNode> nodeIter = api.getChildren(session, node,
+				Iterable<SubNode> nodeIter = read.getChildren(session, node,
 						Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100);
 				Iterator<SubNode> iterator = nodeIter.iterator();
 

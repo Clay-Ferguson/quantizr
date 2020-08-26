@@ -1,16 +1,12 @@
 package org.subnode.service;
 
-import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.subnode.config.AppProp;
+import org.springframework.stereotype.Component;
 import org.subnode.lucene.FileIndexer;
 import org.subnode.lucene.FileSearcher;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.LuceneIndexResponse;
@@ -24,7 +20,7 @@ public class LuceneService {
 	private static final Logger log = LoggerFactory.getLogger(LuceneService.class);
 
 	@Autowired
-	private MongoApi api;
+	private MongoRead read;
 
 	@Autowired
 	private FileIndexer fileIndexer;
@@ -35,7 +31,7 @@ public class LuceneService {
 	public LuceneIndexResponse reindex(MongoSession session, String nodeId, String searchFolder) {
 		LuceneIndexResponse res = new LuceneIndexResponse();
 		String ret = null;
-		SubNode node = api.getNode(session, nodeId, true);
+		SubNode node = read.getNode(session, nodeId, true);
 		if (node != null) {
 			/*
 			 * Remember 'searchFolder' will have to be visible to the VM and therefore this
@@ -61,7 +57,7 @@ public class LuceneService {
 	public LuceneSearchResponse search(MongoSession session, String nodeId, String searchText) {
 		LuceneSearchResponse res = new LuceneSearchResponse();
 		String ret = null;
-		SubNode node = api.getNode(session, nodeId, true);
+		SubNode node = read.getNode(session, nodeId, true);
 		if (node != null) {
 			ret = searcher.search(nodeId, searchText);
 		}

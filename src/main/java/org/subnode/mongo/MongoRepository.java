@@ -2,13 +2,13 @@ package org.subnode.mongo;
 
 import javax.annotation.PreDestroy;
 
-import org.subnode.AppServer;
-import org.subnode.config.AppProp;
-import org.subnode.service.UserFeedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.subnode.AppServer;
+import org.subnode.config.AppProp;
+import org.subnode.service.UserFeedService;
 
 @Component
 public class MongoRepository {
@@ -24,7 +24,10 @@ public class MongoRepository {
 	private AppProp appProp;
 
 	@Autowired
-	private RepositoryUtil repoUtil;
+	private MongoUtil repoUtil;
+
+	@Autowired
+	private MongoAuth auth;
 
 	// MongoTest moved to test package and no longer available in prod code.
 	// @Autowired
@@ -100,7 +103,7 @@ public class MongoRepository {
 			 */
 			initialized = true;
 
-			MongoSession adminSession = api.getAdminSession();
+			MongoSession adminSession = auth.getAdminSession();
 
 			// if (appProp.getMongoTest()) {
 			// mongoTest.wipeDb(adminSession);

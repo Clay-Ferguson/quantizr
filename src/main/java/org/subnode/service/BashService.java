@@ -2,11 +2,15 @@ package org.subnode.service;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
-import org.subnode.model.client.NodeProp;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.mongo.MongoApi;
+import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExecuteNodeRequest;
@@ -16,17 +20,12 @@ import org.subnode.util.FileUtils;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 @Component
 public class BashService {
 	private static final Logger log = LoggerFactory.getLogger(BashService.class);
 
 	@Autowired
-	private MongoApi api;
+	private MongoRead read;
 
 	@Autowired
 	private AppProp appProp;
@@ -55,7 +54,7 @@ public class BashService {
 		}
 
 		String nodeId = req.getNodeId();
-		SubNode node = api.getNode(session, nodeId);
+		SubNode node = read.getNode(session, nodeId);
 		String script;
 
 		/*

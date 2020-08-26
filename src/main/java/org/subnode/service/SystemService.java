@@ -2,17 +2,6 @@ package org.subnode.service;
 
 import java.util.Map;
 
-import org.subnode.config.AppFilter;
-import org.subnode.config.AppSessionListener;
-import org.subnode.mongo.MongoApi;
-import org.subnode.mongo.MongoAppConfig;
-import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.RunAsMongoAdmin;
-import org.subnode.mongo.model.SubNode;
-import org.subnode.util.Const;
-import org.subnode.util.ValContainer;
-import org.subnode.util.XString;
-
 import com.mongodb.client.MongoDatabase;
 
 import org.bson.Document;
@@ -20,6 +9,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.subnode.config.AppFilter;
+import org.subnode.config.AppSessionListener;
+import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoAppConfig;
+import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.model.SubNode;
+import org.subnode.util.Const;
+import org.subnode.util.ValContainer;
+import org.subnode.util.XString;
 
 /**
  * Service methods for System related functions. Admin functions.
@@ -33,6 +33,9 @@ public class SystemService {
 
 	@Autowired
 	private MongoApi api;
+
+	@Autowired
+	private MongoRead read;
 
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
@@ -77,7 +80,7 @@ public class SystemService {
 	}
 
 	public String getJson(MongoSession session, String nodeId) {
-		SubNode node = api.getNode(session, nodeId, true);
+		SubNode node = read.getNode(session, nodeId, true);
 		if (node != null) {
 			return XString.prettyPrint(node);
 		} else {

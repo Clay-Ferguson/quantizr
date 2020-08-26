@@ -13,19 +13,34 @@ import java.util.Random;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.subnode.config.AppProp;
 import org.subnode.config.ConstantsProvider;
-import org.subnode.model.client.PrincipalName;
-import org.subnode.model.client.NodeProp;
-import org.subnode.model.client.NodeType;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.OutOfSpaceException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.model.UserPreferences;
 import org.subnode.model.UserStats;
+import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoAuth;
+import org.subnode.mongo.MongoDelete;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ChangePasswordRequest;
@@ -59,17 +74,6 @@ import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 import org.subnode.util.Validator;
 import org.subnode.util.XString;
-import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * Service methods for processing user management functions. Login, logout,
@@ -83,6 +87,18 @@ public class UserManagerService {
 
 	@Autowired
 	private MongoApi api;
+
+	@Autowired
+	private MongoAuth auth;
+
+	@Autowired
+	private MongoRead read;
+
+	@Autowired
+	private MongoUpdate update;
+
+	@Autowired
+	private MongoDelete delete;
 
 	@Autowired
 	private AppProp appProp;
@@ -153,7 +169,7 @@ public class UserManagerService {
 			res.setMessage("not logged in.");
 			res.setSuccess(false);
 		} else {
-			SubNode userNode = api.getUserNodeByUserName(session, userName);
+			SubNode userNode = read.getUserNodeByUserName(session, userName);
 			if (userNode == null) {
 				throw new RuntimeEx("User not found: " + userName);
 			}
@@ -175,7 +191,7 @@ public class UserManagerService {
 
 			ensureValidCryptoKeys(userNode);
 
-			api.save(session, userNode);
+			update.save(session, userNode);
 
 			res.setSuccess(true);
 		}
@@ -221,18 +237,18 @@ public class UserManagerService {
 		if (userName == null) {
 			return null;
 		}
-		SubNode userNode = api.getUserNodeByUserName(session, userName);
+		SubNode userNode = read.getUserNodeByUserName(session, userName);
 		if (userNode == null)
 			return null;
 
 		String ret = null;
-		SubNode userInbox = api.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s());
+		SubNode userInbox = read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s());
 
 		Date now = new Date();
 		long lastInboxNotifyTime = userNode.getIntProp(NodeProp.LAST_INBOX_NOTIFY_TIME.s());
 
 		if (userInbox != null) {
-			SubNode inboxNode = api.getNewestChild(session, userInbox);
+			SubNode inboxNode = read.getNewestChild(session, userInbox);
 			if (inboxNode != null) {
 				long inboxNodeTimeLong = inboxNode.getModifyTime().getTime();
 
@@ -244,7 +260,7 @@ public class UserManagerService {
 		}
 
 		userNode.setProp(NodeProp.LAST_INBOX_NOTIFY_TIME.s(), now.getTime());
-		api.save(session, userNode);
+		update.save(session, userNode);
 		return ret;
 	}
 
@@ -254,9 +270,9 @@ public class UserManagerService {
 		adminRunner.run(session -> {
 			String userName = sessionContext.getUserName();
 
-			SubNode ownerNode = api.getUserNodeByUserName(session, userName);
+			SubNode ownerNode = read.getUserNodeByUserName(session, userName);
 			if (ownerNode != null) {
-				api.delete(session, ownerNode);
+				delete.delete(session, ownerNode);
 			}
 		});
 		return res;
@@ -269,7 +285,7 @@ public class UserManagerService {
 	 */
 	public void writeUserStats(final MongoSession session, HashMap<ObjectId, UserStats> userStats) {
 		userStats.forEach((final ObjectId key, final UserStats stat) -> {
-			SubNode node = api.getNode(session, key);
+			SubNode node = read.getNode(session, key);
 			if (node != null) {
 				// log.debug("Setting stat.binUsage=" + stat.binUsage);
 				node.setProp(NodeProp.BIN_TOTAL.s(), stat.binUsage);
@@ -300,7 +316,7 @@ public class UserManagerService {
 			// log.debug("Will +/- amt: " + binSize);
 
 			if (userNode == null) {
-				userNode = api.getUserNodeByUserName(null, null);
+				userNode = read.getUserNodeByUserName(null, null);
 			}
 
 			addBytesToUserNodeBytes(binSize, userNode, sign);
@@ -313,7 +329,7 @@ public class UserManagerService {
 	 */
 	public void addBytesToUserNodeBytes(long binSize, SubNode userNode, int sign) {
 		if (userNode == null) {
-			userNode = api.getUserNodeByUserName(null, null);
+			userNode = read.getUserNodeByUserName(null, null);
 		}
 
 		// get the current binTotal on the user account (max they are allowed to upload)
@@ -353,7 +369,7 @@ public class UserManagerService {
 			// signupCode is just the new account node id? I guess that's secure, if user
 			// has this value it's the only user
 			// who could possibly know this unguessable value.
-			SubNode node = api.getNode(session, signupCode);
+			SubNode node = read.getNode(session, signupCode);
 
 			if (node != null) {
 				if (!node.getBooleanProp(NodeProp.SIGNUP_PENDING.s())) {
@@ -369,7 +385,7 @@ public class UserManagerService {
 				}
 
 				node.deleteProp(NodeProp.SIGNUP_PENDING.s());
-				api.save(session, node);
+				update.save(session, node);
 
 				valContainer.setVal("Signup Successful. You may login now.");
 			} else {
@@ -400,7 +416,7 @@ public class UserManagerService {
 	 * that user that we currently know is held in that node (i.e. preferences)
 	 */
 	public SignupResponse signup(SignupRequest req, boolean automated) {
-		MongoSession session = api.getAdminSession();
+		MongoSession session = auth.getAdminSession();
 		SignupResponse res = new SignupResponse();
 
 		final String userName = req.getUserName().trim();
@@ -483,7 +499,7 @@ public class UserManagerService {
 	 */
 	public void initiateSignup(MongoSession session, String userName, String password, String email) {
 
-		SubNode ownerNode = api.getUserNodeByUserName(session, userName);
+		SubNode ownerNode = read.getUserNodeByUserName(session, userName);
 		if (ownerNode != null) {
 			throw new RuntimeEx("User already exists.");
 		}
@@ -521,7 +537,7 @@ public class UserManagerService {
 		final String userName = sessionContext.getUserName();
 
 		adminRunner.run(session -> {
-			SubNode userNode = api.getUserNodeByUserName(session, userName);
+			SubNode userNode = read.getUserNodeByUserName(session, userName);
 
 			if (userNode != null) {
 				userNode.setProp(NodeProp.USER_PREF_PUBLIC_KEY.s(), req.getKeyJson());
@@ -541,7 +557,7 @@ public class UserManagerService {
 		final String userName = sessionContext.getUserName();
 
 		adminRunner.run(session -> {
-			SubNode userNode = api.getUserNodeByUserName(session, userName);
+			SubNode userNode = read.getUserNodeByUserName(session, userName);
 			if (userNode == null) {
 				res.setMessage("unknown user.");
 				res.setSuccess(false);
@@ -563,7 +579,7 @@ public class UserManagerService {
 		final String userName = sessionContext.getUserName();
 
 		adminRunner.run(session -> {
-			SubNode prefsNode = api.getUserNodeByUserName(session, userName);
+			SubNode prefsNode = read.getUserNodeByUserName(session, userName);
 
 			UserPreferences reqUserPrefs = req.getUserPreferences();
 
@@ -597,7 +613,7 @@ public class UserManagerService {
 
 		adminRunner.run(session -> {
 			boolean failed = false;
-			SubNode userNode = api.getUserNodeByUserName(session, userName);
+			SubNode userNode = read.getUserNodeByUserName(session, userName);
 
 			// DO NOT DELETE: This is temporaryly disabled (no ability to edit userNaem)
 			// If userName is changing, validate it first.
@@ -616,7 +632,7 @@ public class UserManagerService {
 				// userNode.setProp(NodeProp.USER.s(), req.getUserName());
 				userNode.setProp(NodeProp.USER_BIO.s(), req.getUserBio());
 				// sessionContext.setUserName(req.getUserName());
-				api.save(session, userNode);
+				update.save(session, userNode);
 				res.setSuccess(true);
 			}
 		});
@@ -628,7 +644,7 @@ public class UserManagerService {
 		final String userName = sessionContext.getUserName();
 
 		adminRunner.run(session -> {
-			SubNode userNode = api.getUserNodeByUserName(session, userName);
+			SubNode userNode = read.getUserNodeByUserName(session, userName);
 			if (userNode != null) {
 				res.setUserName(userNode.getStringProp(NodeProp.USER.s()));
 				res.setUserBio(userNode.getStringProp(NodeProp.USER_BIO.s()));
@@ -649,7 +665,7 @@ public class UserManagerService {
 		final UserPreferences userPrefs = new UserPreferences();
 
 		adminRunner.run(session -> {
-			SubNode prefsNode = api.getUserNodeByUserName(session, userName);
+			SubNode prefsNode = read.getUserNodeByUserName(session, userName);
 			userPrefs.setEditMode(prefsNode.getBooleanProp(NodeProp.USER_PREF_EDIT_MODE.s()));
 			userPrefs.setShowMetaData(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_METADATA.s()));
 			userPrefs.setImportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_IMPORT_ALLOWED.s()));
@@ -691,7 +707,7 @@ public class UserManagerService {
 				if (userNodeId == null) {
 					throw new RuntimeEx("Unable to find userNodeId: " + userNodeId);
 				}
-				userNode[0] = api.getNode(mongoSession, userNodeId);
+				userNode[0] = read.getNode(mongoSession, userNodeId);
 
 				if (userNode[0] == null) {
 					throw ExUtil.wrapEx("Invald password reset code.");
@@ -717,7 +733,7 @@ public class UserManagerService {
 				// note: the adminRunner.run saves the session so we don't do that here.
 			});
 		} else {
-			userNode[0] = api.getUserNodeByUserName(session, session.getUser());
+			userNode[0] = read.getUserNodeByUserName(session, session.getUser());
 
 			if (userNode[0] == null) {
 				throw ExUtil.wrapEx("changePassword cannot find user.");
@@ -732,7 +748,7 @@ public class UserManagerService {
 			userNode[0].setProp(NodeProp.PWD_HASH.s(), api.getHashOfPassword(password));
 			userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
-			api.save(session, userNode[0]);
+			update.save(session, userNode[0]);
 		}
 
 		res.setUser(userName[0]);
@@ -761,7 +777,7 @@ public class UserManagerService {
 				return;
 			}
 
-			SubNode ownerNode = api.getUserNodeByUserName(session, user);
+			SubNode ownerNode = read.getUserNodeByUserName(session, user);
 			if (ownerNode == null) {
 				res.setMessage("User does not exist.");
 				res.setSuccess(false);
@@ -797,7 +813,7 @@ public class UserManagerService {
 			long authCode = new Date().getTime() + oneDayMillis + rand.nextInt(oneDayMillis);
 
 			ownerNode.setProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s(), String.valueOf(authCode));
-			api.save(session, ownerNode);
+			update.save(session, ownerNode);
 
 			String passCode = ownerNode.getId().toHexString() + "-" + String.valueOf(authCode);
 
@@ -821,15 +837,15 @@ public class UserManagerService {
 
 		List<FriendInfo> friends = new LinkedList<FriendInfo>();
 
-		SubNode userNode = api.getUserNodeByUserName(session, null);
+		SubNode userNode = read.getUserNodeByUserName(session, null);
 		if (userNode == null)
 			return res;
 
-		SubNode friendsNode = api.findTypedNodeUnderPath(session, userNode.getPath(), NodeType.FRIEND_LIST.s());
+		SubNode friendsNode = read.findTypedNodeUnderPath(session, userNode.getPath(), NodeType.FRIEND_LIST.s());
 		if (friendsNode == null)
 			return res;
 
-		for (SubNode friendNode : api.getChildren(session, friendsNode, null, null)) {
+		for (SubNode friendNode : read.getChildren(session, friendsNode, null, null)) {
 			String userName = friendNode.getStringProp(NodeProp.USER.s());
 			if (userName != null) {
 				FriendInfo fi = new FriendInfo();

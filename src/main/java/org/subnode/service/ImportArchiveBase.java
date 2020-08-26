@@ -1,32 +1,32 @@
 package org.subnode.service;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.StringTokenizer;
 
-import org.subnode.model.client.NodeProp;
-import org.subnode.config.SessionContext;
-import org.subnode.exception.base.RuntimeEx;
-import org.subnode.mongo.MongoApi;
-import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.model.SubNode;
-import org.subnode.util.ExUtil;
-import org.subnode.util.SubNodeUtil;
-import org.subnode.util.XString;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.HashMap;
-import java.util.StringTokenizer;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.subnode.config.SessionContext;
+import org.subnode.exception.base.RuntimeEx;
+import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.model.SubNode;
+import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.MimeUtil;
+import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
-import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.subnode.util.XString;
 
 public abstract class ImportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportArchiveBase.class);
@@ -42,6 +42,12 @@ public abstract class ImportArchiveBase {
 
 	@Autowired
 	public MongoApi api;
+
+	@Autowired
+	public MongoUpdate update;
+
+	@Autowired
+	public MongoRead read;
 
 	@Autowired
 	public AttachmentService attachmentService;
@@ -90,7 +96,7 @@ public abstract class ImportArchiveBase {
 				// we must nullify the node ID so that it creates a new node when saved.
 				node.setId(null);
 				node.setOwner(ownerId);
-				api.save(session, node);
+				update.save(session, node);
 
 				oldIdToNewIdMap.put(oldId, node.getId().toHexString());
 			}
@@ -141,7 +147,7 @@ public abstract class ImportArchiveBase {
 		}
 
 		if (nodeId != null) {
-			SubNode node = api.getNode(session, nodeId);
+			SubNode node = read.getNode(session, nodeId);
 			if (node == null) {
 				throw new RuntimeEx("Unable to find node by id: " + nodeId);
 			}

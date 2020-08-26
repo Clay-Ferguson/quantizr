@@ -3,6 +3,10 @@ package org.subnode.mail;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.subnode.config.ConstantsProvider;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
@@ -10,18 +14,16 @@ import org.subnode.model.UserFeedInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.CreateNodeLocation;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoCreate;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.InboxPushInfo;
 import org.subnode.service.UserFeedService;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Manages the node where we store all emails that are queued up to be sent.
@@ -36,7 +38,13 @@ public class OutboxMgr {
 	private static final Logger log = LoggerFactory.getLogger(OutboxMgr.class);
 
 	@Autowired
-	MongoApi api;
+	private MongoCreate create;
+
+	@Autowired
+	private MongoRead read;
+
+	@Autowired
+	private MongoUpdate update;
 
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
@@ -75,13 +83,13 @@ public class OutboxMgr {
 			 * to blow up the save operation
 			 */
 			try {
-				SubNode parentNode = api.getParent(session, node);
+				SubNode parentNode = read.getParent(session, node);
 
 				/*
 				 * userNode here will be the root node of the person whose node has just been
 				 * replied to, and the person recieving a notification in their inbox
 				 */
-				SubNode userNode = api.getNode(session, parentNode.getOwner());
+				SubNode userNode = read.getNode(session, parentNode.getOwner());
 				if (userNode == null) {
 					log.warn("No userNode was found for parentNode.owner=" + parentNode.getOwner());
 					return;
@@ -139,7 +147,7 @@ public class OutboxMgr {
 	public void addInboxNotification(MongoSession session, String recieverUserName, SubNode userNode, SubNode node,
 			String notifyMessage) {
 
-		SubNode userInbox = api.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s());
+		SubNode userInbox = read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s());
 
 		if (userInbox != null) {
 			// log.debug("userInbox id=" + userInbox.getId().toHexString());
@@ -148,7 +156,7 @@ public class OutboxMgr {
 			 * First look to see if there is a target node already existing in this persons
 			 * inbox that points to the node in question
 			 */
-			SubNode notifyNode = api.findSubNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(),
+			SubNode notifyNode = read.findSubNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(),
 					node.getId().toHexString());
 
 			/*
@@ -156,7 +164,7 @@ public class OutboxMgr {
 			 * one
 			 */
 			if (notifyNode == null) {
-				notifyNode = api.createNode(session, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L,
+				notifyNode = create.createNode(session, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L,
 						CreateNodeLocation.FIRST, null);
 
 				// trim to 280 like twitter.
@@ -169,18 +177,18 @@ public class OutboxMgr {
 				notifyNode.setOwner(userInbox.getOwner());
 				notifyNode.setContent(content);
 				notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getId().toHexString());
-				api.save(session, notifyNode);
+				update.save(session, notifyNode);
 			}
 
 			// and then always send out a push notification so the user sees live there's a
 			// new share comming in or being re-added even.
 			userFeedService.sendServerPushInfo(recieverUserName, new InboxPushInfo(node.getId().toHexString()));
 
-			SubNode recieverAccountNode = api.getUserNodeByUserName(session, recieverUserName);
+			SubNode recieverAccountNode = read.getUserNodeByUserName(session, recieverUserName);
 			if (recieverAccountNode != null) {
 				Date now = new Date();
 				recieverAccountNode.setProp(NodeProp.LAST_INBOX_NOTIFY_TIME.s(), now.getTime());
-				api.save(session, recieverAccountNode);
+				update.save(session, recieverAccountNode);
 			}
 		}
 	}
@@ -204,13 +212,13 @@ public class OutboxMgr {
 	public void queueMailUsingAdminSession(MongoSession session, final String recipients, final String subject,
 			final String content) {
 		SubNode outboxNode = getSystemOutbox(session);
-		SubNode outboundEmailNode = api.createNode(session, outboxNode.getPath() + "/?", NodeType.NONE.s());
+		SubNode outboundEmailNode = create.createNode(session, outboxNode.getPath() + "/?", NodeType.NONE.s());
 
 		outboundEmailNode.setProp(NodeProp.EMAIL_CONTENT.s(), content);
 		outboundEmailNode.setProp(NodeProp.EMAIL_SUBJECT.s(), subject);
 		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP.s(), recipients);
 
-		api.save(session, outboundEmailNode);
+		update.save(session, outboundEmailNode);
 	}
 
 	/*
@@ -220,7 +228,7 @@ public class OutboxMgr {
 		SubNode outboxNode = getSystemOutbox(session);
 
 		int mailBatchSizeInt = Integer.parseInt(mailBatchSize);
-		return api.getChildrenAsList(session, outboxNode, false, mailBatchSizeInt);
+		return read.getChildrenAsList(session, outboxNode, false, mailBatchSizeInt);
 	}
 
 	/*

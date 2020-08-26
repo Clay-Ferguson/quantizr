@@ -8,12 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoAuth;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetSharedNodesRequest;
 import org.subnode.request.NodeSearchRequest;
@@ -41,8 +40,11 @@ public class NodeSearchService {
 			DateUtil.DATE_FORMAT_LOCALE);
 
 	@Autowired
-	private MongoApi api;
+	private MongoRead read;
 
+	@Autowired
+	private MongoAuth auth;
+	
 	@Autowired
 	private Convert convert;
 
@@ -63,7 +65,7 @@ public class NodeSearchService {
 		int counter = 0;
 
 		if ("node.id".equals(req.getSearchProp())) {
-			SubNode node = api.getNode(session, req.getSearchText(), true);
+			SubNode node = read.getNode(session, req.getSearchText(), true);
 			if (node != null) {
 				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1,
 						false, false, false);
@@ -75,7 +77,7 @@ public class NodeSearchService {
 		 * a fuzzy search but an exact lookup.
 		 */
 		else if ("node.name".equals(req.getSearchProp())) {
-			SubNode node = api.getNode(session, ":" + req.getSearchText(), true);
+			SubNode node = read.getNode(session, ":" + req.getSearchText(), true);
 			if (node != null) {
 				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1,
 						false, false, false);
@@ -84,9 +86,9 @@ public class NodeSearchService {
 		}
 		// othwerwise we're searching all node properties, only under the selected node.
 		else {
-			SubNode searchRoot = api.getNode(session, req.getNodeId());
+			SubNode searchRoot = read.getNode(session, req.getNodeId());
 
-			for (SubNode node : api.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText,
+			for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText,
 					req.getSortField(), MAX_NODES, req.getFuzzy(), req.getCaseSensitive())) {
 				// log.debug("NodeFound: node: "+ XString.prettyPrint(node));
 				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1,
@@ -118,9 +120,9 @@ public class NodeSearchService {
 		//SubNode searchRoot = api.getNode(session, req.getNodeId());
 
 		//search under account root only
-		SubNode searchRoot = api.getNode(session, sessionContext.getRootId());
+		SubNode searchRoot = read.getNode(session, sessionContext.getRootId());
 
-		for (SubNode node : api.searchSubGraphByAcl(session, searchRoot, SubNode.FIELD_MODIFY_TIME, MAX_NODES)) {
+		for (SubNode node : auth.searchSubGraphByAcl(session, searchRoot, SubNode.FIELD_MODIFY_TIME, MAX_NODES)) {
 
 			/*
 			 * If we're only looking for shares to a specific person (or public) then check

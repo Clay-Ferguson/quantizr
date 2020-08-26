@@ -2,17 +2,17 @@ package org.subnode.service;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Map;
 
-import org.subnode.config.AppProp;
-import org.subnode.exception.base.RuntimeEx;
-import org.subnode.model.MerkleNode;
-import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoApi;
-import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.model.SubNode;
-import org.subnode.util.XString;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,21 +26,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.subnode.config.AppProp;
+import org.subnode.exception.base.RuntimeEx;
+import org.subnode.model.MerkleNode;
+import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Const;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
-
-import java.util.Map;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.subnode.util.XString;
 
 @Component
 public class IPFSService {
@@ -60,14 +57,11 @@ public class IPFSService {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    @Autowired
-    private MongoApi api;
+	@Autowired
+	private MongoRead read;
 
     @Autowired
     private AppProp appProp;
-
-    @Autowired
-    private AttachmentService attachmentService;
 
     /**
      * Looks up quanta node by 'nodeId', and gets the 'ipfs:link' property, which is
@@ -76,7 +70,7 @@ public class IPFSService {
      */
     public final String getNodeInfo(MongoSession session, String nodeId) {
         String ret = "";
-        SubNode node = api.getNode(session, nodeId);
+        SubNode node = read.getNode(session, nodeId);
         if (node != null) {
             String hash = node.getStringProp(NodeProp.IPFS_LINK);
             if (StringUtils.isEmpty(hash)) {

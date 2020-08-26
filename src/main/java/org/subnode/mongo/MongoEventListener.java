@@ -1,13 +1,5 @@
 package org.subnode.mongo;
 
-import org.subnode.config.NodeName;
-import org.subnode.exception.base.RuntimeEx;
-import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.model.SubNode;
-import org.subnode.service.UserFeedService;
-import org.subnode.util.Util;
-import org.subnode.util.XString;
-
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -19,13 +11,20 @@ import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
+import org.subnode.config.NodeName;
+import org.subnode.exception.base.RuntimeEx;
+import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.model.SubNode;
+import org.subnode.service.UserFeedService;
+import org.subnode.util.Util;
+import org.subnode.util.XString;
 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	private static final Logger log = LoggerFactory.getLogger(MongoEventListener.class);
 
 	@Autowired
-	private MongoApi api;
+	private MongoRead read;
 
 	@Autowired
 	private UserFeedService userFeedService;
@@ -96,7 +95,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		if (parentCheckEnabled) {
-			api.checkParentExists(null, node);
+			read.checkParentExists(null, node);
 		}
 
 		/*

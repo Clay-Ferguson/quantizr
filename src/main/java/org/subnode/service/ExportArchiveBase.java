@@ -8,14 +8,24 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Sort;
 import org.subnode.config.AppProp;
-import org.subnode.model.client.NodeProp;
-import org.subnode.model.client.NodeType;
 import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.UserPreferences;
-import org.subnode.mongo.MongoApi;
+import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
+import org.subnode.mongo.MongoAuth;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExportRequest;
@@ -28,15 +38,6 @@ import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Sort;
 
 /**
  * Base class for exporting to archives (ZIP and TAR).
@@ -51,8 +52,11 @@ public abstract class ExportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
 
 	@Autowired
-	private MongoApi api;
+	private MongoRead read;
 
+	@Autowired
+	private MongoAuth auth;
+	
 	@Autowired
 	private SubNodeUtil util;
 
@@ -72,7 +76,7 @@ public abstract class ExportArchiveBase {
 	 * same name, so we have to detect that and number them, so we use this hashset
 	 * to detect existing filenames.
 	 */
-	private HashSet<String> fileNameSet = new HashSet<String>();
+	private final HashSet<String> fileNameSet = new HashSet<String>();
 
 	@Autowired
 	private AppProp appProp;
@@ -82,14 +86,14 @@ public abstract class ExportArchiveBase {
 
 	private MongoSession session;
 
-	public void export(MongoSession session, ExportRequest req, ExportResponse res) {
+	public void export(MongoSession session, final ExportRequest req, final ExportResponse res) {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
 		this.session = session;
 
-		UserPreferences userPreferences = sessionContext.getUserPreferences();
-		boolean exportAllowed = userPreferences != null ? userPreferences.isExportAllowed() : false;
+		final UserPreferences userPreferences = sessionContext.getUserPreferences();
+		final boolean exportAllowed = userPreferences != null ? userPreferences.isExportAllowed() : false;
 		if (!exportAllowed && !sessionContext.isAdmin()) {
 			throw ExUtil.wrapEx("You are not authorized to export.");
 		}
@@ -98,7 +102,7 @@ public abstract class ExportArchiveBase {
 			throw ExUtil.wrapEx("adminDataFolder does not exist: " + appProp.getAdminDataFolder());
 		}
 
-		String nodeId = req.getNodeId();
+		final String nodeId = req.getNodeId();
 
 		shortFileName = "f" + util.getGUID() + "." + getFileExtension();
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
@@ -108,15 +112,15 @@ public abstract class ExportArchiveBase {
 			openOutputStream(fullFileName);
 			writeRootFiles();
 
-			SubNode node = api.getNode(session, nodeId);
+			final SubNode node = read.getNode(session, nodeId);
 			rootPathParent = node.getParentPath();
-			api.authRequireOwnerOfNode(session, node);
-			ArrayList<SubNode> nodeStack = new ArrayList<SubNode>();
+			auth.authRequireOwnerOfNode(session, node);
+			final ArrayList<SubNode> nodeStack = new ArrayList<SubNode>();
 			nodeStack.add(node);
 			recurseNode("../", "", node, nodeStack, 0, null, null);
 			res.setFileName(shortFileName);
 			success = true;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		} finally {
 			closeOutputStream();
@@ -136,29 +140,29 @@ public abstract class ExportArchiveBase {
 		writeRootFile("darcula.css");
 	}
 
-	private void writeRootFile(String fileName) {
+	private void writeRootFile(final String fileName) {
 		InputStream is = null;
-		String resourceName = "classpath:/public/export-includes/" + fileName;
+		final String resourceName = "classpath:/public/export-includes/" + fileName;
 		try {
-			Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
+			final Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 			is = resource.getInputStream();
-			byte[] targetArray = IOUtils.toByteArray(is);
+			final byte[] targetArray = IOUtils.toByteArray(is);
 			addFileEntry(fileName, targetArray);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new RuntimeEx("Unable to write resource: " + resourceName, e);
 		} finally {
 			StreamUtil.close(is);
 		}
 	}
 
-	private void recurseNode(String rootPath, String parentFolder, SubNode node, ArrayList<SubNode> nodeStack,
-			int level, String parentHtmlFile, String parentId) {
+	private void recurseNode(final String rootPath, final String parentFolder, final SubNode node,
+			final ArrayList<SubNode> nodeStack, final int level, final String parentHtmlFile, final String parentId) {
 		if (node == null)
 			return;
 
 		log.debug("recurseNode: " + node.getContent() + " parentHtmlFile=" + parentHtmlFile);
 
-		StringBuilder html = new StringBuilder();
+		final StringBuilder html = new StringBuilder();
 		html.append("<html>");
 
 		html.append("<head>\n");
@@ -170,14 +174,14 @@ public abstract class ExportArchiveBase {
 
 		// breadcrumbs at the top of each page.
 		if (nodeStack.size() > 1) {
-			StringBuilder sb = new StringBuilder();
-			int max = nodeStack.size() - 1;
+			final StringBuilder sb = new StringBuilder();
+			final int max = nodeStack.size() - 1;
 			int count = 0;
-			for (SubNode bcNode : nodeStack) {
+			for (final SubNode bcNode : nodeStack) {
 				if (sb.length() > 0) {
 					sb.append(" / ");
 				}
-				String friendlyName = generateFileNameFromNode(bcNode);
+				final String friendlyName = generateFileNameFromNode(bcNode);
 				if (friendlyName != null) {
 					sb.append(friendlyName);
 				}
@@ -195,11 +199,11 @@ public abstract class ExportArchiveBase {
 		}
 
 		/* process the current node */
-		ValContainer<String> fileName = new ValContainer<String>();
+		final ValContainer<String> fileName = new ValContainer<String>();
 
-		Iterable<SubNode> iter = api.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL),
-				null);
-		List<SubNode> children = api.iterateToList(iter);
+		final Iterable<SubNode> iter = read.getChildren(session, node,
+				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null);
+		final List<SubNode> children = read.iterateToList(iter);
 
 		/*
 		 * This is the header row at the top of the page. The rest of the page is
@@ -208,21 +212,21 @@ public abstract class ExportArchiveBase {
 		html.append("<div class='top-row'/>\n");
 		processNodeExport(session, parentFolder, "", node, html, true, fileName, true, 0, true);
 		html.append("</div>\n");
-		String folder = node.getId().toHexString();
+		final String folder = node.getId().toHexString();
 
 		if (children != null) {
 			/*
 			 * First pass over children is to embed their content onto the child display on
 			 * the current page
 			 */
-			for (SubNode n : children) {
-				String inlineChildren = n.getStringProp(NodeProp.INLINE_CHILDREN.s());
-				boolean allowOpenButton = !"1".equals(inlineChildren);
+			for (final SubNode n : children) {
+				final String inlineChildren = n.getStringProp(NodeProp.INLINE_CHILDREN.s());
+				final boolean allowOpenButton = !"1".equals(inlineChildren);
 
 				processNodeExport(session, parentFolder, "", n, html, false, null, allowOpenButton, 0, false);
 
 				if ("1".equals(inlineChildren)) {
-					String subFolder = n.getId().toHexString();
+					final String subFolder = n.getId().toHexString();
 					// log.debug("Inline Node: "+node.getContent()+" subFolder="+subFolder);
 					inlineChildren(html, n, parentFolder, subFolder + "/", 1);
 				}
@@ -233,14 +237,14 @@ public abstract class ExportArchiveBase {
 		html.append("<script src='" + rootPath + "exported.js'></script>");
 
 		html.append("</body></html>");
-		String htmlFile = fileName.getVal() + ".html";
+		final String htmlFile = fileName.getVal() + ".html";
 		addFileEntry(htmlFile, html.toString().getBytes(StandardCharsets.UTF_8));
 
-		String relParent = "../" + fileUtils.getShortFileName(htmlFile);
+		final String relParent = "../" + fileUtils.getShortFileName(htmlFile);
 
 		if (children != null) {
 			/* Second pass over children is the actual recursion down into the tree */
-			for (SubNode n : children) {
+			for (final SubNode n : children) {
 				nodeStack.add(n);
 				recurseNode(rootPath + "../", parentFolder + "/" + folder, n, nodeStack, level + 1, relParent,
 						n.getId().toHexString());
@@ -249,20 +253,21 @@ public abstract class ExportArchiveBase {
 		}
 	}
 
-	private void inlineChildren(StringBuilder html, SubNode node, String parentFolder, String deeperPath, int level) {
-		Iterable<SubNode> iter = api.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL),
-				null);
-		List<SubNode> children = api.iterateToList(iter);
+	private void inlineChildren(final StringBuilder html, final SubNode node, final String parentFolder,
+			final String deeperPath, final int level) {
+		final Iterable<SubNode> iter = read.getChildren(session, node,
+				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null);
+		final List<SubNode> children = read.iterateToList(iter);
 
 		if (children != null) {
 			/*
 			 * First pass over children is to embed their content onto the child display on
 			 * the current page
 			 */
-			for (SubNode n : children) {
-				String inlineChildren = n.getStringProp(NodeProp.INLINE_CHILDREN.s());
-				boolean allowOpenButton = !"1".equals(inlineChildren);
-				String folder = n.getId().toHexString();
+			for (final SubNode n : children) {
+				final String inlineChildren = n.getStringProp(NodeProp.INLINE_CHILDREN.s());
+				final boolean allowOpenButton = !"1".equals(inlineChildren);
+				final String folder = n.getId().toHexString();
 
 				processNodeExport(session, parentFolder, deeperPath, n, html, false, null, allowOpenButton, level,
 						false);
@@ -283,16 +288,17 @@ public abstract class ExportArchiveBase {
 	 * fileNameCont is an output parameter that has the complete filename minus the
 	 * period and extension.
 	 */
-	private void processNodeExport(MongoSession session, String parentFolder, String deeperPath, SubNode node,
-			StringBuilder html, boolean writeFile, ValContainer<String> fileNameCont, boolean allowOpenButton,
-			int level, boolean isTopRow) {
+	private void processNodeExport(final MongoSession session, final String parentFolder, final String deeperPath,
+			final SubNode node, final StringBuilder html, final boolean writeFile,
+			final ValContainer<String> fileNameCont, final boolean allowOpenButton, final int level,
+			final boolean isTopRow) {
 		try {
 			// log.debug("Processing Node: " + node.getContent()+" parentFolder:
 			// "+parentFolder);
 
-			String nodeId = node.getId().toHexString();
-			String fileName = nodeId;
-			String rowClass = isTopRow ? "" : "class='row-div'";
+			final String nodeId = node.getId().toHexString();
+			final String fileName = nodeId;
+			final String rowClass = isTopRow ? "" : "class='row-div'";
 
 			String indenter = "";
 			if (level > 0) {
@@ -313,9 +319,9 @@ public abstract class ExportArchiveBase {
 				 * so this will be redundant, but I don't want to refactor now to solve this
 				 * yet. That's almost an optimization that should come later
 				 */
-				long childCount = api.getChildCount(session, node);
+				final long childCount = read.getChildCount(session, node);
 				if (childCount > 0) {
-					String htmlFile = "./" + deeperPath + fileName + "/" + fileName + ".html";
+					final String htmlFile = "./" + deeperPath + fileName + "/" + fileName + ".html";
 					html.append("<a href='" + htmlFile + "'><button class='open-button'>Open</button></a>");
 				}
 			}
@@ -323,7 +329,7 @@ public abstract class ExportArchiveBase {
 			String content = node.getContent() != null ? node.getContent() : "";
 			content = content.trim();
 
-			String escapedContent = StringEscapeUtils.escapeHtml4(content);
+			final String escapedContent = StringEscapeUtils.escapeHtml4(content);
 			if (node.getType().equals(NodeType.PLAIN_TEXT.s())) {
 				html.append("\n<pre>" + escapedContent + "\n</pre>");
 			} else {
@@ -331,18 +337,18 @@ public abstract class ExportArchiveBase {
 			}
 
 			String ext = null;
-			String binFileNameProp = node.getStringProp(NodeProp.BIN_FILENAME.s());
+			final String binFileNameProp = node.getStringProp(NodeProp.BIN_FILENAME.s());
 			if (binFileNameProp != null) {
 				ext = FilenameUtils.getExtension(binFileNameProp);
 				if (!StringUtils.isEmpty(ext)) {
 					ext = "." + ext;
 				}
 			}
-			String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
+			final String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
 
-			String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK.s());
+			final String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK.s());
 
-			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
+			final String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 
 			String imgUrl = null;
 			String attachmentUrl = null;
@@ -352,7 +358,7 @@ public abstract class ExportArchiveBase {
 			 * if this is a 'data:' encoded image read it from binary storage and put that
 			 * directly in url src
 			 */
-			String dataUrl = node.getStringProp(NodeProp.BIN_DATA_URL.s());
+			final String dataUrl = node.getStringProp(NodeProp.BIN_DATA_URL.s());
 
 			if ("t".equals(dataUrl)) {
 				imgUrl = attachmentService.getStringByNode(session, node);
@@ -360,8 +366,7 @@ public abstract class ExportArchiveBase {
 				// sanity check here.
 				if (!imgUrl.startsWith("data:")) {
 					imgUrl = null;
-				}
-				else {
+				} else {
 					embeddedImage = true;
 					html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
 							+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId
@@ -372,7 +377,7 @@ public abstract class ExportArchiveBase {
 			if (!embeddedImage && mimeType != null) {
 				// Otherwise if this is an ordinary binary image, encode the link to it.
 				if (imgUrl == null && mimeType.startsWith("image/")) {
-					String relImgPath = writeFile ? "" : (fileName + "/");
+					final String relImgPath = writeFile ? "" : (fileName + "/");
 					/*
 					 * embeds an image that's 400px wide until you click it which makes it go
 					 * fullsize
@@ -385,7 +390,7 @@ public abstract class ExportArchiveBase {
 							+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId
 							+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
 				} else {
-					String relPath = writeFile ? "" : (fileName + "/");
+					final String relPath = writeFile ? "" : (fileName + "/");
 					/*
 					 * embeds an image that's 400px wide until you click it which makes it go
 					 * fullsize
@@ -406,10 +411,10 @@ public abstract class ExportArchiveBase {
 				 * Pretty print the node having the relative path, and then restore the node to
 				 * the full path
 				 */
-				String fullPath = node.getPath();
-				String relPath = fullPath.substring(rootPathParent.length());
+				final String fullPath = node.getPath();
+				final String relPath = fullPath.substring(rootPathParent.length());
 				node.setPath(relPath);
-				String json = XString.prettyPrint(node);
+				final String json = XString.prettyPrint(node);
 				node.setPath(fullPath);
 
 				addFileEntry(parentFolder + "/" + fileName + "/" + fileName + ".json",
@@ -430,9 +435,9 @@ public abstract class ExportArchiveBase {
 					InputStream is = null;
 					try {
 						is = attachmentService.getStream(session, node, false, false);
-						BufferedInputStream bis = new BufferedInputStream(is);
-						long length = node.getIntProp(NodeProp.BIN_SIZE.s());
-						String binFileName = parentFolder + "/" + fileName + "/" + nodeId + ext;
+						final BufferedInputStream bis = new BufferedInputStream(is);
+						final long length = node.getIntProp(NodeProp.BIN_SIZE.s());
+						final String binFileName = parentFolder + "/" + fileName + "/" + nodeId + ext;
 
 						if (length > 0) {
 							/* NOTE: the archive WILL fail if no length exists in this codepath */
@@ -451,7 +456,7 @@ public abstract class ExportArchiveBase {
 					}
 				}
 			}
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
 	}
@@ -464,7 +469,7 @@ public abstract class ExportArchiveBase {
 		return fileName;
 	}
 
-	private void addFileEntry(String fileName, byte[] bytes) {
+	private void addFileEntry(String fileName, final byte[] bytes) {
 		/*
 		 * If we have duplicated a filename, number it sequentially to create a unique
 		 * file
@@ -483,7 +488,7 @@ public abstract class ExportArchiveBase {
 		addEntry(fileName, bytes);
 	}
 
-	private void addFileEntry(String fileName, InputStream is, long length) {
+	private void addFileEntry(String fileName, final InputStream is, final long length) {
 		if (length <= 0) {
 			throw new RuntimeEx("length is required");
 		}
@@ -505,7 +510,7 @@ public abstract class ExportArchiveBase {
 		addEntry(fileName, is, length);
 	}
 
-	private String generateFileNameFromNode(SubNode node) {
+	private String generateFileNameFromNode(final SubNode node) {
 		String fileName = node.getName();
 
 		if (StringUtils.isEmpty(fileName)) {

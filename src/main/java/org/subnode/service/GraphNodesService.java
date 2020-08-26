@@ -8,11 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import org.subnode.config.SessionContext;
 import org.subnode.model.GraphEdge;
 import org.subnode.model.GraphNode;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GraphRequest;
@@ -26,7 +24,7 @@ public class GraphNodesService {
 	private static final Logger log = LoggerFactory.getLogger(GraphNodesService.class);
 
 	@Autowired
-	private MongoApi api;
+	private MongoRead read;
 
 	private static final int MAX_NODES = 500;
 
@@ -61,7 +59,7 @@ public class GraphNodesService {
 		res.setNodes(new LinkedList<GraphNode>());
 		res.setEdges(new LinkedList<GraphEdge>());
 
-		SubNode node = api.getNode(session, req.getNodeId(), true);
+		SubNode node = read.getNode(session, req.getNodeId(), true);
 		try {
 			log.debug("Graphing Node: " + node.getPath());
 
@@ -97,7 +95,7 @@ public class GraphNodesService {
 		/* process the current node */
 		processNode(ctx, res, parent, node);
 
-		for (SubNode n : api.getChildren(session, node, null, null)) {
+		for (SubNode n : read.getChildren(session, node, null, null)) {
 			recurseNode(ctx, res, session, node, n, level + 1);
 			if (ctx.nodeCount >= MAX_NODES) {
 				return;

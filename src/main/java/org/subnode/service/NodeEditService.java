@@ -2,17 +2,27 @@ package org.subnode.service;
 
 import java.util.Date;
 
-import org.subnode.model.client.NodeProp;
-import org.subnode.model.client.NodeType;
-import org.subnode.model.client.PrincipalName;
+import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;
+import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoAuth;
+import org.subnode.mongo.MongoCreate;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AppDropRequest;
@@ -30,17 +40,10 @@ import org.subnode.response.SaveNodeResponse;
 import org.subnode.response.SplitNodeResponse;
 import org.subnode.response.TransferNodeResponse;
 import org.subnode.util.Convert;
-import org.subnode.util.Util;
-import org.subnode.util.ValContainer;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
-
-import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.subnode.util.Util;
+import org.subnode.util.ValContainer;
 
 /**
  * Service for editing content of nodes. That is, this method updates property
@@ -59,6 +62,15 @@ public class NodeEditService {
 	private MongoApi api;
 
 	@Autowired
+	private MongoCreate create;
+
+	@Autowired
+	private MongoRead read;
+
+	@Autowired
+	private MongoUpdate update;
+
+	@Autowired
 	private SessionContext sessionContext;
 
 	@Autowired
@@ -69,6 +81,9 @@ public class NodeEditService {
 
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
+
+	@Autowired
+	private MongoAuth auth;
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request.
@@ -82,9 +97,9 @@ public class NodeEditService {
 		String nodeId = req.getNodeId();
 		SubNode node = null;
 		if (nodeId.equals("~notes")) {
-			node = api.getUserNodeByType(session, session.getUser(), null, "### Notes", NodeType.NOTES.s());
+			node = read.getUserNodeByType(session, session.getUser(), null, "### Notes", NodeType.NOTES.s());
 		} else {
-			node = api.getNode(session, nodeId);
+			node = read.getNode(session, nodeId);
 		}
 		if (node == null) {
 			res.setMessage("unable to locate parent for insert");
@@ -108,7 +123,7 @@ public class NodeEditService {
 
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
-		SubNode newNode = api.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties());
+		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties());
 
 		if (!req.isUpdateModTime()) {
 			newNode.setModifyTime(null);
@@ -120,7 +135,7 @@ public class NodeEditService {
 			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 		}
 
-		api.save(session, newNode);
+		update.save(session, newNode);
 		res.setNewNode(
 				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false, false));
 
@@ -149,14 +164,14 @@ public class NodeEditService {
 			return res;
 		}
 
-		SubNode linksNode = api.getUserNodeByType(session, session.getUser(), null, "### Notes", NodeType.NOTES.s());
+		SubNode linksNode = read.getUserNodeByType(session, session.getUser(), null, "### Notes", NodeType.NOTES.s());
 
 		if (linksNode == null) {
 			log.warn("unable to get linksNode");
 			return null;
 		}
 
-		SubNode newNode = api.createNode(session, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST,
+		SubNode newNode = create.createNode(session, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST,
 				null);
 
 		String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
@@ -164,7 +179,7 @@ public class NodeEditService {
 		content += data;
 		newNode.setContent(content);
 
-		api.save(session, newNode);
+		update.save(session, newNode);
 
 		res.setMessage("Drop Accepted: Created link to: " + data);
 		return res;
@@ -181,7 +196,7 @@ public class NodeEditService {
 		}
 		String parentNodeId = req.getParentId();
 		log.debug("Inserting under parent: " + parentNodeId);
-		SubNode parentNode = api.getNode(session, parentNodeId);
+		SubNode parentNode = read.getNode(session, parentNodeId);
 
 		/*
 		 * We have this hack (until the privileges are more nuanced, or updated) which
@@ -197,7 +212,7 @@ public class NodeEditService {
 			return res;
 		}
 
-		SubNode newNode = api.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
+		SubNode newNode = create.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
 				CreateNodeLocation.ORDINAL, null);
 
 		if (req.getInitialValue() != null) {
@@ -210,7 +225,7 @@ public class NodeEditService {
 			newNode.setModifyTime(null);
 		}
 	
-		api.save(session, newNode);
+		update.save(session, newNode);
 		res.setNewNode(
 				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false, false));
 
@@ -231,8 +246,8 @@ public class NodeEditService {
 		String nodeId = nodeInfo.getId();
 
 		// log.debug("saveNode. nodeId=" + nodeId + " nodeName=" + nodeInfo.getName());
-		SubNode node = api.getNode(session, nodeId);
-		api.authRequireOwnerOfNode(session, node);
+		SubNode node = read.getNode(session, nodeId);
+		auth.authRequireOwnerOfNode(session, node);
 
 		if (node == null) {
 			throw new RuntimeEx("Unable find node to save: nodeId=" + nodeId);
@@ -260,7 +275,7 @@ public class NodeEditService {
 			 * We don't use unique index on node name, because we want to save storage space
 			 * on the server, so we have to do the uniqueness check ourselves here manually
 			 */
-			SubNode nodeByName = api.getNodeByName(session, nodeInfo.getName());
+			SubNode nodeByName = read.getNodeByName(session, nodeInfo.getName());
 			if (nodeByName != null) {
 				throw new RuntimeEx("Node name is already in use. Duplicates not allowed.");
 			}
@@ -301,7 +316,7 @@ public class NodeEditService {
 			}
 			/* if adding entryption to this node, and the node wasn't currently encrypted */
 			else {
-				res.setAclEntries(api.getAclEntries(session, node));
+				res.setAclEntries(auth.getAclEntries(session, node));
 			}
 
 			if (!req.isUpdateModTime()) {
@@ -338,7 +353,7 @@ public class NodeEditService {
 					ValContainer<SubNode> _userNode = new ValContainer<SubNode>();
 					final String _userName = friendUserName;
 					adminRunner.run(s -> {
-						_userNode.setVal(api.getUserNodeByUserName(s, _userName));
+						_userNode.setVal(read.getUserNodeByUserName(s, _userName));
 					});
 
 					if (_userNode.getVal() != null) {
@@ -363,10 +378,10 @@ public class NodeEditService {
 			session = ThreadLocals.getMongoSession();
 		}
 		String nodeId = req.getNodeId();
-		SubNode node = api.getNode(session, nodeId);
+		SubNode node = read.getNode(session, nodeId);
 		String propertyName = req.getPropName();
 		node.deleteProp(propertyName);
-		api.save(session, node);
+		update.save(session, node);
 		res.setSuccess(true);
 		return res;
 	}
@@ -385,10 +400,10 @@ public class NodeEditService {
 		String nodeId = req.getNodeId();
 
 		//log.debug("Splitting node: " + nodeId);
-		SubNode node = api.getNode(session, nodeId);
-		SubNode parentNode = api.getParent(session, node);
+		SubNode node = read.getNode(session, nodeId);
+		SubNode parentNode = read.getParent(session, node);
 
-		api.authRequireOwnerOfNode(session, node);
+		auth.authRequireOwnerOfNode(session, node);
 		String content = node.getContent();
 		boolean containsDelim = content.contains(req.getDelimiter());
 
@@ -424,8 +439,8 @@ public class NodeEditService {
 
 		int numNewSlots = contentParts.length - 1;
 		if (numNewSlots > 0) {
-			api.insertOrdinal(session, parentForNewNodes, firstOrdinal, numNewSlots);
-			api.save(session, parentForNewNodes);
+			create.insertOrdinal(session, parentForNewNodes, firstOrdinal, numNewSlots);
+			update.save(session, parentForNewNodes);
 		}
 
 		Date now = new Date();
@@ -436,12 +451,12 @@ public class NodeEditService {
 			if (idx == 0) {
 				node.setContent(part);
 				node.setModifyTime(now);
-				api.save(session, node);
+				update.save(session, node);
 			} else {
-				SubNode newNode = api.createNode(session, parentForNewNodes, null, firstOrdinal + idx,
+				SubNode newNode = create.createNode(session, parentForNewNodes, null, firstOrdinal + idx,
 						CreateNodeLocation.ORDINAL);
 				newNode.setContent(part);
-				api.save(session, newNode);
+				update.save(session, newNode);
 			}
 			idx++;
 		}
@@ -459,17 +474,17 @@ public class NodeEditService {
 		String nodeId = req.getNodeId();
 
 		log.debug("Transfer node: " + nodeId);
-		SubNode node = api.getNode(session, nodeId);
-		api.authRequireOwnerOfNode(session, node);
+		SubNode node = read.getNode(session, nodeId);
+		auth.authRequireOwnerOfNode(session, node);
 
-		SubNode toUserNode = api.getUserNodeByUserName(api.getAdminSession(), req.getToUser());
+		SubNode toUserNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getToUser());
 		if (toUserNode == null) {
 			throw new RuntimeEx("User not found: " + req.getToUser());
 		}
 
 		SubNode fromUserNode = null;
 		if (!StringUtils.isEmpty(req.getFromUser())) {
-			fromUserNode = api.getUserNodeByUserName(api.getAdminSession(), req.getFromUser());
+			fromUserNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getFromUser());
 			if (fromUserNode == null) {
 				throw new RuntimeEx("User not found: " + req.getFromUser());
 			}
@@ -491,7 +506,7 @@ public class NodeEditService {
 			 * "fromUserObjId.equals(toUserObjId)" condition into the query itself and let
 			 * MongoDB to the filtering for us
 			 */
-			for (SubNode n : api.getSubGraph(session, node)) {
+			for (SubNode n : read.getSubGraph(session, node)) {
 				// log.debug("Node: path=" + path + " content=" + n.getContent());
 				if (fromUserNode == null) {
 					n.setOwner(toUserNode.getOwner());
@@ -505,7 +520,7 @@ public class NodeEditService {
 		}
 
 		if (transfers > 0) {
-			api.saveSession(session);
+			update.saveSession(session);
 		}
 
 		res.setMessage(String.valueOf(transfers) + " nodes were transferred.");

@@ -7,23 +7,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import org.subnode.config.AppProp;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.SignupRequest;
 import org.subnode.service.UserManagerService;
-import org.subnode.util.SubNodeUtil;
 import org.subnode.util.XString;
 
 /**
  * Utilities related to management of the JCR Repository
  */
 @Component
-public class RepositoryUtil {
-	private static final Logger log = LoggerFactory.getLogger(RepositoryUtil.class);
-
-	@Autowired
-	private MongoApi api;
+public class MongoUtil {
+	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);
 
 	@Autowired
 	private UserManagerService userManagerService;
@@ -35,7 +30,7 @@ public class RepositoryUtil {
 	private AppProp appProp;
 
 	@Autowired
-	private SubNodeUtil jcrUtil;
+	private MongoRead read;
 
 	private HashSet<String> testAccountNames = new HashSet<String>();
 
@@ -84,7 +79,7 @@ public class RepositoryUtil {
 
 				String userName = accountInfoList.get(0);
 				
-				SubNode ownerNode = api.getUserNodeByUserName(session, userName);
+				SubNode ownerNode = read.getUserNodeByUserName(session, userName);
 				if (ownerNode == null) {
 					log.debug("userName not found: "+userName+". Account will be created.");
 					SignupRequest signupReq = new SignupRequest();

@@ -1,11 +1,10 @@
 package org.subnode.mongo;
 
-import org.subnode.util.MongoRunnable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.subnode.util.MongoRunnable;
 
 /**
  * Helper class to run some processing workload as the admin user. Simplifies by encapsulating the
@@ -18,15 +17,18 @@ public class RunAsMongoAdmin {
 	private static final Logger log = LoggerFactory.getLogger(RunAsMongoAdmin.class);
 
 	@Autowired
-	private MongoApi api;
+	private MongoUpdate update;
+
+	@Autowired
+	private MongoAuth auth;
 
 	public void run(MongoRunnable runner) {
 		MongoSession session = null;
 
 		try {
-			session = api.getAdminSession();
+			session = auth.getAdminSession();
 			runner.run(session);
-			api.saveSession(session);
+			update.saveSession(session);
 		}
 		catch (Exception ex) {
 			log.error("error", ex);

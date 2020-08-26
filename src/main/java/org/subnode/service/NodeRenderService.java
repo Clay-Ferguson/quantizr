@@ -5,6 +5,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
 import org.subnode.AppController;
 import org.subnode.config.AppProp;
 import org.subnode.config.ConstantsProvider;
@@ -13,8 +20,8 @@ import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeProp;
-import org.subnode.model.client.NodeType;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoAuth;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.InitNodeEditRequest;
@@ -26,13 +33,6 @@ import org.subnode.util.Convert;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
-import org.springframework.ui.Model;
 
 /**
  * Service for rendering the content of a page. The actual page is not rendered
@@ -49,13 +49,16 @@ public class NodeRenderService {
 	private SubNodeUtil subNodeUtil;
 
 	@Autowired
-	private MongoApi api;
+	private MongoRead read;
 
 	@Autowired
 	private AppProp appProp;
 
 	@Autowired
 	private Convert convert;
+
+	@Autowired
+	private MongoAuth auth;
 
 	@Autowired
 	private SessionContext sessionContext;
@@ -83,7 +86,7 @@ public class NodeRenderService {
 		// log.debug("renderNode: \nreq=" + XString.prettyPrint(req));
 		SubNode node = null;
 		try {
-			node = api.getNode(session, targetId);
+			node = read.getNode(session, targetId);
 		} catch (NodeAuthFailedException e) {
 			res.setSuccess(false);
 			res.setMessage("Unauthorized.");
@@ -95,7 +98,7 @@ public class NodeRenderService {
 
 		if (node == null) {
 			log.debug("nodeId not found: " + targetId + " seding user to :public instead");
-			node = api.getNode(session, appProp.getUserLandingPageNode());
+			node = read.getNode(session, appProp.getUserLandingPageNode());
 		}
 
 		if (node == null) {
@@ -133,16 +136,16 @@ public class NodeRenderService {
 		 * next node.
 		 */
 		if (req.getSiblingOffset() != 0) {
-			SubNode parent = api.getParent(session, node);
+			SubNode parent = read.getParent(session, node);
 			if (req.getSiblingOffset() < 0) {
-				SubNode nodeAbove = api.getSiblingAbove(session, node);
+				SubNode nodeAbove = read.getSiblingAbove(session, node);
 				if (nodeAbove != null) {
 					node = nodeAbove;
 				} else {
 					node = parent != null ? parent : node;
 				}
 			} else if (req.getSiblingOffset() > 0) {
-				SubNode nodeBelow = api.getSiblingBelow(session, node);
+				SubNode nodeBelow = read.getSiblingBelow(session, node);
 				if (nodeBelow != null) {
 					node = nodeBelow;
 				} else {
@@ -159,7 +162,7 @@ public class NodeRenderService {
 				while (node != null && levelsUpRemaining > 0) {
 					// log.debug("upLevelsRemaining=" + levelsUpRemaining);
 					try {
-						SubNode parent = api.getParent(session, node);
+						SubNode parent = read.getParent(session, node);
 						if (parent != null) {
 							node = parent;
 						} else {
@@ -227,7 +230,7 @@ public class NodeRenderService {
 		} else {
 			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
 		}
-		Iterable<SubNode> nodeIter = api.getChildren(session, node, sort, queryLimit);
+		Iterable<SubNode> nodeIter = read.getChildren(session, node, sort, queryLimit);
 		Iterator<SubNode> iterator = nodeIter.iterator();
 
 		int idx = 0, count = 0, idxOfNodeFound = -1;
@@ -260,7 +263,7 @@ public class NodeRenderService {
 		 */
 		if (!scanToNode && offset > 0) {
 			// log.debug("Skipping the first " + offset + " records in the resultset.");
-			idx = api.skip(iterator, offset);
+			idx = read.skip(iterator, offset);
 		}
 
 		List<SubNode> slidingWindow = null;
@@ -398,7 +401,7 @@ public class NodeRenderService {
 		}
 
 		String nodeId = req.getNodeId();
-		SubNode node = api.getNode(session, nodeId);
+		SubNode node = read.getNode(session, nodeId);
 
 		if (node == null) {
 			res.setMessage("Node not found.");
@@ -448,10 +451,10 @@ public class NodeRenderService {
 	 * Returns true if there was a node at 'nodeName' and false otherwise.
 	 */
 	public boolean thymeleafRenderNode(HashMap<String, String> model, String nodeName) {
-		MongoSession session = api.getAdminSession();
+		MongoSession session = auth.getAdminSession();
 		boolean ret = false;
 
-		SubNode node = api.getNodeByName(session, nodeName, true);
+		SubNode node = read.getNodeByName(session, nodeName, true);
 		if (node != null) {
 			thymeleafProcessChildren(session, node, model, null);
 			ret = true;
@@ -485,7 +488,7 @@ public class NodeRenderService {
 			nodeName = parentName;
 		}
 
-		List<SubNode> children = api.getChildrenAsList(session, node, true, null);
+		List<SubNode> children = read.getChildrenAsList(session, node, true, null);
 		if (children != null) {
 			for (SubNode child : children) {
 				thymeleafProcessChildren(session, child, model, nodeName);

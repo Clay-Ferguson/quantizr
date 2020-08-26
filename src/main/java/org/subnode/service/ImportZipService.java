@@ -2,20 +2,23 @@ package org.subnode.service;
 
 import java.io.InputStream;
 
-import org.subnode.config.SpringContextUtil;
-import org.subnode.exception.base.RuntimeEx;
-import org.subnode.model.UserPreferences;
-import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.model.SubNode;
-import org.subnode.util.ExUtil;
-import org.subnode.util.StreamUtil;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.subnode.config.SpringContextUtil;
+import org.subnode.exception.base.RuntimeEx;
+import org.subnode.model.UserPreferences;
+import org.subnode.mongo.MongoAuth;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.model.SubNode;
+import org.subnode.util.ExUtil;
+import org.subnode.util.StreamUtil;
 
 /**
  * Import from ZIP files. Imports zip files that have the same type of directory
@@ -29,6 +32,12 @@ public class ImportZipService extends ImportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportZipService.class);
 
 	private ZipArchiveInputStream zis;
+
+	@Autowired
+	private MongoAuth auth;
+
+	@Autowired
+	private MongoUpdate update;
 
 	/*
 	 * imports the file directly from an internal resource file (classpath resource,
@@ -49,7 +58,7 @@ public class ImportZipService extends ImportArchiveBase {
 		}
 
 		log.debug("Finished Input From Zip file.");
-		api.saveSession(session);
+		update.saveSession(session);
 		return rootNode;
 	}
 
@@ -61,7 +70,7 @@ public class ImportZipService extends ImportArchiveBase {
 		}
 		used = true;
 
-		SubNode userNode = api.getUserNodeByUserName(api.getAdminSession(), sessionContext.getUserName());
+		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sessionContext.getUserName());
 		if (userNode == null) {
 			throw new RuntimeEx("UserNode not found: " + sessionContext.getUserName());
 		}

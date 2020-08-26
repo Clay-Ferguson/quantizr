@@ -9,11 +9,6 @@ import java.util.TimeZone;
 import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpSession;
 
-import org.subnode.model.UserPreferences;
-import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.RepositoryUtil;
-import org.subnode.util.DateUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +16,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.subnode.model.UserPreferences;
+import org.subnode.model.client.PrincipalName;
+import org.subnode.mongo.MongoUtil;
+import org.subnode.util.DateUtil;
 
 /**
  * The ScopedProxyMode.TARGET_CLASS annotation allows this session bean to be
@@ -33,7 +32,7 @@ public class SessionContext {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
 
 	@Autowired
-	RepositoryUtil repoUtil;
+	MongoUtil repoUtil;
 
 	private String error;
 

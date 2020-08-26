@@ -2,9 +2,17 @@ package org.subnode.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoAuth;
+import org.subnode.mongo.MongoCreate;
+import org.subnode.mongo.MongoDelete;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.MoveNodesRequest;
@@ -15,10 +23,6 @@ import org.subnode.response.MoveNodesResponse;
 import org.subnode.response.SelectAllNodesResponse;
 import org.subnode.response.SetNodePositionResponse;
 import org.subnode.util.ThreadLocals;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Service for controlling the positions (ordinals) of nodes relative to their
@@ -33,7 +37,19 @@ public class NodeMoveService {
 	private static final Logger log = LoggerFactory.getLogger(NodeMoveService.class);
 
 	@Autowired
-	private MongoApi api;
+	private MongoCreate create;
+
+	@Autowired
+	private MongoRead read;
+
+	@Autowired
+	private MongoUpdate update;
+
+	@Autowired
+	private MongoDelete delete;
+
+	@Autowired
+	private MongoAuth auth;
 
 	@Autowired
 	private UserManagerService userManagerService;
@@ -52,7 +68,7 @@ public class NodeMoveService {
 
 		String nodeId = req.getNodeId();
 
-		SubNode node = api.getNode(session, nodeId);
+		SubNode node = read.getNode(session, nodeId);
 		if (node == null) {
 			throw new RuntimeEx("Node not found: " + nodeId);
 		}
@@ -74,52 +90,52 @@ public class NodeMoveService {
 	}
 
 	public void moveNodeUp(MongoSession session, SubNode node) {
-		SubNode nodeAbove = api.getSiblingAbove(session, node);
+		SubNode nodeAbove = read.getSiblingAbove(session, node);
 		if (nodeAbove != null) {
 			Long saveOrdinal = nodeAbove.getOrdinal();
 			nodeAbove.setOrdinal(node.getOrdinal());
 			node.setOrdinal(saveOrdinal);
 		}
-		api.saveSession(session);
+		update.saveSession(session);
 	}
 
 	public void moveNodeDown(MongoSession session, SubNode node) {
-		SubNode nodeBelow = api.getSiblingBelow(session, node);
+		SubNode nodeBelow = read.getSiblingBelow(session, node);
 		if (nodeBelow != null) {
 			Long saveOrdinal = nodeBelow.getOrdinal();
 			nodeBelow.setOrdinal(node.getOrdinal());
 			node.setOrdinal(saveOrdinal);
 		}
-		api.saveSession(session);
+		update.saveSession(session);
 	}
 
 	public void moveNodeToTop(MongoSession session, SubNode node) {
-		SubNode parentNode = api.getParent(session, node);
+		SubNode parentNode = read.getParent(session, node);
 		if (parentNode == null) {
 			return;
 		}
-		api.insertOrdinal(session, parentNode, 0L, 1L);
+		create.insertOrdinal(session, parentNode, 0L, 1L);
 
 		// todo-2: there is a slight ineffieiency here in that 'node' does end up
 		// getting saved
 		// both as part of the insertOrdinal, and also then with the setting of it to
 		// zero. Will be
 		// easy to fix when I get to it, but is low priority for now.
-		api.saveSession(session);
+		update.saveSession(session);
 
 		node.setOrdinal(0L);
-		api.saveSession(session);
+		update.saveSession(session);
 	}
 
 	public void moveNodeToBottom(MongoSession session, SubNode node) {
-		SubNode parentNode = api.getParent(session, node);
+		SubNode parentNode = read.getParent(session, node);
 		if (parentNode == null) {
 			return;
 		}
-		long ordinal = api.getMaxChildOrdinal(session, parentNode) + 1L;
+		long ordinal = read.getMaxChildOrdinal(session, parentNode) + 1L;
 		node.setOrdinal(ordinal);
 		parentNode.setMaxChildOrdinal(ordinal);
-		api.saveSession(session);
+		update.saveSession(session);
 	}
 
 	/*
@@ -128,7 +144,7 @@ public class NodeMoveService {
 	public DeleteNodesResponse deleteNodes(MongoSession session, DeleteNodesRequest req) {
 
 		// sample the first node to see if this is a garbage bin delete or not
-		SubNode firstNode = api.getNode(session, req.getNodeIds().get(0));
+		SubNode firstNode = read.getNode(session, req.getNodeIds().get(0));
 
 		// Note: the 'endsWith("/d")' condition is checking if this is the actual trash
 		// node itself being deleted
@@ -140,7 +156,7 @@ public class NodeMoveService {
 				session = ThreadLocals.getMongoSession();
 			}
 
-			SubNode trashNode = api.getTrashNode(session, session.getUser(), null);
+			SubNode trashNode = read.getTrashNode(session, session.getUser(), null);
 			moveNodesInternal(session, "inside", trashNode.getId().toHexString(), req.getNodeIds());
 			res.setSuccess(true);
 			return res;
@@ -153,24 +169,24 @@ public class NodeMoveService {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		SubNode userNode = api.getUserNodeByUserName(null, null);
+		SubNode userNode = read.getUserNodeByUserName(null, null);
 		if (userNode == null) {
 			throw new RuntimeEx("User not found.");
 		}
 
 		for (String nodeId : req.getNodeIds()) {
 			// lookup the node we're going to delete
-			SubNode node = api.getNode(session, nodeId);
+			SubNode node = read.getNode(session, nodeId);
 
 			// back out the number of bytes it was using
 			if (!session.isAdmin()) {
 				userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
 			}
 
-			api.deleteNode(session, node);
+			delete.deleteNode(session, node);
 		}
 
-		api.saveSession(session);
+		update.saveSession(session);
 		res.setSuccess(true);
 		return res;
 	}
@@ -200,12 +216,12 @@ public class NodeMoveService {
 	private void moveNodesInternal(MongoSession session, String location, String targetId, List<String> nodeIds) {
 
 		log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
-		SubNode targetNode = api.getNode(session, targetId);
+		SubNode targetNode = read.getNode(session, targetId);
 
 		SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode
-				: api.getParent(session, targetNode);
+				: read.getParent(session, targetNode);
 
-		api.authRequireOwnerOfNode(session, parentToPasteInto);
+		auth.authRequireOwnerOfNode(session, parentToPasteInto);
 		String parentPath = parentToPasteInto.getPath();
 		// log.debug("targetPath: " + targetPath);
 		Long curTargetOrdinal = null;
@@ -217,20 +233,20 @@ public class NodeMoveService {
 		// location==inline (todo-1: rename this to inline-below)
 		else if (location.equalsIgnoreCase("inline")) {
 			curTargetOrdinal = targetNode.getOrdinal() + 1;
-			api.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, nodeIds.size());
+			create.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, nodeIds.size());
 		}
 		// location==inline-above
 		else if (location.equalsIgnoreCase("inline-above")) {
 			curTargetOrdinal = targetNode.getOrdinal();
-			api.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, nodeIds.size());
+			create.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, nodeIds.size());
 		}
 
 		for (String nodeId : nodeIds) {
 			// log.debug("Moving ID: " + nodeId);
 
-			SubNode node = api.getNode(session, nodeId);
-			api.authRequireOwnerOfNode(session, node);
-			SubNode nodeParent = api.getParent(session, node);
+			SubNode node = read.getNode(session, nodeId);
+			auth.authRequireOwnerOfNode(session, node);
+			SubNode nodeParent = read.getParent(session, node);
 
 			/*
 			 * If this 'node' will be changing parents (moving to new parent) we need to
@@ -247,7 +263,7 @@ public class NodeMoveService {
 
 			curTargetOrdinal++;
 		}
-		api.saveSession(session);
+		update.saveSession(session);
 	}
 
 	private void changePathOfSubGraph(MongoSession session, SubNode graphRoot, String newPathPrefix) {
@@ -255,7 +271,7 @@ public class NodeMoveService {
 		log.debug("originalPath (graphRoot.path): " + originalPath);
 		int originalParentPathLen = graphRoot.getParentPath().length();
 
-		for (SubNode node : api.getSubGraph(session, graphRoot)) {
+		for (SubNode node : read.getSubGraph(session, graphRoot)) {
 			if (!node.getPath().startsWith(originalPath)) {
 				throw new RuntimeEx(
 						"Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
@@ -276,8 +292,8 @@ public class NodeMoveService {
 		}
 
 		String nodeId = req.getParentNodeId();
-		SubNode node = api.getNode(session, nodeId);
-		List<String> nodeIds = api.getChildrenIds(session, node, false, null);
+		SubNode node = read.getNode(session, nodeId);
+		List<String> nodeIds = read.getChildrenIds(session, node, false, null);
 		res.setNodeIds(nodeIds);
 		res.setSuccess(true);
 		return res;

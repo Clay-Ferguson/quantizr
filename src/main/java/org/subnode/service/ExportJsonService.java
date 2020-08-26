@@ -11,19 +11,6 @@ import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import org.subnode.config.AppProp;
-import org.subnode.model.client.NodeProp;
-import org.subnode.config.SpringContextUtil;
-import org.subnode.mongo.MongoApi;
-import org.subnode.mongo.MongoEventListener;
-import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.model.SubNode;
-import org.subnode.util.Const;
-import org.subnode.util.ExUtil;
-import org.subnode.util.FileUtils;
-import org.subnode.util.LimitedInputStreamEx;
-import org.subnode.util.StreamUtil;
-import org.subnode.util.ValContainer;
 
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -35,6 +22,19 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import org.subnode.config.AppProp;
+import org.subnode.config.SpringContextUtil;
+import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.MongoApi;
+import org.subnode.mongo.MongoEventListener;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.model.SubNode;
+import org.subnode.util.ExUtil;
+import org.subnode.util.FileUtils;
+import org.subnode.util.LimitedInputStreamEx;
+import org.subnode.util.StreamUtil;
+import org.subnode.util.ValContainer;
 
 /**
  * Import/Export of Raw JSON and Binaries to and from filesystem/classpath)
@@ -49,6 +49,9 @@ public class ExportJsonService {
 
 	@Autowired
 	private MongoApi api;
+
+	@Autowired
+	private MongoUpdate update;
 
 	@Autowired
 	private AppProp appProp;
@@ -148,7 +151,7 @@ public class ExportJsonService {
 				is = resource.getInputStream();
 				lis = new LimitedInputStreamEx(is, session.getMaxUploadSize());
 				attachmentService.writeStream(session, node, lis, binFileName, binMime);
-				api.save(session, node);
+				update.save(session, node);
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -218,7 +221,7 @@ public class ExportJsonService {
 
 					// jsonToNodeService.importJsonContent(json, node);
 					SubNode node = objectMapper.readValue(json, SubNode.class);
-					api.save(session, node);
+					update.save(session, node);
 
 					String binFileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
 					if (binFileName != null) {
