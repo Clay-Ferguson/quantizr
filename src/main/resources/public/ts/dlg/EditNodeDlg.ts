@@ -38,6 +38,7 @@ import { NodeActionType } from "../enums/NodeActionType";
 import { ValueIntf } from "../Interfaces";
 import { PropValueHolder } from "../PropValueHolder";
 import { SplitNodeDlg } from "../dlg/SplitNodeDlg";
+import { DateField } from "../widget/DateField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -655,7 +656,7 @@ export class EditNodeDlg extends DialogBase {
                 formGroup.addChild(new Label(label));
             }
 
-            let valEditor: I.TextEditorIntf = null;
+            let valEditor: CompIntf = null;
             let multiLine = false;
 
             let valueIntf = {
@@ -683,8 +684,14 @@ export class EditNodeDlg extends DialogBase {
                 }
             }
             else {
-                //console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
-                valEditor = new TextField(null, false, null, valueIntf);
+                //todo-1: eventually we will have data types.
+                // if (propEntry.name == "date") {
+                //     valEditor = new DateField(null, valueIntf); 
+                // }
+                // else {
+                    //console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
+                    valEditor = new TextField(null, false, null, valueIntf);
+                //}
             }
 
             formGroup.addChild(valEditor as any as Comp);
