@@ -285,7 +285,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }
                     //S.log("Uploaded to Hash: " + ipfsHash);
 
-                    //todo-0: case with IPFS (via Quanta Gateway) and multiple files needs testing and is likely not functional.
+                    //todo-0: case with IPFS (via Quanta Gateway) and multiple files uploading this needs testing and is likely not functional.
 
                     //https://developer.mozilla.org/en-US/docs/Web/API/File
                     if (dlg.getState().toIpfs && this.toTemporal) {

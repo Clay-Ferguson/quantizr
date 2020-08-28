@@ -64,7 +64,9 @@ module.exports = {
                 }
             }
         }),
-        //todo-0: with thymeleaf enabled, we no longer need this, and the index.htm folder is moved into 'templates' also.
+        /* With thymeleaf enabled, we no longer need this, and the index.htm folder is moved into 'templates' also,
+        but lets keep this code commented for future reference. */
+
         // new HtmlWebpackPlugin({
         //     template: './html/index.html',
         //     filename: 'index.html',

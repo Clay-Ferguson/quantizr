@@ -52,13 +52,6 @@ that's used during builds.
 
 			<dependencies>
 				<!--include:org.springframework.boot.xml-->
-<!-- it's super ugly how we are excluding the logging from all these
-    and if you add a spring dependency and forget to exclude what happens is the logging
-    just gets disabled with no hint what's wrong, and no ability to even step into log4j code
-    in the debugger so unless you litterally just remember to come here and look at these
-    dependencies you'll never figure out what's wrong. I know from experience (todo-0 FIX THIS) 
--->
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -447,12 +440,6 @@ of the spring configs for security are also perfected.
 
 			<dependencies>
 				<!--include:org.springframework.boot.xml-->
-<!-- it's super ugly how we are excluding the logging from all these
-    and if you add a spring dependency and forget to exclude what happens is the logging
-    just gets disabled with no hint what's wrong, and no ability to even step into log4j code
-    in the debugger so unless you litterally just remember to come here and look at these
-    dependencies you'll never figure out what's wrong. I know from experience (todo-0 FIX THIS) 
--->
 
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -684,12 +671,6 @@ of the spring configs for security are also perfected.
 
 			<dependencies>
 				<!--include:org.springframework.boot.xml-->
-<!-- it's super ugly how we are excluding the logging from all these
-    and if you add a spring dependency and forget to exclude what happens is the logging
-    just gets disabled with no hint what's wrong, and no ability to even step into log4j code
-    in the debugger so unless you litterally just remember to come here and look at these
-    dependencies you'll never figure out what's wrong. I know from experience (todo-0 FIX THIS) 
--->
 
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -1097,12 +1078,6 @@ of the spring configs for security are also perfected.
 
 			<dependencies>
 				<!--include:org.springframework.boot.xml-->
-<!-- it's super ugly how we are excluding the logging from all these
-    and if you add a spring dependency and forget to exclude what happens is the logging
-    just gets disabled with no hint what's wrong, and no ability to even step into log4j code
-    in the debugger so unless you litterally just remember to come here and look at these
-    dependencies you'll never figure out what's wrong. I know from experience (todo-0 FIX THIS) 
--->
 
 <dependency>
     <groupId>org.springframework.boot</groupId>
