@@ -43,7 +43,7 @@ public class LuceneService {
 			 * keep the index of this node garanteed to be separate but determined by this
 			 * node (i.e. unique to this node)
 			 */
-			fileIndexer.index(searchFolder /* "/subnode-tmp/search" */, nodeId, "sh,md,txt,pdf,zip,tar,json,gz,tgz,xz",
+			fileIndexer.index(searchFolder /* "/tmp/search" */, nodeId, "sh,md,txt,pdf,zip,tar,json,gz,tgz,xz",
 					true);
 			ret = fileIndexer.getSummaryReport();
 			fileIndexer.close();

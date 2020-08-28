@@ -60,8 +60,8 @@ services:
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
             - '${DATA_FOLDER}/docs:/docs'
-            - '${DATA_FOLDER}/tmp:/subnode-tmp'
-            - '${DATA_FOLDER}/log:/subnode-log'
+            - '${DATA_FOLDER}/tmp:/tmp'
+            - '${DATA_FOLDER}/log:/log'
             - '/etc/letsencrypt/live/${quanta_domain}:/letsencrypt'
         ports:
             - '443:443'
@@ -91,7 +91,7 @@ services:
             spring.http.multipart.max-request-size: "200MB" 
             spring.servlet.multipart.max-file-size: "200MB"
             spring.servlet.multipart.max-request-size: "200MB"
-            adminDataFolder: "/subnode-tmp" 
+            adminDataFolder: "/tmp" 
             
             # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"

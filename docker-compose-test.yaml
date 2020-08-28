@@ -47,8 +47,8 @@ services:
             - "8181"
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
-            - "${DEPLOY_TARGET}/tmp:/subnode-tmp"
-            - "${DEPLOY_TARGET}/log:/subnode-log"
+            - "${DEPLOY_TARGET}/tmp:/tmp"
+            - "${DEPLOY_TARGET}/log:/log"
         ports:
             - "8181:8181"
         networks:
@@ -73,7 +73,7 @@ services:
             spring.http.multipart.max-request-size: "200MB" 
             spring.servlet.multipart.max-file-size: "200MB"
             spring.servlet.multipart.max-request-size: "200MB"
-            adminDataFolder: "/subnode-tmp" 
+            adminDataFolder: "/tmp" 
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
             ipfs.host: "http://ipfs:5001"
         image: subnode-test

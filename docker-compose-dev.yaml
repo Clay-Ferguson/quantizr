@@ -69,8 +69,8 @@ services:
             - '8182'
             - '8000'
         volumes:
-            - '${QUANTA_BASE}/tmp:/subnode-tmp'
-            - '${QUANTA_BASE}/log:/subnode-log'
+            - '${QUANTA_BASE}/tmp:/tmp'
+            - '${QUANTA_BASE}/log:/log'
             - '${QUANTA_BASE}/lucene:/subnode-lucene'
             # Now that 'loader-path' is here, we don't need /dev-resource-base !!
             # (So I will be mothballing resourcesBaseFolder approach soon)
@@ -107,7 +107,7 @@ services:
             spring.http.multipart.max-request-size: "200MB" 
             spring.servlet.multipart.max-file-size: "200MB"
             spring.servlet.multipart.max-request-size: "200MB"
-            adminDataFolder: "/subnode-tmp" 
+            adminDataFolder: "/tmp" 
             mail.port: ""
             mail.user: "postmaster@quantizr.com" 
             mail.password: "${emailPassword}" 
