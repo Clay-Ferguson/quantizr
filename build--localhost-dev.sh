@@ -16,7 +16,11 @@ source ./setenv--localhost-dev.sh
 
 sudo chown 999:999 ../secrets/mongod--localhost-dev.conf
 
-sudo rm -f /home/clay/quantizr-tmp/log/*
+sudo mkdir -p ${QUANTA_BASE}/log
+sudo mkdir -p ${QUANTA_BASE}/tmp
+sudo mkdir -p ${QUANTA_BASE}/lucene
+
+sudo rm -f ${QUANTA_BASE}/log/*
 mkdir -p ${ipfs_staging}
 
 cd ${PRJROOT}

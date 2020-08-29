@@ -23,5 +23,3 @@ Allow: /
 # Group 3
 User-agent: *
 Allow: /
-
-# todo-0: add sitemap: https://support.google.com/webmasters/answer/156184

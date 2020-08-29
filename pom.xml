@@ -64,19 +64,6 @@ that's used during builds.
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
-    <exclusions>
-
-        <!--
-        <exclusion>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.glassfish.jersey.ext</groupId>
-            <artifactId>jersey-bean-validation</artifactId>
-        </exclusion>
-        -->
-    </exclusions>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -92,6 +79,7 @@ that's used during builds.
         </exclusion>
     </exclusions>
 </dependency>
+
 <!-- WARNING: adding this will totally disable the app, until ALL
 of the spring configs for security are also perfected. 
 (but our custom security is better than Spring for now at least)
@@ -130,7 +118,8 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
-</dependency>				<!--include:common.xml-->
+</dependency>
+				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
@@ -440,7 +429,6 @@ of the spring configs for security are also perfected.
 
 			<dependencies>
 				<!--include:org.springframework.boot.xml-->
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -453,19 +441,6 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
-    <exclusions>
-
-        <!--
-        <exclusion>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.glassfish.jersey.ext</groupId>
-            <artifactId>jersey-bean-validation</artifactId>
-        </exclusion>
-        -->
-    </exclusions>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -481,6 +456,7 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
+
 <!-- WARNING: adding this will totally disable the app, until ALL
 of the spring configs for security are also perfected. 
 (but our custom security is better than Spring for now at least)
@@ -519,7 +495,8 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
-</dependency>				<!--include:common.xml-->
+</dependency>
+				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
@@ -671,7 +648,6 @@ of the spring configs for security are also perfected.
 
 			<dependencies>
 				<!--include:org.springframework.boot.xml-->
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -684,19 +660,6 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
-    <exclusions>
-
-        <!--
-        <exclusion>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.glassfish.jersey.ext</groupId>
-            <artifactId>jersey-bean-validation</artifactId>
-        </exclusion>
-        -->
-    </exclusions>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -712,6 +675,7 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
+
 <!-- WARNING: adding this will totally disable the app, until ALL
 of the spring configs for security are also perfected. 
 (but our custom security is better than Spring for now at least)
@@ -750,7 +714,8 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
-</dependency>				<!--include:common.xml-->
+</dependency>
+				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
@@ -1078,7 +1043,6 @@ of the spring configs for security are also perfected.
 
 			<dependencies>
 				<!--include:org.springframework.boot.xml-->
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -1091,19 +1055,6 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jersey</artifactId>
-    <exclusions>
-
-        <!--
-        <exclusion>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.glassfish.jersey.ext</groupId>
-            <artifactId>jersey-bean-validation</artifactId>
-        </exclusion>
-        -->
-    </exclusions>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -1119,6 +1070,7 @@ of the spring configs for security are also perfected.
         </exclusion>
     </exclusions>
 </dependency>
+
 <!-- WARNING: adding this will totally disable the app, until ALL
 of the spring configs for security are also perfected. 
 (but our custom security is better than Spring for now at least)
@@ -1157,7 +1109,8 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
-</dependency>				<!--include:common.xml-->
+</dependency>
+				<!--include:common.xml-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>

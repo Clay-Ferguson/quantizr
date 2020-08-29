@@ -106,6 +106,7 @@ import org.subnode.service.SystemService;
 import org.subnode.service.UserFeedService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.ExUtil;
+import org.subnode.util.FileUtils;
 
 /**
  * Primary Spring MVC controller. All application logic from the browser
@@ -141,8 +142,14 @@ public class AppController implements ErrorController {
 	private static HashMap<String, String> welcomeMap = null;
 	private static final Object welcomeMapLock = new Object();
 
-	private static final String cacheBuster = String.valueOf(new Date().getTime());
+	// maps classpath resource names to their md5 values
+	private static HashMap<String, String> cacheBusterMd5 = null;
+
+	//private static final String cacheBuster = String.valueOf(new Date().getTime());
 	private static boolean welcomePagePresent;
+
+	@Autowired
+	private FileUtils fileUtils;
 
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
@@ -217,9 +224,24 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = ERROR_MAPPING)
 	public String error(Model model) {
 		model.addAttribute("hostAndPort", constProvider.getHostAndPort());
-		model.addAttribute("cacheBuster", cacheBuster);
+		model.addAllAttributes(cacheBusterMd5);
 		// pulls up error.html
 		return "error";
+	}
+
+	public void init() {
+		cacheBusterMd5 = new HashMap<String, String>();
+
+		cacheBusterMd5.put("BUNDLE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bundle.js"));
+		cacheBusterMd5.put("MAIN_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/meta64.css"));
+		cacheBusterMd5.put("FONT_AWESOME_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/font-awesome-4.7.0/css/font-awesome.min.css"));
+		cacheBusterMd5.put("DROPZONE_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.css"));
+		cacheBusterMd5.put("DARCULA_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/highlightjs/darcula.css"));
+		cacheBusterMd5.put("JQUERY_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/jquery/jquery-3.3.1.min.js"));
+		cacheBusterMd5.put("POPPER_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/popper/popper.min.js"));
+		cacheBusterMd5.put("BOOTSTRAP_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bootstrap-4/js/bootstrap.min.js"));
+		cacheBusterMd5.put("DROPZONE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.js"));
+		cacheBusterMd5.put("ACE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/ace/src-noconflict/ace.js"));
 	}
 
 	@Override
@@ -258,7 +280,7 @@ public class AppController implements ErrorController {
 		try {
 			// log.debug("AppController.index: sessionUser=" +
 			// sessionContext.getUserName());
-			model.addAttribute("cacheBuster", cacheBuster);
+			model.addAllAttributes(cacheBusterMd5);
 
 			// Node Names are identified using a colon in front of it, to make it detectable
 			if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
@@ -310,7 +332,6 @@ public class AppController implements ErrorController {
 			synchronized (welcomeMapLock) {
 				HashMap<String, String> newMap = new HashMap<String, String>();
 				welcomePagePresent = nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
-				newMap.put("cacheBuster", cacheBuster);
 				welcomeMap = newMap;
 			}
 		}
@@ -320,13 +341,14 @@ public class AppController implements ErrorController {
 			model.addAttribute("signupResponse", signupResponse);
 		}
 
+		model.addAllAttributes(cacheBusterMd5);
+
 		/*
 		 * if welcomeMap is empty that likely means the "pg_welcome" node hasn't yet
-		 * been created on this instanace so we bypass the landing page and go to
+		 * been created on this quanta instanace so we bypass the landing page and go to
 		 * index.html instead.
 		 */
 		if (!welcomePagePresent) {
-			model.addAttribute("cacheBuster", cacheBuster);
 			return "index";
 		}
 		/* otherwise rener the landing page */

@@ -1,5 +1,6 @@
 package org.subnode.config;
 
+import org.subnode.AppController;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mongo.MongoRepository;
 
@@ -24,8 +25,12 @@ public class SpringContextUtil implements ApplicationContextAware {
 	private MongoRepository mongoRepo;
 
 	@Autowired
+	private AppController appController;
+
+	@Autowired
 	private TestRunner testRunner;
 
+	/* main() entrypoint */
 	@Override
 	public void setApplicationContext(ApplicationContext context) throws BeansException {
 		log.debug("SpringContextUtil initialized context.");
@@ -33,6 +38,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 
 		try {
 			mongoRepo.init();
+			appController.init();
 		}
 		catch (Exception e) {
 			log.error("application startup failed.");

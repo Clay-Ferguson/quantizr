@@ -11,18 +11,20 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.comparator.NameFileComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
 import java.nio.file.attribute.PosixFilePermission;
-
 
 @Component
 public class FileUtils {
@@ -45,6 +47,19 @@ public class FileUtils {
 		imageExtensions.add("png");
 		imageExtensions.add("gif");
 		imageExtensions.add("bmp");
+	}
+
+	public String genHashOfClasspathResource(final String resourceName) {
+		InputStream is = null;
+		try {
+			Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:"+resourceName);
+			is = resource.getInputStream();
+			return DigestUtils.md5Hex(is);
+		} catch (final Exception e) {
+			throw new RuntimeEx("Unable to hash resource: " + resourceName, e);
+		} finally {
+			StreamUtil.close(is);
+		}
 	}
 
 	public long getFileCreateTime(File file) {

@@ -16,8 +16,5 @@ export mvn_profile=prod
 # INSTANCE_FOLDER tells docker yaml volume where to find mongo-scripts folder and mongod.conf file.
 export INSTANCE_FOLDER=/home/clay/quanta
 
-# DATA_FOLDER tells docker yaml volume where to find mongo-dumps folder
-export DATA_FOLDER=/home/clay/quanta-data
-
 # deploy target folder is where we will be running the app from
 export DEPLOY_TARGET=/home/clay/ferguson/subnode-run

@@ -14,5 +14,5 @@ export docker_compose_yaml=docker-compose-dev.yaml
 export mvn_profile=dev
 
 export MONGO_BASE=/home/clay/ferguson
-export QUANTA_BASE=/home/clay/quantizr-tmp
+export QUANTA_BASE=/home/clay/quanta-localhost-dev
 

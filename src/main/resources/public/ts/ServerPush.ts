@@ -38,7 +38,7 @@ export class ServerPush implements ServerPushIntf {
             //console.log("Incomming Push: "+S.util.prettyPrint(obj));
             let nodeInfo: J.NodeInfo = obj.nodeInfo;
             if (nodeInfo) {
-                //todo-0: I think this dispatch is working, but another full FeedView refresh (from actual server query too) is somehow following after also
+                //todo-1: I think this dispatch is working, but another full FeedView refresh (from actual server query too) is somehow following after also
                 //so need to check and see how to avoid that.
                 dispatch({
                     type: "Action_RenderFeedResults",
