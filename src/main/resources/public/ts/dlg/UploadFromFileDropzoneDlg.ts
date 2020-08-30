@@ -32,8 +32,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     dropzoneDiv: Div = null;
     sent: boolean = false;
 
-    /* If this is true we upload directly to temporal rather than routing thru Quanta */
-    toTemporal: boolean = false;
     maxFiles: number = 50;
 
     //this varible gets set if anything is detected wrong during the upload
@@ -73,7 +71,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Upload from URL", this.uploadFromUrl),
                     new Button("Upload from Clipboard", this.uploadFromClipboard),
-                    (state.toIpfs && this.toTemporal) ? new Button("IPFS Credentials", () => { S.ipfsUtil.getTemporalCredentials(true); }) : null,
                     new Button("Close", () => {
                         this.close();
                     }),
@@ -131,25 +128,15 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let state = this.getState();
         return new Promise<boolean>(async (resolve, reject) => {
             if (this.filesAreValid()) {
-                let allowUpload = true;
 
-                if (state.toIpfs && this.toTemporal) {
-                    let loginOk = await S.ipfsUtil.temporalLogin();
-                    if (!loginOk) {
-                        allowUpload = false;
-                    }
-                }
+                const files = this.dropzone.getAcceptedFiles();
+                this.numFiles = files.length;
 
-                if (allowUpload) {
-                    const files = this.dropzone.getAcceptedFiles();
-                    this.numFiles = files.length;
-                   
-                        if (files.length > 0) {
-                            files.forEach((file: File) => {
-                                S.log("Dropzone Processing File: " + file.name);
-                                this.dropzone.processFile(file)
-                            });
-                        }
+                if (files.length > 0) {
+                    files.forEach((file: File) => {
+                        S.log("Dropzone Processing File: " + file.name);
+                        this.dropzone.processFile(file)
+                    });
                 }
             }
             resolve(true);
@@ -158,10 +145,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     configureDropZone = (): void => {
         let state = this.getState();
-        let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
 
-        /* Limit based on user quota for Quanta accounts or else leave unlimited for temporal and let temporal worry about it */
-        let maxFileSize = (state.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
+        /* Limit based on user quota for Quanta accounts */
+        let maxFileSize = this.appState.userPreferences.maxUploadFileSize;
         //console.log("configureDropZone: maxFileSize="+maxUploadSize);
 
         let action;
@@ -169,8 +155,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             action = S.util.getRpcPath() + "streamImport";
         }
         else {
-            action = (state.toIpfs && this.toTemporal) ? (C.TEMPORAL_HOST + "/v2/ipfs/public/file/add") :
-                S.util.getRpcPath() + "upload";
+            action = S.util.getRpcPath() + "upload";
         }
         let url = action;
 
@@ -183,7 +168,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             url,
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
-            paramName: (state.toIpfs && dlg.toTemporal) ? "file" : "files",
+            paramName: "files",
             maxFilesize: maxFileSize,
 
             //sets max number to send in each request, to keep from overloading server when large numbers are being sent
@@ -207,8 +192,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.on("addedfile", function (file) {
                     dlg.uploadFailed = false;
                     dlg.errorShown = false;
-                    if (!dlg.toTemporal && (file.size > maxUploadSize * Constants.ONE_MB)) {
-                        S.util.showMessage("File is too large. Max Size=" + maxUploadSize + "MB", "Warning");
+                    if (file.size > maxFileSize * Constants.ONE_MB) {
+                        S.util.showMessage("File is too large. Max Size=" + maxFileSize + "MB", "Warning");
                         return;
                     }
                     dlg.updateFileList(this);
@@ -229,33 +214,24 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     //console.log("sending file: "+file.name);
 
                     /* If Uploading DIRECTLY to Temporal.cloud */
-                    if (state.toIpfs && dlg.toTemporal) {
-                        formData.append("file", file);
-                        formData.append("hold_time", "1");
 
-                        xhr.withCredentials = false;
-                        xhr.setRequestHeader("Cache-Control", "no-cache");
-                        xhr.setRequestHeader("Authorization", "Bearer " + S.ipfsUtil.temporalToken);
+                    S.log("Sending File: " + file.name);
+                    formData.append("files", file);
+
+                    //It's important to check before calling append on this formData, because when uploading multiple files
+                    //when this runs for the second, third, etc file it ends up createing 
+                    //nodeId as a comma delimted list which is wrong.
+                    if (!formData.has("nodeId")) {
+                        formData.append("nodeId", dlg.nodeId);
+                        formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
+
+                        //NOTE: This ipfs flag is *not* for the Temporal.cloud upload but is for the currently unused capability 
+                        //Quanta platform has to run it's own gateway IPFS-GO instance (but currently we aren't running it)
+                        formData.append("ipfs", state.toIpfs ? "true" : "false");
+
+                        formData.append("createAsChildren", dlg.numFiles > 1 ? "true" : "false");
                     }
-                    /* Else we'll be uploading onto Quanta and saving to ipfs based on the 'ipfs' flag */
-                    else {
-                        S.log("Sending File: " + file.name);
-                        formData.append("files", file);
 
-                        //It's important to check before calling append on this formData, because when uploading multiple files
-                        //when this runs for the second, third, etc file it ends up createing 
-                        //nodeId as a comma delimted list which is wrong.
-                        if (!formData.has("nodeId")) {
-                            formData.append("nodeId", dlg.nodeId);
-                            formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
-
-                            //NOTE: This ipfs flag is *not* for the Temporal.cloud upload but is for the currently unused capability 
-                            //Quanta platform has to run it's own gateway IPFS-GO instance (but currently we aren't running it)
-                            formData.append("ipfs", state.toIpfs ? "true" : "false");
-
-                            formData.append("createAsChildren", dlg.numFiles > 1 ? "true" : "false");
-                        }
-                    }
                     dlg.zipQuestionAnswered = false;
                 });
 
@@ -358,7 +334,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
 
             if (this.autoAddFile) {
-                if (!dlg.toTemporal && (this.autoAddFile.size > maxUploadSize * Constants.ONE_MB)) {
+                if (this.autoAddFile.size > maxUploadSize * Constants.ONE_MB) {
                     S.util.showMessage("File is too large. Max Size=" + maxUploadSize + "MB", "Warning");
                     return;
                 }
@@ -399,10 +375,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             return false;
         }
 
-        let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
-        let maxFileSizeMb = (state.toIpfs && this.toTemporal) ? maxUploadSize * 1024 : maxUploadSize;
-        //console.log("filesAreValid: maxFileSize="+maxUploadSize);
-
+        let maxFileSizeMb = this.appState.userPreferences.maxUploadFileSize;
         for (let file of this.fileList) {
             if (file.size > maxFileSizeMb * Constants.ONE_MB) {
                 return false;

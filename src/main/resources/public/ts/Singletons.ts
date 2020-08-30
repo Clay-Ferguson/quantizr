@@ -17,7 +17,6 @@ import { ServerPushIntf } from "./intf/ServerPushIntf";
 import { LocalDBIntf } from "./intf/LocalDBIntf";
 import { PluginMgrIntf } from "./intf/PluginMgrIntf";
 import { DialogBaseImpl } from "./DialogBaseImpl";
-import { IPFSUtilIntf } from "./intf/IPFSUtilIntf";
 
 /* NOTE: If this Singleton pattern looks countrary to good module design, keep in mind all module systems
 are susceptible to circular references, and these Singtons are an unbreakable solution to that 
@@ -26,7 +25,6 @@ export interface Singletons {
     meta64: Meta64Intf;
     plugin: PluginMgrIntf;
     util: UtilIntf;
-    ipfsUtil: IPFSUtilIntf;
     push: ServerPushIntf;
     edit: EditIntf;
     attachment: AttachmentIntf;
