@@ -113,9 +113,6 @@ public class AttachmentService {
 	private AppProp appProp;
 
 	@Autowired
-	private MimeTypeUtils mimeTypeUtils;
-
-	@Autowired
 	private UserManagerService userManagerService;
 
 	@Autowired
@@ -264,7 +261,8 @@ public class AttachmentService {
 		 */
 		if (addAsChild) {
 			try {
-				final SubNode newNode = create.createNode(session, node, null, null, null, CreateNodeLocation.LAST, null);
+				final SubNode newNode = create.createNode(session, node, null, null, null, CreateNodeLocation.LAST,
+						null);
 				newNode.setContent(fileName);
 
 				/*
@@ -455,82 +453,7 @@ public class AttachmentService {
 	 * I stopped using this method (for now) because of this error, which is a
 	 * Spring problem and not in my code. I created the simpler getBinary() version
 	 * (below) which works find AND is simpler.
-	 */
-	public ResponseEntity<InputStreamResource> getBinary_legacy(MongoSession session, final String nodeId) {
-		try {
-			if (session == null) {
-				session = ThreadLocals.getMongoSession();
-			}
-
-			final SubNode node = read.getNode(session, nodeId, false);
-			final boolean ipfs = StringUtils.isNotEmpty(node.getStringProp(NodeProp.IPFS_LINK.s()));
-
-			// Everyone's account node can publish it's attachment and is assumed to be an
-			// avatar.
-			boolean allowAuth = true;
-			if (auth.isAnAccountNode(session, node)) {
-				allowAuth = false;
-			}
-
-			if (allowAuth) {
-				auth.auth(session, node, PrivilegeType.READ);
-			}
-
-			final String mimeTypeProp = node.getStringProp(NodeProp.BIN_MIME.s());
-			if (mimeTypeProp == null) {
-				throw ExUtil.wrapEx("unable to find mimeType property");
-			}
-
-			String fileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
-			if (fileName == null) {
-				fileName = "filename";
-			}
-
-			// I took out the autoClosing stream, and I'm not sure if it's needed based on
-			// current design, since when it
-			// was originally put here.
-			// AutoCloseInputStream acis = api.getAutoClosingStream(session, node, null,
-			// allowAuth, ipfs);
-			// StreamingResponseBody stream = (os) -> {
-			// int bytesCopied = IOUtils.copy(acis, os);
-			// log.debug("io copy complete: bytes="+bytesCopied);
-			// os.flush();
-			// log.debug("flush complete.");
-			// };
-
-			final InputStream is = getStream(session, node, allowAuth, ipfs);
-			final InputStreamResource isr = new InputStreamResource(is);
-
-			final long size = node.getIntProp(NodeProp.BIN_SIZE.s());
-			log.debug("Getting Binary for nodeId=" + nodeId + " size=" + size);
-
-			/*
-			 * To make, for example an image type of resource DISPLAY in the browser (rather
-			 * than a downloaded file), you'd need this to be omitted (or 'inline')
-			 */
-			ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
-			if (size > 0) {
-				/*
-				 * todo-1: I'm getting the "disappearing image" network problem related to size
-				 * (content length), but not calling 'contentLength()' below is a workaround.
-				 * 
-				 * You get this error if you just wait about 30s to 1 minute, and maybe scroll
-				 * out of view and back into view the images.
-				 * 
-				 * Failed to load resource: net::ERR_CONTENT_LENGTH_MISMATCH
-				 */
-				builder = builder.contentLength(size);
-			}
-			builder = builder.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"");
-			builder = builder.contentType(MediaType.parseMediaType(mimeTypeProp));
-			return builder.body(isr);
-		} catch (final Exception e) {
-			log.error(e.getMessage());
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	/*
+	 * 
 	 * If 'download' is true we send back a "Content-Disposition: attachment;"
 	 * rather than the default of "inline" by omitting it
 	 */
@@ -647,7 +570,7 @@ public class AttachmentService {
 			if (!file.isFile())
 				throw ExUtil.wrapEx("file not found.");
 
-			final String mimeType = mimeTypeUtils.getMimeType(file);
+			final String mimeType = MimeTypeUtils.getMimeType(file);
 			if (disposition == null) {
 				disposition = "inline";
 			}
@@ -688,7 +611,7 @@ public class AttachmentService {
 				throw new RuntimeEx("File not found: " + fullFileName);
 			}
 
-			final String mimeType = mimeTypeUtils.getMimeType(file);
+			final String mimeType = MimeTypeUtils.getMimeType(file);
 			if (disposition == null) {
 				disposition = "inline";
 			}

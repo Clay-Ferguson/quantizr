@@ -13,9 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-@Component
 public class MimeTypeUtils {
     private static final Logger log = LoggerFactory.getLogger(MimeTypeUtils.class);
     private static final Tika tika = new Tika();

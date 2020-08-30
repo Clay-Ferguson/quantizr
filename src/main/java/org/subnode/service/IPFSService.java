@@ -57,8 +57,8 @@ public class IPFSService {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-	@Autowired
-	private MongoRead read;
+    @Autowired
+    private MongoRead read;
 
     @Autowired
     private AppProp appProp;
@@ -145,10 +145,8 @@ public class IPFSService {
     }
 
     /**
-     * @param hash
-     * @param encoding text | json
-     * @return Returns string of the the hash get, as requested usingn the
-     *         'encoding=' url argument specified.
+     * Returns string of the the hash get, as requested usingn the 'encoding=' url
+     * argument specified.
      */
     public final String getAsString(String hash, String encoding) {
         String ret = null;
@@ -193,7 +191,7 @@ public class IPFSService {
                     new TypeReference<Map<String, Object>>() {
                     });
 
-            //log.debug("respMap=" + XString.prettyPrint(respMap));
+            // log.debug("respMap=" + XString.prettyPrint(respMap));
 
             hash = (String) respMap.get("Hash");
             streamSize.setVal((int) lis.getCount());
@@ -212,6 +210,7 @@ public class IPFSService {
     }
 
     public InputStream getStream(MongoSession session, String hash, String mimeType) {
+        //todo-0: try https here!
         String sourceUrl = "http://ipfs:8080/ipfs/" + hash;
 
         try {

@@ -613,22 +613,6 @@ public class AppController implements ErrorController {
 		});
 	}
 
-	/*
-	 * We could persist the real filename when uploaded, and then make the links
-	 * actually reference that filename on this type of path. Will have to add to
-	 * binary info property sent to client in JSON.
-	 * 
-	 * NOTE: Currently unused. We use 'getBinary' instead. See getBinary_legacy for
-	 * explanation.
-	 */
-	@RequestMapping(value = API_PATH + "/bin_legacy/{fileName}", method = RequestMethod.GET)
-	public Object getBinaryLegacy(@PathVariable("fileName") String fileName, @RequestParam("nodeId") String nodeId,
-			HttpSession session) {
-		return callProc.run("bin", null, session, ms -> {
-			return attachmentService.getBinary_legacy(null, nodeId);
-		});
-	}
-
 	@RequestMapping(value = API_PATH + "/bin/{fileName}", method = RequestMethod.GET)
 	public void getBinary(@PathVariable("fileName") String fileName, //
 			@RequestParam("nodeId") String nodeId, //
