@@ -224,10 +224,16 @@ public class NodeEditService {
 		if (!req.isUpdateModTime()) {
 			newNode.setModifyTime(null);
 		}
-	
+
 		update.save(session, newNode);
 		res.setNewNode(
 				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false, false));
+
+		if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
+				// don't evern send notifications when 'admin' is the one doing the editing.
+				&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
+			outboxMgr.sendNotificationForNodeEdit(newNode, sessionContext.getUserName());
+		}
 
 		if (newNode.getType().equals(NodeType.USER_FEED.s())) {
 			userFeedService.addUserFeedInfo(session, newNode, null, sessionContext.getUserName());
@@ -323,7 +329,7 @@ public class NodeEditService {
 				node.setModifyTime(null);
 			}
 
-			if (!StringUtils.isEmpty(node.getContent()) //
+			if (req.isUpdateModTime() && !StringUtils.isEmpty(node.getContent()) //
 					// don't evern send notifications when 'admin' is the one doing the editing.
 					&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
@@ -332,7 +338,6 @@ public class NodeEditService {
 			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1, false,
 					false, false);
 			res.setNode(newNodeInfo);
-			// api.saveSession(session); //shouldn't be necessar
 		}
 
 		// todo-1: eventually we need a plugin-type architecture to decouple this kind
@@ -399,7 +404,7 @@ public class NodeEditService {
 		}
 		String nodeId = req.getNodeId();
 
-		//log.debug("Splitting node: " + nodeId);
+		// log.debug("Splitting node: " + nodeId);
 		SubNode node = read.getNode(session, nodeId);
 		SubNode parentNode = read.getParent(session, node);
 
@@ -446,7 +451,7 @@ public class NodeEditService {
 		Date now = new Date();
 		int idx = 0;
 		for (String part : contentParts) {
-			//log.debug("ContentPart[" + idx + "] " + part);
+			// log.debug("ContentPart[" + idx + "] " + part);
 			part = part.trim();
 			if (idx == 0) {
 				node.setContent(part);

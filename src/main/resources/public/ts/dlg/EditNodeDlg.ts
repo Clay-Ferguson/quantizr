@@ -581,6 +581,7 @@ export class EditNodeDlg extends DialogBase {
                 (state.node as J.NodeInfo).content.indexOf("\n\n\n") != -1);
 
             //console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
+            
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                 updateModTime: true,
                 node: state.node
