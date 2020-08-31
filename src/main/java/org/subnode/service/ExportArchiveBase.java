@@ -47,6 +47,10 @@ import org.subnode.util.XString;
  * export, a new instance of this class is created that is dedicated just do
  * doing that one export and so any member varibles in this class have just that
  * one export as their 'scope'
+ * 
+ * todo-0: Ipfs gateway needs to be in a variable in a root js file so it can be changed after the fact.
+ *
+ * todo-0: Also shouldn't an export pull the data out of IPFS and dump it into the exported file?
  */
 public abstract class ExportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);

@@ -145,7 +145,8 @@ public class AppController implements ErrorController {
 	// maps classpath resource names to their md5 values
 	private static HashMap<String, String> cacheBusterMd5 = null;
 
-	//private static final String cacheBuster = String.valueOf(new Date().getTime());
+	// private static final String cacheBuster = String.valueOf(new
+	// Date().getTime());
 	private static boolean welcomePagePresent;
 
 	@Autowired
@@ -234,12 +235,17 @@ public class AppController implements ErrorController {
 
 		cacheBusterMd5.put("BUNDLE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bundle.js"));
 		cacheBusterMd5.put("MAIN_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/meta64.css"));
-		cacheBusterMd5.put("FONT_AWESOME_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/font-awesome-4.7.0/css/font-awesome.min.css"));
-		cacheBusterMd5.put("DROPZONE_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.css"));
-		cacheBusterMd5.put("DARCULA_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/highlightjs/darcula.css"));
-		cacheBusterMd5.put("JQUERY_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/jquery/jquery-3.3.1.min.js"));
+		cacheBusterMd5.put("FONT_AWESOME_CSS_HASH",
+				fileUtils.genHashOfClasspathResource("/public/font-awesome-4.7.0/css/font-awesome.min.css"));
+		cacheBusterMd5.put("DROPZONE_CSS_HASH",
+				fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.css"));
+		cacheBusterMd5.put("DARCULA_CSS_HASH",
+				fileUtils.genHashOfClasspathResource("/public/css/highlightjs/darcula.css"));
+		cacheBusterMd5.put("JQUERY_JS_HASH",
+				fileUtils.genHashOfClasspathResource("/public/js/jquery/jquery-3.3.1.min.js"));
 		cacheBusterMd5.put("POPPER_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/popper/popper.min.js"));
-		cacheBusterMd5.put("BOOTSTRAP_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bootstrap-4/js/bootstrap.min.js"));
+		cacheBusterMd5.put("BOOTSTRAP_JS_HASH",
+				fileUtils.genHashOfClasspathResource("/public/bootstrap-4/js/bootstrap.min.js"));
 		cacheBusterMd5.put("DROPZONE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.js"));
 		cacheBusterMd5.put("ACE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/ace/src-noconflict/ace.js"));
 	}
@@ -613,8 +619,13 @@ public class AppController implements ErrorController {
 		});
 	}
 
-	@RequestMapping(value = API_PATH + "/bin/{fileName}", method = RequestMethod.GET)
-	public void getBinary(@PathVariable("fileName") String fileName, //
+	/*
+	 * binId param not uses currently but the client will send either the gridId or
+	 * the ipfsHash of the node depending on which type of attachment it sees on the
+	 * node
+	 */
+	@RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
+	public void getBinary(@PathVariable("binId") String binId, //
 			@RequestParam("nodeId") String nodeId, //
 			@RequestParam(value = "download", required = false) String download, //
 			HttpSession session, HttpServletResponse response) {

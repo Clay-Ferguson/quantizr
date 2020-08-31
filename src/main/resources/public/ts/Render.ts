@@ -348,11 +348,15 @@ export class Render implements RenderIntf {
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
         let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
-        if (ipfsLink) {
-            return C.IPFS_IO_GATEWAY + ipfsLink;
-        }
 
-        let bin = S.props.getNodePropVal(J.NodeProp.BIN, node);
+        /* If we had a public gateway we could actually trust we could return this, but gateways have a tendency
+         to be flaky and often appear to blacklist videos uploated thru Quanta.wiki, and I won't even speculate why */
+        // if (ipfsLink) {
+        //     return C.IPFS_IO_GATEWAY + ipfsLink;
+        // }
+
+        // If there's no IPFS_LINK on the node try the BIN prop instead.
+        let bin = ipfsLink || S.props.getNodePropVal(J.NodeProp.BIN, node);
         if (bin) {
             let ret: string = S.util.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + node.id;
             if (downloadLink) {

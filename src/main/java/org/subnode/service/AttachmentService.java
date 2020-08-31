@@ -981,6 +981,7 @@ public class AttachmentService {
 		if (ipfs) {
 			final String ipfsHash = node.getStringProp(NodeProp.IPFS_LINK.s());
 			final String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
+			//log.debug("Getting IPFS Stream: hash=" + ipfsHash + " mime=" + mimeType);
 			is = ipfsService.getStream(session, ipfsHash, mimeType);
 		} else {
 			is = getStreamByNode(node);

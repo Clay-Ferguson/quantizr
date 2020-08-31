@@ -67,7 +67,7 @@ public class NodeRenderService {
 	private ConstantsProvider constProvider;
 
 	/* Note: this MUST match nav.ROWS_PER_PAGE variable in TypeScript */
-	private static int ROWS_PER_PAGE = 25; 
+	private static int ROWS_PER_PAGE = 25;
 
 	/*
 	 * This is the call that gets all the data to show on a page. Whenever user is
@@ -170,8 +170,7 @@ public class NodeRenderService {
 						}
 						// log.trace(" upLevel to nodeid: " + node.getPath());
 						levelsUpRemaining--;
-					}
-					catch (Exception e) {
+					} catch (Exception e) {
 						/*
 						 * UPDATE: It's never actually a render problem if we can't grab the parent in
 						 * cases where we tried to. Always just allow it to render 'node' itself.
@@ -530,11 +529,17 @@ public class NodeRenderService {
 
 	public String getImageUrl(SubNode node) {
 		String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK);
-		if (ipfsLink != null) {
-			return Const.IPFS_IO_GATEWAY + ipfsLink;
-		}
 
-		String bin = node.getStringProp(NodeProp.BIN);
+		/*
+		 * If we had a public gateway we could actually trust we could return this, but
+		 * gateways have a tendency to be flaky and often appear to blacklist videos
+		 * uploated thru Quanta.wiki, and I won't even speculate why
+		 */
+		// if (ipfsLink != null) {
+		// return Const.IPFS_IO_GATEWAY + ipfsLink;
+		// }
+
+		String bin = ipfsLink != null ? ipfsLink : node.getStringProp(NodeProp.BIN);
 		if (bin != null) {
 			return constProvider.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId="
 					+ node.getId().toHexString();
