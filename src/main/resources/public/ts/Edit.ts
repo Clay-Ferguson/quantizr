@@ -64,14 +64,14 @@ export class Edit implements EditIntf {
         S.view.scrollToSelectedNode(state);
     }
 
-    private deleteNodesResponse = (res: J.DeleteNodesResponse, postDeleteSelNodeId: string, state: AppState): void => {
+    private deleteNodesResponse = (res: J.DeleteNodesResponse, postDelSelNodeId: string, state: AppState): void => {
         if (S.util.checkSuccess("Delete node", res)) {
             S.meta64.clearSelNodes(state);
 
             //We only want to pass a nodeId here if we are going to root node.
-            let nodeId = postDeleteSelNodeId == state.homeNodeId ? postDeleteSelNodeId : null;
+            let nodeId = postDelSelNodeId == state.homeNodeId ? postDelSelNodeId : null;
 
-            S.view.refreshTree(nodeId, false, postDeleteSelNodeId, false, false, true, true, state);
+            S.view.refreshTree(nodeId, false, postDelSelNodeId, false, false, true, true, state);
         }
     }
 
@@ -508,6 +508,8 @@ export class Edit implements EditIntf {
      */
     deleteSelNodes = (nodeId: string, hardDelete: boolean, state?: AppState): void => {
         state = appState(state);
+
+        //if a nodeId was specified we use it as the selected nodes to delete
         if (nodeId) {
             S.nav.setNodeSel(true, nodeId, state);
         }
@@ -518,20 +520,8 @@ export class Edit implements EditIntf {
             return;
         }
 
-        let failMsg = null;
         if (selNodesArray.find(id => id == state.homeNodeId)) {
-            failMsg = "Sorry, you can't delete your account root node!";
-        }
-
-        let postDeleteSelNodeId: string = null;
-
-        /* if one of the nodes being deleted is the page root, then render the account root, rather than trying to find ist's parent */
-        if (selNodesArray.find(id => id == state.node.id)) {
-            postDeleteSelNodeId = state.homeNodeId;
-        }
-
-        if (failMsg) {
-            S.util.showMessage(failMsg, "Warning");
+            S.util.showMessage("Sorry, you can't delete your account root node!", "Warning");
             return;
         }
 
@@ -549,21 +539,24 @@ export class Edit implements EditIntf {
 
         new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
             () => {
-                if (!postDeleteSelNodeId) {
-                    let node: J.NodeInfo = this.getBestPostDeleteSelNode(state);
-                    if (node) {
-                        postDeleteSelNodeId = node.id;
-                    }
+                let postDelSelNodeId: string = null;
+
+                let node: J.NodeInfo = this.getBestPostDeleteSelNode(state);
+                if (node) {
+                    postDelSelNodeId = node.id;
                 }
 
-                if (!postDeleteSelNodeId) {
-                    postDeleteSelNodeId = state.homeNodeId;
-                }
                 S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                     nodeIds: selNodesArray,
                     hardDelete
                 }, (res: J.DeleteNodesResponse) => {
-                    this.deleteNodesResponse(res, postDeleteSelNodeId, state);
+
+                    if (!postDelSelNodeId) {
+                        //we get here if user has deleted the last child (all chidren) of the parent of the current page
+                        S.nav.navUpLevel();
+                    } else {
+                        this.deleteNodesResponse(res, postDelSelNodeId, state);
+                    }
                 });
             },
             null, //no callback
@@ -573,13 +566,14 @@ export class Edit implements EditIntf {
         ).open();
     }
 
-    /* Gets the node we want to scroll to after a delete */
+    /* Gets the node we want to scroll to after a delete, but if we're deleting the page root we return null, 
+    meaning we don't know which node to scroll to */
     getBestPostDeleteSelNode = (state: AppState): J.NodeInfo => {
         /* Use a hashmap-type approach to saving all selected nodes into a lookup map */
-        let nodesMap: Object = S.meta64.getSelNodesAsMapById(state);
+        let nodesToDelMap: Object = S.meta64.getSelNodesAsMapById(state);
 
         //If we are deleting the page root node return 'null' to trigger an 'upLevel'
-        if (nodesMap[state.node.id]) {
+        if (nodesToDelMap[state.node.id]) {
             return null;
         }
 
@@ -587,13 +581,13 @@ export class Edit implements EditIntf {
         let takeNextNode: boolean = false;
         if (!state.node || !state.node.children) return null;
 
-        /* now we scan the children, and the last child we encounterd up until we find the rist one in nodesMap will be the
+        /* now we scan the children, and the last child we encounterd up until we find the fist one in nodesMap will be the
         node we will want to select and scroll the user to AFTER the deleting is done */
         for (let i = 0; i < state.node.children.length; i++) {
             let node: J.NodeInfo = state.node.children[i];
 
-            /* is this node one to be deleted */
-            if (nodesMap[node.id]) {
+            /* is this one of the nodes we'll be deleting */
+            if (nodesToDelMap[node.id]) {
                 takeNextNode = true;
             }
             else {

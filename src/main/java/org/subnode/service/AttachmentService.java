@@ -713,9 +713,7 @@ public class AttachmentService {
 					.serveResource();
 		} catch (final Exception e) {
 			log.error(e.getMessage());
-		} finally {
-			// StreamUtil.close(inStream);
-		}
+		} 
 	}
 
 	/*
