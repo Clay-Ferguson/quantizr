@@ -491,7 +491,7 @@ public class AttachmentService {
 				fileName = "filename";
 			}
 
-			final InputStream is = getStream(session, node, allowAuth, ipfs);
+			final InputStream is = getStream(session, node, allowAuth);
 			final long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 			log.debug("Getting Binary for nodeId=" + nodeId + " size=" + size);
 
@@ -680,8 +680,6 @@ public class AttachmentService {
 			}
 
 			final SubNode node = read.getNode(session, nodeId, false);
-			final boolean ipfs = StringUtils.isNotEmpty(node.getStringProp(NodeProp.IPFS_LINK.s()));
-
 			auth.auth(session, node, PrivilegeType.READ);
 
 			final String mimeTypeProp = node.getStringProp(NodeProp.BIN_MIME.s());
@@ -694,7 +692,7 @@ public class AttachmentService {
 				fileName = "filename";
 			}
 
-			final InputStream is = getStream(session, node, true, ipfs);
+			final InputStream is = getStream(session, node, true);
 			final long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 
 			if (size == 0) {
@@ -713,7 +711,7 @@ public class AttachmentService {
 					.serveResource();
 		} catch (final Exception e) {
 			log.error(e.getMessage());
-		} 
+		}
 	}
 
 	/*
@@ -969,17 +967,20 @@ public class AttachmentService {
 		grid.delete(new Query(Criteria.where("_id").is(id)));
 	}
 
-	public InputStream getStream(final MongoSession session, final SubNode node, final boolean _auth,
-			final boolean ipfs) {
+	/*
+	 * Gets the binary data attachment stream from the node regardless of wether
+	 * it's from IPFS_LINK or BIN
+	 */
+	public InputStream getStream(final MongoSession session, final SubNode node, final boolean _auth) {
 		if (_auth) {
 			auth.auth(session, node, PrivilegeType.READ);
 		}
 
 		InputStream is = null;
-		if (ipfs) {
-			final String ipfsHash = node.getStringProp(NodeProp.IPFS_LINK.s());
-			final String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
-			//log.debug("Getting IPFS Stream: hash=" + ipfsHash + " mime=" + mimeType);
+		String ipfsHash = node.getStringProp(NodeProp.IPFS_LINK.s());
+		if (ipfsHash != null) {
+			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
+			// log.debug("Getting IPFS Stream: hash=" + ipfsHash + " mime=" + mimeType);
 			is = ipfsService.getStream(session, ipfsHash, mimeType);
 		} else {
 			is = getStreamByNode(node);
@@ -992,11 +993,12 @@ public class AttachmentService {
 			return null;
 		log.debug("getStreamByNode: " + node.getId().toHexString());
 
-		final String id = node.getStringProp("bin");
+		String id = node.getStringProp(NodeProp.BIN.s());
 		if (id == null) {
 			return null;
 		}
 
+		/* why not an import here? */
 		final com.mongodb.client.gridfs.model.GridFSFile gridFile = grid
 				.findOne(new Query(Criteria.where("_id").is(id)));
 		// new Query(Criteria.where("metadata.nodeId").is(nodeId)));

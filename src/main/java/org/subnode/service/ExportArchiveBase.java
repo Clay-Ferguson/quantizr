@@ -30,7 +30,6 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
-import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.StreamUtil;
@@ -47,10 +46,6 @@ import org.subnode.util.XString;
  * export, a new instance of this class is created that is dedicated just do
  * doing that one export and so any member varibles in this class have just that
  * one export as their 'scope'
- * 
- * todo-0: Ipfs gateway needs to be in a variable in a root js file so it can be changed after the fact.
- *
- * todo-0: Also shouldn't an export pull the data out of IPFS and dump it into the exported file?
  */
 public abstract class ExportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
@@ -350,13 +345,12 @@ public abstract class ExportArchiveBase {
 			}
 			final String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
 
-			final String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK.s());
-
+			//final String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK.s());
 			final String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 
 			String imgUrl = null;
 			String attachmentUrl = null;
-			boolean embeddedImage = false;
+			boolean rawDataUrl = false;
 
 			/*
 			 * if this is a 'data:' encoded image read it from binary storage and put that
@@ -371,14 +365,14 @@ public abstract class ExportArchiveBase {
 				if (!imgUrl.startsWith("data:")) {
 					imgUrl = null;
 				} else {
-					embeddedImage = true;
+					rawDataUrl = true;
 					html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
 							+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId
 							+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
 				}
 			}
 
-			if (!embeddedImage && mimeType != null) {
+			if (!rawDataUrl && mimeType != null) {
 				// Otherwise if this is an ordinary binary image, encode the link to it.
 				if (imgUrl == null && mimeType.startsWith("image/")) {
 					final String relImgPath = writeFile ? "" : (fileName + "/");
@@ -387,8 +381,12 @@ public abstract class ExportArchiveBase {
 					 * fullsize
 					 * 
 					 */
-					imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + nodeId + ext)
-							: (Const.IPFS_IO_GATEWAY + ipfsLink);
+					
+					// Theoretically we could exclude the IPFS data and just export a link to a gateway but instead we export the file
+					// imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + nodeId + ext)
+					// 		: (Const.IPFS_IO_GATEWAY + ipfsLink);
+
+					imgUrl = "./" + relImgPath + nodeId + ext;
 
 					html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
 							+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId
@@ -399,8 +397,11 @@ public abstract class ExportArchiveBase {
 					 * embeds an image that's 400px wide until you click it which makes it go
 					 * fullsize
 					 */
-					attachmentUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relPath + nodeId + ext)
-							: (Const.IPFS_IO_GATEWAY + ipfsLink);
+					// Theoretically we could exclude the IPFS data and just export a link to a gateway but instead we export the file
+					// attachmentUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relPath + nodeId + ext)
+					// 		: (Const.IPFS_IO_GATEWAY + ipfsLink);
+					attachmentUrl = "./" + relPath + nodeId + ext;
+					
 					html.append("<a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: "
 							+ binFileNameStr + "</a>");
 				}
@@ -434,11 +435,11 @@ public abstract class ExportArchiveBase {
 				 * If we had a binary property on this node we write the binary file into a
 				 * separate file, but for ipfs links we do NOT do this
 				 */
-				if (!embeddedImage && mimeType != null && StringUtils.isEmpty(ipfsLink)) {
+				if (!rawDataUrl && mimeType != null) {
 
 					InputStream is = null;
 					try {
-						is = attachmentService.getStream(session, node, false, false);
+						is = attachmentService.getStream(session, node, false);
 						final BufferedInputStream bis = new BufferedInputStream(is);
 						final long length = node.getIntProp(NodeProp.BIN_SIZE.s());
 						final String binFileName = parentFolder + "/" + fileName + "/" + nodeId + ext;

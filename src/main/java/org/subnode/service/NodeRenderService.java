@@ -517,7 +517,7 @@ public class NodeRenderService {
 				ogDescription = content;
 			}
 
-			ogImage = getImageUrl(node);
+			ogImage = getAttachmentUrl(node);
 			ogUrl = constProvider.getHostAndPort() + "/app?id=" + node.getId().toHexString();
 		}
 
@@ -527,7 +527,7 @@ public class NodeRenderService {
 		model.addAttribute("ogUrl", ogUrl);
 	}
 
-	public String getImageUrl(SubNode node) {
+	public String getAttachmentUrl(SubNode node) {
 		String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK);
 
 		/*
