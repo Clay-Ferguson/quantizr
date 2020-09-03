@@ -2,7 +2,7 @@ import { EncryptionKeyPair } from "../EncryptionKeyPair";
 
 export interface EncryptionIntf {
 
-    KEY_SAVE_FORMAT: string;
+    DEFAULT_KEY_FORMAT: string;
     ASYM_ALGO: string;
     SYM_ALGO: string;
     HASH_ALGO: string;
@@ -38,6 +38,8 @@ export interface EncryptionIntf {
     //todo-1: there's lots of places i pass 'extractable=true' and also more keyUsages than required. See if limiting those wokrs, because
     //doing so is bound to help performance and resources
     importKey(key: JsonWebKey, algos: any, extractable: boolean, keyUsages: string[]): Promise<CryptoKey>;
+
+    importKeyPair(keyPair: string): Promise<boolean>;
 }
 
 export interface SymKeyDataPackage {

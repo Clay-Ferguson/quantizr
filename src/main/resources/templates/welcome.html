@@ -8,8 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <title>Quanta</title>
-    <!-- todo-0: this cache buster could be improved by making it actually a hash of the file itself, because with the current
-    algorithm every time there is a server restart it forces user to download new CSS -->
     <link rel="stylesheet" th:href="'/css/meta64.css?v='+${MAIN_CSS_HASH}" />
 </head>
 

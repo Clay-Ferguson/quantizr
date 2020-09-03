@@ -100,7 +100,7 @@ export class ProfileDlg extends DialogBase {
     }
 
     /* Base class override used to get data before rendering the dialog */
-    queryServer(): Promise<void> {
+    preLoad(): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             await this.reload();
             resolve();

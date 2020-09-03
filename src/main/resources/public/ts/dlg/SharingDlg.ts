@@ -44,7 +44,7 @@ export class SharingDlg extends DialogBase {
         return null;
     }
 
-    queryServer(): Promise<void> {
+    preLoad(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             this.reload();
             resolve();

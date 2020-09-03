@@ -22,8 +22,10 @@ export class NodeCompMarkdown extends MarkdownDiv {
     todo-1: We could make this a user preference so users in a secure location can just view all encrypted data.
     
     UPDATE: turning this ON for now, because for testing 'shared' nodes we don't have editing capability and thus need a way to decrypt
+
+    todo-0: also this is kinda broke, it shows [encrypted] upon rendering and doesn't decrypt until the row is clicked.
     */
-    private immediateDecrypting: boolean = true;
+    private immediateDecrypting: boolean = false;
 
     constructor(public node: J.NodeInfo, private appState: AppState) {
         super();

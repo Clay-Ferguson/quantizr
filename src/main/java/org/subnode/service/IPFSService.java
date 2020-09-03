@@ -43,6 +43,8 @@ import org.subnode.util.XString;
 public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
+    private static String INTERNAL_IPFS_GATEWAY = "http://ipfs:8080/ipfs/";
+
     /*
      * originally this was 'data-endcoding' (or at least i got that from somewhere),
      * but now their example page seems to show 'encoding' is the name here.
@@ -210,8 +212,7 @@ public class IPFSService {
     }
 
     public InputStream getStream(MongoSession session, String hash, String mimeType) {
-        //todo-0: try https here!
-        String sourceUrl = "http://ipfs:8080/ipfs/" + hash;
+        String sourceUrl = INTERNAL_IPFS_GATEWAY + hash;
 
         try {
             int timeout = 20;

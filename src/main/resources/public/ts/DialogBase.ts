@@ -79,7 +79,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             }
 
             /* If the dialog has a function to load from server, call here first */
-            let queryServerPromise = this.queryServer();
+            let queryServerPromise = this.preLoad();
             if (queryServerPromise) {
                 await queryServerPromise;
             }
@@ -99,10 +99,10 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         });
     }
 
-    /* NOTE: query server is always forced to complete BEFORE any dialog GUI is allowed to render in case we need to
+    /* NOTE: preLoad is always forced to complete BEFORE any dialog GUI is allowed to render in case we need to
     get information from the server before displaying the dialog. This is optional. Many dialogs of course don't need to get data 
     from the server before displaying */
-    queryServer(): Promise<void> {
+    preLoad(): Promise<void> {
         return null;
     }
 

@@ -116,7 +116,6 @@ export class Nav implements NavIntf {
 
     navUpLevel = (event: any = null): void => {
         let state = appState();
-        debugger;
         if (!state.node) return null;
 
         //Always just scroll to the top before doing an actual 'upLevel' to parent.

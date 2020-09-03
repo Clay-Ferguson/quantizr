@@ -14,6 +14,7 @@ import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { AppState } from "./AppState";
 import { useSelector, useDispatch } from "react-redux";
+import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -161,6 +162,14 @@ export class MenuPanel extends Div {
             new MenuItem("Export", () => S.edit.openExportDlg(state),
                 state.isAdminUser && exportFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId == highlightNode.id))), //
         ]));
+
+        children.push(new Menu("Encryption", [
+            new MenuItem("Show Keys", () => { new ManageEncryptionKeysDlg(state).open(); }, !state.isAnonUser), //
+            new MenuItem("Generate Keys", () => { S.encryption.initKeys(true); }, !state.isAnonUser), //
+            new MenuItem("Publish Keys", () => { S.encryption.initKeys(false, true); }, !state.isAnonUser), //
+            new MenuItem("Import Keys", () => {new ImportCryptoKeyDlg(state).open()}, !state.isAnonUser), //
+        ]));
+
         // //need to make export safe for end users to use (recarding file sizes)
         // if (state.isAdminUser) {
         //     children.push(new Menu("Admin Tools", [
@@ -186,7 +195,6 @@ export class MenuPanel extends Div {
             new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), //
             new MenuItem("Change Password", () => S.edit.openChangePasswordDlg(state), !state.isAnonUser), //
             new MenuItem("Manage Account", () => S.edit.openManageAccountDlg(state), !state.isAnonUser), //
-            new MenuItem("Encryption Keys", () => { new ManageEncryptionKeysDlg(state).open(); }, !state.isAnonUser), //
 
             // menuItem("Full Repository Export", "fullRepositoryExport", "
             // S.edit.fullRepositoryExport();") + //

@@ -41,7 +41,7 @@ export class ManageAccountDlg extends DialogBase {
         return null;
     }
 
-    queryServer(): Promise<void> {
+    preLoad(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,
                 (res: J.GetUserAccountInfoResponse) => {

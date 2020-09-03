@@ -23,14 +23,6 @@ export class ManageEncryptionKeysDlg extends DialogBase {
         return [
             new TextContent(this.getState().keyJson, "tallTextContent", true),
             new ButtonBar([
-                //both of these operations need some kind of confirmation dialog to come up after
-                new Button("Generate New Keys", async () => {
-                    await S.encryption.initKeys(true);
-                    this.queryServer();
-                }),
-                new Button("Re-Publish Keys", async () => {
-                    await S.encryption.initKeys(false, true);
-                }),
                 new Button("Close", () => {
                     this.close();
                 })
@@ -43,7 +35,7 @@ export class ManageEncryptionKeysDlg extends DialogBase {
     }
 
     //@Override
-    queryServer(): Promise<void> {
+    preLoad(): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             let keyJson: string = await S.encryption.exportKeys();
             this.mergeState({keyJson});
