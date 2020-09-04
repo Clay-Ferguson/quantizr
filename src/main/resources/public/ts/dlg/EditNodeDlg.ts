@@ -729,6 +729,9 @@ export class EditNodeDlg extends DialogBase {
                                 if (cipherKey) {
                                     let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
+                                    if (clearText==null) {
+                                        clearText = "[Decryption Failed]";
+                                    }
                                     //console.log('decrypted to:' + value);
                                     (this.contentEditor as AceEditPropTextarea).setValue(clearText);
                                 }
@@ -774,6 +777,10 @@ export class EditNodeDlg extends DialogBase {
                         let cipherKey = S.props.getCryptoKey(node, this.appState);
                         if (cipherKey) {
                             let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
+
+                            if (clearText==null) {
+                                clearText = "[Decryption Failed]";
+                            }
                             //console.log("decrypted to:" + value);
                             (this.contentEditor as Textarea).setValue(clearText);
                         }

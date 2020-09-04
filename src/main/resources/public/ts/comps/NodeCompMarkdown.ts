@@ -163,10 +163,13 @@ export class NodeCompMarkdown extends MarkdownDiv {
                     if (cipherKey) {
                         let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
-                        if (clearText) {
+                        if (clearText==null) {
                             node.content = clearText;
                             let val2 = this.renderRawMarkdown(node);
                             this.state.content = val2;
+                        }
+                        else {
+                            this.state.content = "[Decryption Failed]";
                         }
                     }
                 }, 1);
