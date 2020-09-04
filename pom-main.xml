@@ -7,7 +7,8 @@ Also if you edit THIS file (pom-main.xml) be sure to run the script that reconca
 that's used during builds.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.subnode</groupId>
 	<artifactId>org.subnode</artifactId>
@@ -24,11 +25,7 @@ that's used during builds.
 		<!-- lookup parent from repository -->
 	</parent>
 
-	<!-- 
-	===========================================================================
-	DEV PROFILE BEGIN 
-	===========================================================================	
-	-->
+	<!-- ========== DEV PROFILE BEGIN ========== -->
 	<profiles>
 		<profile>
 			<id>dev</id>
@@ -40,9 +37,9 @@ that's used during builds.
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				
+
 				<!-- The filename below can contain only 'dev' or 'prod'. If you're troubleshooting React/Redux performance for example,
-				be sure to set to 'prod' so you aren't chasing performance problems what may not even exist in prod builds. --> 
+				be sure to set to 'prod' so you aren't chasing performance problems what may not even exist in prod builds. -->
 				<webpack.args>--config webpack.dev.js</webpack.args>
 
 				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -64,7 +61,7 @@ that's used during builds.
 
 					<resource>
 						<directory>src/main/resources</directory>
-						
+
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
@@ -245,11 +242,9 @@ that's used during builds.
 		</profile>
 
 		<!-- 
-		This profile is for the purpose of updating /target/classes only so we can do a rapid server reload/iteration
-	===========================================================================
-	JAVA-COMPILE PROFILE BEGIN 
-	===========================================================================	
-	-->
+		This profile is for the purpose of updating /target/classes only so we can do a rapid server reload/iteration ===========================================================================
+		-->
+		<!-- ========== JAVA-COMPILE PROFILE BEGIN ========== -->
 
 		<profile>
 			<id>java-compile</id>
@@ -280,11 +275,7 @@ that's used during builds.
 			</build>
 		</profile>
 
-		<!-- 
-	===========================================================================
-	DEV-VSCODE PROFILE BEGIN 
-	===========================================================================	
-	-->
+		<!-- ========== DEV-VSCODE PROFILE BEGIN ==========	-->
 		<!-- This profile 'dev-vscode' is the one we activate by default so that when opening in VSCode we don't run into the
 		bug that exists where 'node' process will HANG forever with maxed out CPU usage. This profile is identical to the 'dev' 
 		profile except for omitting the webpack part which causes this bug/hang. All profiles work just fine with or without
@@ -330,7 +321,7 @@ that's used during builds.
 
 					<resource>
 						<directory>src/main/resources</directory>
-			
+
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
@@ -367,8 +358,8 @@ that's used during builds.
 						</executions>
 						<configuration>
 							<optionalAnnotations>
-        						<annotation>javax.annotation.Nullable</annotation>
-    						</optionalAnnotations>
+								<annotation>javax.annotation.Nullable</annotation>
+							</optionalAnnotations>
 							<jsonLibrary>jackson2</jsonLibrary>
 
 							<!-- Supposedly this will allow @JsonProperty(required = false) in the java to put a '?' after the param
@@ -376,7 +367,7 @@ that's used during builds.
 							    to get maximal typesafety
 							<optionalProperties>useLibraryDefinition</optionalProperties>
 							-->
-							
+
 							<classPatterns>
 								<pattern>org.subnode.model.client.**</pattern>
 								<pattern>org.subnode.request.**</pattern>
@@ -532,11 +523,7 @@ that's used during builds.
 			</build>
 		</profile>
 
-		<!-- 
-	===========================================================================
-	PROD PROFILE BEGIN 
-	===========================================================================	
-	-->
+		<!-- ========== PROD PROFILE BEGIN ========== -->
 		<profile>
 			<id>prod</id>
 			<properties>
@@ -560,7 +547,7 @@ that's used during builds.
 
 					<resource>
 						<directory>src/main/resources</directory>
-						
+
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
@@ -717,11 +704,7 @@ that's used during builds.
 
 		</profile>
 
-		<!-- 
-	===========================================================================
-	WEBPACK PROFILE BEGIN 
-	===========================================================================	
-	-->
+		<!-- ========== WEBPACK PROFILE BEGIN ========== -->
 		<!-- This profile does the minimal work of just compiling TS files, so that we can run this profile, which is extremely fast (couple of seconds), 
 		and then be able to simply refresh the browser and see the changes immediately without doing an actual full maven build -->
 		<profile>
@@ -745,7 +728,7 @@ that's used during builds.
 
 					<resource>
 						<directory>src/main/resources</directory>
-						
+
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
