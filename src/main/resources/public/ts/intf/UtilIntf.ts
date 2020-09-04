@@ -114,4 +114,5 @@ export interface UtilIntf {
     getPathPartForNamedNode(node: J.NodeInfo): string;
     setDropHandler(attribs: any, func: (elm: any) => void): void;
     resetDropHandler(attribs: any): void;
+    generateNewCryptoKeys(state: AppState): any;
 }

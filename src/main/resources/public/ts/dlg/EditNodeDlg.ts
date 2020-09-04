@@ -581,7 +581,7 @@ export class EditNodeDlg extends DialogBase {
                 (state.node as J.NodeInfo).content.indexOf("\n\n\n") != -1);
 
             //console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
-            
+
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                 updateModTime: true,
                 node: state.node
@@ -690,8 +690,8 @@ export class EditNodeDlg extends DialogBase {
                 //     valEditor = new DateField(null, valueIntf); 
                 // }
                 // else {
-                    //console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
-                    valEditor = new TextField(null, false, null, valueIntf);
+                //console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
+                valEditor = new TextField(null, false, null, valueIntf);
                 //}
             }
 
@@ -729,11 +729,13 @@ export class EditNodeDlg extends DialogBase {
                                 if (cipherKey) {
                                     let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
-                                    if (clearText==null) {
-                                        clearText = "[Decryption Failed]";
+                                    if (clearText == null) {
+                                        (this.contentEditor as Textarea).setError("Decryption Failed");
                                     }
-                                    //console.log('decrypted to:' + value);
-                                    (this.contentEditor as AceEditPropTextarea).setValue(clearText);
+                                    else {
+                                        //console.log('decrypted to:' + value);
+                                        (this.contentEditor as AceEditPropTextarea).setValue(clearText);
+                                    }
                                 }
                             })();
                         }
@@ -778,11 +780,13 @@ export class EditNodeDlg extends DialogBase {
                         if (cipherKey) {
                             let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
-                            if (clearText==null) {
-                                clearText = "[Decryption Failed]";
+                            if (clearText == null) {
+                                (this.contentEditor as Textarea).setError("Decryption Failed");
                             }
-                            //console.log("decrypted to:" + value);
-                            (this.contentEditor as Textarea).setValue(clearText);
+                            else {
+                                //console.log("decrypted to:" + value);
+                                (this.contentEditor as Textarea).setValue(clearText);
+                            }
                         }
                     })();
                 }

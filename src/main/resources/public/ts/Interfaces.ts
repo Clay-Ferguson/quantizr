@@ -41,6 +41,7 @@ export interface TextEditorIntf {
     setValue(val: string): void;
     focus(): void;
     whenElm(func: Function): void;
+    setError(error: string): void;
 }
 
 export interface CheckboxIntf {

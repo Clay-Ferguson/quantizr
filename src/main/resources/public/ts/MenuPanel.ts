@@ -165,9 +165,9 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Encryption", [
             new MenuItem("Show Keys", () => { new ManageEncryptionKeysDlg(state).open(); }, !state.isAnonUser), //
-            new MenuItem("Generate Keys", () => { S.encryption.initKeys(true); }, !state.isAnonUser), //
+            new MenuItem("Generate Keys", () => { S.util.generateNewCryptoKeys(state); }, !state.isAnonUser), //
             new MenuItem("Publish Keys", () => { S.encryption.initKeys(false, true); }, !state.isAnonUser), //
-            new MenuItem("Import Keys", () => {new ImportCryptoKeyDlg(state).open()}, !state.isAnonUser), //
+            new MenuItem("Import Keys", () => { new ImportCryptoKeyDlg(state).open() }, !state.isAnonUser), //
         ]));
 
         // //need to make export safe for end users to use (recarding file sizes)

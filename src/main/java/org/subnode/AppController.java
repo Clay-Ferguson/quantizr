@@ -145,8 +145,6 @@ public class AppController implements ErrorController {
 	// maps classpath resource names to their md5 values
 	private static HashMap<String, String> cacheBusterMd5 = null;
 
-	// private static final String cacheBuster = String.valueOf(new
-	// Date().getTime());
 	private static boolean welcomePagePresent;
 
 	@Autowired
@@ -231,6 +229,10 @@ public class AppController implements ErrorController {
 	}
 
 	public void init() {
+		initCacheBuster();
+	}
+
+	public void initCacheBuster() {
 		cacheBusterMd5 = new HashMap<String, String>();
 
 		cacheBusterMd5.put("BUNDLE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bundle.js"));
@@ -262,7 +264,8 @@ public class AppController implements ErrorController {
 	 * ID is optional url parameter that user can specify to access a specific node
 	 * 
 	 * passCode is an auth code for a password reset
-	 *
+	 * 
+	 * Renders with Thymeleaf
 	 */
 	@RequestMapping(value = { "/app", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}" })
 	public String index(//
@@ -284,6 +287,11 @@ public class AppController implements ErrorController {
 			Model model) {
 
 		try {
+			// if in DEV mode we always update cache buster in case files have changed.
+			if (constProvider.getProfileName().equals("dev")) {
+				initCacheBuster();
+			}
+
 			// log.debug("AppController.index: sessionUser=" +
 			// sessionContext.getUserName());
 			model.addAllAttributes(cacheBusterMd5);
@@ -327,13 +335,16 @@ public class AppController implements ErrorController {
 	}
 
 	/*
-	 * This is our only "Thymeleaf Page" !
-	 * 
-	 * https://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html
+	 * Renders with Thymeleaf
 	 */
 	@RequestMapping(value = { "/" })
 	public String welcome(@RequestParam(value = "signupCode", required = false) String signupCode, //
 			Model model) {
+		// if in DEV mode we always update cache buster in case files have changed.
+		if (constProvider.getProfileName().equals("dev")) {
+			initCacheBuster();
+		}
+
 		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 			synchronized (welcomeMapLock) {
 				HashMap<String, String> newMap = new HashMap<String, String>();
@@ -364,7 +375,10 @@ public class AppController implements ErrorController {
 		}
 	}
 
-	/* Testing here, for how to render plain HTML directly from a string */
+	/*
+	 * DO NOT DELETE: Leave as example for how to render plain HTML directly from a
+	 * string
+	 */
 	@GetMapping(value = { "/sp/{systemPage}" }, produces = MediaType.TEXT_HTML_VALUE)
 	public @ResponseBody String systemPage(@PathVariable(value = "systemPage", required = false) String systemPage) {
 		return "<html><body>My Full Page: " + systemPage + "</body></html>";

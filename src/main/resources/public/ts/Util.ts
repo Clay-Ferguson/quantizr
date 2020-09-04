@@ -9,6 +9,7 @@ import { Constants as C } from "./Constants";
 import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 import { AppState } from "./AppState";
 import { CompIntf } from "./widget/base/CompIntf";
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -1259,5 +1260,17 @@ export class Util implements UtilIntf {
             event.target.style.border = nonDragBorder;
             func(event);
         };
+    }
+
+    generateNewCryptoKeys = (state: AppState): any => {
+        new ConfirmDlg("Gernerate new Crypto Keys?", "Warning",
+            () => {
+                new ConfirmDlg("Warning: Any data encrypted with your current key will become inaccessible, unless you reimport your current key back in.", "Last Chance... One more Click",
+                    () => {
+                        S.encryption.initKeys(true);
+                    },  null, "btn-danger", "alert alert-danger", state
+                ).open();
+            }, null, "btn-danger", "alert alert-danger", state
+        ).open();
     }
 }

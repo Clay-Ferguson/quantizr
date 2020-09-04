@@ -49,6 +49,10 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         }
     }
 
+    setError(error: string) : void {
+        this.mergeState({error});
+    }
+
     //Handler to update state
     updateValFunc(value: string): void {
         if (value != this.valueIntf.getValue()) {

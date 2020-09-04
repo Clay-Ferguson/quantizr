@@ -71,6 +71,10 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
         });
     }
 
+    setError(error: string) : void {
+        this.mergeState({error});
+    }
+
     setWordWrap(wordWrap: boolean): void {
         if (this.getAceEditor()) {
             this.getAceEditor().session.setUseWrapMode(wordWrap);

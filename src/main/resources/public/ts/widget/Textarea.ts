@@ -43,6 +43,10 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         }
     }
 
+    setError(error: string) : void {
+        this.mergeState({error});
+    }
+
     //Handler to update state if edit field looses focus
     updateValFunc(value: string): void {
         if (value != this.valueIntf.getValue()) {
@@ -73,11 +77,19 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         let state = this.getState();
         let children = [];
 
+        if (state.error) {
+            children.push(S.e("div", {
+                id: this.getId() + "_error",
+                key: this.getId() + "_error",
+                className: "alert alert-warning"
+            }, state.error));
+        }
+
         if (this.label) {
             children.push(S.e("label", {
                 id: this.getId() + "_label",
                 key: this.getId() + "_label",
-                htmlFor: this.getId()
+                htmlFor: this.getId(),
             }, this.label));
         }
 
