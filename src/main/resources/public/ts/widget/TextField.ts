@@ -1,14 +1,14 @@
-import * as I from "../Interfaces";
 import { Constants as C } from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Div } from "./Div";
-import { Label } from "./Label";
-import { Input } from "./Input";
-import { Anchor } from "./Anchor";
-import { ToggleIcon } from "./ToggleIcon";
+import * as I from "../Interfaces";
 import { ValueIntf } from "../Interfaces";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { Anchor } from "./Anchor";
 import { Comp } from "./base/Comp";
+import { Div } from "./Div";
+import { Input } from "./Input";
+import { Label } from "./Label";
+import { ToggleIcon } from "./ToggleIcon";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

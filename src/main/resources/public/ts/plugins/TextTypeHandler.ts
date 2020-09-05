@@ -1,7 +1,7 @@
-import * as J from "../JavaIntf";
 import { Constants as C } from "../Constants";
-import { Singletons } from "../Singletons";
+import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;

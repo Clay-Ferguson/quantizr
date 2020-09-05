@@ -1,7 +1,7 @@
-import { Singletons } from "./Singletons";
-import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import { ValueIntf } from "./Interfaces";
+import { PubSub } from "./PubSub";
+import { Singletons } from "./Singletons";
 import { CompIntf } from "./widget/base/CompIntf";
 
 let S: Singletons;

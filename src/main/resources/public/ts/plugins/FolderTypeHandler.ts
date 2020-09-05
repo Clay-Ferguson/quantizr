@@ -1,10 +1,6 @@
-import * as J from "../JavaIntf";
-import { Constants as C} from "../Constants";
-import { Singletons } from "../Singletons";
+import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
-import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { Comp } from "../widget/base/Comp";
-import { Heading } from "../widget/Heading";
+import { Singletons } from "../Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

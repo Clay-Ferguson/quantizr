@@ -1,8 +1,7 @@
+import { AxiosPromise } from "axios";
+import { AppState } from "../AppState";
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
-
-import { AppState } from "../AppState";
-import { AxiosPromise } from "axios";
 
 export interface UtilIntf {
     logAjax: boolean;

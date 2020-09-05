@@ -1,10 +1,10 @@
-import { Comp } from "./base/Comp";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
-import { CompIntf } from "./base/CompIntf";
 import { ReactNode } from "react";
+import { Constants as C } from "../Constants";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { BaseCompState } from "./base/BaseCompState";
+import { Comp } from "./base/Comp";
+import { CompIntf } from "./base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

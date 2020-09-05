@@ -1,9 +1,9 @@
+import { ReactNode } from "react";
+import { Constants as C } from "../Constants";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { RadioButton } from "./RadioButton";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
-import { ReactNode } from "react";
 
 let S : Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

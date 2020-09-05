@@ -1,7 +1,5 @@
-import * as J from "../JavaIntf";
-
-import { LoginDlg } from "../dlg/LoginDlg";
 import { AppState } from "../AppState";
+import * as J from "../JavaIntf";
 
 export interface UserIntf {
     closeAccountResponse(res: J.CloseAccountResponse, state: AppState): void;

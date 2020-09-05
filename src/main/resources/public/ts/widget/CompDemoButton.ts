@@ -1,13 +1,13 @@
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
-import { Div } from "./Div";
-import { AppState } from "../AppState";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { dispatch } from "../AppRedux";
-import { CompIntf } from "./base/CompIntf";
-import { HorizontalLayout } from "./HorizontalLayout";
+import { AppState } from "../AppState";
+import { Constants as C } from "../Constants";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
+import { CompIntf } from "./base/CompIntf";
+import { Div } from "./Div";
+import { HorizontalLayout } from "./HorizontalLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

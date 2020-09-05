@@ -1,18 +1,6 @@
-import * as J from "../JavaIntf";
-import { Constants as C} from "../Constants";
-import { Singletons } from "../Singletons";
+import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
-import { Anchor } from "../widget/Anchor";
-import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { Img } from "../widget/Img";
-import { Button } from "../widget/Button";
-import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
-import { VideoPlayerDlg } from "../dlg/VideoPlayerDlg";
-import { Heading } from "../widget/Heading";
-import { CollapsiblePanel } from "../widget/CollapsiblePanel";
-import { Div } from "../widget/Div";
-import { Pre } from "../widget/Pre";
-import { Comp } from "../widget/base/Comp";
+import { Singletons } from "../Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

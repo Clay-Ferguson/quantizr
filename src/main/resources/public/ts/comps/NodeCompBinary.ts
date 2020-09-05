@@ -1,19 +1,19 @@
-import * as J from "../JavaIntf";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
+import { useSelector } from "react-redux";
+import { appState, dispatch } from "../AppRedux";
+import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
-import { Div } from "../widget/Div";
-import { Icon } from "../widget/Icon";
+import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
+import { VideoPlayerDlg } from "../dlg/VideoPlayerDlg";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { Anchor } from "../widget/Anchor";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
-import { VideoPlayerDlg } from "../dlg/VideoPlayerDlg";
-import { Anchor } from "../widget/Anchor";
-import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
-import { Span } from "../widget/Span";
+import { Div } from "../widget/Div";
+import { Icon } from "../widget/Icon";
 import { Img } from "../widget/Img";
-import { useSelector, useDispatch } from "react-redux";
-import { AppState } from "../AppState";
-import { dispatch, appState } from "../AppRedux";
+import { Span } from "../widget/Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -36,14 +36,14 @@ export class NodeCompBinary extends Div {
             imgSize = state.fullScreenImageSize;
         }
         else if (this.isEditorEmbed) {
-            imgSize = "200px"
+            imgSize = "200px";
         }
         else {
-            imgSize = (this.imgSizeOverride && this.imgSizeOverride != "n") ? this.imgSizeOverride : S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
+            imgSize = (this.imgSizeOverride && this.imgSizeOverride !== "n") ? this.imgSizeOverride : S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
         }
         let style: any = {};
 
-        if (!imgSize || imgSize == "0") {
+        if (!imgSize || imgSize === "0") {
             style.maxWidth = "";
             style.width = "";
         }
@@ -77,7 +77,8 @@ export class NodeCompBinary extends Div {
         let state = appState();
 
         dispatch({
-            type: "Action_ClickImage", state,
+            type: "Action_ClickImage",
+            state,
             update: (s: AppState): void => {
 
                 if (s.fullScreenViewId && this.isFullScreenEmbed) {
@@ -130,7 +131,7 @@ export class NodeCompBinary extends Div {
             let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, this.node);
 
             let viewFileLink: Anchor = null;
-            if (fileType == "application/pdf" || fileType.startsWith("text/")) {
+            if (fileType === "application/pdf" || fileType.startsWith("text/")) {
                 viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(this.node, false), "[View]", {
                     target: "_blank",
                     className: "marginLeft"
@@ -142,7 +143,7 @@ export class NodeCompBinary extends Div {
                 title: "File Size:" + fileSize + " Type:" + fileType
             }, [
                 new Icon({
-                    style: { marginRight: '12px', verticalAlign: 'middle' },
+                    style: { marginRight: "12px", verticalAlign: "middle" },
                     className: "fa fa-file fa-lg"
                 }),
                 new Span(fileName, {

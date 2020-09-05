@@ -1,11 +1,11 @@
-import * as J from "./JavaIntf";
-import { SignupDlg } from "./dlg/SignupDlg";
-import { ConfirmDlg } from "./dlg/ConfirmDlg";
-import { UserIntf } from "./intf/UserIntf";
-import { Singletons } from "./Singletons";
-import { PubSub } from "./PubSub";
-import { Constants as C } from "./Constants";
 import { AppState } from "./AppState";
+import { Constants as C } from "./Constants";
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
+import { SignupDlg } from "./dlg/SignupDlg";
+import { UserIntf } from "./intf/UserIntf";
+import * as J from "./JavaIntf";
+import { PubSub } from "./PubSub";
+import { Singletons } from "./Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

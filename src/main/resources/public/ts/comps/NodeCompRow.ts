@@ -1,16 +1,16 @@
-import * as J from "../JavaIntf";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
-import { Comp } from "../widget/base/Comp";
-import { NodeCompButtonBar } from "./NodeCompButtonBar";
-import { Div } from "../widget/Div";
-import { NodeCompContent } from "./NodeCompContent";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
+import { Constants as C } from "../Constants";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { Comp } from "../widget/base/Comp";
 import { CompIntf } from "../widget/base/CompIntf";
-import { NodeCompRowHeader } from "./NodeCompRowHeader";
+import { Div } from "../widget/Div";
 import { QuickEditField } from "../widget/QuickEditField";
+import { NodeCompButtonBar } from "./NodeCompButtonBar";
+import { NodeCompContent } from "./NodeCompContent";
+import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

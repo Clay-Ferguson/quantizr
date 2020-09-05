@@ -1,10 +1,10 @@
-import { ButtonBar } from "../widget/ButtonBar";
-import { Button } from "../widget/Button";
-import { TextContent } from "../widget/TextContent";
-import { Comp } from "../widget/base/Comp";
-import { DialogBase } from "../DialogBase";
 import { AppState } from "../AppState";
+import { DialogBase } from "../DialogBase";
+import { Comp } from "../widget/base/Comp";
 import { CompIntf } from "../widget/base/CompIntf";
+import { Button } from "../widget/Button";
+import { ButtonBar } from "../widget/ButtonBar";
+import { TextContent } from "../widget/TextContent";
 
 /*
  * Callback can be null if you don't need to run any function when the dialog is closed

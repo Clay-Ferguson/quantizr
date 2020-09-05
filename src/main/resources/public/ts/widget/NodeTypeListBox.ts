@@ -1,11 +1,11 @@
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
-import { ListBox } from "./ListBox";
-import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { NodeTypeListBoxRow } from "./NodeTypeListBoxRow";
 import { AppState } from "../AppState";
+import { Constants as C } from "../Constants";
 import { ValueIntf } from "../Interfaces";
+import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { ListBox } from "./ListBox";
+import { NodeTypeListBoxRow } from "./NodeTypeListBoxRow";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

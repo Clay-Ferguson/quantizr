@@ -1,21 +1,21 @@
-import { Singletons } from "./Singletons";
-import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
-import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { PluginMgrIntf } from "./intf/PluginMgrIntf";
-import { RssTypeHandler } from "./plugins/RssTypeHandler";
-import { IPFSNodeTypeHandler } from "./plugins/IPFSNodeTypeHandler";
-import { RepoRootTypeHandler } from "./plugins/RepoRootTypeHandler";
+import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { AccountTypeHandler } from "./plugins/AccountTypeHandler";
-import { TrashNodeTypeHandler } from "./plugins/TrashNodeTypeHandler";
-import { InboxNodeTypeHandler } from "./plugins/InboxNodeTypeHandler";
-import { NotesNodeTypeHandler } from "./plugins/NotesNodeTypeHandler";
 import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
 import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
-import { MarkdownTypeHandler } from "./plugins/MarkdownTypeHandler";
-import { TextTypeHandler } from "./plugins/TextTypeHandler";
-import { UserFeedTypeHandler } from "./plugins/UserFeedTypeHandler";
 import { InboxEntryTypeHandler } from "./plugins/InboxEntryTypeHandler";
+import { InboxNodeTypeHandler } from "./plugins/InboxNodeTypeHandler";
+import { IPFSNodeTypeHandler } from "./plugins/IPFSNodeTypeHandler";
+import { MarkdownTypeHandler } from "./plugins/MarkdownTypeHandler";
+import { NotesNodeTypeHandler } from "./plugins/NotesNodeTypeHandler";
+import { RepoRootTypeHandler } from "./plugins/RepoRootTypeHandler";
+import { RssTypeHandler } from "./plugins/RssTypeHandler";
+import { TextTypeHandler } from "./plugins/TextTypeHandler";
+import { TrashNodeTypeHandler } from "./plugins/TrashNodeTypeHandler";
+import { UserFeedTypeHandler } from "./plugins/UserFeedTypeHandler";
+import { PubSub } from "./PubSub";
+import { Singletons } from "./Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

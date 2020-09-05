@@ -1,13 +1,13 @@
-import * as J from "../JavaIntf";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
-import { Comp } from "../widget/base/Comp";
-import { Div } from "../widget/Div";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
+import { Constants as C } from "../Constants";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Div } from "../widget/Div";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -17,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class FeedView extends Div {
 
-    constructor() {
+    constructor () {
         super(null, {
             id: "feedTab",
         });
@@ -27,11 +27,11 @@ export class FeedView extends Div {
         let state: AppState = useSelector((state: AppState) => state);
 
         this.attribs.className = "tab-pane fade my-tab-pane";
-        if (state.activeTab == this.getId()) {
+        if (state.activeTab === this.getId()) {
             this.attribs.className += " show active";
         }
 
-        if (!state.feedResults || state.feedResults.length == 0) {
+        if (!state.feedResults || state.feedResults.length === 0) {
             this.setChildren([
                 new Div("Nothing to show here. Nobody has posted anything.", {
                     id: "feedResultsPanel"
@@ -54,7 +54,7 @@ export class FeedView extends Div {
                 className: (state.feedDirty ? "feedDirtyButton" : "feedNotDirtyButton")
             }, [
                 new Button("Refresh Feed" + (state.feedDirty ? " (New Posts)" : ""), () => {
-                    S.nav.navFeed(state)
+                    S.nav.navFeed(state);
                 })
             ])
         ], null, "float-right marginBottom");
@@ -64,16 +64,16 @@ export class FeedView extends Div {
         children.push(new Div(null, { className: "clearfix" }));
 
         let i = 0;
-        let lastOwner: string = null;
+        // let lastOwner: string = null;
         state.feedResults.forEach((node: J.NodeInfo) => {
             //console.log("FEED: node id=" + node.id + " content: " + node.content);
             S.srch.initSearchNode(node);
 
-            //For now, let's just allow all feed items to show the avatar. 
+            //For now, let's just allow all feed items to show the avatar.
             let allowAvatar = true; //node.owner != lastOwner;
 
             children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, "feed", true, false, state));
-            lastOwner = node.owner;
+            // lastOwner = node.owner;
             i++;
             rowCount++;
         });

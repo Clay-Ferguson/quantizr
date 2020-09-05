@@ -1,17 +1,17 @@
+import { AppState } from "../AppState";
+import { CompValueHolder } from "../CompValueHolder";
+import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
-import { ButtonBar } from "../widget/ButtonBar";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
-import { TextField } from "../widget/TextField";
+import { ButtonBar } from "../widget/ButtonBar";
+import { Checkbox } from "../widget/Checkbox";
 import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
-import { Constants as C } from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { DialogBase } from "../DialogBase";
-import { Checkbox } from "../widget/Checkbox";
-import { AppState } from "../AppState";
-import { CompIntf } from "../widget/base/CompIntf";
-import { CompValueHolder } from "../CompValueHolder";
+import { TextField } from "../widget/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

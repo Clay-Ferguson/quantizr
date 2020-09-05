@@ -1,9 +1,9 @@
-import { AppState } from "./AppState";
-import { AppAction } from "./Interfaces";
 import { createStore } from 'redux';
-import { Singletons } from "./Singletons";
-import { PubSub } from "./PubSub";
+import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
+import { AppAction } from "./Interfaces";
+import { PubSub } from "./PubSub";
+import { Singletons } from "./Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

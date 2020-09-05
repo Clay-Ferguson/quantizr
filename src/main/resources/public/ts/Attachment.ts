@@ -1,14 +1,14 @@
+import { AxiosPromise } from "axios";
+import { fastDispatch } from "./AppRedux";
+import { AppState } from "./AppState";
+import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
-import * as J from "./JavaIntf";
 import { AttachmentIntf } from "./intf/AttachmentIntf";
-import { Singletons } from "./Singletons";
+import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
-import { Constants as C } from "./Constants";
-import { AppState } from "./AppState";
-import { fastDispatch } from "./AppRedux";
-import { AxiosPromise } from "axios";
+import { Singletons } from "./Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

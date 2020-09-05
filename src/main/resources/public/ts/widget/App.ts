@@ -1,18 +1,18 @@
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
-import { TabPanel } from "./TabPanel";
-import { MainNavPanel } from "./MainNavPanel";
-import { Div } from "./Div";
-import { Main } from "./Main";
-import { LeftNavPanel } from "./LeftNavPanel";
-import { RightNavPanel } from "./RightNavPanel";
-import clientInfo from "../ClientInfo";
+import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
-import { useSelector, useDispatch } from "react-redux";
-import { FullScreenImgViewer } from "./FullScreenImgViewer";
+import clientInfo from "../ClientInfo";
+import { Constants as C } from "../Constants";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
+import { Div } from "./Div";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
+import { FullScreenImgViewer } from "./FullScreenImgViewer";
+import { LeftNavPanel } from "./LeftNavPanel";
+import { Main } from "./Main";
+import { MainNavPanel } from "./MainNavPanel";
+import { RightNavPanel } from "./RightNavPanel";
+import { TabPanel } from "./TabPanel";
 
 //todo-1: everywhere in the app that calls 'store.getState()' is highly suspicious becasue userSelector should be used most of the time
 

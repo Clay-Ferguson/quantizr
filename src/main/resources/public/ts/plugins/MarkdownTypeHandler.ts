@@ -1,9 +1,9 @@
-import * as J from "../JavaIntf";
-import { Constants as C } from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { TypeBase } from "./base/TypeBase";
 import { store } from "../AppRedux";
+import { Constants as C } from "../Constants";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

@@ -1,7 +1,7 @@
-import { Constants as C} from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
+import { Constants as C } from "../Constants";
 import * as I from "../Interfaces";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { EditPrivsTableRow } from "./EditPrivsTableRow";
 import { ListBox } from "./ListBox";
 

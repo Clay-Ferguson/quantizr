@@ -2,17 +2,16 @@
 // https://reactjs.org/docs/hooks-reference.html#usestate
 // #RulesOfHooks: https://fb.me/rules-of-hooks
 
-import { CompIntf } from "./CompIntf";
-import { PubSub } from "../../PubSub";
-import { Constants as C } from "../../Constants";
-import { Singletons } from "../../Singletons";
+import { ReactElement, ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import * as ReactDOM from "react-dom";
-import { renderToString, renderToStaticMarkup } from 'react-dom/server';
-import { ReactNode, ReactElement, useState, useEffect, useLayoutEffect } from "react";
-import { Provider } from 'react-redux';
+import { renderToString } from 'react-dom/server';
+import { Provider, useSelector } from 'react-redux';
 import { AppState } from "../../AppState";
-import { useSelector, useDispatch } from "react-redux";
+import { Constants as C } from "../../Constants";
+import { PubSub } from "../../PubSub";
+import { Singletons } from "../../Singletons";
 import { BaseCompState } from "./BaseCompState";
+import { CompIntf } from "./CompIntf";
 
 //tip: merging two objects: this.state = { ...this.state, ...moreState };
 

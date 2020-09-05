@@ -1,11 +1,11 @@
-import * as J from "./JavaIntf";
-import { Singletons } from "./Singletons";
-import { PubSub } from "./PubSub";
-import { Constants as C } from "./Constants";
-import { ViewIntf } from "./intf/ViewIntf";
-import { AppState } from "./AppState";
 import { fastDispatch } from "./AppRedux";
+import { AppState } from "./AppState";
+import { Constants as C } from "./Constants";
 import { InboxNotifyDlg } from "./dlg/InboxNotifyDlg";
+import { ViewIntf } from "./intf/ViewIntf";
+import * as J from "./JavaIntf";
+import { PubSub } from "./PubSub";
+import { Singletons } from "./Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

@@ -1,14 +1,14 @@
-import * as J from "../JavaIntf";
-import { DialogBase } from "../DialogBase";
-import { TextContent } from "../widget/TextContent";
-import { ButtonBar } from "../widget/ButtonBar";
-import { Button } from "../widget/Button";
-import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { CompIntf } from "../widget/base/CompIntf";
+import { Button } from "../widget/Button";
+import { ButtonBar } from "../widget/ButtonBar";
+import { Form } from "../widget/Form";
+import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

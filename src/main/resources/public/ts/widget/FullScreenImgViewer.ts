@@ -1,11 +1,11 @@
-import * as J from "../JavaIntf";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
-import { Main } from "./Main";
+import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
-import { useSelector, useDispatch } from "react-redux";
 import { NodeCompBinary } from "../comps/NodeCompBinary";
+import { Constants as C } from "../Constants";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { Main } from "./Main";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

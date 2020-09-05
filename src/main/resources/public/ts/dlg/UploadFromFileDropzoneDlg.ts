@@ -1,17 +1,17 @@
-import * as J from "../JavaIntf";
+import { AppState } from "../AppState";
+import { Constants as C, Constants } from "../Constants";
 import { DialogBase } from "../DialogBase";
-import { ConfirmDlg } from "./ConfirmDlg";
-import { ButtonBar } from "../widget/ButtonBar";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
+import { ButtonBar } from "../widget/ButtonBar";
+import { Checkbox } from "../widget/Checkbox";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
-import { Constants as C, Constants } from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { AppState } from "../AppState";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Checkbox } from "../widget/Checkbox";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { ConfirmDlg } from "./ConfirmDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

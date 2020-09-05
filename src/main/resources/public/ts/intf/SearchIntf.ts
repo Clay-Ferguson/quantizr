@@ -1,6 +1,5 @@
-import * as I from "../Interfaces";
-import * as J from "../JavaIntf";
 import { AppState } from "../AppState";
+import * as J from "../JavaIntf";
 
 export interface SearchIntf {
     _UID_ROWID_PREFIX: string;

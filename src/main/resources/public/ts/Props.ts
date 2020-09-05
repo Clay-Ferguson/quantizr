@@ -1,13 +1,12 @@
-import * as J from "./JavaIntf";
-import { PropTable } from "./widget/PropTable";
-import { PropTableRow } from "./widget/PropTableRow";
-import { PropTableCell } from "./widget/PropTableCell";
-import { PropsIntf } from "./intf/PropsIntf";
-import { Singletons } from "./Singletons";
-import { PubSub } from "./PubSub";
-import { Constants as C } from "./Constants";
 import { AppState } from "./AppState";
-
+import { Constants as C } from "./Constants";
+import { PropsIntf } from "./intf/PropsIntf";
+import * as J from "./JavaIntf";
+import { PubSub } from "./PubSub";
+import { Singletons } from "./Singletons";
+import { PropTable } from "./widget/PropTable";
+import { PropTableCell } from "./widget/PropTableCell";
+import { PropTableRow } from "./widget/PropTableRow";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

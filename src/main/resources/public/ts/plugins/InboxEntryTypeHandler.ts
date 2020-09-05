@@ -1,10 +1,10 @@
-import * as J from "../JavaIntf";
-import { Constants as C } from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { TypeBase } from "./base/TypeBase";
 import { AppState } from "../AppState";
+import { Constants as C } from "../Constants";
 import { NodeActionType } from "../enums/NodeActionType";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

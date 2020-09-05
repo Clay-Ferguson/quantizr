@@ -1,18 +1,18 @@
-import * as J from "../JavaIntf";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
-import { Icon } from "../widget/Icon";
-import { Button } from "../widget/Button";
-import { Checkbox } from "../widget/Checkbox";
-import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { Img } from "../widget/Img";
-import { ButtonBar } from "../widget/ButtonBar";
-import { HorizontalLayout } from "../widget/HorizontalLayout";
-import { IconButton } from "../widget/IconButton";
+import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
-import { useSelector, useDispatch } from "react-redux";
+import { Constants as C } from "../Constants";
 import { NodeActionType } from "../enums/NodeActionType";
+import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { Button } from "../widget/Button";
+import { ButtonBar } from "../widget/ButtonBar";
+import { Checkbox } from "../widget/Checkbox";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { Icon } from "../widget/Icon";
+import { IconButton } from "../widget/IconButton";
+import { Img } from "../widget/Img";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -56,9 +56,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let searchButton: IconButton;
         let timelineButton: IconButton;
 
-        let isPageRootNode = state.node && this.node.id == state.node.id;
+        let isPageRootNode = state.node && this.node.id === state.node.id;
 
-        if (state.node && this.node.id == state.node.id) {
+        if (state.node && this.node.id === state.node.id) {
             if (S.nav.parentVisibleToUser(state)) {
                 upLevelButton = new IconButton("fa-chevron-circle-up", "Up Level", {
                     /* For onclick functions I need a new approach for some (not all) where I can get by 
@@ -159,7 +159,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
             if (editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, node, state)) &&
                 //no need to ever select home node
-                node.id != state.homeNodeId) {
+                node.id !== state.homeNodeId) {
                 selButton = new Checkbox(null, {
                     title: "Select Node for multi-node functions."
                 }, {
@@ -183,7 +183,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
             if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node, state) &&
                 //not page root node 'or' page no children exist.
-                (node.id != state.node.id || !node.children || node.children.length == 0)) {
+                (node.id !== state.node.id || !node.children || node.children.length == 0)) {
                 createSubNodeButton = new Button("New", S.meta64.getNodeFunc(S.edit.cached_newSubNode, "S.edit.newSubNode", node.id),
                     { title: "Create new Node as a child of this node." });
             }
@@ -201,7 +201,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     });
                 }
 
-                if (!isPageRootNode && node.type != J.NodeType.REPO_ROOT && !state.nodesToMove) {
+                if (!isPageRootNode && node.type !== J.NodeType.REPO_ROOT && !state.nodesToMove) {
                     cutNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_cutSelNodes, "S.edit.cutSelNodes", node.id), {
                         iconclass: "fa fa-cut fa-lg",
                         title: "Cut selected Node(s) to paste elsewhere."
@@ -226,7 +226,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
                 }
 
                 //not user's account node!
-                if (node.id != state.homeNodeId) {
+                if (node.id !== state.homeNodeId) {
                     deleteNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_softDeleteSelNodes, "S.edit.softDeleteSelNodes", node.id), {
                         iconclass: "fa fa-trash fa-lg",
                         title: "Move Node(s) to Trash Bin"
@@ -244,7 +244,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
         //If showMetaData is true the avatar will show up in a different place (very upper left), instead of here
         let avatarImg: Img;
-        if (!state.userPreferences.showMetaData && this.allowAvatar && node.owner != J.PrincipalName.ADMIN) {
+        if (!state.userPreferences.showMetaData && this.allowAvatar && node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeAvatarImage(node, state);
         }
 

@@ -1,13 +1,13 @@
-import * as J from "../../JavaIntf";
-import { Constants as C } from "../../Constants";
-import { Singletons } from "../../Singletons";
-import { PubSub } from "../../PubSub";
-import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
-import { Comp } from "../../widget/base/Comp";
-import { NodeCompMarkdown } from "../../comps/NodeCompMarkdown";
 import { AppState } from "../../AppState";
-import { CompIntf } from "../../widget/base/CompIntf";
+import { NodeCompMarkdown } from "../../comps/NodeCompMarkdown";
+import { Constants as C } from "../../Constants";
 import { NodeActionType } from "../../enums/NodeActionType";
+import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
+import * as J from "../../JavaIntf";
+import { PubSub } from "../../PubSub";
+import { Singletons } from "../../Singletons";
+import { Comp } from "../../widget/base/Comp";
+import { CompIntf } from "../../widget/base/CompIntf";
 import { InlineEditField } from "../../widget/InlineEditField";
 
 let S: Singletons;

@@ -1,9 +1,9 @@
-import * as J from "./JavaIntf";
+import { Constants as C } from "./Constants";
 import { EncryptionKeyPair } from "./EncryptionKeyPair";
 import { EncryptionIntf, SymKeyDataPackage } from "./intf/EncryptionIntf";
-import { Singletons } from "./Singletons";
+import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
-import { Constants as C } from "./Constants";
+import { Singletons } from "./Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

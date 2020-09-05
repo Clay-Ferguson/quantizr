@@ -1,12 +1,12 @@
+import { AppState } from "../AppState";
+import { NodeCompMarkdown } from "../comps/NodeCompMarkdown";
+import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
-import { Constants as C} from "../Constants";
-import { Singletons } from "../Singletons";
 import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
-import { NodeCompMarkdown } from "../comps/NodeCompMarkdown";
-import { AppState } from "../AppState";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;

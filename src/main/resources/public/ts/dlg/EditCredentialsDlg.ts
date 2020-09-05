@@ -1,16 +1,16 @@
-import { ButtonBar } from "../widget/ButtonBar";
+import { AppState } from "../AppState";
+import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { BaseCompState } from "../widget/base/BaseCompState";
+import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
-import { TextField } from "../widget/TextField";
+import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
-import { Constants as C } from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { DialogBase } from "../DialogBase";
 import { TextContent } from "../widget/TextContent";
-import { AppState } from "../AppState";
-import { CompIntf } from "../widget/base/CompIntf";
-import { BaseCompState } from "../widget/base/BaseCompState";
+import { TextField } from "../widget/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

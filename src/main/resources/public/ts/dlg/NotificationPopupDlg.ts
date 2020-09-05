@@ -1,7 +1,7 @@
-import { TextContent } from "../widget/TextContent";
-import { DialogBase } from "../DialogBase";
 import { AppState } from "../AppState";
+import { DialogBase } from "../DialogBase";
 import { CompIntf } from "../widget/base/CompIntf";
+import { TextContent } from "../widget/TextContent";
 
 /*
  * Notification Dialog that pops up and displays for a short time and then automatically destroys itself

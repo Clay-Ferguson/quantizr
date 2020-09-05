@@ -1,15 +1,15 @@
+import { AppState } from "../AppState";
+import { CompValueHolder } from "../CompValueHolder";
+import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
-import { ButtonBar } from "../widget/ButtonBar";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
+import { ButtonBar } from "../widget/ButtonBar";
+import { Form } from "../widget/Form";
 import { Textarea } from "../widget/Textarea";
 import { TextContent } from "../widget/TextContent";
-import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
-import { Singletons } from "../Singletons";
-import { Form } from "../widget/Form";
-import { AppState } from "../AppState";
-import { CompIntf } from "../widget/base/CompIntf";
-import { CompValueHolder } from "../CompValueHolder";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

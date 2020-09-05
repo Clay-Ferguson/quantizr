@@ -1,14 +1,14 @@
-import * as J from "../JavaIntf";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
-import { Textarea } from "../widget/Textarea";
-import { Span } from "./Span";
 import { AppState } from "../AppState";
-import { Div } from "./Div";
-import { ButtonBar } from "./ButtonBar";
-import { Button } from "./Button";
+import { Constants as C } from "../Constants";
 import { SplitNodeDlg } from "../dlg/SplitNodeDlg";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { Textarea } from "../widget/Textarea";
+import { Button } from "./Button";
+import { ButtonBar } from "./ButtonBar";
+import { Div } from "./Div";
+import { Span } from "./Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

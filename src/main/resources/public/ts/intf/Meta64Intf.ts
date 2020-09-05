@@ -1,6 +1,6 @@
+import { AppState } from "../AppState";
 import * as J from "../JavaIntf";
 import { CompIntf } from "../widget/base/CompIntf";
-import { AppState } from "../AppState";
 
 export interface Meta64Intf {
 

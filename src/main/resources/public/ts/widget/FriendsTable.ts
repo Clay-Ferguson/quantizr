@@ -1,10 +1,10 @@
 import { Constants as C } from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
+import { ValueIntf } from "../Interfaces";
 import { FriendInfo } from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { FriendsTableRow } from "./FriendsTableRow";
 import { ListBox } from "./ListBox";
-import { ValueIntf } from "../Interfaces";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

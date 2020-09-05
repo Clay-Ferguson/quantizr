@@ -1,15 +1,14 @@
+import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AppState } from "./AppState";
+import { Constants as C } from "./Constants";
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as I from "./Interfaces";
-import * as J from "./JavaIntf";
 import { UtilIntf } from "./intf/UtilIntf";
-import { Singletons } from "./Singletons";
+import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
-import { Constants as C } from "./Constants";
-import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
-import { AppState } from "./AppState";
-import { CompIntf } from "./widget/base/CompIntf";
-import { ConfirmDlg } from "./dlg/ConfirmDlg";
+import { Singletons } from "./Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

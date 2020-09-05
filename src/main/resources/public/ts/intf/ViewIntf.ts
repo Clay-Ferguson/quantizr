@@ -1,4 +1,3 @@
-import * as J from "../JavaIntf";
 import { AppState } from "../AppState";
 
 export interface ViewIntf {

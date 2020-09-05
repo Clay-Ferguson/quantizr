@@ -1,6 +1,5 @@
-import * as I from "../Interfaces";
-import * as J from "../JavaIntf";
 import { AppState } from "../AppState";
+import * as J from "../JavaIntf";
 
 export interface GraphIntf {
     graphTreeStructure(state: AppState): any;

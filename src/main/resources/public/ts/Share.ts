@@ -1,11 +1,10 @@
-import * as J from "./JavaIntf";
+import { AppState } from "./AppState";
+import { Constants as C } from "./Constants";
 import { SharingDlg } from "./dlg/SharingDlg";
 import { ShareIntf } from "./intf/ShareIntf";
-import { Singletons } from "./Singletons";
+import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
-import { Constants as C } from "./Constants";
-import { SymKeyDataPackage } from "./intf/EncryptionIntf";
-import { AppState } from "./AppState";
+import { Singletons } from "./Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

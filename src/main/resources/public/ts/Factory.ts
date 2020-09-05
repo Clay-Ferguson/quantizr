@@ -11,29 +11,29 @@ NOTE: This Factory is allowed to import anything it wants and the way we allow C
 being a problem is by having the rule that no other modules are allowed to import this Factory module, 
 but only the interface of it.
 */
-import { PubSub } from "./PubSub";
-import { Meta64 } from "./Meta64";
-import { PluginMgr } from "./PluginMgr";
+import * as React from "react";
+import { ActivityPub } from "./ActivityPub";
 import { Attachment } from "./Attachment";
+import { Constants as C } from "./Constants";
+import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
-import { Constants as C } from "./Constants";
+import { Graph } from "./Graph";
+import { LocalDB } from "./LocalDB";
+import { Meta64 } from "./Meta64";
 import { Nav } from "./Nav";
+import { PluginMgr } from "./PluginMgr";
 import { Props } from "./Props";
+import { PubSub } from "./PubSub";
 import { Render } from "./Render";
 import { RSSReader } from "./RSSReader";
 import { Search } from "./Search";
-import { Graph } from "./Graph";
+import { ServerPush } from "./ServerPush";
 import { Share } from "./Share";
+import { Singletons } from "./Singletons";
 import { User } from "./User";
 import { Util } from "./Util";
 import { View } from "./View";
-import { Singletons } from "./Singletons";
-import { ActivityPub } from "./ActivityPub";
-import * as React from "react";
-import { ServerPush } from "./ServerPush";
-import { LocalDB } from "./LocalDB";
-import { MainMenuDlg } from "./dlg/MainMenuDlg";
 
 export class Factory {
     /* 

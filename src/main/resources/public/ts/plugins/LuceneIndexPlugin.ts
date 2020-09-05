@@ -1,14 +1,6 @@
-import * as J from "../JavaIntf";
-import { Constants as C} from "../Constants";
-import { Singletons } from "../Singletons";
+import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
-import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { Comp } from "../widget/base/Comp";
-import { VerticalLayout } from "../widget/VerticalLayout";
-import { Button } from "../widget/Button";
-import { Heading } from "../widget/Heading";
-import { SearchFileSystemDlg } from "../dlg/SearchFileSystemDlg";
-import { ButtonBar } from "../widget/ButtonBar";
+import { Singletons } from "../Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

@@ -1,8 +1,8 @@
-import { DialogBase } from "../DialogBase";
-import { Progress } from "../widget/Progress";
-import { Div } from "../widget/Div";
 import { AppState } from "../AppState";
+import { DialogBase } from "../DialogBase";
 import { CompIntf } from "../widget/base/CompIntf";
+import { Div } from "../widget/Div";
+import { Progress } from "../widget/Progress";
 
 export class ProgressDlg extends DialogBase {
 

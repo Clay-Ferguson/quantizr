@@ -1,13 +1,13 @@
-import * as J from "../JavaIntf";
-import { Constants as C} from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
 import { AppState } from "../AppState";
-import { TypeBase } from "./base/TypeBase";
+import { Constants as C } from "../Constants";
+import { NodeActionType } from "../enums/NodeActionType";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Heading } from "../widget/Heading";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
-import { NodeActionType } from "../enums/NodeActionType";
+import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

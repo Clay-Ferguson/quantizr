@@ -1,12 +1,12 @@
-import * as I from "../Interfaces";
 import { Constants as C } from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Div } from "./Div";
-import { Label } from "./Label";
-import { Input } from "./Input";
+import * as I from "../Interfaces";
 import { ValueIntf } from "../Interfaces";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
+import { Div } from "./Div";
+import { Input } from "./Input";
+import { Label } from "./Label";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

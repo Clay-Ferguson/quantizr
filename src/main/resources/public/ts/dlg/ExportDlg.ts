@@ -1,18 +1,18 @@
+import { AppState } from "../AppState";
+import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
-import { MessageDlg } from "./MessageDlg";
-import { Header } from "../widget/Header";
-import { ButtonBar } from "../widget/ButtonBar";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { Anchor } from "../widget/Anchor";
+import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
+import { ButtonBar } from "../widget/ButtonBar";
+import { Header } from "../widget/Header";
 import { RadioButton } from "../widget/RadioButton";
 import { RadioButtonGroup } from "../widget/RadioButtonGroup";
-import { Anchor } from "../widget/Anchor";
 import { VerticalLayout } from "../widget/VerticalLayout";
-import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
-import { Singletons } from "../Singletons";
-import { AppState } from "../AppState";
-import { CompIntf } from "../widget/base/CompIntf";
+import { MessageDlg } from "./MessageDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

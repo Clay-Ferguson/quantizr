@@ -1,13 +1,13 @@
-import * as J from "../JavaIntf";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
+import { useSelector } from "react-redux";
+import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { CompIntf } from "../widget/base/CompIntf";
 import { Div } from "../widget/Div";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
-import { useSelector, useDispatch } from "react-redux";
-import { AppState } from "../AppState";
-import { CompIntf } from "../widget/base/CompIntf";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 let S: Singletons;

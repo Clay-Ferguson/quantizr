@@ -1,6 +1,6 @@
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { Div } from "./Div";
 
 let S: Singletons;

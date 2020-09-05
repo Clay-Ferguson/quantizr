@@ -1,10 +1,10 @@
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
-import { MenuPanel } from "../MenuPanel";
-import { DialogBase } from "../DialogBase";
-import { CompIntf } from "../widget/base/CompIntf";
 import { store } from "../AppRedux";
+import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
+import { MenuPanel } from "../MenuPanel";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

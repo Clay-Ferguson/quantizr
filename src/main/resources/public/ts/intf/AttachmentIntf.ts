@@ -1,6 +1,5 @@
-import * as I from "../Interfaces";
-import * as J from "../JavaIntf";
 import { AppState } from "../AppState";
+import * as J from "../JavaIntf";
 
 export interface AttachmentIntf {
     openUploadFromFileDlg(toIpfs: boolean, node: J.NodeInfo, autoAddFile: File, state: AppState): void;

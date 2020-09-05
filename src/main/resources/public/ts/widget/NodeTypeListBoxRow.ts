@@ -1,11 +1,10 @@
-import { ListBoxRow } from "./ListBoxRow";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
 import { Constants as C } from "../Constants";
-import { ListBox } from "./ListBox";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { Icon } from "./Icon";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { HorizontalLayout } from "./HorizontalLayout";
+import { Icon } from "./Icon";
+import { ListBoxRow } from "./ListBoxRow";
 import { Span } from "./Span";
 
 let S: Singletons;

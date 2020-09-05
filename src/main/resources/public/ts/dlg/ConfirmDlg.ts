@@ -1,10 +1,10 @@
-import { DialogBase } from "../DialogBase";
-import { TextContent } from "../widget/TextContent";
-import { ButtonBar } from "../widget/ButtonBar";
-import { Button } from "../widget/Button";
-import { Form } from "../widget/Form";
 import { AppState } from "../AppState";
+import { DialogBase } from "../DialogBase";
 import { CompIntf } from "../widget/base/CompIntf";
+import { Button } from "../widget/Button";
+import { ButtonBar } from "../widget/ButtonBar";
+import { Form } from "../widget/Form";
+import { TextContent } from "../widget/TextContent";
 
 export class ConfirmDlg extends DialogBase {
 

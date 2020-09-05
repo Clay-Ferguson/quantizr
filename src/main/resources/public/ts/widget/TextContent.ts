@@ -1,8 +1,8 @@
-import { Comp } from "../widget/base/Comp";
-import { Constants as C} from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
 import { ReactNode } from "react";
+import { Constants as C } from "../Constants";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { Comp } from "../widget/base/Comp";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

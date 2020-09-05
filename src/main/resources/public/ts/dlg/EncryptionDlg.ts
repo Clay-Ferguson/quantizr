@@ -1,14 +1,14 @@
-import { DialogBase } from "../DialogBase";
-import { ButtonBar } from "../widget/ButtonBar";
-import { Button } from "../widget/Button";
-import { Form } from "../widget/Form";
-import { Constants as C } from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Checkbox } from "../widget/Checkbox";
-import { VerticalLayout } from "../widget/VerticalLayout";
 import { AppState } from "../AppState";
+import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
+import { Button } from "../widget/Button";
+import { ButtonBar } from "../widget/ButtonBar";
+import { Checkbox } from "../widget/Checkbox";
+import { Form } from "../widget/Form";
+import { VerticalLayout } from "../widget/VerticalLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

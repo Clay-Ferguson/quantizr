@@ -1,11 +1,11 @@
 /* Graph code is temporarily disabled */
-import * as J from "./JavaIntf";
-import { Singletons } from "./Singletons";
-import { PubSub } from "./PubSub";
-import { Constants as C} from "./Constants";
-import { GraphIntf } from "./intf/GraphIntf";
 //import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
 import { AppState } from "./AppState";
+import { Constants as C } from "./Constants";
+import { GraphIntf } from "./intf/GraphIntf";
+import * as J from "./JavaIntf";
+import { PubSub } from "./PubSub";
+import { Singletons } from "./Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

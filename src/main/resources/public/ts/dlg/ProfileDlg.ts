@@ -1,19 +1,19 @@
+import { store } from "../AppRedux";
+import { AppState } from "../AppState";
+import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
-import { ButtonBar } from "../widget/ButtonBar";
-import { Button } from "../widget/Button";
 import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
 import { Singletons } from "../Singletons";
-import { Form } from "../widget/Form";
-import { AppState } from "../AppState";
 import { CompIntf } from "../widget/base/CompIntf";
+import { Button } from "../widget/Button";
+import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
-import { TextField } from "../widget/TextField";
-import { Textarea } from "../widget/Textarea";
+import { Form } from "../widget/Form";
 import { Img } from "../widget/Img";
-import { store, dispatch } from "../AppRedux";
 import { Label } from "../widget/Label";
+import { Textarea } from "../widget/Textarea";
+import { TextField } from "../widget/TextField";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 let S: Singletons;

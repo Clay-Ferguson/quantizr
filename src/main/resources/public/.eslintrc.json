@@ -26,6 +26,8 @@
         "prefer-const": "off",
         "spaced-comment": "off",
         "camelcase": "off",
-        "padded-blocks": "off"
+        "padded-blocks": "off",
+        "space-before-function-paren": "off",
+        "comma-dangle": "off"
       }
 }

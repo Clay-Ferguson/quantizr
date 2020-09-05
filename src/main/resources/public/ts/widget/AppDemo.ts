@@ -1,15 +1,15 @@
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
-import { Div } from "./Div";
-import { Button } from "./Button";
-import { AppState } from "../AppState";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { dispatch } from "../AppRedux";
-import { CompDemo } from "./CompDemo";
-import { HorizontalLayout } from "./HorizontalLayout";
-import { Comp } from "./base/Comp";
+import { AppState } from "../AppState";
 import { runClassDemoTest } from "../ClassDemoTest";
+import { Constants as C } from "../Constants";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { Comp } from "./base/Comp";
+import { Button } from "./Button";
+import { CompDemo } from "./CompDemo";
+import { Div } from "./Div";
+import { HorizontalLayout } from "./HorizontalLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

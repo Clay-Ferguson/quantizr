@@ -1,14 +1,14 @@
-import * as J from "../JavaIntf";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { Constants as C } from "../Constants";
-import { Comp } from "../widget/base/Comp";
-import { NodeCompRow } from "./NodeCompRow";
-import { Div } from "../widget/Div";
+import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
-import { useSelector, useDispatch } from "react-redux";
-import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
+import { Constants as C } from "../Constants";
 import { NodeActionType } from "../enums/NodeActionType";
+import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { Comp } from "../widget/base/Comp";
+import { Div } from "../widget/Div";
+import { NodeCompRow } from "./NodeCompRow";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

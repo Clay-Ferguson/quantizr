@@ -1,4 +1,3 @@
-import { EncryptionKeyPair } from "../EncryptionKeyPair";
 
 export interface EncryptionIntf {
 

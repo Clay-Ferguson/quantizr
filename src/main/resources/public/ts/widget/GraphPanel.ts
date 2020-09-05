@@ -1,10 +1,10 @@
 /* Graph code is temporarily disabled */
-import { Singletons } from "../Singletons";
+import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
-import { Constants as C} from "../Constants";
-
+import { Singletons } from "../Singletons";
 //import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
 import { Div } from "./Div";
+
 
 // https://github.com/visjs/vis-network
 //      npm install vis-network

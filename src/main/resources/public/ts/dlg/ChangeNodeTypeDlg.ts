@@ -1,14 +1,14 @@
-import { DialogBase } from "../DialogBase";
-import { ButtonBar } from "../widget/ButtonBar";
-import { Button } from "../widget/Button";
-import { Form } from "../widget/Form";
-import { Constants as C } from "../Constants";
-import { Singletons } from "../Singletons";
-import { PubSub } from "../PubSub";
-import { NodeTypeListBox } from "../widget/NodeTypeListBox";
 import { AppState } from "../AppState";
-import { CompIntf } from "../widget/base/CompIntf";
+import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
+import { CompIntf } from "../widget/base/CompIntf";
+import { Button } from "../widget/Button";
+import { ButtonBar } from "../widget/ButtonBar";
+import { Form } from "../widget/Form";
+import { NodeTypeListBox } from "../widget/NodeTypeListBox";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

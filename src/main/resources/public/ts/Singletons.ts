@@ -1,22 +1,22 @@
-import { Meta64Intf } from "./intf/Meta64Intf";
+import { DialogBaseImpl } from "./DialogBaseImpl";
+import { ActivityPubIntf } from "./intf/ActivityPubIntf";
 import { AttachmentIntf } from "./intf/AttachmentIntf";
 import { EditIntf } from "./intf/EditIntf";
 import { EncryptionIntf } from "./intf/EncryptionIntf";
+import { GraphIntf } from "./intf/GraphIntf";
+import { LocalDBIntf } from "./intf/LocalDBIntf";
+import { Meta64Intf } from "./intf/Meta64Intf";
 import { NavIntf } from "./intf/NavIntf";
+import { PluginMgrIntf } from "./intf/PluginMgrIntf";
 import { PropsIntf } from "./intf/PropsIntf";
 import { RenderIntf } from "./intf/RenderIntf";
+import { RSSReaderIntf } from "./intf/RSSReaderIntf";
 import { SearchIntf } from "./intf/SearchIntf";
+import { ServerPushIntf } from "./intf/ServerPushIntf";
 import { ShareIntf } from "./intf/ShareIntf";
 import { UserIntf } from "./intf/UserIntf";
 import { UtilIntf } from "./intf/UtilIntf";
 import { ViewIntf } from "./intf/ViewIntf";
-import { RSSReaderIntf } from "./intf/RSSReaderIntf";
-import { ActivityPubIntf } from "./intf/ActivityPubIntf";
-import { GraphIntf } from "./intf/GraphIntf";
-import { ServerPushIntf } from "./intf/ServerPushIntf";
-import { LocalDBIntf } from "./intf/LocalDBIntf";
-import { PluginMgrIntf } from "./intf/PluginMgrIntf";
-import { DialogBaseImpl } from "./DialogBaseImpl";
 
 /* NOTE: If this Singleton pattern looks countrary to good module design, keep in mind all module systems
 are susceptible to circular references, and these Singtons are an unbreakable solution to that 

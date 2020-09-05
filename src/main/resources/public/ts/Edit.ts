@@ -1,18 +1,18 @@
-import * as J from "./JavaIntf";
-import { EditNodeDlg } from "./dlg/EditNodeDlg";
-import { ConfirmDlg } from "./dlg/ConfirmDlg";
-import { ExportDlg } from "./dlg/ExportDlg";
-import { PrefsDlg } from "./dlg/PrefsDlg";
-import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
-import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
-import { EditIntf } from "./intf/EditIntf";
-import { Singletons } from "./Singletons";
-import { PubSub } from "./PubSub";
-import { Constants as C } from "./Constants";
-import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
+import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
-import { dispatch, appState, store } from "./AppRedux";
+import { Constants as C } from "./Constants";
+import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
+import { EditNodeDlg } from "./dlg/EditNodeDlg";
+import { ExportDlg } from "./dlg/ExportDlg";
+import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
+import { PrefsDlg } from "./dlg/PrefsDlg";
 import { ProfileDlg } from "./dlg/ProfileDlg";
+import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
+import { EditIntf } from "./intf/EditIntf";
+import * as J from "./JavaIntf";
+import { PubSub } from "./PubSub";
+import { Singletons } from "./Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

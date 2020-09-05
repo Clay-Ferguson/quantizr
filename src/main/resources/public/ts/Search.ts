@@ -1,18 +1,17 @@
-import * as J from "./JavaIntf";
-import { SearchIntf } from "./intf/SearchIntf";
-import { Singletons } from "./Singletons";
-import { PubSub } from "./PubSub";
+import { dispatch } from "./AppRedux";
+import { AppState } from "./AppState";
+import { NodeCompContent } from "./comps/NodeCompContent";
+import { NodeCompRowFooter } from "./comps/NodeCompRowFooter";
+import { NodeCompRowHeader } from "./comps/NodeCompRowHeader";
 import { Constants as C } from "./Constants";
+import { SearchIntf } from "./intf/SearchIntf";
+import * as J from "./JavaIntf";
+import { PubSub } from "./PubSub";
+import { Singletons } from "./Singletons";
+import { Comp } from "./widget/base/Comp";
 import { Button } from "./widget/Button";
 import { Div } from "./widget/Div";
-import { Comp } from "./widget/base/Comp";
 import { HorizontalLayout } from "./widget/HorizontalLayout";
-import { Img } from "./widget/Img";
-import { NodeCompContent } from "./comps/NodeCompContent";
-import { AppState } from "./AppState";
-import { dispatch } from "./AppRedux";
-import { NodeCompRowHeader } from "./comps/NodeCompRowHeader";
-import { NodeCompRowFooter } from "./comps/NodeCompRowFooter";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

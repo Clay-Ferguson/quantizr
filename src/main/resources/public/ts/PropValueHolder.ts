@@ -1,8 +1,8 @@
-import { Singletons } from "./Singletons";
-import { PubSub } from "./PubSub";
 import { Constants as C } from "./Constants";
 import { ValueIntf } from "./Interfaces";
 import { NodeInfo } from "./JavaIntf";
+import { PubSub } from "./PubSub";
+import { Singletons } from "./Singletons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

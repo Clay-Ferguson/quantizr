@@ -1,15 +1,13 @@
-import * as J from "./JavaIntf";
+import { appState, dispatch, store } from "./AppRedux";
+import { AppState } from "./AppState";
+import { Constants as C } from "./Constants";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { Meta64Intf } from "./intf/Meta64Intf";
-import { Singletons } from "./Singletons";
+import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
-import { Constants as C } from "./Constants";
+import { Singletons } from "./Singletons";
 import { App } from "./widget/App";
-import { AppState } from "./AppState";
-import { dispatch, initialState, appState } from "./AppRedux";
-import { store } from "./AppRedux";
 import { CompIntf } from "./widget/base/CompIntf";
-import { AppDemo } from "./widget/AppDemo";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

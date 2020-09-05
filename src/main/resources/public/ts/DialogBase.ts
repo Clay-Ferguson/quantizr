@@ -1,17 +1,17 @@
-import { DialogBaseImpl } from "./DialogBaseImpl";
-import { Singletons } from "./Singletons";
-import { PubSub } from "./PubSub";
-import { Constants as C } from "./Constants";
-import { Comp } from "./widget/base/Comp";
-import { Div } from "./widget/Div";
-import { Span } from "./widget/Span";
 import * as ReactDOM from "react-dom";
-import { CompIntf } from "./widget/base/CompIntf";
-import { AppState } from "./AppState";
 import { Provider } from 'react-redux';
 import { store } from "./AppRedux";
+import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
+import { Constants as C } from "./Constants";
+import { DialogBaseImpl } from "./DialogBaseImpl";
+import { PubSub } from "./PubSub";
+import { Singletons } from "./Singletons";
 import { BaseCompState } from "./widget/base/BaseCompState";
+import { Comp } from "./widget/base/Comp";
+import { CompIntf } from "./widget/base/CompIntf";
+import { Div } from "./widget/Div";
+import { Span } from "./widget/Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
