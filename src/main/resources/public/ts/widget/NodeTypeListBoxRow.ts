@@ -1,16 +1,8 @@
-import { Constants as C } from "../Constants";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { HorizontalLayout } from "./HorizontalLayout";
 import { Icon } from "./Icon";
 import { ListBoxRow } from "./ListBoxRow";
 import { Span } from "./Span";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 /* NOTE: This class doesn't hold any state and is re-rendered when the state in the parent owning it is rendered. */
 export class NodeTypeListBoxRow extends ListBoxRow {
@@ -24,7 +16,7 @@ export class NodeTypeListBoxRow extends ListBoxRow {
         let iconClass = this.typeHandler.getIconClass();
         if (iconClass) {
             icon = new Icon({
-                style: { marginRight: '12px', verticalAlign: 'middle' },
+                style: { marginRight: "12px", verticalAlign: "middle" },
                 className: iconClass
             });
         }

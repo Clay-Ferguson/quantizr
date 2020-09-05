@@ -3,12 +3,6 @@ import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { AppAction } from "./Interfaces";
 import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 export const initialState = new AppState();
 
@@ -62,14 +56,14 @@ export let dispatch = (action: AppAction) => {
 
     store.dispatch(action);
     //console.log("Dispatch Complete: " + action.type);
-}
+};
 
 /* This is MUCH faster, for when structural changes won't happen (only style changes for example),
 becuase it doesn't reset static objects to null, meaning they get reused, without reconstructing */
 export let fastDispatch = (action: AppAction) => {
     store.dispatch(action);
     //console.log("Fast Dispatch Complete: " + action.type);
-}
+};
 
 /* This listener is temporary until I find a better way to do this code, which needs to always run after any
 render is complete and AFTER the html DOM is updated/final 
@@ -78,6 +72,7 @@ This works, but is currently not needed.
 */
 const handleChange = () => {
     //console.log("AppRedux change.");
-}
+};
+
 const unsubscribe = store.subscribe(handleChange);
 // // unsubscribe()

@@ -12,7 +12,6 @@ export class Constants {
     static readonly ONE_MB = 1048576; // 1024 * 1024;
     static readonly MAX_UPLOAD_MB = 20;
 
-
     static readonly IPFS_IO_GATEWAY: string = "https://gateway.pinata.cloud/ipfs/";
     
     static readonly TEMPORAL_HOST: string = "https://api.temporal.cloud";
@@ -67,5 +66,3 @@ export class Constants {
         alt='Donate with PayPal button'/> 
     </a>`;
 }
-
-

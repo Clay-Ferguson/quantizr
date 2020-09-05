@@ -32,7 +32,7 @@ export class View implements ViewIntf {
 
         if (!highlightId) {
             let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
-            highlightId = !!currentSelNode ? currentSelNode.id : nodeId;
+            highlightId = currentSelNode ? currentSelNode.id : nodeId;
         }
 
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -109,12 +109,12 @@ export class View implements ViewIntf {
         let newNode: J.NodeInfo = null;
 
         //First detect if page root node is selected, before doing a child search
-        if (currentSelNode.id == state.node.id) {
+        if (currentSelNode.id === state.node.id) {
             //if going down that means first child node.
-            if (dir == "down" && state.node.children && state.node.children.length > 0) {
+            if (dir === "down" && state.node.children && state.node.children.length > 0) {
                 S.meta64.highlightNode(state.node.children[0], true, state);
             }
-            else if (dir == "up") {
+            else if (dir === "up") {
                 S.nav.navUpLevel();
             }
         }
@@ -131,7 +131,7 @@ export class View implements ViewIntf {
                     S.meta64.highlightNode(child, true, state);
                 }
 
-                if (child.id == currentSelNode.id) {
+                if (child.id === currentSelNode.id) {
                     if (dir === "up") {
                         if (prevChild) {
                             ret = true;
@@ -178,7 +178,7 @@ export class View implements ViewIntf {
                 it is better looking to just scroll to zero index, because that will always
                 be what user wants to see */
                 let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
-                if (currentSelNode && state.node.id == currentSelNode.id) {
+                if (currentSelNode && state.node.id === currentSelNode.id) {
                     this.docElm.scrollTop = 0;
                     return;
                 }
@@ -220,7 +220,7 @@ export class View implements ViewIntf {
 
         S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
             command: command,
-            nodeId: !!node ? node.id : null
+            nodeId: node ? node.id : null
         },
             (res: J.GetServerInfoResponse) => {
 
@@ -228,7 +228,7 @@ export class View implements ViewIntf {
                     res.messages.forEach(m => {
                         /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
                   there are other commands that exist also */
-                        if (command == "getServerInfo") {
+                        if (command === "getServerInfo") {
                             m.message += "<br>Browser Memory: " + S.util.getBrowserMemoryInfo();
                             m.message += "<br>Build Time: " + BUILDTIME;
                             m.message += "<br>Profile: " + PROFILE;
@@ -250,7 +250,7 @@ export class View implements ViewIntf {
 
         S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getNotifications", {
             command: command,
-            nodeId: !!node ? node.id : null
+            nodeId: node ? node.id : null
         },
             (res: J.GetServerInfoResponse) => {
                 if (res.messages) {

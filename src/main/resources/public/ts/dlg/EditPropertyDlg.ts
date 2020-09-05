@@ -37,7 +37,7 @@ export class EditPropertyDlg extends DialogBase {
             new ButtonBar([
                 new Button("Save", this.save, null, "btn-primary"),
                 new Button("Cancel", () => {
-                    this.close()
+                    this.close();
                 })
             ], null, "marginTop")
         ];
@@ -51,7 +51,7 @@ export class EditPropertyDlg extends DialogBase {
         this.name = this.getState().propName;
 
         /* verify first that this property doesn't already exist */
-        if (!!S.props.getNodeProp(name, this.editNode)) {
+        if (S.props.getNodeProp(name, this.editNode)) {
             S.util.showMessage("Property already exists: " + name, "Warning");
             return;
         }

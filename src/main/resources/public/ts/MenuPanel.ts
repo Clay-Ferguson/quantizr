@@ -44,7 +44,7 @@ export class MenuPanel extends Div {
 
         let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, highlightNode);
         let allowNodeMove: boolean = !orderByProp && S.edit.isInsertAllowed(state.node, state);
-        let isPageRootNode = state.node && highlightNode && state.node.id == highlightNode.id;
+        let isPageRootNode = state.node && highlightNode && state.node.id === highlightNode.id;
 
         let canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.firstChild);
         let canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.lastChild);
@@ -83,12 +83,12 @@ export class MenuPanel extends Div {
 
             new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state), !state.isAnonUser && selNodeCount > 0), //
             new MenuItem("Split Node", () => new SplitNodeDlg(null, state).open(), !state.isAnonUser && selNodeIsMine), //
-            new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open() }, !state.isAnonUser && selNodeIsMine), //
+            new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open(); }, !state.isAnonUser && selNodeIsMine), //
 
             new MenuItemSeparator(), //
 
             new MenuItem("Move to Top", () => S.edit.moveNodeToTop(null, state), canMoveUp), //
-            new MenuItem("Move to Bottom", () => S.edit.moveNodeToBottom(null, state), canMoveDown),//
+            new MenuItem("Move to Bottom", () => S.edit.moveNodeToBottom(null, state), canMoveDown), //
             new MenuItemSeparator(), //
 
             new MenuItem("Permanent Delete", () => S.edit.deleteSelNodes(null, true, state), !state.isAnonUser && selNodeCount > 0 && selNodeIsMine), //
@@ -136,10 +136,10 @@ export class MenuPanel extends Div {
         // ]),
         children.push(new Menu("Timeline", [
 
-            new MenuItem("Created", () => S.srch.timeline('ctm', state), //
+            new MenuItem("Created", () => S.srch.timeline("ctm", state), //
                 !state.isAnonUser && !!highlightNode), //
 
-            new MenuItem("Modified", () => S.srch.timeline('mtm', state), //
+            new MenuItem("Modified", () => S.srch.timeline("mtm", state), //
                 !state.isAnonUser && !!highlightNode), //
         ]));
 
@@ -157,17 +157,17 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Import", () => S.edit.openImportDlg(state), //
-                state.isAdminUser && importFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId == highlightNode.id))), //
+                state.isAdminUser && importFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId === highlightNode.id))), //
 
             new MenuItem("Export", () => S.edit.openExportDlg(state),
-                state.isAdminUser && exportFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId == highlightNode.id))), //
+                state.isAdminUser && exportFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId === highlightNode.id))), //
         ]));
 
         children.push(new Menu("Encryption", [
             new MenuItem("Show Keys", () => { new ManageEncryptionKeysDlg(state).open(); }, !state.isAnonUser), //
             new MenuItem("Generate Keys", () => { S.util.generateNewCryptoKeys(state); }, !state.isAnonUser), //
             new MenuItem("Publish Keys", () => { S.encryption.initKeys(false, true); }, !state.isAnonUser), //
-            new MenuItem("Import Keys", () => { new ImportCryptoKeyDlg(state).open() }, !state.isAnonUser), //
+            new MenuItem("Import Keys", () => { new ImportCryptoKeyDlg(state).open(); }, !state.isAnonUser), //
         ]));
 
         // //need to make export safe for end users to use (recarding file sizes)
@@ -208,10 +208,10 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Force Refresh", () => {
                     let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
-                    let nodeId: string = !!currentSelNode ? currentSelNode.id : null;
+                    let nodeId: string = currentSelNode ? currentSelNode.id : null;
                     S.view.refreshTree(nodeId, false, nodeId, false, true, true, true, state);
                 },
-                    state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine))
+                state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine))
             ]));
         }
 

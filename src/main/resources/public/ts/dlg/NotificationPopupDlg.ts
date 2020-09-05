@@ -22,7 +22,7 @@ export class NotificationPopupDlg extends DialogBase {
         return null;
     }
 
-    show(message: string, title: string, timeout: number=3000) {
+    show(message: string, title: string, timeout: number = 3000) {
         let dlg = new NotificationPopupDlg(message, title, this.appState);
         dlg.open();
         setTimeout(() => {

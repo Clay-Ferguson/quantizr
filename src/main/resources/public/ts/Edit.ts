@@ -69,7 +69,7 @@ export class Edit implements EditIntf {
             S.meta64.clearSelNodes(state);
 
             //We only want to pass a nodeId here if we are going to root node.
-            let nodeId = postDelSelNodeId == state.homeNodeId ? postDelSelNodeId : null;
+            let nodeId = postDelSelNodeId === state.homeNodeId ? postDelSelNodeId : null;
 
             S.view.refreshTree(nodeId, false, postDelSelNodeId, false, false, true, true, state);
         }
@@ -110,7 +110,8 @@ export class Edit implements EditIntf {
     private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, state: AppState): void => {
         if (S.util.checkSuccess("Move nodes", res)) {
             dispatch({
-                type: "Action_SetNodesToMove", state,
+                type: "Action_SetNodesToMove", 
+                state,
                 update: (s: AppState): void => {
                     s.nodesToMove = null;
                 },
@@ -137,10 +138,10 @@ export class Edit implements EditIntf {
 
         //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to 
         //make nodes editable by any other user.
-        if (owner == "admin" && !state.isAdminUser) return false;
+        if (owner === "admin" && !state.isAdminUser) return false;
 
         return state.userPreferences.editMode &&
-            (state.isAdminUser || state.userName == owner);
+            (state.isAdminUser || state.userName === owner);
         // /*
         //  * Check that if we have a commentBy property we are the commenter, before allowing edit button also.
         //  */
@@ -158,7 +159,7 @@ export class Edit implements EditIntf {
 
         //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to 
         //make nodes editable by any other user.
-        if (owner == "admin" && !state.isAdminUser) return false;
+        if (owner === "admin" && !state.isAdminUser) return false;
 
         //right now, for logged in users, we enable the 'new' button because the CPU load for determining it's enablement is too much, so
         //we throw an exception if they cannot. todo-1: need to make this work better.
@@ -166,7 +167,7 @@ export class Edit implements EditIntf {
         if (state.isAdminUser) return true;
         if (state.isAnonUser) return false;
         //console.log("isInsertAllowed: node.owner="+node.owner+" nodeI="+node.id);
-        return node.owner != "admin";
+        return node.owner !== "admin";
     }
 
     /*
@@ -186,7 +187,7 @@ export class Edit implements EditIntf {
                 parentId: parentNode.id,
                 targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
                 newNodeName: "",
-                typeName: typeName ? typeName : "u",
+                typeName: typeName || "u",
                 initialValue: ""
             }, (res) => { this.insertNodeResponse(res, state); });
         } else {
@@ -194,7 +195,7 @@ export class Edit implements EditIntf {
                 updateModTime: false,
                 nodeId: parentNode.id,
                 newNodeName: "",
-                typeName: typeName ? typeName : "u",
+                typeName: typeName || "u",
                 createAtTop,
                 content: null,
                 typeLock: false,
@@ -290,7 +291,8 @@ export class Edit implements EditIntf {
         S.meta64.saveUserPreferences(state);
 
         dispatch({
-            type: "Action_SetUserPreferences", state,
+            type: "Action_SetUserPreferences", 
+            state,
             update: (s: AppState): void => {
                 s.userPreferences = state.userPreferences;
             }
@@ -515,12 +517,12 @@ export class Edit implements EditIntf {
         }
         let selNodesArray = S.meta64.getSelNodeIdsArray(state);
 
-        if (!selNodesArray || selNodesArray.length == 0) {
+        if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("You have not selected any nodes to delete.", "Warning");
             return;
         }
 
-        if (selNodesArray.find(id => id == state.homeNodeId)) {
+        if (selNodesArray.find(id => id === state.homeNodeId)) {
             S.util.showMessage("Sorry, you can't delete your account root node!", "Warning");
             return;
         }
@@ -531,7 +533,7 @@ export class Edit implements EditIntf {
         let nodeCheck: J.NodeInfo = state.idToNodeMap[firstNodeId];
         let confirmMsg = null;
         if (nodeCheck.deleted || hardDelete) {
-            confirmMsg = "Permanently Delete " + selNodesArray.length + " node(s) ?"
+            confirmMsg = "Permanently Delete " + selNodesArray.length + " node(s) ?";
         }
         else {
             confirmMsg = "Move " + selNodesArray.length + " node(s) to the trash bin ?";
@@ -602,7 +604,8 @@ export class Edit implements EditIntf {
 
     undoCutSelNodes = async (state: AppState): Promise<void> => {
         dispatch({
-            type: "Action_SetNodesToMove", state,
+            type: "Action_SetNodesToMove", 
+            state,
             update: (s: AppState): void => {
                 s.nodesToMove = null;
             }
@@ -618,7 +621,8 @@ export class Edit implements EditIntf {
         new ConfirmDlg("Cut " + selNodesArray.length + " node(s), to paste/move to new location ?", "Confirm Cut",
             async () => {
                 dispatch({
-                    type: "Action_SetNodesToMove", state,
+                    type: "Action_SetNodesToMove", 
+                    state,
                     update: (s: AppState): void => {
                         s.nodesToMove = selNodesArray;
                     }
@@ -631,7 +635,7 @@ export class Edit implements EditIntf {
 
     cached_pasteSelNodesInside = (nodeId: string) => {
         let state = appState();
-        this.pasteSelNodes(nodeId, 'inside', state);
+        this.pasteSelNodes(nodeId, "inside", state);
     }
 
     //location=inside | inline | inline-above (todo-1: put in java-aware enum)
@@ -700,9 +704,9 @@ export class Edit implements EditIntf {
                 typeLock: false,
                 properties: null
             },
-                () => {
-                    S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
-                }
+            () => {
+                S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
+            }
             );
         });
     }
@@ -769,7 +773,7 @@ export class Edit implements EditIntf {
 
     moveNodeByDrop = (targetNodeId: string, sourceNodeId: string, isFirst: boolean): void => {
         /* if node being dropped on itself, then ignore */
-        if (targetNodeId == sourceNodeId) {
+        if (targetNodeId === sourceNodeId) {
             return;
         }
 

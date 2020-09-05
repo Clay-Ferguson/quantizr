@@ -40,7 +40,7 @@ export class Render implements RenderIntf {
     injectSubstitutions = (val: string): string => {
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
 
-        if (val.indexOf("{{paypal-button}}") != -1) {
+        if (val.indexOf("{{paypal-button}}") !== -1) {
             val = S.util.replaceAll(val, "{{paypal-button}}", C.PAY_PAL_BUTTON);
         }
         return val;
@@ -97,11 +97,11 @@ export class Render implements RenderIntf {
                 let d = data[i];
                 console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
 
-                if (d.kind == 'string') {
+                if (d.kind === "string") {
                     d.getAsString((s) => {
-                        if (d.type.match('^text/uri-list')) {
+                        if (d.type.match("^text/uri-list")) {
                             /* Disallow dropping from our app onto our app */
-                            if (s.startsWith(location.protocol + '//' + location.hostname)) {
+                            if (s.startsWith(location.protocol + "//" + location.hostname)) {
                                 return;
                             }
                             S.attachment.openUploadFromUrlDlg(node, s, null, state);
@@ -109,14 +109,13 @@ export class Render implements RenderIntf {
                         /* this is the case where a user is moving a node by dragging it over another node */
                         else if (s.startsWith(S.nav._UID_ROWID_PREFIX)) {
                             S.edit.moveNodeByDrop(node.id, s.substring(4), isFirst);
-                            return;
                         }
                     });
                     return;
                 }
-                else if (d.kind == 'string' && d.type.match('^text/html')) {
+                else if (d.kind === "string" && d.type.match("^text/html")) {
                 }
-                else if (d.kind == 'file' /* && d.type.match('^image/') */) {
+                else if (d.kind === "file" /* && d.type.match('^image/') */) {
                     let file: File = data[i].getAsFile();
 
                     // if (file.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB) {
@@ -198,7 +197,8 @@ export class Render implements RenderIntf {
 
         try {
             dispatch({
-                type: "Action_RenderPage", state,
+                type: "Action_RenderPage", 
+                state,
                 updateNew: (s: AppState): AppState => {
                     //VERY IMPORTANT to return a NEW object so we create it here. If you don't return new object rendering can fail.
                     s = { ...s };
@@ -288,10 +288,10 @@ export class Render implements RenderIntf {
          * the client side for various reasons.
          */
         let layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
-        if (!layout || layout == "v") {
+        if (!layout || layout === "v") {
             return new NodeCompVerticalRowLayout(node, level, allowNodeMove);
         }
-        else if (layout.indexOf("c") == 0) {
+        else if (layout.indexOf("c") === 0) {
             return new NodeCompTableRowLayout(node, level, layout, allowNodeMove);
         }
         else {
@@ -308,7 +308,7 @@ export class Render implements RenderIntf {
     createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, state: AppState): Comp => {
         let pasteInlineButton: Button = null;
 
-        if (!state.isAnonUser && !!state.nodesToMove && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
+        if (!state.isAnonUser && !!state.nodesToMove && (S.props.isMine(node, state) || node.id === state.homeNodeId)) {
 
             //console.log("pasteSelButton: node.id=" + node.id + " isFirst=" + isFirst);
 

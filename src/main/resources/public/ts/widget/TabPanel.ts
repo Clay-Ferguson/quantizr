@@ -7,17 +7,10 @@ import { MainTabComp } from "../comps/MainTabComp";
 import { SearchView } from "../comps/SearchView";
 import { TimelineView } from "../comps/TimelineView";
 import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Anchor } from "./Anchor";
 import { Div } from "./Div";
 import { Li } from "./Li";
 import { Ul } from "./Ul";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class TabPanel extends Div {
 
@@ -54,7 +47,7 @@ export class TabPanel extends Div {
         }, [
             new Ul(null, {
                 className: "nav nav-tabs",
-                style: { marginLeft: '15px' },
+                style: { marginLeft: "15px" },
                 id: "navTabs"
             },
                 /* These 'li' (list item) elements hold the tab bar that goes across the top of every page */
@@ -64,7 +57,7 @@ export class TabPanel extends Div {
                 }, [
                     new Anchor("#mainTab", "Main", {
                         "data-toggle": "tab",
-                        className: "nav-link" + (state.activeTab == "mainTab" ? " active" : ""),
+                        className: "nav-link" + (state.activeTab === "mainTab" ? " active" : ""),
                         onClick: () => {
                             dispatch({
                                 type: "Action_SetTab",
@@ -82,7 +75,7 @@ export class TabPanel extends Div {
                 },
                     [new Anchor("#searchTab", "Search", {
                         "data-toggle": "tab",
-                        className: "nav-link" + (state.activeTab == "searchTab" ? " active" : ""),
+                        className: "nav-link" + (state.activeTab === "searchTab" ? " active" : ""),
                         onClick: () => {
                             dispatch({
                                 type: "Action_SetTab",
@@ -100,7 +93,7 @@ export class TabPanel extends Div {
                 },
                     [new Anchor("#timelineTab", "Timeline", {
                         "data-toggle": "tab",
-                        className: "nav-link" + (state.activeTab == "timelineTab" ? " active" : ""),
+                        className: "nav-link" + (state.activeTab === "timelineTab" ? " active" : ""),
                         onClick: () => {
                             dispatch({
                                 type: "Action_SetTab",
@@ -118,7 +111,7 @@ export class TabPanel extends Div {
                 },
                     [new Anchor("#feedTab", "Feed", {
                         "data-toggle": "tab",
-                        className: "nav-link" + (state.activeTab == "feedTab" ? " active" : ""),
+                        className: "nav-link" + (state.activeTab === "feedTab" ? " active" : ""),
                         onClick: () => {
                             dispatch({
                                 type: "Action_SetTab",

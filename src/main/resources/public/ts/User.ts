@@ -108,10 +108,10 @@ export class User implements UserIntf {
                             S.meta64.loadAnonPageHome(state);
                         }
                     },
-                        async (error: string) => {
-                            await S.user.deleteAllUserLocalDbEntries();
-                            S.meta64.loadAnonPageHome(state);
-                        });
+                    async (error: string) => {
+                        await S.user.deleteAllUserLocalDbEntries();
+                        S.meta64.loadAnonPageHome(state);
+                    });
                 }
             }
             finally {

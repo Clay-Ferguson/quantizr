@@ -22,7 +22,7 @@ export class UploadFromUrlDlg extends DialogBase {
 
     constructor(private node: J.NodeInfo, private url: string, private onUploadFunc: Function, state: AppState) {
         super("Upload File", null, false, state);
-        this.mergeState({url});
+        this.mergeState({ url });
     }
 
     renderDlg(): CompIntf[] {

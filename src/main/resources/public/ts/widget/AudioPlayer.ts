@@ -16,9 +16,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 //Creates an HTMLAudioElement
 export class AudioPlayer extends Comp {
 
-    constructor(attribs: Object) {
-        super(attribs);
-    }
+    // constructor(attribs: Object) {
+    //     super(attribs);
+    // }
     
     compRender(): ReactNode {
         return S.e("audio", this.attribs);

@@ -28,7 +28,7 @@ export class MessageDlg extends DialogBase {
         return [
             this.message ? new TextContent(this.message, null, this.preformatted) : null,
             this.customWidget,
-            this.flashTimeout == 0 ? new ButtonBar([
+            this.flashTimeout === 0 ? new ButtonBar([
                 new Button("Ok", () => {
                     this.close();
 

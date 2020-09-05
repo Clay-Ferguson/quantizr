@@ -26,7 +26,7 @@ export class ServerPush implements ServerPushIntf {
 
         eventSource.onopen = (e: any) => {
             //onsole.log("ServerPush.onopen" + e);
-        }
+        };
 
         eventSource.onerror = (e: any) => {
             //console.log("ServerPush.onerror:" + e);
@@ -47,7 +47,7 @@ export class ServerPush implements ServerPushIntf {
                         /* If we detect the incomming change that is our own creation, we display it, but if it's not our own we
                         don't display because for now we aren't doing live feed updates since that can be a nuisance for users to have the
                         page change while they're maybe reading it */
-                        if (nodeInfo.owner == s.userName) {
+                        if (nodeInfo.owner === s.userName) {
 
                             //this is a slight hack to cause the new rows to animate their background, but it's ok, and I plan to leave it like this
                             S.render.fadeInId = nodeInfo.id;
@@ -79,4 +79,3 @@ export class ServerPush implements ServerPushIntf {
         }, false);
     }
 }
-

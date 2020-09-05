@@ -49,7 +49,7 @@ export class Share implements ShareIntf {
     */
     addCipherKeyToNode = async (node: J.NodeInfo, principalPublicKeyStr: string, principalNodeId: string): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            if (principalNodeId == "public") {
+            if (principalNodeId === "public") {
                 console.warn("public node has encryption turned on. This is a bug.");
                 resolve();
             }

@@ -1,19 +1,11 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { Form } from "../widget/Form";
 import { VerticalLayout } from "../widget/VerticalLayout";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 /**
  * Dialog to let user configure encryption for a node. Output is stored in 'this.encrypted', don't get it from the state

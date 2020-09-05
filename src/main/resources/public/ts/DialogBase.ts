@@ -44,9 +44,9 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         super(null);
         this.appState = appState;
 
-        this.attribs.className = clientInfo.isMobile ?
-            (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen") :
-            (this.overrideClass ? this.overrideClass : "app-modal-content");
+        this.attribs.className = clientInfo.isMobile 
+            ? (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen") 
+            : (this.overrideClass ? this.overrideClass : "app-modal-content");
     }
 
     /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is 
@@ -87,11 +87,11 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             //this renders the dlgComp onto the screen (on the backdrop elm)
             this.domRender();
 
-            if (++DialogBase.refCounter == 1) {
+            if (++DialogBase.refCounter === 1) {
                 /* we only hide and reshow the scroll bar and disable scrolling when we're in mobile mode, because that's when 
                 full-screen dialogs are in use, which is when we need this. */
                 if (clientInfo.isMobile) {
-                    document.body.style.overflow = 'hidden';
+                    document.body.style.overflow = "hidden";
                 }
             }
 
@@ -125,7 +125,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
 
             if (--DialogBase.refCounter <= 0) {
                 if (clientInfo.isMobile) {
-                    document.body.style.overflow = 'auto';
+                    document.body.style.overflow = "auto";
                 }
             }
         }
@@ -166,7 +166,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             children.push(new Div(null, {
                 className: "app-modal-title"
             },
-                titleChildren
+            titleChildren
             ));
             timesIcon.renderRawHtml = true;
         }

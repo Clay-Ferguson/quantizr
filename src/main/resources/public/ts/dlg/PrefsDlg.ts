@@ -51,7 +51,7 @@ export class PrefsDlg extends DialogBase {
 
     savePreferences = (): void => {
         S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
-            "userPreferences": {
+            userPreferences: {
                 editMode: this.appState.userPreferences.editMode,
                 importAllowed: false,
                 exportAllowed: false,

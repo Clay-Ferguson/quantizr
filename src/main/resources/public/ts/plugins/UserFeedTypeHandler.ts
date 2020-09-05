@@ -22,20 +22,19 @@ export class UserFeedTypeHandler extends TypeBase {
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
-
         switch (action) {
-            case NodeActionType.addChild:
-                return S.props.isMine(node, appState);
-            case NodeActionType.editNode:
-                return false;
-            default:
-                return true;
+        case NodeActionType.addChild:
+            return S.props.isMine(node, appState);
+        case NodeActionType.editNode:
+            return false;
+        default:
+            return true;
         }
     }
     
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
 
-        let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
+        //let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
         return new Div(null, null, [
             new Heading(4, "Posts: " + node.owner, {
                 className: "marginAll"

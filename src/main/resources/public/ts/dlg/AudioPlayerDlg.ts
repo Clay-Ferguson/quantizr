@@ -44,7 +44,7 @@ export class AudioPlayerDlg extends DialogBase {
     NOTE: Originally this app had an automatic AD-blocking 
     feature (see adSegments, commented out currently in the code), which automatically made this player
     skip right over ADs just like they didn't even exist!
-    
+
     If the 'adSegments' array variable below contains an array of start/stop times then during playback this player will seamlessly and autmatically
     jump over those time ranges in the audio just like they didn't even exist. It's basically censoring out those time ranges.
     Currently we aren't using this at all, but was the core of the ad-blocker featue that i deciced to remove.
@@ -138,8 +138,7 @@ export class AudioPlayerDlg extends DialogBase {
                 if (this.playButton) {
                     this.playButton.setText("Pause");
                 }
-            }
-            else {
+            } else {
                 this.player.pause();
                 if (this.playButton) {
                     this.playButton.setText("Play");

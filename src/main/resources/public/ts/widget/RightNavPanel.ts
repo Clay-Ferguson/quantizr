@@ -1,14 +1,5 @@
-import { useSelector } from "react-redux";
-import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Div } from "./Div";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class RightNavPanel extends Div {
 
@@ -18,7 +9,7 @@ export class RightNavPanel extends Div {
     }
 
     preRender(): void {
-        const state: AppState = useSelector((state: AppState) => state);
+        //const state: AppState = useSelector((state: AppState) => state);
 
         this.setChildren([
         ]);

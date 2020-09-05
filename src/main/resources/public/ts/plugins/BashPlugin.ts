@@ -1,11 +1,3 @@
-import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 //todo-1: temporarily disabling
 // class BashTypeHandler implements TypeHandlerIntf {

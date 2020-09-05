@@ -44,7 +44,7 @@ export class Props implements PropsIntf {
 
     moveNodePosition = (props: J.PropertyInfo[], idx: number, typeName: string): number => {
         let tagIdx: number = S.util.arrayIndexOfItemByProp(props, "name", typeName);
-        if (tagIdx != -1) {
+        if (tagIdx !== -1) {
             S.util.arrayMoveItem(props, tagIdx, idx++);
         }
         return idx;
@@ -73,7 +73,7 @@ export class Props implements PropsIntf {
     private movePropsToTop = (propsList: string[], props: J.PropertyInfo[]) => {
         for (let prop of propsList) {
             let tagIdx = S.util.arrayIndexOfItemByProp(props, "name", prop);
-            if (tagIdx != -1) {
+            if (tagIdx !== -1) {
                 S.util.arrayMoveItem(props, tagIdx, 0);
             }
         }
@@ -83,7 +83,7 @@ export class Props implements PropsIntf {
     private movePropsToEnd = (propsList: string[], props: J.PropertyInfo[]) => {
         for (let prop of propsList) {
             let tagIdx = S.util.arrayIndexOfItemByProp(props, "name", prop);
-            if (tagIdx != -1) {
+            if (tagIdx !== -1) {
                 S.util.arrayMoveItem(props, tagIdx, props.length);
             }
         }
@@ -114,7 +114,7 @@ export class Props implements PropsIntf {
 
                 let propTableRow = new PropTableRow({
                     className: "prop-table-row"
-                }, [propNameCell, propValCell])
+                }, [propNameCell, propValCell]);
                 propTable.addChild(propTableRow);
             });
             return propTable;
@@ -128,8 +128,9 @@ export class Props implements PropsIntf {
      * (PropertyInfo.java) with name matching propertyName, else null.
      */
     getNodeProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {
-        if (!node || !node.properties)
+        if (!node || !node.properties) {
             return null;
+        }
 
         return node.properties.find(p => p.name === propName);
     }
@@ -142,7 +143,7 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
         let cipherKey = null;
 
         /* if we own this node then this cipherKey for it will be ENC_KEY for us */
-        if (state.userName == node.owner) {
+        if (state.userName === node.owner) {
             cipherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
             console.log("getting cipherKey for node, from ENC_KEY: " + cipherKey);
         }
@@ -159,12 +160,12 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
     }
 
     isPublic = (node: J.NodeInfo): boolean => {
-        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId == 'public');
+        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === "public");
     }
 
     isMine = (node: J.NodeInfo, state: AppState): boolean => {
-        if (!state.userName || state.userName == J.PrincipalName.ANON) return false;
-        return state.userName == node.owner;
+        if (!state.userName || state.userName === J.PrincipalName.ANON) return false;
+        return state.userName === node.owner;
     }
 
     isEncrypted = (node: J.NodeInfo): boolean => {
@@ -200,7 +201,7 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
         let prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
 
         /* If we found a property by propertyName, then set it's value */
-        if (!!prop) {
+        if (prop) {
             prop.value = val;
         }
         /* Else this is a new property we must add (ret remains true here) */
@@ -236,7 +237,7 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
     //here's the simple mode property hider!
     initConstants = () => {
         S.util.addAllToSet(this.allBinaryProps, [ //
-            J.NodeProp.IMG_WIDTH,//
+            J.NodeProp.IMG_WIDTH, //
             J.NodeProp.IMG_HEIGHT, //
             J.NodeProp.IMG_SIZE, //
             J.NodeProp.BIN_MIME, //
@@ -288,4 +289,3 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
     //     return owner != meta64.userName;
     // }
 }
-

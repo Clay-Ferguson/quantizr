@@ -26,7 +26,7 @@ export class QuickEditField extends Span {
     constructor(private node: J.NodeInfo, private isFirst: boolean, private appState: AppState) {
         super();
         this.attribs.className = "col-9 quickEditSpan ";
-        let isEditing = QuickEditField.editingId == node.id && QuickEditField.editingIsFirst == isFirst;
+        let isEditing = QuickEditField.editingId === node.id && QuickEditField.editingIsFirst === isFirst;
 
         this.mergeState({
             quickEditVal: isEditing ? QuickEditField.editingVal : "",
@@ -108,7 +108,7 @@ export class QuickEditField extends Span {
         QuickEditField.editingId = null;
         QuickEditField.editingVal = null;
         let val = this.getState().quickEditVal;
-        let askToSplit = val.indexOf("{split}") != -1 || val.indexOf("\n\n\n") != -1;
+        let askToSplit = val.indexOf("{split}") !== -1 || val.indexOf("\n\n\n") !== -1;
 
         S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
             updateModTime: true,

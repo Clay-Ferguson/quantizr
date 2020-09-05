@@ -1,17 +1,9 @@
-import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Div } from "./Div";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class ListBoxRow extends Div {
 
     /* The isSelectedFunc is a way of delegating the state holding which row is selected to to the parent ListBox itself */
-    constructor(content: string = null, onClickFunc: Function=null) {
+    constructor(content: string = null, onClickFunc: Function = null) {
         super(content, {
             className: "list-group-item list-group-item-action listBoxRow",
         });

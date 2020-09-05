@@ -377,7 +377,7 @@ export class Nav implements NavIntf {
 
             state.node.children.some((child: J.NodeInfo) => {
                 let ret = false;
-                let isAnAccountNode = child.ownerId && child.id == child.ownerId;
+                let isAnAccountNode = child.ownerId && child.id === child.ownerId;
 
                 if (S.props.hasBinary(child) && !isAnAccountNode) {
 

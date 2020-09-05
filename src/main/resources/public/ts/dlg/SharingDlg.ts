@@ -21,7 +21,7 @@ export class SharingDlg extends DialogBase {
 
     constructor(private node: J.NodeInfo, state: AppState) {
         super("Node Sharing", "app-modal-content-medium-width", null, state);
-        this.mergeState({nodePrivsInfo: null});
+        this.mergeState({ nodePrivsInfo: null });
     }
 
     renderDlg(): CompIntf[] {
@@ -60,7 +60,7 @@ export class SharingDlg extends DialogBase {
             includeAcl: true,
             includeOwners: true
         }, (res: J.GetNodePrivilegesResponse): void => {
-            this.mergeState({nodePrivsInfo: res});
+            this.mergeState({ nodePrivsInfo: res });
         });
     }
 
@@ -78,7 +78,7 @@ export class SharingDlg extends DialogBase {
             includeAcl: true,
             includeOwners: true
         }, (res: J.GetNodePrivilegesResponse): void => {
-            this.mergeState({nodePrivsInfo: res});
+            this.mergeState({ nodePrivsInfo: res });
         });
     }
 

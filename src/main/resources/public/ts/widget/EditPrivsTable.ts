@@ -1,14 +1,11 @@
-import { Constants as C } from "../Constants";
 import * as I from "../Interfaces";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { EditPrivsTableRow } from "./EditPrivsTableRow";
 import { ListBox } from "./ListBox";
 
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+// let S: Singletons;
+// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+//     S = ctx;
+// });
 
 export class EditPrivsTable extends ListBox {
 

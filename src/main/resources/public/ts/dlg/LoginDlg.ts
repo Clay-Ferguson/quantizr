@@ -55,7 +55,7 @@ export class LoginDlg extends DialogBase {
         this.mergeState({
             user,
             password
-        })
+        });
        
         return null;
     }
@@ -72,7 +72,7 @@ export class LoginDlg extends DialogBase {
                 dst: S.util.daylightSavingsTime
             }, (res: J.LoginResponse) => {
                 S.user.loginResponse(res, usr, pwd, true, this.appState);
-                this.close()
+                this.close();
             });
         }
     }

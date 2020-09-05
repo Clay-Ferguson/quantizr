@@ -23,7 +23,7 @@ export class VideoPlayerDlg extends DialogBase {
     videoPlayer: VideoPlayer;
 
     constructor(private sourceUrl: string, private mediaTitle: string, state: AppState) {
-        super(mediaTitle ? mediaTitle : "Video", null, false, state);
+        super(mediaTitle || "Video", null, false, state);
     }
 
     renderDlg(): CompIntf[] {

@@ -30,7 +30,7 @@ export class Input extends Comp {
     _toggleType = (): void => {
         let state = this.getState();
         this.mergeState({
-            type: state.type == "password" ? "text" : "password"
+            type: state.type === "password" ? "text" : "password"
         });
     }
 

@@ -20,7 +20,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-declare var PROFILE;
+//declare var PROFILE;
 
 /**
  * This base class is a hybrid that can render React components or can be used to render plain HTML to be used in innerHTML of elements.
@@ -94,7 +94,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
     /* Returns true if there are any non-null children */
     childrenExist(): boolean {
-        if (this.children == null || this.children.length == 0) return false;
+        if (this.children == null || this.children.length === 0) return false;
         return this.children.some(child => !!child);
     }
 
@@ -246,7 +246,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         }
 
         //console.log("buildChildren: " + this.jsClassName);
-        if (this.children == null || this.children.length == 0) return null;
+        if (this.children == null || this.children.length === 0) return null;
         let reChildren: ReactNode[] = [];
 
         this.children.forEach(function (child: Comp) {
@@ -356,7 +356,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         if (!state) {
             state = {};
         }
-        if (typeof state == "function") {
+        if (typeof state === "function") {
             this.state = state(this.state);
         }
         else {
@@ -459,7 +459,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             if (Comp.enableMemoMap) {
 
                 //note: getting full state here is a big performance hit? There's definitely a performance issue.
-                appState = useSelector(function (state: AppState) { return state });
+                appState = useSelector(function (state: AppState) { return state; });
 
                 //NOTE: The final experimental definition of this function is that it returns a 'string' not an object.
                 let keyObj = this.makeCacheKeyObj(appState, state, props);

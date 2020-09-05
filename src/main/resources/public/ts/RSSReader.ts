@@ -1,8 +1,5 @@
 import axios from 'axios';
-import { Constants as C } from "./Constants";
 import { RSSReaderIntf } from "./intf/RSSReaderIntf";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
 
 /*
 WARNING: This code was experimental and never worked fully becasue the feed i was testing it on refused to send
@@ -10,11 +7,6 @@ anything but HTML back, which is NOT RSS, and i ended up trying to add '?format=
 worked. I need some way to detect this is happening, but for now i'll just go back to showing an error when
 the preferred rss processor is failing for any reason.
 */
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 export class RSSReader implements RSSReaderIntf {
 
@@ -36,7 +28,7 @@ export class RSSReader implements RSSReaderIntf {
             },
         })
             .then((response) => {
-                if (response.status == 200) {
+                if (response.status === 200) {
                     this.processData(response.data, callback);
                 }
             })

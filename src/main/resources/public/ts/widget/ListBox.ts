@@ -1,13 +1,5 @@
-import { Constants as C } from "../Constants";
 import { ValueIntf } from "../Interfaces";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Div } from "./Div";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class ListBox extends Div {
 
@@ -23,7 +15,7 @@ export class ListBox extends Div {
             return;
         }
 
-        if (value != this.valueIntf.getValue()) {
+        if (value !== this.valueIntf.getValue()) {
             this.valueIntf.setValue(value);
 
             //needing this line took a while to figure out. If nothing is setting any actual detectable state change

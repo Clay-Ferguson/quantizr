@@ -31,7 +31,7 @@ export class ProfileDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let state = this.getState();
+        //let state = this.getState();
         let profileImg: CompIntf = this.makeProfileImg();
 
         let children = [

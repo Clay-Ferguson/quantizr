@@ -39,7 +39,7 @@ export class TransferNodeDlg extends DialogBase {
                 new FormGroup(null, [
                     new Checkbox("Include Sub-Nodes", null, {
                         setValue: (checked: boolean): void => {
-                            this.mergeState({recursive: checked});
+                            this.mergeState({ recursive: checked });
                         },
                         getValue: (): boolean => {
                             return this.getState().recursive;

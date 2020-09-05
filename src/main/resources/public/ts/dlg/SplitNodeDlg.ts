@@ -27,14 +27,14 @@ export class SplitNodeDlg extends DialogBase {
         }
 
         let splitMode: string;
-        if (this.node.content.indexOf("\n\n\n") != -1) {
-            splitMode = "triple"
+        if (this.node.content.indexOf("\n\n\n") !== -1) {
+            splitMode = "triple";
         }
-        else if (this.node.content.indexOf("\n\n") != -1) {
-            splitMode = "double"
+        else if (this.node.content.indexOf("\n\n") !== -1) {
+            splitMode = "double";
         }
         else {
-            splitMode = "custom"
+            splitMode = "custom";
         }
 
         this.mergeState({
@@ -56,7 +56,7 @@ export class SplitNodeDlg extends DialogBase {
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().splitType == "inline";
+                        return this.getState().splitType === "inline";
                     }
                 }),
                 new RadioButton("Split into Children", true, "splitTypeGroup", null, {
@@ -66,7 +66,7 @@ export class SplitNodeDlg extends DialogBase {
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().splitType == "children";
+                        return this.getState().splitType === "children";
                     }
                 })
             ], "form-group-border marginBottom"),
@@ -79,7 +79,7 @@ export class SplitNodeDlg extends DialogBase {
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().splitMode == "double";
+                        return this.getState().splitMode === "double";
                     }
                 }),
                 new RadioButton("Double Blank Line", false, "splitSpacingGroup", null, {
@@ -89,7 +89,7 @@ export class SplitNodeDlg extends DialogBase {
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().splitMode == "triple";
+                        return this.getState().splitMode === "triple";
                     }
                 }),
                 new RadioButton("Custom Delimiter", false, "splitSpacingGroup", null, {
@@ -99,12 +99,12 @@ export class SplitNodeDlg extends DialogBase {
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().splitMode == "custom";
+                        return this.getState().splitMode === "custom";
                     }
                 }),
             ], "form-group-border marginBottom"),
 
-            (this.getState().splitMode == "custom") ? new TextField("Delimiter", false, null, {
+            (this.getState().splitMode === "custom") ? new TextField("Delimiter", false, null, {
                 getValue: (): string => {
                     return this.getState().delimiter;
                 },
@@ -130,17 +130,17 @@ export class SplitNodeDlg extends DialogBase {
         let state = this.getState();
 
         let delim = "";
-        if (state.splitMode == "double") {
+        if (state.splitMode === "double") {
             delim = "\n\n";
         }
-        else if (state.splitMode == "triple") {
+        else if (state.splitMode === "triple") {
             delim = "\n\n\n";
         }
-        else if (state.splitMode == "custom") {
+        else if (state.splitMode === "custom") {
             delim = state.delimiter;
         }
 
-        S.edit.splitNode(this.node, state.splitType, delim, this.appState)
+        S.edit.splitNode(this.node, state.splitType, delim, this.appState);
         this.close();
     }
 }

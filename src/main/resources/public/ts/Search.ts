@@ -38,8 +38,8 @@ export class Search implements SearchIntf {
     numSearchResults = (res: J.NodeSearchResponse): number => {
         return !!res && //
             !!res.searchResults && //
-            !!res.searchResults.length ? //
-            res.searchResults.length : 0;
+            !!res.searchResults.length //
+            ? res.searchResults.length : 0;
     }
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
@@ -74,7 +74,7 @@ export class Search implements SearchIntf {
             goToLastPage: false,
             forceIPFSRefresh: false,
             singleNode: false
-        }, (res) => { S.nav.navPageNodeResponse(res, state) });
+        }, (res) => { S.nav.navPageNodeResponse(res, state); });
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
@@ -148,7 +148,7 @@ export class Search implements SearchIntf {
         //clazz += " non-editing-border"
         //}
 
-        if (S.render.fadeInId == node.id) {
+        if (S.render.fadeInId === node.id) {
             S.render.fadeInId = null;
             clazz += " fadeInRowBkgClz";
         }
@@ -164,7 +164,7 @@ export class Search implements SearchIntf {
             }
         }
         else {
-            clazz += " inactive-row"
+            clazz += " inactive-row";
         }
 
         let div = new Div(null, {

@@ -33,7 +33,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
                 new TextContent("Enter JWK Key Text"),
                 this.keyTextField = new Textarea("Keys", {
                     rows: 15
-                },  new CompValueHolder<string>(this, "keyText")),
+                }, new CompValueHolder<string>(this, "keyText")),
                 new ButtonBar([
                     new Button("Import", this.import, null, "btn-primary"),
                     new Button("Close", () => {
@@ -63,4 +63,3 @@ export class ImportCryptoKeyDlg extends DialogBase {
         this.close();
     }
 }
-

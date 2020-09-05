@@ -49,7 +49,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let state = this.getState();
+        //let state = this.getState();
         //S.log("upload.renderDlg: state.toIpfs="+state.toIpfs);
         let children = [
             new Form(null, [
@@ -129,7 +129,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     upload = async (): Promise<boolean> => {
-        let state = this.getState();
+        //let state = this.getState();
         return new Promise<boolean>(async (resolve, reject) => {
             if (this.filesAreValid()) {
 
@@ -139,7 +139,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 if (files.length > 0) {
                     files.forEach((file: File) => {
                         S.log("Dropzone Processing File: " + file.name);
-                        this.dropzone.processFile(file)
+                        this.dropzone.processFile(file);
                     });
                 }
             }
@@ -168,7 +168,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             action,
             width: "100%",
             height: "100%",
-            progressBarWidth: '100%',
+            progressBarWidth: "100%",
             url,
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
@@ -275,12 +275,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         //it's too late to check the count here. it may be down to one. need to get mutiFlag right when processing starts
                         if (dlg.numFiles > 1) {
                             let properties: J.PropertyInfo[] = [
-                                { "name": J.NodeProp.BIN, value: "[null]" },
-                                { "name": J.NodeProp.IPFS_LINK, value: ipfsHash },
-                                { "name": J.NodeProp.BIN_MIME, value: file.type },
-                                { "name": J.NodeProp.BIN_SIZE, value: `${file.size}` },
-                                { "name": J.NodeProp.BIN_FILENAME, value: file.name },
-                                { "name": J.NodeProp.IMG_SIZE, value: "100%" }
+                                { name: J.NodeProp.BIN, value: "[null]" },
+                                { name: J.NodeProp.IPFS_LINK, value: ipfsHash },
+                                { name: J.NodeProp.BIN_MIME, value: file.type },
+                                { name: J.NodeProp.BIN_SIZE, value: `${file.size}` },
+                                { name: J.NodeProp.BIN_FILENAME, value: file.name },
+                                { name: J.NodeProp.IMG_SIZE, value: "100%" }
                             ];
 
                             S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
@@ -374,7 +374,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     filesAreValid = (): boolean => {
-        let state = this.getState();
+        //let state = this.getState();
         if (!this.fileList || this.fileList.length == 0 || this.fileList.length > this.maxFiles) {
             return false;
         }

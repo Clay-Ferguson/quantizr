@@ -36,7 +36,7 @@ export class InboxNotifyDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Go to Inbox", () => {
                         this.close();
-                        S.nav.openContentNode("~"+J.NodeType.INBOX, this.appState);
+                        S.nav.openContentNode("~" + J.NodeType.INBOX, this.appState);
                     }),
                     new Button("Maybe later", () => {
                         this.close();

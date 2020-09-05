@@ -1,19 +1,16 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
 import * as I from "../Interfaces";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Button } from "./Button";
 import { CompDemoButton } from "./CompDemoButton";
 import { Div } from "./Div";
 import { Textarea } from "./Textarea";
 
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+// let S: Singletons;
+// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+//     S = ctx;
+// });
 
 export class CompDemo extends Div {
     textarea: I.TextEditorIntf;
@@ -24,8 +21,8 @@ export class CompDemo extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
-        let cstate = this.getState();
+        // let state: AppState = useSelector((state: AppState) => state);
+        // let cstate = this.getState();
         let children: CompIntf[] = [];
 
         children.push(this.textarea = new Textarea("Textarea", {

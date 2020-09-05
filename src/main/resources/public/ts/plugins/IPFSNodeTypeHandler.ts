@@ -21,7 +21,7 @@ export class IPFSNodeTypeHandler extends TypeBase {
     }
 
     allowPropertyEdit(propName: string): boolean {
-        if (propName == "sn:linkName" || propName == J.NodeProp.IPFS_LINK) {
+        if (propName === "sn:linkName" || propName === J.NodeProp.IPFS_LINK) {
             return true;
         }
         return false;
@@ -31,7 +31,7 @@ export class IPFSNodeTypeHandler extends TypeBase {
         let ret: Comp[] = [];
 
         let name = node.content;
-    if (name) {
+        if (name) {
             let linkName = S.props.getNodePropVal(J.NodeProp.IPFS_LINK_NAME, node);
             if (linkName) {
                 ret.push(new Heading(6, "Link Name: " + linkName, { className: "ipfs-text" }));
@@ -57,5 +57,3 @@ export class IPFSNodeTypeHandler extends TypeBase {
         return new Div(null, null, ret);
     }
 }
-
-

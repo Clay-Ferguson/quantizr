@@ -32,7 +32,7 @@ export class InlineEditField extends Span {
     }
 
     preRender(): void {
-        let state = this.getState();
+        //let state = this.getState();
 
         let textarea = new Textarea(null, {
             rows: 10,
@@ -67,8 +67,8 @@ export class InlineEditField extends Span {
             update: (s: AppState): void => {
                 s.inlineEditId = null;
                 this.node.content = this.getState().inlineEditVal;
-                let askToSplit = this.node.content && (this.node.content.indexOf("{split}") != -1 ||
-                    this.node.content.indexOf("\n\n\n") != -1);
+                let askToSplit = this.node.content && (this.node.content.indexOf("{split}") !== -1 ||
+                    this.node.content.indexOf("\n\n\n") !== -1);
 
                 S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                     updateModTime: true,

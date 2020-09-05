@@ -23,17 +23,17 @@ export class RadioButton extends Comp {
 
         this.attribs.onChange = (evt: any) => {
             this.updateValFunc(evt.target.checked);
-        }
+        };
 
         this.attribs.name = groupName; 
         this.attribs.type = "radio";
         this.attribs.label = label;
-        this.attribs.value = "val-"+this.getId();
+        this.attribs.value = "val-" + this.getId();
     }
 
     //Handler to update state
     updateValFunc(value: boolean): void {
-        if (value != this.valueIntf.getValue()) {
+        if (value !== this.valueIntf.getValue()) {
             this.valueIntf.setValue(value);
 
             //needing this line took a while to figure out. If nothing is setting any actual detectable state change

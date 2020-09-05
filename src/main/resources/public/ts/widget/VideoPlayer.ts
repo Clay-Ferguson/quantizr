@@ -14,12 +14,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 //https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API 
 export class VideoPlayer extends Comp {
 
-    constructor(attribs: Object) {
-        super(attribs);
-    }
-
     getVideoElement(): HTMLVideoElement {
-        return <HTMLVideoElement>this.getElement();
+        return <HTMLVideoElement> this.getElement();
     }
 
     compRender(): ReactNode {

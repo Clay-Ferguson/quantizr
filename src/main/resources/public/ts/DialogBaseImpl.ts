@@ -7,4 +7,3 @@ export interface DialogBaseImpl {
     renderDlg(): CompIntf[];
     renderButtons(): CompIntf;
 }
-

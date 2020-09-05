@@ -19,14 +19,14 @@ export class IconButton extends Comp {
 
     compRender(): ReactNode {
         let state = this.getState();
-        let _style = { display: (state.visible && !state.disabled ? '' : 'none') };
+        let _style = { display: (state.visible && !state.disabled ? "" : "none") };
         let _attribs = { ...this.attribs, ...{ style: _style } };
 
         let toggleClass = "";
-        if (this.toggle=="on") {
+        if (this.toggle === "on") {
             toggleClass = " iconToggleOn";
         }
-        else if (this.toggle=="off") {
+        else if (this.toggle === "off") {
             toggleClass = " iconToggleOff";
         }
 
@@ -37,7 +37,7 @@ export class IconButton extends Comp {
             }, [
                 S.e("span", {
                     key: "s_" + this.getId(),
-                    className: 'button-font'
+                    className: "button-font"
                 }, this.text == null ? null : " " + this.text)
             ], true)
         );

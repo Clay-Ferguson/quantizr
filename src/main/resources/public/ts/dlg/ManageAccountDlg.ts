@@ -61,7 +61,7 @@ export class ManageAccountDlg extends DialogBase {
                     let info = //
                         "Your Storage Quota: " + S.util.formatMemory(res.binQuota) + "\n" +//
                         "Storage Used: " + S.util.formatMemory(res.binTotal) + "\n" +//
-                        "Percent Used: " + used //
+                        "Percent Used: " + used;
 
                     this.mergeState({ info });
                     resolve();

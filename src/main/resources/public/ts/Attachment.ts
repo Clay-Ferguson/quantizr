@@ -88,11 +88,11 @@ export class Attachment implements AttachmentIntf {
             forceIPFSRefresh: false,
             singleNode: true
         },
-            (res: J.RenderNodeResponse) => {
-                if (res.node.properties) {
-                    S.props.transferBinaryProps(res.node, node);
-                }
-            });
+        (res: J.RenderNodeResponse) => {
+            if (res.node.properties) {
+                S.props.transferBinaryProps(res.node, node);
+            }
+        });
 
         return res;
     }
@@ -111,9 +111,10 @@ export class Attachment implements AttachmentIntf {
         }
     }
 
-    removeBinaryPropertiesById = (id: string, state: AppState) => {
-        if (!state.node || !state.node.children) return;
-        let node = state.node.children.find(node => node.id == id);
+    //todo-0: remove this?
+    removeBinaryPropertiesById = (id: string, state: AppState): any => {
+        //if (!state.node || !state.node.children) return;
+        //let node = state.node.children.find(node => node.id === id);
     }
 
     removeBinaryProperties = (node: J.NodeInfo) => {

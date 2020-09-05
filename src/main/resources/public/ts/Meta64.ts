@@ -79,7 +79,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     selectTab = (tabName: string): void => {
-        let state = store.getState();
+        //let state = store.getState();
 
         /* if tab is already active no need to update state now 
         
@@ -134,7 +134,7 @@ export class Meta64 implements Meta64Intf {
     getSelNodesAsMapById = (state: AppState): Object => {
         let ret: Object = {};
         let selArray: J.NodeInfo[] = this.getSelNodesArray(state);
-        if (!selArray || selArray.length == 0) {
+        if (!selArray || selArray.length === 0) {
             let node = this.getHighlightedNode(state);
             if (node) {
                 ret[node.id] = node;
@@ -164,7 +164,8 @@ export class Meta64 implements Meta64Intf {
 
     clearSelNodes = (state: AppState) => {
         dispatch({
-            type: "Action_ClearSelections", state,
+            type: "Action_ClearSelections", 
+            state,
             update: (s: AppState): void => {
                 s.selectedNodes = {};
             }
@@ -248,15 +249,15 @@ export class Meta64 implements Meta64Intf {
         let node: J.NodeInfo = state.idToNodeMap[nodeId];
 
         if (!node) {
-            node = state.feedResults.find(n => n.id == nodeId);
+            node = state.feedResults.find(n => n.id === nodeId);
         }
 
         if (!node) {
-            node = state.timelineResults.find(n => n.id == nodeId);
+            node = state.timelineResults.find(n => n.id === nodeId);
         }
 
         if (!node) {
-            node = state.searchResults.find(n => n.id == nodeId);
+            node = state.searchResults.find(n => n.id === nodeId);
         }
         return node;
     }
@@ -289,10 +290,10 @@ export class Meta64 implements Meta64Intf {
 
     getNodeByName = (node: J.NodeInfo, name: string, state: AppState): J.NodeInfo => {
         if (!node) return null;
-        if (node.name == name) return node;
+        if (node.name === name) return node;
 
         if (node.children) {
-            return state.node.children.find(node => node.name == name);
+            return state.node.children.find(node => node.name === name);
         }
         return null;
     }
@@ -318,8 +319,9 @@ export class Meta64 implements Meta64Intf {
             // this.propOrderingFunctionsByType["meta64:filelist"] = systemfolder.fileListPropOrdering;
 
             (window as any).addEvent = (object: any, type: any, callback: any) => {
-                if (object == null || typeof (object) == 'undefined')
+                if (object == null || typeof (object) === "undefined") {
                     return;
+                }
                 if (object.addEventListener) {
                     object.addEventListener(type, callback, false);
                 } else if (object.attachEvent) {
@@ -356,12 +358,12 @@ export class Meta64 implements Meta64Intf {
                 //if (event.ctrlKey) {
 
                 switch (event.code) {
-                    case "Escape":
-                        if (state.fullScreenViewId && state.fullScreenGraphId) {
-                            S.nav.closeFullScreenImgViewer(state);
-                        }
-                       
-                        break;
+                case "Escape":
+                    if (state.fullScreenViewId && state.fullScreenGraphId) {
+                        S.nav.closeFullScreenImgViewer(state);
+                    }
+                    
+                    break;
 
                     // case "ArrowDown": 
                     //     if (this.keyDebounce()) return;
@@ -375,30 +377,31 @@ export class Meta64 implements Meta64Intf {
                     //     S.view.scrollRelativeToNode("up", state);
                     //     break;
 
-                    case "ArrowLeft":
-                        if (this.keyDebounce()) return;
-                        //S.nav.navUpLevel();
-                        if (state.fullScreenViewId) {
-                            S.nav.prevFullScreenImgViewer(state);
-                        }
-                        break;
+                case "ArrowLeft":
+                    if (this.keyDebounce()) return;
+                    //S.nav.navUpLevel();
+                    if (state.fullScreenViewId) {
+                        S.nav.prevFullScreenImgViewer(state);
+                    }
+                    break;
 
-                    case "ArrowRight":
-                        if (this.keyDebounce()) return;
-                        state = store.getState();
-                        //S.nav.navOpenSelectedNode(state);
-                        if (state.fullScreenViewId) {
-                            S.nav.nextFullScreenImgViewer(state);
-                        }
-                        break;
+                case "ArrowRight":
+                    if (this.keyDebounce()) return;
+                    state = store.getState();
+                    //S.nav.navOpenSelectedNode(state);
+                    if (state.fullScreenViewId) {
+                        S.nav.nextFullScreenImgViewer(state);
+                    }
+                    break;
 
-                    default: break;
+                default: break;
                 }
                 //}
             });
 
-            if (this.appInitialized)
+            if (this.appInitialized) {
                 return;
+            }
 
             this.appInitialized = true;
 
@@ -432,7 +435,7 @@ export class Meta64 implements Meta64Intf {
             this.deviceHeight = window.innerHeight;
 
             //This is the root react App component that contains the entire application
-            this.app = new App();  //new AppDemo
+            this.app = new App(); //new AppDemo
             this.app.updateDOM(store, "app");
 
             /*
@@ -503,7 +506,7 @@ export class Meta64 implements Meta64Intf {
             throw new Error("Overlay calls are mismatched");
         }
 
-        if (Meta64.overlayCounter == 1) {
+        if (Meta64.overlayCounter === 1) {
 
             /* Whenever we are about to show the overlay always give the app 0.7 seconds before showing the overlay in case
             the app did something real fast and the display of the overlay would have just been a wasted annoyance (visually)
@@ -521,7 +524,7 @@ export class Meta64 implements Meta64Intf {
                 }
             }, 1200);
         }
-        else if (Meta64.overlayCounter == 0) {
+        else if (Meta64.overlayCounter === 0) {
             //console.log("hiding overlay.");
             let elm = S.util.domElm("overlayDiv");
             if (elm) {
@@ -572,7 +575,7 @@ export class Meta64 implements Meta64Intf {
         console.log("loadAnonPageHome()");
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null,
             (res: J.RenderNodeResponse): void => {
-                if (!res.success || res.exceptionType == "auth") {
+                if (!res.success || res.exceptionType === "auth") {
                     S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
                 }
                 S.render.renderPageFromData(res, false, null, true, true, state);
@@ -617,7 +620,8 @@ export class Meta64 implements Meta64Intf {
         }
 
         dispatch({
-            type: "Action_LoginResponse", state,
+            type: "Action_LoginResponse", 
+            state,
             update: (s: AppState): void => {
                 s.title = title;
             }
@@ -626,7 +630,7 @@ export class Meta64 implements Meta64Intf {
 
     //todo-1: need to decide if I want this. It's disabled currently (not called)
     removeRedundantFeedItems = (feedResults: J.NodeInfo[]): J.NodeInfo[] => {
-        if (!feedResults || feedResults.length == 0) return feedResults;
+        if (!feedResults || feedResults.length === 0) return feedResults;
 
         //first build teh set of ids that that are in 'ni.parent.id' 
         let idSet: Set<string> = new Set<string>();

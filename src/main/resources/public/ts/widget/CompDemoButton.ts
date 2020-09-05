@@ -1,18 +1,15 @@
 import { useSelector } from "react-redux";
 import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
 import { HorizontalLayout } from "./HorizontalLayout";
 
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+// let S: Singletons;
+// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+//     S = ctx;
+// });
 
 export class CompDemoButton extends Div {
 
@@ -31,7 +28,7 @@ export class CompDemoButton extends Div {
 
         children.push(new HorizontalLayout([
             new Div("Button " + cstate.idx + ": Inc CompDemo.state.counter=" + cstate.counter + " AppState.counter=" + state.counter, {
-                className: "btn btn-primary" + (state.compDemoIdActive == cstate.idx ? " testHighlight": ""), 
+                className: "btn btn-primary" + (state.compDemoIdActive === cstate.idx ? " testHighlight": ""), 
                 type: "button",
                 onClick: () => {
                     Comp.renderCounter = 0;
@@ -39,7 +36,8 @@ export class CompDemoButton extends Div {
                     this.mergeState({ counter: ++cstate.counter });
 
                     dispatch({
-                        type: "Action_DemoAppIncCounter", state,
+                        type: "Action_DemoAppIncCounter", 
+                        state,
                         update: (s: AppState): void => {
                             s.compDemoIdActive = cstate.idx;
                         },

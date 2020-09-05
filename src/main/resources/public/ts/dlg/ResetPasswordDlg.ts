@@ -21,7 +21,7 @@ export class ResetPasswordDlg extends DialogBase {
 
     constructor(user: string, state: AppState) {
         super("Reset Password", "app-modal-content-narrow-width", false, state);
-        this.mergeState({user});
+        this.mergeState({ user });
     }
     
     renderDlg(): CompIntf[] {
@@ -51,7 +51,7 @@ export class ResetPasswordDlg extends DialogBase {
         var emailAddress = state.email;
 
         /* Note: Admin check is done also on server, so no browser hacking can get around this */
-        if (userName && emailAddress && userName.toLowerCase() != "admin") {
+        if (userName && emailAddress && userName.toLowerCase() !== "admin") {
             S.util.ajax<J.ResetPasswordRequest, J.ResetPasswordResponse>("resetPassword", {
                 user: userName,
                 email: emailAddress

@@ -19,7 +19,7 @@ export class PubSub {
     /* 'retro=true' means that at the time we subscribe if an event of that type
     had already been published, then we refire it with the arguments it had last time it fired
     */
-    static sub = (name: string, fn: Function, retro : boolean=true) => {
+    static sub = (name: string, fn: Function, retro : boolean = true) => {
         if (retro && PubSub.lastFires[name]) {
             fn.apply(null, PubSub.lastFires[name]);
         }

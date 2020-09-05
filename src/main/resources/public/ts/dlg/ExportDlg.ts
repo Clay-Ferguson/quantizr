@@ -37,7 +37,7 @@ export class ExportDlg extends DialogBase {
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().exportType == "zip";
+                        return this.getState().exportType === "zip";
                     }
                 }),
                 new RadioButton("TAR", false, "exportTypeGroup", null, {
@@ -47,7 +47,7 @@ export class ExportDlg extends DialogBase {
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().exportType == "tar";
+                        return this.getState().exportType === "tar";
                     }
                 }),
                 new RadioButton("TAR.GZ", false, "exportTypeGroup", null, {
@@ -57,7 +57,7 @@ export class ExportDlg extends DialogBase {
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().exportType == "tar.gz";
+                        return this.getState().exportType === "tar.gz";
                     }
                 }),
 

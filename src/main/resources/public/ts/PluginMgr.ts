@@ -1,4 +1,3 @@
-import { Constants as C } from "./Constants";
 import { PluginMgrIntf } from "./intf/PluginMgrIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { AccountTypeHandler } from "./plugins/AccountTypeHandler";
@@ -14,13 +13,6 @@ import { RssTypeHandler } from "./plugins/RssTypeHandler";
 import { TextTypeHandler } from "./plugins/TextTypeHandler";
 import { TrashNodeTypeHandler } from "./plugins/TrashNodeTypeHandler";
 import { UserFeedTypeHandler } from "./plugins/UserFeedTypeHandler";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 export class PluginMgr implements PluginMgrIntf {
 
@@ -66,4 +58,3 @@ export class PluginMgr implements PluginMgrIntf {
         //S.meta64.addTypeHandler("fs:lucene", this.luceneIndexTypeHandler);
     }
 }
-

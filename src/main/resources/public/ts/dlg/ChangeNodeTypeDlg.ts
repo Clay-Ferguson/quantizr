@@ -1,19 +1,11 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { NodeTypeListBox } from "../widget/NodeTypeListBox";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class ChangeNodeTypeDlg extends DialogBase {
 

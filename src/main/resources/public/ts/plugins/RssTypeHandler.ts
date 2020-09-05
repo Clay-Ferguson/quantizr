@@ -35,15 +35,15 @@ export class RssTypeHandler extends TypeBase {
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
-            case NodeActionType.upload:
-                return false;
-            default:
-                return true;
+        case NodeActionType.upload:
+            return false;
+        default:
+            return true;
         }
     }
 
     getEditLabelForProp(propName: string): string {
-        if (propName == J.NodeProp.RSS_FEED_SRC) {
+        if (propName === J.NodeProp.RSS_FEED_SRC) {
             return "RSS Feed URL";
         }
         return propName;
@@ -62,7 +62,7 @@ export class RssTypeHandler extends TypeBase {
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {
-        return propName == J.NodeProp.RSS_FEED_SRC;
+        return propName === J.NodeProp.RSS_FEED_SRC;
     }
 
     ensureDefaultProperties(node: J.NodeInfo) {
@@ -109,7 +109,8 @@ export class RssTypeHandler extends TypeBase {
                     //new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
                     //console.log(err.message || "RSS Feed failed to load.");
                     dispatch({
-                        type: "Action_RSSUpdated", state,
+                        type: "Action_RSSUpdated", 
+                        state,
                         update: (s: AppState): void => {
                             s.failedFeedCache[feedSrc] = "true";
                         },
@@ -117,7 +118,8 @@ export class RssTypeHandler extends TypeBase {
                 }
                 else {
                     dispatch({
-                        type: "Action_RSSUpdated", state,
+                        type: "Action_RSSUpdated", 
+                        state,
                         update: (s: AppState): void => {
                             s.feedCache[feedSrc] = feed;
                         },
@@ -166,11 +168,11 @@ export class RssTypeHandler extends TypeBase {
         let children: Comp[] = [];
         children.push(new Anchor(entry.link, entry.title, {
             style: { fontSize: "25px" },
-            "target": "_blank"
+            target: "_blank"
         }));
 
         if (entry.enclosure && entry.enclosure.url && entry.enclosure.type &&
-            entry.enclosure.type.indexOf("audio/") != -1) {
+            entry.enclosure.type.indexOf("audio/") !== -1) {
             let audioButton = new Button("Play Audio", //
                 () => {
                     new AudioPlayerDlg(entry.enclosure.url, state).open();

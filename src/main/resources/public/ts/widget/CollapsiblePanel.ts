@@ -18,7 +18,7 @@ export class CollapsiblePanel extends Comp {
         this.setChildren(initialChildren);
         this.collapsedButtonText = collapsedButtonText || "More...";
         this.expandedButtonText = expandedButtonText || "Less...";
-        this.mergeState({expanded});
+        this.mergeState({ expanded });
     }
 
     setExpanded(expanded: boolean) {
@@ -34,24 +34,24 @@ export class CollapsiblePanel extends Comp {
             style: { marginTop: "10px", marginBottom: "10px" },
             key: "panel_" + this.getId()
         },
-            //This span is the expande/collapse button itself
-            S.e("span", {
-                className: style + " " + this.extraToggleButtonClass,
-                //Warning: This can't be camel case!
-                "data-toggle": collapseClass,
-                id: "btn_" + this.getId(),
-                key: "btn_" + this.getId(),
-                onClick: this.onToggle
-            }, state.expanded ? this.expandedButtonText : this.collapsedButtonText),
+        //This span is the expande/collapse button itself
+        S.e("span", {
+            className: style + " " + this.extraToggleButtonClass,
+            //Warning: This can't be camel case!
+            "data-toggle": collapseClass,
+            id: "btn_" + this.getId(),
+            key: "btn_" + this.getId(),
+            onClick: this.onToggle
+        }, state.expanded ? this.expandedButtonText : this.collapsedButtonText),
 
-            //This div and it's children holds the actual collapsible content.
-            S.e("div", {
-                className: collapseClass,
-                id: this.getId(),
-                key: "content_" + this.getId(),
-            },
-                this.buildChildren()
-            ));
+        //This div and it's children holds the actual collapsible content.
+        S.e("div", {
+            className: collapseClass,
+            id: this.getId(),
+            key: "content_" + this.getId(),
+        },
+        this.buildChildren()
+        ));
     }
 
     onToggle = (): void => {
@@ -62,4 +62,3 @@ export class CollapsiblePanel extends Comp {
         }
     }
 }
-

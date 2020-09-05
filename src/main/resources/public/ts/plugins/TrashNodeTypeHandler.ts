@@ -38,12 +38,10 @@ export class TrashNodeTypeHandler extends TypeBase {
             }),
             new ButtonBar([
                 new Button("Empty Trash", () => {
-                    S.edit.emptyTrash(state)
+                    S.edit.emptyTrash(state);
                 })
             ], null, "float-right marginBottom"),
             new Div(null, { className: "clearfix" })
         ]);
     }
 }
-
-

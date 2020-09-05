@@ -28,8 +28,7 @@ export interface PropertyIterator {
 
 /* Models a time-range in some media where an AD starts and stops */
 export class AdSegment {
-    constructor(public beginTime: number,//
-        public endTime: number) {
+    constructor(public beginTime: number, public endTime: number) {
     }
 }
 

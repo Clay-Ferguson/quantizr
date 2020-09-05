@@ -19,21 +19,21 @@ export class Selection extends Comp {
         //https://hackerthemes.com/bootstrap-cheatsheet/#m-1 
         this.attribs.className = "custom-select " + moreClasses;
 
-        selectionOptions.forEach(function (row: Object) {
+        selectionOptions.forEach(function (row: any) {
             //NOTE: for default selection we do it this way rather than the 'elm.selectedIndex' which is used to
             //to set selected item after rendered.
-            this.children.push(new SelectionOption(row['key'], row['val']));
+            this.children.push(new SelectionOption(row.key, row.val));
         }, this);
 
         this.attribs.onChange = (evt: any) => {
             this.updateValFunc(evt.target.value);
             //console.log("value = " + evt.target.value);
-        }
+        };
     }
 
     //Handler to update state
     updateValFunc(value: boolean): void {
-        if (value != this.valueIntf.getValue()) {
+        if (value !== this.valueIntf.getValue()) {
             this.valueIntf.setValue(value);
 
             //needing this line took a while to figure out. If nothing is setting any actual detectable state change

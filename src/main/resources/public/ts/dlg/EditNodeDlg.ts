@@ -150,7 +150,7 @@ export class EditNodeDlg extends DialogBase {
             let iconClass = typeHandler.getIconClass();
             if (iconClass) {
                 return new Icon({
-                    style: { marginRight: '12px', verticalAlign: 'middle' },
+                    style: { marginRight: "12px", verticalAlign: "middle" },
                     className: iconClass
                 });
             }
@@ -164,7 +164,7 @@ export class EditNodeDlg extends DialogBase {
 
         if (S.props.isEncrypted(state.node)) {
             comps.push(new Icon({
-                style: { marginLeft: '12px', verticalAlign: 'middle' },
+                style: { marginLeft: "12px", verticalAlign: "middle" },
                 className: "fa fa-lock fa-lg"
             }));
         }
@@ -187,14 +187,14 @@ export class EditNodeDlg extends DialogBase {
         let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
 
         //regardless of value, if this property is present we consider the type locked
-        let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
+        //let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
         //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
         //to dangerously opt into this also without hacking the code with this var.
         let allowEditAllProps: boolean = this.appState.isAdminUser;
 
-        let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
-        let allowShare = true;
+        // let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
+        // let allowShare = true;
 
         let children = [
             new Form(null, [
@@ -222,7 +222,7 @@ export class EditNodeDlg extends DialogBase {
                     }
                 },
                 getValue: (): boolean => {
-                    return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) != "1";
+                    return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) !== "1";
                 }
             }),
 
@@ -283,12 +283,12 @@ export class EditNodeDlg extends DialogBase {
 
         if (allowContentEdit) {
             //We use 4 rows instead of 15 only if this is a customProps node.
-            let rows = "15"
-            if (customProps && !!customProps.find(p => p == "content")) {
+            let rows = "15";
+            if (customProps && !!customProps.find(p => p === "content")) {
                 rows = "4";
             }
 
-            if (!customProps || (customProps && !!customProps.find(p => p == "content"))) {
+            if (!customProps || (customProps && !!customProps.find(p => p === "content"))) {
                 let contentTableRow = this.makeContentEditorFormGroup(state.node, isWordWrap, rows);
                 mainPropsTable.addChild(contentTableRow);
                 this.contentEditor.setWordWrap(isWordWrap);
@@ -307,7 +307,7 @@ export class EditNodeDlg extends DialogBase {
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!this.isGuiControlBasedProp(prop)) {
-                        let allowSelection = !customProps || !customProps.find(p => p == prop.name);
+                        let allowSelection = !customProps || !customProps.find(p => p === prop.name);
                         let tableRow = this.makePropEditor(typeHandler, prop, allowSelection);
                         propsParent.addChild(tableRow);
                     }
@@ -334,9 +334,9 @@ export class EditNodeDlg extends DialogBase {
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
             nodeNameTextField, optionsBar, selectionsBar, propsTable
         ], false,
-            (state: boolean) => {
-                EditNodeDlg.morePanelExpanded = state;
-            }, EditNodeDlg.morePanelExpanded, "float-right") : null;
+        (state: boolean) => {
+            EditNodeDlg.morePanelExpanded = state;
+        }, EditNodeDlg.morePanelExpanded, "float-right") : null;
 
         let binarySection: LayoutRow = null;
         if (hasAttachment) {
@@ -359,7 +359,7 @@ export class EditNodeDlg extends DialogBase {
                     ipfsLink ? new Div("Stored on IPFS", { className: "marginTop" }) : null,
                 ]),
 
-            ], "binaryEditorSection")
+            ], "binaryEditorSection");
         }
 
         this.propertyEditFieldContainer.setChildren([mainPropsTable, binarySection, collapsiblePanel]);
@@ -372,7 +372,7 @@ export class EditNodeDlg extends DialogBase {
                 S.props.setNodePropVal(propName, this.getState().node, checked ? "1" : null);
             },
             getValue: (): boolean => {
-                return S.props.getNodePropVal(propName, this.getState().node) == "1";
+                return S.props.getNodePropVal(propName, this.getState().node) === "1";
             }
         };
     }
@@ -576,8 +576,8 @@ export class EditNodeDlg extends DialogBase {
             state.node.content = content;
             await S.edit.updateIpfsNodeJson(state.node, this.appState);
 
-            let askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") != -1 ||
-                (state.node as J.NodeInfo).content.indexOf("\n\n\n") != -1);
+            let askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") !== -1 ||
+                (state.node as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
 
             //console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
 
@@ -608,7 +608,7 @@ export class EditNodeDlg extends DialogBase {
         let propVal = propEntry.value;
 
         let label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
-        let propValStr = propVal ? propVal : "";
+        let propValStr = propVal || "";
         propValStr = S.util.escapeForAttrib(propValStr);
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
         //     + "] fieldId=" + propEntry.id);

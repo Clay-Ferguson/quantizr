@@ -3,7 +3,6 @@ import { AppState } from "../AppState";
 import clientInfo from "../ClientInfo";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Div } from "./Div";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
@@ -16,10 +15,10 @@ import { TabPanel } from "./TabPanel";
 
 //todo-1: everywhere in the app that calls 'store.getState()' is highly suspicious becasue userSelector should be used most of the time
 
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+// let S: Singletons;
+// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+//     S = ctx;
+// });
 
 export class App extends Div {
     tabPanel: TabPanel = null;

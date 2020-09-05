@@ -1,12 +1,4 @@
-import { Constants as C } from "./Constants";
 import { LocalDBIntf } from "./intf/LocalDBIntf";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 /* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
 export class LocalDB implements LocalDBIntf {
@@ -68,7 +60,8 @@ export class LocalDB implements LocalDBIntf {
                     this.db = req.result;
                     this.runTrans(access, runner);
                 }
-            }
+            };
+            
             req.onerror = () => {
                 console.warn("runTrans failed");
             };
@@ -81,7 +74,7 @@ export class LocalDB implements LocalDBIntf {
             let keyPrefix = this.getKeyPrefix(userName);
             let obj: any = await this.readObject(keyPrefix + key);
             //console.log("LocalDB[" + LocalDB.DB_NAME + "] getVal name=" + keyPrefix + key + " val=" + (!!obj ? obj.val : null));
-            resolve(!!obj ? obj.val : null);
+            resolve(obj ? obj.val : null);
         });
     }
 
@@ -133,7 +126,7 @@ export class LocalDB implements LocalDBIntf {
 
         //allow parameter userName to override with special case handled for 'anon'
         if (userName) {
-            if (userName == "anon") {
+            if (userName === "anon") {
                 userName = null;
             }
             prefix = userName ? (userName + "_") : "kv_";

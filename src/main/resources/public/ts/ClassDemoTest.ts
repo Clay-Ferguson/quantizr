@@ -1,11 +1,3 @@
-import { Constants as C } from "./Constants";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 /**
  * This class was for proving to myself how certain aspects of inheritance work in TypeScript 

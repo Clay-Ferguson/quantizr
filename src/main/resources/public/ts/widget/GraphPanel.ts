@@ -1,18 +1,14 @@
 /* Graph code is temporarily disabled */
-import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 //import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
 import { Div } from "./Div";
-
 
 // https://github.com/visjs/vis-network
 //      npm install vis-network
 
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+// let S: Singletons;
+// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+//     S = ctx;
+// });
 
 export class GraphPanel extends Div {
 
@@ -71,4 +67,3 @@ export class GraphPanel extends Div {
         this.init();
     }
 }
-

@@ -20,10 +20,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class MainNavPanel extends NavTag {
 
-    constructor(attribs: any) {
-        super(attribs);
-    }
-
     compRender(): ReactNode {
         //console.log("Rendering MainNavPanel");
         const state: AppState = useSelector((state: AppState) => state);
@@ -264,7 +260,7 @@ export class MainNavPanel extends NavTag {
         elm.addEventListener("dragover", (event) => {
             //console.log('DRAGOVER: ' + S.util.prettyPrint(event));
             event.preventDefault();
-            event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
+            event.dataTransfer.dropEffect = "copy"; // See the section on the DataTransfer object.
         });
 
         elm.addEventListener("drop", (ev) => {
@@ -279,8 +275,8 @@ export class MainNavPanel extends NavTag {
                 let d = data[i];
                 console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
 
-                if ((d.kind == 'string') &&
-                    (d.type.match('^text/plain'))) {
+                if ((d.kind === "string") &&
+                    (d.type.match("^text/plain"))) {
                 }
 
                 d.getAsString((s) => {

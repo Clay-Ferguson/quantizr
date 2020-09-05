@@ -51,7 +51,7 @@ export class EditCredentialsDlg extends DialogBase<EditCredentialsDlgState> {
                             return this.getState().password;
                         },
                         setValue: (val: string): void => {
-                            this.mergeState({password: val});
+                            this.mergeState({ password: val });
                         }
                     })
                 ]),
@@ -73,7 +73,7 @@ export class EditCredentialsDlg extends DialogBase<EditCredentialsDlgState> {
         this.mergeState({
             user: await S.localDB.getVal(this.usrDbProp),
             password: await S.localDB.getVal(this.pwdDbProp)
-        })
+        });
     }
 
     saveCreds = async () => {

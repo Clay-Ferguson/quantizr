@@ -27,7 +27,7 @@ export class SearchFileSystemDlg extends DialogBase {
         this.whenElm((elm: HTMLSelectElement) => {
             this.searchTextField.focus();
         });
-        this.mergeState({searchText: SearchFileSystemDlg.defaultSearchText});
+        this.mergeState({ searchText: SearchFileSystemDlg.defaultSearchText });
     }
 
     renderDlg(): CompIntf[] {
@@ -81,6 +81,4 @@ export class SearchFileSystemDlg extends DialogBase {
         S.util.showMessage(res.message, "Note", true, "modal-lg");
         this.close();
     }
-
 }
-

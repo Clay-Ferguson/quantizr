@@ -1,7 +1,4 @@
-import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Button } from "./Button";
 import { ButtonBar } from "./ButtonBar";
 import { Div } from "./Div";
@@ -10,10 +7,10 @@ import { HorizontalLayout } from "./HorizontalLayout";
 import { ListBoxRow } from "./ListBoxRow";
 import { Span } from "./Span";
 
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+// let S: Singletons;
+// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+//     S = ctx;
+// });
 
 export class EditPrivsTableRow extends ListBoxRow {
 

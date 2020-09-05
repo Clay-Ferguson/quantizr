@@ -48,4 +48,3 @@ export interface EditIntf {
     updateIpfsNodeJson(node: J.NodeInfo, state: AppState): Promise<void>;
     initNodeEditResponse(res: J.InitNodeEditResponse, state: AppState, dialogEditor: boolean): void;
 }
-

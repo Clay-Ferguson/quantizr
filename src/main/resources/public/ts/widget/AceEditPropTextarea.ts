@@ -63,7 +63,7 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
 
             //always force word wrapping for markdown mode ??? maybe not, markdown can contain long code blocks sometimes, so
             //leave this up to user???
-            if (this.aceMode == "ace/mode/markdown") {
+            if (this.aceMode === "ace/mode/markdown") {
                 this.wordWrap = true;
             }
 
@@ -120,4 +120,3 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
         });
     }
 }
-

@@ -1,15 +1,12 @@
-import { Constants as C } from "../Constants";
 import { ValueIntf } from "../Interfaces";
 import { FriendInfo } from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { FriendsTableRow } from "./FriendsTableRow";
 import { ListBox } from "./ListBox";
 
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+// let S: Singletons;
+// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
+//     S = ctx;
+// });
 
 export class FriendsTable extends ListBox {
 
@@ -24,7 +21,7 @@ export class FriendsTable extends ListBox {
             this.friends.forEach((friend: FriendInfo) => {
                 children.push(new FriendsTableRow(friend, () => {
                     this.updateValFunc(friend.userName);
-                }, this.valueIntf.getValue() == friend.userName));
+                }, this.valueIntf.getValue() === friend.userName));
             });
         }
         this.setChildren(children);

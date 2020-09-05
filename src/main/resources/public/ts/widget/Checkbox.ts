@@ -36,12 +36,12 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
             //         Comp.renderCachedChildren = false;
             //     }, 250);
             // }
-        }
+        };
     }
 
     //Handler to update state
     updateValFunc(value: boolean): void {
-        if (value != this.valueIntf.getValue()) {
+        if (value !== this.valueIntf.getValue()) {
             this.valueIntf.setValue(value);
 
             //needing this line took a while to figure out. If nothing is setting any actual detectable state change

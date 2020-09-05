@@ -67,7 +67,7 @@ export class ShareToPersonDlg extends DialogBase {
         }
 
         let appState = store.getState();
-        if (targetUser == appState.userName) {
+        if (targetUser === appState.userName) {
             S.util.showMessage("You can't share a node to yourself.", "Warning");
             return;
         }

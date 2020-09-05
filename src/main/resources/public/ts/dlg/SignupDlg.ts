@@ -56,14 +56,14 @@ export class SignupDlg extends DialogBase {
 
     signupNow = (reCaptchaToken: string): void => {
         let state = this.getState();
-        let userName = state.user
+        let userName = state.user;
         let password = state.password;
         let email = state.email;
 
         /* no real validation yet, other than non-empty */
-        if (!userName || userName.length == 0 || //
-            !password || password.length == 0 || //
-            !email || email.length == 0) {
+        if (!userName || userName.length === 0 || //
+            !password || password.length === 0 || //
+            !email || email.length === 0) {
             S.util.showMessage("You cannot leave any fields blank.", "Warning");
             return;
         }

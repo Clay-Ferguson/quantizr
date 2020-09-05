@@ -1,14 +1,6 @@
 import { ReactNode } from "react";
-import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class Menu extends Div {
 
@@ -22,8 +14,8 @@ export class Menu extends Div {
 
     compRender(): ReactNode {
         let state = this.getState();
-        this.attribs.style = { display: (state.visible && !state.disabled ? '' : 'none') };
-        let show = Menu.activeMenu == this.name;
+        this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
+        let show = Menu.activeMenu === this.name;
 
         this.setChildren([
             new Div(this.name, {
@@ -34,7 +26,7 @@ export class Menu extends Div {
                 role: "tab",
                 id: "heading" + this.getId(),
                 onClick: (elm) => {
-                    let expanded = elm.target.getAttribute("aria-expanded")=="true";
+                    let expanded = elm.target.getAttribute("aria-expanded") === "true";
                     Menu.activeMenu = expanded ? this.name : null;
                     //console.log("Expand or collapse: "+name+" expan="+elm.target.getAttribute("aria-expanded"));
                 }
@@ -53,8 +45,7 @@ export class Menu extends Div {
                     new Div(null, {
                         className: "list-group flex-column"
                     },
-                        this.menuItems
-                    )
+                    this.menuItems)
                 ])
             ])
         ]);

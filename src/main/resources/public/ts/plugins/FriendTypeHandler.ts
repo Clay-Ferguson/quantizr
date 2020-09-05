@@ -22,15 +22,15 @@ export class FriendTypeHandler extends TypeBase {
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
-            case NodeActionType.editNode:
-                return true;
-            default:
-                return false;
+        case NodeActionType.editNode:
+            return true;
+        default:
+            return false;
         }
     }
 
     getEditLabelForProp(propName: string): string {
-        if (propName == J.NodeProp.USER) {
+        if (propName === J.NodeProp.USER) {
             return "User Name";
         }
         return propName;
@@ -50,7 +50,7 @@ export class FriendTypeHandler extends TypeBase {
 
     allowPropertyEdit(propName: string, state: AppState): boolean {
         //USER_NODE_ID is generated and maintained by the server, and we can ignore it in the editor.
-        return propName == J.NodeProp.USER;
+        return propName === J.NodeProp.USER;
     }
 
     ensureDefaultProperties(node: J.NodeInfo) {
@@ -79,7 +79,7 @@ export class FriendTypeHandler extends TypeBase {
         }, [
             img,
             new Div(null, null, [
-                new Heading(4, "User: " + (user ? user : ""), {
+                new Heading(4, "User: " + (user || ""), {
                     className: "marginAll"
                 }),
                 new Div(userBio, {

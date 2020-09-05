@@ -35,19 +35,19 @@ export class InboxNodeTypeHandler extends TypeBase {
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {
-        return false
+        return false;
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
 
-        let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
+        //let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
         return new HorizontalLayout([
             new Heading(4, "Inbox", {
                 className: "marginAll"
             }),
             new ButtonBar([
                 new Button("Clear Inbox", () => {
-                    S.edit.clearInbox(state)
+                    S.edit.clearInbox(state);
                 })
             ], null, "float-right marginBottom"),
             new Div(null, { className: "clearfix" })

@@ -5,4 +5,3 @@ export interface PluginMgrIntf {
     getTypeHandler(typeName: string): TypeHandlerIntf;
     getAllTypeHandlers(): { [key: string]: TypeHandlerIntf };
 }
-

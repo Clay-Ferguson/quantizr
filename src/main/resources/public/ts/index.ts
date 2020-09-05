@@ -1,17 +1,16 @@
 import 'bootstrap';
 import { Factory } from "./Factory";
 
-
 //set in index.html
 declare var browserSupported;
 
 window.onerror = function (message, url, line, col, err) {
-	var msg = "ERROR: " + message + " [url:" + url + "] line " + line + " col: " + col;
+    let msg = "ERROR: " + message + " [url:" + url + "] line " + line + " col: " + col;
 	if (err.stack) {
 		msg += " err: " + err.stack;
 	}
 	console.log(msg);
-}
+};
 
 if (browserSupported) {
 	console.log("bundle entrypoint running.");
@@ -19,4 +18,4 @@ if (browserSupported) {
 	factory.constructAll();
 
 	factory.singletons.meta64.initApp();
-}
+};

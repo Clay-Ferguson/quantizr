@@ -46,16 +46,16 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
                     Comp.renderCachedChildren = false;
                 }, 250);
             }
-        }
+        };
     }
 
     setError(error: string) : void {
-        this.mergeState({error});
+        this.mergeState({ error });
     }
 
     //Handler to update state
     updateValFunc(value: string): void {
-        if (value != this.valueIntf.getValue()) {
+        if (value !== this.valueIntf.getValue()) {
             this.valueIntf.setValue(value);
         }
     }
@@ -109,7 +109,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
                         onClick: (evt) => {
                             evt.preventDefault(); 
                             this.mergeState({
-                                inputType: state.inputType == "password" ? "text" : "password"
+                                inputType: state.inputType === "password" ? "text" : "password"
                             });
                             this.icon._toggleClass(); 
                         },
@@ -124,7 +124,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
 
         if (this.onEnterKey) {
             this.input.attribs.onKeyPress = (e: KeyboardEvent) => {
-                if (e.which == 13) { // 13==enter key code
+                if (e.which === 13) { // 13==enter key code
                     this.onEnterKey();
                     return false;
                 }
@@ -132,4 +132,3 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         }
     }
 }
-

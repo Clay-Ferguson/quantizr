@@ -38,12 +38,12 @@ export class DateField extends Div implements I.ValueIntf {
                     Comp.renderCachedChildren = false;
                 }, 250);
             }
-        }
+        };
     }
 
     //Handler to update state
     updateValFunc(value: string): void {
-        if (value != this.valueIntf.getValue()) {
+        if (value !== this.valueIntf.getValue()) {
             this.valueIntf.setValue(value);
         }
     }
@@ -65,7 +65,7 @@ export class DateField extends Div implements I.ValueIntf {
 
     preRender(): void {
         //console.log("preRender id=" + this.getId() + " value=" + this.valueIntf.getValue());
-        let state = this.getState();
+        //let state = this.getState();
 
         this.setChildren([
             this.label ? new Label(this.label, { key: this.getId() + "_label" }) : null,
@@ -84,4 +84,3 @@ export class DateField extends Div implements I.ValueIntf {
         ]);
     }
 }
-

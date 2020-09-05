@@ -5,4 +5,3 @@ export interface GraphIntf {
     graphTreeStructure(state: AppState): any;
     graphNodesResponse(res: J.GraphResponse): any;
 }
-

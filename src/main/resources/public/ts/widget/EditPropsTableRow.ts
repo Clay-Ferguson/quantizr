@@ -9,8 +9,4 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class EditPropsTableRow extends Div {
-
-    constructor() {
-        super();
-    }
 }

@@ -40,16 +40,16 @@ export class Textarea extends Comp implements I.TextEditorIntf {
                     Comp.renderCachedChildren = false;
                 }, 250);
             }
-        }
+        };
     }
 
     setError(error: string) : void {
-        this.mergeState({error});
+        this.mergeState({ error });
     }
 
     //Handler to update state if edit field looses focus
     updateValFunc(value: string): void {
-        if (value != this.valueIntf.getValue()) {
+        if (value !== this.valueIntf.getValue()) {
             this.valueIntf.setValue(value);
         }
     }
@@ -98,13 +98,13 @@ export class Textarea extends Comp implements I.TextEditorIntf {
             _attribs.style = {
                 whiteSpace: "nowrap",
                 overflow: "auto",
-            }
+            };
         }
 
         _attribs.value = this.valueIntf.getValue();
         _attribs.style = { fontFamily: "monospace" };
 
-        children.push(S.e('textarea', _attribs));
+        children.push(S.e("textarea", _attribs));
 
         //changing from div to span is very new 6/30/2020. not fully vetted.
         return S.e("span" /* "div" */, {

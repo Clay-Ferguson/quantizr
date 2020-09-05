@@ -121,4 +121,3 @@ export class SearchContentDlg extends DialogBase {
         }
     }
 }
-
