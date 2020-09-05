@@ -123,3 +123,28 @@ In file `setenv-common.sh` you'll see a `secrets.sh` file. You must provide this
     export reCaptcha3SecretKey=
 
 Also you'll need to edit any of the `setenv-*.sh` scripts to put in your own paths before you run a build. There are only a couple of paths that you'll need to provide, but they are critical/required. The builder won't run without them set correctly. 
+
+# ESLint Notes
+
+## Installing command line linter:
+
+https://www.npmjs.com/package/eslint
+
+* To install: 
+
+    npm install eslint --save-dev
+
+* Run interactive setup utility:
+
+    ./node_modules/.bin/eslint --init
+
+* Run in folder with packages.json (root)
+
+    ./node_modules/.bin/eslint ./ts/**/*.ts
+
+## Install VSCode Plugins
+
+ESLint (by Dirk Baeumer)
+
+Prettier ESLint (by Rebecca Vest
+)

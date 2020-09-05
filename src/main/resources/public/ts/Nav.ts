@@ -1,17 +1,17 @@
-import * as J from "./JavaIntf";
-import { NavIntf } from "./intf/NavIntf";
-import { LoginDlg } from "./dlg/LoginDlg";
-import { PrefsDlg } from "./dlg/PrefsDlg";
-import { Singletons } from "./Singletons";
-import { PubSub } from "./PubSub";
+import { appState, dispatch, fastDispatch } from "./AppRedux";
+import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
+import { LoginDlg } from "./dlg/LoginDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
-import { VerticalLayout } from "./widget/VerticalLayout";
+import { PrefsDlg } from "./dlg/PrefsDlg";
+import { SearchContentDlg } from "./dlg/SearchContentDlg";
+import { NavIntf } from "./intf/NavIntf";
+import * as J from "./JavaIntf";
+import { PubSub } from "./PubSub";
+import { Singletons } from "./Singletons";
 import { Anchor } from "./widget/Anchor";
 import { Heading } from "./widget/Heading";
-import { AppState } from "./AppState";
-import { dispatch, fastDispatch, appState } from "./AppRedux";
-import { SearchContentDlg } from "./dlg/SearchContentDlg";
+import { VerticalLayout } from "./widget/VerticalLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -19,7 +19,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Nav implements NavIntf {
-
     _UID_ROWID_PREFIX: string = "row_";
 
     /* todo-2: eventually when we do paging for other lists, we will need a set of these variables for each list display (i.e. search, timeline, etc) */
@@ -30,7 +29,7 @@ export class Nav implements NavIntf {
     ROWS_PER_PAGE: number = 25;
 
     login = (state: AppState): void => {
-        let dlg = new LoginDlg(null, state);
+        const dlg = new LoginDlg(null, state);
         dlg.populateFromLocalDb();
         dlg.open();
     }
@@ -49,9 +48,9 @@ export class Nav implements NavIntf {
 
     displayingRepositoryRoot = (state: AppState): boolean => {
         if (!state.node) return false;
-        //one way to detect repository root (without path, since we don't send paths back to client) is as the only node that owns itself.
-        //console.log(S.util.prettyPrint(S.meta64.currentNodeData.node));
-        return state.node.id == state.node.ownerId;
+        // one way to detect repository root (without path, since we don't send paths back to client) is as the only node that owns itself.
+        // console.log(S.util.prettyPrint(S.meta64.currentNodeData.node));
+        return state.node.id === state.node.ownerId;
     }
 
     displayingHome = (state: AppState): boolean => {
@@ -76,7 +75,7 @@ export class Nav implements NavIntf {
     }
 
     navOpenSelectedNode = (state: AppState): void => {
-        let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+        const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!currentSelNode) return;
         S.nav.cached_openNodeById(currentSelNode.id, state);
     }
@@ -94,7 +93,7 @@ export class Nav implements NavIntf {
         if (!state.node) return null;
 
         this.mainOffset = 0;
-        let res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: state.node.id,
             upLevel: null,
             siblingOffset: siblingOffset,
@@ -104,14 +103,14 @@ export class Nav implements NavIntf {
             forceIPFSRefresh: false,
             singleNode: false
         },
-            //success callback
-            (res: J.RenderNodeResponse) => {
-                this.upLevelResponse(res, null, true, state);
-            },
-            //fail callback
-            (res: string) => {
-                this.navHome(state);
-            });
+        // success callback
+        (res: J.RenderNodeResponse) => {
+            this.upLevelResponse(res, null, true, state);
+        },
+        // fail callback
+        (res: string) => {
+            this.navHome(state);
+        });
     }
 
     navUpLevel = (event: any = null): void => {
@@ -136,7 +135,7 @@ export class Nav implements NavIntf {
             return;
         }
 
-        let res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: state.node.id,
             upLevel: 1,
             siblingOffset: 0,
@@ -146,17 +145,17 @@ export class Nav implements NavIntf {
             forceIPFSRefresh: false,
             singleNode: false
         },
-            //success callback
-            (res: J.RenderNodeResponse) => {
-                this.mainOffset = res.offsetOfNodeFound;
-                this.upLevelResponse(res, state.node.id, false, state);
-            },
-            //fail callback
-            (res: string) => {
-                //Navigating home was a bad idea. If someone tries to uplevel and cannot, we don't want to change them away from
-                //whatever page they're on. Just show the error and stay on same node.
-                //this.navHome(state);
-            });
+        //success callback
+        (res: J.RenderNodeResponse) => {
+            this.mainOffset = res.offsetOfNodeFound;
+            this.upLevelResponse(res, state.node.id, false, state);
+        },
+        //fail callback
+        (res: string) => {
+            //Navigating home was a bad idea. If someone tries to uplevel and cannot, we don't want to change them away from
+            //whatever page they're on. Just show the error and stay on same node.
+            //this.navHome(state);
+        });
     }
 
     /*
@@ -165,7 +164,6 @@ export class Nav implements NavIntf {
     getSelectedDomElement = (state: AppState): HTMLElement => {
         var currentSelNode = S.meta64.getHighlightedNode(state);
         if (currentSelNode) {
-
             /* get node by node identifier */
             let node: J.NodeInfo = state.idToNodeMap[currentSelNode.id];
 
@@ -190,7 +188,7 @@ export class Nav implements NavIntf {
 
         /* First check if this node is already highlighted and if so just return */
         let highlightNode = S.meta64.getHighlightedNode();
-        if (highlightNode && highlightNode.id == nodeId) {
+        if (highlightNode && highlightNode.id === nodeId) {
             return;
         }
 
@@ -273,7 +271,7 @@ export class Nav implements NavIntf {
                         new Heading(4, "+/- " + location.coords.accuracy),
                         new Anchor("https://www.google.com/maps/search/?api=1&query=" + location.coords.latitude + "," + location.coords.longitude,
                             "Show Your Google Maps Location",
-                            { "target": "_blank" }),
+                            { target: "_blank" })
                     ]), false, 0, state
                 ).open();
             });
@@ -370,7 +368,7 @@ export class Nav implements NavIntf {
         let newNode: J.NodeInfo = null;
 
         //First detect if page root node is selected, before doing a child search
-        if (state.fullScreenViewId == state.node.id) {
+        if (state.fullScreenViewId === state.node.id) {
             return null;
         }
         else if (state.node.children && state.node.children.length > 0) {
@@ -388,7 +386,7 @@ export class Nav implements NavIntf {
                         newNode = child;
                     }
 
-                    if (child.id == state.fullScreenViewId) {
+                    if (child.id === state.fullScreenViewId) {
                         if (dir === "prev") {
                             if (prevChild) {
                                 ret = true;
@@ -407,4 +405,3 @@ export class Nav implements NavIntf {
         return newNode;
     }
 }
-

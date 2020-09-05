@@ -18,6 +18,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+/* Note: There is a react-dropzone package that exists, but for now we just use the standard approach from the 
+https://dropzonejs.com website and load the 'js' file in an HTML script tag, and do things without an npm module 
+for dropzone */
+
 declare var Dropzone;
 
 export class UploadFromFileDropzoneDlg extends DialogBase {
