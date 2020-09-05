@@ -45,9 +45,9 @@
         /*<![CDATA[*/
         MathJax = {
             tex: {
-                //warning: don't remove the space between the squar braces here or that will trigger thymeleaf to pick up 
+                //warning: don't remove the space between the square braces here or that will trigger thymeleaf to pick up 
                 //the string and try to interpret it. Also the "th:inline: none" all by itself can fix this too, which we do use.
-                inlineMath: [ ['$', '$'], ['\\(', '\\)'] ]
+                inlineMath: [ ['[math]', '[/math]'] ]
             }
         };
         /*]]>*/

@@ -5,6 +5,23 @@ import { Constants as C } from "../Constants";
 import { CompIntf } from "./base/CompIntf";
 import { ReactNode } from "react";
 
+// https://github.com/mathjax/MathJax-demos-web
+// https://github.com/mathjax/MathJax-node
+// 
+// Supposedly mathjax-node should work, but I never got this import to 
+// compile without errors, so I just went back to loading MathJax from CDN
+// as a script tag in the HTML.
+//
+// import { MathJax } from "mathjax-node";
+// MathJax.config({
+//     MathJax: {
+//         tex: {
+//             inlineMath: [['[math]', '[/math]']]
+//         }
+//     }
+// });
+// MathJax.start();
+
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
@@ -22,7 +39,7 @@ export class MarkdownDiv extends Comp {
     }
 
     setText = (content: string) => {
-        this.mergeState({content});
+        this.mergeState({ content });
     }
 
     compRender(): ReactNode {
@@ -34,6 +51,7 @@ export class MarkdownDiv extends Comp {
         this.attribs.dangerouslySetInnerHTML = { "__html": this.getState().content };
         return S.e("div", this.attribs);
     }
+
 
     /* We do two things in here: 1) update formula rendering, and 2) change all "a" tags inside this div to have a target=_blank */
     domPreUpdateEvent = (): void => {
