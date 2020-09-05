@@ -243,11 +243,6 @@ public class AppController implements ErrorController {
 				fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.css"));
 		cacheBusterMd5.put("DARCULA_CSS_HASH",
 				fileUtils.genHashOfClasspathResource("/public/css/highlightjs/darcula.css"));
-		cacheBusterMd5.put("JQUERY_JS_HASH",
-				fileUtils.genHashOfClasspathResource("/public/js/jquery/jquery-3.3.1.min.js"));
-		cacheBusterMd5.put("POPPER_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/popper/popper.min.js"));
-		cacheBusterMd5.put("BOOTSTRAP_JS_HASH",
-				fileUtils.genHashOfClasspathResource("/public/bootstrap-4/js/bootstrap.min.js"));
 		cacheBusterMd5.put("DROPZONE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.js"));
 		cacheBusterMd5.put("ACE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/ace/src-noconflict/ace.js"));
 	}
@@ -373,6 +368,32 @@ public class AppController implements ErrorController {
 			model.addAllAttributes(welcomeMap);
 			return "welcome";
 		}
+	}
+
+	/*
+	 * Renders with Thymeleaf
+	 * 
+	 * Renders statich HTML if whatever is in demo.html, used for experimenting with
+	 * HTML snippets.
+	 */
+	@RequestMapping(value = { "/demo/{file}" })
+	public String demo(@PathVariable(value = "file", required = false) String file, //
+			Model model) {
+		// if in DEV mode we always update cache buster in case files have changed.
+		if (constProvider.getProfileName().equals("dev")) {
+			initCacheBuster();
+		}
+
+		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
+			synchronized (welcomeMapLock) {
+				HashMap<String, String> newMap = new HashMap<String, String>();
+				welcomePagePresent = nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
+				welcomeMap = newMap;
+			}
+		}
+
+		model.addAllAttributes(cacheBusterMd5);
+		return "demo/" + file;
 	}
 
 	/*

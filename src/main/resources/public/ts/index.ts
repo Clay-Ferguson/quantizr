@@ -1,5 +1,7 @@
 import { Factory } from "./Factory";
 
+import 'bootstrap';
+
 //set in index.html
 declare var browserSupported;
 

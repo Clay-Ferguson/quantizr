@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base href="/" />
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Quanta</title>
+    <link rel="stylesheet" th:href="'/css/meta64.css?v='+${MAIN_CSS_HASH}" />
+</head>
+
+<body>
+
+    <main role="main">
+        <h1>Accordion Demo</h1>
+
+        <p>
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample"
+                aria-expanded="false" aria-controls="collapseExample">
+                Button with data-target
+            </button>
+        </p>
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body">
+                This is the card-body which can be expanded and collapsed
+            </div>
+        </div>
+
+    </main>
+
+    <script type="text/javascript" th:src="'bundle.js?v='+${BUNDLE_JS_HASH}"></script>
+
+</body>
+
+</html>

@@ -30,6 +30,7 @@ export class Menu extends Div {
             new Div(this.name, {
                 className: "card-header menuHeading mb-0",
                 "data-toggle": "collapse",
+                //"data-target": "#collapse" + this.getId(),
                 href: "#collapse" + this.getId(),
                 role: "tab",
                 id: "heading" + this.getId(),
