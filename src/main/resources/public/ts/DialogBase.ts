@@ -30,7 +30,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     backdrop: HTMLElement;
 
     /* Warning: Base 'Comp' already has 'state', I think it was wrong to rely on 'appState' everywhere inside dialogs, because
-    we need to just let the render methods grab the latest state like every other component in the render method. 
+    we need to just let the render methods grab the latest state like every other component in the render method.
     */
     appState: AppState;
 
@@ -44,12 +44,12 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         super(null);
         this.appState = appState;
 
-        this.attribs.className = clientInfo.isMobile 
-            ? (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen") 
+        this.attribs.className = clientInfo.isMobile
+            ? (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen")
             : (this.overrideClass ? this.overrideClass : "app-modal-content");
     }
 
-    /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is 
+    /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is
     closed. */
     open = (display: string = null): Promise<DialogBase> => {
         this.opened = true;
@@ -69,7 +69,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             if (this.closeByOutsideClick) {
                 this.backdrop.addEventListener("click", (evt: any) => {
                     //get our dialog itself.
-                    let contentElm: any = S.util.domElm(this.getId());
+                    const contentElm: any = S.util.domElm(this.getId());
 
                     //check if the click was outside the dialog.
                     if (!!contentElm && !contentElm.contains(evt.target)) {
@@ -79,7 +79,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             }
 
             /* If the dialog has a function to load from server, call here first */
-            let queryServerPromise = this.preLoad();
+            const queryServerPromise = this.preLoad();
             if (queryServerPromise) {
                 await queryServerPromise;
             }
@@ -88,7 +88,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             this.domRender();
 
             if (++DialogBase.refCounter === 1) {
-                /* we only hide and reshow the scroll bar and disable scrolling when we're in mobile mode, because that's when 
+                /* we only hide and reshow the scroll bar and disable scrolling when we're in mobile mode, because that's when
                 full-screen dialogs are in use, which is when we need this. */
                 if (clientInfo.isMobile) {
                     document.body.style.overflow = "hidden";
@@ -100,17 +100,17 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     }
 
     /* NOTE: preLoad is always forced to complete BEFORE any dialog GUI is allowed to render in case we need to
-    get information from the server before displaying the dialog. This is optional. Many dialogs of course don't need to get data 
+    get information from the server before displaying the dialog. This is optional. Many dialogs of course don't need to get data
     from the server before displaying */
     preLoad(): Promise<void> {
         return null;
     }
 
     domRender(): void {
-        let reactElm = S.e(this._render, this.attribs);
+        const reactElm = S.e(this._render, this.attribs);
 
         //console.log("Rendering with provider");
-        let provider = S.e(Provider, { store }, reactElm);
+        const provider = S.e(Provider, { store }, reactElm);
         ReactDOM.render(provider, this.backdrop);
     }
 
@@ -146,10 +146,10 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     preRender(): void {
         let timesIcon: Comp;
         //Dialog Header with close button (x) right justified on it.
-        let children: CompIntf[] = [];
+        const children: CompIntf[] = [];
 
-        let titleIconComp: CompIntf = this.getTitleIconComp();
-        let extraHeaderComps = this.getExtraTitleBarComps();
+        const titleIconComp: CompIntf = this.getTitleIconComp();
+        const extraHeaderComps = this.getExtraTitleBarComps();
         let titleChildren: CompIntf[] = [titleIconComp, new Span(this.title)];
 
         if (extraHeaderComps) {
@@ -176,7 +176,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         /* This will make the content area of the dialog above the buttons be scrollable, with a max size that is the full
         page size before scrolling. This scrolling makes the dialog buttons always stay visible and not themselves scroll */
         if (this.internalScrolling) {
-            let style = {
+            const style = {
                 maxHeight: "" + (S.meta64.deviceHeight - S.meta64.navBarHeight - 50) + "px"
             };
             contentAttribs = {
@@ -185,7 +185,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             };
         }
 
-        let contentDiv = new Div(null, contentAttribs, this.renderDlg());
+        const contentDiv = new Div(null, contentAttribs, this.renderDlg());
 
         children.push(contentDiv);
         children.push(this.renderButtons());

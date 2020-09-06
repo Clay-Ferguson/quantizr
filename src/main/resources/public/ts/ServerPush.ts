@@ -33,9 +33,9 @@ export class ServerPush implements ServerPushIntf {
         };
 
         eventSource.addEventListener("feedPush", function (e: any) {
-            let obj = JSON.parse(e.data);
+            const obj = JSON.parse(e.data);
             //console.log("Incomming Push: "+S.util.prettyPrint(obj));
-            let nodeInfo: J.NodeInfo = obj.nodeInfo;
+            const nodeInfo: J.NodeInfo = obj.nodeInfo;
             if (nodeInfo) {
                 //todo-1: I think this dispatch is working, but another full FeedView refresh (from actual server query too) is somehow following after also
                 //so need to check and see how to avoid that.
@@ -71,7 +71,7 @@ export class ServerPush implements ServerPushIntf {
             //Removing this type notification for now, because it's not really ready. For example, if bob creates a reply to a feed item bob gets
             //the notification, which is wrong. In other words based on the new 'feed' capability notification can
             //end up being just a redundant annoyance.
-            
+
             //temporary remove: I was seeing this come up when I replied to someone ELSES node, or in other words I was getting
             //a notification about my own node that I creted.
             //todo-0

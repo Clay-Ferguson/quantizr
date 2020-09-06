@@ -4,7 +4,7 @@ export class PubSub {
 
     private static registry: Object = {};
     private static lastFires: Object = {};
-    
+
     static pub = (name: string, ...args: any[]) => {
         if (!PubSub.registry[name]) {
             console.log("Unknown PubSub name: " + name);

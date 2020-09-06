@@ -61,10 +61,7 @@ export class User implements UserIntf {
             try {
                 console.log("refreshLogin.");
 
-                let callUsr: string;
-                let callPwd: string;
-
-                let loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
+                const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
 
                 /* if we have known state as logged out, then do nothing here */
                 if (loginState === "0") {
@@ -73,15 +70,15 @@ export class User implements UserIntf {
                     return;
                 }
 
-                let usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
-                let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
-                let usingCredentials: boolean = usr && pwd;
+                const usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
+                const pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
+                const usingCredentials: boolean = usr && pwd;
 
                 /*
                  * empyt credentials causes server to try to log in with any active session credentials.
                  */
-                callUsr = usr || "";
-                callPwd = pwd || "";
+                const callUsr: string = usr || "";
+                const callPwd: string = pwd || "";
 
                 console.log("refreshLogin with name: " + callUsr);
 
@@ -192,7 +189,7 @@ export class User implements UserIntf {
                         }
                     } //
                     else {
-                        let lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
+                        const lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
 
                         if (lastNode) {
                             id = lastNode;
@@ -211,7 +208,7 @@ export class User implements UserIntf {
                     console.log("LocalDb login failed.");
 
                     //if we tried a login and it wasn't from a login dialog then just blow away the login state
-                    //so that any kind of page refresh is guaranteed to just show login dialog and not try to login                    
+                    //so that any kind of page refresh is guaranteed to just show login dialog and not try to login
                     await this.deleteAllUserLocalDbEntries();
 
                     //location.reload();
@@ -231,7 +228,7 @@ export class User implements UserIntf {
             recursive,
             nodeId,
             fromUser,
-            toUser,
+            toUser
         }, (res: J.TransferNodeResponse) => {
             S.view.refreshTree(null, false, null, false, false, true, true, state);
             S.util.showMessage(res.message, "Success");

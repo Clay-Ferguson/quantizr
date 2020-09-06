@@ -1,15 +1,15 @@
 
 /**
- * This class was for proving to myself how certain aspects of inheritance work in TypeScript 
+ * This class was for proving to myself how certain aspects of inheritance work in TypeScript
  * related to Fat Arrow functions, binding, and overriding base class functions. There are only
  * a handful of files with "Demo" in their filename, and those can be removed from this project and
  * the web app will still work fine of course.
- * 
+ *
  * Important rules of thumb:
- * 
+ *
  * For a normal class member (no arrow function) if you are ever using it in a way that's not an 'immediate call'
  * then you need to be sure it's either binded, or a fat arrow function.
- * 
+ *
  */
 
 class Animal {
@@ -53,7 +53,7 @@ export function runClassDemoTest() {
         //}
         //S.util.perfEnd("Test completed: iters=" + iters, startTime);
 
-        let fido = new Dog("Fido");
+        const fido = new Dog("Fido");
         fido.askGoForWalk();
         fido.printName();
 

@@ -35,7 +35,7 @@ export class Meta64 implements Meta64Intf {
     private static lastKeyDownTime: number = 0;
 
     /* We want to only be able to drag nodes by clicking on their TYPE ICON, and we accomplish that by using the mouseover/mouseout
-    on those icons to detect an 'is mouse over' condition any time a drag attempt is started on a row and only allow it if mouse 
+    on those icons to detect an 'is mouse over' condition any time a drag attempt is started on a row and only allow it if mouse
     is over the icon */
     public draggableId: string = null;
 
@@ -46,7 +46,7 @@ export class Meta64 implements Meta64Intf {
 
     /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
     getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {
-        let k = op + "_" + id;
+        const k = op + "_" + id;
         if (!this.fc[k]) {
             this.fc[k] = function () { func(id); };
 
@@ -81,8 +81,8 @@ export class Meta64 implements Meta64Intf {
     selectTab = (tabName: string): void => {
         //let state = store.getState();
 
-        /* if tab is already active no need to update state now 
-        
+        /* if tab is already active no need to update state now
+
         SOME codepaths like (openNode) are currently relying on selectTab
         to cause the dispatch/update, even when tab isn't changing, so need
         to find all those before we can optimize here to ignore setting to same tab.
@@ -98,7 +98,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     getSelNodeUidsArray = (state: AppState): string[] => {
-        let selArray: string[] = [];
+        const selArray: string[] = [];
         S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
             selArray.push(id);
             return true;
@@ -110,7 +110,7 @@ export class Meta64 implements Meta64Intf {
     Returns a new array of all the selected nodes each time it's called.
     */
     getSelNodeIdsArray = (state: AppState): string[] => {
-        let selArray: string[] = [];
+        const selArray: string[] = [];
 
         if (!state.selectedNodes) {
             console.log("no selected nodes.");
@@ -119,7 +119,7 @@ export class Meta64 implements Meta64Intf {
         }
 
         S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
-            let node: J.NodeInfo = state.idToNodeMap[id];
+            const node: J.NodeInfo = state.idToNodeMap[id];
             if (!node) {
                 console.log("unable to find idToNodeMap for id=" + id);
             } else {
@@ -132,10 +132,10 @@ export class Meta64 implements Meta64Intf {
 
     /* return an object with properties for each NodeInfo where the key is the id */
     getSelNodesAsMapById = (state: AppState): Object => {
-        let ret: Object = {};
-        let selArray: J.NodeInfo[] = this.getSelNodesArray(state);
+        const ret: Object = {};
+        const selArray: J.NodeInfo[] = this.getSelNodesArray(state);
         if (!selArray || selArray.length === 0) {
-            let node = this.getHighlightedNode(state);
+            const node = this.getHighlightedNode(state);
             if (node) {
                 ret[node.id] = node;
                 return ret;
@@ -143,7 +143,7 @@ export class Meta64 implements Meta64Intf {
         }
 
         for (let i = 0; i < selArray.length; i++) {
-            let id = selArray[i].id;
+            const id = selArray[i].id;
             ret[id] = selArray[i];
         }
         return ret;
@@ -151,9 +151,9 @@ export class Meta64 implements Meta64Intf {
 
     /* Gets selected nodes as NodeInfo.java objects array */
     getSelNodesArray = (state: AppState): J.NodeInfo[] => {
-        let selArray: J.NodeInfo[] = [];
+        const selArray: J.NodeInfo[] = [];
         S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
-            let node = state.idToNodeMap[id];
+            const node = state.idToNodeMap[id];
             if (node) {
                 selArray.push(node);
             }
@@ -164,7 +164,7 @@ export class Meta64 implements Meta64Intf {
 
     clearSelNodes = (state: AppState) => {
         dispatch({
-            type: "Action_ClearSelections", 
+            type: "Action_ClearSelections",
             state,
             update: (s: AppState): void => {
                 s.selectedNodes = {};
@@ -196,7 +196,7 @@ export class Meta64 implements Meta64Intf {
     getHighlightedNode = (state: AppState = null): J.NodeInfo => {
         state = appState(state);
         if (!state.node) return null;
-        let id: string = S.meta64.parentIdToFocusNodeMap[state.node.id];
+        const id: string = S.meta64.parentIdToFocusNodeMap[state.node.id];
         if (id) {
             return state.idToNodeMap[id];
         }
@@ -303,7 +303,7 @@ export class Meta64 implements Meta64Intf {
         return new Promise<void>(async (resolve, reject) => {
             console.log("initApp running.");
 
-            let state: AppState = store.getState();
+            const state: AppState = store.getState();
             state.pendingLocationHash = window.location.hash;
             S.plugin.initPlugins();
 
@@ -335,7 +335,7 @@ export class Meta64 implements Meta64Intf {
             // window.onhashchange = function (e) {
             // }
 
-            /* 
+            /*
             NOTE: This works in conjunction with pushState, and is part of what it takes to make the back button (browser hisotry) work
             in the context of SPAs
             */
@@ -350,7 +350,7 @@ export class Meta64 implements Meta64Intf {
 
             // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node.
             // WARNING: even with tabIndex added none of the other DIVS react renders seem to be able to accept an onKeyDown event.
-            // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs re Open, because this WILL 
+            // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs re Open, because this WILL
             // capture events going to dialogs / edit fields
             document.body.addEventListener("keydown", (event: KeyboardEvent) => {
                 //console.log("keydown: " + event.code);
@@ -362,10 +362,10 @@ export class Meta64 implements Meta64Intf {
                     if (state.fullScreenViewId && state.fullScreenGraphId) {
                         S.nav.closeFullScreenImgViewer(state);
                     }
-                    
+
                     break;
 
-                    // case "ArrowDown": 
+                    // case "ArrowDown":
                     //     if (this.keyDebounce()) return;
                     //     state = store.getState();
                     //     S.view.scrollRelativeToNode("down", state);
@@ -470,7 +470,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     keyDebounce = () => {
-        let now = S.util.currentTimeMillis();
+        const now = S.util.currentTimeMillis();
         //allow one operation every quarter second.
         if (Meta64.lastKeyDownTime > 0 && now - Meta64.lastKeyDownTime < 250) {
             return true;
@@ -489,7 +489,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     /* The overlayCounter allows recursive operations which show/hide the overlay
-    to happen such that if something has already shown the overlay and not hidden it yet, then 
+    to happen such that if something has already shown the overlay and not hidden it yet, then
     any number of 'sub-processes' (functionality) cannot distrupt the proper state. This is just
     the standard sort of 'reference counting' sort of algo here. Note that we initialize
     the counter to '1' and not zero since the overlay is initially visible so that's the correct
@@ -516,7 +516,7 @@ export class Meta64 implements Meta64Intf {
                 //after the timer we check for the counter still being greater than zero (not an ==1 this time).
                 if (Meta64.overlayCounter > 0) {
                     //console.log("showing overlay.");
-                    let elm = S.util.domElm("overlayDiv");
+                    const elm = S.util.domElm("overlayDiv");
                     if (elm) {
                         elm.style.display = "block";
                         elm.style.cursor = "wait";
@@ -526,7 +526,7 @@ export class Meta64 implements Meta64Intf {
         }
         else if (Meta64.overlayCounter === 0) {
             //console.log("hiding overlay.");
-            let elm = S.util.domElm("overlayDiv");
+            const elm = S.util.domElm("overlayDiv");
             if (elm) {
                 elm.style.display = "none";
             }
@@ -551,9 +551,9 @@ export class Meta64 implements Meta64Intf {
     }
 
     displaySignupMessage = (): void => {
-        let signupElm = S.util.domElm("signupCodeResponse");
+        const signupElm = S.util.domElm("signupCodeResponse");
         if (signupElm) {
-            let signupResponse = signupElm.textContent;
+            const signupResponse = signupElm.textContent;
             if (signupResponse === "ok") {
                 S.util.showMessage("Signup complete.", "Note");
             }
@@ -579,7 +579,7 @@ export class Meta64 implements Meta64Intf {
                     S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
                 }
                 S.render.renderPageFromData(res, false, null, true, true, state);
-            },
+            }
         );
     }
 
@@ -620,7 +620,7 @@ export class Meta64 implements Meta64Intf {
         }
 
         dispatch({
-            type: "Action_LoginResponse", 
+            type: "Action_LoginResponse",
             state,
             update: (s: AppState): void => {
                 s.title = title;
@@ -632,8 +632,8 @@ export class Meta64 implements Meta64Intf {
     removeRedundantFeedItems = (feedResults: J.NodeInfo[]): J.NodeInfo[] => {
         if (!feedResults || feedResults.length === 0) return feedResults;
 
-        //first build teh set of ids that that are in 'ni.parent.id' 
-        let idSet: Set<string> = new Set<string>();
+        //first build teh set of ids that that are in 'ni.parent.id'
+        const idSet: Set<string> = new Set<string>();
         feedResults.forEach((ni: J.NodeInfo) => {
             if (ni.parent) {
                 idSet.add(ni.parent.id);

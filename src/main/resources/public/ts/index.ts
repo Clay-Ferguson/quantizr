@@ -14,7 +14,7 @@ window.onerror = function (message, url, line, col, err) {
 
 if (browserSupported) {
     console.log("bundle entrypoint running.");
-    let factory = new Factory();
+    const factory = new Factory();
     factory.constructAll();
 
     factory.singletons.meta64.initApp();

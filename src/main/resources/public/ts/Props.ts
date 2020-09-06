@@ -23,10 +23,10 @@ export class Props implements PropsIntf {
     controlBasedPropertyList: Set<string> = new Set<string>();
 
     orderProps = (propOrder: string[], _props: J.PropertyInfo[]): J.PropertyInfo[] => {
-        let propsNew: J.PropertyInfo[] = S.util.arrayClone(_props);
+        const propsNew: J.PropertyInfo[] = S.util.arrayClone(_props);
         let targetIdx: number = 0;
 
-        for (let prop of propOrder) {
+        for (const prop of propOrder) {
             targetIdx = this.moveNodePosition(propsNew, targetIdx, prop);
         }
 
@@ -43,7 +43,7 @@ export class Props implements PropsIntf {
     }
 
     moveNodePosition = (props: J.PropertyInfo[], idx: number, typeName: string): number => {
-        let tagIdx: number = S.util.arrayIndexOfItemByProp(props, "name", typeName);
+        const tagIdx: number = S.util.arrayIndexOfItemByProp(props, "name", typeName);
         if (tagIdx !== -1) {
             S.util.arrayMoveItem(props, tagIdx, idx++);
         }
@@ -71,8 +71,8 @@ export class Props implements PropsIntf {
 
     /* Moves all the properties listed in propList array to the end of the list of properties and keeps them in the order specified */
     private movePropsToTop = (propsList: string[], props: J.PropertyInfo[]) => {
-        for (let prop of propsList) {
-            let tagIdx = S.util.arrayIndexOfItemByProp(props, "name", prop);
+        for (const prop of propsList) {
+            const tagIdx = S.util.arrayIndexOfItemByProp(props, "name", prop);
             if (tagIdx !== -1) {
                 S.util.arrayMoveItem(props, tagIdx, 0);
             }
@@ -81,8 +81,8 @@ export class Props implements PropsIntf {
 
     /* Moves all the properties listed in propList array to the end of the list of properties and keeps them in the order specified */
     private movePropsToEnd = (propsList: string[], props: J.PropertyInfo[]) => {
-        for (let prop of propsList) {
-            let tagIdx = S.util.arrayIndexOfItemByProp(props, "name", prop);
+        for (const prop of propsList) {
+            const tagIdx = S.util.arrayIndexOfItemByProp(props, "name", prop);
             if (tagIdx !== -1) {
                 S.util.arrayMoveItem(props, tagIdx, props.length);
             }
@@ -94,7 +94,7 @@ export class Props implements PropsIntf {
      */
     renderProperties = (properties: J.PropertyInfo[]): PropTable => {
         if (properties) {
-            let propTable = new PropTable({
+            const propTable = new PropTable({
                 border: "1",
                 className: "property-table"
                 // "sourceClass" : "[propsTable]"
@@ -102,17 +102,16 @@ export class Props implements PropsIntf {
 
             properties.forEach(function (property: J.PropertyInfo) {
                 //console.log("Render Prop: "+property.name);
-                let propNameCell = new PropTableCell(property.name, {
+                const propNameCell = new PropTableCell(property.name, {
                     className: "prop-table-name-col"
                 });
 
-                let valCellAttrs = {
+                const valCellAttrs = {
                     className: "prop-table-val-col"
                 };
-                let propValCell: PropTableCell;
-                propValCell = new PropTableCell(property.value, valCellAttrs);
+                const propValCell: PropTableCell = new PropTableCell(property.value, valCellAttrs);
 
-                let propTableRow = new PropTableRow({
+                const propTableRow = new PropTableRow({
                     className: "prop-table-row"
                 }, [propNameCell, propValCell]);
                 propTable.addChild(propTableRow);
@@ -135,7 +134,7 @@ export class Props implements PropsIntf {
         return node.properties.find(p => p.name === propName);
     }
 
-    /* Gets the crypto key from this node that will allow user to decrypt the node. If the user is the owner of the 
+    /* Gets the crypto key from this node that will allow user to decrypt the node. If the user is the owner of the
 node this simply returns the ENC_KEY property but if not we look up in the ACL on the node a copy of the encrypted
     key that goes with the current user (us, logged in user), which should decrypt using our private key.
     */
@@ -178,22 +177,22 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
     }
 
     hasImage = (node: J.NodeInfo): boolean => {
-        let target = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+        const target = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
         return (target && target.startsWith("image/"));
     }
 
     hasAudio = (node: J.NodeInfo): boolean => {
-        let target = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+        const target = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
         return (target && target.startsWith("audio/"));
     }
 
     hasVideo = (node: J.NodeInfo): boolean => {
-        let target = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+        const target = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
         return (target && target.startsWith("video/"));
     }
 
     getNodePropVal = (propertyName: string, node: J.NodeInfo): string => {
-        let prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
+        const prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
         return prop ? prop.value : null;
     }
 
@@ -219,7 +218,7 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
 
     setNodeProp = (node: J.NodeInfo, newProp: J.PropertyInfo): void => {
         if (!newProp) return;
-        let prop: J.PropertyInfo = this.getNodeProp(newProp.name, node);
+        const prop: J.PropertyInfo = this.getNodeProp(newProp.name, node);
 
         /* If we found a property by propertyName, then set it's value */
         if (prop) {
@@ -248,8 +247,8 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
             J.NodeProp.BIN_DATA_URL,
 
             J.NodeProp.IPFS_LINK, //
-            J.NodeProp.IPFS_LINK_NAME, // 
-            J.NodeProp.IPFS_OK, //
+            J.NodeProp.IPFS_LINK_NAME, //
+            J.NodeProp.IPFS_OK //
         ]);
 
         S.util.addAllToSet(this.readOnlyPropertyList, [ //

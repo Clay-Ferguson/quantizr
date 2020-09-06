@@ -90,11 +90,11 @@ export class Render implements RenderIntf {
         //console.log("Setting drop handler: id="+node.id);
 
         S.util.setDropHandler(attribs, (evt: DragEvent) => {
-            let data = evt.dataTransfer.items;
+            const data = evt.dataTransfer.items;
 
             //todo-1: right now we only actually support one file being dragged. Would be nice to support multiples
             for (let i = 0; i < data.length; i++) {
-                let d = data[i];
+                const d = data[i];
                 console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
 
                 if (d.kind === "string") {
@@ -116,7 +116,7 @@ export class Render implements RenderIntf {
                 else if (d.kind === "string" && d.type.match("^text/html")) {
                 }
                 else if (d.kind === "file" /* && d.type.match('^image/') */) {
-                    let file: File = data[i].getAsFile();
+                    const file: File = data[i].getAsFile();
 
                     // if (file.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB) {
                     //     S.util.showMessage("That file is too large to upload. Max file size is "+Constants.MAX_UPLOAD_MB+" MB");
@@ -139,7 +139,7 @@ export class Render implements RenderIntf {
             return;
         }
 
-        let children = [];
+        const children = [];
 
         //todo-1: need copy-to-clipboard links here!
 
@@ -170,7 +170,7 @@ export class Render implements RenderIntf {
         //     }));
         // }
 
-        let jsonIpfsLink = S.props.getNodePropVal(J.NodeProp.JSON_HASH, node);
+        const jsonIpfsLink = S.props.getNodePropVal(J.NodeProp.JSON_HASH, node);
         if (jsonIpfsLink) {
             url = C.IPFS_IO_GATEWAY + jsonIpfsLink;
             children.push(new Heading(5, "IPFS Node JSON"));
@@ -180,7 +180,7 @@ export class Render implements RenderIntf {
             }));
         }
 
-        let linksDiv = new Div(null, null, children);
+        const linksDiv = new Div(null, null, children);
         new MessageDlg(null, "URL", null, linksDiv, false, 0, null).open();
     }
 
@@ -197,7 +197,7 @@ export class Render implements RenderIntf {
 
         try {
             dispatch({
-                type: "Action_RenderPage", 
+                type: "Action_RenderPage",
                 state,
                 updateNew: (s: AppState): AppState => {
                     //VERY IMPORTANT to return a NEW object so we create it here. If you don't return new object rendering can fail.
@@ -224,7 +224,7 @@ export class Render implements RenderIntf {
                         //so we have to call getNodeByName() to get the 'id' that goes with that node name.
                         if (targetNodeId.startsWith(":")) {
                             targetNodeId = targetNodeId.substring(1);
-                            let foundNode: J.NodeInfo = S.meta64.getNodeByName(res.node, targetNodeId, s);
+                            const foundNode: J.NodeInfo = S.meta64.getNodeByName(res.node, targetNodeId, s);
                             if (foundNode) {
                                 targetNodeId = foundNode.id;
                             }
@@ -287,7 +287,7 @@ export class Render implements RenderIntf {
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on
          * the client side for various reasons.
          */
-        let layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
+        const layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
         if (!layout || layout === "v") {
             return new NodeCompVerticalRowLayout(node, level, allowNodeMove);
         }
@@ -300,8 +300,8 @@ export class Render implements RenderIntf {
         }
     }
 
-    /* This is the button bar displayed between all nodes to let nodes be inserted at specific locations 
-     
+    /* This is the button bar displayed between all nodes to let nodes be inserted at specific locations
+
     The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
     */
 
@@ -325,19 +325,19 @@ export class Render implements RenderIntf {
             });
         }
 
-        let newNodeButton = new IconButton("fa-plus", null, {
+        const newNodeButton = new IconButton("fa-plus", null, {
             onClick: e => {
                 S.edit.insertNode(node.id, "u", isFirst ? 0 : 1, state);
             },
             title: "Insert new node here"
         }, "btn-sm");
 
-        let buttonBar = new Span(null, {
+        const buttonBar = new Span(null, {
             className: "float-right microMarginTop"
         }, [pasteInlineButton, newNodeButton]);
 
         return new Div(null, {
-            className: "betweenRowsContainer row no-gutters",
+            className: "betweenRowsContainer row no-gutters"
         }, [
             new QuickEditField(node, isFirst, state),
             new Span(null, {
@@ -347,7 +347,7 @@ export class Render implements RenderIntf {
     }
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
-        let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+        const ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
 
         /* If we had a public gateway we could actually trust we could return this, but gateways have a tendency
          to be flaky and often appear to blacklist videos uploated thru Quanta.wiki, and I won't even speculate why */
@@ -356,7 +356,7 @@ export class Render implements RenderIntf {
         // }
 
         // If there's no IPFS_LINK on the node try the BIN prop instead.
-        let bin = ipfsLink || S.props.getNodePropVal(J.NodeProp.BIN, node);
+        const bin = ipfsLink || S.props.getNodePropVal(J.NodeProp.BIN, node);
         if (bin) {
             let ret: string = S.util.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + node.id;
             if (downloadLink) {
@@ -391,17 +391,17 @@ export class Render implements RenderIntf {
     }
 
     makeAvatarImage = (node: J.NodeInfo, state: AppState) => {
-        let src: string = this.getAvatarImgUrl(node.ownerId, node.avatarVer);
+        const src: string = this.getAvatarImgUrl(node.ownerId, node.avatarVer);
         if (!src) {
             return null;
         }
-        let key = "avatar-" + node.id;
+        const key = "avatar-" + node.id;
 
         //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-        let img: Img = new Img(key, {
+        const img: Img = new Img(key, {
             src,
             className: "avatarImage",
-            title: "Node owned by: " + node.owner,
+            title: "Node owned by: " + node.owner
 
             // I decided not to let avatars be clickable.
             // onClick: (evt) => {
@@ -418,7 +418,7 @@ export class Render implements RenderIntf {
 
     /* Returns true if the logged in user and the type of node allow the property to be edited by the user */
     allowPropertyEdit = (node: J.NodeInfo, propName: string, state: AppState): boolean => {
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+        const typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
         return typeHandler ? typeHandler.allowPropertyEdit(propName, state) : true;
     }
 

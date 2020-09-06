@@ -19,7 +19,7 @@ import { UtilIntf } from "./intf/UtilIntf";
 import { ViewIntf } from "./intf/ViewIntf";
 
 /* NOTE: If this Singleton pattern looks countrary to good module design, keep in mind all module systems
-are susceptible to circular references, and these Singtons are an unbreakable solution to that 
+are susceptible to circular references, and these Singtons are an unbreakable solution to that
 issue, due to the delayed pub-sub way of injecting them into wherever we need them. */
 export interface Singletons {
     meta64: Meta64Intf;

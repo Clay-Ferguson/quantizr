@@ -102,13 +102,13 @@ export class Util implements UtilIntf {
     /** Returns one of the types listed in 'fileExtensionTypes' based on fileName where fileName can either be an actual
     extension or else a full filename including extension */
     getFileTypeFormFileName = (fileName: string): string => {
-        let ext = this.getFileExtensionFromFileName(fileName);
+        const ext = this.getFileExtensionFromFileName(fileName);
         return this.fileExtensionTypes[ext];
     }
 
     getFileExtensionFromFileName = (fileName: string): string => {
         let ext = "";
-        let idx = fileName.lastIndexOf(".");
+        const idx = fileName.lastIndexOf(".");
         if (idx !== -1) {
             ext = fileName.substring(idx + 1);
         }
@@ -116,7 +116,7 @@ export class Util implements UtilIntf {
     }
 
     isEditableFile = (fileName: string): boolean => {
-        let ext = this.getFileExtensionFromFileName(fileName);
+        const ext = this.getFileExtensionFromFileName(fileName);
         return this.editableExtensions[ext];
     }
 
@@ -209,7 +209,7 @@ export class Util implements UtilIntf {
     }
 
     chopAtLastChar = (str: string, char: string): string => {
-        let idx = str.lastIndexOf(char);
+        const idx = str.lastIndexOf(char);
         if (idx !== -1) {
             return str.substring(0, idx);
         }
@@ -239,7 +239,7 @@ export class Util implements UtilIntf {
     };
 
     arrayIndexOfItemByProp = (a: any[], propName: string, propVal: string): number => {
-        let len = a.length;
+        const len = a.length;
         for (let i = 0; i < len; i++) {
             if (a[i][propName] === propVal) {
                 return i;
@@ -253,8 +253,8 @@ export class Util implements UtilIntf {
     };
 
     stdTimezoneOffset = (date: Date) => {
-        let jan = new Date(date.getFullYear(), 0, 1);
-        let jul = new Date(date.getFullYear(), 6, 1);
+        const jan = new Date(date.getFullYear(), 0, 1);
+        const jul = new Date(date.getFullYear(), 6, 1);
         return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
     }
 
@@ -286,7 +286,7 @@ export class Util implements UtilIntf {
     daylightSavingsTime: boolean = (this.dst(new Date())) ? true : false;
 
     getCheckBoxStateById = (id: string): boolean => {
-        let checkbox = this.domElm(id);
+        const checkbox = this.domElm(id);
         if (checkbox) {
             return (<any>checkbox).checked;
         }
@@ -314,8 +314,8 @@ export class Util implements UtilIntf {
             url = window.location.href;
         }
         name = name.replace(/[\[\]]/g, "\\$&");
-        let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-        let results = regex.exec(url);
+        const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+        const results = regex.exec(url);
         if (!results) {
             return null;
         }
@@ -331,12 +331,12 @@ export class Util implements UtilIntf {
     }
 
     progressInterval = (state: AppState): void => {
-        let isWaiting = this.isAjaxWaiting();
+        const isWaiting = this.isAjaxWaiting();
         if (isWaiting) {
             this.waitCounter++;
             if (this.waitCounter >= 3) {
                 if (!this.pgrsDlg) {
-                    let dlg = new ProgressDlg(state);
+                    const dlg = new ProgressDlg(state);
                     this.pgrsDlg = dlg;
                     this.pgrsDlg.open();
                 }
@@ -355,7 +355,7 @@ export class Util implements UtilIntf {
     }
 
     /* Calls to SERVER must to to this URL. We allow CORS, and can run the server itself on port 8181 for example, and then let
-    the webpack dev server be able to be serving up the JS file(s) on a separate port 8080. Theoretically this should work even 
+    the webpack dev server be able to be serving up the JS file(s) on a separate port 8080. Theoretically this should work even
     if the server is truly on a different Machine/IP, but i haven't tried that scenario yet */
     getRemoteHost = (): string => {
         if (this.rhost) {
@@ -394,8 +394,8 @@ export class Util implements UtilIntf {
             S.meta64.setOverlay(true);
             axiosRequest = axios.post(this.getRpcPath() + postName, postData, <AxiosRequestConfig>{
                 //Without this withCredentials axios (at least for CORS requests) doesn't send enough info to allow the server
-                //to recognize the same "session", and makes the server malfunction becasue it thinks each request is a 
-                //new session and fails the login security. 
+                //to recognize the same "session", and makes the server malfunction becasue it thinks each request is a
+                //new session and fails the login security.
                 withCredentials: true
             });
         } catch (ex) {
@@ -475,8 +475,8 @@ export class Util implements UtilIntf {
                 try {
                     this._ajaxCounter--;
                     this.progressInterval(null);
-                    let status = error.response ? error.response.status : "";
-                    let info = "Status: " + status + " message: " + error.message + " stack: " + error.stack;
+                    const status = error.response ? error.response.status : "";
+                    const info = "Status: " + status + " message: " + error.message + " stack: " + error.stack;
                     console.log("HTTP RESP [" + postName + "]: Error: " + info);
 
                     if (error.response && error.response.status === 401) {
@@ -511,7 +511,7 @@ export class Util implements UtilIntf {
                         failCallback(msg);
                     }
                     else {
-                        let status = error.response ? error.response.status : "";
+                        const status = error.response ? error.response.status : "";
                         this.showMessage("Request failed: ERROR: " + status + ": " + error.message, "Warning", true);
                     }
                 } catch (ex) {
@@ -558,7 +558,7 @@ export class Util implements UtilIntf {
     }
 
     focusElmById = (id: string) => {
-        let elm: HTMLElement = this.domElm(id);
+        const elm: HTMLElement = this.domElm(id);
 
         if (elm) {
             //console.log(`Element found (${id}), focusing`);
@@ -620,13 +620,13 @@ export class Util implements UtilIntf {
             return null;
         }
 
-        let e = document.getElementById(id);
+        const e = document.getElementById(id);
         return !!e;
     }
 
     /* Takes textarea dom Id (# optional) and returns its value */
     getTextAreaValById = (id: string): string => {
-        let de: HTMLInputElement = <HTMLInputElement> this.domElm(id);
+        const de: HTMLInputElement = <HTMLInputElement> this.domElm(id);
         return de.value;
     }
 
@@ -656,7 +656,7 @@ export class Util implements UtilIntf {
     }
 
     domElmRemove = (id: string): void => {
-        let elm = this.domElm(id);
+        const elm = this.domElm(id);
         if (elm) {
             elm.parentNode.removeChild(elm);
         }
@@ -668,7 +668,7 @@ export class Util implements UtilIntf {
         return new Promise<HTMLElement>((resolve, reject) => {
 
             // First we immediately try to get the element.
-            let e: HTMLElement = document.getElementById(id);
+            const e: HTMLElement = document.getElementById(id);
             if (e) {
                 //console.log("ELM found immediately: "+id);
                 if (exResolve) {
@@ -680,12 +680,12 @@ export class Util implements UtilIntf {
             // (is there a better native JS approach than polling for the element?)
             else {
                 let accumWaitTime = 0;
-                let timeSlice = 100;
+                const timeSlice = 100;
 
                 //don't hang the promise more than 5 seconds, before reporting error and continuing.
-                let maxWaitTime = 5000;
+                const maxWaitTime = 5000;
 
-                let interval = setInterval(() => {
+                const interval = setInterval(() => {
 
                     // oops I only want this on PROD because when debugging it can timeout too much when breakpoints are set.
                     accumWaitTime += timeSlice;
@@ -695,7 +695,7 @@ export class Util implements UtilIntf {
                         resolve(null);
                     }
 
-                    let e: HTMLElement = document.getElementById(id);
+                    const e: HTMLElement = document.getElementById(id);
                     //console.log("waiting for elm: "+id);
                     if (e) {
                         clearInterval(interval);
@@ -725,7 +725,7 @@ export class Util implements UtilIntf {
             return null;
         }
 
-        let e: HTMLElement = document.getElementById(id);
+        const e: HTMLElement = document.getElementById(id);
         return e;
     }
 
@@ -747,7 +747,7 @@ export class Util implements UtilIntf {
         if (val == null) {
             val = "";
         }
-        let elm = this.domElm(id);
+        const elm = this.domElm(id);
         if (elm) {
             //elm.node.value = val;
             (<any>elm).value = val;
@@ -771,7 +771,7 @@ export class Util implements UtilIntf {
             content = "";
         }
 
-        let elm: HTMLElement = this.domElm(id);
+        const elm: HTMLElement = this.domElm(id);
         if (!elm) {
             console.log("Unable to setHtml on ID: " + id + ". Not found.");
             return;
@@ -779,20 +779,20 @@ export class Util implements UtilIntf {
         elm.innerHTML = content;
     }
 
-    /* Finds all elements that are under selectors[0], and then finds all under THOSE that are under selectors[1], etc, 
+    /* Finds all elements that are under selectors[0], and then finds all under THOSE that are under selectors[1], etc,
     and executes 'func' on the leaf nodes of that kind of search. There may be a way that querySelectorAll can do this all
     at once but i want to get in the chain here in case i need to do other processing along this chain of selections
     */
     domSelExec = (selectors: string[], func: Function, level: number = 0) => {
         if (!selectors || selectors.length === 0) return;
 
-        let elements = document.querySelectorAll(selectors[level]);
+        const elements = document.querySelectorAll(selectors[level]);
         Array.prototype.forEach.call(elements, (el: HTMLElement) => {
             //if at final dept level, exec the function
             if (selectors.length - 1 === level) {
                 func(el);
             }
-            //else drill deeper, using recursion 
+            //else drill deeper, using recursion
             else {
                 this.domSelExec(selectors, func, level + 1);
             }
@@ -801,7 +801,7 @@ export class Util implements UtilIntf {
     }
 
     setElmDisplayById = (id: string, showing: boolean) => {
-        let elm: HTMLElement = this.domElm(id);
+        const elm: HTMLElement = this.domElm(id);
         if (elm) {
             this.setElmDisplay(elm, showing);
         }
@@ -820,16 +820,16 @@ export class Util implements UtilIntf {
     so it's debatable wether the overhead of that is better for large objects */
     getPropertyCount = (obj: Object): number => {
         if (!obj) return 0;
-        let names: string[] = Object.getOwnPropertyNames(obj);
+        const names: string[] = Object.getOwnPropertyNames(obj);
         return names ? names.length : 0;
     }
 
     forEachElmBySel = (sel: string, callback: Function): void => {
-        let elements = document.querySelectorAll(sel);
+        const elements = document.querySelectorAll(sel);
         Array.prototype.forEach.call(elements, callback);
     }
 
-    /* Equivalent of ES6 Object.assign(). Takes all properties from src and merges them onto dst 
+    /* Equivalent of ES6 Object.assign(). Takes all properties from src and merges them onto dst
     todo-1: get rid of this function and just use Object.assign
     */
     mergeProps = (dst: Object, src: Object): void => {
@@ -842,7 +842,7 @@ export class Util implements UtilIntf {
     }
 
     /* Very similar to ES6 Object.assign(), but slightly different. Takes all properties from src and merges them onto dst, except this one
-    will notice if the src and dest both have any of the keys defined and will combine the dest by concatinating it to the source 
+    will notice if the src and dest both have any of the keys defined and will combine the dest by concatinating it to the source
     rather than setting (overwriting) that property value from the source */
     mergeAndMixProps = (dst: Object, src: Object, mixPrefix: string): void => {
         if (!src) return;
@@ -857,11 +857,11 @@ export class Util implements UtilIntf {
         });
     }
 
-    /* Iterates by callling callback with property key/value pairs for each property in the object 
+    /* Iterates by callling callback with property key/value pairs for each property in the object
     check to see if tyescript has a better native way to iterate 'hasOwn' properties */
     forEachProp = (obj: Object, callback: I.PropertyIterator): void => {
         if (!obj) return;
-        let names: any[] = Object.getOwnPropertyNames(obj);
+        const names: any[] = Object.getOwnPropertyNames(obj);
         if (names) {
             names.forEach(function (prop) {
                 /* we use the unusual '== false' here so that returning a value is optional, but if you return false it terminates looping */
@@ -941,11 +941,11 @@ export class Util implements UtilIntf {
     }
 
     /* Programatically creates objects by name, similar to what Java reflection does
-    
+
     * ex: let example = InstanceLoader.getInstance<NamedThing>(window, 'ExampleClass', args...);
     */
     getInstance = <T>(context: Object, name: string, ...args: any[]): T => {
-        let instance = Object.create(context[name].prototype);
+        const instance = Object.create(context[name].prototype);
         instance.constructor.apply(instance, args);
         return <T>instance;
     }
@@ -1019,8 +1019,8 @@ export class Util implements UtilIntf {
             el.classList.toggle(clazz);
         } else {
             if (el.className) {
-                let classes = el.className.split(" ");
-                let existingIndex = classes.indexOf(clazz);
+                const classes = el.className.split(" ");
+                const existingIndex = classes.indexOf(clazz);
 
                 if (existingIndex >= 0) {
                     classes.splice(existingIndex, 1);
@@ -1066,27 +1066,27 @@ export class Util implements UtilIntf {
             console.error("Ignoring Util.trigger. elm is null");
         }
         // For a full list of event types: https://developer.mozilla.org/en-US/docs/Web/API/document.createEvent
-        let event = document.createEvent("HTMLEvents");
+        const event = document.createEvent("HTMLEvents");
         event.initEvent(evt, true, false);
         elm.dispatchEvent(event);
     }
 
     formatDate = (date): string => {
         let hours = date.getHours();
-        let minutes = date.getMinutes();
-        let ampm = hours >= 12 ? "pm" : "am";
+        const minutes = date.getMinutes();
+        const ampm = hours >= 12 ? "pm" : "am";
         hours = hours % 12;
         hours = hours ? hours : 12; // the hour '0' should be '12'
-        let strTime = hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + ampm;
+        const strTime = hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + ampm;
         return (date.getMonth() + 1) + "-" + date.getDate() + "-" + date.getFullYear() + " " + strTime;
     }
 
-    /* Our 'hash' part of the history works perfectly when entering into browser and refreshing browser, 
+    /* Our 'hash' part of the history works perfectly when entering into browser and refreshing browser,
     but in general using the back button is not working correctly quite yet (will come back to this later. is good enough for now)
-    todo-1 
-    
+    todo-1
+
     NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
-    the current location is. 
+    the current location is.
 
     NOTE: todo-1 We don't currently have a call to updateHistory for 1) initial page load 2) Search results click 3) timeline click, but those
     would be nice additions.
@@ -1100,7 +1100,7 @@ export class Util implements UtilIntf {
         }
         let url, title, state;
         if (node.name) {
-            let queryPath = this.getPathPartForNamedNode(node);
+            const queryPath = this.getPathPartForNamedNode(node);
             url = window.location.origin + queryPath;
 
             if (childNode && childNode.id !== node.id) {
@@ -1156,14 +1156,14 @@ export class Util implements UtilIntf {
     // //Non-Linear Animated Scroll (ease in and out):
     // //https://stackoverflow.com/questions/21474678/scrolltop-animation-without-jquery
     animateScrollToTop_v1 = () => {
-        let scrollDuration = 900;
+        const scrollDuration = 900;
         const scrollHeight = window.scrollY;
         const scrollStep = Math.PI / (scrollDuration / 15);
         const cosParameter = scrollHeight / 2;
         let scrollCount = 0;
         let scrollMargin = 0;
 
-        let scrollInterval = setInterval(() => {
+        const scrollInterval = setInterval(() => {
             if (window.scrollY !== 0) {
                 scrollCount = scrollCount + 1;
                 scrollMargin = cosParameter - cosParameter * Math.cos(scrollCount * scrollStep);
@@ -1183,12 +1183,12 @@ export class Util implements UtilIntf {
             return;
         }
 
-        let scrollDuration = 900;
-        let cosParameter = window.scrollY / 2;
+        const scrollDuration = 900;
+        const cosParameter = window.scrollY / 2;
         let scrollCount = 0;
         let oldTimestamp = performance.now();
 
-        let step = (newTimestamp: number) => {
+        const step = (newTimestamp: number) => {
             scrollCount += Math.PI / (scrollDuration / (newTimestamp - oldTimestamp));
             if (scrollCount >= Math.PI) window.scrollTo(0, 0);
             if (window.scrollY === 0) return;
@@ -1198,13 +1198,13 @@ export class Util implements UtilIntf {
         };
         window.requestAnimationFrame(step);
     }
-    /* 
+    /*
         Explanations:
         - pi is the length/end point of the cosinus intervall (see above)
         - newTimestamp indicates the current time when callbacks queued by requestAnimationFrame begin to fire.
           (for more information see https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame)
         - newTimestamp - oldTimestamp equals the duration
-    
+
           a * cos (bx + c) + d                      | c translates along the x axis = 0
         = a * cos (bx) + d                          | d translates along the y axis = 1 -> only positive y values
         = a * cos (bx) + 1                          | a stretches along the y axis = cosParameter = window.scrollY / 2
@@ -1214,7 +1214,7 @@ export class Util implements UtilIntf {
 
     getBrowserMemoryInfo = (): string => {
         let ret = "";
-        let p: any = performance as any;
+        const p: any = performance as any;
         if (p.memory) {
             ret += "<br>HeapSizeLimit: " + this.formatMemory(p.memory.jsHeapSizeLimit);
             ret += "<br>TotalHeapSize: " + this.formatMemory(p.memory.totalJSHeapSize);
@@ -1242,7 +1242,7 @@ export class Util implements UtilIntf {
     //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
     setDropHandler = (attribs: any, func: (elm: any) => void): void => {
 
-        let nonDragBorder = "";
+        const nonDragBorder = "";
 
         attribs.onDragEnter = function (event) {
             //console.log("onDragEnter: id="+event.target.id);

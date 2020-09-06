@@ -32,24 +32,24 @@ export class MenuPanel extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        const state: AppState = useSelector((state: AppState) => state);
 
-        let selNodeCount = S.util.getPropertyCount(state.selectedNodes);
-        let highlightNode = S.meta64.getHighlightedNode(state);
-        let selNodeIsMine = !!highlightNode && (highlightNode.owner === state.userName || state.userName === "admin");
+        const selNodeCount = S.util.getPropertyCount(state.selectedNodes);
+        const highlightNode = S.meta64.getHighlightedNode(state);
+        const selNodeIsMine = !!highlightNode && (highlightNode.owner === state.userName || state.userName === "admin");
 
         //for now, allowing all users to import+export (todo-2)
-        let importFeatureEnabled = state.isAdminUser || state.userPreferences.importAllowed;
-        let exportFeatureEnabled = state.isAdminUser || state.userPreferences.exportAllowed;
+        const importFeatureEnabled = state.isAdminUser || state.userPreferences.importAllowed;
+        const exportFeatureEnabled = state.isAdminUser || state.userPreferences.exportAllowed;
 
-        let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, highlightNode);
-        let allowNodeMove: boolean = !orderByProp && S.edit.isInsertAllowed(state.node, state);
-        let isPageRootNode = state.node && highlightNode && state.node.id === highlightNode.id;
+        const orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, highlightNode);
+        const allowNodeMove: boolean = !orderByProp && S.edit.isInsertAllowed(state.node, state);
+        const isPageRootNode = state.node && highlightNode && state.node.id === highlightNode.id;
 
-        let canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.firstChild);
-        let canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.lastChild);
+        const canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.firstChild);
+        const canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.lastChild);
 
-        let children = [];
+        const children = [];
 
         //WARNING: The string 'Navigate' is also in Menu.activeMenu.
         children.push(new Menu("Navigate", [
@@ -61,7 +61,7 @@ export class MenuPanel extends Div {
 
             //this appears to be broken for user 'bob' at least. Also "Show Feed" is broken on the feed node
             new MenuItem("Feed", () => S.nav.navFeed(state), !state.isAnonUser),
-            new MenuItem("Post", () => S.nav.openContentNode("~" + J.NodeType.USER_FEED, state), !state.isAnonUser),
+            new MenuItem("Post", () => S.nav.openContentNode("~" + J.NodeType.USER_FEED, state), !state.isAnonUser)
 
             //I'm removing my RSS feeds, for now (mainly to remove any political or interest-specific content from the platform)
             //new MenuItem("Podcast Feeds", () => { S.nav.openContentNode("/r/rss"); }),
@@ -92,7 +92,7 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Permanent Delete", () => S.edit.deleteSelNodes(null, true, state), !state.isAnonUser && selNodeCount > 0 && selNodeIsMine), //
-            new MenuItem("Show Trash Bin", () => S.nav.openContentNode(state.homeNodePath + "/d", state), !state.isAnonUser),
+            new MenuItem("Show Trash Bin", () => S.nav.openContentNode(state.homeNodePath + "/d", state), !state.isAnonUser)
 
             //todo-1: disabled during mongo conversion
             //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
@@ -124,7 +124,7 @@ export class MenuPanel extends Div {
                 !state.isAnonUser && !!highlightNode), //
 
             new MenuItem("By ID", () => { new SearchByIDDlg(state).open(); }, //
-                !state.isAnonUser && !!highlightNode), //
+                !state.isAnonUser && !!highlightNode) //
 
             //new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch })
@@ -140,7 +140,7 @@ export class MenuPanel extends Div {
                 !state.isAnonUser && !!highlightNode), //
 
             new MenuItem("Modified", () => S.srch.timeline("mtm", state), //
-                !state.isAnonUser && !!highlightNode), //
+                !state.isAnonUser && !!highlightNode) //
         ]));
 
         children.push(new Menu("Tools", [
@@ -160,14 +160,14 @@ export class MenuPanel extends Div {
                 state.isAdminUser && importFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId === highlightNode.id))), //
 
             new MenuItem("Export", () => S.edit.openExportDlg(state),
-                state.isAdminUser && exportFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId === highlightNode.id))), //
+                state.isAdminUser && exportFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId === highlightNode.id))) //
         ]));
 
         children.push(new Menu("Encryption", [
             new MenuItem("Show Keys", () => { new ManageEncryptionKeysDlg(state).open(); }, !state.isAnonUser), //
             new MenuItem("Generate Keys", () => { S.util.generateNewCryptoKeys(state); }, !state.isAnonUser), //
             new MenuItem("Publish Keys", () => { S.encryption.initKeys(false, true); }, !state.isAnonUser), //
-            new MenuItem("Import Keys", () => { new ImportCryptoKeyDlg(state).open(); }, !state.isAnonUser), //
+            new MenuItem("Import Keys", () => { new ImportCryptoKeyDlg(state).open(); }, !state.isAnonUser) //
         ]));
 
         // //need to make export safe for end users to use (recarding file sizes)
@@ -194,7 +194,7 @@ export class MenuPanel extends Div {
             new MenuItem("Profile", () => S.edit.openProfileDlg(state), !state.isAnonUser), //
             new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), //
             new MenuItem("Change Password", () => S.edit.openChangePasswordDlg(state), !state.isAnonUser), //
-            new MenuItem("Manage Account", () => S.edit.openManageAccountDlg(state), !state.isAnonUser), //
+            new MenuItem("Manage Account", () => S.edit.openManageAccountDlg(state), !state.isAnonUser) //
 
             // menuItem("Full Repository Export", "fullRepositoryExport", "
             // S.edit.fullRepositoryExport();") + //
@@ -207,8 +207,8 @@ export class MenuPanel extends Div {
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)),
 
                 new MenuItem("Force Refresh", () => {
-                    let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
-                    let nodeId: string = currentSelNode ? currentSelNode.id : null;
+                    const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+                    const nodeId: string = currentSelNode ? currentSelNode.id : null;
                     S.view.refreshTree(nodeId, false, nodeId, false, true, true, true, state);
                 },
                 state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine))
@@ -221,7 +221,7 @@ export class MenuPanel extends Div {
                 //     () => { return state.isAdminUser },
                 //     () => { return state.isAdminUser }
                 // ),
-                new MenuItem("Refresh Index", () => S.view.runServerCommand("refreshLuceneIndex", null, null, state)),
+                new MenuItem("Refresh Index", () => S.view.runServerCommand("refreshLuceneIndex", null, null, state))
             ]));
         }
 
@@ -242,7 +242,7 @@ export class MenuPanel extends Div {
                     S.util.showMessage("Encryption Test Complete. Check browser console for output.", "Note", true);
                 }),
                 new MenuItem("TTS Test", async () => {
-                    let tts = window.speechSynthesis;
+                    const tts = window.speechSynthesis;
                     // let voices = tts.getVoices();
                     // for (let i = 0; i < voices.length; i++) {
                     //     let voice = voices[i];
@@ -254,13 +254,13 @@ export class MenuPanel extends Div {
                     on my Ubuntu 18.04, machine, so for now any TTS development is on hold. */
                     var utterThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
                     tts.speak(utterThis);
-                }),
+                })
             ]));
         }
 
         children.push(new Menu("Help", [
             new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide", state)),
-            new MenuItem("Getting Started", () => S.nav.openContentNode(":getting-started", state)),
+            new MenuItem("Getting Started", () => S.nav.openContentNode(":getting-started", state))
         ]));
 
         this.setChildren(children);

@@ -12,10 +12,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class ActivityPub implements ActivityPubIntf {
 
     postNode = (state: AppState): void => {
-        let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
+        const node: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (node) {
             S.util.ajax<J.ActivityPubPostRequest, J.ActivityPubPostResponse>("activityPubPost", {
-                nodeId: node.id,
+                nodeId: node.id
             }, this.activityPubPostResponse);
         }
     }

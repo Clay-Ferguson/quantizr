@@ -8,7 +8,7 @@ export class CompValueHolder<T> implements ValueIntf {
     }
 
     setValue(val: T): void {
-        let obj = {};
+        const obj = {};
         obj[this.propName] = val || "";
         this.comp.mergeState(obj);
     }

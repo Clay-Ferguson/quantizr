@@ -23,11 +23,11 @@ export function rootReducer(state: AppState = initialState, /* action: Action<an
     else if (action.update) {
         action.update(state);
 
-        /* todo-1: this line is a stop-gap because for now our 'sensitivity' for re-renders needs to be ANYTHING in the state 
+        /* todo-1: this line is a stop-gap because for now our 'sensitivity' for re-renders needs to be ANYTHING in the state
         can trigger everything to rerender. This line will go away once we have the ability to have the useSelector() calls
         in each component be smart enough to only retrieve exactly what's needed, which will speed up rendering a lot, and once
         we have that this line can be removed. This line is forcing react to see we have a whole new state and can trigger
-        re-render of everything in that state 
+        re-render of everything in that state
         */
         state = { ...state };
     }
@@ -51,7 +51,7 @@ export const appState = (state?: AppState): AppState => {
     return state || store.getState();
 };
 
-export let dispatch = (action: AppAction) => {
+export const dispatch = (action: AppAction) => {
     PubSub.pub(C.PUBSUB_ClearComponentCache);
 
     store.dispatch(action);
@@ -60,13 +60,13 @@ export let dispatch = (action: AppAction) => {
 
 /* This is MUCH faster, for when structural changes won't happen (only style changes for example),
 becuase it doesn't reset static objects to null, meaning they get reused, without reconstructing */
-export let fastDispatch = (action: AppAction) => {
+export const fastDispatch = (action: AppAction) => {
     store.dispatch(action);
     //console.log("Fast Dispatch Complete: " + action.type);
 };
 
 /* This listener is temporary until I find a better way to do this code, which needs to always run after any
-render is complete and AFTER the html DOM is updated/final 
+render is complete and AFTER the html DOM is updated/final
 
 This works, but is currently not needed.
 */

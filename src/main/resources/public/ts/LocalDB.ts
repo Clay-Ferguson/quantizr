@@ -26,7 +26,7 @@ export class LocalDB implements LocalDBIntf {
         if (!indexedDB) {
             throw new Error("IndexedDB API not available in browser.");
         }
-        let req: IDBOpenDBRequest = indexedDB.open(LocalDB.DB_NAME, LocalDB.VERSION);
+        const req: IDBOpenDBRequest = indexedDB.open(LocalDB.DB_NAME, LocalDB.VERSION);
 
         req.onupgradeneeded = () => {
             req.result.createObjectStore(LocalDB.STORE_NAME, { keyPath: LocalDB.KEY_NAME });
@@ -38,8 +38,8 @@ export class LocalDB implements LocalDBIntf {
     private runTrans = (access: IDBTransactionMode, runner: (store: IDBObjectStore) => void) => {
 
         if (this.db) {
-            let tx: IDBTransaction = this.db.transaction(LocalDB.STORE_NAME, access);
-            let store: IDBObjectStore = tx.objectStore(LocalDB.STORE_NAME);
+            const tx: IDBTransaction = this.db.transaction(LocalDB.STORE_NAME, access);
+            const store: IDBObjectStore = tx.objectStore(LocalDB.STORE_NAME);
 
             runner(store);
 
@@ -53,7 +53,7 @@ export class LocalDB implements LocalDBIntf {
             };
         }
         else {
-            let req: IDBOpenDBRequest = this.openDB();
+            const req: IDBOpenDBRequest = this.openDB();
             req.onsuccess = () => {
                 //this is a one level recursion, just as a design choice. This isn't inherently a recursive operation.
                 if (req.result) {
@@ -61,7 +61,7 @@ export class LocalDB implements LocalDBIntf {
                     this.runTrans(access, runner);
                 }
             };
-            
+
             req.onerror = () => {
                 console.warn("runTrans failed");
             };
@@ -71,8 +71,8 @@ export class LocalDB implements LocalDBIntf {
     // gets the value stored under the key (like a simple map/keystore)
     getVal = (key: string, userName: string = null): Promise<any> => {
         return new Promise<any>(async (resolve, reject) => {
-            let keyPrefix = this.getKeyPrefix(userName);
-            let obj: any = await this.readObject(keyPrefix + key);
+            const keyPrefix = this.getKeyPrefix(userName);
+            const obj: any = await this.readObject(keyPrefix + key);
             //console.log("LocalDB[" + LocalDB.DB_NAME + "] getVal name=" + keyPrefix + key + " val=" + (!!obj ? obj.val : null));
             resolve(obj ? obj.val : null);
         });
@@ -81,7 +81,7 @@ export class LocalDB implements LocalDBIntf {
     // stores the value under this key  (like a simple map/keystore)
     setVal = (key: string, val: any, userName: string = null): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            let keyPrefix = this.getKeyPrefix(userName);
+            const keyPrefix = this.getKeyPrefix(userName);
             //console.log("LocalDB[" + LocalDB.DB_NAME + "] setVal name=" + keyPrefix + key + " val=" + val);
             await this.writeObject({ name: keyPrefix + key, val });
             resolve();
@@ -108,7 +108,7 @@ export class LocalDB implements LocalDBIntf {
             this.runTrans(LocalDB.ACCESS_READONLY,
                 (store: IDBObjectStore) => {
                     //NOTE: name is the "keyPath" value.
-                    let promise = store.get(name);
+                    const promise = store.get(name);
 
                     promise.onsuccess = () => {
                         resolve(promise.result);

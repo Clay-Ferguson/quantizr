@@ -31,7 +31,7 @@ export class View implements ViewIntf {
         }
 
         if (!highlightId) {
-            let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             highlightId = currentSelNode ? currentSelNode.id : nodeId;
         }
 
@@ -103,7 +103,7 @@ export class View implements ViewIntf {
 
     //todo-1: need to add logic to detect if this is root node on the page, and if so, we consider the first child the target
     scrollRelativeToNode = (dir: string, state: AppState) => {
-        let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+        const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!currentSelNode) return;
 
         let newNode: J.NodeInfo = null;
@@ -177,13 +177,13 @@ export class View implements ViewIntf {
                 /* Check to see if we are rendering the top node (page root), and if so
                 it is better looking to just scroll to zero index, because that will always
                 be what user wants to see */
-                let currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+                const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
                 if (currentSelNode && state.node.id === currentSelNode.id) {
                     this.docElm.scrollTop = 0;
                     return;
                 }
 
-                let elm: any = S.nav.getSelectedDomElement(state);
+                const elm: any = S.nav.getSelectedDomElement(state);
                 if (elm) {
                     elm.scrollIntoView(true);
 
@@ -216,7 +216,7 @@ export class View implements ViewIntf {
     }
 
     runServerCommand = (command: string, dlgTitle: string, dlgDescription: string, state: AppState) => {
-        let node = S.meta64.getHighlightedNode(state);
+        const node = S.meta64.getHighlightedNode(state);
 
         S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
             command: command,
@@ -233,7 +233,7 @@ export class View implements ViewIntf {
                         m.message += "<br>Build Time: " + BUILDTIME;
                         m.message += "<br>Profile: " + PROFILE;
                     }
-                        
+
                     /* For now just prefix description onto the text. This will be made 'prettier' later todo-1 */
                     if (dlgDescription) {
                         m.message = dlgDescription + "\n\n" + m.message;
@@ -246,7 +246,7 @@ export class View implements ViewIntf {
     }
 
     displayNotifications = (command: string, state: AppState) => {
-        let node = S.meta64.getHighlightedNode(state);
+        const node = S.meta64.getHighlightedNode(state);
 
         S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getNotifications", {
             command: command,

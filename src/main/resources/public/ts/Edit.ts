@@ -40,13 +40,13 @@ export class Edit implements EditIntf {
     }
 
     openImportDlg = (state: AppState): void => {
-        let node: J.NodeInfo = S.meta64.getHighlightedNode(state);
+        const node: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
             return;
         }
 
-        let dlg = new UploadFromFileDropzoneDlg(node.id, node, false, null, true, state, () => {
+        const dlg = new UploadFromFileDropzoneDlg(node.id, node, false, null, true, state, () => {
             S.meta64.refresh(state);
         });
         dlg.open();
@@ -69,7 +69,7 @@ export class Edit implements EditIntf {
             S.meta64.clearSelNodes(state);
 
             //We only want to pass a nodeId here if we are going to root node.
-            let nodeId = postDelSelNodeId === state.homeNodeId ? postDelSelNodeId : null;
+            const nodeId = postDelSelNodeId === state.homeNodeId ? postDelSelNodeId : null;
 
             S.view.refreshTree(nodeId, false, postDelSelNodeId, false, false, true, true, state);
         }
@@ -77,18 +77,18 @@ export class Edit implements EditIntf {
 
     public initNodeEditResponse = (res: J.InitNodeEditResponse, state: AppState, dialogEditor: boolean): void => {
         if (S.util.checkSuccess("Editing node", res)) {
-            let node: J.NodeInfo = res.nodeInfo;
+            const node: J.NodeInfo = res.nodeInfo;
 
-            let editingAllowed = this.isEditAllowed(node, state);
+            const editingAllowed = this.isEditAllowed(node, state);
             if (editingAllowed) {
                 /*
                  * Server will have sent us back the raw text content, that should be markdown instead of any HTML, so
                  * that we can display this and save.
                  */
-                let editNode = res.nodeInfo;
+                const editNode = res.nodeInfo;
 
                 if (dialogEditor) {
-                    let dlg = new EditNodeDlg(editNode, state);
+                    const dlg = new EditNodeDlg(editNode, state);
                     dlg.open();
                 }
                 else {
@@ -110,11 +110,11 @@ export class Edit implements EditIntf {
     private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, state: AppState): void => {
         if (S.util.checkSuccess("Move nodes", res)) {
             dispatch({
-                type: "Action_SetNodesToMove", 
+                type: "Action_SetNodesToMove",
                 state,
                 update: (s: AppState): void => {
                     s.nodesToMove = null;
-                },
+                }
             });
 
             S.view.refreshTree(null, false, nodeId, false, false, true, true, state);
@@ -136,7 +136,7 @@ export class Edit implements EditIntf {
             owner = "admin";
         }
 
-        //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to 
+        //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to
         //make nodes editable by any other user.
         if (owner === "admin" && !state.isAdminUser) return false;
 
@@ -157,7 +157,7 @@ export class Edit implements EditIntf {
             owner = "admin";
         }
 
-        //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to 
+        //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to
         //make nodes editable by any other user.
         if (owner === "admin" && !state.isAdminUser) return false;
 
@@ -199,7 +199,7 @@ export class Edit implements EditIntf {
                 createAtTop,
                 content: null,
                 typeLock: false,
-                properties: null,
+                properties: null
             }, (res) => {
                 this.createSubNodeResponse(res, state);
             });
@@ -273,7 +273,7 @@ export class Edit implements EditIntf {
             }
 
             for (let i = 0; i < aclEntries.length; i++) {
-                let ac = aclEntries[i];
+                const ac = aclEntries[i];
 
                 // console.log("Distribute Key to Principal: " + S.util.prettyPrint(ac));
                 await S.share.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
@@ -291,7 +291,7 @@ export class Edit implements EditIntf {
         S.meta64.saveUserPreferences(state);
 
         dispatch({
-            type: "Action_SetUserPreferences", 
+            type: "Action_SetUserPreferences",
             state,
             update: (s: AppState): void => {
                 s.userPreferences = state.userPreferences;
@@ -302,11 +302,11 @@ export class Edit implements EditIntf {
     cached_moveNodeUp = (id: string, state?: AppState): void => {
         state = appState(state);
         if (!id) {
-            let selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             id = selNode.id;
         }
 
-        let node: J.NodeInfo = state.idToNodeMap[id];
+        const node: J.NodeInfo = state.idToNodeMap[id];
         if (node) {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
@@ -320,11 +320,11 @@ export class Edit implements EditIntf {
     cached_moveNodeDown = (id: string, state: AppState): void => {
         state = appState(state);
         if (!id) {
-            let selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             id = selNode.id;
         }
 
-        let node: J.NodeInfo = state.idToNodeMap[id];
+        const node: J.NodeInfo = state.idToNodeMap[id];
         if (node) {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
@@ -337,10 +337,10 @@ export class Edit implements EditIntf {
 
     moveNodeToTop = (id: string, state: AppState): void => {
         if (!id) {
-            let selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             id = selNode.id;
         }
-        let node: J.NodeInfo = state.idToNodeMap[id];
+        const node: J.NodeInfo = state.idToNodeMap[id];
         if (node) {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
@@ -353,10 +353,10 @@ export class Edit implements EditIntf {
 
     moveNodeToBottom = (id: string, state: AppState): void => {
         if (!id) {
-            let selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             id = selNode.id;
         }
-        let node: J.NodeInfo = state.idToNodeMap[id];
+        const node: J.NodeInfo = state.idToNodeMap[id];
         if (node) {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
@@ -422,7 +422,7 @@ export class Edit implements EditIntf {
 
     /* Need all cached functions to be prefixed so they're recognizable, since refactoring them can break things */
     cached_newSubNode = (id: any) => {
-        let state = store.getState();
+        const state = store.getState();
         this.createSubNode(id, null, true, state.node, null);
     }
 
@@ -433,7 +433,7 @@ export class Edit implements EditIntf {
          * node if there is a selected node.
          */
         if (!id) {
-            let highlightNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const highlightNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             if (highlightNode) {
                 parentNode = highlightNode;
             }
@@ -453,7 +453,7 @@ export class Edit implements EditIntf {
     }
 
     selectAllNodes = async (state: AppState): Promise<void> => {
-        let highlightNode = S.meta64.getHighlightedNode(state);
+        const highlightNode = S.meta64.getHighlightedNode(state);
         S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             parentNodeId: highlightNode.id
         }, async (res: J.SelectAllNodesResponse) => {
@@ -515,7 +515,7 @@ export class Edit implements EditIntf {
         if (nodeId) {
             S.nav.setNodeSel(true, nodeId, state);
         }
-        let selNodesArray = S.meta64.getSelNodeIdsArray(state);
+        const selNodesArray = S.meta64.getSelNodeIdsArray(state);
 
         if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("You have not selected any nodes to delete.", "Warning");
@@ -527,10 +527,10 @@ export class Edit implements EditIntf {
             return;
         }
 
-        let firstNodeId: string = selNodesArray[0];
+        const firstNodeId: string = selNodesArray[0];
 
         /* todo-1: would be better to check if ANY of the nodes are deleted not just arbitary first one */
-        let nodeCheck: J.NodeInfo = state.idToNodeMap[firstNodeId];
+        const nodeCheck: J.NodeInfo = state.idToNodeMap[firstNodeId];
         let confirmMsg = null;
         if (nodeCheck.deleted || hardDelete) {
             confirmMsg = "Permanently Delete " + selNodesArray.length + " node(s) ?";
@@ -543,7 +543,7 @@ export class Edit implements EditIntf {
             () => {
                 let postDelSelNodeId: string = null;
 
-                let node: J.NodeInfo = this.getBestPostDeleteSelNode(state);
+                const node: J.NodeInfo = this.getBestPostDeleteSelNode(state);
                 if (node) {
                     postDelSelNodeId = node.id;
                 }
@@ -568,11 +568,11 @@ export class Edit implements EditIntf {
         ).open();
     }
 
-    /* Gets the node we want to scroll to after a delete, but if we're deleting the page root we return null, 
+    /* Gets the node we want to scroll to after a delete, but if we're deleting the page root we return null,
     meaning we don't know which node to scroll to */
     getBestPostDeleteSelNode = (state: AppState): J.NodeInfo => {
         /* Use a hashmap-type approach to saving all selected nodes into a lookup map */
-        let nodesToDelMap: Object = S.meta64.getSelNodesAsMapById(state);
+        const nodesToDelMap: Object = S.meta64.getSelNodesAsMapById(state);
 
         //If we are deleting the page root node return 'null' to trigger an 'upLevel'
         if (nodesToDelMap[state.node.id]) {
@@ -586,7 +586,7 @@ export class Edit implements EditIntf {
         /* now we scan the children, and the last child we encounterd up until we find the fist one in nodesMap will be the
         node we will want to select and scroll the user to AFTER the deleting is done */
         for (let i = 0; i < state.node.children.length; i++) {
-            let node: J.NodeInfo = state.node.children[i];
+            const node: J.NodeInfo = state.node.children[i];
 
             /* is this one of the nodes we'll be deleting */
             if (nodesToDelMap[node.id]) {
@@ -604,7 +604,7 @@ export class Edit implements EditIntf {
 
     undoCutSelNodes = async (state: AppState): Promise<void> => {
         dispatch({
-            type: "Action_SetNodesToMove", 
+            type: "Action_SetNodesToMove",
             state,
             update: (s: AppState): void => {
                 s.nodesToMove = null;
@@ -616,12 +616,12 @@ export class Edit implements EditIntf {
         state = appState(state);
 
         S.nav.setNodeSel(true, nodeId, state);
-        let selNodesArray = S.meta64.getSelNodeIdsArray(state);
+        const selNodesArray = S.meta64.getSelNodeIdsArray(state);
 
         new ConfirmDlg("Cut " + selNodesArray.length + " node(s), to paste/move to new location ?", "Confirm Cut",
             async () => {
                 dispatch({
-                    type: "Action_SetNodesToMove", 
+                    type: "Action_SetNodesToMove",
                     state,
                     update: (s: AppState): void => {
                         s.nodesToMove = selNodesArray;
@@ -634,7 +634,7 @@ export class Edit implements EditIntf {
     }
 
     cached_pasteSelNodesInside = (nodeId: string) => {
-        let state = appState();
+        const state = appState();
         this.pasteSelNodes(nodeId, "inside", state);
     }
 
@@ -668,7 +668,7 @@ export class Edit implements EditIntf {
             "Confirm",
             () => {
                 /* inserting under whatever node user has focused */
-                let node = S.meta64.getHighlightedNode(state);
+                const node = S.meta64.getHighlightedNode(state);
 
                 if (!node) {
                     S.util.showMessage("No node is selected.", "Warning");
@@ -748,7 +748,7 @@ export class Edit implements EditIntf {
             createAtTop: false,
             content: null,
             typeLock: false,
-            properties: null,
+            properties: null
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });
@@ -765,7 +765,7 @@ export class Edit implements EditIntf {
             createAtTop: true,
             content: null,
             typeLock: true,
-            properties: null,
+            properties: null
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });
@@ -778,7 +778,7 @@ export class Edit implements EditIntf {
         }
 
         //console.log("Moving node[" + targetNodeId + "] into position of node[" + sourceNodeId + "]");
-        let state = appState(null);
+        const state = appState(null);
 
         S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId,

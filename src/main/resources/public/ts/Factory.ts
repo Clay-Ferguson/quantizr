@@ -1,6 +1,6 @@
-/* 
+/*
 This is a 'Factory', but the main thing it does is manage the singletons, somewhat analoglous to a SpringContext
-but actually existing for mostly different reasons having to do with our need to support circular 
+but actually existing for mostly different reasons having to do with our need to support circular
 references.
 
 WARNING: Singletons (just like in Spring) are not allowed to do any logic that requires other modules
@@ -8,7 +8,7 @@ inside their constructors becasue there is no guarantee that all (or any) of the
 been constructed yet.
 
 NOTE: This Factory is allowed to import anything it wants and the way we allow Circular Dependencies to exist without
-being a problem is by having the rule that no other modules are allowed to import this Factory module, 
+being a problem is by having the rule that no other modules are allowed to import this Factory module,
 but only the interface of it.
 */
 import * as React from "react";
@@ -36,17 +36,17 @@ import { Util } from "./Util";
 import { View } from "./View";
 
 export class Factory {
-    /* 
+    /*
     We could have implemented the
     singleton pattern in every one of these modules, but I like this better, where we centralize the
-    control (sort of Inversion of Control, IoC) and make it where the objects themselves don't even 
+    control (sort of Inversion of Control, IoC) and make it where the objects themselves don't even
     know they are being used as singletons (instantated only once).
     */
     singletons: Singletons;
 
     /*
-     * Just like in a SpringContext, we init all singletons up front and this allows circular references 
-     * to exist with no problems. 
+     * Just like in a SpringContext, we init all singletons up front and this allows circular references
+     * to exist with no problems.
      */
     constructAll = (): void => {
         this.singletons = {

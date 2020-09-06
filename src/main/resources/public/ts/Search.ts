@@ -79,7 +79,7 @@ export class Search implements SearchIntf {
 
     /* prop = mtm (modification time) | ctm (create time) */
     timeline = (prop: string, state: AppState) => {
-        let node = S.meta64.getHighlightedNode(state);
+        const node = S.meta64.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected to 'timeline' under.", "Warning");
             return;
@@ -129,16 +129,16 @@ export class Search implements SearchIntf {
      */
     renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, allowAvatar: boolean, prefix: string, isFeed: boolean, isParent: boolean, state: AppState): Comp => {
 
-        /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the 
+        /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
         item we are rendering */
         let parentItem: Comp = null;
         if (node.parent) {
             parentItem = this.renderSearchResultAsListItem(node.parent, index, count, rowCount, allowAvatar, prefix, isFeed, true, state);
         }
 
-        let cssId = this._UID_ROWID_PREFIX + node.id;
-        let buttonBar = this.makeButtonBarHtml(node, allowAvatar, state);
-        let content = new NodeCompContent(node, true, true, prefix, true, null);
+        const cssId = this._UID_ROWID_PREFIX + node.id;
+        const buttonBar = this.makeButtonBarHtml(node, allowAvatar, state);
+        const content = new NodeCompContent(node, true, true, prefix, true, null);
 
         let clazz = "node-table-row";
         //if (state.userPreferences.editMode) {
@@ -167,7 +167,7 @@ export class Search implements SearchIntf {
             clazz += " inactive-row";
         }
 
-        let div = new Div(null, {
+        const div = new Div(null, {
             className: clazz,
             onClick: S.meta64.getNodeFunc(this.cached_clickOnSearchResultRow, "S.srch.clickOnSearchResultRow", node.id),
             id: cssId
@@ -229,9 +229,9 @@ export class Search implements SearchIntf {
         }
 
         /* now make CSS id from node */
-        let nodeId = this._UID_ROWID_PREFIX + this.highlightRowNode.id;
+        const nodeId = this._UID_ROWID_PREFIX + this.highlightRowNode.id;
 
-        let elm: HTMLElement = S.util.domElm(nodeId);
+        const elm: HTMLElement = S.util.domElm(nodeId);
         if (elm) {
             /* change class on element */
             S.util.changeOrAddClassToElm(elm,

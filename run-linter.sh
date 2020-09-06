@@ -7,4 +7,4 @@ cd ${PRJROOT}/src/main/resources/public
 
 ./node_modules/.bin/eslint ./**/*.ts
 
-
+verifySuccess "Linter"

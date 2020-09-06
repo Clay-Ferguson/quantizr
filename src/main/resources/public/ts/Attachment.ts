@@ -26,7 +26,7 @@ export class Attachment implements AttachmentIntf {
             return;
         }
 
-        let dlg = new UploadFromFileDropzoneDlg(node.id, node, toIpfs, autoAddFile, false, state, () => {
+        const dlg = new UploadFromFileDropzoneDlg(node.id, node, toIpfs, autoAddFile, false, state, () => {
             S.meta64.refresh(state);
         });
         dlg.open();
@@ -47,7 +47,7 @@ export class Attachment implements AttachmentIntf {
             return;
         }
 
-        let dlg = new UploadFromUrlDlg(node, defaultUrl, onUploadFunc, state);
+        const dlg = new UploadFromUrlDlg(node, defaultUrl, onUploadFunc, state);
         dlg.open();
     }
 
@@ -57,7 +57,7 @@ export class Attachment implements AttachmentIntf {
             let deleted = false;
             let delPromise: AxiosPromise<any> = null;
             if (node) {
-                let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
+                const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
                     () => {
                         delPromise = S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
                             nodeId: node.id
@@ -78,7 +78,7 @@ export class Attachment implements AttachmentIntf {
 
     /* Queries the server for the purpose of just loading the binary properties into node, and leaving everything else intact */
     refreshBinaryPropsFromServer = (node: J.NodeInfo): Promise<any> => {
-        let res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+        const res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: node.id,
             upLevel: null,
             siblingOffset: 0,

@@ -24,7 +24,7 @@ export class Nav implements NavIntf {
     /* todo-2: eventually when we do paging for other lists, we will need a set of these variables for each list display (i.e. search, timeline, etc) */
     mainOffset: number = 0;
 
-    /* todo-2: need to have this value passed from server rather than coded in TypeScript, however for now 
+    /* todo-2: need to have this value passed from server rather than coded in TypeScript, however for now
     this MUST match RenderNodeService.ROWS_PER_PAGE in Java on server. */
     ROWS_PER_PAGE: number = 25;
 
@@ -114,7 +114,7 @@ export class Nav implements NavIntf {
     }
 
     navUpLevel = (event: any = null): void => {
-        let state = appState();
+        const state = appState();
         if (!state.node) return null;
 
         //Always just scroll to the top before doing an actual 'upLevel' to parent.
@@ -165,13 +165,13 @@ export class Nav implements NavIntf {
         var currentSelNode = S.meta64.getHighlightedNode(state);
         if (currentSelNode) {
             /* get node by node identifier */
-            let node: J.NodeInfo = state.idToNodeMap[currentSelNode.id];
+            const node: J.NodeInfo = state.idToNodeMap[currentSelNode.id];
 
             if (node) {
                 //console.log("found highlighted node.id=" + node.id);
 
                 /* now make CSS id from node */
-                let nodeId: string = this._UID_ROWID_PREFIX + node.id;
+                const nodeId: string = this._UID_ROWID_PREFIX + node.id;
                 // console.log("looking up using element id: "+nodeId);
 
                 return S.util.domElm(nodeId);
@@ -181,18 +181,18 @@ export class Nav implements NavIntf {
         return null;
     }
 
-    /* NOTE: Elements that have this as an onClick method must have the nodeId 
+    /* NOTE: Elements that have this as an onClick method must have the nodeId
     on an attribute of the element */
     cached_clickNodeRow = (nodeId: string, state?: AppState): void => {
         state = appState(state);
 
         /* First check if this node is already highlighted and if so just return */
-        let highlightNode = S.meta64.getHighlightedNode();
+        const highlightNode = S.meta64.getHighlightedNode();
         if (highlightNode && highlightNode.id === nodeId) {
             return;
         }
 
-        let node: J.NodeInfo = state.idToNodeMap[nodeId];
+        const node: J.NodeInfo = state.idToNodeMap[nodeId];
         if (!node) {
             //console.log("idToNodeMap: "+S.util.prettyPrint(state.idToNodeMap));
             throw new Error("node not found in idToNodeMap: " + nodeId);
@@ -235,7 +235,7 @@ export class Nav implements NavIntf {
         this.mainOffset = 0;
 
         state = appState(state);
-        let node: J.NodeInfo = state.idToNodeMap[id];
+        const node: J.NodeInfo = state.idToNodeMap[id];
         S.meta64.highlightNode(node, false, state);
 
         if (!node) {
@@ -315,13 +315,13 @@ export class Nav implements NavIntf {
     }
 
     runSearch = (): void => {
-        let state = appState();
+        const state = appState();
         this.cached_clickNodeRow(state.node.id);
         new SearchContentDlg(state).open();
     }
 
     runTimeline = (): void => {
-        let state = appState();
+        const state = appState();
         this.cached_clickNodeRow(state.node.id);
         S.srch.timeline("mtm", state);
     }
@@ -332,32 +332,32 @@ export class Nav implements NavIntf {
             update: (s: AppState): void => {
                 s.fullScreenViewId = null;
                 s.fullScreenGraphId = null;
-            },
+            }
         });
     }
 
     prevFullScreenImgViewer = (appState: AppState): void => {
-        let prevNode: J.NodeInfo = this.getAdjacentNode("prev", appState);
+        const prevNode: J.NodeInfo = this.getAdjacentNode("prev", appState);
 
         if (prevNode) {
             dispatch({
                 type: "Action_PrevFullScreenImgViewer",
                 update: (s: AppState): void => {
                     s.fullScreenViewId = prevNode.id;
-                },
+                }
             });
         }
     }
 
     nextFullScreenImgViewer = (appState: AppState): void => {
-        let nextNode: J.NodeInfo = this.getAdjacentNode("next", appState);
+        const nextNode: J.NodeInfo = this.getAdjacentNode("next", appState);
 
         if (nextNode) {
             dispatch({
                 type: "Action_NextFullScreenImgViewer",
                 update: (s: AppState): void => {
                     s.fullScreenViewId = nextNode.id;
-                },
+                }
             });
         }
     }
@@ -377,7 +377,7 @@ export class Nav implements NavIntf {
 
             state.node.children.some((child: J.NodeInfo) => {
                 let ret = false;
-                let isAnAccountNode = child.ownerId && child.id === child.ownerId;
+                const isAnAccountNode = child.ownerId && child.id === child.ownerId;
 
                 if (S.props.hasBinary(child) && !isAnAccountNode) {
 

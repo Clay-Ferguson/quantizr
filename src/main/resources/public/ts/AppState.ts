@@ -41,7 +41,7 @@ export class AppState {
     //this node is null we are displaying that FullScreenView comp, which occupies everything below the toolbar.
     fullScreenViewId: string = null;
     fullScreenGraphId: string = null;
-    
+
     fullScreenImageSize: string = "100%";
 
     userPreferences: J.UserPreferences = {
@@ -62,7 +62,7 @@ export class AppState {
     //todo-1: implement this as Set<string>
     selectedNodes: any = {};
 
-    /* maps node.id values to NodeInfo.java objects 
+    /* maps node.id values to NodeInfo.java objects
     Make this use a Map type (typescript)
     */
     idToNodeMap: { [key: string]: J.NodeInfo } = {};

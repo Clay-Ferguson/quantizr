@@ -14,13 +14,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class Graph implements GraphIntf {
     graphTreeStructure = (state: AppState) => {
-        let highlightNode = S.meta64.getHighlightedNode(state);
+        const highlightNode = S.meta64.getHighlightedNode(state);
         if (!highlightNode) {
             return;
         }
-        let nodeId = highlightNode.id;
+        const nodeId = highlightNode.id;
         S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
-            nodeId: nodeId,
+            nodeId
         }, this.graphNodesResponse);
     }
 

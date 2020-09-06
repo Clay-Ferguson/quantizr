@@ -18,14 +18,14 @@ export class RSSReader implements RSSReaderIntf {
         // accepts:{
         //     xml:"application/rss+xml"
         // },
-        // dataType:"xml",     
+        // dataType:"xml",
 
         axios.get(feedSrc, {
             //responseType: "document",
             headers: {
                 //"Accept": "application/rss+xml",
                 "user-agent": this.FAKE_USER_AGENT
-            },
+            }
         })
             .then((response) => {
                 if (response.status === 200) {
@@ -42,7 +42,7 @@ export class RSSReader implements RSSReaderIntf {
     processData = (data: string, callback: Function): void => {
         //onsole.log("RSS: " + data);
         // try {
-        //     let xmlDoc = $.parseXML(data); 
+        //     let xmlDoc = $.parseXML(data);
         //     let $xml = $(xmlDoc);
         //     let $title = $xml.find("title");
         //

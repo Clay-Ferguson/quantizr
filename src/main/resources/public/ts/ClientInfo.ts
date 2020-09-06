@@ -5,7 +5,7 @@ class ClientInfo {
 
     /**
         * Detect if browser is a mobile (something smaller than tabled)
-        * 
+        *
         * from: https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
         */
     private mobileCheck(): boolean {
@@ -24,5 +24,5 @@ class ClientInfo {
     }
 }
 
-let clientInfo = new ClientInfo();
+const clientInfo = new ClientInfo();
 export default clientInfo;
