@@ -1,4 +1,4 @@
-import { createStore } from 'redux';
+import { createStore } from "redux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { AppAction } from "./Interfaces";
@@ -49,7 +49,7 @@ export const store = createStore(rootReducer);
 /* For syntactical sugar we allow a state to get passed or not */
 export const appState = (state?: AppState): AppState => {
     return state || store.getState();
-}
+};
 
 export let dispatch = (action: AppAction) => {
     PubSub.pub(C.PUBSUB_ClearComponentCache);
@@ -74,5 +74,6 @@ const handleChange = () => {
     //console.log("AppRedux change.");
 };
 
-const unsubscribe = store.subscribe(handleChange);
-// // unsubscribe()
+store.subscribe(handleChange);
+//const unsubscribe = store.subscribe(handleChange);
+//unsubscribe()

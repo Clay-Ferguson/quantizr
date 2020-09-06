@@ -212,7 +212,7 @@ export class Search implements SearchIntf {
          */
         this.highlightRowNode = this.idToNodeMap[id];
         if (!this.highlightRowNode) {
-            throw "Unable to find uid in search results: " + id;
+            throw new Error("Unable to find uid in search results: " + id);
         }
 
         S.view.refreshTree(this.highlightRowNode.id, true, this.highlightRowNode.id, false, false, true, true, state);

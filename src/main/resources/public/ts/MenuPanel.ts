@@ -36,7 +36,7 @@ export class MenuPanel extends Div {
 
         let selNodeCount = S.util.getPropertyCount(state.selectedNodes);
         let highlightNode = S.meta64.getHighlightedNode(state);
-        let selNodeIsMine = !!highlightNode && (highlightNode.owner === state.userName || "admin" === state.userName);
+        let selNodeIsMine = !!highlightNode && (highlightNode.owner === state.userName || state.userName === "admin");
 
         //for now, allowing all users to import+export (todo-2)
         let importFeatureEnabled = state.isAdminUser || state.userPreferences.importAllowed;

@@ -54,7 +54,7 @@ export class Props implements PropsIntf {
      * Toggles display of properties in the gui.
      */
     propsToggle = async (state: AppState): Promise<void> => {
-        state.showProperties = state.showProperties ? false : true;
+        state.showProperties = !state.showProperties;
     }
 
     deleteProp = (node: J.NodeInfo, propertyName: string): void => {

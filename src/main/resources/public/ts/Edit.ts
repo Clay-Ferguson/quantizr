@@ -286,7 +286,7 @@ export class Edit implements EditIntf {
     }
 
     toggleEditMode = async (state: AppState): Promise<void> => {
-        state.userPreferences.editMode = state.userPreferences.editMode ? false : true;
+        state.userPreferences.editMode = !state.userPreferences.editMode;
 
         S.meta64.saveUserPreferences(state);
 

@@ -1,5 +1,5 @@
 import * as ReactDOM from "react-dom";
-import { Provider } from 'react-redux';
+import { Provider } from "react-redux";
 import { store } from "./AppRedux";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";

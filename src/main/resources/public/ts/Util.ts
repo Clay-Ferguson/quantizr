@@ -1,4 +1,4 @@
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
@@ -18,33 +18,33 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Util implements UtilIntf {
 
     static escapeMap = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;',
-        '/': '&#x2F;',
-        '`': '&#x60;',
-        '=': '&#x3D;'
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+        "/": "&#x2F;",
+        "`": "&#x60;",
+        "=": "&#x3D;"
     };
 
     //todo-p1: need to complete these
     fileExtensionTypes = {
-        'md': 'md',
-        'txt': 'txt',
-        'sh': 'txt',
-        'jpg': 'img',
-        'png': 'img',
-        'jpeg': 'img',
-        'mp3': 'audio',
-        'm4a': 'audio',
-        'mp4': 'video'
+        md: "md",
+        txt: "txt",
+        sh: "txt",
+        jpg: "img",
+        png: "img",
+        jpeg: "img",
+        mp3: "audio",
+        m4a: "audio",
+        mp4: "video"
     };
 
     editableExtensions = {
-        'md': true,
-        'txt': true,
-        'sh': true
+        md: true,
+        txt: true,
+        sh: true
     };
 
     rhost: string;
@@ -81,8 +81,11 @@ export class Util implements UtilIntf {
     }
 
     hashOfString = (s: string): string => {
-        let hash = 0, i, chr;
+        let hash = 0;
+        let i = 0;
+        let chr = 0;
         if (s.length === 0) return hash.toString();
+
         for (i = 0; i < s.length; i++) {
             chr = s.charCodeAt(i);
             hash = ((hash << 5) - hash) + chr;
@@ -106,7 +109,7 @@ export class Util implements UtilIntf {
     getFileExtensionFromFileName = (fileName: string): string => {
         let ext = "";
         let idx = fileName.lastIndexOf(".");
-        if (idx != -1) {
+        if (idx !== -1) {
             ext = fileName.substring(idx + 1);
         }
         return ext;
@@ -118,31 +121,31 @@ export class Util implements UtilIntf {
     }
 
     isImageFileName = (fileName: string): boolean => {
-        return "img" == this.getFileTypeFormFileName(fileName);
+        return this.getFileTypeFormFileName(fileName) === "img";
     }
 
     isAudioFileName = (fileName: string): boolean => {
-        return "audio" == this.getFileTypeFormFileName(fileName);
+        return this.getFileTypeFormFileName(fileName) === "audio";
     }
 
     isVideoFileName = (fileName: string): boolean => {
-        return "video" == this.getFileTypeFormFileName(fileName);
+        return this.getFileTypeFormFileName(fileName) === "video";
     }
 
     buf2hex = (arr: Uint8Array): string => {
         //return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
 
         //Diferent Algorithm:
-        var hexStr = '';
+        var hexStr = "";
         for (var i = 0; i < arr.length; i++) {
             var hex = (arr[i] & 0xff).toString(16);
-            hex = (hex.length === 1) ? '0' + hex : hex;
+            hex = (hex.length === 1) ? "0" + hex : hex;
             hexStr += hex;
         }
         return hexStr;
     }
 
-    hex2buf = (str): Uint8Array => {
+    hex2buf = (str: string): Uint8Array => {
         if (!str) {
             return new Uint8Array([]);
         }
@@ -166,15 +169,15 @@ export class Util implements UtilIntf {
     }
 
     unencodeHtml = (s: string): string => {
-        if (!this.contains(s, "&"))
+        if (!this.contains(s, "&")) {
             return s;
-
+        }
         let ret = s;
-        ret = this.replaceAll(ret, '&amp;', '&');
-        ret = this.replaceAll(ret, '&gt;', '>');
-        ret = this.replaceAll(ret, '&lt;', '<');
-        ret = this.replaceAll(ret, '&quot;', '"');
-        ret = this.replaceAll(ret, '&#39;', "'");
+        ret = this.replaceAll(ret, "&amp;", "&");
+        ret = this.replaceAll(ret, "&gt;", ">");
+        ret = this.replaceAll(ret, "&lt;", "<");
+        ret = this.replaceAll(ret, "&quot;", '"');
+        ret = this.replaceAll(ret, "&#39;", "'");
         return ret;
     }
 
@@ -187,13 +190,13 @@ export class Util implements UtilIntf {
     }
 
     replaceAll = (s: string, find: string, replace: string): string => {
-        if (!s || s.indexOf(find) == -1) return s;
-        return s.replace(new RegExp(this.escapeRegExp(find), 'g'), replace);
+        if (!s || s.indexOf(find) === -1) return s;
+        return s.replace(new RegExp(this.escapeRegExp(find), "g"), replace);
     }
 
     contains = (s: string, str: string): boolean => {
         if (!s) return false;
-        return s.indexOf(str) != -1;
+        return s.indexOf(str) !== -1;
     }
 
     startsWith = (s: string, str: string): boolean => {
@@ -207,7 +210,7 @@ export class Util implements UtilIntf {
 
     chopAtLastChar = (str: string, char: string): string => {
         let idx = str.lastIndexOf(char);
-        if (idx != -1) {
+        if (idx !== -1) {
             return str.substring(0, idx);
         }
         else {
@@ -231,7 +234,7 @@ export class Util implements UtilIntf {
 
     arrayClone(a: any[]): any[] {
         if (a == null) return null;
-        if (a.length == 0) return [];
+        if (a.length === 0) return [];
         return a.slice(0);
     };
 
@@ -274,12 +277,6 @@ export class Util implements UtilIntf {
         }
     }
 
-    assertNotNull = (varName) => {
-        if (typeof eval(varName) === 'undefined') {
-            this.showMessage("Variable not found: " + varName, "Warning");
-        }
-    }
-
     /*
      * We use this variable to determine if we are waiting for an ajax call, but the server also enforces that each
      * session is only allowed one concurrent call and simultaneous calls just "queue up".
@@ -294,7 +291,7 @@ export class Util implements UtilIntf {
             return (<any>checkbox).checked;
         }
         else {
-            throw "checkbox not found: " + id;
+            throw new Error("checkbox not found: " + id);
         }
     }
 
@@ -313,14 +310,18 @@ export class Util implements UtilIntf {
      * http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
      */
     getParameterByName = (name?: any, url?: any): string => {
-        if (!url)
+        if (!url) {
             url = window.location.href;
+        }
         name = name.replace(/[\[\]]/g, "\\$&");
-        let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), results = regex.exec(url);
-        if (!results)
+        let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+        let results = regex.exec(url);
+        if (!results) {
             return null;
-        if (!results[2])
-            return '';
+        }
+        if (!results[2]) {
+            return "";
+        }
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
@@ -350,7 +351,7 @@ export class Util implements UtilIntf {
     }
 
     getHostAndPort = (): string => {
-        return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+        return location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
     }
 
     /* Calls to SERVER must to to this URL. We allow CORS, and can run the server itself on port 8181 for example, and then let
@@ -436,11 +437,11 @@ export class Util implements UtilIntf {
                         if (response.data.message) {
                             this.showMessage(response.data.message, "Warning");
 
-                            console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: "
-                                + this.prettyPrint(response));
+                            console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
+                                this.prettyPrint(response));
 
                             //calling the failCallback here is new. (6/24/2020)
-                            if (typeof failCallback == "function") {
+                            if (typeof failCallback === "function") {
                                 failCallback(null);
                             }
 
@@ -451,11 +452,11 @@ export class Util implements UtilIntf {
                     }
 
                     if (this.logAjax) {
-                        console.log("    JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: "
-                            + this.prettyPrint(response));
+                        console.log("    JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
+                            this.prettyPrint(response));
                     }
 
-                    if (typeof callback == "function") {
+                    if (typeof callback === "function") {
                         callback(<ResponseType>response.data);
                     }
                 } catch (ex) {
@@ -475,7 +476,7 @@ export class Util implements UtilIntf {
                     this._ajaxCounter--;
                     this.progressInterval(null);
                     let status = error.response ? error.response.status : "";
-                    let info = "Status: " + status + " message: " + error.message + " stack: " + error.stack
+                    let info = "Status: " + status + " message: " + error.message + " stack: " + error.stack;
                     console.log("HTTP RESP [" + postName + "]: Error: " + info);
 
                     if (error.response && error.response.status === 401) {
@@ -506,7 +507,7 @@ export class Util implements UtilIntf {
                     msg += info;
                     console.error("Request failed: msg=" + msg);
 
-                    if (typeof failCallback == "function") {
+                    if (typeof failCallback === "function") {
                         failCallback(msg);
                     }
                     else {
@@ -527,7 +528,7 @@ export class Util implements UtilIntf {
     logAndThrow = (message: string) => {
         let stack = "[stack, not supported]";
         try {
-            stack = (<any>new Error()).stack;
+            stack = (<any> new Error()).stack;
         }
         catch (e) { }
         console.error(message + "STACK: " + stack);
@@ -537,7 +538,7 @@ export class Util implements UtilIntf {
     logAndReThrow = (message: string, exception: any) => {
         let stack = "[stack, not supported]";
         try {
-            stack = (<any>new Error()).stack;
+            stack = (<any> new Error()).stack;
         }
         catch (e) { }
         console.error(message + ": " + exception.message + "\nSTACK: " + stack);
@@ -602,7 +603,7 @@ export class Util implements UtilIntf {
         if (!array) return;
         array.forEach(v => {
             set.add(v);
-        })
+        });
     }
 
     nullOrUndef = (obj): boolean => {
@@ -625,7 +626,7 @@ export class Util implements UtilIntf {
 
     /* Takes textarea dom Id (# optional) and returns its value */
     getTextAreaValById = (id: string): string => {
-        let de: HTMLInputElement = <HTMLInputElement>this.domElm(id);
+        let de: HTMLInputElement = <HTMLInputElement> this.domElm(id);
         return de.value;
     }
 
@@ -729,7 +730,7 @@ export class Util implements UtilIntf {
     }
 
     isObject = (obj: any): boolean => {
-        return obj && obj.length != 0;
+        return obj && obj.length !== 0;
     }
 
     currentTimeMillis = (): number => {
@@ -738,7 +739,7 @@ export class Util implements UtilIntf {
     }
 
     getInputVal = (id: string): any => {
-        return (<any>this.domElm(id)).value;
+        return (<any> this.domElm(id)).value;
     }
 
     /* returns true if element was found, or false if element not found */
@@ -757,7 +758,7 @@ export class Util implements UtilIntf {
     /*
      * displays message (msg) of object is not of specified type
      */
-    verifyType = (obj: any, type: any, msg: string) => {
+    verifyType = (obj: any, type: string, msg: string) => {
         if (typeof obj !== type) {
             this.showMessage(msg, "Warning");
             return false;
@@ -783,12 +784,12 @@ export class Util implements UtilIntf {
     at once but i want to get in the chain here in case i need to do other processing along this chain of selections
     */
     domSelExec = (selectors: string[], func: Function, level: number = 0) => {
-        if (!selectors || selectors.length == 0) return;
+        if (!selectors || selectors.length === 0) return;
 
         let elements = document.querySelectorAll(selectors[level]);
         Array.prototype.forEach.call(elements, (el: HTMLElement) => {
             //if at final dept level, exec the function
-            if (selectors.length - 1 == level) {
+            if (selectors.length - 1 === level) {
                 func(el);
             }
             //else drill deeper, using recursion 
@@ -808,10 +809,10 @@ export class Util implements UtilIntf {
 
     setElmDisplay = (elm: HTMLElement, showing: boolean) => {
         if (showing) {
-            elm.style.display = '';
+            elm.style.display = "";
         }
         else {
-            elm.style.display = 'none';
+            elm.style.display = "none";
         }
     }
 
@@ -846,7 +847,7 @@ export class Util implements UtilIntf {
     mergeAndMixProps = (dst: Object, src: Object, mixPrefix: string): void => {
         if (!src) return;
         this.forEachProp(src, (k, v): boolean => {
-            if (dst[k] && (typeof dst[k] === 'string')) {
+            if (dst[k] && (typeof dst[k] === "string")) {
                 dst[k] += mixPrefix + v;
             }
             else {
@@ -877,7 +878,7 @@ export class Util implements UtilIntf {
             return "null";
         }
 
-        let val: string = ""
+        let val: string = "";
         try {
             let count: number = 0;
             this.forEachProp(obj, (prop, v): boolean => {
@@ -898,8 +899,9 @@ export class Util implements UtilIntf {
 
     /* iterates over an object creating a string containing it's keys */
     printKeys = (obj: Object): string => {
-        if (!obj)
+        if (!obj) {
             return "null";
+        }
 
         let val: string = "";
         this.forEachProp(obj, (k, v): boolean => {
@@ -908,7 +910,7 @@ export class Util implements UtilIntf {
             }
 
             if (val.length > 0) {
-                val += ',';
+                val += ",";
             }
             val += k;
             return true;
@@ -924,7 +926,7 @@ export class Util implements UtilIntf {
     setEnablement = (elmId: string, enable: boolean): void => {
 
         let elm: HTMLElement = null;
-        if (typeof elmId == "string") {
+        if (typeof elmId === "string") {
             elm = this.domElm(elmId);
         } else {
             elm = elmId;
@@ -980,7 +982,7 @@ export class Util implements UtilIntf {
         else if (el.className) {
             //WCF: I think this came from here: http://youmightnotneedjquery.com/
             //I personally would have never written this mess of RegExp and found some other way. I hate RegExp!
-            el.className = el.className.replace(new RegExp('(^|\\b)' + clazz.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+            el.className = el.className.replace(new RegExp("(^|\\b)" + clazz.split(" ").join("|") + "(\\b|$)", "gi"), " ");
         }
     }
 
@@ -1020,10 +1022,12 @@ export class Util implements UtilIntf {
                 let classes = el.className.split(" ");
                 let existingIndex = classes.indexOf(clazz);
 
-                if (existingIndex >= 0)
+                if (existingIndex >= 0) {
                     classes.splice(existingIndex, 1);
-                else
+                }
+                else {
                     classes.push(clazz);
+                }
 
                 el.className = classes.join(" ");
             }
@@ -1046,10 +1050,11 @@ export class Util implements UtilIntf {
             console.error("Ignoring Util.triggerCustom. elm is null");
         }
 
+        let event = null;
         if ((<any>window).CustomEvent) {
-            let event = new CustomEvent(evt, { detail: obj });
+            event = new CustomEvent(evt, { detail: obj });
         } else {
-            let event = document.createEvent('CustomEvent');
+            event = document.createEvent("CustomEvent");
             event.initCustomEvent(evt, true, true, obj);
         }
 
@@ -1061,7 +1066,7 @@ export class Util implements UtilIntf {
             console.error("Ignoring Util.trigger. elm is null");
         }
         // For a full list of event types: https://developer.mozilla.org/en-US/docs/Web/API/document.createEvent
-        let event = document.createEvent('HTMLEvents');
+        let event = document.createEvent("HTMLEvents");
         event.initEvent(evt, true, false);
         elm.dispatchEvent(event);
     }
@@ -1098,23 +1103,23 @@ export class Util implements UtilIntf {
             let queryPath = this.getPathPartForNamedNode(node);
             url = window.location.origin + queryPath;
 
-            if (childNode && childNode.id != node.id) {
+            if (childNode && childNode.id !== node.id) {
                 url += "#" + childNode.id;
             }
             state = {
                 nodeId: ":" + node.name,
-                highlightId: (childNode && childNode.id != node.id) ? childNode.id : null
+                highlightId: (childNode && childNode.id !== node.id) ? childNode.id : null
             };
             title = node.name;
         }
         else {
             url = window.location.origin + "/app?id=" + node.id;
-            if (childNode && childNode.id != node.id) {
+            if (childNode && childNode.id !== node.id) {
                 url += "#" + childNode.id;
             }
             state = {
                 nodeId: node.id,
-                highlightId: (childNode && childNode.id != node.id) ? childNode.id : null
+                highlightId: (childNode && childNode.id !== node.id) ? childNode.id : null
             };
             title = node.id;
         }
@@ -1126,7 +1131,7 @@ export class Util implements UtilIntf {
     getPathPartForNamedNode = (node: J.NodeInfo): string => {
         if (!node.name) return null;
 
-        if (node.owner == "admin") {
+        if (node.owner === "admin") {
             return "/n/" + node.name;
         }
         else {
@@ -1152,12 +1157,14 @@ export class Util implements UtilIntf {
     // //https://stackoverflow.com/questions/21474678/scrolltop-animation-without-jquery
     animateScrollToTop_v1 = () => {
         let scrollDuration = 900;
-        const scrollHeight = window.scrollY,
-            scrollStep = Math.PI / (scrollDuration / 15),
-            cosParameter = scrollHeight / 2;
-        let scrollCount = 0, scrollMargin;
+        const scrollHeight = window.scrollY;
+        const scrollStep = Math.PI / (scrollDuration / 15);
+        const cosParameter = scrollHeight / 2;
+        let scrollCount = 0;
+        let scrollMargin = 0;
+
         let scrollInterval = setInterval(() => {
-            if (window.scrollY != 0) {
+            if (window.scrollY !== 0) {
                 scrollCount = scrollCount + 1;
                 scrollMargin = cosParameter - cosParameter * Math.cos(scrollCount * scrollStep);
                 window.scrollTo(0, (scrollHeight - scrollMargin));
@@ -1176,9 +1183,11 @@ export class Util implements UtilIntf {
             return;
         }
 
-        let scrollDuration = 900, cosParameter = window.scrollY / 2,
-            scrollCount = 0,
-            oldTimestamp = performance.now();
+        let scrollDuration = 900;
+        let cosParameter = window.scrollY / 2;
+        let scrollCount = 0;
+        let oldTimestamp = performance.now();
+
         let step = (newTimestamp: number) => {
             scrollCount += Math.PI / (scrollDuration / (newTimestamp - oldTimestamp));
             if (scrollCount >= Math.PI) window.scrollTo(0, 0);
@@ -1186,7 +1195,7 @@ export class Util implements UtilIntf {
             window.scrollTo(0, Math.round(cosParameter + cosParameter * Math.cos(scrollCount)));
             oldTimestamp = newTimestamp;
             window.requestAnimationFrame(step);
-        }
+        };
         window.requestAnimationFrame(step);
     }
     /* 
@@ -1243,7 +1252,7 @@ export class Util implements UtilIntf {
         attribs.onDragOver = function (event) {
             //console.log("onDragOver: id="+event.target.id);
             event.preventDefault();
-            event.dataTransfer.dropEffect = 'copy';  // See the section on the DataTransfer object.
+            event.dataTransfer.dropEffect = "copy"; // See the section on the DataTransfer object.
             event.target.style.border = "2px solid green";
         };
 
@@ -1267,7 +1276,7 @@ export class Util implements UtilIntf {
                 new ConfirmDlg("Warning: Any data encrypted with your current key will become inaccessible, unless you reimport your current key back in.", "Last Chance... One more Click",
                     () => {
                         S.encryption.initKeys(true);
-                    },  null, "btn-danger", "alert alert-danger", state
+                    }, null, "btn-danger", "alert alert-danger", state
                 ).open();
             }, null, "btn-danger", "alert alert-danger", state
         ).open();

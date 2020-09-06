@@ -222,27 +222,27 @@ export class View implements ViewIntf {
             command: command,
             nodeId: node ? node.id : null
         },
-            (res: J.GetServerInfoResponse) => {
+        (res: J.GetServerInfoResponse) => {
 
-                if (res.messages) {
-                    res.messages.forEach(m => {
-                        /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
+            if (res.messages) {
+                res.messages.forEach(m => {
+                    /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
                   there are other commands that exist also */
-                        if (command === "getServerInfo") {
-                            m.message += "<br>Browser Memory: " + S.util.getBrowserMemoryInfo();
-                            m.message += "<br>Build Time: " + BUILDTIME;
-                            m.message += "<br>Profile: " + PROFILE;
-                        }
+                    if (command === "getServerInfo") {
+                        m.message += "<br>Browser Memory: " + S.util.getBrowserMemoryInfo();
+                        m.message += "<br>Build Time: " + BUILDTIME;
+                        m.message += "<br>Profile: " + PROFILE;
+                    }
                         
-                        /* For now just prefix description onto the text. This will be made 'prettier' later todo-1 */
-                        if (dlgDescription) {
-                            m.message = dlgDescription + "\n\n" + m.message;
-                        }
+                    /* For now just prefix description onto the text. This will be made 'prettier' later todo-1 */
+                    if (dlgDescription) {
+                        m.message = dlgDescription + "\n\n" + m.message;
+                    }
 
-                        S.util.showMessage(m.message, dlgTitle || "Server Reply", true);
-                    });
-                }
-            });
+                    S.util.showMessage(m.message, dlgTitle || "Server Reply", true);
+                });
+            }
+        });
     }
 
     displayNotifications = (command: string, state: AppState) => {
@@ -252,21 +252,21 @@ export class View implements ViewIntf {
             command: command,
             nodeId: node ? node.id : null
         },
-            (res: J.GetServerInfoResponse) => {
-                if (res.messages) {
-                    res.messages.forEach(m => {
-                        if (m.type != "inbox") {
-                            //todo-1: really need to put ALL messages into a single dialog display
-                            S.util.showMessage(m.message, "Notifications", false);
-                        }
-                    });
+        (res: J.GetServerInfoResponse) => {
+            if (res.messages) {
+                res.messages.forEach(m => {
+                    if (m.type !== "inbox") {
+                        //todo-1: really need to put ALL messages into a single dialog display
+                        S.util.showMessage(m.message, "Notifications", false);
+                    }
+                });
 
-                    res.messages.forEach(m => {
-                        if (m.type == "inbox") {
-                            new InboxNotifyDlg(m.message, state).open();
-                        }
-                    });
-                }
-            });
+                res.messages.forEach(m => {
+                    if (m.type === "inbox") {
+                        new InboxNotifyDlg(m.message, state).open();
+                    }
+                });
+            }
+        });
     }
 }

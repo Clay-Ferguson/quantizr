@@ -1,5 +1,5 @@
-import * as highlightjs from 'highlightjs';
-import * as marked from 'marked';
+import * as highlightjs from "highlightjs";
+import * as marked from "marked";
 import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
 import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";

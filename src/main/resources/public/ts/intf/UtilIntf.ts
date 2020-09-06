@@ -35,7 +35,6 @@ export interface UtilIntf {
     stdTimezoneOffset(date: Date);
     dst(date: Date);
     indexOfObject(arr: any[], obj);
-    assertNotNull(varName);
     domSelExec(selectors: string[], func: Function, level?: number);
 
     daylightSavingsTime: boolean;

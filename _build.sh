@@ -22,6 +22,10 @@ cd ${PRJROOT}/src/main/resources/public
 npm config set ignore-scripts true
 
 cd ${PRJROOT}
+./run-linter.sh
+verifySuccess "Linter"
+
+cd ${PRJROOT}
 docker-compose -f ${docker_compose_yaml} down --remove-orphans
 verifySuccess "Docker Compose: down"
 

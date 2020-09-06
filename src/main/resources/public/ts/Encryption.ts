@@ -24,7 +24,6 @@ to reimport the JSON key text back in at any time, or install the keys in a diff
 
 At no point in time does the users' Private Key ever leave their own browser storage.
 
-
 SYMMETRIC ENCRYPTION
 --------------------
 Code complete except for we have a hardcoded password instead of prompting user for the password. This feature
@@ -284,7 +283,8 @@ export class Encryption implements EncryptionIntf {
                 if (val && !forceUpdate) {
                     if (this.logKeys) {
                         let cryptoKey: CryptoKey = val.val;
-                        let symKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, cryptoKey);
+                        await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, cryptoKey);
+                        //let symKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, cryptoKey);
                         //console.log("symkey: " + S.util.toJson(symKeyStr));
                     }
                 }
@@ -416,7 +416,7 @@ export class Encryption implements EncryptionIntf {
     }
 
     arrayBufferToString(buffer: any): any {
-        let binary = '';
+        let binary = "";
         let bytes = new Uint8Array(buffer);
         let len = bytes.byteLength;
         for (let i = 0; i < len; i++) {
@@ -429,7 +429,7 @@ export class Encryption implements EncryptionIntf {
         let finalString = "-----BEGIN PUBLIC KEY-----\n";
 
         while (str.length > 0) {
-            finalString += str.substring(0, 64) + '\n';
+            finalString += str.substring(0, 64) + "\n";
             str = str.substring(64);
         }
 

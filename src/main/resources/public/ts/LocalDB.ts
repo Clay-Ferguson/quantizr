@@ -24,7 +24,7 @@ export class LocalDB implements LocalDBIntf {
 
     private openDB = (): IDBOpenDBRequest => {
         if (!indexedDB) {
-            throw "IndexedDB API not available in browser.";
+            throw new Error("IndexedDB API not available in browser.");
         }
         let req: IDBOpenDBRequest = indexedDB.open(LocalDB.DB_NAME, LocalDB.VERSION);
 
