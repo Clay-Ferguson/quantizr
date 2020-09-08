@@ -32,7 +32,7 @@ export class AppDemo extends Div {
                         state,
                         update: (s: AppState): void => {
                             s.counter++;
-                        },
+                        }
                     });
                 })
             ]),

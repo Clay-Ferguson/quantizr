@@ -2,6 +2,8 @@
     "extends": "./tsconfig.base.json",
     "compilerOptions": {
         "outDir": "./dist/",
-        "watch": false
+        "watch": false,
+        "sourceMap": true,
+        "inlineSources": true
     }
 }

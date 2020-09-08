@@ -17,8 +17,11 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
+
+        //make this only DEV.
         "sourceMap": true,
         "inlineSources": true,
+
         "noEmitOnError": true,
         "watch": true,
         "allowJs": true,
@@ -43,6 +46,6 @@
         "./node_modules/",
         "./node/"
     ],
-    "compileOnSave": true,
-    "buildOnSave": true
+    //"compileOnSave": true,
+    //"buildOnSave": true
 }

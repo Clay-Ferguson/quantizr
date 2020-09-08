@@ -26,7 +26,7 @@ export class NavBarButton extends Comp {
         return S.e("button", _attribs,
             S.e("i", {
                 key: "s_" + this.getId(),
-                className: "fa fa-lg button-font",
+                className: "fa fa-lg button-font"
             }, this.content, true)
         );
     }

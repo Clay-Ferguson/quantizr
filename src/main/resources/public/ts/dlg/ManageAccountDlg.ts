@@ -26,7 +26,7 @@ export class ManageAccountDlg extends DialogBase {
             new TextContent(this.getState().info, null, true),
 
             new CollapsiblePanel(null, null, null, [
-                new Button("Close Account", this.closeAccount),
+                new Button("Close Account", this.closeAccount)
             ], false, null, false, "float-right"),
 
             new ButtonBar([

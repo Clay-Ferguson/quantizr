@@ -17,7 +17,7 @@ export class SearchView extends Div {
 
     constructor() {
         super(null, {
-            id: "searchTab",
+            id: "searchTab"
         });
     }
 
@@ -26,13 +26,13 @@ export class SearchView extends Div {
         let results = state.searchResults;
 
         this.attribs.className = "tab-pane fade my-tab-pane";
-        if (state.activeTab==this.getId()) {
+        if (state.activeTab === this.getId()) {
             this.attribs.className += " show active";
         }
 
-        if (!results || results.length == 0) {
+        if (!results || results.length === 0) {
             this.setChildren([new Div("No Search Displaying", {
-                id: "searchResultsPanel",
+                id: "searchResultsPanel"
             })]);
             return;
         }
@@ -50,7 +50,7 @@ export class SearchView extends Div {
         results.forEach(function(node: J.NodeInfo) {
             S.srch.initSearchNode(node);
 
-            let allowAvatar = node.owner != lastOwner;
+            let allowAvatar = node.owner !== lastOwner;
             children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, "srch", false, false, state));
             lastOwner = node.owner;
             i++;

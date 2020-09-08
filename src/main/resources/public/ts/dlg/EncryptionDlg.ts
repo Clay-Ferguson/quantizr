@@ -29,7 +29,7 @@ export class EncryptionDlg extends DialogBase {
                         getValue: (): boolean => {
                             return this.getState().encrypted;
                         }
-                    }),
+                    })
                 ]),
                 new ButtonBar([
                     new Button("Save", () => {

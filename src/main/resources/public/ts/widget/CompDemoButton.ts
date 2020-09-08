@@ -6,17 +6,12 @@ import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
 import { HorizontalLayout } from "./HorizontalLayout";
 
-// let S: Singletons;
-// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-//     S = ctx;
-// });
-
 export class CompDemoButton extends Div {
 
     constructor(public idx: number) {
         super(null, {
             id: "CompDemoButton_id_" + idx,
-            key: "CompDemoButton_key_" + idx,
+            key: "CompDemoButton_key_" + idx
         });
         this.setStateEx({ counter: 0, idx: idx });
     }
@@ -28,7 +23,7 @@ export class CompDemoButton extends Div {
 
         children.push(new HorizontalLayout([
             new Div("Button " + cstate.idx + ": Inc CompDemo.state.counter=" + cstate.counter + " AppState.counter=" + state.counter, {
-                className: "btn btn-primary" + (state.compDemoIdActive === cstate.idx ? " testHighlight": ""), 
+                className: "btn btn-primary" + (state.compDemoIdActive === cstate.idx ? " testHighlight" : ""), 
                 type: "button",
                 onClick: () => {
                     Comp.renderCounter = 0;
@@ -40,7 +35,7 @@ export class CompDemoButton extends Div {
                         state,
                         update: (s: AppState): void => {
                             s.compDemoIdActive = cstate.idx;
-                        },
+                        }
                     });
                 }
             })

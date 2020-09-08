@@ -14,7 +14,7 @@ export class NotificationPopupDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new TextContent(this.message),
+            new TextContent(this.message)
         ];
     }
 

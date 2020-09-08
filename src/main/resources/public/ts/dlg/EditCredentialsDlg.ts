@@ -43,7 +43,7 @@ export class EditCredentialsDlg extends DialogBase<EditCredentialsDlgState> {
                             return this.getState().user;
                         },
                         setValue: (val: string): void => {
-                            this.mergeState({user: val});
+                            this.mergeState({ user: val });
                         }
                     }),
                     new TextField("Password", true, null, {

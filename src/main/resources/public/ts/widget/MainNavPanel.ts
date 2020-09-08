@@ -127,7 +127,7 @@ export class MainNavPanel extends NavTag {
                     new IconButton("fa-pencil", null, {
                         onClick: e => { S.edit.toggleEditMode(state); },
                         title: "Toggle Edit Mode on/off"
-                    }, "nav-link", state.userPreferences.editMode ? "on" : "off"),
+                    }, "nav-link", state.userPreferences.editMode ? "on" : "off")
                 ]));
             }
 
@@ -197,15 +197,15 @@ export class MainNavPanel extends NavTag {
                                 }
                             }
                         },
-                        id: "mainMenu",
+                        id: "mainMenu"
                         //only applies to mobile. just don't show title for now.
                         //title: "Show Main Menu"
                     }, "nav-link", "off")
-                ]),
+                ])
             ]),
 
             new Span(state.title, {
-                className: "navbar-brand",
+                className: "navbar-brand"
             }),
 
             new ButtonTag(null, {

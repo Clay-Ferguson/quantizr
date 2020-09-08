@@ -17,7 +17,7 @@ export class FriendsTableRow extends ListBoxRow {
         this.setChildren([
             new Div(this.friend.userName, {
                 className: "heading5" + (this.isSelected ? " selectedListItem" : " unselectedListItem")
-            }),
+            })
         ]);
     }
 }

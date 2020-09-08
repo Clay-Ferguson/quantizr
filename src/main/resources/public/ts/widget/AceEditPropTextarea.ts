@@ -72,7 +72,7 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
     }
 
     setError(error: string) : void {
-        this.mergeState({error});
+        this.mergeState({ error });
     }
 
     setWordWrap(wordWrap: boolean): void {

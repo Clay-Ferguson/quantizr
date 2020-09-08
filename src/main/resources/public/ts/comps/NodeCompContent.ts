@@ -60,7 +60,7 @@ export class NodeCompContent extends Div {
 
         /* if node owner matches node id this is someone's account root node, so what we're doing here is not
          showing the normal attachment for this node, because that will the same as the avatar */
-        let isAnAccountNode = node.ownerId && node.id == node.ownerId;
+        let isAnAccountNode = node.ownerId && node.id === node.ownerId;
 
         if (S.props.hasBinary(node) && !isAnAccountNode) {
             let binary = new NodeCompBinary(node, false, false, this.imgSizeOverride);

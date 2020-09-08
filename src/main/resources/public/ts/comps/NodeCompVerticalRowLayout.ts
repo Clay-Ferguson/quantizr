@@ -31,7 +31,7 @@ export class NodeCompVerticalRowLayout extends Div {
             layoutClass += " editing-border";
         }
         else {
-            layoutClass += " non-editing-border"
+            layoutClass += " non-editing-border";
         }
 
         let childCount: number = this.node.children.length;
@@ -42,33 +42,33 @@ export class NodeCompVerticalRowLayout extends Div {
         //to ber correct before the second loop stats.
         for (let i = 0; i < this.node.children.length; i++) {
             let n: J.NodeInfo = this.node.children[i];
-            if (!(state.nodesToMove && state.nodesToMove.find(id => id == n.id))) {
+            if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
                 countToDisplay++;
             }
         }
 
-        let allowInsert = S.edit.isInsertAllowed(this.node, state);;
+        let allowInsert = S.edit.isInsertAllowed(this.node, state);
 
         /* We have this hack (until the privileges are more nuanced, or updated) which verifies if someone is 
-		inserting under a USER_FEED node we don't allow it unless its' the person who OWNS the USER_FEED, and we have this check
+        inserting under a USER_FEED node we don't allow it unless its' the person who OWNS the USER_FEED, and we have this check
         because right now our design is that USER_FEED nodes are by definition automatically 'public'
         
         NOTE: Server also enforces this check if it gets by the client.
-		*/
+        */
         if (allowInsert && typeHandler) {
-            allowInsert =  state.isAdminUser || typeHandler.allowAction(NodeActionType.addChild, this.node, state);
+            allowInsert = state.isAdminUser || typeHandler.allowAction(NodeActionType.addChild, this.node, state);
         }
 
         let rowCount: number = 0;
         for (let i = 0; i < this.node.children.length; i++) {
             let n: J.NodeInfo = this.node.children[i];
-            if (!(state.nodesToMove && state.nodesToMove.find(id => id == n.id))) {
+            if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
 
                 if (this.debug && n) {
                     console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
                 }
 
-                if (state.userPreferences.editMode && allowInsert && rowCount == 0 && state.userPreferences.editMode && this.level == 1) {
+                if (state.userPreferences.editMode && allowInsert && rowCount === 0 && state.userPreferences.editMode && this.level === 1) {
                     comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
 
                     //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
@@ -86,8 +86,8 @@ export class NodeCompVerticalRowLayout extends Div {
                     comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
                 }
 
-                if (state.userPreferences.editMode && allowInsert && state.userPreferences.editMode && this.level == 1) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount == countToDisplay, state));
+                if (state.userPreferences.editMode && allowInsert && state.userPreferences.editMode && this.level === 1) {
+                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount === countToDisplay, state));
 
                     //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     comps.push(new Div(null, { className: "clearfix" }));

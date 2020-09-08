@@ -27,11 +27,11 @@ export class NodeCompRowFooter extends Div {
 
         /* We show a simplified header for User Feed rows, because these are always visible and don't need a lot of the info */
         if (this.isFeed) {
-                children.push(new Icon({
-                    title: "Create a new reply",
-                    className: "fa fa-comments fa-lg rowFooterIcon",
-                    onClick: () => S.edit.addComment(node, state)
-                }));
+            children.push(new Icon({
+                title: "Create a new reply",
+                className: "fa fa-comments fa-lg rowFooterIcon",
+                onClick: () => S.edit.addComment(node, state)
+            }));
         }
         else {
            

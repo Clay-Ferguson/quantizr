@@ -70,7 +70,7 @@ export class FriendTypeHandler extends TypeBase {
             if (src) {
                 img = new Img(null, {
                     className: "friendImage",
-                    src,
+                    src
                 });
             }
         }

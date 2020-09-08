@@ -17,7 +17,7 @@ export class TimelineView extends Div {
 
     constructor() {
         super(null, {
-            id: "timelineTab",
+            id: "timelineTab"
         });
     }
 
@@ -26,14 +26,14 @@ export class TimelineView extends Div {
         let results = state.timelineResults;
 
         this.attribs.className = "tab-pane fade my-tab-pane";
-        if (state.activeTab == this.getId()) {
+        if (state.activeTab === this.getId()) {
             this.attribs.className += " show active";
         }
 
-        if (!results || results.length == 0) {
+        if (!results || results.length === 0) {
             this.setChildren([
                 new Div("No Timeline Displaying", {
-                    id: "timelineResultsPanel",
+                    id: "timelineResultsPanel"
                 })
             ]);
             return;
@@ -53,7 +53,7 @@ export class TimelineView extends Div {
             //console.log("TIMELINE: node id=" + node.id + " content: " + node.content);
             S.srch.initSearchNode(node);
 
-            let allowAvatar = node.owner != lastOwner;
+            let allowAvatar = node.owner !== lastOwner;
             children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, "timeln", false, false, state));
             lastOwner = node.owner;
             i++;

@@ -46,4 +46,3 @@ export interface SymKeyDataPackage {
     cipherKey: string;
     symKey?: CryptoKey;
 }
-

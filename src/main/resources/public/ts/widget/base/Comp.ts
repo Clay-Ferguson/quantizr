@@ -4,8 +4,8 @@
 
 import { ReactElement, ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import * as ReactDOM from "react-dom";
-import { renderToString } from 'react-dom/server';
-import { Provider, useSelector } from 'react-redux';
+import { renderToString } from "react-dom/server";
+import { Provider, useSelector } from "react-redux";
 import { AppState } from "../../AppState";
 import { Constants as C } from "../../Constants";
 import { PubSub } from "../../PubSub";

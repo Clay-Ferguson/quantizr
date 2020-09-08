@@ -34,7 +34,7 @@ export class TransferNodeDlg extends DialogBase {
             new Form(null, [
                 new FormGroup(null, [
                     new TextField("From User", null, null, new CompValueHolder<string>(this, "fromUser")),
-                    new TextField("To User", null, null, new CompValueHolder<string>(this, "toUser")),
+                    new TextField("To User", null, null, new CompValueHolder<string>(this, "toUser"))
                 ]),
                 new FormGroup(null, [
                     new Checkbox("Include Sub-Nodes", null, {
@@ -44,7 +44,7 @@ export class TransferNodeDlg extends DialogBase {
                         getValue: (): boolean => {
                             return this.getState().recursive;
                         }
-                    }),
+                    })
                 ]),
                 new ButtonBar([
                     new Button("Transfer", this.transfer, null, "btn-primary"),

@@ -13,7 +13,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Textarea extends Comp implements I.TextEditorIntf {
 
-    constructor(private label: string, attribs: any, private valueIntf: ValueIntf, customClass: string=null) {
+    constructor(private label: string, attribs: any, private valueIntf: ValueIntf, customClass: string = null) {
         super(attribs);
         S.util.mergeProps(this.attribs, {
             className: customClass || "form-control pre-textarea"
@@ -89,7 +89,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
             children.push(S.e("label", {
                 id: this.getId() + "_label",
                 key: this.getId() + "_label",
-                htmlFor: this.getId(),
+                htmlFor: this.getId()
             }, this.label));
         }
 
@@ -97,7 +97,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         if (!state.wordWrap) {
             _attribs.style = {
                 whiteSpace: "nowrap",
-                overflow: "auto",
+                overflow: "auto"
             };
         }
 

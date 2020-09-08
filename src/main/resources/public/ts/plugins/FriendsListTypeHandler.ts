@@ -42,7 +42,7 @@ export class FriendsListTypeHandler extends TypeBase {
             new ButtonBar([
                 new Button("Add Friend", () => S.edit.addFriend(node, state), {
                     title: "Add a new friend to this list of friends."
-                }),
+                })
 
                 // DO NOT DELETE (YET)
                 // this is no longer needed here, since it's on the main menu now but i'll leave it for now commented out.

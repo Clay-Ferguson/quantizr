@@ -9,7 +9,7 @@ export class MainTabComp extends Div {
 
     constructor() {
         super(null, {
-            id: "mainTab",
+            id: "mainTab"
         });
     }
 

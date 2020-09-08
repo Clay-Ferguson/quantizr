@@ -48,7 +48,7 @@ export class CollapsiblePanel extends Comp {
         S.e("div", {
             className: collapseClass,
             id: this.getId(),
-            key: "content_" + this.getId(),
+            key: "content_" + this.getId()
         },
         this.buildChildren()
         ));

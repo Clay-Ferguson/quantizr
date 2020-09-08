@@ -77,8 +77,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     new Button("Upload from Clipboard", this.uploadFromClipboard),
                     new Button("Close", () => {
                         this.close();
-                    }),
-                ]),
+                    })
+                ])
             ])
         ];
 
@@ -291,7 +291,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                                 createAtTop: false,
                                 content: file.name,
                                 typeLock: false,
-                                properties,
+                                properties
                             }, (res) => {
                                 //nothing to be done here.
                             });
@@ -375,7 +375,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     filesAreValid = (): boolean => {
         //let state = this.getState();
-        if (!this.fileList || this.fileList.length == 0 || this.fileList.length > this.maxFiles) {
+        if (!this.fileList || this.fileList.length === 0 || this.fileList.length > this.maxFiles) {
             return false;
         }
 

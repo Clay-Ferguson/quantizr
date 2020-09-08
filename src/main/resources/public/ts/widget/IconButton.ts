@@ -33,12 +33,12 @@ export class IconButton extends Comp {
         return S.e("button", _attribs,
             S.e("i", {
                 key: "i_" + this.getId(),
-                className: "fa fa-lg " + this.iconClass + toggleClass,
+                className: "fa fa-lg " + this.iconClass + toggleClass
             }, [
                 S.e("span", {
                     key: "s_" + this.getId(),
                     className: "button-font"
-                }, this.text == null ? null : " " + this.text)
+                }, this.text === null ? null : " " + this.text)
             ], true)
         );
     }

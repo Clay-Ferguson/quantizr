@@ -1,4 +1,4 @@
-import * as RssParser from 'rss-parser';
+import * as RssParser from "rss-parser";
 import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
@@ -113,7 +113,7 @@ export class RssTypeHandler extends TypeBase {
                         state,
                         update: (s: AppState): void => {
                             s.failedFeedCache[feedSrc] = "true";
-                        },
+                        }
                     });
                 }
                 else {
@@ -122,7 +122,7 @@ export class RssTypeHandler extends TypeBase {
                         state,
                         update: (s: AppState): void => {
                             s.feedCache[feedSrc] = feed;
-                        },
+                        }
                     });
                 }
             });

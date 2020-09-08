@@ -65,7 +65,7 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
-        if (state.inlineEditId == node.id) {
+        if (state.inlineEditId === node.id) {
             return new InlineEditField(node, state);
         }
         else {
@@ -104,5 +104,3 @@ export class TypeBase implements TypeHandlerIntf {
         }
     }
 }
-
-

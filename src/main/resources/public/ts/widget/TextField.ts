@@ -25,7 +25,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         super(null);
         S.util.mergeProps(this.attribs, {
             name: this.getId(),
-            className: "form-group",
+            className: "form-group"
         });
 
         this.mergeState({
@@ -103,7 +103,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
                     value: this.valueIntf.getValue()
                 }),
                 this.isPassword ? new Div(null, {
-                    className: "input-group-addon",
+                    className: "input-group-addon"
                 }, [
                     new Anchor(null, null, {
                         onClick: (evt) => {
@@ -112,10 +112,10 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
                                 inputType: state.inputType === "password" ? "text" : "password"
                             });
                             this.icon._toggleClass(); 
-                        },
+                        }
                     }, [
                         this.icon = new ToggleIcon("fa-eye-slash", "fa-eye", {
-                            className: "fa fa-lg passwordEyeIcon",
+                            className: "fa fa-lg passwordEyeIcon"
                         })
                     ])
                 ]) : null

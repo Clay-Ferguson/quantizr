@@ -19,7 +19,7 @@ export class FeedView extends Div {
 
     constructor () {
         super(null, {
-            id: "feedTab",
+            id: "feedTab"
         });
     }
 

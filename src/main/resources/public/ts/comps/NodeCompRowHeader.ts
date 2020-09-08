@@ -28,7 +28,7 @@ export class NodeCompRowHeader extends Div {
         let children = [];
 
         let avatarImg: Img = null;
-        if (node.owner != J.PrincipalName.ADMIN) {
+        if (node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeAvatarImage(node, state);
             if (avatarImg) {
                 children.push(avatarImg);
@@ -37,7 +37,7 @@ export class NodeCompRowHeader extends Div {
 
         /* We show a simplified header for User Feed rows, because these are always visible and don't need a lot of the info */
         if (this.isFeed) {
-            if (node.owner && node.owner != "?") {
+            if (node.owner && node.owner !== "?") {
                 children.push(new Span(node.owner, {
                     className: (node.owner === state.userName) ? "created-by-me" : "created-by-other"
                 }));
@@ -48,9 +48,9 @@ export class NodeCompRowHeader extends Div {
         }
         else {
             let priorityVal = S.props.getNodePropVal(J.NodeProp.PRIORITY, node);
-            let priority = (priorityVal && priorityVal != "0") ? "P" + priorityVal : "";
+            let priority = (priorityVal && priorityVal !== "0") ? "P" + priorityVal : "";
 
-            if (node.owner && node.owner != "?") {
+            if (node.owner && node.owner !== "?") {
                 children.push(new Span(node.owner, {
                     className: (node.owner === state.userName) ? "created-by-me" : "created-by-other"
                 }));
@@ -66,7 +66,7 @@ export class NodeCompRowHeader extends Div {
             if (state.isAdminUser) {
                 children.push(new Span(
                     "ID:" + node.id + " " + //
-                    ((node.logicalOrdinal != -1) ? ("[" + node.logicalOrdinal + "] ") : " ") + //
+                    ((node.logicalOrdinal !== -1) ? ("[" + node.logicalOrdinal + "] ") : " ") + //
                     node.type + //
                     (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") //
                 ));

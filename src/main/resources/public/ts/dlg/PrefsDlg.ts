@@ -56,7 +56,7 @@ export class PrefsDlg extends DialogBase {
                 importAllowed: false,
                 exportAllowed: false,
                 showMetaData: this.appState.userPreferences.showMetaData,
-                maxUploadFileSize: -1,
+                maxUploadFileSize: -1
             }
         }, this.savePreferencesResponse);
         this.close();

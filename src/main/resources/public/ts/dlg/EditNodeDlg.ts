@@ -98,7 +98,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "c2", val: "2 Columns" },
             { key: "c3", val: "3 Columns" },
             { key: "c4", val: "4 Columns" }
-        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v"));  //w-25
+        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v")); //w-25
         return selection;
     }
 
@@ -120,7 +120,7 @@ export class EditNodeDlg extends DialogBase {
         if (allowNone) {
             //none means we would ignore the option during rendering, slightly different from "Actual" in cases
             //where this is an override that we don't want to override with. 'none' means don't override.
-            options.push({ key: "n", val: "None" })
+            options.push({ key: "n", val: "None" });
         }
 
         options = options.concat([
@@ -135,7 +135,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "200px", val: "200px" },
             { key: "400px", val: "400px" },
             { key: "800px", val: "800px" },
-            { key: "1000px", val: "1000px" },
+            { key: "1000px", val: "1000px" }
         ]);
 
         let selection: Selection = new Selection(null, label, options, "m-2", valueIntf);
@@ -202,8 +202,8 @@ export class EditNodeDlg extends DialogBase {
                 new Div(null, {
                 }, [
                     this.propertyEditFieldContainer = new Div("", {
-                    }),
-                ]),
+                    })
+                ])
                 //     //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
                 //     this.cancelButton = new Button("Cancel", this.cancelEdit)
                 // ])
@@ -212,7 +212,7 @@ export class EditNodeDlg extends DialogBase {
 
         let optionsBar = new Div("", null, [
             this.wordWrapCheckBox = new Checkbox("Word Wrap", {
-                className: "marginRight",
+                className: "marginRight"
             }, {
                 setValue: (checked: boolean): void => {
                     //this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
@@ -239,7 +239,7 @@ export class EditNodeDlg extends DialogBase {
             state.node.hasChildren ? this.createLayoutSelection() : null,
             state.node.hasChildren ? this.createImgSizeSelection("Images", true, //
                 new PropValueHolder(this.getState().node, J.NodeProp.CHILDREN_IMG_SIZES, "0")) : null,
-            this.createPrioritySelection(),
+            this.createPrioritySelection()
         ]);
 
         let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, //
@@ -324,7 +324,7 @@ export class EditNodeDlg extends DialogBase {
         if (allowPropertyAdd) {
             this.propsButtonBar = new ButtonBar([
                 this.addPropertyButton = new Button("Add Property", this.addProperty),
-                this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick),
+                this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick)
             ]);
 
             this.deletePropButton.setEnabled(false);
@@ -344,7 +344,7 @@ export class EditNodeDlg extends DialogBase {
 
             binarySection = new LayoutRow([
                 new Div(null, { className: "col-4 editBinaryContainer" }, [
-                    new NodeCompBinary(state.node, true, false, null),
+                    new NodeCompBinary(state.node, true, false, null)
                 ]),
 
                 new Div(null, {
@@ -354,10 +354,10 @@ export class EditNodeDlg extends DialogBase {
                     new ButtonBar([
                         this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
                         this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
-                        ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null,
+                        ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
                     ]),
-                    ipfsLink ? new Div("Stored on IPFS", { className: "marginTop" }) : null,
-                ]),
+                    ipfsLink ? new Div("Stored on IPFS", { className: "marginTop" }) : null
+                ])
 
             ], "binaryEditorSection");
         }
@@ -415,10 +415,10 @@ export class EditNodeDlg extends DialogBase {
             this.shareButton = allowShare ? new Button("Share", this.share) : null,
 
             this.setTypeButton = !typeLocked ? new Button("Type", this.openChangeNodeTypeDlg) : null,
-            this.encryptionButton = !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
+            this.encryptionButton = !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null
 
             //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
-        ])
+        ]);
     }
 
     isGuiControlBasedProp = (prop: J.PropertyInfo): boolean => {
@@ -679,7 +679,7 @@ export class EditNodeDlg extends DialogBase {
                 }
                 else {
                     valEditor = new Textarea(null, {
-                        rows: "20",
+                        rows: "20"
                     }, valueIntf);
                 }
             }
@@ -713,7 +713,7 @@ export class EditNodeDlg extends DialogBase {
         //console.log("making field editor for val[" + value + "]");
 
         if (C.ENABLE_ACE_EDITOR) {
-            let aceMode = node.type == J.NodeType.PLAIN_TEXT ? "ace/mode/text" : "ace/mode/markdown";
+            let aceMode = node.type === J.NodeType.PLAIN_TEXT ? "ace/mode/text" : "ace/mode/markdown";
             this.contentEditor = new AceEditPropTextarea(encrypted ? "[encrypted]" : value, "25em", aceMode, isWordWrap);
 
             this.contentEditor.whenElm((elm: HTMLElement) => {
@@ -750,7 +750,7 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             this.contentEditor = new Textarea(null, {
-                rows,
+                rows
             }, {
                 getValue: () => {
                     let ret = this.getState().node.content;

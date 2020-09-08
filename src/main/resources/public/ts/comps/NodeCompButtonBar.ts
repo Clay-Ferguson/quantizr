@@ -24,7 +24,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
     constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean) {
         super(null, "marginLeft microMarginTop", {
-            id: "NodeCompButtonBar_" + node.id,
+            id: "NodeCompButtonBar_" + node.id
         });
     }
 
@@ -61,7 +61,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         if (state.node && this.node.id === state.node.id) {
             if (S.nav.parentVisibleToUser(state)) {
                 upLevelButton = new IconButton("fa-chevron-circle-up", "Up Level", {
-                    /* For onclick functions I need a new approach for some (not all) where I can get by 
+                    /* For onclick functions I need a new approach for some (not all) where I can get by
                     with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
                     directly off the DOM */
                     onClick: S.nav.navUpLevel,
@@ -86,7 +86,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     onClick: S.nav.runSearch,
                     title: "Search underneath Node"
                 });
-
 
                 timelineButton = new IconButton("fa-clock-o", null, {
                     onClick: S.nav.runTimeline,
@@ -183,7 +182,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
             if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node, state) &&
                 //not page root node 'or' page no children exist.
-                (node.id !== state.node.id || !node.children || node.children.length == 0)) {
+                (node.id !== state.node.id || !node.children || node.children.length === 0)) {
                 createSubNodeButton = new Button("New", S.meta64.getNodeFunc(S.edit.cached_newSubNode, "S.edit.newSubNode", node.id),
                     { title: "Create new Node as a child of this node." });
             }
@@ -233,7 +232,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     });
                 }
 
-                if (!state.isAnonUser && !!state.nodesToMove && (S.props.isMine(node, state) || node.id == state.homeNodeId)) {
+                if (!state.isAnonUser && !!state.nodesToMove && (S.props.isMine(node, state) || node.id === state.homeNodeId)) {
                     pasteInsideButton = new Button("Paste Inside", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodesInside, "S.edit.pasteSelNodesInside", node.id), {
                         className: "highlightBorder",
                         title: "Paste Node(s) you've cut. (Inside this node as more children)"

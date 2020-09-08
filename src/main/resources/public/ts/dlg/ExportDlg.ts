@@ -59,7 +59,7 @@ export class ExportDlg extends DialogBase {
                     getValue: (): boolean => {
                         return this.getState().exportType === "tar.gz";
                     }
-                }),
+                })
 
                 // had to disable PDF, because PDFBox hangs in Java, and until they fix that bug
                 // there's nothing i can do other than ditch PDF box completely, which i'm not ready to do yet.
@@ -85,7 +85,7 @@ export class ExportDlg extends DialogBase {
 
             S.util.ajax<J.ExportRequest, J.ExportResponse>("export", {
                 nodeId: highlightNode.id,
-                exportExt: state.exportType,
+                exportExt: state.exportType
             }, (res: J.ExportResponse) => {
                 this.exportResponse(res);
             });

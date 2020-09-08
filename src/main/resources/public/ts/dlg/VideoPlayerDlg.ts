@@ -1,19 +1,11 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
 import { VideoPlayer } from "../widget/VideoPlayer";
-
-let S : Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 /**
  * See also: AudioPlayerDlg (which is very similar)
@@ -44,7 +36,7 @@ export class VideoPlayerDlg extends DialogBase {
                     //"ontimeupdate": () => { S.podcast.onTimeUpdate(this); },
                     //"oncanplay": () => { S.podcast.onCanPlay(this); },
                     controls: "controls",
-                    autoPlay: "autoplay",
+                    autoPlay: "autoplay"
                     //"muted" : "false",
                     //"volume": "0.9",
                     //"preload": "auto"

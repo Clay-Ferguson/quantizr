@@ -14,7 +14,7 @@ export class DlgContainer extends Div {
 
     preRender(): void {
         this.setChildren([
-            new Div("This is a test"),
+            new Div("This is a test")
         ]);
     }
 }

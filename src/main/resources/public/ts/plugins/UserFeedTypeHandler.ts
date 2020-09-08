@@ -38,7 +38,7 @@ export class UserFeedTypeHandler extends TypeBase {
         return new Div(null, null, [
             new Heading(4, "Posts: " + node.owner, {
                 className: "marginAll"
-            }),
+            })
 
             // this works perfectly but might be confusing to user to have too many different buttons doing the same thing
             // new ButtonBar([

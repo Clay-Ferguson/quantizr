@@ -22,7 +22,7 @@
     "rules": {
         "quotes": ["error", "double", { "avoidEscape": true }],
         "semi": ["error", "always"],
-        "indent": ["error", 4],
+        // "indent": ["error", 4],
         "spaced-comment": "off",
         "camelcase": "off",
         "padded-blocks": "off",
@@ -38,6 +38,11 @@
         "standard/no-callback-literal": "off",
         "valid-typeof": "off",
         "no-useless-return": "off",
-        "prefer-promise-reject-errors": "off"
+        "prefer-promise-reject-errors": "off",
+        "prefer-const": "off",
+        "no-trailing-spaces": "off",
+        "indent": "off",
+        "no-unused-vars": "off",
+        "no-use-before-define": "off"
       }
 }

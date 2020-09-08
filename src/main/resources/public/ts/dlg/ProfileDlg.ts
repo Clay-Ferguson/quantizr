@@ -27,7 +27,7 @@ export class ProfileDlg extends DialogBase {
     bioTextarea: Textarea;
 
     constructor(state: AppState) {
-        super("Profile: "+state.userName, null, false, state);
+        super("Profile: " + state.userName, null, false, state);
     }
 
     renderDlg(): CompIntf[] {
@@ -62,7 +62,7 @@ export class ProfileDlg extends DialogBase {
                                     this.mergeState({ defaultBio: val });
                                 }
                             })
-                        ]),
+                        ])
                     ]),
 
                     new Div(null, {
@@ -71,8 +71,8 @@ export class ProfileDlg extends DialogBase {
                         new Div(null, null, [
                             new Label("Profile Picture")
                         ]),
-                        profileImg,
-                    ]),
+                        profileImg
+                    ])
                 ]),
 
                 new Div(null, {

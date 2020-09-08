@@ -53,20 +53,20 @@ export class NodeCompMainList extends Div {
         if (S.nav.mainOffset > 0) {
             firstButton = new IconButton("fa-angle-double-left", null, {
                 onClick: () => S.view.firstPage(state),
-                title: "First Page",
-            }); 
+                title: "First Page"
+            });
 
             prevButton = new IconButton("fa-angle-left", null, {
                 onClick: () => S.view.prevPage(state),
-                title: "Previous Page",
-            }); 
+                title: "Previous Page"
+            });
         }
 
         if (!endReached) {
             nextButton = new IconButton("fa-angle-right", null, {
                 onClick: () => S.view.nextPage(state),
-                title: "Next Page",
-            }); 
+                title: "Next Page"
+            });
         }
 
         if (firstButton || prevButton || nextButton) {

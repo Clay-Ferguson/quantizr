@@ -1,4 +1,4 @@
-import * as marked from 'marked';
+import * as marked from "marked";
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
@@ -15,11 +15,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMarkdown extends MarkdownDiv {
 
-    /* 
+    /*
     This flag makes the text ALWAYS decrypt and display onscreen if the person owning the content is viewing it, but this
     is most likely never wanted, because it's insecure in screen-share context, or when someone can see your screen for any reason.
     todo-1: We could make this a user preference so users in a secure location can just view all encrypted data.
-    
+
     UPDATE: turning this ON for now, because for testing 'shared' nodes we don't have editing capability and thus need a way to decrypt
 
     todo-0: also this is kinda broke, it shows [encrypted] upon rendering and doesn't decrypt until the row is clicked.
@@ -31,12 +31,12 @@ export class NodeCompMarkdown extends MarkdownDiv {
 
         //Set the content display to wider if there is a code block. This makes the non-code text also wrap at a wider
         //width but we have to tolerate that for now, becasue there's not a cleaner 'easy' solution.
-        let widthStyle = node.content && node.content.indexOf("```") != 1 ? "content-medium" : "content-narrow";
+        let widthStyle = node.content && node.content.indexOf("```") !== 1 ? "content-medium" : "content-narrow";
         this.attribs.className = "markdown-content markdown-html " + widthStyle;
 
-        if (this.appState.userPreferences.editMode && node.owner == appState.userName) {
+        if (this.appState.userPreferences.editMode && node.owner === appState.userName) {
             let highlightNode = S.meta64.getHighlightedNode(appState);
-            if (highlightNode && highlightNode.id == node.id) {
+            if (highlightNode && highlightNode.id === node.id) {
                 if (C.clickToEditNodes) {
                     this.attribs.className += " mousePointer";
                     this.attribs.title = "Click to edit";
@@ -76,12 +76,12 @@ export class NodeCompMarkdown extends MarkdownDiv {
         let content = node.content || "";
         let val = "";
 
-        if (node.type == J.NodeType.PLAIN_TEXT) {
+        if (node.type === J.NodeType.PLAIN_TEXT) {
 
             let nowrapProp: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.NOWRAP, node);
-            let wordWrap = !(nowrapProp && nowrapProp.value == "1");
+            let wordWrap = !(nowrapProp && nowrapProp.value === "1");
 
-            if (!!content) {
+            if (content) {
                 if (wordWrap) {
                     let contentFormatted = S.util.escapeHtml(content);
                     contentFormatted = S.util.replaceAll(contentFormatted, "\n\r", "<br>");
@@ -162,7 +162,7 @@ export class NodeCompMarkdown extends MarkdownDiv {
                     if (cipherKey) {
                         let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
-                        if (clearText==null) {
+                        if (clearText === null) {
                             node.content = clearText;
                             let val2 = this.renderRawMarkdown(node);
                             this.state.content = val2;

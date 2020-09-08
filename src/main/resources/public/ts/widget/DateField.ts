@@ -21,7 +21,7 @@ export class DateField extends Div implements I.ValueIntf {
         super(null);
         S.util.mergeProps(this.attribs, {
             name: this.getId(),
-            className: "form-group",
+            className: "form-group"
         });
 
         this.attribs.onChange = (evt: any) => {
@@ -79,7 +79,7 @@ export class DateField extends Div implements I.ValueIntf {
                     className: "form-control pre-textfield",
                     type: "date",
                     value: this.valueIntf.getValue()
-                }),
+                })
             ])
         ]);
     }

@@ -37,7 +37,7 @@ export class TabPanel extends Div {
         let feedDisplay = feedResults ? "inline" : "none";
 
         /* If mainDisplay would be the only tab showing, then don't show that tab */
-        if (searchDisplay == "none" && timelineDisplay == "none" && feedDisplay == "none") {
+        if (searchDisplay === "none" && timelineDisplay === "none" && feedDisplay === "none") {
             mainDisplay = "none";
         }
 
@@ -51,7 +51,7 @@ export class TabPanel extends Div {
                 id: "navTabs"
             },
                 /* These 'li' (list item) elements hold the tab bar that goes across the top of every page */
-                [new Li(null, {
+            [new Li(null, {
                     className: "nav-item",
                     style: { display: mainDisplay }
                 }, [
@@ -121,8 +121,7 @@ export class TabPanel extends Div {
                             });
                         }
                     })]
-                ),
-                ]
+                )]
             )]
         );
 
@@ -130,12 +129,12 @@ export class TabPanel extends Div {
         let tabContent = new Div(null, {
             className: "row tab-content",
             // id: "mainScrollingArea",
-            role: "main",
+            role: "main"
         }, [
             new MainTabComp(),
             new SearchView(),
             new TimelineView(),
-            new FeedView(),
+            new FeedView()
         ]);
 
         this.setChildren([

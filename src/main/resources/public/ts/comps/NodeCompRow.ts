@@ -26,7 +26,7 @@ export class NodeCompRow extends Div {
     constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number,
         public layoutClass: string, public allowNodeMove: boolean, public imgSizeOverride: string, appState: AppState) {
         super(null, {
-            id: S.nav._UID_ROWID_PREFIX + node.id,
+            id: S.nav._UID_ROWID_PREFIX + node.id
         });
 
         /* If we're in edit mode allow dragging */
@@ -41,7 +41,7 @@ export class NodeCompRow extends Div {
         /* If mouse is not over type icon during a drag start don't allow dragging. This way the entire ROW is the thing that is
         getting dragged, but we don't accept drag events anywhere on the node, because we specifically don't want to. We intentionally
         have draggableId so make is so that the user can only do a drag by clicking the type icon itself to start the drag. */
-        if (S.meta64.draggableId != this.node.id) {
+        if (S.meta64.draggableId !== this.node.id) {
             ev.preventDefault();
             return;
         }
@@ -64,7 +64,7 @@ export class NodeCompRow extends Div {
         //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
         let buttonBar: Comp = null;
         if (NodeCompRow.showButtonBar && !state.inlineEditId) {
-            let allowAvatar = node.owner != S.render.lastOwner;
+            let allowAvatar = node.owner !== S.render.lastOwner;
             buttonBar = new NodeCompButtonBar(node, allowAvatar, this.allowNodeMove);
         }
 
@@ -75,7 +75,7 @@ export class NodeCompRow extends Div {
         let selected: boolean = (focusNode && focusNode.id === id);
         this.attribs.className = (this.layoutClass || "") + (selected ? " active-row" : " inactive-row");
 
-        if (S.render.fadeInId == node.id) {
+        if (S.render.fadeInId === node.id) {
             S.render.fadeInId = null;
             this.attribs.className += " fadeInRowBkgClz";
         }
