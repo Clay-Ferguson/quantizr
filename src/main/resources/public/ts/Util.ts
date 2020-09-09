@@ -258,6 +258,16 @@ export class Util implements UtilIntf {
         return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
     }
 
+    // add with sign=1, subtract with sign=-1
+    addTimezoneOffset = (date: Date, sign: number): Date => {
+        let tzOffsetMinutes = date.getTimezoneOffset();
+        //console.log("offset: " + tzOffsetMinutes);
+
+        //make the time value in our current local timezone
+        let adjustedTime = date.getTime() + sign * tzOffsetMinutes * 1000 * 60;
+        return new Date(adjustedTime);
+    }
+
     dst = (date: Date) => {
         return date.getTimezoneOffset() < this.stdTimezoneOffset(date);
     }

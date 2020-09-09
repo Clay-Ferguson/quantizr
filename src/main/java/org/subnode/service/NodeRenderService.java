@@ -221,14 +221,15 @@ public class NodeRenderService {
 		 * we request ROWS_PER_PAGE+1, because that is enough to trigger 'endReached'
 		 * logic to be set correctly
 		 */
-		String orderBy = node.getStringProp("orderBy");
+		String orderBy = node.getStringProp(NodeProp.ORDER_BY.s());
 		Sort sort = null;
-		if ("priority asc".equalsIgnoreCase(orderBy)) {
-			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_PROPERTIES + ".priority")
-					.and(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+
+		if (!StringUtils.isEmpty(orderBy)) {
+			sort = parseOrderByToSort(orderBy);
 		} else {
 			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
 		}
+
 		Iterable<SubNode> nodeIter = read.getChildren(session, node, sort, queryLimit);
 		Iterator<SubNode> iterator = nodeIter.iterator();
 
@@ -391,6 +392,30 @@ public class NodeRenderService {
 		// log.debug("Setting endReached="+endReached);
 		res.setEndReached(endReached);
 		return nodeInfo;
+	}
+
+	/*
+	 * parses something like "priority asc" into a Sort object, assuming the field
+	 * is in the property array of the node, rather than the name of an actual
+	 * SubNode object member property.
+	 */
+	private Sort parseOrderByToSort(String orderBy) {
+		Sort sort = null;
+		int spaceIdx = orderBy.indexOf(" ");
+		String dir = "asc"; // asc or desc
+		if (spaceIdx != -1) {
+			dir = orderBy.substring(spaceIdx + 1);
+			orderBy = orderBy.substring(0, spaceIdx);
+		}
+
+		sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
+				SubNode.FIELD_PROPERTIES + "." + orderBy);
+
+		if (orderBy.equals("priority")) {
+			sort = sort.and(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+		}
+
+		return sort;
 	}
 
 	public InitNodeEditResponse initNodeEdit(MongoSession session, InitNodeEditRequest req) {

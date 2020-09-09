@@ -8,6 +8,7 @@ import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
 import { NodeCompBinary } from "./NodeCompBinary";
+import { Heading } from "../widget/Heading";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -43,6 +44,15 @@ export class NodeCompContent extends Div {
 
         let children: Comp[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+
+        //todo-0: make this a NodeProp constant
+        let timestampVal = S.props.getNodePropVal("timestamp", node);
+        if (timestampVal) {
+            let dateVal: Date = new Date(parseInt(timestampVal));
+            children.push(new Heading(5, "Timestamp: " + dateVal.toLocaleDateString() + " " + dateVal.toLocaleTimeString(), {
+                className: "marginLeft marginTop"
+            }));
+        }
 
         if (state.showProperties) {
             let propTable = S.props.renderProperties(node.properties);

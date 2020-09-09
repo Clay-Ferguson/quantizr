@@ -12,13 +12,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class DateField extends Div implements I.ValueIntf {
+export class TimeField extends Div implements I.ValueIntf {
 
     input: Input;
 
     constructor(private valueIntf: ValueIntf) {
         super(null);
-
+    
         this.attribs.onChange = (evt: any) => {
             Comp.renderCachedChildren = true;
 
@@ -38,7 +38,6 @@ export class DateField extends Div implements I.ValueIntf {
 
     //Handler to update state
     updateValFunc(value: string): void {
-        //console.log("update state: " + value);
         if (value !== this.valueIntf.getValue()) {
             this.valueIntf.setValue(value);
         }
@@ -64,6 +63,7 @@ export class DateField extends Div implements I.ValueIntf {
         //let state = this.getState();
 
         this.setChildren([
+            //this.label ? new Label(this.label, { key: this.getId() + "_label" }) : null,
             new Div(null, {
                 //className: "input-group",
                 /* NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
@@ -72,7 +72,7 @@ export class DateField extends Div implements I.ValueIntf {
             }, [
                 this.input = new Input({
                     className: "form-control pre-textfield",
-                    type: "date",
+                    type: "time",
                     value: this.valueIntf.getValue()
                 })
             ])

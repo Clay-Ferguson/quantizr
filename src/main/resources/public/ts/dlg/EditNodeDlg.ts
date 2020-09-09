@@ -19,6 +19,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
+import { DateTimeField } from "../widget/DateTimeField";
 import { Div } from "../widget/Div";
 import { EditPropsTable } from "../widget/EditPropsTable";
 import { EditPropsTableRow } from "../widget/EditPropsTableRow";
@@ -334,9 +335,9 @@ export class EditNodeDlg extends DialogBase {
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
             nodeNameTextField, optionsBar, selectionsBar, propsTable
         ], false,
-        (state: boolean) => {
-            EditNodeDlg.morePanelExpanded = state;
-        }, EditNodeDlg.morePanelExpanded, "float-right") : null;
+            (state: boolean) => {
+                EditNodeDlg.morePanelExpanded = state;
+            }, EditNodeDlg.morePanelExpanded, "float-right") : null;
 
         let binarySection: LayoutRow = null;
         if (hasAttachment) {
@@ -662,7 +663,7 @@ export class EditNodeDlg extends DialogBase {
             let valueIntf = {
                 getValue: (): string => {
                     let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
-                    //console.log("getValue["+propEntry.name+"]=" + val);
+                    //console.log("getValue[" + propEntry.name + "]=" + val);
                     return val;
                 },
                 setValue: (val: any) => {
@@ -684,14 +685,15 @@ export class EditNodeDlg extends DialogBase {
                 }
             }
             else {
-                //todo-1: eventually we will have data types.
-                // if (propEntry.name == "date") {
-                //     valEditor = new DateField(null, valueIntf); 
-                // }
-                // else {
-                //console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
-                valEditor = new TextField(null, false, null, valueIntf);
-                //}
+                // todo-1: eventually we will have data types, but for now we use a hack
+                // to detect to treat a string as a date based on its property name.
+                if (propEntry.name === "dueDate" || propEntry.name === "timestamp") {
+                    valEditor = new DateTimeField(valueIntf);
+                }
+                else {
+                    //console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
+                    valEditor = new TextField(null, false, null, valueIntf);
+                }
             }
 
             formGroup.addChild(valEditor as any as Comp);

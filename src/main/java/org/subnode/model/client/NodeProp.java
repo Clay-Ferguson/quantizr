@@ -116,7 +116,8 @@ public enum NodeProp {
     // todo-1: add sn:prefix
     INLINE_CHILDREN("inlineChildren", "s"), //
     PRIORITY("priority", "s"), //
-    LAYOUT("layout", "s"), ORDER_BY("orderBy", "s"),
+    LAYOUT("layout", "s"), //
+    ORDER_BY("orderBy", "s"),
 
     TYPE_LOCK("sn:typLoc", "s");
 

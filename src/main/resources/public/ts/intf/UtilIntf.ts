@@ -33,6 +33,7 @@ export interface UtilIntf {
     arrayIndexOfItemByProp(a: any[], propName: string, propVal: string): number;
     arrayMoveItem(a: any[], fromIndex: number, toIndex: number);
     stdTimezoneOffset(date: Date);
+    addTimezoneOffset(date: Date, sign: number): Date;
     dst(date: Date);
     indexOfObject(arr: any[], obj);
     domSelExec(selectors: string[], func: Function, level?: number);
