@@ -44,6 +44,7 @@
         "indent": "off",
         "no-unused-vars": "off",
         "no-use-before-define": "off",
-        "no-debugger": "off"
+        "no-debugger": "off",
+        "keyword-spacing": "off"
       }
 }

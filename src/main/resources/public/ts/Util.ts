@@ -17,6 +17,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class Util implements UtilIntf {
 
+    weekday: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
     static escapeMap = {
         "&": "&amp;",
         "<": "&lt;",
@@ -266,6 +268,10 @@ export class Util implements UtilIntf {
         //make the time value in our current local timezone
         let adjustedTime = date.getTime() + sign * tzOffsetMinutes * 1000 * 60;
         return new Date(adjustedTime);
+    }
+
+    getDayOfWeek = (date: Date): string => {
+        return this.weekday[date.getDay()];
     }
 
     dst = (date: Date) => {
@@ -538,7 +544,7 @@ export class Util implements UtilIntf {
     logAndThrow = (message: string) => {
         let stack = "[stack, not supported]";
         try {
-            stack = (<any> new Error()).stack;
+            stack = (<any>new Error()).stack;
         }
         catch (e) { }
         console.error(message + "STACK: " + stack);
@@ -548,7 +554,7 @@ export class Util implements UtilIntf {
     logAndReThrow = (message: string, exception: any) => {
         let stack = "[stack, not supported]";
         try {
-            stack = (<any> new Error()).stack;
+            stack = (<any>new Error()).stack;
         }
         catch (e) { }
         console.error(message + ": " + exception.message + "\nSTACK: " + stack);
@@ -636,7 +642,7 @@ export class Util implements UtilIntf {
 
     /* Takes textarea dom Id (# optional) and returns its value */
     getTextAreaValById = (id: string): string => {
-        const de: HTMLInputElement = <HTMLInputElement> this.domElm(id);
+        const de: HTMLInputElement = <HTMLInputElement>this.domElm(id);
         return de.value;
     }
 
@@ -749,7 +755,7 @@ export class Util implements UtilIntf {
     }
 
     getInputVal = (id: string): any => {
-        return (<any> this.domElm(id)).value;
+        return (<any>this.domElm(id)).value;
     }
 
     /* returns true if element was found, or false if element not found */

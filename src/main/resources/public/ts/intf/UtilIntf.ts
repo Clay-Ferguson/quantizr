@@ -34,6 +34,7 @@ export interface UtilIntf {
     arrayMoveItem(a: any[], fromIndex: number, toIndex: number);
     stdTimezoneOffset(date: Date);
     addTimezoneOffset(date: Date, sign: number): Date;
+    getDayOfWeek(date: Date): string;
     dst(date: Date);
     indexOfObject(arr: any[], obj);
     domSelExec(selectors: string[], func: Function, level?: number);

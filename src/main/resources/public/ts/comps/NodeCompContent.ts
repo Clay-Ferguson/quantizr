@@ -49,7 +49,32 @@ export class NodeCompContent extends Div {
         let timestampVal = S.props.getNodePropVal("timestamp", node);
         if (timestampVal) {
             let dateVal: Date = new Date(parseInt(timestampVal));
-            children.push(new Heading(5, "Timestamp: " + dateVal.toLocaleDateString() + " " + dateVal.toLocaleTimeString(), {
+            let timeStr = dateVal.toLocaleTimeString().replace(":00 ", " ");
+            let diffTime = dateVal.getTime() - (new Date().getTime());
+            let diffDays: number = Math.round(diffTime / (1000 * 3600 * 24));
+            let diffStr = "";
+            if (diffDays === 0) {
+                diffStr = " (today)";
+            }
+            else if (diffDays > 0) {
+                if (diffDays === 1) {
+                    diffStr = " (tomorrow)";
+                }
+                else {
+                    diffStr = " (" + diffDays + " days away)";
+                }
+            }
+            else if (diffDays < 0) {
+                if (diffDays === -1) {
+                    diffStr = " (yesterday)";
+                }
+                else {
+                    diffStr = " (" + Math.abs(diffDays) + " days ago)";
+                }
+            }
+
+            children.push(new Heading(5, "Time: " + dateVal.toLocaleDateString() + " " + timeStr + //
+                " - " + S.util.getDayOfWeek(dateVal) + diffStr, {
                 className: "marginLeft marginTop"
             }));
         }
