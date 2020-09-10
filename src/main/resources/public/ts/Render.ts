@@ -130,6 +130,22 @@ export class Render implements RenderIntf {
         });
     }
 
+    showCalendar = (state: AppState): void => {
+        let node = S.meta64.getHighlightedNode(state);
+        if (!node) {
+            S.util.showMessage("You must first click on a node.", "Warning");
+            return;
+        }
+
+        dispatch({
+            type: "Action_ShowCalendar",
+            state,
+            update: (s: AppState): void => {
+                s.fullScreenCalendarId = node.id;
+            }
+        });
+    }
+
     showNodeUrl = (node: J.NodeInfo, state: AppState): void => {
         if (!node) {
             node = S.meta64.getHighlightedNode(state);

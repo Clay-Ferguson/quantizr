@@ -53,8 +53,9 @@ export class MainNavPanel extends NavTag {
             ]));
         }
 
-        if (state.fullScreenViewId || state.fullScreenGraphId) {
-
+        let fullScreenComp = false;
+        if (state.fullScreenViewId || state.fullScreenGraphId || state.fullScreenCalendarId) {
+            fullScreenComp = true;
             if (state.fullScreenViewId) {
                 if (S.nav.getAdjacentNode("prev", state)) {
                     buttons.push(new Li(null, {
@@ -143,7 +144,7 @@ export class MainNavPanel extends NavTag {
             }
         }
 
-        if (!state.fullScreenViewId) {
+        if (!fullScreenComp) {
             if (state.isAnonUser) {
                 buttons.push(new Li(null, {
                     className: "nav-item"

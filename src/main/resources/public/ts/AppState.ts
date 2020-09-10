@@ -37,10 +37,11 @@ export class AppState {
 
     activeTab: string = null;
 
-    //When the user clicks an image, we switch to a fullscreen viewer for that image, ad max size of the display, and any time
-    //this node is null we are displaying that FullScreenView comp, which occupies everything below the toolbar.
+    //When the user clicks an image, we switch to a fullscreen viewer for that image, at max size of the display, and any time
+    //this nodeId is non-null we are displaying that FullScreenView comp, which occupies everything below the toolbar.
     fullScreenViewId: string = null;
     fullScreenGraphId: string = null;
+    fullScreenCalendarId: string = null;
 
     fullScreenImageSize: string = "100%";
 

@@ -20,7 +20,7 @@ export default class CalendarDemo extends React.Component<{}, CalendarDemoState>
     render() {
         return (
             <div className='demo-app'>
-                { /* {this.renderSidebar()} */ }
+                { /* {this.renderSidebar()} */}
                 <div className='demo-app-main'>
                     <FullCalendar
                         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -106,9 +106,9 @@ export default class CalendarDemo extends React.Component<{}, CalendarDemoState>
     }
 
     handleEventClick = (clickInfo: EventClickArg) => {
-        if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-            clickInfo.event.remove();
-        }
+        // if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
+        //     clickInfo.event.remove();
+        // }
     }
 
     handleEvents = (events: EventApi[]) => {
@@ -116,7 +116,6 @@ export default class CalendarDemo extends React.Component<{}, CalendarDemoState>
             currentEvents: events
         });
     }
-
 }
 
 function renderEventContent(eventContent: EventContentArg) {

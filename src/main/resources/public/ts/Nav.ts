@@ -332,6 +332,7 @@ export class Nav implements NavIntf {
             update: (s: AppState): void => {
                 s.fullScreenViewId = null;
                 s.fullScreenGraphId = null;
+                s.fullScreenCalendarId = null;
             }
         });
     }

@@ -359,7 +359,7 @@ export class Meta64 implements Meta64Intf {
 
                 switch (event.code) {
                 case "Escape":
-                    if (state.fullScreenViewId && state.fullScreenGraphId) {
+                    if (state.fullScreenViewId || state.fullScreenGraphId || state.fullScreenCalendarId) {
                         S.nav.closeFullScreenImgViewer(state);
                     }
 

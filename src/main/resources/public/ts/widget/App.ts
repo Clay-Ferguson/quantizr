@@ -12,13 +12,7 @@ import { Main } from "./Main";
 import { MainNavPanel } from "./MainNavPanel";
 import { RightNavPanel } from "./RightNavPanel";
 import { TabPanel } from "./TabPanel";
-
-//todo-1: everywhere in the app that calls 'store.getState()' is highly suspicious becasue userSelector should be used most of the time
-
-// let S: Singletons;
-// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-//     S = ctx;
-// });
+import { FullScreenCalendar } from "./FullScreenCalendar";
 
 export class App extends Div {
     tabPanel: TabPanel = null;
@@ -47,6 +41,9 @@ export class App extends Div {
         }
         else if (appState.fullScreenGraphId) {
             fullScreenViewer = new FullScreenGraphViewer();
+        }
+        else if (appState.fullScreenCalendarId) {
+            fullScreenViewer = new FullScreenCalendar();
         }
 
         this.setChildren([
