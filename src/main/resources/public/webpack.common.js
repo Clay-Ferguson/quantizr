@@ -11,7 +11,8 @@ const env = prod ? "prod" : "dev";
 console.log("TARGET ENV: " + env);
 
 module.exports = {
-    entry: "./ts/index.ts",
+    entry: "./ts/index.tsx",
+
     output: {
         filename: "bundle.js",
         path: __dirname
@@ -19,14 +20,14 @@ module.exports = {
 
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".ts", ".js", ".json"]
+        extensions: [".tsx", ".ts", ".js", ".json"]
     },
 
     module: {
         rules: [
             // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
             {
-                test: /\.ts$/,
+                test: /\.tsx?$/,
                 loader: "awesome-typescript-loader",
                 query: {
                     // Use this to point to your tsconfig.json.
@@ -44,7 +45,7 @@ module.exports = {
             {
                 test: /\.htm$/,
                 use: ["html-loader"]
-            },
+            }
         ]
     },
 

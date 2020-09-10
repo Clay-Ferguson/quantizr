@@ -1,17 +1,16 @@
 {
     "compilerOptions": {
-        "target": "es5",
+        "target": "es6", //es5 is IE support.
         "lib": [
-            "es2015",
             "dom",
+            "dom.iterable",
+            "esnext",
             "ScriptHost"
         ],
-        "module": "commonjs",
+        //"strict": true,
+        "module": "esnext",
         "moduleResolution": "node",
-        //"jsx": "React",
-        //"isolatedModules": false,
-        //"declaration": true,
-        //"declarationDir" : "./ts/types",
+        "jsx": "react",
         "noImplicitAny": false,
         "noImplicitUseStrict": false,
         "removeComments": true,
@@ -23,29 +22,19 @@
         "inlineSources": true,
 
         "noEmitOnError": true,
+        "noEmit": true,
         "watch": true,
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
         "traceResolution" : true
-
-        //WARNING: There is an apparent bug in TSC where subfolders under folder(s) you provide
-        //here will report an error even if they are legit, but TC seems to be able to understand
-        //everything fine if you have all your "d.ts" files just somewhere under ./ts/**.* (the 'include')
-        //"typeRoots" : ["./ts/types"]
     },
     "include": [
         "./ts/**/*"
-        //"./ts/subtypes/**/*.d.ts"
-        //TSX files are an ugly disaster that should have neve been invented.
-        //"*.tsx",
-        //"./**/*tsx",
-        //removing. webpack manages this.
-        //"./node_modules/@types/**/*.d.ts"
     ],
     "exclude": [
         "./node_modules/",
         "./node/"
     ],
-    //"compileOnSave": true,
-    //"buildOnSave": true
+    "compileOnSave": true,
+    "buildOnSave": true
 }
