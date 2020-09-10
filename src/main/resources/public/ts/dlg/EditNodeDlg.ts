@@ -687,7 +687,14 @@ export class EditNodeDlg extends DialogBase {
             else {
                 // todo-1: eventually we will have data types, but for now we use a hack
                 // to detect to treat a string as a date based on its property name.
-                if (propEntry.name === "dueDate" || propEntry.name === "timestamp") {
+                if (propEntry.name === "dueDate" || propEntry.name === "date") {
+
+                    //Ensure we have set the default time if none is yet set.
+                    let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
+                    if (!val) {
+                        valueIntf.setValue("" + new Date().getTime());
+                    }
+
                     valEditor = new DateTimeField(valueIntf);
                 }
                 else {

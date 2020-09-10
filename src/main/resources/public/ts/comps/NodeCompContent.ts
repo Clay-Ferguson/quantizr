@@ -9,6 +9,7 @@ import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
 import { NodeCompBinary } from "./NodeCompBinary";
 import { Heading } from "../widget/Heading";
+import { CompIntf } from "../widget/base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -42,42 +43,12 @@ export class NodeCompContent extends Div {
             return;
         }
 
-        let children: Comp[] = [];
+        let children: CompIntf[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
 
         //todo-0: make this a NodeProp constant
-        let timestampVal = S.props.getNodePropVal("timestamp", node);
-        if (timestampVal) {
-            let dateVal: Date = new Date(parseInt(timestampVal));
-            let timeStr = dateVal.toLocaleTimeString().replace(":00 ", " ");
-            let diffTime = dateVal.getTime() - (new Date().getTime());
-            let diffDays: number = Math.round(diffTime / (1000 * 3600 * 24));
-            let diffStr = "";
-            if (diffDays === 0) {
-                diffStr = " (today)";
-            }
-            else if (diffDays > 0) {
-                if (diffDays === 1) {
-                    diffStr = " (tomorrow)";
-                }
-                else {
-                    diffStr = " (" + diffDays + " days away)";
-                }
-            }
-            else if (diffDays < 0) {
-                if (diffDays === -1) {
-                    diffStr = " (yesterday)";
-                }
-                else {
-                    diffStr = " (" + Math.abs(diffDays) + " days ago)";
-                }
-            }
-
-            children.push(new Heading(5, "Time: " + dateVal.toLocaleDateString() + " " + timeStr + //
-                " - " + S.util.getDayOfWeek(dateVal) + diffStr, {
-                className: "marginLeft marginTop"
-            }));
-        }
+        this.maybeRenderDateTime(children, "date", "Date", node);
+        this.maybeRenderDateTime(children, "dueDate", "Due Date", node);
 
         if (state.showProperties) {
             let propTable = S.props.renderProperties(node.properties);
@@ -116,6 +87,42 @@ export class NodeCompContent extends Div {
         }
 
         this.setChildren(children);
+    }
+
+    maybeRenderDateTime = (children: CompIntf[], propName: string, displayName: string, node: J.NodeInfo): void => {
+        let timestampVal = S.props.getNodePropVal(propName, node);
+        //console.log("TimestampVal id=" + node.id + " val=" + timestampVal);
+        if (timestampVal) {
+            let dateVal: Date = new Date(parseInt(timestampVal));
+            let timeStr = dateVal.toLocaleTimeString().replace(":00 ", " ");
+            let diffTime = dateVal.getTime() - (new Date().getTime());
+            let diffDays: number = Math.round(diffTime / (1000 * 3600 * 24));
+            let diffStr = "";
+            if (diffDays === 0) {
+                diffStr = " (today)";
+            }
+            else if (diffDays > 0) {
+                if (diffDays === 1) {
+                    diffStr = " (tomorrow)";
+                }
+                else {
+                    diffStr = " (" + diffDays + " days away)";
+                }
+            }
+            else if (diffDays < 0) {
+                if (diffDays === -1) {
+                    diffStr = " (yesterday)";
+                }
+                else {
+                    diffStr = " (" + Math.abs(diffDays) + " days ago)";
+                }
+            }
+
+            children.push(new Heading(5, displayName + ": " + dateVal.toLocaleDateString() + " " + timeStr + //
+                " - " + S.util.getDayOfWeek(dateVal) + diffStr, {
+                className: "marginLeft marginTop"
+            }));
+        }
     }
 
     /* We do two things in here: 1) update formula rendering, and 2) change all "a" tags inside this div to have a target=_blank */
