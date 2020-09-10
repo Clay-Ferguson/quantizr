@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base href="/" />
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Quanta</title>
+    <link rel="stylesheet" th:href="'/css/meta64.css?v='+${MAIN_CSS_HASH}" />
+</head>
+
+<body>
+    <noscript>
+        This app requires JavaScript.
+    </noscript>
+
+    <div id="app">
+        Loading...
+    </div>
+
+    <script>
+        var __page = "calendar-test";
+    </script>
+
+    <script type="text/javascript" th:src="'bundle.js?v='+${BUNDLE_JS_HASH}"></script>
+
+</body>
+
+</html>

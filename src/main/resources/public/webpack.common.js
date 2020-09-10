@@ -42,6 +42,12 @@ module.exports = {
                 loader: "source-map-loader"
             },
 
+            //todo-0: with this we can load our css in index.tsx and not index.html now right?
+            {
+                test: /\.css$/i,
+                use: ["style-loader", "css-loader"]
+            },
+
             {
                 test: /\.htm$/,
                 use: ["html-loader"]
@@ -51,7 +57,7 @@ module.exports = {
 
     plugins: [
         new WebpackShellPlugin({
-            onBuildStart: ["./on-build-start.sh"],
+            onBuildStart: ["./on-build-start.sh"]
             //onBuildEnd: ['whatever else']
         }),
         new CircularDependencyPlugin({

@@ -20,7 +20,11 @@
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.1",
     "redux": "^4.0.5",
-    "rss-parser": "^3.9.0"
+    "rss-parser": "^3.9.0",
+    "@fullcalendar/daygrid": "^5.0.0",
+    "@fullcalendar/interaction": "^5.0.0",
+    "@fullcalendar/react": "^5.0.0",
+    "@fullcalendar/timegrid": "^5.0.0"
   },
   "devDependencies": {
     "@types/bootstrap": "^4.5.0",
@@ -34,7 +38,6 @@
     "awesome-typescript-loader": "^5.2.1",
     "circular-dependency-plugin": "^5.2.0",
     "clean-webpack-plugin": "^2.0.2",
-    "css-loader": "^2.1.1",
     "eslint": "^7.8.1",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.22.0",
@@ -43,19 +46,20 @@
     "eslint-plugin-react": "^7.20.6",
     "eslint-plugin-standard": "^4.0.1",
     "html-loader": "^0.5.5",
-    "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.5.0",
     "node-sass": "^4.14.0",
     "sass-loader": "^7.3.1",
     "script-loader": "^0.7.2",
     "source-map-loader": "^0.2.4",
-    "style-loader": "^0.23.1",
     "typescript": "^3.9.7",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0",
     "webpack-merge": "^4.2.2",
-    "webpack-shell-plugin": "^0.5.0"
+    "webpack-shell-plugin": "^0.5.0",
+    "css-loader": "^3.0.0",
+    "html-webpack-plugin": "^4.3.0",
+    "style-loader": "^1.2.1"
   }
 }

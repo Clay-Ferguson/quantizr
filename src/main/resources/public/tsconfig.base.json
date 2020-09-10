@@ -31,10 +31,10 @@
     "include": [
         "./ts/**/*"
     ],
-    "exclude": [
-        "./node_modules/",
-        "./node/"
-    ],
+    // "exclude": [
+    //     "./node_modules/",
+    //     "./node/"
+    // ],
     "compileOnSave": true,
     "buildOnSave": true
 }

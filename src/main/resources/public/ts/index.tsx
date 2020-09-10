@@ -3,6 +3,7 @@ import { Factory } from "./Factory";
 import React from "react";
 import ReactDOM from "react-dom";
 import TsxApp from "./TsxApp";
+import CalendarDemo from "./CalendarDemo";
 
 //set in index.html
 declare var __page;
@@ -23,15 +24,19 @@ if (__page === "index") {
     factory.singletons.meta64.initApp();
 }
 else if (__page === "tsx-test") {
-    if (!ReactDOM || !ReactDOM.render) {
-        console.log("React import failed.");
-    }
-    else {
-        ReactDOM.render(
-            <React.StrictMode>
-                <TsxApp />
-            </React.StrictMode>,
-            document.getElementById("app")
-        );
-    }
+
+    ReactDOM.render(
+        <React.StrictMode>
+            <TsxApp />
+        </React.StrictMode>,
+        document.getElementById("app")
+    );
+}
+else if (__page === "calendar-test") {
+    ReactDOM.render(
+        <React.StrictMode>
+            <CalendarDemo />
+        </React.StrictMode>,
+        document.getElementById("app")
+    );
 }
