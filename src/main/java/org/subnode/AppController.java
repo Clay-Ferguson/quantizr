@@ -213,8 +213,6 @@ public class AppController implements ErrorController {
 	@Autowired
 	private ConstantsProvider constProvider;
 
-	private static final boolean logRequests = false;
-
 	// private final CopyOnWriteArrayList<SseEmitter> emitters = new
 	// CopyOnWriteArrayList<>();
 
@@ -375,6 +373,8 @@ public class AppController implements ErrorController {
 	 * 
 	 * Renders statich HTML if whatever is in demo.html, used for experimenting with
 	 * HTML snippets.
+	 * 
+	 * Renders files in './src/main/resources/templates/demo' folder.
 	 */
 	@RequestMapping(value = { "/demo/{file}" })
 	public String demo(@PathVariable(value = "file", required = false) String file, //
@@ -384,13 +384,13 @@ public class AppController implements ErrorController {
 			initCacheBuster();
 		}
 
-		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
-			synchronized (welcomeMapLock) {
-				HashMap<String, String> newMap = new HashMap<String, String>();
-				welcomePagePresent = nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
-				welcomeMap = newMap;
-			}
-		}
+		// if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
+		// 	synchronized (welcomeMapLock) {
+		// 		HashMap<String, String> newMap = new HashMap<String, String>();
+		// 		welcomePagePresent = nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
+		// 		welcomeMap = newMap;
+		// 	}
+		// }
 
 		model.addAllAttributes(cacheBusterMd5);
 		return "demo/" + file;
