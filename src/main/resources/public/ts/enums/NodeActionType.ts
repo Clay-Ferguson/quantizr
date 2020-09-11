@@ -3,4 +3,5 @@ export enum NodeActionType {
     editNode,
     insert,
     upload,
+    delete
 };

@@ -52,6 +52,7 @@ export class EditNodeDlg extends DialogBase {
     //help: TextContent;
     propertyEditFieldContainer: Div;
 
+    //todo-0: some of these vars are not needed. not used.
     wordWrapCheckBox: Checkbox;
     inlineChildrenCheckBox: Checkbox;
     saveNodeButton: Button;
@@ -410,13 +411,19 @@ export class EditNodeDlg extends DialogBase {
                 this.close();
             }, null, "btn-primary"),
 
+            //todo-0: some of these actual variables don't need to exist.
             this.cancelButton = new Button("Cancel", this.cancelEdit, null, "btn-secondary bigMarginRight"),
 
             this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
             this.shareButton = allowShare ? new Button("Share", this.share) : null,
 
             this.setTypeButton = !typeLocked ? new Button("Type", this.openChangeNodeTypeDlg) : null,
-            this.encryptionButton = !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null
+            this.encryptionButton = !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
+
+            new Button("Delete", () => {
+                S.edit.deleteSelNodes(state.node.id, false);
+                this.close();
+            })
 
             //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
         ]);
