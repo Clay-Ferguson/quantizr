@@ -119,7 +119,8 @@ public enum NodeProp {
     LAYOUT("layout", "s"), //
     ORDER_BY("orderBy", "s"),
 
-    TYPE_LOCK("sn:typLoc", "s");
+    TYPE_LOCK("sn:typLoc", "s"), //
+    DATE("date", "s");
 
     @JsonValue
     private final String value;

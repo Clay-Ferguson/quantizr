@@ -610,6 +610,25 @@ public class MongoRead {
         return ops.find(query, SubNode.class);
     }
 
+    /**
+     * Special purpose query to get nodes that have dueDate or time properties.
+     */
+    public Iterable<SubNode> getCalendar(MongoSession session, SubNode node) {
+        auth.auth(session, node, PrivilegeType.READ);
+
+        update.saveSession(session);
+        Query query = new Query();
+        //query.limit(limit);
+
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
+        criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
+
+        query.addCriteria(criteria);
+        query.addCriteria(Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.DATE + ".value").ne(null));
+        return ops.find(query, SubNode.class);
+    }
+
+
     /*
      * Builds the 'criteria' object using the kind of searching Google does where
      * anything in quotes is considered a phrase and anything else separated by

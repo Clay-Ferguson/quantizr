@@ -585,13 +585,16 @@ public class NodeRenderService {
 		LinkedList<CalendarItem> items = new LinkedList<CalendarItem>();
 		res.setItems(items);
 
-		Date now = Calendar.getInstance().getTime();
+		SubNode node = read.getNode(session, req.getNodeId());
+		if (node == null) {
+			return res;
+		}
 
-		for (int i = 0; i < 3; i++) {
+		for (SubNode n : read.getCalendar(session, node)) {
 			CalendarItem item = new CalendarItem();
-			item.setTitle("Cal Item " + i);
-			item.setId(String.valueOf(i));
-			item.setStart(now.getTime());
+			item.setTitle(n.getContent());
+			item.setId(n.getId().toHexString());
+			item.setStart(n.getIntProp(NodeProp.DATE.s()));
 			items.add(item);
 		}
 

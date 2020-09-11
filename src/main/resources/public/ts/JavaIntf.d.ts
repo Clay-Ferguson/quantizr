@@ -627,6 +627,7 @@ export const enum NodeProp {
     LAYOUT = "layout",
     ORDER_BY = "orderBy",
     TYPE_LOCK = "sn:typLoc",
+    TIME = "time",
 }
 
 export const enum NodeType {
