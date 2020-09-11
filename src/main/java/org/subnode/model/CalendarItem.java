@@ -8,6 +8,7 @@ public class CalendarItem {
     private String id;
     private String title;
     private long start;
+    private long end;
 
     public CalendarItem() {
     }
@@ -34,5 +35,13 @@ public class CalendarItem {
 
     public void setStart(long start) {
         this.start = start;
+    }
+
+    public long getEnd() {
+        return end;
+    }
+
+    public void setEnd(long end) {
+        this.end = end;
     }
 }

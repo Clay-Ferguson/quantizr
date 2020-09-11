@@ -1304,15 +1304,14 @@ export class Util implements UtilIntf {
         let ret = [];
 
         items.forEach((v: J.CalendarItem) => {
-            let todayStr = new Date(v.start).toISOString().replace(/T.*$/, ""); // YYYY-MM-DD of today
             ret.push({
                 id: v.id,
                 title: v.title,
-                start: todayStr + "T12:00:00"
+                start: v.start, 
+                end: v.end 
             });
         });
 
-        //console.log("TimeArray: " + S.util.prettyPrint(ret));
         return ret;
     }
 }

@@ -34,6 +34,7 @@ import org.subnode.response.InitNodeEditResponse;
 import org.subnode.response.RenderCalendarResponse;
 import org.subnode.response.RenderNodeResponse;
 import org.subnode.util.Convert;
+import org.subnode.util.DateUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
@@ -593,12 +594,19 @@ public class NodeRenderService {
 		for (SubNode n : read.getCalendar(session, node)) {
 			CalendarItem item = new CalendarItem();
 
+			String durationStr = n.getStringProp(NodeProp.DURATION.s());
+			long duration = DateUtil.getMillisFromDuration(durationStr);
+			if (duration == 0) {
+				duration = 60 * 60 * 1000;
+			}
+
 			String content = n.getContent();
 			content = XString.truncateAfterFirst(content, "\n");
 			content = XString.truncateAfterFirst(content, "\r");
 			item.setTitle(content);
 			item.setId(n.getId().toHexString());
 			item.setStart(n.getIntProp(NodeProp.DATE.s()));
+			item.setEnd(item.getStart() + duration);
 			items.add(item);
 		}
 

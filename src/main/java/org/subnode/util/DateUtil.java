@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.subnode.exception.base.RuntimeEx;
 
 /**
@@ -135,8 +136,11 @@ public class DateUtil {
 		}
 	}
 
-	/* Formats this duration into a string that describes the time about the way a human would say it. For example
-	if it was a number of days ago you don't include minutes and seconds etc. */
+	/*
+	 * Formats this duration into a string that describes the time about the way a
+	 * human would say it. For example if it was a number of days ago you don't
+	 * include minutes and seconds etc.
+	 */
 	public static String formatDurationMillis(long different) {
 		StringBuilder sb = new StringBuilder();
 		long secondsInMilli = 1000;
@@ -201,5 +205,20 @@ public class DateUtil {
 		// else, if could be ANY timezone:
 		OffsetDateTime odt = OffsetDateTime.parse(timeStr);
 		return Date.from(odt.toInstant());
+	}
+
+	public static long getMillisFromDuration(String durationStr) {
+		if (StringUtils.isEmpty(durationStr)) return 0;
+
+		int colonIdx = durationStr.indexOf(":");
+		if (colonIdx==-1) {
+			//if no colon, assume minutes
+			return Integer.parseInt(durationStr) * 60 * 1000;
+		}
+		else {
+			String hrs = durationStr.substring(0, colonIdx);
+			String mins = durationStr.substring(colonIdx + 1);
+			return (Integer.parseInt(hrs) * 60 + Integer.parseInt(mins)) * 60 * 1000;
+		}
 	}
 }

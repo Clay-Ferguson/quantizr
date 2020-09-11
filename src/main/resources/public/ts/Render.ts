@@ -142,8 +142,6 @@ export class Render implements RenderIntf {
         S.util.ajax<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
             nodeId: node.id
         }, (res: J.RenderCalendarResponse) => {
-            console.log("res: " + S.util.prettyPrint(res));
-
             dispatch({
                 type: "Action_ShowCalendar",
                 state,

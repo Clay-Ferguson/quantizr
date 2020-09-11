@@ -563,6 +563,7 @@ export interface CalendarItem {
     id: string;
     title: string;
     start: number;
+    end: number;
 }
 
 export interface PrivilegeInfo {
@@ -628,7 +629,7 @@ export const enum NodeProp {
     ORDER_BY = "orderBy",
     TYPE_LOCK = "sn:typLoc",
     DATE = "date",
-    DURATION = "duration"
+    DURATION = "duration",
 }
 
 export const enum NodeType {

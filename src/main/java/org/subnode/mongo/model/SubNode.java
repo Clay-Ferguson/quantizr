@@ -453,6 +453,9 @@ public class SubNode {
 			// todo-1: When saving from client the values are always sent as strings, and
 			// this is a workaround until that changes.
 			if (val instanceof String) {
+				if (((String) val).length() == 0) {
+					return 0L;
+				}
 				return Long.parseLong((String) val);
 			}
 			return (Long) v.getValue();
@@ -568,8 +571,8 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public boolean isDeleted() {
-		boolean deleted = getPath()!=null && (getPath().contains("/" + NodeName.TRASH + "/")
-				|| getPath().endsWith("/" + NodeName.TRASH));
+		boolean deleted = getPath() != null
+				&& (getPath().contains("/" + NodeName.TRASH + "/") || getPath().endsWith("/" + NodeName.TRASH));
 		return deleted;
 	}
 
