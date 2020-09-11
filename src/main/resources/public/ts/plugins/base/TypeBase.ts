@@ -9,6 +9,9 @@ import { Singletons } from "../../Singletons";
 import { Comp } from "../../widget/base/Comp";
 import { CompIntf } from "../../widget/base/CompIntf";
 import { InlineEditField } from "../../widget/InlineEditField";
+import { Div } from "../../widget/Div";
+import { ButtonBar } from "../../widget/ButtonBar";
+import { Button } from "../../widget/Button";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -69,7 +72,20 @@ export class TypeBase implements TypeHandlerIntf {
             return new InlineEditField(node, state);
         }
         else {
-            return new NodeCompMarkdown(node, state);
+            let prop: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.ORDER_BY, node);
+            if (prop && prop.value.startsWith("date ")) {
+                return new Div(null, null, [
+                    new NodeCompMarkdown(node, state),
+                    new ButtonBar([
+                        new Button("Show Calendar", () => {
+                            S.render.showCalendar(node, state);
+                        })
+                    ], null, "marginLeft marginBottom")
+                ]);
+            }
+            else {
+                return new NodeCompMarkdown(node, state);
+            }
         }
     }
 

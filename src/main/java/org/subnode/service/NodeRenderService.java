@@ -592,7 +592,11 @@ public class NodeRenderService {
 
 		for (SubNode n : read.getCalendar(session, node)) {
 			CalendarItem item = new CalendarItem();
-			item.setTitle(n.getContent());
+
+			String content = n.getContent();
+			content = XString.truncateAfterFirst(content, "\n");
+			content = XString.truncateAfterFirst(content, "\r");
+			item.setTitle(content);
 			item.setId(n.getId().toHexString());
 			item.setStart(n.getIntProp(NodeProp.DATE.s()));
 			items.add(item);

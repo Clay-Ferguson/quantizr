@@ -22,7 +22,8 @@ public enum NodeType {
     FS_FILE("fs:file"), //
     FS_FOLDER("fs:folder"), //
     FS_LUCENE("fs:lucene"), //
-    IPFS_NODE("sn:ipfsNode");
+    IPFS_NODE("sn:ipfsNode"), //
+    CALENDAR_ENTRY("sn:cal");
 
     @JsonValue
     private final String value;

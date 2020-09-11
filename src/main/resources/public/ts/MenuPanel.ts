@@ -149,7 +149,7 @@ export class MenuPanel extends Div {
             //this is broken, so I'm just disabling it for now, since this is low priority. todo-1
             //new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
 
-            new MenuItem("Show Calendar", () => S.render.showCalendar(state), !!highlightNode), //
+            new MenuItem("Show Calendar", () => S.render.showCalendar(null, state), !!highlightNode), //
 
             new MenuItem("Show URL", () => S.render.showNodeUrl(null, state), !!highlightNode), //
 

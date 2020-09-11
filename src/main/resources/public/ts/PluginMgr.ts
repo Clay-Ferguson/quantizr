@@ -10,6 +10,7 @@ import { MarkdownTypeHandler } from "./plugins/MarkdownTypeHandler";
 import { NotesNodeTypeHandler } from "./plugins/NotesNodeTypeHandler";
 import { RepoRootTypeHandler } from "./plugins/RepoRootTypeHandler";
 import { RssTypeHandler } from "./plugins/RssTypeHandler";
+import { CalendarTypeHandler } from "./plugins/CalendarTypeHandler";
 import { TextTypeHandler } from "./plugins/TextTypeHandler";
 import { TrashNodeTypeHandler } from "./plugins/TrashNodeTypeHandler";
 import { UserFeedTypeHandler } from "./plugins/UserFeedTypeHandler";
@@ -40,6 +41,7 @@ export class PluginMgr implements PluginMgrIntf {
         so it's better to just have this one place where we define all them in the order we want */
         this.addTypeHandler(new MarkdownTypeHandler());
         this.addTypeHandler(new TextTypeHandler());
+        this.addTypeHandler(new CalendarTypeHandler());
         this.addTypeHandler(new RssTypeHandler());
         this.addTypeHandler(new IPFSNodeTypeHandler());
         this.addTypeHandler(new RepoRootTypeHandler());

@@ -3,7 +3,7 @@ import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, 
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-//import { INITIAL_EVENTS, createEventId } from "./event-utils";
+// import { INITIAL_EVENTS, createEventId } from "./event-utils";
 
 interface CalendarDemoState {
     weekendsVisible: boolean

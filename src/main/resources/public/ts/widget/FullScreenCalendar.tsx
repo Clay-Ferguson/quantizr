@@ -22,16 +22,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FullScreenCalendar extends Main {
 
+    state: AppState;
+
     _render = (props: any): ReactNode => {
-        let state: AppState = useSelector((state: AppState) => state);
-        let nodeId = state.fullScreenCalendarId;
-        let node: J.NodeInfo = S.meta64.findNodeById(state, nodeId);
+        this.state = useSelector((state: AppState) => state);
+        let nodeId = this.state.fullScreenCalendarId;
+        let node: J.NodeInfo = S.meta64.findNodeById(this.state, nodeId);
 
         if (!node) {
             console.log("Can't find nodeId " + nodeId);
         }
-
-        //console.log("state.calendarData: " + S.util.prettyPrint(state.calendarData));
 
         return React.createElement(FullCalendar, {
             plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -46,27 +46,24 @@ export class FullScreenCalendar extends Main {
             selectMirror: true,
             dayMaxEvents: true,
             //weekends: this.state.weekendsVisible,
-            initialEvents: state.calendarData, // alternatively, use the `events` setting to fetch from a feed
+            initialEvents: this.state.calendarData, // alternatively, use the `events` setting to fetch from a feed
             // select: {this.handleDateSelect},
             eventContent: renderEventContent, // custom render function
-            eventClick: this.handleEventClick,
+            eventClick: this.handleEventClick
             // eventsSet: {this.handleEvents}
 
         }, null);
     }
 
     handleEventClick = (clickInfo: EventClickArg) => {
-        // if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-        //     clickInfo.event.remove();
-        // }
+        S.edit.cached_runEditNode(clickInfo.event.id, this.state);
     }
-
 }
 
 function renderEventContent(eventContent: EventContentArg) {
     return (
         <>
-            <b>{eventContent.timeText}</b>
+            <b>{eventContent.timeText} - </b>
             <i>{eventContent.event.title}</i>
         </>
     );

@@ -627,7 +627,8 @@ export const enum NodeProp {
     LAYOUT = "layout",
     ORDER_BY = "orderBy",
     TYPE_LOCK = "sn:typLoc",
-    TIME = "time",
+    DATE = "date",
+    DURATION = "duration"
 }
 
 export const enum NodeType {
@@ -647,6 +648,7 @@ export const enum NodeType {
     FS_FOLDER = "fs:folder",
     FS_LUCENE = "fs:lucene",
     IPFS_NODE = "sn:ipfsNode",
+    CALENDAR_ENTRY = "sn:cal",
 }
 
 export const enum PrincipalName {
