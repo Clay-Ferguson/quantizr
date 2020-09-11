@@ -37,7 +37,7 @@ export class FullScreenCalendar extends Main {
             plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
             headerToolbar: {
                 left: "prev,next today",
-                center: "title",
+                center: "addEventButton",
                 right: "dayGridMonth,timeGridWeek,timeGridDay"
             },
             initialView: "dayGridMonth",
@@ -48,10 +48,18 @@ export class FullScreenCalendar extends Main {
             //weekends: this.state.weekendsVisible,
             initialEvents: this.state.calendarData, // alternatively, use the `events` setting to fetch from a feed
             // select: {this.handleDateSelect},
-            eventContent: renderEventContent, // custom render function
-            eventClick: this.handleEventClick
+            eventContent: renderEventContent, 
+            eventClick: this.handleEventClick,
             // eventsSet: {this.handleEvents}
 
+            customButtons: {
+                addEventButton: {
+                    text: "Add Event",
+                    click: () => {
+                        S.edit.addCalendarEntry(this.state);
+                    }
+                }
+            }
         }, null);
     }
 

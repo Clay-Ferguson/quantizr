@@ -724,8 +724,7 @@ export class Edit implements EditIntf {
             },
             () => {
                 S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
-            }
-            );
+            });
         });
     }
 
@@ -780,6 +779,23 @@ export class Edit implements EditIntf {
             nodeId: node.id,
             newNodeName: "",
             typeName: J.NodeType.FRIEND,
+            createAtTop: true,
+            content: null,
+            typeLock: true,
+            properties: null
+        }, (res) => {
+            this.createSubNodeResponse(res, state);
+        });
+    }
+
+    addCalendarEntry = (state: AppState) => {
+        state = appState(state);
+
+        S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+            updateModTime: true,
+            nodeId: state.fullScreenCalendarId,
+            newNodeName: "",
+            typeName: J.NodeType.CALENDAR_ENTRY,
             createAtTop: true,
             content: null,
             typeLock: true,
