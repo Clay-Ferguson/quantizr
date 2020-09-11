@@ -65,9 +65,10 @@ import org.subnode.request.NodeSearchRequest;
 import org.subnode.request.PingRequest;
 import org.subnode.request.RebuildIndexesRequest;
 import org.subnode.request.RemovePrivilegeRequest;
+import org.subnode.request.RenderCalendarRequest;
 import org.subnode.request.RenderNodeRequest;
-import org.subnode.request.ResetPasswordRequest;
 import org.subnode.request.SaveNodeRequest;
+import org.subnode.request.ResetPasswordRequest;
 import org.subnode.request.SavePublicKeyRequest;
 import org.subnode.request.SaveUserPreferencesRequest;
 import org.subnode.request.SaveUserProfileRequest;
@@ -438,6 +439,14 @@ public class AppController implements ErrorController {
 			LogoutResponse res = new LogoutResponse();
 			res.setSuccess(true);
 			return res;
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/renderCalendar", method = RequestMethod.POST)
+	public @ResponseBody Object renderCalendarNodes(@RequestBody RenderCalendarRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
+		return callProc.run("renderCalendar", req, session, ms -> {
+			return nodeRenderService.renderCalendar(ms, req);
 		});
 	}
 

@@ -9,6 +9,7 @@ import { UtilIntf } from "./intf/UtilIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
+import { EventInput } from "@fullcalendar/react";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -1296,5 +1297,22 @@ export class Util implements UtilIntf {
                 ).open();
             }, null, "btn-danger", "alert alert-danger", state
         ).open();
+    }
+
+    buildCalendarData = (items: J.CalendarItem[]): EventInput[] => {
+        if (!items) return [];
+        let ret = [];
+
+        items.forEach((v: J.CalendarItem) => {
+            let todayStr = new Date(v.start).toISOString().replace(/T.*$/, ""); // YYYY-MM-DD of today
+            ret.push({
+                id: v.id,
+                title: v.title,
+                start: todayStr + "T12:00:00"
+            });
+        });
+
+        //console.log("TimeArray: " + S.util.prettyPrint(ret));
+        return ret;
     }
 }

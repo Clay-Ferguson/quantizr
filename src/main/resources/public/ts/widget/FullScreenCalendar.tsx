@@ -14,7 +14,6 @@ import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, 
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { INITIAL_EVENTS, createEventId } from "../event-utils";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -32,7 +31,9 @@ export class FullScreenCalendar extends Main {
             console.log("Can't find nodeId " + nodeId);
         }
 
-        return React.createElement(FullCalendar /* CalendarDemo*/, {
+        //console.log("state.calendarData: " + S.util.prettyPrint(state.calendarData));
+
+        return React.createElement(FullCalendar, {
             plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
             headerToolbar: {
                 left: "prev,next today",
@@ -45,7 +46,7 @@ export class FullScreenCalendar extends Main {
             selectMirror: true,
             dayMaxEvents: true,
             //weekends: this.state.weekendsVisible,
-            initialEvents: INITIAL_EVENTS, // alternatively, use the `events` setting to fetch from a feed
+            initialEvents: state.calendarData, // alternatively, use the `events` setting to fetch from a feed
             // select: {this.handleDateSelect},
             eventContent: renderEventContent, // custom render function
             eventClick: this.handleEventClick,

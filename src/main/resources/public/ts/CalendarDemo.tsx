@@ -3,7 +3,7 @@ import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, 
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { INITIAL_EVENTS, createEventId } from "./event-utils";
+//import { INITIAL_EVENTS, createEventId } from "./event-utils";
 
 interface CalendarDemoState {
     weekendsVisible: boolean
@@ -35,7 +35,7 @@ export default class CalendarDemo extends React.Component<{}, CalendarDemoState>
                         selectMirror={true}
                         dayMaxEvents={true}
                         weekends={this.state.weekendsVisible}
-                        initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
+                        //initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
                         select={this.handleDateSelect}
                         eventContent={renderEventContent} // custom render function
                         eventClick={this.handleEventClick}
@@ -96,7 +96,7 @@ export default class CalendarDemo extends React.Component<{}, CalendarDemoState>
 
         if (title) {
             calendarApi.addEvent({
-                id: createEventId(),
+                id: "" + new Date().getTime(),
                 title,
                 start: selectInfo.startStr,
                 end: selectInfo.endStr,

@@ -1,5 +1,7 @@
 package org.subnode.service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,6 +20,7 @@ import org.subnode.config.ConstantsProvider;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
+import org.subnode.model.CalendarItem;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoAuth;
@@ -25,10 +28,11 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.InitNodeEditRequest;
+import org.subnode.request.RenderCalendarRequest;
 import org.subnode.request.RenderNodeRequest;
 import org.subnode.response.InitNodeEditResponse;
+import org.subnode.response.RenderCalendarResponse;
 import org.subnode.response.RenderNodeResponse;
-import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
@@ -570,5 +574,27 @@ public class NodeRenderService {
 					+ node.getId().toHexString();
 		}
 		return null;
+	}
+
+	public RenderCalendarResponse renderCalendar(MongoSession session, RenderCalendarRequest req) {
+		RenderCalendarResponse res = new RenderCalendarResponse();
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+
+		LinkedList<CalendarItem> items = new LinkedList<CalendarItem>();
+		res.setItems(items);
+
+		Date now = Calendar.getInstance().getTime();
+
+		for (int i = 0; i < 3; i++) {
+			CalendarItem item = new CalendarItem();
+			item.setTitle("Cal Item " + i);
+			item.setId(String.valueOf(i));
+			item.setStart(now.getTime());
+			items.add(item);
+		}
+
+		return res;
 	}
 }

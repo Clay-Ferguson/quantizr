@@ -177,6 +177,10 @@ export interface RemovePrivilegeRequest extends RequestBase {
     privilege: string;
 }
 
+export interface RenderCalendarRequest extends RequestBase {
+    nodeId: string;
+}
+
 export interface RenderNodeRequest extends RequestBase {
     nodeId: string;
     offset: number;
@@ -429,6 +433,10 @@ export interface RebuildIndexesResponse extends ResponseBase {
 export interface RemovePrivilegeResponse extends ResponseBase {
 }
 
+export interface RenderCalendarResponse extends ResponseBase {
+    items: CalendarItem[];
+}
+
 export interface RenderNodeResponse extends ResponseBase {
     node: NodeInfo;
     offsetOfNodeFound: number;
@@ -549,6 +557,12 @@ export interface GraphNode {
 export interface GraphEdge {
     to: string;
     from: string;
+}
+
+export interface CalendarItem {
+    id: string;
+    title: string;
+    start: number;
 }
 
 export interface PrivilegeInfo {

@@ -1,5 +1,6 @@
 import * as J from "./JavaIntf";
 import { NodeInfo } from "./JavaIntf";
+import { EventInput } from "@fullcalendar/react";
 
 /* root react Redux state for entire app */
 export class AppState {
@@ -42,6 +43,8 @@ export class AppState {
     fullScreenViewId: string = null;
     fullScreenGraphId: string = null;
     fullScreenCalendarId: string = null;
+
+    calendarData: EventInput[];
 
     fullScreenImageSize: string = "100%";
 

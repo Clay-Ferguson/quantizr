@@ -2,6 +2,7 @@ import { AxiosPromise } from "axios";
 import { AppState } from "../AppState";
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
+import { EventInput } from "@fullcalendar/react";
 
 export interface UtilIntf {
     logAjax: boolean;
@@ -115,4 +116,5 @@ export interface UtilIntf {
     setDropHandler(attribs: any, func: (elm: any) => void): void;
     resetDropHandler(attribs: any): void;
     generateNewCryptoKeys(state: AppState): any;
+    buildCalendarData(items: J.CalendarItem[]): EventInput[];
 }
