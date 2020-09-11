@@ -13,6 +13,7 @@ import { EditIntf } from "./intf/EditIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
+import { EventInput } from "@fullcalendar/react";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -553,6 +554,8 @@ export class Edit implements EditIntf {
                     hardDelete
                 }, (res: J.DeleteNodesResponse) => {
 
+                    this.removeNodesFromCalendarData(selNodesArray, state);
+
                     if (!postDelSelNodeId) {
                         //we get here if user has deleted the last child (all chidren) of the parent of the current page
                         S.nav.navUpLevel();
@@ -566,6 +569,21 @@ export class Edit implements EditIntf {
             (nodeCheck.deleted || hardDelete) ? "alert alert-danger" : null,
             state
         ).open();
+    }
+
+    removeNodesFromCalendarData = (selNodesArray: string[], appState: AppState) => {
+        if (!appState.calendarData) return;
+
+        selNodesArray.forEach((id: string) => {
+            appState.calendarData = appState.calendarData.filter((item: EventInput) => item.id !== id);
+        });
+
+        dispatch({
+            type: "Action_UpdateCalendarData",
+            update: (s: AppState): void => {
+                s.calendarData = appState.calendarData;
+            }
+        });
     }
 
     /* Gets the node we want to scroll to after a delete, but if we're deleting the page root we return null,
