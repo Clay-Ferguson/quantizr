@@ -261,6 +261,9 @@ export class Edit implements EditIntf {
             if (S.util.checkSuccess("Save node", res)) {
                 await this.distributeKeys(node, res.aclEntries);
                 S.view.refreshTree(null, false, node.id, false, false, allowScroll, false, state);
+                if (state.fullScreenCalendarId) {
+                    S.render.showCalendar(state.fullScreenCalendarId, state);
+                }
                 resolve();
             }
         });
@@ -377,21 +380,20 @@ export class Edit implements EditIntf {
 
     cached_runEditNode = (id: any, state?: AppState): void => {
         state = appState(state);
-        let node: J.NodeInfo = null;
         if (!id) {
-            node = S.meta64.getHighlightedNode(state);
-        }
-        else {
-            node = state.idToNodeMap[id];
+            let node = S.meta64.getHighlightedNode(state);
+            if (node) {
+                id = node.id;
+            }
         }
 
-        if (!node) {
-            S.util.showMessage("Unknown nodeId in editNodeClick: " + id, "Warning");
+        if (!id) {
+            S.util.showMessage("Unknown nodeId in editNodeClick: ", "Warning");
             return;
         }
 
         S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
-            nodeId: node.id
+            nodeId: id
         }, (res) => {
             this.initNodeEditResponse(res, state, true);
         });
@@ -722,9 +724,9 @@ export class Edit implements EditIntf {
                 typeLock: false,
                 properties: null
             },
-            () => {
-                S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
-            });
+                () => {
+                    S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
+                });
         });
     }
 
@@ -788,7 +790,7 @@ export class Edit implements EditIntf {
         });
     }
 
-    addCalendarEntry = (state: AppState) => {
+    addCalendarEntry = (initDate: number, state: AppState) => {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
@@ -799,7 +801,8 @@ export class Edit implements EditIntf {
             createAtTop: true,
             content: null,
             typeLock: true,
-            properties: null
+            properties: [{ name: "date", value: "" + initDate }]
+
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });

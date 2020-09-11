@@ -130,23 +130,27 @@ export class Render implements RenderIntf {
         });
     }
 
-    showCalendar = (node: J.NodeInfo, state: AppState): void => {
-        if (!node) {
-            node = S.meta64.getHighlightedNode(state);
+    /* nodeId is parent node to query for calendar content */
+    showCalendar = (nodeId: string, state: AppState): void => {
+        if (!nodeId) {
+            let node = S.meta64.getHighlightedNode(state);
+            if (node) {
+                nodeId = node.id;
+            }
         }
-        if (!node) {
+        if (!nodeId) {
             S.util.showMessage("You must first click on a node.", "Warning");
             return;
         }
 
         S.util.ajax<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
-            nodeId: node.id
+            nodeId
         }, (res: J.RenderCalendarResponse) => {
             dispatch({
                 type: "Action_ShowCalendar",
                 state,
                 update: (s: AppState): void => {
-                    s.fullScreenCalendarId = node.id;
+                    s.fullScreenCalendarId = nodeId;
                     s.calendarData = S.util.buildCalendarData(res.items);
                 }
             });

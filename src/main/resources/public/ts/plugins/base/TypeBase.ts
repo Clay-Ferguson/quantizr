@@ -78,7 +78,7 @@ export class TypeBase implements TypeHandlerIntf {
                     new NodeCompMarkdown(node, state),
                     new ButtonBar([
                         new Button("Show Calendar", () => {
-                            S.render.showCalendar(node, state);
+                            S.render.showCalendar(node.id, state);
                         })
                     ], null, "marginLeft marginBottom")
                 ]);

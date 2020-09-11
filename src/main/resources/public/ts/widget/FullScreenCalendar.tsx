@@ -22,6 +22,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FullScreenCalendar extends Main {
 
+    static lastClickTime: number;
+
     state: AppState;
 
     _render = (props: any): ReactNode => {
@@ -47,8 +49,8 @@ export class FullScreenCalendar extends Main {
             dayMaxEvents: true,
             //weekends: this.state.weekendsVisible,
             initialEvents: this.state.calendarData, // alternatively, use the `events` setting to fetch from a feed
-            // select: {this.handleDateSelect},
-            eventContent: renderEventContent, 
+            select: this.handleDateSelect,
+            eventContent: renderEventContent,
             eventClick: this.handleEventClick,
             // eventsSet: {this.handleEvents}
 
@@ -56,11 +58,16 @@ export class FullScreenCalendar extends Main {
                 addEventButton: {
                     text: "Add Event",
                     click: () => {
-                        S.edit.addCalendarEntry(this.state);
+                        S.edit.addCalendarEntry(FullScreenCalendar.lastClickTime, this.state);
                     }
                 }
             }
         }, null);
+    }
+
+    //todo-0: get correct type here (it IS available)
+    handleDateSelect = (selectInfo: any) => {
+        FullScreenCalendar.lastClickTime = (selectInfo.start as Date).getTime();
     }
 
     handleEventClick = (clickInfo: EventClickArg) => {
