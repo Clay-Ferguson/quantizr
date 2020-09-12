@@ -59,6 +59,16 @@ export class ExportDlg extends DialogBase {
                     getValue: (): boolean => {
                         return this.getState().exportType === "tar.gz";
                     }
+                }),
+                new RadioButton("Text", false, "exportTypeGroup", null, {
+                    setValue: (checked: boolean): void => {
+                        if (checked) {
+                            this.mergeState({ exportType: "text" });
+                        }
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().exportType === "text";
+                    }
                 })
 
                 // had to disable PDF, because PDFBox hangs in Java, and until they fix that bug

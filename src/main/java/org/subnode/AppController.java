@@ -94,6 +94,7 @@ import org.subnode.response.ShutdownServerNodeResponse;
 import org.subnode.service.AclService;
 import org.subnode.service.AttachmentService;
 import org.subnode.service.ExportTarService;
+import org.subnode.service.ExportTextService;
 import org.subnode.service.ExportZipService;
 import org.subnode.service.IPFSService;
 import org.subnode.service.ImportBookService;
@@ -529,7 +530,10 @@ public class AppController implements ErrorController {
 			// SpringContextUtil.getBean(ExportPdfService.class);
 			// svc.export(null, req, res);
 			// }
-			if ("zip".equalsIgnoreCase(req.getExportExt())) {
+			if ("text".equalsIgnoreCase(req.getExportExt())) {
+				ExportTextService svc = (ExportTextService)SpringContextUtil.getBean(ExportTextService.class);
+				svc.export(ms, req, res);
+			} else if ("zip".equalsIgnoreCase(req.getExportExt())) {
 				ExportZipService svc = (ExportZipService) SpringContextUtil.getBean(ExportZipService.class);
 				svc.export(ms, req, res);
 			} else if ("tar".equalsIgnoreCase(req.getExportExt())) {
