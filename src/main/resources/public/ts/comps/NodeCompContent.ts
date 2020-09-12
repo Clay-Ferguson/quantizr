@@ -46,9 +46,7 @@ export class NodeCompContent extends Div {
         let children: CompIntf[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
 
-        //todo-0: make this a NodeProp constant
-        this.maybeRenderDateTime(children, "date", "Date", node);
-        this.maybeRenderDateTime(children, "dueDate", "Due Date", node);
+        this.maybeRenderDateTime(children, J.NodeProp.DATE, "Date", node);
 
         if (state.showProperties) {
             let propTable = S.props.renderProperties(node.properties);

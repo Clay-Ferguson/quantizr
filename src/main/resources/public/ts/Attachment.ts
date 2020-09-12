@@ -99,8 +99,6 @@ export class Attachment implements AttachmentIntf {
 
     deleteAttachmentResponse = (res: J.DeleteAttachmentResponse, id: string, state: AppState): void => {
         if (S.util.checkSuccess("Delete attachment", res)) {
-            this.removeBinaryPropertiesById(id, state);
-
             //but for now just do a dispatch that forces a refresh from client memory (not server)
             fastDispatch({
                 type: "Action_FastRefresh",
@@ -109,12 +107,6 @@ export class Attachment implements AttachmentIntf {
                 }
             });
         }
-    }
-
-    //todo-0: remove this?
-    removeBinaryPropertiesById = (id: string, state: AppState): any => {
-        //if (!state.node || !state.node.children) return;
-        //let node = state.node.children.find(node => node.id === id);
     }
 
     removeBinaryProperties = (node: J.NodeInfo) => {

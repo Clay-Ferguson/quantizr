@@ -47,24 +47,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class EditNodeDlg extends DialogBase {
     header: Header;
-    buttonBar: ButtonBar;
-    propsButtonBar: ButtonBar;
-    //help: TextContent;
     propertyEditFieldContainer: Div;
-
-    //todo-0: some of these vars are not needed. not used.
-    wordWrapCheckBox: Checkbox;
-    inlineChildrenCheckBox: Checkbox;
-    saveNodeButton: Button;
     uploadButton: Button;
-    shareButton: Button;
     deleteUploadButton: Button;
-    setTypeButton: Button;
-    encryptionButton: Button;
-    insertTimeButton: Button;
-    addPropertyButton: Button;
     deletePropButton: Button;
-    cancelButton: Button;
 
     //maps the DOM ids of dom elements the property that DOM element is editing.
     compIdToPropMap: { [key: string]: J.PropertyInfo } = {};
@@ -227,7 +213,7 @@ export class EditNodeDlg extends DialogBase {
         ];
 
         let optionsBar = new Div("", null, [
-            this.wordWrapCheckBox = new Checkbox("Word Wrap", {
+            new Checkbox("Word Wrap", {
                 className: "marginRight"
             }, {
                 setValue: (checked: boolean): void => {
@@ -247,7 +233,7 @@ export class EditNodeDlg extends DialogBase {
             //     className: "marginRight",
             // }, this.makeCheckboxPropValueHandler(J.NodeProp.SAVE_TO_IPFS)),
 
-            this.inlineChildrenCheckBox = state.node.hasChildren ? new Checkbox("Inline Children", null,
+            state.node.hasChildren ? new Checkbox("Inline Children", null,
                 this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null
         ]);
 
@@ -339,13 +325,13 @@ export class EditNodeDlg extends DialogBase {
         let allowPropertyAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
 
         if (allowPropertyAdd) {
-            this.propsButtonBar = new ButtonBar([
-                this.addPropertyButton = new Button("Add Property", this.addProperty),
+            let propsButtonBar: ButtonBar = new ButtonBar([
+                new Button("Add Property", this.addProperty),
                 this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick)
             ]);
 
             this.deletePropButton.setEnabled(false);
-            propsParent.addChild(this.propsButtonBar);
+            propsParent.addChild(propsButtonBar);
         }
 
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
@@ -420,20 +406,19 @@ export class EditNodeDlg extends DialogBase {
 
         let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
-        return this.buttonBar = new ButtonBar([
-            this.saveNodeButton = new Button("Save", () => {
+        return new ButtonBar([
+            new Button("Save", () => {
                 this.saveNode();
                 this.close();
             }, null, "btn-primary"),
 
-            //todo-0: some of these actual variables don't need to exist.
-            this.cancelButton = new Button("Cancel", this.cancelEdit, null, "btn-secondary bigMarginRight"),
+            new Button("Cancel", this.cancelEdit, null, "btn-secondary bigMarginRight"),
 
             this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
-            this.shareButton = allowShare ? new Button("Share", this.share) : null,
+            allowShare ? new Button("Share", this.share) : null,
 
-            this.setTypeButton = !typeLocked ? new Button("Type", this.openChangeNodeTypeDlg) : null,
-            this.encryptionButton = !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
+            !typeLocked ? new Button("Type", this.openChangeNodeTypeDlg) : null,
+            !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
 
             new Button("Delete", () => {
                 S.edit.deleteSelNodes(state.node.id, false);
@@ -710,7 +695,7 @@ export class EditNodeDlg extends DialogBase {
                 // todo-0: It's time to fix this now. Add types (for date)
                 // todo-1: eventually we will have data types, but for now we use a hack
                 // to detect to treat a string as a date based on its property name.
-                if (propEntry.name === "dueDate" || propEntry.name === "date") {
+                if (propEntry.name === "date") {
 
                     //Ensure we have set the default time if none is yet set.
                     let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
