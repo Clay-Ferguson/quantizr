@@ -6,6 +6,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Main } from "./Main";
 import React, { ReactNode } from "react";
+import { dispatch } from "../AppRedux";
 
 /* ========= WARNING ========= 
 Do not re-arrange these imports because fullcalendar will have a problem if you do!!! It needs to load them in this order.
@@ -13,7 +14,7 @@ Do not re-arrange these imports because fullcalendar will have a problem if you 
 import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, formatDate } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
+import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -22,7 +23,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FullScreenCalendar extends Main {
 
-    static lastClickTime: number;
+    static lastClickTime: Date;
 
     state: AppState;
 
@@ -38,36 +39,46 @@ export class FullScreenCalendar extends Main {
         return React.createElement(FullCalendar, {
             plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
             headerToolbar: {
-                left: "prev,next today",
-                center: "addEventButton",
+                left: "prev,next today addEventButton",
+                center: "title",
                 right: "dayGridMonth,timeGridWeek,timeGridDay"
             },
+            initialDate: FullScreenCalendar.lastClickTime || new Date(), //this.state.selectedCalendarDate,
             initialView: "dayGridMonth",
-            editable: true,
-            selectable: true,
+            editable: false,
+            selectable: false,
             selectMirror: true,
             dayMaxEvents: true,
             //weekends: this.state.weekendsVisible,
             initialEvents: this.state.calendarData, // alternatively, use the `events` setting to fetch from a feed
-            select: this.handleDateSelect,
+            dateClick: this.dateClick,
+            //select: this.handleDateSelect,
             eventContent: renderEventContent,
             eventClick: this.handleEventClick,
             // eventsSet: {this.handleEvents}
 
             customButtons: {
                 addEventButton: {
-                    text: "Add Event",
+                    text: "Add",
                     click: () => {
-                        S.edit.addCalendarEntry(FullScreenCalendar.lastClickTime, this.state);
+                        if (!FullScreenCalendar.lastClickTime) {
+                            FullScreenCalendar.lastClickTime = new Date();
+                        }
+                        S.edit.addCalendarEntry(FullScreenCalendar.lastClickTime.getTime(), this.state);
                     }
                 }
             }
         }, null);
     }
 
-    //todo-0: get correct type here (it IS available)
-    handleDateSelect = (selectInfo: any) => {
-        FullScreenCalendar.lastClickTime = (selectInfo.start as Date).getTime();
+    dateClick = (dateClick: DateClickArg): void => {
+        FullScreenCalendar.lastClickTime = dateClick.date;
+        let calendarApi = dateClick.view.calendar;
+        calendarApi.changeView("timeGridDay");
+        calendarApi.gotoDate(dateClick.date);
+    }
+
+    handleDateSelect = (selectInfo: DateSelectArg) => {
     }
 
     handleEventClick = (clickInfo: EventClickArg) => {
