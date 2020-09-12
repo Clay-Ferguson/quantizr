@@ -160,6 +160,20 @@ export class EditNodeDlg extends DialogBase {
         return null;
     }
 
+    getTitleText(): string {
+        let state = this.getState();
+        let ret = null;
+
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+        if (typeHandler) {
+            ret = typeHandler.getName();
+        }
+        else {
+            ret = "Edit";
+        }
+        return ret;
+    }
+
     getExtraTitleBarComps(): CompIntf[] {
         let state = this.getState();
         let comps: CompIntf[] = [];

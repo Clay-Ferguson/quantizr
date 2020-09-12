@@ -143,14 +143,19 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         return null;
     }
 
+    getTitleText(): string {
+        return null;
+    }
+
     preRender(): void {
         let timesIcon: Comp;
         //Dialog Header with close button (x) right justified on it.
         const children: CompIntf[] = [];
 
         const titleIconComp: CompIntf = this.getTitleIconComp();
+        const titleText: string = this.getTitleText();
         const extraHeaderComps = this.getExtraTitleBarComps();
-        let titleChildren: CompIntf[] = [titleIconComp, new Span(this.title)];
+        let titleChildren: CompIntf[] = [titleIconComp, new Span(titleText || this.title)];
 
         if (extraHeaderComps) {
             titleChildren = titleChildren.concat(extraHeaderComps);
