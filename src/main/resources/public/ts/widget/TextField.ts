@@ -20,13 +20,16 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     input: Input;
     icon: ToggleIcon;
 
-    constructor(public label: string, private isPassword: boolean,
-        private onEnterKey: () => void, private valueIntf: ValueIntf) {
+    constructor(public label: string, private isPassword: boolean, private onEnterKey: () => void, private inputClasses: string, private valueIntf: ValueIntf) {
         super(null);
         S.util.mergeProps(this.attribs, {
             name: this.getId(),
             className: "form-group"
         });
+
+        if (inputClasses === null) {
+            inputClasses = "";
+        }
 
         this.mergeState({
             inputType: isPassword ? "password" : "text"
@@ -49,7 +52,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         };
     }
 
-    setError(error: string) : void {
+    setError(error: string): void {
         this.mergeState({ error });
     }
 
@@ -98,7 +101,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
                 style: { fontFamily: "monospace" }
             }, [
                 this.input = new Input({
-                    className: "form-control pre-textfield",
+                    className: "form-control pre-textfield " + this.inputClasses,
                     type: state.inputType,
                     value: this.valueIntf.getValue()
                 }),
@@ -107,11 +110,11 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
                 }, [
                     new Anchor(null, null, {
                         onClick: (evt) => {
-                            evt.preventDefault(); 
+                            evt.preventDefault();
                             this.mergeState({
                                 inputType: state.inputType === "password" ? "text" : "password"
                             });
-                            this.icon._toggleClass(); 
+                            this.icon._toggleClass();
                         }
                     }, [
                         this.icon = new ToggleIcon("fa-eye-slash", "fa-eye", {

@@ -27,4 +27,5 @@ export interface PropsIntf {
     hasVideo(node: J.NodeInfo): boolean;
     getCryptoKey(node: J.NodeInfo, state: AppState): string;
     transferBinaryProps(srcNode: J.NodeInfo, dstNode: J.NodeInfo): void;
+    getInputClassForType(typeName: string): string;
 }

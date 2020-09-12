@@ -38,7 +38,7 @@ export class EditCredentialsDlg extends DialogBase<EditCredentialsDlgState> {
                 " credentials here to enable saving files permanently to IPFS."),
             new Form(null, [
                 new FormGroup(null, [
-                    new TextField("User", false, null, {
+                    new TextField("User", false, null, null, {
                         getValue: (): string => {
                             return this.getState().user;
                         },
@@ -46,7 +46,7 @@ export class EditCredentialsDlg extends DialogBase<EditCredentialsDlgState> {
                             this.mergeState({ user: val });
                         }
                     }),
-                    new TextField("Password", true, null, {
+                    new TextField("Password", true, null, null, {
                         getValue: (): string => {
                             return this.getState().password;
                         },

@@ -104,7 +104,7 @@ export class SplitNodeDlg extends DialogBase {
                 })
             ], "form-group-border marginBottom"),
 
-            (this.getState().splitMode === "custom") ? new TextField("Delimiter", false, null, {
+            (this.getState().splitMode === "custom") ? new TextField("Delimiter", false, null, null, {
                 getValue: (): string => {
                     return this.getState().delimiter;
                 },

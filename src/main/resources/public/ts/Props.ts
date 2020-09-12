@@ -17,6 +17,7 @@ export class Props implements PropsIntf {
 
     readOnlyPropertyList: Set<string> = new Set<string>();
     allBinaryProps: Set<string> = new Set<string>();
+    //allProps: Map<string, J.NodeProp> = new Map<string, J.NodeProp>();
 
     /* Holds the list of properties that are edited using something like a checkbox, or dropdown menu, or whatever, such
     that it would never make sense to display an edit field for editing their value in the editor */
@@ -271,6 +272,15 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
             J.NodeProp.IMG_SIZE,
             J.NodeProp.CHILDREN_IMG_SIZES
         ]);
+    }
+
+    /* This is kind of a hard-coded hack for the one particular type name
+    where we are using it, but needs to work for all properties */
+    getInputClassForType = (typeName: string): string => {
+        if (typeName === "duration") {
+            return "durationTypeInput";
+        }
+        return null;
     }
 
     // /*

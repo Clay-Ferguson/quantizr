@@ -285,7 +285,7 @@ export class EditNodeDlg extends DialogBase {
 
         let nodeNameTextField = null;
         if (!customProps) {
-            nodeNameTextField = new TextField("Node Name", false, null, {
+            nodeNameTextField = new TextField("Node Name", false, null, null, {
                 setValue: (val: string): void => {
                     this.getState().node.name = val || "";
                     nodeNameTextField.forceRender();
@@ -312,6 +312,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         if (state.node.properties) {
+            // This loop creates all the editor input fields for all the properties
             state.node.properties.forEach((prop: J.PropertyInfo) => {
 
                 if (!allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
@@ -622,7 +623,7 @@ export class EditNodeDlg extends DialogBase {
     makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean): EditPropsTableRow => {
         let tableRow = new EditPropsTableRow();
         let allowEditAllProps: boolean = this.appState.isAdminUser;
-        //console.log("Property single-type: " + propEntry.property.name);
+        // console.log("Property single-type: " + propEntry.name);
 
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
 
@@ -706,6 +707,7 @@ export class EditNodeDlg extends DialogBase {
                 }
             }
             else {
+                // todo-0: It's time to fix this now. Add types (for date)
                 // todo-1: eventually we will have data types, but for now we use a hack
                 // to detect to treat a string as a date based on its property name.
                 if (propEntry.name === "dueDate" || propEntry.name === "date") {
@@ -720,7 +722,7 @@ export class EditNodeDlg extends DialogBase {
                 }
                 else {
                     //console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
-                    valEditor = new TextField(null, false, null, valueIntf);
+                    valEditor = new TextField(null, false, null, S.props.getInputClassForType(propEntry.name), valueIntf);
                 }
             }
 
