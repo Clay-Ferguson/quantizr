@@ -45,6 +45,8 @@ export class AppState {
     fullScreenCalendarId: string = null;
 
     calendarData: EventInput[];
+    calendarShowWeekends: boolean = false;
+
     fullScreenImageSize: string = "100%";
 
     userPreferences: J.UserPreferences = {

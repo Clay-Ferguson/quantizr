@@ -39,18 +39,18 @@ export class FullScreenCalendar extends Main {
         return React.createElement(FullCalendar, {
             plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
             headerToolbar: {
-                left: "prev,next today addEventButton",
+                left: "prev,next today,weekendsEventButton,addEventButton",
                 center: "title",
                 right: "dayGridMonth,timeGridWeek,timeGridDay"
             },
-            initialDate: FullScreenCalendar.lastClickTime || new Date(), //this.state.selectedCalendarDate,
+            initialDate: FullScreenCalendar.lastClickTime || new Date(), 
             initialView: "dayGridMonth",
             editable: false,
             selectable: false,
             selectMirror: true,
             dayMaxEvents: true,
-            //weekends: this.state.weekendsVisible,
-            initialEvents: this.state.calendarData, // alternatively, use the `events` setting to fetch from a feed
+            weekends: this.state.calendarShowWeekends,
+            initialEvents: this.state.calendarData, 
             dateClick: this.dateClick,
             //select: this.handleDateSelect,
             eventContent: renderEventContent,
@@ -59,12 +59,23 @@ export class FullScreenCalendar extends Main {
 
             customButtons: {
                 addEventButton: {
-                    text: "Add",
+                    text: "add",
                     click: () => {
                         if (!FullScreenCalendar.lastClickTime) {
                             FullScreenCalendar.lastClickTime = new Date();
                         }
                         S.edit.addCalendarEntry(FullScreenCalendar.lastClickTime.getTime(), this.state);
+                    }
+                },
+                weekendsEventButton: {
+                    text: "weekend",
+                    click: () => {
+                        dispatch({
+                            type: "Action_CalendarToggleWeekends",
+                            update: (s: AppState): void => {
+                                s.calendarShowWeekends = !this.state.calendarShowWeekends;
+                            }
+                        });
                     }
                 }
             }
