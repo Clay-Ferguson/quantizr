@@ -1453,6 +1453,15 @@ Media Queries below are per Bootstap 4 standard */
     overflow-y: auto;
 }
 
+.breadcrumbItem {
+    cursor: pointer;
+}
+
+.breadcrumbSlash {
+    font-weight: 900;
+    font-size: 1.2em;
+}
+
 // All the following is part of CalendarDemo and will be going away soon
 
 .demo-app {

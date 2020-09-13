@@ -55,12 +55,19 @@ export class BreadcrumbsPanel extends NavTag {
                     }
                 }
 
-                children.push(new Button(bc.name, () => {
-                    S.view.refreshTree(bc.id, true, bc.id, false, false, true, true, state);
-                }, null, "btn-primary marginRight"));
+                if (children.length > 0) {
+                    children.push(new Span("/", {
+                        className: "marginRight breadcrumbSlash"
+                    }));
+                }
+
+                children.push(new Span(bc.name, {
+                    onClick: () => { S.view.refreshTree(bc.id, true, bc.id, false, false, true, true, state); },
+                    className: "marginRight breadcrumbItem"
+                }));
             }
             else {
-                children.push(new Span("<-- more", { className: "marginRight" }));
+                children.push(new Span("...", { className: "marginRight" }));
             }
         });
 
