@@ -41,19 +41,6 @@
     <link rel="stylesheet" th:href="'/css/meta64.css?v='+${MAIN_CSS_HASH}" />
     <link rel="stylesheet" th:href="'/css/highlightjs/darcula.css?v='+${DARCULA_CSS_HASH}" />
 
-    <script th:inline="none">
-        /*<![CDATA[*/
-        MathJax = {
-            tex: {
-                //warning: don't remove the space between the square braces here or that will trigger thymeleaf to pick up 
-                //the string and try to interpret it. Also the "th:inline: none" all by itself can fix this too, which we do use.
-                inlineMath: [ ['[math]', '[/math]'] ]
-            }
-        };
-        /*]]>*/
-    </script>
-    <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-
     <!-- #recaptcha-disabled
     <script src="https://www.google.com/recaptcha/api.js?render=<%=htmlWebpackPlugin.options.reCaptcha3SiteKey%>"></script>
     
@@ -108,11 +95,23 @@
         }
     </script>
 
-    <script th:src="'/js/dropzone/dropzone.js?v='+${DROPZONE_JS_HASH}"></script>
-    <script th:src="'/js/ace/src-noconflict/ace.js?v='+${ACE_JS_HASH}"></script>
-
     <div id="overlayDiv" class="overlay"></div>
 
+    <script th:inline="none">
+        /*<![CDATA[*/
+        MathJax = {
+            tex: {
+                //warning: don't remove the space between the square braces here or that will trigger thymeleaf to pick up 
+                //the string and try to interpret it. Also the "th:inline: none" all by itself can fix this too, which we do use.
+                inlineMath: [ ['[math]', '[/math]'] ]
+            }
+        };
+        /*]]>*/
+    </script>
+    <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <script th:src="'/js/dropzone/dropzone.js?v='+${DROPZONE_JS_HASH}"></script>
+    <script th:src="'/js/ace/src-noconflict/ace.js?v='+${ACE_JS_HASH}"></script>
     <script type="text/javascript" th:src="'bundle.js?v='+${BUNDLE_JS_HASH}"></script>
 
 </body>
