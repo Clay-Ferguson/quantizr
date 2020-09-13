@@ -36,50 +36,53 @@ export class FullScreenCalendar extends Main {
             console.log("Can't find nodeId " + nodeId);
         }
 
-        return React.createElement(FullCalendar, {
-            plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-            headerToolbar: {
-                left: "prev,next today,weekendsEventButton,addEventButton",
-                center: "title",
-                right: "dayGridMonth,timeGridWeek,timeGridDay"
-            },
-            initialDate: FullScreenCalendar.lastClickTime || new Date(), 
-            initialView: "dayGridMonth",
-            editable: false,
-            selectable: false,
-            selectMirror: true,
-            dayMaxEvents: true,
-            weekends: this.state.calendarShowWeekends,
-            initialEvents: this.state.calendarData, 
-            dateClick: this.dateClick,
-            //select: this.handleDateSelect,
-            eventContent: renderEventContent,
-            eventClick: this.handleEventClick,
-            // eventsSet: {this.handleEvents}
-
-            customButtons: {
-                addEventButton: {
-                    text: "add",
-                    click: () => {
-                        if (!FullScreenCalendar.lastClickTime) {
-                            FullScreenCalendar.lastClickTime = new Date();
-                        }
-                        S.edit.addCalendarEntry(FullScreenCalendar.lastClickTime.getTime(), this.state);
-                    }
+        return S.e("div", {
+            className: "marginTop"
+        },
+            S.e(FullCalendar, {
+                plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+                headerToolbar: {
+                    left: "prev,next today,weekendsEventButton,addEventButton",
+                    center: "title",
+                    right: "dayGridMonth,timeGridWeek,timeGridDay"
                 },
-                weekendsEventButton: {
-                    text: "weekend",
-                    click: () => {
-                        dispatch({
-                            type: "Action_CalendarToggleWeekends",
-                            update: (s: AppState): void => {
-                                s.calendarShowWeekends = !this.state.calendarShowWeekends;
+                initialDate: FullScreenCalendar.lastClickTime || new Date(),
+                initialView: "dayGridMonth",
+                editable: false,
+                selectable: false,
+                selectMirror: true,
+                dayMaxEvents: true,
+                weekends: this.state.calendarShowWeekends,
+                initialEvents: this.state.calendarData,
+                dateClick: this.dateClick,
+                //select: this.handleDateSelect,
+                eventContent: renderEventContent,
+                eventClick: this.handleEventClick,
+                // eventsSet: {this.handleEvents}
+
+                customButtons: {
+                    addEventButton: {
+                        text: "add",
+                        click: () => {
+                            if (!FullScreenCalendar.lastClickTime) {
+                                FullScreenCalendar.lastClickTime = new Date();
                             }
-                        });
+                            S.edit.addCalendarEntry(FullScreenCalendar.lastClickTime.getTime(), this.state);
+                        }
+                    },
+                    weekendsEventButton: {
+                        text: "weekend",
+                        click: () => {
+                            dispatch({
+                                type: "Action_CalendarToggleWeekends",
+                                update: (s: AppState): void => {
+                                    s.calendarShowWeekends = !this.state.calendarShowWeekends;
+                                }
+                            });
+                        }
                     }
                 }
-            }
-        }, null);
+            }, null));
     }
 
     dateClick = (dateClick: DateClickArg): void => {

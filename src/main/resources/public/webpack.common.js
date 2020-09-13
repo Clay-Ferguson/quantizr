@@ -42,7 +42,6 @@ module.exports = {
                 loader: "source-map-loader"
             },
 
-            //todo-0: with this we can load our css in index.tsx and not index.html now right?
             {
                 test: /\.css$/i,
                 use: ["style-loader", "css-loader"]

@@ -54,6 +54,12 @@ export class TypeBase implements TypeHandlerIntf {
         return null;
     }
 
+    hasCustomProp = (prop: string): boolean => {
+        let customProps = this.getCustomProperties();
+        if (!customProps) return false;
+        return !!customProps.find(p => p === prop);
+    }
+
     /* Types can override this to ensure that during node editing there is a hook to prefill and create any properties that are
     required to exist on that type of node in case they aren't existing yet */
     ensureDefaultProperties(node: J.NodeInfo) {

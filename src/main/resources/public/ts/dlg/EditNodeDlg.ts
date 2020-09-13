@@ -188,9 +188,6 @@ export class EditNodeDlg extends DialogBase {
 
         let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
 
-        //regardless of value, if this property is present we consider the type locked
-        //let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
-
         //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
         //to dangerously opt into this also without hacking the code with this var.
         let allowEditAllProps: boolean = this.appState.isAdminUser;
@@ -284,13 +281,15 @@ export class EditNodeDlg extends DialogBase {
         }
 
         if (allowContentEdit) {
+            let hasContentProp = typeHandler && typeHandler.hasCustomProp("content");
+            
             //We use 4 rows instead of 15 only if this is a customProps node.
             let rows = "15";
-            if (customProps && !!customProps.find(p => p === "content")) {
+            if (customProps && hasContentProp) {
                 rows = "4";
             }
 
-            if (!customProps || (customProps && !!customProps.find(p => p === "content"))) {
+            if (!customProps || hasContentProp) {
                 let contentTableRow = this.makeContentEditorFormGroup(state.node, isWordWrap, rows);
                 mainPropsTable.addChild(contentTableRow);
                 this.contentEditor.setWordWrap(isWordWrap);

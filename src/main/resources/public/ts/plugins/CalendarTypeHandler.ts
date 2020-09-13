@@ -40,7 +40,6 @@ export class CalendarTypeHandler extends TypeBase {
         return false;
     }
 
-    // todo-0: we don't need this because we can just assume if "content" is in getCustomProperties we edit it.
     getAllowContentEdit(): boolean {
         return true;
     }

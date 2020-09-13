@@ -19,4 +19,5 @@ export interface TypeHandlerIntf {
     getAllowContentEdit(): boolean;
     getEditLabelForProp(propName: string): string;
     getAllowUserSelect(): boolean;
+    hasCustomProp(prop: string): boolean;
 }
