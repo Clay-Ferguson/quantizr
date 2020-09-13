@@ -17,9 +17,9 @@
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
 
-        //make this only DEV.
-        "sourceMap": true,
-        "inlineSources": true,
+        //todo-0: make this only DEV.
+        // "sourceMap": true,
+        // "inlineSources": true,
 
         "noEmitOnError": true,
         "noEmit": true,
