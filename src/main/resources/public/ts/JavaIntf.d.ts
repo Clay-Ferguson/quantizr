@@ -71,6 +71,10 @@ export interface FileSystemReindexRequest extends RequestBase {
     nodeId: string;
 }
 
+export interface GetBreadcrumbsRequest extends RequestBase {
+    nodeId: string;
+}
+
 export interface GetFriendsRequest extends RequestBase {
 }
 
@@ -328,6 +332,10 @@ export interface FriendInfo {
     userName: string;
 }
 
+export interface GetBreadcrumbsResponse extends ResponseBase {
+    breadcrumbs: BreadcrumbInfo[];
+}
+
 export interface GetFriendsResponse extends ResponseBase {
     friends: FriendInfo[];
 }
@@ -540,6 +548,12 @@ export interface UserPreferences {
     importAllowed: boolean;
     exportAllowed: boolean;
     maxUploadFileSize: number;
+}
+
+export interface BreadcrumbInfo {
+    id: string;
+    name: string;
+    type: string;
 }
 
 export interface AccessControlInfo {

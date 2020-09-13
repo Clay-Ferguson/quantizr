@@ -46,6 +46,7 @@ import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.DeletePropertyRequest;
 import org.subnode.request.ExecuteNodeRequest;
 import org.subnode.request.ExportRequest;
+import org.subnode.request.GetBreadcrumbsRequest;
 import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.GetServerInfoRequest;
@@ -482,6 +483,13 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req, HttpSession session) {
 		return callProc.run("getNodePrivileges", req, session, ms -> {
 			return aclService.getNodePrivileges(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/getBreadcrumbs", method = RequestMethod.POST)
+	public @ResponseBody Object getBreadcrumbs(@RequestBody GetBreadcrumbsRequest req, HttpSession session) {
+		return callProc.run("getBreadcrumbs", req, session, ms -> {
+			return nodeRenderService.getBreadcrumbs(ms, req);
 		});
 	}
 

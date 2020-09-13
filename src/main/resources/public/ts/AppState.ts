@@ -49,6 +49,10 @@ export class AppState {
 
     fullScreenImageSize: string = "100%";
 
+    //holds array of all parent items all the way up the tree (as far as user is authorized)
+    //for some reason BreadcrumbInfo type isn't getting generated?? I'll worry about that later (todo-0)
+    breadcrumbs: J.BreadcrumbInfo[];
+
     userPreferences: J.UserPreferences = {
         editMode: false,
         importAllowed: false,

@@ -294,6 +294,7 @@ export class Render implements RenderIntf {
                         S.view.scrollToSelectedNode(s);
                     }
 
+                    this.refreshBreadcrumbs(s);
                     return s;
                 }
             });
@@ -305,6 +306,22 @@ export class Render implements RenderIntf {
         catch (err) {
             console.error("render failed.");
         }
+    }
+
+    refreshBreadcrumbs = (state: AppState): void => {
+        if (!state.node) return;
+
+        S.util.ajax<J.GetBreadcrumbsRequest, J.GetBreadcrumbsResponse>("getBreadcrumbs", {
+            nodeId: state.node.id
+        }, (res: J.GetBreadcrumbsResponse) => {
+            dispatch({
+                type: "Action_RefreshBreadcrumbs",
+                state,
+                update: (s: AppState): void => {
+                    s.breadcrumbs = res.breadcrumbs;
+                }
+            });
+        });
     }
 
     renderChildren = (node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp => {

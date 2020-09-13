@@ -13,6 +13,7 @@ import { MainNavPanel } from "./MainNavPanel";
 import { RightNavPanel } from "./RightNavPanel";
 import { TabPanel } from "./TabPanel";
 import { FullScreenCalendar } from "./FullScreenCalendar";
+import { BreadcrumbsPanel } from "./BreadcrumbsPanel";
 
 export class App extends Div {
     tabPanel: TabPanel = null;
@@ -46,8 +47,11 @@ export class App extends Div {
             fullScreenViewer = new FullScreenCalendar();
         }
 
+        let showBreadcrumbs = appState.breadcrumbs && appState.breadcrumbs.length > 0;
+
         this.setChildren([
             new Div(null, { role: "toolbar" }, [new MainNavPanel(null)]),
+            showBreadcrumbs ? new BreadcrumbsPanel() : null,
             //For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
             //both get sized right with no overlapping.
             fullScreenViewer ||

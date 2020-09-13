@@ -1448,6 +1448,11 @@ Media Queries below are per Bootstap 4 standard */
     max-width: 8em;
 }
 
+.breadcrumbPanel {
+    max-height: 5em;
+    overflow-y: auto;
+}
+
 // All the following is part of CalendarDemo and will be going away soon
 
 .demo-app {

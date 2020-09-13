@@ -20,6 +20,7 @@ import org.subnode.config.ConstantsProvider;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
+import org.subnode.model.BreadcrumbInfo;
 import org.subnode.model.CalendarItem;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeProp;
@@ -27,9 +28,11 @@ import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.request.GetBreadcrumbsRequest;
 import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.RenderCalendarRequest;
 import org.subnode.request.RenderNodeRequest;
+import org.subnode.response.GetBreadcrumbsResponse;
 import org.subnode.response.InitNodeEditResponse;
 import org.subnode.response.RenderCalendarResponse;
 import org.subnode.response.RenderNodeResponse;
@@ -608,6 +611,64 @@ public class NodeRenderService {
 			item.setStart(n.getIntProp(NodeProp.DATE.s()));
 			item.setEnd(item.getStart() + duration);
 			items.add(item);
+		}
+
+		return res;
+	}
+
+	public GetBreadcrumbsResponse getBreadcrumbs(MongoSession session, GetBreadcrumbsRequest req) {
+		GetBreadcrumbsResponse res = new GetBreadcrumbsResponse();
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+
+		LinkedList<BreadcrumbInfo> list = new LinkedList<>();
+		res.setBreadcrumbs(list);
+
+		try {
+			String targetId = req.getNodeId();
+			//log.debug("getBreadcrumbs: targetId=" + targetId);
+			SubNode node = read.getNode(session, targetId);
+			if (node != null) {
+				node = read.getParent(session, node);
+			}
+
+			while (node != null) {
+				BreadcrumbInfo bci = new BreadcrumbInfo();
+				if (list.size() >= 7) {
+					bci.setId("");
+					list.add(0, bci);
+					break;
+				}
+				
+				String content = node.getContent();
+				if (content == null) {
+					content = "";
+				}
+				content = content.trim();
+				content = XString.truncateAfterFirst(content, "\n");
+				content = XString.truncateAfterFirst(content, "\r");
+				while (content.startsWith("#")) {
+					content = content.substring(1);
+				}
+
+				if (content.length() > 30) {
+					content = content.substring(0, 30) + "...";
+				}
+				bci.setName(content);
+				bci.setId(node.getId().toHexString());
+				bci.setType(node.getType());
+				list.add(0, bci);
+
+				node = read.getParent(session, node);
+			}
+		} catch (Exception e) {
+			/*
+			 * this is normal for users to wind up here because looking up the tree always
+			 * ends at a place they can't access, and whatever paths we accumulated until
+			 * this access error is what we do want to return so we just return everything
+			 * as is by ignoring this exception
+			 */
 		}
 
 		return res;
