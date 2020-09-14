@@ -19,6 +19,7 @@ export interface Meta64Intf {
     curHighlightNodeCompRow: CompIntf;
 
     draggableId: string;
+    fadeStartTime: number;
 
     /* doesn't need to be in state */
     userName: string;

@@ -40,6 +40,7 @@ export class NodeCompMainNode extends Div {
         if (S.render.fadeInId === node.id) { 
             S.render.fadeInId = null;
             this.attribs.className += " fadeInRowBkgClz";
+            S.meta64.fadeStartTime = new Date().getTime();
         }
 
         this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);

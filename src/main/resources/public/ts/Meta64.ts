@@ -39,6 +39,10 @@ export class Meta64 implements Meta64Intf {
     is over the icon */
     public draggableId: string = null;
 
+    //use this to know how long to delay the refresh for breadrumbs should wait to keep from interrupting the fade effect
+    //by doing which would happen if it rendered before the fade effect was complete. (see fadeInRowBkgClz)
+    public fadeStartTime: number = 0;
+
     /* We save userName+password in these vars to pass in every request
     so that we can log back in again silently after any session timeout */
     userName: string;

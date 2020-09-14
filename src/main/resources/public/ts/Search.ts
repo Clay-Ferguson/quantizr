@@ -151,6 +151,7 @@ export class Search implements SearchIntf {
         if (S.render.fadeInId === node.id) {
             S.render.fadeInId = null;
             clazz += " fadeInRowBkgClz";
+            S.meta64.fadeStartTime = new Date().getTime();
         }
 
         if (isFeed) {

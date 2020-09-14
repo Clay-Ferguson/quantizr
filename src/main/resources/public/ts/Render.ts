@@ -79,7 +79,6 @@ export class Render implements RenderIntf {
             tables: true,
             breaks: false,
             pedantic: false,
-            sanitize: true,
             smartLists: true,
             smartypants: false
         });
@@ -314,13 +313,26 @@ export class Render implements RenderIntf {
         S.util.ajax<J.GetBreadcrumbsRequest, J.GetBreadcrumbsResponse>("getBreadcrumbs", {
             nodeId: state.node.id
         }, (res: J.GetBreadcrumbsResponse) => {
-            dispatch({
-                type: "Action_RefreshBreadcrumbs",
-                state,
-                update: (s: AppState): void => {
-                    s.breadcrumbs = res.breadcrumbs;
-                }
-            });
+
+            //we calculate an addDelay so we don't interrup the fading effect on the row.
+            let addDelay = 1;
+            let now = new Date().getTime();
+
+            // This 3000 must match the fade time for 'fadeInRowBkgClz' class animation-duration in the SCSS
+            if (now - S.meta64.fadeStartTime < 3000) {
+                addDelay = 3000 - (now - S.meta64.fadeStartTime);
+                if (addDelay <= 1) addDelay = 1;
+            }
+
+            setTimeout(() => {
+                dispatch({
+                    type: "Action_RefreshBreadcrumbs",
+                    state,
+                    update: (s: AppState): void => {
+                        s.breadcrumbs = res.breadcrumbs;
+                    }
+                });
+            }, addDelay);
         });
     }
 

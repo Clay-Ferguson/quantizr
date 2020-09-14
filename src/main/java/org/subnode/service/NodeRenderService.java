@@ -215,10 +215,11 @@ public class NodeRenderService {
 		int offset = scanToNode ? 0 : req.getOffset();
 
 		/*
-		 * load a LARGE number (todo-2: what should this large number be, 1000?) if we
-		 * are scanning for a specific node and we don't know what it's actual offset
-		 * is. Unfortunately this would mean broken pagination at large offsets. todo:
-		 * need to check how to do basically an SQL "offset" index here but in MongoDB.
+		 * todo-1: needed optimization to work well with large numbers of child nodes:
+		 * If scanToNode is in use, we should instead look up the node itself, and then
+		 * get it's ordinal, and use that as a '>=' in the query to pull up the list.
+		 * Note, of sort order is by a timestamp we'd need a ">=" on the timestamp
+		 * itself instead
 		 */
 		int queryLimit = scanToNode ? 1000 : offset + ROWS_PER_PAGE + 1;
 
@@ -627,7 +628,7 @@ public class NodeRenderService {
 
 		try {
 			String targetId = req.getNodeId();
-			//log.debug("getBreadcrumbs: targetId=" + targetId);
+			// log.debug("getBreadcrumbs: targetId=" + targetId);
 			SubNode node = read.getNode(session, targetId);
 			if (node != null) {
 				node = read.getParent(session, node);
@@ -640,7 +641,7 @@ public class NodeRenderService {
 					list.add(0, bci);
 					break;
 				}
-				
+
 				String content = node.getContent();
 				if (content == null) {
 					content = "";
