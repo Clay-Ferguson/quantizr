@@ -5,13 +5,6 @@ package org.subnode.model;
  */
 public class PropertyInfo {
 	private String name;
-
-	/*
-	 * Only one of these will be non-null. The property is either multi-valued or single valued
-	 * 
-	 * Also the 'value' is the actual text stored in the DB, and is assumed to be markdown for
-	 * content nodes.
-	 */
 	private String value;
 
 	public PropertyInfo() {

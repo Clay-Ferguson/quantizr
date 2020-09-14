@@ -16,11 +16,6 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
-
-        //todo-0: make this only DEV.
-        // "sourceMap": true,
-        // "inlineSources": true,
-
         "noEmitOnError": true,
         "noEmit": true,
         "watch": true,

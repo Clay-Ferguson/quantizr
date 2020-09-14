@@ -691,9 +691,8 @@ export class EditNodeDlg extends DialogBase {
                 }
             }
             else {
-                // todo-0: It's time to fix this now. Add types (for date)
-                // todo-1: eventually we will have data types, but for now we use a hack
-                // to detect to treat a string as a date based on its property name.
+                /* todo-1: eventually we will have data types, but for now we use a hack
+                to detect to treat a string as a date based on its property name. */
                 if (propEntry.name === "date") {
 
                     //Ensure we have set the default time if none is yet set.

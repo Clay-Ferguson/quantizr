@@ -22,7 +22,7 @@ export class NodeCompMarkdown extends MarkdownDiv {
 
     UPDATE: turning this ON for now, because for testing 'shared' nodes we don't have editing capability and thus need a way to decrypt
 
-    todo-0: also this is kinda broke, it shows [encrypted] upon rendering and doesn't decrypt until the row is clicked.
+    todo-0: this is not working fully, it shows [encrypted] upon rendering and doesn't decrypt until the row is clicked.
     */
     private immediateDecrypting: boolean = false;
 

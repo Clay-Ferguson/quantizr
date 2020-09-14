@@ -115,7 +115,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		if (!pathHash.equals(node.getPathHash())) {
 			dbObj.put(SubNode.FIELD_PATH_HASH, pathHash);
 			node.setPathHash(pathHash);
-			log.debug("RESET PathHash=" + pathHash);
+			// log.debug("RESET PathHash=" + pathHash);
 		}
 
 		/* Node name not allowed to contain : or ~ */
