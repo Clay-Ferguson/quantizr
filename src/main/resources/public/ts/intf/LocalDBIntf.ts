@@ -1,6 +1,6 @@
 export interface LocalDBIntf {
 
-    //we get userName from here rather than appState.userName, just for a bit less tight coupling.
+    // we get userName from here rather than appState.userName, just for a bit less tight coupling.
     userName: string;
 
     writeObject(val: Object): any;

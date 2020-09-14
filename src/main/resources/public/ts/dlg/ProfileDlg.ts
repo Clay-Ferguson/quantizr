@@ -31,7 +31,7 @@ export class ProfileDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        //let state = this.getState();
+        // let state = this.getState();
         let profileImg: CompIntf = this.makeProfileImg();
 
         let children = [
@@ -126,7 +126,7 @@ export class ProfileDlg extends DialogBase {
 
     save = (): void => {
         S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
-            userName: null, //this.userNameTextField.getValue(),
+            userName: null, // this.userNameTextField.getValue(),
             userBio: this.bioTextarea.getValue()
         }, this.saveResponse);
     }
@@ -136,7 +136,7 @@ export class ProfileDlg extends DialogBase {
             let state: AppState = store.getState();
 
             // DO NOT DELETE: this will come back eventually
-            //let userName = this.userNameTextField.getValue();
+            // let userName = this.userNameTextField.getValue();
             // dispatch({
             //     type: "Action_UpdateUserProfile", state,
             //     update: (s: AppState): void => {
@@ -176,7 +176,7 @@ export class ProfileDlg extends DialogBase {
         };
 
         if (src) {
-            //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
             let img: Img = new Img("profile-img", {
                 className: "profileImage",
                 title: "Click to upload new Profile Image",

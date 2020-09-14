@@ -21,14 +21,14 @@ export class Menu extends Div {
             new Div(this.name, {
                 className: "card-header menuHeading mb-0",
                 "data-toggle": "collapse",
-                //"data-target": "#collapse" + this.getId(),
+                // "data-target": "#collapse" + this.getId(),
                 href: "#collapse" + this.getId(),
                 role: "tab",
                 id: "heading" + this.getId(),
                 onClick: (elm) => {
                     let expanded = elm.target.getAttribute("aria-expanded") === "true";
                     Menu.activeMenu = expanded ? this.name : null;
-                    //console.log("Expand or collapse: "+name+" expan="+elm.target.getAttribute("aria-expanded"));
+                    // console.log("Expand or collapse: "+name+" expan="+elm.target.getAttribute("aria-expanded"));
                 }
             }),
 

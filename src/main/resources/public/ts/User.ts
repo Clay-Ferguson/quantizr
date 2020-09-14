@@ -135,7 +135,7 @@ export class User implements UserIntf {
 
                 S.util.ajax<J.LogoutRequest, J.LogoutResponse>("logout", {}, this.logoutResponse);
             }
-            //todo-1: everywhere in the app that I have a resolve() that isn't in a finally block needs to be checked for correctness.
+            // todo-1: everywhere in the app that I have a resolve() that isn't in a finally block needs to be checked for correctness.
             finally {
                 resolve();
             }
@@ -144,7 +144,7 @@ export class User implements UserIntf {
 
     deleteAllUserLocalDbEntries = (): Promise<any> => {
         return Promise.all([
-            //S.localDB.setVal(C.LOCALDB_LOGIN_USR, null),
+            // S.localDB.setVal(C.LOCALDB_LOGIN_USR, null),
             S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null),
             S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null)
         ]);
@@ -159,13 +159,13 @@ export class User implements UserIntf {
                         S.localDB.userName = usr;
                         if (usr) {
                             await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
-                            //set this user for the 'anon' case also meaning it'll be default when user it not logged in
+                            // set this user for the 'anon' case also meaning it'll be default when user it not logged in
                             await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr, "anon");
                         }
 
                         if (pwd) {
                             await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
-                            //set this pwd for the 'anon' case also meaning it'll be default when user it not logged in
+                            // set this pwd for the 'anon' case also meaning it'll be default when user it not logged in
                             await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd, "anon");
                         }
                         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");
@@ -207,11 +207,11 @@ export class User implements UserIntf {
                 } else {
                     console.log("LocalDb login failed.");
 
-                    //if we tried a login and it wasn't from a login dialog then just blow away the login state
-                    //so that any kind of page refresh is guaranteed to just show login dialog and not try to login
+                    // if we tried a login and it wasn't from a login dialog then just blow away the login state
+                    // so that any kind of page refresh is guaranteed to just show login dialog and not try to login
                     await this.deleteAllUserLocalDbEntries();
 
-                    //location.reload();
+                    // location.reload();
                     if (!calledFromLoginDlg) {
                         S.nav.login(state);
                     }

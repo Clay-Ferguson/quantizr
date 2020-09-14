@@ -24,8 +24,8 @@ export class MenuItem extends Div {
         let enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
 
         return this.tagRender("div", state.content, {
-            ...this.attribs, 
-            ...enablement, 
+            ...this.attribs,
+            ...enablement,
             ...{
                 style: _style,
                 className: "list-group-menu-item list-group-item-action " + enablementClass + "  list-group-transparent",
@@ -37,8 +37,8 @@ export class MenuItem extends Div {
     onClick(): void {
         let state = this.getState();
         if (!state.enabled) return;
-        
-        //Note: We're not always hosted in a dialog.
+
+        // Note: We're not always hosted in a dialog.
         if (S.mainMenu) {
             S.mainMenu.close();
         }

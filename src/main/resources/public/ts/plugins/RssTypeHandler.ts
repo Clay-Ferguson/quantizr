@@ -85,9 +85,9 @@ export class RssTypeHandler extends TypeBase {
         // Note: some RSS feeds can't be loaded in the browser due to CORS security.
         // To get around this, you can use a proxy. (todo-1: need to eliminate this proxy)
 
-        //if we find the RSS feed in the cache, use it.
-        //disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to 
-        //figure this out yet.
+        // if we find the RSS feed in the cache, use it.
+        // disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to
+        // figure this out yet.
         if (state.failedFeedCache[feedSrc]) {
             return new Div("Feed Failed: " + feedSrc, {
                 className: "marginAll"
@@ -96,20 +96,20 @@ export class RssTypeHandler extends TypeBase {
         else if (state.feedCache[feedSrc]) {
             this.renderItem(state.feedCache[feedSrc], feedSrc, itemListContainer, state);
         }
-        //otherwise read from the internet
+        // otherwise read from the internet
         else {
             itemListContainer.addChild(new Div("Loading RSS Feed..."));
             itemListContainer.addChild(new Div("(For large feeds this can take a few seconds)"));
 
-            //The 'rss-parser' doc suggested herokuapp, but I don't know if I can write my own service or use some better one?
+            // The 'rss-parser' doc suggested herokuapp, but I don't know if I can write my own service or use some better one?
             const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
             parser.parseURL(CORS_PROXY + feedSrc, (err, feed) => {
                 if (!feed) {
-                    //new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
-                    //console.log(err.message || "RSS Feed failed to load.");
+                    // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
+                    // console.log(err.message || "RSS Feed failed to load.");
                     dispatch({
-                        type: "Action_RSSUpdated", 
+                        type: "Action_RSSUpdated",
                         state,
                         update: (s: AppState): void => {
                             s.failedFeedCache[feedSrc] = "true";
@@ -118,7 +118,7 @@ export class RssTypeHandler extends TypeBase {
                 }
                 else {
                     dispatch({
-                        type: "Action_RSSUpdated", 
+                        type: "Action_RSSUpdated",
                         state,
                         update: (s: AppState): void => {
                             s.feedCache[feedSrc] = feed;
@@ -132,9 +132,9 @@ export class RssTypeHandler extends TypeBase {
     }
 
     renderItem(feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) {
-        //Current approach is to put the feed title in the parent node so we don't need it rendered
-        //here also
-        let feedOut: Comp[] = []; 
+        // Current approach is to put the feed title in the parent node so we don't need it rendered
+        // here also
+        let feedOut: Comp[] = [];
 
         let description = feed.description || "";
         let pubDate = feed.pubDate || "";
@@ -184,7 +184,7 @@ export class RssTypeHandler extends TypeBase {
             }, [new ButtonBar([audioButton])]));
         }
 
-        //item += "CONTENT:ENCODED"+entry["content:encoded"];
+        // item += "CONTENT:ENCODED"+entry["content:encoded"];
         if (entry["content:encoded"]) {
             let contentDiv = new MarkdownDiv(entry["content:encoded"]);
             children.push(contentDiv);

@@ -55,14 +55,14 @@ export const dispatch = (action: AppAction) => {
     PubSub.pub(C.PUBSUB_ClearComponentCache);
 
     store.dispatch(action);
-    //console.log("Dispatch Complete: " + action.type);
+    // console.log("Dispatch Complete: " + action.type);
 };
 
 /* This is MUCH faster, for when structural changes won't happen (only style changes for example),
 becuase it doesn't reset static objects to null, meaning they get reused, without reconstructing */
 export const fastDispatch = (action: AppAction) => {
     store.dispatch(action);
-    //console.log("Fast Dispatch Complete: " + action.type);
+    // console.log("Fast Dispatch Complete: " + action.type);
 };
 
 /* This listener is temporary until I find a better way to do this code, which needs to always run after any
@@ -71,9 +71,9 @@ render is complete and AFTER the html DOM is updated/final
 This works, but is currently not needed.
 */
 const handleChange = () => {
-    //console.log("AppRedux change.");
+    // console.log("AppRedux change.");
 };
 
 store.subscribe(handleChange);
-//const unsubscribe = store.subscribe(handleChange);
-//unsubscribe()
+// const unsubscribe = store.subscribe(handleChange);
+// unsubscribe()

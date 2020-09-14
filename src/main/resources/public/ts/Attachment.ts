@@ -99,7 +99,7 @@ export class Attachment implements AttachmentIntf {
 
     deleteAttachmentResponse = (res: J.DeleteAttachmentResponse, id: string, state: AppState): void => {
         if (S.util.checkSuccess("Delete attachment", res)) {
-            //but for now just do a dispatch that forces a refresh from client memory (not server)
+            // but for now just do a dispatch that forces a refresh from client memory (not server)
             fastDispatch({
                 type: "Action_FastRefresh",
                 updateNew: (s: AppState): AppState => {

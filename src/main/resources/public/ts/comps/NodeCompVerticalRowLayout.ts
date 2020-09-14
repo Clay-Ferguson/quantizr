@@ -38,8 +38,8 @@ export class NodeCompVerticalRowLayout extends Div {
         let comps: Comp[] = [];
         let countToDisplay = 0;
 
-        //we have to make a pass over children before main loop below, because we need the countToDisplay
-        //to ber correct before the second loop stats.
+        // we have to make a pass over children before main loop below, because we need the countToDisplay
+        // to ber correct before the second loop stats.
         for (let i = 0; i < this.node.children.length; i++) {
             let n: J.NodeInfo = this.node.children[i];
             if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
@@ -49,10 +49,10 @@ export class NodeCompVerticalRowLayout extends Div {
 
         let allowInsert = S.edit.isInsertAllowed(this.node, state);
 
-        /* We have this hack (until the privileges are more nuanced, or updated) which verifies if someone is 
+        /* We have this hack (until the privileges are more nuanced, or updated) which verifies if someone is
         inserting under a USER_FEED node we don't allow it unless its' the person who OWNS the USER_FEED, and we have this check
         because right now our design is that USER_FEED nodes are by definition automatically 'public'
-        
+
         NOTE: Server also enforces this check if it gets by the client.
         */
         if (allowInsert && typeHandler) {
@@ -71,7 +71,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 if (state.userPreferences.editMode && allowInsert && rowCount === 0 && state.userPreferences.editMode && this.level === 1) {
                     comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
 
-                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                    // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     comps.push(new Div(null, { className: "clearfix" }));
                 }
 
@@ -89,7 +89,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 if (state.userPreferences.editMode && allowInsert && state.userPreferences.editMode && this.level === 1) {
                     comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount === countToDisplay, state));
 
-                    //since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                    // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     comps.push(new Div(null, { className: "clearfix" }));
                 }
             }

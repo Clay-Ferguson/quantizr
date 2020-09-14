@@ -62,7 +62,7 @@ export class NodeCompRowHeader extends Div {
                 }));
             }
 
-            //only for admin user do we show ID, ordinal, and type as a string
+            // only for admin user do we show ID, ordinal, and type as a string
             if (state.isAdminUser) {
                 children.push(new Span(
                     "ID:" + node.id + " " + //
@@ -71,7 +71,7 @@ export class NodeCompRowHeader extends Div {
                     (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") //
                 ));
             }
-            //if not admin user just show mod time here.
+            // if not admin user just show mod time here.
             else {
                 children.push(new Span(
                     (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") //

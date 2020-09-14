@@ -6,8 +6,8 @@ export class PropTableRow extends Comp {
 
     constructor(attribs: Object = {}, initialChildren: PropTableCell[] = null) {
         super(attribs);
-        //(<any>this.attribs).style = "display: table-row;";
-        //(<any>this.attribs).sourceClass = "EditPropsTableRow";
+        // (<any>this.attribs).style = "display: table-row;";
+        // (<any>this.attribs).sourceClass = "EditPropsTableRow";
         this.setChildren(initialChildren);
     }
 

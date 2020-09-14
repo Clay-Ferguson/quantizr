@@ -50,7 +50,7 @@ export class TimelineView extends Div {
         let i = 0;
         let lastOwner: string = null;
         results.forEach((node: J.NodeInfo) => {
-            //console.log("TIMELINE: node id=" + node.id + " content: " + node.content);
+            // console.log("TIMELINE: node id=" + node.id + " content: " + node.content);
             S.srch.initSearchNode(node);
 
             let allowAvatar = node.owner !== lastOwner;

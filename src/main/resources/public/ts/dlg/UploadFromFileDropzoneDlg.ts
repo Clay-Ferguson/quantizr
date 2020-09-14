@@ -18,8 +18,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-/* Note: There is a react-dropzone package that exists, but for now we just use the standard approach from the 
-https://dropzonejs.com website and load the 'js' file in an HTML script tag, and do things without an npm module 
+/* Note: There is a react-dropzone package that exists, but for now we just use the standard approach from the
+https://dropzonejs.com website and load the 'js' file in an HTML script tag, and do things without an npm module
 for dropzone */
 
 declare var Dropzone;
@@ -38,7 +38,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     maxFiles: number = 50;
 
-    //this varible gets set if anything is detected wrong during the upload
+    // this varible gets set if anything is detected wrong during the upload
     uploadFailed: boolean = false;
     errorShown: boolean = false;
     numFiles: number = 0;
@@ -49,14 +49,14 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        //let state = this.getState();
-        //S.log("upload.renderDlg: state.toIpfs="+state.toIpfs);
+        // let state = this.getState();
+        // S.log("upload.renderDlg: state.toIpfs="+state.toIpfs);
         let children = [
             new Form(null, [
                 new HorizontalLayout([
 
                     /* Having this checkbox and caling the setState here causes a full rerender of this dialog, and this needs work eventually
-                    to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div 
+                    to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div
                     and create a new one any time there's a state change and rerender */
                     new Checkbox("Save to IPFS", null, {
                         setValue: (checked: boolean): void => {
@@ -67,8 +67,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         }
                     })
                 ]),
-                //sorry Temporal guys no longer needing you.
-                //state.toIpfs ? new TextContent("NOTE: IPFS Uploads assume you have a Temporal Account (https://temporal.cloud) which will be the service that hosts your IPFS data. You'll be prompted for the Temporal password when the upload begins.") : null,
+                // sorry Temporal guys no longer needing you.
+                // state.toIpfs ? new TextContent("NOTE: IPFS Uploads assume you have a Temporal Account (https://temporal.cloud) which will be the service that hosts your IPFS data. You'll be prompted for the Temporal password when the upload begins.") : null,
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 new ButtonBar([
@@ -114,7 +114,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             for (const clipboardItem of data) {
                 for (const type of clipboardItem.types) {
                     const blob = await clipboardItem.getType(type);
-                    //console.log(URL.createObjectURL(blob));
+                    // console.log(URL.createObjectURL(blob));
 
                     // DO NOT DELETE: The 'addedfile' emit may be the better way ? not sure yet. addFile() does work.
                     // this.dropzone.emit("addedfile", blob);
@@ -129,7 +129,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     upload = async (): Promise<boolean> => {
-        //let state = this.getState();
+        // let state = this.getState();
         return new Promise<boolean>(async (resolve, reject) => {
             if (this.filesAreValid()) {
 
@@ -152,7 +152,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
         /* Limit based on user quota for Quanta accounts */
         let maxFileSize = this.appState.userPreferences.maxUploadFileSize;
-        //console.log("configureDropZone: maxFileSize="+maxUploadSize);
+        // console.log("configureDropZone: maxFileSize="+maxUploadSize);
 
         let action;
         if (this.importMode) {
@@ -175,11 +175,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             paramName: "files",
             maxFilesize: maxFileSize,
 
-            //sets max number to send in each request, to keep from overloading server when large numbers are being sent
-            //to break up the upload into batches, but still sends each batch as a multi-file post.
+            // sets max number to send in each request, to keep from overloading server when large numbers are being sent
+            // to break up the upload into batches, but still sends each batch as a multi-file post.
             parallelUploads: state.toIpfs ? 1 : 20,
 
-            //Flag tells server to upload multiple files using multi-post requests so more than one file is allowed for each post it makes.
+            // Flag tells server to upload multiple files using multi-post requests so more than one file is allowed for each post it makes.
             uploadMultiple: true,
 
             maxFiles: this.maxFiles,
@@ -188,9 +188,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             dictDefaultMessage: "Click Here to Add Files (or Drag & Drop)",
             hiddenInputContainer: "#" + this.hiddenInputContainer.getId(),
 
-            //ref: https://www.dropzonejs.com/#event-list
+            // ref: https://www.dropzonejs.com/#event-list
 
-            // WARNING: Don't try to put arrow functions in here, these functions are called by Dropzone itself and the 
+            // WARNING: Don't try to put arrow functions in here, these functions are called by Dropzone itself and the
             // 'this' that is in scope during each call must be left as is.
             init: function () {
                 this.on("addedfile", function (file) {
@@ -215,22 +215,22 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("sending", function (file: File, xhr, formData) {
                     dlg.sent = true;
-                    //console.log("sending file: "+file.name);
+                    // console.log("sending file: "+file.name);
 
                     /* If Uploading DIRECTLY to Temporal.cloud */
 
                     S.log("Sending File: " + file.name);
                     formData.append("files", file);
 
-                    //It's important to check before calling append on this formData, because when uploading multiple files
-                    //when this runs for the second, third, etc file it ends up createing 
-                    //nodeId as a comma delimted list which is wrong.
+                    // It's important to check before calling append on this formData, because when uploading multiple files
+                    // when this runs for the second, third, etc file it ends up createing
+                    // nodeId as a comma delimted list which is wrong.
                     if (!formData.has("nodeId")) {
                         formData.append("nodeId", dlg.nodeId);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
 
-                        //NOTE: This ipfs flag is *not* for the Temporal.cloud upload but is for the currently unused capability 
-                        //Quanta platform has to run it's own gateway IPFS-GO instance (but currently we aren't running it)
+                        // NOTE: This ipfs flag is *not* for the Temporal.cloud upload but is for the currently unused capability
+                        // Quanta platform has to run it's own gateway IPFS-GO instance (but currently we aren't running it)
                         formData.append("ipfs", state.toIpfs ? "true" : "false");
 
                         formData.append("createAsChildren", dlg.numFiles > 1 ? "true" : "false");
@@ -252,9 +252,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("success", function (file: File, resp: any, evt: ProgressEvent) {
-                    //S.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
+                    // S.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
 
-                    //todo-1: get rid of the tight coupling to an exception class name here. This was a quick fix/hack
+                    // todo-1: get rid of the tight coupling to an exception class name here. This was a quick fix/hack
                     if (!resp.success && resp.exceptionClass && resp.exceptionClass.endsWith(".OutOfSpaceException")) {
                         if (!dlg.errorShown) {
                             dlg.errorShown = true;
@@ -263,16 +263,16 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         }
                         return;
                     }
-                    //S.log("Uploaded to Hash: " + ipfsHash);
+                    // S.log("Uploaded to Hash: " + ipfsHash);
 
-                    //todo-0: case with IPFS (via Quanta Gateway) and multiple files uploading this needs testing and is likely not functional.
+                    // todo-0: case with IPFS (via Quanta Gateway) and multiple files uploading this needs testing and is likely not functional.
 
-                    //https://developer.mozilla.org/en-US/docs/Web/API/File
+                    // https://developer.mozilla.org/en-US/docs/Web/API/File
                     if (dlg.getState().toIpfs && this.toTemporal) {
                         let ipfsHash = resp.response;
 
-                        //If we're uploading multipe files they all go in as children of the current node
-                        //it's too late to check the count here. it may be down to one. need to get mutiFlag right when processing starts
+                        // If we're uploading multipe files they all go in as children of the current node
+                        // it's too late to check the count here. it may be down to one. need to get mutiFlag right when processing starts
                         if (dlg.numFiles > 1) {
                             let properties: J.PropertyInfo[] = [
                                 { name: J.NodeProp.BIN, value: "[null]" },
@@ -293,7 +293,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                                 typeLock: false,
                                 properties
                             }, (res) => {
-                                //nothing to be done here.
+                                // nothing to be done here.
                             });
                         }
                         /* Otherwise add all the properties to this node to update it for the upload */
@@ -311,7 +311,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                                 node: dlg.node
                             }, async (res: J.SaveNodeResponse) => {
                                 await S.edit.updateIpfsNodeJson(dlg.node, dlg.appState);
-                                //S.log("node after IPFS hash added: "+S.util.prettyPrint(dlg.node));
+                                // S.log("node after IPFS hash added: "+S.util.prettyPrint(dlg.node));
                                 S.edit.saveNodeResponse(dlg.node, res, true, dlg.appState);
                             });
                         }
@@ -361,11 +361,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             this.zipQuestionAnswered = true;
             new ConfirmDlg("Do you want Zip files exploded onto the tree when uploaded?",
                 "Explode Zips?", //
-                //yes function
+                // yes function
                 () => {
                     this.explodeZips = true;
                 },
-                //no function
+                // no function
                 () => {
                     this.explodeZips = false;
                 }, null, null, this.appState
@@ -374,7 +374,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     filesAreValid = (): boolean => {
-        //let state = this.getState();
+        // let state = this.getState();
         if (!this.fileList || this.fileList.length === 0 || this.fileList.length > this.maxFiles) {
             return false;
         }
@@ -401,7 +401,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     runButtonEnablement = (): void => {
         let valid = this.filesAreValid();
 
-        //todo-1: why does setEnabled work just fine but setVisible doesn't work?
+        // todo-1: why does setEnabled work just fine but setVisible doesn't work?
         this.uploadButton.setEnabled(valid);
     }
 }

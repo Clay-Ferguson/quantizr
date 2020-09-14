@@ -12,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-//This is magically defined in webpack.common.js;
+// This is magically defined in webpack.common.js;
 declare var BUILDTIME;
 declare var PROFILE;
 
@@ -61,8 +61,8 @@ export class View implements ViewIntf {
     prevPage = (state: AppState): void => {
         S.nav.mainOffset -= S.nav.ROWS_PER_PAGE;
 
-        //This should be "< 0" instead of "<= 1" here, but there is a bug where the back button will not land you
-        //at the exact first page in all cases, and this is just a compensation for that somewhat harmless bug, until I fix it. todo-1
+        // This should be "< 0" instead of "<= 1" here, but there is a bug where the back button will not land you
+        // at the exact first page in all cases, and this is just a compensation for that somewhat harmless bug, until I fix it. todo-1
         if (S.nav.mainOffset <= 1) {
             S.nav.mainOffset = 0;
         }
@@ -76,7 +76,7 @@ export class View implements ViewIntf {
 
     lastPage = (state: AppState): void => {
         console.log("Running lastPage Query");
-        //nav.mainOffset += nav.ROWS_PER_PAGE;
+        // nav.mainOffset += nav.ROWS_PER_PAGE;
         this.loadPage(true, state);
     }
 
@@ -101,16 +101,16 @@ export class View implements ViewIntf {
         });
     }
 
-    //todo-1: need to add logic to detect if this is root node on the page, and if so, we consider the first child the target
+    // todo-1: need to add logic to detect if this is root node on the page, and if so, we consider the first child the target
     scrollRelativeToNode = (dir: string, state: AppState) => {
         const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!currentSelNode) return;
 
         let newNode: J.NodeInfo = null;
 
-        //First detect if page root node is selected, before doing a child search
+        // First detect if page root node is selected, before doing a child search
         if (currentSelNode.id === state.node.id) {
-            //if going down that means first child node.
+            // if going down that means first child node.
             if (dir === "down" && state.node.children && state.node.children.length > 0) {
                 S.meta64.highlightNode(state.node.children[0], true, state);
             }
@@ -147,7 +147,7 @@ export class View implements ViewIntf {
                 }
                 prevChild = child;
 
-                //NOTE: returning true stops the iteration.
+                // NOTE: returning true stops the iteration.
                 return ret;
             });
         }
@@ -169,7 +169,7 @@ export class View implements ViewIntf {
 
     scrollToSelectedNode = (state: AppState): void => {
 
-        //todo-1: is this still good? the overlay ?
+        // todo-1: is this still good? the overlay ?
         S.meta64.setOverlay(true);
 
         setTimeout(async () => {
@@ -187,10 +187,10 @@ export class View implements ViewIntf {
                 if (elm) {
                     elm.scrollIntoView(true);
 
-                    //the 'scrollIntoView' function doesn't work well when we have margin/padding on the document (for our toolbar at the top)
-                    //so we have to account for that by scrolling up a bit from where the 'scrollIntoView' will have put is.
-                    //Only in the rare case of the very last node on the page will this have slightly undesirable effect of
-                    //scrolling up more than we wanted to, but instead of worrying about that I'm keeping this simple.
+                    // the 'scrollIntoView' function doesn't work well when we have margin/padding on the document (for our toolbar at the top)
+                    // so we have to account for that by scrolling up a bit from where the 'scrollIntoView' will have put is.
+                    // Only in the rare case of the very last node on the page will this have slightly undesirable effect of
+                    // scrolling up more than we wanted to, but instead of worrying about that I'm keeping this simple.
 
                     scrollBy(0, -S.meta64.navBarHeight);
                 }
@@ -256,7 +256,7 @@ export class View implements ViewIntf {
             if (res.messages) {
                 res.messages.forEach(m => {
                     if (m.type !== "inbox") {
-                        //todo-1: really need to put ALL messages into a single dialog display
+                        // todo-1: really need to put ALL messages into a single dialog display
                         S.util.showMessage(m.message, "Notifications", false);
                     }
                 });

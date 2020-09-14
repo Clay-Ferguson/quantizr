@@ -14,7 +14,7 @@ export class RadioButtonGroup extends Comp {
 
     constructor(initialButtons: RadioButton[] = null, moreClasses: string = "") {
         super(null);
-        this.attribs.className = moreClasses; 
+        this.attribs.className = moreClasses;
         this.setChildren(initialButtons);
 
         initialButtons.forEach(function(row: RadioButton) {

@@ -66,11 +66,11 @@ export class FeedView extends Div {
         let i = 0;
         // let lastOwner: string = null;
         state.feedResults.forEach((node: J.NodeInfo) => {
-            //console.log("FEED: node id=" + node.id + " content: " + node.content);
+            // console.log("FEED: node id=" + node.id + " content: " + node.content);
             S.srch.initSearchNode(node);
 
-            //For now, let's just allow all feed items to show the avatar.
-            let allowAvatar = true; //node.owner != lastOwner;
+            // For now, let's just allow all feed items to show the avatar.
+            let allowAvatar = true; // node.owner != lastOwner;
 
             children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, allowAvatar, "feed", true, false, state));
             // lastOwner = node.owner;

@@ -23,7 +23,7 @@ export class DateField extends Div implements I.ValueIntf {
             Comp.renderCachedChildren = true;
 
             try {
-                //console.log("e.target.value=" + evt.target.value);
+                // console.log("e.target.value=" + evt.target.value);
                 this.updateValFunc(evt.target.value);
             }
             finally {
@@ -36,15 +36,15 @@ export class DateField extends Div implements I.ValueIntf {
         };
     }
 
-    //Handler to update state
+    // Handler to update state
     updateValFunc(value: string): void {
-        //console.log("update state: " + value);
+        // console.log("update state: " + value);
         if (value !== this.valueIntf.getValue()) {
             this.valueIntf.setValue(value);
         }
     }
 
-    //Overriding base class so we can focus the correct part of this composite component.
+    // Overriding base class so we can focus the correct part of this composite component.
     focus(): void {
         this.whenElm((elm: HTMLSelectElement) => {
             this.input.focus();
@@ -60,12 +60,12 @@ export class DateField extends Div implements I.ValueIntf {
     }
 
     preRender(): void {
-        //console.log("preRender id=" + this.getId() + " value=" + this.valueIntf.getValue());
-        //let state = this.getState();
+        // console.log("preRender id=" + this.getId() + " value=" + this.valueIntf.getValue());
+        // let state = this.getState();
 
         this.setChildren([
             new Div(null, {
-                //className: "input-group",
+                // className: "input-group",
                 /* NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
                 to the component, or elase there's a react-rerender flicker. */
                 style: { fontFamily: "monospace" }

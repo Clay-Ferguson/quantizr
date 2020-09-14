@@ -1,5 +1,5 @@
 
-//todo-1: temporarily disabling
+// todo-1: temporarily disabling
 // class BashTypeHandler implements TypeHandlerIntf {
 //     constructor(private bashPlugin : BashPlugin) {
 //     }
@@ -58,7 +58,7 @@
 //         console.log("ExecuteNodeResponse running.");
 
 //         S.util.checkSuccess("Execute Node", res);
-        
+
 //         //for now not showing a message after. So the scripting can basically just be used to launch an app
 //         //or something like that where they don't care to see any output.
 //         //S.util.showMessage(res.output, true, "modal-lg");

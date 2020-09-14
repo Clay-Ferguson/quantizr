@@ -17,7 +17,7 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
     initialValue: string;
 
     constructor(value: string, public heightString, public aceMode: string, public wordWrap: boolean = true) {
-        //super(S.util.escapeHtml(propEntry.property.value), {});
+        // super(S.util.escapeHtml(propEntry.property.value), {});
         super(value, {});
 
         this.aceMode = this.aceMode || "ace/mode/text";
@@ -30,9 +30,9 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
             style: { height: heightString }
         });
 
-        this.initialValue = value; //S.util.escapeHtml(propEntry.property.value);
+        this.initialValue = value; // S.util.escapeHtml(propEntry.property.value);
 
-        //console.log("InitialValue(for Ace editor)="+this.initialValue);
+        // console.log("InitialValue(for Ace editor)="+this.initialValue);
 
         this.whenElm((elm: HTMLElement) => {
             this.aceEditor = ace.edit(this.getId());
@@ -40,18 +40,18 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
             // add command to lazy-load keybinding_menu extension
             this.aceEditor.commands.addCommand({
                 name: "insetTimestamp",
-                //On Ubuntu CTRL-ALT-T was already stomped on, so I guess we need to make this configurable by users to set their
-                //own custom keybindings. For now I hope CTRL-ALT-H works for everyone. I had EditNodeDlg.ts using an insertTime button before
-                //deciding todo this via key binding on the element so that is still there commented out, if i change my mind and go back to that.
+                // On Ubuntu CTRL-ALT-T was already stomped on, so I guess we need to make this configurable by users to set their
+                // own custom keybindings. For now I hope CTRL-ALT-H works for everyone. I had EditNodeDlg.ts using an insertTime button before
+                // deciding todo this via key binding on the element so that is still there commented out, if i change my mind and go back to that.
                 bindKey: { win: "Ctrl-Alt-h", mac: "Command-Alt-h" },
                 exec: (editor: any) => {
                     this.insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
                 }
             });
 
-            //reference: https://ace.c9.io/api/editor.html
+            // reference: https://ace.c9.io/api/editor.html
 
-            //this.aceEditor.setTheme("ace/theme/dracula");
+            // this.aceEditor.setTheme("ace/theme/dracula");
             this.aceEditor.setTheme("ace/theme/monokai");
             this.aceEditor.setFontSize("18px");
             this.aceEditor.setShowPrintMargin(false);
@@ -61,8 +61,8 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
 
             this.aceEditor.session.setMode(this.aceMode);
 
-            //always force word wrapping for markdown mode ??? maybe not, markdown can contain long code blocks sometimes, so
-            //leave this up to user???
+            // always force word wrapping for markdown mode ??? maybe not, markdown can contain long code blocks sometimes, so
+            // leave this up to user???
             if (this.aceMode === "ace/mode/markdown") {
                 this.wordWrap = true;
             }
@@ -102,20 +102,20 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
         return this.aceEditor;
     }
 
-    //should we make this just return a promise, and wait for the control ?
+    // should we make this just return a promise, and wait for the control ?
     getValue(): string {
         if (!this.aceEditor) {
-            //console.log("Ace.getValue(1)="+this.initialValue);
+            // console.log("Ace.getValue(1)="+this.initialValue);
             return this.initialValue;
         }
         let val = this.aceEditor.getValue();
-        //console.log("Ace.getValue(2)="+val);
+        // console.log("Ace.getValue(2)="+val);
         return val;
     }
 
     setValue(val: string): void {
         this.whenElm((elm: HTMLElement) => {
-            //console.log("Ace.setValue="+val);
+            // console.log("Ace.setValue="+val);
             this.aceEditor.setValue(val /* S.util.escapeHtml(val) */, 0);
         });
     }

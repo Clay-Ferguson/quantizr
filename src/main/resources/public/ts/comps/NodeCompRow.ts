@@ -57,11 +57,11 @@ export class NodeCompRow extends Div {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         let id: string = node.id;
-        //console.log("Rendering NodeCompRow. id=" + node.id);
+        // console.log("Rendering NodeCompRow. id=" + node.id);
 
         this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
 
-        //console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
+        // console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
         let buttonBar: Comp = null;
         if (NodeCompRow.showButtonBar && !state.inlineEditId) {
             let allowAvatar = node.owner !== S.render.lastOwner;
@@ -99,8 +99,8 @@ export class NodeCompRow extends Div {
         ]);
     }
 
-    /* Return an object such that, if this object changes, we must render, or else we don't need to render 
-  
+    /* Return an object such that, if this object changes, we must render, or else we don't need to render
+
     This implementation is technically very incorrect, but was enough to just use the selection state and ID to
     determine of the caching of ReactNodes (via. Comp.memoMap) rather than constructing them from scratch
     on every render was enough to create a noticeable performance gain. Unfortunately it WAS NOT. So the 'memoMap'
@@ -111,7 +111,7 @@ export class NodeCompRow extends Div {
         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(appState);
         let selected: boolean = (focusNode && focusNode.id === this.node.id);
         let key = this.node.id + " " + selected;
-        //console.log("cache key: " + key + " for element: " + this.jsClassName);
+        // console.log("cache key: " + key + " for element: " + this.jsClassName);
         return key;
         // state = this.getState();
         // return {

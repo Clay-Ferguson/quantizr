@@ -14,7 +14,7 @@ export interface Meta64Intf {
     deviceHeight: number;
 
     navBarHeight: number;
-    //todo-1: convert this to a TypeScript Map<string,string>
+    // todo-1: convert this to a TypeScript Map<string,string>
     parentIdToFocusNodeMap: { [key: string]: string };
     curHighlightNodeCompRow: CompIntf;
 
@@ -25,7 +25,7 @@ export interface Meta64Intf {
     userName: string;
     password: string;
 
-    //function cache accessor
+    // function cache accessor
     getNodeFunc(func: (id: string) => void, name: string, id: string): () => void;
 
     setOverlay(showOverlay: boolean): void;

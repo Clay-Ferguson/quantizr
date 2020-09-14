@@ -107,7 +107,7 @@ export class Search implements SearchIntf {
         dispatch({
             type: "Action_RenderFeedResults",
             update: (s: AppState): void => {
-                //s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
+                // s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
                 s.feedResults = res.searchResults;
                 s.feedDirty = false;
             }
@@ -118,7 +118,7 @@ export class Search implements SearchIntf {
     initSearchNode = (node: J.NodeInfo) => {
         this.idToNodeMap[node.id] = node;
 
-        //NOTE: only the getFeed call (Feed tab) will have items with some parents populated.
+        // NOTE: only the getFeed call (Feed tab) will have items with some parents populated.
         if (node.parent) {
             this.idToNodeMap[node.parent.id] = node.parent;
         }
@@ -141,12 +141,12 @@ export class Search implements SearchIntf {
         const content = new NodeCompContent(node, true, true, prefix, true, null);
 
         let clazz = "node-table-row";
-        //if (state.userPreferences.editMode) {
+        // if (state.userPreferences.editMode) {
         //    clazz += " editing-border";
-        //}
-        //else {
-        //clazz += " non-editing-border"
-        //}
+        // }
+        // else {
+        // clazz += " non-editing-border"
+        // }
 
         if (S.render.fadeInId === node.id) {
             S.render.fadeInId = null;
@@ -197,10 +197,10 @@ export class Search implements SearchIntf {
     }
 
     cached_clickOnSearchResultRow = (id: string) => {
-        //this implementation is obsolete (update if we ever need to uncomment this)
+        // this implementation is obsolete (update if we ever need to uncomment this)
 
-        //DO NOT DELETE (this works, and may be needed some day)
-        //There's really no reason to indicate to user what row is highlighted, so I let't just not clutter the screen for now
+        // DO NOT DELETE (this works, and may be needed some day)
+        // There's really no reason to indicate to user what row is highlighted, so I let't just not clutter the screen for now
         // this.setRowHighlight(false);
         // this.highlightRowNode = this.idToNodeMap[id];
         // this.setRowHighlight(true);

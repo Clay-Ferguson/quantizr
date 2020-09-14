@@ -22,7 +22,7 @@ export class InlineEditField extends Span {
         super();
         this.attribs.className = "col-9 quickEditSpan ";
 
-        //todo-1: this is not the final plae to hold state for this maybe?
+        // todo-1: this is not the final plae to hold state for this maybe?
         this.mergeState({
             inlineEditVal: appState.inlineEditVal
         });
@@ -32,7 +32,7 @@ export class InlineEditField extends Span {
     }
 
     preRender(): void {
-        //let state = this.getState();
+        // let state = this.getState();
 
         let textarea = new Textarea(null, {
             rows: 10

@@ -69,7 +69,7 @@ export class NodeCompContent extends Div {
         if (S.props.hasBinary(node) && !isAnAccountNode) {
             let binary = new NodeCompBinary(node, false, false, this.imgSizeOverride);
 
-            //todo-1: bring this back. I already needed it again.
+            // todo-1: bring this back. I already needed it again.
             /*
              * We append the binary image or resource link either at the end of the text or at the location where
              * the user has put {{insert-attachment}} if they are using that to make the image appear in a specific
@@ -81,7 +81,7 @@ export class NodeCompContent extends Div {
             //     ret = S.util.replaceAll(ret, cnst.INSERT_ATTACHMENT, binary.render());
             // } else {
             children.push(binary);
-            //}
+            // }
         }
 
         this.setChildren(children);
@@ -89,7 +89,7 @@ export class NodeCompContent extends Div {
 
     maybeRenderDateTime = (children: CompIntf[], propName: string, displayName: string, node: J.NodeInfo): void => {
         let timestampVal = S.props.getNodePropVal(propName, node);
-        //console.log("TimestampVal id=" + node.id + " val=" + timestampVal);
+        // console.log("TimestampVal id=" + node.id + " val=" + timestampVal);
         if (timestampVal) {
             let dateVal: Date = new Date(parseInt(timestampVal));
             let timeStr = dateVal.toLocaleTimeString().replace(":00 ", " ");

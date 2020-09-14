@@ -70,9 +70,9 @@ export class Factory {
             localDB: new LocalDB(),
             mainMenu: new MainMenuDlg(),
 
-            //Use this version of the render method to help troubleshoot missing 'key' props
-            //todo-1: move this function into some other static location that is safe to import
-            //with zero risk of any circular references.
+            // Use this version of the render method to help troubleshoot missing 'key' props
+            // todo-1: move this function into some other static location that is safe to import
+            // with zero risk of any circular references.
             // e: (func: any, props: any, ...children: any): any => {
             //     if (props && !props.key) {
             //         throw new Error("PROPS missing key on createElement: "+props);

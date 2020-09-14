@@ -21,7 +21,7 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         this.attribs.onChange = (evt: any) => {
 
             this.updateValFunc(evt.target.checked);
-            
+
             // oops the renderCachedChildren is only for text input! where we KNOW we don't want the rest of the page rendering while user is typing.
             // and if you use this technique it WILL stop any other page updates from happening inside here, before the timer completes.
             // Comp.renderCachedChildren = true;
@@ -39,13 +39,13 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         };
     }
 
-    //Handler to update state
+    // Handler to update state
     updateValFunc(value: boolean): void {
         if (value !== this.valueIntf.getValue()) {
             this.valueIntf.setValue(value);
 
-            //needing this line took a while to figure out. If nothing is setting any actual detectable state change
-            //during his call we have to do this here.
+            // needing this line took a while to figure out. If nothing is setting any actual detectable state change
+            // during his call we have to do this here.
             this.forceRender();
         }
     }
@@ -59,8 +59,8 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
     }
 
     compRender(): ReactNode {
-        //double-bang is important here becasue we do need to support the 'getvalue' comming back as null, or undefined, and in all cases
-        //convert that to exactly the value 'true' or else React itself (internal to React) will fail
+        // double-bang is important here becasue we do need to support the 'getvalue' comming back as null, or undefined, and in all cases
+        // convert that to exactly the value 'true' or else React itself (internal to React) will fail
         this.attribs.checked = !!this.valueIntf.getValue();
 
         if (this.label) {

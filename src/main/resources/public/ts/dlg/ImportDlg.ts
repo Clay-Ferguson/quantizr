@@ -25,7 +25,7 @@ export class ImportDlg extends DialogBase {
             fileName: null
         });
     }
-    
+
     renderDlg(): CompIntf[] {
         return [
             new TextField("File Name to Import", null, null, null, new CompValueHolder<string>(this, "fileName")),

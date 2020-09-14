@@ -39,8 +39,8 @@ export class Meta64 implements Meta64Intf {
     is over the icon */
     public draggableId: string = null;
 
-    //use this to know how long to delay the refresh for breadrumbs should wait to keep from interrupting the fade effect
-    //by doing which would happen if it rendered before the fade effect was complete. (see fadeInRowBkgClz)
+    // use this to know how long to delay the refresh for breadrumbs should wait to keep from interrupting the fade effect
+    // by doing which would happen if it rendered before the fade effect was complete. (see fadeInRowBkgClz)
     public fadeStartTime: number = 0;
 
     /* We save userName+password in these vars to pass in every request
@@ -83,7 +83,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     selectTab = (tabName: string): void => {
-        //let state = store.getState();
+        // let state = store.getState();
 
         /* if tab is already active no need to update state now
 
@@ -91,7 +91,7 @@ export class Meta64 implements Meta64Intf {
         to cause the dispatch/update, even when tab isn't changing, so need
         to find all those before we can optimize here to ignore setting to same tab.
         */
-        //if (state.activeTab==tabName) return;
+        // if (state.activeTab==tabName) return;
 
         dispatch({
             type: "Action_SelectTab",
@@ -186,14 +186,14 @@ export class Meta64 implements Meta64Intf {
         // });
     }
 
-    //note: this code is not currently in use
+    // note: this code is not currently in use
     updateNodeInfo = (node: J.NodeInfo) => {
         S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: node.id,
             includeAcl: false,
             includeOwners: true
         }, (res: J.GetNodePrivilegesResponse) => {
-            //this.updateNodeInfoResponse(res, node);
+            // this.updateNodeInfoResponse(res, node);
         });
     }
 
@@ -219,7 +219,7 @@ export class Meta64 implements Meta64Intf {
         if (node) {
             this.highlightNode(node, scroll, state);
         } else {
-            //if we can't find that node, best behvior is at least to scroll to top.
+            // if we can't find that node, best behvior is at least to scroll to top.
             if (scroll) {
                 S.view.scrollToTop();
             }
@@ -249,7 +249,7 @@ export class Meta64 implements Meta64Intf {
 
     /* Find node by looking everywhere we possibly can on local storage for it */
     findNodeById = (state: AppState, nodeId: string): J.NodeInfo => {
-        //first look in normal tree map for main view.
+        // first look in normal tree map for main view.
         let node: J.NodeInfo = state.idToNodeMap[nodeId];
 
         if (!node) {
@@ -280,7 +280,7 @@ export class Meta64 implements Meta64Intf {
         if (!node) return;
         state.idToNodeMap[node.id] = node;
 
-        //NOTE: only the getFeed call (Feed tab) will have items with some parents populated.
+        // NOTE: only the getFeed call (Feed tab) will have items with some parents populated.
         if (node.parent) {
             state.idToNodeMap[node.parent.id] = node.parent;
         }
@@ -344,7 +344,7 @@ export class Meta64 implements Meta64Intf {
             in the context of SPAs
             */
             window.onpopstate = (event) => {
-                //console.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
+                // console.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
 
                 if (event.state && event.state.nodeId) {
                     S.view.refreshTree(event.state.nodeId, true, event.state.highlightId, false, false, true, true, store.getState());
@@ -357,9 +357,9 @@ export class Meta64 implements Meta64Intf {
             // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs re Open, because this WILL
             // capture events going to dialogs / edit fields
             document.body.addEventListener("keydown", (event: KeyboardEvent) => {
-                //console.log("keydown: " + event.code);
+                // console.log("keydown: " + event.code);
                 let state: AppState = store.getState();
-                //if (event.ctrlKey) {
+                // if (event.ctrlKey) {
 
                 switch (event.code) {
                 case "Escape":
@@ -383,7 +383,7 @@ export class Meta64 implements Meta64Intf {
 
                 case "ArrowLeft":
                     if (this.keyDebounce()) return;
-                    //S.nav.navUpLevel();
+                    // S.nav.navUpLevel();
                     if (state.fullScreenViewId) {
                         S.nav.prevFullScreenImgViewer(state);
                     }
@@ -392,7 +392,7 @@ export class Meta64 implements Meta64Intf {
                 case "ArrowRight":
                     if (this.keyDebounce()) return;
                     state = store.getState();
-                    //S.nav.navOpenSelectedNode(state);
+                    // S.nav.navOpenSelectedNode(state);
                     if (state.fullScreenViewId) {
                         S.nav.nextFullScreenImgViewer(state);
                     }
@@ -400,7 +400,7 @@ export class Meta64 implements Meta64Intf {
 
                 default: break;
                 }
-                //}
+                // }
             });
 
             if (this.appInitialized) {
@@ -438,8 +438,8 @@ export class Meta64 implements Meta64Intf {
             this.deviceWidth = window.innerWidth;
             this.deviceHeight = window.innerHeight;
 
-            //This is the root react App component that contains the entire application
-            this.app = new App(); //new AppDemo
+            // This is the root react App component that contains the entire application
+            this.app = new App(); // new AppDemo
             this.app.updateDOM(store, "app");
 
             /*
@@ -447,7 +447,7 @@ export class Meta64 implements Meta64Intf {
              * the session, and then renders page content, after that.
              */
 
-            //this.pingServer();
+            // this.pingServer();
             S.user.refreshLogin(store.getState());
 
             S.util.initProgressMonitor();
@@ -475,7 +475,7 @@ export class Meta64 implements Meta64Intf {
 
     keyDebounce = () => {
         const now = S.util.currentTimeMillis();
-        //allow one operation every quarter second.
+        // allow one operation every quarter second.
         if (Meta64.lastKeyDownTime > 0 && now - Meta64.lastKeyDownTime < 250) {
             return true;
         }
@@ -484,7 +484,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     maintenanceCycle = () => {
-        //console.log("Maintenance fcCount: "+this.fcCount);
+        // console.log("Maintenance fcCount: "+this.fcCount);
         /* Clean out function referenes after a threshold is reached */
         if (this.fcCount > 500) {
             this.fc = {};
@@ -499,11 +499,11 @@ export class Meta64 implements Meta64Intf {
     the counter to '1' and not zero since the overlay is initially visible so that's the correct
     counter state to start with.
     */
-    static overlayCounter: number = 1; //this starting value is important.
+    static overlayCounter: number = 1; // this starting value is important.
     setOverlay = (showOverlay: boolean) => {
 
         Meta64.overlayCounter += showOverlay ? 1 : -1;
-        //console.log("overlayCounter=" + Meta64.overlayCounter);
+        // console.log("overlayCounter=" + Meta64.overlayCounter);
 
         /* if overlayCounter goes negative, that's a mismatch */
         if (Meta64.overlayCounter < 0) {
@@ -517,9 +517,9 @@ export class Meta64 implements Meta64Intf {
             and just simply caused a bit of unnecessary eye strain
             */
             setTimeout(() => {
-                //after the timer we check for the counter still being greater than zero (not an ==1 this time).
+                // after the timer we check for the counter still being greater than zero (not an ==1 this time).
                 if (Meta64.overlayCounter > 0) {
-                    //console.log("showing overlay.");
+                    // console.log("showing overlay.");
                     const elm = S.util.domElm("overlayDiv");
                     if (elm) {
                         elm.style.display = "block";
@@ -529,13 +529,13 @@ export class Meta64 implements Meta64Intf {
             }, 1200);
         }
         else if (Meta64.overlayCounter === 0) {
-            //console.log("hiding overlay.");
+            // console.log("hiding overlay.");
             const elm = S.util.domElm("overlayDiv");
             if (elm) {
                 elm.style.display = "none";
             }
         }
-        //console.log("overlayCounter="+Meta64.overlayCounter);
+        // console.log("overlayCounter="+Meta64.overlayCounter);
     }
 
     pingServer = () => {
@@ -609,8 +609,8 @@ export class Meta64 implements Meta64Intf {
         state.isAdminUser = res.userName === "admin";
         state.isAnonUser = res.userName === J.PrincipalName.ANON;
 
-        //bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
-        //sure i'm keeping this feature.
+        // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
+        // sure i'm keeping this feature.
         state.allowBashScripting = false;
 
         state.anonUserLandingPageNode = res.anonUserLandingPageNode;
@@ -632,11 +632,11 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
-    //todo-1: need to decide if I want this. It's disabled currently (not called)
+    // todo-1: need to decide if I want this. It's disabled currently (not called)
     removeRedundantFeedItems = (feedResults: J.NodeInfo[]): J.NodeInfo[] => {
         if (!feedResults || feedResults.length === 0) return feedResults;
 
-        //first build teh set of ids that that are in 'ni.parent.id'
+        // first build teh set of ids that that are in 'ni.parent.id'
         const idSet: Set<string> = new Set<string>();
         feedResults.forEach((ni: J.NodeInfo) => {
             if (ni.parent) {
@@ -644,7 +644,7 @@ export class Meta64 implements Meta64Intf {
             }
         });
 
-        //now return filtered list only for items where 'id' is not in the set above.
+        // now return filtered list only for items where 'id' is not in the set above.
         return feedResults.filter(ni => !idSet.has(ni.id));
     }
 }

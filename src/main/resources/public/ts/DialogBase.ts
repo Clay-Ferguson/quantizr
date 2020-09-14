@@ -20,8 +20,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> implements DialogBaseImpl {
 
-    //ref counter that allows multiple dialogs to be opened on top of each other and only
-    //when the final one closes out do we go back to enabling scrolling on body again.
+    // ref counter that allows multiple dialogs to be opened on top of each other and only
+    // when the final one closes out do we go back to enabling scrolling on body again.
     static refCounter = 0;
     static BACKDROP_PREFIX = "backdrop-";
     static backdropZIndex: number = 16000000;
@@ -64,14 +64,14 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             this.backdrop.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex));
             document.body.appendChild(this.backdrop);
 
-            //clicking outside the dialog will close it. We only use this for the main menu of the app, because clicking outside a dialog
-            //is too easy to do while your editing and can cause loss of work/editing.
+            // clicking outside the dialog will close it. We only use this for the main menu of the app, because clicking outside a dialog
+            // is too easy to do while your editing and can cause loss of work/editing.
             if (this.closeByOutsideClick) {
                 this.backdrop.addEventListener("click", (evt: any) => {
-                    //get our dialog itself.
+                    // get our dialog itself.
                     const contentElm: any = S.util.domElm(this.getId());
 
-                    //check if the click was outside the dialog.
+                    // check if the click was outside the dialog.
                     if (!!contentElm && !contentElm.contains(evt.target)) {
                         this.close();
                     }
@@ -84,7 +84,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
                 await queryServerPromise;
             }
 
-            //this renders the dlgComp onto the screen (on the backdrop elm)
+            // this renders the dlgComp onto the screen (on the backdrop elm)
             this.domRender();
 
             if (++DialogBase.refCounter === 1) {
@@ -109,7 +109,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     domRender(): void {
         const reactElm = S.e(this._render, this.attribs);
 
-        //console.log("Rendering with provider");
+        // console.log("Rendering with provider");
         const provider = S.e(Provider, { store }, reactElm);
         ReactDOM.render(provider, this.backdrop);
     }
@@ -149,7 +149,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
 
     preRender(): void {
         let timesIcon: Comp;
-        //Dialog Header with close button (x) right justified on it.
+        // Dialog Header with close button (x) right justified on it.
         const children: CompIntf[] = [];
 
         const titleIconComp: CompIntf = this.getTitleIconComp();
@@ -166,7 +166,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             onClick: this.close
         }));
 
-        //NOTE: title will be null for the main menu, which is actually implemented as a dialog using this base class.
+        // NOTE: title will be null for the main menu, which is actually implemented as a dialog using this base class.
         if (this.title) {
             children.push(new Div(null, {
                 className: "app-modal-title"

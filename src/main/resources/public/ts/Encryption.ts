@@ -45,7 +45,7 @@ export class Encryption implements EncryptionIntf {
     /* jwk = JSON Format */
     DEFAULT_KEY_FORMAT = Encryption.FORMAT_JWK;
 
-    //asymetric keys (public/private)
+    // asymetric keys (public/private)
     STORE_ASYMKEY = "asymkey";
 
     // symmetric key
@@ -89,7 +89,7 @@ export class Encryption implements EncryptionIntf {
 
         todo-1: Some crypto experts told me this IV should not be reused like this but instead stored along with the encryption key.
         */
-        //iv = window.crypto.getRandomValues(new Uint8Array(16)); <--- I saw this in a reputable example. Try it out!
+        // iv = window.crypto.getRandomValues(new Uint8Array(16)); <--- I saw this in a reputable example. Try it out!
         this.vector = new Uint8Array([71, 73, 79, 83, 89, 37, 41, 47, 53, 67, 97, 103, 107, 109, 127, 131]);
     }
 
@@ -147,7 +147,7 @@ export class Encryption implements EncryptionIntf {
                 // test symetric key export/import
                 const keyDat: JsonWebKey = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, key) as JsonWebKey;
 
-                const key2: CryptoKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, keyDat, this.SYM_ALGO /*as AlgorithmIdentifier*/, true, this.OP_ENC_DEC as KeyUsage[]);
+                const key2: CryptoKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, keyDat, this.SYM_ALGO /* as AlgorithmIdentifier */, true, this.OP_ENC_DEC as KeyUsage[]);
 
                 const encHex2 = await this.symEncryptString(key2, clearText);
                 const unencText2 = await this.symDecryptString(key2, encHex2);
@@ -166,7 +166,7 @@ export class Encryption implements EncryptionIntf {
             // test public key encryption
             const obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
             if (obj) {
-                //results += "STORE_ASYMKEY: \n"+S.util.prettyPrint(obj)+"\n\n";
+                // results += "STORE_ASYMKEY: \n"+S.util.prettyPrint(obj)+"\n\n";
 
                 // simple encrypt/decrypt
                 const encHex = await this.asymEncryptString(obj.val.publicKey, clearText);
@@ -175,9 +175,9 @@ export class Encryption implements EncryptionIntf {
 
                 // Export keys to a string format
                 const publicKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, obj.val.publicKey);
-                //console.log("EXPORTED PUBLIC KEY: " + S.util.toJson(publicKeyStr) + "\n");
+                // console.log("EXPORTED PUBLIC KEY: " + S.util.toJson(publicKeyStr) + "\n");
                 const privateKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, obj.val.privateKey);
-                //console.log("EXPORTED PRIVATE KEY: " + S.util.toJson(publicKeyStr) + "\n");
+                // console.log("EXPORTED PRIVATE KEY: " + S.util.toJson(publicKeyStr) + "\n");
 
                 const publicKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, publicKeyStr, {
                     name: this.ASYM_ALGO,
@@ -237,7 +237,7 @@ export class Encryption implements EncryptionIntf {
                 ret = true;
             }
             catch (e) {
-                //leave ret == false.
+                // leave ret == false.
             }
             resolve(ret);
         });
@@ -284,8 +284,8 @@ export class Encryption implements EncryptionIntf {
                     if (this.logKeys) {
                         const cryptoKey: CryptoKey = val.val;
                         await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, cryptoKey);
-                        //let symKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, cryptoKey);
-                        //console.log("symkey: " + S.util.toJson(symKeyStr));
+                        // let symKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, cryptoKey);
+                        // console.log("symkey: " + S.util.toJson(symKeyStr));
                     }
                 }
                 else {
@@ -382,14 +382,14 @@ export class Encryption implements EncryptionIntf {
                     const keyPair: EncryptionKeyPair = obj.val;
 
                     const pubDat = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, keyPair.publicKey);
-                    //this.importKey(this.OP_ENCRYPT, "public", this.publicKeyJson);
+                    // this.importKey(this.OP_ENCRYPT, "public", this.publicKeyJson);
 
                     const privDat = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, keyPair.privateKey);
-                    //this.importKey(this.OP_DECRYPT, "private", this.privateKeyJson);
+                    // this.importKey(this.OP_DECRYPT, "private", this.privateKeyJson);
 
                     ret += "Key Pair (JWK Format):\n" + S.util.toJson({ publicKey: pubDat, privateKey: privDat }) + "\n\n";
 
-                    //yes we export to spki for PEM (not a bug)
+                    // yes we export to spki for PEM (not a bug)
                     const privDatSpki = await crypto.subtle.exportKey("spki", keyPair.publicKey);
                     var pem = this.spkiToPEM(privDatSpki);
                     ret += "Public Key (PEM Format):\n" + pem + "\n\n";
@@ -490,17 +490,17 @@ export class Encryption implements EncryptionIntf {
                     publicKey = await this.getPublicKey();
                 }
 
-                //generate random symmetric key
+                // generate random symmetric key
                 const symKey: CryptoKey = await this.genSymKey();
 
-                //get JWK formatted key string
+                // get JWK formatted key string
                 const symKeyJwk = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, symKey);
                 const symKeyStr = S.util.toJson(symKeyJwk);
 
-                //encrypt the symetric key
+                // encrypt the symetric key
                 const cipherKey = await this.asymEncryptString(publicKey, symKeyStr);
 
-                //encrypt the data with the symetric key
+                // encrypt the data with the symetric key
                 const cipherText = await this.symEncryptString(symKey, data);
 
                 ret = { cipherText, cipherKey };
@@ -524,14 +524,14 @@ export class Encryption implements EncryptionIntf {
                     reject();
                     return;
                 }
-                //Decrypt the symmetric key using our private key
+                // Decrypt the symmetric key using our private key
                 const symKeyJsonStr: string = await this.asymDecryptString(privateKey, skpd.cipherKey);
-                //console.log("Decrypted cipherKey to (asym key to actual data): " + symKeyJsonStr);
+                // console.log("Decrypted cipherKey to (asym key to actual data): " + symKeyJsonStr);
                 const symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
                 const symKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, symKeyJsonObj, this.SYM_ALGO, true, this.OP_ENC_DEC);
-                //console.log("DECRYPTING: cipherText: [" + skpd.cipherText + "]");
+                // console.log("DECRYPTING: cipherText: [" + skpd.cipherText + "]");
                 ret = await this.symDecryptString(symKey, skpd.cipherText);
-                //console.log("            output: [" + ret + "]");
+                // console.log("            output: [" + ret + "]");
             }
             catch (ex) {
                 // todo-1: this was happening when 'importKey' failed for admin user, but I think admin user may not store keys? Need to just

@@ -13,8 +13,8 @@ export class LeftNavPanel extends Div {
     }
 
     preRender(): void {
-        //Haven't figured out yet how I want to deal with scrolling in left
-        //panel which seems incompatible with it being 'fixed' positioning.
+        // Haven't figured out yet how I want to deal with scrolling in left
+        // panel which seems incompatible with it being 'fixed' positioning.
         let state: AppState = useSelector((state: AppState) => state);
         if (!state.isAnonUser && !clientInfo.isMobile) {
             this.setChildren([

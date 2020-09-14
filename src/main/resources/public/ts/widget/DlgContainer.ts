@@ -5,7 +5,7 @@ import { Div } from "./Div";
 //     S = ctx;
 // });
 
-//note: class not in use yet
+// note: class not in use yet
 export class DlgContainer extends Div {
 
     constructor(attribs: Object = {}) {

@@ -34,7 +34,7 @@ export class NodeCompRowFooter extends Div {
             }));
         }
         else {
-           
+
         }
         this.setChildren(children);
     }

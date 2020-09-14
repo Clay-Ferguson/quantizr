@@ -13,7 +13,7 @@ export class MarkdownTypeHandler extends TypeBase {
         super(J.NodeType.NONE, "Markdown", "fa-align-left", true);
     }
 
-    /* don't show this icon unless we are in edit mode, because since most everything is markdown 
+    /* don't show this icon unless we are in edit mode, because since most everything is markdown
     type it would be too verbose. */
     getIconClass(): string {
         let appState = store.getState();

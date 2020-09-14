@@ -17,8 +17,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class QuickEditField extends Span {
 
-    //These statics help us be able to persist editing (not loose edits) across global renders without storing these
-    //in global state which I don't want to do, becuase I don't want these updates triggering rerender cycles.
+    // These statics help us be able to persist editing (not loose edits) across global renders without storing these
+    // in global state which I don't want to do, becuase I don't want these updates triggering rerender cycles.
     static editingId: string = null;
     static editingIsFirst: boolean = false;
     static editingVal: string = null;
@@ -100,7 +100,7 @@ export class QuickEditField extends Span {
     }
 
     saveEdit(): void {
-        //update to not editing state immediately so user gets instant feedback
+        // update to not editing state immediately so user gets instant feedback
         this.mergeState({
             isEditing: false
         });
@@ -118,7 +118,7 @@ export class QuickEditField extends Span {
             typeName: "u",
             initialValue: val
         }, (res) => {
-            //todo-1: this timeout is required, to see the new data, and I don't know why unless it's mongo not being able to commit fast enough ?
+            // todo-1: this timeout is required, to see the new data, and I don't know why unless it's mongo not being able to commit fast enough ?
             setTimeout(() => {
                 S.view.refreshTree(this.appState.node.id, false, res.newNode.id, false, false, false, false, this.appState);
 

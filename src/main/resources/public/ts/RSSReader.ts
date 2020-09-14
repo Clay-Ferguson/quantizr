@@ -13,7 +13,7 @@ export class RSSReader implements RSSReaderIntf {
     FAKE_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)Chrome/53.0.2785.143Safari/537.36";
 
     readFeed = (feedSrc: string, callback: Function): void => {
-        //console.log("Read feed: " + feedSrc);
+        // console.log("Read feed: " + feedSrc);
 
         // accepts:{
         //     xml:"application/rss+xml"
@@ -21,9 +21,9 @@ export class RSSReader implements RSSReaderIntf {
         // dataType:"xml",
 
         axios.get(feedSrc, {
-            //responseType: "document",
+            // responseType: "document",
             headers: {
-                //"Accept": "application/rss+xml",
+                // "Accept": "application/rss+xml",
                 "user-agent": this.FAKE_USER_AGENT
             }
         })
@@ -37,10 +37,10 @@ export class RSSReader implements RSSReaderIntf {
             });
     }
 
-    //NOTE: I'm commenting this whole function becasue I've gotten rid of JQuery, but actually now that i have a single-node-per-feed plugin for RSS feeds
-    //that does the Feed rendering differently i think this whole RSSReader clas can be deleted now ?
+    // NOTE: I'm commenting this whole function becasue I've gotten rid of JQuery, but actually now that i have a single-node-per-feed plugin for RSS feeds
+    // that does the Feed rendering differently i think this whole RSSReader clas can be deleted now ?
     processData = (data: string, callback: Function): void => {
-        //onsole.log("RSS: " + data);
+        // onsole.log("RSS: " + data);
         // try {
         //     let xmlDoc = $.parseXML(data);
         //     let $xml = $(xmlDoc);

@@ -15,29 +15,29 @@ export class Selection extends Comp {
 
     constructor(attribs: any, private label: string = null, public selectionOptions: Object[] = null, moreClasses: string = "", private valueIntf: ValueIntf) {
         super(attribs || {});
-        //w-25 = width 25%
-        //https://hackerthemes.com/bootstrap-cheatsheet/#m-1 
+        // w-25 = width 25%
+        // https://hackerthemes.com/bootstrap-cheatsheet/#m-1
         this.attribs.className = "custom-select " + moreClasses;
 
         selectionOptions.forEach(function (row: any) {
-            //NOTE: for default selection we do it this way rather than the 'elm.selectedIndex' which is used to
-            //to set selected item after rendered.
+            // NOTE: for default selection we do it this way rather than the 'elm.selectedIndex' which is used to
+            // to set selected item after rendered.
             this.children.push(new SelectionOption(row.key, row.val));
         }, this);
 
         this.attribs.onChange = (evt: any) => {
             this.updateValFunc(evt.target.value);
-            //console.log("value = " + evt.target.value);
+            // console.log("value = " + evt.target.value);
         };
     }
 
-    //Handler to update state
+    // Handler to update state
     updateValFunc(value: boolean): void {
         if (value !== this.valueIntf.getValue()) {
             this.valueIntf.setValue(value);
 
-            //needing this line took a while to figure out. If nothing is setting any actual detectable state change
-            //during his call we have to do this here.
+            // needing this line took a while to figure out. If nothing is setting any actual detectable state change
+            // during his call we have to do this here.
             this.forceRender();
         }
     }

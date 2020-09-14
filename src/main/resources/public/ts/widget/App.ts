@@ -21,8 +21,8 @@ export class App extends Div {
     constructor(attribs: Object = {}) {
         super(null, attribs);
 
-        //Since we only instantiate ONE App ever we don't need an 'unsubscribe' and also
-        //our pubsub doesn't even HAVE any unsubscribe function yet.
+        // Since we only instantiate ONE App ever we don't need an 'unsubscribe' and also
+        // our pubsub doesn't even HAVE any unsubscribe function yet.
         PubSub.sub(C.PUBSUB_ClearComponentCache, () => {
             this.tabPanel = null;
         });
@@ -52,8 +52,8 @@ export class App extends Div {
         this.setChildren([
             new Div(null, { role: "toolbar" }, [new MainNavPanel(null)]),
             showBreadcrumbs ? new BreadcrumbsPanel() : null,
-            //For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
-            //both get sized right with no overlapping.
+            // For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
+            // both get sized right with no overlapping.
             fullScreenViewer ||
             new Main({ role: "main", className: clientInfo.isMobile ? "container" : "container-fluid" }, [
                 new Div(null, {

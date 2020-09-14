@@ -13,18 +13,18 @@ import { Singletons } from "../../Singletons";
 import { BaseCompState } from "./BaseCompState";
 import { CompIntf } from "./CompIntf";
 
-//tip: merging two objects: this.state = { ...this.state, ...moreState };
+// tip: merging two objects: this.state = { ...this.state, ...moreState };
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-//declare var PROFILE;
+// declare var PROFILE;
 
 /**
  * This base class is a hybrid that can render React components or can be used to render plain HTML to be used in innerHTML of elements.
- * The innerHTML approach is being phased out in order to transition fully over to normal ReactJS. 
+ * The innerHTML approach is being phased out in order to transition fully over to normal ReactJS.
  */
 export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     static renderCounter: number = 0;
@@ -33,10 +33,10 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     public debugState: boolean = false;
     private static guid: number = 0;
 
-    //This is boolean is kinda tricky. It is needed for when we have text inputs bound to state by onChange to update state
-    //and end up setting state into parent which forces a rerender, and destroys the focus and cursor position as the render creates a NEW
-    //component, and this flag makes the component keep the same 'key' attribute by not rendering with new keys on all elements during onChange
-    //So reuseChildren tells the component keep children if they exist. (mainly only functional in Dialogs currently)
+    // This is boolean is kinda tricky. It is needed for when we have text inputs bound to state by onChange to update state
+    // and end up setting state into parent which forces a rerender, and destroys the focus and cursor position as the render creates a NEW
+    // component, and this flag makes the component keep the same 'key' attribute by not rendering with new keys on all elements during onChange
+    // So reuseChildren tells the component keep children if they exist. (mainly only functional in Dialogs currently)
     static renderCachedChildren: boolean = false;
 
     state: S = {} as any;
@@ -44,10 +44,10 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
     /* this is a more powerful of doing what React.memo can do but supports keys in a better way than React.memo, because
     rect memo, relies on props, and we want to be able to have a custom key object provider instead, which is more flexible and powerful.
-    
+
     Update: It turned out he complexity cost AND performance improvement was horrible, so this memoMap stuff is currently disabled
-    with this switch, but I'm leaving the code here in case there IS a future scenario where this code may be leveraged. 
-    
+    with this switch, but I'm leaving the code here in case there IS a future scenario where this code may be leveraged.
+
     NOTE: IF you turn enableMemoMap back on you need so also find the tag
     #memoReq in this file and uncomment those blocks
     */
@@ -64,7 +64,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     jsClassName: string;
     clazz: string;
 
-    //holds queue of functions to be ran once this component is rendered.
+    // holds queue of functions to be ran once this component is rendered.
     domAddFuncs: ((elm: HTMLElement) => void)[];
 
     renderRawHtml: boolean = false;
@@ -72,7 +72,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     /**
      * 'react' should be true only if this component and all its decendants are true React components that are rendered and
      * controlled by ReactJS (rather than our own innerHTML)
-     * 
+     *
      * allowRect can be set to false for components that are known to be used in cases where not all of their subchildren are react or for
      * whatever reason we want to disable react rendering, and fall back on render-to-text approach
      */
@@ -112,25 +112,25 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         return <HTMLElement>document.getElementById(this.getId());
     }
 
-    //This is the original implementation of whenElm which uses a timer to wait for the element to come into existence
-    //and is only used in one odd place where we manually attach Dialogs to the DOM (see DialogBase.ts)
+    // This is the original implementation of whenElm which uses a timer to wait for the element to come into existence
+    // and is only used in one odd place where we manually attach Dialogs to the DOM (see DialogBase.ts)
     whenElmEx(func: (elm: HTMLElement) => void) {
         S.util.getElm(this.getId(), func);
     }
 
-    //WARNING: Use whenElmEx for DialogBase derived components!
+    // WARNING: Use whenElmEx for DialogBase derived components!
     whenElm(func: (elm: HTMLElement) => void) {
-        //console.log("whenElm running for " + this.jsClassName);
+        // console.log("whenElm running for " + this.jsClassName);
 
         let elm = this.getElement();
         if (elm) {
-            //console.log("Looked for and FOUND on DOM: " + this.jsClassName);
+            // console.log("Looked for and FOUND on DOM: " + this.jsClassName);
             func(elm);
             return;
         }
 
-        //console.log("queueing the function " + this.jsClassName);
-        //queue up the 'func' to be called once the domAddEvent gets executed.
+        // console.log("queueing the function " + this.jsClassName);
+        // queue up the 'func' to be called once the domAddEvent gets executed.
         if (!this.domAddFuncs) {
             this.domAddFuncs = [func];
         }
@@ -189,7 +189,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
     renderHtmlElm(elm: ReactElement): string {
         return renderToString(elm);
-        //return renderToStaticMarkup(elm);
+        // return renderToStaticMarkup(elm);
     }
 
     reactRenderHtmlInDiv(): string {
@@ -202,9 +202,9 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         return "<span id='" + this.getId() + "_re'></span>";
     }
 
-    /* Attaches a react element directly to the dom at the DOM id specified. 
-       WARNING: This can only re-render the *children* under the target node and not the attributes or tag of the node itself. 
-       
+    /* Attaches a react element directly to the dom at the DOM id specified.
+       WARNING: This can only re-render the *children* under the target node and not the attributes or tag of the node itself.
+
        Also this can only re-render TOP LEVEL elements, meaning elements that are not children of other React Elements, but attached
        to the DOM old-school.
     */
@@ -216,7 +216,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         //     throw new Error("Attempted to treat non-react component as react: " + this.constructor.name);
         // }
         S.util.getElm(id, (elm: HTMLElement) => {
-            //See #RulesOfHooks in this file, for the reason we blowaway the existing element to force a rebuild.
+            // See #RulesOfHooks in this file, for the reason we blowaway the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
 
             (this._render as any).displayName = this.jsClassName;
@@ -224,7 +224,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
             /* If this component has a store then wrap with the Redux Provider to make it all reactive */
             if (store) {
-                //console.log("Rendering with provider");
+                // console.log("Rendering with provider");
                 let provider = S.e(Provider, { store }, reactElm);
                 ReactDOM.render(provider, elm);
             }
@@ -239,13 +239,13 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             this.children = this.cachedChildren;
         }
         else {
-            //looks like we don't need to clone the children, we can just use as is.
+            // looks like we don't need to clone the children, we can just use as is.
             // this.cachedChildren = [];
             // this.cachedChildren = this.cachedChildren.concat(this.children);
             this.cachedChildren = this.children;
         }
 
-        //console.log("buildChildren: " + this.jsClassName);
+        // console.log("buildChildren: " + this.jsClassName);
         if (this.children == null || this.children.length === 0) return null;
         let reChildren: ReactNode[] = [];
 
@@ -253,7 +253,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             if (child) {
                 let reChild: ReactNode = null;
                 try {
-                    //console.log("ChildRender: " + child.jsClassName);
+                    // console.log("ChildRender: " + child.jsClassName);
                     (this._render as any).displayName = child.jsClassName;
                     reChild = S.e(child._render, child.attribs);
                 }
@@ -265,7 +265,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
                     reChildren.push(reChild);
                 }
                 else {
-                    //console.log("ChildRendered to null: " + child.jsClassName);
+                    // console.log("ChildRendered to null: " + child.jsClassName);
                 }
             }
         }, this);
@@ -290,7 +290,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
     tagRender(tag: string, content: string, props: any) {
-        //console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
+        // console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
 
         this.updateVisAndEnablement();
 
@@ -306,11 +306,11 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             }
 
             if (children && children.length > 0) {
-                //console.log("Render Tag with children.");
+                // console.log("Render Tag with children.");
                 return S.e(tag, props, children);
             }
             else {
-                //console.log("Render Tag no children.");
+                // console.log("Render Tag no children.");
                 return S.e(tag, props);
             }
         }
@@ -342,8 +342,8 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         });
     }
 
-    /* Note: this method performs a direct state mod, until react overrides it using useState return value 
-    
+    /* Note: this method performs a direct state mod, until react overrides it using useState return value
+
     To add new properties...use this pattern (mergeState above does this)
     setStateFunc(prevState => {
         // Object.assign would also work
@@ -380,23 +380,23 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
     _render = (props: any): ReactNode => {
-        //console.log("render(): " + this.jsClassName);
+        // console.log("render(): " + this.jsClassName);
         this.rendered = true;
 
         let ret: ReactNode = null;
         try {
             const [state, setStateEx] = useState(this.state);
 
-            //#memoReq
-            //const [isMounted, setIsMounted] = useState<boolean>(false);
+            // #memoReq
+            // const [isMounted, setIsMounted] = useState<boolean>(false);
 
-            //console.warn("Component state was null in render for: " + this.jsClassName);
+            // console.warn("Component state was null in render for: " + this.jsClassName);
             this.state = state;
 
             this.setStateEx = setStateEx.bind(this);
             // #memoReq
             // this.setStateEx = (state) => {
-            //     //React will bark at us if we allow a setState call to execute on a component that's no longer mounted, so that's why we have the 'isMounted' 
+            //     //React will bark at us if we allow a setState call to execute on a component that's no longer mounted, so that's why we have the 'isMounted'
             //     //varible. The error in React says this:
             //     //Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function. in Unknown
             //     //if (!isMounted) return;
@@ -411,7 +411,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             // }, []);
             useEffect(this._domAddEvent || (this._domAddEvent = this.domAddEvent.bind(this)), []);
 
-            //This hook should work fine but just isn't needed yet.
+            // This hook should work fine but just isn't needed yet.
             if (this.domUpdateEvent) {
                 // useEffect(() => {
                 //     //console.log("DOM UPDATE: " + this.jsClassName);
@@ -428,49 +428,49 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
                 useLayoutEffect(this.domPreUpdateEvent);
             }
 
-            /* 
+            /*
             This 'useEffect' call makes react call 'domRemoveEvent' once the dom element is removed from the acutal DOM.
             (NOTE: Remember this won't run for DialogBase because it's done using pure DOM Javascript, which is the same reason
             whenElmEx has to still exist right now)
             */
-            //useEffect(this.domRemoveEventFunc, []);
+            // useEffect(this.domRemoveEventFunc, []);
 
             this.updateVisAndEnablement();
 
             /* Theoretically we could avoid calling preRender if it weren't for the fact that React monitors
-            which hooks get called at each render cycle, so if we bypass the preRender because we wont' be using 
+            which hooks get called at each render cycle, so if we bypass the preRender because we wont' be using
             the children it generates, react will still throw an error becasue the calls to those hooks will not have been made.
 
             DO NOT DELETE THE COMMENTNED IF BELOW (it serves as warning of what NOT to do.)
             */
-            //if (!Comp.renderCachedChildren) {
+            // if (!Comp.renderCachedChildren) {
             this.preRender();
-            //}
+            // }
 
             let key = null;
             let appState: AppState = null;
 
-            /* if we are caching this ReactNode (memoizing) then try to get object from cache 
-            instead of rendering it 
-            
+            /* if we are caching this ReactNode (memoizing) then try to get object from cache
+            instead of rendering it
+
             TODO: If we ever re-enable this code find a way to make it so that components not providing any makeCacheKeyObj can be detected
             and and avoid even entering into this block on a component by component basis
             */
             if (Comp.enableMemoMap) {
 
-                //note: getting full state here is a big performance hit? There's definitely a performance issue.
+                // note: getting full state here is a big performance hit? There's definitely a performance issue.
                 appState = useSelector(function (state: AppState) { return state; });
 
-                //NOTE: The final experimental definition of this function is that it returns a 'string' not an object.
+                // NOTE: The final experimental definition of this function is that it returns a 'string' not an object.
                 let keyObj = this.makeCacheKeyObj(appState, state, props);
-                //console.log("keyObj=" + S.util.prettyPrint(keyObj));
+                // console.log("keyObj=" + S.util.prettyPrint(keyObj));
                 if (keyObj) {
-                    key = keyObj; //this.constructor.name + "_" + JSON.stringify(keyObj); // S.util.hashOfObject(keyObj);
+                    key = keyObj; // this.constructor.name + "_" + JSON.stringify(keyObj); // S.util.hashOfObject(keyObj);
 
-                    //console.log("CACHE KEY HASH: "+key);
+                    // console.log("CACHE KEY HASH: "+key);
                     let rnode: ReactNode = Comp.memoMap[key];
                     if (rnode) {
-                        //console.log("********** CACHE HIT: " + this.jsClassName);
+                        // console.log("********** CACHE HIT: " + this.jsClassName);
                         return rnode;
                     }
                 }
@@ -478,7 +478,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
             Comp.renderCounter++;
             if (this.debug) {
-                console.log("calling compRender: " + this.jsClassName + " counter=" + Comp.renderCounter); //+ " PROPS=" + S.util.prettyPrint(props));
+                console.log("calling compRender: " + this.jsClassName + " counter=" + Comp.renderCounter); // + " PROPS=" + S.util.prettyPrint(props));
             }
 
             ret = this.compRender();
@@ -489,7 +489,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             }
         }
         catch (e) {
-            //todo-1: this is not logging the stack
+            // todo-1: this is not logging the stack
             console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key + " Error: " + e);
         }
 
@@ -513,7 +513,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
     _domAddEvent: () => void = null;
     domAddEvent(): void {
-        //console.log("domAddEvent: " + this.jsClassName);
+        // console.log("domAddEvent: " + this.jsClassName);
 
         if (this.domAddFuncs) {
             let elm: HTMLElement = this.getElement();
@@ -522,7 +522,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
                 return;
             }
             else {
-                //console.log("domAddFuncs running for "+this.jsClassName+" for "+this.domAddFuncs.length+" functions.");
+                // console.log("domAddFuncs running for "+this.jsClassName+" for "+this.domAddFuncs.length+" functions.");
             }
             this.domAddFuncs.forEach(function (func) {
                 func(elm);
@@ -531,7 +531,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         }
     }
 
-    /* Intended to be optionally overridable to set children, and the ONLY thing to be done in this method should also be 
+    /* Intended to be optionally overridable to set children, and the ONLY thing to be done in this method should also be
     just to set the children */
     preRender(): void {
     }

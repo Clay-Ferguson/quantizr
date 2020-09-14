@@ -41,7 +41,7 @@ export class TabPanel extends Div {
             mainDisplay = "none";
         }
 
-        //the row of buttons that ARE the tabs where you click to change tabs.
+        // the row of buttons that ARE the tabs where you click to change tabs.
         let tabButtons = new Div(null, {
             className: "row tab-buttons-container"
         }, [
@@ -125,7 +125,7 @@ export class TabPanel extends Div {
             )]
         );
 
-        //Tab content below buttons
+        // Tab content below buttons
         let tabContent = new Div(null, {
             className: "row tab-content",
             // id: "mainScrollingArea",

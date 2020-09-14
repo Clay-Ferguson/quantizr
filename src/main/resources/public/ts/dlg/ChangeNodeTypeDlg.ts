@@ -52,7 +52,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
     }
 
     setNodeType = (): void => {
-        //console.log("accepting TypeSelected: " + this.getState().selType);
+        // console.log("accepting TypeSelected: " + this.getState().selType);
         this.selCallback(this.getState().selType);
     }
 }

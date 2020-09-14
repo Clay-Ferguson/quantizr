@@ -13,8 +13,8 @@ export class ToggleIcon extends Comp {
 
     constructor(private toggleOnClass: string, private toggleOffClass: string, attribs: Object = null) {
         super(attribs);
-        //for now we're letting the container class do the toggling.
-        //this.attribs.onClick = this.onClick;
+        // for now we're letting the container class do the toggling.
+        // this.attribs.onClick = this.onClick;
         this.mergeState({
             className: this.attribs.className,
             toggle: false

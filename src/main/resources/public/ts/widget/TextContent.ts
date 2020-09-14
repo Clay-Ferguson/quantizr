@@ -24,15 +24,15 @@ export class TextContent extends Comp {
     compRender(): ReactNode {
         let state = this.getState();
 
-        //todo-1: research this hack. Not sure I want to keep detecting HTML this way.
+        // todo-1: research this hack. Not sure I want to keep detecting HTML this way.
         if (state.text && state.text.indexOf("<") !== -1) {
-            //console.log("Dangerously setting html: "+this.jsClassName);
+            // console.log("Dangerously setting html: "+this.jsClassName);
             let _p: any = { id: this.getId(), key: this.getId() };
             _p.dangerouslySetInnerHTML = { __html: state.text };
             return S.e(this.preformatted ? "pre" : "div", { ...this.attribs, ..._p });
         }
         else {
-            //console.log("Building (TextContent) react element: " + this.attribs.id);
+            // console.log("Building (TextContent) react element: " + this.attribs.id);
             return S.e(this.preformatted ? "pre" : "div", this.attribs, state.text);
         }
     }

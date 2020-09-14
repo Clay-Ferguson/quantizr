@@ -52,7 +52,7 @@ export class EditNodeDlg extends DialogBase {
     deleteUploadButton: Button;
     deletePropButton: Button;
 
-    //maps the DOM ids of dom elements the property that DOM element is editing.
+    // maps the DOM ids of dom elements the property that DOM element is editing.
     compIdToPropMap: { [key: string]: J.PropertyInfo } = {};
 
     contentEditor: I.TextEditorIntf;
@@ -61,7 +61,7 @@ export class EditNodeDlg extends DialogBase {
 
     skdp: SymKeyDataPackage;
 
-    //if user uploads or deletes an upload we set this, to force refresh when dialog closes even if they don't click save.
+    // if user uploads or deletes an upload we set this, to force refresh when dialog closes even if they don't click save.
     binaryDirty: boolean = false;
 
     /* Since some of our property editing (the Selection components) modify properties 'in-place' in the node we have
@@ -73,20 +73,20 @@ export class EditNodeDlg extends DialogBase {
         this.mergeState({
             node,
 
-            //selected props is used as a set of all 'selected' (via checkbox) property names
+            // selected props is used as a set of all 'selected' (via checkbox) property names
             selectedProps: new Set<string>()
         });
         this.initialProps = S.util.arrayClone(node.properties);
     }
 
     createLayoutSelection = (): Selection => {
-        //todo-1: these columns need to auto-space and not go past allowed width of page display
+        // todo-1: these columns need to auto-space and not go past allowed width of page display
         let selection: Selection = new Selection(null, "Layout", [
             { key: "v", val: "Vertical" },
             { key: "c2", val: "2 Columns" },
             { key: "c3", val: "3 Columns" },
             { key: "c4", val: "4 Columns" }
-        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v")); //w-25
+        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v")); // w-25
         return selection;
     }
 
@@ -106,8 +106,8 @@ export class EditNodeDlg extends DialogBase {
         let options = [];
 
         if (allowNone) {
-            //none means we would ignore the option during rendering, slightly different from "Actual" in cases
-            //where this is an override that we don't want to override with. 'none' means don't override.
+            // none means we would ignore the option during rendering, slightly different from "Actual" in cases
+            // where this is an override that we don't want to override with. 'none' means don't override.
             options.push({ key: "n", val: "None" });
         }
 
@@ -188,8 +188,8 @@ export class EditNodeDlg extends DialogBase {
 
         let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
 
-        //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
-        //to dangerously opt into this also without hacking the code with this var.
+        // This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
+        // to dangerously opt into this also without hacking the code with this var.
         let allowEditAllProps: boolean = this.appState.isAdminUser;
 
         // let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
@@ -197,7 +197,7 @@ export class EditNodeDlg extends DialogBase {
 
         let children = [
             new Form(null, [
-                //this.help = new TextContent("Help content."),
+                // this.help = new TextContent("Help content."),
                 new Div(null, {
                 }, [
                     this.propertyEditFieldContainer = new Div("", {
@@ -214,7 +214,7 @@ export class EditNodeDlg extends DialogBase {
                 className: "marginRight"
             }, {
                 setValue: (checked: boolean): void => {
-                    //this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
+                    // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
                     S.props.setNodePropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
                     if (this.contentEditor) {
                         this.contentEditor.setWordWrap(checked);
@@ -248,16 +248,16 @@ export class EditNodeDlg extends DialogBase {
         let propsTable = null;
         let mainPropsTable = null;
 
-        //if customProps exists then the props are all added into 'editPropsTable' instead of the collapsible panel
+        // if customProps exists then the props are all added into 'editPropsTable' instead of the collapsible panel
         if (!customProps) {
             propsTable = new EditPropsTable({
                 className: "edit-props-table form-group-border"
             });
-            //This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
+            // This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
             mainPropsTable = new EditPropsTable();
         }
         else {
-            //This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
+            // This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
             mainPropsTable = new EditPropsTable({
                 className: "edit-props-table form-group-border"
             });
@@ -282,8 +282,8 @@ export class EditNodeDlg extends DialogBase {
 
         if (allowContentEdit) {
             let hasContentProp = typeHandler && typeHandler.hasCustomProp("content");
-            
-            //We use 4 rows instead of 15 only if this is a customProps node.
+
+            // We use 4 rows instead of 15 only if this is a customProps node.
             let rows = "15";
             if (customProps && hasContentProp) {
                 rows = "4";
@@ -424,7 +424,7 @@ export class EditNodeDlg extends DialogBase {
                 this.close();
             })
 
-            //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
+            // this.insertTimeButton = new Button("Ins. Time", this.insertTime),
         ]);
     }
 
@@ -454,7 +454,7 @@ export class EditNodeDlg extends DialogBase {
             });
             this.mergeState({ state });
         }
-        //we don't need to return an actual promise here
+        // we don't need to return an actual promise here
         return null;
     }
 
@@ -569,8 +569,8 @@ export class EditNodeDlg extends DialogBase {
             if (this.contentEditor) {
                 content = this.contentEditor.getValue();
 
-                //todo-1: an optimization can be done here such that if we just ENCRYPTED the node, we use this.skpd.symKey becuase that
-                //will already be available
+                // todo-1: an optimization can be done here such that if we just ENCRYPTED the node, we use this.skpd.symKey becuase that
+                // will already be available
                 let cipherKey = S.props.getCryptoKey(state.node, this.appState);
                 if (cipherKey) {
                     content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
@@ -586,7 +586,7 @@ export class EditNodeDlg extends DialogBase {
             let askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") !== -1 ||
                 (state.node as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
 
-            //console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
+            // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
 
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
                 updateModTime: true,
@@ -620,19 +620,19 @@ export class EditNodeDlg extends DialogBase {
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
         //     + "] fieldId=" + propEntry.id);
 
-        //todo-1: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
-        //and be better with a Textfield based editor
+        // todo-1: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
+        // and be better with a Textfield based editor
         if (!allowEditAllProps && isReadOnly) {
             let textarea = new Textarea(label + " (read-only)", {
                 readOnly: "readOnly",
                 disabled: "disabled"
             }, {
                 getValue: () => {
-                    //read-only. always return original value.
+                    // read-only. always return original value.
                     return propValStr;
                 },
                 setValue: (val: any) => {
-                    //this is a read-only field
+                    // this is a read-only field
                 }
             });
 
@@ -669,11 +669,11 @@ export class EditNodeDlg extends DialogBase {
             let valueIntf = {
                 getValue: (): string => {
                     let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
-                    //console.log("getValue[" + propEntry.name + "]=" + val);
+                    // console.log("getValue[" + propEntry.name + "]=" + val);
                     return val;
                 },
                 setValue: (val: any) => {
-                    //console.log("settingValue[" + propEntry.name + "]=" + val);
+                    // console.log("settingValue[" + propEntry.name + "]=" + val);
                     let state = this.getState();
                     S.props.setNodePropVal(propEntry.name, this.getState().node, val);
                     this.mergeState(state);
@@ -695,7 +695,7 @@ export class EditNodeDlg extends DialogBase {
                 to detect to treat a string as a date based on its property name. */
                 if (propEntry.name === "date") {
 
-                    //Ensure we have set the default time if none is yet set.
+                    // Ensure we have set the default time if none is yet set.
                     let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
                     if (!val) {
                         valueIntf.setValue("" + new Date().getTime());
@@ -704,7 +704,7 @@ export class EditNodeDlg extends DialogBase {
                     valEditor = new DateTimeField(valueIntf);
                 }
                 else {
-                    //console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
+                    // console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
                     valEditor = new TextField(null, false, null, S.props.getInputClassForType(propEntry.name), valueIntf);
                 }
             }
@@ -721,11 +721,11 @@ export class EditNodeDlg extends DialogBase {
         let formGroup = new FormGroup();
         let encrypted = value.startsWith(J.Constant.ENC_TAG);
 
-        //if this is the first pass thru here (not a re-render) then allow focus() to get called
+        // if this is the first pass thru here (not a re-render) then allow focus() to get called
         let allowFocus = !this.contentEditor;
 
         value = S.util.escapeForAttrib(value);
-        //console.log("making field editor for val[" + value + "]");
+        // console.log("making field editor for val[" + value + "]");
 
         if (C.ENABLE_ACE_EDITOR) {
             let aceMode = node.type === J.NodeType.PLAIN_TEXT ? "ace/mode/text" : "ace/mode/markdown";
@@ -736,7 +736,7 @@ export class EditNodeDlg extends DialogBase {
                     if ((this.contentEditor as AceEditPropTextarea).getAceEditor()) {
 
                         if (encrypted) {
-                            //console.log('decrypting: ' + value);
+                            // console.log('decrypting: ' + value);
                             let cipherText = value.substring(J.Constant.ENC_TAG.length);
                             (async () => {
                                 let cipherKey = S.props.getCryptoKey(node, this.appState);
@@ -747,7 +747,7 @@ export class EditNodeDlg extends DialogBase {
                                         (this.contentEditor as Textarea).setError("Decryption Failed");
                                     }
                                     else {
-                                        //console.log('decrypted to:' + value);
+                                        // console.log('decrypted to:' + value);
                                         (this.contentEditor as AceEditPropTextarea).setValue(clearText);
                                     }
                                 }
@@ -787,7 +787,7 @@ export class EditNodeDlg extends DialogBase {
 
             this.contentEditor.whenElm((elm: HTMLElement) => {
                 if (encrypted) {
-                    //console.log("decrypting: " + value);
+                    // console.log("decrypting: " + value);
                     let cipherText = value.substring(J.Constant.ENC_TAG.length);
                     (async () => {
                         let cipherKey = S.props.getCryptoKey(node, this.appState);
@@ -798,7 +798,7 @@ export class EditNodeDlg extends DialogBase {
                                 (this.contentEditor as Textarea).setError("Decryption Failed");
                             }
                             else {
-                                //console.log("decrypted to:" + value);
+                                // console.log("decrypted to:" + value);
                                 (this.contentEditor as Textarea).setValue(clearText);
                             }
                         }
@@ -830,7 +830,7 @@ export class EditNodeDlg extends DialogBase {
     cancelEdit = (): void => {
         this.close();
 
-        //rollback properties.
+        // rollback properties.
         this.getState().node.properties = this.initialProps;
 
         if (this.binaryDirty) {

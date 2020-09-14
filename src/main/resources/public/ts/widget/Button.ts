@@ -45,9 +45,9 @@ export class Button extends Comp {
             this.attribs.disabled = "disabled";
         }
 
-        //console.log("ButtonRender: "+this.jsClassName+" attribs.disabled="+this.attribs.disabled);
+        // console.log("ButtonRender: "+this.jsClassName+" attribs.disabled="+this.attribs.disabled);
 
-        // I'd rather hide the button (instead of show as disabled), but the corners are inconisistent due to the way bootstrap 
+        // I'd rather hide the button (instead of show as disabled), but the corners are inconisistent due to the way bootstrap
         // jams buttons together and
         // makes them touch with square sides so that if a button is hidden from one of the left or right sides it leaves an ugly square edge
         // on remaining button.

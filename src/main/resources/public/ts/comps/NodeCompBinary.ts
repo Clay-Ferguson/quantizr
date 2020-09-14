@@ -50,7 +50,7 @@ export class NodeCompBinary extends Div {
         else {
             imgSize = imgSize.trim();
 
-            //for backwards compatability if no units are given assume percent
+            // for backwards compatability if no units are given assume percent
             if (!imgSize.endsWith("%") && !imgSize.endsWith("px")) {
                 imgSize += "%";
             }
@@ -58,7 +58,7 @@ export class NodeCompBinary extends Div {
             style.width = "calc(" + imgSize + " - 12px)";
         }
 
-        //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+        // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
         let img: Img = new Img(node.id, {
             src,
             className: this.isEditorEmbed ? "attached-img-in-editor" : "attached-img-in-row",
@@ -86,7 +86,7 @@ export class NodeCompBinary extends Div {
                 }
 
                 s.fullScreenViewId = nodeId;
-                //s.fullScreenGraphId = nodeId;
+                // s.fullScreenGraphId = nodeId;
             }
         });
     }

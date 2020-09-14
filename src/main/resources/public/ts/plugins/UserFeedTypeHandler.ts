@@ -31,10 +31,10 @@ export class UserFeedTypeHandler extends TypeBase {
             return true;
         }
     }
-    
+
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
 
-        //let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
+        // let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
         return new Div(null, null, [
             new Heading(4, "Posts: " + node.owner, {
                 className: "marginAll"
@@ -46,7 +46,7 @@ export class UserFeedTypeHandler extends TypeBase {
             //         S.nav.navFeed(state)
             //     })
             // ], null, "float-right marginBottom"),
-            //new Div(null, { className: "clearfix" })
+            // new Div(null, { className: "clearfix" })
         ]);
     }
 }

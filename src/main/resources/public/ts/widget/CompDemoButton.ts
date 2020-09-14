@@ -23,15 +23,15 @@ export class CompDemoButton extends Div {
 
         children.push(new HorizontalLayout([
             new Div("Button " + cstate.idx + ": Inc CompDemo.state.counter=" + cstate.counter + " AppState.counter=" + state.counter, {
-                className: "btn btn-primary" + (state.compDemoIdActive === cstate.idx ? " testHighlight" : ""), 
+                className: "btn btn-primary" + (state.compDemoIdActive === cstate.idx ? " testHighlight" : ""),
                 type: "button",
                 onClick: () => {
                     Comp.renderCounter = 0;
-                    //this.setStateEx({ counter: ++cstate.counter, cstate.idx });
+                    // this.setStateEx({ counter: ++cstate.counter, cstate.idx });
                     this.mergeState({ counter: ++cstate.counter });
 
                     dispatch({
-                        type: "Action_DemoAppIncCounter", 
+                        type: "Action_DemoAppIncCounter",
                         state,
                         update: (s: AppState): void => {
                             s.compDemoIdActive = cstate.idx;

@@ -69,7 +69,7 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Delete node", res)) {
             S.meta64.clearSelNodes(state);
 
-            //We only want to pass a nodeId here if we are going to root node.
+            // We only want to pass a nodeId here if we are going to root node.
             const nodeId = postDelSelNodeId === state.homeNodeId ? postDelSelNodeId : null;
 
             S.view.refreshTree(nodeId, false, postDelSelNodeId, false, false, true, true, state);
@@ -137,8 +137,8 @@ export class Edit implements EditIntf {
             owner = "admin";
         }
 
-        //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to
-        //make nodes editable by any other user.
+        // if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to
+        // make nodes editable by any other user.
         if (owner === "admin" && !state.isAdminUser) return false;
 
         return state.userPreferences.editMode &&
@@ -158,16 +158,16 @@ export class Edit implements EditIntf {
             owner = "admin";
         }
 
-        //if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to
-        //make nodes editable by any other user.
+        // if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to
+        // make nodes editable by any other user.
         if (owner === "admin" && !state.isAdminUser) return false;
 
-        //right now, for logged in users, we enable the 'new' button because the CPU load for determining it's enablement is too much, so
-        //we throw an exception if they cannot. todo-1: need to make this work better.
-        //however we CAN check if this node is an "admin" node and at least disallow any inserts under admin-owned nodess
+        // right now, for logged in users, we enable the 'new' button because the CPU load for determining it's enablement is too much, so
+        // we throw an exception if they cannot. todo-1: need to make this work better.
+        // however we CAN check if this node is an "admin" node and at least disallow any inserts under admin-owned nodess
         if (state.isAdminUser) return true;
         if (state.isAnonUser) return false;
-        //console.log("isInsertAllowed: node.owner="+node.owner+" nodeI="+node.id);
+        // console.log("isInsertAllowed: node.owner="+node.owner+" nodeI="+node.id);
         return node.owner !== "admin";
     }
 
@@ -470,19 +470,19 @@ export class Edit implements EditIntf {
 
         new ConfirmDlg("Permanently delete your entire Trash Bin", "Empty Trash",
             () => {
-                //do not delete (see note above)
-                //let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode();
+                // do not delete (see note above)
+                // let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode();
 
                 S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                     nodeIds: [state.homeNodePath + "/d"],
                     hardDelete: true
                 }, (res: J.DeleteNodesResponse) => {
-                    //if user was viewing trash when the deleted it that's a proble, so for now the short term
-                    //solution is send user to their root now.
+                    // if user was viewing trash when the deleted it that's a proble, so for now the short term
+                    // solution is send user to their root now.
                     S.nav.openContentNode(state.homeNodePath, state);
 
-                    //do not delete (see note above)
-                    //this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode });
+                    // do not delete (see note above)
+                    // this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode });
                 });
             }, null, "btn-danger", "alert alert-danger", state
         ).open();
@@ -514,7 +514,7 @@ export class Edit implements EditIntf {
     deleteSelNodes = (nodeId: string, hardDelete: boolean, state?: AppState): void => {
         state = appState(state);
 
-        //if a nodeId was specified we use it as the selected nodes to delete
+        // if a nodeId was specified we use it as the selected nodes to delete
         if (nodeId) {
             S.nav.setNodeSel(true, nodeId, state);
         }
@@ -559,14 +559,14 @@ export class Edit implements EditIntf {
                     this.removeNodesFromCalendarData(selNodesArray, state);
 
                     if (!postDelSelNodeId) {
-                        //we get here if user has deleted the last child (all chidren) of the parent of the current page
+                        // we get here if user has deleted the last child (all chidren) of the parent of the current page
                         S.nav.navUpLevel();
                     } else {
                         this.deleteNodesResponse(res, postDelSelNodeId, state);
                     }
                 });
             },
-            null, //no callback
+            null, // no callback
             (nodeCheck.deleted || hardDelete) ? "btn-danger" : null,
             (nodeCheck.deleted || hardDelete) ? "alert alert-danger" : null,
             state
@@ -594,7 +594,7 @@ export class Edit implements EditIntf {
         /* Use a hashmap-type approach to saving all selected nodes into a lookup map */
         const nodesToDelMap: Object = S.meta64.getSelNodesAsMapById(state);
 
-        //If we are deleting the page root node return 'null' to trigger an 'upLevel'
+        // If we are deleting the page root node return 'null' to trigger an 'upLevel'
         if (nodesToDelMap[state.node.id]) {
             return null;
         }
@@ -638,19 +638,14 @@ export class Edit implements EditIntf {
         S.nav.setNodeSel(true, nodeId, state);
         const selNodesArray = S.meta64.getSelNodeIdsArray(state);
 
-        new ConfirmDlg("Cut " + selNodesArray.length + " node(s), to paste/move to new location ?", "Confirm Cut",
-            async () => {
-                dispatch({
-                    type: "Action_SetNodesToMove",
-                    state,
-                    update: (s: AppState): void => {
-                        s.nodesToMove = selNodesArray;
-                    }
-                });
-                state.selectedNodes = {}; // clear selections.
-
-            }, null, null, null, state
-        ).open();
+        dispatch({
+            type: "Action_SetNodesToMove",
+            state,
+            update: (s: AppState): void => {
+                s.nodesToMove = selNodesArray;
+            }
+        });
+        state.selectedNodes = {};
     }
 
     cached_pasteSelNodesInside = (nodeId: string) => {
@@ -658,7 +653,7 @@ export class Edit implements EditIntf {
         this.pasteSelNodes(nodeId, "inside", state);
     }
 
-    //location=inside | inline | inline-above (todo-1: put in java-aware enum)
+    // location=inside | inline | inline-above (todo-1: put in java-aware enum)
     pasteSelNodes = (nodeId: string, location: string, state?: AppState): void => {
         state = appState(state);
         /*
@@ -814,7 +809,7 @@ export class Edit implements EditIntf {
             return;
         }
 
-        //console.log("Moving node[" + targetNodeId + "] into position of node[" + sourceNodeId + "]");
+        // console.log("Moving node[" + targetNodeId + "] into position of node[" + sourceNodeId + "]");
         const state = appState(null);
 
         S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {

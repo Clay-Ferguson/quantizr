@@ -94,7 +94,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
             }
         }
 
-        //todo-1: need to DRY up places where this code block is repeated
+        // todo-1: need to DRY up places where this code block is repeated
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass();
@@ -140,7 +140,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         on a page and we don't want to burn that much CPU just to prevent empty-folders from being explored. Empty folders are rare.
         */
         if (node.hasChildren && !isPageRootNode &&
-            //If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
+            // If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
             (!isInlineChildren || state.userPreferences.editMode)) {
 
             /* convert this button to a className attribute for styles */
@@ -157,7 +157,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
             // console.log("Editing allowed: " + nodeId);
 
             if (editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, node, state)) &&
-                //no need to ever select home node
+                // no need to ever select home node
                 node.id !== state.homeNodeId) {
                 selButton = new Checkbox(null, {
                     title: "Select Node for multi-node functions."
@@ -181,7 +181,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
             }
 
             if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node, state) &&
-                //not page root node 'or' page no children exist.
+                // not page root node 'or' page no children exist.
                 (node.id !== state.node.id || !node.children || node.children.length === 0)) {
                 createSubNodeButton = new Button("New", S.meta64.getNodeFunc(S.edit.cached_newSubNode, "S.edit.newSubNode", node.id),
                     { title: "Create new Node as a child of this node." });
@@ -224,7 +224,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     }
                 }
 
-                //not user's account node!
+                // not user's account node!
                 if (node.id !== state.homeNodeId) {
                     deleteNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_softDeleteSelNodes, "S.edit.softDeleteSelNodes", node.id), {
                         iconclass: "fa fa-trash fa-lg",
@@ -241,7 +241,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
             }
         }
 
-        //If showMetaData is true the avatar will show up in a different place (very upper left), instead of here
+        // If showMetaData is true the avatar will show up in a different place (very upper left), instead of here
         let avatarImg: Img;
         if (!state.userPreferences.showMetaData && this.allowAvatar && node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeAvatarImage(node, state);

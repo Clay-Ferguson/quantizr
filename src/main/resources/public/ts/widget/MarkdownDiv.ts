@@ -7,8 +7,8 @@ import { CompIntf } from "./base/CompIntf";
 
 // https://github.com/mathjax/MathJax-demos-web
 // https://github.com/mathjax/MathJax-node
-// 
-// Supposedly mathjax-node should work, but I never got this import to 
+//
+// Supposedly mathjax-node should work, but I never got this import to
 // compile without errors, so I just went back to loading MathJax from CDN
 // as a script tag in the HTML.
 //
@@ -47,7 +47,7 @@ export class MarkdownDiv extends Comp {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
 
-        //console.log("Rendering MarkdownDiv: "+this.getState().content);
+        // console.log("Rendering MarkdownDiv: "+this.getState().content);
         this.attribs.dangerouslySetInnerHTML = { __html: this.getState().content };
         return S.e("div", this.attribs);
     }
@@ -56,7 +56,7 @@ export class MarkdownDiv extends Comp {
     domPreUpdateEvent = (): void => {
         this.whenElm((elm) => {
             if (MathJax && MathJax.typeset) {
-                //note: MathJax.typesetPromise(), also exists
+                // note: MathJax.typesetPromise(), also exists
                 MathJax.typeset([elm]);
 
                 S.util.forEachElmBySel("#" + this.getId() + " a", (el, i) => {

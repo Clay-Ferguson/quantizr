@@ -3,8 +3,8 @@ import { LocalDBIntf } from "./intf/LocalDBIntf";
 /* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
 export class LocalDB implements LocalDBIntf {
 
-    //For performance, I think it may be better to just never close the database once opened, but this flag allows
-    //the logic to flow either way if we ever need to (close always or not)
+    // For performance, I think it may be better to just never close the database once opened, but this flag allows
+    // the logic to flow either way if we ever need to (close always or not)
     keepDbOpen: boolean = true;
     db: IDBDatabase = null;
 
@@ -45,8 +45,8 @@ export class LocalDB implements LocalDBIntf {
 
             tx.oncomplete = () => {
                 if (!this.keepDbOpen) {
-                    //todo-1: need to research best practice for this, and see if we should be closing the DB here or if there's
-                    //some better pattern for keeping it open for more transactions.
+                    // todo-1: need to research best practice for this, and see if we should be closing the DB here or if there's
+                    // some better pattern for keeping it open for more transactions.
                     this.db.close();
                     this.db = null;
                 }
@@ -55,7 +55,7 @@ export class LocalDB implements LocalDBIntf {
         else {
             const req: IDBOpenDBRequest = this.openDB();
             req.onsuccess = () => {
-                //this is a one level recursion, just as a design choice. This isn't inherently a recursive operation.
+                // this is a one level recursion, just as a design choice. This isn't inherently a recursive operation.
                 if (req.result) {
                     this.db = req.result;
                     this.runTrans(access, runner);
@@ -73,7 +73,7 @@ export class LocalDB implements LocalDBIntf {
         return new Promise<any>(async (resolve, reject) => {
             const keyPrefix = this.getKeyPrefix(userName);
             const obj: any = await this.readObject(keyPrefix + key);
-            //console.log("LocalDB[" + LocalDB.DB_NAME + "] getVal name=" + keyPrefix + key + " val=" + (!!obj ? obj.val : null));
+            // console.log("LocalDB[" + LocalDB.DB_NAME + "] getVal name=" + keyPrefix + key + " val=" + (!!obj ? obj.val : null));
             resolve(obj ? obj.val : null);
         });
     }
@@ -82,7 +82,7 @@ export class LocalDB implements LocalDBIntf {
     setVal = (key: string, val: any, userName: string = null): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             const keyPrefix = this.getKeyPrefix(userName);
-            //console.log("LocalDB[" + LocalDB.DB_NAME + "] setVal name=" + keyPrefix + key + " val=" + val);
+            // console.log("LocalDB[" + LocalDB.DB_NAME + "] setVal name=" + keyPrefix + key + " val=" + val);
             await this.writeObject({ name: keyPrefix + key, val });
             resolve();
         });
@@ -94,7 +94,7 @@ export class LocalDB implements LocalDBIntf {
         return new Promise<void>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READWRITE,
                 (store: IDBObjectStore) => {
-                    //console.log("LocalDB[" + LocalDB.DB_NAME + "] writeObject=" + S.util.prettyPrint(val));
+                    // console.log("LocalDB[" + LocalDB.DB_NAME + "] writeObject=" + S.util.prettyPrint(val));
                     store.put(val);
                     resolve();
                 });
@@ -107,7 +107,7 @@ export class LocalDB implements LocalDBIntf {
         return new Promise<Object>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READONLY,
                 (store: IDBObjectStore) => {
-                    //NOTE: name is the "keyPath" value.
+                    // NOTE: name is the "keyPath" value.
                     const promise = store.get(name);
 
                     promise.onsuccess = () => {
@@ -124,14 +124,14 @@ export class LocalDB implements LocalDBIntf {
     private getKeyPrefix = (userName: string): string => {
         let prefix;
 
-        //allow parameter userName to override with special case handled for 'anon'
+        // allow parameter userName to override with special case handled for 'anon'
         if (userName) {
             if (userName === "anon") {
                 userName = null;
             }
             prefix = userName ? (userName + "_") : "kv_";
         }
-        //else use this.userName
+        // else use this.userName
         else {
             prefix = this.userName ? (this.userName + "_") : "kv_";
         }

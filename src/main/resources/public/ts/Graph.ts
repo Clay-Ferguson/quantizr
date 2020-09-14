@@ -1,5 +1,5 @@
 /* Graph code is temporarily disabled */
-//import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
+// import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { GraphIntf } from "./intf/GraphIntf";
@@ -25,10 +25,10 @@ export class Graph implements GraphIntf {
     }
 
     graphNodesResponse = (res: J.GraphResponse) => {
-        //console.log(S.util.prettyPrint(res));
+        // console.log(S.util.prettyPrint(res));
 
-        //graphPanel var went away. This will have to be done with AppState now.
-        //S.meta64.graphPanel.setGraphData({nodes: res.nodes, edges: res.edges});
-        //S.meta64.selectTab("graphTab");
+        // graphPanel var went away. This will have to be done with AppState now.
+        // S.meta64.graphPanel.setGraphData({nodes: res.nodes, edges: res.edges});
+        // S.meta64.selectTab("graphTab");
     }
 }

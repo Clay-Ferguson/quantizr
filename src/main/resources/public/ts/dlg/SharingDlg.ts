@@ -86,7 +86,7 @@ export class SharingDlg extends DialogBase {
         let dlg = new ShareToPersonDlg(this.node, this.reload, this.appState);
         await dlg.open();
 
-        //this promise currently isn't needed
+        // this promise currently isn't needed
         return null;
     }
 

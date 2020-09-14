@@ -21,7 +21,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class MainNavPanel extends NavTag {
 
     compRender(): ReactNode {
-        //console.log("Rendering MainNavPanel");
+        // console.log("Rendering MainNavPanel");
         const state: AppState = useSelector((state: AppState) => state);
 
         // navbar-expand-sm would makes it collapsable, but messes up top margin.
@@ -31,7 +31,7 @@ export class MainNavPanel extends NavTag {
 
         // if (S.nav.parentVisibleToUser(state)) {
         //     buttons.push(new IconButton("fa-chevron-circle-up", "Up Level", {
-        //         /* For onclick functions I need a new approach for some (not all) where I can get by 
+        //         /* For onclick functions I need a new approach for some (not all) where I can get by
         //         with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
         //         directly off the DOM */
         //         onClick: S.nav.navUpLevel,
@@ -40,7 +40,7 @@ export class MainNavPanel extends NavTag {
         // }
 
         /* Feature to read from clipboard might scare some users (as it should) so I'm turning this on only for admins
-        until we have a more specific User Preference allowing users to have to opt-in (not opt-out) to use this feature 
+        until we have a more specific User Preference allowing users to have to opt-in (not opt-out) to use this feature
         */
         if (state.isAdminUser) {
             buttons.push(new Li(null, {
@@ -168,7 +168,7 @@ export class MainNavPanel extends NavTag {
             }
         }
 
-        //example of a dropdown menu would go here.
+        // example of a dropdown menu would go here.
         // <li class="nav-item dropdown">
         //     <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown"
         //     aria-haspopup="true" aria-expanded="false">Dropdown</a>
@@ -188,7 +188,7 @@ export class MainNavPanel extends NavTag {
                 }, [
                     new IconButton(clientInfo.isMobile ? "fa-bars" : null, "Quanta", {
                         onClick: e => {
-                            //If user is not logged in this button just takes you back to the landing page.
+                            // If user is not logged in this button just takes you back to the landing page.
                             if (state.isAnonUser || !clientInfo.isMobile) {
                                 window.location.href = window.location.origin;
                             }
@@ -199,8 +199,8 @@ export class MainNavPanel extends NavTag {
                             }
                         },
                         id: "mainMenu"
-                        //only applies to mobile. just don't show title for now.
-                        //title: "Show Main Menu"
+                        // only applies to mobile. just don't show title for now.
+                        // title: "Show Main Menu"
                     }, "nav-link", "off")
                 ])
             ]),
@@ -223,8 +223,8 @@ export class MainNavPanel extends NavTag {
                 className: "collapse navbar-collapse",
                 id: "navbarsMainNav"
             }, [
-                //I don't need any left-justified navbar items for now, but also without this "mr-auto" empty navbar-nav
-                //element here also the right justified ones won't even work and all get force to left.
+                // I don't need any left-justified navbar items for now, but also without this "mr-auto" empty navbar-nav
+                // element here also the right justified ones won't even work and all get force to left.
                 new Ul(null, {
                     className: "navbar-nav mr-auto"
                 }, [
@@ -243,23 +243,23 @@ export class MainNavPanel extends NavTag {
     domAddEvent(): void {
         let elm: HTMLElement = this.getElement();
 
-        //since we only ever set this height one time, and don't need it immediately i'm throwing in a timeout
-        //just to be sure the browser has finished calculating it's offsetHeight, but I have no actual evidence or reason
-        //to believe this timeout is necessary (but merely safer and harmless)
+        // since we only ever set this height one time, and don't need it immediately i'm throwing in a timeout
+        // just to be sure the browser has finished calculating it's offsetHeight, but I have no actual evidence or reason
+        // to believe this timeout is necessary (but merely safer and harmless)
         setTimeout(() => {
-            //see also: clientHeight, offsetHeight, scrollHeight
-            //NOTE: I added the additional 20, when I went to 'container-fluid' instead of 'container' for the main
-            //panel, which I needed to do after adding the left and right panels to the main layout.
+            // see also: clientHeight, offsetHeight, scrollHeight
+            // NOTE: I added the additional 20, when I went to 'container-fluid' instead of 'container' for the main
+            // panel, which I needed to do after adding the left and right panels to the main layout.
             S.meta64.navBarHeight = elm.offsetHeight + 20;
         }, 750);
 
         elm.addEventListener("dragenter", (event) => {
-            //console.log('DRAGENTER: ' + S.util.prettyPrint(event));
+            // console.log('DRAGENTER: ' + S.util.prettyPrint(event));
             event.preventDefault();
         });
 
         elm.addEventListener("dragover", (event) => {
-            //console.log('DRAGOVER: ' + S.util.prettyPrint(event));
+            // console.log('DRAGOVER: ' + S.util.prettyPrint(event));
             event.preventDefault();
             event.dataTransfer.dropEffect = "copy"; // See the section on the DataTransfer object.
         });
@@ -268,8 +268,8 @@ export class MainNavPanel extends NavTag {
             ev.stopPropagation();
             ev.preventDefault();
 
-            //var imageUrl = evt.dataTransfer.getData('URL');
-            //var imageUrl = evt.dataTransfer.getData('text/html');
+            // var imageUrl = evt.dataTransfer.getData('URL');
+            // var imageUrl = evt.dataTransfer.getData('text/html');
 
             let data = ev.dataTransfer.items;
             for (let i = 0; i < data.length; i++) {
@@ -281,7 +281,7 @@ export class MainNavPanel extends NavTag {
                 }
 
                 d.getAsString((s) => {
-                    //This detects drops, successfully but I'm not using it yet.
+                    // This detects drops, successfully but I'm not using it yet.
                     console.log("DROP STRING[" + i + "]: " + s);
                 });
 

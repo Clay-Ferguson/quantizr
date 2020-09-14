@@ -53,30 +53,30 @@ export class Share implements ShareIntf {
                 console.warn("public node has encryption turned on. This is a bug.");
                 resolve();
             }
-            //console.log("PrincipalPublicKeyStr:" + principalPublicKeyStr + " principalNodeId:" + principalNodeId);
+            // console.log("PrincipalPublicKeyStr:" + principalPublicKeyStr + " principalNodeId:" + principalNodeId);
 
-            //get the asym-encrypted sym Key to this node (decryptable by owner of node only, which is us)
+            // get the asym-encrypted sym Key to this node (decryptable by owner of node only, which is us)
             const cipherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
-            //console.log("cipherKey on ENC_KEY: "+cipherKey);
+            // console.log("cipherKey on ENC_KEY: "+cipherKey);
 
             const privateKey: CryptoKey = await S.encryption.getPrivateKey();
 
-            //so this is the decrypted symmetric key to the data
+            // so this is the decrypted symmetric key to the data
             const clearTextKey = await S.encryption.asymDecryptString(privateKey, cipherKey);
             if (!clearTextKey) {
                 throw new Error("Unable to access encryption key.");
             }
 
-            //console.log("clear text key to re-encrypt: " + clearTextKey);
+            // console.log("clear text key to re-encrypt: " + clearTextKey);
 
-            //first build up a usable key from principalPublicKey.
+            // first build up a usable key from principalPublicKey.
             const principalSymKeyJsonObj: JsonWebKey = JSON.parse(principalPublicKeyStr);
 
             const principalPublicKey = await S.encryption.importKey(principalSymKeyJsonObj, S.encryption.ASYM_IMPORT_ALGO, true, S.encryption.OP_ENC);
 
-            //now re-encrypt this clearTextKey using the public key (of the user being shared to).
+            // now re-encrypt this clearTextKey using the public key (of the user being shared to).
             const userCipherKey = await S.encryption.asymEncryptString(principalPublicKey, clearTextKey);
-            //console.log("userCipherKey=" + userCipherKey);
+            // console.log("userCipherKey=" + userCipherKey);
 
             await S.util.ajax<J.SetCipherKeyRequest, J.SetCipherKeyResponse>("setCipherKey", {
                 nodeId: node.id,
@@ -84,7 +84,7 @@ export class Share implements ShareIntf {
                 cipherKey: userCipherKey
             });
 
-            //console.log("Added cipher key: " + userCipherKey + " for principalNodeId: " + principalNodeId);
+            // console.log("Added cipher key: " + userCipherKey + " for principalNodeId: " + principalNodeId);
             resolve();
         });
     }

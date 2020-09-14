@@ -17,9 +17,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class FriendsDlg extends DialogBase {
-    
+
     selectionValueIntf: ValueIntf;
-    
+
     constructor(state: AppState) {
         super("Friends", "app-modal-content-medium-width", null, state);
 

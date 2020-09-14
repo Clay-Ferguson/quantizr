@@ -21,7 +21,7 @@ export class VideoPlayerDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                //space is at a premium for mobile, so let's just not even show the header.
+                // space is at a premium for mobile, so let's just not even show the header.
                 this.mediaTitle ? new TextContent(this.mediaTitle) : null,
                 this.videoPlayer = new VideoPlayer({
                     src: this.sourceUrl,
@@ -33,16 +33,16 @@ export class VideoPlayerDlg extends DialogBase {
                         marginLeft: "0px",
                         marginRight: "0px"
                     },
-                    //"ontimeupdate": () => { S.podcast.onTimeUpdate(this); },
-                    //"oncanplay": () => { S.podcast.onCanPlay(this); },
+                    // "ontimeupdate": () => { S.podcast.onTimeUpdate(this); },
+                    // "oncanplay": () => { S.podcast.onCanPlay(this); },
                     controls: "controls",
                     autoPlay: "autoplay"
-                    //"muted" : "false",
-                    //"volume": "0.9",
-                    //"preload": "auto"
+                    // "muted" : "false",
+                    // "volume": "0.9",
+                    // "preload": "auto"
                 }),
                 new ButtonBar([
-                    //todo-1: even if this button appears to work, I need it to explicitly enforce the saving of the time value AND the removal of the VIDEO element from the DOM */
+                    // todo-1: even if this button appears to work, I need it to explicitly enforce the saving of the time value AND the removal of the VIDEO element from the DOM */
                     new Button("Close", () => {
                         this.close();
                     })
@@ -64,7 +64,7 @@ export class VideoPlayerDlg extends DialogBase {
     /* When the dialog closes we need to stop and remove the player */
     close = (): void => {
         console.log("VideoPlayerDialog cancel()");
-        //todo-1: need to check over, and document flow of this functiuon as it relates to calling "podcast.destroyPlayer(this);"
+        // todo-1: need to check over, and document flow of this functiuon as it relates to calling "podcast.destroyPlayer(this);"
         this.destroyPlayer();
         this.superClose();
     }

@@ -40,7 +40,7 @@ export class InboxNodeTypeHandler extends TypeBase {
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
 
-        //let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
+        // let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
         return new HorizontalLayout([
             new Heading(4, "Inbox", {
                 className: "marginAll"

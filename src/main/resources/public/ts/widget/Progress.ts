@@ -18,7 +18,7 @@ export class Progress extends Comp {
             "aria-valuenow": "100",
             "aria-valuemin": "0",
             "aria-valuemax": "100",
-            style: { width: "100%" } 
+            style: { width: "100%" }
         });
     }
 

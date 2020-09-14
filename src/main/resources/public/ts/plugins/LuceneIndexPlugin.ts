@@ -4,7 +4,7 @@
 //     S = ctx;
 // });
 
-//todo-1: disabled for now.
+// todo-1: disabled for now.
 
 // export class LuceneIndexTypeHandler implements TypeHandlerIntf {
 //     constructor(private luceneIndexPlugin: LuceneIndexPlugin) {

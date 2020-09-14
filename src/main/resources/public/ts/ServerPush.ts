@@ -25,20 +25,20 @@ export class ServerPush implements ServerPushIntf {
         // };
 
         eventSource.onopen = (e: any) => {
-            //onsole.log("ServerPush.onopen" + e);
+            // onsole.log("ServerPush.onopen" + e);
         };
 
         eventSource.onerror = (e: any) => {
-            //console.log("ServerPush.onerror:" + e);
+            // console.log("ServerPush.onerror:" + e);
         };
 
         eventSource.addEventListener("feedPush", function (e: any) {
             const obj = JSON.parse(e.data);
-            //console.log("Incomming Push: "+S.util.prettyPrint(obj));
+            // console.log("Incomming Push: "+S.util.prettyPrint(obj));
             const nodeInfo: J.NodeInfo = obj.nodeInfo;
             if (nodeInfo) {
-                //todo-1: I think this dispatch is working, but another full FeedView refresh (from actual server query too) is somehow following after also
-                //so need to check and see how to avoid that.
+                // todo-1: I think this dispatch is working, but another full FeedView refresh (from actual server query too) is somehow following after also
+                // so need to check and see how to avoid that.
                 dispatch({
                     type: "Action_RenderFeedResults",
                     update: (s: AppState): void => {
@@ -49,13 +49,13 @@ export class ServerPush implements ServerPushIntf {
                         page change while they're maybe reading it */
                         if (nodeInfo.owner === s.userName) {
 
-                            //this is a slight hack to cause the new rows to animate their background, but it's ok, and I plan to leave it like this
+                            // this is a slight hack to cause the new rows to animate their background, but it's ok, and I plan to leave it like this
                             S.render.fadeInId = nodeInfo.id;
                             s.feedResults.unshift(nodeInfo);
 
-                            //scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
-                            //then remove the nodeInfo.id from the list becasue it would be redundant in the list.
-                            //s.feedResults = S.meta64.removeRedundantFeedItems(s.feedResults);
+                            // scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
+                            // then remove the nodeInfo.id from the list becasue it would be redundant in the list.
+                            // s.feedResults = S.meta64.removeRedundantFeedItems(s.feedResults);
                         }
                         else {
                             /* note: we could que up the incomming nodeInfo, adn then avoid a call to the server but for now we just
@@ -68,14 +68,14 @@ export class ServerPush implements ServerPushIntf {
         }, false);
 
         eventSource.addEventListener("inboxPush", function (e: any) {
-            //Removing this type notification for now, because it's not really ready. For example, if bob creates a reply to a feed item bob gets
-            //the notification, which is wrong. In other words based on the new 'feed' capability notification can
-            //end up being just a redundant annoyance.
+            // Removing this type notification for now, because it's not really ready. For example, if bob creates a reply to a feed item bob gets
+            // the notification, which is wrong. In other words based on the new 'feed' capability notification can
+            // end up being just a redundant annoyance.
 
-            //temporary remove: I was seeing this come up when I replied to someone ELSES node, or in other words I was getting
-            //a notification about my own node that I creted.
-            //todo-0
-            //new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
+            // temporary remove: I was seeing this come up when I replied to someone ELSES node, or in other words I was getting
+            // a notification about my own node that I creted.
+            // todo-0
+            // new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
         }, false);
     }
 }

@@ -11,7 +11,7 @@ export class MainMenuDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         if (this.appState.isAnonUser) {
-            //anon users don't get the menu
+            // anon users don't get the menu
             return [];
         } else {
             return [

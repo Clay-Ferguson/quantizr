@@ -4,7 +4,7 @@ import { EventInput } from "@fullcalendar/react";
 
 /* root react Redux state for entire app */
 export class AppState {
-    //up until guiReady the main App component will just render "loading..."
+    // up until guiReady the main App component will just render "loading..."
     guiReady: boolean = false;
 
     /* flag that indicates the user can click "Refresh Feed" because there are new changes read */
@@ -13,14 +13,14 @@ export class AppState {
     inlineEditId: string;
     inlineEditVal: string;
 
-    //for testing in AppDemo
+    // for testing in AppDemo
     counter: number = 0;
     compDemoIdActive: number = -1;
 
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
 
-    //todo-1: the S.nav.mainOffset is often the same as this. Is S.nav.mainOffset still needed? or is only offsetOfNodeFound needed?
+    // todo-1: the S.nav.mainOffset is often the same as this. Is S.nav.mainOffset still needed? or is only offsetOfNodeFound needed?
     offsetOfNodeFound: number;
     displayedParent: boolean;
     title: string = "";
@@ -37,8 +37,8 @@ export class AppState {
 
     activeTab: string = null;
 
-    //When the user clicks an image, we switch to a fullscreen viewer for that image, at max size of the display, and any time
-    //this nodeId is non-null we are displaying that FullScreenView comp, which occupies everything below the toolbar.
+    // When the user clicks an image, we switch to a fullscreen viewer for that image, at max size of the display, and any time
+    // this nodeId is non-null we are displaying that FullScreenView comp, which occupies everything below the toolbar.
     fullScreenViewId: string = null;
     fullScreenGraphId: string = null;
     fullScreenCalendarId: string = null;
@@ -66,7 +66,7 @@ export class AppState {
        console.log(el * 2);
    });
     */
-    //todo-1: implement this as Set<string>
+    // todo-1: implement this as Set<string>
     selectedNodes: any = {};
 
     /* maps node.id values to NodeInfo.java objects
@@ -91,7 +91,7 @@ export class AppState {
 
     pendingLocationHash: string;
 
-    //Rss feeds
+    // Rss feeds
     feedCache = {};
     failedFeedCache = {};
 }

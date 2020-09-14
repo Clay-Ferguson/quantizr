@@ -38,8 +38,8 @@ export class SplitNodeDlg extends DialogBase {
         }
 
         this.mergeState({
-            splitMode, //can be: custom | double | triple (todo-1: make an enum)
-            splitType: "inline", //can be: inline | children (todo-1: make an enum)
+            splitMode, // can be: custom | double | triple (todo-1: make an enum)
+            splitType: "inline", // can be: inline | children (todo-1: make an enum)
             delimiter: "{split}"
         });
     }

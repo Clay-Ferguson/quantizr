@@ -12,8 +12,8 @@ import { Form } from "../widget/Form";
 import { TextField } from "../widget/TextField";
 
 // #recaptcha-disabled
-//declare var grecaptcha;
-//declare var reCaptcha3SiteKey;
+// declare var grecaptcha;
+// declare var reCaptcha3SiteKey;
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -25,7 +25,7 @@ export class SignupDlg extends DialogBase {
     constructor(state: AppState) {
         super("Create Account", "app-modal-content-medium-width", null, state);
     }
-    
+
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [

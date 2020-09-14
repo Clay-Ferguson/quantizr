@@ -45,7 +45,7 @@ export class InboxNotifyDlg extends DialogBase {
             ])
         ];
     }
-    
+
     renderButtons(): CompIntf {
         return null;
     }

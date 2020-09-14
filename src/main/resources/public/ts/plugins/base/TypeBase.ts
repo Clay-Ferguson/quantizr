@@ -46,8 +46,8 @@ export class TypeBase implements TypeHandlerIntf {
         return this.typeName;
     }
 
-    /* If this returns non-null the editor dialog is expected to show only the enumerated properties for editing 
-    
+    /* If this returns non-null the editor dialog is expected to show only the enumerated properties for editing
+
     note: adding 'content' to this (not a genuine property like the rest, is allowed)
     */
     getCustomProperties(): string[] {
@@ -100,7 +100,7 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     getIconClass(): string {
-        //https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
+        // https://www.w3schools.com/icons/fontawesome_icons_webapp.asp
         if (!this.iconStyle) return null;
         return "fa " + this.iconStyle + " fa-lg";
     }

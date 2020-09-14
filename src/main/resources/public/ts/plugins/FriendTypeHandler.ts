@@ -49,7 +49,7 @@ export class FriendTypeHandler extends TypeBase {
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {
-        //USER_NODE_ID is generated and maintained by the server, and we can ignore it in the editor.
+        // USER_NODE_ID is generated and maintained by the server, and we can ignore it in the editor.
         return propName === J.NodeProp.USER;
     }
 

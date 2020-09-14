@@ -31,7 +31,7 @@ export class Util implements UtilIntf {
         "=": "&#x3D;"
     };
 
-    //todo-p1: need to complete these
+    // todo-p1: need to complete these
     fileExtensionTypes = {
         md: "md",
         txt: "txt",
@@ -62,7 +62,7 @@ export class Util implements UtilIntf {
     }
 
     formatMemory = (val: number): string => {
-        //put these vals in const file KB,MB,GB
+        // put these vals in const file KB,MB,GB
         if (val < 1024) {
             if (val < 1) {
                 return "0 bytes";
@@ -136,9 +136,9 @@ export class Util implements UtilIntf {
     }
 
     buf2hex = (arr: Uint8Array): string => {
-        //return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
+        // return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
 
-        //Diferent Algorithm:
+        // Diferent Algorithm:
         var hexStr = "";
         for (var i = 0; i < arr.length; i++) {
             var hex = (arr[i] & 0xff).toString(16);
@@ -166,8 +166,8 @@ export class Util implements UtilIntf {
     }
 
     escapeForAttrib = (s: string): string => {
-        //Disabling. When was this ever needed?
-        //return this.replaceAll(s, "\"", "&quot;");
+        // Disabling. When was this ever needed?
+        // return this.replaceAll(s, "\"", "&quot;");
         return s;
     }
 
@@ -264,9 +264,9 @@ export class Util implements UtilIntf {
     // add with sign=1, subtract with sign=-1
     addTimezoneOffset = (date: Date, sign: number): Date => {
         let tzOffsetMinutes = date.getTimezoneOffset();
-        //console.log("offset: " + tzOffsetMinutes);
+        // console.log("offset: " + tzOffsetMinutes);
 
-        //make the time value in our current local timezone
+        // make the time value in our current local timezone
         let adjustedTime = date.getTime() + sign * tzOffsetMinutes * 1000 * 60;
         return new Date(adjustedTime);
     }
@@ -343,7 +343,7 @@ export class Util implements UtilIntf {
     }
 
     initProgressMonitor = (): void => {
-        //This timer is a singleton that runs always so we don't need to ever clear the timeout. Not a resource leak.
+        // This timer is a singleton that runs always so we don't need to ever clear the timeout. Not a resource leak.
         setInterval(this.progressInterval, 1000);
     }
 
@@ -410,9 +410,9 @@ export class Util implements UtilIntf {
             this._ajaxCounter++;
             S.meta64.setOverlay(true);
             axiosRequest = axios.post(this.getRpcPath() + postName, postData, <AxiosRequestConfig>{
-                //Without this withCredentials axios (at least for CORS requests) doesn't send enough info to allow the server
-                //to recognize the same "session", and makes the server malfunction becasue it thinks each request is a
-                //new session and fails the login security.
+                // Without this withCredentials axios (at least for CORS requests) doesn't send enough info to allow the server
+                // to recognize the same "session", and makes the server malfunction becasue it thinks each request is a
+                // new session and fails the login security.
                 withCredentials: true
             });
         } catch (ex) {
@@ -442,9 +442,9 @@ export class Util implements UtilIntf {
          * failing, it fails this "ANDed" one also.
          */
         axiosRequest.then(//
-            //------------------------------------------------
+            // ------------------------------------------------
             // Handle Success
-            //------------------------------------------------
+            // ------------------------------------------------
             (response) => {
                 try {
                     this._ajaxCounter--;
@@ -457,7 +457,7 @@ export class Util implements UtilIntf {
                             console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
                                 this.prettyPrint(response));
 
-                            //calling the failCallback here is new. (6/24/2020)
+                            // calling the failCallback here is new. (6/24/2020)
                             if (typeof failCallback === "function") {
                                 failCallback(null);
                             }
@@ -483,11 +483,11 @@ export class Util implements UtilIntf {
                     S.meta64.setOverlay(false);
                 }
             },
-            //------------------------------------------------
+            // ------------------------------------------------
             // Handle Fail
             // We should only reach here when there's an actual failure to call the server, and is completely
             // separete from the server perhaps haveing an exception where it sent back an error.
-            //------------------------------------------------
+            // ------------------------------------------------
             (error) => {
                 try {
                     this._ajaxCounter--;
@@ -502,13 +502,13 @@ export class Util implements UtilIntf {
                             this.timeoutMessageShown = true;
                         }
 
-                        //we wait about a second for user to have time to see the message that their session had timed out.
+                        // we wait about a second for user to have time to see the message that their session had timed out.
                         setTimeout(async () => {
                             // window.onbeforeunload = null;
                             // window.location.href = window.location.origin;
                             // await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
 
-                            //NOTE: This opens the login dialog. Requires user to click login before attempting a login.
+                            // NOTE: This opens the login dialog. Requires user to click login before attempting a login.
                             S.nav.login(null);
                         }, 200);
                         return;
@@ -578,7 +578,7 @@ export class Util implements UtilIntf {
         const elm: HTMLElement = this.domElm(id);
 
         if (elm) {
-            //console.log(`Element found (${id}), focusing`);
+            // console.log(`Element found (${id}), focusing`);
             elm.focus();
         }
     }
@@ -665,7 +665,7 @@ export class Util implements UtilIntf {
         }
     }
 
-    //This may fail. oddly the API where i get the object from here wants to reutrn Elements not HTMLElements.
+    // This may fail. oddly the API where i get the object from here wants to reutrn Elements not HTMLElements.
     domElmObjRemove = (elm: Element): void => {
         if (elm) {
             elm.parentNode.removeChild(elm);
@@ -687,7 +687,7 @@ export class Util implements UtilIntf {
             // First we immediately try to get the element.
             const e: HTMLElement = document.getElementById(id);
             if (e) {
-                //console.log("ELM found immediately: "+id);
+                // console.log("ELM found immediately: "+id);
                 if (exResolve) {
                     exResolve(e);
                 }
@@ -699,7 +699,7 @@ export class Util implements UtilIntf {
                 let accumWaitTime = 0;
                 const timeSlice = 100;
 
-                //don't hang the promise more than 5 seconds, before reporting error and continuing.
+                // don't hang the promise more than 5 seconds, before reporting error and continuing.
                 const maxWaitTime = 5000;
 
                 const interval = setInterval(() => {
@@ -713,10 +713,10 @@ export class Util implements UtilIntf {
                     }
 
                     const e: HTMLElement = document.getElementById(id);
-                    //console.log("waiting for elm: "+id);
+                    // console.log("waiting for elm: "+id);
                     if (e) {
                         clearInterval(interval);
-                        //console.log("Got Elm: "+id);
+                        // console.log("Got Elm: "+id);
                         if (exResolve) {
                             exResolve(e);
                         }
@@ -751,7 +751,7 @@ export class Util implements UtilIntf {
     }
 
     currentTimeMillis = (): number => {
-        //warning DO NOT USE getMilliseconds, which is only 0 thru 999
+        // warning DO NOT USE getMilliseconds, which is only 0 thru 999
         return new Date().getTime();
     }
 
@@ -766,7 +766,7 @@ export class Util implements UtilIntf {
         }
         const elm = this.domElm(id);
         if (elm) {
-            //elm.node.value = val;
+            // elm.node.value = val;
             (<any>elm).value = val;
         }
         return !!elm;
@@ -805,11 +805,11 @@ export class Util implements UtilIntf {
 
         const elements = document.querySelectorAll(selectors[level]);
         Array.prototype.forEach.call(elements, (el: HTMLElement) => {
-            //if at final dept level, exec the function
+            // if at final dept level, exec the function
             if (selectors.length - 1 === level) {
                 func(el);
             }
-            //else drill deeper, using recursion
+            // else drill deeper, using recursion
             else {
                 this.domSelExec(selectors, func, level + 1);
             }
@@ -967,7 +967,7 @@ export class Util implements UtilIntf {
         return <T>instance;
     }
 
-    //todo-1: is this still used ? eliminate it.
+    // todo-1: is this still used ? eliminate it.
     changeOrAddClassToElm = (elm: HTMLElement, oldClass: string, newClass: string) => {
         this.removeClassFromElmById(elm.id, oldClass);
         this.addClassToElmById(elm.id, newClass);
@@ -983,54 +983,54 @@ export class Util implements UtilIntf {
         this.addClassToElmById(id, newClass);
     }
 
-    //todo-1: is this still used ? eliminate it.
+    // todo-1: is this still used ? eliminate it.
     removeClassFromElmById = (id: string, clazz: string) => {
         this.getElm(id, (elm: HTMLElement) => {
             this.removeClassFromElm(elm, clazz);
         });
     }
 
-    //todo-1: is this still used ? eliminate it.
+    // todo-1: is this still used ? eliminate it.
     removeClassFromElm = (el: HTMLElement, clazz: string): void => {
         if (el.classList) {
-            //console.log("remove to classList " + clazz);
+            // console.log("remove to classList " + clazz);
             el.classList.remove(clazz);
         }
         else if (el.className) {
-            //WCF: I think this came from here: http://youmightnotneedjquery.com/
-            //I personally would have never written this mess of RegExp and found some other way. I hate RegExp!
+            // WCF: I think this came from here: http://youmightnotneedjquery.com/
+            // I personally would have never written this mess of RegExp and found some other way. I hate RegExp!
             el.className = el.className.replace(new RegExp("(^|\\b)" + clazz.split(" ").join("|") + "(\\b|$)", "gi"), " ");
         }
     }
 
-    //todo-1: is this still used ? eliminate it.
+    // todo-1: is this still used ? eliminate it.
     addClassToElmById = (id: string, clazz: string): void => {
-        //console.log("Adding class "+clazz+" to dom id "+id);
+        // console.log("Adding class "+clazz+" to dom id "+id);
         this.getElm(id, (elm: HTMLElement) => {
-            //console.log("found dom id, adding class now.");
+            // console.log("found dom id, adding class now.");
             this.addClassToElm(elm, clazz);
         });
     }
 
-    //todo-1: is this still used ? eliminate it.
+    // todo-1: is this still used ? eliminate it.
     addClassToElm = (el: HTMLElement, clazz: string): void => {
         if (el.classList) {
-            //console.log("add to classList " + clazz);
+            // console.log("add to classList " + clazz);
             el.classList.add(clazz);
         }
         else {
             if (el.className) {
-                //console.log("appending to className " + clazz);
+                // console.log("appending to className " + clazz);
                 el.className += " " + clazz;
             }
             else {
-                //console.log("setting className " + clazz);
+                // console.log("setting className " + clazz);
                 el.className = clazz;
             }
         }
     }
 
-    //todo-1: is this still used ? eliminate it.
+    // todo-1: is this still used ? eliminate it.
     toggleClassFromElm = (el: any, clazz: string): void => {
         if (el.classList) {
             el.classList.toggle(clazz);
@@ -1141,7 +1141,7 @@ export class Util implements UtilIntf {
             title = node.id;
         }
 
-        //console.log("PUSHSTATE: url: " + url + ", state: " + JSON.stringify(state));
+        // console.log("PUSHSTATE: url: " + url + ", state: " + JSON.stringify(state));
         history.pushState(state, title, url);
     }
 
@@ -1194,7 +1194,7 @@ export class Util implements UtilIntf {
 
     animateScrollToTop = () => {
 
-        //just to be careful we can fall back to simpler version of animation frames aren't supported.
+        // just to be careful we can fall back to simpler version of animation frames aren't supported.
         if (!window.requestAnimationFrame) {
             this.animateScrollToTop_v1();
             return;
@@ -1256,18 +1256,18 @@ export class Util implements UtilIntf {
         delete attribs.onDrop;
     }
 
-    //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
+    // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
     setDropHandler = (attribs: any, func: (elm: any) => void): void => {
 
         const nonDragBorder = "";
 
         attribs.onDragEnter = function (event) {
-            //console.log("onDragEnter: id="+event.target.id);
+            // console.log("onDragEnter: id="+event.target.id);
             event.preventDefault();
         };
 
         attribs.onDragOver = function (event) {
-            //console.log("onDragOver: id="+event.target.id);
+            // console.log("onDragOver: id="+event.target.id);
             event.preventDefault();
             event.dataTransfer.dropEffect = "copy"; // See the section on the DataTransfer object.
             event.target.style.border = "2px solid green";
@@ -1279,7 +1279,7 @@ export class Util implements UtilIntf {
         };
 
         attribs.onDrop = function (event) {
-            //console.log("onDrop: id="+event.target.id);
+            // console.log("onDrop: id="+event.target.id);
             event.stopPropagation();
             event.preventDefault();
             event.target.style.border = nonDragBorder;
@@ -1307,8 +1307,8 @@ export class Util implements UtilIntf {
             ret.push({
                 id: v.id,
                 title: v.title,
-                start: v.start, 
-                end: v.end 
+                start: v.start,
+                end: v.end
             });
         });
 

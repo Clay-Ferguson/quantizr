@@ -56,7 +56,7 @@ export class LoginDlg extends DialogBase {
             user,
             password
         });
-       
+
         return null;
     }
 

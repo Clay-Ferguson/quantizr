@@ -34,7 +34,7 @@ export class ManageEncryptionKeysDlg extends DialogBase {
         return null;
     }
 
-    //@Override
+    // @Override
     preLoad(): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             let keyJson: string = await S.encryption.exportKeys();

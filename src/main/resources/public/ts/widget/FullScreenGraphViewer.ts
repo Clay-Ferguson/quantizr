@@ -9,7 +9,7 @@ import { Main } from "./Main";
 export class FullScreenGraphViewer extends Main {
 
     preRender(): void {
-        //let state: AppState = useSelector((state: AppState) => state);
+        // let state: AppState = useSelector((state: AppState) => state);
         // let nodeId = state.fullScreenViewId;
         // let node: J.NodeInfo = S.meta64.findNodeById(state, nodeId);
 

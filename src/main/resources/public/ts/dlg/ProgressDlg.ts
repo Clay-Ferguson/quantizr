@@ -15,7 +15,7 @@ export class ProgressDlg extends DialogBase {
             new Div(null, {
                 className: "progress"
 
-            }, [new Progress()]) 
+            }, [new Progress()])
         ];
     }
 

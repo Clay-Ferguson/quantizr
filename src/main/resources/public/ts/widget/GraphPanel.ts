@@ -1,5 +1,5 @@
 /* Graph code is temporarily disabled */
-//import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
+// import { Network, DataSet, Node, Edge, IdType } from 'vis-network';
 import { Div } from "./Div";
 
 // https://github.com/visjs/vis-network
@@ -12,8 +12,8 @@ import { Div } from "./Div";
 
 export class GraphPanel extends Div {
 
-    //temporarily removed
-    //network: Network;
+    // temporarily removed
+    // network: Network;
 
     constructor() {
         super(null, { style: { width: "100%", height: "600px", border: "1px solid gray" } });
@@ -49,7 +49,7 @@ export class GraphPanel extends Div {
     }
 
     setGraphData(data: any): void {
-        //vis library temporarily removed.
+        // vis library temporarily removed.
         // this.whenElm((elm: HTMLElement) => {
 
         //     // Lazy create network, and populate with data.

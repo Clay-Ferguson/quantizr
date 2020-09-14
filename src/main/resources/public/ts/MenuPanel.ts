@@ -38,7 +38,7 @@ export class MenuPanel extends Div {
         const highlightNode = S.meta64.getHighlightedNode(state);
         const selNodeIsMine = !!highlightNode && (highlightNode.owner === state.userName || state.userName === "admin");
 
-        //for now, allowing all users to import+export (todo-2)
+        // for now, allowing all users to import+export (todo-2)
         const importFeatureEnabled = state.isAdminUser || state.userPreferences.importAllowed;
         const exportFeatureEnabled = state.isAdminUser || state.userPreferences.exportAllowed;
 
@@ -51,7 +51,7 @@ export class MenuPanel extends Div {
 
         const children = [];
 
-        //WARNING: The string 'Navigate' is also in Menu.activeMenu.
+        // WARNING: The string 'Navigate' is also in Menu.activeMenu.
         children.push(new Menu("Navigate", [
             new MenuItem("Welcome", () => { window.location.href = window.location.origin; }),
             new MenuItem("Portal", () => S.meta64.loadAnonPageHome(state)),
@@ -59,27 +59,27 @@ export class MenuPanel extends Div {
             new MenuItem("Inbox", () => S.nav.openContentNode("~" + J.NodeType.INBOX, state), !state.isAnonUser),
             new MenuItem("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), !state.isAnonUser),
 
-            //this appears to be broken for user 'bob' at least. Also "Show Feed" is broken on the feed node
+            // this appears to be broken for user 'bob' at least. Also "Show Feed" is broken on the feed node
             new MenuItem("Feed", () => S.nav.navFeed(state), !state.isAnonUser),
             new MenuItem("Post", () => S.nav.openContentNode("~" + J.NodeType.USER_FEED, state), !state.isAnonUser)
 
-            //I'm removing my RSS feeds, for now (mainly to remove any political or interest-specific content from the platform)
-            //new MenuItem("Podcast Feeds", () => { S.nav.openContentNode("/r/rss"); }),
+            // I'm removing my RSS feeds, for now (mainly to remove any political or interest-specific content from the platform)
+            // new MenuItem("Podcast Feeds", () => { S.nav.openContentNode("/r/rss"); }),
 
-            //new MenuItem("Sample Document", () => { S.nav.openContentNode("/r/books/war-and-peace"); }),
+            // new MenuItem("Sample Document", () => { S.nav.openContentNode("/r/books/war-and-peace"); }),
 
-            //this is on nav bar already
-            //new MenuItem("Logout", () => S.nav.logout(state)),
+            // this is on nav bar already
+            // new MenuItem("Logout", () => S.nav.logout(state)),
 
-            //I decided ALL information will be stored native right in mongo, and no filesystem stuff.
-            //new MenuItem("Documentation", () => { S.nav.openContentNode("/r/public/subnode-docs"); }),
+            // I decided ALL information will be stored native right in mongo, and no filesystem stuff.
+            // new MenuItem("Documentation", () => { S.nav.openContentNode("/r/public/subnode-docs"); }),
         ]));
 
         children.push(new Menu("Edit", [
-            //new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
+            // new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
             new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !state.isAnonUser && !!state.nodesToMove), //
 
-            //new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
+            // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
             new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state), !state.isAnonUser && selNodeCount > 0), //
             new MenuItem("Split Node", () => new SplitNodeDlg(null, state).open(), !state.isAnonUser && selNodeIsMine), //
@@ -94,17 +94,17 @@ export class MenuPanel extends Div {
             new MenuItem("Permanent Delete", () => S.edit.deleteSelNodes(null, true, state), !state.isAnonUser && selNodeCount > 0 && selNodeIsMine), //
             new MenuItem("Show Trash Bin", () => S.nav.openContentNode(state.homeNodePath + "/d", state), !state.isAnonUser)
 
-            //todo-1: disabled during mongo conversion
-            //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
-            //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
+            // todo-1: disabled during mongo conversion
+            // new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
+            // new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
             //    () => { return state.isAdminUser && highlightNode != null }, //
             //    () => { return state.isAdminUser }, //
             //    true
-            //), //
+            // ), //
         ]));
 
         children.push(new Menu("Share", [
-            //moved into editor dialog
+            // moved into editor dialog
             // new MenuItem("Edit Node Sharing", () => S.share.editNodeSharing(state), //
             //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
 
@@ -126,11 +126,11 @@ export class MenuPanel extends Div {
             new MenuItem("By ID", () => { new SearchByIDDlg(state).open(); }, //
                 !state.isAnonUser && !!highlightNode) //
 
-            //new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },
+            // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch })
         ]));
 
-        //NOTE:Graph feature is fully functional, but not ready to deploy yet.
+        // NOTE:Graph feature is fully functional, but not ready to deploy yet.
         // new Menu("Graph", [
         //     new MenuItem("Tree Structure", S.graph.graphTreeStructure, () => { return !state.isAnonUser && highlightNode != null }), //
         // ]),
@@ -144,10 +144,10 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Tools", [
-            //todo-1: properties toggle really should be a preferences setting i think, and not a menu option here.
+            // todo-1: properties toggle really should be a preferences setting i think, and not a menu option here.
 
-            //this is broken, so I'm just disabling it for now, since this is low priority. todo-1
-            //new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
+            // this is broken, so I'm just disabling it for now, since this is low priority. todo-1
+            // new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
 
             new MenuItem("Show Calendar", () => S.render.showCalendar(null, state), !!highlightNode), //
 

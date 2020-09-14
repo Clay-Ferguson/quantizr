@@ -17,7 +17,7 @@ export interface EncryptionIntf {
     test(): Promise<string>;
     initKeys(forceUpdate?:boolean, republish?: boolean): any;
     exportKeys(): Promise<string>;
-        
+
     asymEncryptString(key: CryptoKey, data: string): Promise<string>;
     symEncryptString(key: CryptoKey, data: string): Promise<string>;
     symEncryptStringWithCipherKey(cipherKey: string, data: string): Promise<string>;
@@ -34,8 +34,8 @@ export interface EncryptionIntf {
     getPrivateKey(): Promise<CryptoKey>;
     getPublicKey(): Promise<CryptoKey>;
 
-    //todo-1: there's lots of places i pass 'extractable=true' and also more keyUsages than required. See if limiting those wokrs, because
-    //doing so is bound to help performance and resources
+    // todo-1: there's lots of places i pass 'extractable=true' and also more keyUsages than required. See if limiting those wokrs, because
+    // doing so is bound to help performance and resources
     importKey(key: JsonWebKey, algos: any, extractable: boolean, keyUsages: string[]): Promise<CryptoKey>;
 
     importKeyPair(keyPair: string): Promise<boolean>;

@@ -1,6 +1,6 @@
 export class Constants {
 
-    //per bootstrap design these must sum to 12;
+    // per bootstrap design these must sum to 12;
     static leftNavPanelCols: number = 3;
     static mainPanelCols: number = 6;
     static rightNavPanelCols: number = 3;

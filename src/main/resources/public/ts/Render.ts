@@ -67,10 +67,10 @@ export class Render implements RenderIntf {
         marked.setOptions({
             renderer: this.markedRenderer,
 
-            //This appears to be working just fine, but i don't have the CSS styles added into the distro yet
-            //so none of the actual highlighting works yet, so i'm just commenting out for now, until i add classes.
+            // This appears to be working just fine, but i don't have the CSS styles added into the distro yet
+            // so none of the actual highlighting works yet, so i'm just commenting out for now, until i add classes.
             //
-            //Note: using the 'markedRenderer.code' set above do we still need this highlight call here? I have no idea. Need to check/test
+            // Note: using the 'markedRenderer.code' set above do we still need this highlight call here? I have no idea. Need to check/test
             highlight: function (code) {
                 return highlightjs.highlightAuto(code).value;
             },
@@ -86,12 +86,12 @@ export class Render implements RenderIntf {
 
     setNodeDropHandler = (attribs: any, node: J.NodeInfo, isFirst: boolean, state: AppState): void => {
         if (!node) return;
-        //console.log("Setting drop handler: id="+node.id);
+        // console.log("Setting drop handler: id="+node.id);
 
         S.util.setDropHandler(attribs, (evt: DragEvent) => {
             const data = evt.dataTransfer.items;
 
-            //todo-1: right now we only actually support one file being dragged. Would be nice to support multiples
+            // todo-1: right now we only actually support one file being dragged. Would be nice to support multiples
             for (let i = 0; i < data.length; i++) {
                 const d = data[i];
                 console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
@@ -167,7 +167,7 @@ export class Render implements RenderIntf {
 
         const children = [];
 
-        //todo-1: need copy-to-clipboard links here!
+        // todo-1: need copy-to-clipboard links here!
 
         let url = window.location.origin + "/app?id=" + node.id;
         children.push(new Heading(5, "By ID"));
@@ -226,7 +226,7 @@ export class Render implements RenderIntf {
                 type: "Action_RenderPage",
                 state,
                 updateNew: (s: AppState): AppState => {
-                    //VERY IMPORTANT to return a NEW object so we create it here. If you don't return new object rendering can fail.
+                    // VERY IMPORTANT to return a NEW object so we create it here. If you don't return new object rendering can fail.
                     s = { ...s };
 
                     if (!s.activeTab || clickTab) {
@@ -246,8 +246,8 @@ export class Render implements RenderIntf {
                     if (res) S.meta64.updateNodeMap(res.node, s);
 
                     if (targetNodeId) {
-                        //If you access /n/myNodeName we get here with targetNodeId being the name (and not the ID)
-                        //so we have to call getNodeByName() to get the 'id' that goes with that node name.
+                        // If you access /n/myNodeName we get here with targetNodeId being the name (and not the ID)
+                        // so we have to call getNodeByName() to get the 'id' that goes with that node name.
                         if (targetNodeId.startsWith(":")) {
                             targetNodeId = targetNodeId.substring(1);
                             const foundNode: J.NodeInfo = S.meta64.getNodeByName(res.node, targetNodeId, s);
@@ -258,15 +258,15 @@ export class Render implements RenderIntf {
 
                         S.render.fadeInId = targetNodeId;
 
-                        //this is new. not fully vetted.
+                        // this is new. not fully vetted.
                         state.pendingLocationHash = null;
                     }
 
                     s.selectedNodes = {};
 
                     if (s.node && !state.isAnonUser) {
-                        //now that 'redux' is in control and we call this method less directly/often, I need to check to see if
-                        //this method is getting called every time it should.
+                        // now that 'redux' is in control and we call this method less directly/often, I need to check to see if
+                        // this method is getting called every time it should.
                         S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
                         S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
                     }
@@ -277,7 +277,7 @@ export class Render implements RenderIntf {
 
                     if (state.pendingLocationHash) {
                         window.location.hash = state.pendingLocationHash;
-                        //Note: the substring(1) trims the "#" character off.
+                        // Note: the substring(1) trims the "#" character off.
                         if (allowScroll) {
                             S.meta64.highlightRowById(state.pendingLocationHash.substring(1), true, s);
                         }
@@ -314,7 +314,7 @@ export class Render implements RenderIntf {
             nodeId: state.node.id
         }, (res: J.GetBreadcrumbsResponse) => {
 
-            //we calculate an addDelay so we don't interrup the fading effect on the row.
+            // we calculate an addDelay so we don't interrup the fading effect on the row.
             let addDelay = 1;
             let now = new Date().getTime();
 
@@ -351,7 +351,7 @@ export class Render implements RenderIntf {
             return new NodeCompTableRowLayout(node, level, layout, allowNodeMove);
         }
         else {
-            //of no layout is valid, fall back on vertical.
+            // of no layout is valid, fall back on vertical.
             return new NodeCompVerticalRowLayout(node, level, allowNodeMove);
         }
     }
@@ -366,7 +366,7 @@ export class Render implements RenderIntf {
 
         if (!state.isAnonUser && !!state.nodesToMove && (S.props.isMine(node, state) || node.id === state.homeNodeId)) {
 
-            //console.log("pasteSelButton: node.id=" + node.id + " isFirst=" + isFirst);
+            // console.log("pasteSelButton: node.id=" + node.id + " isFirst=" + isFirst);
 
             let func: Function = null;
             if (isFirst) {
@@ -428,11 +428,11 @@ export class Render implements RenderIntf {
         let ret = null;
         if (node.dataUrl) {
             ret = node.dataUrl;
-            //console.log("getUrlForNodeAttachment: id="+node.id+" url="+ret+" from dataUrl");
+            // console.log("getUrlForNodeAttachment: id="+node.id+" url="+ret+" from dataUrl");
         }
         else {
             ret = this.getAttachmentUrl("bin", node, downloadLink);
-            //console.log("getUrlForNodeAttachment: id=" + node.id + " url=" + ret + " from bin");
+            // console.log("getUrlForNodeAttachment: id=" + node.id + " url=" + ret + " from bin");
         }
         return ret;
     }
@@ -453,7 +453,7 @@ export class Render implements RenderIntf {
         }
         const key = "avatar-" + node.id;
 
-        //Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+        // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
         const img: Img = new Img(key, {
             src,
             className: "avatarImage",

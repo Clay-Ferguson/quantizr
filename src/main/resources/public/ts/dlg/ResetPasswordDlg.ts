@@ -23,12 +23,12 @@ export class ResetPasswordDlg extends DialogBase {
         super("Reset Password", "app-modal-content-narrow-width", false, state);
         this.mergeState({ user });
     }
-    
+
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
                 new TextContent("Enter your user name and email address and a change-password link will be sent to you"),
-    
+
                 new TextField("User Name", false, null, null, new CompValueHolder<string>(this, "user")),
                 new TextField("Email Address", false, null, null, new CompValueHolder<string>(this, "email")),
                 new ButtonBar([

@@ -117,13 +117,13 @@ export class Nav implements NavIntf {
         const state = appState();
         if (!state.node) return null;
 
-        //Always just scroll to the top before doing an actual 'upLevel' to parent.
+        // Always just scroll to the top before doing an actual 'upLevel' to parent.
         if (S.view.docElm.scrollTop > 100) {
             S.view.docElm.scrollTop = 0;
 
             /* This works fine but actually for me causes eye-strain. I might enable this for mobile some day, but for now
             let's just comment it out. */
-            //S.util.animateScrollToTop();
+            // S.util.animateScrollToTop();
 
             S.meta64.highlightNode(state.node, false, state);
             return;
@@ -145,16 +145,16 @@ export class Nav implements NavIntf {
             forceIPFSRefresh: false,
             singleNode: false
         },
-        //success callback
+        // success callback
         (res: J.RenderNodeResponse) => {
             this.mainOffset = res.offsetOfNodeFound;
             this.upLevelResponse(res, state.node.id, false, state);
         },
-        //fail callback
+        // fail callback
         (res: string) => {
-            //Navigating home was a bad idea. If someone tries to uplevel and cannot, we don't want to change them away from
-            //whatever page they're on. Just show the error and stay on same node.
-            //this.navHome(state);
+            // Navigating home was a bad idea. If someone tries to uplevel and cannot, we don't want to change them away from
+            // whatever page they're on. Just show the error and stay on same node.
+            // this.navHome(state);
         });
     }
 
@@ -168,7 +168,7 @@ export class Nav implements NavIntf {
             const node: J.NodeInfo = state.idToNodeMap[currentSelNode.id];
 
             if (node) {
-                //console.log("found highlighted node.id=" + node.id);
+                // console.log("found highlighted node.id=" + node.id);
 
                 /* now make CSS id from node */
                 const nodeId: string = this._UID_ROWID_PREFIX + node.id;
@@ -194,7 +194,7 @@ export class Nav implements NavIntf {
 
         const node: J.NodeInfo = state.idToNodeMap[nodeId];
         if (!node) {
-            //console.log("idToNodeMap: "+S.util.prettyPrint(state.idToNodeMap));
+            // console.log("idToNodeMap: "+S.util.prettyPrint(state.idToNodeMap));
             throw new Error("node not found in idToNodeMap: " + nodeId);
         }
 
@@ -363,12 +363,12 @@ export class Nav implements NavIntf {
         }
     }
 
-    //todo-1: need to make view.scrollRelativeToNode use this function instead of embedding all the same logic.
+    // todo-1: need to make view.scrollRelativeToNode use this function instead of embedding all the same logic.
     getAdjacentNode = (dir: string, state: AppState): J.NodeInfo => {
 
         let newNode: J.NodeInfo = null;
 
-        //First detect if page root node is selected, before doing a child search
+        // First detect if page root node is selected, before doing a child search
         if (state.fullScreenViewId === state.node.id) {
             return null;
         }
@@ -398,7 +398,7 @@ export class Nav implements NavIntf {
                     }
                     prevChild = child;
                 }
-                //NOTE: returning true stops the iteration.
+                // NOTE: returning true stops the iteration.
                 return ret;
             });
         }

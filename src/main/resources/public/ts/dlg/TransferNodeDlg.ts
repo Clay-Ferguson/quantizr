@@ -62,9 +62,9 @@ export class TransferNodeDlg extends DialogBase {
 
     transfer = (): void => {
         let state = this.getState();
-        
-        //if fromUser is left blank that's how to take ownership of any nodes regardless of current ownership
-        if (/*!fromUser ||*/ !state.toUser) {
+
+        // if fromUser is left blank that's how to take ownership of any nodes regardless of current ownership
+        if (/*! fromUser || */ !state.toUser) {
             S.util.showMessage("To user name is required.", "Warning");
             return;
         }
@@ -73,7 +73,7 @@ export class TransferNodeDlg extends DialogBase {
             S.util.showMessage("No node was selected.", "Warning");
             return;
         }
-       
+
         S.user.transferNode(this.getState().recursive, node.id, state.fromUser, state.toUser, this.appState);
         this.close();
     }

@@ -5,8 +5,8 @@ export class PropTable extends Comp {
 
     constructor(attribs : Object = {}) {
         super(attribs);
-        //(<any>this.attribs).style = "display:table; width:100%;";
-        //(<any>this.attribs).sourceClass = "EditPropsTable";
+        // (<any>this.attribs).style = "display:table; width:100%;";
+        // (<any>this.attribs).sourceClass = "EditPropsTable";
     }
 
     compRender(): ReactNode {

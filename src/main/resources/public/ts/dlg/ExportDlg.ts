@@ -112,8 +112,8 @@ export class ExportDlg extends DialogBase {
                 "Export",
                 null,
                 new VerticalLayout([
-                    //new Anchor(hostAndPort + "/file/" + res.fileName + "?disp=inline", "Raw View", { "target": "_blank" }),
-                    //new Anchor(hostAndPort + "/view/" + res.fileName, "Formatted View", { "target": "_blank" }),
+                    // new Anchor(hostAndPort + "/file/" + res.fileName + "?disp=inline", "Raw View", { "target": "_blank" }),
+                    // new Anchor(hostAndPort + "/view/" + res.fileName, "Formatted View", { "target": "_blank" }),
                     new Anchor(downloadLink, "Download: " + downloadLink, null)
                 ]), false, 0, this.appState
             ).open();

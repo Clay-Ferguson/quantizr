@@ -35,7 +35,7 @@ export class DateTimeField extends Span {
             try {
                 dateTime = new Date(parseInt(dateTimeStr));
                 dateTime = S.util.addTimezoneOffset(dateTime, -1);
-                //console.log("parsed ok: " + dateTimeStr + " proof=" + dateTime.toLocaleDateString());
+                // console.log("parsed ok: " + dateTimeStr + " proof=" + dateTime.toLocaleDateString());
             }
             catch (e) {
                 console.log("Unable to parse: " + dateTimeStr);
@@ -44,7 +44,7 @@ export class DateTimeField extends Span {
         }
 
         let isoStr = dateTime.toISOString();
-        //console.log("isoStr: " + isoStr);
+        // console.log("isoStr: " + isoStr);
 
         let dateStr = isoStr.substr(0, 10);
         this.mergeState({ date: dateStr });
@@ -61,7 +61,7 @@ export class DateTimeField extends Span {
 
         let timeStr = hourStr + ":" + minStr;
 
-        //console.log("timeStr: " + timeStr);
+        // console.log("timeStr: " + timeStr);
         this.mergeState({ time: timeStr });
 
         this.dateValueIntf = {
@@ -81,7 +81,7 @@ export class DateTimeField extends Span {
             },
 
             getValue: (): string => {
-                //console.log("Getting Date: " + this.getState().date);
+                // console.log("Getting Date: " + this.getState().date);
                 return this.getState().date;
             }
         };
@@ -90,7 +90,7 @@ export class DateTimeField extends Span {
             setValue: (val: string): void => {
                 try {
                     let newTimestamp = this.dateValueIntf.getValue() + " " + val + ":00";
-                    //console.log("newTimestamp(b): " + newTimestamp);
+                    // console.log("newTimestamp(b): " + newTimestamp);
                     let newDate = new Date(newTimestamp);
 
                     if (newDate && newDate.getTime()) {
@@ -103,7 +103,7 @@ export class DateTimeField extends Span {
             },
 
             getValue: (): string => {
-                //console.log("Getting Time: " + this.getState().time);
+                // console.log("Getting Time: " + this.getState().time);
                 return this.getState().time;
             }
         };

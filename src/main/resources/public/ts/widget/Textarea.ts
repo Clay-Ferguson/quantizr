@@ -30,7 +30,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
             Comp.renderCachedChildren = true;
 
             try {
-                //console.log("e.target.value=" + evt.target.value);
+                // console.log("e.target.value=" + evt.target.value);
                 this.updateValFunc(evt.target.value);
             }
             finally {
@@ -47,7 +47,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         this.mergeState({ error });
     }
 
-    //Handler to update state if edit field looses focus
+    // Handler to update state if edit field looses focus
     updateValFunc(value: string): void {
         if (value !== this.valueIntf.getValue()) {
             this.valueIntf.setValue(value);
@@ -55,7 +55,7 @@ export class Textarea extends Comp implements I.TextEditorIntf {
     }
 
     insertTextAtCursor = (text: string) => {
-        //should we implement this ? todo-1
+        // should we implement this ? todo-1
     }
 
     setMode(mode: string): void {
@@ -106,12 +106,12 @@ export class Textarea extends Comp implements I.TextEditorIntf {
 
         children.push(S.e("textarea", _attribs));
 
-        //changing from div to span is very new 6/30/2020. not fully vetted.
+        // changing from div to span is very new 6/30/2020. not fully vetted.
         return S.e("span" /* "div" */, {
             id: this.getId() + "_textfield",
             key: this.getId() + "_textfield",
-            //NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
-            //to the component, or elase there's a react-rerender flicker.
+            // NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
+            // to the component, or elase there's a react-rerender flicker.
             style: { fontFamily: "monospace" }
         }, children);
     }

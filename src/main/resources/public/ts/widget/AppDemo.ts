@@ -28,7 +28,7 @@ export class AppDemo extends Div {
                 new Button("Inc AppState.counter=" + state.counter + " compDemoIdActive=" + state.compDemoIdActive, () => {
                     Comp.renderCounter = 0;
                     dispatch({
-                        type: "Action_DemoAppIncCounter", 
+                        type: "Action_DemoAppIncCounter",
                         state,
                         update: (s: AppState): void => {
                             s.counter++;

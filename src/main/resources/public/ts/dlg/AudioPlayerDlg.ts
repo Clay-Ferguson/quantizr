@@ -17,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 /**
  * See also: AudioPlayerDlg (which is very similar)
- * 
+ *
  * This is an audio player dialog that has ad-skipping technology provided by podcast.ts
  *
  * NOTE: currently the AD-skip (Advertisement Skip) feature is a proof-of-concept (and it does functionally work!), but croud sourcing
@@ -25,11 +25,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
  * creating technology to destroy podcast's ability to collect ad-revenue is counter-productive to the entire podcasting industry
  * which is an industry i love, and I won't want to be associated with such a hostile act against podcasters as trying to eliminate
  * their ads!! So the ad-skipping is on hold, but this AudioPlayer still of course functions fine just to play podcasts normally.
- * 
+ *
  * WARNING: DO NOT TRY to add react 'state' to this dialog. Let it render once and never call mergeState or any kind of state update
  *          because it looks like when react re-renders a media component it can't do so without breaking it, which makes sense because
  *          a media player (audio or video) isn't something that can just be replaced in the DOM while it's already playing.
- * 
+ *
  * https://www.w3.org/2010/05/video/mediaevents.html
  */
 export class AudioPlayerDlg extends DialogBase {
@@ -40,17 +40,17 @@ export class AudioPlayerDlg extends DialogBase {
 
     startTimePending: number = null;
 
-    /** 
-    NOTE: Originally this app had an automatic AD-blocking 
+    /**
+    NOTE: Originally this app had an automatic AD-blocking
     feature (see adSegments, commented out currently in the code), which automatically made this player
     skip right over ADs just like they didn't even exist!
 
     If the 'adSegments' array variable below contains an array of start/stop times then during playback this player will seamlessly and autmatically
     jump over those time ranges in the audio just like they didn't even exist. It's basically censoring out those time ranges.
     Currently we aren't using this at all, but was the core of the ad-blocker featue that i deciced to remove.
-    
+
     Interestingly, and entire website/service would be build around doing sort the 'inverse' of this feature where we could have
-    a feature where ONLY a custom series of playback time ranges are include, and use this to build up some discussion or some way to 
+    a feature where ONLY a custom series of playback time ranges are include, and use this to build up some discussion or some way to
     built a community around people who can post 'custom segments' they somehow choose, and then open up just that one or more segmens
     of audio to have online discussion threads about certain specific parts of any podcast or media.
     */
@@ -63,13 +63,13 @@ export class AudioPlayerDlg extends DialogBase {
 
         this.urlHash = S.util.hashOfString(sourceUrl);
         this.startTimePending = localStorage[this.urlHash];
-        //console.log("startTimePending = localStorage[" + this.urlHash + "]=" + localStorage[this.urlHash]);
+        // console.log("startTimePending = localStorage[" + this.urlHash + "]=" + localStorage[this.urlHash]);
     }
 
     renderDlg(): CompIntf[] {
         let children = [
             new Form(null, [
-                //new TextContent(this.title), 
+                // new TextContent(this.title),
                 this.audioPlayer = new AudioPlayer({
                     src: this.sourceUrl,
                     style: {
@@ -105,7 +105,7 @@ export class AudioPlayerDlg extends DialogBase {
 
         this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
             this.player = elm;
-            //use a very long delay here, to be sure media player has had time to do what it needs to do.
+            // use a very long delay here, to be sure media player has had time to do what it needs to do.
             setTimeout(this.updatePlayButtonText, 3000);
         });
 
@@ -119,7 +119,7 @@ export class AudioPlayerDlg extends DialogBase {
     cancel(): void {
         this.close();
         if (this.player) {
-            //console.log("player pause and remove");
+            // console.log("player pause and remove");
             this.player.pause();
             this.player.remove();
         }
@@ -189,14 +189,14 @@ export class AudioPlayerDlg extends DialogBase {
     restoreStartTime = () => {
         /* makes player always start wherever the user last was when they clicked "pause" */
         if (this.player && this.startTimePending) {
-            //console.log("setting time on player: "+this.startTimePending);
+            // console.log("setting time on player: "+this.startTimePending);
             this.player.currentTime = this.startTimePending;
             this.startTimePending = null;
         }
     }
 
     onTimeUpdate = (): void => {
-        //console.log("CurrentTime=" + this.player.currentTime);
+        // console.log("CurrentTime=" + this.player.currentTime);
 
         if (!this.saveTimer) {
             /* save time offset into browser local storage every 3 seconds */
@@ -245,7 +245,7 @@ export class AudioPlayerDlg extends DialogBase {
             /* this safety check to be sure no hidden audio can still be playing should no longer be needed
             now that I have the close listener even on the dialog, but i'll leave this here anyway. Can't hurt. */
             if (!S.util.isElmVisible(this.player)) {
-                //console.log("closing player, because it was detected as not visible. player dialog get hidden?");
+                // console.log("closing player, because it was detected as not visible. player dialog get hidden?");
                 this.player.pause();
             }
 
@@ -257,6 +257,6 @@ export class AudioPlayerDlg extends DialogBase {
         if (this.appState.isAnonUser) return;
         let urlHash = S.util.hashOfString(url);
         localStorage[urlHash] = timeOffset;
-        //console.log("localStorage[" + urlHash + "]=" + timeOffset);
+        // console.log("localStorage[" + urlHash + "]=" + timeOffset);
     }
 }

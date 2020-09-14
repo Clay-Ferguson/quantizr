@@ -42,6 +42,6 @@ export interface Singletons {
     localDB: LocalDBIntf;
     mainMenu: DialogBaseImpl;
 
-    e: Function; //React.createElement
-    log: Function; //console.log
+    e: Function; // React.createElement
+    log: Function; // console.log
 }

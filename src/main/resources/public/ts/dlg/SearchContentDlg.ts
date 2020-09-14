@@ -43,7 +43,7 @@ export class SearchContentDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                this.searchTextField = new TextField("Search", false, this.search, null, 
+                this.searchTextField = new TextField("Search", false, this.search, null,
                     new CompValueHolder<string>(this, "searchText")),
                 new HorizontalLayout([
                     new Checkbox("Fuzzy Search (slower)", null, {

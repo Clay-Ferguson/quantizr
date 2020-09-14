@@ -4,12 +4,12 @@
 //     S = ctx;
 // });
 
-//todo-1: disabled for now.
+// todo-1: disabled for now.
 // export class FolderTypeHandler implements TypeHandlerIntf {
 //     constructor(private plugin: CoreTypesPlugin) {
 //     }
 
-//     render = (node: J.NodeInfo, rowStyling: boolean): Comp => {    
+//     render = (node: J.NodeInfo, rowStyling: boolean): Comp => {
 //         let ret: Comp = null;
 
 //         let name = node.content;
