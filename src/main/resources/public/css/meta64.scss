@@ -1348,6 +1348,23 @@ i'm backing out for now
     margin-left: $smallGap;
 }
 
+.durationTypeInput {
+    max-width: 8em;
+}
+
+.breadcrumbPanel {
+    max-height: 5em;
+    overflow-y: auto;
+    padding: $tinyGap;
+}
+
+.breadcrumbItem {
+    cursor: pointer;
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 4px;
+    margin-right: 10px;
+}
 
 /************************************************************** 
 Media Queries below are per Bootstap 4 standard */
@@ -1443,21 +1460,4 @@ Media Queries below are per Bootstap 4 standard */
     .container{
         max-width: 1400px;
     }
-}
-
-.durationTypeInput {
-    max-width: 8em;
-}
-
-.breadcrumbPanel {
-    max-height: 5em;
-    overflow-y: auto;
-    padding: $tinyGap;
-}
-
-.breadcrumbItem {
-    cursor: pointer;
-    border: 1px solid gray;
-    border-radius: 4px;
-    padding: 4px;
 }

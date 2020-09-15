@@ -57,7 +57,7 @@ export class BreadcrumbsPanel extends NavTag {
 
                 children.push(new Span(bc.name, {
                     onClick: () => { S.view.refreshTree(bc.id, true, bc.id, false, false, true, true, state); },
-                    className: "marginRight breadcrumbItem"
+                    className: "breadcrumbItem"
                 }));
             }
             else {

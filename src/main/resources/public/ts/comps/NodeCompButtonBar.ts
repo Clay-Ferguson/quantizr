@@ -141,7 +141,8 @@ export class NodeCompButtonBar extends HorizontalLayout {
         */
         if (node.hasChildren && !isPageRootNode &&
             // If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
-            (!isInlineChildren || state.userPreferences.editMode)) {
+            // Update: Changed my mind. It's confusing if 'open' is displayed even if editMode is on.
+            (!isInlineChildren /* || state.userPreferences.editMode */)) {
 
             /* convert this button to a className attribute for styles */
             openButton = new Button("Open", S.meta64.getNodeFunc(S.nav.cached_openNodeById, "S.nav.openNodeById", node.id),
