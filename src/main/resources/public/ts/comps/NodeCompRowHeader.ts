@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { dispatch, store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
@@ -18,7 +19,22 @@ export class NodeCompRowHeader extends Div {
 
     constructor(private node: J.NodeInfo, private isFeed: boolean = false) {
         super(null, {
-            className: "header-text"
+            className: "header-text",
+            title: "Click to hide metadata."
+        });
+
+        // do this AFTER super call because 'this' isn't available in super call.
+        this.attribs.onClick = this.turnOffHeaders;
+    }
+
+    turnOffHeaders = () => {
+        let state = store.getState();
+        dispatch({
+            type: "Action_HideMetadata",
+            update: (s: AppState): void => {
+                state.userPreferences.showMetaData = false;
+                s.userPreferences = state.userPreferences;
+            }
         });
     }
 
