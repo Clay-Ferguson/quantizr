@@ -22,7 +22,7 @@ export class BreadcrumbsPanel extends NavTag {
 
     compRender(): ReactNode {
         const state: AppState = useSelector((state: AppState) => state);
-        this.attribs.className = "navbar navbar-expand navbar-dark bg-dark main-navbar breadcrumbPanel";
+        this.attribs.className = "navbar navbar-expand navbar-dark bg-dark breadcrumbPanel";
 
         this.setChildren([
             new Ul(null, {
@@ -53,12 +53,6 @@ export class BreadcrumbsPanel extends NavTag {
                     else {
                         bc.name = "???";
                     }
-                }
-
-                if (children.length > 0) {
-                    children.push(new Span("/", {
-                        className: "marginRight breadcrumbSlash"
-                    }));
                 }
 
                 children.push(new Span(bc.name, {
