@@ -38,8 +38,8 @@ export class NodeCompVerticalRowLayout extends Div {
         let comps: Comp[] = [];
         let countToDisplay = 0;
 
-        // we have to make a pass over children before main loop below, because we need the countToDisplay
-        // to ber correct before the second loop stats.
+        /* we have to make a pass over children before main loop below, because we need the countToDisplay
+        to ber correct before the second loop stats. */
         for (let i = 0; i < this.node.children.length; i++) {
             let n: J.NodeInfo = this.node.children[i];
             if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
@@ -76,8 +76,17 @@ export class NodeCompVerticalRowLayout extends Div {
                 }
 
                 let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
-                let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove, childrenImgSizes, state);
-                comps.push(row);
+
+                let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
+
+                // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
+                if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode) {
+
+                }
+                else {
+                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove, childrenImgSizes, state);
+                    comps.push(row);
+                }
 
                 S.render.lastOwner = this.node.owner;
                 rowCount++;
