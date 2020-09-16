@@ -8,7 +8,7 @@ import { Main } from "./Main";
 import React, { ReactNode } from "react";
 import { dispatch } from "../AppRedux";
 
-/* ========= WARNING ========= 
+/* ========= WARNING =========
 Do not re-arrange these imports because fullcalendar will have a problem if you do!!! It needs to load them in this order.
 */
 import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, formatDate } from "@fullcalendar/react";
@@ -46,6 +46,11 @@ export class FullScreenCalendar extends Main {
                     center: "title",
                     right: "dayGridMonth,timeGridWeek,timeGridDay"
                 },
+
+                // WARNING: setting window sizes, or even this aspect ratio causes a bug when the user resizes the window
+                // and this bug completely disables the app.
+                // aspectRatio: 2.4,
+
                 initialDate: FullScreenCalendar.lastClickTime || new Date(),
                 initialView: "dayGridMonth",
                 editable: false,
@@ -55,7 +60,7 @@ export class FullScreenCalendar extends Main {
                 weekends: this.state.calendarShowWeekends,
                 initialEvents: this.state.calendarData,
                 dateClick: this.dateClick,
-                //select: this.handleDateSelect,
+                // select: this.handleDateSelect,
                 eventContent: renderEventContent,
                 eventClick: this.handleEventClick,
                 // eventsSet: {this.handleEvents}

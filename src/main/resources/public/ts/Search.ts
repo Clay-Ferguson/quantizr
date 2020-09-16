@@ -148,7 +148,7 @@ export class Search implements SearchIntf {
         // clazz += " non-editing-border"
         // }
 
-        if (S.render.fadeInId === node.id && S.render.allowFadeInId) {
+        if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
             S.render.allowFadeInId = false;
             clazz += " fadeInRowBkgClz";

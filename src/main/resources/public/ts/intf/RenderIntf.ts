@@ -8,6 +8,8 @@ import { TypeHandlerIntf } from "./TypeHandlerIntf";
 
 export interface RenderIntf {
     lastOwner: string;
+
+    enableRowFading: boolean;
     fadeInId: string;
 
     // retrofit to be sure fading is only done AFTER the breadcrumb query update is done.

@@ -31,6 +31,11 @@ export class Render implements RenderIntf {
 
     private debug: boolean = false;
     private markedRenderer = null;
+
+    // After adding the breadcrumb query it's a real challenge to get this fading to work right, so for now
+    // I'm disabling it entirely with this flag.
+    enableRowFading: boolean = false;
+
     fadeInId: string;
     allowFadeInId: boolean = false;
 
