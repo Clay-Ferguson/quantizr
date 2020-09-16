@@ -32,6 +32,7 @@ export class Render implements RenderIntf {
     private debug: boolean = false;
     private markedRenderer = null;
     fadeInId: string;
+    allowFadeInId: boolean = false;
 
     /* Since js is singlethreaded we can have lastOwner get updated from any other function and use it to keep track
     during the rendering, what the last owner was so we can keep from displaying the same avatars unnecessarily */
@@ -318,25 +319,14 @@ export class Render implements RenderIntf {
             nodeId: state.node.id
         }, (res: J.GetBreadcrumbsResponse) => {
 
-            // we calculate an addDelay so we don't interrup the fading effect on the row.
-            let addDelay = 1;
-            let now = new Date().getTime();
-
-            // This 3000 must match the fade time for 'fadeInRowBkgClz' class animation-duration in the SCSS
-            if (now - S.meta64.fadeStartTime < 3000) {
-                addDelay = 3000 - (now - S.meta64.fadeStartTime);
-                if (addDelay <= 1) addDelay = 1;
-            }
-
-            setTimeout(() => {
-                dispatch({
-                    type: "Action_RefreshBreadcrumbs",
-                    state,
-                    update: (s: AppState): void => {
-                        s.breadcrumbs = res.breadcrumbs;
-                    }
-                });
-            }, addDelay);
+            dispatch({
+                type: "Action_RefreshBreadcrumbs",
+                state,
+                update: (s: AppState): void => {
+                    this.allowFadeInId = true;
+                    s.breadcrumbs = res.breadcrumbs;
+                }
+            });
         });
     }
 

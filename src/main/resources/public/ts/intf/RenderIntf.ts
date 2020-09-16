@@ -10,6 +10,9 @@ export interface RenderIntf {
     lastOwner: string;
     fadeInId: string;
 
+    // retrofit to be sure fading is only done AFTER the breadcrumb query update is done.
+    allowFadeInId: boolean;
+
     setNodeDropHandler(attribs: any, node: J.NodeInfo, isFirst: boolean, state: AppState): void;
     initMarkdown(): void;
     injectSubstitutions(content: string): string;

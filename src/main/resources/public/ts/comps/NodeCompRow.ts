@@ -75,8 +75,9 @@ export class NodeCompRow extends Div {
         let selected: boolean = (focusNode && focusNode.id === id);
         this.attribs.className = (this.layoutClass || "") + (selected ? " active-row" : " inactive-row");
 
-        if (S.render.fadeInId === node.id) {
+        if (S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
+            S.render.allowFadeInId = false;
             this.attribs.className += " fadeInRowBkgClz";
             S.meta64.fadeStartTime = new Date().getTime();
         }

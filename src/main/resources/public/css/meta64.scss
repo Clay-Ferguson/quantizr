@@ -55,9 +55,6 @@ $mediumBorderSize: 6px;
 $smallBorderSize: 3px;
 
 html {
-    // not supported by all browers.
-    // scroll-behavior: smooth;
-
     font-family: "Roboto", "Verdana", "Aria";
 } 
 
@@ -380,7 +377,7 @@ strong em {
 .customScrollbar {
     //I was trying to get Firefox scrollbars to look better but it doesn't work.
     scrollbar-width: auto;
-    scrollbar-color:  $body-bg;
+    scrollbar-color: $body-bg;
 }
 
 .customScrollbar::-webkit-scrollbar-track {
