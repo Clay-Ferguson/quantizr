@@ -18,25 +18,20 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class BreadcrumbsPanel extends NavTag {
+export class BreadcrumbsPanel extends Div {
 
-    compRender(): ReactNode {
-        const state: AppState = useSelector((state: AppState) => state);
-        this.attribs.className = "navbar navbar-expand navbar-dark bg-dark breadcrumbPanel";
+    constructor() {
+        super(null, {
+            className: "breadcrumbPanel"
+        });
+    }
+
+    preRender(): void {
+        let state: AppState = useSelector((state: AppState) => state);
 
         this.setChildren([
-            new Ul(null, {
-                className: "navbar-nav"
-            }, [
-                new Li(null, {
-                    className: "nav-item"
-                }, [
-                    this.createBreadcrumbs(state)
-                ])
-            ])
+            this.createBreadcrumbs(state)
         ]);
-
-        return this.tagRender("nav", this.content, this.attribs);
     }
 
     createBreadcrumbs = (state: AppState): Comp => {

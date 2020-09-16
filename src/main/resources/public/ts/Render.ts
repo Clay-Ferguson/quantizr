@@ -276,6 +276,7 @@ export class Render implements RenderIntf {
                     }
 
                     if (state.pendingLocationHash) {
+                        console.log("highlight: pendingLocationHash");
                         window.location.hash = state.pendingLocationHash;
                         // Note: the substring(1) trims the "#" character off.
                         if (allowScroll) {
@@ -284,12 +285,15 @@ export class Render implements RenderIntf {
                         state.pendingLocationHash = null;
                     }
                     else if (allowScroll && targetNodeId) {
+                        console.log("highlight: byId");
                         S.meta64.highlightRowById(targetNodeId, true, s);
                     } //
                     else if (allowScroll && (scrollToTop || !S.meta64.getHighlightedNode(s))) {
+                        console.log("highlight: scrollTop");
                         S.view.scrollToTop();
                     } //
                     else if (allowScroll) {
+                        console.log("highlight: scrollToSelected");
                         S.view.scrollToSelectedNode(s);
                     }
 

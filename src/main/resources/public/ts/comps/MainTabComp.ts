@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
+import { BreadcrumbsPanel } from "../widget/BreadcrumbsPanel";
 import { Div } from "../widget/Div";
 import { NodeCompMainList } from "./NodeCompMainList";
 import { NodeCompMainNode } from "./NodeCompMainNode";
@@ -26,7 +27,9 @@ export class MainTabComp extends Div {
             return;
         }
 
+        let showBreadcrumbs = state.breadcrumbs && state.breadcrumbs.length > 0;
         this.setChildren([
+            showBreadcrumbs ? new BreadcrumbsPanel() : null,
             new NodeCompMainNode(state, null),
             new NodeCompMainList()
         ]);

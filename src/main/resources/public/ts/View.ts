@@ -169,7 +169,6 @@ export class View implements ViewIntf {
 
     scrollToSelectedNode = (state: AppState): void => {
 
-        // todo-1: is this still good? the overlay ?
         S.meta64.setOverlay(true);
 
         setTimeout(async () => {

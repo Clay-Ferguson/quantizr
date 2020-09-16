@@ -118,16 +118,16 @@ export class Nav implements NavIntf {
         if (!state.node) return null;
 
         // Always just scroll to the top before doing an actual 'upLevel' to parent.
-        if (S.view.docElm.scrollTop > 100) {
-            S.view.docElm.scrollTop = 0;
+        // if (S.view.docElm.scrollTop > 100) {
+        //     S.view.docElm.scrollTop = 0;
 
-            /* This works fine but actually for me causes eye-strain. I might enable this for mobile some day, but for now
-            let's just comment it out. */
-            // S.util.animateScrollToTop();
+        //     /* This works fine but actually for me causes eye-strain. I might enable this for mobile some day, but for now
+        //     let's just comment it out. */
+        //     // S.util.animateScrollToTop();
 
-            S.meta64.highlightNode(state.node, false, state);
-            return;
-        }
+        //     S.meta64.highlightNode(state.node, false, state);
+        //     return;
+        // }
 
         if (!this.parentVisibleToUser(state)) {
             S.util.showMessage("The parent of this node isn't shared to you.", "Warning");
