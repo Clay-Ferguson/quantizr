@@ -36,6 +36,12 @@ export class NodeCompRowHeader extends Div {
                 s.userPreferences = state.userPreferences;
             }
         });
+
+        S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
+            userPreferences: state.userPreferences
+        }, () => {
+            // nothing to do here.
+        });
     }
 
     preRender(): void {

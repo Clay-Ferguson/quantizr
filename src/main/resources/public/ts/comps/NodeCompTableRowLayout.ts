@@ -83,8 +83,17 @@ export class NodeCompTableRowLayout extends Div {
                 }
 
                 let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
-                let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove, childrenImgSizes, state);
-                comps.push(row);
+
+                let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
+
+                // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
+                if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode) {
+                }
+                else {
+                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove, childrenImgSizes, state);
+                    comps.push(row);
+                }
+
                 rowCount++;
                 S.render.lastOwner = n.owner;
 
