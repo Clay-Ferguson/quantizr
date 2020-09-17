@@ -1,13 +1,20 @@
 package org.subnode.service;
 
 import java.io.File;
+import java.io.InputStream;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
 import org.subnode.model.UserPreferences;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -26,6 +34,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
+import java.awt.image.BufferedImage;
 
 /* This file was taken from ExportTxtService (copied) and was about to be converted to PDF exporter
  * but i discovered the PDF api error shown below in which PDFBOX api freezes/hangs the thread whenver
@@ -44,6 +53,9 @@ public class ExportPdfService {
 
 	@Autowired
 	private MongoRead read;
+
+	@Autowired
+	private AttachmentService attachmentService;
 
 	@Autowired
 	private SessionContext sessionContext;
@@ -177,6 +189,48 @@ public class ExportPdfService {
 			String content = node.getContent();
 			setFontSizeFromMarkdown(content);
 			printContent(content);
+			writeImage(node);
+		} catch (Exception ex) {
+			throw ExUtil.wrapEx(ex);
+		}
+	}
+
+	private void writeImage(SubNode node) {
+		try {
+			String bin = node.getStringProp(NodeProp.BIN.s());
+			if (bin == null) {
+				return;
+			}
+			String mime = node.getStringProp(NodeProp.BIN_MIME.s());
+
+			InputStream is = attachmentService.getStream(session, node, false);
+			if (is == null)
+				return;
+
+			PDImageXObject pdImage = null;
+			try {
+				if ("image/jpeg".equals(mime) || "image/jpg".equals(mime)) {
+					pdImage = JPEGFactory.createFromStream(doc, is);
+				} else if ("image/gif".equals(mime) || "image/bmp".equals(mime) || "image/png".equals(mime)) {
+					BufferedImage bim = ImageIO.read(is);
+					pdImage = LosslessFactory.createFromImage(doc, bim);
+				}
+			} finally {
+				IOUtils.closeQuietly(is);
+			}
+
+			if (pdImage == null)
+				return;
+
+			float scale = width / pdImage.getWidth();
+			startY -= (pdImage.getHeight() * scale);
+
+			if (startY <= margin) {
+				newPage();
+				startY -= pdImage.getHeight() * scale;
+			}
+
+			stream.drawImage(pdImage, startX, startY, width, pdImage.getHeight() * scale);
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
@@ -269,6 +323,12 @@ public class ExportPdfService {
 
 	public void setFontSize(float fontSize) {
 		this.fontSize = fontSize;
-		this.leading = 1.5f * fontSize;
+
+		// this conditional is just to make sure we don't get too much space below title lines.
+		if (fontSize > baseFontSize + 4) {
+			this.leading = 1.5f * (baseFontSize + 4);
+		} else {
+			this.leading = 1.5f * fontSize;
+		}
 	}
 }
