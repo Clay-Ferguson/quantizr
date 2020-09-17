@@ -49,8 +49,6 @@ public class ExportTextService {
 
 	private static final byte[] NL = "\n".getBytes(StandardCharsets.UTF_8);
 
-	//private ExportResponse res;
-
 	/*
 	 * Exports the node specified in the req. If the node specified is "/", or the
 	 * repository root, then we don't expect a filename, because we will generate a
@@ -60,7 +58,7 @@ public class ExportTextService {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
-		//this.res = res;
+	
 		this.session = session;
 
 		UserPreferences userPreferences = sessionContext.getUserPreferences();

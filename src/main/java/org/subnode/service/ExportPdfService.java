@@ -1,253 +1,274 @@
 package org.subnode.service;
 
-//I have this entire file disabled because 1) this code never worked (yet), and 2) i decided to also just remove the
-//pom.xml dependency for pdfbox also until it's working. WARNING: Also beware the PDF dependency has a log4j dependency in it
-//which might conflict, and need to be 'excluded' from the dependency tree
- 
-// import java.io.BufferedOutputStream;
-// import java.io.File;
-// import java.nio.charset.StandardCharsets;
+import java.io.File;
 
-// import org.apache.pdfbox.pdmodel.PDDocument;
-// import org.apache.pdfbox.pdmodel.PDPage;
-// import org.apache.pdfbox.pdmodel.PDPageContentStream;
-// import org.apache.pdfbox.pdmodel.font.PDFont;
-// import org.apache.pdfbox.pdmodel.font.PDType1Font;
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.context.annotation.Scope;
-// import org.springframework.stereotype.Component;
-
-// import org.subnode.config.AppProp;
-// import org.subnode.model.client.NodeProp;
-// import org.subnode.config.SessionContext;
-// import org.subnode.model.UserPreferences;
-// import org.subnode.mongo.MongoUtil;
-// import org.subnode.mongo.MongoSession;
-// import org.subnode.mongo.model.SubNode;
-// import org.subnode.request.ExportRequest;
-// import org.subnode.response.ExportResponse;
-// import org.subnode.util.ExUtil;
-// import org.subnode.util.FileTools;
-// import org.subnode.util.SubNodeUtil;
-// import org.subnode.util.ThreadLocals;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
+import org.subnode.config.AppProp;
+import org.subnode.config.SessionContext;
+import org.subnode.model.UserPreferences;
+import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.model.SubNode;
+import org.subnode.request.ExportRequest;
+import org.subnode.response.ExportResponse;
+import org.subnode.util.ExUtil;
+import org.subnode.util.FileUtils;
+import org.subnode.util.SubNodeUtil;
+import org.subnode.util.ThreadLocals;
 
 /* This file was taken from ExportTxtService (copied) and was about to be converted to PDF exporter
  * but i discovered the PDF api error shown below in which PDFBOX api freezes/hangs the thread whenver
  * any font is attempted to be created.
  */
-// @Component
-// @Scope("prototype")
+@Component
+@Scope("prototype")
 public class ExportPdfService {
-	// private static final Logger log = LoggerFactory.getLogger(ExportPdfService.class);
+	private static final Logger log = LoggerFactory.getLogger(ExportPdfService.class);
 
-	// @Autowired
-	// private MongoUtil api;
+	@Autowired
+	private SubNodeUtil util;
 
-	// @Autowired
-	// private SubNodeUtil util;
+	@Autowired
+	private AppProp appProp;
 
-	// @Autowired
-	// private AppProp appProp;
+	@Autowired
+	private MongoRead read;
 
-	// @Autowired
-	// private SessionContext sessionContext;
+	@Autowired
+	private SessionContext sessionContext;
 
-	// private MongoSession session;
+	private MongoSession session;
 
-	// private BufferedOutputStream output = null;
-	// private String shortFileName;
-	// private String fullFileName;
+	private String shortFileName;
+	private String fullFileName;
 
-	// private static final byte[] NL = "\n".getBytes(StandardCharsets.UTF_8);
+	private PDFont font = PDType1Font.HELVETICA;
+	private float baseFontSize = 12;
+	private float fontSize = baseFontSize;
+	private float leading;
+	private int lineCount = 0;
 
-	// private ExportResponse res;
+	private PDPageContentStream stream = null;
+	private PDDocument doc = null;
 
-	// /*
-	//  * Exports the node specified in the req. If the node specified is "/", or the repository root,
-	//  * then we don't expect a filename, because we will generate a timestamped one.
-	//  */
-	// public void export(MongoSession session, ExportRequest req, ExportResponse res) {
-	// 	if (session == null) {
-	// 		session = ThreadLocals.getMongoSession();
-	// 	}
-	// 	this.res = res;
-	// 	this.session = session;
+	private PDRectangle mediabox;
+	private float margin = 35;
+	private float width;
+	private float startX;
+	private float startY;
+	private int lastSpace = -1;
 
-	// 	UserPreferences userPreferences = sessionContext.getUserPreferences();
-	// 	boolean exportAllowed = userPreferences != null ? userPreferences.isExportAllowed() : false;
-	// 	if (!exportAllowed && !sessionContext.isAdmin()) {
-	// 		throw ExUtil.newEx("You are not authorized to export.");
-	// 	}
+	/*
+	 * Exports the node specified in the req. If the node specified is "/", or the
+	 * repository root, then we don't expect a filename, because we will generate a
+	 * timestamped one.
+	 */
+	public void export(MongoSession session, ExportRequest req, ExportResponse res) {
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+		this.session = session;
 
-	// 	String nodeId = req.getNodeId();
+		UserPreferences userPreferences = sessionContext.getUserPreferences();
+		boolean exportAllowed = userPreferences != null ? userPreferences.isExportAllowed() : false;
+		if (!exportAllowed && !sessionContext.isAdmin()) {
+			throw ExUtil.wrapEx("You are not authorized to export.");
+		}
 
-	// 	if (!FileTools.dirExists(appProp.getAdminDataFolder())) {
-	// 		throw ExUtil.newEx("adminDataFolder does not exist");
-	// 	}
+		String nodeId = req.getNodeId();
 
-	// 	if (nodeId.equals("/")) {
-	// 		throw ExUtil.newEx("Exporting entire repository is not supported.");
-	// 	}
-	// 	else {
-	// 		log.info("Exporting to Text File");
-	// 		exportNodeToFile(session, nodeId);
-	// 		res.setFileName(shortFileName);
-	// 	}
+		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
+			throw ExUtil.wrapEx("adminDataFolder does not exist");
+		}
 
-	// 	res.setSuccess(true);
-	// }
+		if (nodeId.equals("/")) {
+			throw ExUtil.wrapEx("Exporting entire repository is not supported.");
+		} else {
+			log.info("Exporting to Text File");
+			exportNodeToFile(session, nodeId);
+			res.setFileName(shortFileName);
+		}
 
-	// private void exportNodeToFile(MongoSession session, String nodeId) {
-	// 	if (!FileTools.dirExists(appProp.getAdminDataFolder())) {
-	// 		throw ExUtil.newEx("adminDataFolder does not exist.");
-	// 	}
+		res.setSuccess(true);
+	}
 
-	// 	shortFileName = "f" + util.getGUID() + ".md";
-	// 	fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
+	private void exportNodeToFile(MongoSession session, String nodeId) {
+		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
+			throw ExUtil.wrapEx("adminDataFolder does not exist.");
+		}
 
-	// 	SubNode exportNode = api.getNode(session, nodeId, true);
-	// 	try {
-	// 		log.debug("Export Node: " + exportNode.getPath() + " to file " + fullFileName);
-	// 		//output = new BufferedOutputStream(new FileOutputStream(fullFileName));
-			
-	// 		///////////////////////
-	// 		// Create a document and add a page to it
-	// 		PDDocument document = new PDDocument();
-	// 		PDPage page = new PDPage();
-	// 		document.addPage(page);
+		setFontSize(baseFontSize);
+		shortFileName = "f" + util.getGUID() + ".pdf";
+		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
 
-	// 		// Create a new font object selecting one of the PDF base fonts
-	// 		//********************************************************************************
-	// 		//********************************************************************************
-	// 		//********************************************************************************
-	// 		//********************************************************************************			
-	// 		//
-	// 		// This line of code FREEZES in ALL versions of PdfBox, so pdf box is completely unusable
-	// 		// at this point. I it may be my OS, or Java version, or whatever, but for now I cannot
-	// 		// do any development around PDFBox because of this, and am putting all PDF work on hold
-	// 		// pending new information.
-	// 		//
-	// 		PDFont font = PDType1Font.HELVETICA; 
-	// 		//********************************************************************************
-	// 		//********************************************************************************
-	// 		//********************************************************************************
-	// 		//********************************************************************************
+		SubNode exportNode = read.getNode(session, nodeId, true);
+		try {
+			log.debug("Export Node: " + exportNode.getPath() + " to file " + fullFileName);
+			doc = new PDDocument();
+			newPage();
+			recurseNode(exportNode, 0);
+		} catch (Exception ex) {
+			throw ExUtil.wrapEx(ex);
+		} finally {
+			try {
+				if (stream != null) {
+					stream.close();
+				}
 
-	// 		// Start a new content stream which will "hold" the to be created content
-	// 		PDPageContentStream contentStream = new PDPageContentStream(document, page);
+				// Save the results and ensure that the document is properly closed:
+				doc.save(fullFileName);
+				doc.close();
+			} catch (Exception e) {
+				throw ExUtil.wrapEx(e);
+			}
 
-	// 		// Define a text content stream using the selected font, moving the cursor and drawing
-	// 		// the text "Hello World"
-	// 		contentStream.beginText();
-	// 		contentStream.setFont(font, 12);
-	// 		contentStream.newLineAtOffset(100, 700);
-	// 		contentStream.showText("Hello World. Clay's new PDF is awesome.");
-	// 		contentStream.endText();
+			(new File(fullFileName)).deleteOnExit();
+		}
+	}
 
-	// 		// Make sure that the content stream is closed:
-	// 		contentStream.close();
+	private void newPage() {
+		try {
+			if (stream != null) {
+				stream.close();
+			}
 
-	// 		// Save the results and ensure that the document is properly closed:
-	// 		document.save(fullFileName);
-	// 		document.close();
-	// 		///////////////////////
+			PDPage page = new PDPage();
+			mediabox = page.getMediaBox();
 
-	// 		// recurseNode(exportNode, 0);
-	// 		// output.flush();
-	// 	}
-	// 	catch (Exception ex) {
-	// 		throw ExUtil.newEx(ex);
-	// 	}
-	// 	finally {
-	// 		//StreamUtil.close(output);
-	// 		(new File(fullFileName)).deleteOnExit();
-	// 	}
-	// }
+			lineCount = 0;
+			width = mediabox.getWidth() - 2 * margin;
+			startX = mediabox.getLowerLeftX() + margin;
+			startY = mediabox.getUpperRightY() - margin;
 
-	// private void recurseNode(SubNode node, int level) {
-	// 	if (node == null) return;
+			doc.addPage(page);
 
-	// 	/* process the current node */
-	// 	processNode(node);
+			stream = new PDPageContentStream(doc, page);
+			stream.setLeading(leading);
+		} catch (Exception ex) {
+			throw ExUtil.wrapEx(ex);
+		}
+	}
 
-	// 	for (SubNode n : api.getChildren(session, node, true, null)) {
-	// 		recurseNode(n, level + 1);
-	// 	}
-	// }
+	private void recurseNode(SubNode node, int level) {
+		if (node == null)
+			return;
 
-	// private void processNode(SubNode node) {
-	// 	try {
-	// 		if (node.getProperties() != null) {
-	// 			node.getProperties().forEach((propName, propVal) -> {
-	// 				// log.debug(" PROP: "+propName);
-	// 		}
-	// 		print("\n----");
-	// 	}
-	// 	catch (Exception ex) {
-	// 		throw ExUtil.newEx(ex);
-	// 	}
-	// }
+		processNode(node);
+		Sort sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
 
-	// // private List<String> removeIgnoredProps(List<String> list) {
-	// // return list.stream().filter(item -> !ignoreProperty(item)).collect(Collectors.toList());
-	// // }
-	// //
-	// // private boolean displayProperty(String propName) {
-	// // if (NodeProp.CONTENT.equals(propName)) {
-	// // return true;
-	// // }
-	// // return false;
-	// // }
+		for (SubNode n : read.getChildren(session, node, sort, null)) {
+			recurseNode(n, level + 1);
+		}
+	}
 
-	// /*
-	//  * todo-2: For verification of import/export we need to ignore these, but for DB replication in
-	//  * P2P we wouldn't. need to store these values in a HASH for fast lookup
-	//  */
-	// // private boolean ignoreProperty(String propName) {
-	// // return JcrProp.CREATED.equals(propName) || //
-	// // JcrProp.LAST_MODIFIED.equals(propName) || //
-	// // JcrProp.CREATED_BY.equals(propName) || //
-	// // JcrProp.UUID.equals(propName) || //
-	// // JcrProp.MERKLE_HASH.equals(propName) || //
-	// // JcrProp.BIN_VER.equals(propName);
-	// // }
+	private void processNode(SubNode node) {
+		try {
+			String content = node.getContent();
+			setFontSizeFromMarkdown(content);
+			printContent(content);
+		} catch (Exception ex) {
+			throw ExUtil.wrapEx(ex);
+		}
+	}
 
-	// // private void writeProperty(Property prop) {
-	// // try {
-	// // /* multivalue */
-	// // if (prop.isMultiple()) {
-	// // print(prop.getName() + ":");
-	// // for (Value v : prop.getValues()) {
-	// // print("* " + v.getString());
-	// // }
-	// // }
-	// // /* else single value */
-	// // else {
-	// // if (prop.getName().equals(JcrProp.BIN_DATA)) {
-	// // // writing a text file, so we ignore binaries...
-	// // }
-	// // else {
-	// // // print(prop.getName() + ":");
-	// // print(prop.getValue().getString());
-	// // }
-	// // }
-	// // }
-	// // catch (Exception ex) {
-	// // throw ExUtil.newEx(ex);
-	// // }
-	// // }
+	private void setFontSizeFromMarkdown(String text) {
+		if (text.startsWith("##### ")) {
+			setFontSize(baseFontSize + 2);
+		} else if (text.startsWith("#### ")) {
+			setFontSize(baseFontSize + 4);
+		} else if (text.startsWith("### ")) {
+			setFontSize(baseFontSize + 6);
+		} else if (text.startsWith("## ")) {
+			setFontSize(baseFontSize + 8);
+		} else if (text.startsWith("# ")) {
+			setFontSize(baseFontSize + 10);
+		} else {
+			setFontSize(baseFontSize);
+		}
+	}
 
-	// private void print(String val) {
-	// 	try {
-	// 		output.write(val.getBytes(StandardCharsets.UTF_8));
-	// 		if (!val.endsWith("\n")) {
-	// 			output.write(NL);
-	// 		}
-	// 	}
-	// 	catch (Exception ex) {
-	// 		throw ExUtil.newEx(ex);
-	// 	}
-	// }
+	private void print(String val) {
+		try {
+			stream.beginText();
+			stream.setFont(font, fontSize);
+
+			if (lineCount > 0) {
+				startY -= leading;
+			}
+			stream.newLineAtOffset(startX, startY);
+
+			// I think once you call endText you can't expect newLine to work again without
+			// calling newLineAtOffset again first.
+			// stream.newLine();
+
+			stream.showText(val);
+			stream.endText();
+			lineCount++;
+
+			if (startY <= margin) {
+				newPage();
+			}
+		} catch (Exception ex) {
+			throw ExUtil.wrapEx(ex);
+		}
+	}
+
+	private void printContent(String wholeLetter) {
+		try {
+			String[] paragraphs = wholeLetter.split(System.getProperty("line.separator"));
+
+			for (String para : paragraphs) {
+				lastSpace = -1;
+				printParagraph(para);
+				startY -= leading;
+			}
+		} catch (Exception ex) {
+			throw ExUtil.wrapEx(ex);
+		}
+	}
+
+	private void printParagraph(String para) {
+		try {
+			while (para.length() > 0) {
+				int spaceIdx = para.indexOf(' ', lastSpace + 1);
+				if (spaceIdx < 0) {
+					spaceIdx = para.length();
+				}
+				String subStr = para.substring(0, spaceIdx);
+				float size = fontSize * font.getStringWidth(subStr) / 1000;
+				if (size > width) {
+					if (lastSpace < 0) {
+						lastSpace = spaceIdx;
+					}
+					subStr = para.substring(0, lastSpace);
+					print(subStr);
+					para = para.substring(lastSpace).trim();
+					lastSpace = -1;
+				} else if (spaceIdx == para.length()) {
+					print(para);
+					para = "";
+				} else {
+					lastSpace = spaceIdx;
+				}
+			}
+		} catch (Exception ex) {
+			throw ExUtil.wrapEx(ex);
+		}
+	}
+
+	public void setFontSize(float fontSize) {
+		this.fontSize = fontSize;
+		this.leading = 1.5f * fontSize;
+	}
 }

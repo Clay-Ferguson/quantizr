@@ -94,6 +94,7 @@ import org.subnode.response.SendTestEmailResponse;
 import org.subnode.response.ShutdownServerNodeResponse;
 import org.subnode.service.AclService;
 import org.subnode.service.AttachmentService;
+import org.subnode.service.ExportPdfService;
 import org.subnode.service.ExportTarService;
 import org.subnode.service.ExportTextService;
 import org.subnode.service.ExportZipService;
@@ -387,12 +388,14 @@ public class AppController implements ErrorController {
 			initCacheBuster();
 		}
 
-		// if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
-		// 	synchronized (welcomeMapLock) {
-		// 		HashMap<String, String> newMap = new HashMap<String, String>();
-		// 		welcomePagePresent = nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
-		// 		welcomeMap = newMap;
-		// 	}
+		// if (welcomeMap == null ||
+		// PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
+		// synchronized (welcomeMapLock) {
+		// HashMap<String, String> newMap = new HashMap<String, String>();
+		// welcomePagePresent = nodeRenderService.thymeleafRenderNode(newMap,
+		// "pg_welcome");
+		// welcomeMap = newMap;
+		// }
 		// }
 
 		model.addAllAttributes(cacheBusterMd5);
@@ -533,13 +536,11 @@ public class AppController implements ErrorController {
 		return callProc.run("export", req, session, ms -> {
 			ExportResponse res = new ExportResponse();
 
-			// else if ("pdf".equalsIgnoreCase(req.getExportExt())) {
-			// ExportPdfService svc = (ExportPdfService)
-			// SpringContextUtil.getBean(ExportPdfService.class);
-			// svc.export(null, req, res);
-			// }
-			if ("text".equalsIgnoreCase(req.getExportExt())) {
-				ExportTextService svc = (ExportTextService)SpringContextUtil.getBean(ExportTextService.class);
+			if ("pdf".equalsIgnoreCase(req.getExportExt())) {
+				ExportPdfService svc = (ExportPdfService) SpringContextUtil.getBean(ExportPdfService.class);
+				svc.export(ms, req, res);
+			} else if ("text".equalsIgnoreCase(req.getExportExt())) {
+				ExportTextService svc = (ExportTextService) SpringContextUtil.getBean(ExportTextService.class);
 				svc.export(ms, req, res);
 			} else if ("zip".equalsIgnoreCase(req.getExportExt())) {
 				ExportZipService svc = (ExportZipService) SpringContextUtil.getBean(ExportZipService.class);
