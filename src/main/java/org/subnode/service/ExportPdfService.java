@@ -34,6 +34,8 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
+import org.subnode.util.XString;
+
 import java.awt.image.BufferedImage;
 
 /* This file was taken from ExportTxtService (copied) and was about to be converted to PDF exporter
@@ -126,7 +128,7 @@ public class ExportPdfService {
 
 		SubNode exportNode = read.getNode(session, nodeId, true);
 		try {
-			log.debug("Export Node: " + exportNode.getPath() + " to file " + fullFileName);
+			// log.debug("Export Node: " + exportNode.getPath() + " to file " + fullFileName);
 			doc = new PDDocument();
 			newPage();
 			recurseNode(exportNode, 0);
@@ -138,7 +140,6 @@ public class ExportPdfService {
 					stream.close();
 				}
 
-				// Save the results and ensure that the document is properly closed:
 				doc.save(fullFileName);
 				doc.close();
 			} catch (Exception e) {
@@ -203,6 +204,14 @@ public class ExportPdfService {
 			}
 			String mime = node.getStringProp(NodeProp.BIN_MIME.s());
 
+			String imgSize = node.getStringProp(NodeProp.IMG_SIZE.s());
+			float sizeFactor = 1f;
+			if (imgSize != null && imgSize.endsWith("%")) {
+				imgSize = XString.stripIfEndsWith(imgSize, "%");
+				int size = Integer.parseInt(imgSize);
+				sizeFactor = Float.valueOf(size).floatValue() / 100;
+			}
+
 			InputStream is = attachmentService.getStream(session, node, false);
 			if (is == null)
 				return;
@@ -222,17 +231,23 @@ public class ExportPdfService {
 			if (pdImage == null)
 				return;
 
-			float scale = width / pdImage.getWidth();
-			startY -= (pdImage.getHeight() * scale);
+			float imgWidth = width * sizeFactor;
+			float scale = imgWidth / pdImage.getWidth();
+			advanceY(pdImage.getHeight() * scale);
 
-			if (startY <= margin) {
-				newPage();
-				startY -= pdImage.getHeight() * scale;
-			}
-
-			stream.drawImage(pdImage, startX, startY, width, pdImage.getHeight() * scale);
+			stream.drawImage(pdImage, startX, startY, imgWidth, pdImage.getHeight() * scale);
+			advanceY(leading);
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
+		}
+	}
+
+	private void advanceY(float delta) {
+		startY -= delta;
+
+		if (startY <= margin) {
+			newPage();
+			startY -= delta;
 		}
 	}
 
@@ -254,12 +269,12 @@ public class ExportPdfService {
 
 	private void print(String val) {
 		try {
+			if (lineCount > 0) {
+				advanceY(leading);
+			}
+
 			stream.beginText();
 			stream.setFont(font, fontSize);
-
-			if (lineCount > 0) {
-				startY -= leading;
-			}
 			stream.newLineAtOffset(startX, startY);
 
 			// I think once you call endText you can't expect newLine to work again without
@@ -269,10 +284,6 @@ public class ExportPdfService {
 			stream.showText(val);
 			stream.endText();
 			lineCount++;
-
-			if (startY <= margin) {
-				newPage();
-			}
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
@@ -285,7 +296,7 @@ public class ExportPdfService {
 			for (String para : paragraphs) {
 				lastSpace = -1;
 				printParagraph(para);
-				startY -= leading;
+				advanceY(leading);
 			}
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
@@ -324,7 +335,8 @@ public class ExportPdfService {
 	public void setFontSize(float fontSize) {
 		this.fontSize = fontSize;
 
-		// this conditional is just to make sure we don't get too much space below title lines.
+		// this conditional is just to make sure we don't get too much space below title
+		// lines.
 		if (fontSize > baseFontSize + 4) {
 			this.leading = 1.5f * (baseFontSize + 4);
 		} else {

@@ -42,6 +42,7 @@ export class NodeCompBinary extends Div {
             imgSize = (this.imgSizeOverride && this.imgSizeOverride !== "n") ? this.imgSizeOverride : S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
         }
         let style: any = {};
+        // console.log("id: " + node.id + " imgSize=" + imgSize);
 
         if (!imgSize || imgSize === "0") {
             style.maxWidth = "";
