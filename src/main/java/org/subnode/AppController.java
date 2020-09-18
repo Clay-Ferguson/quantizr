@@ -94,7 +94,7 @@ import org.subnode.response.SendTestEmailResponse;
 import org.subnode.response.ShutdownServerNodeResponse;
 import org.subnode.service.AclService;
 import org.subnode.service.AttachmentService;
-import org.subnode.service.ExportPdfService;
+import org.subnode.service.ExportPdfServiceFlexmark;
 import org.subnode.service.ExportTarService;
 import org.subnode.service.ExportTextService;
 import org.subnode.service.ExportZipService;
@@ -537,7 +537,13 @@ public class AppController implements ErrorController {
 			ExportResponse res = new ExportResponse();
 
 			if ("pdf".equalsIgnoreCase(req.getExportExt())) {
-				ExportPdfService svc = (ExportPdfService) SpringContextUtil.getBean(ExportPdfService.class);
+				/*
+				 * NOTE: The original implementation of PDF export is in ExportPdfServicePdfBox
+				 * and us the one using PDFBox, but the newest version is the one using
+				 * https://github.com/vsch/flexmark-java, and is the one currently in use
+				 */
+				ExportPdfServiceFlexmark svc = (ExportPdfServiceFlexmark) SpringContextUtil
+						.getBean(ExportPdfServiceFlexmark.class);
 				svc.export(ms, req, res);
 			} else if ("text".equalsIgnoreCase(req.getExportExt())) {
 				ExportTextService svc = (ExportTextService) SpringContextUtil.getBean(ExportTextService.class);
@@ -684,12 +690,24 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
 	public void getBinary(@PathVariable("binId") String binId, //
 			@RequestParam("nodeId") String nodeId, //
+			// The "Export To PDF" feature relies on sending this 'token' as it's form of
+			// access/auth
+			@RequestParam(value = "token", required = false) String token, //
 			@RequestParam(value = "download", required = false) String download, //
 			HttpSession session, HttpServletResponse response) {
-		callProc.run("bin", null, session, ms -> {
-			attachmentService.getBinary(null, nodeId, download != null, response);
-			return null;
-		});
+
+		if (token == null) {
+			callProc.run("bin", null, session, ms -> {
+				attachmentService.getBinary(null, nodeId, download != null, response);
+				return null;
+			});
+		} else {
+			if (SessionContext.validToken(token)) {
+				adminRunner.run(mongoSession -> {
+					attachmentService.getBinary(mongoSession, nodeId, download != null, response);
+				});
+			}
+		}
 	}
 
 	/*

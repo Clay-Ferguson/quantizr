@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.TimeZone;
 
 import javax.annotation.PreDestroy;
@@ -44,7 +45,7 @@ public class SessionContext {
 	private String timezone;
 	private String timeZoneAbbrev;
 
-	//variable not currently being used (due to refactoring)
+	// variable not currently being used (due to refactoring)
 	private long lastLoginTime;
 
 	private UserPreferences userPreferences;
@@ -59,31 +60,52 @@ public class SessionContext {
 
 	private HttpSession httpSessionToInvalidate;
 
-
 	/* Emitter for sending push notifications to the client */
 	private SseEmitter pushEmitter;
 
-	public static final HashMap<String, SessionContext> allSessions = new HashMap<String, SessionContext>();
+	public static final HashMap<String, SessionContext> sessionsByUserName = new HashMap<String, SessionContext>();
+	public static final HashMap<String, SessionContext> sessionsByToken = new HashMap<String, SessionContext>();
 
-	/* Whenever the user views their feed we store in this list all the userIds of all their friends. 
-	(the account root ids of all their friend's accounts) */
+	private static final Random rand = new Random();
+	private String userToken = String.valueOf(rand.nextInt());
+
+	/*
+	 * Whenever the user views their feed we store in this list all the userIds of
+	 * all their friends. (the account root ids of all their friend's accounts)
+	 */
 	private HashSet<String> feedUserNodeIds;
 
 	public SessionContext() {
 		log.trace(String.format("Creating Session object hashCode[%d]", hashCode()));
+		synchronized (sessionsByToken) {
+			sessionsByToken.put(userToken, this);
+		}
+	}
+
+	public static boolean validToken(String token) {
+		synchronized (sessionsByToken) {
+			return sessionsByToken.containsKey(token);
+		}
+	}
+
+	public String getUserToken() {
+		return userToken;
 	}
 
 	public static SessionContext getSessionByUserName(String userName) {
-		synchronized (allSessions) {
-			return allSessions.get(userName);
+		synchronized (sessionsByUserName) {
+			return sessionsByUserName.get(userName);
 		}
 	}
 
 	@PreDestroy
 	public void preDestroy() {
 		log.trace(String.format("Destroying Session object hashCode[%d] of user %s", hashCode(), userName));
-		synchronized (allSessions) {
-			allSessions.remove(userName);
+		synchronized (sessionsByUserName) {
+			sessionsByUserName.remove(userName);
+		}
+		synchronized (sessionsByToken) {
+			sessionsByToken.remove(userToken);
 		}
 	}
 
@@ -134,10 +156,12 @@ public class SessionContext {
 		return userName;
 	}
 
+	// todo-0: is this call safe with same user logging in with multuple sessions
+	// perhaps?
 	public void setUserName(String userName) {
 		this.userName = userName;
-		synchronized (allSessions) {
-			allSessions.put(userName, this);
+		synchronized (sessionsByUserName) {
+			sessionsByUserName.put(userName, this);
 		}
 	}
 

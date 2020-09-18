@@ -54,10 +54,6 @@ $fatBorderSize: 9px;
 $mediumBorderSize: 6px;
 $smallBorderSize: 3px;
 
-html {
-    font-family: "Roboto", "Verdana", "Aria";
-} 
-
 // @keyframes animatedBackground {
 // 	from { 
 //         background-size: 100% 100%; 
@@ -129,7 +125,7 @@ html {
 }
 
 .app-body {
-    font-family: 'Roboto','Helvetica','Arial', sans-serif;
+    font-family: 'QuantaCustomFont', 'Roboto','Helvetica','Arial', sans-serif !important;
 
     /* This top-padding is how the bootstrap example keept the main content from being covered by the navbar, but one of their primary examples
     was using 3.5rem instead. Not sure which is better. */
@@ -139,7 +135,7 @@ html {
 }
 
 .welcome-body {
-    font-family: 'Roboto','Helvetica','Arial', sans-serif;
+    font-family: 'QuantaCustomFont', 'Roboto','Helvetica','Arial', sans-serif !important;
     font-size: 1.4rem;
     font-weight: 400;
     line-height: 1.5;
@@ -221,7 +217,7 @@ strong em {
 }
 
 .button-font {
-    font-family: "Roboto", "Verdana", "Aria";
+    font-family: 'QuantaCustomFont', 'Roboto','Helvetica','Arial', sans-serif !important;
 }
 
 .form-group-border {

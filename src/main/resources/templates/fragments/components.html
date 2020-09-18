@@ -22,6 +22,19 @@
         -->
     </div>
 
+    <style th:fragment="fontLoaderStyle">
+        @font-face {
+            font-family: "QuantaCustomFont";
+            src: url('/fonts/Roboto/Roboto-Light.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal; 
+        }
+
+        body {
+            font-family: "QuantaCustomFont" !important;
+        }
+    </style>
+
 </body>
 
 </html>

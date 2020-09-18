@@ -38,14 +38,13 @@ import org.subnode.util.XString;
 
 import java.awt.image.BufferedImage;
 
-/* This file was taken from ExportTxtService (copied) and was about to be converted to PDF exporter
- * but i discovered the PDF api error shown below in which PDFBOX api freezes/hangs the thread whenver
- * any font is attempted to be created.
+/**
+ * Exporter using PDFBox
  */
 @Component
 @Scope("prototype")
-public class ExportPdfService {
-	private static final Logger log = LoggerFactory.getLogger(ExportPdfService.class);
+public class ExportPdfServicePdfBox {
+	private static final Logger log = LoggerFactory.getLogger(ExportPdfServicePdfBox.class);
 
 	@Autowired
 	private SubNodeUtil util;

@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <base href="/"/>
+    <base href="/" />
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -11,25 +11,26 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="application-name" content="Quanta" />
 
-    <meta property="og:type" th:if="${not #strings.isEmpty(ogDescription)}" content="website"/>
-    <meta property="og:title" th:if="${not #strings.isEmpty(ogTitle)}" th:attr="content=${ogTitle}"/>
+    <meta property="og:type" th:if="${not #strings.isEmpty(ogDescription)}" content="website" />
+    <meta property="og:title" th:if="${not #strings.isEmpty(ogTitle)}" th:attr="content=${ogTitle}" />
     <!-- <meta property="og:site_name" content="${ogSiteName}"/> -->
-    <meta property="og:description" th:if="${not #strings.isEmpty(ogDescription)}" th:attr="content=${ogDescription}"/>
-    <meta property="og:image" th:if="${not #strings.isEmpty(ogImage)}" th:attr="content=${ogImage}"/>
-    <meta property="og:url" th:if="${not #strings.isEmpty(ogUrl)}" th:attr="content=${ogUrl}"/>
-    
-    <meta name="twitter:card" th:if="${not #strings.isEmpty(ogDescription)}" content="summary"/>    
+    <meta property="og:description" th:if="${not #strings.isEmpty(ogDescription)}" th:attr="content=${ogDescription}" />
+    <meta property="og:image" th:if="${not #strings.isEmpty(ogImage)}" th:attr="content=${ogImage}" />
+    <meta property="og:url" th:if="${not #strings.isEmpty(ogUrl)}" th:attr="content=${ogUrl}" />
+
+    <meta name="twitter:card" th:if="${not #strings.isEmpty(ogDescription)}" content="summary" />
     <!-- <meta name="twitter:site" content="@yourwebsite"/>
     <meta name="twitter:creator" content="@yourtwitterhandle"/> -->
-    <meta name="twitter:title" th:if="${not #strings.isEmpty(ogTitle)}" th:attr="content=${ogTitle}"/>
-    <meta name="twitter:description" th:if="${not #strings.isEmpty(ogDescription)}" th:attr="content=${ogDescription}"/>
+    <meta name="twitter:title" th:if="${not #strings.isEmpty(ogTitle)}" th:attr="content=${ogTitle}" />
+    <meta name="twitter:description" th:if="${not #strings.isEmpty(ogDescription)}"
+        th:attr="content=${ogDescription}" />
 
     <!-- NOTE: Twitter is refusing to display this image, and I'm 99% sure it's a shadow-banning thing, where quanta.wiki is blacklisted, 
         because I know the link is working, and their validator shows it working, but twitter itself still refuses to show any images ever.
         meta name is correct, url is working, robots.txt is correct. Only possibility left: shadow-banned.
         https://cards-dev.twitter.com/validator
     -->
-    <meta name="twitter:image" th:if="${not #strings.isEmpty(ogImage)}" th:attr="content=${ogImage}"/>
+    <meta name="twitter:image" th:if="${not #strings.isEmpty(ogImage)}" th:attr="content=${ogImage}" />
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=3" />
@@ -49,6 +50,8 @@
     </script>
     -->
 
+    <style th:replace="fragments/components :: fontLoaderStyle"></style>
+
     <title>Quanta</title>
 </head>
 
@@ -63,7 +66,7 @@
 
     <script>
         var __page = "index";
-        
+
         function oldIEdetection() {
             var ua = window.navigator.userAgent;
             var msie = ua.indexOf('MSIE ');
@@ -90,7 +93,7 @@
         }
         var result = oldIEdetection();
         if (result) {
-            document.write("Browser not supported: IE "+result);
+            document.write("Browser not supported: IE " + result);
             document.write("<br>Try a modern browser like Chrome, Firefox, or Edge.")
         }
     </script>
@@ -103,6 +106,8 @@
             tex: {
                 //warning: don't remove the space between the square braces here or that will trigger thymeleaf to pick up 
                 //the string and try to interpret it. Also the "th:inline: none" all by itself can fix this too, which we do use.
+                // todo-0: warning: the formatter can remove the spaces 
+                // so use an array var to hold the iner array
                 inlineMath: [ ['[math]', '[/math]'] ]
             }
         };

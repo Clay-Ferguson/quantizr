@@ -226,8 +226,8 @@ public class UserFeedService {
 		 * this lock FAST since it has the effect of making logins or other critical
 		 * processes block while locked
 		 */
-		synchronized (SessionContext.allSessions) {
-			keys = SessionContext.allSessions.keySet();
+		synchronized (SessionContext.sessionsByUserName) {
+			keys = SessionContext.sessionsByUserName.keySet();
 		}
 
 		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, 1, false, false,
@@ -236,7 +236,7 @@ public class UserFeedService {
 
 		/* Iterate each session one at a time */
 		for (String key : keys) {
-			SessionContext sc = SessionContext.allSessions.get(key);
+			SessionContext sc = SessionContext.sessionsByUserName.get(key);
 			if (sc != null) {
 				pushNodeNotificationToSession(session, sc, node, nodeInfo);
 			}
