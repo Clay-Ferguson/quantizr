@@ -184,3 +184,64 @@ public class ExportPdfServiceFlexmark {
 				+ node.getId().toHexString() + "&token=" + sessionContext.getUserToken() + "' " + style + "/>\n");
 	}
 }
+
+////////////////////////////////////////////////////////////////
+// DO NOT DELETE
+//
+// This is the code to do export to DOCX (MS Word) files but 
+// according to LibreOffice the file it generates is invalid, so
+// I'm mothballing the code in this comment block for future reference
+////////////////////////////////////////////////////////////////
+//
+// <dependency>
+//     <groupId>com.vladsch.flexmark</groupId>
+//     <artifactId>flexmark-docx-converter</artifactId>
+//     <version>0.62.2</version>
+// </dependency>
+
+// <dependency>
+//   <groupId>org.docx4j</groupId>
+//   <artifactId>docx4j-JAXB-ReferenceImpl</artifactId>
+//   <version>8.1.0</version>
+// </dependency>
+
+// MutableDataSet options =
+// new MutableDataSet()
+// .set(Parser.EXTENSIONS, Arrays.asList(
+// 		// DefinitionExtension.create(),
+// 		// EmojiExtension.create(),
+// 		// FootnoteExtension.create(),
+// 		// StrikethroughSubscriptExtension.create(),
+// 		// InsExtension.create(),
+// 		// SuperscriptExtension.create(),
+// 		TablesExtension.create(),
+// 		TocExtension.create()
+// 		// SimTocExtension.create(),
+// 		// WikiLinkExtension.create()
+// ))
+// .set(DocxRenderer.SUPPRESS_HTML, true)
+// // the following two are needed to allow doc relative and site relative address resolution
+// //.set(DocxRenderer.DOC_RELATIVE_URL, "") // this will be used for URLs like 'images/...' or './' or '../'
+// //.set(DocxRenderer.DOC_ROOT_URL, "") // this will be used for URLs like: '/...'
+// ;
+
+// Parser PARSER = Parser.builder(options).build();
+// DocxRenderer RENDERER = DocxRenderer.builder(options).build();
+
+// recurseNode(exportNode, 0);
+// Node document = PARSER.parse(markdown.toString());
+
+// // to get XML
+// String xml = RENDERER.render(document);
+
+// // or to control the package
+// WordprocessingMLPackage template = DocxRenderer.getDefaultTemplate();
+// RENDERER.render(document, template);
+
+// File file = new File(fullFileName);
+// try {
+// 	template.save(file);
+// } catch (Docx4JException e) {
+// 	e.printStackTrace();
+// }
+
