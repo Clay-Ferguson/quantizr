@@ -30,56 +30,12 @@ export class ExportDlg extends DialogBase {
         return [
             new Header("Export node content to file..."),
             new RadioButtonGroup([
-                new RadioButton("ZIP", false, "exportTypeGroup", null, {
-                    setValue: (checked: boolean): void => {
-                        if (checked) {
-                            this.mergeState({ exportType: "zip" });
-                        }
-                    },
-                    getValue: (): boolean => {
-                        return this.getState().exportType === "zip";
-                    }
-                }),
-                new RadioButton("TAR", false, "exportTypeGroup", null, {
-                    setValue: (checked: boolean): void => {
-                        if (checked) {
-                            this.mergeState({ exportType: "tar" });
-                        }
-                    },
-                    getValue: (): boolean => {
-                        return this.getState().exportType === "tar";
-                    }
-                }),
-                new RadioButton("TAR.GZ", false, "exportTypeGroup", null, {
-                    setValue: (checked: boolean): void => {
-                        if (checked) {
-                            this.mergeState({ exportType: "tar.gz" });
-                        }
-                    },
-                    getValue: (): boolean => {
-                        return this.getState().exportType === "tar.gz";
-                    }
-                }),
-                new RadioButton("Text", false, "exportTypeGroup", null, {
-                    setValue: (checked: boolean): void => {
-                        if (checked) {
-                            this.mergeState({ exportType: "text" });
-                        }
-                    },
-                    getValue: (): boolean => {
-                        return this.getState().exportType === "text";
-                    }
-                }),
-                new RadioButton("PDF", false, "exportTypeGroup", null, {
-                    setValue: (checked: boolean): void => {
-                        if (checked) {
-                            this.mergeState({ exportType: "pdf" });
-                        }
-                    },
-                    getValue: (): boolean => {
-                        return this.getState().exportType === "pdf";
-                    }
-                })
+                this.createRadioButton("ZIP", "zip"),
+                this.createRadioButton("TAR", "tar"),
+                this.createRadioButton("TAR.GZ", "tar.gz"),
+                this.createRadioButton("Text", "text"),
+                this.createRadioButton("PDF", "pdf"),
+                this.createRadioButton("HTML", "html")
             ]),
             new ButtonBar([
                 new Button("Export", this.exportNodes, null, "btn-primary"),
@@ -88,6 +44,19 @@ export class ExportDlg extends DialogBase {
                 })
             ])
         ];
+    }
+
+    createRadioButton = (name: string, exportType: string) => {
+        return new RadioButton(name, false, "exportTypeGroup", null, {
+            setValue: (checked: boolean): void => {
+                if (checked) {
+                    this.mergeState({ exportType });
+                }
+            },
+            getValue: (): boolean => {
+                return this.getState().exportType === exportType;
+            }
+        });
     }
 
     renderButtons(): CompIntf {

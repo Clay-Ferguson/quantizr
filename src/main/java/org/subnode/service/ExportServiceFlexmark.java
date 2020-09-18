@@ -36,8 +36,8 @@ import com.vladsch.flexmark.util.data.MutableDataSet;
  */
 @Component
 @Scope("prototype")
-public class ExportPdfServiceFlexmark {
-	private static final Logger log = LoggerFactory.getLogger(ExportPdfServiceFlexmark.class);
+public class ExportServiceFlexmark {
+	private static final Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
 
 	@Autowired
 	private SubNodeUtil util;
@@ -60,17 +60,21 @@ public class ExportPdfServiceFlexmark {
 	private String fullFileName;
 
 	private StringBuilder markdown = new StringBuilder();
+	private String format;
 
 	/*
 	 * Exports the node specified in the req. If the node specified is "/", or the
 	 * repository root, then we don't expect a filename, because we will generate a
 	 * timestamped one.
+	 * 
+	 * Format can be 'html' or 'pdf'
 	 */
-	public void export(MongoSession session, ExportRequest req, ExportResponse res) {
+	public void export(MongoSession session, String format, ExportRequest req, ExportResponse res) {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
 		this.session = session;
+		this.format = format;
 
 		UserPreferences userPreferences = sessionContext.getUserPreferences();
 		boolean exportAllowed = userPreferences != null ? userPreferences.isExportAllowed() : false;
@@ -100,20 +104,13 @@ public class ExportPdfServiceFlexmark {
 			throw ExUtil.wrapEx("adminDataFolder does not exist.");
 		}
 
-		shortFileName = "f" + util.getGUID() + ".pdf";
+		shortFileName = "f" + util.getGUID() + "." + format; 
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
 
 		SubNode exportNode = read.getNode(session, nodeId, true);
 		FileOutputStream out = null;
 		try {
 			MutableDataSet options = new MutableDataSet();
-
-			// uncomment to set optional extensions
-			// options.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(),
-			// StrikethroughExtension.create()));
-
-			// uncomment to convert soft-breaks to hard breaks
-			// options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
 
 			Parser parser = Parser.builder(options).build();
 			HtmlRenderer renderer = HtmlRenderer.builder(options).build();
@@ -123,22 +120,25 @@ public class ExportPdfServiceFlexmark {
 			Node document = parser.parse(markdown.toString());
 			String html = renderer.render(document);
 
-			// todo-0: just by writing html to file we can implement an HTML export option!
-
-			out = new FileOutputStream(new File(fullFileName));
-
-			// Using font weight 700 makes headings less bold in the generated PDF
-			// String fontFace = "@font-face {src: url('" + constProvider.getHostAndPort()
-			// 		+ "/fonts/Roboto/Roboto-Light.ttf'); font-family: 'QuantaCustomFont'; font-weight: 700;}\n";
-
+			String fontWeight = ""; // "font-weight: 700;";
 			String fontFace = "@font-face {src: url('" + constProvider.getHostAndPort()
-					+ "/fonts/Roboto/Roboto-Light.ttf'); font-family: 'QuantaCustomFont';}\n";
+					+ "/fonts/Roboto/Roboto-Light.ttf'); "
+					+ " format('truetype'); font-weight: normal; font-style: normal;\n"
+					+ "font-family: 'QuantaCustomFont'; " + fontWeight + "}\n";
 
-			html = PdfConverterExtension.embedCss(html, fontFace + "body {font-family: 'QuantaCustomFont';}\n");
+			html = PdfConverterExtension.embedCss(html, fontFace
+					+ "body {font-family: 'QuantaCustomFont','Roboto','Verdana','Helvetica','Arial','sans-serif' !important;}\n");
 
-			// log.debug("HTML=" + html);
-
-			PdfConverterExtension.exportToPdf(out, html, "", options);
+			if ("html".equals(format)) {
+				FileUtils.writeEntireFile(fullFileName, html);
+			}
+			else if ("pdf".equals(format)) {
+				out = new FileOutputStream(new File(fullFileName));
+				PdfConverterExtension.exportToPdf(out, html, "", options);
+			}
+			else {
+				throw new RuntimeException("invalid format.");
+			}
 
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
@@ -188,41 +188,47 @@ public class ExportPdfServiceFlexmark {
 ////////////////////////////////////////////////////////////////
 // DO NOT DELETE
 //
-// This is the code to do export to DOCX (MS Word) files but 
+// This is the code to do export to DOCX (MS Word) files but
 // according to LibreOffice the file it generates is invalid, so
 // I'm mothballing the code in this comment block for future reference
+//
+// I never looked deep into this however:
+// https://github.com/vsch/flexmark-java/blob/c0313d67e0146292a10d04eb8944faff991579e9/flexmark-docx-converter/src/test/java/com/vladsch/flexmark/docx/converter/ComboDocxConverterSpecTestBase.java#L58
 ////////////////////////////////////////////////////////////////
 //
 // <dependency>
-//     <groupId>com.vladsch.flexmark</groupId>
-//     <artifactId>flexmark-docx-converter</artifactId>
-//     <version>0.62.2</version>
+// <groupId>com.vladsch.flexmark</groupId>
+// <artifactId>flexmark-docx-converter</artifactId>
+// <version>0.62.2</version>
 // </dependency>
 
 // <dependency>
-//   <groupId>org.docx4j</groupId>
-//   <artifactId>docx4j-JAXB-ReferenceImpl</artifactId>
-//   <version>8.1.0</version>
+// <groupId>org.docx4j</groupId>
+// <artifactId>docx4j-JAXB-ReferenceImpl</artifactId>
+// <version>8.1.0</version>
 // </dependency>
 
 // MutableDataSet options =
 // new MutableDataSet()
 // .set(Parser.EXTENSIONS, Arrays.asList(
-// 		// DefinitionExtension.create(),
-// 		// EmojiExtension.create(),
-// 		// FootnoteExtension.create(),
-// 		// StrikethroughSubscriptExtension.create(),
-// 		// InsExtension.create(),
-// 		// SuperscriptExtension.create(),
-// 		TablesExtension.create(),
-// 		TocExtension.create()
-// 		// SimTocExtension.create(),
-// 		// WikiLinkExtension.create()
+// // DefinitionExtension.create(),
+// // EmojiExtension.create(),
+// // FootnoteExtension.create(),
+// // StrikethroughSubscriptExtension.create(),
+// // InsExtension.create(),
+// // SuperscriptExtension.create(),
+// TablesExtension.create(),
+// TocExtension.create()
+// // SimTocExtension.create(),
+// // WikiLinkExtension.create()
 // ))
 // .set(DocxRenderer.SUPPRESS_HTML, true)
-// // the following two are needed to allow doc relative and site relative address resolution
-// //.set(DocxRenderer.DOC_RELATIVE_URL, "") // this will be used for URLs like 'images/...' or './' or '../'
-// //.set(DocxRenderer.DOC_ROOT_URL, "") // this will be used for URLs like: '/...'
+// // the following two are needed to allow doc relative and site relative
+// address resolution
+// //.set(DocxRenderer.DOC_RELATIVE_URL, "") // this will be used for URLs like
+// 'images/...' or './' or '../'
+// //.set(DocxRenderer.DOC_ROOT_URL, "") // this will be used for URLs like:
+// '/...'
 // ;
 
 // Parser PARSER = Parser.builder(options).build();
@@ -240,8 +246,7 @@ public class ExportPdfServiceFlexmark {
 
 // File file = new File(fullFileName);
 // try {
-// 	template.save(file);
+// template.save(file);
 // } catch (Docx4JException e) {
-// 	e.printStackTrace();
+// e.printStackTrace();
 // }
-

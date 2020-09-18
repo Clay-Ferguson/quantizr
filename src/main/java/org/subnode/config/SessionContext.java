@@ -156,8 +156,6 @@ public class SessionContext {
 		return userName;
 	}
 
-	// todo-0: is this call safe with same user logging in with multuple sessions
-	// perhaps?
 	public void setUserName(String userName) {
 		this.userName = userName;
 		synchronized (sessionsByUserName) {

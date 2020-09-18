@@ -25,6 +25,8 @@ $disabled-body-color: gray; //darken($body-color, 90%);
 
 @import "bootswatch.scss";
 
+$fontFamily: 'QuantaCustomFont','Roboto','Verdana','Helvetica','Arial','sans-serif';
+
 //This does work (border around focused edit fields) but I don't need it.
 // .form-control:focus {
 //     border-color: green;
@@ -125,7 +127,7 @@ $smallBorderSize: 3px;
 }
 
 .app-body {
-    font-family: 'QuantaCustomFont', 'Roboto','Helvetica','Arial', sans-serif !important;
+    font-family: $fontFamily !important;
 
     /* This top-padding is how the bootstrap example keept the main content from being covered by the navbar, but one of their primary examples
     was using 3.5rem instead. Not sure which is better. */
@@ -135,7 +137,7 @@ $smallBorderSize: 3px;
 }
 
 .welcome-body {
-    font-family: 'QuantaCustomFont', 'Roboto','Helvetica','Arial', sans-serif !important;
+    font-family: $fontFamily !important;
     font-size: 1.4rem;
     font-weight: 400;
     line-height: 1.5;
@@ -217,7 +219,7 @@ strong em {
 }
 
 .button-font {
-    font-family: 'QuantaCustomFont', 'Roboto','Helvetica','Arial', sans-serif !important;
+    font-family: $fontFamily !important;
 }
 
 .form-group-border {

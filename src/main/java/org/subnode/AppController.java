@@ -94,7 +94,7 @@ import org.subnode.response.SendTestEmailResponse;
 import org.subnode.response.ShutdownServerNodeResponse;
 import org.subnode.service.AclService;
 import org.subnode.service.AttachmentService;
-import org.subnode.service.ExportPdfServiceFlexmark;
+import org.subnode.service.ExportServiceFlexmark;
 import org.subnode.service.ExportTarService;
 import org.subnode.service.ExportTextService;
 import org.subnode.service.ExportZipService;
@@ -542,23 +542,33 @@ public class AppController implements ErrorController {
 				 * and us the one using PDFBox, but the newest version is the one using
 				 * https://github.com/vsch/flexmark-java, and is the one currently in use
 				 */
-				ExportPdfServiceFlexmark svc = (ExportPdfServiceFlexmark) SpringContextUtil
-						.getBean(ExportPdfServiceFlexmark.class);
-				svc.export(ms, req, res);
-			} else if ("text".equalsIgnoreCase(req.getExportExt())) {
+				ExportServiceFlexmark svc = (ExportServiceFlexmark) SpringContextUtil
+						.getBean(ExportServiceFlexmark.class);
+				svc.export(ms, "pdf", req, res);
+			} //
+			else if ("html".equalsIgnoreCase(req.getExportExt())) {
+				ExportServiceFlexmark svc = (ExportServiceFlexmark) SpringContextUtil
+						.getBean(ExportServiceFlexmark.class);
+				svc.export(ms, "html", req, res);
+			} //
+			else if ("text".equalsIgnoreCase(req.getExportExt())) {
 				ExportTextService svc = (ExportTextService) SpringContextUtil.getBean(ExportTextService.class);
 				svc.export(ms, req, res);
-			} else if ("zip".equalsIgnoreCase(req.getExportExt())) {
+			} //
+			else if ("zip".equalsIgnoreCase(req.getExportExt())) {
 				ExportZipService svc = (ExportZipService) SpringContextUtil.getBean(ExportZipService.class);
 				svc.export(ms, req, res);
-			} else if ("tar".equalsIgnoreCase(req.getExportExt())) {
+			} //
+			else if ("tar".equalsIgnoreCase(req.getExportExt())) {
 				ExportTarService svc = (ExportTarService) SpringContextUtil.getBean(ExportTarService.class);
 				svc.export(ms, req, res);
-			} else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) {
+			} //
+			else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) {
 				ExportTarService svc = (ExportTarService) SpringContextUtil.getBean(ExportTarService.class);
 				svc.setUseGZip(true);
 				svc.export(ms, req, res);
-			} else {
+			} //
+			else {
 				throw ExUtil.wrapEx("Unsupported file extension: " + req.getExportExt());
 			}
 			return res;
