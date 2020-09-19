@@ -8,8 +8,18 @@ public class ExportRequest extends RequestBase {
 	// must be file extension, and selects which type of file to export
 	private String exportExt;
 
+	private String fileName;
+
 	public String getNodeId() {
 		return nodeId;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
 	public void setNodeId(String nodeId) {

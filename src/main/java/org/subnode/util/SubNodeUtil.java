@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +70,9 @@ public class SubNodeUtil {
 		return (read.getChildCount(session, node) > 0);
 	}
 
-	//todo-1: everywhere this is called can we be sure the path is not actually used as a lookup, but instead the node name?
-	//The new design has path as a non-named hierarchy-only aspect.
+	// todo-1: everywhere this is called can we be sure the path is not actually
+	// used as a lookup, but instead the node name?
+	// The new design has path as a non-named hierarchy-only aspect.
 	public SubNode ensureNodeExists(MongoSession session, String parentPath, String name, String defaultContent,
 			String primaryTypeName, boolean saveImmediate, SubNodePropertyMap props, ValContainer<Boolean> created) {
 		if (!parentPath.endsWith("/")) {
@@ -120,7 +122,8 @@ public class SubNodeUtil {
 				// log.debug("Creating " + nameToken + " node, which didn't exist.");
 
 				/* Note if parent PARAMETER here is null we are adding a root node */
-				parent = create.createNode(session, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null);
+				parent = create.createNode(session, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST,
+						null);
 
 				if (parent == null) {
 					throw ExUtil.wrapEx("unable to create " + nameToken);
@@ -151,6 +154,18 @@ public class SubNodeUtil {
 
 	public static String fixPath(String path) {
 		return path.replace("//", "/");
+	}
+
+	public String getExportFileName(String fileName, SubNode node) {
+		if (!StringUtils.isEmpty(fileName)) {
+			// truncate any file name extension.
+			fileName = XString.truncateAfterLast(fileName, ".");
+			return fileName;
+		} else if (node.getName() != null) {
+			return node.getName();
+		} else {
+			return "f" + getGUID();
+		}
 	}
 
 	/*

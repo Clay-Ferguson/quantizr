@@ -1,7 +1,9 @@
 import { AppState } from "../AppState";
+import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Anchor } from "../widget/Anchor";
@@ -11,6 +13,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Header } from "../widget/Header";
 import { RadioButton } from "../widget/RadioButton";
 import { RadioButtonGroup } from "../widget/RadioButtonGroup";
+import { TextField } from "../widget/TextField";
 import { VerticalLayout } from "../widget/VerticalLayout";
 import { MessageDlg } from "./MessageDlg";
 
@@ -21,14 +24,17 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ExportDlg extends DialogBase {
 
-    constructor(state: AppState) {
+    constructor(state: AppState, private node: NodeInfo) {
         super("Export", null, false, state);
-        this.mergeState({ exportType: "zip" });
+        this.mergeState({
+            exportType: "zip",
+            fileName: node.name ? node.name : null
+        });
     }
 
     renderDlg(): CompIntf[] {
         return [
-            new Header("Export node content to file..."),
+            new TextField("Export File Name", false, null, null, new CompValueHolder<string>(this, "fileName")),
             new RadioButtonGroup([
                 this.createRadioButton("ZIP", "zip"),
                 this.createRadioButton("TAR", "tar"),
@@ -65,16 +71,16 @@ export class ExportDlg extends DialogBase {
 
     exportNodes = (): void => {
         let state = this.getState();
-        let highlightNode = S.meta64.getHighlightedNode(this.appState);
-        if (highlightNode) {
+        let fileName = this.getState().fileName;
 
-            S.util.ajax<J.ExportRequest, J.ExportResponse>("export", {
-                nodeId: highlightNode.id,
-                exportExt: state.exportType
-            }, (res: J.ExportResponse) => {
-                this.exportResponse(res);
-            });
-        }
+        S.util.ajax<J.ExportRequest, J.ExportResponse>("export", {
+            nodeId: this.node.id,
+            exportExt: state.exportType,
+            fileName
+        }, (res: J.ExportResponse) => {
+            this.exportResponse(res);
+        });
+
         this.close();
     }
 

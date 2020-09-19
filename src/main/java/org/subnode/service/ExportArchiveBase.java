@@ -103,7 +103,9 @@ public abstract class ExportArchiveBase {
 
 		final String nodeId = req.getNodeId();
 
-		shortFileName = "f" + util.getGUID() + "." + getFileExtension();
+		final SubNode node = read.getNode(session, nodeId);
+		String fileName = util.getExportFileName(req.getFileName(), node);
+		shortFileName = fileName + "." + getFileExtension();
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
 
 		boolean success = false;
@@ -111,7 +113,6 @@ public abstract class ExportArchiveBase {
 			openOutputStream(fullFileName);
 			writeRootFiles();
 
-			final SubNode node = read.getNode(session, nodeId);
 			rootPathParent = node.getParentPath();
 			auth.authRequireOwnerOfNode(session, node);
 			final ArrayList<SubNode> nodeStack = new ArrayList<SubNode>();

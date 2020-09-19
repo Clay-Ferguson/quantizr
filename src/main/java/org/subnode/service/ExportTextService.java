@@ -49,6 +49,8 @@ public class ExportTextService {
 
 	private static final byte[] NL = "\n".getBytes(StandardCharsets.UTF_8);
 
+	private ExportRequest req;
+
 	/*
 	 * Exports the node specified in the req. If the node specified is "/", or the
 	 * repository root, then we don't expect a filename, because we will generate a
@@ -60,6 +62,7 @@ public class ExportTextService {
 		}
 	
 		this.session = session;
+		this.req = req;
 
 		UserPreferences userPreferences = sessionContext.getUserPreferences();
 		boolean exportAllowed = userPreferences != null ? userPreferences.isExportAllowed() : false;
@@ -89,10 +92,11 @@ public class ExportTextService {
 			throw ExUtil.wrapEx("adminDataFolder does not exist.");
 		}
 
-		shortFileName = "f" + util.getGUID() + ".md";
+		SubNode exportNode = read.getNode(session, nodeId, true);
+		String fileName = util.getExportFileName(req.getFileName(), exportNode);
+		shortFileName = fileName + ".md";
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
 
-		SubNode exportNode = read.getNode(session, nodeId, true);
 		try {
 			log.debug("Export Node: " + exportNode.getPath() + " to file " + fullFileName);
 			output = new BufferedOutputStream(new FileOutputStream(fullFileName));

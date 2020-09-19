@@ -59,6 +59,7 @@ export interface ExecuteNodeRequest extends RequestBase {
 export interface ExportRequest extends RequestBase {
     nodeId: string;
     exportExt: string;
+    fileName: string;
 }
 
 export interface FileSearchRequest extends RequestBase {

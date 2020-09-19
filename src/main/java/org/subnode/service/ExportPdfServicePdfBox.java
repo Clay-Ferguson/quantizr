@@ -82,6 +82,8 @@ public class ExportPdfServicePdfBox {
 	private float startY;
 	private int lastSpace = -1;
 
+	private ExportRequest req;
+
 	/*
 	 * Exports the node specified in the req. If the node specified is "/", or the
 	 * repository root, then we don't expect a filename, because we will generate a
@@ -92,6 +94,7 @@ public class ExportPdfServicePdfBox {
 			session = ThreadLocals.getMongoSession();
 		}
 		this.session = session;
+		this.req = req;
 
 		UserPreferences userPreferences = sessionContext.getUserPreferences();
 		boolean exportAllowed = userPreferences != null ? userPreferences.isExportAllowed() : false;
@@ -122,10 +125,12 @@ public class ExportPdfServicePdfBox {
 		}
 
 		setFontSize(baseFontSize);
-		shortFileName = "f" + util.getGUID() + ".pdf";
-		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
 
 		SubNode exportNode = read.getNode(session, nodeId, true);
+		String fileName = util.getExportFileName(req.getFileName(), exportNode);
+		shortFileName = fileName + ".pdf"; 
+		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
+
 		try {
 			// log.debug("Export Node: " + exportNode.getPath() + " to file " + fullFileName);
 			doc = new PDDocument();

@@ -54,7 +54,10 @@ export class Edit implements EditIntf {
     }
 
     openExportDlg = (state: AppState): void => {
-        new ExportDlg(state).open();
+        let node = S.meta64.getHighlightedNode(state);
+        if (node) {
+            new ExportDlg(state, node).open();
+        }
     }
 
     private insertBookResponse = (res: J.InsertBookResponse, state: AppState): void => {

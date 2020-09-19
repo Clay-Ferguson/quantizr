@@ -62,6 +62,8 @@ public class ExportServiceFlexmark {
 	private StringBuilder markdown = new StringBuilder();
 	private String format;
 
+	private ExportRequest req;
+
 	/*
 	 * Exports the node specified in the req. If the node specified is "/", or the
 	 * repository root, then we don't expect a filename, because we will generate a
@@ -75,6 +77,7 @@ public class ExportServiceFlexmark {
 		}
 		this.session = session;
 		this.format = format;
+		this.req = req;
 
 		UserPreferences userPreferences = sessionContext.getUserPreferences();
 		boolean exportAllowed = userPreferences != null ? userPreferences.isExportAllowed() : false;
@@ -104,10 +107,11 @@ public class ExportServiceFlexmark {
 			throw ExUtil.wrapEx("adminDataFolder does not exist.");
 		}
 
-		shortFileName = "f" + util.getGUID() + "." + format; 
+		SubNode exportNode = read.getNode(session, nodeId, true);
+		String fileName = util.getExportFileName(req.getFileName(), exportNode);
+		shortFileName = fileName + "." + format; 
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
 
-		SubNode exportNode = read.getNode(session, nodeId, true);
 		FileOutputStream out = null;
 		try {
 			MutableDataSet options = new MutableDataSet();
