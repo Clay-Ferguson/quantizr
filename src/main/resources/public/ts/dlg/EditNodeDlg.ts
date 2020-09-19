@@ -419,10 +419,12 @@ export class EditNodeDlg extends DialogBase {
             !typeLocked ? new Button("Type", this.openChangeNodeTypeDlg) : null,
             !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
 
-            new Button("Delete", () => {
-                S.edit.deleteSelNodes(state.node.id, false);
-                this.close();
-            })
+            // show delete button only if we're in a fullscreen viewer (like Calendar view)
+            S.meta64.fullscreenViewerActive(this.appState)
+                ? new Button("Delete", () => {
+                    S.edit.deleteSelNodes(state.node.id, false);
+                    this.close();
+                }) : null
 
             // this.insertTimeButton = new Button("Ins. Time", this.insertTime),
         ]);

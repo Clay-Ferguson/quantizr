@@ -362,12 +362,12 @@ export class Meta64 implements Meta64Intf {
                 // if (event.ctrlKey) {
 
                 switch (event.code) {
-                case "Escape":
-                    if (state.fullScreenViewId || state.fullScreenGraphId || state.fullScreenCalendarId) {
-                        S.nav.closeFullScreenImgViewer(state);
-                    }
+                    case "Escape":
+                        if (S.meta64.fullscreenViewerActive(state)) {
+                            S.nav.closeFullScreenImgViewer(state);
+                        }
 
-                    break;
+                        break;
 
                     // case "ArrowDown":
                     //     if (this.keyDebounce()) return;
@@ -381,24 +381,24 @@ export class Meta64 implements Meta64Intf {
                     //     S.view.scrollRelativeToNode("up", state);
                     //     break;
 
-                case "ArrowLeft":
-                    if (this.keyDebounce()) return;
-                    // S.nav.navUpLevel();
-                    if (state.fullScreenViewId) {
-                        S.nav.prevFullScreenImgViewer(state);
-                    }
-                    break;
+                    case "ArrowLeft":
+                        if (this.keyDebounce()) return;
+                        // S.nav.navUpLevel();
+                        if (state.fullScreenViewId) {
+                            S.nav.prevFullScreenImgViewer(state);
+                        }
+                        break;
 
-                case "ArrowRight":
-                    if (this.keyDebounce()) return;
-                    state = store.getState();
-                    // S.nav.navOpenSelectedNode(state);
-                    if (state.fullScreenViewId) {
-                        S.nav.nextFullScreenImgViewer(state);
-                    }
-                    break;
+                    case "ArrowRight":
+                        if (this.keyDebounce()) return;
+                        state = store.getState();
+                        // S.nav.navOpenSelectedNode(state);
+                        if (state.fullScreenViewId) {
+                            S.nav.nextFullScreenImgViewer(state);
+                        }
+                        break;
 
-                default: break;
+                    default: break;
                 }
                 // }
             });
@@ -646,5 +646,9 @@ export class Meta64 implements Meta64Intf {
 
         // now return filtered list only for items where 'id' is not in the set above.
         return feedResults.filter(ni => !idSet.has(ni.id));
+    }
+
+    fullscreenViewerActive = (state: AppState): boolean => {
+        return !!(state.fullScreenViewId || state.fullScreenGraphId || state.fullScreenCalendarId);
     }
 }

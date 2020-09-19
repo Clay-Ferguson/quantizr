@@ -56,4 +56,5 @@ export interface Meta64Intf {
     removeRedundantFeedItems(feedResults: J.NodeInfo[]): J.NodeInfo[];
     getNodeByName(node: J.NodeInfo, name: string, state: AppState): J.NodeInfo;
     findNodeById(state: AppState, nodeId: string): J.NodeInfo;
+    fullscreenViewerActive(state: AppState): boolean;
 }

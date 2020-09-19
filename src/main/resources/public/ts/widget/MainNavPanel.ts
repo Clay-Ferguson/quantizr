@@ -54,7 +54,7 @@ export class MainNavPanel extends NavTag {
         }
 
         let fullScreenComp = false;
-        if (state.fullScreenViewId || state.fullScreenGraphId || state.fullScreenCalendarId) {
+        if (S.meta64.fullscreenViewerActive(state)) {
             fullScreenComp = true;
             if (state.fullScreenViewId) {
                 if (S.nav.getAdjacentNode("prev", state)) {
