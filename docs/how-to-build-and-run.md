@@ -1,22 +1,29 @@
-# Building the App
+## Building the App
 
 ## Build Basics
 
 You should have a working knowledge of the following things before you try to build Quanta (at least if you want to understand it): 
 
-Maven, Docker, Docker Compose, Linux Bash Scripts, Java, TypeScript, WebPack, MongoDB
+* Maven
+* Docker
+* Docker Compose
+* Linux Bash Scripts
+* Java
+* TypeScript
+* WebPack
+* MongoDB
 
-# Build Scripts
+## Build Scripts
 
-The bash shell scripts for building the code are named 'build--*.sh' in the project root. There are 4 of them for various kinds of deployments. Each one has notes in the top saying what it's for.
+The bash shell scripts for building the code are named `build--*.sh` in the project root. There are 4 of them for various kinds of deployments. Each one has notes in the top saying what it's for.
 
-# About the Builder
+## About the Builder
 
 This app uses maven as the builder (see pom.xml), and the languages involved are Java and TypeScript. The build generates a 'fat jar' containing Tomcat and the WebApp itself, and is a free-standing Java JAR that contains everything, all the code. This fat jar is turned into a docker image, for deploying in a 'docker compose' container.
 
 The way MongoDB is integrated into the runtime is by having a docker instance that contains both the MongoDB and the App fat JAR deployed.
 
-# Prerequisites
+## Prerequisites
 
 If you're running Linux the following will need to be installed before running a build:
 
@@ -40,7 +47,7 @@ Maven Note: If you use the build scripts (i.e. build-dev.sh, build-prod.sh, buil
 
 Why are we *generating* the pom.xml? Basically the reason is to make it where we can include dependencies from external files like this:
 
-```
+```xml
     <dependencies>
         <!--include:org.springframework.boot.xml-->
         <!--include:common.xml-->
@@ -78,7 +85,7 @@ sudo npm install --save-dev --unsafe-perm -g node-sass
 
 To ensure everything with npm is ok, delete the 'node_modules' folders completely.
 
-Then run 'npm install' from the folder that contains he 'package.json' file. 
+Then run 'npm install' from the folder that contains he 'package.json' file.
 
 ## Upgrading NPM Versions (optional)
 
@@ -97,7 +104,7 @@ Then install the Java Debugger and Java development plugins into it from Redhat 
 
 If you do use VSCode you will be able to use the file */.vscode/tasks.json* to run build scripts.
 
-# Maven 'dev' Profile
+## Maven 'dev' Profile
 
 How to do a kind of "Hot Deploy" of client-side files, without requiring a full build:
 
@@ -109,7 +116,7 @@ However if you have the app deployed already and have only just edited client si
 
 The `dev` maven profile (see build-dev.sh) also is configured to deploy to docker in a way where the classpath is overridden to load classes directly from the `${PRJROOT}/target/classes` at runtime. For a full description of how this works, or how to stop doing that, see ./how-to-redeploy-java-classes.md
 
-# Configure secrets.sh and ENV vars before you Build!
+## Configure secrets.sh and ENV vars before you Build!
 
 In file `setenv-common.sh` you'll see a `secrets.sh` file. You must provide this file yourself and all it should be is a shell script with the following exports defined.
 
@@ -122,29 +129,29 @@ In file `setenv-common.sh` you'll see a `secrets.sh` file. You must provide this
     export reCaptcha3SiteKey=
     export reCaptcha3SecretKey=
 
-Also you'll need to edit any of the `setenv-*.sh` scripts to put in your own paths before you run a build. There are only a couple of paths that you'll need to provide, but they are critical/required. The builder won't run without them set correctly. 
+Also you'll need to edit any of the `setenv-*.sh` scripts to put in your own paths before you run a build. There are only a couple of paths that you'll need to provide, but they are critical/required. The builder won't run without them set correctly.
 
-# ESLint Notes
+## ESLint Notes
 
-## Installing command line linter:
+Installing command line linter:
 
 https://www.npmjs.com/package/eslint
 
-* To install: 
+To install: 
 
     npm install eslint --save-dev
 
-* Run interactive setup utility:
+Run interactive setup utility:
 
     ./node_modules/.bin/eslint --init
 
-* Run in folder with packages.json (root)
+Run in folder with packages.json (root)
 
     ./node_modules/.bin/eslint ./ts/**/*.ts
 
 ## Install VSCode Plugins
 
-ESLint (by Dirk Baeumer)
+* ESLint (by Dirk Baeumer)
 
-Prettier ESLint (by Rebecca Vest
-)
+* Prettier ESLint (by Rebecca Vest)
+
