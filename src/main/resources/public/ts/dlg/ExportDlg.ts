@@ -39,7 +39,7 @@ export class ExportDlg extends DialogBase {
                 this.createRadioButton("ZIP", "zip"),
                 this.createRadioButton("TAR", "tar"),
                 this.createRadioButton("TAR.GZ", "tar.gz"),
-                this.createRadioButton("Text", "text"),
+                this.createRadioButton("Markdown", "md"),
                 this.createRadioButton("PDF", "pdf"),
                 this.createRadioButton("HTML", "html")
             ]),

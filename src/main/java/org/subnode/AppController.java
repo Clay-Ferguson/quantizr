@@ -551,7 +551,7 @@ public class AppController implements ErrorController {
 						.getBean(ExportServiceFlexmark.class);
 				svc.export(ms, "html", req, res);
 			} //
-			else if ("text".equalsIgnoreCase(req.getExportExt())) {
+			else if ("md".equalsIgnoreCase(req.getExportExt())) {
 				ExportTextService svc = (ExportTextService) SpringContextUtil.getBean(ExportTextService.class);
 				svc.export(ms, req, res);
 			} //

@@ -2,6 +2,16 @@ package org.subnode.service;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Arrays;
+
+import com.vladsch.flexmark.ext.tables.TablesExtension;
+import com.vladsch.flexmark.ext.toc.TocExtension;
+import com.vladsch.flexmark.ext.toc.internal.TocOptions;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.pdf.converter.PdfConverterExtension;
+import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +34,6 @@ import org.subnode.util.FileUtils;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
-
-import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.html.HtmlRenderer;
-import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.pdf.converter.PdfConverterExtension;
-import com.vladsch.flexmark.util.data.MutableDataSet;
 
 /**
  * https://github.com/vsch/flexmark-java
@@ -109,12 +113,31 @@ public class ExportServiceFlexmark {
 
 		SubNode exportNode = read.getNode(session, nodeId, true);
 		String fileName = util.getExportFileName(req.getFileName(), exportNode);
-		shortFileName = fileName + "." + format; 
+		shortFileName = fileName + "." + format;
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
 
 		FileOutputStream out = null;
 		try {
+			// Let's keep these examples commented until I have time to understand them...
+			//
+			// MutableDataSet options = PegdownOptionsAdapter.flexmarkOptions(
+			// Extensions.ALL & ~(Extensions.ANCHORLINKS | Extensions.EXTANCHORLINKS_WRAP)
+			// , TocExtension.create()).toMutable()
+			// .set(TocExtension.LIST_CLASS, PdfConverterExtension.DEFAULT_TOC_LIST_CLASS)
+			// .toImmutable();
+			/////////////////
+			// options.set(Parser.EXTENSIONS, Arrays.asList(
+			// TocExtension.create(),
+			// AnchorLinkExtension.create()
+			// ));
+			// options.set(AnchorLinkExtension.ANCHORLINKS_WRAP_TEXT, false);
+
+			// uncomment to convert soft-breaks to hard breaks
+			// options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
+
 			MutableDataSet options = new MutableDataSet();
+			options.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(), TocExtension.create()));
+			options.set(TocExtension.LEVELS, TocOptions.getLevels(1, 2, 3, 4, 5, 6));
 
 			Parser parser = Parser.builder(options).build();
 			HtmlRenderer renderer = HtmlRenderer.builder(options).build();
@@ -135,12 +158,10 @@ public class ExportServiceFlexmark {
 
 			if ("html".equals(format)) {
 				FileUtils.writeEntireFile(fullFileName, html);
-			}
-			else if ("pdf".equals(format)) {
+			} else if ("pdf".equals(format)) {
 				out = new FileOutputStream(new File(fullFileName));
 				PdfConverterExtension.exportToPdf(out, html, "", options);
-			}
-			else {
+			} else {
 				throw new RuntimeException("invalid format.");
 			}
 
