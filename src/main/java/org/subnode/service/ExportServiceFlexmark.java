@@ -34,6 +34,7 @@ import org.subnode.util.FileUtils;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
+import org.subnode.util.XString;
 
 /**
  * https://github.com/vsch/flexmark-java
@@ -145,16 +146,9 @@ public class ExportServiceFlexmark {
 			recurseNode(exportNode, 0);
 
 			Node document = parser.parse(markdown.toString());
-			String html = renderer.render(document);
+			String body = renderer.render(document);
 
-			String fontWeight = ""; // "font-weight: 700;";
-			String fontFace = "@font-face {src: url('" + constProvider.getHostAndPort()
-					+ "/fonts/Roboto/Roboto-Light.ttf'); "
-					+ " format('truetype'); font-weight: normal; font-style: normal;\n"
-					+ "font-family: 'QuantaCustomFont'; " + fontWeight + "}\n";
-
-			html = PdfConverterExtension.embedCss(html, fontFace
-					+ "body {font-family: 'QuantaCustomFont','Roboto','Verdana','Helvetica','Arial','sans-serif' !important;}\n");
+			String html = generateHtml(body);
 
 			if ("html".equals(format)) {
 				FileUtils.writeEntireFile(fullFileName, html);
@@ -207,6 +201,16 @@ public class ExportServiceFlexmark {
 
 		markdown.append("\n<img src='" + constProvider.getHostAndPort() + "/mobile/api/bin/" + bin + "?nodeId="
 				+ node.getId().toHexString() + "&token=" + sessionContext.getUserToken() + "' " + style + "/>\n");
+	}
+
+	/**
+	 * Wraps the generated content (html body part) into a larger complete HTML file
+	 */
+	private String generateHtml(String body) {
+		String ret = XString.getResourceAsString("/public/export-includes/flexmark/html-template.html");
+		ret = ret.replace("{{hostAndPort}}", constProvider.getHostAndPort());
+		ret = ret.replace("{{body}}", body);
+		return ret;
 	}
 }
 

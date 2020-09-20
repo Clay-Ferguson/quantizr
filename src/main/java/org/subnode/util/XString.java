@@ -108,42 +108,20 @@ public class XString {
 		return val.substring(0, maxLen - 1);
 	}
 
-	// Resource resource =
-	// SpringContextUtil.getApplicationContext().getResource(resourceName);
-	// InputStream is = null;
-	// SubNode rootNode = null;
-	// try {
-	// is = resource.getInputStream();
-	// rootNode = inputZipFileFromStream(session, is, node, true);
-	// } catch (Exception e) {
-	// throw ExUtil.newEx(e);
-	// } finally {
-	// StreamUtil.close(is);
-	// }
-
 	public static String getResourceAsString(String resourceName) {
-		Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
-		String content = XString.loadResourceIntoString(resource);
-		return content;
-	}
-
-	public static String loadResourceIntoString(Resource resource) {
-		BufferedReader in = null;
-		StringBuilder sb = new StringBuilder();
-
+		InputStream is = null;
+		String ret = null;
+		resourceName = "classpath:" + resourceName; // "classpath:/public/export-includes/flexmark/html-template.html";
 		try {
-			in = new BufferedReader(new InputStreamReader(resource.getInputStream()));
-			String line;
-			while ((line = in.readLine()) != null) {
-				sb.append(line);
-				sb.append("\n");
-			}
-		} catch (Exception e) {
-			sb.setLength(0);
+			final Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
+			is = resource.getInputStream();
+			ret = IOUtils.toString(is, StandardCharsets.UTF_8.name());
+		} catch (final Exception e) {
+			throw new RuntimeEx("Unable to read resource: " + resourceName, e);
 		} finally {
-			StreamUtil.close(in);
+			StreamUtil.close(is);
 		}
-		return sb.toString();
+		return ret;
 	}
 
 	/* Truncates after delimiter including truncating the delimiter */

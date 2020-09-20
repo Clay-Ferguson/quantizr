@@ -105,7 +105,7 @@ public class MongoUtil {
 	// try {
 	// Resource resource =
 	// SpringContextUtil.getApplicationContext().getResource(classpath);
-	// String content = XString.loadResourceIntoString(resource);
+	// String content = XString.loadResourceIntoString(resource); //see XString.getResourceAsString
 	// node.setProperty(JcrProp.CONTENT, content);
 	// AccessControlUtil.makeNodePublic(session, node);
 	// node.setProperty(JcrProp.DISABLE_INSERT, "y");
