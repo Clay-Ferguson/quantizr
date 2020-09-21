@@ -400,8 +400,6 @@ public class AttachmentService {
 				StreamUtil.close(is);
 			}
 		}
-
-		// log.debug("Saving node with upload: "+XString.prettyPrint(node));
 		update.save(session, node);
 	}
 

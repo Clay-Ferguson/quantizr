@@ -124,8 +124,21 @@ public class FileUtils {
 		} else {
 			ext = "";
 		}
-		log.debug("Ext of [" + fileName + "] is [" + ext + "]");
 		return ext;
+	}
+
+	public final String stripExtension(String fileName) {
+		if (fileName == null)
+			return null;
+
+		String ret = null;
+		int idx = fileName.lastIndexOf(".");
+		if (idx != -1) {
+			ret = fileName.substring(0, idx);
+		} else {
+			ret = fileName;
+		}
+		return ret;
 	}
 
 	public static String readFile(File file) {

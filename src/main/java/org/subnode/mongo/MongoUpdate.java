@@ -67,9 +67,10 @@ public class MongoUpdate {
 				}
 
 				for (SubNode node : nodes) {
-					// log.debug("saveSession: Saving Dirty. nodeId=" + node.getId().toHexString());
+					//log.debug("saveSession: Saving Dirty. nodeId=" + (node.getId()==null ? "null (new node?)" : node.getId().toHexString()));
 					save(session, node, false);
 				}
+				MongoThreadLocal.clearDirtyNodes();
 			}
 		} finally {
 			session.saving = false;

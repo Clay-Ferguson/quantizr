@@ -166,7 +166,17 @@ public class SubNode {
 
 	@JsonProperty(FIELD_ID)
 	public void setId(ObjectId id) {
-		MongoThreadLocal.dirty(this);
+		/*
+		 * If we are setting this 'id' to null we need to remove it from the dirty
+		 * cache, because if not we end up tracking the wrong objects and can have a
+		 * corruption when old/wrong data gets written out during the final dirty-nodes
+		 * save
+		 */
+		if (id == null && this.id != null) {
+			MongoThreadLocal.clean(this);
+		} else {
+			MongoThreadLocal.dirty(this);
+		}
 		this.id = id;
 	}
 

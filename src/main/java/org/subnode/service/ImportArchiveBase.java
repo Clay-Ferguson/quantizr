@@ -3,7 +3,6 @@ package org.subnode.service;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -16,12 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.ExUtil;
+import org.subnode.util.FileUtils;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.MimeUtil;
 import org.subnode.util.SubNodeUtil;
@@ -58,6 +58,9 @@ public abstract class ImportArchiveBase {
 	@Autowired
 	public SessionContext sessionContext;
 
+	@Autowired
+	public FileUtils fileUtils;
+
 	public String targetPath;
 
 	public MongoSession session;
@@ -69,9 +72,7 @@ public abstract class ImportArchiveBase {
 	public void processFile(ArchiveEntry entry, InputStream zis, ObjectId ownerId) {
 		String name = entry.getName();
 		int lastSlashIdx = name.lastIndexOf("/");
-		String fileName = name.substring(lastSlashIdx + 1);
-		String path = name.substring(0, lastSlashIdx);
-		path = hashizePath(path);
+		String fileName = lastSlashIdx == -1 ? name : name.substring(lastSlashIdx + 1);
 
 		log.trace("Import FILE Entry: " + entry.getName());
 		try {
@@ -107,8 +108,14 @@ public abstract class ImportArchiveBase {
 			}
 			// Or else treat as binary attachment
 			else {
-				log.debug("  isBIN: " + fileName);
-				storeBinary(entry, zis);
+				/*
+				 * check fo a slash in name to avoide any of our root files, which for the HTML
+				 * viewing only (of exploded jars)
+				 */
+				if (lastSlashIdx != -1) {
+					log.debug("  isBIN: " + fileName);
+					storeBinary(entry, zis, fileName);
+				}
 			}
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
@@ -116,35 +123,17 @@ public abstract class ImportArchiveBase {
 	}
 
 	/*
-	 * Note the fileame will be either 'ipfs-[ipfsHash]-filename.ext' or
-	 * '[gridId]-filename.ext' , depending on if the binary is an IPFS-persisted
-	 * data file or not
+	 * The part of the file name not including the extension will be the actual
+	 * nodeId of the node onto which we need to attach the binary after translating
+	 * thru oldIdToNewIdMap however!
 	 */
-	public void storeBinary(ArchiveEntry entry, InputStream zis) {
-		String name = entry.getName();
-		int lastSlashIdx = name.lastIndexOf("/");
-		String fileName = name.substring(lastSlashIdx + 1);
-		StringTokenizer t = new StringTokenizer(fileName, "-", false);
-		String nodeId = null;
-		while (t.hasMoreTokens()) {
-			String tok = t.nextToken().trim();
-			if (tok.equals("ipfs")) {
-				return;
-			} else {
-				/*
-				 * NOTE: For this lookup to work, we're requiring the JSON file to be ahead of
-				 * the binary attachment in the actual zip stream, which may be problematic if
-				 * we ever try to import 'user generted' files that may have the correct format
-				 * but weren't exported by the platform.
-				 */
-				nodeId = oldIdToNewIdMap.get(tok);
-				if (nodeId != null) {
-					log.debug("Found owner for binary as id=" + nodeId);
-					break;
-				}
-				break;
-			}
-		}
+	public void storeBinary(ArchiveEntry entry, InputStream zis, String fileName) {
+		String nodeId = fileUtils.stripExtension(fileName);
+		/* todo-0: need to retest whether an export actually INCLUDES IPFS file data
+		or just maintains a link to the IPFS data? This really needs to be an export option
+		that the user can specify, because it would be nice if there WERE a way for an export
+		to extract data out of IPFS and save it in the exported file */
+		nodeId = oldIdToNewIdMap.get(nodeId);
 
 		if (nodeId != null) {
 			SubNode node = read.getNode(session, nodeId);
@@ -154,9 +143,12 @@ public abstract class ImportArchiveBase {
 			Long length = node.getIntProp(NodeProp.BIN_SIZE.s());
 			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 
-			int maxFileSize = session.getMaxUploadSize();
+			int maxFileSize = Integer.MAX_VALUE;
+
+			// todo-0: get rid of this and just make it InputStream
 			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, maxFileSize);
-			//log.debug("Attaching binary to nodeId: " + node.getId().toHexString());
+
+			// log.debug("Attaching binary to nodeId: " + node.getId().toHexString());
 			attachmentService.attachBinaryFromStream(session, node, null, fileName, length, lzis, mimeType, -1, -1,
 					false, false, false, true, false, false);
 		} else {
@@ -165,6 +157,11 @@ public abstract class ImportArchiveBase {
 	}
 
 	public String hashizePath(String path) {
+		if (path == null)
+			return null;
+		if (path.equals(""))
+			return path;
+
 		List<String> pathItems = XString.tokenize(path, "/", true);
 		StringBuilder sb = new StringBuilder();
 		for (String pathPart : pathItems) {
