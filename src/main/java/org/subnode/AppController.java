@@ -693,6 +693,53 @@ public class AppController implements ErrorController {
 	}
 
 	/*
+	 * An alternative way to get the binary attachment from a node allowing more
+	 * friendly url format (named nodes)
+	 */
+	@RequestMapping(value = { "/f/id/{id}", "/f/{nameOnAdminNode}", "/f/{userName}/{nameOnUserNode}" })
+	public void attachment(//
+			// node name on 'admin' account. Non-admin named nodes use url
+			// "/u/userName/nodeName"
+			@PathVariable(value = "nameOnAdminNode", required = false) String nameOnAdminNode, //
+
+			@PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode, //
+			@PathVariable(value = "userName", required = false) String userName, //
+
+			@PathVariable(value = "id", required = false) String id, //
+			@RequestParam(value = "download", required = false) String download, //
+			HttpSession session, HttpServletResponse response) {
+		try {
+
+			// Node Names are identified using a colon in front of it, to make it detectable
+			if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
+				id = ":" + userName + ":" + nameOnUserNode;
+			} else if (!StringUtils.isEmpty(nameOnAdminNode)) {
+				id = ":" + nameOnAdminNode;
+			} 
+
+			if (id != null) {
+				String _id = id;
+				adminRunner.run(mongoSession -> {
+					// we don't check ownership of node at this time, but merely check sanity of
+					// whether this ID is even existing or not.
+					SubNode node = read.getNode(mongoSession, _id);
+
+					if (node == null) {
+						log.debug("Node did not exist: " + _id);
+						throw new RuntimeException("Node not found.");
+					} else {
+						attachmentService.getBinary(mongoSession, node.getId().toHexString(), download != null, response);
+					}
+				});
+			} 
+		} catch (Exception e) {
+			// need to add some kind of message to exception to indicate to user something
+			// with the arguments went wrong.
+			ExUtil.error(log, "exception in call processor", e);
+		}
+	}
+
+	/*
 	 * binId param not uses currently but the client will send either the gridId or
 	 * the ipfsHash of the node depending on which type of attachment it sees on the
 	 * node
@@ -700,8 +747,13 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
 	public void getBinary(@PathVariable("binId") String binId, //
 			@RequestParam("nodeId") String nodeId, //
-			// The "Export To PDF" feature relies on sending this 'token' as it's form of
-			// access/auth
+			/*
+			 * The "Export To PDF" feature relies on sending this 'token' as it's form of
+			 * access/auth because it's generated from HTML intermediate file what has all
+			 * the links in it for accessing binary content, and as the PDF is being
+			 * generated calls are made to this endpoint for each image, or other file so we
+			 * use the token to auth the request
+			 */
 			@RequestParam(value = "token", required = false) String token, //
 			@RequestParam(value = "download", required = false) String download, //
 			HttpSession session, HttpServletResponse response) {

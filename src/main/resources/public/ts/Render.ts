@@ -176,19 +176,52 @@ export class Render implements RenderIntf {
         // todo-1: need copy-to-clipboard links here!
 
         let url = window.location.origin + "/app?id=" + node.id;
-        children.push(new Heading(5, "By ID"));
+        children.push(new Heading(5, "View Node By ID"));
         children.push(new Anchor(url, url, {
             target: "_blank",
             className: "anchorBigMarginBottom"
         }));
 
-        if (node.name) {
-            url = window.location.origin + S.util.getPathPartForNamedNode(node);
-            children.push(new Heading(5, "By Name"));
+        let bin = S.props.getNodePropVal(J.NodeProp.BIN, node);
+        if (bin) {
+            let url = window.location.origin + "/f/id/" + node.id;
+            children.push(new Heading(5, "View Attachment By Id"));
             children.push(new Anchor(url, url, {
                 target: "_blank",
                 className: "anchorBigMarginBottom"
             }));
+
+            url += "?download=y";
+            children.push(new Heading(5, "Download Attachment By Id"));
+            children.push(new Anchor(url, url, {
+                target: "_blank",
+                className: "anchorBigMarginBottom"
+            }));
+        }
+
+        if (node.name) {
+            url = window.location.origin + S.util.getPathPartForNamedNode(node);
+            children.push(new Heading(5, "View Node By Name"));
+            children.push(new Anchor(url, url, {
+                target: "_blank",
+                className: "anchorBigMarginBottom"
+            }));
+
+            if (bin) {
+                url = window.location.origin + S.util.getPathPartForNamedNodeAttachment(node);
+                children.push(new Heading(5, "View Attachment By Name"));
+                children.push(new Anchor(url, url, {
+                    target: "_blank",
+                    className: "anchorBigMarginBottom"
+                }));
+
+                url += "?download=y";
+                children.push(new Heading(5, "Download Attachment By Name"));
+                children.push(new Anchor(url, url, {
+                    target: "_blank",
+                    className: "anchorBigMarginBottom"
+                }));
+            }
         }
 
         // Disabling this for now since the Quanta server doesn't directly expose it's Gateway to the outside world.
@@ -213,7 +246,7 @@ export class Render implements RenderIntf {
         }
 
         const linksDiv = new Div(null, null, children);
-        new MessageDlg(null, "URL", null, linksDiv, false, 0, null).open();
+        new MessageDlg(null, "URLs", null, linksDiv, false, 0, null).open();
     }
 
     allowAction = (typeHandler: TypeHandlerIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean => {

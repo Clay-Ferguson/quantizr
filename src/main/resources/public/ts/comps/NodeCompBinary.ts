@@ -133,7 +133,7 @@ export class NodeCompBinary extends Div {
 
             let viewFileLink: Anchor = null;
             if (fileType === "application/pdf" || fileType.startsWith("text/")) {
-                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(this.node, false), "[View]", {
+                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(this.node, false), "[ View ]", {
                     target: "_blank",
                     className: "marginLeft"
                 });
@@ -150,7 +150,7 @@ export class NodeCompBinary extends Div {
                 new Span(fileName, {
                     className: "normalText marginRight"
                 }),
-                new Anchor(S.render.getUrlForNodeAttachment(this.node, true), "[Download]"),
+                new Anchor(S.render.getUrlForNodeAttachment(this.node, true), "[ Download ]"),
                 viewFileLink
             ])]);
         }

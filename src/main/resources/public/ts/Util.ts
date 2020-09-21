@@ -1156,6 +1156,17 @@ export class Util implements UtilIntf {
         }
     }
 
+    getPathPartForNamedNodeAttachment = (node: J.NodeInfo): string => {
+        if (!node.name) return null;
+
+        if (node.owner === "admin") {
+            return "/f/" + node.name; // todo-0: needs testing.
+        }
+        else {
+            return "/f/" + node.owner + "/" + node.name;
+        }
+    }
+
     // DO NOT DELETE: THIS CODE WORKS FINE
     // //Linear Animated Scroll
     // //https://stackoverflow.com/questions/21474678/scrolltop-animation-without-jquery

@@ -152,7 +152,7 @@ export class EditNodeDlg extends DialogBase {
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {
-            ret = typeHandler.getName();
+            ret = "Edit (" + typeHandler.getName() + ")";
         }
         else {
             ret = "Edit";
@@ -345,19 +345,22 @@ export class EditNodeDlg extends DialogBase {
             let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, state.node);
 
             binarySection = new LayoutRow([
-                new Div(null, { className: "col-4 editBinaryContainer" }, [
+                new Div(null, { className: "col-6 editBinaryContainer" }, [
+                    new Div("Attachment", {
+                        className: "smallHeading"
+                    }),
                     new NodeCompBinary(state.node, true, false, null)
                 ]),
 
                 new Div(null, {
-                    className: "col-8"
+                    className: "col-6"
                 }, [
                     imgSizeSelection,
                     new ButtonBar([
                         this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
                         this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
                         ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
-                    ]),
+                    ], null, "float-right"),
                     ipfsLink ? new Div("Stored on IPFS", { className: "marginTop" }) : null
                 ])
 
