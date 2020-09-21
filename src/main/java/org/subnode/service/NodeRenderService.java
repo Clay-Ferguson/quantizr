@@ -483,7 +483,7 @@ public class NodeRenderService {
 	 * 
 	 * Returns true if there was a node at 'nodeName' and false otherwise.
 	 */
-	public boolean thymeleafRenderNode(HashMap<String, String> model, String nodeName) {
+	public boolean /*WARNING: this method name exists in docs*/ thymeleafRenderNode(HashMap<String, String> model, String nodeName) {
 		MongoSession session = auth.getAdminSession();
 		boolean ret = false;
 

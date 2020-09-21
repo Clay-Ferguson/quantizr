@@ -86,7 +86,9 @@ export class ExportDlg extends DialogBase {
 
     exportResponse = (res: J.ExportResponse): void => {
         let hostAndPort: string = S.util.getHostAndPort();
-        let downloadLink = hostAndPort + "/file/" + res.fileName + "?disp=attachment";
+        /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but eventually
+        the plan is to have the export return the actual md5 of the export for use here */
+        let downloadLink = hostAndPort + "/file/" + res.fileName + "?disp=attachment?v=" + (new Date().getTime());
         if (S.util.checkSuccess("Export", res)) {
             new MessageDlg(
                 "Export successful.<p>Use the download link below now, to get the file.",

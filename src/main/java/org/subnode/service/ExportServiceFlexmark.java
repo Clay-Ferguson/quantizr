@@ -36,6 +36,8 @@ import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
+// todo-0: export need to return the md5 hash back to the client so the client can put that in the url with ?v=cache
+
 /**
  * https://github.com/vsch/flexmark-java
  */
