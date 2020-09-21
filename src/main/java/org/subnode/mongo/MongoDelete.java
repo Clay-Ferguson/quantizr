@@ -57,10 +57,11 @@ public class MongoDelete {
 		 * changes might be flagged as dirty that might be about to be deleted.
 		 * 
 		 * todo-1: potential optimization: just clear from the cache any nodes that have
-		 * a path starting with 'node.getPath()', and leave the rest in teh cache. But
+		 * a path starting with 'node.getPath()', and leave the rest in the cache. But
 		 * this will be rare that it has any performance impact.
 		 */
 		update.saveSession(session);
+		
 		/*
 		 * First delete all the children of the node by using the path, knowing all
 		 * their paths 'start with' (as substring) this path. Note how efficient it is

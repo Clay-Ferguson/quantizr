@@ -20,9 +20,9 @@ public class MongoUpdate {
 
 	@Autowired
 	private MongoTemplate ops;
-    
-    @Autowired
-    private MongoAuth auth;
+
+	@Autowired
+	private MongoAuth auth;
 
 	public void save(MongoSession session, SubNode node) {
 		save(session, node, true);
@@ -37,7 +37,7 @@ public class MongoUpdate {
 		MongoThreadLocal.clean(node);
 	}
 
-    public void saveSession(MongoSession session) {
+	public void saveSession(MongoSession session) {
 		if (session == null || session.saving || !MongoThreadLocal.hasDirtyNodes())
 			return;
 
@@ -67,14 +67,19 @@ public class MongoUpdate {
 				}
 
 				for (SubNode node : nodes) {
-					//log.debug("saveSession: Saving Dirty. nodeId=" + (node.getId()==null ? "null (new node?)" : node.getId().toHexString()));
+					// log.debug("saveSession: Saving Dirty. nodeId=" + (node.getId()==null ? "null
+					// (new node?)" : node.getId().toHexString()));
 					save(session, node, false);
 				}
+
+				/*
+				 * This theoretically should never find any dirty nodes, because we just saved
+				 * them all but we definitely still want this line of code here
+				 */
 				MongoThreadLocal.clearDirtyNodes();
 			}
 		} finally {
 			session.saving = false;
 		}
 	}
-
 }

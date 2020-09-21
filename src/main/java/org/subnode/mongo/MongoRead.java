@@ -36,8 +36,14 @@ import org.subnode.util.XString;
 public class MongoRead {
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
 
+    /*
+     * always access this thru 'getOps()' so we can be sure to always save all dirty
+     * nodes before doing any reads, and be sure we can't read any inconsistent
+     * data. This is similar to an RDBMS 'Transaction Isolation' that disables dirty
+     * reads
+     */
     @Autowired
-    private MongoTemplate ops;
+    private MongoTemplate _ops;
 
     @Autowired
     private AclService aclService;
@@ -49,16 +55,21 @@ public class MongoRead {
     private UserFeedService userFeedService;
 
     @Autowired
-	private MongoCreate create;
+    private MongoCreate create;
 
-	@Autowired
-	private MongoUpdate update;
-    
+    @Autowired
+    private MongoUpdate update;
+
     @Autowired
     private MongoAuth auth;
 
     @Autowired
     private MongoUtil util;
+
+    private MongoTemplate getOps(MongoSession session) {
+        update.saveSession(session);
+        return _ops;
+    }
 
     /**
      * Gets account name from the root node associated with whoever owns 'node'
@@ -108,8 +119,7 @@ public class MongoRead {
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);
-        update.saveSession(session);
-        return ops.count(query, SubNode.class);
+        return getOps(session).count(query, SubNode.class);
     }
 
     /*
@@ -121,8 +131,8 @@ public class MongoRead {
         // Criteria criteria =
         // Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(node.getPath()));
         // query.addCriteria(criteria);
-        update.saveSession(session);
-        return ops.count(query, SubNode.class);
+
+        return getOps(session).count(query, SubNode.class);
     }
 
     public SubNode getChildAt(MongoSession session, SubNode node, long idx) {
@@ -132,8 +142,8 @@ public class MongoRead {
                 SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()))//
                 .and(SubNode.FIELD_ORDINAL).is(idx);
         query.addCriteria(criteria);
-        update.saveSession(session);
-        SubNode ret = ops.findOne(query, SubNode.class);
+    
+        SubNode ret = getOps(session).findOne(query, SubNode.class);
         return ret;
     }
 
@@ -150,8 +160,7 @@ public class MongoRead {
         Query query = new Query();
         query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
 
-        update.saveSession(session);
-        if (!ops.exists(query, SubNode.class)) {
+        if (!getOps(session).exists(query, SubNode.class)) {
             throw new RuntimeEx("Attempted to add a node before its parent exists:" + parentPath);
         }
     }
@@ -193,8 +202,8 @@ public class MongoRead {
 
         query.addCriteria(Criteria.where(SubNode.FIELD_NAME).is(name)//
                 .and(SubNode.FIELD_OWNER).is(nodeOwnerId));
-        update.saveSession(session);
-        SubNode ret = ops.findOne(query, SubNode.class);
+
+        SubNode ret = getOps(session).findOne(query, SubNode.class);
 
         // if (ret != null) {
         // log.debug("Node found: id=" + ret.getId().toHexString());
@@ -251,8 +260,8 @@ public class MongoRead {
             identifier = XString.stripIfEndsWith(identifier, "/");
             Query query = new Query();
             query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(identifier));
-            update.saveSession(session);
-            ret = ops.findOne(query, SubNode.class);
+            
+            ret = getOps(session).findOne(query, SubNode.class);
             // if (ret == null) {
             // log.debug("nope. path not found.");
             // } else {
@@ -269,8 +278,8 @@ public class MongoRead {
     public boolean nodeExists(MongoSession session, ObjectId id) {
         Query query = new Query();
         query.addCriteria(Criteria.where(SubNode.FIELD_ID).is(id));
-        update.saveSession(session);
-        return ops.exists(query, SubNode.class);
+    
+        return getOps(session).exists(query, SubNode.class);
     }
 
     public SubNode getNode(MongoSession session, ObjectId objId) {
@@ -281,8 +290,7 @@ public class MongoRead {
         if (objId == null)
             return null;
 
-        update.saveSession(session);
-        SubNode ret = ops.findById(objId, SubNode.class);
+        SubNode ret = getOps(session).findById(objId, SubNode.class);
         if (allowAuth) {
             auth.auth(session, ret, PrivilegeType.READ);
         }
@@ -297,8 +305,8 @@ public class MongoRead {
         String parentPath = XString.truncateAfterLast(path, "/");
         Query query = new Query();
         query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
-        update.saveSession(session);
-        SubNode ret = ops.findOne(query, SubNode.class);
+        
+        SubNode ret = getOps(session).findOne(query, SubNode.class);
         auth.auth(session, ret, PrivilegeType.READ);
         return ret;
     }
@@ -345,8 +353,7 @@ public class MongoRead {
         }
         query.addCriteria(criteria);
 
-        update.saveSession(session);
-        Iterable<SubNode> iter = ops.find(query, SubNode.class);
+        Iterable<SubNode> iter = getOps(session).find(query, SubNode.class);
         List<String> nodeIds = new LinkedList<String>();
         for (SubNode n : iter) {
             nodeIds.add(n.getId().toHexString());
@@ -392,8 +399,7 @@ public class MongoRead {
         }
 
         query.addCriteria(criteria);
-        update.saveSession(session);
-        return ops.find(query, SubNode.class);
+        return getOps(session).find(query, SubNode.class);
     }
 
     /*
@@ -440,10 +446,9 @@ public class MongoRead {
         query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
         query.addCriteria(criteria);
 
-        update.saveSession(session);
         // for 'findOne' is it also advantageous to also setup the query criteria with
         // something like LIMIT=1 (sql)?
-        SubNode nodeFound = ops.findOne(query, SubNode.class);
+        SubNode nodeFound = getOps(session).findOne(query, SubNode.class);
         if (nodeFound == null) {
             return 0L;
         }
@@ -458,7 +463,7 @@ public class MongoRead {
         query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
         query.addCriteria(criteria);
 
-        SubNode nodeFound = ops.findOne(query, SubNode.class);
+        SubNode nodeFound = getOps(session).findOne(query, SubNode.class);
         return nodeFound;
     }
 
@@ -472,7 +477,8 @@ public class MongoRead {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query query = new Query();
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getParentPath()));
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
+                .regex(util.regexDirectChildrenOfPath(node.getParentPath()));
         query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
         query.addCriteria(criteria);
 
@@ -480,8 +486,7 @@ public class MongoRead {
         // query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(50).gt(20));
         query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(node.getOrdinal()));
 
-        update.saveSession(session);
-        SubNode nodeFound = ops.findOne(query, SubNode.class);
+        SubNode nodeFound = getOps(session).findOne(query, SubNode.class);
         return nodeFound;
     }
 
@@ -494,7 +499,8 @@ public class MongoRead {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query query = new Query();
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getParentPath()));
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
+                .regex(util.regexDirectChildrenOfPath(node.getParentPath()));
         query.with(Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
         query.addCriteria(criteria);
 
@@ -502,8 +508,7 @@ public class MongoRead {
         // query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(50).gt(20));
         query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).gt(node.getOrdinal()));
 
-        update.saveSession(session);
-        SubNode nodeFound = ops.findOne(query, SubNode.class);
+        SubNode nodeFound = getOps(session).findOne(query, SubNode.class);
         return nodeFound;
     }
 
@@ -536,8 +541,8 @@ public class MongoRead {
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);
-        update.saveSession(session);
-        return ops.find(query, SubNode.class);
+        
+        return getOps(session).find(query, SubNode.class);
     }
 
     /**
@@ -549,7 +554,6 @@ public class MongoRead {
             String sortField, int limit, boolean fuzzy, boolean caseSensitive) {
         auth.auth(session, node, PrivilegeType.READ);
 
-        update.saveSession(session);
         Query query = new Query();
         query.limit(limit);
         /*
@@ -607,7 +611,7 @@ public class MongoRead {
             query.with(Sort.by(Sort.Direction.DESC, sortField));
         }
 
-        return ops.find(query, SubNode.class);
+        return getOps(session).find(query, SubNode.class);
     }
 
     /**
@@ -616,18 +620,17 @@ public class MongoRead {
     public Iterable<SubNode> getCalendar(MongoSession session, SubNode node) {
         auth.auth(session, node, PrivilegeType.READ);
 
-        update.saveSession(session);
         Query query = new Query();
-        //query.limit(limit);
+        // query.limit(limit);
 
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
         criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
 
         query.addCriteria(criteria);
         query.addCriteria(Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.DATE + ".value").ne(null));
-        return ops.find(query, SubNode.class);
-    }
 
+        return getOps(session).find(query, SubNode.class);
+    }
 
     /*
      * Builds the 'criteria' object using the kind of searching Google does where
@@ -708,8 +711,8 @@ public class MongoRead {
         SubNode node = getNode(session, path);
 
         if (node == null) {
-            node = create.createNode(session, userNode, NodeName.TRASH, NodeType.TRASH_BIN.s(), 0L, CreateNodeLocation.LAST,
-                    null);
+            node = create.createNode(session, userNode, NodeName.TRASH, NodeType.TRASH_BIN.s(), 0L,
+                    CreateNodeLocation.LAST, null);
             node.setOwner(userNode.getId());
             update.save(session, node);
         }
@@ -739,8 +742,8 @@ public class MongoRead {
                 .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
 
         query.addCriteria(criteria);
-        update.saveSession(session);
-        SubNode ret = ops.findOne(query, SubNode.class);
+    
+        SubNode ret = getOps(session).findOne(query, SubNode.class);
         auth.auth(session, ret, PrivilegeType.READ);
         return ret;
     }
@@ -758,8 +761,7 @@ public class MongoRead {
                 .and(SubNode.FIELD_TYPE).is(type);
 
         query.addCriteria(criteria);
-        update.saveSession(session);
-        SubNode ret = ops.findOne(query, SubNode.class);
+        SubNode ret = getOps(session).findOne(query, SubNode.class);
         auth.auth(session, ret, PrivilegeType.READ);
         return ret;
     }
@@ -777,10 +779,8 @@ public class MongoRead {
                 .and(SubNode.FIELD_PROPERTIES + "." + propName + ".value").is(propVal);
 
         query.addCriteria(criteria);
-        update.saveSession(session);
-        SubNode ret = ops.findOne(query, SubNode.class);
+        SubNode ret = getOps(session).findOne(query, SubNode.class);
         auth.auth(session, ret, PrivilegeType.READ);
         return ret;
     }
-
 }
