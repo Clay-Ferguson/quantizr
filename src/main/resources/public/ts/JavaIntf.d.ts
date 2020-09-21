@@ -261,6 +261,10 @@ export interface TransferNodeRequest extends RequestBase {
     toUser: string;
 }
 
+export interface UpdateHeadingsRequest extends RequestBase {
+    nodeId: string;
+}
+
 export interface UploadFromUrlRequest extends RequestBase {
     nodeId: string;
     sourceUrl: string;
@@ -498,6 +502,9 @@ export interface SplitNodeResponse extends ResponseBase {
 }
 
 export interface TransferNodeResponse extends ResponseBase {
+}
+
+export interface UpdateHeadingsResponse extends ResponseBase {
 }
 
 export interface UploadFromUrlResponse extends ResponseBase {

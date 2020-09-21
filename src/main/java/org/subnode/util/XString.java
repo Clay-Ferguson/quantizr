@@ -100,6 +100,19 @@ public class XString {
 		return list;
 	}
 
+	public static int getHeadingLevel(String val) {
+		if (!val.startsWith("#")) {
+			return -1;
+		}
+		int len = val.length();
+		int idx = 0;
+		while (idx < len && val.charAt(idx) == '#') {
+			idx++;
+			if (idx >= 6) break;
+		}
+		return idx + 1;
+	}
+
 	public static String trimToMaxLen(String val, int maxLen) {
 		if (val == null)
 			return null;

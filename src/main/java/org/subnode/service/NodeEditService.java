@@ -32,6 +32,7 @@ import org.subnode.request.InsertNodeRequest;
 import org.subnode.request.SaveNodeRequest;
 import org.subnode.request.SplitNodeRequest;
 import org.subnode.request.TransferNodeRequest;
+import org.subnode.request.UpdateHeadingsRequest;
 import org.subnode.response.AppDropResponse;
 import org.subnode.response.CreateSubNodeResponse;
 import org.subnode.response.DeletePropertyResponse;
@@ -39,11 +40,14 @@ import org.subnode.response.InsertNodeResponse;
 import org.subnode.response.SaveNodeResponse;
 import org.subnode.response.SplitNodeResponse;
 import org.subnode.response.TransferNodeResponse;
+import org.subnode.response.UpdateHeadingsResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
+import org.subnode.util.XString;
+import org.springframework.data.domain.Sort;
 
 /**
  * Service for editing content of nodes. That is, this method updates property
@@ -230,7 +234,7 @@ public class NodeEditService {
 				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false, false));
 
 		if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
-				// don't evern send notifications when 'admin' is the one doing the editing.
+		// don't evern send notifications when 'admin' is the one doing the editing.
 				&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 			outboxMgr.sendNotificationForNodeEdit(newNode, sessionContext.getUserName());
 		}
@@ -330,7 +334,7 @@ public class NodeEditService {
 			}
 
 			if (req.isUpdateModTime() && !StringUtils.isEmpty(node.getContent()) //
-					// don't evern send notifications when 'admin' is the one doing the editing.
+			// don't evern send notifications when 'admin' is the one doing the editing.
 					&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
 			}
@@ -541,5 +545,59 @@ public class NodeEditService {
 			return true;
 		}
 		return false;
+	}
+
+	public UpdateHeadingsResponse updateHeadings(MongoSession session, UpdateHeadingsRequest req) {
+		UpdateHeadingsResponse res = new UpdateHeadingsResponse();
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+
+		SubNode node = read.getNode(session, req.getNodeId(), true);
+		String content = node.getContent();
+		int baseLevel = XString.getHeadingLevel(content);
+		updateHeadingsRecurseNode(session, node, 0, baseLevel < 0 ? 0 : baseLevel-1);
+
+		return res;
+	}
+
+	private void updateHeadingsRecurseNode(MongoSession session, SubNode node, int level, int baseLevel) {
+		if (node == null)
+			return;
+
+		String content = node.getContent();
+		int spaceIdx = content.indexOf(" ");
+		if (spaceIdx != -1) {
+			content = content.substring(spaceIdx+1);
+			switch (level + baseLevel) {
+				case 1:
+					node.setContent("# " + content);
+					break;
+				case 2:
+					node.setContent("## " + content);
+					break;
+				case 3:
+					node.setContent("### " + content);
+					break;
+				case 4:
+					node.setContent("#### " + content);
+					break;
+				case 5:
+					node.setContent("##### " + content);
+					break;
+				case 6:
+					node.setContent("###### " + content);
+					break;
+				default:
+					break;
+			}
+		}
+
+		Sort sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
+		for (SubNode n : read.getChildren(session, node, sort, null)) {
+			updateHeadingsRecurseNode(session, n, level + 1, baseLevel);
+		}
+
+		update.saveSession(session);
 	}
 }

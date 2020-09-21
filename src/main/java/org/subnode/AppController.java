@@ -81,6 +81,7 @@ import org.subnode.request.ShutdownServerNodeRequest;
 import org.subnode.request.SignupRequest;
 import org.subnode.request.SplitNodeRequest;
 import org.subnode.request.TransferNodeRequest;
+import org.subnode.request.UpdateHeadingsRequest;
 import org.subnode.request.UploadFromUrlRequest;
 import org.subnode.response.CloseAccountResponse;
 import org.subnode.response.ExecuteNodeResponse;
@@ -654,6 +655,13 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object selectAllNodes(@RequestBody SelectAllNodesRequest req, HttpSession session) {
 		return callProc.run("selectAllNodes", req, session, ms -> {
 			return nodeMoveService.selectAllNodes(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/updateHeadings", method = RequestMethod.POST)
+	public @ResponseBody Object updateHeadings(@RequestBody UpdateHeadingsRequest req, HttpSession session) {
+		return callProc.run("updateHeadings", req, session, ms -> {
+			return nodeEditService.updateHeadings(ms, req);
 		});
 	}
 

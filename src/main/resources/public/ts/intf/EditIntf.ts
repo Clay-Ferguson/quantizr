@@ -48,4 +48,5 @@ export interface EditIntf {
     moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): void;
     updateIpfsNodeJson(node: J.NodeInfo, state: AppState): Promise<void>;
     initNodeEditResponse(res: J.InitNodeEditResponse, state: AppState, dialogEditor: boolean): void;
+    updateHeadings(state: AppState): void;
 }

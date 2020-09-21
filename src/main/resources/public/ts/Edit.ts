@@ -824,4 +824,15 @@ export class Edit implements EditIntf {
             this.moveNodesResponse(res, sourceNodeId, state);
         });
     }
+
+    updateHeadings = (state: AppState): void => {
+        const node: J.NodeInfo = S.meta64.getHighlightedNode(state);
+        if (node) {
+            S.util.ajax<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
+                nodeId: node.id
+            }, (res) => {
+                S.meta64.refresh(state);
+            });
+        }
+    }
 }
