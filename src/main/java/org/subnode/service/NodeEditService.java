@@ -554,9 +554,14 @@ public class NodeEditService {
 		}
 
 		SubNode node = read.getNode(session, req.getNodeId(), true);
-		String content = node.getContent();
-		int baseLevel = XString.getHeadingLevel(content);
-		updateHeadingsRecurseNode(session, node, 0, baseLevel < 0 ? 0 : baseLevel - 1);
+
+		// NOTE: LEAVE this commented code, for future, it can be used to make headings
+		// base off current heading sizes
+		// instead of always starting at "#" on the selected node and it's immediate
+		// children
+		// String content = node.getContent();
+		// int baseLevel = XString.getHeadingLevel(content);
+		updateHeadingsRecurseNode(session, node, 0, 0); // baseLevel < 0 ? 0 : baseLevel - 1);
 
 		return res;
 	}
@@ -565,7 +570,8 @@ public class NodeEditService {
 		if (node == null)
 			return;
 
-		String content = node.getContent();
+		String nodeContent = node.getContent();
+		String content = nodeContent;
 		if (content.startsWith("#") && content.indexOf(" ") < 7) {
 			int spaceIdx = content.indexOf(" ");
 			if (spaceIdx != -1) {
@@ -576,23 +582,36 @@ public class NodeEditService {
 				 * switch with them hardcoded is more performant
 				 */
 				switch (level + baseLevel) {
+					case 0: // this will be the root node (user selected node)
 					case 1:
-						node.setContent("# " + content);
+						if (!nodeContent.startsWith("# ")) {
+							node.setContent("# " + content);
+						}
 						break;
 					case 2:
-						node.setContent("## " + content);
+						if (!nodeContent.startsWith("## ")) {
+							node.setContent("## " + content);
+						}
 						break;
 					case 3:
-						node.setContent("### " + content);
+						if (!nodeContent.startsWith("### ")) {
+							node.setContent("### " + content);
+						}
 						break;
 					case 4:
-						node.setContent("#### " + content);
+						if (!nodeContent.startsWith("#### ")) {
+							node.setContent("#### " + content);
+						}
 						break;
 					case 5:
-						node.setContent("##### " + content);
+						if (!nodeContent.startsWith("##### ")) {
+							node.setContent("##### " + content);
+						}
 						break;
 					case 6:
-						node.setContent("###### " + content);
+						if (!nodeContent.startsWith("###### ")) {
+							node.setContent("###### " + content);
+						}
 						break;
 					default:
 						break;
