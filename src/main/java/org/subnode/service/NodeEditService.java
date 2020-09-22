@@ -556,7 +556,7 @@ public class NodeEditService {
 		SubNode node = read.getNode(session, req.getNodeId(), true);
 		String content = node.getContent();
 		int baseLevel = XString.getHeadingLevel(content);
-		updateHeadingsRecurseNode(session, node, 0, baseLevel < 0 ? 0 : baseLevel-1);
+		updateHeadingsRecurseNode(session, node, 0, baseLevel < 0 ? 0 : baseLevel - 1);
 
 		return res;
 	}
@@ -566,30 +566,37 @@ public class NodeEditService {
 			return;
 
 		String content = node.getContent();
-		int spaceIdx = content.indexOf(" ");
-		if (spaceIdx != -1) {
-			content = content.substring(spaceIdx+1);
-			switch (level + baseLevel) {
-				case 1:
-					node.setContent("# " + content);
-					break;
-				case 2:
-					node.setContent("## " + content);
-					break;
-				case 3:
-					node.setContent("### " + content);
-					break;
-				case 4:
-					node.setContent("#### " + content);
-					break;
-				case 5:
-					node.setContent("##### " + content);
-					break;
-				case 6:
-					node.setContent("###### " + content);
-					break;
-				default:
-					break;
+		if (content.startsWith("#") && content.indexOf(" ") < 7) {
+			int spaceIdx = content.indexOf(" ");
+			if (spaceIdx != -1) {
+				content = content.substring(spaceIdx + 1);
+
+				/*
+				 * These strings (pound sign headings) could be generated dynamically, but this
+				 * switch with them hardcoded is more performant
+				 */
+				switch (level + baseLevel) {
+					case 1:
+						node.setContent("# " + content);
+						break;
+					case 2:
+						node.setContent("## " + content);
+						break;
+					case 3:
+						node.setContent("### " + content);
+						break;
+					case 4:
+						node.setContent("#### " + content);
+						break;
+					case 5:
+						node.setContent("##### " + content);
+						break;
+					case 6:
+						node.setContent("###### " + content);
+						break;
+					default:
+						break;
+				}
 			}
 		}
 
