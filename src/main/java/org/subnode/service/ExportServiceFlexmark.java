@@ -140,6 +140,9 @@ public class ExportServiceFlexmark {
 			options.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(), TocExtension.create()));
 			options.set(TocExtension.LEVELS, TocOptions.getLevels(1, 2, 3, 4, 5, 6));
 
+			// This numbering works in the TOC but I haven't figured out how to number the actual headings in the body of the document itself.
+			// options.set(TocExtension.IS_NUMBERED, true);
+
 			Parser parser = Parser.builder(options).build();
 			HtmlRenderer renderer = HtmlRenderer.builder(options).build();
 
