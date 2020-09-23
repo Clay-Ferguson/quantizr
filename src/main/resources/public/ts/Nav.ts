@@ -103,14 +103,14 @@ export class Nav implements NavIntf {
             forceIPFSRefresh: false,
             singleNode: false
         },
-        // success callback
-        (res: J.RenderNodeResponse) => {
-            this.upLevelResponse(res, null, true, state);
-        },
-        // fail callback
-        (res: string) => {
-            this.navHome(state);
-        });
+            // success callback
+            (res: J.RenderNodeResponse) => {
+                this.upLevelResponse(res, null, true, state);
+            },
+            // fail callback
+            (res: string) => {
+                this.navHome(state);
+            });
     }
 
     navUpLevel = (event: any = null): void => {
@@ -145,17 +145,17 @@ export class Nav implements NavIntf {
             forceIPFSRefresh: false,
             singleNode: false
         },
-        // success callback
-        (res: J.RenderNodeResponse) => {
-            this.mainOffset = res.offsetOfNodeFound;
-            this.upLevelResponse(res, state.node.id, false, state);
-        },
-        // fail callback
-        (res: string) => {
-            // Navigating home was a bad idea. If someone tries to uplevel and cannot, we don't want to change them away from
-            // whatever page they're on. Just show the error and stay on same node.
-            // this.navHome(state);
-        });
+            // success callback
+            (res: J.RenderNodeResponse) => {
+                this.mainOffset = res.offsetOfNodeFound;
+                this.upLevelResponse(res, state.node.id, false, state);
+            },
+            // fail callback
+            (res: string) => {
+                // Navigating home was a bad idea. If someone tries to uplevel and cannot, we don't want to change them away from
+                // whatever page they're on. Just show the error and stay on same node.
+                // this.navHome(state);
+            });
     }
 
     /*

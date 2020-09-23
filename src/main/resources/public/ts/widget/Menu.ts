@@ -4,7 +4,7 @@ import { Div } from "./Div";
 
 export class Menu extends Div {
 
-    static activeMenu: string = "Navigate";
+    static activeMenu: string = "Messaging";
 
     constructor(public name: string, public menuItems: CompIntf[]) {
         super(null, {

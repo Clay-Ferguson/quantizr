@@ -51,11 +51,14 @@ export class MenuPanel extends Div {
 
         const children = [];
 
-        // WARNING: The string 'Navigate' is also in Menu.activeMenu.
-        children.push(new Menu("Navigate", [
-            new MenuItem("Welcome", () => { window.location.href = window.location.origin; }),
-            new MenuItem("Portal", () => S.meta64.loadAnonPageHome(state)),
-            new MenuItem("Home", () => S.nav.navHome(state), !state.isAnonUser),
+        // WARNING: The string 'Messaging' is also in Menu.activeMenu, to set the default menu that's opened
+        children.push(new Menu("Messaging", [
+
+            // These are unneeded, because they're icons on the upper right corner.
+            // new MenuItem("Welcome", () => { window.location.href = window.location.origin; }),
+            // new MenuItem("Home", () => S.meta64.loadAnonPageHome(state)),
+            // new MenuItem("Account Root", () => S.nav.navHome(state), !state.isAnonUser),
+
             new MenuItem("Inbox", () => S.nav.openContentNode("~" + J.NodeType.INBOX, state), !state.isAnonUser),
             new MenuItem("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), !state.isAnonUser),
 
@@ -261,9 +264,9 @@ export class MenuPanel extends Div {
             ]));
         }
 
-        children.push(new Menu("Help", [
-            new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide", state)),
-            new MenuItem("Getting Started", () => S.nav.openContentNode(":getting-started", state))
+        children.push(new Menu("Platform Docs", [
+            new MenuItem("User Guide", () => window.open(S.util.getHostAndPort() + "/f/user-guide", "_blank")),
+            new MenuItem("Getting Started", () => window.open(S.util.getHostAndPort() + "/f/getting-started", "_blank"))
         ]));
 
         this.setChildren(children);
