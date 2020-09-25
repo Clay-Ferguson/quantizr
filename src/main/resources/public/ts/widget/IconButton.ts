@@ -11,10 +11,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class IconButton extends Comp {
 
-    constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private specialClasses: string = "", private toggle: string = "") {
+    constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private specialClasses: string = "btn-primary", private toggle: string = "") {
         super(attribs);
         this.attribs.type = "button";
-        this.attribs.className = "btn " + specialClasses + " align-middle btn-primary";
+        this.attribs.className = "btn align-middle " + specialClasses;
     }
 
     compRender(): ReactNode {

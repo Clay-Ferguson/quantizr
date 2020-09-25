@@ -49,7 +49,7 @@ export class MainNavPanel extends NavTag {
                 new IconButton("fa-clipboard", null, {
                     onClick: e => { S.edit.saveClipboardToNode(); },
                     title: "Save Clipboard text to a Note"
-                }, "nav-link", "off")
+                }, "nav-link btn-primary", "off")
             ]));
         }
 
@@ -64,7 +64,7 @@ export class MainNavPanel extends NavTag {
                         new IconButton("fa-angle-left fa-lg", "", {
                             onClick: e => { S.nav.prevFullScreenImgViewer(state); },
                             title: "View Previous Node (or left arrow key)"
-                        }, "nav-link", "off")
+                        }, "nav-link btn-primary", "off")
                     ]));
                 }
 
@@ -75,7 +75,7 @@ export class MainNavPanel extends NavTag {
                         new IconButton("fa-angle-right fa-lg", "", {
                             onClick: e => { S.nav.nextFullScreenImgViewer(state); },
                             title: "View Next Node (or right arrow key)"
-                        }, "nav-link", "off")
+                        }, "nav-link btn-primary", "off")
                     ]));
                 }
             }
@@ -86,7 +86,7 @@ export class MainNavPanel extends NavTag {
                 new IconButton("fa-window-close fa-lg", "Close", {
                     onClick: e => { S.nav.closeFullScreenImgViewer(state); },
                     title: "Close Viewer (or escape key)"
-                }, "nav-link", "off")
+                }, "nav-link btn-primary", "off")
             ]));
         }
         else if (!clientInfo.isMobile) {
@@ -97,7 +97,7 @@ export class MainNavPanel extends NavTag {
                     new IconButton("fa-database", null, {
                         onClick: e => { S.nav.navHome(state); },
                         title: "Go to Your Root Node"
-                    }, "nav-link", "off")
+                    }, "nav-link btn-primary", "off")
                 ]));
             }
 
@@ -107,7 +107,7 @@ export class MainNavPanel extends NavTag {
                 new IconButton("fa-home", null, {
                     onClick: e => { S.meta64.loadAnonPageHome(state); },
                     title: "Go to Portal Root Node"
-                }, "nav-link", "off")
+                }, "nav-link btn-primary", "off")
             ]));
 
             if (!state.isAnonUser) {
@@ -117,7 +117,7 @@ export class MainNavPanel extends NavTag {
                     new IconButton("fa-gear", null, {
                         onClick: e => { S.edit.editPreferences(state); },
                         title: "Edit Preferences"
-                    }, "nav-link", "off")
+                    }, "nav-link btn-primary", "off")
                 ]));
             }
 
@@ -127,8 +127,8 @@ export class MainNavPanel extends NavTag {
                 }, [
                     new IconButton("fa-pencil", null, {
                         onClick: e => { S.edit.toggleEditMode(state); },
-                        title: "Turn Edit Mode " + state.userPreferences.editMode ? "off" : "on"
-                    }, "nav-link", state.userPreferences.editMode ? "on" : "off")
+                        title: "Turn Edit Mode " + (state.userPreferences.editMode ? "off" : "on")
+                    }, "nav-link btn-primary", state.userPreferences.editMode ? "on" : "off")
                 ]));
             }
 
@@ -139,7 +139,7 @@ export class MainNavPanel extends NavTag {
                     new IconButton("fa-user-plus", "Signup", {
                         onClick: e => { S.nav.signup(state); },
                         title: "Create new Account"
-                    }, "nav-link", "off")
+                    }, "nav-link btn-primary", "off")
                 ]));
             }
         }
@@ -152,7 +152,7 @@ export class MainNavPanel extends NavTag {
                 new IconButton("fa-question-circle", null, {
                     onClick: () => { window.open(S.util.getHostAndPort() + "/f/user-guide"); },
                     title: "Help (User Guide)"
-                }, "nav-link", "off")
+                }, "nav-link btn-primary", "off")
             ]));
 
             if (state.isAnonUser) {
@@ -162,7 +162,7 @@ export class MainNavPanel extends NavTag {
                     new IconButton("fa-sign-in", "Login", {
                         onClick: e => { S.nav.login(state); },
                         title: "Login to Quanta"
-                    }, "nav-link", "off")
+                    }, "nav-link btn-primary", "off")
                 ]));
             }
 
@@ -173,7 +173,7 @@ export class MainNavPanel extends NavTag {
                     new IconButton("fa-sign-out", null, {
                         onClick: e => { S.nav.logout(state); },
                         title: "Logout"
-                    }, "nav-link", "off")
+                    }, "nav-link btn-primary", "off")
                 ]));
             }
         }
@@ -211,7 +211,7 @@ export class MainNavPanel extends NavTag {
                         id: "mainMenu"
                         // only applies to mobile. just don't show title for now.
                         // title: "Show Main Menu"
-                    }, "nav-link", "off")
+                    }, "nav-link btn-primary", "off")
                 ])
             ]),
 

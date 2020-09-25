@@ -418,7 +418,7 @@ export class Render implements RenderIntf {
                 S.edit.insertNode(node.id, "u", isFirst ? 0 : 1, state);
             },
             title: "Insert new node here"
-        }, "btn-sm");
+        }, "btn-sm btn-secondary");
 
         const buttonBar = new Span(null, {
             className: "float-right microMarginTop"
