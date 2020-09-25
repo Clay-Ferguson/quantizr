@@ -127,7 +127,7 @@ export class MainNavPanel extends NavTag {
                 }, [
                     new IconButton("fa-pencil", null, {
                         onClick: e => { S.edit.toggleEditMode(state); },
-                        title: "Toggle Edit Mode on/off"
+                        title: "Turn Edit Mode " + state.userPreferences.editMode ? "off" : "on"
                     }, "nav-link", state.userPreferences.editMode ? "on" : "off")
                 ]));
             }
@@ -145,6 +145,16 @@ export class MainNavPanel extends NavTag {
         }
 
         if (!fullScreenComp) {
+
+            buttons.push(new Li(null, {
+                className: "nav-item"
+            }, [
+                new IconButton("fa-question-circle", null, {
+                    onClick: () => { window.open(S.util.getHostAndPort() + "/f/user-guide"); },
+                    title: "Help (User Guide)"
+                }, "nav-link", "off")
+            ]));
+
             if (state.isAnonUser) {
                 buttons.push(new Li(null, {
                     className: "nav-item"

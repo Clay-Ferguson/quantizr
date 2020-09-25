@@ -60,6 +60,7 @@ export class NodeCompVerticalRowLayout extends Div {
         }
 
         let rowCount: number = 0;
+        let lastNode: J.NodeInfo = null;
         for (let i = 0; i < this.node.children.length; i++) {
             let n: J.NodeInfo = this.node.children[i];
             if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
@@ -68,21 +69,22 @@ export class NodeCompVerticalRowLayout extends Div {
                     console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
                 }
 
-                if (state.userPreferences.editMode && allowInsert && rowCount === 0 && state.userPreferences.editMode && this.level === 1) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
-
-                    // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                    comps.push(new Div(null, { className: "clearfix" }));
-                }
+                // DO NOT DELETE (YET)
+                // if (state.userPreferences.editMode && allowInsert && rowCount === 0 && this.level === 1) {
+                //     comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
+                //     // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                //     comps.push(new Div(null, { className: "clearfix" }));
+                // }
 
                 let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
 
                 let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
 
                 // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
-                if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode) {
+                if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode && !S.props.hasBinary(n)) {
                 }
                 else {
+                    lastNode = n;
                     let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove, childrenImgSizes, state);
                     comps.push(row);
                 }
@@ -94,14 +96,21 @@ export class NodeCompVerticalRowLayout extends Div {
                     comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
                 }
 
-                if (state.userPreferences.editMode && allowInsert && state.userPreferences.editMode && this.level === 1) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount === countToDisplay, state));
-
-                    // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                    comps.push(new Div(null, { className: "clearfix" }));
-                }
+                // DO NOT DELETE (YET)
+                // if (state.userPreferences.editMode && allowInsert && this.level === 1) {
+                //     comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount === countToDisplay, state));
+                //     // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                //     comps.push(new Div(null, { className: "clearfix" }));
+                // }
             }
         }
+
+        if (lastNode && state.userPreferences.editMode && allowInsert && this.level === 1) {
+            comps.push(S.render.createBetweenNodeButtonBar(lastNode, false, true, state));
+            // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+            comps.push(new Div(null, { className: "clearfix" }));
+        }
+
         this.setChildren(comps);
     }
 }

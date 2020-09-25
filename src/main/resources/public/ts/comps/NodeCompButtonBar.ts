@@ -55,6 +55,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let nextButton: IconButton;
         let searchButton: IconButton;
         let timelineButton: IconButton;
+        let insertInlineButton: IconButton;
 
         let isPageRootNode = state.node && this.node.id === state.node.id;
 
@@ -240,6 +241,15 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     });
                 }
             }
+
+            if (!isPageRootNode) {
+                insertInlineButton = new IconButton("fa-plus", null, {
+                    onClick: e => {
+                        S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
+                    },
+                    title: "Insert new node here"
+                }, "btn-sm float-right");
+            }
         }
 
         // If showMetaData is true the avatar will show up in a different place (very upper left), instead of here
@@ -249,7 +259,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         }
 
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
-            moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton], null, "marginLeft");
+            moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton, insertInlineButton], null, "marginLeft");
 
         let navButtonBar;
 

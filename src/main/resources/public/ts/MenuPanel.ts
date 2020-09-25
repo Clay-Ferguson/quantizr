@@ -264,11 +264,6 @@ export class MenuPanel extends Div {
             ]));
         }
 
-        children.push(new Menu("Platform Docs", [
-            new MenuItem("User Guide", () => window.open(S.util.getHostAndPort() + "/f/user-guide", "_blank")),
-            new MenuItem("Getting Started", () => window.open(S.util.getHostAndPort() + "/f/getting-started", "_blank"))
-        ]));
-
         this.setChildren(children);
     }
 }

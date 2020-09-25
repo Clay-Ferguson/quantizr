@@ -427,7 +427,11 @@ export class Render implements RenderIntf {
         return new Div(null, {
             className: "betweenRowsContainer row no-gutters"
         }, [
-            new QuickEditField(node, isFirst, state),
+            // This works, but I decided having only ONE editor is better, and
+            // if we need to edit inline we can put the main editor dialog in inline in the content
+            // instead of making it a dialog
+            // todo-1: eventually we can get rid of the whole QuidkEditField stuff?
+            // new QuickEditField(node, isFirst, state),
             new Span(null, {
                 className: "col"
             }, [buttonBar])
