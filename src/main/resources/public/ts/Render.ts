@@ -408,21 +408,14 @@ export class Render implements RenderIntf {
                 func = S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_Inline, "S.edit.pasteSelNodes_Inline", node.id);
             }
 
-            pasteInlineButton = new Button("Paste Inline", func, {
+            pasteInlineButton = new Button("Paste", func, {
                 className: "highlightBorder"
             });
         }
 
-        const newNodeButton = new IconButton("fa-plus", null, {
-            onClick: e => {
-                S.edit.insertNode(node.id, "u", isFirst ? 0 : 1, state);
-            },
-            title: "Insert new node here"
-        }, "btn-sm btn-secondary");
-
         const buttonBar = new Span(null, {
             className: "float-right microMarginTop"
-        }, [pasteInlineButton, newNodeButton]);
+        }, [pasteInlineButton]);
 
         return new Div(null, {
             className: "betweenRowsContainer row no-gutters"

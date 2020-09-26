@@ -8,6 +8,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
+import { IconButton } from "../widget/IconButton";
 import { NodeCompRow } from "./NodeCompRow";
 
 let S: Singletons;
@@ -69,12 +70,11 @@ export class NodeCompVerticalRowLayout extends Div {
                     console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
                 }
 
-                // DO NOT DELETE (YET)
-                // if (state.userPreferences.editMode && allowInsert && rowCount === 0 && this.level === 1) {
-                //     comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
-                //     // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                //     comps.push(new Div(null, { className: "clearfix" }));
-                // }
+                if (allowInsert && !state.isAnonUser && state.userPreferences.editMode && !!state.nodesToMove && S.props.isMine(n, state) && this.level === 1 && rowCount === 0) {
+                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
+                    // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                    comps.push(new Div(null, { className: "clearfix" }));
+                }
 
                 let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
 
@@ -96,20 +96,20 @@ export class NodeCompVerticalRowLayout extends Div {
                     comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
                 }
 
-                // DO NOT DELETE (YET)
-                // if (state.userPreferences.editMode && allowInsert && this.level === 1) {
-                //     comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount === countToDisplay, state));
-                //     // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                //     comps.push(new Div(null, { className: "clearfix" }));
-                // }
+                if (allowInsert && !state.isAnonUser && state.userPreferences.editMode && !!state.nodesToMove && S.props.isMine(n, state) && this.level === 1) {
+                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount === countToDisplay, state));
+                    // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
+                    comps.push(new Div(null, { className: "clearfix" }));
+                }
             }
         }
 
-        if (lastNode && state.userPreferences.editMode && allowInsert && this.level === 1) {
-            comps.push(S.render.createBetweenNodeButtonBar(lastNode, false, true, state));
-            // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-            comps.push(new Div(null, { className: "clearfix" }));
-        }
+        comps.push(new IconButton("fa-plus", null, {
+            onClick: e => {
+                S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+            },
+            title: "Insert new node here"
+        }, "btn-sm btn-secondary"));
 
         this.setChildren(comps);
     }
