@@ -16,7 +16,7 @@ export class NodeCompRowFooter extends Div {
 
     constructor(private node: J.NodeInfo, private isFeed: boolean = false) {
         super(null, {
-            className: "header-text"
+            className: "row-footer"
         });
     }
 

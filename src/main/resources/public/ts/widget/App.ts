@@ -5,6 +5,7 @@ import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Comp } from "./base/Comp";
 import { Div } from "./Div";
+import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
 import { FullScreenImgViewer } from "./FullScreenImgViewer";
 import { LeftNavPanel } from "./LeftNavPanel";
@@ -12,8 +13,6 @@ import { Main } from "./Main";
 import { MainNavPanel } from "./MainNavPanel";
 import { RightNavPanel } from "./RightNavPanel";
 import { TabPanel } from "./TabPanel";
-import { FullScreenCalendar } from "./FullScreenCalendar";
-import { BreadcrumbsPanel } from "./BreadcrumbsPanel";
 
 export class App extends Div {
     tabPanel: TabPanel = null;
@@ -48,7 +47,9 @@ export class App extends Div {
         }
 
         this.setChildren([
-            new Div(null, { role: "toolbar" }, [new MainNavPanel(null)]),
+            new Div(null, { role: "toolbar" }, [
+                new MainNavPanel(null)
+            ]),
             // For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
             // both get sized right with no overlapping.
             fullScreenViewer ||

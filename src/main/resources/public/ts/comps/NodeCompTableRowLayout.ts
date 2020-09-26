@@ -132,12 +132,14 @@ export class NodeCompTableRowLayout extends Div {
             children.push(curRow);
         }
 
-        children.push(new IconButton("fa-plus", null, {
-            onClick: e => {
-                S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
-            },
-            title: "Insert new node here"
-        }, "btn-sm btn-secondary"));
+        if (allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
+            children.push(new IconButton("fa-plus", null, {
+                onClick: e => {
+                    S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                },
+                title: "Insert new node here"
+            }, "btn-sm btn-secondary"));
+        }
 
         this.setChildren(children);
     }

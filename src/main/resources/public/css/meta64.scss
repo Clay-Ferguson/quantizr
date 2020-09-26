@@ -149,7 +149,6 @@ $smallBorderSize: 3px;
     padding-bottom: 1rem;
 }
 
-
 .highlightBorder {
     border: 2px solid green;
 }
@@ -938,6 +937,41 @@ which it will do by default. */
     padding-top: $microGap;
     cursor: pointer;
 }
+
+@keyframes fadeToHidden {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+
+.compHidden {
+    visibility: hidden;
+
+    // animating the hiding part doesn't work well, because the effect gets interrupted by other parts of 
+    // our animation flow, so we have to set to hidden instantly without animation.
+    // animation-name: fadeToHidden;
+    // animation-duration: 1s;
+
+    //opacity: 0;
+}
+
+/* Note: visibility is not allowed to be animated. This is a rule of CSS engines, not our own limitation */
+@keyframes fadeToVisible {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+.compVisible {
+    visibility: visible;
+    // animation-name: fadeToVisible;
+    // animation-duration: 1s;
+}
+
+.row-footer {
+    font-size: small;
+    margin-left: 16px;
+    cursor: pointer;
+}
+
 
 .nodeName {
     padding: 4px;

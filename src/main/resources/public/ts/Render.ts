@@ -273,70 +273,93 @@ export class Render implements RenderIntf {
                     }
 
                     s.guiReady = true;
+                    s.rendering = true;
 
-                    if (res) {
-                        s.node = res.node;
-                        s.endReached = res.endReached;
-                        s.offsetOfNodeFound = res.offsetOfNodeFound;
-                        s.displayedParent = res.displayedParent;
-                    }
+                    /* Note: This try block is solely to enforce the finally block to happen to guarantee setting s.rendering
+                    back to false, no matter what */
+                    try {
+                        if (res) {
+                            s.node = res.node;
+                            s.endReached = res.endReached;
+                            s.offsetOfNodeFound = res.offsetOfNodeFound;
+                            s.displayedParent = res.displayedParent;
+                        }
 
-                    s.idToNodeMap = {};
-                    if (res) S.meta64.updateNodeMap(res.node, s);
+                        s.idToNodeMap = {};
+                        if (res) {
+                            S.meta64.updateNodeMap(res.node, s);
+                        }
 
-                    if (targetNodeId) {
-                        // If you access /n/myNodeName we get here with targetNodeId being the name (and not the ID)
-                        // so we have to call getNodeByName() to get the 'id' that goes with that node name.
-                        if (targetNodeId.startsWith(":")) {
-                            targetNodeId = targetNodeId.substring(1);
-                            const foundNode: J.NodeInfo = S.meta64.getNodeByName(res.node, targetNodeId, s);
-                            if (foundNode) {
-                                targetNodeId = foundNode.id;
+                        if (targetNodeId) {
+                            // If you access /n/myNodeName we get here with targetNodeId being the name (and not the ID)
+                            // so we have to call getNodeByName() to get the 'id' that goes with that node name.
+                            if (targetNodeId.startsWith(":")) {
+                                targetNodeId = targetNodeId.substring(1);
+                                const foundNode: J.NodeInfo = S.meta64.getNodeByName(res.node, targetNodeId, s);
+                                if (foundNode) {
+                                    targetNodeId = foundNode.id;
+                                }
                             }
+
+                            S.render.fadeInId = targetNodeId;
+
+                            // this is new. not fully vetted.
+                            state.pendingLocationHash = null;
                         }
 
-                        S.render.fadeInId = targetNodeId;
+                        s.selectedNodes = {};
 
-                        // this is new. not fully vetted.
-                        state.pendingLocationHash = null;
-                    }
-
-                    s.selectedNodes = {};
-
-                    if (s.node && !state.isAnonUser) {
-                        // now that 'redux' is in control and we call this method less directly/often, I need to check to see if
-                        // this method is getting called every time it should.
-                        S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
-                        S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
-                    }
-
-                    if (this.debug && s.node) {
-                        console.log("RENDER NODE: " + s.node.id);
-                    }
-
-                    if (state.pendingLocationHash) {
-                        console.log("highlight: pendingLocationHash");
-                        window.location.hash = state.pendingLocationHash;
-                        // Note: the substring(1) trims the "#" character off.
-                        if (allowScroll) {
-                            S.meta64.highlightRowById(state.pendingLocationHash.substring(1), true, s);
+                        if (s.node && !state.isAnonUser) {
+                            // now that 'redux' is in control and we call this method less directly/often, I need to check to see if
+                            // this method is getting called every time it should.
+                            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
+                            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
                         }
-                        state.pendingLocationHash = null;
+
+                        if (this.debug && s.node) {
+                            console.log("RENDER NODE: " + s.node.id);
+                        }
+
+                        if (state.pendingLocationHash) {
+                            // console.log("highlight: pendingLocationHash");
+                            window.location.hash = state.pendingLocationHash;
+                            // Note: the substring(1) trims the "#" character off.
+                            if (allowScroll) {
+                                S.meta64.highlightRowById(state.pendingLocationHash.substring(1), true, s);
+                            }
+                            state.pendingLocationHash = null;
+                        }
+                        else if (allowScroll && targetNodeId) {
+                            // console.log("highlight: byId");
+                            S.meta64.highlightRowById(targetNodeId, true, s);
+                        } //
+                        else if (allowScroll && (scrollToTop || !S.meta64.getHighlightedNode(s))) {
+                            // console.log("highlight: scrollTop");
+                            S.view.scrollToTop();
+                        } //
+                        else if (allowScroll) {
+                            // console.log("highlight: scrollToSelected");
+                            S.view.scrollToSelectedNode(s);
+                        }
                     }
-                    else if (allowScroll && targetNodeId) {
-                        console.log("highlight: byId");
-                        S.meta64.highlightRowById(targetNodeId, true, s);
-                    } //
-                    else if (allowScroll && (scrollToTop || !S.meta64.getHighlightedNode(s))) {
-                        console.log("highlight: scrollTop");
-                        S.view.scrollToTop();
-                    } //
-                    else if (allowScroll) {
-                        console.log("highlight: scrollToSelected");
-                        S.view.scrollToSelectedNode(s);
+                    finally {
+                        /* This is a tiny timeout yes, but don't remove this timer. We need it or else this won't work */
+                        setTimeout(() => {
+                            dispatch({
+                                type: "Action_settingVisible",
+                                state,
+                                update: (s: AppState): void => {
+                                    s.rendering = false;
+
+                                    // todo-0: need to move the breadcrumb query into a part of renderNode so that there's just one query,
+                                    // and then we can also do the animation effect in the css class compVisible too! Right now the refresh
+                                    // of breadcrumbs wall would interrupt that fade effect if we didn't delay it
+                                    this.refreshBreadcrumbs(s);
+                                }
+                            });
+                        }, 1000 /* This delay has to be long enough to be sure scrolling has taken place already */);
                     }
 
-                    this.refreshBreadcrumbs(s);
                     return s;
                 }
             });

@@ -32,6 +32,8 @@ export class NodeCompMainList extends Div {
         }
         let children: Comp[] = [];
 
+        this.attribs.className = state.rendering ? " compHidden" : " compVisible";
+
         if (rootNode.children) {
             this.addPaginationButtons(children, endReached, state);
 
