@@ -45,12 +45,16 @@ services:
         container_name: subnode-test
         expose:
             - "8181"
+            # Uncomment for debugging...
+            #- '8000'
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
             - "${DEPLOY_TARGET}/tmp:/tmp"
             - "${DEPLOY_TARGET}/log:/log"
         ports:
             - "8181:8181"
+            # Uncomment for debugging...
+            #- '8000:8000'
         networks:
             - net-test
         environment:
@@ -74,7 +78,10 @@ services:
             spring.servlet.multipart.max-file-size: "200MB"
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/tmp" 
+
+            # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+            
             ipfs.host: "http://ipfs:5001"
         image: subnode-test
         depends_on:
