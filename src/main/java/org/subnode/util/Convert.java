@@ -77,8 +77,8 @@ public class Convert {
 			}
 		}
 
-		boolean hasChildren = (read.getChildCount(session, node) > 0);
-		// log.trace("hasNodes=" + hasNodes + " path=" + node.getPath());
+		boolean hasChildren = read.getChildCount(session, node) > 0;
+		// log.trace("hasNodes=" + hasChildren + " node: "+node.getId().toHexString());
 
 		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly, initNodeEdit);
 

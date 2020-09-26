@@ -118,6 +118,7 @@ public class MongoRead {
     public long getChildCount(MongoSession session, SubNode node) {
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
+        criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
         query.addCriteria(criteria);
         return getOps(session).count(query, SubNode.class);
     }
