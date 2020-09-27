@@ -208,7 +208,6 @@ export class Meta64 implements Meta64Intf {
     }
 
     highlightRowById = (id: string, scroll: boolean, state: AppState): void => {
-
         let node: J.NodeInfo = state.idToNodeMap[id];
 
         /* If node now known, resort to taking the best, previous node we had */

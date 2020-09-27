@@ -138,7 +138,7 @@ export class NodeCompTableRowLayout extends Div {
                     S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
                 },
                 title: "Insert new node here"
-            }, "btn-sm btn-secondary"));
+            }, "btn-sm btn-secondary marginTop marginLeft"));
         }
 
         this.setChildren(children);

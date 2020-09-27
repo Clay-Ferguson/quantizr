@@ -150,7 +150,8 @@ export class MainNavPanel extends NavTag {
                 className: "nav-item"
             }, [
                 new IconButton("fa-question-circle", null, {
-                    onClick: () => { window.open(S.util.getHostAndPort() + "/f/user-guide"); },
+                    // todo-0: this version number needs to somehow be the md5 hash of the file.
+                    onClick: () => { window.open(S.util.getHostAndPort() + "/f/user-guide?v=1"); },
                     title: "Help (User Guide)"
                 }, "nav-link btn-primary", "off")
             ]));

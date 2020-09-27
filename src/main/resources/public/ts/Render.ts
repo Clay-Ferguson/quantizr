@@ -370,7 +370,7 @@ export class Render implements RenderIntf {
                                         this.allowFadeInId = true;
                                     }
                                 });
-                            }, 750 /* This delay has to be long enough to be sure scrolling has taken place already */);
+                            }, 500 /* This delay has to be long enough to be sure scrolling has taken place already */);
                         }
                         else {
                             this.allowFadeInId = true;

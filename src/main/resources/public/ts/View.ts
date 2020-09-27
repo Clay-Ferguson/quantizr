@@ -210,7 +210,7 @@ export class View implements ViewIntf {
             setTimeout(() => {
                 this.docElm.scrollTop = 0;
                 resolve();
-            }, 250);
+            }, 100);
         });
     }
 
