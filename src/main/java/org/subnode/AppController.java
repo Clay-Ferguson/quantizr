@@ -32,8 +32,8 @@ import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.MailSender;
 import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddPrivilegeRequest;
@@ -46,7 +46,6 @@ import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.DeletePropertyRequest;
 import org.subnode.request.ExecuteNodeRequest;
 import org.subnode.request.ExportRequest;
-import org.subnode.request.GetBreadcrumbsRequest;
 import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.GetServerInfoRequest;
@@ -68,8 +67,8 @@ import org.subnode.request.RebuildIndexesRequest;
 import org.subnode.request.RemovePrivilegeRequest;
 import org.subnode.request.RenderCalendarRequest;
 import org.subnode.request.RenderNodeRequest;
-import org.subnode.request.SaveNodeRequest;
 import org.subnode.request.ResetPasswordRequest;
+import org.subnode.request.SaveNodeRequest;
 import org.subnode.request.SavePublicKeyRequest;
 import org.subnode.request.SaveUserPreferencesRequest;
 import org.subnode.request.SaveUserProfileRequest;
@@ -487,13 +486,6 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req, HttpSession session) {
 		return callProc.run("getNodePrivileges", req, session, ms -> {
 			return aclService.getNodePrivileges(ms, req);
-		});
-	}
-
-	@RequestMapping(value = API_PATH + "/getBreadcrumbs", method = RequestMethod.POST)
-	public @ResponseBody Object getBreadcrumbs(@RequestBody GetBreadcrumbsRequest req, HttpSession session) {
-		return callProc.run("getBreadcrumbs", req, session, ms -> {
-			return nodeRenderService.getBreadcrumbs(ms, req);
 		});
 	}
 

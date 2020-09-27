@@ -34,7 +34,7 @@ export class Render implements RenderIntf {
 
     // After adding the breadcrumb query it's a real challenge to get this fading to work right, so for now
     // I'm disabling it entirely with this flag.
-    enableRowFading: boolean = false;
+    enableRowFading: boolean = true;
 
     fadeInId: string;
     allowFadeInId: boolean = false;
@@ -273,7 +273,6 @@ export class Render implements RenderIntf {
                     }
 
                     s.guiReady = true;
-                    s.rendering = true;
 
                     /* Note: This try block is solely to enforce the finally block to happen to guarantee setting s.rendering
                     back to false, no matter what */
@@ -283,6 +282,7 @@ export class Render implements RenderIntf {
                             s.endReached = res.endReached;
                             s.offsetOfNodeFound = res.offsetOfNodeFound;
                             s.displayedParent = res.displayedParent;
+                            s.breadcrumbs = res.breadcrumbs;
                         }
 
                         s.idToNodeMap = {};
@@ -306,6 +306,11 @@ export class Render implements RenderIntf {
                             // this is new. not fully vetted.
                             state.pendingLocationHash = null;
                         }
+                        else {
+                            if (!S.render.fadeInId) {
+                                S.render.fadeInId = s.node.id;
+                            }
+                        }
 
                         s.selectedNodes = {};
 
@@ -320,44 +325,56 @@ export class Render implements RenderIntf {
                             console.log("RENDER NODE: " + s.node.id);
                         }
 
+                        // NOTE: In these blocks we set rendering=true only if we're scrolling so that the user doesn't see
+                        // a jump in position during scroll, but a smooth reveal of the post-scroll location/rendering.
                         if (state.pendingLocationHash) {
                             // console.log("highlight: pendingLocationHash");
                             window.location.hash = state.pendingLocationHash;
                             // Note: the substring(1) trims the "#" character off.
                             if (allowScroll) {
+                                // console.log("highlight: pendingLocationHash (allowScroll)");
                                 S.meta64.highlightRowById(state.pendingLocationHash.substring(1), true, s);
+                                s.rendering = true;
                             }
                             state.pendingLocationHash = null;
                         }
                         else if (allowScroll && targetNodeId) {
                             // console.log("highlight: byId");
                             S.meta64.highlightRowById(targetNodeId, true, s);
+                            s.rendering = true;
                         } //
                         else if (allowScroll && (scrollToTop || !S.meta64.getHighlightedNode(s))) {
                             // console.log("highlight: scrollTop");
                             S.view.scrollToTop();
+                            s.rendering = true;
                         } //
                         else if (allowScroll) {
                             // console.log("highlight: scrollToSelected");
                             S.view.scrollToSelectedNode(s);
+                            s.rendering = true;
                         }
                     }
                     finally {
-                        /* This is a tiny timeout yes, but don't remove this timer. We need it or else this won't work */
-                        setTimeout(() => {
-                            dispatch({
-                                type: "Action_settingVisible",
-                                state,
-                                update: (s: AppState): void => {
-                                    s.rendering = false;
+                        if (s.rendering) {
+                            /* This is a tiny timeout yes, but don't remove this timer. We need it or else this won't work.
 
-                                    // todo-0: need to move the breadcrumb query into a part of renderNode so that there's just one query,
-                                    // and then we can also do the animation effect in the css class compVisible too! Right now the refresh
-                                    // of breadcrumbs wall would interrupt that fade effect if we didn't delay it
-                                    this.refreshBreadcrumbs(s);
-                                }
-                            });
-                        }, 1000 /* This delay has to be long enough to be sure scrolling has taken place already */);
+                            todo-0: Instead of a timer here, try letting each of the scroller methods above return a promise when done wo
+                            we can hook into that and be faster.
+                            */
+                            setTimeout(() => {
+                                dispatch({
+                                    type: "Action_settingVisible",
+                                    state,
+                                    update: (s: AppState): void => {
+                                        s.rendering = false;
+                                        this.allowFadeInId = true;
+                                    }
+                                });
+                            }, 750 /* This delay has to be long enough to be sure scrolling has taken place already */);
+                        }
+                        else {
+                            this.allowFadeInId = true;
+                        }
                     }
 
                     return s;
@@ -371,24 +388,6 @@ export class Render implements RenderIntf {
         catch (err) {
             console.error("render failed.");
         }
-    }
-
-    refreshBreadcrumbs = (state: AppState): void => {
-        if (!state.node) return;
-
-        S.util.ajax<J.GetBreadcrumbsRequest, J.GetBreadcrumbsResponse>("getBreadcrumbs", {
-            nodeId: state.node.id
-        }, (res: J.GetBreadcrumbsResponse) => {
-
-            dispatch({
-                type: "Action_RefreshBreadcrumbs",
-                state,
-                update: (s: AppState): void => {
-                    this.allowFadeInId = true;
-                    s.breadcrumbs = res.breadcrumbs;
-                }
-            });
-        });
     }
 
     renderChildren = (node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp => {

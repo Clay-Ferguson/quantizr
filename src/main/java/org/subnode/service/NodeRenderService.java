@@ -1,7 +1,5 @@
 package org.subnode.service;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -28,11 +26,9 @@ import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.request.GetBreadcrumbsRequest;
 import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.RenderCalendarRequest;
 import org.subnode.request.RenderNodeRequest;
-import org.subnode.response.GetBreadcrumbsResponse;
 import org.subnode.response.InitNodeEditResponse;
 import org.subnode.response.RenderCalendarResponse;
 import org.subnode.response.RenderNodeResponse;
@@ -113,6 +109,10 @@ public class NodeRenderService {
 			res.setNoDataResponse("Node not found.");
 			return res;
 		}
+
+		LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<BreadcrumbInfo>();
+		res.setBreadcrumbs(breadcrumbs);
+		getBreadcrumbs(session, node, breadcrumbs);
 
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
@@ -617,19 +617,12 @@ public class NodeRenderService {
 		return res;
 	}
 
-	public GetBreadcrumbsResponse getBreadcrumbs(MongoSession session, GetBreadcrumbsRequest req) {
-		GetBreadcrumbsResponse res = new GetBreadcrumbsResponse();
+	public void getBreadcrumbs(MongoSession session, SubNode node, LinkedList<BreadcrumbInfo> list) {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		LinkedList<BreadcrumbInfo> list = new LinkedList<>();
-		res.setBreadcrumbs(list);
-
 		try {
-			String targetId = req.getNodeId();
-			// log.debug("getBreadcrumbs: targetId=" + targetId);
-			SubNode node = read.getNode(session, targetId);
 			if (node != null) {
 				node = read.getParent(session, node);
 			}
@@ -671,7 +664,5 @@ public class NodeRenderService {
 			 * as is by ignoring this exception
 			 */
 		}
-
-		return res;
 	}
 }

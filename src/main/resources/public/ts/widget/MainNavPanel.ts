@@ -29,15 +29,15 @@ export class MainNavPanel extends NavTag {
         let buttons = [];
         let allowEditMode = state.node && !state.isAnonUser;
 
-        // if (S.nav.parentVisibleToUser(state)) {
-        //     buttons.push(new IconButton("fa-chevron-circle-up", "Up Level", {
-        //         /* For onclick functions I need a new approach for some (not all) where I can get by
-        //         with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
-        //         directly off the DOM */
-        //         onClick: S.nav.navUpLevel,
-        //         title: "Go to Parent Node"
-        //     }));
-        // }
+        if (S.nav.parentVisibleToUser(state)) {
+            buttons.push(new IconButton("fa-chevron-circle-up", "Up Level", {
+                /* For onclick functions I need a new approach for some (not all) where I can get by
+                with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
+                directly off the DOM */
+                onClick: S.nav.navUpLevel,
+                title: "Go to Parent Node"
+            }));
+        }
 
         /* Feature to read from clipboard might scare some users (as it should) so I'm turning this on only for admins
         until we have a more specific User Preference allowing users to have to opt-in (not opt-out) to use this feature

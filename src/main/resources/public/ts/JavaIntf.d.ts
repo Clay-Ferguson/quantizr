@@ -72,10 +72,6 @@ export interface FileSystemReindexRequest extends RequestBase {
     nodeId: string;
 }
 
-export interface GetBreadcrumbsRequest extends RequestBase {
-    nodeId: string;
-}
-
 export interface GetFriendsRequest extends RequestBase {
 }
 
@@ -337,10 +333,6 @@ export interface FriendInfo {
     userName: string;
 }
 
-export interface GetBreadcrumbsResponse extends ResponseBase {
-    breadcrumbs: BreadcrumbInfo[];
-}
-
 export interface GetFriendsResponse extends ResponseBase {
     friends: FriendInfo[];
 }
@@ -456,6 +448,7 @@ export interface RenderNodeResponse extends ResponseBase {
     endReached: boolean;
     displayedParent: boolean;
     noDataResponse: string;
+    breadcrumbs: BreadcrumbInfo[];
 }
 
 export interface ResetPasswordResponse extends ResponseBase {
@@ -558,12 +551,6 @@ export interface UserPreferences {
     maxUploadFileSize: number;
 }
 
-export interface BreadcrumbInfo {
-    id: string;
-    name: string;
-    type: string;
-}
-
 export interface AccessControlInfo {
     principalName: string;
     principalNodeId: string;
@@ -586,6 +573,12 @@ export interface CalendarItem {
     title: string;
     start: number;
     end: number;
+}
+
+export interface BreadcrumbInfo {
+    id: string;
+    name: string;
+    type: string;
 }
 
 export interface PrivilegeInfo {

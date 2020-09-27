@@ -1,7 +1,11 @@
 package org.subnode.response;
 
+import java.util.LinkedList;
+
+import org.subnode.model.BreadcrumbInfo;
 import org.subnode.model.NodeInfo;
 import org.subnode.response.base.ResponseBase;
+
 
 public class RenderNodeResponse extends ResponseBase {
 
@@ -28,6 +32,8 @@ public class RenderNodeResponse extends ResponseBase {
 	private boolean displayedParent;
 	
 	private String noDataResponse;
+
+	private LinkedList<BreadcrumbInfo> breadcrumbs;
 
 	public NodeInfo getNode() {
 		return node;
@@ -68,4 +74,12 @@ public class RenderNodeResponse extends ResponseBase {
 	public void setNoDataResponse(String noDataResponse) {
 		this.noDataResponse = noDataResponse;
 	}
+
+	public LinkedList<BreadcrumbInfo> getBreadcrumbs() {
+        return breadcrumbs;
+    }
+
+    public void setBreadcrumbs(LinkedList<BreadcrumbInfo> breadcrumbs) {
+        this.breadcrumbs = breadcrumbs;
+    }
 }
