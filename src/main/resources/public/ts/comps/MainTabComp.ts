@@ -28,10 +28,16 @@ export class MainTabComp extends Div {
         }
 
         let showBreadcrumbs = state.breadcrumbs && state.breadcrumbs.length > 0;
+
         this.setChildren([
-            showBreadcrumbs ? new BreadcrumbsPanel() : null,
-            new NodeCompMainNode(state, null),
-            new NodeCompMainList()
+            new Div(null, {
+                // This visibility setting makes the main content not visible until final scrolling is complete
+                className: state.rendering ? "compHidden" : "compVisible"
+            }, [
+                showBreadcrumbs ? new BreadcrumbsPanel() : null,
+                new NodeCompMainNode(state, null),
+                new NodeCompMainList()
+            ])
         ]);
     }
 }

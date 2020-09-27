@@ -35,19 +35,19 @@ export class MenuPanel extends Div {
         const state: AppState = useSelector((state: AppState) => state);
 
         const selNodeCount = S.util.getPropertyCount(state.selectedNodes);
-        const highlightNode = S.meta64.getHighlightedNode(state);
-        const selNodeIsMine = !!highlightNode && (highlightNode.owner === state.userName || state.userName === "admin");
+        const hltNode = S.meta64.getHighlightedNode(state);
+        const selNodeIsMine = !!hltNode && (hltNode.owner === state.userName || state.userName === "admin");
 
         // for now, allowing all users to import+export (todo-2)
         const importFeatureEnabled = state.isAdminUser || state.userPreferences.importAllowed;
         const exportFeatureEnabled = state.isAdminUser || state.userPreferences.exportAllowed;
 
-        const orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, highlightNode);
+        const orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, hltNode);
         const allowNodeMove: boolean = !orderByProp && S.edit.isInsertAllowed(state.node, state);
-        const isPageRootNode = state.node && highlightNode && state.node.id === highlightNode.id;
+        const isPageRootNode = state.node && hltNode && state.node.id === hltNode.id;
 
-        const canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.firstChild);
-        const canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && highlightNode && !highlightNode.lastChild);
+        const canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && !hltNode.firstChild);
+        const canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && !hltNode.lastChild);
 
         const children = [];
 
@@ -113,22 +113,22 @@ export class MenuPanel extends Div {
             //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
 
             new MenuItem("Show All Shares", () => S.share.findSharedNodes(state, null), //
-                !state.isAnonUser && !!highlightNode),
+                !state.isAnonUser && !!hltNode),
 
             new MenuItem("Show Public Shares", () => S.share.findSharedNodes(state, "public"), //
-                !state.isAnonUser && !!highlightNode)
+                !state.isAnonUser && !!hltNode)
         ]));
 
         children.push(new Menu("Search", [
 
             new MenuItem("All Content", () => { new SearchContentDlg(state).open(); }, //
-                !state.isAnonUser && !!highlightNode), //
+                !state.isAnonUser && !!hltNode), //
 
             new MenuItem("By Name", () => { new SearchByNameDlg(state).open(); }, //
-                !state.isAnonUser && !!highlightNode), //
+                !state.isAnonUser && !!hltNode), //
 
             new MenuItem("By ID", () => { new SearchByIDDlg(state).open(); }, //
-                !state.isAnonUser && !!highlightNode) //
+                !state.isAnonUser && !!hltNode) //
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch })
@@ -141,10 +141,10 @@ export class MenuPanel extends Div {
         children.push(new Menu("Timeline", [
 
             new MenuItem("Created", () => S.srch.timeline("ctm", state), //
-                !state.isAnonUser && !!highlightNode), //
+                !state.isAnonUser && !!hltNode), //
 
             new MenuItem("Modified", () => S.srch.timeline("mtm", state), //
-                !state.isAnonUser && !!highlightNode) //
+                !state.isAnonUser && !!hltNode) //
         ]));
 
         children.push(new Menu("Tools", [
@@ -154,9 +154,9 @@ export class MenuPanel extends Div {
             // new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
 
             // calendar is experimental and only shown for admin user currently
-            state.isAdminUser ? new MenuItem("Show Calendar", () => S.render.showCalendar(null, state), !!highlightNode) : null, //
+            state.isAdminUser ? new MenuItem("Show Calendar", () => S.render.showCalendar(null, state), !!hltNode) : null, //
 
-            new MenuItem("Show URL", () => S.render.showNodeUrl(null, state), !!highlightNode), //
+            new MenuItem("Show URL", () => S.render.showNodeUrl(null, state), !!hltNode), //
 
             new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", state), //
                 !state.isAnonUser && selNodeIsMine), //
@@ -164,10 +164,10 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Import", () => S.edit.openImportDlg(state), //
-                state.isAdminUser && importFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId === highlightNode.id))), //
+                state.isAdminUser && importFeatureEnabled && (selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id))), //
 
             new MenuItem("Export", () => S.edit.openExportDlg(state),
-                state.isAdminUser && exportFeatureEnabled && (selNodeIsMine || (!!highlightNode && state.homeNodeId === highlightNode.id))) //
+                state.isAdminUser && exportFeatureEnabled && (selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id))) //
         ]));
 
         children.push(new Menu("Encryption", [

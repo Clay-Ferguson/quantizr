@@ -35,8 +35,8 @@ export class NodeCompMarkdown extends MarkdownDiv {
         this.attribs.className = "markdown-content markdown-html " + widthStyle;
 
         if (this.appState.userPreferences.editMode && node.owner === appState.userName) {
-            let highlightNode = S.meta64.getHighlightedNode(appState);
-            if (highlightNode && highlightNode.id === node.id) {
+            let hltNode = S.meta64.getHighlightedNode(appState);
+            if (hltNode && hltNode.id === node.id) {
                 if (C.clickToEditNodes) {
                     this.attribs.className += " mousePointer";
                     this.attribs.title = "Click to edit";

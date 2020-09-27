@@ -439,9 +439,9 @@ export class Edit implements EditIntf {
          * node if there is a selected node.
          */
         if (!id) {
-            const highlightNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
-            if (highlightNode) {
-                parentNode = highlightNode;
+            const node: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            if (node) {
+                parentNode = node;
             }
             else {
                 if (!state.node || !state.node.children) return null;

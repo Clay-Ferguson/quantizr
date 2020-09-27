@@ -43,7 +43,7 @@ export class ImportDlg extends DialogBase {
     }
 
     importNodes = (): void => {
-        let highlightNode = S.meta64.getHighlightedNode(this.appState);
+        let hltNode = S.meta64.getHighlightedNode(this.appState);
         let state = this.getState();
 
         if (!state.fileName) {
@@ -51,9 +51,9 @@ export class ImportDlg extends DialogBase {
             return;
         }
 
-        if (highlightNode) {
+        if (hltNode) {
             S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
-                nodeId: highlightNode.id,
+                nodeId: hltNode.id,
                 sourceFileName: state.fileName
             }, this.importResponse);
         }

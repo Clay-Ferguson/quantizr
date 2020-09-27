@@ -36,7 +36,6 @@ export class NodeCompMainNode extends Div {
         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         let selected: boolean = (focusNode && focusNode.id === node.id);
         this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main");
-        this.attribs.className += state.rendering ? " compHidden" : " compVisible";
 
         // console.log("fadeInId=" + S.render.fadeInId + " allowFadeInId=" + S.render.allowFadeInId);
 

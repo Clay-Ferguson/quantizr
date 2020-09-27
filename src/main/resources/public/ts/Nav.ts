@@ -187,8 +187,8 @@ export class Nav implements NavIntf {
         state = appState(state);
 
         /* First check if this node is already highlighted and if so just return */
-        const highlightNode = S.meta64.getHighlightedNode();
-        if (highlightNode && highlightNode.id === nodeId) {
+        const hltNode = S.meta64.getHighlightedNode();
+        if (hltNode && hltNode.id === nodeId) {
             return;
         }
 
