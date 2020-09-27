@@ -168,49 +168,65 @@ export class View implements ViewIntf {
     }
 
     scrollToSelectedNode = (state: AppState): void => {
+        // S.meta64.setOverlay(true);
 
-        S.meta64.setOverlay(true);
-
-        setTimeout(async () => {
-            try {
-                /* Check to see if we are rendering the top node (page root), and if so
-                it is better looking to just scroll to zero index, because that will always
-                be what user wants to see */
-                const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
-                if (currentSelNode && state.node.id === currentSelNode.id) {
-                    this.docElm.scrollTop = 0;
-                    return;
-                }
-
-                const elm: any = S.nav.getSelectedDomElement(state);
-                if (elm) {
-                    elm.scrollIntoView(true);
-
-                    // the 'scrollIntoView' function doesn't work well when we have margin/padding on the document (for our toolbar at the top)
-                    // so we have to account for that by scrolling up a bit from where the 'scrollIntoView' will have put is.
-                    // Only in the rare case of the very last node on the page will this have slightly undesirable effect of
-                    // scrolling up more than we wanted to, but instead of worrying about that I'm keeping this simple.
-
-                    scrollBy(0, -S.meta64.navBarHeight);
-                }
-                else {
-                    this.docElm.scrollTop = 0;
-                }
-
-            } finally {
-                setTimeout(() => {
-                    S.meta64.setOverlay(false);
-                }, 100);
+        let func = () => {
+            // NOTE: LEAVE THIS timer code here until the new pubsub-based scrolling timing is well proven
+            // setTimeout(async () => {
+            //    try {
+            /* Check to see if we are rendering the top node (page root), and if so
+            it is better looking to just scroll to zero index, because that will always
+            be what user wants to see */
+            const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            if (currentSelNode && state.node.id === currentSelNode.id) {
+                // console.log("setting scrollTop=0 (a)");
+                this.docElm.scrollTop = 0;
+                return;
             }
-        }, 100);
+
+            const elm: HTMLElement = S.nav.getSelectedDomElement(state);
+            if (elm) {
+                // console.log("scrollIntoView=0");
+                elm.scrollIntoView(true);
+
+                // the 'scrollIntoView' function doesn't work well when we have margin/padding on the document (for our toolbar at the top)
+                // so we have to account for that by scrolling up a bit from where the 'scrollIntoView' will have put is.
+                // Only in the rare case of the very last node on the page will this have slightly undesirable effect of
+                // scrolling up more than we wanted to, but instead of worrying about that I'm keeping this simple.
+
+                scrollBy(0, -S.meta64.navBarHeight);
+            }
+            else {
+                // console.log("setting scrollTop=0 (b)");
+                this.docElm.scrollTop = 0;
+            }
+        };
+        //     } finally {
+        //         setTimeout(() => {
+        //             S.meta64.setOverlay(false);
+        //         }, 100);
+        //     }
+        // }, 100);
+
+        PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
+            // console.log("execute: C.PUBSUB_mainRenderComplete");
+            func();
+        });
     }
 
     scrollToTop = async (): Promise<void> => {
-        return new Promise<void>((resolve, reject) => {
-            setTimeout(() => {
-                this.docElm.scrollTop = 0;
-                resolve();
-            }, 100);
+        // NOTE: LEAVE THIS timer code here until the new pubsub-based scrolling timing is well proven
+        // return new Promise<void>((resolve, reject) => {
+        //     setTimeout(() => {
+        //         console.log("scrollTop()");
+        //         this.docElm.scrollTop = 0;
+        //         resolve();
+        //     }, 100);
+        // });
+
+        PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
+            // console.log("execute: C.PUBSUB_mainRenderComplete");
+            this.docElm.scrollTop = 0;
         });
     }
 
@@ -221,27 +237,27 @@ export class View implements ViewIntf {
             command: command,
             nodeId: node ? node.id : null
         },
-        (res: J.GetServerInfoResponse) => {
+            (res: J.GetServerInfoResponse) => {
 
-            if (res.messages) {
-                res.messages.forEach(m => {
-                    /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
-                  there are other commands that exist also */
-                    if (command === "getServerInfo") {
-                        m.message += "<br>Browser Memory: " + S.util.getBrowserMemoryInfo();
-                        m.message += "<br>Build Time: " + BUILDTIME;
-                        m.message += "<br>Profile: " + PROFILE;
-                    }
+                if (res.messages) {
+                    res.messages.forEach(m => {
+                        /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
+                      there are other commands that exist also */
+                        if (command === "getServerInfo") {
+                            m.message += "<br>Browser Memory: " + S.util.getBrowserMemoryInfo();
+                            m.message += "<br>Build Time: " + BUILDTIME;
+                            m.message += "<br>Profile: " + PROFILE;
+                        }
 
-                    /* For now just prefix description onto the text. This will be made 'prettier' later todo-1 */
-                    if (dlgDescription) {
-                        m.message = dlgDescription + "\n\n" + m.message;
-                    }
+                        /* For now just prefix description onto the text. This will be made 'prettier' later todo-1 */
+                        if (dlgDescription) {
+                            m.message = dlgDescription + "\n\n" + m.message;
+                        }
 
-                    S.util.showMessage(m.message, dlgTitle || "Server Reply", true);
-                });
-            }
-        });
+                        S.util.showMessage(m.message, dlgTitle || "Server Reply", true);
+                    });
+                }
+            });
     }
 
     displayNotifications = (command: string, state: AppState) => {
@@ -251,21 +267,21 @@ export class View implements ViewIntf {
             command: command,
             nodeId: node ? node.id : null
         },
-        (res: J.GetServerInfoResponse) => {
-            if (res.messages) {
-                res.messages.forEach(m => {
-                    if (m.type !== "inbox") {
-                        // todo-1: really need to put ALL messages into a single dialog display
-                        S.util.showMessage(m.message, "Notifications", false);
-                    }
-                });
+            (res: J.GetServerInfoResponse) => {
+                if (res.messages) {
+                    res.messages.forEach(m => {
+                        if (m.type !== "inbox") {
+                            // todo-1: really need to put ALL messages into a single dialog display
+                            S.util.showMessage(m.message, "Notifications", false);
+                        }
+                    });
 
-                res.messages.forEach(m => {
-                    if (m.type === "inbox") {
-                        new InboxNotifyDlg(m.message, state).open();
-                    }
-                });
-            }
-        });
+                    res.messages.forEach(m => {
+                        if (m.type === "inbox") {
+                            new InboxNotifyDlg(m.message, state).open();
+                        }
+                    });
+                }
+            });
     }
 }

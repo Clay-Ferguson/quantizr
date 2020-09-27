@@ -28,8 +28,10 @@ export class Constants {
 
     /* ======================================================================== */
 
-    static readonly PUBSUB_SingletonsReady = "pubsub-singletons-ready";
-    static readonly PUBSUB_ClearComponentCache = "clear-component-cache";
+    static readonly PUBSUB_SingletonsReady = "PUBSUB_SingletonsReady";
+    static readonly PUBSUB_ClearComponentCache = "PUBSUB_ClearComponentCache";
+    static readonly PUBSUB_mainWindowScroll = "PUBSUB_mainWindowScroll";
+    static readonly PUBSUB_postMainWindowScroll = "PUBSUB_postMainWindowScroll";
 
     static readonly LOCALDB_LOGIN_USR: string = "loginUsr";
     static readonly LOCALDB_LOGIN_PWD: string = "loginPwd";

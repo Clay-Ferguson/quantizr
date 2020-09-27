@@ -20,8 +20,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-// declare var PROFILE;
-
 /**
  * This base class is a hybrid that can render React components or can be used to render plain HTML to be used in innerHTML of elements.
  * The innerHTML approach is being phased out in order to transition fully over to normal ReactJS.
@@ -291,7 +289,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
     tagRender(tag: string, content: string, props: any) {
         // console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
-
         this.updateVisAndEnablement();
 
         try {
@@ -409,7 +406,12 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             //     setIsMounted(true);
             //     this.domAddEvent();
             // }, []);
-            useEffect(this._domAddEvent || (this._domAddEvent = this.domAddEvent.bind(this)), []);
+
+            if (!this._domAddEvent) {
+                this._domAddEvent = this.domAddEvent.bind(this);
+            }
+
+            useEffect(this._domAddEvent, []);
 
             // This hook should work fine but just isn't needed yet.
             if (this.domUpdateEvent) {

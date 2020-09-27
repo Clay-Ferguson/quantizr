@@ -356,21 +356,25 @@ export class Render implements RenderIntf {
                     }
                     finally {
                         if (s.rendering) {
-                            /* This is a tiny timeout yes, but don't remove this timer. We need it or else this won't work.
+                            /* This is a tiny timeout yes, but don't remove this timer. We need it or else this won't work. */
 
-                            todo-0: Instead of a timer here, try letting each of the scroller methods above return a promise when done wo
-                            we can hook into that and be faster.
-                            */
-                            setTimeout(() => {
-                                dispatch({
-                                    type: "Action_settingVisible",
-                                    state,
-                                    update: (s: AppState): void => {
-                                        s.rendering = false;
-                                        this.allowFadeInId = true;
-                                    }
-                                });
-                            }, 500 /* This delay has to be long enough to be sure scrolling has taken place already */);
+                            PubSub.subSingleOnce(C.PUBSUB_postMainWindowScroll, () => {
+                                setTimeout(() => {
+                                    dispatch({
+                                        type: "Action_settingVisible",
+                                        state,
+                                        update: (s: AppState): void => {
+                                            s.rendering = false;
+                                            this.allowFadeInId = true;
+                                        }
+                                    });
+                                },
+                                /* This delay has to be long enough to be sure scrolling has taken place already
+                                   I'm pretty sure this might work even at 100ms or less on most machines, but I'm leaving room for slower
+                                   browsers, because it's critical that this be long enough, but not long enough to be noticeable.
+                                */
+                                300);
+                            });
                         }
                         else {
                             this.allowFadeInId = true;

@@ -46,6 +46,7 @@ export class App extends Div {
             fullScreenViewer = new FullScreenCalendar();
         }
 
+        let main: Main = null;
         this.setChildren([
             new Div(null, { role: "toolbar" }, [
                 new MainNavPanel(null)
@@ -53,7 +54,7 @@ export class App extends Div {
             // For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
             // both get sized right with no overlapping.
             fullScreenViewer ||
-            new Main({ role: "main", className: clientInfo.isMobile ? "container" : "container-fluid" }, [
+            (main = new Main({ role: "main", className: clientInfo.isMobile ? "container" : "container-fluid" }, [
                 new Div(null, {
                     className: "row",
                     role: "banner"
@@ -62,7 +63,14 @@ export class App extends Div {
                     this.tabPanel || (this.tabPanel = new TabPanel()),
                     clientInfo.isMobile ? null : new RightNavPanel()
                 ])
-            ])
+            ]))
         ]);
+
+        /* This is where we send an event that lets code hook into the render cycle to process whatever needs 
+        to be done AFTER the main render is complete, like doing scrolling for example */
+        main.domUpdateEvent = () => {
+            PubSub.pub(C.PUBSUB_mainWindowScroll);
+            PubSub.pub(C.PUBSUB_postMainWindowScroll);
+        };
     }
 }
