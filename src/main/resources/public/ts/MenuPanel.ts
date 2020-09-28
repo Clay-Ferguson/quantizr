@@ -156,7 +156,7 @@ export class MenuPanel extends Div {
             // calendar is experimental and only shown for admin user currently
             state.isAdminUser ? new MenuItem("Show Calendar", () => S.render.showCalendar(null, state), !!hltNode) : null, //
 
-            new MenuItem("Show URL", () => S.render.showNodeUrl(null, state), !!hltNode), //
+            new MenuItem("Show URLs", () => S.render.showNodeUrl(null, state), !!hltNode), //
 
             new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", state), //
                 !state.isAnonUser && selNodeIsMine), //

@@ -453,8 +453,10 @@ public class AttachmentService {
 	 * 
 	 * If 'download' is true we send back a "Content-Disposition: attachment;"
 	 * rather than the default of "inline" by omitting it
+	 * 
+	 * node can be passed in -or- nodeId. If node is passed nodeId can be null.
 	 */
-	public void getBinary(MongoSession session, final String nodeId, final boolean download,
+	public void getBinary(MongoSession session, SubNode node, String nodeId, final boolean download,
 			final HttpServletResponse response) {
 		BufferedInputStream inStream = null;
 		BufferedOutputStream outStream = null;
@@ -464,7 +466,17 @@ public class AttachmentService {
 				session = ThreadLocals.getMongoSession();
 			}
 
-			final SubNode node = read.getNode(session, nodeId, false);
+			if (node == null) {
+				node = read.getNode(session, nodeId, false);
+			}
+			else {
+				nodeId = node.getId().toHexString();
+			}
+
+			if (node == null) {
+				throw ExUtil.wrapEx("node not found.");
+			}
+
 			final boolean ipfs = StringUtils.isNotEmpty(node.getStringProp(NodeProp.IPFS_LINK.s()));
 
 			// Everyone's account node can publish it's attachment and is assumed to be an

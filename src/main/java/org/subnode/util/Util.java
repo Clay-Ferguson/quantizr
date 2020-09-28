@@ -3,6 +3,8 @@ package org.subnode.util;
 import java.io.InputStream;
 import java.util.Scanner;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
@@ -12,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
@@ -26,12 +29,40 @@ public class Util {
 		}
 	}
 
-	//extracts mime from this type of url: data:image/png;base64,[data...]
+	/*
+	 * If addParam is non null it's expected to be something like "param=val" and
+	 * will get added to any existing query string
+	 * 
+	 * todo-0: I grabbed this impl from online. Need to rewrite it, because it's not
+	 * really my style of coding.
+	 */
+	public static String getFullURL(HttpServletRequest request, String addParam) {
+		StringBuilder requestURL = new StringBuilder(request.getRequestURL().toString());
+		String queryString = request.getQueryString();
+
+		// append to queryString if necessary.
+		if (!StringUtils.isEmpty(addParam)) {
+			if (!StringUtils.isEmpty(queryString)) {
+				queryString += "&" + addParam;
+			}
+			else {
+				queryString = "&" + addParam;
+			}
+		}
+
+		if (queryString == null) {
+			return requestURL.toString();
+		} else {
+			return requestURL.append('?').append(queryString).toString();
+		}
+	}
+
+	// extracts mime from this type of url: data:image/png;base64,[data...]
 	public static String getMimeFromDataUrl(String url) {
 		int colonIdx = url.indexOf(":");
 		int semiColonIdx = url.indexOf(";");
-		String mime = url.substring(colonIdx+1, semiColonIdx);
-		return mime; 
+		String mime = url.substring(colonIdx + 1, semiColonIdx);
+		return mime;
 	}
 
 	/**
@@ -74,9 +105,9 @@ public class Util {
 		try {
 			int timeout = 20;
 			RequestConfig config = RequestConfig.custom()//
-						.setConnectTimeout(timeout * 1000) //
-						.setConnectionRequestTimeout(timeout * 1000) //
-						.setSocketTimeout(timeout * 1000).build();
+					.setConnectTimeout(timeout * 1000) //
+					.setConnectionRequestTimeout(timeout * 1000) //
+					.setSocketTimeout(timeout * 1000).build();
 			HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 			HttpGet request = new HttpGet(url);
 			request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
@@ -100,22 +131,23 @@ public class Util {
 
 		// InputStream response = null;
 		// try {
-		// 	String url = "http://www.google.com";
-		// 	response = new URL(url).openStream();
+		// String url = "http://www.google.com";
+		// response = new URL(url).openStream();
 
-		// 	Scanner scanner = new Scanner(response);
-		// 	String responseBody = scanner.useDelimiter("\\A").next();
-		// 	System.out.println(
-		// 			responseBody.substring(responseBody.indexOf("<title>") + 7, responseBody.indexOf("</title>")));
+		// Scanner scanner = new Scanner(response);
+		// String responseBody = scanner.useDelimiter("\\A").next();
+		// System.out.println(
+		// responseBody.substring(responseBody.indexOf("<title>") + 7,
+		// responseBody.indexOf("</title>")));
 
 		// } catch (IOException ex) {
-		// 	ex.printStackTrace();
+		// ex.printStackTrace();
 		// } finally {
-		// 	try {
-		// 		response.close();
-		// 	} catch (IOException ex) {
-		// 		ex.printStackTrace();
-		// 	}
+		// try {
+		// response.close();
+		// } catch (IOException ex) {
+		// ex.printStackTrace();
+		// }
 		// }
 	}
 

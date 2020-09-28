@@ -66,7 +66,7 @@ export class App extends Div {
             ]))
         ]);
 
-        /* This is where we send an event that lets code hook into the render cycle to process whatever needs 
+        /* This is where we send an event that lets code hook into the render cycle to process whatever needs
         to be done AFTER the main render is complete, like doing scrolling for example */
         main.domUpdateEvent = () => {
             PubSub.pub(C.PUBSUB_mainWindowScroll);

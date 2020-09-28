@@ -31,6 +31,7 @@ import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.MailSender;
+import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoUtil;
@@ -111,6 +112,7 @@ import org.subnode.service.UserFeedService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
+import org.subnode.util.Util;
 
 /**
  * Primary Spring MVC controller. All application logic from the browser
@@ -707,7 +709,13 @@ public class AppController implements ErrorController {
 
 			@PathVariable(value = "id", required = false) String id, //
 			@RequestParam(value = "download", required = false) String download, //
-			HttpSession session, HttpServletResponse response) {
+
+			// gid is used ONLY for cache bustring so it can be the IPFS hash -or- the
+			// gridId, we don't know or care which it is.
+			@RequestParam(value = "gid", required = false) String gid, //
+			HttpSession session, //
+			HttpServletRequest req, //
+			HttpServletResponse response) {
 		try {
 
 			// Node Names are identified using a colon in front of it, to make it detectable
@@ -715,7 +723,7 @@ public class AppController implements ErrorController {
 				id = ":" + userName + ":" + nameOnUserNode;
 			} else if (!StringUtils.isEmpty(nameOnAdminNode)) {
 				id = ":" + nameOnAdminNode;
-			} 
+			}
 
 			if (id != null) {
 				String _id = id;
@@ -724,14 +732,36 @@ public class AppController implements ErrorController {
 					// whether this ID is even existing or not.
 					SubNode node = read.getNode(mongoSession, _id);
 
+					String _gid = gid;
+
+					// if no cachebuster gid was on url then redirect to a url that does have the gid
+					if (_gid == null) {
+						_gid = node.getStringProp(NodeProp.IPFS_LINK.s());
+						if (_gid == null) {
+							_gid = node.getStringProp(NodeProp.BIN.s());
+						}
+
+						if (_gid != null) {
+							try {
+								response.sendRedirect(Util.getFullURL(req, "gid=" + _gid));
+							} catch (Exception e) {
+								throw new RuntimeException("fail.");
+							}
+						}
+					}
+
+					if (_gid == null) {
+						throw new RuntimeException("No attachment data for node.");
+					}
+
 					if (node == null) {
 						log.debug("Node did not exist: " + _id);
 						throw new RuntimeException("Node not found.");
 					} else {
-						attachmentService.getBinary(mongoSession, node.getId().toHexString(), download != null, response);
+						attachmentService.getBinary(mongoSession, node, null, download != null, response);
 					}
 				});
-			} 
+			}
 		} catch (Exception e) {
 			// need to add some kind of message to exception to indicate to user something
 			// with the arguments went wrong.
@@ -760,13 +790,13 @@ public class AppController implements ErrorController {
 
 		if (token == null) {
 			callProc.run("bin", null, session, ms -> {
-				attachmentService.getBinary(null, nodeId, download != null, response);
+				attachmentService.getBinary(null, null, nodeId, download != null, response);
 				return null;
 			});
 		} else {
 			if (SessionContext.validToken(token)) {
 				adminRunner.run(mongoSession -> {
-					attachmentService.getBinary(mongoSession, nodeId, download != null, response);
+					attachmentService.getBinary(mongoSession, null, nodeId, download != null, response);
 				});
 			}
 		}
