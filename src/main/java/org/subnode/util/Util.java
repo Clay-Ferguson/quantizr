@@ -32,28 +32,24 @@ public class Util {
 	/*
 	 * If addParam is non null it's expected to be something like "param=val" and
 	 * will get added to any existing query string
-	 * 
-	 * todo-0: I grabbed this impl from online. Need to rewrite it, because it's not
-	 * really my style of coding.
 	 */
 	public static String getFullURL(HttpServletRequest request, String addParam) {
-		StringBuilder requestURL = new StringBuilder(request.getRequestURL().toString());
-		String queryString = request.getQueryString();
+		String url = request.getRequestURL().toString();
+		String query = request.getQueryString();
 
 		// append to queryString if necessary.
 		if (!StringUtils.isEmpty(addParam)) {
-			if (!StringUtils.isEmpty(queryString)) {
-				queryString += "&" + addParam;
-			}
-			else {
-				queryString = "&" + addParam;
+			if (!StringUtils.isEmpty(query)) {
+				query += "&" + addParam;
+			} else {
+				query = "&" + addParam;
 			}
 		}
 
-		if (queryString == null) {
-			return requestURL.toString();
+		if (query == null) {
+			return url;
 		} else {
-			return requestURL.append('?').append(queryString).toString();
+			return url + "?" + query;
 		}
 	}
 
