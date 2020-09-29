@@ -3,6 +3,7 @@ import { AppState } from "../AppState";
 import clientInfo from "../ClientInfo";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Div } from "./Div";
 import { FullScreenCalendar } from "./FullScreenCalendar";
@@ -13,6 +14,11 @@ import { Main } from "./Main";
 import { MainNavPanel } from "./MainNavPanel";
 import { RightNavPanel } from "./RightNavPanel";
 import { TabPanel } from "./TabPanel";
+
+let S: Singletons;
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
+    S = s;
+});
 
 export class App extends Div {
     tabPanel: TabPanel = null;
@@ -66,11 +72,20 @@ export class App extends Div {
             ]))
         ]);
 
-        /* This is where we send an event that lets code hook into the render cycle to process whatever needs
-        to be done AFTER the main render is complete, like doing scrolling for example */
-        main.domUpdateEvent = () => {
-            PubSub.pub(C.PUBSUB_mainWindowScroll);
-            PubSub.pub(C.PUBSUB_postMainWindowScroll);
-        };
+        if (main) {
+            /* This is where we send an event that lets code hook into the render cycle to process whatever needs
+            to be done AFTER the main render is complete, like doing scrolling for example */
+            main.domUpdateEvent = () => {
+                PubSub.pub(C.PUBSUB_mainWindowScroll);
+                PubSub.pub(C.PUBSUB_postMainWindowScroll);
+            };
+        }
+        else if (fullScreenViewer) {
+            // todo-0: this is a quick fix, this needs to be done consistently.
+            // need similar logic to the main tree here, which is "don't show until scroll complete"
+            setTimeout(() => {
+                S.view.docElm.scrollTop = 0;
+            }, 250);
+        }
     }
 }
