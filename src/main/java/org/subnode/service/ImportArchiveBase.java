@@ -129,7 +129,7 @@ public abstract class ImportArchiveBase {
 	 */
 	public void storeBinary(ArchiveEntry entry, InputStream zis, String fileName) {
 		String nodeId = fileUtils.stripExtension(fileName);
-		/* todo-0: need to retest whether an export actually INCLUDES IPFS file data
+		/* todo-1: need to retest whether an export actually INCLUDES IPFS file data
 		or just maintains a link to the IPFS data? This really needs to be an export option
 		that the user can specify, because it would be nice if there WERE a way for an export
 		to extract data out of IPFS and save it in the exported file */
@@ -142,11 +142,7 @@ public abstract class ImportArchiveBase {
 			}
 			Long length = node.getIntProp(NodeProp.BIN_SIZE.s());
 			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
-
-			int maxFileSize = Integer.MAX_VALUE;
-
-			// todo-0: get rid of this and just make it InputStream
-			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, maxFileSize);
+			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
 
 			// log.debug("Attaching binary to nodeId: " + node.getId().toHexString());
 			attachmentService.attachBinaryFromStream(session, node, null, fileName, length, lzis, mimeType, -1, -1,

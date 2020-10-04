@@ -81,11 +81,9 @@ export class App extends Div {
             };
         }
         else if (fullScreenViewer) {
-            // todo-0: this is a quick fix, this needs to be done consistently.
-            // need similar logic to the main tree here, which is "don't show until scroll complete"
-            setTimeout(() => {
+            fullScreenViewer.domUpdateEvent = () => {
                 S.view.docElm.scrollTop = 0;
-            }, 250);
+            };
         }
     }
 }

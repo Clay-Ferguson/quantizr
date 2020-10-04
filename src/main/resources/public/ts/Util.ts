@@ -1160,7 +1160,7 @@ export class Util implements UtilIntf {
         if (!node.name) return null;
 
         if (node.owner === "admin") {
-            return "/f/" + node.name; // todo-0: needs testing.
+            return "/f/" + node.name;
         }
         else {
             return "/f/" + node.owner + "/" + node.name;
