@@ -369,11 +369,11 @@ export class Render implements RenderIntf {
                                         }
                                     });
                                 },
-                                /* This delay has to be long enough to be sure scrolling has taken place already
-                                   I'm pretty sure this might work even at 100ms or less on most machines, but I'm leaving room for slower
-                                   browsers, because it's critical that this be long enough, but not long enough to be noticeable.
-                                */
-                                300);
+                                    /* This delay has to be long enough to be sure scrolling has taken place already
+                                       I'm pretty sure this might work even at 100ms or less on most machines, but I'm leaving room for slower
+                                       browsers, because it's critical that this be long enough, but not long enough to be noticeable.
+                                    */
+                                    300);
                             });
                         }
                         else {
@@ -418,7 +418,6 @@ export class Render implements RenderIntf {
 
     The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
     */
-
     createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, state: AppState): Comp => {
         let pasteInlineButton: Button = null;
 

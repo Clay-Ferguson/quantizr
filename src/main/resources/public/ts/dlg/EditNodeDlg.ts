@@ -237,12 +237,12 @@ export class EditNodeDlg extends DialogBase {
         let selectionsBar = new FormInline(null, [
             state.node.hasChildren ? this.createLayoutSelection() : null,
             state.node.hasChildren ? this.createImgSizeSelection("Images", true, //
-                new PropValueHolder(this.getState().node, J.NodeProp.CHILDREN_IMG_SIZES, "0")) : null,
+                new PropValueHolder(this.getState().node, J.NodeProp.CHILDREN_IMG_SIZES, "n")) : null,
             this.createPrioritySelection()
         ]);
 
         let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, //
-            new PropValueHolder(this.getState().node, J.NodeProp.IMG_SIZE, "0")) : null;
+            new PropValueHolder(this.getState().node, J.NodeProp.IMG_SIZE, "100%")) : null;
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
         let propsTable = null;

@@ -105,12 +105,21 @@ export class NodeCompVerticalRowLayout extends Div {
         }
 
         if (allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
-            comps.push(new IconButton("fa-plus", null, {
-                onClick: e => {
-                    S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
-                },
-                title: "Insert new node here"
-            }, "btn-sm btn-secondary marginTop marginLeft"));
+            let attribs = {};
+            if (state.userPreferences.editMode) {
+                S.render.setNodeDropHandler(attribs, lastNode, false, state);
+            }
+
+            let div = new Div(null, attribs, [
+                new IconButton("fa-plus", null, {
+                    onClick: e => {
+                        S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                    },
+                    title: "Insert new node here"
+                }, "btn-sm btn-secondary marginTop marginLeft")
+            ]);
+
+            comps.push(div);
         }
 
         this.setChildren(comps);

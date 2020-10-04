@@ -1278,22 +1278,22 @@ export class Util implements UtilIntf {
         };
 
         attribs.onDragOver = function (event) {
-            // console.log("onDragOver: id="+event.target.id);
+            // console.log("onDragOver: id=" + event.target.id);
             event.preventDefault();
             event.dataTransfer.dropEffect = "copy"; // See the section on the DataTransfer object.
-            event.target.style.border = "2px solid green";
+            event.target.style.borderTop = "4px solid green";
         };
 
         attribs.onDragLeave = function (event) {
             event.preventDefault();
-            event.target.style.border = nonDragBorder;
+            event.target.style.borderTop = "4px solid transparent";
         };
 
         attribs.onDrop = function (event) {
             // console.log("onDrop: id="+event.target.id);
             event.stopPropagation();
             event.preventDefault();
-            event.target.style.border = nonDragBorder;
+            event.target.style.borderTop = "4px solid transparent";
             func(event);
         };
     }

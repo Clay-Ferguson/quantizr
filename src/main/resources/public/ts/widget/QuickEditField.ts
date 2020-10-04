@@ -63,9 +63,11 @@ export class QuickEditField extends Span {
 
         if (!state.isEditing) {
             let clickDiv = new Span("", {
-                className: "clickToEdit",
-                title: "Insert new node",
-                onClick: this.startEditing
+                /* We don't currently support clicking in between a node to insert there, but I want to keep
+                 that old functionality intact, in case it's useful again. */
+                // className: "clickToEdit",
+                // title: "Insert new node",
+                // onClick: this.startEditing
             });
             this.setChildren([clickDiv]);
         }

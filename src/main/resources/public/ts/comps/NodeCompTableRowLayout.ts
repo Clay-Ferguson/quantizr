@@ -133,12 +133,21 @@ export class NodeCompTableRowLayout extends Div {
         }
 
         if (allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
-            children.push(new IconButton("fa-plus", null, {
-                onClick: e => {
-                    S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
-                },
-                title: "Insert new node here"
-            }, "btn-sm btn-secondary marginTop marginLeft"));
+            let attribs = {};
+            if (state.userPreferences.editMode) {
+                S.render.setNodeDropHandler(attribs, lastNode, false, state);
+            }
+
+            let div = new Div(null, attribs, [
+                new IconButton("fa-plus", null, {
+                    onClick: e => {
+                        S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                    },
+                    title: "Insert new node here"
+                }, "btn-sm btn-secondary marginTop marginLeft")
+            ]);
+
+            children.push(div);
         }
 
         this.setChildren(children);
