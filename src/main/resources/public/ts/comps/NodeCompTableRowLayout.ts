@@ -80,12 +80,12 @@ export class NodeCompTableRowLayout extends Div {
                     console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
                 }
 
-                if (allowInsert && !state.isAnonUser && state.userPreferences.editMode && !!state.nodesToMove && (S.props.isMine(n, state)) && rowCount === 0 && this.level === 1) {
+                let userCanPaste = S.props.isMine(n, state) || state.isAdminUser || n.id === state.homeNodeId;
+                if (allowInsert && !state.isAnonUser && state.userPreferences.editMode && !!state.nodesToMove && userCanPaste && rowCount === 0 && this.level === 1) {
                     children.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
                 }
 
                 let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
-
                 let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
 
                 // special case where we aren't in edit mode, and we run across a markdown type with blank content AND no attachment, then don't even render it.
@@ -104,7 +104,7 @@ export class NodeCompTableRowLayout extends Div {
                     comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
                 }
 
-                if (allowInsert && !state.isAnonUser && state.userPreferences.editMode && !!state.nodesToMove && (S.props.isMine(n, state)) && this.level === 1) {
+                if (allowInsert && !state.isAnonUser && state.userPreferences.editMode && !!state.nodesToMove && userCanPaste && this.level === 1) {
                     comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount === countToDisplay, state));
                     // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     comps.push(new Div(null, { className: "clearfix" }));

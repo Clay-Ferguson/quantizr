@@ -421,7 +421,9 @@ export class Render implements RenderIntf {
     createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, state: AppState): Comp => {
         let pasteInlineButton: Button = null;
 
-        if (!state.isAnonUser && !!state.nodesToMove && (S.props.isMine(node, state) || node.id === state.homeNodeId)) {
+        let userCanPaste = S.props.isMine(node, state) || state.isAdminUser || node.id === state.homeNodeId;
+
+        if (!state.isAnonUser && !!state.nodesToMove && userCanPaste) {
 
             // console.log("pasteSelButton: node.id=" + node.id + " isFirst=" + isFirst);
 

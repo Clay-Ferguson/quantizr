@@ -70,7 +70,8 @@ export class NodeCompVerticalRowLayout extends Div {
                     console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
                 }
 
-                if (allowInsert && !state.isAnonUser && state.userPreferences.editMode && !!state.nodesToMove && S.props.isMine(n, state) && this.level === 1 && rowCount === 0) {
+                let userCanPaste = S.props.isMine(n, state) || state.isAdminUser || n.id === state.homeNodeId;
+                if (allowInsert && !state.isAnonUser && state.userPreferences.editMode && !!state.nodesToMove && userCanPaste && this.level === 1 && rowCount === 0) {
                     comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
                     // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     comps.push(new Div(null, { className: "clearfix" }));
@@ -96,7 +97,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
                 }
 
-                if (allowInsert && !state.isAnonUser && state.userPreferences.editMode && !!state.nodesToMove && S.props.isMine(n, state) && this.level === 1) {
+                if (allowInsert && !state.isAnonUser && state.userPreferences.editMode && !!state.nodesToMove && userCanPaste && this.level === 1) {
                     comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount === countToDisplay, state));
                     // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
                     comps.push(new Div(null, { className: "clearfix" }));

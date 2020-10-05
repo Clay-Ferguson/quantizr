@@ -24,7 +24,7 @@ export class UserFeedTypeHandler extends TypeBase {
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
         case NodeActionType.addChild:
-            return S.props.isMine(node, appState);
+            return S.props.isMine(node, appState) || appState.isAdminUser;
         case NodeActionType.editNode:
             return false;
         default:
