@@ -4,7 +4,8 @@ import { Div } from "./Div";
 
 export class Menu extends Div {
 
-    static activeMenu: string = "Messaging";
+    // This can auto expand any menu, but I'm setting to null, to disable, becasue I decided I kinda don't like it.
+    static activeMenu: string = null; // "Social";
 
     constructor(public name: string, public menuItems: CompIntf[]) {
         super(null, {
@@ -20,6 +21,7 @@ export class Menu extends Div {
         this.setChildren([
             new Div(this.name, {
                 className: "card-header menuHeading mb-0",
+                "aria-expanded": Menu.activeMenu === this.name ? "true" : "false",
                 "data-toggle": "collapse",
                 // "data-target": "#collapse" + this.getId(),
                 href: "#collapse" + this.getId(),
@@ -40,7 +42,7 @@ export class Menu extends Div {
                 "data-parent": "#accordion"
             }, [
                 new Div(null, {
-                    className: "card-body"
+                    className: "card-body menuCardBody"
                 }, [
                     new Div(null, {
                         className: "list-group flex-column"
