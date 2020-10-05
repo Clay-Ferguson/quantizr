@@ -530,10 +530,10 @@ public class MongoUtil {
 				"Public Home", null, true, null, created);
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 
-		created = new ValContainer<>();
-		SubNode userGuide = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "userguide",
-				"User Guide", null, true, null, created);
-		log.debug("UserGuide Node exists at id: " + userGuide.getId());
+		// created = new ValContainer<>();
+		// SubNode userGuide = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "userguide",
+		// 		"User Guide", null, true, null, created);
+		// log.debug("UserGuide Node exists at id: " + userGuide.getId());
 
 		/* Ensure Content folder is created and synced to file system */
 		// SubNodePropertyMap props = new SubNodePropertyMap();

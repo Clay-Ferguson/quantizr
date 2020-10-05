@@ -1269,31 +1269,33 @@ export class Util implements UtilIntf {
 
     // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
     setDropHandler = (attribs: any, func: (elm: any) => void): void => {
-
+        // console.log("setDropHandler: nodeId=" + attribs.id);
         const nonDragBorder = "";
 
         attribs.onDragEnter = function (event) {
-            // console.log("onDragEnter: id="+event.target.id);
+            event.stopPropagation();
             event.preventDefault();
         };
 
         attribs.onDragOver = function (event) {
-            // console.log("onDragOver: id=" + event.target.id);
+            event.stopPropagation();
             event.preventDefault();
+            // console.log("onDragOver: id=" + event.target.id);
             event.dataTransfer.dropEffect = "copy"; // See the section on the DataTransfer object.
-            event.target.style.borderTop = "4px solid green";
+            event.currentTarget.style.borderTop = "4px solid green";
         };
 
         attribs.onDragLeave = function (event) {
+            event.stopPropagation();
             event.preventDefault();
-            event.target.style.borderTop = "4px solid transparent";
+            event.currentTarget.style.borderTop = "4px solid transparent";
         };
 
         attribs.onDrop = function (event) {
             // console.log("onDrop: id="+event.target.id);
             event.stopPropagation();
             event.preventDefault();
-            event.target.style.borderTop = "4px solid transparent";
+            event.currentTarget.style.borderTop = "4px solid transparent";
             func(event);
         };
     }

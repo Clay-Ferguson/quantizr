@@ -92,7 +92,7 @@ export class Render implements RenderIntf {
 
     setNodeDropHandler = (attribs: any, node: J.NodeInfo, isFirst: boolean, state: AppState): void => {
         if (!node) return;
-        // console.log("Setting drop handler: id="+node.id);
+        // console.log("Setting drop handler: nodeId=" + node.id + " attribs.id=" + attribs.id);
 
         S.util.setDropHandler(attribs, (evt: DragEvent) => {
             const data = evt.dataTransfer.items;

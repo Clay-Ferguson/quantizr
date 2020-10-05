@@ -89,6 +89,11 @@ export class NodeCompRow extends Div {
             header = new NodeCompRowHeader(node, false);
         }
 
+        // if editMode is on, an this isn't the page root node
+        if (state.userPreferences.editMode && this.node.id !== state.node.id) {
+            S.render.setNodeDropHandler(this.attribs, this.node, true, state);
+        }
+
         this.setChildren([
             header,
             buttonBar,

@@ -38,18 +38,6 @@ export class NodeCompContent extends Div {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
 
-        // BEWARE: For some unknown reason if I try to put this drop handling in "NodeCompRow" where I'd rather have it,
-        // it ends up getting applied to the buttonbar AND the content I guess somehow becasue the attributes must be somehow
-        // shared so for now I'm sticking this here, becasue it still makes sense that dropping over content and that will work for now.
-
-        // if editMode is on, an this isn't the page root node
-        if (state.userPreferences.editMode && this.node.id !== state.node.id) {
-            S.render.setNodeDropHandler(this.attribs, this.node, true, state);
-        }
-        else {
-            S.util.resetDropHandler(this.attribs);
-        }
-
         if (!node) {
             this.setChildren(null);
             return;

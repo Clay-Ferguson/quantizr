@@ -19,7 +19,6 @@ import org.subnode.request.NodeSearchRequest;
 import org.subnode.response.GetSharedNodesResponse;
 import org.subnode.response.NodeSearchResponse;
 import org.subnode.util.Convert;
-import org.subnode.util.DateUtil;
 import org.subnode.util.ThreadLocals;
 
 /**
@@ -36,8 +35,6 @@ import org.subnode.util.ThreadLocals;
 @Component
 public class NodeSearchService {
 	private static final Logger log = LoggerFactory.getLogger(NodeSearchService.class);
-	private SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE,
-			DateUtil.DATE_FORMAT_LOCALE);
 
 	@Autowired
 	private MongoRead read;
