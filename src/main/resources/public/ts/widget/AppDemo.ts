@@ -8,11 +8,6 @@ import { CompDemo } from "./CompDemo";
 import { Div } from "./Div";
 import { HorizontalLayout } from "./HorizontalLayout";
 
-// let S: Singletons;
-// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-//     S = ctx;
-// });
-
 export class AppDemo extends Div {
 
     constructor() {

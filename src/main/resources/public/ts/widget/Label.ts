@@ -1,11 +1,6 @@
 import { ReactNode } from "react";
 import { Comp } from "./base/Comp";
 
-// let S: Singletons;
-// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-//     S = ctx;
-// });
-
 export class Label extends Comp {
 
     constructor(content: string = "", attribs: Object = {}) {

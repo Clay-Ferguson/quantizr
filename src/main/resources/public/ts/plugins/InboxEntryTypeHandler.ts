@@ -3,11 +3,6 @@ import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 
-// let S: Singletons;
-// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-//     S = ctx;
-// });
-
 export class InboxEntryTypeHandler extends TypeBase {
     constructor() {
         super(J.NodeType.INBOX_ENTRY, "Inbox Entry", "fa-envelope", false);

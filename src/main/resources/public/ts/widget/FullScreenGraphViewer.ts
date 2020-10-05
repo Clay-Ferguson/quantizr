@@ -1,11 +1,6 @@
 import { Div } from "./Div";
 import { Main } from "./Main";
 
-// let S: Singletons;
-// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-//     S = ctx;
-// });
-
 export class FullScreenGraphViewer extends Main {
 
     preRender(): void {

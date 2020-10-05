@@ -7,11 +7,6 @@ import { HorizontalLayout } from "./HorizontalLayout";
 import { ListBoxRow } from "./ListBoxRow";
 import { Span } from "./Span";
 
-// let S: Singletons;
-// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-//     S = ctx;
-// });
-
 export class EditPrivsTableRow extends ListBoxRow {
 
     constructor(public aclEntry: J.AccessControlInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {

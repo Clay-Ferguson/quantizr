@@ -5,15 +5,10 @@ import { Heading } from "../widget/Heading";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { TypeBase } from "./base/TypeBase";
 
-// let S: Singletons;
-// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-//     S = ctx;
-// });
-
 export class RepoRootTypeHandler extends TypeBase {
 
     constructor() {
-        super(J.NodeType.REPO_ROOT, "Repository Root", "fa-home", false);
+        super(J.NodeType.REPO_ROOT, "Root", "fa-home", false);
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {
@@ -22,7 +17,7 @@ export class RepoRootTypeHandler extends TypeBase {
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
         return new HorizontalLayout([
-            new Heading(4, "Repository Root", {
+            new Heading(4, "Root", {
                 className: "marginAll"
             })
         ]);

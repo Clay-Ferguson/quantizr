@@ -5,11 +5,6 @@ import { Div } from "./Div";
 // https://github.com/visjs/vis-network
 //      npm install vis-network
 
-// let S: Singletons;
-// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-//     S = ctx;
-// });
-
 export class GraphPanel extends Div {
 
     // temporarily removed

@@ -3,11 +3,6 @@ import { FriendInfo } from "../JavaIntf";
 import { FriendsTableRow } from "./FriendsTableRow";
 import { ListBox } from "./ListBox";
 
-// let S: Singletons;
-// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-//     S = ctx;
-// });
-
 export class FriendsTable extends ListBox {
 
     constructor(public friends: FriendInfo[], valueIntf: ValueIntf) {

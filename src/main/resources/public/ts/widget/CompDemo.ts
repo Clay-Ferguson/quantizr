@@ -7,11 +7,6 @@ import { CompDemoButton } from "./CompDemoButton";
 import { Div } from "./Div";
 import { Textarea } from "./Textarea";
 
-// let S: Singletons;
-// PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-//     S = ctx;
-// });
-
 export class CompDemo extends Div {
     textarea: I.TextEditorIntf;
 
