@@ -170,7 +170,7 @@ export class MenuPanel extends Div {
                 state.isAdminUser && exportFeatureEnabled && (selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id))) //
         ]));
 
-        children.push(new Menu("Encryption", [
+        children.push(new Menu("Encrypt", [
             new MenuItem("Show Keys", () => { new ManageEncryptionKeysDlg(state).open(); }, !state.isAnonUser), //
             new MenuItem("Generate Keys", () => { S.util.generateNewCryptoKeys(state); }, !state.isAnonUser), //
             new MenuItem("Publish Keys", () => { S.encryption.initKeys(false, true); }, !state.isAnonUser), //
