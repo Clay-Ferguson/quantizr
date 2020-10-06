@@ -73,14 +73,14 @@ public class SubNodeUtil {
 	// todo-1: everywhere this is called can we be sure the path is not actually
 	// used as a lookup, but instead the node name?
 	// The new design has path as a non-named hierarchy-only aspect.
-	public SubNode ensureNodeExists(MongoSession session, String parentPath, String name, String defaultContent,
+	public SubNode ensureNodeExists(MongoSession session, String parentPath, String pathName, String nodeName, String defaultContent,
 			String primaryTypeName, boolean saveImmediate, SubNodePropertyMap props, ValContainer<Boolean> created) {
 		if (!parentPath.endsWith("/")) {
 			parentPath += "/";
 		}
 
 		// log.debug("Looking up node by path: "+(parentPath+name));
-		SubNode node = read.getNode(session, fixPath(parentPath + name));
+		SubNode node = read.getNode(session, fixPath(parentPath + pathName));
 		if (node != null) {
 			if (created != null) {
 				created.setVal(false);
@@ -92,7 +92,7 @@ public class SubNodeUtil {
 			created.setVal(true);
 		}
 
-		List<String> nameTokens = XString.tokenize(name, "/", true);
+		List<String> nameTokens = XString.tokenize(pathName, "/", true);
 		if (nameTokens == null) {
 			return null;
 		}
@@ -136,6 +136,10 @@ public class SubNodeUtil {
 				update.save(session, parent);
 			}
 			parentPath += nameToken + "/";
+		}
+
+		if (nodeName != null) {
+			parent.setName(nodeName);
 		}
 
 		if (defaultContent != null) {

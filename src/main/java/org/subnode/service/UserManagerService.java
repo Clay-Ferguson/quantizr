@@ -189,8 +189,7 @@ public class UserManagerService {
 			sessionContext.setLastLoginTime(now.getTime());
 			userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), now.getTime());
 
-			ensureValidCryptoKeys(userNode);
-
+			// ensureValidCryptoKeys(userNode);
 			update.save(session, userNode);
 
 			res.setSuccess(true);
@@ -212,25 +211,29 @@ public class UserManagerService {
 		return res;
 	}
 
-	/* Creates crypto key properties if not already existing */
-	public void ensureValidCryptoKeys(SubNode userNode) {
-		try {
-			String publicKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
-			if (publicKey == null) {
-				KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-				kpg.initialize(2048);
-				KeyPair pair = kpg.generateKeyPair();
+	/* Creates crypto key properties if not already existing 
+	
+	no longer used.
+	*/
+	// public void ensureValidCryptoKeys(SubNode userNode) {
+	// 	try {
+	// 		String publicKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
+	// 		if (publicKey == null) {
+	// 			KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+	// 			kpg.initialize(2048);
+	// 			KeyPair pair = kpg.generateKeyPair();
 
-				publicKey = Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
-				String privateKey = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
+	// 			publicKey = Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
+	// 			String privateKey = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
 
-				userNode.setProp(NodeProp.CRYPTO_KEY_PUBLIC.s(), publicKey);
-				userNode.setProp(NodeProp.CRYPTO_KEY_PRIVATE.s(), privateKey);
-			}
-		} catch (Exception e) {
-			log.error("failed creating crypto keys", e);
-		}
-	}
+	// 			//todo-0: these keys are obsolete/unused right? Because currently all the encryption should be happening in the browser only.
+	// 			userNode.setProp(NodeProp.CRYPTO_KEY_PUBLIC.s(), publicKey);
+	// 			userNode.setProp(NodeProp.CRYPTO_KEY_PRIVATE.s(), privateKey);
+	// 		}
+	// 	} catch (Exception e) {
+	// 		log.error("failed creating crypto keys", e);
+	// 	}
+	// }
 
 	public String getInboxNotification(MongoSession session) {
 		String userName = sessionContext.getUserName();

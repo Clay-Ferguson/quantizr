@@ -107,8 +107,9 @@ public enum NodeProp {
     LAST_LOGIN_TIME("sn:lastLogin", "s"), //
     LAST_INBOX_NOTIFY_TIME("sn:lastInboxNotify", "s"), //
 
-    CRYPTO_KEY_PUBLIC("sn:cryptoKeyPublic", "s"), //
-    CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate", "s"), //
+    // no longer used: all encryption handled on browser now.
+    // CRYPTO_KEY_PUBLIC("sn:cryptoKeyPublic", "s"), //
+    // CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate", "s"), //
 
     // amount of bytes the user is ALLOWED to save.
     BIN_QUOTA("sn:binQuota", "s"), //

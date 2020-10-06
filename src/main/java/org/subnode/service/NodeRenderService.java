@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.subnode.AppController;
 import org.subnode.config.AppProp;
 import org.subnode.config.ConstantsProvider;
+import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
@@ -101,8 +102,12 @@ public class NodeRenderService {
 		}
 
 		if (node == null) {
-			log.debug("nodeId not found: " + targetId + " seding user to :public instead");
+			log.debug("nodeId not found: " + targetId + " sending user to :public instead");
 			node = read.getNode(session, appProp.getUserLandingPageNode());
+
+			if (node == null) {
+				node = read.getNode(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC + "/home");
+			}
 		}
 
 		if (node == null) {
@@ -483,7 +488,8 @@ public class NodeRenderService {
 	 * 
 	 * Returns true if there was a node at 'nodeName' and false otherwise.
 	 */
-	public boolean /*WARNING: this method name exists in docs*/ thymeleafRenderNode(HashMap<String, String> model, String nodeName) {
+	public boolean /* WARNING: this method name exists in docs */ thymeleafRenderNode(HashMap<String, String> model,
+			String nodeName) {
 		MongoSession session = auth.getAdminSession();
 		boolean ret = false;
 

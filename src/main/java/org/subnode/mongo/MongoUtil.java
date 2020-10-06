@@ -492,7 +492,7 @@ public class MongoUtil {
 
 		SubNode adminNode = read.getUserNodeByUserName(auth.getAdminSession(), adminUser);
 		if (adminNode == null) {
-			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, "Repository Root", NodeType.REPO_ROOT.s(),
+			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(),
 					true, null, null);
 
 			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
@@ -501,9 +501,9 @@ public class MongoUtil {
 			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 			update.save(session, adminNode);
 
-			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, "Root of All Users", null, true, null,
+			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null,
 					null);
-			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.OUTBOX, "System Email Outbox", null, true,
+			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.OUTBOX, null, "System Email Outbox", null, true,
 					null, null);
 		}
 
@@ -513,7 +513,7 @@ public class MongoUtil {
 	public void createPublicNodes(MongoSession session) {
 		log.debug("creating PublicNodes");
 		ValContainer<Boolean> created = new ValContainer<>();
-		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, "Public", null,
+		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null,
 				true, null, created);
 
 		if (created.getVal()) {
@@ -526,8 +526,9 @@ public class MongoUtil {
 		 * initialize these two nodes (landing page, and userguide)
 		 */
 		created = new ValContainer<>();
-		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "home",
+		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "home", "home",
 				"Public Home", null, true, null, created);
+			
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 
 		// created = new ValContainer<>();
