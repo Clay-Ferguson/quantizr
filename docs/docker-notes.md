@@ -1,4 +1,4 @@
-## Docker Install
+## Docker
 
 ### Installing Docker on Ubuntu 20.04
 
@@ -71,4 +71,27 @@ After the cleanup below we *might* (i'm not sure) need to run this again:
 -a: for all containers, even not running, (or images)
 
 -q: to remove all the details other than the ID of containers (or images)
+
+### Docker Maintenance
+
+### Docker Disk Space Usage
+
+Docker tends to fill up a hard drive by keeping too many images here:
+
+```
+/var/lib/docker/overlay2
+```
+
+Here's how to clean it up, by deleting files that are not needed:
+
+```sh
+# check disk space
+df -h
+
+sudo -i
+
+docker image prune --all
+
+docker system prune -a
+```
 
