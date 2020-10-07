@@ -2,6 +2,7 @@ import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
+import { ValueIntf } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
@@ -13,6 +14,7 @@ import { Form } from "../widget/Form";
 import { Img } from "../widget/Img";
 import { Label } from "../widget/Label";
 import { Textarea } from "../widget/Textarea";
+import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
@@ -24,15 +26,23 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ProfileDlg extends DialogBase {
 
     userNameTextField: TextField;
-    bioTextarea: Textarea;
+    bioValueIntf: ValueIntf;
 
-    constructor(state: AppState) {
+    constructor(state: AppState, private readOnly: boolean, private userId: string) {
         super("Profile: " + state.userName, null, false, state);
     }
 
     renderDlg(): CompIntf[] {
-        // let state = this.getState();
         let profileImg: CompIntf = this.makeProfileImg();
+
+        this.bioValueIntf = {
+            getValue: () => {
+                return this.getState().defaultBio;
+            },
+            setValue: (val: any) => {
+                this.mergeState({ defaultBio: val });
+            }
+        };
 
         let children = [
             new Form(null, [
@@ -52,23 +62,18 @@ export class ProfileDlg extends DialogBase {
                             //         this.mergeState({ defaultUserName: val });
                             //     }
                             // }),
-                            this.bioTextarea = new Textarea("Bio", {
-                                rows: 15
-                            }, {
-                                getValue: () => {
-                                    return this.getState().defaultBio;
-                                },
-                                setValue: (val: any) => {
-                                    this.mergeState({ defaultBio: val });
-                                }
-                            })
+                            this.readOnly
+                                ? new Div(this.bioValueIntf.getValue())
+                                : new Textarea("Bio", {
+                                    rows: 15
+                                }, this.bioValueIntf)
                         ])
                     ]),
 
                     new Div(null, {
                         className: "col-6"
                     }, [
-                        new Div(null, null, [
+                        this.readOnly ? null : new Div(null, null, [
                             new Label("Profile Picture")
                         ]),
                         profileImg
@@ -82,8 +87,8 @@ export class ProfileDlg extends DialogBase {
                         className: "col-12"
                     }, [
                         new ButtonBar([
-                            new Button("Save", this.save, null, "btn-primary"),
-                            new Button("Cancel", () => {
+                            this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
+                            new Button(this.readOnly ? "Close" : "Cancel", () => {
                                 this.close();
                             })
                         ], null, "marginTop")
@@ -110,6 +115,7 @@ export class ProfileDlg extends DialogBase {
     reload(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                userId: this.userId
             }, (res: J.GetUserProfileResponse): void => {
                 if (res) {
                     this.mergeState({
@@ -127,7 +133,7 @@ export class ProfileDlg extends DialogBase {
     save = (): void => {
         S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null, // this.userNameTextField.getValue(),
-            userBio: this.bioTextarea.getValue()
+            userBio: this.bioValueIntf.getValue()
         }, this.saveResponse);
     }
 
@@ -156,9 +162,12 @@ export class ProfileDlg extends DialogBase {
         let src: string = S.render.getAvatarImgUrl(this.appState.homeNodeId, avatarVer);
 
         let onClick = (evt) => {
+            if (this.readOnly) return;
+
             let dlg = new UploadFromFileDropzoneDlg(state.userNodeId, null, false, null, false, this.appState, () => {
 
                 S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                    userId: this.userId
                 }, (res: J.GetUserProfileResponse): void => {
                     if (res) {
                         this.mergeState({
@@ -178,7 +187,7 @@ export class ProfileDlg extends DialogBase {
         if (src) {
             // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
             let img: Img = new Img("profile-img", {
-                className: "profileImage",
+                className: this.readOnly ? "readOnlyProfileImage" : "profileImage",
                 title: "Click to upload new Profile Image",
                 src,
                 onClick

@@ -211,28 +211,32 @@ public class UserManagerService {
 		return res;
 	}
 
-	/* Creates crypto key properties if not already existing 
-	
-	no longer used.
-	*/
+	/*
+	 * Creates crypto key properties if not already existing
+	 * 
+	 * no longer used.
+	 */
 	// public void ensureValidCryptoKeys(SubNode userNode) {
-	// 	try {
-	// 		String publicKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
-	// 		if (publicKey == null) {
-	// 			KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-	// 			kpg.initialize(2048);
-	// 			KeyPair pair = kpg.generateKeyPair();
+	// try {
+	// String publicKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
+	// if (publicKey == null) {
+	// KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+	// kpg.initialize(2048);
+	// KeyPair pair = kpg.generateKeyPair();
 
-	// 			publicKey = Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
-	// 			String privateKey = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
+	// publicKey =
+	// Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
+	// String privateKey =
+	// Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
 
-	// 			//todo-0: these keys are obsolete/unused right? Because currently all the encryption should be happening in the browser only.
-	// 			userNode.setProp(NodeProp.CRYPTO_KEY_PUBLIC.s(), publicKey);
-	// 			userNode.setProp(NodeProp.CRYPTO_KEY_PRIVATE.s(), privateKey);
-	// 		}
-	// 	} catch (Exception e) {
-	// 		log.error("failed creating crypto keys", e);
-	// 	}
+	// //todo-0: these keys are obsolete/unused right? Because currently all the
+	// encryption should be happening in the browser only.
+	// userNode.setProp(NodeProp.CRYPTO_KEY_PUBLIC.s(), publicKey);
+	// userNode.setProp(NodeProp.CRYPTO_KEY_PRIVATE.s(), privateKey);
+	// }
+	// } catch (Exception e) {
+	// log.error("failed creating crypto keys", e);
+	// }
 	// }
 
 	public String getInboxNotification(MongoSession session) {
@@ -647,7 +651,15 @@ public class UserManagerService {
 		final String userName = sessionContext.getUserName();
 
 		adminRunner.run(session -> {
-			SubNode userNode = read.getUserNodeByUserName(session, userName);
+			SubNode userNode = null;
+
+			if (req.getUserId() == null) {
+				userNode = read.getUserNodeByUserName(session, userName);
+			}
+			else {
+				userNode = read.getNode(session, req.getUserId(), false);
+			}
+
 			if (userNode != null) {
 				res.setUserName(userNode.getStringProp(NodeProp.USER.s()));
 				res.setUserBio(userNode.getStringProp(NodeProp.USER_BIO.s()));

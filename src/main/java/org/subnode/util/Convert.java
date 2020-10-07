@@ -106,6 +106,10 @@ public class Convert {
 		} else {
 			nameProp = userNode.getStringProp(NodeProp.USER.s());
 			avatarVer = userNode.getStringProp(NodeProp.BIN.s());
+
+			/* todo-1: right here, get user profile off 'userNode', and put it into a map that will be sent back to client
+			packaged in this response, so that tooltip on the browser can display it, and the browser will simply contain this 
+			same 'map' that maps userIds to profile text, for good performance. */
 		}
 
 		String owner = userNode == null ? PrincipalName.ADMIN.s() : nameProp;

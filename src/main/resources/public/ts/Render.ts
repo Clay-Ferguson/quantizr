@@ -6,6 +6,7 @@ import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comps/NodeCompVerticalRowLayout";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
+import { ProfileDlg } from "./dlg/ProfileDlg";
 import { NodeActionType } from "./enums/NodeActionType";
 import { RenderIntf } from "./intf/RenderIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
@@ -513,16 +514,15 @@ export class Render implements RenderIntf {
         const img: Img = new Img(key, {
             src,
             className: "avatarImage",
-            title: "Node owned by: " + node.owner
 
-            // I decided not to let avatars be clickable.
-            // onClick: (evt) => {
-            //     dispatch({
-            //         type: "Action_ClickImage", state,
-            //         update: (s: AppState): void => {
-            //         },
-            //     });
-            // }
+            // todo-1: need to make server include after '\n\n' the user profile text of the user but first
+            // 1) consider performance on server, and number of queries cost
+            // 2) and also we would need to limit to a max number of characters that's like a small paragrah
+            title: "User: " + node.owner + "\n\nClick for Bio",
+
+            onClick: (evt) => {
+                new ProfileDlg(state, true, node.ownerId).open();
+            }
         });
 
         return img;

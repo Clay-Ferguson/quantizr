@@ -95,6 +95,7 @@ export interface GetUserAccountInfoRequest extends RequestBase {
 }
 
 export interface GetUserProfileRequest extends RequestBase {
+    userId: string;
 }
 
 export interface GraphRequest extends RequestBase {

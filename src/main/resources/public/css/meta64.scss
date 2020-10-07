@@ -177,6 +177,14 @@ $smallBorderSize: 3px;
     border: 6px dotted $nodeBorderBottomColor;
 }
 
+.readOnlyProfileImage {
+    border-radius: $borderRadiusLarge;
+    width: 300px;
+    cursor: pointer;
+    padding: 8px;
+    border: 1px solid $nodeBorderBottomColor;
+}
+
 .friendImage {
     width: 200px;
     cursor: pointer;
