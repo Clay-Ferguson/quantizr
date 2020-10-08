@@ -10,6 +10,7 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { EventInput } from "@fullcalendar/react";
+import * as marked from "marked";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -1326,5 +1327,16 @@ export class Util implements UtilIntf {
         });
 
         return ret;
+    }
+
+    markdown = (val: string): any => {
+        val = marked(val);
+
+        // the marked adds a 'p tag' wrapping we don't need so we remove it just to speed up DOM as much as possible
+        val = val.trim();
+        val = S.util.stripIfStartsWith(val, "<p>");
+        val = S.util.stripIfEndsWith(val, "</p>");
+
+        return val;
     }
 }

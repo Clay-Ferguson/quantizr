@@ -32,7 +32,7 @@ export class NodeCompMarkdown extends MarkdownDiv {
         // Set the content display to wider if there is a code block. This makes the non-code text also wrap at a wider
         // width but we have to tolerate that for now, becasue there's not a cleaner 'easy' solution.
         let widthStyle = node.content && node.content.indexOf("```") !== 1 ? "content-medium" : "content-narrow";
-        this.attribs.className = "markdown-content markdown-html " + widthStyle;
+        this.attribs.className = "markdown-content " + widthStyle;
 
         if (this.appState.userPreferences.editMode && node.owner === appState.userName) {
             let hltNode = S.meta64.getHighlightedNode(appState);
@@ -108,14 +108,7 @@ export class NodeCompMarkdown extends MarkdownDiv {
             //     content = content.replace(S.srch.searchText, "**_" + S.srch.searchText + "_**");
             // }
 
-            // Do the actual markdown rendering here.
-            val = marked(content);
-
-            // the marked adds a 'p tag' wrapping we don't need so we remove it just to speed up DOM as much as possible
-            val = val.trim();
-            val = S.util.stripIfStartsWith(val, "<p>");
-            val = S.util.stripIfEndsWith(val, "</p>");
-            // console.log("MARKDOWN OUT: " + mc);
+            val = S.util.markdown(content);
         }
         return val;
     }
@@ -134,14 +127,6 @@ export class NodeCompMarkdown extends MarkdownDiv {
         }
 
         val = S.render.injectSubstitutions(val);
-
-        // NOTE: markdown-html doesn't apply any actual styling but instead is used in a JS dom lookup to find all the
-        // images under each markdown element to apply a styling update post-render.
-        // todo-1: need to research the built-in support in React that allows these kinds of 'post-render' updates.
-        // see: https://reactjs.org/docs/hooks-reference.html#useeffect
-        // let div = new MarkdownDiv(val, {
-        //     className: clazz + " markdown-html",
-        // });
 
         this.state.content = val;
 

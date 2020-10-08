@@ -118,4 +118,5 @@ export interface UtilIntf {
     resetDropHandler(attribs: any): void;
     generateNewCryptoKeys(state: AppState): any;
     buildCalendarData(items: J.CalendarItem[]): EventInput[];
+    markdown(val: string): any;
 }

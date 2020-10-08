@@ -13,8 +13,8 @@ import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
 import { Img } from "../widget/Img";
 import { Label } from "../widget/Label";
+import { MarkdownDiv } from "../widget/MarkdownDiv";
 import { Textarea } from "../widget/Textarea";
-import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
@@ -63,7 +63,7 @@ export class ProfileDlg extends DialogBase {
                             //     }
                             // }),
                             this.readOnly
-                                ? new Div(this.bioValueIntf.getValue() || "This user hasn't entered a bio yet")
+                                ? new MarkdownDiv(S.util.markdown(this.bioValueIntf.getValue()) || "This user hasn't entered a bio yet")
                                 : new Textarea("Bio", {
                                     rows: 15
                                 }, this.bioValueIntf)
