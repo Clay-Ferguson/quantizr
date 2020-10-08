@@ -198,7 +198,7 @@ export class MenuPanel extends Div {
         // let fileSystemMenu = makeTopLevelMenu("FileSys", fileSystemMenuItems);
 
         children.push(new Menu("Account", [
-            new MenuItem("Profile", () => S.edit.openProfileDlg(state), !state.isAnonUser), //
+            new MenuItem("Bio & Avatar", () => S.edit.openProfileDlg(state), !state.isAnonUser), //
             new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), //
             new MenuItem("Change Password", () => S.edit.openChangePasswordDlg(state), !state.isAnonUser), //
             new MenuItem("Manage Account", () => S.edit.openManageAccountDlg(state), !state.isAnonUser) //

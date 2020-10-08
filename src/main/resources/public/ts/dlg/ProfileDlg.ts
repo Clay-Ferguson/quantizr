@@ -28,8 +28,8 @@ export class ProfileDlg extends DialogBase {
     userNameTextField: TextField;
     bioValueIntf: ValueIntf;
 
-    constructor(state: AppState, private readOnly: boolean, private userId: string) {
-        super("Profile: " + state.userName, null, false, state);
+    constructor(state: AppState, private readOnly: boolean, private userId: string, private userName: string) {
+        super("User: " + (userName || state.userName), null, false, state);
     }
 
     renderDlg(): CompIntf[] {
@@ -63,7 +63,7 @@ export class ProfileDlg extends DialogBase {
                             //     }
                             // }),
                             this.readOnly
-                                ? new Div(this.bioValueIntf.getValue())
+                                ? new Div(this.bioValueIntf.getValue() || "This user hasn't entered a bio yet")
                                 : new Textarea("Bio", {
                                     rows: 15
                                 }, this.bioValueIntf)
@@ -159,7 +159,7 @@ export class ProfileDlg extends DialogBase {
     makeProfileImg(): CompIntf {
         let state = this.getState();
         let avatarVer = this.getState().avatarVer;
-        let src: string = S.render.getAvatarImgUrl(this.appState.homeNodeId, avatarVer);
+        let src: string = S.render.getAvatarImgUrl(this.userId || this.appState.homeNodeId, avatarVer);
 
         let onClick = (evt) => {
             if (this.readOnly) return;

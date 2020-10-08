@@ -25,7 +25,7 @@ export class Edit implements EditIntf {
     showReadOnlyProperties: boolean = false;
 
     openProfileDlg = (state: AppState): void => {
-        new ProfileDlg(state, false, null).open();
+        new ProfileDlg(state, false, null, null).open();
     }
 
     openChangePasswordDlg = (state: AppState): void => {

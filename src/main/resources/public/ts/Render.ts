@@ -521,7 +521,7 @@ export class Render implements RenderIntf {
             title: "User: " + node.owner + "\n\nClick for Bio",
 
             onClick: (evt) => {
-                new ProfileDlg(state, true, node.ownerId).open();
+                new ProfileDlg(state, true, node.ownerId, node.owner).open();
             }
         });
 
