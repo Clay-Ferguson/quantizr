@@ -18,9 +18,7 @@ import { Comp } from "./widget/base/Comp";
 import { Button } from "./widget/Button";
 import { Div } from "./widget/Div";
 import { Heading } from "./widget/Heading";
-import { IconButton } from "./widget/IconButton";
 import { Img } from "./widget/Img";
-import { QuickEditField } from "./widget/QuickEditField";
 import { Span } from "./widget/Span";
 
 let S: Singletons;

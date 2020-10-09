@@ -539,7 +539,7 @@ public class UserManagerService {
 		 * the user, because it's random and tied to this user by definition
 		 */
 		String signupCode = newUserNode.getId().toHexString();
-		String signupLink = constProvider.getHostAndPort() + "?signupCode=" + signupCode;
+		String signupLink = appProp.getHttpProtocol() + "://" + appProp.getMetaHost() + "?signupCode=" + signupCode;
 		String content = null;
 
 		/*

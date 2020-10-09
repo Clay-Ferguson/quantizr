@@ -1330,6 +1330,7 @@ export class Util implements UtilIntf {
     }
 
     markdown = (val: string): any => {
+        if (!val) return "";
         val = marked(val);
 
         // the marked adds a 'p tag' wrapping we don't need so we remove it just to speed up DOM as much as possible
