@@ -23,7 +23,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class SignupDlg extends DialogBase {
 
     constructor(state: AppState) {
-        super("Create Account", "app-modal-content-medium-width", null, state);
+        super("Crete Account", "app-modal-content-medium-width", null, state);
     }
 
     renderDlg(): CompIntf[] {
@@ -40,11 +40,69 @@ export class SignupDlg extends DialogBase {
         ];
     }
 
+    validate = (): boolean => {
+        let valid = true;
+        let errors: any = {};
+        let state = this.getState();
+
+        if (!state.user) {
+            errors.userValidationError = "Cannot be empty.";
+            valid = false;
+        }
+        else {
+            if (state.user.length > 25) {
+                errors.userValidationError = "Maximum username length allowed is 25";
+                valid = false;
+            }
+            else if (!S.util.validUsername(state.user)) {
+                errors.userValidationError = "Invalid Username. Only letters numbers dashes and underscores allowed.";
+                valid = false;
+            }
+            else {
+                errors.userValidationError = null;
+            }
+        }
+
+        if (!state.password) {
+            errors.passwordValidationError = "Cannot be empty.";
+            valid = false;
+        }
+        else {
+            if (state.password.length > 25) {
+                errors.passwordValidationError = "Maximum password length allowed is 25";
+                valid = false;
+            }
+            else {
+                errors.passwordValidationError = null;
+            }
+        }
+
+        if (!state.email) {
+            errors.emailValidationError = "Cannot be empty.";
+            valid = false;
+        }
+        else {
+            if (state.email.length > 50) {
+                errors.emailValidationError = "Maximum email length allowed is 50";
+                valid = false;
+            }
+            else {
+                errors.emailValidationError = null;
+            }
+        }
+
+        this.mergeState(errors);
+        return valid;
+    }
+
     renderButtons(): CompIntf {
         return null;
     }
 
     signup = (): void => {
+        if (!this.validate()) {
+            return;
+        }
         // #recaptcha-disabled
         // grecaptcha.ready(() => {
         //     grecaptcha.execute(reCaptcha3SiteKey, { action: 'submit' }).then((token) => {
@@ -56,57 +114,34 @@ export class SignupDlg extends DialogBase {
 
     signupNow = (reCaptchaToken: string): void => {
         let state = this.getState();
-        let userName = state.user;
-        let password = state.password;
-        let email = state.email;
-
-        /* no real validation yet, other than non-empty */
-        if (!userName || userName.length === 0 || //
-            !password || password.length === 0 || //
-            !email || email.length === 0) {
-            S.util.showMessage("You cannot leave any fields blank.", "Warning");
-            return;
-        }
-
-        if (userName.length > 25) {
-            S.util.showMessage("Maximum username length allowed is 25", "Warning");
-            return;
-        }
-
-        if (!S.util.validUsername(userName)) {
-            S.util.showMessage("Invalid Username. Only letters numbers dashes and underscores allowed.", "Warning");
-            return;
-        }
-
-        if (email.length > 25) {
-            S.util.showMessage("Maximum email length allowed is 25", "Warning");
-            return;
-        }
-
-        if (password.length > 25) {
-            S.util.showMessage("Maximum password length allowed is 25", "Warning");
-            return;
-        }
 
         S.util.ajax<J.SignupRequest, J.SignupResponse>("signup", {
-            userName,
-            password,
-            email,
+            userName: state.user,
+            password: state.password,
+            email: state.email,
             reCaptchaToken
         }, this.signupResponse);
-
-        this.close();
     }
 
     signupResponse = (res: J.SignupResponse): void => {
-        if (S.util.checkSuccess("Signup new user", res)) {
-
+        if (res.success) {
             /* close the signup dialog */
             this.close();
 
             S.util.showMessage(
-                "User Information Accepted.<p/><p/>Check your email for account verification.", "Note"
+                "User Information Accepted.<p/><p/>Check your email for verification link.", "Note"
             );
+        }
+        else {
+            let errors: any = {};
+
+            // S.util.showMessage("Invalid information for Signup", "Signup");
+
+            errors.userValidationError = res.userError;
+            errors.passwordValidationError = res.passwordError;
+            errors.emailValidationError = res.emailError;
+
+            this.mergeState(errors);
         }
     }
 }

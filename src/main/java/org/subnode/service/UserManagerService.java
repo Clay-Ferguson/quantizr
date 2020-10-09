@@ -447,10 +447,30 @@ public class UserManagerService {
 
 		log.debug("Signup: userName=" + userName + " email=" + email);
 
+		res.setSuccess(true);
+
 		/* throw exceptions of the username or password are not valid */
-		validator.checkUserName(userName);
-		validator.checkPassword(password);
-		validator.checkEmail(email);
+		String userError = validator.checkUserName(userName);
+		if (userError != null) {
+			res.setUserError(userError);
+			res.setSuccess(false);
+		}
+
+		String passwordError = validator.checkPassword(password);
+		if (passwordError != null) {
+			res.setPasswordError(passwordError);
+			res.setSuccess(false);
+		}
+
+		String emailError = validator.checkEmail(email);
+		if (emailError != null) {
+			res.setEmailError(emailError);
+			res.setSuccess(false);
+		}
+
+		if (!res.isSuccess()) {
+			return res;
+		}
 
 		if (!automated) {
 			initiateSignup(session, userName, password, email);
@@ -459,7 +479,6 @@ public class UserManagerService {
 		}
 
 		res.setMessage("success");
-		res.setSuccess(true);
 		return res;
 	}
 

@@ -490,6 +490,9 @@ export interface ShutdownServerNodeResponse extends ResponseBase {
 }
 
 export interface SignupResponse extends ResponseBase {
+    userError: string;
+    passwordError: string;
+    emailError: string;
 }
 
 export interface SplitNodeResponse extends ResponseBase {

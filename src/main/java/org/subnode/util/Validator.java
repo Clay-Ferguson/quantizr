@@ -17,9 +17,9 @@ public class Validator {
 	 * Note that part of our requirement is that it must also be a valid substring inside JCR path
 	 * names, that are used or looking up things about this user.
 	 */
-	public void checkUserName(String userName) {
+	public String checkUserName(String userName) {
 		if (!auth.isAllowedUserName(userName)) {
-			throw ExUtil.wrapEx("Invalid or Illegal user name.");
+			return "Invalid or illegal user name.";
 		}
 		
 		int len = userName.length();
@@ -28,19 +28,22 @@ public class Validator {
 		for (int i = 0; i < len; i++) {
 			char c = userName.charAt(i);
 			if (!(Character.isLetterOrDigit(c) || c == '-' || c == '_' || c == ' ')) {
-				throw ExUtil.wrapEx("Username can contain only letters, digits, dashes, underscores, and spaces. invalid[" + userName + "]");
+				return "Username can contain only letters, digits, dashes, underscores, and spaces. invalid[" + userName + "]";
 			}
 		}
+		return null;
 	}
 
 	/* passwords are only checked for length of 5 thru 100 */
-	public void checkPassword(String password) {
+	public String checkPassword(String password) {
 		int len = password.length();
-		if (len < 5 || len > 40) throw ExUtil.wrapEx("Password must be between 5 and 40 characters long.");
+		if (len < 5 || len > 40) return "Password must be between 5 and 40 characters long.";
+		return null;
 	}
 
-	public void checkEmail(String email) {
+	public String checkEmail(String email) {
 		int len = email.length();
-		if (len < 7 || len > 100) throw ExUtil.wrapEx("Invalid email address");
+		if (len < 7 || len > 100) return "Invalid email address";
+		return null;
 	}
 }
