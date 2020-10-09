@@ -92,6 +92,8 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         // console.log("preRender id=" + this.getId() + " value=" + this.valueIntf.getValue());
         let state = this.getState();
 
+        let validationError = this.valueIntf.getValidationError ? this.valueIntf.getValidationError() : null;
+
         this.setChildren([
             this.label ? new Label(this.label, { key: this.getId() + "_label" }) : null,
             new Div(null, {
@@ -101,7 +103,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
                 style: { fontFamily: "monospace" }
             }, [
                 this.input = new Input({
-                    className: "form-control pre-textfield " + this.inputClasses,
+                    className: "form-control pre-textfield " + (this.inputClasses || "") + (validationError ? " validationErrorBorder" : ""),
                     type: state.inputType,
                     value: this.valueIntf.getValue()
                 }),
@@ -122,7 +124,11 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
                         })
                     ])
                 ]) : null
-            ])
+            ]),
+            validationError ? new Label(validationError, {
+                key: this.getId() + "_labelErr",
+                className: "validationError"
+             }) : null
         ]);
 
         if (this.onEnterKey) {

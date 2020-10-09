@@ -919,6 +919,14 @@ which it will do by default. */
     margin-bottom: $smallGap;
 }
 
+.validationError {
+    color: #E74C3C;
+}
+
+.validationErrorBorder {
+    border: 2px solid #E74C3C;
+}
+
 .dialog-header {
     font-weight: bold;
     font-size: large;

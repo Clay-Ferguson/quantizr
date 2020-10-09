@@ -1,3 +1,4 @@
+import { BASE_OPTION_DEFAULTS } from "@fullcalendar/react";
 import { ValueIntf } from "./Interfaces";
 import { CompIntf } from "./widget/base/CompIntf";
 
@@ -15,5 +16,11 @@ export class CompValueHolder<T> implements ValueIntf {
 
     getValue(): T {
         return this.comp.getState()[this.propName];
+    }
+
+    /* This is kind of confusing, but by convention we have the validation error for any property specified as the property
+    of the same name that ends with ValidationError */
+    getValidationError(): string {
+        return this.comp.getState()[this.propName + "ValidationError"];
     }
 }

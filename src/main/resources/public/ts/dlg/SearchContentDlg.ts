@@ -39,6 +39,26 @@ export class SearchContentDlg extends DialogBase {
         });
     }
 
+    validate = (): boolean => {
+        let valid = true;
+        let errors: any = {};
+        let state = this.getState();
+
+        if (!state.searchText) {
+            valid = false;
+            errors.searchTextValidationError = "Enter something to search for.";
+        }
+        else {
+            errors.searchTextValidationError = null;
+        }
+
+        if (!valid) {
+            this.mergeState(errors);
+        }
+
+        return valid;
+    }
+
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
@@ -78,6 +98,10 @@ export class SearchContentDlg extends DialogBase {
     }
 
     search = () => {
+        if (!this.validate()) {
+            return;
+        }
+
         if (!S.util.ajaxReady("searchNodes")) {
             return;
         }
@@ -92,10 +116,6 @@ export class SearchContentDlg extends DialogBase {
         // until better validation, just check for empty
         let searchText = this.getState().searchText;
         S.srch.searchText = searchText;
-        if (!searchText) {
-            S.util.showMessage("Enter search text.", "Warning");
-            return;
-        }
 
         SearchContentDlg.defaultSearchText = searchText;
 

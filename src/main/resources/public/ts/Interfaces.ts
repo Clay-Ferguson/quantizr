@@ -7,6 +7,7 @@ import * as J from "./JavaIntf";
 export interface ValueIntf {
     getValue(): any;
     setValue(val: any);
+    getValidationError?();
 }
 
 export interface AppAction extends Action<any> {
