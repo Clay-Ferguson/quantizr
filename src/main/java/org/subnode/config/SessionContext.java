@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.subnode.model.UserPreferences;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoUtil;
+import org.subnode.request.base.RequestBase;
 import org.subnode.util.DateUtil;
 
 /**
@@ -80,6 +81,13 @@ public class SessionContext {
 		synchronized (sessionsByToken) {
 			sessionsByToken.put(userToken, this);
 		}
+	}
+
+	public void init(RequestBase req) {
+		setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
+		setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
+		setUserName(req.getUserName());
+		setPassword(req.getPassword());
 	}
 
 	public static boolean validToken(String token) {

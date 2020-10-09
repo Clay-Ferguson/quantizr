@@ -142,22 +142,18 @@ public class UserManagerService {
 		}
 
 		String userName = req.getUserName();
-		String password = req.getPassword();
 		log.debug("login: user=" + userName);
+
+		if (userName.equals("")) {
+			userName = sessionContext.getUserName();
+			req.setUserName(userName);
+		}
 
 		/*
 		 * We have to get timezone information from the user's browser, so that all
 		 * times on all nodes always show up in their precise local time!
 		 */
-		sessionContext.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
-		sessionContext.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
-
-		if (userName.equals("")) {
-			userName = sessionContext.getUserName();
-		} else {
-			sessionContext.setUserName(userName);
-			sessionContext.setPassword(password);
-		}
+		sessionContext.init(req);
 
 		if (session == null) {
 			log.debug("session==null, using anonymous user");
@@ -169,29 +165,7 @@ public class UserManagerService {
 			res.setMessage("not logged in.");
 			res.setSuccess(false);
 		} else {
-			SubNode userNode = read.getUserNodeByUserName(session, userName);
-			if (userNode == null) {
-				throw new RuntimeEx("User not found: " + userName);
-			}
-
-			String id = userNode.getId().toHexString();
-			sessionContext.setRootId(id);
-			res.setRootNode(id);
-			res.setRootNodePath(userNode.getPath());
-			res.setUserName(userName);
-			res.setAllowFileSystemSearch(appProp.isAllowFileSystemSearch());
-
-			UserPreferences userPreferences = getUserPreferences();
-			sessionContext.setUserPreferences(userPreferences);
-			res.setUserPreferences(userPreferences);
-
-			Date now = new Date();
-			sessionContext.setLastLoginTime(now.getTime());
-			userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), now.getTime());
-
-			// ensureValidCryptoKeys(userNode);
-			update.save(session, userNode);
-
+			processLogin(session, res, userName);
 			res.setSuccess(true);
 		}
 
@@ -209,6 +183,34 @@ public class UserManagerService {
 		}
 
 		return res;
+	}
+
+	public void processLogin(MongoSession session, LoginResponse res, String userName) {
+		SubNode userNode = read.getUserNodeByUserName(session, userName);
+		if (userNode == null) {
+			throw new RuntimeEx("User not found: " + userName);
+		}
+
+		String id = userNode.getId().toHexString();
+		sessionContext.setRootId(id);
+
+		UserPreferences userPreferences = getUserPreferences(userName);
+		sessionContext.setUserPreferences(userPreferences);
+
+		if (res != null) {
+			res.setRootNode(id);
+			res.setRootNodePath(userNode.getPath());
+			res.setUserName(userName);
+			res.setAllowFileSystemSearch(appProp.isAllowFileSystemSearch());
+			res.setUserPreferences(userPreferences);
+		}
+
+		Date now = new Date();
+		sessionContext.setLastLoginTime(now.getTime());
+		userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), now.getTime());
+
+		// ensureValidCryptoKeys(userNode);
+		update.save(session, userNode);
 	}
 
 	/*
@@ -583,6 +585,13 @@ public class UserManagerService {
 
 	public SaveUserPreferencesResponse saveUserPreferences(final SaveUserPreferencesRequest req) {
 		SaveUserPreferencesResponse res = new SaveUserPreferencesResponse();
+
+		UserPreferences userPreferences = sessionContext.getUserPreferences();
+		// note: This will be null if session has timed out.
+		if (userPreferences == null) {
+			return res;
+		}
+
 		final String userName = sessionContext.getUserName();
 
 		adminRunner.run(session -> {
@@ -605,7 +614,6 @@ public class UserManagerService {
 			 * repository. The only time we load user preferences from repository is during
 			 * login when we can't get it from anywhere else at that time.
 			 */
-			UserPreferences userPreferences = sessionContext.getUserPreferences();
 			userPreferences.setEditMode(editMode);
 			userPreferences.setShowMetaData(showMetaData);
 
@@ -655,8 +663,7 @@ public class UserManagerService {
 
 			if (req.getUserId() == null) {
 				userNode = read.getUserNodeByUserName(session, userName);
-			}
-			else {
+			} else {
 				userNode = read.getNode(session, req.getUserId(), false);
 			}
 
@@ -675,8 +682,7 @@ public class UserManagerService {
 		return new UserPreferences();
 	}
 
-	public UserPreferences getUserPreferences() {
-		final String userName = sessionContext.getUserName();
+	public UserPreferences getUserPreferences(String userName) {
 		final UserPreferences userPrefs = new UserPreferences();
 
 		adminRunner.run(session -> {

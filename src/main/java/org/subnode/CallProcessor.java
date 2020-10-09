@@ -25,7 +25,7 @@ import org.subnode.request.SignupRequest;
 import org.subnode.request.base.RequestBase;
 import org.subnode.response.LoginResponse;
 import org.subnode.response.base.ResponseBase;
-import org.subnode.util.DateUtil;
+import org.subnode.service.UserManagerService;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LockEx;
 import org.subnode.util.MongoRunnableEx;
@@ -41,6 +41,9 @@ public class CallProcessor {
 
 	@Autowired
 	private MongoAuth auth;
+
+	@Autowired
+	private UserManagerService userManagerService;
 
 	private static final boolean logRequests = true;
 	// private static int mutexCounter = 0;
@@ -85,7 +88,6 @@ public class CallProcessor {
 			 * that some RPC call is attempted.
 			 */
 			if (!(req instanceof LoginRequest) && //
-			// !(req instanceof AnonPageLoadRequest) && //
 					!(req instanceof SignupRequest) && //
 					!(req instanceof ResetPasswordRequest) && //
 					!(req instanceof ChangePasswordRequest) && //
@@ -99,10 +101,8 @@ public class CallProcessor {
 				boolean success = false;
 				try {
 					MongoSession session = auth.login(req.getUserName(), req.getPassword());
-					sessionContext.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
-					sessionContext.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
-					sessionContext.setUserName(req.getUserName());
-					sessionContext.setPassword(req.getPassword());
+					sessionContext.init(req);
+					userManagerService.processLogin(session, null, req.getUserName());
 
 					success = true;
 				} catch (Exception e) {
