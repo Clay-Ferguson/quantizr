@@ -85,7 +85,9 @@ export class EditNodeDlg extends DialogBase {
             { key: "v", val: "Vertical" },
             { key: "c2", val: "2 Columns" },
             { key: "c3", val: "3 Columns" },
-            { key: "c4", val: "4 Columns" }
+            { key: "c4", val: "4 Columns" },
+            { key: "c5", val: "5 Columns" },
+            { key: "c6", val: "6 Columns" }
         ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v")); // w-25
         return selection;
     }
