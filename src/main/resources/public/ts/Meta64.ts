@@ -48,6 +48,10 @@ export class Meta64 implements Meta64Intf {
     userName: string;
     password: string;
 
+    // maps the hash of an encrypted block of text to the unencrypted text, so that we never run the same
+    // decryption code twice.
+    decryptCache: { [key: string]: string } = {};
+
     /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
     getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {
         const k = op + "_" + id;

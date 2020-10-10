@@ -16,16 +16,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMarkdown extends MarkdownDiv {
 
-    /*
-    This flag makes the text ALWAYS decrypt and display onscreen if the person owning the content is viewing it, but this
-    is most likely never wanted, because it's insecure in screen-share context, or when someone can see your screen for any reason.
-    todo-1: We could make this a user preference so users in a secure location can just view all encrypted data.
-
-    UPDATE: turning this ON for now, because for testing 'shared' nodes we don't have editing capability and thus need a way to decrypt
-
-    todo-0: this is not working fully, it shows [encrypted] upon rendering and doesn't decrypt until the row is clicked.
-    */
-    private immediateDecrypting: boolean = true;
+    // This flag makes encrypted text always decrypt and display immediately
+    private autoDecrypting: boolean = true;
 
     constructor(public node: J.NodeInfo, private appState: AppState) {
         super();
@@ -136,10 +128,22 @@ export class NodeCompMarkdown extends MarkdownDiv {
     preRender(): void {
         let state = this.getState();
 
-        if (this.immediateDecrypting && state.pendingDecrypt) {
-            setTimeout(async () => {
-                this.decrypt();
-            }, 100);
+        if (this.autoDecrypting && state.pendingDecrypt) {
+            let cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
+            let cipherHash: string = S.util.hashOfString(cipherText);
+
+            // if we have already decrypted this data use the result.
+            if (S.meta64.decryptCache[cipherHash]) {
+                this.mergeState({
+                    content: S.meta64.decryptCache[cipherHash],
+                    pendingDecrypt: null
+                });
+            }
+            else {
+                setTimeout(async () => {
+                    this.decrypt();
+                }, 10);
+            }
         }
     }
 
@@ -159,19 +163,13 @@ export class NodeCompMarkdown extends MarkdownDiv {
             let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
             if (clearText === null) {
-                this.node.content = clearText;
-                let val2 = this.renderRawMarkdown(this.node);
-                this.mergeState({
-                    content: val2,
-                    pendingDecrypt: null
-                });
+                clearText = "[Decrrypt Failed]";
             }
-            else {
-                this.mergeState({
-                    content: clearText,
-                    pendingDecrypt: null
-                });
-            }
+
+            this.mergeState({
+                content: clearText,
+                pendingDecrypt: null
+            });
         }
     }
 }

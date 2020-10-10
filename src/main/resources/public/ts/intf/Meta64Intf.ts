@@ -25,6 +25,8 @@ export interface Meta64Intf {
     userName: string;
     password: string;
 
+    decryptCache: { [key: string]: string };
+
     // function cache accessor
     getNodeFunc(func: (id: string) => void, name: string, id: string): () => void;
 

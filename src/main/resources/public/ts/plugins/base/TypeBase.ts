@@ -95,7 +95,7 @@ export class TypeBase implements TypeHandlerIntf {
             // and thrownging an error when the decrypt call below tries to update the state on a component
             // that somehow is already gone by the time it runs.
             //
-            // Solution: I'm just going with the immediateDecrypting==true setup for now, and will come back
+            // Solution: I'm just going with the autoDecrypting==true setup for now, and will come back
             // and solve this later.
             //
             // else if (node.content && node.content.startsWith(J.Constant.ENC_TAG)) {

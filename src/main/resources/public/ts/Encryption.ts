@@ -515,23 +515,38 @@ export class Encryption implements EncryptionIntf {
     decryptSharableString = async (privateKey: CryptoKey, skpd: SymKeyDataPackage): Promise<string> => {
         return new Promise<string>(async (resolve, reject) => {
             let ret: string = null;
+
+            // get hash of the encrypted data
+            let cipherHash: string = S.util.hashOfString(skpd.cipherText);
+
+            // if we have already decrypted this data return the result.
+            if (S.meta64.decryptCache[cipherHash]) {
+                // console.log("decryption cache hit!");
+                resolve(S.meta64.decryptCache[cipherHash]);
+                return;
+            }
+
             try {
                 // console.log("decrypting with cipherKey: " + skpd.cipherKey);
                 if (!privateKey) {
                     privateKey = await this.getPrivateKey();
                 }
+
                 if (!privateKey) {
                     reject();
                     return;
                 }
+
                 // Decrypt the symmetric key using our private key
                 const symKeyJsonStr: string = await this.asymDecryptString(privateKey, skpd.cipherKey);
+
                 // console.log("Decrypted cipherKey to (asym key to actual data): " + symKeyJsonStr);
                 const symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
                 const symKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, symKeyJsonObj, this.SYM_ALGO, true, this.OP_ENC_DEC);
                 // console.log("DECRYPTING: cipherText: [" + skpd.cipherText + "]");
                 ret = await this.symDecryptString(symKey, skpd.cipherText);
                 // console.log("            output: [" + ret + "]");
+                S.meta64.decryptCache[cipherHash] = ret;
             }
             catch (ex) {
                 // todo-1: this was happening when 'importKey' failed for admin user, but I think admin user may not store keys? Need to just
