@@ -136,7 +136,7 @@ export class Props implements PropsIntf {
     }
 
     /* Gets the crypto key from this node that will allow user to decrypt the node. If the user is the owner of the
-node this simply returns the ENC_KEY property but if not we look up in the ACL on the node a copy of the encrypted
+    node this simply returns the ENC_KEY property but if not we look up in the ACL on the node a copy of the encrypted
     key that goes with the current user (us, logged in user), which should decrypt using our private key.
     */
     getCryptoKey = (node: J.NodeInfo, state: AppState) => {
@@ -145,12 +145,12 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
         /* if we own this node then this cipherKey for it will be ENC_KEY for us */
         if (state.userName === node.owner) {
             cipherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
-            console.log("getting cipherKey for node, from ENC_KEY: " + cipherKey);
+            // console.log("getting cipherKey for node, from ENC_KEY: " + cipherKey);
         }
         /* else if the server has provided the cipher key to us from the ACL (AccessControl) then use it. */
         else {
             cipherKey = node.cipherKey;
-            console.log("getting cipherKey from node.cipherKey (not your node): " + cipherKey);
+            // console.log("getting cipherKey from node.cipherKey (not your node): " + cipherKey);
         }
         return cipherKey;
     }
@@ -260,7 +260,8 @@ node this simply returns the ENC_KEY property but if not we look up in the ACL o
             J.NodeProp.BIN_SIZE, //
             J.NodeProp.BIN_FILENAME, //
             J.NodeProp.JSON_HASH, //
-            J.NodeProp.IPFS_LINK
+            J.NodeProp.IPFS_LINK, //
+            J.NodeProp.ENC_KEY
         ]);
 
         S.util.addAllToSet(this.controlBasedPropertyList, [ //

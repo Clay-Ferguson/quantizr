@@ -516,7 +516,7 @@ export class Encryption implements EncryptionIntf {
         return new Promise<string>(async (resolve, reject) => {
             let ret: string = null;
             try {
-                console.log("decrypting with cipherKey: " + skpd.cipherKey);
+                // console.log("decrypting with cipherKey: " + skpd.cipherKey);
                 if (!privateKey) {
                     privateKey = await this.getPrivateKey();
                 }

@@ -736,7 +736,7 @@ export class EditNodeDlg extends DialogBase {
 
         if (C.ENABLE_ACE_EDITOR) {
             let aceMode = node.type === J.NodeType.PLAIN_TEXT ? "ace/mode/text" : "ace/mode/markdown";
-            this.contentEditor = new AceEditPropTextarea(encrypted ? "[encrypted]" : value, "25em", aceMode, isWordWrap);
+            this.contentEditor = new AceEditPropTextarea(encrypted ? "[Encrypted]" : value, "25em", aceMode, isWordWrap);
 
             this.contentEditor.whenElm((elm: HTMLElement) => {
                 let timer = setInterval(() => {

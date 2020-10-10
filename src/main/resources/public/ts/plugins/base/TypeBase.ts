@@ -74,6 +74,8 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
+        // let markdownComp: NodeCompMarkdown;
+
         if (state.inlineEditId === node.id) {
             return new InlineEditField(node, state);
         }
@@ -89,6 +91,23 @@ export class TypeBase implements TypeHandlerIntf {
                     ], null, "marginLeft marginBottom")
                 ]);
             }
+            // I was trying to let this button decrypt, but react is saying the component got unmounted
+            // and thrownging an error when the decrypt call below tries to update the state on a component
+            // that somehow is already gone by the time it runs.
+            //
+            // Solution: I'm just going with the immediateDecrypting==true setup for now, and will come back
+            // and solve this later.
+            //
+            // else if (node.content && node.content.startsWith(J.Constant.ENC_TAG)) {
+            //     return new Div(null, null, [
+            //         markdownComp = new NodeCompMarkdown(node, state),
+            //         new ButtonBar([
+            //             new Button("Decrypt", () => {
+            //                 markdownComp.decrypt();
+            //             })
+            //         ], null, "marginLeft marginBottom")
+            //     ]);
+            // }
             else {
                 return new NodeCompMarkdown(node, state);
             }
