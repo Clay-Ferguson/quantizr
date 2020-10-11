@@ -29,7 +29,7 @@ export class ProfileDlg extends DialogBase {
     bioValueIntf: ValueIntf;
 
     constructor(state: AppState, private readOnly: boolean, private userId: string, private userName: string) {
-        super("User: " + (userName || state.userName), null, false, state);
+        super("User Profile: " + (userName || state.userName), null, false, state);
     }
 
     renderDlg(): CompIntf[] {
