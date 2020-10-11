@@ -58,11 +58,13 @@ public class NotificationDaemon {
 	 * see also: @EnableScheduling (in this project)
 	 * 
 	 * @Scheduled value is in milliseconds.
+	 * 
+	 * Runs immediately at startup, and then every 10 seconds
 	 */
-	@Scheduled(fixedDelay = 30 * 1000)
+	@Scheduled(fixedDelay = 10 * 1000)
 	public void run() {
 		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
-			log.debug("ignoring schedule cycle");
+			log.debug("ignoring NotificationDeamon schedule cycle");
 			return;
 		}
 

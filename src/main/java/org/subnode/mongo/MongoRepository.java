@@ -127,8 +127,6 @@ public class MongoRepository {
 			// mongoTest.mainTest();
 			// }
 
-			userFeedService.init();
-
 			log.debug("MongoRepository fully initialized.");
 			fullInit = true;
 		}

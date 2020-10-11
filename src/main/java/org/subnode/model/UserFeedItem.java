@@ -5,14 +5,14 @@ import java.util.Date;
 import org.bson.types.ObjectId;
 import org.subnode.mongo.model.SubNode;
 
-/* Holds the nodeId and modTime of a recent post to a user's UserFeed */
+/* Holds the nodeId and modTime of a recent post to a user's Outbox */
 public class UserFeedItem {
     private ObjectId nodeId;
     private Date modTime;
 
     /* Until we have 1000s of users we can get away with saving the actual node here, and it will be extremely
     easy to stop actually storing the node here (to save memory) at some point in the future. For now we just do what's 
-    the very simplest. No pre-mature optimization! */
+    the very simplest. No pre-mature optimization. */
     private SubNode node;
 
     public ObjectId getNodeId() {

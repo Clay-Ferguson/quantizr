@@ -14,9 +14,11 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
+import org.subnode.AppServer;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
@@ -58,7 +60,7 @@ public class UserFeedService {
 
 	/*
 	 * Map key is userName. For each user we keep a UserFeedInfo which holds the
-	 * timeline of all their posts, so that we can generate a Feed for any user by
+	 * timeline of all their Outbox, so that we can generate a Feed for any user by
 	 * combining together from memory the feeds of all their friends without doing a
 	 * DB query
 	 */
@@ -72,12 +74,21 @@ public class UserFeedService {
 
 	static HashMap<String, NodeInfo> nodeInfoMapByPath = new HashMap<String, NodeInfo>();
 
-	public void init() {
-		log.debug("UserFeedService.init()");
-		initAllUsers();
+	/* Runs immediately at startup, and then every 30 minutes run a full reinit. */
+	@Scheduled(fixedDelay = 30 * 60 * 1000)
+	public void run() {
+		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
+			log.debug("ignoring UserFeedService schedule cycle");
+			return;
+		}
+
+		log.debug("UserFeedService Scheduler running init2 ()");
+		init();
 	}
 
-	private void initAllUsers() {
+	public void init() {
+		log.debug("UserFeedService.init()");
+		
 		userFeedInfoMapByUserName.clear();
 		userFeedInfoMapByPath.clear();
 
@@ -125,7 +136,7 @@ public class UserFeedService {
 				userFeedItem.setNode(node);
 				userFeedInfo.getUserFeedList().add(userFeedItem);
 
-				log.debug("UserFeed ITEM: " + node.getId().toHexString());
+				//log.debug("UserFeed ITEM: " + node.getId().toHexString());
 			}
 		}
 
@@ -322,6 +333,10 @@ public class UserFeedService {
 	 * req is is expected to be a FRIEND_LIST node with FRIEND types under it, and
 	 * we generate a feed based on that set of friends to then display in the feed
 	 * tab.
+	 * 
+	 * Currently req.nodeId is always just "~sn:friendList" which has the leading
+	 * tiled syntax designating it's a special node type (i.e. not a name, path, or
+	 * id)
 	 */
 	public NodeFeedResponse nodeFeed(MongoSession session, NodeFeedRequest req) {
 		/*
@@ -339,153 +354,167 @@ public class UserFeedService {
 		int counter = 0;
 
 		SubNode friendListNode = read.getNode(session, req.getNodeId());
-		if (friendListNode != null) {
-			if (!friendListNode.getType().equals(NodeType.FRIEND_LIST.s())) {
-				throw new RuntimeException("only FRIEND_LIST type nodes can generate a feed.");
+		if (friendListNode == null) {
+			return res;
+		}
+		if (!friendListNode.getType().equals(NodeType.FRIEND_LIST.s())) {
+			throw new RuntimeException("only FRIEND_LIST type nodes can generate a feed.");
+		}
+
+		/*
+		 * This collection will hold the merged list of all the Outbox content of all
+		 * Friends
+		 */
+		List<UserFeedItem> fullFeedList = new LinkedList<UserFeedItem>();
+
+		/*
+		 * we store the set of the currently active userNodeIds in the session, so that
+		 * directly from the user's session memory we can tell who all the users are in
+		 * the feed they are now viewing
+		 */
+		HashSet<String> userNodeIds = new HashSet<String>();
+
+		/*
+		 * We have to add in ourselves here so that we get our own feed to include our
+		 * own posts
+		 */
+		userNodeIds.add(sessionContext.getRootId());
+
+		/* Get all friend nodes the user has created */
+		Iterable<SubNode> friendNodes = read.getChildrenUnderParentPath(session, friendListNode.getPath(), null,
+				MAX_NODES);
+
+		// Process all friends, to accumulate all of fullFeedList items
+		for (SubNode friendNode : friendNodes) {
+			// get userNodeId off friend node
+			String userNodeId = friendNode.getStringProp(NodeProp.USER_NODE_ID.s());
+			if (userNodeId == null) {
+				log.warn("user node id missing on node: " + friendNode.getId().toHexString());
+				continue;
 			}
 
-			Iterable<SubNode> friendNodes = read.getChildrenUnderParentPath(session, friendListNode.getPath(), null,
-					MAX_NODES);
-
-			List<UserFeedItem> fullFeedList = new LinkedList<UserFeedItem>();
-
-			/*
-			 * we store the set of the currently active userNodeIds in the session, so that
-			 * directly from the user's session memory we can tell who all the users are in
-			 * the feed they are now viewing
-			 */
-			HashSet<String> userNodeIds = new HashSet<String>();
-
-			/*
-			 * We have to add in ourselves here so that we get our own feed updated per our
-			 * own posts
-			 */
-			userNodeIds.add(sessionContext.getRootId());
-
-			for (SubNode friendNode : friendNodes) {
-				String userNodeId = friendNode.getStringProp(NodeProp.USER_NODE_ID.s());
-				if (userNodeId == null) {
-					log.warn("user node id missing on node: " + friendNode.getId().toHexString());
-					continue;
-				}
-				String friendUserName = friendNode.getStringProp(NodeProp.USER.s());
-				if (friendUserName == null) {
-					log.warn("user missing on node: " + friendNode.getId().toHexString());
-					continue;
-				}
-
-				userNodeIds.add(userNodeId);
-
-				// log.debug("user " + sessionContext.getUserName() + " has friend: " +
-				// friendUserName);
-
-				/*
-				 * Look up the cached User Feed nodes (in memory) and add all of 'userName'
-				 * cached items into the full feed list
-				 */
-				synchronized (UserFeedService.userFeedInfoMapByUserName) {
-					UserFeedInfo userFeedInfo = UserFeedService.userFeedInfoMapByUserName.get(friendUserName);
-					if (userFeedInfo != null) {
-						// for troubleshooting
-						// for (UserFeedItem ufi : userFeedInfo.getUserFeedList()) {
-						// log.debug(
-						// "Friend post: " + friendUserName + " post.content: " +
-						// ufi.getNode().getContent());
-						// }
-
-						fullFeedList.addAll(userFeedInfo.getUserFeedList());
-					}
-				}
+			// get user name of this friend
+			String friendUserName = friendNode.getStringProp(NodeProp.USER.s());
+			if (friendUserName == null) {
+				log.warn("user missing on node: " + friendNode.getId().toHexString());
+				continue;
 			}
 
+			userNodeIds.add(userNodeId);
+
+			// log.debug("user " + sessionContext.getUserName() + " has friend: " +
+			// friendUserName);
+
 			/*
-			 * Now add the feed of the current user because a user should be able to see his
-			 * own posts appear in the feed
+			 * Look up the cached Outbox nodes (in memory) and add all of 'userName' cached
+			 * items into the full feed list
 			 */
 			synchronized (UserFeedService.userFeedInfoMapByUserName) {
-				// log.debug("Now adding in our own feed posts: " +
-				// sessionContext.getUserName());
-				UserFeedInfo userFeedInfo = UserFeedService.userFeedInfoMapByUserName.get(sessionContext.getUserName());
-
+				UserFeedInfo userFeedInfo = UserFeedService.userFeedInfoMapByUserName.get(friendUserName);
 				if (userFeedInfo != null) {
-
-					// log.debug("UserFeedInfo [hashcode=" + userFeedInfo.hashCode() + "] of user "
-					// + userFeedInfo.getUserName()
-					// + " has count=" + userFeedInfo.getUserFeedList().size());
-
 					// for troubleshooting
 					// for (UserFeedItem ufi : userFeedInfo.getUserFeedList()) {
-					// log.debug(" OUR OWN: content=" + ufi.getNode().getContent());
+					// log.debug(
+					// "Friend post: " + friendUserName + " post.content: " +
+					// ufi.getNode().getContent());
 					// }
 
 					fullFeedList.addAll(userFeedInfo.getUserFeedList());
-				} else {
-					log.debug("oops there isn't a userFeedInfo for us.");
 				}
 			}
-
-			/* Sort the feed items chrononologially */
-			Collections.sort(fullFeedList, new Comparator<UserFeedItem>() {
-				@Override
-				public int compare(UserFeedItem s1, UserFeedItem s2) {
-					return (int) (s2.getModTime().getTime() - s1.getModTime().getTime());
-				}
-			});
-
-			/*
-			 * Generate the final presentation info objects to send back to client (NodeInfo
-			 * list)
-			 */
-			List<NodeInfo> results = new LinkedList<NodeInfo>();
-
-			// The set of all IDs that were put into any 'NodeInfo.parent' objects in the
-			// loop below */
-			HashSet<String> parentIdSet = new HashSet<String>();
-
-			for (UserFeedItem ufi : fullFeedList) {
-				SubNode node = ufi.getNode();
-
-				// If this node is a parent already, then blow by it, ignoring it, becasue it's
-				// already known to be rendering
-				// in the output as a parent, and we don't need it showing up twice.
-				if (node == null || parentIdSet.contains(node.getId().toHexString())) {
-					continue;
-				}
-
-				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1,
-						false, false, false);
-				results.add(info);
-
-				/*
-				 * If this node is not a direct child of a POSTS (USER_FEED) type node, then
-				 * that means it's a reply to someone's post and so we need to lookup the parent
-				 * and assign that so the client can render this node with the node it's a reply
-				 * to displayed directly above it in the feed
-				 */
-				if (lookupParent(session, info, node.getPath())) {
-					parentIdSet.add(info.getParent().getId());
-				}
-
-				if (counter++ > MAX_NODES) {
-					break;
-				}
-			}
-
-			/*
-			 * Now to remove a bit of redundancy and make the feed look nicer, we remove any
-			 * of the items from 'results' that are in the list some other place as an
-			 * 'NodeInfo.parent'
-			 */
-			List<NodeInfo> filteredResults = results.stream().filter(ninf -> !parentIdSet.contains(ninf.getId()))
-					.collect(Collectors.toList());
-
-			res.setSearchResults(filteredResults);
-			res.setSuccess(true);
-
-			sessionContext.setFeedUserNodeIds(userNodeIds);
-
-			// log.debug("feed count: " + counter);
 		}
+
+		/*
+		 * Now add the feed of the current user because a user should be able to see his
+		 * own posts appear in the feed
+		 */
+		synchronized (UserFeedService.userFeedInfoMapByUserName) {
+			// log.debug("Now adding in our own feed posts: " +
+			// sessionContext.getUserName());
+			UserFeedInfo userFeedInfo = UserFeedService.userFeedInfoMapByUserName.get(sessionContext.getUserName());
+
+			if (userFeedInfo != null) {
+
+				// log.debug("UserFeedInfo [hashcode=" + userFeedInfo.hashCode() + "] of user "
+				// + userFeedInfo.getUserName()
+				// + " has count=" + userFeedInfo.getUserFeedList().size());
+
+				// for troubleshooting
+				// for (UserFeedItem ufi : userFeedInfo.getUserFeedList()) {
+				// log.debug(" OUR OWN: content=" + ufi.getNode().getContent());
+				// }
+
+				fullFeedList.addAll(userFeedInfo.getUserFeedList());
+			} else {
+				log.debug("oops there isn't a userFeedInfo for us.");
+			}
+		}
+
+		/* Sort the feed items chrononologially */
+		Collections.sort(fullFeedList, new Comparator<UserFeedItem>() {
+			@Override
+			public int compare(UserFeedItem s1, UserFeedItem s2) {
+				return (int) (s2.getModTime().getTime() - s1.getModTime().getTime());
+			}
+		});
+
+		/*
+		 * Generate the final presentation info objects to send back to client (NodeInfo
+		 * list)
+		 */
+		List<NodeInfo> results = new LinkedList<NodeInfo>();
+
+		/*
+		 * The set of all IDs that were put into any 'NodeInfo.parent' objects in the
+		 * loop below
+		 */
+		HashSet<String> parentIdSet = new HashSet<String>();
+
+		for (UserFeedItem ufi : fullFeedList) {
+			SubNode node = ufi.getNode();
+
+			/*
+			 * If this node is a parent already, then blow by it, ignoring it, becasue it's
+			 * already known to be rendering in the output as a parent, and we don't need it
+			 * showing up twice.
+			 */
+			if (node == null || parentIdSet.contains(node.getId().toHexString())) {
+				continue;
+			}
+
+			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1, false,
+					false, false);
+			results.add(info);
+
+			/*
+			 * If this node is not a direct child of a POSTS (USER_FEED) type node, then
+			 * that means it's a reply to someone's post and so we need to lookup the parent
+			 * and assign that so the client can render this node with the node it's a reply
+			 * to displayed directly above it in the feed
+			 */
+			if (lookupParent(session, info, node.getPath())) {
+				parentIdSet.add(info.getParent().getId());
+			}
+
+			if (counter++ > MAX_NODES) {
+				break;
+			}
+		}
+
+		/*
+		 * Now to remove a bit of redundancy and make the feed look nicer, we remove any
+		 * of the items from 'results' that are in the list some other place as an
+		 * 'NodeInfo.parent'
+		 */
+		List<NodeInfo> filteredResults = results.stream().filter(ninf -> !parentIdSet.contains(ninf.getId()))
+				.collect(Collectors.toList());
+
+		res.setSearchResults(filteredResults);
+		res.setSuccess(true);
+
+		sessionContext.setFeedUserNodeIds(userNodeIds);
+
+		// log.debug("feed count: " + counter);
 		return res;
 	}
 
