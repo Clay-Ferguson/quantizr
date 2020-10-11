@@ -43,9 +43,10 @@ export class Share implements ShareIntf {
         });
     }
 
-    /* Whenever an encrypted node is shared to a user, this is the final operation we run which
-    generates a key to the data, encrypted with the public key of the person (identified by principalNodeId)
-    the node is shared to, and then publishes that info into the DB
+    /* Whenever we share an encrypted node to a another user, this is the final operation we run which
+    generates a key to the data which is encrypted with the public key of the person (identified by principalNodeId)
+    the node is shared to. Then publishes that key info into the DB, so that only the other person who this node is shared to
+    can use their private key to decrypt the key to the data, to view the node.
     */
     addCipherKeyToNode = async (node: J.NodeInfo, principalPublicKeyStr: string, principalNodeId: string): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
@@ -59,9 +60,10 @@ export class Share implements ShareIntf {
             const cipherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
             // console.log("cipherKey on ENC_KEY: "+cipherKey);
 
+            // get this broswer's private key from browser storage
             const privateKey: CryptoKey = await S.encryption.getPrivateKey();
 
-            // so this is the decrypted symmetric key to the data
+            // so this is the decrypted symmetric key to the data (the unencrypted copy of the actual AES key to the data)
             const clearTextKey = await S.encryption.asymDecryptString(privateKey, cipherKey);
             if (!clearTextKey) {
                 throw new Error("Unable to access encryption key.");
@@ -69,18 +71,19 @@ export class Share implements ShareIntf {
 
             // console.log("clear text key to re-encrypt: " + clearTextKey);
 
-            // first build up a usable key from principalPublicKey.
+            // first parse the key and build a usable key from principalPublicKey.
             const principalSymKeyJsonObj: JsonWebKey = JSON.parse(principalPublicKeyStr);
-
             const principalPublicKey = await S.encryption.importKey(principalSymKeyJsonObj, S.encryption.ASYM_IMPORT_ALGO, true, S.encryption.OP_ENC);
 
             // now re-encrypt this clearTextKey using the public key (of the user being shared to).
             const userCipherKey = await S.encryption.asymEncryptString(principalPublicKey, clearTextKey);
             // console.log("userCipherKey=" + userCipherKey);
 
+            /* Now post this encrypted key (decryptable only by principalNodeId's private key) up to the server which will
+            then store this key alongside the ACL (access control list) for the sharing entry for this user */
             await S.util.ajax<J.SetCipherKeyRequest, J.SetCipherKeyResponse>("setCipherKey", {
                 nodeId: node.id,
-                principalNodeId: principalNodeId,
+                principalNodeId,
                 cipherKey: userCipherKey
             });
 

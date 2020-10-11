@@ -28,7 +28,7 @@ export class ShareToPersonDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new TextContent("Enter the user name of the person you want to share this node with:"),
+                new TextContent("Enter the user name of the person to share this node with:"),
                 new TextField("User to share with", false, this.shareNodeToPerson, null,
                     new CompValueHolder<string>(this, "userName")),
                 new ButtonBar([
@@ -43,7 +43,7 @@ export class ShareToPersonDlg extends DialogBase {
                         await friendsDlg.open();
                         if (friendsDlg.getState().selectedName) {
                             this.close();
-                            this.shareToPersonImmediate(friendsDlg.getState().selectedName);
+                            this.shareImmediate(friendsDlg.getState().selectedName);
                         }
                     }, null, "btn-primary"),
 
@@ -72,18 +72,18 @@ export class ShareToPersonDlg extends DialogBase {
             return;
         }
 
-        this.shareToPersonImmediate(targetUser);
+        this.shareImmediate(targetUser);
     }
 
-    shareToPersonImmediate = (userName: string) => {
+    shareImmediate = (userName: string) => {
         S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: userName,
             privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]
-        }, this.reloadFromShareWithPerson);
+        }, this.reload);
     }
 
-    reloadFromShareWithPerson = async (res: J.AddPrivilegeResponse): Promise<void> => {
+    reload = async (res: J.AddPrivilegeResponse): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             if (S.util.checkSuccess("Share Node with Person", res)) {
                 if (res.principalPublicKey) {

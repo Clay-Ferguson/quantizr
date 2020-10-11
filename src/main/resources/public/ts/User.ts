@@ -200,10 +200,6 @@ export class User implements UserIntf {
                     }
 
                     S.view.refreshTree(id, renderLeafIfParent, childId, true, false, true, true, state);
-
-                    setTimeout(() => {
-                        S.encryption.initKeys();
-                    }, 500);
                 } else {
                     console.log("LocalDb login failed.");
 

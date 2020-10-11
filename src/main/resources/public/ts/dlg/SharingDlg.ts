@@ -52,7 +52,7 @@ export class SharingDlg extends DialogBase {
     }
 
     /*
-     * Gets privileges from server and displays in GUI also. Assumes gui is already at correct page.
+     * Gets privileges from server and saves into state.
      */
     reload = (): void => {
         S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {

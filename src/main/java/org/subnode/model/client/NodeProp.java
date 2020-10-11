@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
 
-    // This is the encrypted symetric key to the node data, that was encrypted using
-    // the private key of the owner of the node.
+    /* This is the encrypted symetric key to the node data, that was encrypted using the private key of the owner of the node.
+    When nodes are shared to other users the cleartext copy of this key is encrypted with the public key of the user it's being
+    shared to so that user can use their private key to decrypt this key and gain access to the actual data. */
     ENC_KEY("sn:encKey", "s"),
 
     /*

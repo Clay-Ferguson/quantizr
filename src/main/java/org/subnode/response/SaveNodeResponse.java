@@ -11,7 +11,7 @@ public class SaveNodeResponse extends ResponseBase {
 
 	/* In cases where the updated node is adding encryption we need to send back all the principalIds 
 	(userNodeIds actually) so the client can generate keys for all of them to send back up to allow
-	access by these shared users */
+	access by these shared users. Unless the node is being encrypted these aclEntries will be null */
 	private List<AccessControlInfo> aclEntries;
 
 	public List<AccessControlInfo> getAclEntries() {
