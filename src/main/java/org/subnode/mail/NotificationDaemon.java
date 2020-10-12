@@ -110,7 +110,7 @@ public class NotificationDaemon {
 
 							log.debug("Found mail to send to: " + email);
 							mailSender.sendMail(email, null, content, subject);
-							delete.delete(session, node);
+							delete.delete(session, node, false);
 						}
 						else {
 							log.debug("not sending email. Missing some properties. email or subject or content");

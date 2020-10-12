@@ -146,8 +146,10 @@ public class NodeMoveService {
 		// sample the first node to see if this is a garbage bin delete or not
 		SubNode firstNode = read.getNode(session, req.getNodeIds().get(0));
 
-		// Note: the 'endsWith("/d")' condition is checking if this is the actual trash
-		// node itself being deleted
+		/*
+		 * Note: the 'endsWith("/d")' condition is checking if this is the actual trash
+		 * node itself being deleted
+		 */
 		if (req.isHardDelete() || firstNode.getPath().contains("/d/") || firstNode.getPath().endsWith("/d")) {
 			return hardDeleteNodes(session, req);
 		} else {
@@ -183,7 +185,7 @@ public class NodeMoveService {
 				userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
 			}
 
-			delete.deleteNode(session, node);
+			delete.deleteNode(session, node, req.isChildrenOnly());
 		}
 
 		update.saveSession(session);

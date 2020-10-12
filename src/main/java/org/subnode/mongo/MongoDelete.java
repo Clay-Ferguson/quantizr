@@ -26,20 +26,22 @@ public class MongoDelete {
 	private AttachmentService attachmentService;
 
 	@Autowired
-    private MongoUpdate update;
-    
-    @Autowired
-    private MongoAuth auth;
+	private MongoUpdate update;
 
-    @Autowired
-    private MongoUtil util;
+	@Autowired
+	private MongoAuth auth;
 
-	public void deleteNode(MongoSession session, SubNode node) {
-		attachmentService.deleteBinary(session, node);
-		delete(session, node);
+	@Autowired
+	private MongoUtil util;
+
+	public void deleteNode(MongoSession session, SubNode node, boolean childrenOnly) {
+		if (!childrenOnly) {
+			attachmentService.deleteBinary(session, node);
+		}
+		delete(session, node, childrenOnly);
 	}
 
-    	/**
+	/**
 	 * 2: cleaning up GridFS will be done as an async thread. For now we can just
 	 * let GridFS binaries data get orphaned... BUT I think it might end up being
 	 * super efficient if we have the 'path' stored in the GridFS metadata so we can
@@ -47,7 +49,7 @@ public class MongoDelete {
 	 * below for deleting the nodes themselves.
 	 * 
 	 */
-	public void delete(MongoSession session, SubNode node) {
+	public void delete(MongoSession session, SubNode node, boolean childrenOnly) {
 		auth.authRequireOwnerOfNode(session, node);
 
 		log.debug("Deleting under path: " + node.getPath());
@@ -61,7 +63,7 @@ public class MongoDelete {
 		 * this will be rare that it has any performance impact.
 		 */
 		update.saveSession(session);
-		
+
 		/*
 		 * First delete all the children of the node by using the path, knowing all
 		 * their paths 'start with' (as substring) this path. Note how efficient it is
@@ -80,8 +82,8 @@ public class MongoDelete {
 		 * node, other wise deleting /ab would also delete /abc for example. so we must
 		 * have our recursive delete identify deleting "/ab" as starting with "/ab/"
 		 */
-
-		ops.remove(node);
+		if (!childrenOnly) {
+			ops.remove(node);
+		}
 	}
-
 }

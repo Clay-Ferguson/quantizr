@@ -279,7 +279,7 @@ public class UserManagerService {
 
 			SubNode ownerNode = read.getUserNodeByUserName(session, userName);
 			if (ownerNode != null) {
-				delete.delete(session, ownerNode);
+				delete.delete(session, ownerNode, false);
 			}
 		});
 		return res;

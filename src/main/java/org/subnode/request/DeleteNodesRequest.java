@@ -7,6 +7,7 @@ import org.subnode.request.base.RequestBase;
 public class DeleteNodesRequest extends RequestBase {
 	private List<String> nodeIds;
 	private boolean hardDelete;
+	private boolean childrenOnly;
 
 	public List<String> getNodeIds() {
 		return nodeIds;
@@ -22,5 +23,13 @@ public class DeleteNodesRequest extends RequestBase {
 
 	public void setHardDelete(boolean hardDelete) {
 		this.hardDelete = hardDelete;
+	}
+
+	public boolean isChildrenOnly() {
+		return childrenOnly;
+	}
+
+	public void setChildrenOnly(boolean childrenOnly) {
+		this.childrenOnly = childrenOnly;
 	}
 }

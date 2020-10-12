@@ -471,14 +471,15 @@ export class Edit implements EditIntf {
     emptyTrash = (state: AppState): void => {
         S.meta64.clearSelNodes(state);
 
-        new ConfirmDlg("Permanently delete your entire Trash Bin", "Empty Trash",
+        new ConfirmDlg("Permanently delete the nodes in your trash bin?", "Empty Trash",
             () => {
                 // do not delete (see note above)
                 // let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode();
 
                 S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                     nodeIds: [state.homeNodePath + "/d"],
-                    hardDelete: true
+                    hardDelete: true,
+                    childrenOnly: true
                 }, (res: J.DeleteNodesResponse) => {
                     // if user was viewing trash when the deleted it that's a proble, so for now the short term
                     // solution is send user to their root now.
@@ -494,11 +495,12 @@ export class Edit implements EditIntf {
     clearInbox = (state: AppState): void => {
         S.meta64.clearSelNodes(state);
 
-        new ConfirmDlg("Permanently delete your entire Inbox", "Cleaer Inbox",
+        new ConfirmDlg("Permanently delete the nodes in your Inbox", "Cleaer Inbox",
             () => {
                 S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                     nodeIds: ["~" + J.NodeType.INBOX],
-                    hardDelete: true
+                    hardDelete: true,
+                    childrenOnly: true
                 }, (res: J.DeleteNodesResponse) => {
                     S.nav.openContentNode(state.homeNodePath, state);
                 });
@@ -556,7 +558,8 @@ export class Edit implements EditIntf {
 
                 S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                     nodeIds: selNodesArray,
-                    hardDelete
+                    hardDelete,
+                    childrenOnly: false
                 }, (res: J.DeleteNodesResponse) => {
 
                     this.removeNodesFromCalendarData(selNodesArray, state);

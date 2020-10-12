@@ -173,7 +173,7 @@ public class MongoTest {
 		readAllChildrenOneByOne(adminSession, node, childCount);
 
 		// ---------Delete one node
-		delete.delete(adminSession, node);
+		delete.delete(adminSession, node, false);
 
 		// deleted the node AND all children.
 		expectedCount -= (1 + childCount);
