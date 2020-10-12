@@ -564,7 +564,7 @@ export class Edit implements EditIntf {
 
                     this.removeNodesFromCalendarData(selNodesArray, state);
 
-                    if (!postDelSelNodeId) {
+                    if (!postDelSelNodeId && !S.nav.displayingRepositoryRoot(state)) {
                         // we get here if user has deleted the last child (all chidren) of the parent of the current page
                         S.nav.navUpLevel();
                     } else {

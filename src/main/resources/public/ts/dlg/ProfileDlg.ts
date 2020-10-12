@@ -185,13 +185,17 @@ export class ProfileDlg extends DialogBase {
         };
 
         if (src) {
-            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-            let img: Img = new Img("profile-img", {
+            let att: any = {
                 className: this.readOnly ? "readOnlyProfileImage" : "profileImage",
-                title: "Click to upload new Profile Image",
                 src,
                 onClick
-            });
+            };
+            if (!this.readOnly) {
+                att.title = "Click to upload new Profile Image";
+            }
+
+            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+            let img: Img = new Img("profile-img", att);
             return img;
         }
         else {
