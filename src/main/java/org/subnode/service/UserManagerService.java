@@ -231,8 +231,6 @@ public class UserManagerService {
 	// String privateKey =
 	// Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
 
-	// //todo-0: these keys are obsolete/unused right? Because currently all the
-	// encryption should be happening in the browser only.
 	// userNode.setProp(NodeProp.CRYPTO_KEY_PUBLIC.s(), publicKey);
 	// userNode.setProp(NodeProp.CRYPTO_KEY_PRIVATE.s(), privateKey);
 	// }
