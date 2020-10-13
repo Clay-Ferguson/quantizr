@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <style th:replace="fragments/components :: fontLoaderStyle"></style>
-    
+
     <title>Quanta</title>
     <link rel="stylesheet" th:href="'/css/meta64.css?v='+${MAIN_CSS_HASH}" />
 </head>
@@ -37,7 +37,7 @@
                         GitHub
                     </a>
                 </li> -->
-                
+
                 <!-- <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">Dropdown</a>
@@ -206,9 +206,7 @@
                     :: featureInfoR(title='Open Source', content=${pg_welcome__openSource})">
                 </div>
             </div>
-
             <hr>
-
         </div>
     </main>
 
@@ -232,14 +230,15 @@
 
     <!-- load some scripts here, that aren't needed on this page, but we make use of the fact that the user is looking at
     the landing page, and use that time to pre-load this into browser for when it's needed. -->
-    
+
     <script th:inline="none">
+        var innerArray = ['[math]', '[/math]'];
         /*<![CDATA[*/
         MathJax = {
             tex: {
                 //warning: don't remove the space between the square braces here or that will trigger thymeleaf to pick up 
                 //the string and try to interpret it. Also the "th:inline: none" all by itself can fix this too, which we do use.
-                inlineMath: [ ['[math]', '[/math]'] ]
+                inlineMath: [innerArray]
             }
         };
         /*]]>*/

@@ -5,7 +5,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
@@ -29,6 +29,7 @@ export class RadioButton extends Comp {
         this.attribs.type = "radio";
         this.attribs.label = label;
         this.attribs.value = "val-" + this.getId();
+        this.attribs.className = "custom-control-input";
     }
 
     // Handler to update state
@@ -53,18 +54,15 @@ export class RadioButton extends Comp {
     compRender(): ReactNode {
         this.attribs.checked = !!this.valueIntf.getValue();
 
-        if (this.label) {
-            return S.e("span", {
-                key: this.attribs.id + "_span",
-                className: "myRadioButton"
-            },
-            S.e("input", this.attribs), S.e("label", { key: this.attribs.id + "_label", htmlFor: this.attribs.id }, this.label));
-        }
-        else {
-            return S.e("span", {
-                key: this.attribs.id + "_span",
-                className: "myRadioButton"
-            }, S.e("input", this.attribs));
-        }
+        return S.e("span", {
+            key: this.attribs.id + "_span",
+            className: "myRadioButton custom-control custom-radio inline-radio"
+        },
+            S.e("input", this.attribs),
+            S.e("label", {
+                key: this.attribs.id + "_label",
+                htmlFor: this.attribs.id,
+                className: "custom-control-label"
+            }, this.label || ""));
     }
 }

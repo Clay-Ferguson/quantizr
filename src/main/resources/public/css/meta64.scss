@@ -21,6 +21,9 @@ $body-color: white;
 
 $disabled-body-color: gray; //darken($body-color, 90%);
 
+// This gives us awesome large checkboxes and radio buttons!!
+$custom-control-indicator-size: 1.75rem;
+
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 @import "bootswatch.scss";
@@ -221,8 +224,16 @@ strong em {
     margin-bottom: 0px;
 }
 
-.checkbox-label {
-    margin-bottom: 0px;
+.inline-checkbox {
+    display: inline;
+    line-height: 2.5rem;
+    cursor: pointer;
+}
+
+.inline-radio {
+    display: inline;
+    line-height: 2.5rem;
+    cursor: pointer;
 }
 
 .button-font {
@@ -488,7 +499,6 @@ input[type="radio"] {
 }
 
 .myRadioButton {
-    cursor: pointer;
     margin-right: 2em;
 }
 
@@ -961,7 +971,6 @@ which it will do by default. */
 
 .header-text {
     font-size: small;
-    margin-left: 16px;
     margin-top: 8px;
     margin-bottom: 8px;
     padding-top: $microGap;

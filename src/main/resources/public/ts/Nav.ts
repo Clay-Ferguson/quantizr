@@ -208,12 +208,17 @@ export class Nav implements NavIntf {
             S.util.updateHistory(null, node, state);
         }, 10);
 
-        fastDispatch({
-            type: "Action_FastRefresh",
-            updateNew: (s: AppState): AppState => {
-                return { ...state };
-            }
-        });
+        // There's a wierd event/ording probelm where, without this timer (delay) clicking a checkbox on a node
+        // row won't get it's setter (onChange) called in time, because this refresh blows away too much state. This
+        // is related to the Checkbox.ts class.
+        setTimeout(() => {
+            fastDispatch({
+                type: "Action_FastRefresh",
+                updateNew: (s: AppState): AppState => {
+                    return { ...state };
+                }
+            });
+        }, 100);
     }
 
     openContentNode = (nodePathOrId: string, state: AppState): void => {

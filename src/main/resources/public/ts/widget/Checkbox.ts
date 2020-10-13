@@ -17,25 +17,10 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         super(_attribs);
 
         this.attribs.type = "checkbox";
+        this.attribs.className = "custom-control-input";
 
         this.attribs.onChange = (evt: any) => {
-
             this.updateValFunc(evt.target.checked);
-
-            // oops the renderCachedChildren is only for text input! where we KNOW we don't want the rest of the page rendering while user is typing.
-            // and if you use this technique it WILL stop any other page updates from happening inside here, before the timer completes.
-            // Comp.renderCachedChildren = true;
-            // try {
-            //     //console.log("e.target.checked=" + evt.target.checked);
-            //     this.updateValFunc(evt.target.checked);
-            // }
-            // finally {
-            //     /* React doesn't have a 'global' way to know when all rendering that's about to be done HAS been done, so all we can do here, is
-            //     use a timeout */
-            //     setTimeout(() => {
-            //         Comp.renderCachedChildren = false;
-            //     }, 250);
-            // }
         };
     }
 
@@ -63,16 +48,17 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         // convert that to exactly the value 'true' or else React itself (internal to React) will fail
         this.attribs.checked = !!this.valueIntf.getValue();
 
-        if (this.label) {
-            return S.e("span", { key: this.attribs.id + "_span" }, S.e("input", this.attribs),
-                S.e("label", {
-                    key: this.attribs.id + "_label",
-                    className: "checkbox-label",
-                    htmlFor: this.attribs.id
-                }, this.label));
-        }
-        else {
-            return S.e("span", { key: this.attribs.id + "_span" }, S.e("input", this.attribs));
-        }
+        return S.e("span", {
+            key: this.attribs.id + "_span",
+            // there is also a 'custom-control-inline' that could be used instead of 'inline-checkbox' but it adds space to the right
+            // NOTE: custom-switch or custom-checkbox will work here with all other things being identical! The custom-switch shows
+            // a little slider switch button instead of a box with a check.
+            className: "custom-control custom-checkbox inline-checkbox"
+        }, S.e("input", this.attribs),
+            S.e("label", {
+                key: this.attribs.id + "_label",
+                className: "custom-control-label",
+                htmlFor: this.attribs.id
+            }, this.label || ""));
     }
 }
