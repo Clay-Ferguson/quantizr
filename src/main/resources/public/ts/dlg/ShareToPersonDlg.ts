@@ -32,12 +32,7 @@ export class ShareToPersonDlg extends DialogBase {
                 new TextField("User to share with", false, this.shareNodeToPerson, null,
                     new CompValueHolder<string>(this, "userName")),
                 new ButtonBar([
-
-                    new Button("Share", () => {
-                        this.shareNodeToPerson();
-                        this.close();
-                    }, null, "btn-primary"),
-
+                    new Button("Share", this.shareNodeToPerson, null, "btn-primary"),
                     new Button("Choose Friend", async () => {
                         let friendsDlg: FriendsDlg = new FriendsDlg(this.appState);
                         await friendsDlg.open();
@@ -47,12 +42,27 @@ export class ShareToPersonDlg extends DialogBase {
                         }
                     }, null, "btn-primary"),
 
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Close", this.close)
                 ])
             ])
         ];
+    }
+
+    validate = (): boolean => {
+        let valid = true;
+        let errors: any = {};
+        let state = this.getState();
+
+        if (!state.userName) {
+            errors.userNameTextValidationError = "Cannot be empty.";
+            valid = false;
+        }
+        else {
+            errors.userNameTextValidationError = null;
+        }
+
+        this.mergeState(errors);
+        return valid;
     }
 
     renderButtons(): CompIntf {
@@ -60,6 +70,10 @@ export class ShareToPersonDlg extends DialogBase {
     }
 
     shareNodeToPerson = (): void => {
+        if (!this.validate()) {
+            return;
+        }
+
         let targetUser = this.getState().userName;
         if (!targetUser) {
             S.util.showMessage("Please enter a username", "Warning");
@@ -91,6 +105,7 @@ export class ShareToPersonDlg extends DialogBase {
                 }
                 this.sharedNodeFunc(res);
             }
+            this.close();
             resolve();
         });
     }

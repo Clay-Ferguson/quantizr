@@ -43,9 +43,7 @@ export class VideoPlayerDlg extends DialogBase {
                 }),
                 new ButtonBar([
                     // todo-1: even if this button appears to work, I need it to explicitly enforce the saving of the time value AND the removal of the VIDEO element from the DOM */
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Close", this.close)
                 ])
             ])
         ];

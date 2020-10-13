@@ -33,12 +33,35 @@ export class ResetPasswordDlg extends DialogBase {
                 new TextField("Email Address", false, null, null, new CompValueHolder<string>(this, "email")),
                 new ButtonBar([
                     new Button("Reset my Password", this.resetPassword, null, "btn-primary"),
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Close", this.close)
                 ])
             ])
         ];
+    }
+
+    validate = (): boolean => {
+        let valid = true;
+        let errors: any = {};
+        let state = this.getState();
+
+        if (!state.user) {
+            errors.userValidationError = "Cannot be empty.";
+            valid = false;
+        }
+        else {
+            errors.userValidationError = null;
+        }
+
+        if (!state.email) {
+            errors.emailValidationError = "Cannot be empty.";
+            valid = false;
+        }
+        else {
+            errors.emailValidationError = null;
+        }
+
+        this.mergeState(errors);
+        return valid;
     }
 
     renderButtons(): CompIntf {
@@ -46,6 +69,9 @@ export class ResetPasswordDlg extends DialogBase {
     }
 
     resetPassword = (): void => {
+        if (!this.validate()) {
+            return;
+        }
         let state = this.getState();
         var userName = state.user;
         var emailAddress = state.email;

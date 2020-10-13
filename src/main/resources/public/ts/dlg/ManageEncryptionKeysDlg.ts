@@ -23,9 +23,7 @@ export class ManageEncryptionKeysDlg extends DialogBase {
         return [
             new TextContent(this.getState().keyJson, "tallTextContent", true),
             new ButtonBar([
-                new Button("Close", () => {
-                    this.close();
-                })
+                new Button("Close", this.close)
             ])
         ];
     }

@@ -36,9 +36,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
                 }, new CompValueHolder<string>(this, "keyText")),
                 new ButtonBar([
                     new Button("Import", this.import, null, "btn-primary"),
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Close", this.close)
                 ])
             ])
         ];

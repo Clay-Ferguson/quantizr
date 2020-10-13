@@ -25,7 +25,7 @@ export class EditPropertyDlg extends DialogBase {
     name: string;
 
     constructor(private editNode: J.NodeInfo, state: AppState) {
-        super("Edit Property Name", null, false, state);
+        super("Edit Property Name", "app-modal-content-narrow-width", false, state);
     }
 
     renderDlg(): CompIntf[] {
@@ -36,11 +36,26 @@ export class EditPropertyDlg extends DialogBase {
 
             new ButtonBar([
                 new Button("Save", this.save, null, "btn-primary"),
-                new Button("Cancel", () => {
-                    this.close();
-                })
+                new Button("Cancel", this.close)
             ], null, "marginTop")
         ];
+    }
+
+    validate = (): boolean => {
+        let valid = true;
+        let errors: any = {};
+        let state = this.getState();
+
+        if (!state.propName) {
+            errors.propNameValidationError = "Cannot be empty.";
+            valid = false;
+        }
+        else {
+            errors.propNameValidationError = null;
+        }
+
+        this.mergeState(errors);
+        return valid;
     }
 
     renderButtons(): CompIntf {
@@ -48,6 +63,10 @@ export class EditPropertyDlg extends DialogBase {
     }
 
     save = (): void => {
+        if (!this.validate()) {
+            return;
+        }
+
         this.name = this.getState().propName;
 
         /* verify first that this property doesn't already exist */

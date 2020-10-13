@@ -38,9 +38,7 @@ export class SearchFileSystemDlg extends DialogBase {
                     new CompValueHolder<string>(this, "searchText")),
                 new ButtonBar([
                     new Button("Search", this.searchNodes),
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Close", this.close)
                 ])
             ])
         ];

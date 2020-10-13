@@ -48,12 +48,27 @@ export class TransferNodeDlg extends DialogBase {
                 ]),
                 new ButtonBar([
                     new Button("Transfer", this.transfer, null, "btn-primary"),
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Close", this.close)
                 ])
             ])
         ];
+    }
+
+    validate = (): boolean => {
+        let valid = true;
+        let errors: any = {};
+        let state = this.getState();
+
+        if (!state.toUser) {
+            errors.toUserNameTextValidationError = "Cannot be empty.";
+            valid = false;
+        }
+        else {
+            errors.toUserNameTextValidationError = null;
+        }
+
+        this.mergeState(errors);
+        return valid;
     }
 
     renderButtons(): CompIntf {
@@ -61,6 +76,10 @@ export class TransferNodeDlg extends DialogBase {
     }
 
     transfer = (): void => {
+        if (!this.validate()) {
+            return;
+        }
+
         let state = this.getState();
 
         // if fromUser is left blank that's how to take ownership of any nodes regardless of current ownership

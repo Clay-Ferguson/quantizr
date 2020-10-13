@@ -49,9 +49,7 @@ export class FriendsDlg extends DialogBase {
                     new Button("Choose", () => {
                         this.close();
                     }, null, "btn-primary"),
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Close", this.close)
                 ])
             ])
         ];

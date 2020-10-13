@@ -88,9 +88,7 @@ export class ProfileDlg extends DialogBase {
                     }, [
                         new ButtonBar([
                             this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-                            new Button(this.readOnly ? "Close" : "Cancel", () => {
-                                this.close();
-                            })
+                            new Button(this.readOnly ? "Close" : "Cancel", this.close)
                         ], null, "marginTop")
                     ])
                 ])

@@ -36,9 +36,7 @@ export class EncryptionDlg extends DialogBase {
                         this.encrypted = this.getState().encrypted;
                         this.close();
                     }, null, "btn-primary"),
-                    new Button("Cancel", () => {
-                        this.close();
-                    })
+                    new Button("Cancel", this.close)
                 ])
             ])
         ];

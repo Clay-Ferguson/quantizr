@@ -85,9 +85,7 @@ export class SearchContentDlg extends DialogBase {
                 ], "marginBottom"),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Close", this.close)
                 ])
             ])
         ];

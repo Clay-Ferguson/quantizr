@@ -925,10 +925,15 @@ which it will do by default. */
 
 .validationError {
     color: #E74C3C;
+    margin-bottom: 0px;
 }
 
 .validationErrorBorder {
     border: 2px solid #E74C3C;
+}
+
+.txtFieldLabel {
+    margin-bottom: .25rem;
 }
 
 .dialog-header {

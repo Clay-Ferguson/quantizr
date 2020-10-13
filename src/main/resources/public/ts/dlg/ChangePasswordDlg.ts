@@ -35,16 +35,28 @@ export class ChangePasswordDlg extends DialogBase {
                 new TextContent("Enter your new password below..."),
                 this.passwordField = new TextField("New Password", true, null, null, new CompValueHolder<string>(this, "pwd")),
                 new ButtonBar([
-                    new Button("Change Password", () => {
-                        this.changePassword();
-                        this.close();
-                    }, null, "btn-primary"),
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Change Password", this.changePassword, null, "btn-primary"),
+                    new Button("Close", this.close)
                 ])
             ])
         ];
+    }
+
+    validate = (): boolean => {
+        let valid = true;
+        let errors: any = {};
+        let state = this.getState();
+
+        if (!state.pwd) {
+            errors.pwdValidationError = "Cannot be empty.";
+            valid = false;
+        }
+        else {
+            errors.pwdValidationError = null;
+        }
+
+        this.mergeState(errors);
+        return valid;
     }
 
     renderButtons(): CompIntf {
@@ -57,6 +69,9 @@ export class ChangePasswordDlg extends DialogBase {
      * user.
      */
     changePassword = (): void => {
+        if (!this.validate()) {
+            return;
+        }
         let pwd = this.getState().pwd;
 
         if (pwd && pwd.length >= 4) {
@@ -71,6 +86,7 @@ export class ChangePasswordDlg extends DialogBase {
 
     changePasswordResponse = (res: J.ChangePasswordResponse) => {
         if (S.util.checkSuccess("Change password", res)) {
+            this.close();
             let msg = "Password changed successfully.";
 
             if (this.passCode) {

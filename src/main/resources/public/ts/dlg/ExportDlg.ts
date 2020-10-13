@@ -45,9 +45,7 @@ export class ExportDlg extends DialogBase {
             ]),
             new ButtonBar([
                 new Button("Export", this.exportNodes, null, "btn-primary"),
-                new Button("Close", () => {
-                    this.close();
-                })
+                new Button("Close", this.close)
             ])
         ];
     }

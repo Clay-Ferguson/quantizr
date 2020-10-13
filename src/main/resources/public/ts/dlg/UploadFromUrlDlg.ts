@@ -31,9 +31,7 @@ export class UploadFromUrlDlg extends DialogBase {
                 new TextField("Upload from URL", false, null, null, new CompValueHolder<string>(this, "url")),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Close", this.close)
                 ])
             ])
         ];

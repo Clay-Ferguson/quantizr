@@ -1,3 +1,4 @@
+import { compose } from "redux";
 import { AppState } from "../AppState";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
@@ -35,13 +36,8 @@ export class ChangeNodeTypeDlg extends DialogBase {
             new Form(null, [
                 new NodeTypeListBox(this.selTypeValueIntf, this.appState),
                 new ButtonBar([
-                    new Button("Set Type", () => {
-                        this.setNodeType();
-                        this.close();
-                    }, null, "btn-primary"),
-                    new Button("Cancel", () => {
-                        this.close();
-                    })
+                    new Button("Set Type", this.setNodeType, null, "btn-primary"),
+                    new Button("Cancel", this.close)
                 ])
             ])
         ];
@@ -54,5 +50,6 @@ export class ChangeNodeTypeDlg extends DialogBase {
     setNodeType = (): void => {
         // console.log("accepting TypeSelected: " + this.getState().selType);
         this.selCallback(this.getState().selType);
+        this.close();
     }
 }

@@ -30,9 +30,7 @@ export class ManageAccountDlg extends DialogBase {
             ], false, null, false, "float-right"),
 
             new ButtonBar([
-                new Button("Close", () => {
-                    this.close();
-                })
+                new Button("Close", this.close)
             ])
         ];
     }

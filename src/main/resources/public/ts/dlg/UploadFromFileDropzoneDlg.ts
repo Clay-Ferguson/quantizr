@@ -75,9 +75,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Upload from URL", this.uploadFromUrl),
                     new Button("Upload from Clipboard", this.uploadFromClipboard),
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Close", this.close)
                 ])
             ])
         ];

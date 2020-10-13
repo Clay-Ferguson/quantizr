@@ -36,12 +36,35 @@ export class LoginDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Login", this.login, null, "btn-primary"),
                     new Button("Forgot Password", this.resetPassword),
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Close", this.close)
                 ])
             ])
         ];
+    }
+
+    validate = (): boolean => {
+        let valid = true;
+        let errors: any = {};
+        let state = this.getState();
+
+        if (!state.user) {
+            errors.userValidationError = "Cannot be empty.";
+            valid = false;
+        }
+        else {
+            errors.userValidationError = null;
+        }
+
+        if (!state.password) {
+            errors.passwordValidationError = "Cannot be empty.";
+            valid = false;
+        }
+        else {
+            errors.passwordValidationError = null;
+        }
+
+        this.mergeState(errors);
+        return valid;
     }
 
     renderButtons(): CompIntf {
@@ -61,6 +84,10 @@ export class LoginDlg extends DialogBase {
     }
 
     login = (): void => {
+        if (!this.validate()) {
+            return;
+        }
+
         let usr = this.getState().user;
         let pwd = this.getState().password;
 

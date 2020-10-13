@@ -33,6 +33,23 @@ export class SearchByNameDlg extends DialogBase {
         });
     }
 
+    validate = (): boolean => {
+        let valid = true;
+        let errors: any = {};
+        let state = this.getState();
+
+        if (!state.searchText) {
+            errors.searchTextValidationError = "Cannot be empty.";
+            valid = false;
+        }
+        else {
+            errors.searchTextValidationError = null;
+        }
+
+        this.mergeState(errors);
+        return valid;
+    }
+
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
@@ -41,9 +58,7 @@ export class SearchByNameDlg extends DialogBase {
                     new CompValueHolder<string>(this, "searchText")),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
-                    new Button("Close", () => {
-                        this.close();
-                    })
+                    new Button("Close", this.close)
                 ])
             ])
         ];
@@ -54,6 +69,10 @@ export class SearchByNameDlg extends DialogBase {
     }
 
     search = () => {
+        if (!this.validate()) {
+            return;
+        }
+
         if (!S.util.ajaxReady("searchNodes")) {
             return;
         }
