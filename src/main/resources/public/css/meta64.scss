@@ -224,15 +224,17 @@ strong em {
     margin-bottom: 0px;
 }
 
-.inline-checkbox {
-    display: inline;
+.radioButtonsBar {
     line-height: 2.5rem;
+}
+
+.inline-checkbox {
+    display: inline-block;
     cursor: pointer;
 }
 
 .inline-radio {
-    display: inline;
-    line-height: 2.5rem;
+    display: inline-block;
     cursor: pointer;
 }
 

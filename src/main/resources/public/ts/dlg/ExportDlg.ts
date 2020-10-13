@@ -42,11 +42,11 @@ export class ExportDlg extends DialogBase {
                 this.createRadioButton("Markdown", "md"),
                 this.createRadioButton("PDF", "pdf"),
                 this.createRadioButton("HTML", "html")
-            ]),
+            ], "radioButtonsBar"),
             new ButtonBar([
                 new Button("Export", this.exportNodes, null, "btn-primary"),
                 new Button("Close", this.close)
-            ])
+            ], null, "marginTop")
         ];
     }
 

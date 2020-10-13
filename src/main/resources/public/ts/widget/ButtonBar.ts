@@ -12,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ButtonBar extends Comp {
 
     // wrapperClass can be 'text-center' for centering.
-    constructor(initialButtons: Comp[] = null, private wrapperClass: string = "", private extraClass:string = "") {
+    constructor(initialButtons: Comp[] = null, private wrapperClass: string = "", private extraClass: string = "") {
         super(null);
         this.attribs.className = "btn-group " + extraClass;
         this.attribs.role = "group";
@@ -28,7 +28,7 @@ export class ButtonBar extends Comp {
                 className: "wrapper " + this.wrapperClass,
                 key: this.getId() + "_wrp"
             },
-            S.e("div", this.attribs, this.buildChildren()));
+                S.e("div", this.attribs, this.buildChildren()));
         }
         else {
             return S.e("div", this.attribs, this.buildChildren());
