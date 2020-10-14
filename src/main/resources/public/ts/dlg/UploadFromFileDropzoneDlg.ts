@@ -53,7 +53,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         // S.log("upload.renderDlg: state.toIpfs="+state.toIpfs);
         let children = [
             new Form(null, [
-                new HorizontalLayout([
+                this.importMode ? null : new HorizontalLayout([
 
                     /* Having this checkbox and caling the setState here causes a full rerender of this dialog, and this needs work eventually
                     to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div
@@ -72,9 +72,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 new ButtonBar([
-                    this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
-                    new Button("Upload from URL", this.uploadFromUrl),
-                    new Button("Upload from Clipboard", this.uploadFromClipboard),
+                    this.uploadButton = new Button(this.importMode ? "Import" : "Upload", this.upload, null, "btn-primary"),
+                    this.importMode ? null : new Button("Upload from URL", this.uploadFromUrl),
+                    this.importMode ? null : new Button("Upload from Clipboard", this.uploadFromClipboard),
                     new Button("Close", this.close)
                 ])
             ])
