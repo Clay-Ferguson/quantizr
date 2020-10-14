@@ -27,13 +27,14 @@ export class Button extends Comp {
     }
 
     compRender(): ReactNode {
+        let text: string = this.getState().text;
         let icon: any;
         if (this.attribs.iconclass) {
             icon = S.e("i", {
                 key: "s_" + this.getId(),
                 className: this.attribs.iconclass,
                 style: {
-                    marginRight: "6px"
+                    marginRight: text ? "6px" : "0px"
                 }
             });
         }
@@ -58,6 +59,6 @@ export class Button extends Comp {
         //     display : this.getState().visible ? "inline-block" : "none"
         // };
 
-        return S.e("button", this.attribs, [icon, this.getState().text]);
+        return S.e("button", this.attribs, [icon, text]);
     }
 }

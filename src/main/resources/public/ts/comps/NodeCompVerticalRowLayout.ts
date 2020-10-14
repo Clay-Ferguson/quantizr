@@ -117,7 +117,7 @@ export class NodeCompVerticalRowLayout extends Div {
                         S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
                     },
                     title: "Insert new node here"
-                }, "btn-sm btn-secondary marginTop marginLeft")
+                }, "btn-secondary marginTop marginLeft")
             ]);
 
             comps.push(div);

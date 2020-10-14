@@ -256,7 +256,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
                         S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
                     },
                     title: "Insert new node (above)"
-                }, "btn-sm btn-secondary float-right");
+                }, "btn-secondary");
             }
         }
 
