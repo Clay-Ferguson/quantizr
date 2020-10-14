@@ -57,7 +57,7 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         }, S.e("input", this.attribs),
             S.e("label", {
                 key: this.attribs.id + "_label",
-                className: "custom-control-label",
+                className: "custom-control-label checkboxLabel",
                 htmlFor: this.attribs.id
             }, this.label || ""));
     }

@@ -88,23 +88,22 @@ export class EditNodeDlg extends DialogBase {
             { key: "c4", val: "4 Columns" },
             { key: "c5", val: "5 Columns" },
             { key: "c6", val: "6 Columns" }
-        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v")); // w-25
+        ], "m-2", "", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v")); // w-25
         return selection;
     }
 
     createPrioritySelection = (): Selection => {
-        let selection: Selection = new Selection(null, "Priority", [
+        return new Selection(null, "Priority", [
             { key: "0", val: "none" },
             { key: "1", val: "Top" },
             { key: "2", val: "High" },
             { key: "3", val: "Medium" },
             { key: "4", val: "Low" },
             { key: "5", val: "Backlog" }
-        ], "m-2", new PropValueHolder(this.getState().node, J.NodeProp.PRIORITY, "0"));
-        return selection;
+        ], "m-2", "", new PropValueHolder(this.getState().node, J.NodeProp.PRIORITY, "0"));
     }
 
-    createImgSizeSelection = (label: string, allowNone: boolean, valueIntf: ValueIntf): Selection => {
+    createImgSizeSelection = (label: string, allowNone: boolean, extraClasses: string, valueIntf: ValueIntf): Selection => {
         let options = [];
 
         if (allowNone) {
@@ -128,8 +127,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "1000px", val: "1000px" }
         ]);
 
-        let selection: Selection = new Selection(null, label, options, "m-2", valueIntf);
-        return selection;
+        return new Selection(null, label, options, "m-2 width-7rem", extraClasses, valueIntf);
     }
 
     getTitleIconComp(): CompIntf {
@@ -211,10 +209,8 @@ export class EditNodeDlg extends DialogBase {
             ])
         ];
 
-        let optionsBar = new Div("", null, [
-            new Checkbox("Word Wrap", {
-                className: "marginRight"
-            }, {
+        let optionsBar = new Div("", { className: "marginBottom" }, [
+            new Checkbox("Word Wrap", null, {
                 setValue: (checked: boolean): void => {
                     // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
                     S.props.setNodePropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
@@ -238,12 +234,12 @@ export class EditNodeDlg extends DialogBase {
 
         let selectionsBar = new FormInline(null, [
             state.node.hasChildren ? this.createLayoutSelection() : null,
-            state.node.hasChildren ? this.createImgSizeSelection("Images", true, //
+            state.node.hasChildren ? this.createImgSizeSelection("Images", true, null, //
                 new PropValueHolder(this.getState().node, J.NodeProp.CHILDREN_IMG_SIZES, "n")) : null,
             this.createPrioritySelection()
         ]);
 
-        let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, //
+        let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, "float-right", //
             new PropValueHolder(this.getState().node, J.NodeProp.IMG_SIZE, "100%")) : null;
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
@@ -346,6 +342,7 @@ export class EditNodeDlg extends DialogBase {
         if (hasAttachment) {
             let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, state.node);
 
+            // NOTE: col numbers in the children of LayoutRow must add up to 12 (per bootstrap)!
             binarySection = new LayoutRow([
                 new Div(null, { className: "col-6 editBinaryContainer" }, [
                     new Div("Attachment", {
@@ -357,13 +354,15 @@ export class EditNodeDlg extends DialogBase {
                 new Div(null, {
                     className: "col-6"
                 }, [
-                    imgSizeSelection,
-                    new ButtonBar([
-                        this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
-                        this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
-                        ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
-                    ], null, "float-right"),
-                    ipfsLink ? new Div("Stored on IPFS", { className: "marginTop" }) : null
+                    new Div(null, null, [
+                        imgSizeSelection,
+                        new ButtonBar([
+                            this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
+                            this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
+                            ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
+                        ], null, "float-right"),
+                        ipfsLink ? new Div("Stored on IPFS", { className: "marginTop" }) : null
+                    ])
                 ])
 
             ], "binaryEditorSection");
@@ -647,7 +646,7 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             if (allowCheckbox) {
-                let checkbox: Checkbox = new Checkbox(label, null, {
+                let checkbox: Checkbox = new Checkbox(label, { className: "checkboxContainerHeight" }, {
                     setValue: (checked: boolean): void => {
                         let state = this.getState();
                         if (checked) {

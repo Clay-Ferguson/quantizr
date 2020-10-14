@@ -220,11 +220,29 @@ strong em {
     background-color: green;
 } 
 
+.width-7rem {
+    width: 7rem;
+}
+
 .textfield-label {
     margin-bottom: 0px;
 }
 
+.checkboxLabel {
+    margin-right: 16px;
+    margin-bottom: $smallGap;
+}
+
+.radioLabel {
+    margin-right: 16px;
+    margin-bottom: $smallGap;
+}
+
 .radioButtonsBar {
+    line-height: 2.5rem;
+}
+
+.checkboxContainerHeight {
     line-height: 2.5rem;
 }
 

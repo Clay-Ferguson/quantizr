@@ -13,7 +13,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Selection extends Comp {
 
-    constructor(attribs: any, private label: string = null, public selectionOptions: Object[] = null, moreClasses: string = "", private valueIntf: ValueIntf) {
+    constructor(attribs: any, private label: string = null, public selectionOptions: Object[] = null, moreClasses: string, private outterClasses: string, private valueIntf: ValueIntf) {
         super(attribs || {});
         // w-25 = width 25%
         // https://hackerthemes.com/bootstrap-cheatsheet/#m-1
@@ -60,7 +60,7 @@ export class Selection extends Comp {
         return S.e("div", {
             id: this.getId() + "_sel",
             key: this.getId() + "_sel",
-            className: "form-group"
+            className: "form-group " + (this.outterClasses || "")
         }, children);
     }
 }

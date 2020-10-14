@@ -62,7 +62,7 @@ export class RadioButton extends Comp {
             S.e("label", {
                 key: this.attribs.id + "_label",
                 htmlFor: this.attribs.id,
-                className: "custom-control-label"
+                className: "custom-control-label radioLabel"
             }, this.label || ""));
     }
 }
