@@ -18,10 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
 import org.subnode.config.AppProp;
-import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.model.UserPreferences;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoAuth;
@@ -80,9 +78,6 @@ public abstract class ExportArchiveBase {
 	@Autowired
 	private AppProp appProp;
 
-	@Autowired
-	private SessionContext sessionContext;
-
 	private MongoSession session;
 
 	public void export(MongoSession session, final ExportRequest req, final ExportResponse res) {
@@ -90,12 +85,6 @@ public abstract class ExportArchiveBase {
 			session = ThreadLocals.getMongoSession();
 		}
 		this.session = session;
-
-		final UserPreferences userPreferences = sessionContext.getUserPreferences();
-		final boolean exportAllowed = userPreferences != null ? userPreferences.isExportAllowed() : false;
-		if (!exportAllowed && !sessionContext.isAdmin()) {
-			throw ExUtil.wrapEx("You are not authorized to export.");
-		}
 
 		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist: " + appProp.getAdminDataFolder());

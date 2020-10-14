@@ -332,9 +332,10 @@ public class AttachmentService {
 
 		if (ImageUtil.isImageMime(mimeType)) {
 
-			// default image to be 100% size so it always fits right into the width of the
-			// display row.
-			node.setProp(NodeProp.IMG_SIZE.s(), "100%");
+			// default image to be 100% size
+			if (node.getStringProp(NodeProp.IMG_SIZE.s())==null) {
+				node.setProp(NodeProp.IMG_SIZE.s(), "100%");
+			}
 
 			if (calcImageSize) {
 				LimitedInputStream is = null;

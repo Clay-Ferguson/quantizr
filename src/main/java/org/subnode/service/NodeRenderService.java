@@ -204,8 +204,6 @@ public class NodeRenderService {
 	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res,
 			final SubNode node, boolean scanToNode, String scanToPath, int ordinal, int level) {
 
-		// log.debug("RENDER nodeId: " + node.getId().toHexString()); //
-		// .prettyPrint(node));
 		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, ordinal, level > 0,
 				false, false);
 

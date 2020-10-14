@@ -59,8 +59,6 @@ export class AppState {
 
     userPreferences: J.UserPreferences = {
         editMode: false,
-        importAllowed: false,
-        exportAllowed: false,
         showMetaData: false,
         maxUploadFileSize: 0
     };

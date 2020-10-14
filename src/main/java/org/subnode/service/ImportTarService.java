@@ -44,14 +44,6 @@ public class ImportTarService extends ImportArchiveBase {
 			throw new RuntimeEx("UserNode not found: " + sessionContext.getUserName());
 		}
 
-		if (!isNonRequestThread) {
-			final UserPreferences userPreferences = sessionContext.getUserPreferences();
-			final boolean importAllowed = userPreferences != null ? userPreferences.isImportAllowed() : false;
-			if (!importAllowed && !sessionContext.isAdmin()) {
-				throw ExUtil.wrapEx("You are not authorized to import.");
-			}
-		}
-
 		try {
 			targetPath = node.getPath();
 			this.session = session;

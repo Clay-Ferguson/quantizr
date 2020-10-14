@@ -51,8 +51,6 @@ export class PrefsDlg extends DialogBase {
         S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
             userPreferences: {
                 editMode: this.appState.userPreferences.editMode,
-                importAllowed: false,
-                exportAllowed: false,
                 showMetaData: this.appState.userPreferences.showMetaData,
                 maxUploadFileSize: -1
             }

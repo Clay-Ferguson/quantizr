@@ -706,9 +706,7 @@ public class UserManagerService {
 			SubNode prefsNode = read.getUserNodeByUserName(session, userName);
 			userPrefs.setEditMode(prefsNode.getBooleanProp(NodeProp.USER_PREF_EDIT_MODE.s()));
 			userPrefs.setShowMetaData(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_METADATA.s()));
-			userPrefs.setImportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_IMPORT_ALLOWED.s()));
-			userPrefs.setExportAllowed(prefsNode.getBooleanProp(NodeProp.USER_PREF_EXPORT_ALLOWED.s()));
-
+	
 			long maxFileSize = prefsNode.getIntProp(NodeProp.BIN_QUOTA.s());
 			if (maxFileSize == 0) {
 				maxFileSize = Const.DEFAULT_USER_QUOTA;

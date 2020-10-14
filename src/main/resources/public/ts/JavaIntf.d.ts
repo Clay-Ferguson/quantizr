@@ -551,8 +551,6 @@ export interface NodeInfo {
 export interface UserPreferences {
     editMode: boolean;
     showMetaData: boolean;
-    importAllowed: boolean;
-    exportAllowed: boolean;
     maxUploadFileSize: number;
 }
 
@@ -600,8 +598,6 @@ export const enum NodeProp {
     USER_PREF_PUBLIC_KEY = "sn:publicKey",
     USER_PREF_EDIT_MODE = "sn:editMode",
     USER_PREF_SHOW_METADATA = "sn:showMetaData",
-    USER_PREF_IMPORT_ALLOWED = "sn:importAllowed",
-    USER_PREF_EXPORT_ALLOWED = "sn:exportAllowed",
     USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth",
     SIGNUP_PENDING = "sn:signupPending",
     EMAIL_CONTENT = "sn:content",

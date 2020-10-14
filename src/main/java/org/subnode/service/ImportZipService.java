@@ -12,12 +12,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.model.UserPreferences;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
+import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
 
 /**
@@ -63,7 +64,7 @@ public class ImportZipService extends ImportArchiveBase {
 	}
 
 	/* Returns the first node created which is always the root of the import */
-	public SubNode importFromStream(MongoSession session, InputStream is, SubNode node,
+	public SubNode importFromStream(MongoSession session, InputStream inputStream, SubNode node,
 			boolean isNonRequestThread) {
 		if (used) {
 			throw new RuntimeEx("Prototype bean used multiple times is not allowed.");
@@ -75,19 +76,16 @@ public class ImportZipService extends ImportArchiveBase {
 			throw new RuntimeEx("UserNode not found: " + sessionContext.getUserName());
 		}
 
-		if (!isNonRequestThread) {
-			UserPreferences userPreferences = sessionContext.getUserPreferences();
-			boolean importAllowed = userPreferences != null ? userPreferences.isImportAllowed() : false;
-			if (!importAllowed && !sessionContext.isAdmin()) {
-				throw ExUtil.wrapEx("You are not authorized to import.");
-			}
-		}
-
+		LimitedInputStreamEx is = null;
 		try {
 			targetPath = node.getPath();
 			this.session = session;
 
+			// todo-1: replace with the true amount of storage this user has remaining. Admin is unlimited. 
+			int maxSize = sessionContext.isAdmin() ? Integer.MAX_VALUE : Const.DEFAULT_USER_QUOTA;
+			is = new LimitedInputStreamEx(inputStream, maxSize);
 			zis = new ZipArchiveInputStream(is);
+			
 			ZipArchiveEntry entry;
 			while ((entry = zis.getNextZipEntry()) != null) {
 				if (!entry.isDirectory()) {
@@ -98,7 +96,7 @@ public class ImportZipService extends ImportArchiveBase {
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		} finally {
-			StreamUtil.close(zis);
+			StreamUtil.close(is);
 		}
 		return importRootNode;
 	}

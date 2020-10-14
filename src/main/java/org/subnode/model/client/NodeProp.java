@@ -18,8 +18,6 @@ public enum NodeProp {
     USER_PREF_PUBLIC_KEY("sn:publicKey", "s"), //
     USER_PREF_EDIT_MODE("sn:editMode", "s"), //
     USER_PREF_SHOW_METADATA("sn:showMetaData", "s"), //
-    USER_PREF_IMPORT_ALLOWED("sn:importAllowed", "s"), //
-    USER_PREF_EXPORT_ALLOWED("sn:exportAllowed", "s"), //
     USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth", "s"), //
     SIGNUP_PENDING("sn:signupPending", "s"), //
 

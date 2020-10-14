@@ -8,8 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UserPreferences {
 	private boolean editMode;
 	private boolean showMetaData;
-	private boolean importAllowed;
-	private boolean exportAllowed;
 
 	@JsonProperty(required = false)
 	private long maxUploadFileSize;
@@ -21,23 +19,7 @@ public class UserPreferences {
 	public void setEditMode(boolean editMode) {
 		this.editMode = editMode;
 	}
-
-	public boolean isImportAllowed() {
-		return importAllowed;
-	}
-
-	public void setImportAllowed(boolean importAllowed) {
-		this.importAllowed = importAllowed;
-	}
-
-	public boolean isExportAllowed() {
-		return exportAllowed;
-	}
-
-	public void setExportAllowed(boolean exportAllowed) {
-		this.exportAllowed = exportAllowed;
-	}
-
+	
 	public boolean isShowMetaData() {
 		return showMetaData;
 	}

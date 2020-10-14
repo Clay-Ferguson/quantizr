@@ -83,7 +83,10 @@ public abstract class ImportArchiveBase {
 			} else if (mimeUtil.isJsonFileType(fileName)) {
 				log.debug("  isJSON: " + fileName);
 				String json = IOUtils.toString(zis, "UTF-8");
+				//log.debug("  JSON STRING: " + json);
 				SubNode node = jsonMapper.readValue(json, SubNode.class);
+
+				//log.debug("   from JAVA:" + XString.prettyPrint(node));
 
 				node.setPath(targetPath + node.getPath());
 				String oldId = node.getId().toHexString();
@@ -129,10 +132,13 @@ public abstract class ImportArchiveBase {
 	 */
 	public void storeBinary(ArchiveEntry entry, InputStream zis, String fileName) {
 		String nodeId = fileUtils.stripExtension(fileName);
-		/* todo-1: need to retest whether an export actually INCLUDES IPFS file data
-		or just maintains a link to the IPFS data? This really needs to be an export option
-		that the user can specify, because it would be nice if there WERE a way for an export
-		to extract data out of IPFS and save it in the exported file */
+		/*
+		 * todo-1: need to retest whether an export actually INCLUDES IPFS file data or
+		 * just maintains a link to the IPFS data? This really needs to be an export
+		 * option that the user can specify, because it would be nice if there WERE a
+		 * way for an export to extract data out of IPFS and save it in the exported
+		 * file
+		 */
 		nodeId = oldIdToNewIdMap.get(nodeId);
 
 		if (nodeId != null) {

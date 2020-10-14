@@ -38,9 +38,8 @@ export class MenuPanel extends Div {
         const hltNode = S.meta64.getHighlightedNode(state);
         const selNodeIsMine = !!hltNode && (hltNode.owner === state.userName || state.userName === "admin");
 
-        // for now, allowing all users to import+export (todo-2)
-        const importFeatureEnabled = state.isAdminUser || state.userPreferences.importAllowed;
-        const exportFeatureEnabled = state.isAdminUser || state.userPreferences.exportAllowed;
+        const importFeatureEnabled = selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id);
+        const exportFeatureEnabled = selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id);
 
         const orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, hltNode);
         const allowNodeMove: boolean = !orderByProp && S.edit.isInsertAllowed(state.node, state);
@@ -163,11 +162,8 @@ export class MenuPanel extends Div {
 
             new MenuItemSeparator(), //
 
-            new MenuItem("Import", () => S.edit.openImportDlg(state), //
-                state.isAdminUser && importFeatureEnabled && (selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id))), //
-
-            new MenuItem("Export", () => S.edit.openExportDlg(state),
-                state.isAdminUser && exportFeatureEnabled && (selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id))) //
+            new MenuItem("Import", () => S.edit.openImportDlg(state), importFeatureEnabled),
+            new MenuItem("Export", () => S.edit.openExportDlg(state), exportFeatureEnabled)
         ]));
 
         children.push(new Menu("Encrypt", [
@@ -218,7 +214,7 @@ export class MenuPanel extends Div {
                     const nodeId: string = currentSelNode ? currentSelNode.id : null;
                     S.view.refreshTree(nodeId, false, nodeId, false, true, true, true, state);
                 },
-                state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine))
+                    state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine))
             ]));
         }
 

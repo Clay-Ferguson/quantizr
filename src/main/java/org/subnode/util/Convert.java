@@ -117,6 +117,8 @@ public class Convert {
 		log.trace("RENDER ID=" + node.getId().toHexString() + " rootId=" + ownerId + " session.rootId="
 				+ sessionContext.getRootId() + " node.content=" + node.getContent() + " owner=" + owner);
 
+		//log.debug("RENDER nodeId: " + node.getId().toHexString()+" -- json: "+XString.prettyPrint(node));
+
 		/*
 		 * If the node is not owned by the person doing the browsing we need to extract
 		 * the key from ACL and put in cipherKey, so send back so the user can decrypt

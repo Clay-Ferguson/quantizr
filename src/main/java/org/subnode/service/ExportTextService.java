@@ -63,13 +63,6 @@ public class ExportTextService {
 	
 		this.session = session;
 		this.req = req;
-
-		UserPreferences userPreferences = sessionContext.getUserPreferences();
-		boolean exportAllowed = userPreferences != null ? userPreferences.isExportAllowed() : false;
-		if (!exportAllowed && !sessionContext.isAdmin()) {
-			throw ExUtil.wrapEx("You are not authorized to export.");
-		}
-
 		String nodeId = req.getNodeId();
 
 		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
