@@ -22,7 +22,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompButtonBar extends HorizontalLayout {
 
-    constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean) {
+    constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean, private level: number) {
         super(null, "marginLeft", {
             id: "NodeCompButtonBar_" + node.id
         });
@@ -148,8 +148,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         */
         if (node.hasChildren && !isPageRootNode &&
             // If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
-            // Update: Changed my mind. It's confusing if 'open' is displayed even if editMode is on.
-            (!isInlineChildren /* || state.userPreferences.editMode */)) {
+            (!isInlineChildren || state.userPreferences.editMode)) {
 
             /* convert this button to a className attribute for styles */
             openButton = new Button("Open", S.meta64.getNodeFunc(S.nav.cached_openNodeById, "S.nav.openNodeById", node.id),
@@ -250,7 +249,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
                 }
             }
 
-            if (!isPageRootNode) {
+            if (!isPageRootNode && this.level === 1) {
                 insertInlineButton = new IconButton("fa-plus", null, {
                     onClick: e => {
                         S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);

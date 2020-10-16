@@ -65,7 +65,7 @@ export class NodeCompRow extends Div {
         let buttonBar: Comp = null;
         if (NodeCompRow.showButtonBar && !state.inlineEditId) {
             let allowAvatar = node.owner !== S.render.lastOwner;
-            buttonBar = new NodeCompButtonBar(node, allowAvatar, this.allowNodeMove);
+            buttonBar = new NodeCompButtonBar(node, allowAvatar, this.allowNodeMove, this.level);
         }
 
         let indentLevel = this.layoutClass === "node-grid-item" ? 0 : this.level;
