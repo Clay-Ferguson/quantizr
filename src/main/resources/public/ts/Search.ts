@@ -218,7 +218,6 @@ export class Search implements SearchIntf {
         }
 
         S.view.refreshTree(this.highlightRowNode.id, true, this.highlightRowNode.id, false, false, true, true, state);
-        S.meta64.selectTab("mainTab");
     }
 
     /*
