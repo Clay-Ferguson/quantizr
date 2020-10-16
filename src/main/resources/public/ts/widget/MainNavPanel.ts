@@ -211,7 +211,7 @@ export class MainNavPanel extends NavTag {
                         id: "mainMenu"
                         // only applies to mobile. just don't show title for now.
                         // title: "Show Main Menu"
-                    }, "nav-link btn-primary", "off")
+                    }, "nav-link btn-primary", "off", "/images/eagle-logo-50px-tr.jpg")
                 ])
             ]),
 

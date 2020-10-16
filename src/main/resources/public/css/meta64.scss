@@ -212,7 +212,8 @@ $smallBorderSize: 3px;
 }
 
 .main-navbar {
-    padding: $tinyGap;
+    margin: 0px;
+    padding: 0px;
 }
 
 /* This is how the search terms get highlighted by wrapping them like this in 
@@ -606,6 +607,12 @@ input[type="radio"] {
     margin-top: 1em;
 }
 
+.markdown-content {
+    padding-top: .5em;
+    padding-left: 1em;
+    padding-bottom: .5em;
+}
+
 // These borders make the hash-created titles (like '### Title') look really attractive, but it looks ugly 
 // when there's a single line title in the root node which itself has a border (and must for clarity as the root node)
 // so for now let's not do these unless/until we find a better way to indicate to user clearly that the root node
@@ -634,6 +641,12 @@ input[type="radio"] {
 // .markdown-content h6 {
 //     // border-bottom: 1px solid $gray-700;
 // }
+
+// without this any multi-paragraph text that our markdown renders always has too much spacing at the bottom. We already specify the
+// amount of spacing we want in the markdown-content style itself so we stop this from messing that up with this 'last-child' style
+.markdown-content p:last-child {
+    margin-bottom: 0px;
+}
 
 .markdown-content kbd,
 .markdown-content pre,
@@ -848,13 +861,6 @@ input[type="radio"] {
 
 .content-wide {
     max-width: 950px;
-}
-
-.markdown-content {
-    padding-top: .5em;
-    padding-left: 1em;
-    //padding-right: 1em;
-    padding-bottom: .5em;
 }
 
 .mousePointer {

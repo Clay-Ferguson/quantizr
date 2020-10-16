@@ -11,7 +11,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class IconButton extends Comp {
 
-    constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private specialClasses: string = "btn-primary", private toggle: string = "") {
+    constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private specialClasses: string = "btn-primary", private toggle: string = "", private imageUrl: string = null) {
         super(attribs);
         this.attribs.type = "button";
         this.attribs.className = "btn align-middle " + specialClasses;
@@ -30,16 +30,22 @@ export class IconButton extends Comp {
             toggleClass = " iconToggleOff";
         }
 
-        return S.e("button", _attribs,
-            S.e("i", {
-                key: "i_" + this.getId(),
-                className: "fa fa-lg " + this.iconClass + toggleClass
-            }, [
-                S.e("span", {
-                    key: "s_" + this.getId(),
-                    className: "button-font"
-                }, this.text === null ? null : " " + this.text)
-            ], true)
-        );
+        let buttonChildren = [];
+        if (this.imageUrl) {
+            buttonChildren.push(S.e("img", {
+                key: "s_img_" + this.getId(),
+                src: this.imageUrl
+            }));
+        }
+
+        buttonChildren.push(S.e("i", {
+            key: "i_" + this.getId(),
+            className: "fa fa-lg " + this.iconClass + toggleClass
+        }, [S.e("span", {
+            key: "s_txt_" + this.getId(),
+            className: "button-font"
+        }, this.text === null ? null : " " + this.text)], true));
+
+        return S.e("button", _attribs, buttonChildren);
     }
 }
