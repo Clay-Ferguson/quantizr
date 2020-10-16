@@ -1,0 +1,75 @@
+.menuPanel {
+    //border: 2px solid $nodeBorderBottomColor; 
+    background-color: transparent;
+}
+
+.menuItemSeparator {
+    border-bottom: 2px solid $nodeBorderBottomColor;
+}
+
+.mainMenuItemDisabled {
+    cursor: auto;
+    font-weight: lighter;
+    background-color: transparent;
+    //font-style: italic;
+    color: $disabled-body-color;
+    padding: 5px; 
+
+    @if $highlightActiveMenuItems {
+        border-left: 5px solid transparent;     
+    }
+}
+
+.mainMenuItemDisabled:hover {
+    cursor: auto;
+    font-weight: lighter;
+    background-color: transparent;
+    //font-style: italic;
+    color: $disabled-body-color;
+}
+
+.mainMenuItemEnabled {
+    cursor: pointer;
+    font-weight: normal;
+    background-color: transparent;
+
+    @if $highlightActiveMenuItems {
+        border-left: 5px solid $nodeBorderBottomColor; 
+    } 
+    padding: 5px;
+}
+
+.menuCardBody {
+    padding: 0px;
+    border: 2px solid #444;
+}
+
+.menuCard {
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+}
+
+.menuHeading {
+    cursor: pointer;
+    //background-color: $list-group-bg;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 10px; 
+}
+
+.menuHeading:hover {
+    background-color: $menuItemHoverBackgroundColor;
+    border-radius: 0;
+}
+
+.menuHeading[aria-expanded=true] {
+    background-color: $secondary;
+    border-radius: 0;
+}
+
+.mainMenuItemEnabled:hover {
+    cursor: pointer;
+    background-color: $menuItemHoverBackgroundColor;
+}

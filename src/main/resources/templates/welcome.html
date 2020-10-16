@@ -9,61 +9,28 @@
 
     <style th:replace="fragments/components :: fontLoaderStyle"></style>
 
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Quanta" />
+    <meta property="og:description" content="The world's first Quantized Editor!" />
+    <meta property="og:image" content="/images/eagle-logo-150px-tr.jpg" />
+    <meta property="og:url" content="https://quanta.wiki" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Quanta" />
+    <meta name="twitter:description" content="The world's first Quantized Editor!" />
+    <meta name="twitter:image" content="/images/eagle-logo-150px-tr.jpg" />
+
     <title>Quanta</title>
     <link rel="stylesheet" th:href="'/css/meta64.css?v='+${MAIN_CSS_HASH}" />
 </head>
 
-<body class="welcome-body customScrollbar">
-
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <a class="navbar-brand navbar-font" href="/app">Quanta.wiki</a>
-
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
-            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-            <ul class="navbar-nav ml-auto">
-
-                <!-- todo-0: need to add this: developer node isn't created yet 
-                <li class="nav-item active">
-                    <a class="nav-link" href="/n/developers">Developers</a>
-                </li>
-                -->
-
-                <!-- <li class="nav-item active">
-                    <a class="nav-link" href="https://github.com/Clay-Ferguson/quantizr">
-                        GitHub
-                    </a>
-                </li> -->
-
-                <!-- <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">Dropdown</a>
-                    <div class="dropdown-menu" aria-labelledby="dropdown01">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div> 
-                
-                </li>
-            -->
-            </ul>
-
-            <!-- <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form> -->
-        </div>
-
-    </nav>
+<body class="welcome-body-no-navbar customScrollbar">
 
     <main role="main">
 
-        <div class="container myjumbotron">
+        <div class="container-fluid myjumbotron h-100">
             <div class="row align-items-center h-100">
-                <div class="col-xs-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 mx-auto">
+                <div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xl-6 mx-auto">
                     <div class="jumbotron transparentBg">
 
                         <h4 class="alert alert-info justify-content-center"
@@ -71,8 +38,14 @@
 
                         <img class="mainLogoImg" src="/images/eagle-logo-250px-tr.jpg"></img>
 
-                        <p th:text="${pg_welcome__intro1}"></p>
-                        <p th:text="${pg_welcome__intro2}"></p>
+                        <h1 class="text-center">Quanta</h1>
+
+                        <h3 class="text-center">The world's first Quantized Editor!</h3>
+
+                        <p>&nbsp</p>
+
+                        <p class="text-center" th:text="${pg_welcome__intro1}"></p>
+                        <p class="text-center" th:text="${pg_welcome__intro2}"></p>
 
                         <!-- <p class="text-center">
                             <a target="_blank" href="https://gateway.pinata.cloud/ipfs/QmUDRVSLBMSwb7Fkn7d8WGzSUeJPD4EJaBmt31npFYraxi">
@@ -89,7 +62,7 @@
             </div>
         </div>
 
-        <div class="container-fluid welcome-container">
+        <div class="container-fluid welcome-container-no-navbar">
 
             <!-- <div class="row justify-content-center">
                 <h1 class="col-md-4">Features...</h1>

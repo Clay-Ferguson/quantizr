@@ -1,0 +1,18 @@
+.breadcrumbPanel {
+    padding-bottom: $tinyGap;
+}
+
+.breadcrumbItem {
+    cursor: pointer;
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 4px;
+    margin-right: 8px;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.breadcrumbItem:hover {
+    border: 1px solid white;
+}

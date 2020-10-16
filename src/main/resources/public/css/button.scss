@@ -1,0 +1,41 @@
+/* Warning: setting any kind of left margin won't work becasue the btn-group? style of bootstrap overrides it in button groups */
+
+.btn {
+    border-radius: 0 !important;
+}
+
+.btn[disabled] {
+    font-style: italic;
+    cursor: auto;
+}
+
+.btn:hover {
+    border: 1px solid white;
+    cursor: auto;
+}
+
+.errorBackButton {
+    margin-top: 1.5em;
+    font-weight: 700;
+}
+
+.appEnterButton {
+    font-weight: 700;
+}
+
+.button-font {
+    font-family: $fontFamily !important;
+}
+
+.feedDirtyButton {
+    border: 4px solid green;
+}
+
+//This class exists only so the space for the border is always taken up
+.feedNotDirtyButton {
+    border: 4px solid transparent;
+}
+
+.bash-exec-button {
+    margin: 1em;
+}
