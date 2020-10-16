@@ -43,6 +43,12 @@ export class NodeCompTableRowLayout extends Div {
         else if (this.layout === "c4") {
             maxCols = 4;
         }
+        else if (this.layout === "c5") {
+            maxCols = 5;
+        }
+        else if (this.layout === "c6") {
+            maxCols = 6;
+        }
         let cellWidth = 100 / maxCols;
 
         let countToDisplay = 0;

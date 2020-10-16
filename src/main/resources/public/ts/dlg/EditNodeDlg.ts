@@ -80,7 +80,6 @@ export class EditNodeDlg extends DialogBase {
     }
 
     createLayoutSelection = (): Selection => {
-        // todo-1: these columns need to auto-space and not go past allowed width of page display
         let selection: Selection = new Selection(null, "Layout", [
             { key: "v", val: "Vertical" },
             { key: "c2", val: "2 Columns" },
