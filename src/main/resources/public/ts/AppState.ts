@@ -28,7 +28,6 @@ export class AppState {
 
     // todo-1: the S.nav.mainOffset is often the same as this. Is S.nav.mainOffset still needed? or is only offsetOfNodeFound needed?
     offsetOfNodeFound: number;
-    displayedParent: boolean;
     title: string = "";
 
     node: J.NodeInfo;

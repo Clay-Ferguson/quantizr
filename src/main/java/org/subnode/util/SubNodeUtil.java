@@ -66,7 +66,7 @@ public class SubNodeUtil {
 		return !nonSavableProperties.contains(propertyName);
 	}
 
-	public boolean hasDisplayableNodes(MongoSession session, boolean isAdvancedEditingMode, SubNode node) {
+	public boolean hasDisplayableNodes(MongoSession session, SubNode node) {
 		return (read.getChildCount(session, node) > 0);
 	}
 

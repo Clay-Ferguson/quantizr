@@ -132,14 +132,12 @@ public class NodeRenderService {
 		 * If this is true it means we need to keep scanning child nodes until we find
 		 * the targetId, so we can make that one be the first of the search results to
 		 * display, and set that offset upon return. During the scan once the node is
-		 * found, we set this scanToNode var back to false, so it represents always if
-		 * we're still scanning or not.
+		 * found, we set this scanToNode var back to false.
 		 */
 		boolean scanToNode = false;
 		String scanToPath = node.getPath();
 
-		if (req.isRenderParentIfLeaf() && !subNodeUtil.hasDisplayableNodes(session, false /* advanced_Mode */, node)) {
-			res.setDisplayedParent(true);
+		if (req.isRenderParentIfLeaf() && !subNodeUtil.hasDisplayableNodes(session, node)) {
 			req.setUpLevel(1);
 		}
 
@@ -211,6 +209,8 @@ public class NodeRenderService {
 			return nodeInfo;
 		}
 
+		nodeInfo.setChildren(new LinkedList<NodeInfo>());
+
 		/*
 		 * If we are scanning to a node we know we need to start from zero offset, or
 		 * else we use the offset passed in
@@ -220,19 +220,17 @@ public class NodeRenderService {
 		/*
 		 * todo-1: needed optimization to work well with large numbers of child nodes:
 		 * If scanToNode is in use, we should instead look up the node itself, and then
-		 * get it's ordinal, and use that as a '>=' in the query to pull up the list.
-		 * Note, of sort order is by a timestamp we'd need a ">=" on the timestamp
-		 * itself instead
+		 * get it's ordinal, and use that as a '>=' in the query to pull up the list, at
+		 * least when the node ordering is ordinal. Note, if sort order is by a
+		 * timestamp we'd need a ">=" on the timestamp itself instead. We request
+		 * ROWS_PER_PAGE+1, because that is enough to trigger 'endReached' logic to be
+		 * set correctly
 		 */
-		int queryLimit = scanToNode ? 1000 : offset + ROWS_PER_PAGE + 1;
+		int queryLimit = scanToNode ? 1000 : offset + ROWS_PER_PAGE + 2;
 
 		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode="
 		// + scanToNode);
 
-		/*
-		 * we request ROWS_PER_PAGE+1, because that is enough to trigger 'endReached'
-		 * logic to be set correctly
-		 */
 		String orderBy = node.getStringProp(NodeProp.ORDER_BY.s());
 		Sort sort = null;
 
@@ -245,7 +243,7 @@ public class NodeRenderService {
 		Iterable<SubNode> nodeIter = read.getChildren(session, node, sort, queryLimit);
 		Iterator<SubNode> iterator = nodeIter.iterator();
 
-		int idx = 0, count = 0, idxOfNodeFound = -1;
+		int idx = 0, idxOfNodeFound = -1;
 
 		// this should only get set to true if we run out of records, because we reached
 		// the true end of records and not related to a queryLimit
@@ -261,18 +259,6 @@ public class NodeRenderService {
 			// res.setOffsetOfNodeFound(offset);
 		}
 
-		/*
-		 * Calling 'skip' here technically violates the fact that
-		 * nodeVisibleInSimpleMode() can return false for some nodes, but because of the
-		 * performance boost it offers i'm doing it anyway. I don't think skipping to
-		 * far or too little by one or two will ever be a noticeable issue in the
-		 * paginating so this should be fine, because there will be a very small number
-		 * of nodes that are not visible to the user, so I can't think of a pathological
-		 * case here. Just noting that this IS an imperfection/flaw.
-		 * 
-		 * todo-1: Instead of running 'skip' here we should be setting an 'offset' on
-		 * the initial query.
-		 */
 		if (!scanToNode && offset > 0) {
 			// log.debug("Skipping the first " + offset + " records in the resultset.");
 			idx = read.skip(iterator, offset);
@@ -320,24 +306,19 @@ public class NodeRenderService {
 
 						/*
 						 * If we found our target node, and it's on the first page, then we don't need
-						 * to set idxOfNodeFound, but just leave it unset, and we need to load in the
-						 * nodes we had collected so far, before continuing
+						 * to set idxOfNodeFound, but just leave it unset, but we need to load into the
+						 * results the nodes we had collected so far, before continuing
 						 */
 						if (idx <= ROWS_PER_PAGE && slidingWindow != null) {
 
 							/* loop over all our precached nodes */
 							for (SubNode sn : slidingWindow) {
-								count++;
-
-								if (nodeInfo.getChildren() == null) {
-									nodeInfo.setChildren(new LinkedList<NodeInfo>());
-								}
 
 								// log.debug("renderNode DUMP[count=" + count + " idx=" +
 								// String.valueOf(idx) + " logicalOrdinal=" + String.valueOf(offset
 								// + count) + "]: "
 								// + XString.prettyPrint(node));
-								ninfo = processRenderNode(session, req, res, sn, false, null, offset + count,
+								ninfo = processRenderNode(session, req, res, sn, false, null, offset + nodeInfo.getChildren().size()+1,
 										level + 1);
 								nodeInfo.getChildren().add(ninfo);
 								if (offset == 0 && nodeInfo.getChildren().size() == 1) {
@@ -361,24 +342,15 @@ public class NodeRenderService {
 						continue;
 					}
 				}
-
-				count++;
-
-				if (nodeInfo.getChildren() == null) {
-					nodeInfo.setChildren(new LinkedList<NodeInfo>());
-				}
-				// log.debug("renderNode DUMP[count=" + count + " idx=" + String.valueOf(idx) +
-				// "
-				// logicalOrdinal=" + String.valueOf(offset + count) + "]: "
-				// + XString.prettyPrint(node));
-				ninfo = processRenderNode(session, req, res, n, false, null, offset + count, level + 1);
+			
+				ninfo = processRenderNode(session, req, res, n, false, null, offset + nodeInfo.getChildren().size()+1, level + 1);
 				nodeInfo.getChildren().add(ninfo);
 
 				if (offset == 0 && nodeInfo.getChildren().size() == 1) {
 					ninfo.setFirstChild(true);
 				}
 
-				if (count >= ROWS_PER_PAGE) {
+				if (nodeInfo.getChildren().size() >= ROWS_PER_PAGE) {
 					if (!iterator.hasNext()) {
 						endReached = true;
 					}

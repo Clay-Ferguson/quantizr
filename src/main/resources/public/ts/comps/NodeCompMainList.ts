@@ -23,23 +23,21 @@ export class NodeCompMainList extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let rootNode = state.node;
-        let endReached = state.endReached;
 
-        if (!rootNode) {
+        if (!state.node) {
             this.setChildren(null);
             return;
         }
         let children: Comp[] = [];
 
-        if (rootNode.children) {
-            this.addPaginationButtons(children, endReached, state);
+        if (state.node.children) {
+            this.addPaginationButtons(children, state.endReached, state);
 
-            let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, rootNode);
+            let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, state.node);
             let allowNodeMove: boolean = !orderByProp;
-            children.push(S.render.renderChildren(rootNode, 1, allowNodeMove));
+            children.push(S.render.renderChildren(state.node, 1, allowNodeMove));
 
-            this.addPaginationButtons(children, endReached, state);
+            this.addPaginationButtons(children, state.endReached, state);
         }
 
         this.setChildren(children);
@@ -70,7 +68,7 @@ export class NodeCompMainList extends Div {
         }
 
         if (firstButton || prevButton || nextButton) {
-            children.push(new ButtonBar([firstButton, prevButton, nextButton], "text-center marginTop"));
+            children.push(new ButtonBar([firstButton, prevButton, nextButton], "text-center marginTop marginBottom"));
             children.push(new Div(null, { className: "clearfix" }));
         }
     }

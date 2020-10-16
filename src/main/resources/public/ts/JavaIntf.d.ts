@@ -448,7 +448,6 @@ export interface RenderNodeResponse extends ResponseBase {
     node: NodeInfo;
     offsetOfNodeFound: number;
     endReached: boolean;
-    displayedParent: boolean;
     noDataResponse: string;
     breadcrumbs: BreadcrumbInfo[];
 }

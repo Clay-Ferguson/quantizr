@@ -280,7 +280,6 @@ export class Render implements RenderIntf {
                             s.node = res.node;
                             s.endReached = res.endReached;
                             s.offsetOfNodeFound = res.offsetOfNodeFound;
-                            s.displayedParent = res.displayedParent;
                             s.breadcrumbs = res.breadcrumbs;
                         }
 

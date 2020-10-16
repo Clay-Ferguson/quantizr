@@ -24,12 +24,6 @@ public class RenderNodeResponse extends ResponseBase {
 	 * object.
 	 */
 	private boolean endReached;
-
-	/*
-	 * under certain situations the rendering request will be pointed to parent node instead and we
-	 * send back to the client 'true' here when that happens.
-	 */
-	private boolean displayedParent;
 	
 	private String noDataResponse;
 
@@ -41,14 +35,6 @@ public class RenderNodeResponse extends ResponseBase {
 
 	public void setNode(NodeInfo node) {
 		this.node = node;
-	}
-
-	public boolean isDisplayedParent() {
-		return displayedParent;
-	}
-
-	public void setDisplayedParent(boolean displayedParent) {
-		this.displayedParent = displayedParent;
 	}
 
 	public boolean isEndReached() {
