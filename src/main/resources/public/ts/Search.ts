@@ -137,7 +137,7 @@ export class Search implements SearchIntf {
         }
 
         const cssId = this._UID_ROWID_PREFIX + node.id;
-        const buttonBar = this.makeButtonBarHtml(node, allowAvatar, state);
+        const buttonBar = this.makeButtonBarHtml(node, state);
         const content = new NodeCompContent(node, true, true, prefix, true, null);
 
         let clazz = "node-table-row";
@@ -185,7 +185,7 @@ export class Search implements SearchIntf {
         }, [parentItem, div]);
     }
 
-    makeButtonBarHtml = (node: J.NodeInfo, allowAvatar: boolean, state: AppState): Comp => {
+    makeButtonBarHtml = (node: J.NodeInfo, state: AppState): Comp => {
         return new HorizontalLayout([
             new Button("Jump", () => {
                 this.clickSearchNode(node.id, state);

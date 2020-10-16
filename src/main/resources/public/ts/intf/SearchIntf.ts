@@ -21,7 +21,7 @@ export interface SearchIntf {
     timeline(prop: string, state: AppState): any;
     initSearchNode(node: J.NodeInfo): any;
     renderSearchResultAsListItem(node: J.NodeInfo, index: number, count: number, rowCount: number, allowAvatar: boolean, prefix: string, isFeed: boolean, isParent: boolean, state: AppState): any;
-    makeButtonBarHtml(node: J.NodeInfo, allowAvatar: boolean, state: AppState): any;
+    makeButtonBarHtml(node: J.NodeInfo, state: AppState): any;
     cached_clickOnSearchResultRow(id : string): any;
     clickSearchNode(id: string, state: AppState): any;
     setRowHighlight(state: boolean): any;

@@ -19,28 +19,7 @@ export class NodeCompRowHeader extends Div {
 
     constructor(private node: J.NodeInfo, private isFeed: boolean = false) {
         super(null, {
-            className: "header-text",
-            title: "Click to hide metadata."
-        });
-
-        // do this AFTER super call because 'this' isn't available in super call.
-        this.attribs.onClick = this.turnOffHeaders;
-    }
-
-    turnOffHeaders = () => {
-        let state = store.getState();
-        dispatch({
-            type: "Action_HideMetadata",
-            update: (s: AppState): void => {
-                state.userPreferences.showMetaData = false;
-                s.userPreferences = state.userPreferences;
-            }
-        });
-
-        S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
-            userPreferences: state.userPreferences
-        }, () => {
-            // nothing to do here.
+            className: "header-text"
         });
     }
 
