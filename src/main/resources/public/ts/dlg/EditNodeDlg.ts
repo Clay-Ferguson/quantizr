@@ -384,7 +384,6 @@ export class EditNodeDlg extends DialogBase {
 
     renderButtons(): CompIntf {
         let state = this.getState();
-
         let hasAttachment: boolean = S.props.hasBinary(state.node);
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);

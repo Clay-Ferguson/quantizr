@@ -41,6 +41,7 @@ export class Util implements UtilIntf {
         png: "img",
         jpeg: "img",
         mp3: "audio",
+        opus: "audio",
         m4a: "audio",
         mp4: "video"
     };
