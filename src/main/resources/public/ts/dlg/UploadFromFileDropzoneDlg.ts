@@ -13,6 +13,7 @@ import { Form } from "../widget/Form";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
+import { IconButton } from "../widget/IconButton";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -74,24 +75,35 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 new ButtonBar([
                     this.uploadButton = new Button(this.importMode ? "Import" : "Upload", this.upload, null, "btn-primary"),
-                    this.importMode ? null : new Button("Upload from URL", this.uploadFromUrl),
-                    this.importMode ? null : new Button("Upload from Clipboard", this.uploadFromClipboard),
-                    new Button("Record Audio", async () => {
-                        let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, false);
-                        await dlg.open();
-                        if (dlg.uploadRequested) {
-                            this.dropzone.addFile(new File([dlg.blob], "audio-recording.opus", { type: dlg.blobType }));
-                            this.runButtonEnablement();
-                        }
-                    }),
-                    new Button("Record Video", async () => {
-                        let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, true);
-                        await dlg.open();
-                        if (dlg.uploadRequested) {
-                            this.dropzone.addFile(new File([dlg.blob], "video-recording.webm", { type: dlg.blobType }));
-                            this.runButtonEnablement();
-                        }
-                    }),
+                    this.importMode ? null : new Button("From URL", this.uploadFromUrl),
+                    this.importMode ? null : new Button("From Clipboard", this.uploadFromClipboard),
+
+                    new IconButton("fa-microphone", /* "From Mic" */ null, {
+                        onClick: async () => {
+                            let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, false);
+                            await dlg.open();
+                            if (dlg.uploadRequested) {
+                                this.dropzone.addFile(new File([dlg.blob], "audio-recording.opus", { type: dlg.blobType }));
+                                this.runButtonEnablement();
+                                this.upload();
+                            }
+                        },
+                        title: "Record Audio to Attachment"
+                    }, "btn-secondary"),
+
+                    new IconButton("fa-video-camera", /* From WebCam */ null, {
+                        onClick: async () => {
+                            let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, true);
+                            await dlg.open();
+                            if (dlg.uploadRequested) {
+                                this.dropzone.addFile(new File([dlg.blob], "video-recording.webm", { type: dlg.blobType }));
+                                this.runButtonEnablement();
+                                this.upload();
+                            }
+                        },
+                        title: "Record Video to Attachment"
+                    }, "btn-secondary"),
+
                     new Button("Close", this.close)
                 ])
             ])
@@ -100,7 +112,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         this.uploadButton.setVisible(false);
         this.configureDropZone();
         this.runButtonEnablement();
-
         return children;
     }
 
