@@ -12,6 +12,8 @@ import { TextContent } from "../widget/TextContent";
 import { AudioPlayerDlg } from "./AudioPlayerDlg";
 import { VideoPlayerDlg } from "./VideoPlayerDlg";
 
+// https://developers.google.com/web/fundamentals/media/recording-audio
+
 declare var MediaRecorder;
 
 let S: Singletons;

@@ -80,7 +80,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, false);
                         await dlg.open();
                         if (dlg.uploadRequested) {
-                            // todo-0: need to extract the file extension (opus) out of the blobType here and not hardcode.
                             this.dropzone.addFile(new File([dlg.blob], "audio-recording.opus", { type: dlg.blobType }));
                             this.runButtonEnablement();
                         }
@@ -89,7 +88,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, true);
                         await dlg.open();
                         if (dlg.uploadRequested) {
-                            // todo-0: need to extract the file extension (opus) out of the blobType here and not hardcode.
                             this.dropzone.addFile(new File([dlg.blob], "video-recording.webm", { type: dlg.blobType }));
                             this.runButtonEnablement();
                         }

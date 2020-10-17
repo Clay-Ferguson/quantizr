@@ -87,7 +87,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     private setId(id: string) {
         this.attribs.id = id;
         this.attribs.key = id;
-        this.jsClassName = this.constructor.name + "[" + id + "]"; // todo-0: only turn on during dev?
+        this.jsClassName = this.constructor.name + "_" + id;
     }
 
     /* Returns true if there are any non-null children */
