@@ -28,6 +28,7 @@ export class MediaRecorderDlg extends DialogBase {
     recordingTimer: any;
     recordingTime: number = 0;
     continuable: boolean = false;
+    status: Heading;
 
     public blob: Blob;
     public blobType: string;
@@ -43,7 +44,7 @@ export class MediaRecorderDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Record directly from your device, then play back and/or upload the audio as an attachment."),
-                new Heading(1, state.status),
+                this.status = new Heading(1, state.status),
                 new ButtonBar([
                     state.recording ? null : new Button("New Recording", this.newRecording, null, "btn-primary"),
 
@@ -94,18 +95,13 @@ export class MediaRecorderDlg extends DialogBase {
         this.recordingTime = 0;
 
         this.mergeState({ status: this.videoMode ? "Recording Video..." : "Recording Audio...", recording: true });
-
-        // This update every second works fine BUT there is a noticeable risk that you can click a button
-        // during a react render, and it can ignore the click, so if/when we bring this back it will need to be an
-        // ordinary javascript DOM update (non-react)
-        // this.recordingTimeslice();
-        // this.recordingTimer = setInterval(() => {
-        //     this.recordingTimeslice();
-        // }, 1000);
+        this.recordingTimer = setInterval(() => {
+            this.recordingTimeslice();
+        }, 1000);
     }
 
     recordingTimeslice = () => {
-        this.mergeState({ status: "Recording: " + (this.recordingTime++) + "s", recording: true });
+        document.getElementById(this.status.getId()).innerHTML = this.videoMode ? "Recording Video:" : "Recording Audio: " + (++this.recordingTime) + "s";
     }
 
     cancelTimer = () => {
