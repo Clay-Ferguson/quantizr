@@ -19,6 +19,37 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
+// check with: MediaRecorder.isTypeSupported('video/webm;codecs=vp8');
+//
+// From StackOverflow.com
+// video/webm
+// video/webm;codecs=vp8
+// video/webm;codecs=vp9
+// video/webm;codecs=vp8.0
+// video/webm;codecs=vp9.0
+// video/webm;codecs=h264
+// video/webm;codecs=H264
+// video/webm;codecs=avc1
+// video/webm;codecs=vp8,opus
+// video/WEBM;codecs=VP8,OPUS
+// video/webm;codecs=vp9,opus
+// video/webm;codecs=vp8,vp9,opus
+// video/webm;codecs=h264,opus
+// video/webm;codecs=h264,vp9,opus
+// audio/webm
+// audio/webm;codecs=opus
+//
+// https://developer.mozilla.org/en-US/docs/Web/Media/Formats/codecs_parameter
+//
+// audio/mpeg
+// audio/ogg
+// audio/mp4
+// audio/webm
+//
+// video/ogg
+// video/mp4
+// video/webm
+
 export class MediaRecorderDlg extends DialogBase {
     stream: any;
     chunks = [];
@@ -65,7 +96,7 @@ export class MediaRecorderDlg extends DialogBase {
         return null;
     }
 
-    newRecording = async () => {
+    newRecording = () => {
         this.chunks = [];
         this.continueRecording();
     }
@@ -79,6 +110,11 @@ export class MediaRecorderDlg extends DialogBase {
             }
 
             this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+            // I experimented with passing mimeTypes to Chrome and only the webm one seems to be supported, so we don't need
+            // these options. May be smarter to just let the browser use it's default anyway for all sorts of other reasons.
+            // let options = { mimeType: "audio/ogg" };
+            // this.recorder = new MediaRecorder(this.stream, options);
             this.recorder = new MediaRecorder(this.stream);
 
             this.recorder.addEventListener("dataavailable", event => {
@@ -101,7 +137,7 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     recordingTimeslice = () => {
-        document.getElementById(this.status.getId()).innerHTML = this.videoMode ? "Recording Video:" : "Recording Audio: " + (++this.recordingTime) + "s";
+        document.getElementById(this.status.getId()).innerHTML = (this.videoMode ? "Recording Video: " : "Recording Audio: ") + (++this.recordingTime) + "s";
     }
 
     cancelTimer = () => {
@@ -145,7 +181,7 @@ export class MediaRecorderDlg extends DialogBase {
 
     closeStream = (): void => {
         if (this.stream) {
-            this.stream.getTracks().forEach(function(track) {
+            this.stream.getTracks().forEach(function (track) {
                 track.stop();
             });
         }
