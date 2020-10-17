@@ -20,11 +20,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class MediaRecorderDlg extends DialogBase {
-    // recorder: any;
-    audio: any;
     stream: any;
     chunks = [];
-    mediaRecorder: any;
+    recorder: any;
+
+    // this timer is also used as a way to detect if we are currently recording. This will be null always if not currently recording.
     recordingTimer: any;
     recordingTime: number = 0;
     continuable: boolean = false;
@@ -35,7 +35,7 @@ export class MediaRecorderDlg extends DialogBase {
     public uploadRequested: boolean;
 
     constructor(state: AppState, public videoMode: boolean) {
-        super("Audio Recorder", null, false, state);
+        super(videoMode ? "Video Recorder" : "Audio Recorder", null, false, state);
         this.mergeState({ status: "", recording: false });
     }
 
@@ -43,7 +43,7 @@ export class MediaRecorderDlg extends DialogBase {
         let state: any = this.getState();
         return [
             new Form(null, [
-                new TextContent("Record directly from your device, then play back and/or upload the audio as an attachment."),
+                new TextContent("Records from your device, to upload as an attachment."),
                 this.status = new Heading(1, state.status),
                 new ButtonBar([
                     state.recording ? null : new Button("New Recording", this.newRecording, null, "btn-primary"),
@@ -71,7 +71,7 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     continueRecording = async () => {
-        if (!this.mediaRecorder) {
+        if (!this.recorder) {
 
             let constraints: any = { audio: true };
             if (this.videoMode) {
@@ -79,19 +79,19 @@ export class MediaRecorderDlg extends DialogBase {
             }
 
             this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-            this.mediaRecorder = new MediaRecorder(this.stream);
+            this.recorder = new MediaRecorder(this.stream);
 
-            this.mediaRecorder.addEventListener("dataavailable", event => {
+            this.recorder.addEventListener("dataavailable", event => {
                 this.chunks.push(event.data);
             });
 
-            this.mediaRecorder.addEventListener("stop", () => {
+            this.recorder.addEventListener("stop", () => {
                 this.blob = new Blob(this.chunks, { type: this.chunks[0].type });
                 this.blobType = this.chunks[0].type;
             });
         }
 
-        this.mediaRecorder.start();
+        this.recorder.start();
         this.recordingTime = 0;
 
         this.mergeState({ status: this.videoMode ? "Recording Video..." : "Recording Audio...", recording: true });
@@ -107,19 +107,22 @@ export class MediaRecorderDlg extends DialogBase {
     cancelTimer = () => {
         if (this.recordingTimer) {
             clearInterval(this.recordingTimer);
+            this.recordingTimer = null;
         }
     }
 
-    stop = async () => {
+    stop = () => {
+        if (!this.recordingTimer) return;
         this.continuable = true;
         this.cancelTimer();
         this.mergeState({ status: "Paused", recording: false });
-        if (this.mediaRecorder) {
-            this.mediaRecorder.stop();
+        if (this.recorder) {
+            this.recorder.stop();
         }
     }
 
-    play = async () => {
+    play = () => {
+        if (this.recordingTimer) return;
         this.cancelTimer();
         this.stop();
 
@@ -127,27 +130,25 @@ export class MediaRecorderDlg extends DialogBase {
             const url = URL.createObjectURL(this.blob);
 
             if (this.videoMode) {
-                let dlg = new VideoPlayerDlg(url, null, this.appState).open();
+                new VideoPlayerDlg(url, null, this.appState).open();
             }
             else {
-                // DO NOT DELETE: This can play the audio without the dialog.
-                // const audio = new Audio(audioUrl);
-                // audio.play();
-                let dlg = new AudioPlayerDlg(url, this.appState).open();
+                new AudioPlayerDlg(url, this.appState).open();
             }
         }
     }
 
     cleanup = (): void => {
         this.blob = null;
-        this.mediaRecorder = null;
-        this.audio = null;
+        this.recorder = null;
     }
 
     closeStream = (): void => {
-        this.stream.getTracks().forEach(function (track) {
-            track.stop();
-        });
+        if (this.stream) {
+            this.stream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
     }
 
     cancel = (): void => {
