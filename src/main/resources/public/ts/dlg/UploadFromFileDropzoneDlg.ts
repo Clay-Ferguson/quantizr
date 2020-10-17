@@ -77,11 +77,20 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     this.importMode ? null : new Button("Upload from URL", this.uploadFromUrl),
                     this.importMode ? null : new Button("Upload from Clipboard", this.uploadFromClipboard),
                     new Button("Record Audio", async () => {
-                        let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState);
+                        let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, false);
                         await dlg.open();
                         if (dlg.uploadRequested) {
                             // todo-0: need to extract the file extension (opus) out of the blobType here and not hardcode.
-                            this.dropzone.addFile(new File([dlg.audioBlob], "audio-recording.opus", { type: dlg.blobType }));
+                            this.dropzone.addFile(new File([dlg.blob], "audio-recording.opus", { type: dlg.blobType }));
+                            this.runButtonEnablement();
+                        }
+                    }),
+                    new Button("Record Video", async () => {
+                        let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, true);
+                        await dlg.open();
+                        if (dlg.uploadRequested) {
+                            // todo-0: need to extract the file extension (opus) out of the blobType here and not hardcode.
+                            this.dropzone.addFile(new File([dlg.blob], "video-recording.webm", { type: dlg.blobType }));
                             this.runButtonEnablement();
                         }
                     }),

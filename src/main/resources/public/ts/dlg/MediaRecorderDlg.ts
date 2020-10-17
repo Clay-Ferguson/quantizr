@@ -10,6 +10,7 @@ import { Form } from "../widget/Form";
 import { Heading } from "../widget/Heading";
 import { TextContent } from "../widget/TextContent";
 import { AudioPlayerDlg } from "./AudioPlayerDlg";
+import { VideoPlayerDlg } from "./VideoPlayerDlg";
 
 declare var MediaRecorder;
 
@@ -21,17 +22,18 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class MediaRecorderDlg extends DialogBase {
     // recorder: any;
     audio: any;
+    stream: any;
     chunks = [];
     mediaRecorder: any;
     recordingTimer: any;
     recordingTime: number = 0;
     continuable: boolean = false;
 
-    public audioBlob: Blob;
+    public blob: Blob;
     public blobType: string;
     public uploadRequested: boolean;
 
-    constructor(state: AppState) {
+    constructor(state: AppState, public videoMode: boolean) {
         super("Audio Recorder", null, false, state);
         this.mergeState({ status: "", recording: false });
     }
@@ -44,7 +46,11 @@ export class MediaRecorderDlg extends DialogBase {
                 new Heading(1, state.status),
                 new ButtonBar([
                     state.recording ? null : new Button("New Recording", this.newRecording, null, "btn-primary"),
-                    state.recording || !this.continuable ? null : new Button("Continue Recording", this.continueRecording, null),
+
+                    // This didn't work for video (only audio) which actually means my wild guess to just combine chunks isn't the correct way
+                    // to accomplish this, and so I"m just disabling it until I have time to research.
+                    // state.recording || !this.continuable ? null : new Button("Continue Recording", this.continueRecording, null),
+
                     state.recording ? new Button("Stop", this.stop, null) : null,
                     state.recording || !this.continuable ? null : new Button("Play", this.play, null),
                     state.recording || !this.continuable ? null : new Button("Save", this.save, null),
@@ -65,15 +71,21 @@ export class MediaRecorderDlg extends DialogBase {
 
     continueRecording = async () => {
         if (!this.mediaRecorder) {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            this.mediaRecorder = new MediaRecorder(stream);
+
+            let constraints: any = { audio: true };
+            if (this.videoMode) {
+                constraints.video = true;
+            }
+
+            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+            this.mediaRecorder = new MediaRecorder(this.stream);
 
             this.mediaRecorder.addEventListener("dataavailable", event => {
                 this.chunks.push(event.data);
             });
 
             this.mediaRecorder.addEventListener("stop", () => {
-                this.audioBlob = new Blob(this.chunks, { type: this.chunks[0].type });
+                this.blob = new Blob(this.chunks, { type: this.chunks[0].type });
                 this.blobType = this.chunks[0].type;
             });
         }
@@ -81,7 +93,7 @@ export class MediaRecorderDlg extends DialogBase {
         this.mediaRecorder.start();
         this.recordingTime = 0;
 
-        this.mergeState({ status: "Recording your Mic...", recording: true });
+        this.mergeState({ status: this.videoMode ? "Recording Video..." : "Recording Audio...", recording: true });
 
         // This update every second works fine BUT there is a noticeable risk that you can click a button
         // during a react render, and it can ignore the click, so if/when we bring this back it will need to be an
@@ -115,31 +127,44 @@ export class MediaRecorderDlg extends DialogBase {
         this.cancelTimer();
         this.stop();
 
-        if (this.audioBlob) {
-            const audioUrl = URL.createObjectURL(this.audioBlob);
-            // DO NOT DELETE: This can play the audio without the dialog.
-            // const audio = new Audio(audioUrl);
-            // audio.play();
-            let dlg = new AudioPlayerDlg(audioUrl, this.appState);
-            dlg.open();
+        if (this.blob) {
+            const url = URL.createObjectURL(this.blob);
+
+            if (this.videoMode) {
+                let dlg = new VideoPlayerDlg(url, null, this.appState).open();
+            }
+            else {
+                // DO NOT DELETE: This can play the audio without the dialog.
+                // const audio = new Audio(audioUrl);
+                // audio.play();
+                let dlg = new AudioPlayerDlg(url, this.appState).open();
+            }
         }
     }
 
     cleanup = (): void => {
-        this.audioBlob = null;
+        this.blob = null;
         this.mediaRecorder = null;
         this.audio = null;
+    }
+
+    closeStream = (): void => {
+        this.stream.getTracks().forEach(function (track) {
+            track.stop();
+        });
     }
 
     cancel = (): void => {
         this.cancelTimer();
         this.stop();
+        this.closeStream();
         this.cleanup();
         this.close();
     }
 
     save = (): void => {
         this.stop();
+        this.closeStream();
         this.cancelTimer();
         this.uploadRequested = true;
         this.close();
