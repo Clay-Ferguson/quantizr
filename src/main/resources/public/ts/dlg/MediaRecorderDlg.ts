@@ -9,6 +9,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { Heading } from "../widget/Heading";
 import { TextContent } from "../widget/TextContent";
+import { VideoPlayer } from "../widget/VideoPlayer";
 import { AudioPlayerDlg } from "./AudioPlayerDlg";
 import { VideoPlayerDlg } from "./VideoPlayerDlg";
 
@@ -63,6 +64,8 @@ export class MediaRecorderDlg extends DialogBase {
     continuable: boolean = false;
     status: Heading;
 
+    videoPlayer: VideoPlayer;
+
     public blob: Blob;
     public blobType: string;
     public uploadRequested: boolean;
@@ -72,8 +75,49 @@ export class MediaRecorderDlg extends DialogBase {
         this.mergeState({ status: "", recording: false });
     }
 
+    preLoad(): Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+            let constraints: any = { audio: true };
+            if (this.videoMode) {
+                constraints.video = true;
+            }
+
+            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+            resolve();
+        });
+    }
+
     renderDlg(): CompIntf[] {
         let state: any = this.getState();
+
+        // This creates the video display showing just the live feed of the camera always, regardless of whether currently recrding.
+        if (this.videoMode) {
+            // if (!this.videoPlayer) {
+                this.videoPlayer = new VideoPlayer({
+                    style: {
+                        width: "100%",
+                        border: "3px solid gray",
+                        padding: "0px",
+                        marginTop: "10px",
+                        marginLeft: "0px",
+                        marginRight: "0px"
+                    },
+                    // "ontimeupdate": () => { S.podcast.onTimeUpdate(this); },
+                    // "oncanplay": () => { S.podcast.onCanPlay(this); },
+                    // controls: "controls",
+                    autoPlay: "autoplay",
+                    muted: "true"
+                    // "volume": "0.9",
+                    // "preload": "auto"
+                });
+            // }
+
+            /* this is required to get the video live after every re-render, but I really need to learn react 'refs'
+            to do this slightly cleaner without a whenElm. We have to call this even if we didn't just create
+            the video element because react can unmount the old one during re-renders. */
+            this.displayStream();
+        }
+
         return [
             new Form(null, [
                 new TextContent("Records from your device, to upload as an attachment."),
@@ -89,7 +133,8 @@ export class MediaRecorderDlg extends DialogBase {
                     state.recording || !this.continuable ? null : new Button("Play", this.play, null),
                     state.recording || !this.continuable ? null : new Button("Save", this.save, null),
                     new Button("Cancel", this.cancel)
-                ])
+                ]),
+                this.videoMode ? this.videoPlayer : null
             ])
         ];
     }
@@ -105,14 +150,6 @@ export class MediaRecorderDlg extends DialogBase {
 
     continueRecording = async () => {
         if (!this.recorder) {
-
-            let constraints: any = { audio: true };
-            if (this.videoMode) {
-                constraints.video = true;
-            }
-
-            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-
             // I experimented with passing mimeTypes to Chrome and only the webm one seems to be supported, so we don't need
             // these options. May be smarter to just let the browser use it's default anyway for all sorts of other reasons.
             // let options = { mimeType: "audio/ogg" };
@@ -136,6 +173,14 @@ export class MediaRecorderDlg extends DialogBase {
         this.recordingTimer = setInterval(() => {
             this.recordingTimeslice();
         }, 1000);
+    }
+
+    displayStream = () => {
+        if (this.videoPlayer && this.stream) {
+            this.videoPlayer.whenElm((elm: HTMLVideoElement): void => {
+                elm.srcObject = this.stream;
+            });
+        }
     }
 
     recordingTimeslice = () => {
@@ -190,6 +235,7 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     cancel = (): void => {
+        // todo-0; need confirmation here if they clicked the record button ever.
         this.cancelTimer();
         this.stop();
         this.closeStream();
