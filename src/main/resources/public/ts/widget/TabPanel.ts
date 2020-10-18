@@ -7,10 +7,18 @@ import { MainTabComp } from "../comps/MainTabComp";
 import { SearchView } from "../comps/SearchView";
 import { TimelineView } from "../comps/TimelineView";
 import { Constants as C } from "../Constants";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { Anchor } from "./Anchor";
 import { Div } from "./Div";
+import { IconButton } from "./IconButton";
 import { Li } from "./Li";
 import { Ul } from "./Ul";
+
+let S: Singletons;
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
+    S = s;
+});
 
 export class TabPanel extends Div {
 
@@ -51,7 +59,7 @@ export class TabPanel extends Div {
                 id: "navTabs"
             },
                 /* These 'li' (list item) elements hold the tab bar that goes across the top of every page */
-            [new Li(null, {
+                [new Li(null, {
                     className: "nav-item",
                     style: { display: mainDisplay }
                 }, [

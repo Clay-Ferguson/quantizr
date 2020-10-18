@@ -2,6 +2,7 @@ import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
+import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { Meta64Intf } from "./intf/Meta64Intf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -15,6 +16,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Meta64 implements Meta64Intf {
+
+    mainMenu: MainMenuDlg;
 
     app: CompIntf;
     navBarHeight: number = 0;

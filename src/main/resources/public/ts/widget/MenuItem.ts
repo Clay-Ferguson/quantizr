@@ -38,9 +38,8 @@ export class MenuItem extends Div {
         let state = this.getState();
         if (!state.enabled) return;
 
-        // Note: We're not always hosted in a dialog.
-        if (S.mainMenu) {
-            S.mainMenu.close();
+        if (S.meta64.mainMenu) {
+            S.meta64.mainMenu.close();
         }
         this.clickFunc();
     }

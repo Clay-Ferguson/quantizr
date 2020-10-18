@@ -10,9 +10,12 @@ import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenControlBar } from "./FullScreenControlBar";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
 import { FullScreenImgViewer } from "./FullScreenImgViewer";
+import { IconButton } from "./IconButton";
+import { Img } from "./Img";
 import { LeftNavPanel } from "./LeftNavPanel";
 import { Main } from "./Main";
 import { RightNavPanel } from "./RightNavPanel";
+import { Span } from "./Span";
 import { TabPanel } from "./TabPanel";
 
 let S: Singletons;
@@ -34,26 +37,64 @@ export class App extends Div {
     }
 
     preRender(): void {
-        const appState: AppState = useSelector((state: AppState) => state);
+        const state: AppState = useSelector((state: AppState) => state);
 
-        if (!appState.guiReady) {
+        if (!state.guiReady) {
             this.setChildren([new Div("Loading...")]);
             return;
         }
 
         let fullScreenViewer: Comp = null;
-        if (appState.fullScreenViewId) {
+        if (state.fullScreenViewId) {
             fullScreenViewer = new FullScreenImgViewer();
         }
-        else if (appState.fullScreenGraphId) {
+        else if (state.fullScreenGraphId) {
             fullScreenViewer = new FullScreenGraphViewer();
         }
-        else if (appState.fullScreenCalendarId) {
+        else if (state.fullScreenCalendarId) {
             fullScreenViewer = new FullScreenCalendar();
+        }
+
+        let mobileTopBar = null;
+        if (clientInfo.isMobile) {
+            let menuButton = null;
+            menuButton = new IconButton("fa-bars", "Menu", {
+                onClick: e => {
+                    S.nav.showMainMenu(state);
+                },
+                id: "mainMenu"
+                // only applies to mobile. just don't show title for now.
+                // title: "Show Main Menu"
+            }, "btn-secondary marginRight", "off");
+
+            let allowEditMode = state.node && !state.isAnonUser;
+
+            let signupButton = state.isAnonUser ? new IconButton("fa-user-plus", "Signup", {
+                onClick: e => { S.nav.signup(state); },
+                title: "Create new Account"
+            }, "btn-primary marginRight", "off") : null;
+
+            let loginButton = state.isAnonUser ? new IconButton("fa-sign-in", "Login", {
+                onClick: e => { S.nav.login(state); },
+                title: "Login to Quanta"
+            }, "btn-primary marginRight", "off") : null;
+
+            let editIcon = allowEditMode ? new IconButton("fa-pencil", null, {
+                onClick: e => { S.edit.toggleEditMode(state); },
+                title: "Turn Edit Mode " + (state.userPreferences.editMode ? "off" : "on")
+            }, "btn-secondary marginRight", state.userPreferences.editMode ? "on" : "off") : null;
+
+            let logo = new Img(this.getId() + "_logo", {
+                className: "marginRight",
+                src: "/images/eagle-logo-50px-tr.jpg"
+            });
+            let title = new Span(state.title);
+            mobileTopBar = new Div(null, null, [logo, menuButton, signupButton, loginButton, editIcon, title]);
         }
 
         let main: Main = null;
         this.setChildren([
+            mobileTopBar,
             fullScreenViewer ? new FullScreenControlBar() : null,
             // For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
             // both get sized right with no overlapping.

@@ -22,7 +22,6 @@ export class LeftNavPanel extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-
         let allowEditMode = state.node && !state.isAnonUser;
 
         let signupButton = state.isAnonUser ? new IconButton("fa-user-plus", "Signup", {
@@ -34,23 +33,6 @@ export class LeftNavPanel extends Div {
             onClick: e => { S.nav.login(state); },
             title: "Login to Quanta"
         }, "btn-primary", "off") : null;
-
-        // new IconButton(clientInfo.isMobile ? "fa-bars" : null, "Quanta", {
-        //     onClick: e => {
-        //         // If user is not logged in this button just takes you back to the landing page.
-        //         if (state.isAnonUser || !clientInfo.isMobile) {
-        //             window.location.href = window.location.origin;
-        //         }
-        //         else {
-        //             if (clientInfo.isMobile) {
-        //                 S.nav.showMainMenu(state);
-        //             }
-        //         }
-        //     },
-        //     id: "mainMenu"
-        //     // only applies to mobile. just don't show title for now.
-        //     // title: "Show Main Menu"
-        // }, "nav-link btn-primary", "off", "/images/eagle-logo-50px-tr.jpg")
 
         this.setChildren([
             allowEditMode ? new IconButton("fa-pencil", null, {

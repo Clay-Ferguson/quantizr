@@ -1,4 +1,3 @@
-import { DialogBaseImpl } from "./DialogBaseImpl";
 import { ActivityPubIntf } from "./intf/ActivityPubIntf";
 import { AttachmentIntf } from "./intf/AttachmentIntf";
 import { EditIntf } from "./intf/EditIntf";
@@ -40,7 +39,6 @@ export interface Singletons {
     activityPub: ActivityPubIntf;
     rssReader: RSSReaderIntf;
     localDB: LocalDBIntf;
-    mainMenu: DialogBaseImpl;
 
     e: Function; // React.createElement
     log: Function; // console.log

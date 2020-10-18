@@ -15,7 +15,6 @@ import * as React from "react";
 import { ActivityPub } from "./ActivityPub";
 import { Attachment } from "./Attachment";
 import { Constants as C } from "./Constants";
-import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
 import { Graph } from "./Graph";
@@ -68,7 +67,6 @@ export class Factory {
             view: new View(),
             rssReader: new RSSReader(),
             localDB: new LocalDB(),
-            mainMenu: new MainMenuDlg(),
 
             // Use this version of the render method to help troubleshoot missing 'key' props
             // todo-1: move this function into some other static location that is safe to import

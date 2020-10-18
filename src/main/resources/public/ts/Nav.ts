@@ -2,6 +2,7 @@ import { appState, dispatch, fastDispatch } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { LoginDlg } from "./dlg/LoginDlg";
+import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
@@ -287,9 +288,8 @@ export class Nav implements NavIntf {
     }
 
     showMainMenu = (state: AppState): void => {
-        if (S.mainMenu) {
-            S.mainMenu.open("inline-block");
-        }
+       S.meta64.mainMenu = new MainMenuDlg();
+       S.meta64.mainMenu.open();
     }
 
     navFeed = (state: AppState): void => {

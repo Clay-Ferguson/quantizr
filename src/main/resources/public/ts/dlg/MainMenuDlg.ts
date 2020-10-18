@@ -10,14 +10,9 @@ export class MainMenuDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        if (this.appState.isAnonUser) {
-            // anon users don't get the menu
-            return [];
-        } else {
-            return [
-                new MenuPanel(this.appState)
-            ];
-        }
+        return [
+            new MenuPanel(this.appState)
+        ];
     }
 
     renderButtons(): CompIntf {
