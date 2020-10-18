@@ -12,6 +12,8 @@ import { TextContent } from "../widget/TextContent";
 import { VideoPlayer } from "../widget/VideoPlayer";
 import { AudioPlayerDlg } from "./AudioPlayerDlg";
 import { VideoPlayerDlg } from "./VideoPlayerDlg";
+import { Selection } from "../widget/Selection";
+import { Div } from "../widget/Div";
 
 // https://developers.google.com/web/fundamentals/media/recording-audio
 
@@ -70,6 +72,9 @@ export class MediaRecorderDlg extends DialogBase {
     public blobType: string;
     public uploadRequested: boolean;
 
+    audioInputOptions: any[];
+    videoInputOptions: any[];
+
     constructor(state: AppState, public videoMode: boolean) {
         super(videoMode ? "Video Recorder" : "Audio Recorder", null, false, state);
         this.mergeState({ status: "", recording: false });
@@ -77,12 +82,45 @@ export class MediaRecorderDlg extends DialogBase {
 
     preLoad(): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
-            let constraints: any = { audio: true };
-            if (this.videoMode) {
-                constraints.video = true;
-            }
+            await this.scanDevices();
+            await this.resetStream();
+            resolve();
+        });
+    }
 
-            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+    scanDevices = async (): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            this.audioInputOptions = [];
+            this.videoInputOptions = [];
+            let audioInput = null;
+            let videoInput = null;
+
+            let devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
+
+            devices.forEach((device: MediaDeviceInfo) => {
+                if (device.kind === "audioinput") {
+
+                    // take the first one here
+                    if (!audioInput) {
+                        audioInput = device.deviceId;
+                    }
+
+                    // add to data for dropdown
+                    this.audioInputOptions.push({ key: device.deviceId, val: device.label });
+                }
+                else if (device.kind === "videoinput") {
+
+                    // take the first one here
+                    if (!videoInput) {
+                        videoInput = device.deviceId;
+                    }
+
+                    // add to data for dropdown
+                    this.videoInputOptions.push({ key: device.deviceId, val: device.label });
+                }
+            });
+
+            this.mergeState({ audioInput, videoInput });
             resolve();
         });
     }
@@ -93,23 +131,23 @@ export class MediaRecorderDlg extends DialogBase {
         // This creates the video display showing just the live feed of the camera always, regardless of whether currently recrding.
         if (this.videoMode) {
             // if (!this.videoPlayer) {
-                this.videoPlayer = new VideoPlayer({
-                    style: {
-                        width: "100%",
-                        border: "3px solid gray",
-                        padding: "0px",
-                        marginTop: "10px",
-                        marginLeft: "0px",
-                        marginRight: "0px"
-                    },
-                    // "ontimeupdate": () => { S.podcast.onTimeUpdate(this); },
-                    // "oncanplay": () => { S.podcast.onCanPlay(this); },
-                    // controls: "controls",
-                    autoPlay: "autoplay",
-                    muted: "true"
-                    // "volume": "0.9",
-                    // "preload": "auto"
-                });
+            this.videoPlayer = new VideoPlayer({
+                style: {
+                    width: "100%",
+                    border: "3px solid gray",
+                    padding: "0px",
+                    marginTop: "10px",
+                    marginLeft: "0px",
+                    marginRight: "0px"
+                },
+                // "ontimeupdate": () => { S.podcast.onTimeUpdate(this); },
+                // "oncanplay": () => { S.podcast.onCanPlay(this); },
+                // controls: "controls",
+                autoPlay: "autoplay",
+                muted: "true"
+                // "volume": "0.9",
+                // "preload": "auto"
+            });
             // }
 
             /* this is required to get the video live after every re-render, but I really need to learn react 'refs'
@@ -118,10 +156,39 @@ export class MediaRecorderDlg extends DialogBase {
             this.displayStream();
         }
 
+        let audioSelect = new Selection(null, "Audio Input", this.audioInputOptions, "w-50", "", {
+            setValue: (val: string): void => {
+                this.mergeState({ audioInput: val });
+                setTimeout(() => {
+                    this.resetStream();
+                }, 250);
+            },
+            getValue: (): string => {
+                return this.getState().audioInput;
+            }
+        });
+
+        let videoSelect = null;
+        if (this.videoMode) {
+            videoSelect = new Selection(null, "Video Input", this.videoInputOptions, "w-50", "", {
+                setValue: (val: string): void => {
+                    this.mergeState({ videoInput: val });
+
+                    setTimeout(() => {
+                        this.resetStream();
+                    }, 250);
+                },
+                getValue: (): string => {
+                    return this.getState().videoInput;
+                }
+            });
+        }
+
         return [
             new Form(null, [
                 new TextContent("Records from your device, to upload as an attachment."),
                 this.status = new Heading(1, state.status),
+                new Div("", { className: "marginBottom" }, [audioSelect, videoSelect]),
                 new ButtonBar([
                     state.recording ? null : new Button("New Recording", this.newRecording, null, "btn-primary"),
 
@@ -137,6 +204,31 @@ export class MediaRecorderDlg extends DialogBase {
                 this.videoMode ? this.videoPlayer : null
             ])
         ];
+    }
+
+    resetStream = async () => {
+        return new Promise<void>(async (resolve, reject) => {
+            this.stop();
+
+            // stop() doesn't always nullify 'recorder' but we do it here. Any time stream is changing
+            // we force it to recreate the recorder object.
+            this.recorder = null;
+
+            let state = this.getState();
+            let constraints: any = { audio: { deviceId: state.audioInput } };
+            if (this.videoMode) {
+                constraints.video = { deviceId: state.videoInput };
+            }
+
+            this.closeStream();
+            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+            if (this.videoMode) {
+                this.displayStream();
+            }
+
+            resolve();
+        });
     }
 
     renderButtons(): CompIntf {
@@ -194,6 +286,7 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
+    // stop recording
     stop = () => {
         if (!this.recordingTimer) return;
         this.continuable = true;
@@ -235,7 +328,7 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     cancel = (): void => {
-        // todo-0; need confirmation here if they clicked the record button ever.
+        // todo-0: need confirmation here if they clicked the record button ever.
         this.cancelTimer();
         this.stop();
         this.closeStream();

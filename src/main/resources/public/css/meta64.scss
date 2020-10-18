@@ -112,6 +112,7 @@ $smallBorderSize: 3px;
 }
 
 .welcome-container-no-navbar {
+    margin-top: 20px;
 }
 
 .navbar {
@@ -136,7 +137,7 @@ $smallBorderSize: 3px;
 .welcome-body {
     font-family: $fontFamily !important;
     font-size: 1.4rem;
-    font-weight: 400;
+    font-weight: 300;
     line-height: 1.5;
 
     /* This top-padding is how the bootstrap example keept the main content from being covered by the navbar, but one of their primary examples
@@ -149,7 +150,7 @@ $smallBorderSize: 3px;
 .welcome-body-no-navbar {
     font-family: $fontFamily !important;
     font-size: 1.4rem;
-    font-weight: 400;
+    font-weight: 300;
     line-height: 1.5;
 
     padding-bottom: 1rem;
@@ -1088,6 +1089,7 @@ i'm backing out for now
 
 .selectLabel {
     margin-bottom: 0px;
+    margin-right: 6px;
 }
 
 .binaryEditorSection {
