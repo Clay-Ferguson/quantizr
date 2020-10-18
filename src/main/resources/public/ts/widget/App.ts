@@ -107,7 +107,7 @@ export class App extends Div {
 
             allowEditMode ? new IconButton("fa-pencil", null, {
                 onClick: e => { S.edit.toggleEditMode(state); },
-                title: "Turn Edit Mode " + (state.userPreferences.editMode ? "off" : "on")
+                title: "Turn edit mode " + (state.userPreferences.editMode ? "off" : "on")
             }, "btn-secondary editModeButton", state.userPreferences.editMode ? "on" : "off") : null,
 
             new IconButton("fa-arrow-up", null, {
@@ -115,7 +115,7 @@ export class App extends Div {
                     window.scrollTo(0, 0);
                 },
                 title: "Scroll to Top"
-            }, "btn-secondary scrollTopButton")
+            }, "btn-secondary scrollTopButton", "off")
         ]);
 
         if (main) {
