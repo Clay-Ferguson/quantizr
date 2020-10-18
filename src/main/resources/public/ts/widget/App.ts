@@ -7,11 +7,11 @@ import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Div } from "./Div";
 import { FullScreenCalendar } from "./FullScreenCalendar";
+import { FullScreenControlBar } from "./FullScreenControlBar";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
 import { FullScreenImgViewer } from "./FullScreenImgViewer";
 import { LeftNavPanel } from "./LeftNavPanel";
 import { Main } from "./Main";
-import { MainNavPanel } from "./MainNavPanel";
 import { RightNavPanel } from "./RightNavPanel";
 import { TabPanel } from "./TabPanel";
 
@@ -54,9 +54,7 @@ export class App extends Div {
 
         let main: Main = null;
         this.setChildren([
-            new Div(null, { role: "toolbar" }, [
-                new MainNavPanel(null)
-            ]),
+            fullScreenViewer ? new FullScreenControlBar() : null,
             // For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
             // both get sized right with no overlapping.
             fullScreenViewer ||

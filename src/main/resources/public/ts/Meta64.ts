@@ -625,9 +625,12 @@ export class Meta64 implements Meta64Intf {
 
         state.userPreferences = res.userPreferences;
 
-        var title = "";
+        var title;
         if (!state.isAnonUser) {
-            title += "User: " + res.userName;
+            title = res.userName + "@Quanta";
+        }
+        else {
+            title = "Quanta";
         }
 
         dispatch({

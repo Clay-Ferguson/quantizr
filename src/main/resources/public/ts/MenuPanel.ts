@@ -44,11 +44,17 @@ export class MenuPanel extends Div {
         const orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, hltNode);
         const allowNodeMove: boolean = !orderByProp && S.edit.isInsertAllowed(state.node, state);
         const isPageRootNode = state.node && hltNode && state.node.id === hltNode.id;
-
         const canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && !hltNode.firstChild);
         const canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && !hltNode.lastChild);
 
         const children = [];
+
+        children.push(new Menu("Site Nav", [
+            new MenuItem("Your Root Node", () => S.nav.navHome(state), !state.isAnonUser), // "fa-database"
+            new MenuItem("Portal Root Node", () => S.meta64.loadAnonPageHome(state)), // fa-home"
+            new MenuItem("User Guide", () => window.open(S.util.getHostAndPort() + "/f/user-guide")), // "fa-question-circle"
+            new MenuItem("Logout", () => S.nav.logout(state), !state.isAnonUser) // "fa-sign-out"
+        ]));
 
         // WARNING: The string 'Social' is also in Menu.activeMenu, to set the default menu that's opened
         children.push(new Menu("Social", [
@@ -154,6 +160,7 @@ export class MenuPanel extends Div {
 
             // calendar is experimental and only shown for admin user currently
             state.isAdminUser ? new MenuItem("Show Calendar", () => S.render.showCalendar(null, state), !!hltNode) : null, //
+            !state.isAnonUser ? new MenuItem("Save Clipboard", () => S.edit.saveClipboardToNode()) : null, // "fa-clipboard"
 
             new MenuItem("Show URLs", () => S.render.showNodeUrl(null, state), !!hltNode), //
 
@@ -195,7 +202,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Account", [
             new MenuItem("Profile", () => S.edit.openProfileDlg(state), !state.isAnonUser), //
-            new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), //
+            new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), // "fa-gear"
             new MenuItem("Change Password", () => S.edit.openChangePasswordDlg(state), !state.isAnonUser), //
             new MenuItem("Manage Account", () => S.edit.openManageAccountDlg(state), !state.isAnonUser) //
 

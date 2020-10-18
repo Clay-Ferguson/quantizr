@@ -61,20 +61,15 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
         if (state.node && this.node.id === state.node.id) {
 
-            // DO NOT DELETE (Clicking the rightmost breadcrumb can do this, so I'm removing it to see if I really
-            // prefer without or not)
-            // WARNING: actually this 'upLevel' is setting some important flags to make
-            // scrolling happen so we can't yet just get rid of this uplevel and expect the last
-            // breadcrumb to have the same effect becasue it doesn't yet, because of scrolling.
-            // if (S.nav.parentVisibleToUser(state)) {
-            //     upLevelButton = new IconButton("fa-chevron-circle-up", "Up Level", {
-            //         /* For onclick functions I need a new approach for some (not all) where I can get by
-            //         with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
-            //         directly off the DOM */
-            //         onClick: S.nav.navUpLevel,
-            //         title: "Go to Parent Node"
-            //     });
-            // }
+            if (S.nav.parentVisibleToUser(state)) {
+                upLevelButton = new IconButton("fa-chevron-circle-up", "Up Level", {
+                    /* For onclick functions I need a new approach for some (not all) where I can get by
+                    with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
+                    directly off the DOM */
+                    onClick: S.nav.navUpLevel,
+                    title: "Go to Parent Node"
+                });
+            }
 
             if (!S.nav.displayingRepositoryRoot(state)) {
                 prevButton = new IconButton("fa-chevron-circle-left", null, {
