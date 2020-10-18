@@ -11,7 +11,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class IconButton extends Comp {
 
-    constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private specialClasses: string = "btn-primary", private toggle: string = "", private imageUrl: string = null) {
+    constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private specialClasses: string = "btn-secondary", private toggle: string = "", private imageUrl: string = null) {
         super(attribs);
         this.attribs.type = "button";
         this.attribs.className = "btn align-middle " + specialClasses;

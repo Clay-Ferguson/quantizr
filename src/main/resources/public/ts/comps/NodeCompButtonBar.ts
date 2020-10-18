@@ -50,51 +50,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let replyButton: Button;
         let deleteNodeButton: Button;
         let pasteInsideButton: Button;
-        let upLevelButton: IconButton;
-        let prevButton: IconButton;
-        let nextButton: IconButton;
-        let searchButton: IconButton;
-        let timelineButton: IconButton;
         let insertInlineButton: IconButton;
 
         let isPageRootNode = state.node && this.node.id === state.node.id;
-
-        if (state.node && this.node.id === state.node.id) {
-
-            if (S.nav.parentVisibleToUser(state)) {
-                upLevelButton = new IconButton("fa-chevron-circle-up", "Up", {
-                    /* For onclick functions I need a new approach for some (not all) where I can get by
-                    with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
-                    directly off the DOM */
-                    onClick: S.nav.navUpLevel,
-                    title: "Go to Parent Node"
-                });
-            }
-
-            if (!S.nav.displayingRepositoryRoot(state)) {
-                prevButton = new IconButton("fa-chevron-circle-left", null, {
-                    onClick: S.nav.navToPrev,
-                    title: "Go to Previous Node"
-                });
-
-                nextButton = new IconButton("fa-chevron-circle-right", null, {
-                    onClick: S.nav.navToNext,
-                    title: "Go to Next Node"
-                });
-            }
-
-            if (!state.isAnonUser) {
-                searchButton = new IconButton("fa-search", null, {
-                    onClick: S.nav.runSearch,
-                    title: "Search underneath Node"
-                });
-
-                timelineButton = new IconButton("fa-clock-o", null, {
-                    onClick: S.nav.runTimeline,
-                    title: "View Timeline underneath Node (by Mod Time)"
-                });
-            }
-        }
 
         // todo-1: need to DRY up places where this code block is repeated
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
@@ -262,11 +220,56 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
             moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton, insertInlineButton], null, "marginLeft");
 
-        let navButtonBar;
+        let navButtonBar = null;
 
         if (isPageRootNode) {
+
+            let upLevelButton: IconButton;
+            let prevButton: IconButton;
+            let nextButton: IconButton;
+            let searchButton: IconButton;
+            let timelineButton: IconButton;
+
+            if (state.node && this.node.id === state.node.id) {
+
+                if (S.nav.parentVisibleToUser(state)) {
+                    upLevelButton = new IconButton("fa-chevron-circle-up", "Up Level", {
+                        /* For onclick functions I need a new approach for some (not all) where I can get by
+                        with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
+                        directly off the DOM */
+                        onClick: S.nav.navUpLevel,
+                        title: "Go to Parent Node"
+                    }, "btn-primary");
+                }
+
+                if (!S.nav.displayingRepositoryRoot(state)) {
+                    prevButton = new IconButton("fa-chevron-circle-left", null, {
+                        onClick: S.nav.navToPrev,
+                        title: "Go to Previous Node"
+                    });
+
+                    nextButton = new IconButton("fa-chevron-circle-right", null, {
+                        onClick: S.nav.navToNext,
+                        title: "Go to Next Node"
+                    });
+                }
+
+                if (!state.isAnonUser) {
+                    searchButton = new IconButton("fa-search", null, {
+                        onClick: S.nav.runSearch,
+                        title: "Search underneath Node"
+                    });
+
+                    timelineButton = new IconButton("fa-clock-o", null, {
+                        onClick: S.nav.runTimeline,
+                        title: "View Timeline underneath Node (by Mod Time)"
+                    });
+                }
+            }
+
+            // todo-0: performance improvement: only create these buttons IN HERE since otherwise they are ignored dummy!!
             navButtonBar = new ButtonBar([searchButton, timelineButton, upLevelButton, prevButton, nextButton],
-                null, "float-right marginTop marginBottom");
+                null, "float-right marginBottom");
             if (!navButtonBar.childrenExist()) {
                 navButtonBar = null;
             }

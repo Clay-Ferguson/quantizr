@@ -55,9 +55,10 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
             // a little slider switch button instead of a box with a check.
             className: "custom-control custom-checkbox inline-checkbox"
         }, S.e("input", this.attribs),
+            // warning without this label element the entire control fails to render, and this is apparently related to bootstrap itself.
             S.e("label", {
                 key: this.attribs.id + "_label",
-                className: "custom-control-label checkboxLabel",
+                className: "custom-control-label " + (this.label ? "checkboxLabel" : ""),
                 htmlFor: this.attribs.id
             }, this.label || ""));
     }

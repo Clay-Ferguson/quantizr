@@ -26,6 +26,8 @@
 
 .button-font {
     font-family: $fontFamily !important;
+    white-space: nowrap;
+
 }
 
 .feedDirtyButton {
