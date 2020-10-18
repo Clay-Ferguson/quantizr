@@ -8,7 +8,6 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { Heading } from "../widget/Heading";
-import { TextContent } from "../widget/TextContent";
 import { VideoPlayer } from "../widget/VideoPlayer";
 import { AudioPlayerDlg } from "./AudioPlayerDlg";
 import { VideoPlayerDlg } from "./VideoPlayerDlg";
@@ -72,12 +71,12 @@ export class MediaRecorderDlg extends DialogBase {
     public blobType: string;
     public uploadRequested: boolean;
 
-    audioInputOptions: any[];
-    videoInputOptions: any[];
-
     constructor(state: AppState, public videoMode: boolean) {
         super(videoMode ? "Video Recorder" : "Audio Recorder", null, false, state);
-        this.mergeState({ status: "", recording: false });
+        this.mergeState({
+            status: "",
+            recording: false
+        });
     }
 
     preLoad(): Promise<void> {
@@ -90,8 +89,8 @@ export class MediaRecorderDlg extends DialogBase {
 
     scanDevices = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            this.audioInputOptions = [];
-            this.videoInputOptions = [];
+            let audioInputOptions = [];
+            let videoInputOptions = [];
             let audioInput = null;
             let videoInput = null;
 
@@ -99,14 +98,13 @@ export class MediaRecorderDlg extends DialogBase {
 
             devices.forEach((device: MediaDeviceInfo) => {
                 if (device.kind === "audioinput") {
-
                     // take the first one here
                     if (!audioInput) {
                         audioInput = device.deviceId;
                     }
 
                     // add to data for dropdown
-                    this.audioInputOptions.push({ key: device.deviceId, val: device.label });
+                    audioInputOptions.push({ key: device.deviceId, val: device.label });
                 }
                 else if (device.kind === "videoinput") {
 
@@ -116,11 +114,11 @@ export class MediaRecorderDlg extends DialogBase {
                     }
 
                     // add to data for dropdown
-                    this.videoInputOptions.push({ key: device.deviceId, val: device.label });
+                    videoInputOptions.push({ key: device.deviceId, val: device.label });
                 }
             });
 
-            this.mergeState({ audioInput, videoInput });
+            this.mergeState({ audioInput, videoInput, audioInputOptions, videoInputOptions });
             resolve();
         });
     }
@@ -156,7 +154,7 @@ export class MediaRecorderDlg extends DialogBase {
             this.displayStream();
         }
 
-        let audioSelect = new Selection(null, "Audio Input", this.audioInputOptions, "w-50", "", {
+        let audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "", {
             setValue: (val: string): void => {
                 this.mergeState({ audioInput: val });
                 setTimeout(() => {
@@ -170,7 +168,7 @@ export class MediaRecorderDlg extends DialogBase {
 
         let videoSelect = null;
         if (this.videoMode) {
-            videoSelect = new Selection(null, "Video Input", this.videoInputOptions, "w-50", "", {
+            videoSelect = new Selection(null, "Video", state.videoInputOptions, "mediaStreamInputOption", "", {
                 setValue: (val: string): void => {
                     this.mergeState({ videoInput: val });
 
@@ -186,7 +184,6 @@ export class MediaRecorderDlg extends DialogBase {
 
         return [
             new Form(null, [
-                new TextContent("Records from your device, to upload as an attachment."),
                 this.status = new Heading(1, state.status),
                 new Div("", { className: "marginBottom" }, [audioSelect, videoSelect]),
                 new ButtonBar([

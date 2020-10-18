@@ -627,14 +627,7 @@ export class Meta64 implements Meta64Intf {
         state.allowFileSystemSearch = res.allowFileSystemSearch;
 
         state.userPreferences = res.userPreferences;
-
-        var title;
-        if (!state.isAnonUser) {
-            title = res.userName + "@Quanta";
-        }
-        else {
-            title = "Quanta";
-        }
+        var title = !state.isAnonUser ? res.userName : "";
 
         dispatch({
             type: "Action_LoginResponse",

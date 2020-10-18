@@ -62,7 +62,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         if (state.node && this.node.id === state.node.id) {
 
             if (S.nav.parentVisibleToUser(state)) {
-                upLevelButton = new IconButton("fa-chevron-circle-up", "Up Level", {
+                upLevelButton = new IconButton("fa-chevron-circle-up", "Up", {
                     /* For onclick functions I need a new approach for some (not all) where I can get by
                     with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
                     directly off the DOM */
@@ -194,6 +194,8 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     { title: "Insert new Node at this location." });
             }
 
+            let userCanPaste = editingAllowed && (S.props.isMine(node, state) || state.isAdminUser || node.id === state.homeNodeId);
+
             if (editingAllowed) {
                 if (editableNode) {
                     editNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_runEditNode, "S.edit.runEditNode", node.id), {
@@ -234,8 +236,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     });
                 }
 
-                let userCanPaste = S.props.isMine(node, state) || state.isAdminUser || node.id === state.homeNodeId;
-
                 if (!state.isAnonUser && !!state.nodesToMove && userCanPaste) {
                     pasteInsideButton = new Button("Paste Inside", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodesInside, "S.edit.pasteSelNodesInside", node.id), {
                         className: "highlightBorder"
@@ -243,7 +243,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
                 }
             }
 
-            if (!isPageRootNode && this.level === 1) {
+            if (!isPageRootNode && this.level === 1 && userCanPaste) {
                 insertInlineButton = new IconButton("fa-plus", null, {
                     onClick: e => {
                         S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);

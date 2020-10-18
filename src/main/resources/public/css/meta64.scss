@@ -85,6 +85,10 @@ $smallBorderSize: 3px;
 //     animation: animatedBackground 2s ease-in;
 // }
 
+.mediaStreamInputOption {
+    width: 30rem;
+}
+
 .myFooterText {
     font-size: 80%;
 }
@@ -124,9 +128,15 @@ $smallBorderSize: 3px;
     font-weight: 400;
 }
 
+.smallLogoButton {
+    border: 1px solid gray;
+    cursor: pointer;
+}
+
 .app-body {
     font-family: $fontFamily !important;
     padding-bottom: 1rem;
+    margin-right: 2rem;
 }
 
 .welcome-body {
@@ -142,6 +152,7 @@ $smallBorderSize: 3px;
     padding-bottom: 1rem;
 }
 
+// todo-0: we never have navbar so these 'no-navbar' vars can be renamed.
 .welcome-body-no-navbar {
     font-family: $fontFamily !important;
     font-size: 1.4rem;

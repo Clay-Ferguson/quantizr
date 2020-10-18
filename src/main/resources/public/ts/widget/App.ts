@@ -85,8 +85,9 @@ export class App extends Div {
             }, "btn-secondary marginRight", state.userPreferences.editMode ? "on" : "off") : null;
 
             let logo = new Img(this.getId() + "_logo", {
-                className: "marginRight",
-                src: "/images/eagle-logo-50px-tr.jpg"
+                className: "marginRight smallLogoButton",
+                src: "/images/eagle-logo-50px-tr.jpg",
+                onClick: () => { window.location.href = window.location.origin; }
             });
             let title = new Span(state.title);
             mobileTopBar = new Div(null, null, [logo, menuButton, signupButton, loginButton, editIcon, title]);

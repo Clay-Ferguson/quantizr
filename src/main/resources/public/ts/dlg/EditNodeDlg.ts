@@ -1,4 +1,5 @@
 import { AppState } from "../AppState";
+import clientInfo from "../ClientInfo";
 import { NodeCompBinary } from "../comps/NodeCompBinary";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
@@ -279,9 +280,7 @@ export class EditNodeDlg extends DialogBase {
 
         if (allowContentEdit) {
             let hasContentProp = typeHandler && typeHandler.hasCustomProp("content");
-
-            // We use 4 rows instead of 15 only if this is a customProps node.
-            let rows = "15";
+            let rows = clientInfo.isMobile ? "8" : "15";
             if (customProps && hasContentProp) {
                 rows = "4";
             }

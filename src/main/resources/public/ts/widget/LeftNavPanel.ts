@@ -40,7 +40,11 @@ export class LeftNavPanel extends Div {
                 title: "Turn Edit Mode " + (state.userPreferences.editMode ? "off" : "on")
             }, "float-right btn-secondary", state.userPreferences.editMode ? "on" : "off") : null,
 
-            new Img(this.getId() + "_logo", { src: "/images/eagle-logo-50px-tr.jpg" }),
+            new Img(this.getId() + "_logo", {
+                className: "smallLogoButton",
+                src: "/images/eagle-logo-50px-tr.jpg",
+                onClick: () => { window.location.href = window.location.origin; }
+             }),
             new Div(state.title),
 
             new Div(null, {
