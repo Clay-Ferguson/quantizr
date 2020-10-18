@@ -67,8 +67,6 @@ export class App extends Div {
                 // title: "Show Main Menu"
             }, "btn-secondary marginRight", "off");
 
-            let allowEditMode = state.node && !state.isAnonUser;
-
             let signupButton = state.isAnonUser ? new IconButton("fa-user-plus", "Signup", {
                 onClick: e => { S.nav.signup(state); },
                 title: "Create new Account"
@@ -79,21 +77,17 @@ export class App extends Div {
                 title: "Login to Quanta"
             }, "btn-primary marginRight", "off") : null;
 
-            let editIcon = allowEditMode ? new IconButton("fa-pencil", null, {
-                onClick: e => { S.edit.toggleEditMode(state); },
-                title: "Turn Edit Mode " + (state.userPreferences.editMode ? "off" : "on")
-            }, "btn-secondary marginRight", state.userPreferences.editMode ? "on" : "off") : null;
-
             let logo = new Img(this.getId() + "_logo", {
                 className: "marginRight smallLogoButton",
                 src: "/images/eagle-logo-50px-tr.jpg",
                 onClick: () => { window.location.href = window.location.origin; }
             });
             let title = new Span(state.title);
-            mobileTopBar = new Div(null, null, [logo, menuButton, signupButton, loginButton, editIcon, title]);
+            mobileTopBar = new Div(null, null, [logo, menuButton, signupButton, loginButton, title]);
         }
 
         let main: Main = null;
+        let allowEditMode = state.node && !state.isAnonUser;
         this.setChildren([
             mobileTopBar,
             fullScreenViewer ? new FullScreenControlBar() : null,
@@ -109,7 +103,19 @@ export class App extends Div {
                     this.tabPanel || (this.tabPanel = new TabPanel()),
                     clientInfo.isMobile ? null : new RightNavPanel()
                 ])
-            ]))
+            ])),
+
+            allowEditMode ? new IconButton("fa-pencil", null, {
+                onClick: e => { S.edit.toggleEditMode(state); },
+                title: "Turn Edit Mode " + (state.userPreferences.editMode ? "off" : "on")
+            }, "btn-secondary editModeButton", state.userPreferences.editMode ? "on" : "off") : null,
+
+            new IconButton("fa-arrow-up", null, {
+                onClick: e => {
+                    window.scrollTo(0, 0);
+                },
+                title: "Scroll to Top"
+            }, "btn-secondary scrollTopButton")
         ]);
 
         if (main) {

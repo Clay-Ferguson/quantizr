@@ -22,7 +22,6 @@ export class LeftNavPanel extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let allowEditMode = state.node && !state.isAnonUser;
 
         let signupButton = state.isAnonUser ? new IconButton("fa-user-plus", "Signup", {
             onClick: e => { S.nav.signup(state); },
@@ -35,11 +34,6 @@ export class LeftNavPanel extends Div {
         }, "btn-primary", "off") : null;
 
         this.setChildren([
-            allowEditMode ? new IconButton("fa-pencil", null, {
-                onClick: e => { S.edit.toggleEditMode(state); },
-                title: "Turn Edit Mode " + (state.userPreferences.editMode ? "off" : "on")
-            }, "float-right btn-secondary", state.userPreferences.editMode ? "on" : "off") : null,
-
             new Img(this.getId() + "_logo", {
                 className: "smallLogoButton",
                 src: "/images/eagle-logo-50px-tr.jpg",
