@@ -190,7 +190,7 @@ $smallBorderSize: 3px;
     max-height: 80px;
     cursor: pointer;
     margin-bottom: $tinyGap;
-    margin-left: $smallGap;
+    // margin-left: $smallGap; //NO. When metadata is off this will be wrong, so add this margin to the metadata container itself.
 }
 
 .profileImage {
@@ -232,6 +232,17 @@ $smallBorderSize: 3px;
 .main-navbar {
     margin: 0px;
     padding: 0px;
+}
+
+.floatingControlBar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    margin: 10px;
+}
+
+.displayBlock {
+    display: block;
 }
 
 /* This is how the search terms get highlighted by wrapping them like this in 
@@ -815,9 +826,9 @@ input[type="radio"] {
 
 .header-text {
     font-size: small;
-    // margin-top: 8px;
+    margin-left: 8px;
     margin-bottom: 8px;
-    padding-top: $microGap;
+    //padding-top: $microGap;
     cursor: pointer;
 }
 

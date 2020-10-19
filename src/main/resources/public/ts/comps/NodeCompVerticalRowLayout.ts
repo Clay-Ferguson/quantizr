@@ -100,16 +100,18 @@ export class NodeCompVerticalRowLayout extends Div {
                 S.render.setNodeDropHandler(attribs, lastNode, false, state);
             }
 
-            let div = new Div(null, attribs, [
-                new IconButton("fa-plus", null, {
-                    onClick: e => {
-                        S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
-                    },
-                    title: "Insert new node here"
-                }, "btn-secondary marginTop marginLeft")
-            ]);
+            if (this.level <= 1) {
+                let div = new Div(null, attribs, [
+                    new IconButton("fa-plus", null, {
+                        onClick: e => {
+                            S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                        },
+                        title: "Insert new node here"
+                    }, "btn-secondary marginTop marginLeft")
+                ]);
 
-            comps.push(div);
+                comps.push(div);
+            }
         }
 
         this.setChildren(comps);

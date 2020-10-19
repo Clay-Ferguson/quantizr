@@ -88,6 +88,27 @@ export class App extends Div {
 
         let main: Main = null;
         let allowEditMode = state.node && !state.isAnonUser;
+
+        let editButton = (allowEditMode && !fullScreenViewer) ? new IconButton("fa-pencil", null, {
+            onClick: e => { S.edit.toggleEditMode(state); },
+            title: "Turn edit mode " + (state.userPreferences.editMode ? "off" : "on")
+        }, "btn-secondary displayBlock", state.userPreferences.editMode ? "on" : "off") : null;
+
+        let prefsButton = !state.isAnonUser ? new IconButton("fa-gear", null, {
+            onClick: e => { S.edit.editPreferences(state); },
+            title: "Edit user preferences"
+        }, "btn-secondary displayBlock", "off") : null;
+
+        let rootButton = !state.isAnonUser ? new IconButton("fa-database", null, {
+            onClick: e => { S.nav.navHome(state); },
+            title: "Go to Root Node"
+        }, "btn-secondary displayBlock", "off") : null;
+
+        let floatingControlBar = null;
+        if (editButton && prefsButton) {
+            floatingControlBar = new Div(null, { className: "floatingControlBar" }, [editButton, prefsButton, rootButton]);
+        }
+
         this.setChildren([
             mobileTopBar,
             fullScreenViewer ? new FullScreenControlBar() : null,
@@ -98,17 +119,14 @@ export class App extends Div {
                 new Div(null, {
                     className: "row",
                     role: "banner"
-            }, [
+                }, [
                     clientInfo.isMobile ? null : new LeftNavPanel(),
                     this.tabPanel || (this.tabPanel = new TabPanel()),
                     clientInfo.isMobile ? null : new RightNavPanel()
                 ])
             ])),
 
-            (allowEditMode && !fullScreenViewer) ? new IconButton("fa-pencil", null, {
-                onClick: e => { S.edit.toggleEditMode(state); },
-                title: "Turn edit mode " + (state.userPreferences.editMode ? "off" : "on")
-            }, "btn-secondary editModeButton", state.userPreferences.editMode ? "on" : "off") : null,
+            floatingControlBar,
 
             new IconButton("fa-arrow-up", null, {
                 onClick: e => {

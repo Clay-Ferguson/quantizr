@@ -29,7 +29,6 @@ export class NodeCompTableRowLayout extends Div {
         let nodesToMove = state.nodesToMove;
         let curRow = new Div(null, { className: "node-grid-row" });
         let children: Comp[] = [];
-        let layoutClass = "node-grid-item";
         let childCount: number = this.node.children.length;
         let rowCount: number = 0;
         let maxCols = 2;
@@ -142,16 +141,18 @@ export class NodeCompTableRowLayout extends Div {
                 S.render.setNodeDropHandler(attribs, lastNode, false, state);
             }
 
-            let div = new Div(null, attribs, [
-                new IconButton("fa-plus", null, {
-                    onClick: e => {
-                        S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
-                    },
-                    title: "Insert new node here"
-                }, "btn-secondary marginTop marginLeft")
-            ]);
+            if (this.level <= 1) {
+                let div = new Div(null, attribs, [
+                    new IconButton("fa-plus", null, {
+                        onClick: e => {
+                            S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                        },
+                        title: "Insert new node here"
+                    }, "btn-secondary marginTop marginLeft")
+                ]);
 
-            children.push(div);
+                children.push(div);
+            }
         }
 
         this.setChildren(children);
