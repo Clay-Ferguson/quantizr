@@ -7,8 +7,6 @@ import { Img } from "../widget/Img";
 import { TypeHandlerIntf } from "./TypeHandlerIntf";
 
 export interface RenderIntf {
-    lastOwner: string;
-
     enableRowFading: boolean;
     fadeInId: string;
 

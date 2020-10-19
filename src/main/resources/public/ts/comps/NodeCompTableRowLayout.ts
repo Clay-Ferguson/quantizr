@@ -104,8 +104,6 @@ export class NodeCompTableRowLayout extends Div {
                 }
 
                 rowCount++;
-                S.render.lastOwner = n.owner;
-
                 if (n.children) {
                     comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
                 }

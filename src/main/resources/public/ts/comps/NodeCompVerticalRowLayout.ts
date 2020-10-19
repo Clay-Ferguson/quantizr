@@ -81,9 +81,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     comps.push(row);
                 }
 
-                S.render.lastOwner = this.node.owner;
                 rowCount++;
-
                 if (n.children) {
                     comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
                 }

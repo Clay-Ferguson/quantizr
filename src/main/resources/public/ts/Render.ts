@@ -38,10 +38,6 @@ export class Render implements RenderIntf {
     fadeInId: string;
     allowFadeInId: boolean = false;
 
-    /* Since js is singlethreaded we can have lastOwner get updated from any other function and use it to keep track
-    during the rendering, what the last owner was so we can keep from displaying the same avatars unnecessarily */
-    public lastOwner: string;
-
     injectSubstitutions = (val: string): string => {
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
 
@@ -257,7 +253,6 @@ export class Render implements RenderIntf {
             S.util.showMessage(res.noDataResponse, "Note");
             return;
         }
-        this.lastOwner = null;
 
         try {
             dispatch({
@@ -382,10 +377,6 @@ export class Render implements RenderIntf {
                     return s;
                 }
             });
-
-            if (state.node) {
-                this.lastOwner = state.node.owner;
-            }
         }
         catch (err) {
             console.error("render failed.");

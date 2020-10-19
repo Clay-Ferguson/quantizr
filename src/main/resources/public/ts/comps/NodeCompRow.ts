@@ -61,11 +61,10 @@ export class NodeCompRow extends Div {
 
         this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
 
-        // console.log("owner=" + node.owner + " lastOwner=" + this.lastOwner);
         let buttonBar: Comp = null;
         if (NodeCompRow.showButtonBar && !state.inlineEditId) {
-            let allowAvatar = node.owner !== S.render.lastOwner;
-            buttonBar = new NodeCompButtonBar(node, allowAvatar, this.allowNodeMove, this.level);
+            // todo-0: remove allowAvatar param it's always true.
+            buttonBar = new NodeCompButtonBar(node, true, this.allowNodeMove, this.level);
         }
 
         let layoutClass = this.isTableCell ? "node-grid-item" : "node-table-row";
