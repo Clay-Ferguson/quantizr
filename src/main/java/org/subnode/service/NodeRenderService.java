@@ -318,8 +318,8 @@ public class NodeRenderService {
 								// String.valueOf(idx) + " logicalOrdinal=" + String.valueOf(offset
 								// + count) + "]: "
 								// + XString.prettyPrint(node));
-								ninfo = processRenderNode(session, req, res, sn, false, null, offset + nodeInfo.getChildren().size()+1,
-										level + 1);
+								ninfo = processRenderNode(session, req, res, sn, false, null,
+										offset + nodeInfo.getChildren().size() + 1, level + 1);
 								nodeInfo.getChildren().add(ninfo);
 								if (offset == 0 && nodeInfo.getChildren().size() == 1) {
 									ninfo.setFirstChild(true);
@@ -342,8 +342,9 @@ public class NodeRenderService {
 						continue;
 					}
 				}
-			
-				ninfo = processRenderNode(session, req, res, n, false, null, offset + nodeInfo.getChildren().size()+1, level + 1);
+
+				ninfo = processRenderNode(session, req, res, n, false, null, offset + nodeInfo.getChildren().size() + 1,
+						level + 1);
 				nodeInfo.getChildren().add(ninfo);
 
 				if (offset == 0 && nodeInfo.getChildren().size() == 1) {
@@ -606,6 +607,8 @@ public class NodeRenderService {
 			while (node != null) {
 				BreadcrumbInfo bci = new BreadcrumbInfo();
 				if (list.size() >= 5) {
+					// This toplevel one is shows up on the client as "..." indicating more parents
+					// further up
 					bci.setId("");
 					list.add(0, bci);
 					break;
@@ -614,17 +617,21 @@ public class NodeRenderService {
 				String content = node.getContent();
 				if (content == null) {
 					content = "";
-				}
-				content = content.trim();
-				content = XString.truncateAfterFirst(content, "\n");
-				content = XString.truncateAfterFirst(content, "\r");
-				while (content.startsWith("#")) {
-					content = content.substring(1);
-				}
+				} else if (content.startsWith("<[ENC]>")) {
+					content = "[encrypted]";
+				} else {
+					content = content.trim();
+					content = XString.truncateAfterFirst(content, "\n");
+					content = XString.truncateAfterFirst(content, "\r");
+					while (content.startsWith("#")) {
+						content = content.substring(1);
+					}
 
-				if (content.length() > 25) {
-					content = content.substring(0, 25) + "...";
+					if (content.length() > 25) {
+						content = content.substring(0, 25) + "...";
+					}
 				}
+				
 				bci.setName(content);
 				bci.setId(node.getId().toHexString());
 				bci.setType(node.getType());

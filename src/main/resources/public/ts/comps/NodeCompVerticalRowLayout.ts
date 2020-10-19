@@ -26,15 +26,6 @@ export class NodeCompVerticalRowLayout extends Div {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
-        let layoutClass = "node-table-row";
-
-        if (state.userPreferences.editMode) {
-            layoutClass += " editing-border";
-        }
-        else {
-            layoutClass += " non-editing-border";
-        }
-
         let childCount: number = this.node.children.length;
         let comps: Comp[] = [];
         let countToDisplay = 0;
@@ -86,7 +77,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 }
                 else {
                     lastNode = n;
-                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove, childrenImgSizes, state);
+                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, false, this.allowNodeMove, childrenImgSizes, state);
                     comps.push(row);
                 }
 

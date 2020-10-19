@@ -201,7 +201,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
                 }
             }
 
-            if (!isPageRootNode && this.level === 1 && userCanPaste) {
+            if (!isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
                 insertInlineButton = new IconButton("fa-plus", null, {
                     onClick: e => {
                         S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);

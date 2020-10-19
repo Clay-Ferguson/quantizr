@@ -13,6 +13,7 @@ import { AudioPlayerDlg } from "./AudioPlayerDlg";
 import { VideoPlayerDlg } from "./VideoPlayerDlg";
 import { Selection } from "../widget/Selection";
 import { Div } from "../widget/Div";
+import clientInfo from "../ClientInfo";
 
 // https://developers.google.com/web/fundamentals/media/recording-audio
 
@@ -128,13 +129,13 @@ export class MediaRecorderDlg extends DialogBase {
 
         // This creates the video display showing just the live feed of the camera always, regardless of whether currently recrding.
         if (this.videoMode) {
-            // if (!this.videoPlayer) {
             this.videoPlayer = new VideoPlayer({
                 style: {
-                    width: "100%",
+                    width: clientInfo.isMobile ? "50%" : "100%",
                     border: "3px solid gray",
+                    display: "block",
                     padding: "0px",
-                    marginTop: "10px",
+                    marginTop: "8px",
                     marginLeft: "0px",
                     marginRight: "0px"
                 },
@@ -142,11 +143,10 @@ export class MediaRecorderDlg extends DialogBase {
                 // "oncanplay": () => { S.podcast.onCanPlay(this); },
                 // controls: "controls",
                 autoPlay: "autoplay",
-                muted: "true"
+                muted: true
                 // "volume": "0.9",
                 // "preload": "auto"
             });
-            // }
 
             /* this is required to get the video live after every re-render, but I really need to learn react 'refs'
             to do this slightly cleaner without a whenElm. We have to call this even if we didn't just create
@@ -184,8 +184,7 @@ export class MediaRecorderDlg extends DialogBase {
 
         return [
             new Form(null, [
-                this.status = new Heading(1, state.status),
-                new Div("", { className: "marginBottom" }, [audioSelect, videoSelect]),
+                this.status = new Heading(2, state.status),
                 new ButtonBar([
                     state.recording ? null : new Button("New Recording", this.newRecording, null, "btn-primary"),
 
@@ -198,7 +197,8 @@ export class MediaRecorderDlg extends DialogBase {
                     state.recording || !this.continuable ? null : new Button("Save", this.save, null),
                     new Button("Cancel", this.cancel)
                 ]),
-                this.videoMode ? this.videoPlayer : null
+                this.videoMode ? this.videoPlayer : null,
+                new Div("", { className: "marginTop" }, [audioSelect, videoSelect])
             ])
         ];
     }

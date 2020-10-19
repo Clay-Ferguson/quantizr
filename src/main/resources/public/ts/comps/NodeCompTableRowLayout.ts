@@ -99,7 +99,7 @@ export class NodeCompTableRowLayout extends Div {
                 }
                 else {
                     lastNode = n;
-                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, layoutClass, this.allowNodeMove, childrenImgSizes, state);
+                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, state);
                     comps.push(row);
                 }
 

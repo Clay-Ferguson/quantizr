@@ -14,6 +14,7 @@ import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
 import { IconButton } from "../widget/IconButton";
+import clientInfo from "../ClientInfo";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -193,7 +194,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let config: Object = {
             action,
             width: "100%",
-            height: "100%",
+            height: clientInfo.isMobile ? "60%" : "100%",
             progressBarWidth: "100%",
             url,
             // Prevents Dropzone from uploading dropped files immediately

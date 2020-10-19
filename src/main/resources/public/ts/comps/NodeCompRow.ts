@@ -24,7 +24,7 @@ export class NodeCompRow extends Div {
     static showButtonBar: boolean = true;
 
     constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number,
-        public layoutClass: string, public allowNodeMove: boolean, public imgSizeOverride: string, appState: AppState) {
+        public isTableCell: boolean, public allowNodeMove: boolean, public imgSizeOverride: string, appState: AppState) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + node.id
         });
@@ -68,12 +68,31 @@ export class NodeCompRow extends Div {
             buttonBar = new NodeCompButtonBar(node, allowAvatar, this.allowNodeMove, this.level);
         }
 
-        let indentLevel = this.layoutClass === "node-grid-item" ? 0 : this.level;
+        let layoutClass = this.isTableCell ? "node-grid-item" : "node-table-row";
+
+        const layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, this.node);
+
+        // if this node has children as columnar layout, and is rendering as the root node of a page or a node that is expanded inline,
+        // that means there will be a grid below this node so we don't show the border (bottom divider line) because it's more attractive not to.
+        if (this.isTableCell) {
+        }
+        else if (layout && layout.indexOf("c") === 0 && (!!S.props.getNodePropVal(J.NodeProp.INLINE_CHILDREN, this.node) || this.node.id === state.node.id)) {
+        }
+        else {
+            if (state.userPreferences.editMode) {
+                layoutClass += " editing-border";
+            }
+            else {
+                layoutClass += " non-editing-border";
+            }
+        }
+
+        let indentLevel = this.isTableCell ? 0 : this.level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
 
         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         let selected: boolean = (focusNode && focusNode.id === id);
-        this.attribs.className = (this.layoutClass || "") + (selected ? " active-row" : " inactive-row");
+        this.attribs.className = (layoutClass || "") + (selected ? " active-row" : " inactive-row");
 
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;

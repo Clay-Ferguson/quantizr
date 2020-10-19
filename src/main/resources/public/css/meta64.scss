@@ -189,6 +189,7 @@ $smallBorderSize: 3px;
     max-width: 80px;
     cursor: pointer;
     margin-bottom: $tinyGap;
+    margin-left: $smallGap;
 }
 
 .profileImage {
@@ -915,10 +916,16 @@ input[type="radio"] {
 }
 
 .editing-border {
-    border-bottom: 3px dotted $nodeBorderBottomColor;
+    // border-bottom: 3px dotted $nodeBorderBottomColor;
+    border-bottom: 1px dotted lightslategray;
 }
 
 .non-editing-border {
+    border-bottom: 1px dotted lightslategray;
+}
+
+.editing-border {
+    // border-bottom: 3px dotted $nodeBorderBottomColor;
     border-bottom: 1px dotted lightslategray;
 }
 
@@ -934,7 +941,7 @@ i'm backing out for now
     display: table;
     width: 100%;
     table-layout: fixed;
-    margin-top: 10px;
+    //margin-top: 10px;
     //height: 100%;
 
     // if you ever need rounded cells, these two are needed with that.

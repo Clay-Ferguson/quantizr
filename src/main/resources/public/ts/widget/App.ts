@@ -98,14 +98,14 @@ export class App extends Div {
                 new Div(null, {
                     className: "row",
                     role: "banner"
-                }, [
+            }, [
                     clientInfo.isMobile ? null : new LeftNavPanel(),
                     this.tabPanel || (this.tabPanel = new TabPanel()),
                     clientInfo.isMobile ? null : new RightNavPanel()
                 ])
             ])),
 
-            allowEditMode ? new IconButton("fa-pencil", null, {
+            (allowEditMode && !fullScreenViewer) ? new IconButton("fa-pencil", null, {
                 onClick: e => { S.edit.toggleEditMode(state); },
                 title: "Turn edit mode " + (state.userPreferences.editMode ? "off" : "on")
             }, "btn-secondary editModeButton", state.userPreferences.editMode ? "on" : "off") : null,
