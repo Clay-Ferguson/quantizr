@@ -134,6 +134,10 @@ $smallBorderSize: 3px;
     font-weight: 400;
 }
 
+.navItem {
+    margin-top: 8px;
+}
+
 .smallLogoButton {
     border: 1px solid gray;
     cursor: pointer;
@@ -142,7 +146,6 @@ $smallBorderSize: 3px;
 .app-body {
     font-family: $fontFamily !important;
     padding-bottom: 1rem;
-    margin-right: 2rem;
 }
 
 .welcome-body {
@@ -417,7 +420,8 @@ strong em {
 @import 'scrollbar.scss';
 
 .tab-buttons-container {
-    margin-top: 8px;
+    // margin-top: 8px;
+    margin-bottom: 8px;
 }
 
 .rightNavPanel {
@@ -426,7 +430,6 @@ strong em {
 
 .my-tab-pane {
     width: 100%;
-    padding-top: $smallGap;
 }
 
 .tab-content {
@@ -810,7 +813,7 @@ input[type="radio"] {
 
 .header-text {
     font-size: small;
-    margin-top: 8px;
+    // margin-top: 8px;
     margin-bottom: 8px;
     padding-top: $microGap;
     cursor: pointer;

@@ -605,7 +605,7 @@ public class NodeRenderService {
 
 			while (node != null) {
 				BreadcrumbInfo bci = new BreadcrumbInfo();
-				if (list.size() >= 7) {
+				if (list.size() >= 5) {
 					bci.setId("");
 					list.add(0, bci);
 					break;
@@ -622,8 +622,8 @@ public class NodeRenderService {
 					content = content.substring(1);
 				}
 
-				if (content.length() > 30) {
-					content = content.substring(0, 30) + "...";
+				if (content.length() > 25) {
+					content = content.substring(0, 25) + "...";
 				}
 				bci.setName(content);
 				bci.setId(node.getId().toHexString());

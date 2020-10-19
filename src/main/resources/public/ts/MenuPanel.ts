@@ -51,7 +51,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Site Nav", [
             new MenuItem("Your Root Node", () => S.nav.navHome(state), !state.isAnonUser), // "fa-database"
-            new MenuItem("Portal Root Node", () => S.meta64.loadAnonPageHome(state)), // fa-home"
+            new MenuItem("Portal Home", () => S.meta64.loadAnonPageHome(state)), // fa-home"
             new MenuItem("User Guide", () => window.open(S.util.getHostAndPort() + "/f/user-guide")), // "fa-question-circle"
             new MenuItem("Logout", () => S.nav.logout(state), !state.isAnonUser) // "fa-sign-out"
         ]));

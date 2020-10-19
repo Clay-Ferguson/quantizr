@@ -60,7 +60,7 @@ export class TabPanel extends Div {
             },
                 /* These 'li' (list item) elements hold the tab bar that goes across the top of every page */
                 [new Li(null, {
-                    className: "nav-item",
+                    className: "nav-item navItem",
                     style: { display: mainDisplay }
                 }, [
                     new Anchor("#mainTab", "Main", {
@@ -78,7 +78,7 @@ export class TabPanel extends Div {
                 ),
 
                 new Li(null, {
-                    className: "nav-item",
+                    className: "nav-item navItem",
                     style: { display: searchDisplay }
                 },
                     [new Anchor("#searchTab", "Search", {
@@ -96,7 +96,7 @@ export class TabPanel extends Div {
                 ),
 
                 new Li(null, {
-                    className: "nav-item",
+                    className: "nav-item navItem",
                     style: { display: timelineDisplay }
                 },
                     [new Anchor("#timelineTab", "Timeline", {
@@ -114,7 +114,7 @@ export class TabPanel extends Div {
                 ),
 
                 new Li(null, {
-                    className: "nav-item",
+                    className: "nav-item navItem",
                     style: { display: feedDisplay }
                 },
                     [new Anchor("#feedTab", "Feed", {
