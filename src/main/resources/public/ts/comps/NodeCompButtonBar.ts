@@ -200,15 +200,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     });
                 }
             }
-
-            if (!isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
-                insertInlineButton = new IconButton("fa-plus", null, {
-                    onClick: e => {
-                        S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
-                    },
-                    title: "Insert new node (above)"
-                }, "btn-secondary");
-            }
         }
 
         // If showMetaData is true the avatar will show up in a different place (very upper left), instead of here

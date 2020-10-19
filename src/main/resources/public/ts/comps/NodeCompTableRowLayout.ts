@@ -142,16 +142,13 @@ export class NodeCompTableRowLayout extends Div {
             }
 
             if (this.level <= 1) {
-                let div = new Div(null, attribs, [
-                    new IconButton("fa-plus", null, {
-                        onClick: e => {
-                            S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
-                        },
-                        title: "Insert new node here"
-                    }, "btn-secondary marginTop marginLeft")
-                ]);
-
-                children.push(div);
+                let btn = new IconButton("fa-plus", null, {
+                    onClick: e => {
+                        S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                    },
+                    title: "Insert new node"
+                }, "btn-secondary marginLeft marginTop");
+                children.push(btn);
             }
         }
 

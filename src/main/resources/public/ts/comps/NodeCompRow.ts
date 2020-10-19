@@ -1,12 +1,15 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { NodeActionType } from "../enums/NodeActionType";
+import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Div } from "../widget/Div";
+import { IconButton } from "../widget/IconButton";
 import { QuickEditField } from "../widget/QuickEditField";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
@@ -112,7 +115,28 @@ export class NodeCompRow extends Div {
             S.render.setNodeDropHandler(this.attribs, this.node, true, state);
         }
 
+        let insertInlineButton = null;
+
+        if (state.userPreferences.editMode) {
+            let insertAllowed = true;
+            let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+            if (typeHandler) {
+                insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, node, state);
+            }
+
+            let isPageRootNode = state.node && this.node.id === state.node.id;
+            if (!isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
+                insertInlineButton = new IconButton("fa-plus", null, {
+                    onClick: e => {
+                        S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
+                    },
+                    title: "Insert new node"
+                }, "btn-secondary plusButton");
+            }
+        }
+
         this.setChildren([
+            insertInlineButton,
             header,
             buttonBar,
             buttonBar ? new Div(null, {

@@ -832,6 +832,14 @@ input[type="radio"] {
     cursor: pointer;
 }
 
+/* This positioning puts the plus buttion right outside the row to the right between rows
+   so it's intuitive where the insert goes */
+.plusButton {
+    position: absolute;
+    top: -1.3rem;
+    right: -3.2rem;
+}
+
 @keyframes fadeToHidden {
     from {opacity: 1;}
     to {opacity: 0;}
