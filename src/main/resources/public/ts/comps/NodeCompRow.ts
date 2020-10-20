@@ -64,10 +64,29 @@ export class NodeCompRow extends Div {
 
         this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
 
+        let insertInlineButton = null;
+        if (state.userPreferences.editMode) {
+            let insertAllowed = true;
+            let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+            if (typeHandler) {
+                insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, node, state);
+            }
+
+            let isPageRootNode = state.node && this.node.id === state.node.id;
+            if (!isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
+                insertInlineButton = new IconButton("fa-plus", null, {
+                    onClick: e => {
+                        S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
+                    },
+                    title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
+                }, "btn-secondary " + (this.isTableCell ? "" : "plusButtonFloatRight"));
+            }
+        }
+
         let buttonBar: Comp = null;
         if (NodeCompRow.showButtonBar && !state.inlineEditId) {
             // todo-0: remove allowAvatar param it's always true.
-            buttonBar = new NodeCompButtonBar(node, true, this.allowNodeMove, this.level);
+            buttonBar = new NodeCompButtonBar(node, true, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null);
         }
 
         let layoutClass = this.isTableCell ? "node-grid-item" : "node-table-row";
@@ -115,28 +134,8 @@ export class NodeCompRow extends Div {
             S.render.setNodeDropHandler(this.attribs, this.node, true, state);
         }
 
-        let insertInlineButton = null;
-
-        if (state.userPreferences.editMode) {
-            let insertAllowed = true;
-            let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-            if (typeHandler) {
-                insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, node, state);
-            }
-
-            let isPageRootNode = state.node && this.node.id === state.node.id;
-            if (!isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
-                insertInlineButton = new IconButton("fa-plus", null, {
-                    onClick: e => {
-                        S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
-                    },
-                    title: "Insert new node"
-                }, "btn-secondary plusButton");
-            }
-        }
-
         this.setChildren([
-            insertInlineButton,
+            this.isTableCell ? null : insertInlineButton,
             header,
             buttonBar,
             buttonBar ? new Div(null, {

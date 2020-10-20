@@ -6,6 +6,7 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
@@ -22,7 +23,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompButtonBar extends HorizontalLayout {
 
-    constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean, private level: number) {
+    constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean, private level: number, private extraButtons: IconButton[]) {
         super(null, "marginLeft", {
             id: "NodeCompButtonBar_" + node.id
         });
@@ -50,7 +51,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let replyButton: Button;
         let deleteNodeButton: Button;
         let pasteInsideButton: Button;
-        let insertInlineButton: IconButton;
 
         let isPageRootNode = state.node && this.node.id === state.node.id;
 
@@ -208,8 +208,14 @@ export class NodeCompButtonBar extends HorizontalLayout {
             avatarImg = S.render.makeAvatarImage(node, state);
         }
 
-        let buttonBar = new ButtonBar([openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
-            moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton, insertInlineButton], null, "marginLeft");
+        let btnArray: Comp[] = [openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
+            moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton];
+
+        if (this.extraButtons) {
+            btnArray = btnArray.concat(this.extraButtons);
+        }
+
+        let buttonBar = new ButtonBar(btnArray, null, "marginLeft");
 
         let navButtonBar = null;
 
@@ -258,7 +264,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
                 }
             }
 
-            // todo-0: performance improvement: only create these buttons IN HERE since otherwise they are ignored dummy!!
             navButtonBar = new ButtonBar([searchButton, timelineButton, upLevelButton, prevButton, nextButton],
                 null, "float-right marginBottom");
             if (!navButtonBar.childrenExist()) {
