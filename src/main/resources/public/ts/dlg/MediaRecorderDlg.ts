@@ -72,7 +72,7 @@ export class MediaRecorderDlg extends DialogBase {
     public blobType: string;
     public uploadRequested: boolean;
 
-    constructor(state: AppState, public videoMode: boolean) {
+    constructor(state: AppState, public videoMode: boolean, private allowSave: boolean) {
         super(videoMode ? "Video Recorder" : "Audio Recorder", null, false, state);
         this.mergeState({
             status: "",
@@ -186,7 +186,7 @@ export class MediaRecorderDlg extends DialogBase {
             new Form(null, [
                 this.status = new Heading(2, state.status),
                 new ButtonBar([
-                    state.recording ? null : new Button("New Recording", this.newRecording, null, "btn-primary"),
+                    state.recording ? null : new Button(this.allowSave ? "New Recording" : "Start Recording", this.newRecording, null, "btn-primary"),
 
                     // This didn't work for video (only audio) which actually means my wild guess to just combine chunks isn't the correct way
                     // to accomplish this, and so I"m just disabling it until I have time to research.
@@ -194,8 +194,8 @@ export class MediaRecorderDlg extends DialogBase {
 
                     state.recording ? new Button("Stop", this.stop, null) : null,
                     state.recording || !this.continuable ? null : new Button("Play", this.play, null),
-                    state.recording || !this.continuable ? null : new Button("Save", this.save, null),
-                    new Button("Cancel", this.cancel)
+                    (!this.allowSave || (state.recording || !this.continuable)) ? null : new Button("Save", this.save, null),
+                    new Button(this.allowSave ? "Cancel" : "Close", this.cancel)
                 ]),
                 this.videoMode ? this.videoPlayer : null,
                 new Div("", { className: "marginTop" }, [audioSelect, videoSelect])

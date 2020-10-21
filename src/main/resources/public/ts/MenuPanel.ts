@@ -3,6 +3,7 @@ import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
+import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
@@ -170,7 +171,12 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Import", () => S.edit.openImportDlg(state), importFeatureEnabled),
-            new MenuItem("Export", () => S.edit.openExportDlg(state), exportFeatureEnabled)
+            new MenuItem("Export", () => S.edit.openExportDlg(state), exportFeatureEnabled),
+
+            new MenuItemSeparator(), //
+
+            new MenuItem("Test Microphone", () => { new MediaRecorderDlg(state, false, false).open(); }, !state.isAnonUser),
+            new MenuItem("Test Web Cam", () => { new MediaRecorderDlg(state, true, false).open(); }, !state.isAnonUser)
         ]));
 
         children.push(new Menu("Encrypt", [

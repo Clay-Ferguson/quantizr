@@ -817,12 +817,20 @@ input[type="radio"] {
     margin-left: 10px;
 }
 
+.created-by-me:first-child {
+    margin-left: 0px;
+}
+
 .created-by-other {
     background: $createdByAnotherBackgroundColor;
     color: $createdByAnotherTextColor;
     padding: 4px;
     margin-right: 10px;
     margin-left: 10px;
+}
+
+.created-by-other:first-child {
+    margin-left: 0px;
 }
 
 .header-text {

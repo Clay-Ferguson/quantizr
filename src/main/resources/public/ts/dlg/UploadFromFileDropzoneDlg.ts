@@ -81,7 +81,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                     new IconButton("fa-microphone", /* "From Mic" */ null, {
                         onClick: async () => {
-                            let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, false);
+                            let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, false, true);
                             await dlg.open();
                             if (dlg.uploadRequested) {
                                 this.dropzone.addFile(new File([dlg.blob], "audio-recording.opus", { type: dlg.blobType }));
@@ -94,7 +94,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                     new IconButton("fa-video-camera", /* From WebCam */ null, {
                         onClick: async () => {
-                            let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, true);
+                            let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, true, true);
                             await dlg.open();
                             if (dlg.uploadRequested) {
                                 this.dropzone.addFile(new File([dlg.blob], "video-recording.webm", { type: dlg.blobType }));
