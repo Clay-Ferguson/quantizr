@@ -11,7 +11,7 @@ export const initialState = new AppState();
  */
 export function rootReducer(state: AppState = initialState, /* action: Action<any> */ action: AppAction) {
 
-    console.log("Action: " + action.type);
+    // console.log("Action: " + action.type);
 
     /* If this AppAction has 'updateNew' use it to get the new state, but this really is just an opportunity for a BUG where the
     the updateNew might accidentally NOT create a brand new state object, and if it doesn't then the entire rendering breaks, so really

@@ -4,7 +4,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import TsxApp from "./TsxApp";
 
-//set in index.html
+// set in index.html
 declare var __page;
 
 window.onerror = function (message, url, line, col, err) {
@@ -15,15 +15,14 @@ window.onerror = function (message, url, line, col, err) {
     console.log(msg);
 };
 
-if (__page === "index") {
+if ((window as any).__page === "index") {
     console.log("bundle entrypoint running.");
     const factory = new Factory();
     factory.constructAll();
 
     factory.singletons.meta64.initApp();
 }
-else if (__page === "tsx-test") {
-
+else if ((window as any).__page === "tsx-test") {
     ReactDOM.render(
         <React.StrictMode>
             <TsxApp />
