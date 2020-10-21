@@ -108,9 +108,10 @@ export class App extends Div {
 
         let rootButton = !state.isAnonUser ? new IconButton("fa-database", null, {
             onClick: e => { S.nav.navHome(state); },
-            title: "Go to Root Node"
+            title: "Your Root Node"
         }, "btn-secondary floatingControlBarItem", "off") : null;
 
+        // these are the buttons at the upper right of the page.
         let floatingControlBar = null;
         if (editButton && prefsButton) {
             floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton, rootButton, prefsButton, editButton]);

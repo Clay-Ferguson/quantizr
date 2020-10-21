@@ -7,6 +7,7 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
+import { Button } from "../widget/Button";
 import { Div } from "../widget/Div";
 import { IconButton } from "../widget/IconButton";
 import { NodeCompRow } from "./NodeCompRow";
@@ -108,6 +109,11 @@ export class NodeCompVerticalRowLayout extends Div {
                     title: "Insert new node"
                 }, "btn-secondary marginLeft marginTop");
                 comps.push(btn);
+
+                let userCanPaste = S.props.isMine(lastNode, state) || state.isAdminUser || lastNode.id === state.homeNodeId;
+                if (!!state.nodesToMove && userCanPaste) {
+                    comps.push(new Button("Paste", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_Inline, "S.edit.pasteSelNodes_Inline", lastNode.id)));
+                }
             }
         }
 

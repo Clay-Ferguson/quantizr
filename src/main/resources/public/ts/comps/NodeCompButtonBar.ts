@@ -51,6 +51,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         let replyButton: Button;
         let deleteNodeButton: Button;
         let pasteInsideButton: Button;
+        let pasteInlineButton: Button;
 
         let isPageRootNode = state.node && this.node.id === state.node.id;
 
@@ -194,10 +195,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     });
                 }
 
-                if (!state.isAnonUser && !!state.nodesToMove && userCanPaste) {
-                    pasteInsideButton = new Button("Paste Inside", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodesInside, "S.edit.pasteSelNodesInside", node.id), {
-                        className: "highlightBorder"
-                    });
+                if (!!state.nodesToMove && userCanPaste) {
+                    pasteInsideButton = new Button("Paste Inside", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodesInside, "S.edit.pasteSelNodesInside", node.id));
+                    pasteInlineButton = new Button("Paste", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_InlineAbove, "S.edit.pasteSelNodes_InlineAbove", node.id));
                 }
             }
         }
@@ -209,7 +209,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         }
 
         let btnArray: Comp[] = [openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
-            moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton];
+            moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton, pasteInlineButton];
 
         if (this.extraButtons) {
             btnArray = btnArray.concat(this.extraButtons);

@@ -406,45 +406,20 @@ export class Render implements RenderIntf {
     /* This is the button bar displayed between all nodes to let nodes be inserted at specific locations
 
     The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
+
+    todo-0: remove all this.
     */
     createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, state: AppState): Comp => {
-        let pasteInlineButton: Button = null;
-
-        let userCanPaste = S.props.isMine(node, state) || state.isAdminUser || node.id === state.homeNodeId;
-
-        if (!state.isAnonUser && !!state.nodesToMove && userCanPaste) {
-
-            // console.log("pasteSelButton: node.id=" + node.id + " isFirst=" + isFirst);
-
-            let func: Function = null;
-            if (isFirst) {
-                func = S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_InlineAbove, "S.edit.pasteSelNodes_InlineAbove", node.id);
-            }
-            else {
-                func = S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_Inline, "S.edit.pasteSelNodes_Inline", node.id);
-            }
-
-            pasteInlineButton = new Button("Paste", func, {
-                className: "highlightBorder"
-            });
-        }
-
-        const buttonBar = new Span(null, {
-            className: "float-right microMarginTop"
-        }, [pasteInlineButton]);
-
-        return new Div(null, {
-            className: "betweenRowsContainer row no-gutters"
-        }, [
-            // This works, but I decided having only ONE editor is better, and
-            // if we need to edit inline we can put the main editor dialog in inline in the content
-            // instead of making it a dialog
-            // todo-1: eventually we can get rid of the whole QuidkEditField stuff?
-            // new QuickEditField(node, isFirst, state),
-            new Span(null, {
-                className: "col"
-            }, [buttonBar])
-        ]);
+        // return new Div(null, {
+        //     className: "betweenRowsContainer row no-gutters"
+        // }, [
+        //     // This works, but I decided having only ONE editor is better, and
+        //     // if we need to edit inline we can put the main editor dialog in inline in the content
+        //     // instead of making it a dialog
+        //     // todo-1: eventually we can get rid of the whole QuidkEditField stuff?
+        //     // new QuickEditField(node, isFirst, state),
+        // ]);
+        return null;
     }
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
