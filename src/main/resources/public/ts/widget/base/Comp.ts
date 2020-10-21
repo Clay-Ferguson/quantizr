@@ -31,6 +31,15 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     public debugState: boolean = false;
     private static guid: number = 0;
 
+    /*
+    DO NOT DELETE:
+    This is one way that should work, but isn't being used because we're using
+    the domAddEvent method let us know when the element is visible, which should be just
+    as efficient, and isn't using any timers. The way this should work is any
+    constructor can set 'referenced' to true to trigger 'ref' to get set during render. */
+    // public referenced: boolean;
+    // private ref: any;
+
     // This is boolean is kinda tricky. It is needed for when we have text inputs bound to state by onChange to update state
     // and end up setting state into parent which forces a rerender, and destroys the focus and cursor position as the render creates a NEW
     // component, and this flag makes the component keep the same 'key' attribute by not rendering with new keys on all elements during onChange
@@ -107,6 +116,12 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     /* Warning: Under lots of circumstances it's better to call util.getElm rather than getElement() because getElement returns
     null unless the element is already created and rendered onto the DOM */
     getElement(): HTMLElement {
+        // DO NOT DELETE
+        // if (this.ref && this.ref.current) {
+        //     // console.log("***** got element from ref! " + this.jsClassName);
+        //     return this.ref.current;
+        // }
+        // console.log("*** getting element from old-school dom call.");
         return <HTMLElement>document.getElementById(this.getId());
     }
 
@@ -127,7 +142,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             return;
         }
 
-        // console.log("queueing the function " + this.jsClassName);
+        // console.log("queueing a whenElm function on " + this.jsClassName);
         // queue up the 'func' to be called once the domAddEvent gets executed.
         if (!this.domAddFuncs) {
             this.domAddFuncs = [func];
@@ -384,6 +399,13 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         try {
             const [state, setStateEx] = useState(this.state);
 
+            // DO NOT DELETE
+            // if (this.referenced) {
+            //     // console.log("Element is referenced: " + this.jsClassName);
+            //     // NOTE: ref.current will get set to the actual DOM element once available.
+            //     this.ref = useRef(null);
+            // }
+
             // #memoReq
             // const [isMounted, setIsMounted] = useState<boolean>(false);
 
@@ -415,18 +437,10 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
             // This hook should work fine but just isn't needed yet.
             if (this.domUpdateEvent) {
-                // useEffect(() => {
-                //     //console.log("DOM UPDATE: " + this.jsClassName);
-                //     this.domUpdateEvent();
-                // });
                 useEffect(this.domUpdateEvent);
             }
 
             if (this.domPreUpdateEvent) {
-                // useLayoutEffect(() => {
-                //     //console.log("DOM PRE-UPDATE: " + this.jsClassName);
-                //     this.domPreUpdateEvent();
-                // });
                 useLayoutEffect(this.domPreUpdateEvent);
             }
 

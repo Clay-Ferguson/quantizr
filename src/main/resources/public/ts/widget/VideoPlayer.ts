@@ -19,7 +19,6 @@ export class VideoPlayer extends Comp {
     }
 
     compRender(): ReactNode {
-        let elm = S.e("video", this.attribs);
-        return elm;
+        return S.e("video", this.attribs);
     }
 }
