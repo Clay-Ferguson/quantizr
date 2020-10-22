@@ -24,6 +24,7 @@ export interface EditIntf {
     moveNodeToTop(id: string, state: AppState): void;
     moveNodeToBottom(id: string, state: AppState): void;
     getFirstChildNode(state: AppState): any;
+    getLastChildNode(state: AppState): any;
     cached_runEditNode(id: any, state?: AppState): void;
     insertNode(id: string, typeName: string, ordinalOffset: number, state?: AppState): void;
     cached_toolbarInsertNode(id: string): void;

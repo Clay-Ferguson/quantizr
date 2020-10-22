@@ -84,7 +84,6 @@ public class NodeRenderService {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
-		res.setOffsetOfNodeFound(-1);
 
 		String targetId = req.getNodeId();
 
@@ -121,8 +120,7 @@ public class NodeRenderService {
 
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
-			NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, 0, false, false,
-					false);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1, false, false);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -193,17 +191,17 @@ public class NodeRenderService {
 			}
 		}
 
-		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, scanToPath, 0, 0);
+		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, scanToPath, -1, 0);
 		res.setNode(nodeInfo);
 		res.setSuccess(true);
 		return res;
 	}
 
 	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res,
-			final SubNode node, boolean scanToNode, String scanToPath, int ordinal, int level) {
+			final SubNode node, boolean scanToNode, String scanToPath, long logicalOrdinal, int level) {
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, ordinal, level > 0,
-				false, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, logicalOrdinal,
+				level > 0, false);
 
 		if (level > 0) {
 			return nodeInfo;
@@ -211,11 +209,18 @@ public class NodeRenderService {
 
 		nodeInfo.setChildren(new LinkedList<NodeInfo>());
 
+		// todo-0: a great optimization would be to allow caller to pass in an 'offset hint', 
+		// based on information it already knows to jump over likely unneeded records when searching
+		// for a scanToNode node. 
 		/*
 		 * If we are scanning to a node we know we need to start from zero offset, or
-		 * else we use the offset passed in
+		 * else we use the offset passed in. Offset is the number of nodes to IGNORE
+		 * before we start collecting nodes.
 		 */
 		int offset = scanToNode ? 0 : req.getOffset();
+		if (offset < 0) {
+			offset = 0;
+		}
 
 		/*
 		 * todo-1: needed optimization to work well with large numbers of child nodes:
@@ -228,8 +233,7 @@ public class NodeRenderService {
 		 */
 		int queryLimit = scanToNode ? 1000 : offset + ROWS_PER_PAGE + 2;
 
-		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode="
-		// + scanToNode);
+		//log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode=" + scanToNode);
 
 		String orderBy = node.getStringProp(NodeProp.ORDER_BY.s());
 		Sort sort = null;
@@ -243,7 +247,7 @@ public class NodeRenderService {
 		Iterable<SubNode> nodeIter = read.getChildren(session, node, sort, queryLimit);
 		Iterator<SubNode> iterator = nodeIter.iterator();
 
-		int idx = 0, idxOfNodeFound = -1;
+		int idx = 0;
 
 		// this should only get set to true if we run out of records, because we reached
 		// the true end of records and not related to a queryLimit
@@ -256,27 +260,14 @@ public class NodeRenderService {
 			// if (offset < 0) {
 			// offset = 0;
 			// }
-			// res.setOffsetOfNodeFound(offset);
 		}
 
-		if (!scanToNode && offset > 0) {
+		if (offset > 0) {
 			// log.debug("Skipping the first " + offset + " records in the resultset.");
 			idx = read.skip(iterator, offset);
 		}
 
 		List<SubNode> slidingWindow = null;
-
-		/*
-		 * If we are scanning for a specific node, and starting at zero offset, then we
-		 * need to be capturing all the nodes as we go, in a sliding window, so that in
-		 * case we find this node on the first page then we can use the slidingWindow
-		 * nodes to build the entire first page, because we will need to send back these
-		 * nodes starting from the first one.
-		 */
-		if (offset == 0 && scanToNode) {
-			slidingWindow = new LinkedList<SubNode>();
-		}
-
 		NodeInfo ninfo = null;
 
 		/*
@@ -291,83 +282,99 @@ public class NodeRenderService {
 			}
 			SubNode n = iterator.next();
 			idx++;
-			// log.debug("NodeFound[" + idx + "]: nodeId" + n.getId().toHexString());
-			if (idx > offset) {
+			//log.debug("Iterate [" + idx + "]: nodeId" + n.getId().toHexString() + " scanToNode=" + scanToNode);
 
-				if (scanToNode) {
-					String testPath = n.getPath();
+			/* are we still just scanning for our target node */
+			if (scanToNode) {
+				/*
+				 * If this is the node we are scanning for turn off scan mode, and add up to
+				 * ROWS_PER_PAGE-1 of any sliding window nodes above it.
+				 */
+				if (n.getPath().equals(scanToPath)) {
+					scanToNode = false;
 
-					/*
-					 * If this is the node we are scanning for turn off scan mode, but record its
-					 * index position
-					 */
-					if (testPath.equals(scanToPath)) {
-						scanToNode = false;
+					if (slidingWindow != null) {
+						int count = slidingWindow.size();
+						if (count > 0) {
+							int relativeIdx = idx - 1;
+							for (int i = count - 1; i >= 0; i--) {
+								SubNode sn = slidingWindow.get(i);
+								relativeIdx--;
+								ninfo = processRenderNode(session, req, res, sn, false, null, relativeIdx, level + 1);
+								nodeInfo.getChildren().add(0, ninfo);
 
-						/*
-						 * If we found our target node, and it's on the first page, then we don't need
-						 * to set idxOfNodeFound, but just leave it unset, but we need to load into the
-						 * results the nodes we had collected so far, before continuing
-						 */
-						if (idx <= ROWS_PER_PAGE && slidingWindow != null) {
-
-							/* loop over all our precached nodes */
-							for (SubNode sn : slidingWindow) {
-
-								// log.debug("renderNode DUMP[count=" + count + " idx=" +
-								// String.valueOf(idx) + " logicalOrdinal=" + String.valueOf(offset
-								// + count) + "]: "
-								// + XString.prettyPrint(node));
-								ninfo = processRenderNode(session, req, res, sn, false, null,
-										offset + nodeInfo.getChildren().size() + 1, level + 1);
-								nodeInfo.getChildren().add(ninfo);
-								if (offset == 0 && nodeInfo.getChildren().size() == 1) {
-									ninfo.setFirstChild(true);
+								// If we have enough records we're done
+								if (nodeInfo.getChildren().size() >= ROWS_PER_PAGE - 1) {
+									break;
 								}
 							}
-						} else {
-							idxOfNodeFound = idx;
-						}
-					}
-					/*
-					 * else, we can continue while loop after we incremented 'idx'. Nothing else to
-					 * do on this iteration/node
-					 */
-					else {
-						/* Are we still within the bounds of the first page ? */
-						if (idx <= ROWS_PER_PAGE && slidingWindow != null) {
-							slidingWindow.add(n);
 						}
 
-						continue;
+						// We won't need sliding window again, we now just accumulate up to
+						// ROWS_PER_PAGE max and we're done.
+						slidingWindow = null;
 					}
 				}
-
-				ninfo = processRenderNode(session, req, res, n, false, null, offset + nodeInfo.getChildren().size() + 1,
-						level + 1);
-				nodeInfo.getChildren().add(ninfo);
-
-				if (offset == 0 && nodeInfo.getChildren().size() == 1) {
-					ninfo.setFirstChild(true);
-				}
-
-				if (nodeInfo.getChildren().size() >= ROWS_PER_PAGE) {
-					if (!iterator.hasNext()) {
-						endReached = true;
+				/*
+				 * else, we can continue while loop after we incremented 'idx'. Nothing else to
+				 * do on this iteration/node
+				 */
+				else {
+					/* lazily create sliding window */
+					if (slidingWindow == null) {
+						slidingWindow = new LinkedList<SubNode>();
 					}
-					/* break out of while loop, we have enough children to send back */
-					// log.debug("Full page is ready. Exiting loop.");
-					break;
+
+					/* update sliding window */
+					slidingWindow.add(n);
+					if (slidingWindow.size() > ROWS_PER_PAGE) {
+						slidingWindow.remove(0);
+					}
+
+					continue;
+				}
+			}
+
+			/* if we get here we're accumulating rows */
+			ninfo = processRenderNode(session, req, res, n, false, null, idx - 1L, level + 1);
+			nodeInfo.getChildren().add(ninfo);
+
+			if (nodeInfo.getChildren().size() >= ROWS_PER_PAGE) {
+				if (!iterator.hasNext()) {
+					endReached = true;
+				}
+				/* break out of while loop, we have enough children to send back */
+				// log.debug("Full page is ready. Exiting loop.");
+				break;
+			}
+		}
+
+		/*
+		 * if we accumulated less than ROWS_PER_PAGE, then try to scan back up the
+		 * sliding window to build up the ROW_PER_PAGE by looking at nodes that we
+		 * encountered before we reached the end.
+		 */
+		if (slidingWindow != null && nodeInfo.getChildren().size() < ROWS_PER_PAGE) {
+			int count = slidingWindow.size();
+			if (count > 0) {
+				int relativeIdx = idx - 1;
+				for (int i = count - 1; i >= 0; i--) {
+					SubNode sn = slidingWindow.get(i);
+					relativeIdx--;
+
+					ninfo = processRenderNode(session, req, res, sn, false, null, (long) relativeIdx, level + 1);
+					nodeInfo.getChildren().add(0, ninfo);
+
+					// If we have enough records we're done
+					if (nodeInfo.getChildren().size() >= ROWS_PER_PAGE) {
+						break;
+					}
 				}
 			}
 		}
 
 		if (idx == 0) {
 			log.trace("no child nodes found.");
-		}
-
-		if (idxOfNodeFound != -1) {
-			res.setOffsetOfNodeFound(idxOfNodeFound);
 		}
 
 		if (endReached && ninfo != null && nodeInfo.getChildren().size() > 1) {
@@ -418,8 +425,7 @@ public class NodeRenderService {
 			return res;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, false, true, -1, false, false,
-				false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, false, true, -1, false, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;
@@ -631,7 +637,7 @@ public class NodeRenderService {
 						content = content.substring(0, 25) + "...";
 					}
 				}
-				
+
 				bci.setName(content);
 				bci.setId(node.getId().toHexString());
 				bci.setType(node.getType());

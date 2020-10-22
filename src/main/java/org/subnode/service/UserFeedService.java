@@ -241,7 +241,7 @@ public class UserFeedService {
 			keys = SessionContext.sessionsByUserName.keySet();
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, 1, false, false,
+		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, 1, false, 
 				false);
 		lookupParent(session, nodeInfo, node.getPath());
 
@@ -268,7 +268,7 @@ public class UserFeedService {
 			// log.debug("USER GETTING A PUSH: " + sc.getUserName());
 
 			if (nodeInfo == null) {
-				nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false, false);
+				nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false);
 				lookupParent(session, nodeInfo, node.getPath());
 			}
 
@@ -483,7 +483,7 @@ public class UserFeedService {
 			}
 
 			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1, false,
-					false, false);
+					false);
 			results.add(info);
 
 			/*
@@ -560,7 +560,7 @@ public class UserFeedService {
 			SubNode parentNode = read.getNode(session, parentPath);
 			if (parentNode != null) {
 				parentNodeInfo = convert.convertToNodeInfo(sessionContext, session, parentNode, true, false, 0, false,
-						false, false);
+						 false);
 				nodeInfoMapByPath.put(parentPath, parentNodeInfo);
 			}
 		}

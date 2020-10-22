@@ -446,7 +446,6 @@ export interface RenderCalendarResponse extends ResponseBase {
 
 export interface RenderNodeResponse extends ResponseBase {
     node: NodeInfo;
-    offsetOfNodeFound: number;
     endReached: boolean;
     noDataResponse: string;
     breadcrumbs: BreadcrumbInfo[];
@@ -534,7 +533,6 @@ export interface NodeInfo {
     hasChildren: boolean;
     deleted: boolean;
     cipherKey: string;
-    firstChild: boolean;
     lastChild: boolean;
     width: number;
     height: number;

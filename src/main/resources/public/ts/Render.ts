@@ -274,7 +274,6 @@ export class Render implements RenderIntf {
                         if (res) {
                             s.node = res.node;
                             s.endReached = res.endReached;
-                            s.offsetOfNodeFound = res.offsetOfNodeFound;
                             s.breadcrumbs = res.breadcrumbs;
                         }
 

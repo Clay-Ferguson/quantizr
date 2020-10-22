@@ -172,7 +172,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
                 if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove) {
 
-                    if (!node.firstChild) {
+                    if (node.logicalOrdinal > 0) {
                         moveNodeUpButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_moveNodeUp, "S.edit.moveNodeUp", node.id), {
                             iconclass: "fa fa-arrow-up fa-lg",
                             title: "Move Node up one position (higher)"

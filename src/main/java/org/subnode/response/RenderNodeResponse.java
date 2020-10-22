@@ -13,12 +13,6 @@ public class RenderNodeResponse extends ResponseBase {
 	private NodeInfo node;
 
 	/*
-	 * todo-2: really need to rename this to 'newOffset', because it's used for more than when a
-	 * node is found
-	 */
-	private Integer offsetOfNodeFound;
-
-	/*
 	 * This holds the actual number of children on the node, independent of how many at a time the
 	 * browser is requesting to see per page, and unrelated to size of 'children' list, on this
 	 * object.
@@ -43,14 +37,6 @@ public class RenderNodeResponse extends ResponseBase {
 
 	public void setEndReached(boolean endReached) {
 		this.endReached = endReached;
-	}
-
-	public Integer getOffsetOfNodeFound() {
-		return offsetOfNodeFound;
-	}
-
-	public void setOffsetOfNodeFound(Integer offsetOfNodeFound) {
-		this.offsetOfNodeFound = offsetOfNodeFound;
 	}
 
 	public String getNoDataResponse() {

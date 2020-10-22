@@ -35,68 +35,64 @@ export class View implements ViewIntf {
             highlightId = currentSelNode ? currentSelNode.id : nodeId;
         }
 
+        let firstChild: J.NodeInfo = S.edit.getFirstChildNode(state);
+        let offset = firstChild ? firstChild.logicalOrdinal : 0;
+
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            nodeId: nodeId,
+            nodeId,
             upLevel: null,
             siblingOffset: 0,
-            renderParentIfLeaf: !!renderParentIfLeaf,
-            offset: S.nav.mainOffset,
+            renderParentIfLeaf,
+            offset,
             goToLastPage: false,
             forceIPFSRefresh,
             singleNode: false
         }, async (res: J.RenderNodeResponse) => {
-            if (res.offsetOfNodeFound > -1) {
-                S.nav.mainOffset = res.offsetOfNodeFound;
-            }
-
             S.render.renderPageFromData(res, false, highlightId, setTab, allowScroll, state);
         });
     }
 
     firstPage = (state: AppState): void => {
-        S.nav.mainOffset = 0;
-        this.loadPage(false, state);
+        this.loadPage(false, 0, state);
     }
 
     prevPage = (state: AppState): void => {
-        S.nav.mainOffset -= S.nav.ROWS_PER_PAGE;
+        let firstChildNode: J.NodeInfo = S.edit.getFirstChildNode(state);
+        if (firstChildNode && firstChildNode.logicalOrdinal > 0) {
+            let targetOffset = firstChildNode.logicalOrdinal - S.nav.ROWS_PER_PAGE;
+            if (targetOffset < 0) {
+                targetOffset = 0;
+            }
 
-        // This should be "< 0" instead of "<= 1" here, but there is a bug where the back button will not land you
-        // at the exact first page in all cases, and this is just a compensation for that somewhat harmless bug, until I fix it. todo-1
-        if (S.nav.mainOffset <= 1) {
-            S.nav.mainOffset = 0;
+            this.loadPage(false, targetOffset, state);
         }
-        this.loadPage(false, state);
     }
 
     nextPage = (state: AppState): void => {
-        S.nav.mainOffset += S.nav.ROWS_PER_PAGE;
-        this.loadPage(false, state);
+        let lastChildNode: J.NodeInfo = S.edit.getLastChildNode(state);
+        if (lastChildNode) {
+            let targetOffset = lastChildNode.logicalOrdinal + 1;
+            this.loadPage(false, targetOffset, state);
+        }
     }
 
     lastPage = (state: AppState): void => {
         console.log("Running lastPage Query");
         // nav.mainOffset += nav.ROWS_PER_PAGE;
-        this.loadPage(true, state);
+        // this.loadPage(true, targetOffset, state);
     }
 
-    private loadPage = (goToLastPage: boolean, state: AppState): void => {
+    private loadPage = (goToLastPage: boolean, offset: number, state: AppState): void => {
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: state.node.id,
             upLevel: null,
             siblingOffset: 0,
             renderParentIfLeaf: true,
-            offset: S.nav.mainOffset,
+            offset,
             goToLastPage: goToLastPage,
             forceIPFSRefresh: false,
             singleNode: false
         }, async (res: J.RenderNodeResponse) => {
-            if (goToLastPage) {
-                if (res.offsetOfNodeFound > -1) {
-                    S.nav.mainOffset = res.offsetOfNodeFound;
-                }
-            }
-
             S.render.renderPageFromData(res, true, null, true, true, state);
         });
     }

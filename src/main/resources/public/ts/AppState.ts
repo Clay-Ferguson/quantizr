@@ -26,8 +26,6 @@ export class AppState {
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
 
-    // todo-1: the S.nav.mainOffset is often the same as this. Is S.nav.mainOffset still needed? or is only offsetOfNodeFound needed?
-    offsetOfNodeFound: number;
     title: string = "";
 
     node: J.NodeInfo;

@@ -45,7 +45,7 @@ export class MenuPanel extends Div {
         const orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, hltNode);
         const allowNodeMove: boolean = !orderByProp && S.edit.isInsertAllowed(state.node, state);
         const isPageRootNode = state.node && hltNode && state.node.id === hltNode.id;
-        const canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && !hltNode.firstChild);
+        const canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && hltNode.logicalOrdinal > 0);
         const canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && !hltNode.lastChild);
 
         const children = [];

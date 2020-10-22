@@ -48,7 +48,9 @@ export class NodeCompMainList extends Div {
         let prevButton: Comp;
         let nextButton: Comp;
 
-        if (S.nav.mainOffset > 0) {
+        let firstChild: J.NodeInfo = S.edit.getFirstChildNode(state);
+
+        if (firstChild && firstChild.logicalOrdinal > 0) {
             firstButton = new IconButton("fa-angle-double-left", null, {
                 onClick: () => S.view.firstPage(state),
                 title: "First Page"

@@ -377,8 +377,13 @@ export class Edit implements EditIntf {
     }
 
     getFirstChildNode = (state: AppState): any => {
-        if (!state.node || !state.node.children) return null;
+        if (!state.node || !state.node.children || state.node.children.length === 0) return null;
         return state.node.children[0];
+    }
+
+    getLastChildNode = (state: AppState): any => {
+        if (!state.node || !state.node.children || state.node.children.length === 0) return null;
+        return state.node.children[state.node.children.length - 1];
     }
 
     cached_runEditNode = (id: any, state?: AppState): void => {

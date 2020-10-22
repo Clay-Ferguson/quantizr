@@ -22,9 +22,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Nav implements NavIntf {
     _UID_ROWID_PREFIX: string = "row_";
 
-    /* todo-2: eventually when we do paging for other lists, we will need a set of these variables for each list display (i.e. search, timeline, etc) */
-    mainOffset: number = 0;
-
     /* todo-2: need to have this value passed from server rather than coded in TypeScript, however for now
     this MUST match RenderNodeService.ROWS_PER_PAGE in Java on server. */
     ROWS_PER_PAGE: number = 25;
@@ -93,13 +90,12 @@ export class Nav implements NavIntf {
         state = appState(state);
         if (!state.node) return null;
 
-        this.mainOffset = 0;
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: state.node.id,
             upLevel: null,
             siblingOffset: siblingOffset,
             renderParentIfLeaf: true,
-            offset: this.mainOffset,
+            offset: 0,
             goToLastPage: false,
             forceIPFSRefresh: false,
             singleNode: false
@@ -118,18 +114,6 @@ export class Nav implements NavIntf {
         const state = appState();
         if (!state.node) return null;
 
-        // Always just scroll to the top before doing an actual 'upLevel' to parent.
-        // if (S.view.docElm.scrollTop > 100) {
-        //     S.view.docElm.scrollTop = 0;
-
-        //     /* This works fine but actually for me causes eye-strain. I might enable this for mobile some day, but for now
-        //     let's just comment it out. */
-        //     // S.util.animateScrollToTop();
-
-        //     S.meta64.highlightNode(state.node, false, state);
-        //     return;
-        // }
-
         if (!this.parentVisibleToUser(state)) {
             S.util.showMessage("The parent of this node isn't shared to you.", "Warning");
             // Already at root. Can't go up.
@@ -141,14 +125,13 @@ export class Nav implements NavIntf {
             upLevel: 1,
             siblingOffset: 0,
             renderParentIfLeaf: false,
-            offset: this.mainOffset,
+            offset: 0,
             goToLastPage: false,
             forceIPFSRefresh: false,
             singleNode: false
         },
             // success callback
             (res: J.RenderNodeResponse) => {
-                this.mainOffset = res.offsetOfNodeFound;
                 this.upLevelResponse(res, state.node.id, false, state);
             },
             // fail callback
@@ -223,14 +206,13 @@ export class Nav implements NavIntf {
     }
 
     openContentNode = (nodePathOrId: string, state: AppState): void => {
-        this.mainOffset = 0;
         console.log("openContentNode()");
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: nodePathOrId,
             upLevel: null,
             siblingOffset: 0,
             renderParentIfLeaf: null,
-            offset: this.mainOffset,
+            offset: 0,
             goToLastPage: false,
             forceIPFSRefresh: false,
             singleNode: false
@@ -238,8 +220,6 @@ export class Nav implements NavIntf {
     }
 
     cached_openNodeById = (id: string, state: AppState): void => {
-        this.mainOffset = 0;
-
         state = appState(state);
         const node: J.NodeInfo = state.idToNodeMap[id];
         S.meta64.highlightNode(node, false, state);
@@ -301,13 +281,12 @@ export class Nav implements NavIntf {
         if (state.isAnonUser) {
             S.meta64.loadAnonPageHome(state);
         } else {
-            this.mainOffset = 0;
             S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: state.homeNodeId,
                 upLevel: null,
                 siblingOffset: 0,
                 renderParentIfLeaf: null,
-                offset: this.mainOffset,
+                offset: 0,
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false

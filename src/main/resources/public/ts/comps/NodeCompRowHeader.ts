@@ -67,7 +67,7 @@ export class NodeCompRowHeader extends Div {
             if (state.isAdminUser) {
                 children.push(new Span(
                     "ID:" + node.id + " " + //
-                    ((node.logicalOrdinal !== -1) ? ("[" + node.logicalOrdinal + "] ") : " ") + //
+                    "[" + node.logicalOrdinal + "] " + //
                     node.type + //
                     (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") //
                 ));

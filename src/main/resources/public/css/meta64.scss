@@ -991,12 +991,7 @@ i'm backing out for now
 
 .node-grid-cell {
     border: 1px dotted gray;
-    overflow-x: auto;
     display: table-cell;
-    //height: 100%;
-
-    //not doing rounded cells because the selector (selected node) marker in them is asthetically ugly
-    //border-radius: $borderRadiusMedium;
 }
 
 .node-table-row .top-right-image {

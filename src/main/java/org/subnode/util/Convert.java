@@ -54,7 +54,7 @@ public class Convert {
 	 */
 	public NodeInfo convertToNodeInfo(SessionContext sessionContext, MongoSession session, SubNode node,
 			boolean htmlOnly, boolean initNodeEdit, long logicalOrdinal, boolean allowInlineChildren,
-			boolean firstChild, boolean lastChild) {
+			boolean lastChild) {
 
 		ImageSize imageSize = null;
 		String dataUrl = null;
@@ -107,9 +107,12 @@ public class Convert {
 			nameProp = userNode.getStringProp(NodeProp.USER.s());
 			avatarVer = userNode.getStringProp(NodeProp.BIN.s());
 
-			/* todo-1: right here, get user profile off 'userNode', and put it into a map that will be sent back to client
-			packaged in this response, so that tooltip on the browser can display it, and the browser will simply contain this 
-			same 'map' that maps userIds to profile text, for good performance. */
+			/*
+			 * todo-1: right here, get user profile off 'userNode', and put it into a map
+			 * that will be sent back to client packaged in this response, so that tooltip
+			 * on the browser can display it, and the browser will simply contain this same
+			 * 'map' that maps userIds to profile text, for good performance.
+			 */
 		}
 
 		String owner = userNode == null ? PrincipalName.ADMIN.s() : nameProp;
@@ -117,7 +120,8 @@ public class Convert {
 		log.trace("RENDER ID=" + node.getId().toHexString() + " rootId=" + ownerId + " session.rootId="
 				+ sessionContext.getRootId() + " node.content=" + node.getContent() + " owner=" + owner);
 
-		//log.debug("RENDER nodeId: " + node.getId().toHexString()+" -- json: "+XString.prettyPrint(node));
+		// log.debug("RENDER nodeId: " + node.getId().toHexString()+" -- json:
+		// "+XString.prettyPrint(node));
 
 		/*
 		 * If the node is not owned by the person doing the browsing we need to extract
@@ -135,12 +139,12 @@ public class Convert {
 			}
 		}
 
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), owner, ownerId,
-				node.getOrdinal(), //
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), owner,
+				ownerId, node.getOrdinal(), //
 				node.getModifyTime(), propList, acList, hasChildren, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
-				node.getType(), logicalOrdinal, firstChild, lastChild, cipherKey, dataUrl, node.isDeleted(), avatarVer);
+				node.getType(), logicalOrdinal, lastChild, cipherKey, dataUrl, node.isDeleted(), avatarVer);
 
 		/*
 		 * Special case for "Friend" type nodes, to get enough information for the
@@ -152,7 +156,8 @@ public class Convert {
 		if (node.getType().equals(NodeType.FRIEND.s())) {
 			String friendAccountId = node.getStringProp(NodeProp.USER_NODE_ID);
 
-			//NOTE: Right when the Friend node is first created, before a person has been selected, this WILL be null, and is normal
+			// NOTE: Right when the Friend node is first created, before a person has been
+			// selected, this WILL be null, and is normal
 			if (friendAccountId != null) {
 				SubNode friendAccountNode = read.getNode(session, friendAccountId, false);
 				if (friendAccountNode != null) {
@@ -205,7 +210,7 @@ public class Convert {
 					boolean multiLevel = true;
 
 					nodeInfo.getChildren().add(convertToNodeInfo(sessionContext, session, n, htmlOnly, initNodeEdit,
-							logicalOrdinal, multiLevel, firstChild, lastChild));
+							logicalOrdinal, multiLevel, lastChild));
 				}
 			}
 		}

@@ -65,7 +65,7 @@ public class NodeSearchService {
 			SubNode node = read.getNode(session, req.getSearchText(), true);
 			if (node != null) {
 				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1,
-						false, false, false);
+						false, false);
 				searchResults.add(info);
 			}
 		}
@@ -77,7 +77,7 @@ public class NodeSearchService {
 			SubNode node = read.getNode(session, ":" + req.getSearchText(), true);
 			if (node != null) {
 				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1,
-						false, false, false);
+						false, false);
 				searchResults.add(info);
 			}
 		}
@@ -89,7 +89,7 @@ public class NodeSearchService {
 					req.getSortField(), MAX_NODES, req.getFuzzy(), req.getCaseSensitive())) {
 				// log.debug("NodeFound: node: "+ XString.prettyPrint(node));
 				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1,
-						false, false, false);
+						false, false);
 				searchResults.add(info);
 				if (counter++ > MAX_NODES) {
 					break;
@@ -130,7 +130,7 @@ public class NodeSearchService {
 			}
 
 			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1, false,
-					false, false);
+					 false);
 			searchResults.add(info);
 			if (counter++ > MAX_NODES) {
 				break;

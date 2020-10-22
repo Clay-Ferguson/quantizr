@@ -46,7 +46,6 @@ import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
-import org.subnode.util.XString;
 import org.springframework.data.domain.Sort;
 
 /**
@@ -141,7 +140,7 @@ public class NodeEditService {
 
 		update.save(session, newNode);
 		res.setNewNode(
-				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false, false));
+				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));
 
 		if (newNode.getType().equals(NodeType.USER_FEED.s())) {
 			userFeedService.addUserFeedInfo(session, newNode, null, sessionContext.getUserName());
@@ -231,7 +230,7 @@ public class NodeEditService {
 
 		update.save(session, newNode);
 		res.setNewNode(
-				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false, false));
+				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));
 
 		if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// don't evern send notifications when 'admin' is the one doing the editing.
@@ -339,7 +338,7 @@ public class NodeEditService {
 			}
 
 			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1, false,
-					false, false);
+					 false);
 			res.setNode(newNodeInfo);
 		}
 

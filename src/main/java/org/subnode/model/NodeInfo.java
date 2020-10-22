@@ -10,19 +10,24 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
- * Primary object passed back to client to represent a 'node'. Client sees the JSON version of this,
- * in javascript.
+ * Primary object passed back to client to represent a 'node'. Client sees the
+ * JSON version of this, in javascript.
  */
 @JsonInclude(Include.NON_NULL)
 public class NodeInfo {
 	private static final Logger log = LoggerFactory.getLogger(NodeInfo.class);
 
-	private String id;	
+	private String id;
 	private String path;
 	private String name;
 	private String content;
 	private Date lastModified;
+
+	// This is the 0-offset position (index) of the node within the resultset that
+	// queried it, and is relative not to a specific page
+	// but the entire resultset.
 	private Long logicalOrdinal;
+
 	private Long ordinal;
 	private String type;
 	private List<PropertyInfo> properties;
@@ -30,21 +35,28 @@ public class NodeInfo {
 	private boolean hasChildren;
 	private boolean deleted;
 
-	/* For nodes that are encrypted but shared to the current user, we send back the ciperKey (an encrypted sym key) for this node which
-	is a key that can only be decrypted by the private key on the user's browser, but decrypted by them on their browser
-	it gives the symmetric key to the encrypted data so they can access the encrypted node content with it */
+	/*
+	 * For nodes that are encrypted but shared to the current user, we send back the
+	 * ciperKey (an encrypted sym key) for this node which is a key that can only be
+	 * decrypted by the private key on the user's browser, but decrypted by them on
+	 * their browser it gives the symmetric key to the encrypted data so they can
+	 * access the encrypted node content with it
+	 */
 	private String cipherKey;
 
-	// NOTE: These two booleans are hints for gui enablement (for moveUp, moveDown, etc) in the browser, 
+	// NOTE: These two booleans are hints for gui enablement (for moveUp, moveDown,
+	// etc) in the browser,
 	// and are not necessarily reqired to be always even correct
-	private boolean firstChild;
 	private boolean lastChild;
-	
+
 	private int width;
 	private int height;
 
-	/* This is only populated when generating user "feeds", because we want the feed to be able to show the 
-	context for the reply of a post, which entails showing the parent of the reply above the reply */
+	/*
+	 * This is only populated when generating user "feeds", because we want the feed
+	 * to be able to show the context for the reply of a post, which entails showing
+	 * the parent of the reply above the reply
+	 */
 	private NodeInfo parent;
 
 	private List<NodeInfo> children;
@@ -64,10 +76,10 @@ public class NodeInfo {
 	public NodeInfo() {
 	}
 
-	public NodeInfo(String id, String path, String name, String content, String owner, String ownerId, Long ordinal, Date lastModified,
-			List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
-		 int width, int height, String type, long logicalOrdinal,
-			boolean firstChild, boolean lastChild, String cipherKey, String dataUrl, boolean deleted, String avatarVer) {
+	public NodeInfo(String id, String path, String name, String content, String owner, String ownerId, Long ordinal,
+			Date lastModified, List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
+			int width, int height, String type, long logicalOrdinal, boolean lastChild, String cipherKey,
+			String dataUrl, boolean deleted, String avatarVer) {
 		this.id = id;
 		this.path = path;
 		this.name = name;
@@ -76,10 +88,10 @@ public class NodeInfo {
 		this.owner = owner;
 		this.ownerId = ownerId;
 		this.ordinal = ordinal;
+		this.logicalOrdinal = logicalOrdinal;
 		this.properties = properties;
 		this.ac = ac;
 		this.hasChildren = hasChildren;
-		this.firstChild = firstChild;
 		this.lastChild = lastChild;
 		this.width = width;
 		this.height = height;
@@ -106,7 +118,7 @@ public class NodeInfo {
 	public void setCipherKey(String cipherKey) {
 		this.cipherKey = cipherKey;
 	}
-	
+
 	public Date getLastModified() {
 		return lastModified;
 	}
@@ -211,7 +223,6 @@ public class NodeInfo {
 		this.ownerId = ownerId;
 	}
 
-
 	public Long getOrdinal() {
 		return ordinal;
 	}
@@ -226,14 +237,6 @@ public class NodeInfo {
 
 	public void setLogicalOrdinal(Long logicalOrdinal) {
 		this.logicalOrdinal = logicalOrdinal;
-	}
-
-	public boolean isFirstChild() {
-		return this.firstChild;
-	}
-
-	public void setFirstChild(boolean firstChild) {
-		this.firstChild = firstChild;
 	}
 
 	public boolean isLastChild() {
