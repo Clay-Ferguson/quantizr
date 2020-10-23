@@ -308,8 +308,8 @@ public abstract class ExportArchiveBase {
 				 * so this will be redundant, but I don't want to refactor now to solve this
 				 * yet. That's almost an optimization that should come later
 				 */
-				final long childCount = read.getChildCount(session, node);
-				if (childCount > 0) {
+				boolean hasChildren = read.hasChildren(session, node);
+				if (hasChildren) {
 					final String htmlFile = "./" + deeperPath + fileName + "/" + fileName + ".html";
 					html.append("<a href='" + htmlFile + "'><button class='open-button'>Open</button></a>");
 				}

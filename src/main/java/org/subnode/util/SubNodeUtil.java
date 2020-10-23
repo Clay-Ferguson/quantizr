@@ -66,10 +66,6 @@ public class SubNodeUtil {
 		return !nonSavableProperties.contains(propertyName);
 	}
 
-	public boolean hasDisplayableNodes(MongoSession session, SubNode node) {
-		return (read.getChildCount(session, node) > 0);
-	}
-
 	// todo-1: everywhere this is called can we be sure the path is not actually
 	// used as a lookup, but instead the node name?
 	// The new design has path as a non-named hierarchy-only aspect.

@@ -123,10 +123,14 @@ public class MongoRead {
         return getOps(session).count(query, SubNode.class);
     }
 
-    /*
-     * I find it odd that MongoTemplate no count for the whole collection. A query
-     * is always required? Strange oversight on their part.
-     */
+    public boolean hasChildren(MongoSession session, SubNode node) {
+        Query query = new Query();
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
+        criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
+        query.addCriteria(criteria);
+        return getOps(session).exists(query, SubNode.class);
+    }
+
     public long getNodeCount(MongoSession session) {
         Query query = new Query();
         // Criteria criteria =

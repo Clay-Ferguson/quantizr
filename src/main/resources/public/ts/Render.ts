@@ -402,25 +402,6 @@ export class Render implements RenderIntf {
         }
     }
 
-    /* This is the button bar displayed between all nodes to let nodes be inserted at specific locations
-
-    The insert will be below the node unless isFirst is true and then it will be at 0 (topmost)
-
-    todo-0: remove all this.
-    */
-    createBetweenNodeButtonBar = (node: J.NodeInfo, isFirst: boolean, isLastOnPage: boolean, state: AppState): Comp => {
-        // return new Div(null, {
-        //     className: "betweenRowsContainer row no-gutters"
-        // }, [
-        //     // This works, but I decided having only ONE editor is better, and
-        //     // if we need to edit inline we can put the main editor dialog in inline in the content
-        //     // instead of making it a dialog
-        //     // todo-1: eventually we can get rid of the whole QuidkEditField stuff?
-        //     // new QuickEditField(node, isFirst, state),
-        // ]);
-        return null;
-    }
-
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
         const ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
 

@@ -62,15 +62,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
                 }
 
-                let userCanPaste = S.props.isMine(n, state) || state.isAdminUser || n.id === state.homeNodeId;
-                if (allowInsert && !state.isAnonUser && state.userPreferences.editMode && !!state.nodesToMove && userCanPaste && this.level === 1 && rowCount === 0) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, true, false, state));
-                    // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                    comps.push(new Div(null, { className: "clearfix" }));
-                }
-
                 let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
-
                 let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
 
                 // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
@@ -85,12 +77,6 @@ export class NodeCompVerticalRowLayout extends Div {
                 rowCount++;
                 if (n.children) {
                     comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
-                }
-
-                if (allowInsert && !state.isAnonUser && state.userPreferences.editMode && !!state.nodesToMove && userCanPaste && this.level === 1) {
-                    comps.push(S.render.createBetweenNodeButtonBar(n, false, rowCount === countToDisplay, state));
-                    // since the button bar is a float-right, we need a clearfix after it to be sure it consumes vertical space
-                    comps.push(new Div(null, { className: "clearfix" }));
                 }
             }
         }

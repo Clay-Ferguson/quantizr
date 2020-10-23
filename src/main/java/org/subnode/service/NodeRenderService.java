@@ -129,13 +129,13 @@ public class NodeRenderService {
 		/*
 		 * If this is true it means we need to keep scanning child nodes until we find
 		 * the targetId, so we can make that one be the first of the search results to
-		 * display, and set that offset upon return. During the scan once the node is
-		 * found, we set this scanToNode var back to false.
+		 * display. During the scan once the node is found, we set this scanToNode var
+		 * back to false.
 		 */
 		boolean scanToNode = false;
 		String scanToPath = node.getPath();
 
-		if (req.isRenderParentIfLeaf() && !subNodeUtil.hasDisplayableNodes(session, node)) {
+		if (req.isRenderParentIfLeaf() && !read.hasChildren(session, node)) {
 			req.setUpLevel(1);
 		}
 
@@ -209,9 +209,11 @@ public class NodeRenderService {
 
 		nodeInfo.setChildren(new LinkedList<NodeInfo>());
 
-		// todo-0: a great optimization would be to allow caller to pass in an 'offset hint', 
-		// based on information it already knows to jump over likely unneeded records when searching
-		// for a scanToNode node. 
+		/*
+		 * todo-0: a great optimization would be to allow caller to pass in an 'offset
+		 * hint', based on information it already knows to jump over likely unneeded
+		 * records when searching for a scanToNode node.
+		 */
 		/*
 		 * If we are scanning to a node we know we need to start from zero offset, or
 		 * else we use the offset passed in. Offset is the number of nodes to IGNORE
@@ -233,7 +235,8 @@ public class NodeRenderService {
 		 */
 		int queryLimit = scanToNode ? 1000 : offset + ROWS_PER_PAGE + 2;
 
-		//log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode=" + scanToNode);
+		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode="
+		// + scanToNode);
 
 		String orderBy = node.getStringProp(NodeProp.ORDER_BY.s());
 		Sort sort = null;
@@ -282,7 +285,8 @@ public class NodeRenderService {
 			}
 			SubNode n = iterator.next();
 			idx++;
-			//log.debug("Iterate [" + idx + "]: nodeId" + n.getId().toHexString() + " scanToNode=" + scanToNode);
+			// log.debug("Iterate [" + idx + "]: nodeId" + n.getId().toHexString() + "
+			// scanToNode=" + scanToNode);
 
 			/* are we still just scanning for our target node */
 			if (scanToNode) {
