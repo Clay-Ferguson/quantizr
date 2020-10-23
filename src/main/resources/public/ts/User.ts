@@ -199,7 +199,7 @@ export class User implements UserIntf {
                         }
                     }
 
-                    S.view.refreshTree(id, renderLeafIfParent, childId, true, false, true, true, state);
+                    S.view.refreshTree(id, true, renderLeafIfParent, childId, false, true, true, state);
                 } else {
                     console.log("LocalDb login failed.");
 
@@ -226,7 +226,7 @@ export class User implements UserIntf {
             fromUser,
             toUser
         }, (res: J.TransferNodeResponse) => {
-            S.view.refreshTree(null, false, null, false, false, true, true, state);
+            S.view.refreshTree(null, false, false, null, false, true, true, state);
             S.util.showMessage(res.message, "Success");
         });
     }

@@ -225,7 +225,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Force Refresh", () => {
                     const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
                     const nodeId: string = currentSelNode ? currentSelNode.id : null;
-                    S.view.refreshTree(nodeId, false, nodeId, false, true, true, true, state);
+                    S.view.refreshTree(nodeId, false, false, nodeId, true, true, true, state);
                 },
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine))
             ]));

@@ -122,7 +122,7 @@ export class QuickEditField extends Span {
         }, (res) => {
             // todo-1: this timeout is required, to see the new data, and I don't know why unless it's mongo not being able to commit fast enough ?
             setTimeout(() => {
-                S.view.refreshTree(this.appState.node.id, false, res.newNode.id, false, false, false, false, this.appState);
+                S.view.refreshTree(this.appState.node.id, false, false, res.newNode.id, false, false, false, this.appState);
 
                 if (askToSplit) {
                     new SplitNodeDlg(res.newNode, this.appState).open();

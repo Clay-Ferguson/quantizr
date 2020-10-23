@@ -227,7 +227,7 @@ export class Nav implements NavIntf {
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id, "Warning");
         } else {
-            S.view.refreshTree(node.id, true, null, false, false, true, true, state);
+            S.view.refreshTree(node.id, true, true, null, false, true, true, state);
         }
     }
 

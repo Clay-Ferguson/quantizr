@@ -86,7 +86,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     refresh = (state: AppState): void => {
-        S.view.refreshTree(null, true, null, false, false, true, true, state);
+        S.view.refreshTree(null, false, true, null, false, true, true, state);
     }
 
     selectTab = (tabName: string): void => {
@@ -353,7 +353,7 @@ export class Meta64 implements Meta64Intf {
                 // console.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
 
                 if (event.state && event.state.nodeId) {
-                    S.view.refreshTree(event.state.nodeId, true, event.state.highlightId, false, false, true, true, store.getState());
+                    S.view.refreshTree(event.state.nodeId, true, true, event.state.highlightId, false, true, true, store.getState());
                     this.selectTab("mainTab");
                 }
             };

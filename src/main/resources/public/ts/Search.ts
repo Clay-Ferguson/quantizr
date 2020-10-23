@@ -207,7 +207,6 @@ export class Search implements SearchIntf {
     }
 
     clickSearchNode = (id: string, state: AppState) => {
-
         /*
          * update highlight node to point to the node clicked on, just to persist it for later
          */
@@ -216,7 +215,7 @@ export class Search implements SearchIntf {
             throw new Error("Unable to find uid in search results: " + id);
         }
 
-        S.view.refreshTree(this.highlightRowNode.id, true, this.highlightRowNode.id, false, false, true, true, state);
+        S.view.refreshTree(this.highlightRowNode.id, true, true, this.highlightRowNode.id, false, true, true, state);
     }
 
     /*

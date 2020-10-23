@@ -282,7 +282,7 @@ public class NodeRenderService {
 				 * If this is the node we are scanning for turn off scan mode, and add up to
 				 * ROWS_PER_PAGE-1 of any sliding window nodes above it.
 				 */
-				if (n.getPath().equals(node.getPath())) {
+				if (n.getPath().equals(scanToNode.getPath())) {
 					scanToNode = null;
 
 					if (slidingWindow != null) {

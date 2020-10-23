@@ -49,7 +49,7 @@ export class BreadcrumbsPanel extends Div {
                 }
 
                 children.push(new Span(bc.name, {
-                    onClick: () => { S.view.refreshTree(bc.id, true, bc.id, false, false, true, true, state); },
+                    onClick: () => { S.view.refreshTree(bc.id, true, true, bc.id, false, true, true, state); },
                     className: "breadcrumbItem"
                 }));
             }

@@ -64,7 +64,7 @@ export class Edit implements EditIntf {
         console.log("insertBookResponse running.");
         S.util.checkSuccess("Insert Book", res);
 
-        S.view.refreshTree(null, false, null, false, false, true, true, state);
+        S.view.refreshTree(null, true, false, null, false, true, true, state);
         S.view.scrollToSelectedNode(state);
     }
 
@@ -75,7 +75,7 @@ export class Edit implements EditIntf {
             // We only want to pass a nodeId here if we are going to root node.
             const nodeId = postDelSelNodeId === state.homeNodeId ? postDelSelNodeId : null;
 
-            S.view.refreshTree(nodeId, false, postDelSelNodeId, false, false, true, true, state);
+            S.view.refreshTree(nodeId, false, false, postDelSelNodeId, false, true, true, state);
         }
     }
 
@@ -121,7 +121,7 @@ export class Edit implements EditIntf {
                 }
             });
 
-            S.view.refreshTree(null, false, nodeId, false, false, true, true, state);
+            S.view.refreshTree(null, false, false, nodeId, false, true, true, state);
         }
     }
 
@@ -263,7 +263,7 @@ export class Edit implements EditIntf {
         return new Promise<void>(async (resolve, reject) => {
             if (S.util.checkSuccess("Save node", res)) {
                 await this.distributeKeys(node, res.aclEntries);
-                S.view.refreshTree(null, false, node.id, false, false, allowScroll, false, state);
+                S.view.refreshTree(null, false, false, node.id, false, allowScroll, false, state);
                 if (state.fullScreenCalendarId) {
                     S.render.showCalendar(state.fullScreenCalendarId, state);
                 }
@@ -757,7 +757,7 @@ export class Edit implements EditIntf {
 
     splitNodeResponse = (res: J.SplitNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Split content", res)) {
-            S.view.refreshTree(null, false, null, false, false, true, true, state);
+            S.view.refreshTree(null, false, false, null, false, true, true, state);
             S.view.scrollToSelectedNode(state);
         }
     }

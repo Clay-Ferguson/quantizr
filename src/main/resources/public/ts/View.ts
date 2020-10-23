@@ -23,7 +23,7 @@ export class View implements ViewIntf {
     /*
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
-    refreshTree = (nodeId: string, renderParentIfLeaf: boolean, highlightId: string, isInitialRender: boolean, forceIPFSRefresh: boolean,
+    refreshTree = (nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean,
         allowScroll: boolean, setTab: boolean, state: AppState): void => {
 
         if (!nodeId && state.node) {
@@ -35,8 +35,11 @@ export class View implements ViewIntf {
             highlightId = currentSelNode ? currentSelNode.id : nodeId;
         }
 
-        let firstChild: J.NodeInfo = S.edit.getFirstChildNode(state);
-        let offset = firstChild ? firstChild.logicalOrdinal : 0;
+        let offset = 0;
+        if (!zeroOffset) {
+            let firstChild: J.NodeInfo = S.edit.getFirstChildNode(state);
+            offset = firstChild ? firstChild.logicalOrdinal : 0;
+        }
 
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId,
