@@ -51,7 +51,7 @@ export class TimelineView extends Div {
         results.forEach((node: J.NodeInfo) => {
             // console.log("TIMELINE: node id=" + node.id + " content: " + node.content);
             S.srch.initSearchNode(node);
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, true, "timeln", false, false, state));
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, "timeln", false, false, state));
             i++;
             rowCount++;
         });

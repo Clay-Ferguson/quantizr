@@ -529,10 +529,12 @@ input[type="radio"] {
 
 .audioDownloadLink {
     margin-left: $smallGap;
+    white-space: nowrap;
 }
 
 .videoDownloadLink {
     margin-left: $smallGap;
+    white-space: nowrap;
 }
 
 .marginLeft {

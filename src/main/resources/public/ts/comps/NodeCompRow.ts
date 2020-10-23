@@ -85,7 +85,6 @@ export class NodeCompRow extends Div {
 
         let buttonBar: Comp = null;
         if (NodeCompRow.showButtonBar && !state.inlineEditId) {
-            // todo-0: remove allowAvatar param it's always true.
             buttonBar = new NodeCompButtonBar(node, true, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null);
         }
 

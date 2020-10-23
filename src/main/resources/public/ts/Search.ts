@@ -126,13 +126,13 @@ export class Search implements SearchIntf {
     /*
      * Renders a single line of search results on the search results page.
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, allowAvatar: boolean, prefix: string, isFeed: boolean, isParent: boolean, state: AppState): Comp => {
+    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string, isFeed: boolean, isParent: boolean, state: AppState): Comp => {
 
         /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
         item we are rendering */
         let parentItem: Comp = null;
         if (node.parent) {
-            parentItem = this.renderSearchResultAsListItem(node.parent, index, count, rowCount, allowAvatar, prefix, isFeed, true, state);
+            parentItem = this.renderSearchResultAsListItem(node.parent, index, count, rowCount, prefix, isFeed, true, state);
         }
 
         const cssId = this._UID_ROWID_PREFIX + node.id;

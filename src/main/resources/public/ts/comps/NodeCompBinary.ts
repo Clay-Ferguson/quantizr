@@ -108,7 +108,7 @@ export class NodeCompBinary extends Div {
                 new Button("Play Video", () => {
                     new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(this.node), null, state).open();
                 }),
-                new Div("", {
+                new Span("", {
                     className: "videoDownloadLink"
                 }, [new Anchor(S.render.getUrlForNodeAttachment(this.node, true), "[Download Video]")])
             ], "marginAll")]);
@@ -118,7 +118,7 @@ export class NodeCompBinary extends Div {
                 new Button("Play Audio", () => {
                     new AudioPlayerDlg(S.render.getStreamUrlForNodeAttachment(this.node), state).open();
                 }),
-                new Div("", {
+                new Span("", {
                     className: "audioDownloadLink"
                 }, [new Anchor(S.render.getUrlForNodeAttachment(this.node, true), "[Download Audio]")])
             ], "marginAll")]);

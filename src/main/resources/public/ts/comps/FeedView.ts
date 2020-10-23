@@ -67,9 +67,7 @@ export class FeedView extends Div {
         state.feedResults.forEach((node: J.NodeInfo) => {
             // console.log("FEED: node id=" + node.id + " content: " + node.content);
             S.srch.initSearchNode(node);
-
-            // todo-0: remove allowAvatar arg becasue it'a always true now.
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, true, "feed", true, false, state));
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, "feed", true, false, state));
             i++;
             rowCount++;
         });

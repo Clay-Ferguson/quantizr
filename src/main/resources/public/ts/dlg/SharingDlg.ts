@@ -33,8 +33,6 @@ export class SharingDlg extends DialogBase {
                     new Button("Make Public", this.shareNodeToPublic, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
-
-                        // todo-0: isn't this obsolete?
                         S.meta64.refresh(this.appState);
                     })
                 ])

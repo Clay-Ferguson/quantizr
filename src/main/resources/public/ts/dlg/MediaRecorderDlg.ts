@@ -14,6 +14,7 @@ import { VideoPlayerDlg } from "./VideoPlayerDlg";
 import { Selection } from "../widget/Selection";
 import { Div } from "../widget/Div";
 import clientInfo from "../ClientInfo";
+import { ConfirmDlg } from "./ConfirmDlg";
 
 // https://developers.google.com/web/fundamentals/media/recording-audio
 
@@ -71,6 +72,7 @@ export class MediaRecorderDlg extends DialogBase {
     public blob: Blob;
     public blobType: string;
     public uploadRequested: boolean;
+    public recorded: boolean;
 
     constructor(state: AppState, public videoMode: boolean, private allowSave: boolean) {
         super(videoMode ? "Video Recorder" : "Audio Recorder", null, false, state);
@@ -233,6 +235,7 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     newRecording = () => {
+        this.recorded = true;
         this.chunks = [];
         this.continueRecording();
     }
@@ -325,7 +328,19 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     cancel = (): void => {
-        // todo-0: need confirmation here if they clicked the record button ever.
+        if (this.recorded) {
+            new ConfirmDlg("Abandon the current recording?", "Abandon Recording",
+                () => {
+                    this.cancelImmediate();
+                }, null, "btn-danger", "alert alert-danger", this.appState
+            ).open();
+        }
+        else {
+            this.cancelImmediate();
+        }
+    }
+
+    cancelImmediate = (): void => {
         this.cancelTimer();
         this.stop();
         this.closeStream();

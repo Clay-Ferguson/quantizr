@@ -48,7 +48,7 @@ export class SearchView extends Div {
         let i = 0;
         results.forEach(function(node: J.NodeInfo) {
             S.srch.initSearchNode(node);
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, true, "srch", false, false, state));
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, "srch", false, false, state));
             i++;
             rowCount++;
         });
