@@ -66,7 +66,7 @@ export class Search implements SearchIntf {
     searchFilesResponse = (res: J.FileSearchResponse, state: AppState) => {
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: res.searchResultNodeId,
-            upLevel: null,
+            upLevel: false,
             siblingOffset: 0,
             renderParentIfLeaf: null,
             offset: 0,

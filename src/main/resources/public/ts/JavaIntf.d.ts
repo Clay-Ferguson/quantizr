@@ -188,7 +188,7 @@ export interface RenderNodeRequest extends RequestBase {
     nodeId: string;
     offset: number;
     siblingOffset: number;
-    upLevel: number;
+    upLevel: boolean;
     renderParentIfLeaf: boolean;
     goToLastPage: boolean;
     singleNode: boolean;

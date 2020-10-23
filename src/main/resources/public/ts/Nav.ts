@@ -92,7 +92,7 @@ export class Nav implements NavIntf {
 
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: state.node.id,
-            upLevel: null,
+            upLevel: false,
             siblingOffset: siblingOffset,
             renderParentIfLeaf: true,
             offset: 0,
@@ -122,7 +122,7 @@ export class Nav implements NavIntf {
 
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: state.node.id,
-            upLevel: 1,
+            upLevel: true,
             siblingOffset: 0,
             renderParentIfLeaf: false,
             offset: 0,
@@ -209,7 +209,7 @@ export class Nav implements NavIntf {
         console.log("openContentNode()");
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: nodePathOrId,
-            upLevel: null,
+            upLevel: false,
             siblingOffset: 0,
             renderParentIfLeaf: null,
             offset: 0,
@@ -283,7 +283,7 @@ export class Nav implements NavIntf {
         } else {
             S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: state.homeNodeId,
-                upLevel: null,
+                upLevel: false,
                 siblingOffset: 0,
                 renderParentIfLeaf: null,
                 offset: 0,

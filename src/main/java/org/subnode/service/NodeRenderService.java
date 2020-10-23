@@ -127,16 +127,15 @@ public class NodeRenderService {
 		}
 
 		/*
-		 * If this is true it means we need to keep scanning child nodes until we find
-		 * the targetId, so we can make that one be the first of the search results to
-		 * display. During the scan once the node is found, we set this scanToNode var
-		 * back to false.
+		 * If scanToNode is non-null it means we are trying to get a subset of the
+		 * children that contains scanToNode as one child, because that's the child we
+		 * want to highlight and scroll to on the front end when the query returns, and
+		 * the page root node will of course be the parent of scanToNode
 		 */
-		boolean scanToNode = false;
-		String scanToPath = node.getPath();
+		SubNode scanToNode = null;
 
 		if (req.isRenderParentIfLeaf() && !read.hasChildren(session, node)) {
-			req.setUpLevel(1);
+			req.setUpLevel(true);
 		}
 
 		/*
@@ -164,41 +163,30 @@ public class NodeRenderService {
 				node = parent != null ? parent : node;
 			}
 		} else {
-			int levelsUpRemaining = req.getUpLevel();
-			if (levelsUpRemaining > 0) {
-				scanToNode = true;
-
-				while (node != null && levelsUpRemaining > 0) {
-					// log.debug("upLevelsRemaining=" + levelsUpRemaining);
-					try {
-						SubNode parent = read.getParent(session, node);
-						if (parent != null) {
-							node = parent;
-						} else {
-							break;
-						}
-						// log.trace(" upLevel to nodeid: " + node.getPath());
-						levelsUpRemaining--;
-					} catch (Exception e) {
-						/*
-						 * UPDATE: It's never actually a render problem if we can't grab the parent in
-						 * cases where we tried to. Always just allow it to render 'node' itself.
-						 */
-						scanToNode = false;
-						break;
+			if (req.isUpLevel()) {
+				try {
+					SubNode parent = read.getParent(session, node);
+					if (parent != null) {
+						scanToNode = node;
+						node = parent;
 					}
+				} catch (Exception e) {
+					/*
+					 * ignore the exception here. It's ok if we can't get the parent here. May not
+					 * be accessible to the user.
+					 */
 				}
 			}
 		}
 
-		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, scanToPath, -1, 0);
+		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, -1, 0);
 		res.setNode(nodeInfo);
 		res.setSuccess(true);
 		return res;
 	}
 
 	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res,
-			final SubNode node, boolean scanToNode, String scanToPath, long logicalOrdinal, int level) {
+			final SubNode node, SubNode scanToNode, long logicalOrdinal, int level) {
 
 		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, logicalOrdinal,
 				level > 0, false);
@@ -210,16 +198,16 @@ public class NodeRenderService {
 		nodeInfo.setChildren(new LinkedList<NodeInfo>());
 
 		/*
-		 * todo-0: a great optimization would be to allow caller to pass in an 'offset
-		 * hint', based on information it already knows to jump over likely unneeded
-		 * records when searching for a scanToNode node.
-		 */
-		/*
+		 * todo-1: a great optimization would be to allow caller to pass in an 'offset
+		 * hint', based on information it already knows about the last offset where
+		 * scanToNode was found to jump over likely unneeded records when searching for
+		 * the scanToNode node.
+		 *
 		 * If we are scanning to a node we know we need to start from zero offset, or
 		 * else we use the offset passed in. Offset is the number of nodes to IGNORE
 		 * before we start collecting nodes.
 		 */
-		int offset = scanToNode ? 0 : req.getOffset();
+		int offset = scanToNode != null ? 0 : req.getOffset();
 		if (offset < 0) {
 			offset = 0;
 		}
@@ -233,7 +221,7 @@ public class NodeRenderService {
 		 * ROWS_PER_PAGE+1, because that is enough to trigger 'endReached' logic to be
 		 * set correctly
 		 */
-		int queryLimit = scanToNode ? 1000 : offset + ROWS_PER_PAGE + 2;
+		int queryLimit = scanToNode != null ? 1000 : offset + ROWS_PER_PAGE + 2;
 
 		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode="
 		// + scanToNode);
@@ -289,13 +277,13 @@ public class NodeRenderService {
 			// scanToNode=" + scanToNode);
 
 			/* are we still just scanning for our target node */
-			if (scanToNode) {
+			if (scanToNode != null) {
 				/*
 				 * If this is the node we are scanning for turn off scan mode, and add up to
 				 * ROWS_PER_PAGE-1 of any sliding window nodes above it.
 				 */
-				if (n.getPath().equals(scanToPath)) {
-					scanToNode = false;
+				if (n.getPath().equals(node.getPath())) {
+					scanToNode = null;
 
 					if (slidingWindow != null) {
 						int count = slidingWindow.size();
@@ -304,10 +292,17 @@ public class NodeRenderService {
 							for (int i = count - 1; i >= 0; i--) {
 								SubNode sn = slidingWindow.get(i);
 								relativeIdx--;
-								ninfo = processRenderNode(session, req, res, sn, false, null, relativeIdx, level + 1);
+								ninfo = processRenderNode(session, req, res, sn, null, relativeIdx, level + 1);
 								nodeInfo.getChildren().add(0, ninfo);
 
-								// If we have enough records we're done
+								/*
+								 * If we have enough records we're done. Note having ">= ROWS_PER_PAGE/2" for
+								 * example would also work and would bring back the target node as close to the
+								 * center of the results sent back to the brower as possible, but what we do
+								 * instead is just set to ROWS_PER_PAGE which maximizes performance by iterating
+								 * the smallese number of results in order to get a page that contains what we
+								 * need (namely the target node as indiated by scanToNode item)
+								 */
 								if (nodeInfo.getChildren().size() >= ROWS_PER_PAGE - 1) {
 									break;
 								}
@@ -340,7 +335,7 @@ public class NodeRenderService {
 			}
 
 			/* if we get here we're accumulating rows */
-			ninfo = processRenderNode(session, req, res, n, false, null, idx - 1L, level + 1);
+			ninfo = processRenderNode(session, req, res, n, null, idx - 1L, level + 1);
 			nodeInfo.getChildren().add(ninfo);
 
 			if (nodeInfo.getChildren().size() >= ROWS_PER_PAGE) {
@@ -366,7 +361,7 @@ public class NodeRenderService {
 					SubNode sn = slidingWindow.get(i);
 					relativeIdx--;
 
-					ninfo = processRenderNode(session, req, res, sn, false, null, (long) relativeIdx, level + 1);
+					ninfo = processRenderNode(session, req, res, sn, null, (long) relativeIdx, level + 1);
 					nodeInfo.getChildren().add(0, ninfo);
 
 					// If we have enough records we're done

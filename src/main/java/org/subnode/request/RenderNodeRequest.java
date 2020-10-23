@@ -23,11 +23,7 @@ public class RenderNodeRequest extends RequestBase {
 	 */
 	private int siblingOffset;
 
-	/*
-	 * holds number of levels to move up the parent chain from 'nodeId' before
-	 * rendering, or zero to render at nodeId itself
-	 */
-	private int upLevel;
+	private boolean upLevel;
 	private boolean renderParentIfLeaf;
 
 	private boolean goToLastPage;
@@ -54,14 +50,6 @@ public class RenderNodeRequest extends RequestBase {
 
 	public void setNodeId(String nodeId) {
 		this.nodeId = nodeId;
-	}
-
-	public int getUpLevel() {
-		return upLevel;
-	}
-
-	public void setUpLevel(int upLevel) {
-		this.upLevel = upLevel;
 	}
 
 	@JsonProperty(required = false)
@@ -103,5 +91,13 @@ public class RenderNodeRequest extends RequestBase {
 
 	public void setSingleNode(boolean singleNode) {
 		this.singleNode = singleNode;
+	}
+
+	public boolean isUpLevel() {
+		return upLevel;
+	}
+
+	public void setUpLevel(boolean upLevel) {
+		this.upLevel = upLevel;
 	}
 }

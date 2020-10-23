@@ -40,7 +40,7 @@ export class View implements ViewIntf {
 
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId,
-            upLevel: null,
+            upLevel: false,
             siblingOffset: 0,
             renderParentIfLeaf,
             offset,
@@ -85,7 +85,7 @@ export class View implements ViewIntf {
     private loadPage = (goToLastPage: boolean, offset: number, state: AppState): void => {
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: state.node.id,
-            upLevel: null,
+            upLevel: false,
             siblingOffset: 0,
             renderParentIfLeaf: true,
             offset,

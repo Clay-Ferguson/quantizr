@@ -80,7 +80,7 @@ export class Attachment implements AttachmentIntf {
     refreshBinaryPropsFromServer = (node: J.NodeInfo): Promise<any> => {
         const res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: node.id,
-            upLevel: null,
+            upLevel: false,
             siblingOffset: 0,
             renderParentIfLeaf: false,
             offset: 0,
