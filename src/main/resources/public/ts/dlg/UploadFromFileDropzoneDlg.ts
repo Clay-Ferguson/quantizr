@@ -290,7 +290,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         }
                         return;
                     }
-                    // S.log("Uploaded to Hash: " + ipfsHash);
 
                     // todo-0: case with IPFS (via Quanta Gateway) and multiple files uploading this needs testing and is likely not functional.
 

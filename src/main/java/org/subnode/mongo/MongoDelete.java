@@ -41,13 +41,25 @@ public class MongoDelete {
 		delete(session, node, childrenOnly);
 	}
 
+	/* When a user is creating a new node we leave FIELD_MODIFY_TIME null until their first save of it
+	and during the time it's null no other users can see the node. However the user can also abandon the browser
+	or cancel the editing and orphan the node that way, and this method which we call only at startup, cleans up
+	any and all of the orphans */
+	public void removeAbandonedNodes(MongoSession session) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where(SubNode.FIELD_MODIFY_TIME).is(null));
+
+		DeleteResult res = ops.remove(query, SubNode.class);
+		log.debug("Num abandoned nodes deleted: " + res.getDeletedCount());
+	}
+
 	/**
-	 * 2: cleaning up GridFS will be done as an async thread. For now we can just
-	 * let GridFS binaries data get orphaned... BUT I think it might end up being
-	 * super efficient if we have the 'path' stored in the GridFS metadata so we can
-	 * use a 'regex' query to delete all the binaries which is exacly like the one
-	 * below for deleting the nodes themselves.
+	 * Currently cleaning up GridFS orphans is done in gridMaintenanceScan() only.
 	 * 
+	 * todo-2: However, it would be better if we have the 'path' stored in the GridFS
+	 * metadata so we can use a 'regex' query to delete all the binaries
+	 * (recursively under any node, using that path prefix as the criteria) which is
+	 * exacly like the one below for deleting the nodes themselves.
 	 */
 	public void delete(MongoSession session, SubNode node, boolean childrenOnly) {
 		auth.authRequireOwnerOfNode(session, node);

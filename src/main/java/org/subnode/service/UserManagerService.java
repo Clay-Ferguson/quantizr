@@ -881,7 +881,7 @@ public class UserManagerService {
 		if (friendsNode == null)
 			return res;
 
-		for (SubNode friendNode : read.getChildren(session, friendsNode, null, null)) {
+		for (SubNode friendNode : read.getChildren(session, friendsNode, null, null, 0)) {
 			String userName = friendNode.getStringProp(NodeProp.USER.s());
 			if (userName != null) {
 				FriendInfo fi = new FriendInfo();

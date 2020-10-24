@@ -37,7 +37,7 @@ public class MongoRepository {
 	private MongoUtil util;
 
 	@Autowired
-	private UserFeedService userFeedService;
+	private MongoDelete delete;
 
 	/*
 	 * Because of the criticality of this variable, I am not using the Spring getter
@@ -126,6 +126,8 @@ public class MongoRepository {
 			// if (appProp.getMongoTest()) {
 			// mongoTest.mainTest();
 			// }
+
+			delete.removeAbandonedNodes(adminSession);
 
 			log.debug("MongoRepository fully initialized.");
 			fullInit = true;

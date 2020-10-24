@@ -632,7 +632,7 @@ public class AppController implements ErrorController {
 				throw ExUtil.wrapEx("admin only function.");
 			}
 
-			// todo-1: disabling pending security audit.
+			// todo-2: disabling pending security audit.
 			// bashService.executeNode(ms, req, res);
 			return res;
 		});
@@ -734,7 +734,8 @@ public class AppController implements ErrorController {
 
 					String _gid = gid;
 
-					// if no cachebuster gid was on url then redirect to a url that does have the gid
+					// if no cachebuster gid was on url then redirect to a url that does have the
+					// gid
 					if (_gid == null) {
 						_gid = node.getStringProp(NodeProp.IPFS_LINK.s());
 						if (_gid == null) {
@@ -1002,14 +1003,18 @@ public class AppController implements ErrorController {
 
 			if (req.getCommand().equalsIgnoreCase("ipfsGetNodeInfo")) {
 				res.getMessages().add(new InfoMessage(ipfsService.getNodeInfo(ms, req.getNodeId()), null));
-			} else if (req.getCommand().equalsIgnoreCase("compactDb")) {
+			} //
+			else if (req.getCommand().equalsIgnoreCase("compactDb")) {
 				res.getMessages().add(new InfoMessage(systemService.compactDb(), null));
-			} else if (req.getCommand().equalsIgnoreCase("initializeAppContent")) {
+			} //
+			else if (req.getCommand().equalsIgnoreCase("initializeAppContent")) {
 				log.error("initializeAppContent is obsolet, and was also refactored without being retested");
 				// res.setServerInfo(systemService.initializeAppContent());
-			} else if (req.getCommand().equalsIgnoreCase("getServerInfo")) {
+			} //
+			else if (req.getCommand().equalsIgnoreCase("getServerInfo")) {
 				res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));
-			} else if (req.getCommand().equalsIgnoreCase("getJson")) {
+			} //
+			else if (req.getCommand().equalsIgnoreCase("getJson")) {
 				res.getMessages().add(new InfoMessage(systemService.getJson(ms, req.getNodeId()), null));
 			} else {
 				throw new RuntimeEx("Invalid command: " + req.getCommand());
@@ -1028,7 +1033,7 @@ public class AppController implements ErrorController {
 			}
 
 			/*
-			 * todo-1: If we are searching a large directory structure here the search will
+			 * todo-2: If we are searching a large directory structure here the search will
 			 * take a long time and just show a generic non-updated progress base on the
 			 * browser. We need a better way to push status back to server and also not make
 			 * user wait, but be able to close the dlg and move on. Probably we need a

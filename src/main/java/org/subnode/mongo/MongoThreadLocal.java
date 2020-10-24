@@ -1,6 +1,9 @@
 package org.subnode.mongo;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +12,8 @@ import org.subnode.mongo.model.SubNode;
 
 public class MongoThreadLocal {
 	private static final Logger log = LoggerFactory.getLogger(MongoThreadLocal.class);
+
+	private static int MAX_CACHE_SIZE = 100;
 
 	/*
 	 * This is where we can accumulate the set of nodes that will all be updated
@@ -19,36 +24,38 @@ public class MongoThreadLocal {
 	 * finally block somewhere and use that to make sure all updates to any node are
 	 * saved.
 	 * 
-	 * todo-1: consider repurposing dirtyNodes to only *catch* bugs by making it print which
-	 * nodes were modified but never saved, and call this in the web filter on the
-	 * way out of each request, and then change the code style back to where it only writes
-	 * WHEN 'save' is called on each node.
+	 * todo-1: consider repurposing dirtyNodes to only *catch* bugs by making it
+	 * print which nodes were modified but never saved, and call this in the web
+	 * filter on the way out of each request, and then change the code style back to
+	 * where it only writes WHEN 'save' is called on each node.
 	 * 
-	 * and also, we can use this map to detect WHEN some query is done that reads a node in a query
-	 * such that the node read is actually in the 'dirtyNodes' map (of same session) meaning there will 
-	 * then be TWO copies of the node in memory and could be a problem because whichever one is saved
-	 * last will 'win' (overwrite the other)
+	 * and also, we can use this map to detect WHEN some query is done that reads a
+	 * node in a query such that the node read is actually in the 'dirtyNodes' map
+	 * (of same session) meaning there will then be TWO copies of the node in memory
+	 * and could be a problem because whichever one is saved last will 'win'
+	 * (overwrite the other)
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<HashMap<ObjectId, SubNode>>();
 
-	/*
-	 * Because ACL checking is an expensive operation, we cache the results of any
-	 * ACL computations, during the course of any single HTTP Request (i.e. per
-	 * thread) Note: We do not use "Request Scope" Spring bean because we want this
-	 * to work on ANY thread, including just running test cases.
-	 */
-	private static final ThreadLocal<HashMap<String, Boolean>> aclResults = new ThreadLocal<HashMap<String, Boolean>>();
+	private static final ThreadLocal<LinkedHashMap<String, SubNode>> nodesByPath = new ThreadLocal<LinkedHashMap<String, SubNode>>();
 
 	public static void removeAll() {
 		// log.debug("Clear Dirty Nodes.");
 		getDirtyNodes().clear();
-		getAclResults().clear();
+		getNodesByPath().clear();
 	}
 
 	public static void clearDirtyNodes() {
 		getDirtyNodes().clear();
 	}
 
+	/*
+	 * NOTE: It's not an ineffecincy to always create the map any time it's
+	 * accessed, even though it could have been left empty because this is a
+	 * thread-local storage and so this map is reused over and over by all different
+	 * requests and different users, so we only ever create one per thread anyway,
+	 * and the thread pool is mainly fixed in size and small.
+	 */
 	public static HashMap<ObjectId, SubNode> getDirtyNodes() {
 		if (dirtyNodes.get() == null) {
 			dirtyNodes.set(new HashMap<ObjectId, SubNode>());
@@ -58,6 +65,21 @@ public class MongoThreadLocal {
 
 	public static boolean hasDirtyNodes() {
 		return getDirtyNodes().size() > 0;
+	}
+
+	public static LinkedHashMap<String, SubNode> getNodesByPath() {
+		if (nodesByPath.get() == null) {
+			nodesByPath.set(new LinkedHashMap<String, SubNode>(MAX_CACHE_SIZE + 1, .75F, false) {
+				protected boolean removeEldestEntry(Map.Entry<String, SubNode> eldest) {
+					return size() > MAX_CACHE_SIZE;
+				}
+			});
+		}
+		return nodesByPath.get();
+	}
+
+	public static boolean hasNodesByPath() {
+		return getNodesByPath().size() > 0;
 	}
 
 	public static void dumpDirtyNodes() {
@@ -103,22 +125,11 @@ public class MongoThreadLocal {
 
 	/* Opposite of dirty */
 	public static void clean(SubNode node) {
-		//log.debug("Removing from Dirty: " + node.getId().toHexString());
+		// log.debug("Removing from Dirty: " + node.getId().toHexString());
 
-		//commenting this 'if' we don't care if the remove is doing something or now.
-		//if (getDirtyNodes().containsKey(node.getId())) {
-			getDirtyNodes().remove(node.getId());
-		//}
-	}
-
-	public static void setAclResults(HashMap<String, Boolean> res) {
-		aclResults.set(res);
-	}
-
-	public static HashMap<String, Boolean> getAclResults() {
-		if (aclResults.get() == null) {
-			aclResults.set(new HashMap<String, Boolean>());
-		}
-		return aclResults.get();
+		// commenting this 'if' we don't care if the remove is doing something or now.
+		// if (getDirtyNodes().containsKey(node.getId())) {
+		getDirtyNodes().remove(node.getId());
+		// }
 	}
 }

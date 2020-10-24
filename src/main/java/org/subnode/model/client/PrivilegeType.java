@@ -7,10 +7,6 @@ public enum PrivilegeType {
 	/* Can read and write this node. Write to subnodes is not granted by this */
 	WRITE("wr"), //
 
-	/* Can read and create children under this node and any nodes in the subgraph 
-	
-	need to rethink if I need add_children or not, because WRITE has been used for that for a while I think (todo-1)
-	*/
 	ADD_CHILDREN("ac"), //
 
 	/*

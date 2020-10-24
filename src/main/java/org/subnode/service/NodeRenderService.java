@@ -235,10 +235,9 @@ public class NodeRenderService {
 			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
 		}
 
-		Iterable<SubNode> nodeIter = read.getChildren(session, node, sort, queryLimit);
+		Iterable<SubNode> nodeIter = read.getChildren(session, node, sort, queryLimit, offset);
 		Iterator<SubNode> iterator = nodeIter.iterator();
-
-		int idx = 0;
+		int idx = offset;
 
 		// this should only get set to true if we run out of records, because we reached
 		// the true end of records and not related to a queryLimit
@@ -253,10 +252,10 @@ public class NodeRenderService {
 			// }
 		}
 
-		if (offset > 0) {
-			// log.debug("Skipping the first " + offset + " records in the resultset.");
-			idx = read.skip(iterator, offset);
-		}
+		// if (offset > 0) {
+		// 	// log.debug("Skipping the first " + offset + " records in the resultset.");
+		// 	idx = read.skip(iterator, offset);
+		// }
 
 		List<SubNode> slidingWindow = null;
 		NodeInfo ninfo = null;

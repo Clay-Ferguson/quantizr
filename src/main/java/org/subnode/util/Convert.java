@@ -188,7 +188,7 @@ public class Convert {
 			boolean hasInlineChildren = node.getBooleanProp(NodeProp.INLINE_CHILDREN.s());
 			if (hasInlineChildren) {
 				Iterable<SubNode> nodeIter = read.getChildren(session, node,
-						Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100);
+						Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100, 0);
 				Iterator<SubNode> iterator = nodeIter.iterator();
 
 				while (true) {

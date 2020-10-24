@@ -147,7 +147,7 @@ public class MongoRead {
                 SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()))//
                 .and(SubNode.FIELD_ORDINAL).is(idx);
         query.addCriteria(criteria);
-    
+
         SubNode ret = getOps(session).findOne(query, SubNode.class);
         return ret;
     }
@@ -265,7 +265,7 @@ public class MongoRead {
             identifier = XString.stripIfEndsWith(identifier, "/");
             Query query = new Query();
             query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(identifier));
-            
+
             ret = getOps(session).findOne(query, SubNode.class);
             // if (ret == null) {
             // log.debug("nope. path not found.");
@@ -283,7 +283,7 @@ public class MongoRead {
     public boolean nodeExists(MongoSession session, ObjectId id) {
         Query query = new Query();
         query.addCriteria(Criteria.where(SubNode.FIELD_ID).is(id));
-    
+
         return getOps(session).exists(query, SubNode.class);
     }
 
@@ -310,7 +310,7 @@ public class MongoRead {
         String parentPath = XString.truncateAfterLast(path, "/");
         Query query = new Query();
         query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
-        
+
         SubNode ret = getOps(session).findOne(query, SubNode.class);
         auth.auth(session, ret, PrivilegeType.READ);
         return ret;
@@ -318,7 +318,7 @@ public class MongoRead {
 
     public List<SubNode> getChildrenAsList(MongoSession session, SubNode node, boolean ordered, Integer limit) {
         Iterable<SubNode> iter = getChildren(session, node,
-                ordered ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, limit);
+                ordered ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, limit, 0);
         return iterateToList(iter);
     }
 
@@ -368,13 +368,17 @@ public class MongoRead {
 
     /*
      * If node is null it's path is considered empty string, and it represents the
-     * 'root' of the tree. There is no actual NODE that is root node
+     * 'root' of the tree. There is no actual NODE that is root node,
      */
-    public Iterable<SubNode> getChildrenUnderParentPath(MongoSession session, String path, Sort sort, Integer limit) {
+    public Iterable<SubNode> getChildrenUnderParentPath(MongoSession session, String path, Sort sort, Integer limit, int skip) {
 
         Query query = new Query();
         if (limit != null) {
             query.limit(limit.intValue());
+        }
+
+        if (skip > 0) {
+            query.skip(skip);
         }
 
         /*
@@ -393,9 +397,7 @@ public class MongoRead {
 
         /*
          * This condition ensures that when users create a node and are still editing
-         * that node will be invisible to others until they click "save" todo-1: at some
-         * future time we can write code to find any nodes which are orphaned by a user
-         * creating but never saving changes.
+         * that node will be invisible to others until they click "save"
          */
         criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
 
@@ -411,9 +413,9 @@ public class MongoRead {
      * If node is null it's path is considered empty string, and it represents the
      * 'root' of the tree. There is no actual NODE that is root node
      */
-    public Iterable<SubNode> getChildren(MongoSession session, SubNode node, Sort sort, Integer limit) {
+    public Iterable<SubNode> getChildren(MongoSession session, SubNode node, Sort sort, Integer limit, int skip) {
         auth.auth(session, node, PrivilegeType.READ);
-        return getChildrenUnderParentPath(session, node.getPath(), sort, limit);
+        return getChildrenUnderParentPath(session, node.getPath(), sort, limit, skip);
     }
 
     /*
@@ -517,20 +519,6 @@ public class MongoRead {
         return nodeFound;
     }
 
-    // todo-1: There is a Query.skip() function on the Query object, that can be
-    // used instead of this
-    public int skip(Iterator<SubNode> iter, int count) {
-        int iterCount = 0;
-        for (int i = 0; i < count; i++) {
-            if (!iter.hasNext()) {
-                break;
-            }
-            iter.next();
-            iterCount++;
-        }
-        return iterCount;
-    }
-
     /*
      * Gets (recursively) all nodes under 'node', by using all paths starting with
      * the path of that node
@@ -546,7 +534,7 @@ public class MongoRead {
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);
-        
+
         return getOps(session).find(query, SubNode.class);
     }
 
@@ -747,7 +735,7 @@ public class MongoRead {
                 .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
 
         query.addCriteria(criteria);
-    
+
         SubNode ret = getOps(session).findOne(query, SubNode.class);
         auth.auth(session, ret, PrivilegeType.READ);
         return ret;

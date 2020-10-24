@@ -26,7 +26,7 @@ public class AppProp /* implements EnvironmentAware */ {
 	private Environment env;
 
 	public String getLuceneDir() {
-		return "/subnode-lucene"; //todo-1: get this from prop
+		return "/subnode-lucene"; //todo-2: get this from prop
 	}
 
 	public String getStringProp(String propName) {

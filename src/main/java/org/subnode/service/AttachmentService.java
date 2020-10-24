@@ -1153,7 +1153,7 @@ public class AttachmentService {
 			}
 
 			final Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS,
-					null, null);
+					null, null, 0);
 
 			/*
 			 * scan all userAccountNodes, and set a zero amount for those not found (which

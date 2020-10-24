@@ -94,7 +94,7 @@ public class UserFeedService {
 
 		adminRunner.run(session -> {
 			Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
-					null);
+					null, 0);
 
 			for (SubNode accountNode : accountNodes) {
 				String userName = accountNode.getStringProp(NodeProp.USER);
@@ -382,7 +382,7 @@ public class UserFeedService {
 
 		/* Get all friend nodes the user has created */
 		Iterable<SubNode> friendNodes = read.getChildrenUnderParentPath(session, friendListNode.getPath(), null,
-				MAX_NODES);
+				MAX_NODES, -1);
 
 		// Process all friends, to accumulate all of fullFeedList items
 		for (SubNode friendNode : friendNodes) {

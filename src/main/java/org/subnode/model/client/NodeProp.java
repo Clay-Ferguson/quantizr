@@ -93,8 +93,6 @@ public enum NodeProp {
     NOWRAP("sn:nowrap", "s"),
 
     BIN_DATA("sn:jcrData", "s"),
-
-    // todo-1: should this be "sn:" prefixed?
     BIN("bin", "s"),
 
     IMG_WIDTH("sn:imgWidth", "s"), //
@@ -113,7 +111,6 @@ public enum NodeProp {
     // amount of bytes the user is ALLOWED to save.
     BIN_QUOTA("sn:binQuota", "s"), //
 
-    // todo-1: add sn:prefix
     INLINE_CHILDREN("inlineChildren", "s"), //
     PRIORITY("priority", "s"), //
     LAYOUT("layout", "s"), //

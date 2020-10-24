@@ -133,7 +133,7 @@ public class MongoCreate {
 		 * probably fine, but also can we do a query here that selects only the
 		 * ">= ordinal" ones to make this do the minimal size query?
 		 */
-		for (SubNode child : read.getChildren(session, node, null, null)) {
+		for (SubNode child : read.getChildren(session, node, null, null, 0)) {
 			Long childOrdinal = child.getOrdinal();
 			long childOrdinalInt = childOrdinal == null ? 0L : childOrdinal.longValue();
 

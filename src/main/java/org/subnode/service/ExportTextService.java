@@ -112,7 +112,7 @@ public class ExportTextService {
 
 		Sort sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
 
-		for (SubNode n : read.getChildren(session, node, sort, null)) {
+		for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
 			recurseNode(n, level + 1);
 		}
 	}

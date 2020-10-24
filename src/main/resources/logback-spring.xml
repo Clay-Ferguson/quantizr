@@ -57,4 +57,9 @@
         <appender-ref ref="Console" />
     </logger>
 
+     <logger name="org.thymeleaf.ConfigurationPrinterHelper" level="warn" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+
 </configuration>

@@ -191,7 +191,7 @@ public abstract class ExportArchiveBase {
 		final ValContainer<String> fileName = new ValContainer<String>();
 
 		final Iterable<SubNode> iter = read.getChildren(session, node,
-				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null);
+				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
 		final List<SubNode> children = read.iterateToList(iter);
 
 		/*
@@ -245,7 +245,7 @@ public abstract class ExportArchiveBase {
 	private void inlineChildren(final StringBuilder html, final SubNode node, final String parentFolder,
 			final String deeperPath, final int level) {
 		final Iterable<SubNode> iter = read.getChildren(session, node,
-				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null);
+				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
 		final List<SubNode> children = read.iterateToList(iter);
 
 		if (children != null) {

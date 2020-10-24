@@ -207,7 +207,7 @@ public class MongoTest {
 		log.debug("child count query successful.");
 
 		/* check that we can get all the children */
-		Iterable<SubNode> childrenIter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null);
+		Iterable<SubNode> childrenIter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
 		count = util.dump("Dumping ordered children", childrenIter);
 
 		// ----------Read all ordinals. We don't assume they are all perfectly numbered here. (might

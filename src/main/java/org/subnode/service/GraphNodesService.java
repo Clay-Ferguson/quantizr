@@ -95,7 +95,7 @@ public class GraphNodesService {
 		/* process the current node */
 		processNode(ctx, res, parent, node);
 
-		for (SubNode n : read.getChildren(session, node, null, null)) {
+		for (SubNode n : read.getChildren(session, node, null, null, 0)) {
 			recurseNode(ctx, res, session, node, n, level + 1);
 			if (ctx.nodeCount >= MAX_NODES) {
 				return;

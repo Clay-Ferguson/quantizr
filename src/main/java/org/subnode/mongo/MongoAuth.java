@@ -45,9 +45,9 @@ public class MongoAuth {
 
 	@Autowired
 	private MongoUpdate update;
-    
-    @Autowired
-    private MongoUtil util;
+
+	@Autowired
+	private MongoUtil util;
 
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
@@ -132,44 +132,50 @@ public class MongoAuth {
 
 	/*
 	 * NOTE: this should ONLY ever be called from 'auth()' method of this class
-	 * 
-	 * todo-1: MongoThreadLocal class has a variable created to memoize these
-	 * results per-request but that has not yet been implemented.
 	 */
 	private boolean ancestorAuth(MongoSession session, SubNode node, List<PrivilegeType> privs) {
 
 		/* get the non-null sessionUserNodeId if not anonymous user */
 		String sessionUserNodeId = session.isAnon() ? null : session.getUserNode().getId().toHexString();
 
-		String path = node.getPath();
-		log.trace("ancestorAuth: path=" + path);
+		log.trace("ancestorAuth: path=" + node.getPath());
 
 		StringBuilder fullPath = new StringBuilder();
-		StringTokenizer t = new StringTokenizer(path, "/", false);
+		StringTokenizer t = new StringTokenizer(node.getPath(), "/", false);
 		boolean ret = false;
 		while (t.hasMoreTokens()) {
 			String pathPart = t.nextToken().trim();
 			fullPath.append("/");
 			fullPath.append(pathPart);
 
-			// todo-2: remove concats and let NodeName have static finals for these full
-			// paths.
 			if (pathPart.equals("/" + NodeName.ROOT))
 				continue;
 			if (pathPart.equals(NodeName.ROOT_OF_ALL_USERS))
 				continue;
 
-			// I'm putting the caching of ACL results on hold, because this is only a
-			// performance
-			// enhancement and can wait.
-			// Boolean knownAuthResult =
-			// MongoThreadLocal.aclResults().get(buildAclThreadLocalKey(sessionUserNodeId,
-			// fullPath,
-			// privs));
+			String fullPathStr = fullPath.toString();
 
-			SubNode tryNode = read.getNode(session, fullPath.toString(), false);
+			/*
+			 * get node from cache if possible. Note: This cache does have the slight
+			 * imperfection that it assumes once it reads a node for the purposes of
+			 * checking auth (acl) then within the context of the same transaction it can
+			 * always use that same node again meaning the security context on the node
+			 * can't have changed DURING the request. This is fine because we never update
+			 * security on a node and then expect ourselves to find different security on
+			 * the node. Because the only user who can update the security is the owner
+			 * anyway.
+			 */
+			SubNode tryNode = MongoThreadLocal.getNodesByPath().get(fullPathStr);
+
+			// if node not found in cache resort to querying for it
 			if (tryNode == null) {
-				throw new RuntimeEx("Tree corrupt! path not found: " + fullPath.toString());
+				tryNode = read.getNode(session, fullPathStr, false);
+				if (tryNode == null) {
+					throw new RuntimeEx("Tree corrupt! path not found: " + fullPathStr);
+				}
+
+				// put in the cache
+				MongoThreadLocal.getNodesByPath().put(fullPathStr, tryNode);
 			}
 
 			// if this session user is the owner of this node, then they have full power
@@ -230,7 +236,7 @@ public class MongoAuth {
 		return false;
 	}
 
-    public List<AccessControlInfo> getAclEntries(MongoSession session, SubNode node) {
+	public List<AccessControlInfo> getAclEntries(MongoSession session, SubNode node) {
 		HashMap<String, AccessControl> aclMap = node.getAc();
 		if (aclMap == null) {
 			return null;
@@ -275,7 +281,7 @@ public class MongoAuth {
 		return info;
 	}
 
-    public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, SubNode node, String sortField, int limit) {
+	public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, SubNode node, String sortField, int limit) {
 		auth(session, node, PrivilegeType.READ);
 
 		update.saveSession(session);
@@ -306,7 +312,7 @@ public class MongoAuth {
 		return ops.find(query, SubNode.class);
 	}
 
-    public MongoSession login(String userName, String password) {
+	public MongoSession login(String userName, String password) {
 		// log.debug("Mongo API login: user="+userName);
 		MongoSession session = MongoSession.createFromUser(PrincipalName.ANON.s());
 
@@ -342,5 +348,5 @@ public class MongoAuth {
 			}
 		}
 		return session;
-    }    
+	}
 }
