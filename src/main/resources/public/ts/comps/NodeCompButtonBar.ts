@@ -215,7 +215,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
             btnArray = btnArray.concat(this.extraButtons);
         }
 
-        let buttonBar = new ButtonBar(btnArray, null, "marginLeft");
+        let buttonBar = new ButtonBar(btnArray, null, "marginLeftIfNotFirst");
 
         let navButtonBar = null;
 

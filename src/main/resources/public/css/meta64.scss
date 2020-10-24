@@ -537,6 +537,14 @@ input[type="radio"] {
     white-space: nowrap;
 }
 
+.marginLeftIfNotFirst {
+    margin-left: $smallGap;
+}
+
+.marginLeftIfNotFirst:first-child {
+    margin-left: 0;
+}
+
 .marginLeft {
     margin-left: $smallGap;
 }
@@ -837,7 +845,7 @@ input[type="radio"] {
 
 .header-text {
     font-size: small;
-    margin-left: 8px;
+    margin-left: $smallGap;
     margin-bottom: 8px;
     //padding-top: $microGap;
     cursor: pointer;
