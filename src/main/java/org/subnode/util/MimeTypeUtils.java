@@ -18,27 +18,21 @@ public class MimeTypeUtils {
     private static final Logger log = LoggerFactory.getLogger(MimeTypeUtils.class);
     private static final Tika tika = new Tika();
 
-    private static Map<String, String> MimeMap;
+    private static Map<String, String> mimeMap;
     static {
-        MimeMap = new HashMap<>();
-        MimeMap.put("mp4", "video/mp4");
-        MimeMap.put("mp3", "audio/mp3");
-        MimeMap.put("flv", "video/flv");
-        MimeMap.put("webm", "video/webm");
-        MimeMap.put("opus", "audio/webm");
-
-        //todo-0: why does blank string map to video here?
-        MimeMap.put("", "video/mp4");
+        mimeMap = new HashMap<>();
+        mimeMap.put("mp4", "video/mp4");
+        mimeMap.put("mp3", "audio/mp3");
+        mimeMap.put("flv", "video/flv");
+        mimeMap.put("webm", "video/webm");
+        mimeMap.put("opus", "audio/webm");
     }
 
     public static String getMimeType(String extension) {
-        if (extension.isEmpty())
-            return "application/octet-stream";
-
-        if (MimeMap.containsKey(extension)) {
-            return MimeMap.get(extension);
+        if (!extension.isEmpty() && mimeMap.containsKey(extension)) {
+            return mimeMap.get(extension);
         } else {
-            return "unknown/" + extension;
+            return "application/octet-stream";
         }
     }
 
@@ -53,7 +47,7 @@ public class MimeTypeUtils {
             }
         }
 
-        log.debug("ProbeMime: " + file.toString() + " = " + mimeType);
+        //log.debug("ProbeMime: " + file.toString() + " = " + mimeType);
         return mimeType;
     }
 
