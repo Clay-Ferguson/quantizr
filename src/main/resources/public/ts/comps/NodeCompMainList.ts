@@ -63,7 +63,7 @@ export class NodeCompMainList extends Div {
         }
 
         if (!endReached) {
-            nextButton = new IconButton("fa-angle-right", "More...", {
+            nextButton = new IconButton("fa-angle-right", "More", {
                 onClick: () => S.view.nextPage(state),
                 title: "Next Page"
             });
