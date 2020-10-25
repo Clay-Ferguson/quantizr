@@ -4,7 +4,7 @@ import { AppState } from "../AppState";
 export interface EditIntf {
     showReadOnlyProperties: boolean;
 
-    saveClipboardToNode(parentId?: string): void;
+    saveClipboardToChildNode(parentId?: string): void;
     splitNode(node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): void;
     openProfileDlg(state: AppState): void;
     openChangePasswordDlg(state: AppState): void;

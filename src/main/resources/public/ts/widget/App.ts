@@ -115,7 +115,7 @@ export class App extends Div {
 
             let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
                 onClick: e => {
-                    S.edit.saveClipboardToNode();
+                    S.edit.saveClipboardToChildNode();
                 },
                 title: "Save Clipboard"
             }, "btn-secondary floatingControlBarItem", "off") : null;

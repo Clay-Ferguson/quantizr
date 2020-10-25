@@ -179,34 +179,60 @@ export class Edit implements EditIntf {
     * is sent to server for ordinal position assignment of new node. Also if this var is null, it indicates we are
     * creating in a 'create under parent' mode, versus non-null meaning 'insert inline' type of insert.
     */
-    startEditingNewNode = (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, nodeInsertTarget: J.NodeInfo, ordinalOffset: number, state: AppState): void => {
+    startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, nodeInsertTarget: J.NodeInfo, ordinalOffset: number, state: AppState): Promise<void> => {
         if (!this.isInsertAllowed(parentNode, state)) {
             console.log("Rejecting request to edit. Not authorized");
             return;
         }
 
-        if (nodeInsertTarget) {
-            S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
-                updateModTime: false,
-                parentId: parentNode.id,
-                targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
-                newNodeName: "",
-                typeName: typeName || "u",
-                initialValue: ""
-            }, (res) => { this.insertNodeResponse(res, state); });
-        } else {
-            S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                updateModTime: false,
-                nodeId: parentNode.id,
-                newNodeName: "",
-                typeName: typeName || "u",
-                createAtTop,
-                content: null,
-                typeLock: false,
-                properties: null
-            }, (res) => {
-                this.createSubNodeResponse(res, state);
-            });
+        if (S.meta64.ctrlKey) {
+            let clipboardText = await (navigator as any).clipboard.readText();
+            if (nodeInsertTarget) {
+                S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                    updateModTime: true,
+                    parentId: parentNode.id,
+                    targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
+                    newNodeName: "",
+                    typeName: typeName || "u",
+                    initialValue: clipboardText
+                }, (res) => { S.meta64.refresh(state); });
+            } else {
+                S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                    updateModTime: true,
+                    nodeId: parentNode.id,
+                    newNodeName: "",
+                    typeName: typeName || "u",
+                    createAtTop,
+                    content: clipboardText,
+                    typeLock: false,
+                    properties: null
+                }, (res) => { S.meta64.refresh(state); });
+            }
+        }
+        else {
+            if (nodeInsertTarget) {
+                S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                    updateModTime: false,
+                    parentId: parentNode.id,
+                    targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
+                    newNodeName: "",
+                    typeName: typeName || "u",
+                    initialValue: ""
+                }, (res) => { this.insertNodeResponse(res, state); });
+            } else {
+                S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                    updateModTime: false,
+                    nodeId: parentNode.id,
+                    newNodeName: "",
+                    typeName: typeName || "u",
+                    createAtTop,
+                    content: null,
+                    typeLock: false,
+                    properties: null
+                }, (res) => {
+                    this.createSubNodeResponse(res, state);
+                });
+            }
         }
     }
 
@@ -434,7 +460,8 @@ export class Edit implements EditIntf {
     /* Need all cached functions to be prefixed so they're recognizable, since refactoring them can break things */
     cached_newSubNode = (id: string) => {
         if (S.meta64.ctrlKey) {
-            S.edit.saveClipboardToNode(id);
+            // todo-0: why doesn't 'this' work here?
+            S.edit.saveClipboardToChildNode(id);
         }
         else {
             const state = store.getState();
@@ -714,8 +741,9 @@ export class Edit implements EditIntf {
         ).open();
     }
 
-    saveClipboardToNode = (parentId?: string): void => {
+    saveClipboardToChildNode = (parentId?: string): void => {
 
+        // todo-0: use an await here
         (navigator as any).clipboard.readText().then(clipText => {
             if (clipText) {
                 clipText = clipText.trim();
