@@ -89,32 +89,34 @@ export class App extends Div {
         let main: Main = null;
         let allowEditMode = state.node && !state.isAnonUser;
 
-        let topScrollUpButton = new IconButton("fa-angle-double-up", null, {
-            onClick: e => {
-                window.scrollTo(0, 0);
-            },
-            title: "Scroll to Top"
-        }, "btn-secondary floatingControlBarItem", "off");
-
-        let editButton = (allowEditMode && !fullScreenViewer) ? new IconButton("fa-pencil", null, {
-            onClick: e => { S.edit.toggleEditMode(state); },
-            title: "Turn edit mode " + (state.userPreferences.editMode ? "off" : "on")
-        }, "btn-secondary floatingControlBarItem", state.userPreferences.editMode ? "on" : "off") : null;
-
-        let prefsButton = !state.isAnonUser ? new IconButton("fa-gear", null, {
-            onClick: e => { S.edit.editPreferences(state); },
-            title: "Edit user preferences"
-        }, "btn-secondary floatingControlBarItem", "off") : null;
-
-        let rootButton = !state.isAnonUser ? new IconButton("fa-database", null, {
-            onClick: e => { S.nav.navHome(state); },
-            title: "Your Root Node"
-        }, "btn-secondary floatingControlBarItem", "off") : null;
-
-        // these are the buttons at the upper right of the page.
         let floatingControlBar = null;
-        if (editButton && prefsButton) {
-            floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton, rootButton, prefsButton, editButton]);
+        if (!clientInfo.isMobile) {
+            let topScrollUpButton = new IconButton("fa-angle-double-up", null, {
+                onClick: e => {
+                    window.scrollTo(0, 0);
+                },
+                title: "Scroll to Top"
+            }, "btn-secondary floatingControlBarItem", "off");
+
+            let editButton = (allowEditMode && !fullScreenViewer) ? new IconButton("fa-pencil", null, {
+                onClick: e => { S.edit.toggleEditMode(state); },
+                title: "Turn edit mode " + (state.userPreferences.editMode ? "off" : "on")
+            }, "btn-secondary floatingControlBarItem", state.userPreferences.editMode ? "on" : "off") : null;
+
+            let prefsButton = !state.isAnonUser ? new IconButton("fa-gear", null, {
+                onClick: e => { S.edit.editPreferences(state); },
+                title: "Edit user preferences"
+            }, "btn-secondary floatingControlBarItem", "off") : null;
+
+            let rootButton = !state.isAnonUser ? new IconButton("fa-database", null, {
+                onClick: e => { S.nav.navHome(state); },
+                title: "Your Root Node"
+            }, "btn-secondary floatingControlBarItem", "off") : null;
+
+            // these are the buttons at the upper right of the page.
+            if (topScrollUpButton || rootButton || prefsButton || editButton) {
+                floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton, rootButton, prefsButton, editButton]);
+            }
         }
 
         this.setChildren([
@@ -136,7 +138,7 @@ export class App extends Div {
 
             floatingControlBar,
 
-            new IconButton("fa-angle-double-up", null, {
+            clientInfo.isMobile ? null : new IconButton("fa-angle-double-up", null, {
                 onClick: e => {
                     window.scrollTo(0, 0);
                 },

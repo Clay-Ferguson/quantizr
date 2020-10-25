@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import { AppState } from "./AppState";
+import clientInfo from "./ClientInfo";
 import { Constants as C } from "./Constants";
 import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
@@ -85,6 +86,9 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Edit", [
+            !clientInfo.isMobile ? null : new MenuItem("Toggle Edit Mode", () => S.edit.toggleEditMode(state), !state.isAnonUser), //
+            !clientInfo.isMobile ? null : new MenuItemSeparator(), //
+
             // new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
             new MenuItem("Undo Cut", () => S.edit.undoCutSelNodes(state), !state.isAnonUser && !!state.nodesToMove), //
 
