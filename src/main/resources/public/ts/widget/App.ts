@@ -113,9 +113,16 @@ export class App extends Div {
                 title: "Your Root Node"
             }, "btn-secondary floatingControlBarItem", "off") : null;
 
+            let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
+                onClick: e => {
+                    S.edit.saveClipboardToNode();
+                },
+                title: "Save Clipboard"
+            }, "btn-secondary floatingControlBarItem", "off") : null;
+
             // these are the buttons at the upper right of the page.
             if (topScrollUpButton || rootButton || prefsButton || editButton) {
-                floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton, rootButton, prefsButton, editButton]);
+                floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton, rootButton, prefsButton, clipboardPasteButton, editButton]);
             }
         }
 

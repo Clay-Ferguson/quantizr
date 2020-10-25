@@ -40,7 +40,7 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
             // add command to lazy-load keybinding_menu extension
             this.aceEditor.commands.addCommand({
                 name: "insetTimestamp",
-                // On Ubuntu CTRL-ALT-T was already stomped on, so I guess we need to make this configurable by users to set their
+                // On Ubuntu CTRL-ALT-T was already taken by browser/OS, so I guess we need to make this configurable by users to set their
                 // own custom keybindings. For now I hope CTRL-ALT-H works for everyone. I had EditNodeDlg.ts using an insertTime button before
                 // deciding todo this via key binding on the element so that is still there commented out, if i change my mind and go back to that.
                 bindKey: { win: "Ctrl-Alt-h", mac: "Command-Alt-h" },

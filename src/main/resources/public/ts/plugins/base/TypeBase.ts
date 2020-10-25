@@ -74,8 +74,6 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
-        // let markdownComp: NodeCompMarkdown;
-
         if (state.inlineEditId === node.id) {
             return new InlineEditField(node, state);
         }
