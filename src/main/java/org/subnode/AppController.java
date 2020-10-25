@@ -107,6 +107,7 @@ import org.subnode.service.NodeEditService;
 import org.subnode.service.NodeMoveService;
 import org.subnode.service.NodeRenderService;
 import org.subnode.service.NodeSearchService;
+import org.subnode.service.RSSFeedService;
 import org.subnode.service.SystemService;
 import org.subnode.service.UserFeedService;
 import org.subnode.service.UserManagerService;
@@ -218,6 +219,9 @@ public class AppController implements ErrorController {
 
 	@Autowired
 	private ConstantsProvider constProvider;
+
+	@Autowired
+	private RSSFeedService rssFeedService;
 
 	// private final CopyOnWriteArrayList<SseEmitter> emitters = new
 	// CopyOnWriteArrayList<>();
@@ -411,6 +415,18 @@ public class AppController implements ErrorController {
 	@GetMapping(value = { "/sp/{systemPage}" }, produces = MediaType.TEXT_HTML_VALUE)
 	public @ResponseBody String systemPage(@PathVariable(value = "systemPage", required = false) String systemPage) {
 		return "<html><body>My Full Page: " + systemPage + "</body></html>";
+	}
+
+	@GetMapping(value = { "/rss" }, produces = MediaType.APPLICATION_RSS_XML_VALUE)
+	public void getRss(@RequestParam(value = "id", required = true) String nodeId, //
+			HttpServletResponse response) {
+		adminRunner.run(mongoSession -> {
+			try {
+				rssFeedService.getRssFeed(mongoSession, nodeId, response.getWriter());
+			} catch (Exception e) {
+				throw new RuntimeException("internal server error");
+			}
+		});
 	}
 
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)

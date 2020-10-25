@@ -172,6 +172,12 @@ of the spring configs for security are also perfected.
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-log4j12</artifactId>
 </dependency>
+<dependency>
+    <groupId>com.rometools</groupId>
+    <artifactId>rome</artifactId>
+    <version>1.15.0</version>
+</dependency>
+
 <!--
 <dependency>
     <groupId>org.apache.solr</groupId>
@@ -552,6 +558,12 @@ of the spring configs for security are also perfected.
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-log4j12</artifactId>
 </dependency>
+<dependency>
+    <groupId>com.rometools</groupId>
+    <artifactId>rome</artifactId>
+    <version>1.15.0</version>
+</dependency>
+
 <!--
 <dependency>
     <groupId>org.apache.solr</groupId>
@@ -772,6 +784,12 @@ of the spring configs for security are also perfected.
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-log4j12</artifactId>
 </dependency>
+<dependency>
+    <groupId>com.rometools</groupId>
+    <artifactId>rome</artifactId>
+    <version>1.15.0</version>
+</dependency>
+
 <!--
 <dependency>
     <groupId>org.apache.solr</groupId>
@@ -1168,6 +1186,12 @@ of the spring configs for security are also perfected.
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-log4j12</artifactId>
 </dependency>
+<dependency>
+    <groupId>com.rometools</groupId>
+    <artifactId>rome</artifactId>
+    <version>1.15.0</version>
+</dependency>
+
 <!--
 <dependency>
     <groupId>org.apache.solr</groupId>
