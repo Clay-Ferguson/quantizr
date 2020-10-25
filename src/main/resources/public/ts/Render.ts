@@ -177,6 +177,13 @@ export class Render implements RenderIntf {
             className: "anchorBigMarginBottom"
         }));
 
+        let rssFeed = window.location.origin + "/rss?id=" + node.id;
+        children.push(new Heading(5, "RSS Feed"));
+        children.push(new Anchor(rssFeed, rssFeed, {
+            target: "_blank",
+            className: "anchorBigMarginBottom"
+        }));
+
         let bin = S.props.getNodePropVal(J.NodeProp.BIN, node);
         if (bin) {
             let url = window.location.origin + "/f/id/" + node.id;
