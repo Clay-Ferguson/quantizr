@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.subnode.AppController;
+import org.subnode.config.ConstantsProvider;
+import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoCreate;
@@ -44,6 +47,9 @@ public class SubNodeUtil {
 	@Autowired
 	private MongoUpdate update;
 
+	@Autowired
+	private ConstantsProvider constProvider;
+
 	/*
 	 * These are properties we should never allow the client to send back as part of
 	 * a save operation.
@@ -69,8 +75,9 @@ public class SubNodeUtil {
 	// todo-1: everywhere this is called can we be sure the path is not actually
 	// used as a lookup, but instead the node name?
 	// The new design has path as a non-named hierarchy-only aspect.
-	public SubNode ensureNodeExists(MongoSession session, String parentPath, String pathName, String nodeName, String defaultContent,
-			String primaryTypeName, boolean saveImmediate, SubNodePropertyMap props, ValContainer<Boolean> created) {
+	public SubNode ensureNodeExists(MongoSession session, String parentPath, String pathName, String nodeName,
+			String defaultContent, String primaryTypeName, boolean saveImmediate, SubNodePropertyMap props,
+			ValContainer<Boolean> created) {
 		if (!parentPath.endsWith("/")) {
 			parentPath += "/";
 		}
@@ -203,5 +210,53 @@ public class SubNodeUtil {
 		// }
 		//
 		// return String.valueOf(prng.nextLong());
+	}
+
+	public NodeMetaInfo getNodeMetaInfo(SubNode node) {
+		if (node == null)
+			return null;
+		NodeMetaInfo ret = new NodeMetaInfo();
+
+		String content = node.getContent();
+		int newLineIdx = content.indexOf("\n");
+		if (newLineIdx != -1) {
+			String ogTitle = content.substring(0, newLineIdx).trim();
+
+			// remove leading hash marks which will be there if this is a markdown heading.
+			while (ogTitle.startsWith("#")) {
+				ogTitle = XString.stripIfStartsWith(ogTitle, "#");
+			}
+			ogTitle = ogTitle.trim();
+
+			ret.setTitle(ogTitle);
+
+			ret.setDescription(content.substring(newLineIdx + 1).trim());
+		} else {
+			ret.setDescription(content);
+		}
+
+		ret.setLink(getAttachmentUrl(node));
+		ret.setUrl(constProvider.getHostAndPort() + "/app?id=" + node.getId().toHexString());
+		return ret;
+	}
+
+	public String getAttachmentUrl(SubNode node) {
+		String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK);
+
+		/*
+		 * If we had a public gateway we could actually trust we could return this, but
+		 * gateways have a tendency to be flaky and often appear to blacklist videos
+		 * uploated thru Quanta.wiki, and I won't even speculate why
+		 */
+		// if (ipfsLink != null) {
+		// return Const.IPFS_IO_GATEWAY + ipfsLink;
+		// }
+
+		String bin = ipfsLink != null ? ipfsLink : node.getStringProp(NodeProp.BIN);
+		if (bin != null) {
+			return constProvider.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId="
+					+ node.getId().toHexString();
+		}
+		return null;
 	}
 }

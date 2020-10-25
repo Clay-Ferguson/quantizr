@@ -516,6 +516,7 @@ public class NodeRenderService {
 		String ogImage = "";
 		String ogUrl = "";
 
+		// todo-0: use SubNodeUtil.getMetaInfo which is a duplicate of all this.
 		if (node != null) {
 			String content = node.getContent();
 			int newLineIdx = content.indexOf("\n");
@@ -532,7 +533,7 @@ public class NodeRenderService {
 				ogDescription = content;
 			}
 
-			ogImage = getAttachmentUrl(node);
+			ogImage = subNodeUtil.getAttachmentUrl(node);
 			ogUrl = constProvider.getHostAndPort() + "/app?id=" + node.getId().toHexString();
 		}
 
@@ -540,26 +541,6 @@ public class NodeRenderService {
 		model.addAttribute("ogDescription", ogDescription);
 		model.addAttribute("ogImage", ogImage);
 		model.addAttribute("ogUrl", ogUrl);
-	}
-
-	public String getAttachmentUrl(SubNode node) {
-		String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK);
-
-		/*
-		 * If we had a public gateway we could actually trust we could return this, but
-		 * gateways have a tendency to be flaky and often appear to blacklist videos
-		 * uploated thru Quanta.wiki, and I won't even speculate why
-		 */
-		// if (ipfsLink != null) {
-		// return Const.IPFS_IO_GATEWAY + ipfsLink;
-		// }
-
-		String bin = ipfsLink != null ? ipfsLink : node.getStringProp(NodeProp.BIN);
-		if (bin != null) {
-			return constProvider.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId="
-					+ node.getId().toHexString();
-		}
-		return null;
 	}
 
 	public RenderCalendarResponse renderCalendar(MongoSession session, RenderCalendarRequest req) {
