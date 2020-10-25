@@ -4,7 +4,7 @@ import { AppState } from "../AppState";
 export interface EditIntf {
     showReadOnlyProperties: boolean;
 
-    saveClipboardToNode(): void;
+    saveClipboardToNode(parentId?: string): void;
     splitNode(node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): void;
     openProfileDlg(state: AppState): void;
     openChangePasswordDlg(state: AppState): void;
@@ -42,7 +42,7 @@ export interface EditIntf {
     insertBookWarAndPeace(state: AppState): void;
     emptyTrash(state: AppState): void;
     clearInbox(state: AppState): void;
-    cached_newSubNode(id: any);
+    cached_newSubNode(id: string);
     addComment(node: J.NodeInfo, state: AppState): void;
     addFriend(node: J.NodeInfo, state: AppState): void;
     addCalendarEntry(initDate: number, state: AppState): void;

@@ -432,9 +432,14 @@ export class Edit implements EditIntf {
     }
 
     /* Need all cached functions to be prefixed so they're recognizable, since refactoring them can break things */
-    cached_newSubNode = (id: any) => {
-        const state = store.getState();
-        this.createSubNode(id, null, true, state.node, null);
+    cached_newSubNode = (id: string) => {
+        if (S.meta64.ctrlKey) {
+            S.edit.saveClipboardToNode(id);
+        }
+        else {
+            const state = store.getState();
+            this.createSubNode(id, null, true, state.node, null);
+        }
     }
 
     createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void => {
@@ -709,7 +714,7 @@ export class Edit implements EditIntf {
         ).open();
     }
 
-    saveClipboardToNode = (): void => {
+    saveClipboardToNode = (parentId?: string): void => {
 
         (navigator as any).clipboard.readText().then(clipText => {
             if (clipText) {
@@ -722,7 +727,7 @@ export class Edit implements EditIntf {
 
             S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                 updateModTime: true,
-                nodeId: "~" + J.NodeType.NOTES,
+                nodeId: parentId || ("~" + J.NodeType.NOTES),
                 newNodeName: "",
                 typeName: "u",
                 createAtTop: true,
@@ -731,7 +736,12 @@ export class Edit implements EditIntf {
                 properties: null
             },
                 () => {
-                    S.util.flashMessage("Clipboard content saved under your Notes node...\n\n" + clipText, "Note", true);
+                    let message = parentId ? "Clipboard saved" : "Clipboard saved under Notes node";
+                    S.util.flashMessage(message + "...\n\n" + clipText, "Note", true);
+                    setTimeout(() => {
+                        let state: AppState = store.getState();
+                        S.view.refreshTree(null, true, false, null, false, true, true, state);
+                    }, 4200);
                 });
         });
     }

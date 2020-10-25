@@ -51,6 +51,8 @@ export class Meta64 implements Meta64Intf {
     userName: string;
     password: string;
 
+    ctrlKey: boolean;
+
     // maps the hash of an encrypted block of text to the unencrypted text, so that we never run the same
     // decryption code twice.
     decryptCache: { [key: string]: string } = {};
@@ -365,7 +367,7 @@ export class Meta64 implements Meta64Intf {
             document.body.addEventListener("keydown", (event: KeyboardEvent) => {
                 // console.log("keydown: " + event.code);
                 let state: AppState = store.getState();
-                // if (event.ctrlKey) {
+                this.ctrlKey = event.ctrlKey;
 
                 switch (event.code) {
                     case "Escape":
