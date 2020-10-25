@@ -143,9 +143,9 @@ export class App extends Div {
                 ])
             ])),
 
-            floatingControlBar,
+            fullScreenViewer ? null : floatingControlBar,
 
-            clientInfo.isMobile ? null : new IconButton("fa-angle-double-up", null, {
+            (clientInfo.isMobile || fullScreenViewer) ? null : new IconButton("fa-angle-double-up", null, {
                 onClick: e => {
                     window.scrollTo(0, 0);
                 },

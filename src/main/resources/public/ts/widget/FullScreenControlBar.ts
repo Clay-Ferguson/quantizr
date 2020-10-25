@@ -49,7 +49,7 @@ export class FullScreenControlBar extends Div {
         buttons.push(
             new IconButton("fa-window-close fa-lg", "Close", {
                 onClick: e => { S.nav.closeFullScreenImgViewer(state); },
-                title: "Close Viewer (or escape key)"
+                title: "Close Viewer (ESC Key)"
             }, "btn-primary", "off"));
 
         return buttons;
