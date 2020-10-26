@@ -28,10 +28,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class RssTypeHandler extends TypeBase {
 
     static MAX_FEED_ITEMS: number = 50;
-    static USE_PROXY: boolean = false;
-
-    // NOTE: This proxy is no longer being used because we have out own at /rssProxy endpoint
-    static CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
     constructor() {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
@@ -107,14 +103,7 @@ export class RssTypeHandler extends TypeBase {
             itemListContainer.addChild(new Div("Loading RSS Feed..."));
             itemListContainer.addChild(new Div("(For large feeds this can take a few seconds)"));
 
-            let url = null;
-            if (RssTypeHandler.USE_PROXY) {
-                url = RssTypeHandler.CORS_PROXY + feedSrc;
-            }
-            else {
-                url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(feedSrc);
-            }
-
+            let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(feedSrc);
             // console.log("Reading RSS: " + url);
             parser.parseURL(url, (err, feed) => {
                 if (!feed) {
