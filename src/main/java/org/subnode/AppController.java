@@ -429,6 +429,18 @@ public class AppController implements ErrorController {
 		return "<html><body>My Full Page: " + systemPage + "</body></html>";
 	}
 
+	@GetMapping(value = { "/multiRss" }, produces = MediaType.APPLICATION_RSS_XML_VALUE)
+	public void multiRss(@RequestParam(value = "id", required = true) String nodeId, //
+			HttpServletResponse response) {
+		adminRunner.run(mongoSession -> {
+			try {
+				rssFeedService.multiRss(mongoSession, nodeId, response.getWriter());
+			} catch (Exception e) {
+				throw new RuntimeException("internal server error");
+			}
+		});
+	}
+
 	@GetMapping(value = { "/rss" }, produces = MediaType.APPLICATION_RSS_XML_VALUE)
 	public void getRss(@RequestParam(value = "id", required = true) String nodeId, //
 			HttpServletResponse response) {

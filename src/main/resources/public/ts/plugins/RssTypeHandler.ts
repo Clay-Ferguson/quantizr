@@ -83,15 +83,17 @@ export class RssTypeHandler extends TypeBase {
 
         let parser = new RssParser();
         /*
-        Note: some RSS feeds can't be loaded in the browser due to CORS security.
-        To get around this, you can use a proxy. (todo-1: need to eliminate this proxy)
-
-        if we find the RSS feed in the cache, use it.
+        If we find the RSS feed in the cache, use it.
         disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to
         figure this out yet.
         */
-        if (state.failedFeedCache[feedSrc]) {
+        if (state.feedCache[feedSrc] === "failed") {
             return new Div("Feed Failed: " + feedSrc, {
+                className: "marginAll"
+            });
+        }
+        else if (state.feedCache[feedSrc] === "loading") {
+            return new Div("Loading: " + feedSrc, {
                 className: "marginAll"
             });
         }
@@ -100,6 +102,8 @@ export class RssTypeHandler extends TypeBase {
         }
         // otherwise read from the internet
         else {
+            state.feedCache[feedSrc] = "loading";
+
             itemListContainer.addChild(new Div("Loading RSS Feed..."));
             itemListContainer.addChild(new Div("(For large feeds this can take a few seconds)"));
 
@@ -113,7 +117,7 @@ export class RssTypeHandler extends TypeBase {
                         type: "Action_RSSUpdated",
                         state,
                         update: (s: AppState): void => {
-                            s.failedFeedCache[feedSrc] = "true";
+                            s.feedCache[feedSrc] = "failed";
                         }
                     });
                 }
@@ -167,6 +171,8 @@ export class RssTypeHandler extends TypeBase {
 
     buildFeedItem(entry, state: AppState): Comp {
         let children: Comp[] = [];
+
+        children.push(new Div(entry.pubDate));
         children.push(new Anchor(entry.link, entry.title, {
             style: { fontSize: "25px" },
             target: "_blank"
@@ -187,6 +193,7 @@ export class RssTypeHandler extends TypeBase {
 
         // item += "CONTENT:ENCODED"+entry["content:encoded"];
         if (entry["content:encoded"]) {
+            /* set the dangerously flag for this stuff and render as html */
             let contentDiv = new MarkdownDiv(entry["content:encoded"]);
             children.push(contentDiv);
         }

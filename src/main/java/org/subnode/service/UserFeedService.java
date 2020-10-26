@@ -450,11 +450,11 @@ public class UserFeedService {
 			}
 		}
 
-		/* Sort the feed items chrononologially */
+		/* Sort the feed items chrononologially, reversed with newest on top */
 		Collections.sort(fullFeedList, new Comparator<UserFeedItem>() {
 			@Override
 			public int compare(UserFeedItem s1, UserFeedItem s2) {
-				return (int) (s2.getModTime().getTime() - s1.getModTime().getTime());
+				return s2.getModTime().compareTo(s1.getModTime());
 			}
 		});
 
