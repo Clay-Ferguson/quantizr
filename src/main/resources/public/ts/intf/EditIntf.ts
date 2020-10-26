@@ -47,7 +47,6 @@ export interface EditIntf {
     addFriend(node: J.NodeInfo, state: AppState): void;
     addCalendarEntry(initDate: number, state: AppState): void;
     moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): void;
-    updateIpfsNodeJson(node: J.NodeInfo, state: AppState): Promise<void>;
     initNodeEditResponse(res: J.InitNodeEditResponse, state: AppState, dialogEditor: boolean): void;
     updateHeadings(state: AppState): void;
 }

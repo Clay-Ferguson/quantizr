@@ -70,8 +70,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         }
                     })
                 ]),
-                // sorry Temporal guys no longer needing you.
-                // state.toIpfs ? new TextContent("NOTE: IPFS Uploads assume you have a Temporal Account (https://temporal.cloud) which will be the service that hosts your IPFS data. You'll be prompted for the Temporal password when the upload begins.") : null,
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 new ButtonBar([
@@ -244,8 +242,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     dlg.sent = true;
                     // console.log("sending file: "+file.name);
 
-                    /* If Uploading DIRECTLY to Temporal.cloud */
-
                     S.log("Sending File: " + file.name);
                     formData.append("files", file);
 
@@ -255,11 +251,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     if (!formData.has("nodeId")) {
                         formData.append("nodeId", dlg.nodeId);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
-
-                        // NOTE: This ipfs flag is *not* for the Temporal.cloud upload but is for the currently unused capability
-                        // Quanta platform has to run it's own gateway IPFS-GO instance (but currently we aren't running it)
                         formData.append("ipfs", state.toIpfs ? "true" : "false");
-
                         formData.append("createAsChildren", dlg.numFiles > 1 ? "true" : "false");
                     }
 
@@ -286,62 +278,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         if (!dlg.errorShown) {
                             dlg.errorShown = true;
                             dlg.uploadFailed = true;
-                            S.util.showMessage("Upload failed. You're out of storage space on the server. \n\nConsider uploading to IPFS using Temporal (https://temporal.cloud)", "Warning");
+                            S.util.showMessage("Upload failed. You're out of storage space on the server.", "Warning");
                         }
                         return;
                     }
 
                     // todo-0: case with IPFS (via Quanta Gateway) and multiple files uploading this needs testing and is likely not functional.
-
-                    // https://developer.mozilla.org/en-US/docs/Web/API/File
-                    if (dlg.getState().toIpfs && this.toTemporal) {
-                        let ipfsHash = resp.response;
-
-                        // If we're uploading multipe files they all go in as children of the current node
-                        // it's too late to check the count here. it may be down to one. need to get mutiFlag right when processing starts
-                        if (dlg.numFiles > 1) {
-                            let properties: J.PropertyInfo[] = [
-                                { name: J.NodeProp.BIN, value: "[null]" },
-                                { name: J.NodeProp.IPFS_LINK, value: ipfsHash },
-                                { name: J.NodeProp.BIN_MIME, value: file.type },
-                                { name: J.NodeProp.BIN_SIZE, value: `${file.size}` },
-                                { name: J.NodeProp.BIN_FILENAME, value: file.name },
-                                { name: J.NodeProp.IMG_SIZE, value: "100%" }
-                            ];
-
-                            S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                                updateModTime: true,
-                                nodeId: dlg.node.id,
-                                newNodeName: "",
-                                typeName: "u",
-                                createAtTop: false,
-                                content: file.name,
-                                typeLock: false,
-                                properties
-                            }, (res) => {
-                                // nothing to be done here.
-                            });
-                        }
-                        /* Otherwise add all the properties to this node to update it for the upload */
-                        else {
-                            /* delete the BIN property if it's there. Can't have BIN and IPFS_LINK at same time. */
-                            S.props.setNodePropVal(J.NodeProp.BIN, dlg.node, "[null]");
-                            S.props.setNodePropVal(J.NodeProp.IPFS_LINK, dlg.node, ipfsHash);
-                            S.props.setNodePropVal(J.NodeProp.BIN_MIME, dlg.node, file.type);
-                            S.props.setNodePropVal(J.NodeProp.BIN_SIZE, dlg.node, `${file.size}`);
-                            S.props.setNodePropVal(J.NodeProp.BIN_FILENAME, dlg.node, file.name);
-                            S.props.setNodePropVal(J.NodeProp.IMG_SIZE, dlg.node, "100%");
-
-                            S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-                                updateModTime: true,
-                                node: dlg.node
-                            }, async (res: J.SaveNodeResponse) => {
-                                await S.edit.updateIpfsNodeJson(dlg.node, dlg.appState);
-                                // S.log("node after IPFS hash added: "+S.util.prettyPrint(dlg.node));
-                                S.edit.saveNodeResponse(dlg.node, res, true, dlg.appState);
-                            });
-                        }
-                    }
                 });
 
                 this.on("queuecomplete", function (arg) {

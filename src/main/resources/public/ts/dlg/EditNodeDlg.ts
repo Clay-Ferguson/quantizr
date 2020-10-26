@@ -584,7 +584,6 @@ export class EditNodeDlg extends DialogBase {
                 content = content.trim();
             }
             state.node.content = content;
-            await S.edit.updateIpfsNodeJson(state.node, this.appState);
 
             let askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") !== -1 ||
                 (state.node as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
