@@ -516,7 +516,7 @@ public class NodeRenderService {
 		String ogImage = "";
 		String ogUrl = "";
 
-		// todo-0: use SubNodeUtil.getMetaInfo which is a duplicate of all this.
+		// todo-0: use SubNodeUtil.getNodeMetaInfo which is a duplicate of all this.
 		if (node != null) {
 			String content = node.getContent();
 			int newLineIdx = content.indexOf("\n");

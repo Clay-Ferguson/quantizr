@@ -229,7 +229,6 @@ public class SubNodeUtil {
 			ogTitle = ogTitle.trim();
 
 			ret.setTitle(ogTitle);
-
 			ret.setDescription(content.substring(newLineIdx + 1).trim());
 		} else {
 			ret.setDescription(content);

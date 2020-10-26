@@ -28,6 +28,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class RssTypeHandler extends TypeBase {
 
     static MAX_FEED_ITEMS: number = 50;
+    static USE_PROXY: boolean = false;
+    static CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
     constructor() {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
@@ -35,10 +37,10 @@ export class RssTypeHandler extends TypeBase {
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
-        case NodeActionType.upload:
-            return false;
-        default:
-            return true;
+            case NodeActionType.upload:
+                return false;
+            default:
+                return true;
         }
     }
 
@@ -82,12 +84,14 @@ export class RssTypeHandler extends TypeBase {
         ]);
 
         let parser = new RssParser();
-        // Note: some RSS feeds can't be loaded in the browser due to CORS security.
-        // To get around this, you can use a proxy. (todo-1: need to eliminate this proxy)
+        /*
+        Note: some RSS feeds can't be loaded in the browser due to CORS security.
+        To get around this, you can use a proxy. (todo-1: need to eliminate this proxy)
 
-        // if we find the RSS feed in the cache, use it.
-        // disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to
-        // figure this out yet.
+        if we find the RSS feed in the cache, use it.
+        disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to
+        figure this out yet.
+        */
         if (state.failedFeedCache[feedSrc]) {
             return new Div("Feed Failed: " + feedSrc, {
                 className: "marginAll"
@@ -101,10 +105,15 @@ export class RssTypeHandler extends TypeBase {
             itemListContainer.addChild(new Div("Loading RSS Feed..."));
             itemListContainer.addChild(new Div("(For large feeds this can take a few seconds)"));
 
-            // The 'rss-parser' doc suggested herokuapp, but I don't know if I can write my own service or use some better one?
-            const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+            let url = null;
+            if (RssTypeHandler.USE_PROXY) {
+                url = RssTypeHandler.CORS_PROXY + feedSrc;
+            }
+            else {
+                url = S.util.getRemoteHost() + "/rssProxy?url=" + encodeURIComponent(feedSrc);
+            }
 
-            parser.parseURL(CORS_PROXY + feedSrc, (err, feed) => {
+            parser.parseURL(url, (err, feed) => {
                 if (!feed) {
                     // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
                     // console.log(err.message || "RSS Feed failed to load.");

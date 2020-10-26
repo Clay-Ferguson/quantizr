@@ -460,8 +460,7 @@ export class Edit implements EditIntf {
     /* Need all cached functions to be prefixed so they're recognizable, since refactoring them can break things */
     cached_newSubNode = (id: string) => {
         if (S.meta64.ctrlKey) {
-            // todo-0: why doesn't 'this' work here?
-            S.edit.saveClipboardToChildNode(id);
+            this.saveClipboardToChildNode(id);
         }
         else {
             const state = store.getState();
@@ -741,37 +740,34 @@ export class Edit implements EditIntf {
         ).open();
     }
 
-    saveClipboardToChildNode = (parentId?: string): void => {
+    saveClipboardToChildNode = async (parentId?: string): Promise<void> => {
+        let clipText: string = (navigator as any).clipboard.readText();
+        if (clipText) {
+            clipText = clipText.trim();
+        }
+        if (!clipText) {
+            S.util.flashMessage("Nothing saved clipboard is empty!", "Warning", true);
+            return;
+        }
 
-        // todo-0: use an await here
-        (navigator as any).clipboard.readText().then(clipText => {
-            if (clipText) {
-                clipText = clipText.trim();
-            }
-            if (!clipText) {
-                S.util.flashMessage("Nothing saved clipboard is empty!", "Warning", true);
-                return;
-            }
-
-            S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                updateModTime: true,
-                nodeId: parentId || ("~" + J.NodeType.NOTES),
-                newNodeName: "",
-                typeName: "u",
-                createAtTop: true,
-                content: clipText,
-                typeLock: false,
-                properties: null
-            },
-                () => {
-                    let message = parentId ? "Clipboard saved" : "Clipboard saved under Notes node";
-                    S.util.flashMessage(message + "...\n\n" + clipText, "Note", true);
-                    setTimeout(() => {
-                        let state: AppState = store.getState();
-                        S.view.refreshTree(null, true, false, null, false, true, true, state);
-                    }, 4200);
-                });
-        });
+        S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+            updateModTime: true,
+            nodeId: parentId || ("~" + J.NodeType.NOTES),
+            newNodeName: "",
+            typeName: "u",
+            createAtTop: true,
+            content: clipText,
+            typeLock: false,
+            properties: null
+        },
+            () => {
+                let message = parentId ? "Clipboard saved" : "Clipboard saved under Notes node";
+                S.util.flashMessage(message + "...\n\n" + clipText, "Note", true);
+                setTimeout(() => {
+                    let state: AppState = store.getState();
+                    S.view.refreshTree(null, true, false, null, false, true, true, state);
+                }, 4200);
+            });
     }
 
     splitNode = (node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): void => {
