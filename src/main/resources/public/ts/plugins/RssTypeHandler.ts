@@ -29,6 +29,8 @@ export class RssTypeHandler extends TypeBase {
 
     static MAX_FEED_ITEMS: number = 50;
     static USE_PROXY: boolean = false;
+
+    // NOTE: This proxy is no longer being used because we have out own at /rssProxy endpoint
     static CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
     constructor() {
@@ -110,9 +112,10 @@ export class RssTypeHandler extends TypeBase {
                 url = RssTypeHandler.CORS_PROXY + feedSrc;
             }
             else {
-                url = S.util.getRemoteHost() + "/rssProxy?url=" + encodeURIComponent(feedSrc);
+                url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(feedSrc);
             }
 
+            // console.log("Reading RSS: " + url);
             parser.parseURL(url, (err, feed) => {
                 if (!feed) {
                     // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();

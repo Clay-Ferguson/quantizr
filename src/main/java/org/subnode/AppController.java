@@ -1,5 +1,6 @@
 package org.subnode;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -8,12 +9,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.subnode.config.ConstantsProvider;
@@ -153,6 +159,12 @@ public class AppController implements ErrorController {
 	private static HashMap<String, String> cacheBusterMd5 = null;
 
 	private static boolean welcomePagePresent;
+
+	/*
+	 * RestTempalte is thread-safe and reusable, and has no state, so we need only
+	 * one final static instance ever
+	 */
+	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
 
 	@Autowired
 	private FileUtils fileUtils;
@@ -427,6 +439,26 @@ public class AppController implements ErrorController {
 				throw new RuntimeException("internal server error");
 			}
 		});
+	}
+
+	/*
+	 * Proxies an HTTP GET thru to the specified url. Used to avoid CORS errors when
+	 * retrieving RSS directly from arbitrary servers
+	 */
+	@GetMapping(value = { "/proxyGet" })
+	public void proxyGet(@RequestParam(value = "url", required = true) String url, HttpServletResponse response) {
+		try {
+			restTemplate.getForEntity(new URI(url), byte[].class);
+			response.setStatus(HttpStatus.OK.value());
+
+			restTemplate.execute(url, HttpMethod.GET, (ClientHttpRequest requestCallback) -> {
+			}, responseExtractor -> {
+				IOUtils.copy(responseExtractor.getBody(), response.getOutputStream());
+				return null;
+			});
+		} catch (Exception e) {
+			throw new RuntimeException("internal server error");
+		}
 	}
 
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
