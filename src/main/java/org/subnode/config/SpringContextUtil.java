@@ -3,7 +3,7 @@ package org.subnode.config;
 import org.subnode.AppController;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mongo.MongoRepository;
-
+import org.subnode.service.RSSFeedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -30,6 +30,9 @@ public class SpringContextUtil implements ApplicationContextAware {
 	@Autowired
 	private TestRunner testRunner;
 
+	@Autowired
+	private RSSFeedService rssFeedService;
+
 	/* main() entrypoint */
 	@Override
 	public void setApplicationContext(ApplicationContext context) throws BeansException {
@@ -39,6 +42,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 		try {
 			mongoRepo.init();
 			appController.init();
+			rssFeedService.startupPreCache();
 		}
 		catch (Exception e) {
 			log.error("application startup failed.");

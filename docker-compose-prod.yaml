@@ -111,6 +111,9 @@ services:
             mail.host: "smtp.mailgun.org" 
             mail.from: "admin@quanta.wiki"
 
+            # This is the node name for a feed like this: http://localhost:8182/multiRss?id=:podcast-set to cause that feed to precache
+            rssAggregatePreCacheNodeId: ":idw"
+
         image: subnode-prod
         depends_on:
             - mongo-prod

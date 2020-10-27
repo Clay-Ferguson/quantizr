@@ -60,6 +60,10 @@ public class AppProp /* implements EnvironmentAware */ {
 		return env.getProperty("profileName");
 	}
 
+	public String getRssAggregatePreCacheNodeId() {
+		return env.getProperty("rssAggregatePreCacheNodeId");
+	}
+
 	public String getIPFSHost() {
 		return env.getProperty("ipfs.host");
 	}

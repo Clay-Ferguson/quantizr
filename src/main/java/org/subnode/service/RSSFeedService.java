@@ -27,11 +27,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.subnode.AppServer;
+import org.subnode.config.AppProp;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.SubNodeUtil;
 
@@ -46,6 +48,12 @@ public class RSSFeedService {
 	@Autowired
 	private SubNodeUtil subNodeUtil;
 
+	@Autowired
+	private AppProp appProp;
+
+	@Autowired
+	private RunAsMongoAdmin adminRunner;
+
 	private static boolean refreshingCache = false;
 
 	/*
@@ -53,12 +61,19 @@ public class RSSFeedService {
 	 */
 	private static final HashMap<String, List<SyndEntry>> feedCache = new HashMap<String, List<SyndEntry>>();
 
+	private static int runCount = 0;
+
 	/*
 	 * Runs immediately at startup, and then every 240 minutes, to refresh the
 	 * feedCache.
 	 */
 	@Scheduled(fixedDelay = 240 * 60 * 1000)
 	public void run() {
+		// ignore the first call which will happen at startup. We don't need it at
+		// startup because we call startupPreCache
+		if (runCount++ == 0)
+			return;
+
 		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
 			log.debug("ignoring RSSFeedService schedule cycle");
 			return;
@@ -66,6 +81,17 @@ public class RSSFeedService {
 
 		log.debug("RSSFeedService.refreshFeedCache");
 		refreshFeedCache();
+	}
+
+	public void startupPreCache() {
+		log.debug("startupPreCache");
+		String rssNodeId = appProp.getRssAggregatePreCacheNodeId();
+		if (StringUtils.isEmpty(rssNodeId))
+			return;
+
+		adminRunner.run(mongoSession -> {
+			multiRss(mongoSession, rssNodeId, null);
+		});
 	}
 
 	public String refreshFeedCache() {
@@ -107,6 +133,14 @@ public class RSSFeedService {
 	 * 
 	 * todo-0: make sure to test that nodeId can be a node name (like ':name' I
 	 * think) so that it's more premanent and not dependend on id itself.
+	 * 
+	 * If writer is null it means we are just running without writing to a server
+	 * like only to prewarm the cache during app startup called from startupPreCache
+	 * 
+	 * todo-0: currently we cache individual feeds and run this code every time it's
+	 * requested, but the final caching optimization would be to create a cache of
+	 * these SyndFeedOutput keyed off this nodeId so that the server can INSTANTLY
+	 * stream back the feed for any nodeId called here!!
 	 */
 	public void multiRss(MongoSession mongoSession, String nodeId, Writer writer) {
 		SubNode node = null;
@@ -146,14 +180,13 @@ public class RSSFeedService {
 
 		for (String url : urls) {
 			try {
-				// log.debug("Reading Feed: " + url);
-
 				List<SyndEntry> feedEntries = null;
 				synchronized (feedCache) {
 					feedEntries = feedCache.get(url);
 				}
 
 				if (feedEntries == null) {
+					log.debug("Reading Feed: " + url);
 					SyndFeed inFeed = getFeed(url);
 					feedEntries = inFeed.getEntries();
 					synchronized (feedCache) {
@@ -170,10 +203,13 @@ public class RSSFeedService {
 		revChronSortEntries(entries);
 
 		SyndFeedOutput output = new SyndFeedOutput();
-		try {
-			output.output(feed, writer);
-		} catch (Exception e) {
-			throw new RuntimeException("internal server error");
+
+		if (writer != null) {
+			try {
+				output.output(feed, writer);
+			} catch (Exception e) {
+				throw new RuntimeException("internal server error");
+			}
 		}
 	}
 
