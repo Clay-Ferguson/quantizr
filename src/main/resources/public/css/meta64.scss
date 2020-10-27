@@ -75,6 +75,18 @@ $smallBorderSize: 3px;
     display: inline;
 }
 
+a:visited {
+    color: #00bc8c !important;
+}
+
+a:active {
+    color: #00bc8c !important;
+}
+
+a {
+    color: #00bc8c !important;
+}
+
 .myjumbotron {
     background-size: 100% auto;
     background-image: url(/images/PIA09561_large.jpg);
