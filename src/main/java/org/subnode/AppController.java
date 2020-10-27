@@ -473,6 +473,16 @@ public class AppController implements ErrorController {
 		}
 	}
 
+	/* url can be a single RSS url, or multiple newline delimted ones */
+	@GetMapping(value = { "/multiRssFeed" })
+	public void multiRssFeed(@RequestParam(value = "url", required = true) String url, HttpServletResponse response) {
+		try {
+			rssFeedService.multiRssFeed(url, response.getWriter());
+		} catch (Exception e) {
+			throw new RuntimeException("internal server error");
+		}
+	}
+
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
 	public @ResponseBody Object signup(@RequestBody SignupRequest req, HttpSession session) {
 		return callProc.run("signup", req, session, ms -> {

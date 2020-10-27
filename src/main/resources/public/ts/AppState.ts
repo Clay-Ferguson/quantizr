@@ -92,6 +92,6 @@ export class AppState {
 
     pendingLocationHash: string;
 
-    // Rss feeds
+    // Rss feeds (cached by a hash of the feedSrc property text as the key)
     feedCache = {};
 }

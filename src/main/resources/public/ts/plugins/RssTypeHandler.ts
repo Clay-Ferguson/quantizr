@@ -83,6 +83,7 @@ export class RssTypeHandler extends TypeBase {
             return (new TextContent("Set the '" + J.NodeProp.RSS_FEED_SRC + "' node property to the RSS Feed URL.", "alert alert-info marginLeft marginTop"));
         }
 
+        let feedSrcHash = S.util.hashOfString(feedSrc);
         let content = node.content;
         let itemListContainer: Div = new Div("", { className: "rss-feed-listing" }, [
             new Heading(3, content)
@@ -94,29 +95,30 @@ export class RssTypeHandler extends TypeBase {
         disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to
         figure this out yet.
         */
-        if (state.feedCache[feedSrc] === "failed") {
+        if (state.feedCache[feedSrcHash] === "failed") {
             return new Div("Feed Failed: " + feedSrc, {
                 className: "marginAll"
             });
         }
-        else if (state.feedCache[feedSrc] === "loading") {
+        else if (state.feedCache[feedSrcHash] === "loading") {
             return new Div("Loading: " + feedSrc, {
                 className: "marginAll"
             });
         }
-        else if (state.feedCache[feedSrc]) {
-            this.renderItem(state.feedCache[feedSrc], feedSrc, itemListContainer, state);
+        else if (state.feedCache[feedSrcHash]) {
+            this.renderItem(state.feedCache[feedSrcHash], feedSrc, itemListContainer, state);
         }
         // otherwise read from the internet
         else {
-            state.feedCache[feedSrc] = "loading";
+            state.feedCache[feedSrcHash] = "loading";
 
             itemListContainer.addChild(new Div("Loading RSS Feed..."));
             itemListContainer.addChild(new Div("(For large feeds this can take a few seconds)"));
 
             // todo-0: need an additional endpoint called getRssAggregate that takes the feedSrc, and allows it to represent
             // multiple newline delimited feeds and generate the resultant feed by utilizing and updating the rss cach as necessary.
-            let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(feedSrc);
+            // let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(feedSrc);
+            let url = S.util.getRemoteHost() + "/multiRssFeed?url=" + encodeURIComponent(feedSrc);
 
             // console.log("Reading RSS: " + url);
             parser.parseURL(url, (err, feed) => {
@@ -127,7 +129,7 @@ export class RssTypeHandler extends TypeBase {
                         type: "Action_RSSUpdated",
                         state,
                         update: (s: AppState): void => {
-                            s.feedCache[feedSrc] = "failed";
+                            s.feedCache[feedSrcHash] = "failed";
                         }
                     });
                 }
@@ -136,7 +138,7 @@ export class RssTypeHandler extends TypeBase {
                         type: "Action_RSSUpdated",
                         state,
                         update: (s: AppState): void => {
-                            s.feedCache[feedSrc] = feed;
+                            s.feedCache[feedSrcHash] = feed;
                         }
                     });
                 }

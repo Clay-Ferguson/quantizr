@@ -139,8 +139,7 @@ public class NodeEditService {
 		}
 
 		update.save(session, newNode);
-		res.setNewNode(
-				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));
+		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));
 
 		if (newNode.getType().equals(NodeType.USER_FEED.s())) {
 			userFeedService.addUserFeedInfo(session, newNode, null, sessionContext.getUserName());
@@ -229,8 +228,7 @@ public class NodeEditService {
 		}
 
 		update.save(session, newNode);
-		res.setNewNode(
-				convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));
+		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));
 
 		if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// don't evern send notifications when 'admin' is the one doing the editing.
@@ -254,7 +252,7 @@ public class NodeEditService {
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
 
-		// log.debug("saveNode. nodeId=" + nodeId + " nodeName=" + nodeInfo.getName());
+		//log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
 		SubNode node = read.getNode(session, nodeId);
 		auth.authRequireOwnerOfNode(session, node);
 
@@ -304,7 +302,8 @@ public class NodeEditService {
 					 * to assume the worst behavior from client code, for security and robustness.
 					 */
 					if (session.isAdmin() || SubNodeUtil.isSavableProperty(property.getName())) {
-						// log.debug("Property to save: " + property.getName() + "=" + property.getValue());
+						// log.debug("Property to save: " + property.getName() + "=" +
+						// property.getValue());
 						node.setProp(property.getName(), property.getValue());
 					} else {
 						/**
@@ -338,7 +337,7 @@ public class NodeEditService {
 			}
 
 			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1, false,
-					 false);
+					false);
 			res.setNode(newNodeInfo);
 		}
 

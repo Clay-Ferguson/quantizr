@@ -214,6 +214,7 @@ public class Convert {
 				}
 			}
 		}
+		// log.debug("NODEINFO: " + XString.prettyPrint(nodeInfo));
 		return nodeInfo;
 	}
 
@@ -299,7 +300,7 @@ public class Convert {
 	public PropertyInfo convertToPropertyInfo(SessionContext sessionContext, SubNode node, String propName,
 			SubNodePropVal prop, boolean htmlOnly, boolean initNodeEdit) {
 		try {
-			String value = formatValue(sessionContext, prop.getValue(), false, initNodeEdit);
+			String value = "content".equals(propName) ? formatValue(sessionContext, prop.getValue(), false, initNodeEdit) : (String)prop.getValue();
 			/* log.trace(String.format("prop[%s]=%s", prop.getName(), value)); */
 
 			PropertyInfo propInfo = new PropertyInfo(propName, value);
