@@ -32,6 +32,10 @@ export class TypeBase implements TypeHandlerIntf {
         return propName;
     }
 
+    getEditorRowsForProp(propName: string): number {
+        return 1;
+    }
+
     /* Enables editor to show buttons for adding/deleting custom properties */
     getAllowPropertyAdd(): boolean {
         return true;

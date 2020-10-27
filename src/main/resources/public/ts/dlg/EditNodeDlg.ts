@@ -306,7 +306,7 @@ export class EditNodeDlg extends DialogBase {
 
                     if (!this.isGuiControlBasedProp(prop)) {
                         let allowSelection = !customProps || !customProps.find(p => p === prop.name);
-                        let tableRow = this.makePropEditor(typeHandler, prop, allowSelection);
+                        let tableRow = this.makePropEditor(typeHandler, prop, allowSelection, typeHandler ? typeHandler.getEditorRowsForProp(prop.name) : 1);
                         propsParent.addChild(tableRow);
                     }
                 }
@@ -606,7 +606,7 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
-    makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean): EditPropsTableRow => {
+    makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): EditPropsTableRow => {
         let tableRow = new EditPropsTableRow();
         let allowEditAllProps: boolean = this.appState.isAdminUser;
         // console.log("Property single-type: " + propEntry.name);
@@ -666,7 +666,7 @@ export class EditNodeDlg extends DialogBase {
             }
 
             let valEditor: CompIntf = null;
-            let multiLine = false;
+            let multiLine = rows > 1;
 
             let valueIntf = {
                 getValue: (): string => {
@@ -684,11 +684,11 @@ export class EditNodeDlg extends DialogBase {
 
             if (multiLine) {
                 if (C.ENABLE_ACE_EDITOR) {
-                    valEditor = new AceEditPropTextarea(propEntry.value, "25em", null, false);
+                    valEditor = new AceEditPropTextarea(propEntry.value, "" + rows + "em", null, false);
                 }
                 else {
                     valEditor = new Textarea(null, {
-                        rows: "20"
+                        rows: "" + rows
                     }, valueIntf);
                 }
             }

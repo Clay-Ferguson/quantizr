@@ -44,9 +44,16 @@ export class RssTypeHandler extends TypeBase {
 
     getEditLabelForProp(propName: string): string {
         if (propName === J.NodeProp.RSS_FEED_SRC) {
-            return "RSS Feed URL";
+            return "RSS Feed URLs (one per line)";
         }
         return propName;
+    }
+
+    getEditorRowsForProp(propName: string): number {
+        if (propName === J.NodeProp.RSS_FEED_SRC) {
+            return 20;
+        }
+        return 1;
     }
 
     getAllowPropertyAdd(): boolean {
@@ -107,7 +114,10 @@ export class RssTypeHandler extends TypeBase {
             itemListContainer.addChild(new Div("Loading RSS Feed..."));
             itemListContainer.addChild(new Div("(For large feeds this can take a few seconds)"));
 
+            // todo-0: need an additional endpoint called getRssAggregate that takes the feedSrc, and allows it to represent
+            // multiple newline delimited feeds and generate the resultant feed by utilizing and updating the rss cach as necessary.
             let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(feedSrc);
+
             // console.log("Reading RSS: " + url);
             parser.parseURL(url, (err, feed) => {
                 if (!feed) {

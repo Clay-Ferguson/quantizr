@@ -18,6 +18,7 @@ export interface TypeHandlerIntf {
     getAllowPropertyAdd(): boolean;
     getAllowContentEdit(): boolean;
     getEditLabelForProp(propName: string): string;
+    getEditorRowsForProp(propName: string): number;
     getAllowUserSelect(): boolean;
     hasCustomProp(prop: string): boolean;
 }
