@@ -46,6 +46,8 @@ public class RSSFeedService {
 	@Autowired
 	private SubNodeUtil subNodeUtil;
 
+	private static boolean refreshingCache = false;
+
 	/*
 	 * Cache of all feeds. todo-0: make this map hold SyndFeed instances instead.
 	 */
@@ -66,18 +68,32 @@ public class RSSFeedService {
 		refreshFeedCache();
 	}
 
-	public void refreshFeedCache() {
-		SyndFeed feed = null;
-		for (String url : feedCache.keySet()) {
-			try {
-				feed = getFeed(url);
-			} catch (Exception e) {
-				// todo-0: handle
+	public String refreshFeedCache() {
+		if (refreshingCache) {
+			return "Cache refresh was already in progress.";
+		}
+
+		try {
+			refreshingCache = true;
+			SyndFeed feed = null;
+			int count = 0, fails = 0;
+
+			for (String url : feedCache.keySet()) {
+				try {
+					feed = getFeed(url);
+					count++;
+				} catch (Exception e) {
+					fails++;
+					// todo-0: handle
+				}
+
+				synchronized (feedCache) {
+					feedCache.put(url, feed.getEntries());
+				}
 			}
-			
-			synchronized (feedCache) {
-				feedCache.put(url, feed.getEntries());
-			}
+			return "Refreshed " + String.valueOf(count) + " feeds. (Fail Count: " + String.valueOf(fails) + ")";
+		} finally {
+			refreshingCache = false;
 		}
 	}
 
@@ -85,11 +101,12 @@ public class RSSFeedService {
 	 * Streams back an RSS feed that is an aggregate feed of all the children under
 	 * nodeId (immediate children only) that have an RSS_FEED_SRC property
 	 * 
-	 * todo-0: need to preload this cache after app restart, for the nodeId that we know we have
-	 * on the production site, and make this be a commane line list of nodeIds, and also
+	 * todo-0: need to preload this cache after app restart, for the nodeId that we
+	 * know we have on the production site, and make this be a commane line list of
+	 * nodeIds, and also
 	 * 
-	 * todo-0: make sure to test that nodeId can be a node name (like ':name' I think) so that it's
-	 * more premanent and not dependend on id itself.
+	 * todo-0: make sure to test that nodeId can be a node name (like ':name' I
+	 * think) so that it's more premanent and not dependend on id itself.
 	 */
 	public void multiRss(MongoSession mongoSession, String nodeId, Writer writer) {
 		SubNode node = null;

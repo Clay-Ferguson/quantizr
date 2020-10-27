@@ -1067,6 +1067,9 @@ public class AppController implements ErrorController {
 			else if (req.getCommand().equalsIgnoreCase("compactDb")) {
 				res.getMessages().add(new InfoMessage(systemService.compactDb(), null));
 			} //
+			else if (req.getCommand().equalsIgnoreCase("refreshRssCache")) {
+				res.getMessages().add(new InfoMessage(rssFeedService.refreshFeedCache(), null));
+			} //
 			else if (req.getCommand().equalsIgnoreCase("initializeAppContent")) {
 				log.error("initializeAppContent is obsolet, and was also refactored without being retested");
 				// res.setServerInfo(systemService.initializeAppContent());
