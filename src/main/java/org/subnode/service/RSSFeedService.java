@@ -35,6 +35,7 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.util.ExUtil;
 import org.subnode.util.SubNodeUtil;
 
 /* Proof of Concept RSS Publishing */
@@ -115,7 +116,7 @@ public class RSSFeedService {
 					count++;
 				} catch (Exception e) {
 					fails++;
-					// todo-0: handle
+					ExUtil.error(log, "Error reading feed: " + url, e);
 				}
 
 				synchronized (feedCache) {
@@ -134,11 +135,6 @@ public class RSSFeedService {
 	 * 
 	 * If writer is null it means we are just running without writing to a server
 	 * like only to prewarm the cache during app startup called from startupPreCache
-	 * 
-	 * todo-0: currently we cache individual feeds and run this code every time it's
-	 * requested, but the final caching optimization would be to create a cache of
-	 * these SyndFeedOutput keyed off this nodeId so that the server can INSTANTLY
-	 * stream back the feed for any nodeId called here!!
 	 */
 	public void multiRss(MongoSession mongoSession, final String nodeId, Writer writer) {
 
@@ -253,7 +249,6 @@ public class RSSFeedService {
 	}
 
 	public void getRssFeed(MongoSession mongoSession, String nodeId, Writer writer) {
-
 		SubNode node = null;
 		try {
 			node = read.getNode(mongoSession, nodeId);
@@ -264,14 +259,10 @@ public class RSSFeedService {
 		SyndFeed feed = new SyndFeedImpl();
 		feed.setFeedType("rss_2.0");
 
-		String content = node.getContent();
-		if (StringUtils.isEmpty(content)) {
-			content = "n/a";
-		}
-
-		feed.setTitle("Quanta RSS Feed - Poof of Concept");
-		feed.setLink("https://quanta.wiki"); // todo-0: put real link here
-		feed.setDescription(content);
+		NodeMetaInfo metaInfo = subNodeUtil.getNodeMetaInfo(node);
+		feed.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "");
+		feed.setLink("https://quanta.wiki");
+		feed.setDescription(metaInfo.getDescription() != null ? metaInfo.getDescription() : "");
 
 		List<SyndEntry> entries = new LinkedList<SyndEntry>();
 		feed.setEntries(entries);
@@ -282,7 +273,7 @@ public class RSSFeedService {
 
 		if (children != null) {
 			for (final SubNode n : children) {
-				NodeMetaInfo metaInfo = subNodeUtil.getNodeMetaInfo(n);
+				metaInfo = subNodeUtil.getNodeMetaInfo(n);
 
 				// Currently the link will be an attachment URL, but need to research how ROME
 				// handles attachments.
