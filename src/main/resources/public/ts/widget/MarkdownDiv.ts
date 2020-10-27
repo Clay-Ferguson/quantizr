@@ -29,7 +29,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 declare var MathJax;
 
-/* Div that holds Pre-Rendered HTML that came from markdown rendering */
+/* Div that holds Pre-Rendered HTML that came from markdown rendering.
+
+todo-0: why is this named MarkdownDiv??? Why not RawHtmlDiv?? or something similar?
+*/
 export class MarkdownDiv extends Comp {
 
     constructor(content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {

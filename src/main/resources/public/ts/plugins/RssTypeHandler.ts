@@ -149,6 +149,7 @@ export class RssTypeHandler extends TypeBase {
     }
 
     renderItem(feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) {
+        // console.log("Render Feed: " + S.util.prettyPrint(feed));
         // Current approach is to put the feed title in the parent node so we don't need it rendered
         // here also
         let feedOut: Comp[] = [];
@@ -186,23 +187,34 @@ export class RssTypeHandler extends TypeBase {
     buildFeedItem(entry, state: AppState): Comp {
         let children: Comp[] = [];
 
-        children.push(new Div(entry.pubDate));
-        children.push(new Anchor(entry.link, entry.title, {
-            style: { fontSize: "25px" },
-            target: "_blank"
-        }));
+        let colonIdx = entry.title.indexOf(":");
+        if (colonIdx !== -1) {
+            let headerPart = entry.title.substring(0, colonIdx);
+            children.push(new Heading(3, headerPart));
+            let title = entry.title.substring(colonIdx + 1);
+            children.push(new Anchor(entry.link, title, {
+                style: { fontSize: "25px" },
+                target: "_blank"
+            }));
+        }
+        else {
+            children.push(new Anchor(entry.link, entry.title, {
+                style: { fontSize: "25px" },
+                target: "_blank"
+            }));
+        }
 
         if (entry.enclosure && entry.enclosure.url && entry.enclosure.type &&
             entry.enclosure.type.indexOf("audio/") !== -1) {
+
+            let downloadLink = new Anchor(entry.enclosure.url, "[ Download " + entry.enclosure.type + " ]", { className: "rssDownloadLink" }, null, true);
+
             let audioButton = new Button("Play Audio", //
                 () => {
                     new AudioPlayerDlg(entry.enclosure.url, state).open();
                 });
-            children.push(new Div(null, {
-                style: {
-                    paddingBottom: "10px"
-                }
-            }, [new ButtonBar([audioButton])]));
+
+            children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));
         }
 
         // item += "CONTENT:ENCODED"+entry["content:encoded"];
@@ -216,16 +228,13 @@ export class RssTypeHandler extends TypeBase {
             children.push(contentDiv);
         }
 
-        return new Div(null, {
-            style: {
-                borderBottom: "1px solid gray",
-                paddingBottom: "10px",
-                paddingTop: "10px"
-            }
-        }, children);
+        children.push(new Div(entry.pubDate, { className: "float-right" }));
+        children.push(new Div(null, { className: "clearfix" }));
+
+        return new Div(null, { className: "rss-feed-item" }, children);
     }
 
-    /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px in side because
+    /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px wide because
     otherwise we get rediculously large images */
     getDomPreUpdateFunction(parent: CompIntf): void {
         S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el, i) => {

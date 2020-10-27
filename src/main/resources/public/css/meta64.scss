@@ -1101,6 +1101,23 @@ i'm backing out for now
     border-bottom: 1px solid #e5e5e5;
 }
 
+.rssMediaButtons {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.rssDownloadLink {
+    margin-left: 15px;
+}
+
+.rss-feed-item {
+    border-radius: $borderRadiusMedium;
+    border: 2px solid $nodeBorderBottomColor;
+    margin: 12px;
+    padding: 13px;
+}
+
 .rss-feed-listing {
     margin-top: $smallGap;
     margin-left: $smallGap;
