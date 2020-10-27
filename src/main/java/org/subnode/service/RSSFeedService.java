@@ -58,6 +58,8 @@ public class RSSFeedService {
 
 	private static boolean refreshingCache = false;
 
+	private static final String QUANTA_FEED = "Quanta Feed";
+
 	/*
 	 * Cache of all feeds.
 	 */
@@ -120,13 +122,16 @@ public class RSSFeedService {
 				try {
 					feed = getFeed(url);
 					count++;
+
+					synchronized (feedCache) {
+						feedCache.put(url, feed);
+					}
 				} catch (Exception e) {
 					fails++;
 					ExUtil.error(log, "Error reading feed: " + url, e);
-				}
-
-				synchronized (feedCache) {
-					feedCache.put(url, feed);
+					synchronized (feedCache) {
+						feedCache.remove(url);
+					}
 				}
 			}
 			return "Refreshed " + String.valueOf(count) + " feeds. (Fail Count: " + String.valueOf(fails) + ")";
@@ -158,7 +163,7 @@ public class RSSFeedService {
 			feed = new SyndFeedImpl();
 			feed.setFeedType("rss_2.0");
 
-			feed.setTitle(node.getContent());
+			feed.setTitle(QUANTA_FEED);
 			feed.setDescription("");
 			feed.setAuthor("quanta");
 			feed.setLink("https://quanta.wiki");
@@ -229,19 +234,23 @@ public class RSSFeedService {
 	public SyndFeed getFeed(String url) {
 		try {
 			URL inputUrl = new URL(url);
+			//log.debug("getFeed: " + url);
 			SyndFeedInput input = new SyndFeedInput();
 			SyndFeed inFeed = input.build(new XmlReader(inputUrl));
 
 			revChronSortEntries(inFeed.getEntries());
 
-			if (inFeed.getEntries().size() > 10) {
-				inFeed.setEntries(inFeed.getEntries().subList(0, 10));
-			}
+			// without this check it double-prefixes the feed. not what we want
+			if (!QUANTA_FEED.equals(inFeed.getTitle())) {
+				if (inFeed.getEntries().size() > 10) {
+					inFeed.setEntries(inFeed.getEntries().subList(0, 10));
+				}
 
-			// Prefix each Title with the Feed Title so they can be distinguished when
-			// rendered in browser.
-			for (SyndEntry entry : inFeed.getEntries()) {
-				entry.setTitle(inFeed.getTitle() + ": " + entry.getTitle());
+				// Prefix each Title with the Feed Title so they can be distinguished when
+				// rendered in browser.
+				for (SyndEntry entry : inFeed.getEntries()) {
+					entry.setTitle(inFeed.getTitle() + ": " + entry.getTitle());
+				}
 			}
 			return inFeed;
 		} catch (Exception e) {
@@ -264,9 +273,9 @@ public class RSSFeedService {
 	 */
 	public void multiRssFeed(String urls, Writer writer) {
 		SyndFeed feed = new SyndFeedImpl();
-		
+
 		feed.setFeedType("rss_2.0");
-		feed.setTitle("Quanta Generated Aggregate Feed");
+		feed.setTitle(QUANTA_FEED);
 		feed.setDescription("");
 		feed.setAuthor("quanta");
 		feed.setLink("https://quanta.wiki");
