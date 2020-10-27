@@ -82,7 +82,7 @@ public class UserFeedService {
 			return;
 		}
 
-		log.debug("UserFeedService Scheduler running init2 ()");
+		log.debug("UserFeedService Scheduler running init()");
 		init();
 	}
 

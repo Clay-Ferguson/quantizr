@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,9 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.subnode.AppServer;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.model.NodeMetaInfo;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -42,40 +46,105 @@ public class RSSFeedService {
 	@Autowired
 	private SubNodeUtil subNodeUtil;
 
+	/*
+	 * Cache of all feeds. todo-0: make this map hold SyndFeed instances instead.
+	 */
+	private static final HashMap<String, List<SyndEntry>> feedCache = new HashMap<String, List<SyndEntry>>();
+
+	/*
+	 * Runs immediately at startup, and then every 240 minutes, to refresh the
+	 * feedCache.
+	 */
+	@Scheduled(fixedDelay = 240 * 60 * 1000)
+	public void run() {
+		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
+			log.debug("ignoring RSSFeedService schedule cycle");
+			return;
+		}
+
+		log.debug("RSSFeedService.refreshFeedCache");
+		refreshFeedCache();
+	}
+
+	public void refreshFeedCache() {
+		SyndFeed feed = null;
+		for (String url : feedCache.keySet()) {
+			try {
+				feed = getFeed(url);
+			} catch (Exception e) {
+				// todo-0: handle
+			}
+			
+			synchronized (feedCache) {
+				feedCache.put(url, feed.getEntries());
+			}
+		}
+	}
+
+	/*
+	 * Streams back an RSS feed that is an aggregate feed of all the children under
+	 * nodeId (immediate children only) that have an RSS_FEED_SRC property
+	 * 
+	 * todo-0: need to preload this cache after app restart, for the nodeId that we know we have
+	 * on the production site, and make this be a commane line list of nodeIds, and also
+	 * 
+	 * todo-0: make sure to test that nodeId can be a node name (like ':name' I think) so that it's
+	 * more premanent and not dependend on id itself.
+	 */
 	public void multiRss(MongoSession mongoSession, String nodeId, Writer writer) {
+		SubNode node = null;
+		try {
+			node = read.getNode(mongoSession, nodeId);
+		} catch (NodeAuthFailedException e) {
+			return;
+		}
+
 		SyndFeed feed = new SyndFeedImpl();
 		feed.setFeedType("rss_2.0");
 
-		feed.setTitle("Aggregated Feed");
-		feed.setDescription("Anonymous Aggregated Feed");
-		feed.setAuthor("anonymous");
-		feed.setLink("http://www.anonymous.com");
+		feed.setTitle(node.getContent());
+		feed.setDescription("");
+		feed.setAuthor("quanta");
+		feed.setLink("https://quanta.wiki");
 
 		ArrayList<SyndEntry> entries = new ArrayList<SyndEntry>();
 		feed.setEntries(entries);
-
 		List<String> urls = new LinkedList<String>();
-		urls.add("https://feeds.megaphone.fm/KM4602122913");
-		urls.add("https://wakingup.libsyn.com/rss");
+
+		final Iterable<SubNode> iter = read.getSubGraph(mongoSession, node);
+		final List<SubNode> children = read.iterateToList(iter);
+
+		if (children != null) {
+			for (final SubNode n : children) {
+				/* avoid infinite recursion here! */
+				if (n.getId().toHexString().equals(nodeId))
+					continue;
+
+				String feedSrc = n.getStringProp(NodeProp.RSS_FEED_SRC.s());
+				if (!StringUtils.isEmpty(feedSrc) && !feedSrc.contains(nodeId)) {
+					urls.add(feedSrc);
+				}
+			}
+		}
 
 		for (String url : urls) {
 			try {
-				URL inputUrl = new URL(url);
-				SyndFeedInput input = new SyndFeedInput();
-				SyndFeed inFeed = input.build(new XmlReader(inputUrl));
+				// log.debug("Reading Feed: " + url);
 
-				revChronSortEntries(inFeed.getEntries());
-
-				if (inFeed.getEntries().size() > 10) {
-					inFeed.setEntries(inFeed.getEntries().subList(0, 10));
+				List<SyndEntry> feedEntries = null;
+				synchronized (feedCache) {
+					feedEntries = feedCache.get(url);
 				}
 
-				// Prefix each Title with the Feed Title so they can be distinguished when
-				// rendered in browser.
-				for (SyndEntry entry : inFeed.getEntries()) {
-					entry.setTitle(inFeed.getTitle() + ": " + entry.getTitle());
+				if (feedEntries == null) {
+					SyndFeed inFeed = getFeed(url);
+					feedEntries = inFeed.getEntries();
+					synchronized (feedCache) {
+						feedCache.put(url, feedEntries);
+					}
 				}
-				entries.addAll(inFeed.getEntries());
+
+				entries.addAll(feedEntries);
 			} catch (Exception e) {
 				// let one feed fail and not blow up the rest.
 			}
@@ -88,6 +157,29 @@ public class RSSFeedService {
 			output.output(feed, writer);
 		} catch (Exception e) {
 			throw new RuntimeException("internal server error");
+		}
+	}
+
+	public SyndFeed getFeed(String url) {
+		try {
+			URL inputUrl = new URL(url);
+			SyndFeedInput input = new SyndFeedInput();
+			SyndFeed inFeed = input.build(new XmlReader(inputUrl));
+
+			revChronSortEntries(inFeed.getEntries());
+
+			if (inFeed.getEntries().size() > 10) {
+				inFeed.setEntries(inFeed.getEntries().subList(0, 10));
+			}
+
+			// Prefix each Title with the Feed Title so they can be distinguished when
+			// rendered in browser.
+			for (SyndEntry entry : inFeed.getEntries()) {
+				entry.setTitle(inFeed.getTitle() + ": " + entry.getTitle());
+			}
+			return inFeed;
+		} catch (Exception e) {
+			return null;
 		}
 	}
 

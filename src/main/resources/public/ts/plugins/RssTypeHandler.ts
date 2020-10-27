@@ -144,7 +144,9 @@ export class RssTypeHandler extends TypeBase {
         let description = feed.description || "";
         let pubDate = feed.pubDate || "";
 
-        feedOut.push(new Para(description + "  " + pubDate));
+        if (description || pubDate) {
+            feedOut.push(new Para(description + "  " + pubDate));
+        }
         feedOut.push(new Para("Feed: " + feedSrc));
 
         if (feed.itunes && feed.itunes.image) {
