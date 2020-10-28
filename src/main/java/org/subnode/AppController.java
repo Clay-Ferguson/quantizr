@@ -479,6 +479,7 @@ public class AppController implements ErrorController {
 		try {
 			rssFeedService.multiRssFeed(url, response.getWriter());
 		} catch (Exception e) {
+			ExUtil.error(log, "multiRssFeed Error: ", e);
 			throw new RuntimeException("internal server error");
 		}
 	}

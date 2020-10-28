@@ -226,7 +226,8 @@ public class RSSFeedService {
 
 				entries.addAll(feedEntries);
 			} catch (Exception e) {
-				// let one feed fail and not blow up the rest.
+				ExUtil.error(log, "Feed Error: ", e);
+				// let one feed fail and not blow up the rest, so do not rethros
 			}
 		}
 		revChronSortEntries(entries);
@@ -260,6 +261,7 @@ public class RSSFeedService {
 			}
 			return inFeed;
 		} catch (Exception e) {
+			ExUtil.error(log, "Error: ", e);
 			return null;
 		}
 	}
@@ -268,6 +270,18 @@ public class RSSFeedService {
 		Collections.sort(entries, new Comparator<SyndEntry>() {
 			@Override
 			public int compare(SyndEntry s1, SyndEntry s2) {
+				if (s1.getPublishedDate() == null && s2.getPublishedDate() == null) {
+					return 0;
+				}
+
+				if (s1.getPublishedDate() == null) {
+					return 1;
+				}
+
+				if (s2.getPublishedDate() == null) {
+					return 1;
+				}
+
 				return s2.getPublishedDate().compareTo(s1.getPublishedDate());
 			}
 		});
@@ -392,6 +406,7 @@ public class RSSFeedService {
 				feedStr = convertStreamChars(feedStr);
 				writer.write(feedStr);
 			} catch (Exception e) {
+				ExUtil.error(log, "multiRssFeed Error: ", e);
 				throw new RuntimeException("internal server error");
 			}
 		}

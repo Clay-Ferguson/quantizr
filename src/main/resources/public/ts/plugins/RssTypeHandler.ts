@@ -231,7 +231,8 @@ export class RssTypeHandler extends TypeBase {
         let colonIdx = entry.title.indexOf(":");
         if (colonIdx !== -1) {
             let headerPart = entry.title.substring(0, colonIdx);
-            children.push(new Heading(3, headerPart));
+            children.push(new Heading(4, headerPart));
+
             let title = entry.title.substring(colonIdx + 1);
             children.push(new Anchor(entry.link, title, {
                 style: { fontSize: "25px" },
@@ -278,8 +279,7 @@ export class RssTypeHandler extends TypeBase {
     otherwise we get rediculously large images */
     getDomPreUpdateFunction(parent: CompIntf): void {
         S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el, i) => {
-            el.style.maxWidth = "300px";
-            el.style.width = "300px";
+            el.style.maxWidth = "50%";
         });
     }
 }
