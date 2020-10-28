@@ -157,19 +157,57 @@ export class RssTypeHandler extends TypeBase {
         let description = feed.description || "";
         let pubDate = feed.pubDate || "";
 
-        if (description || pubDate) {
-            feedOut.push(new Para(description + "  " + pubDate));
+        if (feed.title) {
+            if (feed.link) {
+                feedOut.push(new Div(null, null, [
+                    new Anchor(feed.link, feed.title, {
+                        style: { fontSize: "45px" },
+                        target: "_blank"
+                    })
+                ]));
+            }
+            else {
+                feedOut.push(new Div(feed.title, {
+                    style: { fontSize: "45px" },
+                    target: "_blank"
+                }));
+            }
         }
-        feedOut.push(new Para("Feed: " + feedSrc));
+
+        // console.log("FEED: " + S.util.prettyPrint(feed));
+
+        if (feed.image) {
+            // link, title, url
+            feedOut.push(new Img(null, {
+                style: {
+                    maxWidth: "50%",
+                    marginBottom: "20px"
+                },
+                src: feed.image.url,
+                title: feed.image.title
+            }));
+        }
 
         if (feed.itunes && feed.itunes.image) {
             feedOut.push(new Img(null, {
                 style: {
-                    maxWidth: "100%",
-                    marginBottom: "20px"
+                    maxWidth: "50%"
                 },
                 src: feed.itunes.image
             }));
+        }
+
+        if (description || pubDate) {
+            feedOut.push(new Para(description + "  " + pubDate));
+        }
+
+        // A bit of a hack to avoid showing the feed URL of our own aggregate feeds. We could publish this but no need to and
+        // is even undesirable for now.
+        if (feedSrc.indexOf("/multiRss?id=") === -1) {
+            feedOut.push(new Div(feedSrc));
+        }
+        if (feed.creator) {
+            feedOut.push(new Div(feed.creator));
         }
 
         let feedOutDiv = new Div(null, null, feedOut);
@@ -189,6 +227,7 @@ export class RssTypeHandler extends TypeBase {
     buildFeedItem(entry, state: AppState): Comp {
         let children: Comp[] = [];
 
+        /* todo-0: When viewing a SINGLE feed that is not aggregate, this prefixed title (name of feed itself) is redundant */
         let colonIdx = entry.title.indexOf(":");
         if (colonIdx !== -1) {
             let headerPart = entry.title.substring(0, colonIdx);

@@ -58,8 +58,6 @@ public class RSSFeedService {
 
 	private static boolean refreshingCache = false;
 
-	private static final String QUANTA_FEED = "Quanta Feed";
-
 	/*
 	 * Cache of all feeds.
 	 */
@@ -170,10 +168,10 @@ public class RSSFeedService {
 
 			feed.setEncoding("UTF-8");
 			feed.setFeedType("rss_2.0");
-			feed.setTitle(QUANTA_FEED);
+			feed.setTitle("");
 			feed.setDescription("");
-			feed.setAuthor("quanta");
-			feed.setLink("https://quanta.wiki");
+			feed.setAuthor("");
+			feed.setLink("");
 
 			List<SyndEntry> entries = new ArrayList<SyndEntry>();
 			feed.setEntries(entries);
@@ -242,8 +240,7 @@ public class RSSFeedService {
 
 			revChronSortEntries(inFeed.getEntries());
 
-			// without this check it double-prefixes the feed. not what we want
-			if (!QUANTA_FEED.equals(inFeed.getTitle())) {
+			if (!StringUtils.isEmpty(inFeed.getTitle())) {
 
 				/*
 				 * this number has to be as large at least as the number the browser will try to
@@ -291,19 +288,19 @@ public class RSSFeedService {
 
 			feed.setEncoding("UTF-8");
 			feed.setFeedType("rss_2.0");
-			feed.setTitle(QUANTA_FEED);
+			feed.setTitle("");
 			feed.setDescription("");
-			feed.setAuthor("quanta");
-			feed.setLink("https://quanta.wiki");
+			feed.setAuthor("");
+			feed.setLink("");
 			List<SyndEntry> entries = new ArrayList<SyndEntry>();
 			feed.setEntries(entries);
 			readUrls(urlList, entries);
 			writeFeed(feed, writer);
-		} 
+		}
 		/* If not an aggregate return the one external feed itself */
 		else {
 			String url = urlList.get(0);
-			
+
 			// todo-0: wrap the cache check/update INSIDE the getFeed method?
 			synchronized (feedCache) {
 				feed = feedCache.get(url);
@@ -335,7 +332,7 @@ public class RSSFeedService {
 
 		NodeMetaInfo metaInfo = subNodeUtil.getNodeMetaInfo(node);
 		feed.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "");
-		feed.setLink("https://quanta.wiki");
+		feed.setLink("");
 		feed.setDescription(metaInfo.getDescription() != null ? metaInfo.getDescription() : "");
 
 		List<SyndEntry> entries = new LinkedList<SyndEntry>();
