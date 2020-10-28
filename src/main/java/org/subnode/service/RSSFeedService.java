@@ -242,8 +242,12 @@ public class RSSFeedService {
 
 			// without this check it double-prefixes the feed. not what we want
 			if (!QUANTA_FEED.equals(inFeed.getTitle())) {
-				if (inFeed.getEntries().size() > 10) {
-					inFeed.setEntries(inFeed.getEntries().subList(0, 10));
+
+				/* this number has to be as large at least as the number the browser will try to show currently, because the 
+				aggregator code is sharing this object with the ordinary single RSS feed retrival and so this number chops it down. Need
+				to rethink this, and only chop down what the aggreggator is working with */
+				if (inFeed.getEntries().size() > 50) {
+					inFeed.setEntries(inFeed.getEntries().subList(0, 50));
 				}
 
 				// Prefix each Title with the Feed Title so they can be distinguished when

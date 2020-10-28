@@ -20,7 +20,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     input: Input;
     icon: ToggleIcon;
 
-    constructor(public label: string, private isPassword: boolean, private onEnterKey: () => void, private inputClasses: string, private valueIntf: ValueIntf) {
+    constructor(public label: string, private isPassword: boolean, private onEnterKey: () => void, private inputClasses: string, public valueIntf: ValueIntf) {
         super(null);
         S.util.mergeProps(this.attribs, {
             name: this.getId(),

@@ -1,4 +1,5 @@
 import { AppState } from "../AppState";
+import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
@@ -8,7 +9,9 @@ import { AudioPlayer } from "../widget/AudioPlayer";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
+import { TextField } from "../widget/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -58,12 +61,34 @@ export class AudioPlayerDlg extends DialogBase {
     private saveTimer: any = null;
     urlHash: string;
 
+    timeLeftTextField: TextField;
+
     constructor(private sourceUrl: string, state: AppState) {
         super("Audio Player", null, false, state);
 
         this.urlHash = S.util.hashOfString(sourceUrl);
         this.startTimePending = localStorage[this.urlHash];
         // console.log("startTimePending = localStorage[" + this.urlHash + "]=" + localStorage[this.urlHash]);
+
+        setInterval(() => {
+            this.timeslice();
+        }, 60000);
+    }
+
+    // This makes the sleep timer work "Stop After (mins.)"
+    timeslice = () => {
+        if (this.timeLeftTextField.valueIntf.getValue()) {
+            try {
+                let timeVal = parseInt(this.timeLeftTextField.valueIntf.getValue());
+                timeVal--;
+                this.timeLeftTextField.valueIntf.setValue(timeVal <= 0 ? "" : "" + timeVal);
+                if (timeVal <= 0 && !this.player.paused && !this.player.ended) {
+                    this.playButtonFunction();
+                }
+            }
+            catch (e) {
+            }
+        }
     }
 
     renderDlg(): CompIntf[] {
@@ -87,6 +112,9 @@ export class AudioPlayerDlg extends DialogBase {
                     autoPlay: "autoplay",
                     preload: "auto"
                 }),
+                new Div(null, { className: "timeRemainingEditField" }, [
+                    this.timeLeftTextField = new TextField("Stop After (mins.)", false, null, null, null)
+                ]),
                 new ButtonBar([
                     this.playButton = new Button("Pause", this.playButtonFunction, null, "btn-primary"),
                     new Button("Close", this.destroyPlayer)
@@ -102,6 +130,10 @@ export class AudioPlayerDlg extends DialogBase {
                 ])
             ])
         ];
+
+        // This lets the valueIntf manage it's own state so that updating the state doesn't force-render the dialog again
+        // todo-0: this needs to be done in the MediaRecorder dialog timer also where direct dom is being used to solve this.
+        this.timeLeftTextField.valueIntf = new CompValueHolder<string>(this.timeLeftTextField, "timeLeft");
 
         this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
             this.player = elm;
