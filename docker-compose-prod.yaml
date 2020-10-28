@@ -97,7 +97,6 @@ services:
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
             
             ipfs.host: "http://ipfs:5001"
-            enableRssDaemon: "false"
 
             security.require-ssl: "true" 
             server.ssl.key-store: "/letsencrypt/keystore.p12" 

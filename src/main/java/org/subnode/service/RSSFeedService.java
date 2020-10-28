@@ -149,7 +149,11 @@ public class RSSFeedService {
 	 */
 	public void multiRss(MongoSession mongoSession, final String nodeId, Writer writer) {
 
-		SyndFeed feed = aggregateCache.get(nodeId);
+		// will be true if this is the IDW node for example on quanta.wiki. The system-defined published aggregate, of which
+		// right now we only support one.
+		boolean portalAggregate = nodeId.equals(appProp.getRssAggregatePreCacheNodeId());
+
+		SyndFeed feed = portalAggregate ? aggregateCache.get(nodeId) : null;
 
 		// if we didn't find in the cache built the feed
 		if (feed == null) {
@@ -191,7 +195,10 @@ public class RSSFeedService {
 			}
 
 			readUrls(urls, entries);
-			aggregateCache.put(nodeId, feed);
+
+			if (portalAggregate) {
+				aggregateCache.put(nodeId, feed);
+			}
 		}
 
 		writeFeed(feed, writer);
@@ -359,7 +366,7 @@ public class RSSFeedService {
 			SyndFeedOutput output = new SyndFeedOutput();
 			String feedStr = null;
 			try {
-				feedStr = output.outputString(feed, false); //prettyPrint=false
+				feedStr = output.outputString(feed, false); // prettyPrint=false
 				feedStr = convertStreamChars(feedStr);
 				writer.write(feedStr);
 			} catch (Exception e) {
