@@ -161,8 +161,9 @@ public class RSSFeedService {
 			}
 
 			feed = new SyndFeedImpl();
-			feed.setFeedType("rss_2.0");
 
+			feed.setEncoding("UTF-8");
+			feed.setFeedType("rss_2.0");
 			feed.setTitle(QUANTA_FEED);
 			feed.setDescription("");
 			feed.setAuthor("quanta");
@@ -193,14 +194,7 @@ public class RSSFeedService {
 			aggregateCache.put(nodeId, feed);
 		}
 
-		SyndFeedOutput output = new SyndFeedOutput();
-		if (writer != null) {
-			try {
-				output.output(feed, writer);
-			} catch (Exception e) {
-				throw new RuntimeException("internal server error");
-			}
-		}
+		writeFeed(feed, writer);
 	}
 
 	public void readUrls(List<String> urls, List<SyndEntry> entries) {
@@ -234,7 +228,6 @@ public class RSSFeedService {
 	public SyndFeed getFeed(String url) {
 		try {
 			URL inputUrl = new URL(url);
-			//log.debug("getFeed: " + url);
 			SyndFeedInput input = new SyndFeedInput();
 			SyndFeed inFeed = input.build(new XmlReader(inputUrl));
 
@@ -243,9 +236,12 @@ public class RSSFeedService {
 			// without this check it double-prefixes the feed. not what we want
 			if (!QUANTA_FEED.equals(inFeed.getTitle())) {
 
-				/* this number has to be as large at least as the number the browser will try to show currently, because the 
-				aggregator code is sharing this object with the ordinary single RSS feed retrival and so this number chops it down. Need
-				to rethink this, and only chop down what the aggreggator is working with */
+				/*
+				 * this number has to be as large at least as the number the browser will try to
+				 * show currently, because the aggregator code is sharing this object with the
+				 * ordinary single RSS feed retrival and so this number chops it down. Need to
+				 * rethink this, and only chop down what the aggreggator is working with
+				 */
 				if (inFeed.getEntries().size() > 50) {
 					inFeed.setEntries(inFeed.getEntries().subList(0, 50));
 				}
@@ -278,6 +274,7 @@ public class RSSFeedService {
 	public void multiRssFeed(String urls, Writer writer) {
 		SyndFeed feed = new SyndFeedImpl();
 
+		feed.setEncoding("UTF-8");
 		feed.setFeedType("rss_2.0");
 		feed.setTitle(QUANTA_FEED);
 		feed.setDescription("");
@@ -289,15 +286,7 @@ public class RSSFeedService {
 		List<String> urlList = XString.tokenize(urls, "\n", true);
 
 		readUrls(urlList, entries);
-
-		SyndFeedOutput output = new SyndFeedOutput();
-		if (writer != null) {
-			try {
-				output.output(feed, writer);
-			} catch (Exception e) {
-				throw new RuntimeException("internal server error");
-			}
-		}
+		writeFeed(feed, writer);
 	}
 
 	public void getRssFeed(MongoSession mongoSession, String nodeId, Writer writer) {
@@ -309,6 +298,7 @@ public class RSSFeedService {
 		}
 
 		SyndFeed feed = new SyndFeedImpl();
+		feed.setEncoding("UTF-8");
 		feed.setFeedType("rss_2.0");
 
 		NodeMetaInfo metaInfo = subNodeUtil.getNodeMetaInfo(node);
@@ -361,12 +351,51 @@ public class RSSFeedService {
 			}
 		}
 
-		SyndFeedOutput output = new SyndFeedOutput();
-		try {
-			output.output(feed, writer);
-		} catch (Exception e) {
-			throw new RuntimeException("internal server error");
+		writeFeed(feed, writer);
+	}
+
+	private void writeFeed(SyndFeed feed, Writer writer) {
+		if (writer != null) {
+			SyndFeedOutput output = new SyndFeedOutput();
+			String feedStr = null;
+			try {
+				feedStr = output.outputString(feed, false); //prettyPrint=false
+				feedStr = convertStreamChars(feedStr);
+				writer.write(feedStr);
+			} catch (Exception e) {
+				throw new RuntimeException("internal server error");
+			}
 		}
+	}
+
+	/*
+	 * Lots of feeds have characters that won't display nicely in HTML so we fix
+	 * that here
+	 */
+	private String convertStreamChars(String s) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			if (c < 128) {
+				sb.append(c);
+			} else {
+				switch (c) {
+					case '—':
+						sb.append("-");
+						break;
+					case '”':
+						sb.append("\"");
+						break;
+					case '’':
+						sb.append("'");
+						break;
+					default:
+						sb.append(" ");
+						break;
+				}
+			}
+		}
+		return sb.toString();
 	}
 
 	// DO NOT DELETE - this is the code to convert to HTML

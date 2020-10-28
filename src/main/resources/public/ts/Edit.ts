@@ -712,7 +712,7 @@ export class Edit implements EditIntf {
     }
 
     saveClipboardToChildNode = async (parentId?: string): Promise<void> => {
-        let clipText: string = (navigator as any).clipboard.readText();
+        let clipText: string = await (navigator as any).clipboard.readText();
         if (clipText) {
             clipText = clipText.trim();
         }

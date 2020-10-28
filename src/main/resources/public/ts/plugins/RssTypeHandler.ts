@@ -176,6 +176,8 @@ export class RssTypeHandler extends TypeBase {
         itemListContainer.getChildren().push(feedOutDiv);
 
         let itemCount = 0;
+
+        // todo-0: this will be faster if we dont' iterata ALL. can't we return false to exit?
         feed.items.forEach(function (item) {
             if (itemCount < RssTypeHandler.MAX_FEED_ITEMS) {
                 itemListContainer.getChildren().push(this.buildFeedItem(item, state));
@@ -217,7 +219,6 @@ export class RssTypeHandler extends TypeBase {
             children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));
         }
 
-        // item += "CONTENT:ENCODED"+entry["content:encoded"];
         if (entry["content:encoded"]) {
             /* set the dangerously flag for this stuff and render as html */
             let contentDiv = new MarkdownDiv(entry["content:encoded"]);

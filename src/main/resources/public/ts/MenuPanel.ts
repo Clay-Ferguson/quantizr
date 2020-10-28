@@ -165,7 +165,7 @@ export class MenuPanel extends Div {
 
             // calendar is experimental and only shown for admin user currently
             state.isAdminUser ? new MenuItem("Show Calendar", () => S.render.showCalendar(null, state), !!hltNode) : null, //
-            !state.isAnonUser ? new MenuItem("Save Clipboard", () => S.edit.saveClipboardToChildNode()) : null, // "fa-clipboard"
+            !state.isAnonUser ? new MenuItem("Save Clipboard", () => S.edit.saveClipboardToChildNode()) : null, //
 
             new MenuItem("Show URLs", () => S.render.showNodeUrl(null, state), !!hltNode), //
 
