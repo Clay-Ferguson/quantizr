@@ -113,6 +113,11 @@ export class App extends Div {
                 title: "Your Root Node"
             }, "btn-secondary floatingControlBarItem", "off") : null;
 
+            let homeButton = new IconButton("fa-home", null, {
+                onClick: e => { S.meta64.loadAnonPageHome(state); },
+                title: "Portal Home"
+            }, "btn-secondary floatingControlBarItem", "off");
+
             let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
                 onClick: e => {
                     S.edit.saveClipboardToChildNode();
@@ -121,8 +126,8 @@ export class App extends Div {
             }, "btn-secondary floatingControlBarItem", "off") : null;
 
             // these are the buttons at the upper right of the page.
-            if (topScrollUpButton || rootButton || prefsButton || editButton) {
-                floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton, rootButton, prefsButton, clipboardPasteButton, editButton]);
+            if (topScrollUpButton || rootButton || homeButton || prefsButton || editButton) {
+                floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton, rootButton, homeButton, prefsButton, clipboardPasteButton, editButton]);
             }
         }
 
