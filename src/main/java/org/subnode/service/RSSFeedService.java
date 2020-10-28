@@ -82,10 +82,11 @@ public class RSSFeedService {
 	 */
 	@Scheduled(fixedDelay = 240 * 60 * 1000)
 	public void run() {
-		// ignore the first call which will happen at startup. We don't need it at
-		// startup because we call startupPreCache
-		if (runCount++ == 0)
+		runCount++;
+		if (runCount == 1) {
+			startupPreCache();
 			return;
+		}
 
 		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
 			log.debug("ignoring RSSFeedService schedule cycle");
@@ -98,12 +99,12 @@ public class RSSFeedService {
 	}
 
 	public void startupPreCache() {
-		log.debug("startupPreCache");
 		String rssNodeId = appProp.getRssAggregatePreCacheNodeId();
 		if (StringUtils.isEmpty(rssNodeId))
 			return;
 
 		adminRunner.run(mongoSession -> {
+			log.debug("startupPreCache: node=" + rssNodeId);
 			multiRss(mongoSession, rssNodeId, null);
 		});
 	}
@@ -149,7 +150,8 @@ public class RSSFeedService {
 	 */
 	public void multiRss(MongoSession mongoSession, final String nodeId, Writer writer) {
 
-		// will be true if this is the IDW node for example on quanta.wiki. The system-defined published aggregate, of which
+		// will be true if this is the IDW node for example on quanta.wiki. The
+		// system-defined published aggregate, of which
 		// right now we only support one.
 		boolean portalAggregate = nodeId.equals(appProp.getRssAggregatePreCacheNodeId());
 
@@ -279,20 +281,43 @@ public class RSSFeedService {
 	 * them as an aggregate while also updating our caching
 	 */
 	public void multiRssFeed(String urls, Writer writer) {
-		SyndFeed feed = new SyndFeedImpl();
 
-		feed.setEncoding("UTF-8");
-		feed.setFeedType("rss_2.0");
-		feed.setTitle(QUANTA_FEED);
-		feed.setDescription("");
-		feed.setAuthor("quanta");
-		feed.setLink("https://quanta.wiki");
-
-		List<SyndEntry> entries = new ArrayList<SyndEntry>();
-		feed.setEntries(entries);
 		List<String> urlList = XString.tokenize(urls, "\n", true);
+		SyndFeed feed = null;
 
-		readUrls(urlList, entries);
+		/* If multiple feeds we build an aggregate */
+		if (urlList.size() > 1) {
+			feed = new SyndFeedImpl();
+
+			feed.setEncoding("UTF-8");
+			feed.setFeedType("rss_2.0");
+			feed.setTitle(QUANTA_FEED);
+			feed.setDescription("");
+			feed.setAuthor("quanta");
+			feed.setLink("https://quanta.wiki");
+			List<SyndEntry> entries = new ArrayList<SyndEntry>();
+			feed.setEntries(entries);
+			readUrls(urlList, entries);
+			writeFeed(feed, writer);
+		} 
+		/* If not an aggregate return the one external feed itself */
+		else {
+			String url = urlList.get(0);
+			
+			// todo-0: wrap the cache check/update INSIDE the getFeed method?
+			synchronized (feedCache) {
+				feed = feedCache.get(url);
+			}
+
+			if (feed == null) {
+				log.debug("Reading Feed: " + url);
+				feed = getFeed(url);
+				synchronized (feedCache) {
+					feedCache.put(url, feed);
+				}
+			}
+		}
+
 		writeFeed(feed, writer);
 	}
 

@@ -30,9 +30,6 @@ public class SpringContextUtil implements ApplicationContextAware {
 	@Autowired
 	private TestRunner testRunner;
 
-	@Autowired
-	private RSSFeedService rssFeedService;
-
 	/* main() entrypoint */
 	@Override
 	public void setApplicationContext(ApplicationContext context) throws BeansException {
@@ -42,7 +39,6 @@ public class SpringContextUtil implements ApplicationContextAware {
 		try {
 			mongoRepo.init();
 			appController.init();
-			rssFeedService.startupPreCache();
 		}
 		catch (Exception e) {
 			log.error("application startup failed.");
