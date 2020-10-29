@@ -35,9 +35,9 @@
 //                 ret.push(playButton);
 //             }
 //             else if (displayName.toLowerCase().endsWith(".md")) {
-//                 let markdownDiv = new NodeCompMarkdown(node, {});
+//                 let html = new NodeCompMarkdown(node, {});
 
-//                 let collapsiblePanel = new CollapsiblePanel(displayName, null, [markdownDiv], true);
+//                 let collapsiblePanel = new CollapsiblePanel(displayName, null, [html], true);
 //                 ret.push(collapsiblePanel);
 //             }
 //             else if (S.util.isEditableFile(displayName)) {

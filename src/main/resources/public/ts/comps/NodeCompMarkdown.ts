@@ -6,7 +6,7 @@ import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { MarkdownDiv } from "../widget/MarkdownDiv";
+import { Html } from "../widget/Html";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -14,7 +14,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompMarkdown extends MarkdownDiv {
+export class NodeCompMarkdown extends Html {
 
     // This flag makes encrypted text always decrypt and display immediately
     private autoDecrypting: boolean = true;

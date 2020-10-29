@@ -29,11 +29,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 declare var MathJax;
 
-/* Div that holds Pre-Rendered HTML that came from markdown rendering.
-
-todo-0: why is this named MarkdownDiv??? Why not RawHtmlDiv?? or something similar?
-*/
-export class MarkdownDiv extends Comp {
+export class Html extends Comp {
 
     constructor(content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {
         super(attribs);
@@ -50,7 +46,6 @@ export class MarkdownDiv extends Comp {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
 
-        // console.log("Rendering MarkdownDiv: "+this.getState().content);
         this.attribs.dangerouslySetInnerHTML = { __html: this.getState().content };
         return S.e("div", this.attribs);
     }

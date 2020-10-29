@@ -15,7 +15,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { Img } from "../widget/Img";
-import { MarkdownDiv } from "../widget/MarkdownDiv";
+import { Html } from "../widget/Html";
 import { Para } from "../widget/Para";
 import { TextContent } from "../widget/TextContent";
 import { TypeBase } from "./base/TypeBase";
@@ -256,11 +256,11 @@ export class RssTypeHandler extends TypeBase {
 
         if (entry["content:encoded"]) {
             /* set the dangerously flag for this stuff and render as html */
-            let contentDiv = new MarkdownDiv(entry["content:encoded"]);
+            let contentDiv = new Html(entry["content:encoded"]);
             children.push(contentDiv);
         }
         else if (entry.contentSnippet) {
-            let contentDiv = new MarkdownDiv(entry.contentSnippet);
+            let contentDiv = new Html(entry.contentSnippet);
             children.push(contentDiv);
         }
 
