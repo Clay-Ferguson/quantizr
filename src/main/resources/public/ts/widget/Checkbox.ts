@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import * as I from "../Interfaces";
 import { ValueIntf } from "../Interfaces";
@@ -15,6 +16,11 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
 
     constructor(public label: string = null, _attribs: Object = null, private valueIntf: ValueIntf) {
         super(_attribs);
+
+        /* Manage state internally if no valueIntf passed in */
+        if (!valueIntf) {
+            this.valueIntf = new CompValueHolder<string>(this, "val");
+        }
 
         this.attribs.type = "checkbox";
         this.attribs.className = "custom-control-input";

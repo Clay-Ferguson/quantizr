@@ -46,12 +46,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     errorShown: boolean = false;
     numFiles: number = 0;
 
-    constructor(private nodeId: string, private node: J.NodeInfo, toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
-        super(importMode ? "Import File" : "Upload File", null, false, state);
+    ipfsCheckbox: Checkbox;
 
-        // todo-0: the state of this ipfs flag should be self-internal (same capability as EditFields have), so that a merge to this state dowesn't
-        // re-render because that blows up all the dragged files.
-        this.mergeState({ toIpfs });
+    constructor(private nodeId: string, private node: J.NodeInfo, private toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
+        super(importMode ? "Import File" : "Upload File", null, false, state);
     }
 
     renderDlg(): CompIntf[] {
@@ -61,14 +59,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     /* Having this checkbox and caling the setState here causes a full rerender of this dialog, and this needs work eventually
                     to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div
                     and create a new one any time there's a state change and rerender */
-                    new Checkbox("Save to IPFS", null, {
-                        setValue: (checked: boolean): void => {
-                            this.mergeState({ toIpfs: checked });
-                        },
-                        getValue: (): boolean => {
-                            return this.getState().toIpfs;
-                        }
-                    })
+                    this.ipfsCheckbox = new Checkbox("Save to IPFS", null, null)
                 ]),
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
@@ -109,6 +100,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         ];
 
         this.uploadButton.setVisible(false);
+        this.ipfsCheckbox.setChecked(this.toIpfs);
         this.configureDropZone();
         this.runButtonEnablement();
         return children;
@@ -243,7 +235,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     if (!formData.has("nodeId")) {
                         formData.append("nodeId", dlg.nodeId);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
-                        formData.append("ipfs", state.toIpfs ? "true" : "false");
+                        formData.append("ipfs", dlg.ipfsCheckbox.getChecked() ? "true" : "false");
                         formData.append("createAsChildren", dlg.numFiles > 1 ? "true" : "false");
                     }
 
