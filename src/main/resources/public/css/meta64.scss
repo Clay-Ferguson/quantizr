@@ -337,10 +337,11 @@ strong em {
 
 .app-modal-title-close-icon {
     cursor: pointer;
-    font-size: 125%;
+    font-size: 160%;
 
     //this icon vertical centering doesn't work, but it's acceptable looking.
     vertical-align: middle;
+    line-height: .5;
 }
  
 .app-modal {

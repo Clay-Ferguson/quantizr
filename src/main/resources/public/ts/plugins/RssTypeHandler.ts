@@ -199,10 +199,11 @@ export class RssTypeHandler extends TypeBase {
         }
 
         // A bit of a hack to avoid showing the feed URL of our own aggregate feeds. We could publish this but no need to and
-        // is even undesirable for now.
-        if (feedSrc.indexOf("/multiRss?id=") === -1) {
+        // is even undesirable for now. Also the newline check is to not show the feed urls if this is a multi RSS feed one
+        if (feedSrc.indexOf("/multiRss?id=") === -1 && feedSrc.indexOf("\n") === -1) {
             feedOut.push(new Div(feedSrc));
         }
+
         if (feed.creator) {
             feedOut.push(new Div(feed.creator));
         }
