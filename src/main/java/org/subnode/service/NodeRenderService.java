@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
-import org.subnode.AppController;
 import org.subnode.config.AppProp;
 import org.subnode.config.ConstantsProvider;
 import org.subnode.config.NodeName;
@@ -22,6 +21,7 @@ import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.BreadcrumbInfo;
 import org.subnode.model.CalendarItem;
 import org.subnode.model.NodeInfo;
+import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
@@ -511,36 +511,11 @@ public class NodeRenderService {
 	}
 
 	public void populateSocialCardProps(SubNode node, Model model) {
-		String ogTitle = "";
-		String ogDescription = "";
-		String ogImage = "";
-		String ogUrl = "";
-
-		// todo-0: use SubNodeUtil.getNodeMetaInfo which is a duplicate of all this.
-		if (node != null) {
-			String content = node.getContent();
-			int newLineIdx = content.indexOf("\n");
-			if (newLineIdx != -1) {
-				ogTitle = content.substring(0, newLineIdx).trim();
-
-				// remove leading hash marks which will be there if this is a markdown heading.
-				while (ogTitle.startsWith("#")) {
-					ogTitle = XString.stripIfStartsWith(ogTitle, "#");
-				}
-				ogTitle = ogTitle.trim();
-				ogDescription = content.substring(newLineIdx + 1).trim();
-			} else {
-				ogDescription = content;
-			}
-
-			ogImage = subNodeUtil.getAttachmentUrl(node);
-			ogUrl = constProvider.getHostAndPort() + "/app?id=" + node.getId().toHexString();
-		}
-
-		model.addAttribute("ogTitle", ogTitle);
-		model.addAttribute("ogDescription", ogDescription);
-		model.addAttribute("ogImage", ogImage);
-		model.addAttribute("ogUrl", ogUrl);
+		NodeMetaInfo metaInfo = subNodeUtil.getNodeMetaInfo(node);
+		model.addAttribute("ogTitle", metaInfo.getTitle());
+		model.addAttribute("ogDescription", metaInfo.getDescription());
+		model.addAttribute("ogImage", metaInfo.getLink());
+		model.addAttribute("ogUrl", metaInfo.getUrl());
 	}
 
 	public RenderCalendarResponse renderCalendar(MongoSession session, RenderCalendarRequest req) {
