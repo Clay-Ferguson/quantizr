@@ -200,7 +200,10 @@ public class RSSFeedService {
 				if (inFeed != null) {
 					for (SyndEntry entry : inFeed.getEntries()) {
 						SyndEntry entryClone = (SyndEntry) entry.clone();
-						entryClone.setTitle(inFeed.getTitle() + ": " + entryClone.getTitle());
+						/* We use this slight hack/technique to allow our client to be able to parse the
+						titles out of the feeds for displaying them in a nicer way, while being unobtrusive enough that
+						any podcast app could display it and it looks fine as it also. */
+						entryClone.setTitle(inFeed.getTitle() + " :: " + entryClone.getTitle());
 						entries.add(entryClone);
 					}
 				}

@@ -224,12 +224,12 @@ export class RssTypeHandler extends TypeBase {
     buildFeedItem(entry, state: AppState): Comp {
         let children: Comp[] = [];
 
-        let colonIdx = entry.title.indexOf(":");
+        let colonIdx = entry.title.indexOf(" :: ");
         if (colonIdx !== -1) {
             let headerPart = entry.title.substring(0, colonIdx);
             children.push(new Heading(4, headerPart));
 
-            let title = entry.title.substring(colonIdx + 1);
+            let title = entry.title.substring(colonIdx + 4);
             children.push(new Anchor(entry.link, title, {
                 style: { fontSize: "25px" },
                 target: "_blank"
