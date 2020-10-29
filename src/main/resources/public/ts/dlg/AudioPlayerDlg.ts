@@ -62,6 +62,7 @@ export class AudioPlayerDlg extends DialogBase {
     urlHash: string;
 
     timeLeftTextField: TextField;
+    intervalTimer: any;
 
     constructor(private sourceUrl: string, state: AppState) {
         super("Audio Player", null, false, state);
@@ -70,9 +71,17 @@ export class AudioPlayerDlg extends DialogBase {
         this.startTimePending = localStorage[this.urlHash];
         // console.log("startTimePending = localStorage[" + this.urlHash + "]=" + localStorage[this.urlHash]);
 
-        setInterval(() => {
+        // todo-0: check all setIntervals in the app to be sure they all have a clearInterval.
+        this.intervalTimer = setInterval(() => {
             this.timeslice();
         }, 60000);
+    }
+
+    preUnmount(): any {
+        if (this.intervalTimer) {
+            clearInterval(this.intervalTimer);
+            clearInterval(this.saveTimer);
+        }
     }
 
     // This makes the sleep timer work "Stop After (mins.)"
@@ -130,10 +139,6 @@ export class AudioPlayerDlg extends DialogBase {
                 ])
             ])
         ];
-
-        // This lets the valueIntf manage it's own state so that updating the state doesn't force-render the dialog again
-        // todo-0: this needs to be done in the MediaRecorder dialog timer also where direct dom is being used to solve this.
-        this.timeLeftTextField.valueIntf = new CompValueHolder<string>(this.timeLeftTextField, "timeLeft");
 
         this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
             this.player = elm;
@@ -286,7 +291,6 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     savePlayerInfo = (url: string, timeOffset: number): void => {
-        if (this.appState.isAnonUser) return;
         let urlHash = S.util.hashOfString(url);
         localStorage[urlHash] = timeOffset;
         // console.log("localStorage[" + urlHash + "]=" + timeOffset);

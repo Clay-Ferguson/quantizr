@@ -1,3 +1,4 @@
+import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import * as I from "../Interfaces";
 import { ValueIntf } from "../Interfaces";
@@ -22,6 +23,12 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
 
     constructor(public label: string, private isPassword: boolean, private onEnterKey: () => void, private inputClasses: string, public valueIntf: ValueIntf) {
         super(null);
+
+        /* Manage state internally if no valueIntf passed in */
+        if (!valueIntf) {
+            this.valueIntf = new CompValueHolder<string>(this, "val");
+        }
+
         S.util.mergeProps(this.attribs, {
             name: this.getId(),
             className: "form-group"
@@ -131,7 +138,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
             validationError ? new Label(validationError, {
                 key: this.getId() + "_labelErr",
                 className: "validationError"
-             }) : null
+            }) : null
         ]);
 
         if (this.onEnterKey) {

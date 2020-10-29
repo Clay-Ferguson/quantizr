@@ -119,6 +119,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         this.opened = false;
         this.resolve(this);
         if (this.getElement()) {
+            this.preUnmount();
             ReactDOM.unmountComponentAtNode(this.backdrop);
             S.util.domElmRemove(this.getId());
             S.util.domElmRemove(DialogBase.BACKDROP_PREFIX + this.getId());
@@ -129,6 +130,9 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
                 }
             }
         }
+    }
+
+    preUnmount(): any {
     }
 
     abstract renderDlg(): CompIntf[];
