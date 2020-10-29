@@ -279,7 +279,7 @@ export class RssTypeHandler extends TypeBase {
     otherwise we get rediculously large images */
     getDomPreUpdateFunction(parent: CompIntf): void {
         S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el, i) => {
-            el.style.maxWidth = "50%";
+            el.style.maxWidth = "40%";
         });
     }
 }
