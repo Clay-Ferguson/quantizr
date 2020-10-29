@@ -115,9 +115,6 @@ export class RssTypeHandler extends TypeBase {
             itemListContainer.addChild(new Div("Loading RSS Feed..."));
             itemListContainer.addChild(new Div("(For large feeds this can take a few seconds)"));
 
-            // todo-0: need an additional endpoint called getRssAggregate that takes the feedSrc, and allows it to represent
-            // multiple newline delimited feeds and generate the resultant feed by utilizing and updating the rss cach as necessary.
-            // let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(feedSrc);
             let url = S.util.getRemoteHost() + "/multiRssFeed?url=" + encodeURIComponent(feedSrc);
 
             // console.log("Reading RSS: " + url);
@@ -215,19 +212,17 @@ export class RssTypeHandler extends TypeBase {
 
         let itemCount = 0;
 
-        // todo-0: this will be faster if we dont' iterata ALL. can't we return false to exit?
-        feed.items.forEach(function (item) {
-            if (itemCount < RssTypeHandler.MAX_FEED_ITEMS) {
-                itemListContainer.getChildren().push(this.buildFeedItem(item, state));
+        for (let item of feed.items) {
+            itemListContainer.getChildren().push(this.buildFeedItem(item, state));
+            if (++itemCount >= RssTypeHandler.MAX_FEED_ITEMS) {
+                break;
             }
-            itemCount++;
-        }, this);
+        }
     }
 
     buildFeedItem(entry, state: AppState): Comp {
         let children: Comp[] = [];
 
-        /* todo-0: When viewing a SINGLE feed that is not aggregate, this prefixed title (name of feed itself) is redundant */
         let colonIdx = entry.title.indexOf(":");
         if (colonIdx !== -1) {
             let headerPart = entry.title.substring(0, colonIdx);
