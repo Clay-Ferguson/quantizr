@@ -64,7 +64,8 @@ public class RSSFeedService {
 	private static final HashMap<String, SyndFeed> feedCache = new HashMap<String, SyndFeed>();
 
 	/*
-	 * Cache of all feeds that are a core publication of the portal (that is part of portal pages)
+	 * Cache of all feeds that are a core publication of the portal (that is part of
+	 * portal pages)
 	 */
 	private static final HashMap<String, SyndFeed> portalCache = new HashMap<String, SyndFeed>();
 
@@ -110,23 +111,14 @@ public class RSSFeedService {
 
 		try {
 			refreshingCache = true;
-			SyndFeed feed = null;
 			int count = 0, fails = 0;
 
 			for (String url : feedCache.keySet()) {
-				try {
-					feed = getFeed(url);
+				SyndFeed feed = getFeed(url, false);
+				if (feed != null) {
 					count++;
-
-					synchronized (feedCache) {
-						feedCache.put(url, feed);
-					}
-				} catch (Exception e) {
+				} else {
 					fails++;
-					ExUtil.error(log, "Error reading feed: " + url, e);
-					synchronized (feedCache) {
-						feedCache.remove(url);
-					}
 				}
 			}
 			return "Refreshed " + String.valueOf(count) + " feeds. (Fail Count: " + String.valueOf(fails) + ")";
@@ -144,9 +136,10 @@ public class RSSFeedService {
 	 */
 	public void multiRss(MongoSession mongoSession, final String nodeId, Writer writer) {
 
-		// will be true if this is the IDW node for example on quanta.wiki. The
-		// system-defined published aggregate, of which
-		// right now we only support one.
+		/*
+		 * will be true if this is the IDW node for example on quanta.wiki. The
+		 * system-defined published aggregate, of which right now we only support one.
+		 */
 		boolean portalAggregate = nodeId.equals(appProp.getRssAggregatePreCacheNodeId());
 
 		SyndFeed feed = portalAggregate ? portalCache.get(nodeId) : null;
@@ -190,7 +183,7 @@ public class RSSFeedService {
 				}
 			}
 
-			readUrls(urls, entries);
+			aggregateFeeds(urls, entries);
 
 			if (portalAggregate) {
 				portalCache.put(nodeId, feed);
@@ -200,42 +193,40 @@ public class RSSFeedService {
 		writeFeed(feed, writer);
 	}
 
-	public void readUrls(List<String> urls, List<SyndEntry> entries) {
-		for (String url : urls) {
-			try {
-				List<SyndEntry> feedEntries = null;
-				synchronized (feedCache) {
-					SyndFeed f = feedCache.get(url);
-					if (f != null) {
-						feedEntries = f.getEntries();
+	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries) {
+		try {
+			for (String url : urls) {
+				SyndFeed inFeed = getFeed(url, true);
+				if (inFeed != null) {
+					for (SyndEntry entry : inFeed.getEntries()) {
+						SyndEntry entryClone = (SyndEntry) entry.clone();
+						entryClone.setTitle(inFeed.getTitle() + ": " + entryClone.getTitle());
+						entries.add(entryClone);
 					}
 				}
-
-				if (feedEntries == null) {
-					log.debug("Reading Feed: " + url);
-					SyndFeed inFeed = getFeed(url);
-					feedEntries = inFeed.getEntries();
-					synchronized (feedCache) {
-						feedCache.put(url, inFeed);
-					}
-				}
-
-				entries.addAll(feedEntries);
-			} catch (Exception e) {
-				ExUtil.error(log, "Feed Error: ", e);
-				// let one feed fail and not blow up the rest, so do not rethros
 			}
+			revChronSortEntries(entries);
+		} catch (Exception e) {
+			ExUtil.error(log, "Error: ", e);
 		}
-		revChronSortEntries(entries);
 	}
 
-	public SyndFeed getFeed(String url) {
+	public SyndFeed getFeed(String url, boolean fromCache) {
 		try {
+			SyndFeed inFeed = null;
+
+			if (fromCache) {
+				synchronized (feedCache) {
+					inFeed = feedCache.get(url);
+					if (inFeed != null) {
+						return inFeed;
+					}
+				}
+			}
+
 			URL inputUrl = new URL(url);
 			SyndFeedInput input = new SyndFeedInput();
-			SyndFeed inFeed = input.build(new XmlReader(inputUrl));
-
-			revChronSortEntries(inFeed.getEntries());
+			inFeed = input.build(new XmlReader(inputUrl));
 
 			if (!StringUtils.isEmpty(inFeed.getTitle())) {
 
@@ -248,15 +239,20 @@ public class RSSFeedService {
 				if (inFeed.getEntries().size() > 50) {
 					inFeed.setEntries(inFeed.getEntries().subList(0, 50));
 				}
-
-				// Prefix each Title with the Feed Title so they can be distinguished when
-				// rendered in browser.
-				for (SyndEntry entry : inFeed.getEntries()) {
-					entry.setTitle(inFeed.getTitle() + ": " + entry.getTitle());
-				}
 			}
+
+			// we update the cache regardless of 'fromCache' val. this is correct.
+			synchronized (feedCache) {
+				feedCache.put(url, inFeed);
+			}
+
 			return inFeed;
 		} catch (Exception e) {
+			/*
+			 * Leave feedCache with any existing mapping it has when it fails. Worst case
+			 * here is a stale cache remains in place rather than getting forgotten just
+			 * because it's currently unavailable
+			 */
 			ExUtil.error(log, "Error: ", e);
 			return null;
 		}
@@ -304,28 +300,18 @@ public class RSSFeedService {
 			feed.setLink("");
 			List<SyndEntry> entries = new ArrayList<SyndEntry>();
 			feed.setEntries(entries);
-			readUrls(urlList, entries);
+			aggregateFeeds(urlList, entries);
 			writeFeed(feed, writer);
 		}
 		/* If not an aggregate return the one external feed itself */
 		else {
 			String url = urlList.get(0);
-
-			// todo-0: wrap the cache check/update INSIDE the getFeed method?
-			synchronized (feedCache) {
-				feed = feedCache.get(url);
-			}
-
-			if (feed == null) {
-				log.debug("Reading Feed: " + url);
-				feed = getFeed(url);
-				synchronized (feedCache) {
-					feedCache.put(url, feed);
-				}
-			}
+			feed = getFeed(url, true);
 		}
 
-		writeFeed(feed, writer);
+		if (feed != null) {
+			writeFeed(feed, writer);
+		}
 	}
 
 	public void getRssFeed(MongoSession mongoSession, String nodeId, Writer writer) {
