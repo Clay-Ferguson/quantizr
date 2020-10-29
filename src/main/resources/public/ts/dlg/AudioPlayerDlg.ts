@@ -71,7 +71,6 @@ export class AudioPlayerDlg extends DialogBase {
         this.startTimePending = localStorage[this.urlHash];
         // console.log("startTimePending = localStorage[" + this.urlHash + "]=" + localStorage[this.urlHash]);
 
-        // todo-0: check all setIntervals in the app to be sure they all have a clearInterval.
         this.intervalTimer = setInterval(() => {
             this.timeslice();
         }, 60000);

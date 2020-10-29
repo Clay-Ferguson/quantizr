@@ -1100,6 +1100,10 @@ export class Util implements UtilIntf {
         return (date.getMonth() + 1) + "-" + date.getDate() + "-" + date.getFullYear() + " " + strTime;
     }
 
+    formatDateShort = (date): string => {
+        return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+    }
+
     /* Our 'hash' part of the history works perfectly when entering into browser and refreshing browser,
     but in general using the back button is not working correctly quite yet (will come back to this later. is good enough for now)
     todo-1

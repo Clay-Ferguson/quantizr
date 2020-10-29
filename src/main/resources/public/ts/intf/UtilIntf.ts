@@ -104,6 +104,7 @@ export interface UtilIntf {
     triggerCustom(elm: HTMLElement, evt: string, obj: Object): void;
     trigger(elm: HTMLElement, evt: string): void;
     formatDate(date): string;
+    formatDateShort(date): string;
     updateHistory(node: J.NodeInfo, childNode: J.NodeInfo, appState: AppState): void;
     getElm(id: string, exResolve?: (elm: HTMLElement) => void): Promise<HTMLElement>;
     animateScrollToTop(): any;

@@ -279,6 +279,10 @@ export class MediaRecorderDlg extends DialogBase {
         document.getElementById(this.status.getId()).innerHTML = (this.videoMode ? "Recording Video: " : "Recording Audio: ") + (++this.recordingTime) + "s";
     }
 
+    preUnmount(): any {
+        this.cancelTimer();
+    }
+
     cancelTimer = () => {
         if (this.recordingTimer) {
             clearInterval(this.recordingTimer);

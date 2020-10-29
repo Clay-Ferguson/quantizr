@@ -194,8 +194,8 @@ export class RssTypeHandler extends TypeBase {
             }));
         }
 
-        if (description || pubDate) {
-            feedOut.push(new Para(description + "  " + pubDate));
+        if (description) {
+            feedOut.push(new Para(description));
         }
 
         // A bit of a hack to avoid showing the feed URL of our own aggregate feeds. We could publish this but no need to and
@@ -231,13 +231,13 @@ export class RssTypeHandler extends TypeBase {
 
             let title = entry.title.substring(colonIdx + 4);
             children.push(new Anchor(entry.link, title, {
-                style: { fontSize: "25px" },
+                className: "rssAnchor",
                 target: "_blank"
             }));
         }
         else {
             children.push(new Anchor(entry.link, entry.title, {
-                style: { fontSize: "25px" },
+                className: "rssAnchor",
                 target: "_blank"
             }));
         }
@@ -265,7 +265,14 @@ export class RssTypeHandler extends TypeBase {
             children.push(contentDiv);
         }
 
-        children.push(new Div(entry.pubDate, { className: "float-right" }));
+        let dateStr = entry.pubDate;
+        if (entry.isoDate) {
+            let date = Date.parse(entry.isoDate);
+            if (date) {
+                dateStr = S.util.formatDateShort(new Date(date));
+            }
+        }
+        children.push(new Div(dateStr, { className: "float-right" }));
         children.push(new Div(null, { className: "clearfix" }));
 
         return new Div(null, { className: "rss-feed-item" }, children);
