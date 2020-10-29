@@ -48,16 +48,16 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     constructor(private nodeId: string, private node: J.NodeInfo, toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
         super(importMode ? "Import File" : "Upload File", null, false, state);
+
+        // todo-0: the state of this ipfs flag should be self-internal (same capability as EditFields have), so that a merge to this state dowesn't
+        // re-render because that blows up all the dragged files.
         this.mergeState({ toIpfs });
     }
 
     renderDlg(): CompIntf[] {
-        // let state = this.getState();
-        // S.log("upload.renderDlg: state.toIpfs="+state.toIpfs);
         let children = [
             new Form(null, [
                 this.importMode ? null : new HorizontalLayout([
-
                     /* Having this checkbox and caling the setState here causes a full rerender of this dialog, and this needs work eventually
                     to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div
                     and create a new one any time there's a state change and rerender */
@@ -77,7 +77,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     this.importMode ? null : new Button("From URL", this.uploadFromUrl),
                     this.importMode ? null : new Button("From Clipboard", this.uploadFromClipboard),
 
-                    new IconButton("fa-microphone", /* "From Mic" */ null, {
+                    this.importMode ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {
                         onClick: async () => {
                             let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, false, true);
                             await dlg.open();
@@ -90,7 +90,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         title: "Record Audio to Attachment"
                     }, "btn-secondary"),
 
-                    new IconButton("fa-video-camera", /* From WebCam */ null, {
+                    this.importMode ? null : new IconButton("fa-video-camera", /* From WebCam */ null, {
                         onClick: async () => {
                             let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, true, true);
                             await dlg.open();
@@ -154,18 +154,13 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     upload = async (): Promise<boolean> => {
-        // let state = this.getState();
         return new Promise<boolean>(async (resolve, reject) => {
             if (this.filesAreValid()) {
-
                 const files = this.dropzone.getAcceptedFiles();
-                this.numFiles = files.length;
 
-                if (files.length > 0) {
-                    files.forEach((file: File) => {
-                        S.log("Dropzone Processing File: " + file.name);
-                        this.dropzone.processFile(file);
-                    });
+                if (files) {
+                    this.numFiles = files.length;
+                    this.dropzone.processQueue();
                 }
             }
             resolve(true);
@@ -200,9 +195,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             paramName: "files",
             maxFilesize: maxFileSize,
 
-            // sets max number to send in each request, to keep from overloading server when large numbers are being sent
-            // to break up the upload into batches, but still sends each batch as a multi-file post.
-            parallelUploads: state.toIpfs ? 1 : 20,
+            parallelUploads: 20,
 
             // Flag tells server to upload multiple files using multi-post requests so more than one file is allowed for each post it makes.
             uploadMultiple: true,
@@ -240,9 +233,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("sending", function (file: File, xhr, formData) {
                     dlg.sent = true;
-                    // console.log("sending file: "+file.name);
+                    // console.log("sending file: " + file.name);
 
-                    S.log("Sending File: " + file.name);
                     formData.append("files", file);
 
                     // It's important to check before calling append on this formData, because when uploading multiple files
@@ -282,8 +274,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         }
                         return;
                     }
-
-                    // todo-0: case with IPFS (via Quanta Gateway) and multiple files uploading this needs testing and is likely not functional.
                 });
 
                 this.on("queuecomplete", function (arg) {
@@ -342,7 +332,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     filesAreValid = (): boolean => {
-        // let state = this.getState();
         if (!this.fileList || this.fileList.length === 0 || this.fileList.length > this.maxFiles) {
             return false;
         }
