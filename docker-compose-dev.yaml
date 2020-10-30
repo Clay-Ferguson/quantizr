@@ -116,7 +116,7 @@ services:
             JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
             ipfs.host: "http://ipfs:5001"
             # This is the node name for a feed like this: http://localhost:8182/multiRss?id=:podcast-set to cause that feed to precache
-            rssAggregatePreCacheNodeId: ":podcast-set"
+            rssAggregatePreCacheNodeId_XX: ":podcast-set"
         image: subnode-dev
         depends_on:
             - mongo-dev

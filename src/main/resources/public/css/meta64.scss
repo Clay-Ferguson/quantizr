@@ -1108,6 +1108,10 @@ i'm backing out for now
     border-top: 1px solid #e5e5e5;
 }
 
+.clearBoth {
+    clear: both;
+}
+
 .border-bottom {
     border-bottom: 1px solid #e5e5e5;
 }
@@ -1120,6 +1124,14 @@ i'm backing out for now
 
 .rssDownloadLink {
     margin-left: 15px;
+}
+
+.rss-feed-image {
+    border-radius: $borderRadiusMedium;
+    border: 1px solid $nodeBorderBottomColor;
+    max-width: 30%;
+    margin-bottom: 12px;
+    margin-right: 12px;
 }
 
 .rss-feed-item {

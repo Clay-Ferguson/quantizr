@@ -177,6 +177,12 @@ of the spring configs for security are also perfected.
     <artifactId>rome</artifactId>
     <version>1.15.0</version>
 </dependency>
+<dependency>
+    <groupId>com.rometools</groupId>
+    <artifactId>rome-modules</artifactId>
+    <version>1.15.0</version>
+</dependency>
+
 
 <!--
 <dependency>
@@ -563,6 +569,12 @@ of the spring configs for security are also perfected.
     <artifactId>rome</artifactId>
     <version>1.15.0</version>
 </dependency>
+<dependency>
+    <groupId>com.rometools</groupId>
+    <artifactId>rome-modules</artifactId>
+    <version>1.15.0</version>
+</dependency>
+
 
 <!--
 <dependency>
@@ -789,6 +801,12 @@ of the spring configs for security are also perfected.
     <artifactId>rome</artifactId>
     <version>1.15.0</version>
 </dependency>
+<dependency>
+    <groupId>com.rometools</groupId>
+    <artifactId>rome-modules</artifactId>
+    <version>1.15.0</version>
+</dependency>
+
 
 <!--
 <dependency>
@@ -1191,6 +1209,12 @@ of the spring configs for security are also perfected.
     <artifactId>rome</artifactId>
     <version>1.15.0</version>
 </dependency>
+<dependency>
+    <groupId>com.rometools</groupId>
+    <artifactId>rome-modules</artifactId>
+    <version>1.15.0</version>
+</dependency>
+
 
 <!--
 <dependency>

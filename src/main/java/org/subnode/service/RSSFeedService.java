@@ -200,9 +200,12 @@ public class RSSFeedService {
 				if (inFeed != null) {
 					for (SyndEntry entry : inFeed.getEntries()) {
 						SyndEntry entryClone = (SyndEntry) entry.clone();
-						/* We use this slight hack/technique to allow our client to be able to parse the
-						titles out of the feeds for displaying them in a nicer way, while being unobtrusive enough that
-						any podcast app could display it and it looks fine as it also. */
+						/*
+						 * We use this slight hack/technique to allow our client to be able to parse the
+						 * titles out of the feeds for displaying them in a nicer way, while being
+						 * unobtrusive enough that any podcast app could display it and it looks fine as
+						 * it also.
+						 */
 						entryClone.setTitle(inFeed.getTitle() + " :: " + entryClone.getTitle());
 						entries.add(entryClone);
 					}
@@ -222,6 +225,7 @@ public class RSSFeedService {
 				synchronized (feedCache) {
 					inFeed = feedCache.get(url);
 					if (inFeed != null) {
+						// log.debug("FEED: " + XString.prettyPrint(inFeed));
 						return inFeed;
 					}
 				}
@@ -230,6 +234,7 @@ public class RSSFeedService {
 			URL inputUrl = new URL(url);
 			SyndFeedInput input = new SyndFeedInput();
 			inFeed = input.build(new XmlReader(inputUrl));
+			// log.debug("FEED: " + XString.prettyPrint(inFeed));
 
 			if (!StringUtils.isEmpty(inFeed.getTitle())) {
 

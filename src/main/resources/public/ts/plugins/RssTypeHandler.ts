@@ -89,7 +89,17 @@ export class RssTypeHandler extends TypeBase {
             new Heading(3, content)
         ]);
 
-        let parser = new RssParser();
+        let parser = new RssParser({
+            customFields: {
+                item: [
+                    ["media:thumbnail", "mediaThumbnail"],
+                    ["category", "category"],
+                    ["itunes:image", "itunesImage"],
+                    ["itunes:subtitle", "itunesSubtitle"]
+                ]
+            }
+        });
+
         /*
         If we find the RSS feed in the cache, use it.
         disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to
@@ -146,7 +156,6 @@ export class RssTypeHandler extends TypeBase {
     }
 
     renderItem(feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) {
-        // console.log("Render Feed: " + S.util.prettyPrint(feed));
         // Current approach is to put the feed title in the parent node so we don't need it rendered
         // here also
         let feedOut: Comp[] = [];
@@ -176,21 +185,18 @@ export class RssTypeHandler extends TypeBase {
         if (feed.image) {
             // link, title, url
             feedOut.push(new Img(null, {
-                style: {
-                    maxWidth: "50%",
-                    marginBottom: "20px"
-                },
+                className: "rss-feed-image",
                 src: feed.image.url,
-                title: feed.image.title
+                title: feed.image.title,
+                align: "left" // causes text to flow around
             }));
         }
 
         if (feed.itunes && feed.itunes.image) {
             feedOut.push(new Img(null, {
-                style: {
-                    maxWidth: "50%"
-                },
-                src: feed.itunes.image
+                className: "rss-feed-image",
+                src: feed.itunes.image,
+                align: "left" // causes text to flow around
             }));
         }
 
@@ -224,23 +230,63 @@ export class RssTypeHandler extends TypeBase {
     buildFeedItem(entry, state: AppState): Comp {
         let children: Comp[] = [];
 
+        let headerDivChildren = [];
+
+        if (entry.mediaThumbnail && entry.mediaThumbnail.$) {
+
+            let style: any = {};
+
+            if (entry.mediaThumbnail.$.width) {
+                style.width = entry.mediaThumbnail.$.width + "px";
+            }
+
+            if (entry.mediaThumbnail.$.height) {
+                style.height = entry.mediaThumbnail.$.height + "px";
+            }
+
+            headerDivChildren.push(new Img(null, {
+                style,
+                className: "rss-feed-image",
+                src: entry.mediaThumbnail.$.url,
+                align: "left" // causes text to flow around
+            }));
+        }
+
+        if (entry.itunesImage && entry.itunesImage.$) {
+            headerDivChildren.push(new Img(null, {
+                className: "rss-feed-image",
+                src: entry.itunesImage.$.href,
+                align: "left" // causes text to flow around
+            }));
+        }
+
+        if (entry.category) {
+            headerDivChildren.push(new Div(entry.category));
+        }
+
         let colonIdx = entry.title.indexOf(" :: ");
         if (colonIdx !== -1) {
             let headerPart = entry.title.substring(0, colonIdx);
-            children.push(new Heading(4, headerPart));
+            headerDivChildren.push(new Heading(4, headerPart));
 
             let title = entry.title.substring(colonIdx + 4);
-            children.push(new Anchor(entry.link, title, {
+            headerDivChildren.push(new Anchor(entry.link, title, {
                 className: "rssAnchor",
                 target: "_blank"
             }));
         }
         else {
-            children.push(new Anchor(entry.link, entry.title, {
+            headerDivChildren.push(new Anchor(entry.link, entry.title, {
                 className: "rssAnchor",
                 target: "_blank"
             }));
         }
+
+        if (entry.itunesSubtitle) {
+            headerDivChildren.push(new Div(entry.itunesSubtitle));
+        }
+
+        children.push(new Div(null, null, headerDivChildren));
 
         if (entry.enclosure && entry.enclosure.url && entry.enclosure.type &&
             entry.enclosure.type.indexOf("audio/") !== -1) {
@@ -254,6 +300,8 @@ export class RssTypeHandler extends TypeBase {
 
             children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));
         }
+
+        children.push(new Div(null, { className: "clearBoth" }));
 
         if (entry["content:encoded"]) {
             /* set the dangerously flag for this stuff and render as html */
