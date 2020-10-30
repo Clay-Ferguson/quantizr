@@ -157,22 +157,16 @@ export class RssTypeHandler extends TypeBase {
     }
 
     renderItem(feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) {
-        // Current approach is to put the feed title in the parent node so we don't need it rendered
-        // here also
         let feedOut: Comp[] = [];
-
-        let description = feed.description || "";
-        let pubDate = feed.pubDate || "";
 
         // console.log("FEED: " + S.util.prettyPrint(feed));
 
         if (feed.image) {
-            // link, title, url
             feedOut.push(new Img(null, {
                 className: "rss-feed-image",
                 src: feed.image.url,
                 title: feed.image.title,
-                align: "left" // causes text to flow around (todo-0) for mobile platform don't allow the text flow (do for all RSS and tree rows?)
+                align: "left" // causes text to flow around
             }));
         }
         else if (feed.itunes && feed.itunes.image) {
@@ -199,8 +193,8 @@ export class RssTypeHandler extends TypeBase {
 
         feedOut.push(new Div(null, { className: "clearBoth" }));
 
-        if (description) {
-            feedOut.push(new Html(description));
+        if (feed.description) {
+            feedOut.push(new Html(feed.description));
         }
 
         // A bit of a hack to avoid showing the feed URL of our own aggregate feeds. We could publish this but no need to and
@@ -327,6 +321,10 @@ export class RssTypeHandler extends TypeBase {
     otherwise we get rediculously large images */
     getDomPreUpdateFunction(parent: CompIntf): void {
         S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el, i) => {
+            el.style.borderRadius = ".6em";
+            el.style.border = "1px solid gray";
+        });
+        S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-image", (el, i) => {
             el.style.maxWidth = "25%";
         });
     }

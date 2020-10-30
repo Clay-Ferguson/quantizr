@@ -2,7 +2,7 @@ package org.subnode.service;
 
 import java.io.Writer;
 import java.net.URL;
-import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -64,18 +64,17 @@ public class RSSFeedService {
 	private static final HashMap<String, SyndFeed> feedCache = new HashMap<String, SyndFeed>();
 
 	/*
-	 * Cache of all feeds that are a core publication of the portal (that is part of
-	 * portal pages)
+	 * Cache of all aggregates
 	 */
-	private static final HashMap<String, SyndFeed> portalCache = new HashMap<String, SyndFeed>();
+	private static final HashMap<String, SyndFeed> aggregateCache = new HashMap<String, SyndFeed>();
 
 	private static int runCount = 0;
 
 	/*
-	 * Runs immediately at startup, and then every 240 minutes, to refresh the
+	 * Runs immediately at startup, and then every 120 minutes, to refresh the
 	 * feedCache.
 	 */
-	@Scheduled(fixedDelay = 240 * 60 * 1000)
+	@Scheduled(fixedDelay = 120 * 60 * 1000)
 	public void run() {
 		runCount++;
 		if (runCount == 1) {
@@ -90,7 +89,7 @@ public class RSSFeedService {
 
 		log.debug("RSSFeedService.refreshFeedCache");
 		refreshFeedCache();
-		portalCache.clear();
+		aggregateCache.clear();
 	}
 
 	public void startupPreCache() {
@@ -135,14 +134,7 @@ public class RSSFeedService {
 	 * like only to prewarm the cache during app startup called from startupPreCache
 	 */
 	public void multiRss(MongoSession mongoSession, final String nodeId, Writer writer) {
-
-		/*
-		 * will be true if this is the IDW node for example on quanta.wiki. The
-		 * system-defined published aggregate, of which right now we only support one.
-		 */
-		boolean portalAggregate = nodeId.equals(appProp.getRssAggregatePreCacheNodeId());
-
-		SyndFeed feed = portalAggregate ? portalCache.get(nodeId) : null;
+		SyndFeed feed = aggregateCache.get(nodeId);
 
 		// if we didn't find in the cache built the feed
 		if (feed == null) {
@@ -162,7 +154,7 @@ public class RSSFeedService {
 			feed.setAuthor("");
 			feed.setLink("");
 
-			List<SyndEntry> entries = new ArrayList<SyndEntry>();
+			List<SyndEntry> entries = new LinkedList<SyndEntry>();
 			feed.setEntries(entries);
 			List<String> urls = new LinkedList<String>();
 
@@ -184,18 +176,26 @@ public class RSSFeedService {
 			}
 
 			aggregateFeeds(urls, entries);
-
-			if (portalAggregate) {
-				portalCache.put(nodeId, feed);
-			}
+			aggregateCache.put(nodeId, feed);
 		}
 
 		writeFeed(feed, writer);
 	}
 
+	/*
+	 * NOTE: todo-1: there is a scenario here where feeds that produce large numbers
+	 * of daily results will simply crowd out the rest of the entries with all
+	 * theirs going to the top pushing all others to the end. Need some new algo
+	 * where we ensure at least X-number of items from each feed is include unless
+	 * they are at least a full day old.
+	 */
 	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries) {
 		try {
 			for (String url : urls) {
+				// allow feeds to be commented
+				if (url.startsWith("#"))
+					continue;
+
 				SyndFeed inFeed = getFeed(url, true);
 				if (inFeed != null) {
 					for (SyndEntry entry : inFeed.getEntries()) {
@@ -212,6 +212,16 @@ public class RSSFeedService {
 				}
 			}
 			revChronSortEntries(entries);
+
+			/*
+			 * this number has to be as large at least as the number the browser will try to
+			 * show currently, because the aggregator code is sharing this object with the
+			 * ordinary single RSS feed retrival and so this number chops it down. Need to
+			 * rethink this, and only chop down what the aggreggator is working with
+			 */
+			while (entries.size() > 50) {
+				entries.remove(entries.size() - 1);
+			}
 		} catch (Exception e) {
 			ExUtil.error(log, "Error: ", e);
 		}
@@ -235,19 +245,6 @@ public class RSSFeedService {
 			SyndFeedInput input = new SyndFeedInput();
 			inFeed = input.build(new XmlReader(inputUrl));
 			// log.debug("FEED: " + XString.prettyPrint(inFeed));
-
-			if (!StringUtils.isEmpty(inFeed.getTitle())) {
-
-				/*
-				 * this number has to be as large at least as the number the browser will try to
-				 * show currently, because the aggregator code is sharing this object with the
-				 * ordinary single RSS feed retrival and so this number chops it down. Need to
-				 * rethink this, and only chop down what the aggreggator is working with
-				 */
-				if (inFeed.getEntries().size() > 50) {
-					inFeed.setEntries(inFeed.getEntries().subList(0, 50));
-				}
-			}
 
 			// we update the cache regardless of 'fromCache' val. this is correct.
 			synchronized (feedCache) {
@@ -306,7 +303,7 @@ public class RSSFeedService {
 			feed.setDescription("");
 			feed.setAuthor("");
 			feed.setLink("");
-			List<SyndEntry> entries = new ArrayList<SyndEntry>();
+			List<SyndEntry> entries = new LinkedList<SyndEntry>();
 			feed.setEntries(entries);
 			aggregateFeeds(urlList, entries);
 			writeFeed(feed, writer);
