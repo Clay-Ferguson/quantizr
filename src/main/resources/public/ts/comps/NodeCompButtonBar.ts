@@ -196,8 +196,8 @@ export class NodeCompButtonBar extends HorizontalLayout {
                 }
 
                 if (!!state.nodesToMove && userCanPaste) {
-                    pasteInsideButton = new Button("Paste Inside", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodesInside, "S.edit.pasteSelNodesInside", node.id));
-                    pasteInlineButton = new Button("Paste", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_InlineAbove, "S.edit.pasteSelNodes_InlineAbove", node.id));
+                    pasteInsideButton = new Button("Paste Inside", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodesInside, "S.edit.pasteSelNodesInside", node.id), null, "btn-secondary pasteButton");
+                    pasteInlineButton = new Button("Paste Here", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_InlineAbove, "S.edit.pasteSelNodes_InlineAbove", node.id), null, "btn-secondary pasteButton");
                 }
             }
         }

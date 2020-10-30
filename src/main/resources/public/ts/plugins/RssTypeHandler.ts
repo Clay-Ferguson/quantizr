@@ -16,10 +16,10 @@ import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { Img } from "../widget/Img";
 import { Html } from "../widget/Html";
-import { Para } from "../widget/Para";
 import { TextContent } from "../widget/TextContent";
 import { TypeBase } from "./base/TypeBase";
 import { Span } from "../widget/Span";
+import { Progress } from "../widget/Progress";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -28,7 +28,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class RssTypeHandler extends TypeBase {
 
-    static MAX_FEED_ITEMS: number = 50;
+    // NOTE: Same value appears in RSSFeedService.ts
+    static MAX_FEED_ITEMS: number = 200;
 
     constructor() {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
@@ -112,9 +113,9 @@ export class RssTypeHandler extends TypeBase {
             });
         }
         else if (state.feedCache[feedSrcHash] === "loading") {
-            return new Div("Loading: " + feedSrc, {
+            return new Div("Loading Feeds...", {
                 className: "marginAll"
-            });
+            }, [new Progress()]);
         }
         else if (state.feedCache[feedSrcHash]) {
             this.renderItem(state.feedCache[feedSrcHash], feedSrc, itemListContainer, state);

@@ -70,6 +70,9 @@ public class RSSFeedService {
 
 	private static int runCount = 0;
 
+	// NOTE: Same value appears in RSSTypeHandler.ts
+	private static final int MAX_FEED_ITEMS = 200;
+
 	/*
 	 * Runs immediately at startup, and then every 120 minutes, to refresh the
 	 * feedCache.
@@ -215,7 +218,7 @@ public class RSSFeedService {
 			 * ordinary single RSS feed retrival and so this number chops it down. Need to
 			 * rethink this, and only chop down what the aggreggator is working with
 			 */
-			while (entries.size() > 50) {
+			while (entries.size() > MAX_FEED_ITEMS) {
 				entries.remove(entries.size() - 1);
 			}
 		} catch (Exception e) {

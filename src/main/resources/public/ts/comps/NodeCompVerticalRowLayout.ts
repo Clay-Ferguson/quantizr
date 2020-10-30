@@ -98,7 +98,7 @@ export class NodeCompVerticalRowLayout extends Div {
 
                 let userCanPaste = S.props.isMine(lastNode, state) || state.isAdminUser || lastNode.id === state.homeNodeId;
                 if (!!state.nodesToMove && userCanPaste) {
-                    comps.push(new Button("Paste", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_Inline, "S.edit.pasteSelNodes_Inline", lastNode.id)));
+                    comps.push(new Button("Paste Here", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_Inline, "S.edit.pasteSelNodes_Inline", lastNode.id), null, "btn-secondary pasteButton"));
                 }
             }
         }
