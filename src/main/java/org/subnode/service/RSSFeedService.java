@@ -192,10 +192,6 @@ public class RSSFeedService {
 	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries) {
 		try {
 			for (String url : urls) {
-				// allow feeds to be commented
-				if (url.startsWith("#"))
-					continue;
-
 				SyndFeed inFeed = getFeed(url, true);
 				if (inFeed != null) {
 					for (SyndEntry entry : inFeed.getEntries()) {
@@ -291,6 +287,8 @@ public class RSSFeedService {
 	public void multiRssFeed(String urls, Writer writer) {
 
 		List<String> urlList = XString.tokenize(urls, "\n", true);
+		urlList.removeIf(url -> url.startsWith("#") || StringUtils.isEmpty(url.trim()));
+
 		SyndFeed feed = null;
 
 		/* If multiple feeds we build an aggregate */
@@ -384,8 +382,18 @@ public class RSSFeedService {
 		writeFeed(feed, writer);
 	}
 
+	private void fixFeed(SyndFeed feed) {
+		if (StringUtils.isEmpty(feed.getEncoding())) feed.setEncoding("UTF-8");
+		if (StringUtils.isEmpty(feed.getFeedType())) feed.setFeedType("rss_2.0");
+		if (StringUtils.isEmpty(feed.getTitle())) feed.setTitle("");
+		if (StringUtils.isEmpty(feed.getDescription())) feed.setDescription("");
+		if (StringUtils.isEmpty(feed.getAuthor())) feed.setAuthor("");
+		if (StringUtils.isEmpty(feed.getLink())) feed.setLink("");
+	}
+
 	private void writeFeed(SyndFeed feed, Writer writer) {
 		if (writer != null) {
+			fixFeed(feed);
 			SyndFeedOutput output = new SyndFeedOutput();
 			String feedStr = null;
 			try {
