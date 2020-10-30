@@ -19,6 +19,7 @@ import { Html } from "../widget/Html";
 import { Para } from "../widget/Para";
 import { TextContent } from "../widget/TextContent";
 import { TypeBase } from "./base/TypeBase";
+import { Span } from "../widget/Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -163,23 +164,6 @@ export class RssTypeHandler extends TypeBase {
         let description = feed.description || "";
         let pubDate = feed.pubDate || "";
 
-        if (feed.title) {
-            if (feed.link) {
-                feedOut.push(new Div(null, null, [
-                    new Anchor(feed.link, feed.title, {
-                        style: { fontSize: "45px" },
-                        target: "_blank"
-                    })
-                ]));
-            }
-            else {
-                feedOut.push(new Div(feed.title, {
-                    style: { fontSize: "45px" },
-                    target: "_blank"
-                }));
-            }
-        }
-
         // console.log("FEED: " + S.util.prettyPrint(feed));
 
         if (feed.image) {
@@ -188,11 +172,10 @@ export class RssTypeHandler extends TypeBase {
                 className: "rss-feed-image",
                 src: feed.image.url,
                 title: feed.image.title,
-                align: "left" // causes text to flow around
+                align: "left" // causes text to flow around (todo-0) for mobile platform don't allow the text flow (do for all RSS and tree rows?)
             }));
         }
-
-        if (feed.itunes && feed.itunes.image) {
+        else if (feed.itunes && feed.itunes.image) {
             feedOut.push(new Img(null, {
                 className: "rss-feed-image",
                 src: feed.itunes.image,
@@ -200,8 +183,24 @@ export class RssTypeHandler extends TypeBase {
             }));
         }
 
+        if (feed.title) {
+            if (feed.link) {
+                feedOut.push(new Anchor(feed.link, feed.title, {
+                    style: { fontSize: "45px" },
+                    target: "_blank"
+                }));
+            }
+            else {
+                feedOut.push(new Span(feed.title, {
+                    style: { fontSize: "45px" }
+                }));
+            }
+        }
+
+        feedOut.push(new Div(null, { className: "clearBoth" }));
+
         if (description) {
-            feedOut.push(new Para(description));
+            feedOut.push(new Html(description));
         }
 
         // A bit of a hack to avoid showing the feed URL of our own aggregate feeds. We could publish this but no need to and
@@ -233,7 +232,6 @@ export class RssTypeHandler extends TypeBase {
         let headerDivChildren = [];
 
         if (entry.mediaThumbnail && entry.mediaThumbnail.$) {
-
             let style: any = {};
 
             if (entry.mediaThumbnail.$.width) {
@@ -251,8 +249,7 @@ export class RssTypeHandler extends TypeBase {
                 align: "left" // causes text to flow around
             }));
         }
-
-        if (entry.itunesImage && entry.itunesImage.$) {
+        else if (entry.itunesImage && entry.itunesImage.$) {
             headerDivChildren.push(new Img(null, {
                 className: "rss-feed-image",
                 src: entry.itunesImage.$.href,
@@ -330,7 +327,7 @@ export class RssTypeHandler extends TypeBase {
     otherwise we get rediculously large images */
     getDomPreUpdateFunction(parent: CompIntf): void {
         S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el, i) => {
-            el.style.maxWidth = "40%";
+            el.style.maxWidth = "25%";
         });
     }
 }
