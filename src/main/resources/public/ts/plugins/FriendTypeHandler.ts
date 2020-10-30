@@ -74,6 +74,7 @@ export class FriendTypeHandler extends TypeBase {
                 });
             }
         }
+
         return new Div(null, {
             className: "row marginLeft"
         }, [

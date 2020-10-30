@@ -461,7 +461,7 @@ export class Render implements RenderIntf {
         const key = "avatar-" + node.id;
 
         // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-        const img: Img = new Img(key, {
+        return new Img(key, {
             src,
             className: "avatarImage",
 
@@ -474,8 +474,6 @@ export class Render implements RenderIntf {
                 new ProfileDlg(state, true, node.ownerId, node.owner).open();
             }
         });
-
-        return img;
     }
 
     /* Returns true if the logged in user and the type of node allow the property to be edited by the user */

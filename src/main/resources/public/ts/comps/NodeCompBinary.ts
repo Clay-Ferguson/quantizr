@@ -59,8 +59,7 @@ export class NodeCompBinary extends Div {
             style.width = "calc(" + imgSize + " - 12px)";
         }
 
-        // todo-0: need a strategy for having align: "left" attribute on the image to have text flow around.
-        let img: Img = new Img(node.id, {
+        return new Img(node.id, {
             src,
             className: this.isEditorEmbed ? "attached-img-in-editor" : "attached-img-in-row",
             style,
@@ -69,7 +68,6 @@ export class NodeCompBinary extends Div {
                 this.cached_clickOnImage(node.id);
             }
         });
-        return img;
     }
 
     cached_clickOnImage = (nodeId: string) => {

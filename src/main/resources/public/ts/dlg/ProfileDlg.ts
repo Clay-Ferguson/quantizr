@@ -193,8 +193,7 @@ export class ProfileDlg extends DialogBase {
             }
 
             // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-            let img: Img = new Img("profile-img", att);
-            return img;
+            return new Img("profile-img", att);
         }
         else {
             return new Div("Click to upload Profile Image", {
