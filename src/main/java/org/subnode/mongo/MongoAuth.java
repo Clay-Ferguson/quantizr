@@ -82,6 +82,7 @@ public class MongoAuth {
 	}
 
 	public void auth(MongoSession session, SubNode node, PrivilegeType... privs) {
+		if (session.isAdmin()) return; // admin can do anything. skip auth
 		auth(session, node, Arrays.asList(privs));
 	}
 

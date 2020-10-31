@@ -2,6 +2,7 @@ package org.subnode.service;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -113,6 +114,40 @@ public class IPFSService {
         return ret;
     }
 
+    public final boolean removePin(String cid) {
+        try {
+            String url = appProp.getIPFSHost() + "/api/v0/pin/rm?arg=" + cid;
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(null, null);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            return response.getStatusCode().value() == 200;
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.exchange", e);
+        }
+        return false;
+    }
+
+    public final LinkedHashMap<String, Object> getPins() {
+        LinkedHashMap<String, Object> pins = null;
+        try {
+            String url = appProp.getIPFSHost() + "/api/v0/pin/ls?type=recursive";
+
+            ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
+            MediaType contentType = result.getHeaders().getContentType();
+
+            // log.debug("RAW RESULT: " + result.getBody());
+
+            if (MediaType.APPLICATION_JSON.equals(contentType)) {
+                Map<String, Object> respMap = mapper.readValue(result.getBody(),
+                        new TypeReference<Map<String, Object>>() {
+                        });
+                pins = (LinkedHashMap<String, Object>) respMap.get("Keys");
+            }
+        } catch (Exception e) {
+            // log.error("Failed in restTemplate.getForEntity", e);
+        }
+        return pins;
+    }
+
     /**
      * @param hash
      * @param encoding text | json
@@ -130,7 +165,7 @@ public class IPFSService {
             ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
             MediaType contentType = result.getHeaders().getContentType();
 
-            log.debug("RAW RESULT: " + result.getBody());
+            // log.debug("RAW RESULT: " + result.getBody());
 
             if (MediaType.APPLICATION_JSON.equals(contentType)) {
                 ret = XString.jsonMapper.readValue(result.getBody(), MerkleNode.class);

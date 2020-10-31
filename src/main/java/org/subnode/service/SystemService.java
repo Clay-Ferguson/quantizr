@@ -15,6 +15,7 @@ import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoAppConfig;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Const;
@@ -38,6 +39,9 @@ public class SystemService {
 	private MongoRead read;
 
 	@Autowired
+	private MongoUpdate update;
+
+	@Autowired
 	private RunAsMongoAdmin adminRunner;
 
 	@Autowired
@@ -59,6 +63,7 @@ public class SystemService {
 
 	public String compactDb() {
 		attachmentService.gridMaintenanceScan();
+		update.releaseOrphanIPFSPins();
 
 		MongoDatabase database = mac.mongoClient().getDatabase(MongoAppConfig.databaseName);
 		Document result = database.runCommand(new Document("compact", "nodes"));
@@ -68,6 +73,7 @@ public class SystemService {
 		for (Map.Entry<String, Object> set : result.entrySet()) {
 			ret.append(String.format("%s: %s%n", set.getKey(), set.getValue()));
 		}
+	
 		return ret.toString();
 	}
 

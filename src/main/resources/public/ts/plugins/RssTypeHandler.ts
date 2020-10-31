@@ -113,9 +113,10 @@ export class RssTypeHandler extends TypeBase {
             });
         }
         else if (state.feedCache[feedSrcHash] === "loading") {
+            // todo-1: I tried to put "new Progress()" as a child but it doesn't render. never tried to troubleshoot.
             return new Div("Loading Feeds...", {
                 className: "marginAll"
-            }, [new Progress()]);
+            });
         }
         else if (state.feedCache[feedSrcHash]) {
             this.renderItem(state.feedCache[feedSrcHash], feedSrc, itemListContainer, state);

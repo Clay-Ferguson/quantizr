@@ -18,6 +18,11 @@ public class IPFSTest implements TestIntf {
 
     @Override
     public void test() throws Exception {
+        log.debug("IPFSTest.test() running.");
+        // ipfs.getPins();
+    }
+
+    public void oldTest() throws Exception {
         try {
             String hash = "QmaaqrHyAQm7gALkRW8DcfGX3u8q9rWKnxEMmf7m9z515w";
             log.debug("Querying Hash: " + hash);
@@ -30,7 +35,6 @@ public class IPFSTest implements TestIntf {
 
             //String merkContent = ipfs.objectCat(hash);
         } finally {
-
         }
     }
 }

@@ -222,15 +222,7 @@ export class MenuPanel extends Div {
 
         if (state.isAdminUser) {
             children.push(new Menu("IPFS", [
-
                 new MenuItem("Display Node Info", () => S.view.runServerCommand("ipfsGetNodeInfo", "IPFS Node Info", null, state), //
-                    state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)),
-
-                new MenuItem("Force Refresh", () => {
-                    const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
-                    const nodeId: string = currentSelNode ? currentSelNode.id : null;
-                    S.view.refreshTree(nodeId, false, false, nodeId, true, true, true, state);
-                },
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine))
             ]));
         }

@@ -776,4 +776,16 @@ public class MongoRead {
         auth.auth(session, ret, PrivilegeType.READ);
         return ret;
     }
+
+     /*
+     * Returns one (or first) node that has a matching propName and propVal
+     */
+    public SubNode findSubNodeByProp(MongoSession session, String propName, String propVal) {
+        Query query = new Query();
+        Criteria criteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + propName + ".value").is(propVal);
+        query.addCriteria(criteria);
+        SubNode ret = getOps(session).findOne(query, SubNode.class);
+        auth.auth(session, ret, PrivilegeType.READ);  
+        return ret;
+    }
 }

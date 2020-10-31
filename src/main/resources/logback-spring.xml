@@ -57,7 +57,12 @@
         <appender-ref ref="Console" />
     </logger>
 
-     <logger name="org.thymeleaf.ConfigurationPrinterHelper" level="warn" additivity="false">
+    <logger name="org.thymeleaf.ConfigurationPrinterHelper" level="warn" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+
+    <logger name="com.rometools.modules.content.io.ContentModuleGenerator" level="warn" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger>
