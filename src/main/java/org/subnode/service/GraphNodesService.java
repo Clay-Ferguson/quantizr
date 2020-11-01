@@ -23,6 +23,8 @@ import org.subnode.util.XString;
 public class GraphNodesService {
 	private static final Logger log = LoggerFactory.getLogger(GraphNodesService.class);
 
+	static int guid = 0;
+
 	@Autowired
 	private MongoRead read;
 
@@ -137,10 +139,10 @@ public class GraphNodesService {
 		GraphNode parent = mapByPath.get(parentPath);
 
 		if (parent == null) {
-			// todo-0: browser does a live query on nodes where id start with slash meaning it was one of these 'scaffolding' nodes
-			// not part of search results so need to avoid sending back any 'name' property here. not needed. it's queried live.
-			// but be careful right now a null name here DOES break the code.
-			parent = new GraphNode(parentPath, parentPath, parentPath);
+			// We only need guid on this name, to ensure D3 works, but the actual name on these
+			// is queries for during mouseover because otherwise it could be a large number
+			// of queries to populate them here now, when that's not needed.
+			parent = new GraphNode(parentPath, String.valueOf(guid++), parentPath);
 			mapByPath.put(parentPath, parent);
 
 			// keep creating parents until we know we made it to common root.

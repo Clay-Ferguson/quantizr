@@ -112,6 +112,7 @@ export class FullScreenGraphViewer extends Main {
             let data: J.GraphNode = node.__data__.data;
 
             let title = circle.select("title");
+            title.text("Loading...");
             if (data.id.startsWith("/")) {
                 _this.updateText(data.id, title);
             }

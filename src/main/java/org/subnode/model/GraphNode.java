@@ -13,7 +13,7 @@ public class GraphNode {
     private String name;
     private String path;
     private List<GraphNode> children;
-    private HashSet<String> childNames; 
+    private HashSet<String> childIds;
 
     public GraphNode() {
     }
@@ -25,16 +25,17 @@ public class GraphNode {
     }
 
     public void addChild(GraphNode child) {
-        if (childNames!=null && childNames.contains(child.getName())) return;
+        if (childIds != null && childIds.contains(child.getId()))
+            return;
 
         if (children == null) {
             children = new LinkedList<GraphNode>();
         }
         children.add(child);
-        if (childNames == null) {
-            childNames = new HashSet<String>();
+        if (childIds == null) {
+            childIds = new HashSet<String>();
         }
-        childNames.add(child.getName());
+        childIds.add(child.getId());
     }
 
     public String getName() {
@@ -66,11 +67,11 @@ public class GraphNode {
     @Transient
     @JsonIgnore
     public HashSet<String> getChildIds() {
-        return childNames;
+        return childIds;
     }
 
     public void setChildIds(HashSet<String> childIds) {
-        this.childNames = childIds;
+        this.childIds = childIds;
     }
 
     public String getId() {
