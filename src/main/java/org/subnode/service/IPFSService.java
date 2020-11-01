@@ -143,7 +143,7 @@ public class IPFSService {
                 pins = (LinkedHashMap<String, Object>) respMap.get("Keys");
             }
         } catch (Exception e) {
-            // log.error("Failed in restTemplate.getForEntity", e);
+            log.error("Failed to get pins", e);
         }
         return pins;
     }

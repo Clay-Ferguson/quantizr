@@ -95,21 +95,26 @@ public class MongoUpdate {
 		}
 	}
 
-	/* Unpins any IPFS data that is not currently referenced by MongoDb. Cleans up orphans. */
+	/*
+	 * Unpins any IPFS data that is not currently referenced by MongoDb. Cleans up
+	 * orphans.
+	 */
 	public void releaseOrphanIPFSPins() {
 		adminRunner.run(session -> {
 			int pinCount = 0, orphanCount = 0;
 			LinkedHashMap<String, Object> pins = ipfs.getPins();
-			for (String pin : pins.keySet()) {
-				SubNode ipfsNode = read.findSubNodeByProp(session, NodeProp.IPFS_LINK.s(), pin);
-				if (ipfsNode != null) {
-					pinCount++;
-					// log.debug("Found IPFS CID=" + pin + " on nodeId " +
-					// ipfsNode.getId().toHexString());
-				} else {
-					// log.debug("Removing Orphan IPFS CID=" + pin);
-					orphanCount++;
-					ipfs.removePin(pin);
+			if (pins != null) {
+				for (String pin : pins.keySet()) {
+					SubNode ipfsNode = read.findSubNodeByProp(session, NodeProp.IPFS_LINK.s(), pin);
+					if (ipfsNode != null) {
+						pinCount++;
+						// log.debug("Found IPFS CID=" + pin + " on nodeId " +
+						// ipfsNode.getId().toHexString());
+					} else {
+						// log.debug("Removing Orphan IPFS CID=" + pin);
+						orphanCount++;
+						ipfs.removePin(pin);
+					}
 				}
 			}
 			log.debug("Number of IPFS Pins in use: " + pinCount + "\nNumber of orphans removed: " + orphanCount);
