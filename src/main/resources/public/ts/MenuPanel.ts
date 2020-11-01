@@ -158,7 +158,7 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Tools", [
-            state.isAdminUser ? new MenuItem("Show Graph", () => S.render.showGraph(null, state), !!hltNode) : null, //
+            state.isAdminUser ? new MenuItem("Show Graph", () => S.render.showGraph(null, null, state), !!hltNode) : null, //
 
             // todo-1: properties toggle really should be a preferences setting i think, and not a menu option here.
 

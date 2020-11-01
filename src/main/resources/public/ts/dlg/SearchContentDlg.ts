@@ -85,6 +85,7 @@ export class SearchContentDlg extends DialogBase {
                 ], "marginBottom"),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
+                    new Button("Graph", this.graph, null, "btn-primary"),
                     new Button("Close", this.close)
                 ])
             ])
@@ -93,6 +94,29 @@ export class SearchContentDlg extends DialogBase {
 
     renderButtons(): CompIntf {
         return null;
+    }
+
+    graph = () => {
+        if (!this.validate()) {
+            return;
+        }
+
+        if (!S.util.ajaxReady("searchNodes")) {
+            return;
+        }
+
+        // until we have better validation
+        let node = S.meta64.getHighlightedNode(this.appState);
+        if (!node) {
+            S.util.showMessage("No node is selected to search under.", "Warning");
+            return;
+        }
+
+        // until better validation, just check for empty
+        let searchText = this.getState().searchText;
+
+        this.close();
+        S.render.showGraph(null, searchText, this.appState);
     }
 
     search = () => {

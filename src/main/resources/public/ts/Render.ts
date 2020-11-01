@@ -486,7 +486,7 @@ export class Render implements RenderIntf {
         return S.props.readOnlyPropertyList.has(propName);
     }
 
-    showGraph = (node: J.NodeInfo, state: AppState): void => {
+    showGraph = (node: J.NodeInfo, searchText: string, state: AppState): void => {
         if (!node) {
             node = S.meta64.getHighlightedNode(state);
         }
@@ -496,6 +496,7 @@ export class Render implements RenderIntf {
             state,
             update: (s: AppState): void => {
                 s.fullScreenGraphId = node.id;
+                s.graphSearchText = searchText;
             }
         });
     }

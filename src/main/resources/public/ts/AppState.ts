@@ -44,6 +44,7 @@ export class AppState {
     // this nodeId is non-null we are displaying that FullScreenView comp, which occupies everything below the toolbar.
     fullScreenViewId: string = null;
     fullScreenGraphId: string = null;
+    graphSearchText: string = null;
     fullScreenCalendarId: string = null;
 
     calendarData: EventInput[];
