@@ -449,7 +449,11 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             (NOTE: Remember this won't run for DialogBase because it's done using pure DOM Javascript, which is the same reason
             whenElmEx has to still exist right now)
             */
-            // useEffect(this.domRemoveEventFunc, []);
+            if (this.domRemoveEvent) {
+                useEffect(() => {
+                    return this.domRemoveEvent;
+                }, []);
+            }
 
             this.updateVisAndEnablement();
 
@@ -512,19 +516,8 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         return ret;
     }
 
-    // DO NOT DELETE
-    //
-    // WARNING: This isn't redundant. React requires this to be a function that returns a function.
-    // domRemoveEventFunc = () => {
-    //     return this.domRemoveEvent;
-    // }
-
-    // domRemoveEvent = (): void => {
-    //     //console.log("DOM REMOVE:" + this.jsClassName);
-    // }
-
+    domRemoveEvent = null;
     domUpdateEvent = null;
-
     domPreUpdateEvent = null;
 
     _domAddEvent: () => void = null;

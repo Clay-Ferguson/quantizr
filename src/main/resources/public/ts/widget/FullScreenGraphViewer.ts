@@ -14,6 +14,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FullScreenGraphViewer extends Main {
 
+    simulation: any;
+
     constructor(appState: AppState) {
         super();
         let nodeId = appState.fullScreenGraphId;
@@ -36,6 +38,7 @@ export class FullScreenGraphViewer extends Main {
     }
 
     domPreUpdateEvent = (): void => {
+        let _this = this;
         let state = this.getState();
         if (!state.data) return;
 
@@ -47,7 +50,9 @@ export class FullScreenGraphViewer extends Main {
             .scaleExtent([1, 8])
             .on("zoom", zoomed);
 
-        const simulation = d3.forceSimulation(nodes)
+        this.stopSim();
+
+        this.simulation = d3.forceSimulation(nodes)
             .force("link", d3.forceLink(links).id(d => d.id).distance(0).strength(1))
             .force("charge", d3.forceManyBody().strength(-50))
             .force("x", d3.forceX())
@@ -65,8 +70,6 @@ export class FullScreenGraphViewer extends Main {
             svg.attr("stroke-width", 1 / transform.k);
         }
 
-        // todo-0: what is the 'append("g")' i keep seeing.
-
         const link = svg.append("g")
             .attr("stroke", "#999")
             .attr("stroke-opacity", 0.6)
@@ -75,16 +78,20 @@ export class FullScreenGraphViewer extends Main {
             .join("line");
 
         const node = svg.append("g")
-            .attr("fill", "#fff")
-            .attr("stroke", "#000")
+            // .attr("fill", "#fff")
+            .attr("stroke", "#fff")
             .attr("stroke-width", 1.5)
+            .style("cursor", "pointer")
             .selectAll("circle")
             .data(nodes)
             .join("circle")
-            .attr("fill", d => d.children ? null : "#000")
-            .attr("stroke", d => d.children ? null : "#fff")
+            .attr("fill", d => {
+                return d.data.id.startsWith("/") ? "#000" : "slateblue";
+            })
+            // .attr("stroke", d => d.children ? null : "#fff")
+            // .attr("stroke", "#fff")
             .attr("r", 3.5)
-            .call(this.drag(simulation));
+            .call(this.drag(this.simulation));
 
         node.on("click", function () {
             let circle = d3.select(this);
@@ -99,9 +106,20 @@ export class FullScreenGraphViewer extends Main {
             }
         });
 
-        node.append("title").text(d => d.data.name);
+        node.on("mouseover", function () {
+            let circle = d3.select(this);
+            let node = circle.node();
+            let data: J.GraphNode = node.__data__.data;
 
-        simulation.on("tick", () => {
+            let title = circle.select("title");
+            if (data.id.startsWith("/")) {
+                _this.updateText(data.id, title);
+            }
+        });
+
+        node.append("title").text(d => d.data.name || d.data.id);
+
+        this.simulation.on("tick", () => {
             link
                 .attr("x1", d => d.source.x)
                 .attr("y1", d => d.source.y)
@@ -117,6 +135,39 @@ export class FullScreenGraphViewer extends Main {
 
         // todo-0: need to do this cleanup.
         // invalidation.then(() => simulation.stop());
+    }
+
+    domRemoveEvent = () => {
+        this.stopSim();
+    }
+
+    stopSim = () => {
+        if (this.simulation) {
+            this.simulation.stop();
+            this.simulation = null;
+        }
+    }
+
+    updateText = (nodeId: string, title: any) => {
+        const res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            nodeId,
+            upLevel: false,
+            siblingOffset: 0,
+            renderParentIfLeaf: false,
+            offset: 0,
+            goToLastPage: false,
+            forceIPFSRefresh: false,
+            singleNode: true
+        },
+            (res: J.RenderNodeResponse) => {
+                if (res.node) {
+                    let content = res.node.content;
+                    if (content.length > 100) {
+                        content = content.substring(0, 100) + "...";
+                    }
+                    title.text(content);
+                }
+            });
     }
 
     drag = simulation => {

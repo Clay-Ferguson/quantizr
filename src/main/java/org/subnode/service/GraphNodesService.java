@@ -85,12 +85,15 @@ public class GraphNodesService {
 			name = content;
 		}
 		if (name.length() > 100) {
-			name = name.substring(0, 100);
+			name = name.substring(0, 100) + "...";
 		}
 		return name;
 	}
 
 	private void processNodes(String rootPath, HashMap<String, GraphNode> mapByPath) {
+
+		// get a collection to hold keys so we don't get concurrent modification
+		// exception when updating the map.
 		List<String> keys = new LinkedList<String>();
 		for (String path : mapByPath.keySet()) {
 			keys.add(path);
@@ -124,17 +127,20 @@ public class GraphNodesService {
 
 	public void ensureEnoughParents(String rootPath, String path, HashMap<String, GraphNode> mapByPath) {
 
-		if (path==null || path.length() < 3) return;
+		if (path == null || path.length() < 3)
+			return;
 
 		String parentPath = XString.truncateAfterLast(path, "/");
 		if (parentPath.equals(rootPath))
 			return;
 
 		GraphNode parent = mapByPath.get(parentPath);
-	
+
 		if (parent == null) {
-			// log.debug(" creatingThatParent");
-			parent = new GraphNode(null, parentPath, parentPath); // todo-0: fix null id and name here ?
+			// todo-0: browser does a live query on nodes where id start with slash meaning it was one of these 'scaffolding' nodes
+			// not part of search results so need to avoid sending back any 'name' property here. not needed. it's queried live.
+			// but be careful right now a null name here DOES break the code.
+			parent = new GraphNode(parentPath, parentPath, parentPath);
 			mapByPath.put(parentPath, parent);
 
 			// keep creating parents until we know we made it to common root.
