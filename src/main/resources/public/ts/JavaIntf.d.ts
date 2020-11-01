@@ -101,6 +101,7 @@ export interface GetUserProfileRequest extends RequestBase {
 
 export interface GraphRequest extends RequestBase {
     nodeId: string;
+    searchText: string;
 }
 
 export interface ImportRequest extends RequestBase {

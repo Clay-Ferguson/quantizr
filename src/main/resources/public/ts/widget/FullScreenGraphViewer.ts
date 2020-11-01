@@ -24,6 +24,7 @@ export class FullScreenGraphViewer extends Main {
         }
 
         S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
+            searchText: null, // "nicholas", //temporary test
             nodeId
         }, (resp: J.GraphResponse) => {
             this.mergeState({ data: resp.rootNode });
