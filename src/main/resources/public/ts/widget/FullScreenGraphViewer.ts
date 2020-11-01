@@ -42,9 +42,6 @@ export class FullScreenGraphViewer extends Main {
         const links = root.links();
         const nodes = root.descendants();
 
-        let width = 600;
-        let height = 600;
-
         const zoom = d3.zoom()
             .scaleExtent([1, 8])
             .on("zoom", zoomed);
@@ -87,6 +84,19 @@ export class FullScreenGraphViewer extends Main {
             .attr("stroke", d => d.children ? null : "#fff")
             .attr("r", 3.5)
             .call(this.drag(simulation));
+
+        node.on("click", function () {
+            let circle = d3.select(this);
+            let node = circle.node();
+            let data: J.GraphNode = node.__data__.data;
+            circle
+                // .style("fill", "lightcoral")
+                .style("stroke", "green");
+
+            if (data.id) {
+                window.open(S.util.getHostAndPort() + "/app?id=" + data.id, "_blank");
+            }
+        });
 
         node.append("title").text(d => d.data.name);
 

@@ -33,17 +33,16 @@ public class GraphNodesService {
 		}
 
 		SubNode node = read.getNode(session, req.getNodeId(), true);
-		GraphNode gnode = new GraphNode(node.getId().toHexString());
+		GraphNode gnode = new GraphNode(node.getId().toHexString(), getNodeName(node), node.getPath());
 		String rootPath = node.getPath();
-		gnode.setPath(node.getPath());
+
 		mapByPath.put(gnode.getPath(), gnode);
 		// log.debug("Root Node Path: " + node.getPath());
 
 		try {
 			for (SubNode n : read.getSubGraph(session, node)) {
 				// log.debug("Node Path: " + n.getPath());
-				GraphNode gn = new GraphNode(n.getId().toHexString());
-				gn.setPath(n.getPath());
+				GraphNode gn = new GraphNode(n.getId().toHexString(), getNodeName(n), n.getPath());
 				mapByPath.put(gn.getPath(), gn);
 			}
 
@@ -56,6 +55,29 @@ public class GraphNodesService {
 
 		res.setSuccess(true);
 		return res;
+	}
+
+	private String getNodeName(SubNode node) {
+		String content = node.getContent();
+		if (content==null) return "";
+		String name = null;
+
+		int newLineIdx = content.indexOf("\n");
+		if (newLineIdx != -1) {
+			name = content.substring(0, newLineIdx).trim();
+
+			// remove leading hash marks which will be there if this is a markdown heading.
+			while (name.startsWith("#")) {
+				name = XString.stripIfStartsWith(name, "#");
+			}
+			name = name.trim();
+		} else {
+			name = content;
+		}
+		if (name.length() > 100) {
+			name = name.substring(0, 100);
+		}
+		return name;
 	}
 
 	private void processNodes(String rootPath, HashMap<String, GraphNode> mapByPath) {
@@ -73,8 +95,7 @@ public class GraphNodesService {
 			GraphNode parent = mapByPath.get(parentPath);
 			if (parent == null) {
 				// log.debug("   creatingThatParent");
-				parent = new GraphNode(parentPath);
-				parent.setPath(parentPath);
+				parent = new GraphNode(null, parentPath, parentPath); //todo-0: fix null id and name here
 				newNodes.add(parent);
 			}
 		}

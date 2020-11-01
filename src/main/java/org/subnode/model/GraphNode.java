@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 
 public class GraphNode {
+    private String id;
     private String name;
     private String path;
     private List<GraphNode> children;
@@ -17,8 +18,10 @@ public class GraphNode {
     public GraphNode() {
     }
 
-    public GraphNode(String name) {
+    public GraphNode(String id, String name, String path) {
+        this.id = id;
         this.name = name;
+        this.path = path;
     }
 
     public void addChild(GraphNode child) {
@@ -68,5 +71,13 @@ public class GraphNode {
 
     public void setChildIds(HashSet<String> childIds) {
         this.childNames = childIds;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
