@@ -37,6 +37,7 @@ import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.MailSender;
+import org.subnode.model.GraphNode;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoRead;
@@ -59,6 +60,7 @@ import org.subnode.request.GetServerInfoRequest;
 import org.subnode.request.GetSharedNodesRequest;
 import org.subnode.request.GetUserAccountInfoRequest;
 import org.subnode.request.GetUserProfileRequest;
+import org.subnode.request.GraphRequest;
 import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.InsertBookRequest;
 import org.subnode.request.InsertNodeRequest;
@@ -93,6 +95,7 @@ import org.subnode.response.CloseAccountResponse;
 import org.subnode.response.ExecuteNodeResponse;
 import org.subnode.response.ExportResponse;
 import org.subnode.response.GetServerInfoResponse;
+import org.subnode.response.GraphResponse;
 import org.subnode.response.InfoMessage;
 import org.subnode.response.LogoutResponse;
 import org.subnode.response.PingResponse;
@@ -105,6 +108,7 @@ import org.subnode.service.ExportServiceFlexmark;
 import org.subnode.service.ExportTarService;
 import org.subnode.service.ExportTextService;
 import org.subnode.service.ExportZipService;
+import org.subnode.service.GraphNodesService;
 import org.subnode.service.IPFSService;
 import org.subnode.service.ImportBookService;
 import org.subnode.service.ImportService;
@@ -234,6 +238,9 @@ public class AppController implements ErrorController {
 
 	@Autowired
 	private RSSFeedService rssFeedService;
+
+	@Autowired
+	private GraphNodesService graphNodesService;
 
 	// private final CopyOnWriteArrayList<SseEmitter> emitters = new
 	// CopyOnWriteArrayList<>();
@@ -1095,6 +1102,15 @@ public class AppController implements ErrorController {
 			}
 			res.setSuccess(true);
 
+			return res;
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/graphNodes", method = RequestMethod.POST)
+	public @ResponseBody Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
+		return callProc.run("graphNodes", req, session, ms -> {
+			GraphResponse res =  graphNodesService.graphNodes(ms, req);
+			res.setSuccess(true);
 			return res;
 		});
 	}

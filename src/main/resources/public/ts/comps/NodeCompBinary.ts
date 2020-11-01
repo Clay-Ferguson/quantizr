@@ -84,7 +84,6 @@ export class NodeCompBinary extends Div {
                 }
 
                 s.fullScreenViewId = nodeId;
-                // s.fullScreenGraphId = nodeId;
             }
         });
     }

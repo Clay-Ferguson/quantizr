@@ -2,7 +2,6 @@ import { ActivityPubIntf } from "./intf/ActivityPubIntf";
 import { AttachmentIntf } from "./intf/AttachmentIntf";
 import { EditIntf } from "./intf/EditIntf";
 import { EncryptionIntf } from "./intf/EncryptionIntf";
-import { GraphIntf } from "./intf/GraphIntf";
 import { LocalDBIntf } from "./intf/LocalDBIntf";
 import { Meta64Intf } from "./intf/Meta64Intf";
 import { NavIntf } from "./intf/NavIntf";
@@ -31,7 +30,6 @@ export interface Singletons {
     nav: NavIntf;
     props: PropsIntf;
     render: RenderIntf;
-    graph: GraphIntf;
     srch: SearchIntf;
     share: ShareIntf;
     user: UserIntf;

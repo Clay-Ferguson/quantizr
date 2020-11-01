@@ -17,6 +17,7 @@ export interface RenderIntf {
     initMarkdown(): void;
     injectSubstitutions(content: string): string;
     showNodeUrl(node: J.NodeInfo, state: AppState): void;
+    showGraph(node: J.NodeInfo, state: AppState): void;
     showCalendar(nodeId: string, state: AppState): void;
     renderPageFromData(data: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean, allowScroll: boolean, state: AppState): void;
     getUrlForNodeAttachment(node: J.NodeInfo, downloadLink: boolean): string;

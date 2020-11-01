@@ -369,8 +369,7 @@ export interface GetUserProfileResponse extends ResponseBase {
 }
 
 export interface GraphResponse extends ResponseBase {
-    nodes: GraphNode[];
-    edges: GraphEdge[];
+    rootNode: GraphNode;
 }
 
 export interface ImportResponse extends ResponseBase {
@@ -560,12 +559,8 @@ export interface AccessControlInfo {
 
 export interface GraphNode {
     id: string;
-    label: string;
-}
-
-export interface GraphEdge {
-    to: string;
-    from: string;
+    name: string;
+    children: GraphNode[];
 }
 
 export interface CalendarItem {

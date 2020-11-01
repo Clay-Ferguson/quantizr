@@ -69,6 +69,19 @@ $smallBorderSize: 3px;
 //     }
 // }
 
+.fullScreenToolbar {
+    z-index: 2147483647;
+    position: fixed;
+    top: 0;
+    right: 0;
+    margin: 10px;
+}
+
+.d3Graph {
+    // margin: 2em;
+    // border: 1px solid gray;
+}
+
 // we tack this onto bootstrap btn-group, becasue without it, buttons stretch wider than normal when 
 // wrapped to a new line (position) that where the row isn't full and has space to stretch. 
 .btnGroup {

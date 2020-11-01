@@ -1,29 +1,17 @@
 package org.subnode.response;
 
-import java.util.List;
-
-import org.subnode.model.GraphEdge;
 import org.subnode.model.GraphNode;
 import org.subnode.response.base.ResponseBase;
 
 public class GraphResponse extends ResponseBase {
-	private List<GraphNode> nodes;
-	private List<GraphEdge> edges;
+	private GraphNode rootNode;
 
-	public List<GraphNode> getNodes() {
-		return nodes;
+	public GraphNode getRootNode() {
+		return rootNode;
 	}
 
-	public List<GraphEdge> getEdges() {
-		return edges;
-	}
-
-	public void setEdges(List<GraphEdge> edges) {
-		this.edges = edges;
-	}
-
-	public void setNodes(List<GraphNode> nodes) {
-		this.nodes = nodes;
+	public void setRootNode(GraphNode rootNode) {
+		this.rootNode = rootNode;
 	}
 }
 

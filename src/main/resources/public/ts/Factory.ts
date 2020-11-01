@@ -17,7 +17,6 @@ import { Attachment } from "./Attachment";
 import { Constants as C } from "./Constants";
 import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
-import { Graph } from "./Graph";
 import { LocalDB } from "./LocalDB";
 import { Meta64 } from "./Meta64";
 import { Nav } from "./Nav";
@@ -60,7 +59,6 @@ export class Factory {
             activityPub: new ActivityPub(),
             props: new Props(),
             render: new Render(),
-            graph: new Graph(),
             srch: new Search(),
             share: new Share(),
             user: new User(),

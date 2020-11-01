@@ -49,7 +49,7 @@ export class App extends Div {
             fullScreenViewer = new FullScreenImgViewer();
         }
         else if (state.fullScreenGraphId) {
-            fullScreenViewer = new FullScreenGraphViewer();
+            fullScreenViewer = new FullScreenGraphViewer(state);
         }
         else if (state.fullScreenCalendarId) {
             fullScreenViewer = new FullScreenCalendar();
@@ -134,6 +134,7 @@ export class App extends Div {
         this.setChildren([
             mobileTopBar,
             fullScreenViewer ? new FullScreenControlBar() : null,
+            fullScreenViewer ? new Div(null, { className: "clearfix" }) : null,
             // For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
             // both get sized right with no overlapping.
             fullScreenViewer ||

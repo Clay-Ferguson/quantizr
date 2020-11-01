@@ -485,4 +485,18 @@ export class Render implements RenderIntf {
     isReadOnlyProperty = (propName: string): boolean => {
         return S.props.readOnlyPropertyList.has(propName);
     }
+
+    showGraph = (node: J.NodeInfo, state: AppState): void => {
+        if (!node) {
+            node = S.meta64.getHighlightedNode(state);
+        }
+
+        dispatch({
+            type: "Action_ShowGraph",
+            state,
+            update: (s: AppState): void => {
+                s.fullScreenGraphId = node.id;
+            }
+        });
+    }
 }

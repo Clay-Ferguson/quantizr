@@ -2,13 +2,12 @@ package org.subnode.service;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.StringTokenizer;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.subnode.model.GraphEdge;
 import org.subnode.model.GraphNode;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -26,51 +25,80 @@ public class GraphNodesService {
 	@Autowired
 	private MongoRead read;
 
-	private static final int MAX_NODES = 500;
-
-	class GenerateContext {
-		//we use this to basically compress data. We converte a unique set of strings to another
-		//unique of 'shorter' strings where the shorter ones are a simple sequence
-		public HashMap<String, String> numOfString = new HashMap<String,String>();
-		public int nodeCount = 0;
-
-		/*
-		 * map of all GraphNodes that go created for "tags", and the key in this map is
-		 * the tag itself
-		 */
-		public HashMap<String, GraphNode> tagNodes = new HashMap<String, GraphNode>();
-
-		public String getNumOfString(String val) {
-			String numStr = numOfString.get(val);
-			if (numStr!=null) {
-				return numStr;
-			}
-			numOfString.put(val, numStr = String.valueOf(numOfString.size()+1));
-			return numStr;
-		}
-	}
-
 	public GraphResponse graphNodes(MongoSession session, GraphRequest req) {
+		HashMap<String, GraphNode> mapByPath = new HashMap<String, GraphNode>();
 		GraphResponse res = new GraphResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		res.setNodes(new LinkedList<GraphNode>());
-		res.setEdges(new LinkedList<GraphEdge>());
-
 		SubNode node = read.getNode(session, req.getNodeId(), true);
-		try {
-			log.debug("Graphing Node: " + node.getPath());
+		GraphNode gnode = new GraphNode(node.getId().toHexString());
+		String rootPath = node.getPath();
+		gnode.setPath(node.getPath());
+		mapByPath.put(gnode.getPath(), gnode);
+		// log.debug("Root Node Path: " + node.getPath());
 
-			GenerateContext ctx = new GenerateContext();
-			recurseNode(ctx, res, session, null, node, 0);
+		try {
+			for (SubNode n : read.getSubGraph(session, node)) {
+				// log.debug("Node Path: " + n.getPath());
+				GraphNode gn = new GraphNode(n.getId().toHexString());
+				gn.setPath(n.getPath());
+				mapByPath.put(gn.getPath(), gn);
+			}
+
+			processNodes(rootPath, mapByPath);
+			// log.debug("Final Graph: " + XString.prettyPrint(gnode));
+			res.setRootNode(gnode);
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
 
 		res.setSuccess(true);
 		return res;
+	}
+
+	private void processNodes(String rootPath, HashMap<String, GraphNode> mapByPath) {
+		List<GraphNode> newNodes = new LinkedList<GraphNode>();
+
+		/*
+		 * First scan to create any parents that don't exist, putting them in newNodes
+		 */
+		for (String path : mapByPath.keySet()) {
+			if (path.equals(rootPath)) continue;
+
+			GraphNode n = mapByPath.get(path);
+			String parentPath = XString.truncateAfterLast(n.getPath(), "/");
+			// log.debug("Looking for Parent(a): " + parentPath);
+			GraphNode parent = mapByPath.get(parentPath);
+			if (parent == null) {
+				// log.debug("   creatingThatParent");
+				parent = new GraphNode(parentPath);
+				parent.setPath(parentPath);
+				newNodes.add(parent);
+			}
+		}
+
+		// add all new nodes to hash
+		for (GraphNode nn : newNodes) {
+			mapByPath.put(nn.getPath(), nn);
+		}
+
+		// now add all nodes to the child list of their parents.
+		for (String path : mapByPath.keySet()) {
+			if (path.equals(rootPath)) continue;
+
+			GraphNode n = mapByPath.get(path);
+			String parentPath = XString.truncateAfterLast(n.getPath(), "/");
+			//log.debug("Looking for Parent (b): " + parentPath);
+			GraphNode parent = mapByPath.get(parentPath);
+			if (parent != null) {
+				parent.addChild(n);
+				// log.debug("Parent Name "+parent.getName()+" now has childCount="+parent.getChildren().size());
+			} else {
+				log.debug("Top level node??:" + n);
+			}
+		}
 	}
 
 	// private void graphTags(MongoSession session, SubNode node) {
@@ -86,77 +114,76 @@ public class GraphNodesService {
 	// }
 	// }
 
-	private void recurseNode(GenerateContext ctx, GraphResponse res, MongoSession session, SubNode parent, SubNode node,
-			int level) {
-		
-		if (node == null)
-			return;
+	// private GraphNode recurseNode(GraphResponse res, MongoSession session,
+	// SubNode parent, SubNode node,
+	// int level) {
 
-		/* process the current node */
-		processNode(ctx, res, parent, node);
+	// if (node == null)
+	// return null;
 
-		for (SubNode n : read.getChildren(session, node, null, null, 0)) {
-			recurseNode(ctx, res, session, node, n, level + 1);
-			if (ctx.nodeCount >= MAX_NODES) {
-				return;
-			}
-		}
-	}
+	// /* process the current node */
+	// GraphNode gnode = processNode(res, node);
+	// List<GraphNode> children = null;
 
-	private void processNode(GenerateContext ctx, GraphResponse res, SubNode parent, SubNode node) {
-		String nodeId = XString.lastNChars(node.getId().toHexString(), 5);
-		String nodeIdNum = ctx.getNumOfString(nodeId);
-		String parentId = parent==null ? null : XString.lastNChars(parent.getId().toHexString(), 5);
+	// for (SubNode n : read.getChildren(session, node, null, null, 0)) {
+	// if (children==null) {
+	// gnode.setChildren(children = new LinkedList<GraphNode>());
+	// }
 
-		String tags = node.getStringProp("sn:tags");
-		if (tags != null) {
-			StringTokenizer t = new StringTokenizer(tags, " ", false);
+	// GraphNode gchild = recurseNode(res, session, node, n, level + 1);
+	// children.add(gchild);
+	// }
+	// return gnode;
+	// }
 
-			// split apart all the tokens using space as delimiter
-			while (t.hasMoreTokens()) {
-				String tag = t.nextToken().trim();
+	private GraphNode processNode(GraphResponse res, SubNode node) {
 
-				// look up GrapNode if it might already exist
-				GraphNode graphNode = ctx.tagNodes.get(tag);
+		GraphNode gnode = new GraphNode();
+		gnode.setName(node.getId().toHexString());
+		return gnode;
 
-				String tagId = ctx.getNumOfString(tag);
+		// String nodeId = XString.lastNChars(node.getId().toHexString(), 5);
+		// String parentId = parent==null ? null :
+		// XString.lastNChars(parent.getId().toHexString(), 5);
 
-				// if GraphNode didn't exist, create and put it in the map
-				if (graphNode == null) {
-					graphNode = new GraphNode(tagId, tag);
-					ctx.nodeCount++;
-					res.getNodes().add(graphNode);
-					ctx.tagNodes.put(tag, graphNode);
-				}
+		// String tags = node.getStringProp("sn:tags");
+		// if (tags != null) {
+		// StringTokenizer t = new StringTokenizer(tags, " ", false);
 
-				// add the connection of this node onto the tag node.
-				res.getEdges().add(new GraphEdge(tagId, nodeIdNum));
-			}
-		}
+		// // split apart all the tokens using space as delimiter
+		// while (t.hasMoreTokens()) {
+		// String tag = t.nextToken().trim();
 
-		String label = null;
-		String content = node.getContent();
-		if (content!=null) {
-			if (content.length() > 40) {
-			label = content.substring(0, 40);
-			}
-			else {
-				label = content;
-			}
-		}
-		else {
-			label = nodeId;
-		}
+		// // look up GrapNode if it might already exist
+		// GraphNode graphNode = ctx.tagNodes.get(tag);
 
-		//compress nodeId into a shorter unique val.
-		nodeId = ctx.getNumOfString(nodeId);
-		parentId = ctx.getNumOfString(parentId);
+		// String tagId = ctx.getNumOfString(tag);
 
-		res.getNodes().add(new GraphNode(nodeId, label));
-		ctx.nodeCount++;
-		if (parent != null) {
-			res.getEdges().add(new GraphEdge(parentId, nodeId));
-		}
+		// // if GraphNode didn't exist, create and put it in the map
+		// if (graphNode == null) {
+		// graphNode = new GraphNode(tagId, tag);
+		// ctx.nodeCount++;
+		// res.getNodes().add(graphNode);
+		// ctx.tagNodes.put(tag, graphNode);
+		// }
+
+		// // add the connection of this node onto the tag node.
+		// res.getEdges().add(new GraphEdge(tagId, nodeIdNum));
+		// }
+		// }
+
+		// String label = null;
+		// String content = node.getContent();
+		// if (content!=null) {
+		// if (content.length() > 40) {
+		// label = content.substring(0, 40);
+		// }
+		// else {
+		// label = content;
+		// }
+		// }
+		// else {
+		// label = nodeId;
+		// }
 	}
 }
-
