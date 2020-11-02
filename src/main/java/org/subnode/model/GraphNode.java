@@ -10,6 +10,8 @@ import org.springframework.data.annotation.Transient;
 
 public class GraphNode {
     private String id;
+    private int level;
+    private boolean highlight;
     private String name;
     private String path;
     private List<GraphNode> children;
@@ -18,10 +20,12 @@ public class GraphNode {
     public GraphNode() {
     }
 
-    public GraphNode(String id, String name, String path) {
+    public GraphNode(String id, String name, String path, int level, boolean highlight) {
         this.id = id;
         this.name = name;
         this.path = path;
+        this.level = level;
+        this.highlight = highlight;
     }
 
     public void addChild(GraphNode child) {
@@ -80,5 +84,21 @@ public class GraphNode {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public boolean isHighlight() {
+        return highlight;
+    }
+
+    public void setHighlight(boolean highlight) {
+        this.highlight = highlight;
     }
 }

@@ -560,6 +560,8 @@ export interface AccessControlInfo {
 
 export interface GraphNode {
     id: string;
+    level: number;
+    highlight: boolean;
     name: string;
     children: GraphNode[];
 }

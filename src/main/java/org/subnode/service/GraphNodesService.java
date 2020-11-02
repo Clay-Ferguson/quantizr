@@ -35,9 +35,11 @@ public class GraphNodesService {
 			session = ThreadLocals.getMongoSession();
 		}
 
+		boolean searching = !StringUtils.isEmpty(req.getSearchText());
 		SubNode node = read.getNode(session, req.getNodeId(), true);
-		GraphNode gnode = new GraphNode(node.getId().toHexString(), getNodeName(node), node.getPath());
+		GraphNode gnode = new GraphNode(node.getId().toHexString(), getNodeName(node), node.getPath(), 0, false);
 		String rootPath = node.getPath();
+		int rootLevel = StringUtils.countMatches(rootPath, "/");
 
 		mapByPath.put(gnode.getPath(), gnode);
 		// log.debug("Root Node Path: " + node.getPath());
@@ -52,13 +54,11 @@ public class GraphNodesService {
 			}
 
 			for (SubNode n : results) {
-				// log.debug("Node Path: " + n.getPath());
-				GraphNode gn = new GraphNode(n.getId().toHexString(), getNodeName(n), n.getPath());
+				GraphNode gn = new GraphNode(n.getId().toHexString(), getNodeName(n), n.getPath(), StringUtils.countMatches(n.getPath(), "/")-rootLevel, searching);
 				mapByPath.put(gn.getPath(), gn);
 			}
 
-			processNodes(rootPath, mapByPath);
-			// log.debug("Final Graph: " + XString.prettyPrint(gnode));
+			processNodes(rootPath, rootLevel, mapByPath);
 			res.setRootNode(gnode);
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
@@ -92,7 +92,7 @@ public class GraphNodesService {
 		return name;
 	}
 
-	private void processNodes(String rootPath, HashMap<String, GraphNode> mapByPath) {
+	private void processNodes(String rootPath, int rootLevel, HashMap<String, GraphNode> mapByPath) {
 
 		// get a collection to hold keys so we don't get concurrent modification
 		// exception when updating the map.
@@ -105,7 +105,7 @@ public class GraphNodesService {
 		 * First scan to create any parents that don't exist, putting them in newNodes
 		 */
 		for (String path : keys) {
-			ensureEnoughParents(rootPath, path, mapByPath);
+			ensureEnoughParents(rootPath, rootLevel, path, mapByPath);
 		}
 
 		// now add all nodes to the child list of their parents.
@@ -127,7 +127,7 @@ public class GraphNodesService {
 		}
 	}
 
-	public void ensureEnoughParents(String rootPath, String path, HashMap<String, GraphNode> mapByPath) {
+	public void ensureEnoughParents(String rootPath, int rootLevel, String path, HashMap<String, GraphNode> mapByPath) {
 
 		if (path == null || path.length() < 3)
 			return;
@@ -142,11 +142,11 @@ public class GraphNodesService {
 			// We only need guid on this name, to ensure D3 works, but the actual name on these
 			// is queries for during mouseover because otherwise it could be a large number
 			// of queries to populate them here now, when that's not needed.
-			parent = new GraphNode(parentPath, String.valueOf(guid++), parentPath);
+			parent = new GraphNode(parentPath, String.valueOf(guid++), parentPath,  StringUtils.countMatches(parentPath, "/")-rootLevel, false);
 			mapByPath.put(parentPath, parent);
 
 			// keep creating parents until we know we made it to common root.
-			ensureEnoughParents(rootPath, parentPath, mapByPath);
+			ensureEnoughParents(rootPath, rootLevel, parentPath, mapByPath);
 		}
 	}
 }

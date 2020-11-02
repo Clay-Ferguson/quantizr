@@ -18,20 +18,21 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FullScreenGraphViewer extends Main {
 
+    nodeId: string;
     simulation: any;
 
     constructor(appState: AppState) {
         super();
-        let nodeId = appState.fullScreenGraphId;
-        let node: J.NodeInfo = S.meta64.findNodeById(appState, nodeId);
+        this.nodeId = appState.fullScreenGraphId;
+        let node: J.NodeInfo = S.meta64.findNodeById(appState, this.nodeId);
 
         if (!node) {
-            console.log("Can't find nodeId " + nodeId);
+            console.log("Can't find nodeId " + this.nodeId);
         }
 
         S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
             searchText: appState.graphSearchText,
-            nodeId
+            nodeId: this.nodeId
         }, (resp: J.GraphResponse) => {
             this.mergeState({ data: resp.rootNode });
         });
@@ -51,7 +52,7 @@ export class FullScreenGraphViewer extends Main {
         const nodes = root.descendants();
 
         const zoom = d3.zoom()
-            .scaleExtent([1, 8])
+            .scaleExtent([1, 10])
             .on("zoom", zoomed);
 
         this.stopSim();
@@ -83,18 +84,23 @@ export class FullScreenGraphViewer extends Main {
 
         const node = svg.append("g")
             // .attr("fill", "#fff")
-            .attr("stroke", "#fff")
+            // .attr("stroke", "#fff")
             .attr("stroke-width", 1.5)
             .style("cursor", "pointer")
             .selectAll("circle")
             .data(nodes)
             .join("circle")
             .attr("fill", d => {
-                return d.data.id.startsWith("/") ? "#000" : "slateblue";
+                if (d.data.id === _this.nodeId) return "red";
+                return d.data.highlight ? "green" : "black";
             })
-            // .attr("stroke", d => d.children ? null : "#fff")
-            // .attr("stroke", "#fff")
-            .attr("r", 3.5)
+            .attr("stroke", d => {
+                return _this.getColorForLevel(d.data.level);
+            })
+            .attr("r", d => {
+                if (d.data.id === _this.nodeId) return 5;
+                return 3.5;
+            })
             .call(this.drag(this.simulation));
 
         node.on("click", function () {
@@ -122,7 +128,9 @@ export class FullScreenGraphViewer extends Main {
             }
         });
 
-        node.append("title").text(d => d.data.name || d.data.id);
+        node.append("title").text(d => {
+            return d.data.name || d.data.id;
+        });
 
         this.simulation.on("tick", () => {
             link
@@ -137,9 +145,33 @@ export class FullScreenGraphViewer extends Main {
         });
 
         svg.call(zoom);
+    }
 
-        // todo-0: need to do this cleanup.
-        // invalidation.then(() => simulation.stop());
+    getColorForLevel(level: number): string {
+        switch (level) {
+            case 1:
+                return "red";
+            case 2:
+                return "orange";
+            case 3:
+                return "goldenrod";
+            case 4:
+                return "gold";
+            case 5:
+                return "yellow";
+            case 6:
+                return "magenta";
+            case 7:
+                return "blueviolet";
+            case 8:
+                return "darkviolet";
+            case 9:
+                return "lightslateblue";
+            case 10:
+                return "cyan";
+            default:
+                return "#fff";
+        }
     }
 
     domRemoveEvent = () => {
