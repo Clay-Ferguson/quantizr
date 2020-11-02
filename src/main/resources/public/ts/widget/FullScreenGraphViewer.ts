@@ -7,6 +7,10 @@ import { Div } from "./Div";
 import { Main } from "./Main";
 import { Constants as C } from "../Constants";
 
+// https://observablehq.com/@d3/force-directed-tree
+// https://www.npmjs.com/package/d3
+// https://d3js.org/
+
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
@@ -112,8 +116,8 @@ export class FullScreenGraphViewer extends Main {
             let data: J.GraphNode = node.__data__.data;
 
             let title = circle.select("title");
-            title.text("Loading...");
             if (data.id.startsWith("/")) {
+                title.text("Loading...");
                 _this.updateText(data.id, title);
             }
         });
