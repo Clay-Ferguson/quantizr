@@ -313,7 +313,7 @@ export class MediaRecorderDlg extends DialogBase {
                 new VideoPlayerDlg(url, null, this.appState).open();
             }
             else {
-                new AudioPlayerDlg(url, this.appState).open();
+                new AudioPlayerDlg(null, url, null, this.appState).open();
             }
         }
     }

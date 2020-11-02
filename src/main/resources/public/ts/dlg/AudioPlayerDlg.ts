@@ -1,16 +1,19 @@
+import axios from "axios";
 import { AppState } from "../AppState";
-import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { Anchor } from "../widget/Anchor";
 import { AudioPlayer } from "../widget/AudioPlayer";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
+import { Img } from "../widget/Img";
+import { Span } from "../widget/Span";
 import { TextField } from "../widget/TextField";
 
 let S: Singletons;
@@ -64,7 +67,8 @@ export class AudioPlayerDlg extends DialogBase {
     timeLeftTextField: TextField;
     intervalTimer: any;
 
-    constructor(private sourceUrl: string, state: AppState) {
+    /* chapters url is the "podcast:chapters" url from RSS feeds */
+    constructor(private customTitle, private sourceUrl: string, private chaptersUrl: string, state: AppState) {
         super("Audio Player", null, false, state);
 
         this.urlHash = S.util.hashOfString(sourceUrl);
@@ -74,6 +78,25 @@ export class AudioPlayerDlg extends DialogBase {
         this.intervalTimer = setInterval(() => {
             this.timeslice();
         }, 60000);
+    }
+
+    preLoad(): Promise<void> {
+        if (!this.chaptersUrl) return null;
+
+        return new Promise<void>((resolve, reject) => {
+            let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(this.chaptersUrl);
+
+            axios.get(url, {})
+                .then((response) => {
+                    if (response.status === 200) {
+                        this.mergeState({ chapters: response.data });
+                        resolve();
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        });
     }
 
     preUnmount(): any {
@@ -102,7 +125,7 @@ export class AudioPlayerDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         let children = [
             new Form(null, [
-                // new TextContent(this.title),
+                this.customTitle ? new Div(this.customTitle, { className: "dialogTitle" }) : null,
                 this.audioPlayer = new AudioPlayer({
                     src: this.sourceUrl,
                     style: {
@@ -135,7 +158,8 @@ export class AudioPlayerDlg extends DialogBase {
                     new Button("1x", this.normalSpeedButton),
                     new Button("1.5x", this.speed15Button),
                     new Button("2x", this.speed2Button)
-                ])
+                ]),
+                this.createChaptersDiv()
             ])
         ];
 
@@ -146,6 +170,49 @@ export class AudioPlayerDlg extends DialogBase {
         });
 
         return children;
+    }
+
+    createChaptersDiv = (): Div => {
+        let div = null;
+        let state = this.getState();
+        if (state.chapters) {
+
+            if (!div) {
+                div = new Div(null, { className: "rssChapterPanel" });
+            }
+            for (let chapter of state.chapters.chapters) {
+                let chapDiv = new Div();
+
+                // chapter.img = "https://noagendaassets.com/enc/1604265283.53_na-1291-art-feed.png";
+
+                if (chapter.img) {
+                    chapDiv.addChild(new Img(null, {
+                        className: "rssChapterImage",
+                        src: chapter.img
+                    }));
+                }
+
+                chapDiv.addChild(new Span(chapter.title, {
+                    className: "rssChapterTitle",
+                    onClick: () => {
+                        if (this.player) {
+                            this.player.currentTime = chapter.startTime;
+                        }
+                    }
+                }));
+
+                if (chapter.url) {
+                    chapDiv.addChild(new Anchor(chapter.url, "[ Link ]", {
+                        className: "rssChapterLink",
+                        target: "_blank",
+                        title: "Play it!"
+                    }));
+                }
+
+                div.addChild(chapDiv);
+            }
+            return div;
+        }
     }
 
     renderButtons(): CompIntf {

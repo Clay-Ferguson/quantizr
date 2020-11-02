@@ -348,6 +348,32 @@ strong em {
     font-size: 150%;
 }
 
+.rssChapterLink {
+    cursor: pointer;
+    font-size: 18px;
+    margin-left: 12px;
+}
+
+.rssChapterTitle {
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.rssChapterImage {
+    border-radius: $borderRadiusMedium;
+    border: 1px solid $nodeBorderBottomColor;
+    max-width: 80px;
+    margin: 8px;
+    display: inline-block;
+}
+
+.rssChapterPanel {
+    border-radius: $borderRadiusMedium;
+    border: 2px solid $nodeBorderBottomColor;
+    margin-top: 12px;
+    padding: 13px;
+}
+
 .rssAnchor {
     cursor: pointer;
     font-size: 25px;
@@ -839,6 +865,10 @@ input[type="radio"] {
 
 .txtFieldLabel {
     margin-bottom: .25rem;
+}
+
+.dialogTitle {
+    font-size: 30px;
 }
 
 .dialog-header {

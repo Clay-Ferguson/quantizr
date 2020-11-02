@@ -19,7 +19,6 @@ import { Html } from "../widget/Html";
 import { TextContent } from "../widget/TextContent";
 import { TypeBase } from "./base/TypeBase";
 import { Span } from "../widget/Span";
-import { Progress } from "../widget/Progress";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -94,6 +93,7 @@ export class RssTypeHandler extends TypeBase {
         let parser = new RssParser({
             customFields: {
                 item: [
+                    ["podcast:chapters", "podcastChapters"],
                     ["media:thumbnail", "mediaThumbnail"],
                     ["category", "category"],
                     ["itunes:image", "itunesImage"],
@@ -276,6 +276,8 @@ export class RssTypeHandler extends TypeBase {
         }
 
         if (entry.itunesSubtitle) {
+            // adam curry has this:
+            // &quot; in this text (todo-0) make system smart enough to translate that stuff;
             headerDivChildren.push(new Div(entry.itunesSubtitle));
         }
 
@@ -288,7 +290,8 @@ export class RssTypeHandler extends TypeBase {
 
             let audioButton = new Button("Play Audio", //
                 () => {
-                    new AudioPlayerDlg(entry.enclosure.url, state).open();
+                    let chaptersUrl = (entry.podcastChapters && entry.podcastChapters.$) ? entry.podcastChapters.$.url : null;
+                    new AudioPlayerDlg(entry.title, entry.enclosure.url, chaptersUrl, state).open();
                 });
 
             children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));
