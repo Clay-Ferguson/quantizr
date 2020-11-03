@@ -369,7 +369,11 @@ public class AppController implements ErrorController {
 		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 			synchronized (welcomeMapLock) {
 				HashMap<String, String> newMap = new HashMap<String, String>();
+				// load content from a place that will not be a node visible to users
 				welcomePagePresent = nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
+
+				// load also from another place that will be visible to users.
+				nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome_public");
 				welcomeMap = newMap;
 			}
 		}

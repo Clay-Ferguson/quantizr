@@ -52,10 +52,10 @@ export class MenuPanel extends Div {
         const children = [];
 
         children.push(new Menu("Site Nav", [
-            new MenuItem("Your Root Node", () => S.nav.navHome(state), !state.isAnonUser), // "fa-database"
-            new MenuItem("Portal Home", () => S.meta64.loadAnonPageHome(state)), // fa-home"
-            new MenuItem("User Guide", () => window.open(S.util.getHostAndPort() + "/f/user-guide")), // "fa-question-circle"
-            new MenuItem("Logout", () => S.nav.logout(state), !state.isAnonUser) // "fa-sign-out"
+            new MenuItem("Your Root Node", () => S.nav.navHome(state), !state.isAnonUser),
+            new MenuItem("Portal Home", () => S.meta64.loadAnonPageHome(state)),
+            new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide", state)),
+            new MenuItem("Logout", () => S.nav.logout(state), !state.isAnonUser)
         ]));
 
         // WARNING: The string 'Social' is also in Menu.activeMenu, to set the default menu that's opened

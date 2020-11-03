@@ -89,7 +89,7 @@ public class SubNode {
 	/*
 	 * This property gets updated during the save event processing, and we store the
 	 * hash of the path in here, so that we can achieve the equivalent of a unique
-	 * key on the path (indirectly vis this hash) because the full path becomes to
+	 * key on the path (indirectly via this hash) because the full path becomes to
 	 * long for MongoDb indexes to allow, but also becasue using the hash for
 	 * uniqueness is faster
 	 */

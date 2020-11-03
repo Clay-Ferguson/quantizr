@@ -62,7 +62,7 @@ public class Util {
 	}
 
 	/**
-	 * Returns only 'chars' characters of the hash, or the ebntire sha256 if chars
+	 * Returns only 'chars' characters of the hash, or the entire sha256 if chars
 	 * is -1
 	 */
 	public static String getHashOfString(String val, int chars) {

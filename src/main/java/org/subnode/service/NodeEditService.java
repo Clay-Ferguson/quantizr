@@ -46,6 +46,7 @@ import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
+import org.subnode.util.XString;
 import org.springframework.data.domain.Sort;
 
 /**
@@ -551,14 +552,9 @@ public class NodeEditService {
 		}
 
 		SubNode node = read.getNode(session, req.getNodeId(), true);
-
-		// NOTE: LEAVE this commented code, for future, it can be used to make headings
-		// base off current heading sizes
-		// instead of always starting at "#" on the selected node and it's immediate
-		// children
-		// String content = node.getContent();
-		// int baseLevel = XString.getHeadingLevel(content);
-		updateHeadingsRecurseNode(session, node, 0, 0); // baseLevel < 0 ? 0 : baseLevel - 1);
+		String content = node.getContent();
+		int baseLevel = XString.getHeadingLevel(content);
+		updateHeadingsRecurseNode(session, node, 0, baseLevel < 0 ? 0 : baseLevel);
 
 		return res;
 	}

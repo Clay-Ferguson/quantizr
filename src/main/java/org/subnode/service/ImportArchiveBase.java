@@ -97,6 +97,9 @@ public abstract class ImportArchiveBase {
 				 */
 				node.deleteProp(NodeProp.BIN.s());
 
+				// nullify name because we don't want to blow up indexes
+				node.setName(null);
+
 				// we must nullify the node ID so that it creates a new node when saved.
 				node.setId(null);
 				node.setOwner(ownerId);

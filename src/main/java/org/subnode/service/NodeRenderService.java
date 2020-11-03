@@ -253,8 +253,8 @@ public class NodeRenderService {
 		}
 
 		// if (offset > 0) {
-		// 	// log.debug("Skipping the first " + offset + " records in the resultset.");
-		// 	idx = read.skip(iterator, offset);
+		// // log.debug("Skipping the first " + offset + " records in the resultset.");
+		// idx = read.skip(iterator, offset);
 		// }
 
 		List<SubNode> slidingWindow = null;
@@ -502,9 +502,12 @@ public class NodeRenderService {
 			nodeName = parentName;
 		}
 
-		List<SubNode> children = read.getChildrenAsList(session, node, true, null);
+		final Iterable<SubNode> iter = read.getSubGraph(session, node);
+		final List<SubNode> children = read.iterateToList(iter);
+
+		// Scan to collect all the urls.
 		if (children != null) {
-			for (SubNode child : children) {
+			for (final SubNode child : children) {
 				thymeleafProcessChildren(session, child, model, nodeName);
 			}
 		}
