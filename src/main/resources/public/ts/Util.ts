@@ -182,6 +182,7 @@ export class Util implements UtilIntf {
         ret = this.replaceAll(ret, "&gt;", ">");
         ret = this.replaceAll(ret, "&lt;", "<");
         ret = this.replaceAll(ret, "&quot;", '"');
+        ret = this.replaceAll(ret, "&apos;", "'");
         ret = this.replaceAll(ret, "&#39;", "'");
         return ret;
     }

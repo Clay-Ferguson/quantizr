@@ -41,13 +41,9 @@ export class AudioPlayerDlg extends DialogBase {
     startTimePending: number = null;
 
     /*
-    NOTE: Originally this app had an automatic AD-blocking
-    feature (see adSegments, commented out currently in the code), which automatically made this player
-    skip right over ADs just like they didn't even exist!
-
     If the 'adSegments' array variable below contains an array of start/stop times then during playback this player will seamlessly and autmatically
-    jump over those time ranges in the audio just like they didn't even exist. It's basically censoring out those time ranges.
-    Currently we aren't using this at all, but was the core of the ad-blocker featue that i deciced to remove.
+    jump over those time ranges in the audio during playing just like they didn't even exist, basically censoring out those time ranges.
+    Currently we aren't using this at all, becasue it's not friendly to the podcasting industry!
     */
     private adSegments: I.AdSegment[] = null;
     private saveTimer: any = null;
@@ -65,7 +61,7 @@ export class AudioPlayerDlg extends DialogBase {
         // console.log("startTimePending = localStorage[" + this.urlHash + "]=" + localStorage[this.urlHash]);
 
         this.intervalTimer = setInterval(() => {
-            this.timeslice();
+            this.oneMinuteTimeslice();
         }, 60000);
     }
 
@@ -79,8 +75,8 @@ export class AudioPlayerDlg extends DialogBase {
                 .then((response) => {
                     if (response.status === 200) {
                         this.mergeState({ chapters: response.data });
-                        resolve();
                     }
+                    resolve();
                 })
                 .catch((error) => {
                     resolve();
@@ -97,7 +93,7 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     // This makes the sleep timer work "Stop After (mins.)"
-    timeslice = () => {
+    oneMinuteTimeslice = () => {
         if (this.timeLeftTextField.valueIntf.getValue()) {
             try {
                 let timeVal = parseInt(this.timeLeftTextField.valueIntf.getValue());
@@ -118,14 +114,7 @@ export class AudioPlayerDlg extends DialogBase {
                 this.customTitle ? new Div(this.customTitle, { className: "dialogTitle" }) : null,
                 this.audioPlayer = new AudioPlayer({
                     src: this.sourceUrl,
-                    style: {
-                        width: "100%",
-                        padding: "0px",
-                        marginTop: "0px",
-                        marginLeft: "0px",
-                        marginRight: "0px",
-                        marginBottom: "16px"
-                    },
+                    className: "audioPlayer",
                     onPause: () => { this.savePlayerInfo(this.player.src, this.player.currentTime); },
                     onTimeUpdate: () => { this.onTimeUpdate(); },
                     onCanPlay: () => { this.restoreStartTime(); },
@@ -137,6 +126,7 @@ export class AudioPlayerDlg extends DialogBase {
                     this.timeLeftTextField = new TextField("Stop After (mins.)", false, null, null, null)
                 ]),
                 new ButtonBar([
+                    // todo-0: this button text and state is jank. fix. Use internal state in play button.
                     this.playButton = new Button("Pause", this.playButtonFunction, null, "btn-primary"),
                     new Button("Close", this.destroyPlayer)
                 ]),
@@ -163,17 +153,13 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     createChaptersDiv = (): Div => {
-        let div = null;
+        let div: Div = null;
         let state = this.getState();
         if (state.chapters) {
+            div = new Div(null, { className: "rssChapterPanel" });
 
-            if (!div) {
-                div = new Div(null, { className: "rssChapterPanel" });
-            }
             for (let chapter of state.chapters.chapters) {
                 let chapDiv = new Div();
-
-                // chapter.img = "https://noagendaassets.com/enc/1604265283.53_na-1291-art-feed.png";
 
                 if (chapter.img) {
                     chapDiv.addChild(new Img(null, {
@@ -198,7 +184,6 @@ export class AudioPlayerDlg extends DialogBase {
                         title: "Play it!"
                     }));
                 }
-
                 div.addChild(chapDiv);
             }
             return div;
@@ -212,7 +197,6 @@ export class AudioPlayerDlg extends DialogBase {
     cancel(): void {
         this.close();
         if (this.player) {
-            // console.log("player pause and remove");
             this.player.pause();
             this.player.remove();
         }
@@ -316,7 +300,7 @@ export class AudioPlayerDlg extends DialogBase {
                         this.player.loop = false;
                         this.player.currentTime = this.player.duration - 2;
                     }
-                    /* or else we are in a comercial segment so jump to one second past it */
+                    /* or else we are in a commercial segment so jump to one second past it */
                     else {
                         this.player.currentTime = seg.endTime + 1;
                     }

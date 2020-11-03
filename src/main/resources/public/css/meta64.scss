@@ -567,6 +567,15 @@ input[type="radio"] {
     padding: 10px; 
 }
 
+.audioPlayer {
+    width: 100%;
+    padding: 0px;
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 16px;    
+}
+
 .audioDownloadLink {
     margin-left: $smallGap;
     white-space: nowrap;

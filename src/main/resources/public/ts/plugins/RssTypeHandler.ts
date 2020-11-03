@@ -224,7 +224,6 @@ export class RssTypeHandler extends TypeBase {
 
     buildFeedItem(entry, state: AppState): Comp {
         let children: Comp[] = [];
-
         let headerDivChildren = [];
 
         if (entry.mediaThumbnail && entry.mediaThumbnail.$) {
@@ -276,9 +275,10 @@ export class RssTypeHandler extends TypeBase {
         }
 
         if (entry.itunesSubtitle) {
-            // adam curry has this:
-            // &quot; in this text (todo-0) make system smart enough to translate that stuff;
-            headerDivChildren.push(new Div(entry.itunesSubtitle));
+            // ignore jank subtitles
+            if (entry.itunesSubtitle.indexOf("&amp;") === -1 && entry.itunesSubtitle.indexOf("&quot;") === -1) {
+                headerDivChildren.push(new Div(entry.itunesSubtitle));
+            }
         }
 
         children.push(new Div(null, null, headerDivChildren));
