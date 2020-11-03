@@ -411,6 +411,10 @@ export class Meta64 implements Meta64Intf {
                 // }
             });
 
+            document.body.addEventListener("keyup", (event: KeyboardEvent) => {
+                this.ctrlKey = event.ctrlKey;
+            });
+
             if (this.appInitialized) {
                 return;
             }
