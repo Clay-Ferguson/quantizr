@@ -35,7 +35,6 @@ export class AudioPlayerDlg extends DialogBase {
 
     player: HTMLAudioElement;
     audioPlayer: AudioPlayer;
-    playButton: Button;
 
     startTimePending: number = null;
 
@@ -96,8 +95,8 @@ export class AudioPlayerDlg extends DialogBase {
                 let timeVal = parseInt(this.timeLeftTextField.valueIntf.getValue());
                 timeVal--;
                 this.timeLeftTextField.valueIntf.setValue(timeVal <= 0 ? "" : "" + timeVal);
-                if (timeVal <= 0 && !this.player.paused && !this.player.ended) {
-                    this.playButtonFunction();
+                if (timeVal <= 0 && this.player && !this.player.paused && !this.player.ended) {
+                    this.player.pause();
                 }
             }
             catch (e) {
@@ -123,8 +122,6 @@ export class AudioPlayerDlg extends DialogBase {
                     this.timeLeftTextField = new TextField("Stop After (mins.)", false, null, null, null)
                 ]),
                 new ButtonBar([
-                    // todo-0: this button text and state is jank. fix. Use internal state in play button.
-                    this.playButton = new Button("Pause", this.playButtonFunction, null, "btn-primary"),
                     new Button("Close", this.destroyPlayer)
                 ]),
                 new ButtonBar([
@@ -142,8 +139,6 @@ export class AudioPlayerDlg extends DialogBase {
 
         this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
             this.player = elm;
-            // use a very long delay here, to be sure media player has had time to do what it needs to do.
-            setTimeout(this.updatePlayButtonText, 3000);
         });
 
         return children;
@@ -195,28 +190,6 @@ export class AudioPlayerDlg extends DialogBase {
         if (this.player) {
             this.player.pause();
             this.player.remove();
-        }
-    }
-
-    updatePlayButtonText = (): void => {
-        if (this.player) {
-            this.playButton.setText(this.player.paused || this.player.ended ? "Play" : "Pause");
-        }
-    }
-
-    playButtonFunction = (): void => {
-        if (this.player) {
-            if (this.player.paused || this.player.ended) {
-                this.player.play();
-                if (this.playButton) {
-                    this.playButton.setText("Pause");
-                }
-            } else {
-                this.player.pause();
-                if (this.playButton) {
-                    this.playButton.setText("Play");
-                }
-            }
         }
     }
 
