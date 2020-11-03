@@ -100,7 +100,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         ];
 
         this.uploadButton.setVisible(false);
-        this.ipfsCheckbox.setChecked(this.toIpfs);
+        if (this.ipfsCheckbox) {
+            this.ipfsCheckbox.setChecked(this.toIpfs);
+        }
         this.configureDropZone();
         this.runButtonEnablement();
         return children;
@@ -235,7 +237,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     if (!formData.has("nodeId")) {
                         formData.append("nodeId", dlg.nodeId);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
-                        formData.append("ipfs", dlg.ipfsCheckbox.getChecked() ? "true" : "false");
+                        formData.append("ipfs", dlg.ipfsCheckbox && dlg.ipfsCheckbox.getChecked() ? "true" : "false");
                         formData.append("createAsChildren", dlg.numFiles > 1 ? "true" : "false");
                     }
 

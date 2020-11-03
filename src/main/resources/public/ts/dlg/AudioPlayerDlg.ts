@@ -22,8 +22,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 /**
- * See also: VideoPlayerDlg (which is very similar)
- *
  * NOTE: currently the AD-skip (Advertisement Skip) feature is a proof-of-concept (and it does functionally work!), but croud sourcing
  * the collection of the time-offsets of the begin/end array of commercial segments has not yet been implemented. Also I decided
  * creating technology to destroy podcast's ability to collect ad-revenue is counter-productive to the entire podcasting industry
@@ -31,6 +29,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
  * their ads!! So the ad-skipping technology in here is disabled.
  *
  * https://www.w3.org/2010/05/video/mediaevents.html
+ * See also: VideoPlayerDlg (which is very similar)
  */
 export class AudioPlayerDlg extends DialogBase {
 
@@ -58,8 +57,6 @@ export class AudioPlayerDlg extends DialogBase {
 
         this.urlHash = S.util.hashOfString(sourceUrl);
         this.startTimePending = localStorage[this.urlHash];
-        // console.log("startTimePending = localStorage[" + this.urlHash + "]=" + localStorage[this.urlHash]);
-
         this.intervalTimer = setInterval(() => {
             this.oneMinuteTimeslice();
         }, 60000);
@@ -180,8 +177,7 @@ export class AudioPlayerDlg extends DialogBase {
                 if (chapter.url) {
                     chapDiv.addChild(new Anchor(chapter.url, "[ Link ]", {
                         className: "rssChapterLink",
-                        target: "_blank",
-                        title: "Play it!"
+                        target: "_blank"
                     }));
                 }
                 div.addChild(chapDiv);
@@ -266,24 +262,17 @@ export class AudioPlayerDlg extends DialogBase {
     restoreStartTime = () => {
         /* makes player always start wherever the user last was when they clicked "pause" */
         if (this.player && this.startTimePending) {
-            // console.log("setting time on player: "+this.startTimePending);
             this.player.currentTime = this.startTimePending;
             this.startTimePending = null;
         }
     }
 
     onTimeUpdate = (): void => {
-        // console.log("CurrentTime=" + this.player.currentTime);
-
         if (!this.saveTimer) {
             /* save time offset into browser local storage every 3 seconds */
             this.saveTimer = setInterval(this.saveTime, 3000);
         }
 
-        /* todo-1: we call restoreStartTime upon loading of the component but it doesn't seem to have the effect doing anything at all
-        and can't even update the slider displayed position, until playins is STARTED. Need to come back and fix this because users
-        currently have the glitch of always hearing the first fraction of a second of video, which of course another way to fix
-        would be by altering the volumn to zero until restoreStartTime has gone into effect */
         this.restoreStartTime();
 
         if (this.adSegments) {
@@ -311,18 +300,10 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     saveTime = (state: AppState): void => {
-        /* the purpose of this timer is to be sure the browser session doesn't timeout while user is playing
-        but if the media is paused we DO allow it to timeout. Othwerwise if user is listening to audio, we
-        contact the server during this timer to update the time on the server AND keep session from timing out
-
-        UPDATE: once i changed the savePlayerInfo to be client-only (no server call) we will have to come up with some
-        other way to ping the server periorically to ensure no timeout of browser during playback IF we desire that even?
-        */
         if (this.player && !this.player.paused) {
             /* this safety check to be sure no hidden audio can still be playing should no longer be needed
             now that I have the close listener even on the dialog, but i'll leave this here anyway. Can't hurt. */
             if (!S.util.isElmVisible(this.player)) {
-                // console.log("closing player, because it was detected as not visible. player dialog get hidden?");
                 this.player.pause();
             }
 
@@ -333,6 +314,5 @@ export class AudioPlayerDlg extends DialogBase {
     savePlayerInfo = (url: string, timeOffset: number): void => {
         let urlHash = S.util.hashOfString(url);
         localStorage[urlHash] = timeOffset;
-        // console.log("localStorage[" + urlHash + "]=" + timeOffset);
     }
 }
