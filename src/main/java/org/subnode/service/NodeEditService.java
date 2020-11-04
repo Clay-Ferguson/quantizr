@@ -555,10 +555,11 @@ public class NodeEditService {
 		String content = node.getContent();
 		int baseLevel = XString.getHeadingLevel(content);
 		updateHeadingsRecurseNode(session, node, 0, baseLevel < 0 ? 0 : baseLevel);
-
 		return res;
 	}
 
+	/* todo-0: update to use subgraph query and then just use the slash-count in the path to determine
+	relative tree level here */
 	private void updateHeadingsRecurseNode(MongoSession session, SubNode node, int level, int baseLevel) {
 		if (node == null)
 			return;
@@ -576,6 +577,7 @@ public class NodeEditService {
 				 */
 				switch (level + baseLevel) {
 					case 0: // this will be the root node (user selected node)
+						break;
 					case 1:
 						if (!nodeContent.startsWith("# ")) {
 							node.setContent("# " + content);

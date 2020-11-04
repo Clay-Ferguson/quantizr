@@ -108,7 +108,7 @@ public class XString {
 			idx++;
 			if (idx >= 6) break;
 		}
-		return idx + 1;
+		return idx;
 	}
 
 	public static String trimToMaxLen(String val, int maxLen) {

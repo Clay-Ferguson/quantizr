@@ -470,47 +470,22 @@ public class NodeRenderService {
 
 		SubNode node = read.getNodeByName(session, nodeName, true);
 		if (node != null) {
-			thymeleafProcessChildren(session, node, model, null);
+			// todo-0: for huge performance gain just make a query itself that can find all non-null named nodes.
+			final Iterable<SubNode> iter = read.getSubGraph(session, node);
+			final List<SubNode> children = read.iterateToList(iter);
+
+			if (children != null) {
+				for (final SubNode child : children) {
+					if (!StringUtils.isEmpty(child.getName())) {
+						model.put(child.getName(), child.getContent());
+					}
+				}
+			}
 			ret = true;
 		} else {
 			log.debug("unable to find node named: " + nodeName);
 		}
 		return ret;
-	}
-
-	/*
-	 * Node name starts out as root name like 'welcome', but as the recursion
-	 * proceeds, it gets appended like, 'welcome.intro', 'welcome.intro.para1' etc.
-	 * whenever the recursion encounters a named node. So the 'dotted properties'
-	 * represent the hiearchy of the node structure.
-	 */
-	public void thymeleafProcessChildren(MongoSession session, SubNode node, HashMap<String, String> model,
-			String parentName) {
-		String nodeName;
-
-		/*
-		 * If this node has a name, create a model map entry based on the name that
-		 * contains the content of the node
-		 */
-		if (!StringUtils.isEmpty(node.getName())) {
-			nodeName = parentName != null ? parentName + "__" + node.getName() : node.getName();
-			// log.debug("thymeleaf [" + nodeName + "]=" + node.getContent());
-			model.put(nodeName, node.getContent());
-		}
-		// if this node it not named, skip but process all it's children
-		else {
-			nodeName = parentName;
-		}
-
-		final Iterable<SubNode> iter = read.getSubGraph(session, node);
-		final List<SubNode> children = read.iterateToList(iter);
-
-		// Scan to collect all the urls.
-		if (children != null) {
-			for (final SubNode child : children) {
-				thymeleafProcessChildren(session, child, model, nodeName);
-			}
-		}
 	}
 
 	public void populateSocialCardProps(SubNode node, Model model) {

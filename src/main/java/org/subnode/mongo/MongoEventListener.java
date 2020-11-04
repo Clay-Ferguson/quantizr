@@ -16,6 +16,7 @@ import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.UserFeedService;
+import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
 
@@ -103,13 +104,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		 * of the leaf 'name' part of the path
 		 */
 		if (node.getPath().endsWith("/?")) {
-			String shortId = Util.getHashOfString(id.toHexString(), 10);
+			String shortId = Util.getHashOfString(id.toHexString(), SubNodeUtil.PATH_HASH_LEN);
 			String path = XString.removeLastChar(node.getPath()) + shortId;
 			dbObj.put(SubNode.FIELD_PATH, path);
 			node.setPath(path);
 		}
 
-		String pathHash = Util.getHashOfString(node.getPath(), 14);
+		String pathHash = Util.getHashOfString(node.getPath(), -1);
 		// log.debug("CHECK PathHash=" + pathHash);
 
 		if (!pathHash.equals(node.getPathHash())) {

@@ -44,8 +44,8 @@
 
                         <p>&nbsp</p>
 
-                        <p class="text-center" th:text="${pg_welcome__intro1}"></p>
-                        <p class="text-center" th:text="${pg_welcome__intro2}"></p>
+                        <p class="text-center" th:text="${intro1}"></p>
+                        <p class="text-center" th:text="${intro2}"></p>
 
                         <!-- <p class="text-center">
                             <a target="_blank" href="https://gateway.pinata.cloud/ipfs/QmUDRVSLBMSwb7Fkn7d8WGzSUeJPD4EJaBmt31npFYraxi">
@@ -53,7 +53,7 @@
                             </a>
                         </p> -->
 
-                        <!-- <p th:text="${pg_welcome__intro3}"></p> -->
+                        <!-- <p th:text="${intro3}"></p> -->
                         <p class="text-center"><a class="btn btn-outline-danger btn-lg appEnterButton" href="/app"
                                 role="button">Enter &raquo;</a></p>
 
@@ -70,62 +70,62 @@
 
             <div class="row">
                 <div th:replace="fragments/components 
-                    :: featureInfoL(title='Social Media', content=${pg_welcome__socialMedia})">
+                    :: featureInfoL(title='Social Media', content=${socialMedia})">
                 </div>
 
                 <div th:replace="fragments/components 
-                    :: featureInfoR(title='Wikis', content=${pg_welcome__wikis})">
-                </div>
-            </div>
-
-            <div class="row">
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Blogs', content=${pg_welcome__blogs})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Friend Feeds', content=${pg_welcome__friendFeeds})">
+                    :: featureInfoR(title='Wikis', content=${wikis})">
                 </div>
             </div>
 
             <div class="row">
                 <div th:replace="fragments/components 
-                    :: featureInfoL(title='Web3/IPFS', content=${pg_welcome__web3})">
+                    :: featureInfoL(title='Blogs', content=${blogs})">
                 </div>
 
                 <div th:replace="fragments/components 
-                    :: featureInfoR(title='File Sharing', content=${pg_welcome__fileSharing})">
-                </div>
-            </div>
-
-            <div class="row">
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Secure Messaging', content=${pg_welcome__secureMessaging})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Access Controls', content=${pg_welcome__acl})">
+                    :: featureInfoR(title='Friend Feeds', content=${friendFeeds})">
                 </div>
             </div>
 
             <div class="row">
                 <div th:replace="fragments/components 
-                    :: featureInfoL(title='Advanced Editing', content=${pg_welcome__advancedEditing})">
+                    :: featureInfoL(title='Web3/IPFS', content=${web3})">
                 </div>
 
                 <div th:replace="fragments/components 
-                    :: featureInfoR(title='PDF Creator', content=${pg_welcome__pdfCreator})">
+                    :: featureInfoR(title='File Sharing', content=${fileSharing})">
+                </div>
+            </div>
+
+            <div class="row">
+                <div th:replace="fragments/components 
+                    :: featureInfoL(title='Secure Messaging', content=${secureMessaging})">
+                </div>
+
+                <div th:replace="fragments/components 
+                    :: featureInfoR(title='Access Controls', content=${acl})">
+                </div>
+            </div>
+
+            <div class="row">
+                <div th:replace="fragments/components 
+                    :: featureInfoL(title='Advanced Editing', content=${advancedEditing})">
+                </div>
+
+                <div th:replace="fragments/components 
+                    :: featureInfoR(title='PDF Creator', content=${pdfCreator})">
                 </div>
             </div>
 
             <div class="row">
 
                 <div th:replace="fragments/components 
-                    :: featureInfoL(title='Powerful Search', content=${pg_welcome__powerfulSearch})">
+                    :: featureInfoL(title='Powerful Search', content=${powerfulSearch})">
                 </div>
 
                 <div th:replace="fragments/components 
-                    :: featureInfoR(title='Timelines', content=${pg_welcome__timelines})">
+                    :: featureInfoR(title='Timelines', content=${timelines})">
                 </div>
 
             </div>
@@ -133,11 +133,11 @@
             <div class="row">
 
                 <div th:replace="fragments/components 
-                    :: featureInfoL(title='Quantized', content=${pg_welcome__quantized})">
+                    :: featureInfoL(title='Quantized', content=${quantized})">
                 </div>
 
                 <div th:replace="fragments/components 
-                    :: featureInfoR(title='RSS/Podcasts', content=${pg_welcome__rss})">
+                    :: featureInfoR(title='RSS/Podcasts', content=${rss})">
                 </div>
             
             </div>
@@ -145,73 +145,73 @@
             <div class="row">
 
                 <div th:replace="fragments/components 
-                    :: featureInfoL(title='RSS Publishing', content=${pg_welcome__rssPublishing})">
+                    :: featureInfoL(title='RSS Publishing', content=${rssPublishing})">
                 </div>
 
                 <div th:replace="fragments/components 
-                    :: featureInfoR(title='Audio/Video Player', content=${pg_welcome__audioVideo})">
-                </div>
-            </div>
-
-            <div class="row">
-
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Audio/Video Recording', content=${pg_welcome__avRecorder})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Audio/Video Messaging', content=${pg_welcome__avMessaging})">
+                    :: featureInfoR(title='Audio/Video Player', content=${audioVideo})">
                 </div>
             </div>
 
             <div class="row">
 
                 <div th:replace="fragments/components 
-                    :: featureInfoL(title='Drag-n-Drop', content=${pg_welcome__dragAndDrop})">
+                    :: featureInfoL(title='Audio/Video Recording', content=${avRecorder})">
                 </div>
 
                 <div th:replace="fragments/components 
-                    :: featureInfoR(title='Custom URLs', content=${pg_welcome__customUrls})">
-                </div>
-            </div>
-
-            <div class="row">
-
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Markdown', content=${pg_welcome__markdown})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Math Formulas', content=${pg_welcome__math})">
+                    :: featureInfoR(title='Audio/Video Messaging', content=${avMessaging})">
                 </div>
             </div>
 
             <div class="row">
 
                 <div th:replace="fragments/components 
-                    :: featureInfoL(title='Hierarchical', content=${pg_welcome__hierarchial})">
+                    :: featureInfoL(title='Drag-n-Drop', content=${dragAndDrop})">
                 </div>
 
                 <div th:replace="fragments/components 
-                    :: featureInfoR(title='Node Types', content=${pg_welcome__nodeTypes})">
+                    :: featureInfoR(title='Custom URLs', content=${customUrls})">
                 </div>
             </div>
 
             <div class="row">
 
                 <div th:replace="fragments/components 
-                    :: featureInfoL(title='Import/Export', content=${pg_welcome__importExport})">
+                    :: featureInfoL(title='Markdown', content=${markdown})">
                 </div>
 
                 <div th:replace="fragments/components 
-                    :: featureInfoR(title='Mobile Support', content=${pg_welcome__mobile})">
+                    :: featureInfoR(title='Math Formulas', content=${math})">
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div th:replace="fragments/components 
+                    :: featureInfoL(title='Hierarchical', content=${hierarchial})">
+                </div>
+
+                <div th:replace="fragments/components 
+                    :: featureInfoR(title='Node Types', content=${nodeTypes})">
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div th:replace="fragments/components 
+                    :: featureInfoL(title='Import/Export', content=${importExport})">
+                </div>
+
+                <div th:replace="fragments/components 
+                    :: featureInfoR(title='Mobile Support', content=${mobile})">
                 </div>
 
             </div>
 
             <div class="row">
                 <div th:replace="fragments/components 
-                    :: featureInfoL(title='Open Source', content=${pg_welcome__openSource})">
+                    :: featureInfoL(title='Open Source', content=${openSource})">
                 </div>
 
             </div>

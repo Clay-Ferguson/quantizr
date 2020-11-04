@@ -154,21 +154,25 @@ export class FullScreenGraphViewer extends Main {
             case 2:
                 return "orange";
             case 3:
-                return "goldenrod";
-            case 4:
-                return "gold";
-            case 5:
-                return "yellow";
-            case 6:
-                return "magenta";
-            case 7:
                 return "blueviolet";
+            case 4:
+                return "brown";
+            case 5:
+                return "blue";
+            case 6:
+                return "deeppink";
+            case 7:
+                return "darkcyan";
             case 8:
-                return "darkviolet";
+                return "orange";
             case 9:
-                return "lightslateblue";
+                return "purple";
             case 10:
-                return "cyan";
+                return "brown";
+            case 11:
+                return "slateblue";
+            case 12:
+                return "slategrey";
             default:
                 return "#fff";
         }

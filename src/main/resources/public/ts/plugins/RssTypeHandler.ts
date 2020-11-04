@@ -274,7 +274,7 @@ export class RssTypeHandler extends TypeBase {
             }));
         }
 
-        if (entry.itunesSubtitle) {
+        if (entry.itunesSubtitle && entry.itunesSubtitle !== entry.title) {
             // ignore jank subtitles
             if (entry.itunesSubtitle.indexOf("&amp;") === -1 && entry.itunesSubtitle.indexOf("&quot;") === -1) {
                 headerDivChildren.push(new Div(entry.itunesSubtitle));

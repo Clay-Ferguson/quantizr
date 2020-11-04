@@ -186,28 +186,32 @@ export class Edit implements EditIntf {
         }
 
         if (S.meta64.ctrlKey) {
-            let clipboardText = await (navigator as any).clipboard.readText();
-            if (nodeInsertTarget) {
-                S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
-                    updateModTime: true,
-                    parentId: parentNode.id,
-                    targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
-                    newNodeName: "",
-                    typeName: typeName || "u",
-                    initialValue: clipboardText
-                }, (res) => { S.meta64.refresh(state); });
-            } else {
-                S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                    updateModTime: true,
-                    nodeId: parentNode.id,
-                    newNodeName: "",
-                    typeName: typeName || "u",
-                    createAtTop,
-                    content: clipboardText,
-                    typeLock: false,
-                    properties: null
-                }, (res) => { S.meta64.refresh(state); });
-            }
+            new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
+                async () => {
+                    let clipboardText = await (navigator as any).clipboard.readText();
+                    if (nodeInsertTarget) {
+                        S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                            updateModTime: true,
+                            parentId: parentNode.id,
+                            targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
+                            newNodeName: "",
+                            typeName: typeName || "u",
+                            initialValue: clipboardText
+                        }, (res) => { S.meta64.refresh(state); });
+                    } else {
+                        S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                            updateModTime: true,
+                            nodeId: parentNode.id,
+                            newNodeName: "",
+                            typeName: typeName || "u",
+                            createAtTop,
+                            content: clipboardText,
+                            typeLock: false,
+                            properties: null
+                        }, (res) => { S.meta64.refresh(state); });
+                    }
+                }, null, null, null, state
+            ).open();
         }
         else {
             if (nodeInsertTarget) {
@@ -430,11 +434,15 @@ export class Edit implements EditIntf {
 
     /* Need all cached functions to be prefixed so they're recognizable, since refactoring them can break things */
     cached_newSubNode = (id: string) => {
+        const state = store.getState();
         if (S.meta64.ctrlKey) {
-            this.saveClipboardToChildNode(id);
+            new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
+                async () => {
+                    this.saveClipboardToChildNode(id);
+                }, null, null, null, state
+            ).open();
         }
         else {
-            const state = store.getState();
             this.createSubNode(id, null, true, state.node, null);
         }
     }

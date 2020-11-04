@@ -366,6 +366,7 @@ public class AppController implements ErrorController {
 			initCacheBuster();
 		}
 
+		// Note: this refreshes only when ADMIN is accessing it, so it's slow in this case.
 		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 			synchronized (welcomeMapLock) {
 				HashMap<String, String> newMap = new HashMap<String, String>();

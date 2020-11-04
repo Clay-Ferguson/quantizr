@@ -36,7 +36,7 @@ public class SubNodeUtil {
 	 * only guarantee uniquess inside a single node (sibling uniqueness) so this can
 	 * be kinda short.
 	 */
-	public static final int PATH_HASH_LEN = 7;
+	public static final int PATH_HASH_LEN = 16;
 
 	@Autowired
 	private MongoCreate create;

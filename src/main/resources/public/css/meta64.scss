@@ -1050,12 +1050,9 @@ i'm backing out for now
     display: table;
     width: 100%;
     table-layout: fixed;
-    //margin-top: 10px;
-    //height: 100%;
-
-    // if you ever need rounded cells, these two are needed with that.
-    // border-collapse: separate;
-    // border-spacing: 10px;
+    // This is needed with round borders but is a huge waste of space
+    border-collapse: collapse;
+    border-spacing: 10px;
 }
 
 .node-grid-item {
@@ -1070,7 +1067,11 @@ i'm backing out for now
 }
 
 .node-grid-cell {
-    border: 1px dotted gray;
+    border: 1px dotted $nodeBorderBottomColor;
+
+    // rounded border cells looks cluttered and is a waste of space
+    // padding: 6px;
+    // border-radius: $borderRadiusMedium;
     display: table-cell;
 }
 

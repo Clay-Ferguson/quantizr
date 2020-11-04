@@ -120,6 +120,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "80%", val: "80%" },
             { key: "90%", val: "90%" },
             { key: "100%", val: "100%" },
+            { key: "50px", val: "50px" },
             { key: "100px", val: "100px" },
             { key: "200px", val: "200px" },
             { key: "400px", val: "400px" },
