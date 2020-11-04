@@ -625,6 +625,18 @@ public class MongoRead {
         return getOps(session).find(query, SubNode.class);
     }
 
+    /* todo-1: This is very low hanging fruit to make this a feature on the Search menu */
+    public Iterable<SubNode> getNamedNodes(MongoSession session, SubNode node) {
+        auth.auth(session, node, PrivilegeType.READ);
+
+        Query query = new Query();
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
+        criteria = criteria.and(SubNode.FIELD_NAME).ne(null);
+        query.addCriteria(criteria);
+
+        return getOps(session).find(query, SubNode.class);
+    }
+
     /*
      * Builds the 'criteria' object using the kind of searching Google does where
      * anything in quotes is considered a phrase and anything else separated by

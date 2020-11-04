@@ -470,8 +470,7 @@ public class NodeRenderService {
 
 		SubNode node = read.getNodeByName(session, nodeName, true);
 		if (node != null) {
-			// todo-0: for huge performance gain just make a query itself that can find all non-null named nodes.
-			final Iterable<SubNode> iter = read.getSubGraph(session, node);
+			final Iterable<SubNode> iter = read.getNamedNodes(session, node);
 			final List<SubNode> children = read.iterateToList(iter);
 
 			if (children != null) {
