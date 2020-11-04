@@ -11,17 +11,18 @@
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Quanta" />
-    <meta property="og:description" content="The world's first Quantized Editor!" />
+    <meta property="og:description" th:attr="content=${introSubtitle}" />
     <meta property="og:image" content="/images/eagle-logo-150px-tr.jpg" />
     <meta property="og:url" content="https://quanta.wiki" />
 
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Quanta" />
-    <meta name="twitter:description" content="The world's first Quantized Editor!" />
+    <meta name="twitter:description" th:attr="content=${introSubtitle}" />
     <meta name="twitter:image" content="/images/eagle-logo-150px-tr.jpg" />
 
     <title>Quanta</title>
     <link rel="stylesheet" th:href="'/css/meta64.css?v='+${MAIN_CSS_HASH}" />
+    <link rel="preload" href="/fonts/Roboto/Roboto-Light.ttf" as="font" crossorigin="anonymous" />
 </head>
 
 <body class="welcome-body customScrollbar">
@@ -40,20 +41,13 @@
 
                         <h1 class="text-center">Quanta</h1>
 
-                        <h3 class="text-center">The world's first Quantized Editor!</h3>
+                        <h3 class="text-center" th:text="${introSubtitle}"></h3>
 
                         <p>&nbsp</p>
 
                         <p class="text-center" th:text="${intro1}"></p>
                         <p class="text-center" th:text="${intro2}"></p>
 
-                        <!-- <p class="text-center">
-                            <a target="_blank" href="https://gateway.pinata.cloud/ipfs/QmUDRVSLBMSwb7Fkn7d8WGzSUeJPD4EJaBmt31npFYraxi">
-                                Platform Demo Videos
-                            </a>
-                        </p> -->
-
-                        <!-- <p th:text="${intro3}"></p> -->
                         <p class="text-center"><a class="btn btn-outline-danger btn-lg appEnterButton" href="/app"
                                 role="button">Enter &raquo;</a></p>
 
@@ -63,10 +57,6 @@
         </div>
 
         <div class="container-fluid welcome-container-no-navbar">
-
-            <!-- <div class="row justify-content-center">
-                <h1 class="col-md-4">Features...</h1>
-            </div> -->
 
             <div class="row">
                 <div th:replace="fragments/components 
@@ -237,15 +227,13 @@
 
     </footer>
 
-    <!-- load some scripts here, that aren't needed on this page, but we make use of the fact that the user is looking at
-    the landing page, and use that time to pre-load this into browser for when it's needed. -->
-
     <script th:inline="none">
+        // todo-0: why is the double-dollar still working with this?
         var innerArray = ['[math]', '[/math]'];
         /*<![CDATA[*/
         MathJax = {
             tex: {
-                //warning: don't remove the space between the square braces here or that will trigger thymeleaf to pick up 
+                //warning: Don't combine these two arrays and let '[ [' get into the script. That will trigger thymeleaf to pick up 
                 //the string and try to interpret it. Also the "th:inline: none" all by itself can fix this too, which we do use.
                 inlineMath: [innerArray]
             }
