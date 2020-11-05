@@ -128,9 +128,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     // Linux Ubuntu note: Shift + Ctrl + PrtSc -> Copy the screenshot of a specific region to the clipboard.
     // todo-1: I have a feature that pastes from clipboard to a node as text, but it needs to detect images and if image is in
     // clipboard create a node and put that image in it.
-    uploadFromClipboard = (): void => {
+    uploadFromClipboard = async () => {
         (navigator as any).clipboard.read().then(async (data) => {
+            let done: boolean = false;
             for (const clipboardItem of data) {
+                // this was supposed to be only images, but i'm getting all types as blob. whoops.
                 for (const type of clipboardItem.types) {
                     const blob = await clipboardItem.getType(type);
                     // console.log(URL.createObjectURL(blob));
@@ -142,9 +144,26 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                     this.dropzone.addFile(blob);
                     this.runButtonEnablement();
+                    done = true;
+                    break;
                 }
+                if (done) break;
             }
         });
+
+        // todo-0: temp check to verify we can get HTML, in preparation for the new
+        // button to upload from clipboard HTML to PDF.
+        // const items = await (navigator as any).clipboard.read();
+        // for (let item of items) {
+        //     const blob = await item.getType("text/html");
+        //     if (blob) {
+        //         // let html = await blob.text();
+        //         // clipText = "```html\n" + html + "\n```\n";
+        //         this.dropzone.addFile(blob);
+        //         this.runButtonEnablement();
+        //         break;
+        //     }
+        // }
     }
 
     upload = async (): Promise<boolean> => {
@@ -237,6 +256,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     if (!formData.has("nodeId")) {
                         formData.append("nodeId", dlg.nodeId);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
+                        formData.append("saveAsPdf", false); // todo-0: fix (work in progress: Save HTML fro clipboard as PDF)
                         formData.append("ipfs", dlg.ipfsCheckbox && dlg.ipfsCheckbox.getChecked() ? "true" : "false");
                         formData.append("createAsChildren", dlg.numFiles > 1 ? "true" : "false");
                     }

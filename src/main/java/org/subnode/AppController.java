@@ -988,6 +988,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object upload(//
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
 			@RequestParam(value = "explodeZips", required = true) String explodeZips, //
+			@RequestParam(value = "saveAsPdf", required = true) String saveAsPdf, //
 			@RequestParam(value = "ipfs", required = true) String ipfs, //
 			@RequestParam(value = "createAsChildren", required = true) String createAsChildren, //
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //

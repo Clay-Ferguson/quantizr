@@ -933,6 +933,13 @@ public class AttachmentService {
 		 */
 		deleteBinary(session, node);
 
+		// todo-0: right here if saveAsPdf is true we need to convert the HTML to PDF and write that stream. 
+		// read stream into html as a string.
+		// create new outputstream (in memory) to write to (byte array stream)
+		// PdfConverterExtension.exportToPdf(out, html, "", options);
+		// get an inputstream that reads what was written, and put it in 'stream', 
+		// then the rest fo the code remains as is.
+
 		final String id = grid.store(stream, fileName, mimeType, metaData).toString();
 
 		final long streamCount = stream.getCount();

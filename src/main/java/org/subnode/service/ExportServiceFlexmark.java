@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
 import org.subnode.config.ConstantsProvider;
 import org.subnode.config.SessionContext;
-import org.subnode.model.UserPreferences;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
