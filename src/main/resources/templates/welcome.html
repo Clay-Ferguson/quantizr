@@ -129,7 +129,7 @@
                 <div th:replace="fragments/components 
                     :: featureInfoR(title='RSS/Podcasts', content=${rss})">
                 </div>
-            
+
             </div>
 
             <div class="row">
@@ -201,7 +201,11 @@
 
             <div class="row">
                 <div th:replace="fragments/components 
-                    :: featureInfoL(title='Open Source', content=${openSource})">
+                    :: featureInfoL(title='D3 Graphs', content=${d3-graph})">
+                </div>
+
+                <div th:replace="fragments/components 
+                    :: featureInfoR(title='Open Source', content=${openSource})">
                 </div>
 
             </div>

@@ -315,7 +315,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         if (!propsParent.childrenExist()) {
-            propsParent.addChild(new TextContent("No custom properties."));
+            propsParent.addChild(new TextContent("No properties on this node."));
         }
 
         let allowPropertyAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;

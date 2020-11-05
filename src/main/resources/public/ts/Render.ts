@@ -393,7 +393,6 @@ export class Render implements RenderIntf {
         if (!node || !node.children) return null;
 
         let allowAvatars = !S.util.allChildrenAreSameOwner(node);
-        console.log("renderChildren: allowAvatars=" + allowAvatars);
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on

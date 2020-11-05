@@ -52,6 +52,7 @@ export class Meta64 implements Meta64Intf {
     password: string;
 
     ctrlKey: boolean;
+    ctrlKeyTime: number;
 
     // maps the hash of an encrypted block of text to the unencrypted text, so that we never run the same
     // decryption code twice.
@@ -367,9 +368,12 @@ export class Meta64 implements Meta64Intf {
             document.body.addEventListener("keydown", (event: KeyboardEvent) => {
                 // console.log("keydown: " + event.code);
                 let state: AppState = store.getState();
-                this.ctrlKey = event.ctrlKey;
 
                 switch (event.code) {
+                    case "ControlLeft":
+                        this.ctrlKey = true;
+                        this.ctrlKeyTime = new Date().getTime();
+                        break;
                     case "Escape":
                         if (S.meta64.fullscreenViewerActive(state)) {
                             S.nav.closeFullScreenImgViewer(state);
@@ -412,7 +416,13 @@ export class Meta64 implements Meta64Intf {
             });
 
             document.body.addEventListener("keyup", (event: KeyboardEvent) => {
-                this.ctrlKey = event.ctrlKey;
+                switch (event.code) {
+                    case "ControlLeft":
+                        this.ctrlKey = false;
+                        this.ctrlKeyTime = -1;
+                        break;
+                    default: break;
+                }
             });
 
             if (this.appInitialized) {
@@ -662,5 +672,9 @@ export class Meta64 implements Meta64Intf {
 
     fullscreenViewerActive = (state: AppState): boolean => {
         return !!(state.fullScreenViewId || state.fullScreenGraphId || state.fullScreenCalendarId);
+    }
+
+    ctrlKeyCheck = (): boolean => {
+        return this.ctrlKey && (new Date().getTime() - this.ctrlKeyTime) < 2500;
     }
 }

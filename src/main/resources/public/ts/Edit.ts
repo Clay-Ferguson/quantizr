@@ -185,7 +185,7 @@ export class Edit implements EditIntf {
             return;
         }
 
-        if (S.meta64.ctrlKey) {
+        if (S.meta64.ctrlKeyCheck()) {
             new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
                 async () => {
                     let clipboardText = await (navigator as any).clipboard.readText();
@@ -435,7 +435,7 @@ export class Edit implements EditIntf {
     /* Need all cached functions to be prefixed so they're recognizable, since refactoring them can break things */
     cached_newSubNode = (id: string) => {
         const state = store.getState();
-        if (S.meta64.ctrlKey) {
+        if (S.meta64.ctrlKeyCheck()) {
             new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
                 async () => {
                     this.saveClipboardToChildNode(id);
@@ -546,7 +546,12 @@ export class Edit implements EditIntf {
         }
 
         if (selNodesArray.find(id => id === state.homeNodeId)) {
-            S.util.showMessage("Sorry, you can't delete your account root node!", "Warning");
+            S.util.showMessage("You can't delete your account root node! To close your account use the Account Menu", "Warning");
+            return;
+        }
+
+        if (selNodesArray.find(id => id === state.node.id)) {
+            S.util.showMessage("You can't delete your page node! Go up a level to do that.", "Warning");
             return;
         }
 

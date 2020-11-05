@@ -61,6 +61,10 @@ public class MongoSession {
 		if (userNode == null) {
 			return Const.DEFAULT_USER_QUOTA;
 		}
+		if (isAdmin()) {
+			return Integer.MAX_VALUE;
+		}
+		
 		long ret = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
 		if (ret == 0) {
 			return Const.DEFAULT_USER_QUOTA;

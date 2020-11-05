@@ -1,5 +1,6 @@
 package org.subnode;
 
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,10 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -120,8 +120,10 @@ import org.subnode.service.RSSFeedService;
 import org.subnode.service.SystemService;
 import org.subnode.service.UserFeedService;
 import org.subnode.service.UserManagerService;
+import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
+import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.Util;
 
 /**
@@ -366,7 +368,8 @@ public class AppController implements ErrorController {
 			initCacheBuster();
 		}
 
-		// Note: this refreshes only when ADMIN is accessing it, so it's slow in this case.
+		// Note: this refreshes only when ADMIN is accessing it, so it's slow in this
+		// case.
 		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 			synchronized (welcomeMapLock) {
 				HashMap<String, String> newMap = new HashMap<String, String>();
@@ -467,18 +470,40 @@ public class AppController implements ErrorController {
 	/*
 	 * Proxies an HTTP GET thru to the specified url. Used to avoid CORS errors when
 	 * retrieving RSS directly from arbitrary servers
+	 * 
+	 * todo-1: need a 'useCache' url param option
 	 */
 	@GetMapping(value = { "/proxyGet" })
 	public void proxyGet(@RequestParam(value = "url", required = true) String url, HttpServletResponse response) {
 		try {
-			restTemplate.getForEntity(new URI(url), byte[].class);
-			response.setStatus(HttpStatus.OK.value());
+			// try to get proxy info from cache.
+			byte[] cacheBytes = null;
+			synchronized (RSSFeedService.proxyCache) {
+				cacheBytes = RSSFeedService.proxyCache.get(url);
+			}
 
-			restTemplate.execute(url, HttpMethod.GET, (ClientHttpRequest requestCallback) -> {
-			}, responseExtractor -> {
-				IOUtils.copy(responseExtractor.getBody(), response.getOutputStream());
-				return null;
-			});
+			if (cacheBytes != null) {
+				//limiting the stream just becasue for now this is only used in feed processing, and 5MB is plenty
+				IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 5*Const.ONE_MB), response.getOutputStream());
+			}
+			// not in cache then read and update cache
+			else {
+				ResponseEntity<byte[]> resp = restTemplate.getForEntity(new URI(url), byte[].class);
+				response.setStatus(HttpStatus.OK.value());
+
+				synchronized (RSSFeedService.proxyCache) {
+					RSSFeedService.proxyCache.put(url, resp.getBody());
+				}
+				IOUtils.copy(new ByteArrayInputStream(resp.getBody()), response.getOutputStream());
+
+				// DO NOT DELETE (good example)
+				// restTemplate.execute(url, HttpMethod.GET, (ClientHttpRequest requestCallback)
+				// -> {
+				// }, responseExtractor -> {
+				// IOUtils.copy(responseExtractor.getBody(), response.getOutputStream());
+				// return null;
+				// });
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("internal server error");
 		}
@@ -1114,7 +1139,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/graphNodes", method = RequestMethod.POST)
 	public @ResponseBody Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
 		return callProc.run("graphNodes", req, session, ms -> {
-			GraphResponse res =  graphNodesService.graphNodes(ms, req);
+			GraphResponse res = graphNodesService.graphNodes(ms, req);
 			res.setSuccess(true);
 			return res;
 		});

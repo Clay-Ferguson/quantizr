@@ -29,6 +29,8 @@ export interface Meta64Intf {
 
     // realtime state always holds true if CTRL key is down
     ctrlKey: boolean;
+    ctrlKeyTime: number;
+    ctrlKeyCheck(): boolean;
 
     decryptCache: { [key: string]: string };
 

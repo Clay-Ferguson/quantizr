@@ -68,6 +68,11 @@ public class RSSFeedService {
 	 */
 	private static final HashMap<String, SyndFeed> aggregateCache = new HashMap<String, SyndFeed>();
 
+	/*
+	 * Cache of all calls to proxyGet
+	 */
+	public static final HashMap<String, byte[]> proxyCache = new HashMap<String, byte[]>();
+
 	private static int runCount = 0;
 
 	// NOTE: Same value appears in RSSTypeHandler.ts
@@ -93,6 +98,7 @@ public class RSSFeedService {
 		log.debug("RSSFeedService.refreshFeedCache");
 		refreshFeedCache();
 		aggregateCache.clear();
+		proxyCache.clear();
 	}
 
 	public void startupPreCache() {
