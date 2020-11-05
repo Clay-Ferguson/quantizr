@@ -1346,4 +1346,16 @@ export class Util implements UtilIntf {
 
         return val;
     }
+
+    // returns true if all children are same owner as parent
+    allChildrenAreSameOwner = (node: J.NodeInfo): boolean => {
+        if (!node || !node.children) return true;
+
+        for (let child of node.children) {
+            if (node.ownerId !== child.ownerId) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

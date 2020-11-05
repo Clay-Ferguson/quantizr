@@ -392,20 +392,23 @@ export class Render implements RenderIntf {
     renderChildren = (node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp => {
         if (!node || !node.children) return null;
 
+        let allowAvatars = !S.util.allChildrenAreSameOwner(node);
+        console.log("renderChildren: allowAvatars=" + allowAvatars);
+
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on
          * the client side for various reasons.
          */
         const layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
         if (!layout || layout === "v") {
-            return new NodeCompVerticalRowLayout(node, level, allowNodeMove);
+            return new NodeCompVerticalRowLayout(node, level, allowNodeMove, allowAvatars);
         }
         else if (layout.indexOf("c") === 0) {
-            return new NodeCompTableRowLayout(node, level, layout, allowNodeMove);
+            return new NodeCompTableRowLayout(node, level, layout, allowNodeMove, allowAvatars);
         }
         else {
             // of no layout is valid, fall back on vertical.
-            return new NodeCompVerticalRowLayout(node, level, allowNodeMove);
+            return new NodeCompVerticalRowLayout(node, level, allowNodeMove, allowAvatars);
         }
     }
 
@@ -469,6 +472,7 @@ export class Render implements RenderIntf {
             // 1) consider performance on server, and number of queries cost
             // 2) and also we would need to limit to a max number of characters that's like a small paragrah
             title: "User: " + node.owner + "\n\nClick for Bio",
+            // align: "left", // causes text to flow around
 
             onClick: (evt) => {
                 new ProfileDlg(state, true, node.ownerId, node.owner).open();

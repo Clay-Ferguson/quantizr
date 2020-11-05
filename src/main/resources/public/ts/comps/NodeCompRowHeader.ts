@@ -17,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompRowHeader extends Div {
 
-    constructor(private node: J.NodeInfo, private isFeed: boolean = false) {
+    constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isFeed: boolean = false) {
         super(null, {
             className: "header-text"
         });
@@ -29,7 +29,7 @@ export class NodeCompRowHeader extends Div {
         let children = [];
 
         let avatarImg: Img = null;
-        if (node.owner !== J.PrincipalName.ADMIN) {
+        if ((this.allowAvatars || node.id === state.node.id) && node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeAvatarImage(node, state);
             if (avatarImg) {
                 children.push(avatarImg);

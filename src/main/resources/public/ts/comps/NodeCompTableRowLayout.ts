@@ -20,7 +20,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompTableRowLayout extends Div {
 
-    constructor(public node: J.NodeInfo, public level: number, public layout: string, public allowNodeMove: boolean) {
+    constructor(public node: J.NodeInfo, public level: number, public layout: string, public allowNodeMove: boolean, private allowAvatars: boolean) {
         super(null, { className: "node-grid-table" });
     }
 
@@ -94,7 +94,7 @@ export class NodeCompTableRowLayout extends Div {
                 }
                 else {
                     lastNode = n;
-                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, state);
+                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowAvatars, state);
                     comps.push(row);
                 }
 

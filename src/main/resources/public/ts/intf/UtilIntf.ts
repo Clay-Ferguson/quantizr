@@ -120,4 +120,5 @@ export interface UtilIntf {
     generateNewCryptoKeys(state: AppState): any;
     buildCalendarData(items: J.CalendarItem[]): EventInput[];
     markdown(val: string): any;
+    allChildrenAreSameOwner(node: J.NodeInfo): boolean;
 }

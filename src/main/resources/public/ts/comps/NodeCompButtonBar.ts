@@ -23,7 +23,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompButtonBar extends HorizontalLayout {
 
-    constructor(public node: J.NodeInfo, public allowAvatar: boolean, public allowNodeMove: boolean, private level: number, private extraButtons: IconButton[]) {
+    constructor(public node: J.NodeInfo, public allowAvatars: boolean, public allowNodeMove: boolean, private level: number, private extraButtons: IconButton[]) {
         super(null, "marginLeft", {
             id: "NodeCompButtonBar_" + node.id
         });
@@ -204,7 +204,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
         // If showMetaData is true the avatar will show up in a different place (very upper left), instead of here
         let avatarImg: Img;
-        if (!state.userPreferences.showMetaData && this.allowAvatar && node.owner !== J.PrincipalName.ADMIN) {
+        if (!state.userPreferences.showMetaData && (this.allowAvatars || node.id === state.node.id) && node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeAvatarImage(node, state);
         }
 
