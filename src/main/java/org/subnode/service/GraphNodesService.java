@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.subnode.config.SessionContext;
 import org.subnode.model.GraphNode;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -24,6 +25,9 @@ public class GraphNodesService {
 	private static final Logger log = LoggerFactory.getLogger(GraphNodesService.class);
 
 	static int guid = 0;
+
+	@Autowired
+	private SessionContext sessionContext;
 
 	@Autowired
 	private MongoRead read;
@@ -50,7 +54,8 @@ public class GraphNodesService {
 			if (StringUtils.isEmpty(req.getSearchText())) {
 				results = read.getSubGraph(session, node);
 			} else {
-				results = read.searchSubGraph(session, node, "content", req.getSearchText(), null, 1000, false, false);
+				int limit = sessionContext.isAdmin() ? Integer.MAX_VALUE : 1000;
+				results = read.searchSubGraph(session, node, "content", req.getSearchText(), null, limit, false, false);
 			}
 
 			for (SubNode n : results) {

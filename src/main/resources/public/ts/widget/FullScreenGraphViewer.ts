@@ -11,6 +11,12 @@ import { Constants as C } from "../Constants";
 // https://www.npmjs.com/package/d3
 // https://d3js.org/
 
+// todo-0: our dragging/panning doesn't work but this is a simiar example that DOES.
+// http://bl.ocks.org/FrissAnalytics/e9ce129a11dad7441eecacbbb6bad95c
+
+// http://bl.ocks.org/eyaler/10586116
+
+
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
