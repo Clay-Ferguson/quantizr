@@ -10,6 +10,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -183,7 +184,7 @@ public class MongoUtil {
 	}
 
 	public String getHashOfPassword(String password) {
-		return Util.getHashOfString(password, 20);
+		return DigestUtils.sha256Hex(password).substring(0, 20);
 	}
 
 	public String getNodeReport() {

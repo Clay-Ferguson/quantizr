@@ -1,5 +1,6 @@
 package org.subnode.mongo;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -16,8 +17,6 @@ import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.UserFeedService;
-import org.subnode.util.SubNodeUtil;
-import org.subnode.util.Util;
 import org.subnode.util.XString;
 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
@@ -104,13 +103,14 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		 * of the leaf 'name' part of the path
 		 */
 		if (node.getPath().endsWith("/?")) {
-			String shortId = Util.getHashOfString(id.toHexString(), SubNodeUtil.PATH_HASH_LEN);
-			String path = XString.removeLastChar(node.getPath()) + shortId;
+			// Note: Any code here prior to 11/6/2020, did NOT have the last path part as the ID, but was
+			// instad a function of the hash of the ID.
+			String path = XString.removeLastChar(node.getPath()) + id.toHexString();
 			dbObj.put(SubNode.FIELD_PATH, path);
 			node.setPath(path);
 		}
 
-		String pathHash = Util.getHashOfString(node.getPath(), -1);
+		String pathHash = DigestUtils.sha256Hex(node.getPath());
 		// log.debug("CHECK PathHash=" + pathHash);
 
 		if (!pathHash.equals(node.getPathHash())) {

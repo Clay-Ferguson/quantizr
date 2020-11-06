@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
@@ -24,8 +25,6 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.MimeUtil;
-import org.subnode.util.SubNodeUtil;
-import org.subnode.util.Util;
 import org.subnode.util.XString;
 
 public abstract class ImportArchiveBase {
@@ -170,15 +169,9 @@ public abstract class ImportArchiveBase {
 		List<String> pathItems = XString.tokenize(path, "/", true);
 		StringBuilder sb = new StringBuilder();
 		for (String pathPart : pathItems) {
-			/*
-			 * todo-1: It would be better if we had a way to make the actual path parts
-			 * match the hash of the node ID which is the normal standard because generating
-			 * the hash here like this is *safe* but is kind of the equivalent of 'naming'
-			 * the node, becasue the node can also have any name, and this is like naming it
-			 * the hash we generate here.
-			 */
-			String p = Util.getHashOfString(pathPart, SubNodeUtil.PATH_HASH_LEN);
-			sb.append("/" + p);
+			// todo-0: check to see if we can end up with the node.id hex string 
+			// which would mean delaying this path generation until the insert operation is complete
+			sb.append("/" + DigestUtils.sha1Hex(pathPart));
 		}
 		// log.info("HASHED PATH: " + sb.toString());
 		return sb.toString();

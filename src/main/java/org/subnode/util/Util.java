@@ -61,16 +61,6 @@ public class Util {
 		return mime;
 	}
 
-	/**
-	 * Returns only 'chars' characters of the hash, or the entire sha256 if chars
-	 * is -1
-	 */
-	public static String getHashOfString(String val, int chars) {
-		String pathHash = DigestUtils.sha256Hex(val.getBytes());
-		// todo-0: this algo for chars!=-1 assumes the first 'chars' of a sha256 are random enough
-		return chars == -1 ? pathHash : pathHash.substring(0, chars);
-	}
-
 	public static ClientHttpRequestFactory getClientHttpRequestFactory() {
 		int timeout = 20000;
 		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();

@@ -144,10 +144,6 @@ export class MenuPanel extends Div {
             //    () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch })
         ]));
 
-        // NOTE:Graph feature is fully functional, but not ready to deploy yet.
-        // new Menu("Graph", [
-        //     new MenuItem("Tree Structure", S.graph.graphTreeStructure, () => { return !state.isAnonUser && highlightNode != null }), //
-        // ]),
         children.push(new Menu("Timeline", [
 
             new MenuItem("Created", () => S.srch.timeline("ctm", state), //
@@ -158,7 +154,7 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Tools", [
-            state.isAdminUser ? new MenuItem("Show Graph", () => S.render.showGraph(null, null, state), !!hltNode) : null, //
+            new MenuItem("Show Graph", () => S.render.showGraph(null, null, state), !!hltNode), //
 
             // todo-1: properties toggle really should be a preferences setting i think, and not a menu option here.
 
