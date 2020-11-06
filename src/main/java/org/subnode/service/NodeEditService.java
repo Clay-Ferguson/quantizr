@@ -558,8 +558,8 @@ public class NodeEditService {
 		return res;
 	}
 
-	/* todo-0: update to use subgraph query and then just use the slash-count in the path to determine
-	relative tree level here */
+	/* todo-1: update to use subgraph query and then just use the slash-count in the path to determine
+	relative tree level here. Relative part being important of course. */
 	private void updateHeadingsRecurseNode(MongoSession session, SubNode node, int level, int baseLevel) {
 		if (node == null)
 			return;

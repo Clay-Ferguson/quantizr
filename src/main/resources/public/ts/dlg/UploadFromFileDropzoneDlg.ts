@@ -151,6 +151,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             }
         });
 
+        // DO NOT DELETE (yet)
+        //
         // todo-0: temp check to verify we can get HTML, in preparation for the new
         // button to upload from clipboard HTML to PDF.
         // const items = await (navigator as any).clipboard.read();
@@ -256,7 +258,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     if (!formData.has("nodeId")) {
                         formData.append("nodeId", dlg.nodeId);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
-                        formData.append("saveAsPdf", false); // todo-0: fix (work in progress: Save HTML fro clipboard as PDF)
+                        formData.append("saveAsPdf", false); // todo-0: fix (work in progress: Save HTML from clipboard as PDF)
                         formData.append("ipfs", dlg.ipfsCheckbox && dlg.ipfsCheckbox.getChecked() ? "true" : "false");
                         formData.append("createAsChildren", dlg.numFiles > 1 ? "true" : "false");
                     }

@@ -75,10 +75,9 @@ export class FullScreenGraphViewer extends Main {
                 .force("x", d3.forceX())
                 .force("y", d3.forceY());
 
-            // I think I have a div inside this div when it renders which would be redundant (todo-0)
             _this.tooltip = selection
                 .append("div")
-                .attr("class", "tooltip")
+                .attr("class", "tooltip alert alert-secondary")
                 .style("font-size", "14px")
                 .style("pointer-events", "none");
 
@@ -166,13 +165,20 @@ export class FullScreenGraphViewer extends Main {
                 .on("mouseout", mouseout)
 
                 .on("click", function (event: any, d) {
-                    // todo-0: need to bring back this border color setting.
-                    // circle
-                    //     // .style("fill", "lightcoral")
-                    //     .style("stroke", "green");
-                    if (d.data.id) {
-                        window.open(S.util.getHostAndPort() + "/app?id=" + d.data.id, "_blank");
-                    }
+                    d3.select(this)
+                        .style("fill", "white")
+                        .style("stroke", "red");
+
+                    _this.tooltip.text("Opening...")
+                        .style("left", (event.pageX + 15) + "px")
+                        .style("top", (event.pageY - 50) + "px");
+
+                    // use timeout to give user time to notice the circle was colored white now
+                    setTimeout(() => {
+                        if (d.data.id) {
+                            window.open(S.util.getHostAndPort() + "/app?id=" + d.data.id, "_blank");
+                        }
+                    }, 1000);
                 })
 
                 .call(drag(simulation));
@@ -273,11 +279,14 @@ export class FullScreenGraphViewer extends Main {
     showTooltip = (d: any, x: number, y: number) => {
         this.tooltip.transition()
             .duration(300)
-            .style("opacity", (d) => (!this.isDragging) ? 0.97 : 0);
+            .style("opacity", (d) => !this.isDragging ? 0.97 : 0);
 
-        this.tooltip.html(() => {
-            return "<div class='alert alert-secondary'>" + d.data.name + "</div>";
-        }).style("left", (x + 15) + "px")
+        // DO NOT DELETE (example for how to use HTML)
+        // this.tooltip.html(() => {
+        //     return "<div class='alert alert-secondary'>" + d.data.name + "</div>";
+        // })
+        this.tooltip.text(d.data.name)
+            .style("left", (x + 15) + "px")
             .style("top", (y - 50) + "px");
     }
 

@@ -2,11 +2,9 @@ package org.subnode.service;
 
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
@@ -25,7 +23,6 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.MimeUtil;
-import org.subnode.util.XString;
 
 public abstract class ImportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportArchiveBase.class);
@@ -159,22 +156,4 @@ public abstract class ImportArchiveBase {
 			// this is normal to get here and indicates this file is NOT an attachment file.
 		}
 	}
-
-	public String hashizePath(String path) {
-		if (path == null)
-			return null;
-		if (path.equals(""))
-			return path;
-
-		List<String> pathItems = XString.tokenize(path, "/", true);
-		StringBuilder sb = new StringBuilder();
-		for (String pathPart : pathItems) {
-			// todo-0: check to see if we can end up with the node.id hex string 
-			// which would mean delaying this path generation until the insert operation is complete
-			sb.append("/" + DigestUtils.sha1Hex(pathPart));
-		}
-		// log.info("HASHED PATH: " + sb.toString());
-		return sb.toString();
-	}
-
 }
