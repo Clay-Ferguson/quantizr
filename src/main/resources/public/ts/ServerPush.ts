@@ -74,7 +74,7 @@ export class ServerPush implements ServerPushIntf {
 
             // temporary remove: I was seeing this come up when I replied to someone ELSES node, or in other words I was getting
             // a notification about my own node that I creted.
-            // todo-0
+            // todo-1
             // new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
         }, false);
     }

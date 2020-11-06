@@ -33,7 +33,7 @@ export interface NavIntf {
     runSearch(): void;
     runTimeline(): void;
     runTimeline(): void;
-    closeFullScreenImgViewer(appState: AppState): void;
+    closeFullScreenViewer(appState: AppState): void;
     prevFullScreenImgViewer(appState: AppState): void;
     nextFullScreenImgViewer(appState: AppState): void;
     getAdjacentNode(dir: string, state: AppState): J.NodeInfo;

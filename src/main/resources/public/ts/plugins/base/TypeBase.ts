@@ -83,14 +83,16 @@ export class TypeBase implements TypeHandlerIntf {
         }
         else {
             let prop: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.ORDER_BY, node);
-            if (prop && prop.value.startsWith("date ")) {
-                return new Div(null, null, [
+
+            let showCalendarButton = S.util.nodeHasChildrenOfType(node, J.NodeType.CALENDAR_ENTRY);
+            if (showCalendarButton) {
+                return new Div(null, { className: "marginBottom marginLeft" }, [
                     new NodeCompMarkdown(node, state),
                     new ButtonBar([
                         new Button("Show Calendar", () => {
                             S.render.showCalendar(node.id, state);
                         })
-                    ], null, "marginLeft marginBottom")
+                    ])
                 ]);
             }
             // I was trying to let this button decrypt, but react is saying the component got unmounted

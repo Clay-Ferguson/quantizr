@@ -121,4 +121,5 @@ export interface UtilIntf {
     buildCalendarData(items: J.CalendarItem[]): EventInput[];
     markdown(val: string): any;
     allChildrenAreSameOwner(node: J.NodeInfo): boolean;
+    nodeHasChildrenOfType(node: J.NodeInfo, type: string): boolean;
 }

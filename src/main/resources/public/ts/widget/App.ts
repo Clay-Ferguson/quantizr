@@ -45,6 +45,7 @@ export class App extends Div {
         }
 
         let fullScreenViewer: Comp = null;
+
         if (state.fullScreenViewId) {
             fullScreenViewer = new FullScreenImgViewer();
         }
@@ -133,7 +134,10 @@ export class App extends Div {
 
         this.setChildren([
             mobileTopBar,
-            fullScreenViewer ? new FullScreenControlBar() : null,
+
+            // calendar has close button itself, and doesn't need any control bar showing.
+            (fullScreenViewer && !state.fullScreenCalendarId) ? new FullScreenControlBar() : null,
+
             fullScreenViewer ? new Div(null, { className: "clearfix" }) : null,
             // For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
             // both get sized right with no overlapping.

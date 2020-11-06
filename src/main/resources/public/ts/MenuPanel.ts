@@ -154,15 +154,14 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Tools", [
-            new MenuItem("Show Graph", () => S.render.showGraph(null, null, state), !!hltNode), //
+            !state.isAnonUser ? new MenuItem("Show Graph", () => S.render.showGraph(null, null, state), !!hltNode) : null, //
 
             // todo-1: properties toggle really should be a preferences setting i think, and not a menu option here.
 
             // this is broken, so I'm just disabling it for now, since this is low priority. todo-1
             // new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
 
-            // calendar is experimental and only shown for admin user currently
-            state.isAdminUser ? new MenuItem("Show Calendar", () => S.render.showCalendar(null, state), !!hltNode) : null, //
+            !state.isAnonUser ? new MenuItem("Show Calendar", () => S.render.showCalendar(null, state), !!hltNode) : null, //
             !state.isAnonUser ? new MenuItem("Save Clipboard", () => S.edit.saveClipboardToChildNode()) : null, //
 
             new MenuItem("Show URLs", () => S.render.showNodeUrl(null, state), !!hltNode), //

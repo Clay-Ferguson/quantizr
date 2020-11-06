@@ -42,7 +42,7 @@ export class FullScreenCalendar extends Main {
             S.e(FullCalendar, {
                 plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
                 headerToolbar: {
-                    left: "prev,next today,weekendsEventButton,addEventButton",
+                    left: "prev,next today,weekendsEventButton,addEventButton,closeCalendarButton",
                     center: "title",
                     right: "dayGridMonth,timeGridWeek,timeGridDay"
                 },
@@ -73,6 +73,12 @@ export class FullScreenCalendar extends Main {
                                 FullScreenCalendar.lastClickTime = new Date();
                             }
                             S.edit.addCalendarEntry(FullScreenCalendar.lastClickTime.getTime(), this.state);
+                        }
+                    },
+                    closeCalendarButton: {
+                        text: "Close Calendar",
+                        click: () => {
+                            S.nav.closeFullScreenViewer(this.state);
                         }
                     },
                     weekendsEventButton: {

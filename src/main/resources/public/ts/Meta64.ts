@@ -376,7 +376,7 @@ export class Meta64 implements Meta64Intf {
                         break;
                     case "Escape":
                         if (S.meta64.fullscreenViewerActive(state)) {
-                            S.nav.closeFullScreenImgViewer(state);
+                            S.nav.closeFullScreenViewer(state);
                         }
 
                         break;

@@ -1358,4 +1358,17 @@ export class Util implements UtilIntf {
         }
         return true;
     }
+
+    // returns true if any children match type (this is of course only considering the nodes
+    // on the page of course. Server side may have more that do match, or not)
+    nodeHasChildrenOfType = (node: J.NodeInfo, type: string): boolean => {
+        if (!node || !node.children) return false;
+
+        for (let child of node.children) {
+            if (child.type === type) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

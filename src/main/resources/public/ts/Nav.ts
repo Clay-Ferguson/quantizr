@@ -310,9 +310,9 @@ export class Nav implements NavIntf {
         S.srch.timeline("mtm", state);
     }
 
-    closeFullScreenImgViewer = (appState: AppState): void => {
+    closeFullScreenViewer = (appState: AppState): void => {
         dispatch({
-            type: "Action_CloseFullScreenImgViewer",
+            type: "Action_CloseFullScreenViewer",
             update: (s: AppState): void => {
                 s.fullScreenViewId = null;
                 s.fullScreenGraphId = null;
