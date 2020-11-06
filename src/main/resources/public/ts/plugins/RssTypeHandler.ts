@@ -211,7 +211,6 @@ export class RssTypeHandler extends TypeBase {
 
         let feedOutDiv = new Div(null, null, feedOut);
         itemListContainer.getChildren().push(feedOutDiv);
-
         let itemCount = 0;
 
         for (let item of feed.items) {
