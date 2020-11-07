@@ -6,7 +6,6 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
-import { Heading } from "../widget/Heading";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;
@@ -43,8 +42,6 @@ export class CalcTypeHandler extends TypeBase {
         win.eval(node.content);
 
         let div = new Div(null, { className: "calcOutputArea" });
-        div.addChild(new Div("Calculation"));
-
         for (let s of win.qlogs) {
             div.addChild(new Div(s));
         }

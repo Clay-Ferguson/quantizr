@@ -102,12 +102,12 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         }
 
         _attribs.value = this.valueIntf.getValue();
-        _attribs.style = { fontFamily: "monospace" };
+        _attribs.style.fontFamily = "monospace";
 
         children.push(S.e("textarea", _attribs));
 
         // changing from div to span is very new 6/30/2020. not fully vetted.
-        return S.e("span" /* "div" */, {
+        return S.e("span", {
             id: this.getId() + "_textfield",
             key: this.getId() + "_textfield",
             // NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
