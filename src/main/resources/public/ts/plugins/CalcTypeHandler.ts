@@ -14,10 +14,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 let win: any = window;
-win.qlogs = [];
-win.qlog = (v) => {
-    win.qlogs.push(v);
-};
 
 export class CalcTypeHandler extends TypeBase {
 
@@ -38,19 +34,30 @@ export class CalcTypeHandler extends TypeBase {
             return new Div("Only the Owner of a Calculation node can run the calculation.");
         }
 
-        win.qlogs = [];
+        // scripts are recommended to put all variables in 'window.qc' to be safest
+        win.qc = {
+            logs: [],
+            log: (v: any) => {
+                win.qc.logs.push(v);
+            },
+            formatCurrency: S.util.formatCurrency
+        };
+
         win.eval(node.content);
 
         let div = new Div(null, { className: "calcOutputArea" });
-        for (let s of win.qlogs) {
+        for (let s of win.qc.logs) {
             div.addChild(new Div(s));
         }
+
+        win.qc = null;
         return div;
     }
 
     ensureDefaultProperties(node: J.NodeInfo) {
-        if (!node.content) {
-            node.content = "a=1;\nb=2;\nqlog(a+b);";
-        }
+        // this has the unintended behavior of when the user tries to clear out the text it comes back in realtime.
+        // if (!node.content) {
+        //     node.content = "qc.a=23;\nqc.b=19;\n\nqc.log('Answer=' + (qc.a + qc.b));";
+        // }
     }
 }

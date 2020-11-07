@@ -122,4 +122,5 @@ export interface UtilIntf {
     markdown(val: string): any;
     allChildrenAreSameOwner(node: J.NodeInfo): boolean;
     nodeHasChildrenOfType(node: J.NodeInfo, type: string): boolean;
+    formatCurrency(n: number): string;
 }

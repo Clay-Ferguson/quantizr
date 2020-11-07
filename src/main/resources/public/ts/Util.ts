@@ -17,6 +17,14 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
+let currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+    // These options are needed to round to whole numbers if that's what you want.
+    // minimumFractionDigits: 0,
+    // maximumFractionDigits: 0,
+  });
+
 export class Util implements UtilIntf {
 
     weekday: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -1370,5 +1378,9 @@ export class Util implements UtilIntf {
             }
         }
         return false;
+    }
+
+    formatCurrency = (n: number): string => {
+        return currencyFormatter.format(n);
     }
 }

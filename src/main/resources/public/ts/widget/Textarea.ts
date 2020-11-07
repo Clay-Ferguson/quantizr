@@ -102,6 +102,9 @@ export class Textarea extends Comp implements I.TextEditorIntf {
         }
 
         _attribs.value = this.valueIntf.getValue();
+        if (!_attribs.style) {
+            _attribs.style = {};
+        }
         _attribs.style.fontFamily = "monospace";
 
         children.push(S.e("textarea", _attribs));
