@@ -179,6 +179,7 @@ a {
 .app-body {
     font-family: $fontFamily !important;
     padding-bottom: 1rem;
+    overflow-y: scroll;
 }
 
 // todo-0: we never have navbar so these 'no-navbar' vars can be renamed.
