@@ -12,6 +12,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
+import { Icon } from "../widget/Icon";
 import { Img } from "../widget/Img";
 import { Span } from "../widget/Span";
 import { TextField } from "../widget/TextField";
@@ -49,6 +50,9 @@ export class AudioPlayerDlg extends DialogBase {
 
     timeLeftTextField: TextField;
     intervalTimer: any;
+
+    playButton: Icon;
+    pauseButton: Icon;
 
     /* chapters url is the "podcast:chapters" url from RSS feeds */
     constructor(private customTitle: string, private sourceUrl: string, private chaptersUrl: string, state: AppState) {
@@ -116,8 +120,24 @@ export class AudioPlayerDlg extends DialogBase {
                     onCanPlay: () => { this.restoreStartTime(); },
                     controls: "controls",
                     autoPlay: "autoplay",
-                    preload: "auto"
+                    preload: "auto",
+                    controlsList: "nodownload"
                 }),
+                new Div(null, { className: "playerButtonsContainer" }, [
+                    this.playButton = new Icon({
+                        className: "playerButton fa fa-play fa-3x",
+                        style: { display: "none" },
+                        onClick: () => {
+                            if (this.player) this.player.play();
+                        }
+                    }),
+                    this.pauseButton = new Icon({
+                        className: "playerButton fa fa-pause fa-3x",
+                        onClick: () => {
+                            if (this.player) this.player.pause();
+                        }
+                    })
+                ]),
                 new Div(null, { className: "timeRemainingEditField" }, [
                     this.timeLeftTextField = new TextField("Stop After (mins.)", false, null, null, null)
                 ]),
@@ -125,13 +145,29 @@ export class AudioPlayerDlg extends DialogBase {
                     new Button("Close", this.destroyPlayer)
                 ]),
                 new ButtonBar([
-                    new Button("< 30s", this.skipBack30Button),
-                    new Button("30s >", this.skipForward30Button)
+                    new Button("< 30s", (): void => {
+                        this.skip(-30);
+                    }),
+                    new Button("30s >", (): void => {
+                        this.skip(30);
+                    })
                 ]),
                 new ButtonBar([
-                    new Button("1x", this.normalSpeedButton),
-                    new Button("1.5x", this.speed15Button),
-                    new Button("2x", this.speed2Button)
+                    new Button("1x", (): void => {
+                        this.speed(1);
+                    }),
+                    new Button("1.25x", (): void => {
+                        this.speed(1.25);
+                    }),
+                    new Button("1.5x", (): void => {
+                        this.speed(1.5);
+                    }),
+                    new Button("1.75x", (): void => {
+                        this.speed(1.75);
+                    }),
+                    new Button("2x", (): void => {
+                        this.speed(2);
+                    })
                 ]),
                 this.createChaptersDiv()
             ])
@@ -139,9 +175,29 @@ export class AudioPlayerDlg extends DialogBase {
 
         this.audioPlayer.whenElm((elm: HTMLAudioElement) => {
             this.player = elm;
+            this.player.onpause = (event) => {
+                this.updatePlayButton();
+            };
+            this.player.onplay = (event) => {
+                this.updatePlayButton();
+            };
+            this.player.onended = (event) => {
+                this.updatePlayButton();
+            };
         });
 
         return children;
+    }
+
+    updatePlayButton = (): void => {
+        if (this.player) {
+            this.playButton.whenElm((elm: HTMLAudioElement) => {
+                elm.style.display = this.player.paused || this.player.ended ? "inline-block" : "none";
+            });
+            this.pauseButton.whenElm((elm: HTMLAudioElement) => {
+                elm.style.display = !this.player.paused && !this.player.ended ? "inline-block" : "none";
+            });
+        }
     }
 
     createChaptersDiv = (): Div => {
@@ -203,26 +259,6 @@ export class AudioPlayerDlg extends DialogBase {
         if (this.player) {
             this.player.currentTime += delta;
         }
-    }
-
-    speed2Button = (): void => {
-        this.speed(2);
-    }
-
-    speed15Button = (): void => {
-        this.speed(1.5);
-    }
-
-    normalSpeedButton = (): void => {
-        this.speed(1.0);
-    }
-
-    skipBack30Button = (): void => {
-        this.skip(-30);
-    }
-
-    skipForward30Button = (): void => {
-        this.skip(30);
     }
 
     destroyPlayer = (): void => {

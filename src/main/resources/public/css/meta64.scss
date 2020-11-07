@@ -1366,3 +1366,27 @@ i'm backing out for now
 
 @import 'breadcrumbs.scss';
 @import 'media-queries.scss';
+
+
+//We use the default player except we have our own big play and pause buttons.
+
+audio::-webkit-media-controls-mute-button {
+    display: none !important;
+}
+
+audio::-webkit-media-controls-play-button {
+    display: none !important;
+}
+
+.playerButtonsContainer {
+    text-align: center;
+}
+
+.playerButton {
+    cursor: pointer;
+    display: inline-block;
+    border-radius: 12px;
+    padding: 12px;
+    border: 6px solid lightGray;
+}
+
