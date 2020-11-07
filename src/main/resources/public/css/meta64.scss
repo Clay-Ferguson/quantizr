@@ -883,6 +883,7 @@ input[type="radio"] {
 
 .txtFieldLabel {
     margin-bottom: .25rem;
+    margin-right: .25rem;
 }
 
 .dialogTitle {
@@ -1379,6 +1380,8 @@ audio::-webkit-media-controls-play-button {
     display: none !important;
 }
 
+// NOTE: The way to center an element inside another element is user "text-align: center" on the parent 
+// element and then "display: inline-block" on the element to be centered in the parent.
 .playerButtonsContainer {
     text-align: center;
 }
@@ -1391,3 +1394,7 @@ audio::-webkit-media-controls-play-button {
     border: 6px solid lightGray;
 }
 
+// todo-0: this kind of thing is replaced several places.
+.monospace {
+    font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+}

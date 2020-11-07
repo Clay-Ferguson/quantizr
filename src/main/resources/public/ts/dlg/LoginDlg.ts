@@ -30,8 +30,8 @@ export class LoginDlg extends DialogBase {
         return [
             new Form(null, [
                 new FormGroup(null, [
-                    new TextField("User", false, this.login, null, new CompValueHolder<string>(this, "user")),
-                    new TextField("Password", true, this.login, null, new CompValueHolder<string>(this, "password"))
+                    new TextField("User", false, this.login, null, false, new CompValueHolder<string>(this, "user")),
+                    new TextField("Password", true, this.login, null, false, new CompValueHolder<string>(this, "password"))
                 ]),
                 new ButtonBar([
                     new Button("Login", this.login, null, "btn-primary"),

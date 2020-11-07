@@ -138,8 +138,8 @@ export class AudioPlayerDlg extends DialogBase {
                         }
                     })
                 ]),
-                new Div(null, { className: "timeRemainingEditField" }, [
-                    this.timeLeftTextField = new TextField("Stop After (mins.)", false, null, null, null)
+                new Div(null, null, [
+                    this.timeLeftTextField = new TextField("Stop After (mins.)", false, null, "timeRemainingEditField", true, null)
                 ]),
                 new ButtonBar([
                     new Button("Close", this.destroyPlayer)

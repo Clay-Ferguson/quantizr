@@ -54,7 +54,7 @@ export class ProfileDlg extends DialogBase {
                     }, [
                         new Div(null, null, [
                             // I'm disabling ability to change user name because of a bug (duplicate name risk)
-                            // this.userNameTextField = new TextField("User Name", state.defaultUserName, false, null, {
+                            // this.userNameTextField = new TextField("User Name", state.defaultUserName, false, null, false, {
                             //     getValue: () => {
                             //         return this.getState().defaultUserName;
                             //     },

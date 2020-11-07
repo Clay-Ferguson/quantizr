@@ -267,7 +267,7 @@ export class EditNodeDlg extends DialogBase {
 
         let nodeNameTextField = null;
         if (!customProps) {
-            nodeNameTextField = new TextField("Node Name", false, null, null, {
+            nodeNameTextField = new TextField("Node Name", false, null, null, false, {
                 setValue: (val: string): void => {
                     this.getState().node.name = val || "";
                     nodeNameTextField.forceRender();
@@ -708,7 +708,7 @@ export class EditNodeDlg extends DialogBase {
                 }
                 else {
                     // console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
-                    valEditor = new TextField(null, false, null, S.props.getInputClassForType(propEntry.name), valueIntf);
+                    valEditor = new TextField(null, false, null, S.props.getInputClassForType(propEntry.name), false, valueIntf);
                 }
             }
 

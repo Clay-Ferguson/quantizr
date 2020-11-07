@@ -34,7 +34,7 @@ export class SearchFileSystemDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Enter text to find. Only content text will be searched. All sub-nodes under the selected node are included in the search."),
-                this.searchTextField = new TextField("Search", null, () => this.searchNodes(this.appState), null,
+                this.searchTextField = new TextField("Search", null, () => this.searchNodes(this.appState), null, false,
                     new CompValueHolder<string>(this, "searchText")),
                 new ButtonBar([
                     new Button("Search", this.searchNodes),

@@ -34,7 +34,7 @@ export class ExportDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new TextField("Export File Name", false, null, null, new CompValueHolder<string>(this, "fileName")),
+            new TextField("Export File Name", false, null, null, false, new CompValueHolder<string>(this, "fileName")),
             new RadioButtonGroup([
                 this.createRadioButton("ZIP", "zip"),
                 this.createRadioButton("TAR", "tar"),

@@ -31,7 +31,7 @@ export class EditPropertyDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
-                new TextField("Name", false, null, null, new CompValueHolder<string>(this, "propName"))
+                new TextField("Name", false, null, null, false, new CompValueHolder<string>(this, "propName"))
             ]),
 
             new ButtonBar([

@@ -9,6 +9,7 @@ import { Comp } from "./base/Comp";
 import { Div } from "./Div";
 import { Input } from "./Input";
 import { Label } from "./Label";
+import { Span } from "./Span";
 import { ToggleIcon } from "./ToggleIcon";
 
 let S: Singletons;
@@ -21,7 +22,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     input: Input;
     icon: ToggleIcon;
 
-    constructor(public label: string, private isPassword: boolean, private onEnterKey: () => void, private inputClasses: string, public valueIntf: ValueIntf) {
+    constructor(public label: string, private isPassword: boolean, private onEnterKey: () => void, private inputClasses: string, labelOnLeft: boolean, public valueIntf: ValueIntf) {
         super(null);
 
         /* Manage state internally if no valueIntf passed in */
@@ -31,12 +32,8 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
 
         S.util.mergeProps(this.attribs, {
             name: this.getId(),
-            className: "form-group"
+            className: "form-group" + (labelOnLeft ? " form-inline" : "")
         });
-
-        if (inputClasses === null) {
-            inputClasses = "";
-        }
 
         this.mergeState({
             inputType: isPassword ? "password" : "text"
@@ -96,49 +93,60 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     }
 
     preRender(): void {
-        // console.log("preRender id=" + this.getId() + " value=" + this.valueIntf.getValue());
         let state = this.getState();
 
         let validationError = this.valueIntf.getValidationError ? this.valueIntf.getValidationError() : null;
 
+        let label = this.label ? new Label(this.label, {
+            key: this.getId() + "_label",
+            className: "txtFieldLabel",
+            htmlFor: "inputId_" + this.getId()
+        }) : null;
+
+        let input = this.input = new Input({
+            className: "form-control pre-textfield " + (this.inputClasses || "") + (validationError ? " validationErrorBorder" : ""),
+            type: state.inputType,
+            value: this.valueIntf.getValue(),
+            id: "inputId_" + this.getId()
+        });
+
+        let passwordEye = this.isPassword ? new Span(null, {
+            className: "input-group-addon"
+        }, [
+            new Anchor(null, null, {
+                onClick: (evt) => {
+                    evt.preventDefault();
+                    this.mergeState({
+                        inputType: state.inputType === "password" ? "text" : "password"
+                    });
+                    this.icon._toggleClass();
+                }
+            }, [
+                this.icon = new ToggleIcon("fa-eye-slash", "fa-eye", {
+                    className: "fa fa-lg passwordEyeIcon"
+                })
+            ])
+        ]) : null;
+
+        let error = validationError ? new Div(validationError, {
+            key: this.getId() + "_labelErr",
+            className: "validationError"
+        }) : null;
+
         this.setChildren([
-            this.label ? new Label(this.label, {
-                key: this.getId() + "_label",
-                className: "txtFieldLabel"
-            }) : null,
+            // NOTE: keep label outside of input-group
+            label,
+
             new Div(null, {
                 className: "input-group",
-                // NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
-                // to the component, or elase there's a react-rerender flicker.
+                // **** IMPORTANT ****: Yes we set font on the PARENT and then use 'inherit' to get it
+                // to the component, or else there's a react-rerender flicker.
                 style: { fontFamily: "monospace" }
             }, [
-                this.input = new Input({
-                    className: "form-control pre-textfield " + (this.inputClasses || "") + (validationError ? " validationErrorBorder" : ""),
-                    type: state.inputType,
-                    value: this.valueIntf.getValue()
-                }),
-                this.isPassword ? new Div(null, {
-                    className: "input-group-addon"
-                }, [
-                    new Anchor(null, null, {
-                        onClick: (evt) => {
-                            evt.preventDefault();
-                            this.mergeState({
-                                inputType: state.inputType === "password" ? "text" : "password"
-                            });
-                            this.icon._toggleClass();
-                        }
-                    }, [
-                        this.icon = new ToggleIcon("fa-eye-slash", "fa-eye", {
-                            className: "fa fa-lg passwordEyeIcon"
-                        })
-                    ])
-                ]) : null
-            ]),
-            validationError ? new Label(validationError, {
-                key: this.getId() + "_labelErr",
-                className: "validationError"
-            }) : null
+                input,
+                passwordEye,
+                error
+            ])
         ]);
 
         if (this.onEnterKey) {

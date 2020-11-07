@@ -33,7 +33,7 @@ export class ChangePasswordDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Enter your new password below..."),
-                this.passwordField = new TextField("New Password", true, null, null, new CompValueHolder<string>(this, "pwd")),
+                this.passwordField = new TextField("New Password", true, null, null, false, new CompValueHolder<string>(this, "pwd")),
                 new ButtonBar([
                     new Button("Change Password", this.changePassword, null, "btn-primary"),
                     new Button("Close", this.close)
