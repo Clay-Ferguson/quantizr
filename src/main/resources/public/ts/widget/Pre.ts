@@ -14,9 +14,10 @@ export class Pre extends Comp {
 
     constructor(public content: string = "", attribs : Object = {}) {
         super(attribs);
+        this.attribs.dangerouslySetInnerHTML = { __html: this.content };
     }
 
     compRender(): ReactNode {
-        return S.e("pre", this.attribs, (this.content || ""));
+        return S.e("pre", this.attribs);
     }
 }

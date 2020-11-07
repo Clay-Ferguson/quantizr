@@ -6,6 +6,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
+import { Pre } from "../widget/Pre";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;
@@ -43,15 +44,16 @@ export class CalcTypeHandler extends TypeBase {
             formatCurrency: S.util.formatCurrency
         };
 
-        win.eval(node.content);
-
-        let div = new Div(null, { className: "calcOutputArea" });
-        for (let s of win.qc.logs) {
-            div.addChild(new Div(s));
+        try {
+            win.eval(node.content);
+            return new Pre(win.qc.logs.join("\n"), { className: "calcOutputArea" });
         }
-
-        win.qc = null;
-        return div;
+        catch (e) {
+            return new Pre(e.message + "\n" + e.stack, { className: "calcOutputArea" });
+        }
+        finally {
+            win.qc = null;
+        }
     }
 
     ensureDefaultProperties(node: J.NodeInfo) {
