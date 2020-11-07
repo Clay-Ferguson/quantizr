@@ -77,6 +77,14 @@ $smallBorderSize: 3px;
     margin: 10px;
 }
 
+.calcOutputArea {
+    font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+    font-size: 150%;
+    margin-left: $smallGap;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
 .d3Graph {
     // margin: 2em;
     // border: 1px solid gray;

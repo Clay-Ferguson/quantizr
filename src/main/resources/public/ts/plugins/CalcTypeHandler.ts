@@ -14,6 +14,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+let win: any = window;
+win.qlogs = [];
+win.qlog = (v) => {
+    win.qlogs.push(v);
+};
+
 export class CalcTypeHandler extends TypeBase {
 
     constructor() {
@@ -33,26 +39,21 @@ export class CalcTypeHandler extends TypeBase {
             return new Div("Only the Owner of a Calculation node can run the calculation.");
         }
 
-        // eslint-disable-next-line no-eval
-        window.eval(node.content);
+        win.qlogs = [];
+        win.eval(node.content);
 
-        let div = new Div();
-        div.addChild(new Heading(3, "Calculation", { className: "marginLeft marginTop marginBottom" }));
-        Object.keys(window).forEach(function (key) {
-            if (key.startsWith("_")) {
-                if (node.content.indexOf(key + " ") !== -1 || node.content.indexOf(key + "=") !== -1) {
-                    // eslint-disable-next-line no-eval
-                    div.addChild(new Heading(4, key + " = " + window.eval(key), { className: "marginLeft" }));
-                }
-            }
-        });
+        let div = new Div(null, { className: "calcOutputArea" });
+        div.addChild(new Div("Calculation"));
+
+        for (let s of win.qlogs) {
+            div.addChild(new Div(s));
+        }
         return div;
     }
 
     ensureDefaultProperties(node: J.NodeInfo) {
-        debugger;
         if (!node.content) {
-            node.content = "_a=1;\n_b=2;\n_c=_a+_b;";
+            node.content = "a=1;\nb=2;\nqlog(a+b);";
         }
     }
 }
