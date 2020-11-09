@@ -15,11 +15,9 @@ import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { Anchor } from "./widget/Anchor";
 import { Comp } from "./widget/base/Comp";
-import { Button } from "./widget/Button";
 import { Div } from "./widget/Div";
 import { Heading } from "./widget/Heading";
 import { Img } from "./widget/Img";
-import { Span } from "./widget/Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

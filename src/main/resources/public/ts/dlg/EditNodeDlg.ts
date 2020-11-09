@@ -13,6 +13,7 @@ import * as J from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { AceEditPropTextarea } from "../widget/AceEditPropTextarea";
 import { Comp } from "../widget/base/Comp";
 import { CompIntf } from "../widget/base/CompIntf";
@@ -33,8 +34,10 @@ import { Label } from "../widget/Label";
 import { LayoutRow } from "../widget/LayoutRow";
 import { Selection } from "../widget/Selection";
 import { Textarea } from "../widget/Textarea";
+import { Textarea2 } from "../widget/Textarea2";
 import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg";
@@ -57,6 +60,7 @@ export class EditNodeDlg extends DialogBase {
     compIdToPropMap: { [key: string]: J.PropertyInfo } = {};
 
     contentEditor: I.TextEditorIntf;
+    contentEditorState: ValidatedState<any> = new ValidatedState<any>();
 
     static morePanelExpanded: boolean = false;
 
@@ -68,6 +72,9 @@ export class EditNodeDlg extends DialogBase {
     /* Since some of our property editing (the Selection components) modify properties 'in-place' in the node we have
     this initialProps clone so we can 'rollback' properties if use clicks cancel */
     initialProps: J.PropertyInfo[];
+
+    // holds a map of states by property names.
+    propStates: { [key: string]: ValidatedState<any> } = {};
 
     constructor(node: J.NodeInfo, state: AppState) {
         super("Edit", "app-modal-content", false, state);
@@ -565,6 +572,19 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
+    // Takes all the propStates values and converts them into node properties on the node
+    savePropsToNode = () => {
+        let state = this.getState();
+        if (state.node.properties) {
+            state.node.properties.forEach((prop: J.PropertyInfo) => {
+                let propState = this.propStates[prop.name];
+                if (propState) {
+                    prop.value = propState.getValue();
+                }
+            });
+        }
+    }
+
     saveNode = async (): Promise<void> => {
         let state = this.getState();
         return new Promise<void>(async (resolve, reject) => {
@@ -588,6 +608,8 @@ export class EditNodeDlg extends DialogBase {
 
             let askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") !== -1 ||
                 (state.node as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
+
+            this.savePropsToNode();
 
             // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
 
@@ -623,25 +645,28 @@ export class EditNodeDlg extends DialogBase {
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
         //     + "] fieldId=" + propEntry.id);
 
+        let propState: ValidatedState<any> = this.propStates[propEntry.name];
+        if (!propState) {
+            propState = new ValidatedState<any>();
+            this.propStates[propEntry.name] = propState;
+        }
+
         // todo-1: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
         // and be better with a Textfield based editor
         if (!allowEditAllProps && isReadOnly) {
-            let textarea = new Textarea(label + " (read-only)", {
+            propState.setValue(propValStr);
+
+            let textarea = new Textarea2(label + " (read-only)", {
                 readOnly: "readOnly",
                 disabled: "disabled"
-            }, {
-                getValue: () => {
-                    // read-only. always return original value.
-                    return propValStr;
-                },
-                setValue: (val: any) => {
-                    // this is a read-only field
-                }
-            });
+            }, propState);
 
             formGroup.addChild(textarea);
         }
         else {
+            let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
+            propState.setValue(val);
+
             if (allowCheckbox) {
                 let checkbox: Checkbox = new Checkbox(label, { className: "checkboxContainerHeight" }, {
                     setValue: (checked: boolean): void => {
@@ -669,28 +694,14 @@ export class EditNodeDlg extends DialogBase {
             let valEditor: CompIntf = null;
             let multiLine = rows > 1;
 
-            let valueIntf = {
-                getValue: (): string => {
-                    let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
-                    // console.log("getValue[" + propEntry.name + "]=" + val);
-                    return val;
-                },
-                setValue: (val: any) => {
-                    // console.log("settingValue[" + propEntry.name + "]=" + val);
-                    let state = this.getState();
-                    S.props.setNodePropVal(propEntry.name, this.getState().node, val);
-                    this.mergeState(state);
-                }
-            };
-
             if (multiLine) {
                 if (C.ENABLE_ACE_EDITOR) {
                     valEditor = new AceEditPropTextarea(propEntry.value, "" + rows + "em", null, false);
                 }
                 else {
-                    valEditor = new Textarea(null, {
+                    valEditor = new Textarea2(null, {
                         rows: "" + rows
-                    }, valueIntf);
+                    }, propState);
                 }
             }
             else {
@@ -698,17 +709,17 @@ export class EditNodeDlg extends DialogBase {
                 to detect to treat a string as a date based on its property name. */
                 if (propEntry.name === "date") {
 
-                    // Ensure we have set the default time if none is yet set.
-                    let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
-                    if (!val) {
-                        valueIntf.setValue("" + new Date().getTime());
-                    }
-
-                    valEditor = new DateTimeField(valueIntf);
+                    // todo-0: removing pending refactor to new state management
+                    // // Ensure we have set the default time if none is yet set.
+                    // let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
+                    // if (!val) {
+                    //     propState.setValue("" + new Date().getTime());
+                    // }
+                    // valEditor = new DateTimeField(valueIntf);
                 }
                 else {
                     // console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
-                    valEditor = new TextField(null, false, null, S.props.getInputClassForType(propEntry.name), false, valueIntf);
+                    valEditor = new TextField2(null, false, null, S.props.getInputClassForType(propEntry.name), false, propState);
                 }
             }
 
@@ -767,26 +778,13 @@ export class EditNodeDlg extends DialogBase {
             });
         }
         else {
-            this.contentEditor = new Textarea(null, {
-                rows
-            }, {
-                getValue: () => {
-                    let ret = this.getState().node.content;
-                    if (ret.startsWith(J.Constant.ENC_TAG)) {
-                        ret = "";
-                    }
-                    return ret;
-                },
-                setValue: (val: any) => {
-                    /* Ignore calls to set the encrypted string during editing. */
-                    if (val.startsWith(J.Constant.ENC_TAG)) {
-                        return;
-                    }
-                    let state = this.getState();
-                    state.node.content = val;
-                    this.mergeState(state);
-                }
-            });
+            this.contentEditor = new Textarea2(null, { rows }, this.contentEditorState);
+            if (!value.startsWith(J.Constant.ENC_TAG)) {
+                this.contentEditorState.setValue(value);
+            }
+            else {
+                this.contentEditorState.setValue("");
+            }
 
             let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.appState.node) !== "1";
             this.contentEditor.setWordWrap(wrap);

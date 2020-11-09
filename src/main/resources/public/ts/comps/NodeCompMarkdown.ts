@@ -16,8 +16,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMarkdown extends Html {
 
-    // This flag makes encrypted text always decrypt and display immediately
-    private autoDecrypting: boolean = true;
+    // This flag makes encrypted text always decrypt and display immediately. Setting to true works, but the markdown rendering part is
+    // not working and it shows up without markdown formatting. Will fix later (todo-1)
+    private autoDecrypting: boolean = false;
 
     constructor(public node: J.NodeInfo, private appState: AppState) {
         super();
@@ -30,6 +31,8 @@ export class NodeCompMarkdown extends Html {
         let content = node.content || "";
         let att: any = {
         };
+
+        // console.log("Rendering NodeID=" + node.id + " content=" + node.content);
 
         if (content.startsWith(J.Constant.ENC_TAG)) {
             att.content = "[Encrypted]";

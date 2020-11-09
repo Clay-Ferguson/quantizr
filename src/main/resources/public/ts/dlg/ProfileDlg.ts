@@ -24,7 +24,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class ProfileDlg extends DialogBase {
-
     userNameTextField: TextField;
     bioState: ValidatedState<any> = new ValidatedState<any>();
 

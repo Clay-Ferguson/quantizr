@@ -17,7 +17,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class TextField2 extends Div implements I.TextEditorIntf, I.ValueIntf {
-
     input: Input2;
     icon: ToggleIcon;
 
