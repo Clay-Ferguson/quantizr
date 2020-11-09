@@ -3,7 +3,7 @@
 const webpack = require("webpack");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 const WebpackShellPlugin = require("webpack-shell-plugin");
-//const HtmlWebpackPlugin = require('html-webpack-plugin');
+// const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const prod = process.argv.indexOf("-p") !== -1;
 const env = prod ? "prod" : "dev";
@@ -57,7 +57,7 @@ module.exports = {
     plugins: [
         new WebpackShellPlugin({
             onBuildStart: ["./on-build-start.sh"]
-            //onBuildEnd: ['whatever else']
+            // onBuildEnd: ['whatever else']
         }),
         new CircularDependencyPlugin({
             // `onDetected` is called for each module that is cyclical

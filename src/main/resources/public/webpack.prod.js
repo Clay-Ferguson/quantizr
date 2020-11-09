@@ -2,7 +2,7 @@ const webpack = require("webpack");
 const merge = require("webpack-merge");
 const common = require("./webpack.common.js");
 
-//todo-2 need a way to export this out of common.
+// todo-2 need a way to export this out of common.
 function formatDate(date) {
     var hours = date.getHours();
     var minutes = date.getMinutes();
@@ -15,12 +15,12 @@ function formatDate(date) {
 
 module.exports = merge(common, {
     mode: "production",
-
+    devtool: "source-map",
     plugins: [
         new webpack.DefinePlugin({
-            //this was a test: Didn't work. I tried it in the index.html and it was not translated.
-            //Ended up accomplishing this using my 'cachebuster' option on HtmlWebpackPlugin instead.
-            //WARNING: The 'stringify' here looks redundant but it's actually requird here by DefinePlugin
+            // this was a test: Didn't work. I tried it in the index.html and it was not translated.
+            // Ended up accomplishing this using my 'cachebuster' option on HtmlWebpackPlugin instead.
+            // WARNING: The 'stringify' here looks redundant but it's actually requird here by DefinePlugin
             BUILDTIME: JSON.stringify(formatDate(new Date())),
             PROFILE: JSON.stringify("prod")
         })

@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es6", //es5 is IE support.
+        "target": "es6",
         "lib": [
             "dom",
             "dom.iterable",
