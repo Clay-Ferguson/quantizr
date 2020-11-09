@@ -18,78 +18,78 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class InlineEditField extends Span {
 
-    constructor(private node: J.NodeInfo, private appState: AppState) {
-        super();
-        this.attribs.className = "col-9 quickEditSpan ";
+    // constructor(private node: J.NodeInfo, private appState: AppState) {
+    //     super();
+    //     this.attribs.className = "col-9 quickEditSpan ";
 
-        // todo-1: this is not the final plae to hold state for this maybe?
-        this.mergeState({
-            inlineEditVal: appState.inlineEditVal
-        });
+    //     // todo-1: this is not the final plae to hold state for this maybe?
+    //     this.mergeState({
+    //         inlineEditVal: appState.inlineEditVal
+    //     });
 
-        this.saveEdit = this.saveEdit.bind(this);
-        this.cancelEdit = this.cancelEdit.bind(this);
-    }
+    //     this.saveEdit = this.saveEdit.bind(this);
+    //     this.cancelEdit = this.cancelEdit.bind(this);
+    // }
 
-    preRender(): void {
-        // let state = this.getState();
+    // preRender(): void {
+    //     // let state = this.getState();
 
-        let textarea = new Textarea(null, {
-            rows: 10
-        }, {
-            getValue: () => {
-                return this.getState().inlineEditVal;
-            },
-            setValue: (val: any) => {
-                this.mergeState({
-                    inlineEditVal: val
-                });
-            }
-        }, "form-control pre-textarea quickEditTextArea");
+    //     let textarea = new Textarea(null, {
+    //         rows: 10
+    //     }, {
+    //         getValue: () => {
+    //             return this.getState().inlineEditVal;
+    //         },
+    //         setValue: (val: any) => {
+    //             this.mergeState({
+    //                 inlineEditVal: val
+    //             });
+    //         }
+    //     }, "form-control pre-textarea quickEditTextArea");
 
-        let buttonBar = new ButtonBar([
-            new Button("Save", this.saveEdit, null, "btn-primary"),
-            new Button("Cancel", this.cancelEdit)
-        ], null, "marginTop");
+    //     let buttonBar = new ButtonBar([
+    //         new Button("Save", this.saveEdit, null, "btn-primary"),
+    //         new Button("Cancel", this.cancelEdit)
+    //     ], null, "marginTop");
 
-        let editContainer = new Div(null, {
-            className: "inlineEditFormArea"
-        }, [textarea, buttonBar]);
+    //     let editContainer = new Div(null, {
+    //         className: "inlineEditFormArea"
+    //     }, [textarea, buttonBar]);
 
-        textarea.focus();
+    //     textarea.focus();
 
-        this.setChildren([editContainer]);
-    }
+    //     this.setChildren([editContainer]);
+    // }
 
-    saveEdit(): void {
-        dispatch({
-            type: "Action_InlineEdit",
-            update: (s: AppState): void => {
-                s.inlineEditId = null;
-                this.node.content = this.getState().inlineEditVal;
-                let askToSplit = this.node.content && (this.node.content.indexOf("{split}") !== -1 ||
-                    this.node.content.indexOf("\n\n\n") !== -1);
+    // saveEdit(): void {
+    //     dispatch({
+    //         type: "Action_InlineEdit",
+    //         update: (s: AppState): void => {
+    //             s.inlineEditId = null;
+    //             this.node.content = this.getState().inlineEditVal;
+    //             let askToSplit = this.node.content && (this.node.content.indexOf("{split}") !== -1 ||
+    //                 this.node.content.indexOf("\n\n\n") !== -1);
 
-                S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-                    updateModTime: true,
-                    node: this.node
-                }, async (res: J.SaveNodeResponse) => {
-                    S.edit.saveNodeResponse(this.node, res, false, this.appState);
+    //             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
+    //                 updateModTime: true,
+    //                 node: this.node
+    //             }, async (res: J.SaveNodeResponse) => {
+    //                 S.edit.saveNodeResponse(this.node, res, false, this.appState);
 
-                    if (askToSplit) {
-                        new SplitNodeDlg(this.node, this.appState).open();
-                    }
-                });
-            }
-        });
-    }
+    //                 if (askToSplit) {
+    //                     new SplitNodeDlg(this.node, this.appState).open();
+    //                 }
+    //             });
+    //         }
+    //     });
+    // }
 
-    cancelEdit(): void {
-        dispatch({
-            type: "Action_InlineEdit",
-            update: (s: AppState): void => {
-                s.inlineEditId = null;
-            }
-        });
-    }
+    // cancelEdit(): void {
+    //     dispatch({
+    //         type: "Action_InlineEdit",
+    //         update: (s: AppState): void => {
+    //             s.inlineEditId = null;
+    //         }
+    //     });
+    // }
 }
