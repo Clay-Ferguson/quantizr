@@ -27,9 +27,7 @@ export class Nav implements NavIntf {
     ROWS_PER_PAGE: number = 25;
 
     login = (state: AppState): void => {
-        const dlg = new LoginDlg(null, state);
-        dlg.populateFromLocalDb();
-        dlg.open();
+        new LoginDlg(null, state).open();
     }
 
     logout = (state: AppState): void => {

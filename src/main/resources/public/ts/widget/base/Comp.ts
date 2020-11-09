@@ -5,15 +5,13 @@
 import { ReactElement, ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import * as ReactDOM from "react-dom";
 import { renderToString } from "react-dom/server";
-import { Provider, useSelector } from "react-redux";
-import { AppState } from "../../AppState";
+import { Provider } from "react-redux";
 import { Constants as C } from "../../Constants";
 import { PubSub } from "../../PubSub";
 import { Singletons } from "../../Singletons";
+import { State } from "../../State";
 import { BaseCompState } from "./BaseCompState";
 import { CompIntf } from "./CompIntf";
-
-// tip: merging two objects: this.state = { ...this.state, ...moreState };
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -46,24 +44,10 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     // So reuseChildren tells the component keep children if they exist. (mainly only functional in Dialogs currently)
     static renderCachedChildren: boolean = false;
 
-    state: S = {} as any;
     attribs: any;
-
-    /* this is a more powerful of doing what React.memo can do but supports keys in a better way than React.memo, because
-    rect memo, relies on props, and we want to be able to have a custom key object provider instead, which is more flexible and powerful.
-
-    Update: It turned out he complexity cost AND performance improvement was horrible, so this memoMap stuff is currently disabled
-    with this switch, but I'm leaving the code here in case there IS a future scenario where this code may be leveraged.
-
-    NOTE: IF you turn enableMemoMap back on you need so also find the tag
-    #memoReq in this file and uncomment those blocks
-    */
-    static enableMemoMap: boolean = false;
-    static memoMap: { [key: string]: ReactNode } = {};
 
     /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored */
     private children: CompIntf[];
-
     private cachedChildren: CompIntf[];
 
     logEnablementLogic: boolean = true;
@@ -83,7 +67,10 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
      * allowRect can be set to false for components that are known to be used in cases where not all of their subchildren are react or for
      * whatever reason we want to disable react rendering, and fall back on render-to-text approach
      */
-    constructor(attribs?: any) {
+    constructor(attribs?: any, private s?: State<S>) {
+        if (!s) {
+            this.s = new State<S>();
+        }
         this.attribs = attribs || {};
         this.children = [];
 
@@ -291,13 +278,14 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         });
     }
 
+    // todo-0: is this still used ?
     updateVisAndEnablement() {
-        if (this.state.enabled === undefined) {
-            this.state.enabled = true;
+        if (this.s.state.enabled === undefined) {
+            this.s.state.enabled = true;
         }
 
-        if (this.state.visible === undefined) {
-            this.state.visible = true;
+        if (this.s.state.visible === undefined) {
+            this.s.state.visible = true;
         }
     }
 
@@ -335,13 +323,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
        both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact
        */
     mergeState(moreState: S): any {
-        this.setStateEx((state: any) => {
-            this.state = { ...state, ...moreState };
-            if (this.debugState) {
-                console.log("mergeState final[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.state));
-            }
-            return this.state;
-        });
+        this.s.mergeState(moreState);
     }
 
     forceRender() {
@@ -349,9 +331,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     setState = (newState: any): any => {
-        this.setStateEx((state: any) => {
-            return this.state = { ...newState };
-        });
+        this.s.setState(newState);
     }
 
     /* Note: this method performs a direct state mod, until react overrides it using useState return value
@@ -365,30 +345,12 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     There are places where 'mergeState' works but 'setState' fails, that needs investigation like EditNodeDlg.
     */
     setStateEx(state: any) {
-        if (!state) {
-            state = {};
-        }
-        if (typeof state === "function") {
-            this.state = state(this.state);
-        }
-        else {
-            this.state = state;
-        }
-
-        if (this.debugState) {
-            console.log("setStateEx[" + this.jsClassName + "] STATE=" + S.util.prettyPrint(this.state));
-        }
+        this.s.setStateEx(state);
     }
 
     getState(): S {
-        return this.state;
+        return this.s.state;
     }
-
-    /* Derived classes can implement this to perform something similar to "React.memo" were we memoize based on wether the object
-    that this function returns (or more accurately the hash of it) changes upon additional renderings */
-    makeCacheKeyObj(appState: AppState, state: any, props: any) {
-        return null;
-    };
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
     _render = (props: any): ReactNode => {
@@ -397,7 +359,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
         let ret: ReactNode = null;
         try {
-            const [state, setStateEx] = useState(this.state);
+            this.s.useState();
 
             // DO NOT DELETE
             // if (this.referenced) {
@@ -405,29 +367,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             //     // NOTE: ref.current will get set to the actual DOM element once available.
             //     this.ref = useRef(null);
             // }
-
-            // #memoReq
-            // const [isMounted, setIsMounted] = useState<boolean>(false);
-
-            // console.warn("Component state was null in render for: " + this.jsClassName);
-            this.state = state;
-
-            this.setStateEx = setStateEx.bind(this);
-            // #memoReq
-            // this.setStateEx = (state) => {
-            //     //React will bark at us if we allow a setState call to execute on a component that's no longer mounted, so that's why we have the 'isMounted'
-            //     //varible. The error in React says this:
-            //     //Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function. in Unknown
-            //     //if (!isMounted) return;
-            //     setStateEx(state);
-            // }
-
-            /* This 'useEffect' call makes react call 'domAddEvent' once the dom element comes into existence on the acutal DOM */
-            // #memoReq
-            // useEffect(() => {
-            //     setIsMounted(true);
-            //     this.domAddEvent();
-            // }, []);
 
             if (!this._domAddEvent) {
                 this._domAddEvent = this.domAddEvent.bind(this);
@@ -463,38 +402,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
             DO NOT DELETE THE COMMENTNED IF BELOW (it serves as warning of what NOT to do.)
             */
-            // if (!Comp.renderCachedChildren) {
             this.preRender();
-            // }
-
-            let key = null;
-            let appState: AppState = null;
-
-            /* if we are caching this ReactNode (memoizing) then try to get object from cache
-            instead of rendering it
-
-            TODO: If we ever re-enable this code find a way to make it so that components not providing any makeCacheKeyObj can be detected
-            and and avoid even entering into this block on a component by component basis
-            */
-            if (Comp.enableMemoMap) {
-
-                // note: getting full state here is a big performance hit? There's definitely a performance issue.
-                appState = useSelector(function (state: AppState) { return state; });
-
-                // NOTE: The final experimental definition of this function is that it returns a 'string' not an object.
-                let keyObj = this.makeCacheKeyObj(appState, state, props);
-                // console.log("keyObj=" + S.util.prettyPrint(keyObj));
-                if (keyObj) {
-                    key = keyObj; // this.constructor.name + "_" + JSON.stringify(keyObj); // S.util.hashOfObject(keyObj);
-
-                    // console.log("CACHE KEY HASH: "+key);
-                    let rnode: ReactNode = Comp.memoMap[key];
-                    if (rnode) {
-                        // console.log("********** CACHE HIT: " + this.jsClassName);
-                        return rnode;
-                    }
-                }
-            }
 
             Comp.renderCounter++;
             if (this.debug) {
@@ -502,11 +410,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             }
 
             ret = this.compRender();
-
-            /* If we have the cache key provider, cache this node for later */
-            if (key) {
-                Comp.memoMap[key] = ret;
-            }
         }
         catch (e) {
             // todo-1: this is not logging the stack

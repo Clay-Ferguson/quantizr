@@ -1,16 +1,16 @@
 import { AppState } from "../AppState";
-import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
-import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { ResetPasswordDlg } from "./ResetPasswordDlg";
 
@@ -21,17 +21,19 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class LoginDlg extends DialogBase {
 
+    userState: ValidatedState<any> = new ValidatedState<any>();
+    pwdState: ValidatedState<any> = new ValidatedState<any>();
+
     constructor(paramsTest: Object, state: AppState) {
         super("Login", "app-modal-content-narrow-width", false, state);
-        this.populateFromLocalDb();
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
                 new FormGroup(null, [
-                    new TextField("User", false, this.login, null, false, new CompValueHolder<string>(this, "user")),
-                    new TextField("Password", true, this.login, null, false, new CompValueHolder<string>(this, "password"))
+                    new TextField2("User", false, this.login, null, false, this.userState),
+                    new TextField2("Password", true, this.login, null, false, this.pwdState)
                 ]),
                 new ButtonBar([
                     new Button("Login", this.login, null, "btn-primary"),
@@ -44,26 +46,23 @@ export class LoginDlg extends DialogBase {
 
     validate = (): boolean => {
         let valid = true;
-        let errors: any = {};
-        let state = this.getState();
 
-        if (!state.user) {
-            errors.userValidationError = "Cannot be empty.";
+        if (!this.userState.getValue()) {
+            this.userState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            errors.userValidationError = null;
+            this.userState.setError(null);
         }
 
-        if (!state.password) {
-            errors.passwordValidationError = "Cannot be empty.";
+        if (!this.pwdState.getValue()) {
+            this.pwdState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            errors.passwordValidationError = null;
+            this.pwdState.setError(null);
         }
 
-        this.mergeState(errors);
         return valid;
     }
 
@@ -71,16 +70,12 @@ export class LoginDlg extends DialogBase {
         return null;
     }
 
-    populateFromLocalDb = async (): Promise<void> => {
+    preLoad = async () => {
         let user = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
-        let password = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
+        let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
 
-        this.mergeState({
-            user,
-            password
-        });
-
-        return null;
+        this.userState.setValue(user);
+        this.pwdState.setValue(pwd);
     }
 
     login = (): void => {
@@ -88,8 +83,8 @@ export class LoginDlg extends DialogBase {
             return;
         }
 
-        let usr = this.getState().user;
-        let pwd = this.getState().password;
+        let usr = this.userState.getValue();
+        let pwd = this.pwdState.getValue();
 
         if (usr && pwd) {
             S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
@@ -105,7 +100,7 @@ export class LoginDlg extends DialogBase {
     }
 
     resetPassword = (): any => {
-        let usr = this.getState().user;
+        let usr = this.userState.getValue();
 
         new ConfirmDlg("Reset your password ?",
             "Confirm",
