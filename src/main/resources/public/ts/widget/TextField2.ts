@@ -22,7 +22,7 @@ export class TextField2 extends Div implements I.TextEditorIntf, I.ValueIntf {
     icon: ToggleIcon;
 
     constructor(public label: string, private isPassword: boolean, private onEnterKey: () => void, private inputClasses: string, //
-        labelOnLeft: boolean, private valState: ValidatedState<any>) {
+        private labelOnLeft: boolean, private valState: ValidatedState<any>) {
         // do not pass valState into base class, we want it to have state separately
         super(null);
 
@@ -99,11 +99,6 @@ export class TextField2 extends Div implements I.TextEditorIntf, I.ValueIntf {
             ])
         ]) : null;
 
-        let error = new ErrorDiv({
-            key: this.getId() + "_labelErr",
-            className: "validationError"
-        }, null, this.valState.e);
-
         this.setChildren([
             // NOTE: keep label outside of input-group
             label,
@@ -115,9 +110,9 @@ export class TextField2 extends Div implements I.TextEditorIntf, I.ValueIntf {
                 style: { fontFamily: "monospace" }
             }, [
                 input,
-                passwordEye,
-                error
-            ])
+                passwordEye
+            ]),
+            new ErrorDiv(this.valState.e)
         ]);
 
         if (this.onEnterKey) {

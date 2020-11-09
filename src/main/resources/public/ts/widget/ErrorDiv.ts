@@ -7,9 +7,9 @@ import { CompIntf } from "./base/CompIntf";
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class ErrorDiv<S extends BaseCompState = any> extends Comp<S> {
 
-    constructor(attribs: Object = {}, public initialChildren: CompIntf[] = null, s: State<any>) {
-        super(attribs, s);
-        this.setChildren(this.initialChildren);
+    constructor(s: State<any>) {
+        super(null, s);
+        this.attribs.className = "validationError";
     }
 
     compRender(): ReactNode {
