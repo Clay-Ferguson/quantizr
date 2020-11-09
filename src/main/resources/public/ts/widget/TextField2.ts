@@ -77,7 +77,6 @@ export class TextField2 extends Div implements I.TextEditorIntf, I.ValueIntf {
         let input = this.input = new Input2({
             className: "form-control pre-textfield " + (this.inputClasses || "") + (this.valState.getError() ? " validationErrorBorder" : ""),
             type: state.inputType,
-            value: this.getValue(),
             id: "inputId_" + this.getId()
         }, this.valState.v);
 

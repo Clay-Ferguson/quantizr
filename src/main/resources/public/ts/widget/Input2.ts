@@ -16,7 +16,6 @@ export class Input2 extends Comp {
         super(attribs, s);
         this.attribs.onChange = this.onChange.bind(this);
         this.mergeState({
-            value: this.attribs.value || "",
             type: this.attribs.type
         });
     }
