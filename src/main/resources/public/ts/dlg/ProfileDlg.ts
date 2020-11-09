@@ -44,15 +44,6 @@ export class ProfileDlg extends DialogBase {
                         className: "col-6"
                     }, [
                         new Div(null, null, [
-                            // I'm disabling ability to change user name because of a bug (duplicate name risk)
-                            // this.userNameTextField = new TextField("User Name", state.defaultUserName, false, null, false, {
-                            //     getValue: () => {
-                            //         return this.getState().defaultUserName;
-                            //     },
-                            //     setValue: (val: any) => {
-                            //         this.mergeState({ defaultUserName: val });
-                            //     }
-                            // }),
                             this.readOnly
                                 ? new Html(S.util.markdown(this.bioState.getValue()) || "This user hasn't entered a bio yet")
                                 : new Textarea2("Bio", {

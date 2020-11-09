@@ -1,14 +1,14 @@
 import { AppState } from "../AppState";
-import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
-import { Textarea } from "../widget/Textarea";
+import { Textarea2 } from "../widget/Textarea2";
 import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
@@ -18,22 +18,17 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ImportCryptoKeyDlg extends DialogBase {
 
-    keyTextField: Textarea;
+    keyState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Import Key Pair", "app-modal-content-medium-width", false, state);
-        this.whenElm((elm: HTMLSelectElement) => {
-            this.keyTextField.focus();
-        });
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
                 new TextContent("Enter JWK Key Text"),
-                this.keyTextField = new Textarea("Keys", {
-                    rows: 15
-                }, new CompValueHolder<string>(this, "keyText")),
+                new Textarea2("Keys", { rows: 15 }, this.keyState),
                 new ButtonBar([
                     new Button("Import", this.import, null, "btn-primary"),
                     new Button("Close", this.close)
@@ -48,7 +43,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
 
     import = async () => {
         // until better validation, just check for empty
-        let keyText = this.getState().keyText;
+        let keyText = this.keyState.getValue();
         if (!keyText) {
             S.util.showMessage("Enter key text.", "Warning");
             return;
