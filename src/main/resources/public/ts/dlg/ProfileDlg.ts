@@ -2,19 +2,19 @@ import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
-import { ValueIntf } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
+import { Html } from "../widget/Html";
 import { Img } from "../widget/Img";
 import { Label } from "../widget/Label";
-import { Html } from "../widget/Html";
-import { Textarea } from "../widget/Textarea";
+import { Textarea2 } from "../widget/Textarea2";
 import { TextField } from "../widget/TextField";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
@@ -26,7 +26,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ProfileDlg extends DialogBase {
 
     userNameTextField: TextField;
-    bioValueIntf: ValueIntf;
+    bioState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState, private readOnly: boolean, private userId: string, private userName: string) {
         super("User Profile: " + (userName || state.userName), null, false, state);
@@ -34,15 +34,6 @@ export class ProfileDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         let profileImg: CompIntf = this.makeProfileImg();
-
-        this.bioValueIntf = {
-            getValue: () => {
-                return this.getState().defaultBio;
-            },
-            setValue: (val: any) => {
-                this.mergeState({ defaultBio: val });
-            }
-        };
 
         let children = [
             new Form(null, [
@@ -63,10 +54,10 @@ export class ProfileDlg extends DialogBase {
                             //     }
                             // }),
                             this.readOnly
-                                ? new Html(S.util.markdown(this.bioValueIntf.getValue()) || "This user hasn't entered a bio yet")
-                                : new Textarea("Bio", {
+                                ? new Html(S.util.markdown(this.bioState.getValue()) || "This user hasn't entered a bio yet")
+                                : new Textarea2("Bio", {
                                     rows: 15
-                                }, this.bioValueIntf)
+                                }, this.bioState)
                         ])
                     ]),
 
@@ -118,10 +109,10 @@ export class ProfileDlg extends DialogBase {
                 if (res) {
                     this.mergeState({
                         defaultUserName: res.userName,
-                        defaultBio: res.userBio,
                         avatarVer: res.avatarVer,
                         userNodeId: res.userNodeId
                     });
+                    this.bioState.setValue(res.userBio);
                 }
                 resolve();
             });
@@ -131,7 +122,7 @@ export class ProfileDlg extends DialogBase {
     save = (): void => {
         S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null, // this.userNameTextField.getValue(),
-            userBio: this.bioValueIntf.getValue()
+            userBio: this.bioState.getValue()
         }, this.saveResponse);
     }
 
