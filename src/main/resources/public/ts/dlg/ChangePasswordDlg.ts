@@ -1,16 +1,16 @@
 import { AppState } from "../AppState";
-import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
-import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 import { MessageDlg } from "./MessageDlg";
 
 let S: Singletons;
@@ -20,7 +20,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ChangePasswordDlg extends DialogBase {
 
-    passwordField: TextField;
+    passwordField: TextField2;
+    pwdState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(private passCode: string, state: AppState) {
         super(passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width", false, state);
@@ -33,7 +34,7 @@ export class ChangePasswordDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Enter your new password below..."),
-                this.passwordField = new TextField("New Password", true, null, null, false, new CompValueHolder<string>(this, "pwd")),
+                this.passwordField = new TextField2("New Password", true, null, null, false, this.pwdState),
                 new ButtonBar([
                     new Button("Change Password", this.changePassword, null, "btn-primary"),
                     new Button("Close", this.close)
@@ -44,18 +45,15 @@ export class ChangePasswordDlg extends DialogBase {
 
     validate = (): boolean => {
         let valid = true;
-        let errors: any = {};
-        let state = this.getState();
 
-        if (!state.pwd) {
-            errors.pwdValidationError = "Cannot be empty.";
+        if (!this.pwdState.getValue()) {
+            this.pwdState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            errors.pwdValidationError = null;
+            this.pwdState.setError(null);
         }
 
-        this.mergeState(errors);
         return valid;
     }
 
@@ -72,7 +70,7 @@ export class ChangePasswordDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-        let pwd = this.getState().pwd;
+        let pwd = this.pwdState.getValue();
 
         if (pwd && pwd.length >= 4) {
             S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {

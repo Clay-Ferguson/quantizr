@@ -10,7 +10,6 @@ import { Comp } from "../widget/base/Comp";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Div } from "../widget/Div";
 import { IconButton } from "../widget/IconButton";
-import { QuickEditField } from "../widget/QuickEditField";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
@@ -33,7 +32,7 @@ export class NodeCompRow extends Div {
         });
 
         /* If we're in edit mode allow dragging */
-        if (appState.userPreferences.editMode && !appState.inlineEditId /* && !QuickEditField.editingId */) {
+        if (appState.userPreferences.editMode && !appState.inlineEditId) {
             this.attribs.draggable = "true";
             this.attribs.onDragStart = this.dragStart;
             this.attribs.onDragEnd = this.dragEnd;

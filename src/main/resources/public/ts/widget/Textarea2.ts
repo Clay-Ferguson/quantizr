@@ -15,6 +15,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Textarea2 extends Span implements I.TextEditorIntf {
 
+    input: TextareaTag;
     textareaAttribs: any = {};
 
     constructor(private label: string, attribs: any, private valState: ValidatedState<any>, customClass: string = null) {
@@ -57,6 +58,14 @@ export class Textarea2 extends Span implements I.TextEditorIntf {
         this.valState.v.mergeState({ wordWrap });
     }
 
+    focus(): void {
+        this.whenElm((elm: HTMLSelectElement) => {
+            if (this.input) {
+                this.input.focus();
+            }
+        });
+    }
+
     preRender(): void {
         let state = this.getState();
         let children = [];
@@ -83,7 +92,7 @@ export class Textarea2 extends Span implements I.TextEditorIntf {
         }
         _attribs.style.fontFamily = "monospace";
 
-        children.push(new TextareaTag(_attribs, this.valState.v));
+        children.push(this.input = new TextareaTag(_attribs, this.valState.v));
         this.setChildren(children);
     }
 }

@@ -35,7 +35,6 @@ import { LayoutRow } from "../widget/LayoutRow";
 import { Selection } from "../widget/Selection";
 import { Textarea2 } from "../widget/Textarea2";
 import { TextContent } from "../widget/TextContent";
-import { TextField } from "../widget/TextField";
 import { TextField2 } from "../widget/TextField2";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
@@ -60,6 +59,7 @@ export class EditNodeDlg extends DialogBase {
 
     contentEditor: I.TextEditorIntf;
     contentEditorState: ValidatedState<any> = new ValidatedState<any>();
+    nameState: ValidatedState<any> = new ValidatedState<any>();
 
     static morePanelExpanded: boolean = false;
 
@@ -273,16 +273,7 @@ export class EditNodeDlg extends DialogBase {
 
         let nodeNameTextField = null;
         if (!customProps) {
-            nodeNameTextField = new TextField("Node Name", false, null, null, false, {
-                setValue: (val: string): void => {
-                    this.getState().node.name = val || "";
-                    nodeNameTextField.forceRender();
-                },
-
-                getValue: (): string => {
-                    return this.getState().node.name;
-                }
-            });
+            nodeNameTextField = new TextField2("Node Name", false, null, null, false, this.nameState);
         }
 
         if (allowContentEdit) {
@@ -373,6 +364,8 @@ export class EditNodeDlg extends DialogBase {
             ], "binaryEditorSection");
         }
 
+        this.nameState.setValue(state.node.name);
+
         this.propertyEditFieldContainer.setChildren([mainPropsTable, binarySection, collapsiblePanel]);
         return children;
     }
@@ -454,12 +447,12 @@ export class EditNodeDlg extends DialogBase {
         let dlg = new EditPropertyDlg(state.node, this.appState);
         await dlg.open();
 
-        if (dlg.name) {
+        if (dlg.nameState.getValue()) {
             if (!state.node.properties) {
                 state.node.properties = [];
             }
             state.node.properties.push({
-                name: dlg.name,
+                name: dlg.nameState.getValue(),
                 value: ""
             });
             this.mergeState({ state });
@@ -604,6 +597,7 @@ export class EditNodeDlg extends DialogBase {
                 content = content.trim();
             }
             state.node.content = content;
+            state.node.name = this.nameState.getValue();
 
             let askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") !== -1 ||
                 (state.node as J.NodeInfo).content.indexOf("\n\n\n") !== -1);

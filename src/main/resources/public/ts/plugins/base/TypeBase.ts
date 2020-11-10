@@ -8,7 +8,6 @@ import { PubSub } from "../../PubSub";
 import { Singletons } from "../../Singletons";
 import { Comp } from "../../widget/base/Comp";
 import { CompIntf } from "../../widget/base/CompIntf";
-import { InlineEditField } from "../../widget/InlineEditField";
 import { Div } from "../../widget/Div";
 import { ButtonBar } from "../../widget/ButtonBar";
 import { Button } from "../../widget/Button";
