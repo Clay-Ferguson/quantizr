@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { State } from "../State";
 import { Comp } from "./base/Comp";
 
 let S: Singletons;
@@ -11,17 +12,15 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Input extends Comp {
 
-    constructor(attribs: Object = {}) {
-        super(attribs);
-        this.attribs.onChange = this.onChange.bind(this);
+    constructor(attribs: Object = {}, s?: State<any>) {
+        super(attribs, s);
+        this.attribs.onChange = this.onChange.bind(this); // todo-0: use arrow func instead.
         this.mergeState({
-            value: this.attribs.value || "",
             type: this.attribs.type
         });
     }
 
     onChange(evt): void {
-        // console.log("New Val [" + evt.target.value + "] this.id=" + this.getId());
         this.mergeState({ value: evt.target.value });
     }
 

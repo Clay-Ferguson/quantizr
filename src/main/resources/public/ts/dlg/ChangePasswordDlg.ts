@@ -10,7 +10,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 import { MessageDlg } from "./MessageDlg";
 
 let S: Singletons;
@@ -20,7 +20,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ChangePasswordDlg extends DialogBase {
 
-    passwordField: TextField2;
+    passwordField: TextField;
     pwdState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(private passCode: string, state: AppState) {
@@ -34,7 +34,7 @@ export class ChangePasswordDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Enter your new password below..."),
-                this.passwordField = new TextField2("New Password", true, null, null, false, this.pwdState),
+                this.passwordField = new TextField("New Password", true, null, null, false, this.pwdState),
                 new ButtonBar([
                     new Button("Change Password", this.changePassword, null, "btn-primary"),
                     new Button("Close", this.close)

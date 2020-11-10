@@ -13,7 +13,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class Textarea2 extends Span implements I.TextEditorIntf {
+export class TextArea extends Span implements I.TextEditorIntf {
 
     input: TextareaTag;
     textareaAttribs: any = {};

@@ -11,7 +11,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { RadioButton } from "../widget/RadioButton";
 import { RadioButtonGroup } from "../widget/RadioButtonGroup";
 import { TextContent } from "../widget/TextContent";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -107,7 +107,7 @@ export class SplitNodeDlg extends DialogBase {
                 })
             ], "form-group-border marginBottom"),
 
-            (this.getState().splitMode === "custom") ? new TextField2("Delimiter", false, null, null, false, this.delimiterState) : null,
+            (this.getState().splitMode === "custom") ? new TextField("Delimiter", false, null, null, false, this.delimiterState) : null,
 
             new ButtonBar([
                 new Button("Split Node", this.splitNodes, null, "btn-primary"),

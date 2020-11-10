@@ -3,9 +3,9 @@ import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "./base/CompIntf";
 import { Button } from "./Button";
 import { CompDemoButton } from "./CompDemoButton";
-import { DateTimeField2 } from "./DateTimeField2";
+import { DateTimeField } from "./DateTimeField";
 import { Div } from "./Div";
-import { Textarea2 } from "./Textarea2";
+import { TextArea } from "./TextArea";
 
 export class CompDemo extends Div {
     textarea: I.TextEditorIntf;
@@ -23,9 +23,9 @@ export class CompDemo extends Div {
     preRender(): void {
         let children: CompIntf[] = [];
 
-        children.push(new DateTimeField2(this.dateTimeState));
+        children.push(new DateTimeField(this.dateTimeState));
 
-        // children.push(this.textarea = new Textarea2("Textarea", { rows: "4" }, this.textAreaState));
+        // children.push(this.textarea = new TextArea("Textarea", { rows: "4" }, this.textAreaState));
 
         // children.push(new Button("Set Textarea", () => {
         //     this.textarea.setValue("value set!");

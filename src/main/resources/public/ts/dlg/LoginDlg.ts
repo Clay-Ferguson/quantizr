@@ -10,7 +10,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { ResetPasswordDlg } from "./ResetPasswordDlg";
 
@@ -32,8 +32,8 @@ export class LoginDlg extends DialogBase {
         return [
             new Form(null, [
                 new FormGroup(null, [
-                    new TextField2("User", false, this.login, null, false, this.userState),
-                    new TextField2("Password", true, this.login, null, false, this.pwdState)
+                    new TextField("User", false, this.login, null, false, this.userState),
+                    new TextField("Password", true, this.login, null, false, this.pwdState)
                 ]),
                 new ButtonBar([
                     new Button("Login", this.login, null, "btn-primary"),

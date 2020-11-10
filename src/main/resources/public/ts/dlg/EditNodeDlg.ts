@@ -21,7 +21,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
-import { DateTimeField2 } from "../widget/DateTimeField2";
+import { DateTimeField } from "../widget/DateTimeField";
 import { Div } from "../widget/Div";
 import { EditPropsTable } from "../widget/EditPropsTable";
 import { EditPropsTableRow } from "../widget/EditPropsTableRow";
@@ -33,9 +33,9 @@ import { Icon } from "../widget/Icon";
 import { Label } from "../widget/Label";
 import { LayoutRow } from "../widget/LayoutRow";
 import { Selection } from "../widget/Selection";
-import { Textarea2 } from "../widget/Textarea2";
+import { TextArea } from "../widget/TextArea";
 import { TextContent } from "../widget/TextContent";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg";
@@ -273,7 +273,7 @@ export class EditNodeDlg extends DialogBase {
 
         let nodeNameTextField = null;
         if (!customProps) {
-            nodeNameTextField = new TextField2("Node Name", false, null, null, false, this.nameState);
+            nodeNameTextField = new TextField("Node Name", false, null, null, false, this.nameState);
         }
 
         if (allowContentEdit) {
@@ -649,7 +649,7 @@ export class EditNodeDlg extends DialogBase {
         if (!allowEditAllProps && isReadOnly) {
             propState.setValue(propValStr);
 
-            let textarea = new Textarea2(label + " (read-only)", {
+            let textarea = new TextArea(label + " (read-only)", {
                 readOnly: "readOnly",
                 disabled: "disabled"
             }, propState);
@@ -692,7 +692,7 @@ export class EditNodeDlg extends DialogBase {
                     valEditor = new AceEditPropTextarea(propEntry.value, "" + rows + "em", null, false);
                 }
                 else {
-                    valEditor = new Textarea2(null, {
+                    valEditor = new TextArea(null, {
                         rows: "" + rows
                     }, propState);
                 }
@@ -705,11 +705,11 @@ export class EditNodeDlg extends DialogBase {
                     if (!propState.getValue()) {
                         propState.setValue("" + new Date().getTime());
                     }
-                    valEditor = new DateTimeField2(propState);
+                    valEditor = new DateTimeField(propState);
                 }
                 else {
                     // console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
-                    valEditor = new TextField2(null, false, null, S.props.getInputClassForType(propEntry.name), false, propState);
+                    valEditor = new TextField(null, false, null, S.props.getInputClassForType(propEntry.name), false, propState);
                 }
             }
 
@@ -768,7 +768,7 @@ export class EditNodeDlg extends DialogBase {
             });
         }
         else {
-            this.contentEditor = new Textarea2(null, { rows }, this.contentEditorState);
+            this.contentEditor = new TextArea(null, { rows }, this.contentEditorState);
             if (!value.startsWith(J.Constant.ENC_TAG)) {
                 this.contentEditorState.setValue(value);
             }

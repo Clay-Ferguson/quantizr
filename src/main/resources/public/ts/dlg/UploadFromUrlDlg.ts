@@ -9,7 +9,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -42,7 +42,7 @@ export class UploadFromUrlDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new TextField2("Upload from URL", false, null, null, false, this.urlState),
+                new TextField("Upload from URL", false, null, null, false, this.urlState),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Close", this.close)

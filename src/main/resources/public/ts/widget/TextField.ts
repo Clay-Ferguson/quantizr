@@ -6,7 +6,7 @@ import { ValidatedState } from "../ValidatedState";
 import { Anchor } from "./Anchor";
 import { Div } from "./Div";
 import { ErrorDiv } from "./ErrorDiv";
-import { Input2 } from "./Input2";
+import { Input } from "./Input";
 import { Label } from "./Label";
 import { Span } from "./Span";
 import { ToggleIcon } from "./ToggleIcon";
@@ -16,8 +16,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class TextField2 extends Div implements I.TextEditorIntf, I.ValueIntf {
-    input: Input2;
+export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
+    input: Input;
     icon: ToggleIcon;
 
     constructor(public label: string, private isPassword: boolean, private onEnterKey: () => void, private inputClasses: string, //
@@ -73,7 +73,7 @@ export class TextField2 extends Div implements I.TextEditorIntf, I.ValueIntf {
             htmlFor: "inputId_" + this.getId()
         }) : null;
 
-        let input = this.input = new Input2({
+        let input = this.input = new Input({
             className: "form-control pre-textfield " + (this.inputClasses || "") + (this.valState.getError() ? " validationErrorBorder" : ""),
             type: state.inputType,
             id: "inputId_" + this.getId()

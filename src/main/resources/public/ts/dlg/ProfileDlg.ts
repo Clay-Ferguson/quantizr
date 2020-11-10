@@ -14,7 +14,7 @@ import { Form } from "../widget/Form";
 import { Html } from "../widget/Html";
 import { Img } from "../widget/Img";
 import { Label } from "../widget/Label";
-import { Textarea2 } from "../widget/Textarea2";
+import { TextArea } from "../widget/TextArea";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 let S: Singletons;
@@ -23,7 +23,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class ProfileDlg extends DialogBase {
-    // userNameTextField: TextField2;
+    // userNameTextField: TextField;
     bioState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState, private readOnly: boolean, private userId: string, private userName: string) {
@@ -44,7 +44,7 @@ export class ProfileDlg extends DialogBase {
                         new Div(null, null, [
                             this.readOnly
                                 ? new Html(S.util.markdown(this.bioState.getValue()) || "This user hasn't entered a bio yet")
-                                : new Textarea2("Bio", {
+                                : new TextArea("Bio", {
                                     rows: 15
                                 }, this.bioState)
                         ])

@@ -11,7 +11,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -21,7 +21,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class SearchFileSystemDlg extends DialogBase {
 
     static defaultSearchText: string = "";
-    searchTextField: TextField2;
+    searchTextField: TextField;
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
@@ -50,7 +50,7 @@ export class SearchFileSystemDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Enter text to find. Only content text will be searched. All sub-nodes under the selected node are included in the search."),
-                this.searchTextField = new TextField2("Search", null, () => this.searchNodes(this.appState), null, false,
+                this.searchTextField = new TextField("Search", null, () => this.searchNodes(this.appState), null, false,
                     this.searchTextState),
                 new ButtonBar([
                     new Button("Search", this.searchNodes),

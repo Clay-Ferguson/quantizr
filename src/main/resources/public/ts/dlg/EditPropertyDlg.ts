@@ -9,7 +9,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -30,7 +30,7 @@ export class EditPropertyDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
-                new TextField2("Name", false, null, null, false, this.nameState)
+                new TextField("Name", false, null, null, false, this.nameState)
             ]),
 
             new ButtonBar([

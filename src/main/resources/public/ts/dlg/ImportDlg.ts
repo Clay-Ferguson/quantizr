@@ -10,7 +10,7 @@ import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 import { MessageDlg } from "./MessageDlg";
 
 let S : Singletons;
@@ -28,7 +28,7 @@ export class ImportDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new TextField2("File Name to Import", null, null, null, false, this.fileNameState),
+            new TextField("File Name to Import", null, null, null, false, this.fileNameState),
             new ButtonBar([
                 new Button("Import", this.importNodes, null, "btn-primary"),
                 new Button("Close", this.close)

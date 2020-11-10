@@ -16,7 +16,7 @@ import { Form } from "../widget/Form";
 import { Icon } from "../widget/Icon";
 import { Img } from "../widget/Img";
 import { Span } from "../widget/Span";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -49,7 +49,7 @@ export class AudioPlayerDlg extends DialogBase {
     private saveTimer: any = null;
     urlHash: string;
 
-    timeLeftTextField: TextField2;
+    timeLeftTextField: TextField;
     timeLeftState: ValidatedState<any> = new ValidatedState<any>();
 
     intervalTimer: any;
@@ -143,7 +143,7 @@ export class AudioPlayerDlg extends DialogBase {
                     })
                 ]),
                 new Div(null, null, [
-                    this.timeLeftTextField = new TextField2("Stop After (mins.)", false, null, "timeRemainingEditField", true, this.timeLeftState)
+                    this.timeLeftTextField = new TextField("Stop After (mins.)", false, null, "timeRemainingEditField", true, this.timeLeftState)
                 ]),
                 new ButtonBar([
                     new Button("Close", this.destroyPlayer)

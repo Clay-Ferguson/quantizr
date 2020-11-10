@@ -11,7 +11,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -32,8 +32,8 @@ export class ResetPasswordDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Enter your user name and email address and a change-password link will be sent to you"),
-                new TextField2("User Name", false, null, null, false, this.userState),
-                new TextField2("Email Address", false, null, null, false, this.emailState),
+                new TextField("User Name", false, null, null, false, this.userState),
+                new TextField("Email Address", false, null, null, false, this.emailState),
                 new ButtonBar([
                     new Button("Reset my Password", this.resetPassword, null, "btn-primary"),
                     new Button("Close", this.close)

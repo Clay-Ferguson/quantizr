@@ -10,7 +10,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 import { MessageDlg } from "./MessageDlg";
 
 let S: Singletons;
@@ -21,7 +21,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class SearchByIDDlg extends DialogBase {
 
     static defaultSearchText: string = "";
-    searchTextField: TextField2;
+    searchTextField: TextField;
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
@@ -51,7 +51,7 @@ export class SearchByIDDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                this.searchTextField = new TextField2("Node ID", false, this.search, null, false, this.searchTextState),
+                this.searchTextField = new TextField("Node ID", false, this.search, null, false, this.searchTextState),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", this.close)

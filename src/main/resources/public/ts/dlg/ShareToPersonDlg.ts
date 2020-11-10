@@ -11,7 +11,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 import { FriendsDlg } from "./FriendsDlg";
 
 let S: Singletons;
@@ -45,7 +45,7 @@ export class ShareToPersonDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Enter the user name of the person to share this node with:"),
-                new TextField2("User to share with", false, this.shareNodeToPerson, null, false, this.userNameState),
+                new TextField("User to share with", false, this.shareNodeToPerson, null, false, this.userNameState),
                 new ButtonBar([
                     new Button("Share", this.shareNodeToPerson, null, "btn-primary"),
                     new Button("Choose Friend", async () => {

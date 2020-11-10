@@ -8,7 +8,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
-import { Textarea2 } from "../widget/Textarea2";
+import { TextArea } from "../widget/TextArea";
 import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
@@ -28,7 +28,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Enter JWK Key Text"),
-                new Textarea2("Keys", { rows: 15 }, this.keyState),
+                new TextArea("Keys", { rows: 15 }, this.keyState),
                 new ButtonBar([
                     new Button("Import", this.import, null, "btn-primary"),
                     new Button("Close", this.close)

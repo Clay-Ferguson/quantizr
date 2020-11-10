@@ -2,16 +2,16 @@ import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
-import { DateField2 } from "./DateField2";
+import { DateField } from "./DateField";
 import { Span } from "./Span";
-import { TimeField2 } from "./TimeField2";
+import { TimeField } from "./TimeField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class DateTimeField2 extends Span {
+export class DateTimeField extends Span {
     dateState: ValidatedState<any> = new ValidatedState<any>();
     timeState: ValidatedState<any> = new ValidatedState<any>();
 
@@ -80,8 +80,8 @@ export class DateTimeField2 extends Span {
 
     preRender(): void {
         this.setChildren([
-            new DateField2(this.dateState),
-            new TimeField2(this.timeState)
+            new DateField(this.dateState),
+            new TimeField(this.timeState)
         ]);
     }
 }

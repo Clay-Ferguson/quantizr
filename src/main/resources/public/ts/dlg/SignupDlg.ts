@@ -9,7 +9,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 
 // #recaptcha-disabled
 // declare var grecaptcha;
@@ -33,9 +33,9 @@ export class SignupDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new TextField2("User", false, null, null, false, this.userState),
-                new TextField2("Password", true, null, null, false, this.passwordState),
-                new TextField2("Email", false, null, null, false, this.emailState),
+                new TextField("User", false, null, null, false, this.userState),
+                new TextField("Password", true, null, null, false, this.passwordState),
+                new TextField("Email", false, null, null, false, this.emailState),
                 new ButtonBar([
                     new Button("Create Account", this.signup, null, "btn-primary"),
                     new Button("Cancel", this.close)

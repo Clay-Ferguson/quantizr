@@ -5,15 +5,14 @@ import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 import { Div } from "./Div";
 import { Input } from "./Input";
-import { Input2 } from "./Input2";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class DateField2 extends Div implements I.ValueIntf {
-    input: Input2;
+export class DateField extends Div implements I.ValueIntf {
+    input: Input;
 
     constructor(private valState: ValidatedState<any>) {
         super(null);
@@ -41,7 +40,7 @@ export class DateField2 extends Div implements I.ValueIntf {
                 to the component, or elase there's a react-rerender flicker. */
                 style: { fontFamily: "monospace" }
             }, [
-                this.input = new Input2({
+                this.input = new Input({
                     className: "form-control pre-textfield",
                     type: "date"
                 }, this.valState.v)

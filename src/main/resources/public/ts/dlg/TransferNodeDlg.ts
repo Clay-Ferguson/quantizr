@@ -11,7 +11,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -34,8 +34,8 @@ export class TransferNodeDlg extends DialogBase {
         return [
             new Form(null, [
                 new FormGroup(null, [
-                    new TextField2("From User", null, null, null, false, this.fromUserState),
-                    new TextField2("To User", null, null, null, false, this.toUserState)
+                    new TextField("From User", null, null, null, false, this.fromUserState),
+                    new TextField("To User", null, null, null, false, this.toUserState)
                 ]),
                 new FormGroup(null, [
                     new Checkbox("Include Sub-Nodes", null, {

@@ -14,7 +14,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Header } from "../widget/Header";
 import { RadioButton } from "../widget/RadioButton";
 import { RadioButtonGroup } from "../widget/RadioButtonGroup";
-import { TextField2 } from "../widget/TextField2";
+import { TextField } from "../widget/TextField";
 import { VerticalLayout } from "../widget/VerticalLayout";
 import { MessageDlg } from "./MessageDlg";
 
@@ -37,7 +37,7 @@ export class ExportDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new TextField2("Export File Name", false, null, null, false, this.fileNameState),
+            new TextField("Export File Name", false, null, null, false, this.fileNameState),
             new RadioButtonGroup([
                 this.createRadioButton("ZIP", "zip"),
                 this.createRadioButton("TAR", "tar"),
