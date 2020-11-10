@@ -35,7 +35,13 @@ export class ShareToPersonDlg extends DialogBase {
             valid = false;
         }
         else {
-            this.userNameState.setError(null);
+            if (this.userNameState.getValue() === store.getState().userName) {
+                this.userNameState.setError("You can't share a node to yourself.");
+                valid = false;
+            }
+            else {
+                this.userNameState.setError(null);
+            }
         }
 
         return valid;
@@ -63,24 +69,12 @@ export class ShareToPersonDlg extends DialogBase {
         ];
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     shareNodeToPerson = (): void => {
         if (!this.validate()) {
             return;
         }
 
-        let targetUser = this.userNameState.getValue();
-
-        // todo-0: put this in the validator and set normal error.
-        if (targetUser === store.getState().userName) {
-            S.util.showMessage("You can't share a node to yourself.", "Warning");
-            return;
-        }
-
-        this.shareImmediate(targetUser);
+        this.shareImmediate(this.userNameState.getValue());
     }
 
     shareImmediate = (userName: string) => {
@@ -94,12 +88,12 @@ export class ShareToPersonDlg extends DialogBase {
     reload = async (res: J.AddPrivilegeResponse): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             if (S.util.checkSuccess("Share Node with Person", res)) {
+                this.close();
                 if (res.principalPublicKey) {
                     await S.share.addCipherKeyToNode(this.node, res.principalPublicKey, res.principalNodeId);
                 }
                 this.sharedNodeFunc(res);
             }
-            this.close();
             resolve();
         });
     }

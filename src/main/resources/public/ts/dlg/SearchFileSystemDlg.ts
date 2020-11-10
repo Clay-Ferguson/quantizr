@@ -60,10 +60,6 @@ export class SearchFileSystemDlg extends DialogBase {
         ];
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     searchNodes = (state: AppState): void => {
         if (!this.validate()) {
             return;

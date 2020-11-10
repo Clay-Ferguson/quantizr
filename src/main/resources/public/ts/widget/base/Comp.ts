@@ -260,7 +260,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         });
     }
 
-    // todo-0: is this still used ?
     updateVisAndEnablement() {
         if (this.s.state.enabled === undefined) {
             this.s.state.enabled = true;

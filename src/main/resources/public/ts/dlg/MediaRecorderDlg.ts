@@ -230,10 +230,6 @@ export class MediaRecorderDlg extends DialogBase {
         });
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     newRecording = () => {
         this.recorded = true;
         this.chunks = [];

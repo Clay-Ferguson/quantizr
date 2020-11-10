@@ -13,13 +13,12 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { TextField } from "../widget/TextField";
 import { MessageDlg } from "./MessageDlg";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
 export class ImportDlg extends DialogBase {
-
     fileNameState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
@@ -36,26 +35,34 @@ export class ImportDlg extends DialogBase {
         ];
     }
 
-    renderButtons(): CompIntf {
-        return null;
+    validate = (): boolean => {
+        let valid = true;
+        if (!this.fileNameState.getValue()) {
+            this.fileNameState.setError("Cannot be empty.");
+            valid = false;
+        }
+        else {
+            this.fileNameState.setError(null);
+        }
+        return valid;
     }
 
     importNodes = (): void => {
-        // todo-0: need a standard validate() function here.
-        let hltNode = S.meta64.getHighlightedNode(this.appState);
-        let state = this.getState();
-
-        if (!this.fileNameState.getValue()) {
-            new MessageDlg("Please enter a name for the import file.", "Import", null, null, false, 0, this.appState).open();
+        if (!this.validate()) {
             return;
         }
 
-        if (hltNode) {
-            S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
-                nodeId: hltNode.id,
-                sourceFileName: this.fileNameState.getValue()
-            }, this.importResponse);
+        let hltNode = S.meta64.getHighlightedNode(this.appState);
+        if (!hltNode) {
+            new MessageDlg("You have not selected a node to import into.", "Import", null, null, false, 0, this.appState).open();
+            return;
         }
+
+        S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
+            nodeId: hltNode.id,
+            sourceFileName: this.fileNameState.getValue()
+        }, this.importResponse);
+
         this.close();
     }
 

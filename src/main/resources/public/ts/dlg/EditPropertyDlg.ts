@@ -54,10 +54,6 @@ export class EditPropertyDlg extends DialogBase {
         return valid;
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     save = (): void => {
         if (!this.validate()) {
             return;

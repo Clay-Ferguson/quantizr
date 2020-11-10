@@ -43,10 +43,6 @@ export class ChangeNodeTypeDlg extends DialogBase {
         ];
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     setNodeType = (): void => {
         // console.log("accepting TypeSelected: " + this.getState().selType);
         this.selCallback(this.getState().selType);

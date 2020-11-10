@@ -37,10 +37,6 @@ export class ImportCryptoKeyDlg extends DialogBase {
         ];
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     import = async () => {
         // until better validation, just check for empty
         let keyText = this.keyState.getValue();

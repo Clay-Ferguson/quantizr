@@ -66,10 +66,6 @@ export class LoginDlg extends DialogBase {
         return valid;
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     preLoad = async () => {
         let user = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
         let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);

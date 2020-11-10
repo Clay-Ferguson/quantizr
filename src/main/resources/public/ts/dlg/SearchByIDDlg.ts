@@ -60,10 +60,6 @@ export class SearchByIDDlg extends DialogBase {
         ];
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     search = () => {
         if (!this.validate()) {
             return;

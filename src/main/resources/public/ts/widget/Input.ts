@@ -10,34 +10,18 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+/* Can this be combined with textarea? making of course the tag naem itself a variable ? */
 export class Input extends Comp {
 
     constructor(attribs: Object = {}, s?: State<any>) {
         super(attribs, s);
-        this.attribs.onChange = this.onChange.bind(this); // todo-0: use arrow func instead.
-        this.mergeState({
-            type: this.attribs.type
-        });
-    }
-
-    onChange(evt): void {
-        this.mergeState({ value: evt.target.value });
-    }
-
-    /* This method is never used because we ended up always passing Input params into a new Input object
-    in all circumstances, but I leave it here for future reference. It's still a legit function. */
-    _toggleType = (): void => {
-        let state = this.getState();
-        this.mergeState({
-            type: state.type === "password" ? "text" : "password"
-        });
+        this.attribs.onChange = (evt) => {
+            this.mergeState({ value: evt.target.value });
+        };
     }
 
     compRender(): ReactNode {
-        /* I have several places in other classes where 'conten' and 'attribs' is in reverse/wrong order. check */
-        let state = this.getState();
-        this.attribs.value = state.value;
-        this.attribs.type = state.type;
+        this.attribs.value = this.getState().value;
         return S.e("input", this.attribs);
     }
 }

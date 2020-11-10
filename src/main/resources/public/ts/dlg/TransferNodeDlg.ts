@@ -68,10 +68,6 @@ export class TransferNodeDlg extends DialogBase {
         return valid;
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     transfer = (): void => {
         if (!this.validate()) {
             return;

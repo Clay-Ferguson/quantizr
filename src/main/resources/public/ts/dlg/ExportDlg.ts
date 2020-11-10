@@ -66,10 +66,6 @@ export class ExportDlg extends DialogBase {
         });
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     exportNodes = (): void => {
         let state = this.getState();
 

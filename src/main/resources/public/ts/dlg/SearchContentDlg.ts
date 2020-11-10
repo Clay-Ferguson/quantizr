@@ -88,10 +88,6 @@ export class SearchContentDlg extends DialogBase {
         ];
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     graph = () => {
         if (!this.validate()) {
             return;

@@ -136,7 +136,10 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     }
 
     abstract renderDlg(): CompIntf[];
-    abstract renderButtons(): CompIntf;
+
+    renderButtons(): CompIntf {
+        return null;
+    }
 
     /* Can be overridden to customize content (normally icons) in title bar */
     getExtraTitleBarComps(): CompIntf[] {
@@ -176,7 +179,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             children.push(new Div(null, {
                 className: "app-modal-title"
             },
-            titleChildren
+                titleChildren
             ));
             timesIcon.renderRawHtml = true;
         }
@@ -198,7 +201,11 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         const contentDiv = new Div(null, contentAttribs, this.renderDlg());
 
         children.push(contentDiv);
-        children.push(this.renderButtons());
+
+        let buttons: CompIntf = this.renderButtons();
+        if (buttons) {
+            children.push(buttons);
+        }
 
         this.setChildren(children);
     }

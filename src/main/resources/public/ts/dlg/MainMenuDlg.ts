@@ -14,8 +14,4 @@ export class MainMenuDlg extends DialogBase {
             new MenuPanel(this.appState)
         ];
     }
-
-    renderButtons(): CompIntf {
-        return null;
-    }
 }

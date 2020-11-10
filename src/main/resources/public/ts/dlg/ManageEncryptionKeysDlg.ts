@@ -28,11 +28,6 @@ export class ManageEncryptionKeysDlg extends DialogBase {
         ];
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
-    // @Override
     preLoad(): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             let keyJson: string = await S.encryption.exportKeys();

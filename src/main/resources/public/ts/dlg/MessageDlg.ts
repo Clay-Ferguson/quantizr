@@ -39,8 +39,4 @@ export class MessageDlg extends DialogBase {
             ]) : null
         ];
     }
-
-    renderButtons(): CompIntf {
-        return null;
-    }
 }

@@ -96,10 +96,6 @@ export class SignupDlg extends DialogBase {
         return valid;
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     signup = (): void => {
         if (!this.validate()) {
             return;

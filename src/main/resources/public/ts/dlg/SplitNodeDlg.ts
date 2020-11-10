@@ -116,10 +116,6 @@ export class SplitNodeDlg extends DialogBase {
         ];
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     splitNodes = (): void => {
         let state = this.getState();
 

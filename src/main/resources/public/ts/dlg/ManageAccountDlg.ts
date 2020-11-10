@@ -35,10 +35,6 @@ export class ManageAccountDlg extends DialogBase {
         ];
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     preLoad(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,

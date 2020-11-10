@@ -49,10 +49,6 @@ export class VideoPlayerDlg extends DialogBase {
         ];
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     getVideoElement(): HTMLVideoElement {
         return this.videoPlayer.getVideoElement();
     }

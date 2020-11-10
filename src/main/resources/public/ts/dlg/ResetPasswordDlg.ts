@@ -50,7 +50,13 @@ export class ResetPasswordDlg extends DialogBase {
             valid = false;
         }
         else {
-            this.userState.setError(null);
+            if (this.userState.getValue().trim().toLowerCase() === "admin") {
+                valid = false;
+                this.userState.setError("Invalid use name");
+            }
+            else {
+                this.userState.setError(null);
+            }
         }
 
         if (!this.emailState.getValue()) {
@@ -64,33 +70,20 @@ export class ResetPasswordDlg extends DialogBase {
         return valid;
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     resetPassword = (): void => {
         if (!this.validate()) {
             return;
         }
 
-        // todo-0: this can be cleaned up some (validation)
-        let userName = this.userState.getValue();
-        let emailAddress = this.userState.getValue();
-
-        /* Note: Admin check is done also on server, so no browser hacking can get around this */
-        if (userName && emailAddress && userName.toLowerCase() !== "admin") {
-            S.util.ajax<J.ResetPasswordRequest, J.ResetPasswordResponse>("resetPassword", {
-                user: userName,
-                email: emailAddress
-            }, this.resetPasswordResponse);
-        } else {
-            S.util.showMessage("Oops. Try that again.", "Warning");
-        }
-        this.close();
+        S.util.ajax<J.ResetPasswordRequest, J.ResetPasswordResponse>("resetPassword", {
+            user: this.userState.getValue(),
+            email: this.emailState.getValue()
+        }, this.resetPasswordResponse);
     }
 
     resetPasswordResponse = (res: J.ResetPasswordResponse): void => {
         if (S.util.checkSuccess("Reset password", res)) {
+            this.close();
             S.util.showMessage("Password reset email was sent. Check your email.", "Warning");
         }
     }

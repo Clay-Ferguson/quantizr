@@ -21,7 +21,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class SearchByNameDlg extends DialogBase {
 
-    // todo-0: for all of these we can just use the state object below as a static.
     static defaultSearchText: string = "";
 
     searchTextField: TextField;
@@ -60,11 +59,6 @@ export class SearchByNameDlg extends DialogBase {
                 ])
             ])
         ];
-    }
-
-    // all these type functions should be unnecessary (todo-0)
-    renderButtons(): CompIntf {
-        return null;
     }
 
     search = () => {

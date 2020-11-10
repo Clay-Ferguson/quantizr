@@ -108,10 +108,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         return children;
     }
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     uploadFromUrl = (): void => {
         let state = this.getState();
         S.attachment.openUploadFromUrlDlg(this.node, null, () => {

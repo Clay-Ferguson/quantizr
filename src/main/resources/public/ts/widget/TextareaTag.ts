@@ -14,18 +14,13 @@ export class TextareaTag extends Comp {
 
     constructor(attribs: Object = {}, s?: State<any>) {
         super(attribs, s);
-        this.attribs.onChange = this.onChange.bind(this);
-    }
-
-    onChange(evt): void {
-        // console.log("New Val [" + evt.target.value + "] this.id=" + this.getId());
-        this.mergeState({ value: evt.target.value });
+        this.attribs.onChange = (evt) => {
+            this.mergeState({ value: evt.target.value });
+        };
     }
 
     compRender(): ReactNode {
-        /* I have several places in other classes where 'conten' and 'attribs' is in reverse/wrong order. check */
-        let state = this.getState();
-        this.attribs.value = state.value;
+        this.attribs.value = this.getState().value;
         return S.e("textarea", this.attribs);
     }
 }

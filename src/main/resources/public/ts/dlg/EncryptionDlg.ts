@@ -41,8 +41,4 @@ export class EncryptionDlg extends DialogBase {
             ])
         ];
     }
-
-    renderButtons(): CompIntf {
-        return null;
-    }
 }

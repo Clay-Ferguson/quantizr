@@ -18,8 +18,4 @@ export class ProgressDlg extends DialogBase {
             }, [new Progress()])
         ];
     }
-
-    renderButtons(): CompIntf {
-        return null;
-    }
 }

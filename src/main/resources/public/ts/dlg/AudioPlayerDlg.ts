@@ -96,7 +96,6 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     // This makes the sleep timer work "Stop After (mins.)"
-    // todo-0: this is due for testing.
     oneMinuteTimeslice = () => {
         if (this.timeLeftState.getValue()) {
             try {
@@ -239,10 +238,6 @@ export class AudioPlayerDlg extends DialogBase {
             }
             return div;
         }
-    }
-
-    renderButtons(): CompIntf {
-        return null;
     }
 
     cancel(): void {

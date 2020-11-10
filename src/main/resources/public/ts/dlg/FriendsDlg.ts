@@ -54,8 +54,4 @@ export class FriendsDlg extends DialogBase {
             ])
         ];
     }
-
-    renderButtons(): CompIntf {
-        return null;
-    }
 }
