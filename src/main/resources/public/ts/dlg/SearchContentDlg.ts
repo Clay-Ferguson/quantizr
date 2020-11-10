@@ -1,10 +1,10 @@
 import { AppState } from "../AppState";
-import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
@@ -12,7 +12,7 @@ import { Checkbox } from "../widget/Checkbox";
 import { Form } from "../widget/Form";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { TextContent } from "../widget/TextContent";
-import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 import { MessageDlg } from "./MessageDlg";
 
 let S: Singletons;
@@ -23,37 +23,34 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class SearchContentDlg extends DialogBase {
 
     static defaultSearchText: string = "";
-    searchTextField: TextField;
+    searchTextField: TextField2;
+    searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Search Content", "app-modal-content-medium-width", null, state);
         S.srch.searchText = null;
+
+        // todo-0: need to google "setting focus on react components"!
         this.whenElm((elm: HTMLSelectElement) => {
             this.searchTextField.focus();
         });
 
         this.mergeState({
             fuzzy: false,
-            caseSensitive: false,
-            searchText: SearchContentDlg.defaultSearchText
+            caseSensitive: false
         });
+        this.searchTextState.setValue(SearchContentDlg.defaultSearchText);
     }
 
     validate = (): boolean => {
         let valid = true;
-        let errors: any = {};
-        let state = this.getState();
 
-        if (!state.searchText) {
+        if (!this.searchTextState.getValue()) {
+            this.searchTextState.setError("Cannot be empty.");
             valid = false;
-            errors.searchTextValidationError = "Enter something to search for.";
         }
         else {
-            errors.searchTextValidationError = null;
-        }
-
-        if (!valid) {
-            this.mergeState(errors);
+            this.searchTextState.setError(null);
         }
 
         return valid;
@@ -63,8 +60,7 @@ export class SearchContentDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                this.searchTextField = new TextField("Search", false, this.search, null, false,
-                    new CompValueHolder<string>(this, "searchText")),
+                this.searchTextField = new TextField2("Search", false, this.search, null, false, this.searchTextState),
                 new HorizontalLayout([
                     new Checkbox("Fuzzy Search (slower)", null, {
                         setValue: (checked: boolean): void => {
@@ -112,11 +108,10 @@ export class SearchContentDlg extends DialogBase {
             return;
         }
 
-        // until better validation, just check for empty
-        let searchText = this.getState().searchText;
+        SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
 
         this.close();
-        S.render.showGraph(null, searchText, this.appState);
+        S.render.showGraph(null, SearchContentDlg.defaultSearchText, this.appState);
     }
 
     search = () => {
@@ -135,15 +130,11 @@ export class SearchContentDlg extends DialogBase {
             return;
         }
 
-        // until better validation, just check for empty
-        let searchText = this.getState().searchText;
-        S.srch.searchText = searchText;
-
-        SearchContentDlg.defaultSearchText = searchText;
+        SearchContentDlg.defaultSearchText = S.srch.searchText = this.searchTextState.getValue();
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             nodeId: node.id,
-            searchText,
+            searchText: SearchContentDlg.defaultSearchText,
             sortDir: "",
             sortField: "",
             searchProp: "",

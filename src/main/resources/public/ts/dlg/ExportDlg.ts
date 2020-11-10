@@ -6,6 +6,7 @@ import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { Anchor } from "../widget/Anchor";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
@@ -13,7 +14,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Header } from "../widget/Header";
 import { RadioButton } from "../widget/RadioButton";
 import { RadioButtonGroup } from "../widget/RadioButtonGroup";
-import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 import { VerticalLayout } from "../widget/VerticalLayout";
 import { MessageDlg } from "./MessageDlg";
 
@@ -24,17 +25,19 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ExportDlg extends DialogBase {
 
+    fileNameState: ValidatedState<any> = new ValidatedState<any>();
+
     constructor(state: AppState, private node: NodeInfo) {
         super("Export", null, false, state);
         this.mergeState({
-            exportType: "zip",
-            fileName: node.name ? node.name : null
+            exportType: "zip"
         });
+        this.fileNameState.setValue(node.name);
     }
 
     renderDlg(): CompIntf[] {
         return [
-            new TextField("Export File Name", false, null, null, false, new CompValueHolder<string>(this, "fileName")),
+            new TextField2("Export File Name", false, null, null, false, this.fileNameState),
             new RadioButtonGroup([
                 this.createRadioButton("ZIP", "zip"),
                 this.createRadioButton("TAR", "tar"),
@@ -69,12 +72,11 @@ export class ExportDlg extends DialogBase {
 
     exportNodes = (): void => {
         let state = this.getState();
-        let fileName = this.getState().fileName;
 
         S.util.ajax<J.ExportRequest, J.ExportResponse>("export", {
             nodeId: this.node.id,
             exportExt: state.exportType,
-            fileName
+            fileName: this.fileNameState.getValue()
         }, (res: J.ExportResponse) => {
             this.exportResponse(res);
         });

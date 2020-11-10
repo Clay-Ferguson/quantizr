@@ -38,20 +38,12 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     // public referenced: boolean;
     // private ref: any;
 
-    // This is boolean is kinda tricky. It is needed for when we have text inputs bound to state by onChange to update state
-    // and end up setting state into parent which forces a rerender, and destroys the focus and cursor position as the render creates a NEW
-    // component, and this flag makes the component keep the same 'key' attribute by not rendering with new keys on all elements during onChange
-    // So reuseChildren tells the component keep children if they exist. (mainly only functional in Dialogs currently)
-    static renderCachedChildren: boolean = false;
-
     attribs: any;
 
     /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored */
     private children: CompIntf[];
-    private cachedChildren: CompIntf[];
 
     logEnablementLogic: boolean = true;
-
     jsClassName: string;
     clazz: string;
 
@@ -235,16 +227,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     buildChildren(): ReactNode[] {
-        if (Comp.renderCachedChildren && this.cachedChildren) {
-            this.children = this.cachedChildren;
-        }
-        else {
-            // looks like we don't need to clone the children, we can just use as is.
-            // this.cachedChildren = [];
-            // this.cachedChildren = this.cachedChildren.concat(this.children);
-            this.cachedChildren = this.children;
-        }
-
         // console.log("buildChildren: " + this.jsClassName);
         if (this.children == null || this.children.length === 0) return null;
         let reChildren: ReactNode[] = [];

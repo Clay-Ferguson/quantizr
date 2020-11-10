@@ -1,17 +1,17 @@
 import { AppState } from "../AppState";
-import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
-import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -20,12 +20,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class TransferNodeDlg extends DialogBase {
 
+    toUserState: ValidatedState<any> = new ValidatedState<any>();
+    fromUserState: ValidatedState<any> = new ValidatedState<any>();
+
     constructor(state: AppState) {
         super("Transfer Node", "app-modal-content-narrow-width", false, state);
         this.mergeState({
-            recursive: false,
-            fromUser: null,
-            toUser: null
+            recursive: false
         });
     }
 
@@ -33,8 +34,8 @@ export class TransferNodeDlg extends DialogBase {
         return [
             new Form(null, [
                 new FormGroup(null, [
-                    new TextField("From User", null, null, null, false, new CompValueHolder<string>(this, "fromUser")),
-                    new TextField("To User", null, null, null, false, new CompValueHolder<string>(this, "toUser"))
+                    new TextField2("From User", null, null, null, false, this.fromUserState),
+                    new TextField2("To User", null, null, null, false, this.toUserState)
                 ]),
                 new FormGroup(null, [
                     new Checkbox("Include Sub-Nodes", null, {
@@ -56,18 +57,14 @@ export class TransferNodeDlg extends DialogBase {
 
     validate = (): boolean => {
         let valid = true;
-        let errors: any = {};
-        let state = this.getState();
 
-        if (!state.toUser) {
-            errors.toUserNameTextValidationError = "Cannot be empty.";
+        if (!this.toUserState.getValue()) {
+            this.toUserState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            errors.toUserNameTextValidationError = null;
+            this.toUserState.setError(null);
         }
-
-        this.mergeState(errors);
         return valid;
     }
 
@@ -80,20 +77,13 @@ export class TransferNodeDlg extends DialogBase {
             return;
         }
 
-        let state = this.getState();
-
-        // if fromUser is left blank that's how to take ownership of any nodes regardless of current ownership
-        if (/*! fromUser || */ !state.toUser) {
-            S.util.showMessage("To user name is required.", "Warning");
-            return;
-        }
         let node: J.NodeInfo = S.meta64.getHighlightedNode(this.appState);
         if (!node) {
             S.util.showMessage("No node was selected.", "Warning");
             return;
         }
 
-        S.user.transferNode(this.getState().recursive, node.id, state.fromUser, state.toUser, this.appState);
+        S.user.transferNode(this.getState().recursive, node.id, this.fromUserState.getValue(), this.toUserState.getValue(), this.appState);
         this.close();
     }
 }

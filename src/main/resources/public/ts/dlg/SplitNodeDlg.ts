@@ -4,13 +4,14 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { RadioButton } from "../widget/RadioButton";
 import { RadioButtonGroup } from "../widget/RadioButtonGroup";
 import { TextContent } from "../widget/TextContent";
-import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -18,6 +19,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class SplitNodeDlg extends DialogBase {
+
+    delimiterState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(private node: J.NodeInfo, state: AppState) {
         super("Split Node", null, false, state);
@@ -104,14 +107,7 @@ export class SplitNodeDlg extends DialogBase {
                 })
             ], "form-group-border marginBottom"),
 
-            (this.getState().splitMode === "custom") ? new TextField("Delimiter", false, null, null, false, {
-                getValue: (): string => {
-                    return this.getState().delimiter;
-                },
-                setValue: (val: string): void => {
-                    this.mergeState({ delimiter: val });
-                }
-            }) : null,
+            (this.getState().splitMode === "custom") ? new TextField2("Delimiter", false, null, null, false, this.delimiterState) : null,
 
             new ButtonBar([
                 new Button("Split Node", this.splitNodes, null, "btn-primary"),
@@ -135,7 +131,7 @@ export class SplitNodeDlg extends DialogBase {
             delim = "\n\n\n";
         }
         else if (state.splitMode === "custom") {
-            delim = state.delimiter;
+            delim = this.delimiterState.getValue();
         }
 
         S.edit.splitNode(this.node, state.splitType, delim, this.appState);

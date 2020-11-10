@@ -5,6 +5,7 @@ import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { Anchor } from "../widget/Anchor";
 import { AudioPlayer } from "../widget/AudioPlayer";
 import { CompIntf } from "../widget/base/CompIntf";
@@ -15,7 +16,7 @@ import { Form } from "../widget/Form";
 import { Icon } from "../widget/Icon";
 import { Img } from "../widget/Img";
 import { Span } from "../widget/Span";
-import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -48,7 +49,9 @@ export class AudioPlayerDlg extends DialogBase {
     private saveTimer: any = null;
     urlHash: string;
 
-    timeLeftTextField: TextField;
+    timeLeftTextField: TextField2;
+    timeLeftState: ValidatedState<any> = new ValidatedState<any>();
+
     intervalTimer: any;
 
     playButton: Icon;
@@ -93,12 +96,13 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     // This makes the sleep timer work "Stop After (mins.)"
+    // todo-0: this is due for testing.
     oneMinuteTimeslice = () => {
-        if (this.timeLeftTextField.valueIntf.getValue()) {
+        if (this.timeLeftState.getValue()) {
             try {
-                let timeVal = parseInt(this.timeLeftTextField.valueIntf.getValue());
+                let timeVal = parseInt(this.timeLeftState.getValue());
                 timeVal--;
-                this.timeLeftTextField.valueIntf.setValue(timeVal <= 0 ? "" : "" + timeVal);
+                this.timeLeftState.setValue(timeVal <= 0 ? "" : "" + timeVal);
                 if (timeVal <= 0 && this.player && !this.player.paused && !this.player.ended) {
                     this.player.pause();
                 }
@@ -139,7 +143,7 @@ export class AudioPlayerDlg extends DialogBase {
                     })
                 ]),
                 new Div(null, null, [
-                    this.timeLeftTextField = new TextField("Stop After (mins.)", false, null, "timeRemainingEditField", true, null)
+                    this.timeLeftTextField = new TextField2("Stop After (mins.)", false, null, "timeRemainingEditField", true, this.timeLeftState)
                 ]),
                 new ButtonBar([
                     new Button("Close", this.destroyPlayer)

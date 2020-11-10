@@ -5,12 +5,13 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
-import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 import { MessageDlg } from "./MessageDlg";
 
 let S: Singletons;
@@ -20,33 +21,31 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class SearchByNameDlg extends DialogBase {
 
+    // todo-0: for all of these we can just use the state object below as a static.
     static defaultSearchText: string = "";
-    searchTextField: TextField;
+
+    searchTextField: TextField2;
+    searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Search by Node Name", "app-modal-content-medium-width", false, state);
         this.whenElm((elm: HTMLSelectElement) => {
             this.searchTextField.focus();
         });
-        this.mergeState({
-            searchText: SearchByNameDlg.defaultSearchText
-        });
+        this.searchTextState.setValue(SearchByNameDlg.defaultSearchText);
     }
 
     validate = (): boolean => {
         let valid = true;
-        let errors: any = {};
-        let state = this.getState();
 
-        if (!state.searchText) {
-            errors.searchTextValidationError = "Cannot be empty.";
+        if (!this.searchTextState.getValue()) {
+            this.searchTextState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            errors.searchTextValidationError = null;
+            this.searchTextState.setError(null);
         }
 
-        this.mergeState(errors);
         return valid;
     }
 
@@ -54,8 +53,7 @@ export class SearchByNameDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                this.searchTextField = new TextField("Node Name", false, this.search, null, false,
-                    new CompValueHolder<string>(this, "searchText")),
+                this.searchTextField = new TextField2("Node Name", false, this.search, null, false, this.searchTextState),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", this.close)
@@ -64,6 +62,7 @@ export class SearchByNameDlg extends DialogBase {
         ];
     }
 
+    // all these type functions should be unnecessary (todo-0)
     renderButtons(): CompIntf {
         return null;
     }
@@ -84,18 +83,11 @@ export class SearchByNameDlg extends DialogBase {
             return;
         }
 
-        // until better validation, just check for empty
-        let searchText = this.getState().searchText;
-        if (!searchText) {
-            S.util.showMessage("Enter search text.", "Warning");
-            return;
-        }
-
-        SearchByNameDlg.defaultSearchText = searchText;
+        SearchByNameDlg.defaultSearchText = this.searchTextState.getValue();
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             nodeId: node.id,
-            searchText,
+            searchText: this.searchTextState.getValue(),
             sortDir: "",
             sortField: "",
             searchProp: "node.name",

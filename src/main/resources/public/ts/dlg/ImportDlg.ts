@@ -6,10 +6,11 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
-import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 import { MessageDlg } from "./MessageDlg";
 
 let S : Singletons;
@@ -19,16 +20,15 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class ImportDlg extends DialogBase {
 
+    fileNameState: ValidatedState<any> = new ValidatedState<any>();
+
     constructor(state: AppState) {
         super("Import from XML", null, false, state);
-        this.mergeState({
-            fileName: null
-        });
     }
 
     renderDlg(): CompIntf[] {
         return [
-            new TextField("File Name to Import", null, null, null, false, new CompValueHolder<string>(this, "fileName")),
+            new TextField2("File Name to Import", null, null, null, false, this.fileNameState),
             new ButtonBar([
                 new Button("Import", this.importNodes, null, "btn-primary"),
                 new Button("Close", this.close)
@@ -41,10 +41,11 @@ export class ImportDlg extends DialogBase {
     }
 
     importNodes = (): void => {
+        // todo-0: need a standard validate() function here.
         let hltNode = S.meta64.getHighlightedNode(this.appState);
         let state = this.getState();
 
-        if (!state.fileName) {
+        if (!this.fileNameState.getValue()) {
             new MessageDlg("Please enter a name for the import file.", "Import", null, null, false, 0, this.appState).open();
             return;
         }
@@ -52,7 +53,7 @@ export class ImportDlg extends DialogBase {
         if (hltNode) {
             S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
                 nodeId: hltNode.id,
-                sourceFileName: state.fileName
+                sourceFileName: this.fileNameState.getValue()
             }, this.importResponse);
         }
         this.close();

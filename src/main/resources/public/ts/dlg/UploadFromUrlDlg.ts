@@ -1,17 +1,17 @@
 import { AppState } from "../AppState";
-import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
-import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
@@ -19,16 +19,30 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class UploadFromUrlDlg extends DialogBase {
 
     uploadButton: Button;
+    urlState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(private node: J.NodeInfo, private url: string, private onUploadFunc: Function, state: AppState) {
         super("Upload File", null, false, state);
-        this.mergeState({ url });
+    }
+
+    validate = (): boolean => {
+        let valid = true;
+
+        if (!this.urlState.getValue()) {
+            this.urlState.setError("Cannot be empty.");
+            valid = false;
+        }
+        else {
+            this.urlState.setError(null);
+        }
+
+        return valid;
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new TextField("Upload from URL", false, null, null, false, new CompValueHolder<string>(this, "url")),
+                new TextField2("Upload from URL", false, null, null, false, this.urlState),
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Close", this.close)
@@ -42,14 +56,14 @@ export class UploadFromUrlDlg extends DialogBase {
     }
 
     upload = (): void => {
-        let sourceUrl = this.getState().url;
-
-        if (sourceUrl) {
-            S.util.ajax<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
-                nodeId: this.node.id,
-                sourceUrl
-            }, this.uploadFromUrlResponse);
+        if (!this.validate()) {
+            return;
         }
+
+        S.util.ajax<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
+            nodeId: this.node.id,
+            sourceUrl: this.urlState.getValue()
+        }, this.uploadFromUrlResponse);
     }
 
     uploadFromUrlResponse = (res: J.UploadFromUrlResponse): void => {

@@ -1,16 +1,16 @@
 import { AppState } from "../AppState";
-import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
-import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 import { MessageDlg } from "./MessageDlg";
 
 let S: Singletons;
@@ -21,7 +21,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class SearchByIDDlg extends DialogBase {
 
     static defaultSearchText: string = "";
-    searchTextField: TextField;
+    searchTextField: TextField2;
+    searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Search by Node ID", "app-modal-content-medium-width", false, state);
@@ -29,40 +30,34 @@ export class SearchByIDDlg extends DialogBase {
             this.searchTextField.focus();
         });
 
-        this.mergeState({
-            searchText: SearchByIDDlg.defaultSearchText
-        });
+        this.searchTextState.setValue(SearchByIDDlg.defaultSearchText);
+    }
+
+    validate = (): boolean => {
+        let valid = true;
+
+        if (!this.searchTextState.getValue()) {
+            this.searchTextState.setError("Cannot be empty.");
+            valid = false;
+        }
+        else {
+            this.searchTextState.setError(null);
+        }
+
+        return valid;
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
-                this.searchTextField = new TextField("Node ID", false, this.search, null, false,
-                    new CompValueHolder<string>(this, "searchText")),
+                this.searchTextField = new TextField2("Node ID", false, this.search, null, false, this.searchTextState),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", this.close)
                 ])
             ])
         ];
-    }
-
-    validate = (): boolean => {
-        let valid = true;
-        let errors: any = {};
-        let state = this.getState();
-
-        if (!state.searchText) {
-            errors.searchTextValidationError = "Cannot be empty.";
-            valid = false;
-        }
-        else {
-            errors.searchTextValidationError = null;
-        }
-
-        this.mergeState(errors);
-        return valid;
     }
 
     renderButtons(): CompIntf {
@@ -85,18 +80,11 @@ export class SearchByIDDlg extends DialogBase {
             return;
         }
 
-        // until better validation, just check for empty
-        let searchText = this.getState().searchText;
-        if (!searchText) {
-            S.util.showMessage("Enter search text.", "Warning");
-            return;
-        }
-
-        SearchByIDDlg.defaultSearchText = searchText;
+        SearchByIDDlg.defaultSearchText = this.searchTextState.getValue();
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             nodeId: node.id,
-            searchText,
+            searchText: SearchByIDDlg.defaultSearchText,
             sortDir: "",
             sortField: "",
             searchProp: "node.id",

@@ -5,12 +5,13 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
-import { TextField } from "../widget/TextField";
+import { TextField2 } from "../widget/TextField2";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -18,6 +19,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class ResetPasswordDlg extends DialogBase {
+
+    userState: ValidatedState<any> = new ValidatedState<any>();
+    emailState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(user: string, state: AppState) {
         super("Reset Password", "app-modal-content-narrow-width", false, state);
@@ -28,9 +32,8 @@ export class ResetPasswordDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Enter your user name and email address and a change-password link will be sent to you"),
-
-                new TextField("User Name", false, null, null, false, new CompValueHolder<string>(this, "user")),
-                new TextField("Email Address", false, null, null, false, new CompValueHolder<string>(this, "email")),
+                new TextField2("User Name", false, null, null, false, this.userState),
+                new TextField2("Email Address", false, null, null, false, this.emailState),
                 new ButtonBar([
                     new Button("Reset my Password", this.resetPassword, null, "btn-primary"),
                     new Button("Close", this.close)
@@ -41,26 +44,23 @@ export class ResetPasswordDlg extends DialogBase {
 
     validate = (): boolean => {
         let valid = true;
-        let errors: any = {};
-        let state = this.getState();
 
-        if (!state.user) {
-            errors.userValidationError = "Cannot be empty.";
+        if (!this.userState.getValue()) {
+            this.userState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            errors.userValidationError = null;
+            this.userState.setError(null);
         }
 
-        if (!state.email) {
-            errors.emailValidationError = "Cannot be empty.";
+        if (!this.emailState.getValue()) {
+            this.emailState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            errors.emailValidationError = null;
+            this.emailState.setError(null);
         }
 
-        this.mergeState(errors);
         return valid;
     }
 
@@ -72,9 +72,10 @@ export class ResetPasswordDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-        let state = this.getState();
-        var userName = state.user;
-        var emailAddress = state.email;
+
+        // todo-0: this can be cleaned up some (validation)
+        let userName = this.userState.getValue();
+        let emailAddress = this.userState.getValue();
 
         /* Note: Admin check is done also on server, so no browser hacking can get around this */
         if (userName && emailAddress && userName.toLowerCase() !== "admin") {

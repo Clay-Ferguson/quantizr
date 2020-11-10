@@ -15,7 +15,6 @@ import { Html } from "../widget/Html";
 import { Img } from "../widget/Img";
 import { Label } from "../widget/Label";
 import { Textarea2 } from "../widget/Textarea2";
-import { TextField } from "../widget/TextField";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 let S: Singletons;
@@ -24,7 +23,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class ProfileDlg extends DialogBase {
-    userNameTextField: TextField;
+    // userNameTextField: TextField2;
     bioState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState, private readOnly: boolean, private userId: string, private userName: string) {
