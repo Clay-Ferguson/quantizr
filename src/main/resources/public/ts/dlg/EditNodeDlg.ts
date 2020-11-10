@@ -21,7 +21,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
-import { DateTimeField } from "../widget/DateTimeField";
+import { DateTimeField2 } from "../widget/DateTimeField2";
 import { Div } from "../widget/Div";
 import { EditPropsTable } from "../widget/EditPropsTable";
 import { EditPropsTableRow } from "../widget/EditPropsTableRow";
@@ -33,7 +33,6 @@ import { Icon } from "../widget/Icon";
 import { Label } from "../widget/Label";
 import { LayoutRow } from "../widget/LayoutRow";
 import { Selection } from "../widget/Selection";
-import { Textarea } from "../widget/Textarea";
 import { Textarea2 } from "../widget/Textarea2";
 import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
@@ -708,14 +707,11 @@ export class EditNodeDlg extends DialogBase {
                 /* todo-1: eventually we will have data types, but for now we use a hack
                 to detect to treat a string as a date based on its property name. */
                 if (propEntry.name === "date") {
-
-                    // todo-0: removing pending refactor to new state management
-                    // // Ensure we have set the default time if none is yet set.
-                    // let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
-                    // if (!val) {
-                    //     propState.setValue("" + new Date().getTime());
-                    // }
-                    // valEditor = new DateTimeField(valueIntf);
+                    // Ensure we have set the default time if none is yet set.
+                    if (!propState.getValue()) {
+                        propState.setValue("" + new Date().getTime());
+                    }
+                    valEditor = new DateTimeField2(propState);
                 }
                 else {
                     // console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
@@ -758,7 +754,7 @@ export class EditNodeDlg extends DialogBase {
                                     let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
                                     if (clearText == null) {
-                                        (this.contentEditor as Textarea).setError("Decryption Failed");
+                                        this.contentEditorState.setError("Decryption Failed");
                                     }
                                     else {
                                         // console.log('decrypted to:' + value);
@@ -799,11 +795,11 @@ export class EditNodeDlg extends DialogBase {
                             let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
                             if (clearText == null) {
-                                (this.contentEditor as Textarea).setError("Decryption Failed");
+                                this.contentEditorState.setError("Decryption Failed");
                             }
                             else {
                                 // console.log("decrypted to:" + value);
-                                (this.contentEditor as Textarea).setValue(clearText);
+                                this.contentEditorState.setValue(clearText);
                             }
                         }
                     })();

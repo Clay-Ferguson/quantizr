@@ -78,43 +78,39 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
-        if (state.inlineEditId === node.id) {
-            return new InlineEditField(node, state);
-        }
-        else {
-            let prop: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.ORDER_BY, node);
 
-            let showCalendarButton = S.util.nodeHasChildrenOfType(node, J.NodeType.CALENDAR_ENTRY);
-            if (showCalendarButton) {
-                return new Div(null, { className: "marginBottom marginLeft" }, [
-                    new NodeCompMarkdown(node, state),
-                    new ButtonBar([
-                        new Button("Show Calendar", () => {
-                            S.render.showCalendar(node.id, state);
-                        })
-                    ])
-                ]);
-            }
-            // I was trying to let this button decrypt, but react is saying the component got unmounted
-            // and thrownging an error when the decrypt call below tries to update the state on a component
-            // that somehow is already gone by the time it runs.
-            //
-            // Solution: I'm just going with the autoDecrypting==true setup for now, and will come back
-            // and solve this later.
-            //
-            // else if (node.content && node.content.startsWith(J.Constant.ENC_TAG)) {
-            //     return new Div(null, null, [
-            //         markdownComp = new NodeCompMarkdown(node, state),
-            //         new ButtonBar([
-            //             new Button("Decrypt", () => {
-            //                 markdownComp.decrypt();
-            //             })
-            //         ], null, "marginLeft marginBottom")
-            //     ]);
-            // }
-            else {
-                return new NodeCompMarkdown(node, state);
-            }
+        let prop: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.ORDER_BY, node);
+
+        let showCalendarButton = S.util.nodeHasChildrenOfType(node, J.NodeType.CALENDAR_ENTRY);
+        if (showCalendarButton) {
+            return new Div(null, { className: "marginBottom marginLeft" }, [
+                new NodeCompMarkdown(node, state),
+                new ButtonBar([
+                    new Button("Show Calendar", () => {
+                        S.render.showCalendar(node.id, state);
+                    })
+                ])
+            ]);
+        }
+        // I was trying to let this button decrypt, but react is saying the component got unmounted
+        // and thrownging an error when the decrypt call below tries to update the state on a component
+        // that somehow is already gone by the time it runs.
+        //
+        // Solution: I'm just going with the autoDecrypting==true setup for now, and will come back
+        // and solve this later.
+        //
+        // else if (node.content && node.content.startsWith(J.Constant.ENC_TAG)) {
+        //     return new Div(null, null, [
+        //         markdownComp = new NodeCompMarkdown(node, state),
+        //         new ButtonBar([
+        //             new Button("Decrypt", () => {
+        //                 markdownComp.decrypt();
+        //             })
+        //         ], null, "marginLeft marginBottom")
+        //     ]);
+        // }
+        else {
+            return new NodeCompMarkdown(node, state);
         }
     }
 

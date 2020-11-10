@@ -33,7 +33,7 @@ export class NodeCompRow extends Div {
         });
 
         /* If we're in edit mode allow dragging */
-        if (appState.userPreferences.editMode && !appState.inlineEditId && !QuickEditField.editingId) {
+        if (appState.userPreferences.editMode && !appState.inlineEditId /* && !QuickEditField.editingId */) {
             this.attribs.draggable = "true";
             this.attribs.onDragStart = this.dragStart;
             this.attribs.onDragEnd = this.dragEnd;

@@ -3,16 +3,22 @@ import { useState } from "react";
 export class State<S> {
     state: any = {};
 
+    // this is 'overridable/assignable' so that we have a way to monitor values as they get assigned
+    // or even translate a value to some other value during assignment
+    stateTranslator = (s: any): any => {
+        return s;
+    }
+
     mergeState(moreState: any): any {
         this.setStateEx((state: any) => {
             this.state = { ...state, ...moreState };
-            return this.state;
+            return this.stateTranslator(this.state);
         });
     }
 
     setState = (newState: any): any => {
         this.setStateEx((state: any) => {
-            return this.state = { ...newState };
+            return this.state = this.stateTranslator({ ...newState });
         });
     }
 

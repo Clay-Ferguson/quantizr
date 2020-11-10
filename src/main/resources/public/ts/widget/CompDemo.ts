@@ -3,6 +3,7 @@ import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "./base/CompIntf";
 import { Button } from "./Button";
 import { CompDemoButton } from "./CompDemoButton";
+import { DateTimeField2 } from "./DateTimeField2";
 import { Div } from "./Div";
 import { Textarea2 } from "./Textarea2";
 
@@ -11,18 +12,18 @@ export class CompDemo extends Div {
     textAreaState: ValidatedState<any> = new ValidatedState<any>();
 
     // Holds the string representation of a datetime
-    // dateTimeState: ValidatedState<any> = new ValidatedState<any>();
+    dateTimeState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor() {
         super();
         this.setStateEx({ counter: 0 });
-        // this.dateTimeState.setValue("" + new Date().getTime());
+        this.dateTimeState.setValue("" + new Date().getTime());
     }
 
     preRender(): void {
         let children: CompIntf[] = [];
 
-        // children.push(new DateTimeField(valueIntf));
+        children.push(new DateTimeField2(this.dateTimeState));
 
         // children.push(this.textarea = new Textarea2("Textarea", { rows: "4" }, this.textAreaState));
 
