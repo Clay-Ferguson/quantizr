@@ -30,7 +30,6 @@ export class SearchContentDlg extends DialogBase {
         super("Search Content", "app-modal-content-medium-width", null, state);
         S.srch.searchText = null;
 
-        // todo-0: need to google "setting focus on react components"!
         this.whenElm((elm: HTMLSelectElement) => {
             this.searchTextField.focus();
         });

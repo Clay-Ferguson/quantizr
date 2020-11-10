@@ -55,7 +55,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
     }
 
     setWordWrap(wordWrap: boolean): void {
-        this.valState.v.mergeState({ wordWrap });
+        this.mergeState({ wordWrap });
     }
 
     focus(): void {
