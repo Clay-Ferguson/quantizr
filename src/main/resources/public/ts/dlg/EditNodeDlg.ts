@@ -625,8 +625,6 @@ export class EditNodeDlg extends DialogBase {
     makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): EditPropsTableRow => {
         let tableRow = new EditPropsTableRow();
         let allowEditAllProps: boolean = this.appState.isAdminUser;
-        // console.log("Property single-type: " + propEntry.name);
-
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
 
         let formGroup = new FormGroup();

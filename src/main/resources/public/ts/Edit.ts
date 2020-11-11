@@ -61,7 +61,6 @@ export class Edit implements EditIntf {
     }
 
     private insertBookResponse = (res: J.InsertBookResponse, state: AppState): void => {
-        console.log("insertBookResponse running.");
         S.util.checkSuccess("Insert Book", res);
 
         S.view.refreshTree(null, true, false, null, false, true, true, state);
@@ -282,13 +281,11 @@ export class Edit implements EditIntf {
 
             for (let i = 0; i < aclEntries.length; i++) {
                 const ac = aclEntries[i];
-
                 // console.log("Distribute Key to Principal: " + S.util.prettyPrint(ac));
                 await S.share.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
             }
 
             console.log("Key distribution complete.");
-
             resolve();
         });
     }
@@ -320,8 +317,6 @@ export class Edit implements EditIntf {
                 nodeId: node.id,
                 targetName: "up"
             }, (res) => { this.setNodePositionResponse(res, state); });
-        } else {
-            console.log("idToNodeMap does not contain " + id);
         }
     }
 
@@ -338,8 +333,6 @@ export class Edit implements EditIntf {
                 nodeId: node.id,
                 targetName: "down"
             }, (res) => { this.setNodePositionResponse(res, state); });
-        } else {
-            console.log("idToNodeMap does not contain " + id);
         }
     }
 
@@ -354,8 +347,6 @@ export class Edit implements EditIntf {
                 nodeId: node.id,
                 targetName: "top"
             }, (res) => { this.setNodePositionResponse(res, state); });
-        } else {
-            console.log("idToNodeMap does not contain " + id);
         }
     }
 
@@ -372,8 +363,6 @@ export class Edit implements EditIntf {
             }, (res) => {
                 this.setNodePositionResponse(res, state);
             });
-        } else {
-            console.log("idToNodeMap does not contain " + id);
         }
     }
 
@@ -478,7 +467,6 @@ export class Edit implements EditIntf {
         S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             parentNodeId: highlightNode.id
         }, async (res: J.SelectAllNodesResponse) => {
-            console.log("Node Sel Count: " + res.nodeIds.length);
             S.meta64.selectAllNodes(res.nodeIds);
         });
     }
