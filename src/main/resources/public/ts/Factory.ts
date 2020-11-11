@@ -34,20 +34,14 @@ import { Util } from "./Util";
 import { View } from "./View";
 
 export class Factory {
-    /*
-    We could have implemented the
-    singleton pattern in every one of these modules, but I like this better, where we centralize the
-    control (sort of Inversion of Control, IoC) and make it where the objects themselves don't even
-    know they are being used as singletons (instantated only once).
-    */
-    singletons: Singletons;
+    S: Singletons;
 
     /*
      * Just like in a SpringContext, we init all singletons up front and this allows circular references
      * to exist with no problems.
      */
-    constructAll = (): void => {
-        this.singletons = {
+    constructor() {
+        this.S = {
             meta64: new Meta64(),
             plugin: new PluginMgr(),
             util: new Util(),
@@ -64,22 +58,13 @@ export class Factory {
             user: new User(),
             view: new View(),
             rssReader: new RSSReader(),
-            localDB: new LocalDB(),
-
-            // Use this version of the render method to help troubleshoot missing 'key' props
-            // todo-1: move this function into some other static location that is safe to import
-            // with zero risk of any circular references.
-            // e: (func: any, props: any, ...children: any): any => {
-            //     if (props && !props.key) {
-            //         throw new Error("PROPS missing key on createElement: "+props);
-            //     }
-            //     return React.createElement(func, props, ...children);
-            // }
-            e: React.createElement,
-            log: console.log
+            localDB: new LocalDB()
         };
 
-        PubSub.pub(C.PUBSUB_SingletonsReady, this.singletons);
-        console.log("Factory.constructAll complete.");
+        PubSub.pub(C.PUBSUB_SingletonsReady, this.S);
+
+        // This is basically our main entrypoint into the app. This must ONLY be called after the SingletonsReady has been 
+        // called (line above) initializing all of them and wiring them all up.
+        this.S.meta64.initApp();
     }
 }

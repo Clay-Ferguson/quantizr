@@ -18,6 +18,6 @@ export class Li extends Comp {
     }
 
     compRender(): ReactNode {
-        return S.e("li", this.attribs, this.buildChildren());
+        return this.e("li", this.attribs, this.buildChildren());
     }
 }

@@ -22,6 +22,6 @@ export class Img extends Comp {
         //     this.attribs.style.maxWidth = "calc(100% - 12px)";
         //     this.attribs.style.width = "calc(100% - 12px)";
 
-        return S.e("img", this.attribs);
+        return this.e("img", this.attribs);
     }
 }

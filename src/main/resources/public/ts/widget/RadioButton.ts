@@ -54,12 +54,12 @@ export class RadioButton extends Comp {
     compRender(): ReactNode {
         this.attribs.checked = !!this.valueIntf.getValue();
 
-        return S.e("span", {
+        return this.e("span", {
             key: this.attribs.id + "_span",
             className: "myRadioButton custom-control custom-radio inline-radio"
         },
-            S.e("input", this.attribs),
-            S.e("label", {
+            this.e("input", this.attribs),
+            this.e("label", {
                 key: this.attribs.id + "_label",
                 htmlFor: this.attribs.id,
                 className: "custom-control-label radioLabel"

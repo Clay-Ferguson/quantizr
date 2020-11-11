@@ -21,6 +21,6 @@ export class AudioPlayer extends Comp {
     // }
 
     compRender(): ReactNode {
-        return S.e("audio", this.attribs);
+        return this.e("audio", this.attribs);
     }
 }

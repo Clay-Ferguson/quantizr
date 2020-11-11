@@ -107,10 +107,10 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     }
 
     domRender(): void {
-        const reactElm = S.e(this._render, this.attribs);
+        const reactElm = this.e(this._render, this.attribs);
 
         // console.log("Rendering with provider");
-        const provider = S.e(Provider, { store }, reactElm);
+        const provider = this.e(Provider, { store }, reactElm);
         ReactDOM.render(provider, this.backdrop);
     }
 

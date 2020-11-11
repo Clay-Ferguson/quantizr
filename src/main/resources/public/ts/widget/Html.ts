@@ -47,7 +47,7 @@ export class Html extends Comp {
         }
 
         this.attribs.dangerouslySetInnerHTML = { __html: this.getState().content };
-        return S.e("div", this.attribs);
+        return this.e("div", this.attribs);
     }
 
     /* We do two things in here: 1) update formula rendering, and 2) change all "a" tags inside this div to have a target=_blank */

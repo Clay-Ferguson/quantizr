@@ -93,8 +93,6 @@ export class Meta64 implements Meta64Intf {
     }
 
     selectTab = (tabName: string): void => {
-        // let state = store.getState();
-
         /* if tab is already active no need to update state now
 
         SOME codepaths like (openNode) are currently relying on selectTab
@@ -312,7 +310,6 @@ export class Meta64 implements Meta64Intf {
     }
 
     initApp = async (): Promise<void> => {
-
         return new Promise<void>(async (resolve, reject) => {
             console.log("initApp running.");
 

@@ -16,6 +16,7 @@ import { Form } from "../widget/Form";
 import { Icon } from "../widget/Icon";
 import { Img } from "../widget/Img";
 import { Span } from "../widget/Span";
+import { Log } from "../Log";
 import { TextField } from "../widget/TextField";
 
 let S: Singletons;
@@ -53,7 +54,6 @@ export class AudioPlayerDlg extends DialogBase {
     timeLeftState: ValidatedState<any> = new ValidatedState<any>();
 
     intervalTimer: any;
-
     playButton: Icon;
     pauseButton: Icon;
 
@@ -71,20 +71,21 @@ export class AudioPlayerDlg extends DialogBase {
     preLoad(): Promise<void> {
         if (!this.chaptersUrl) return null;
 
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
             let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(this.chaptersUrl);
 
-            axios.get(url, {})
-                .then((response) => {
-                    if (response.status === 200) {
-                        this.mergeState({ chapters: response.data });
-                    }
-                    resolve();
-                })
-                .catch((error) => {
-                    resolve();
-                    console.log(error);
-                });
+            try {
+                let response = await axios.get(url, {});
+                if (response.status === 200) {
+                    this.mergeState({ chapters: response.data });
+                }
+            }
+            catch (e) {
+                Log.error(e);
+            }
+            finally {
+                resolve();
+            }
         });
     }
 

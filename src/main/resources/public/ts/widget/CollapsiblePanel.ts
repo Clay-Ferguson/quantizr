@@ -30,12 +30,12 @@ export class CollapsiblePanel extends Comp {
         let style = this.textLink ? "file-link" : "btn btn-info ";
         let collapseClass = this.getState().expanded ? "expand" : "collapse";
 
-        return S.e("div", {
+        return this.e("div", {
             style: { marginTop: "10px", marginBottom: "10px" },
             key: "panel_" + this.getId()
         },
             // This span is the expande/collapse button itself
-            S.e("span", {
+            this.e("span", {
                 className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
                 // Warning: This can't be camel case!
                 "data-toggle": collapseClass,
@@ -45,7 +45,7 @@ export class CollapsiblePanel extends Comp {
             }, state.expanded ? this.expandedButtonText : this.collapsedButtonText),
 
             // This div and it's children holds the actual collapsible content.
-            S.e("div", {
+            this.e("div", {
                 className: collapseClass,
                 id: this.getId(),
                 key: "content_" + this.getId()

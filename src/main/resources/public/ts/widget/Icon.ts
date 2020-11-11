@@ -17,6 +17,6 @@ export class Icon extends Comp {
 
     compRender(): ReactNode {
         /* Yes Icon uses "i" tag, this is not a mistake */
-        return S.e("i", this.attribs);
+        return this.e("i", this.attribs);
     }
 }

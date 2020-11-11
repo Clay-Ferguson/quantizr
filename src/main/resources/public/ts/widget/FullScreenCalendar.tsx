@@ -27,7 +27,7 @@ export class FullScreenCalendar extends Main {
 
     state: AppState;
 
-    _render = (props: any): ReactNode => {
+    _render = (): ReactNode => {
         this.state = useSelector((state: AppState) => state);
         let nodeId = this.state.fullScreenCalendarId;
         let node: J.NodeInfo = S.meta64.findNodeById(this.state, nodeId);
@@ -36,10 +36,10 @@ export class FullScreenCalendar extends Main {
             console.log("Can't find nodeId " + nodeId);
         }
 
-        return S.e("div", {
+        return this.e("div", {
             className: "marginTop"
         },
-            S.e(FullCalendar, {
+            this.e(FullCalendar, {
                 plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
                 headerToolbar: {
                     left: "prev,next today,weekendsEventButton,addEventButton,closeCalendarButton",

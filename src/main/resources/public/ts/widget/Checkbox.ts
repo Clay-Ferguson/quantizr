@@ -54,15 +54,15 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         // convert that to exactly the value 'true' or else React itself (internal to React) will fail
         this.attribs.checked = !!this.valueIntf.getValue();
 
-        return S.e("span", {
+        return this.e("span", {
             key: this.attribs.id + "_span",
             // there is also a 'custom-control-inline' that could be used instead of 'inline-checkbox' but it adds space to the right
             // NOTE: custom-switch or custom-checkbox will work here with all other things being identical! The custom-switch shows
             // a little slider switch button instead of a box with a check.
             className: "custom-control custom-checkbox inline-checkbox"
-        }, S.e("input", this.attribs),
+        }, this.e("input", this.attribs),
             // warning without this label element the entire control fails to render, and this is apparently related to bootstrap itself.
-            S.e("label", {
+            this.e("label", {
                 key: this.attribs.id + "_label",
                 className: "custom-control-label " + (this.label ? "checkboxLabel" : ""),
                 htmlFor: this.attribs.id

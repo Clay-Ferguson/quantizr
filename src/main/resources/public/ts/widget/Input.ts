@@ -22,6 +22,6 @@ export class Input extends Comp {
 
     compRender(): ReactNode {
         this.attribs.value = this.getState().value;
-        return S.e("input", this.attribs);
+        return this.e("input", this.attribs);
     }
 }

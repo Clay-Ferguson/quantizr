@@ -18,6 +18,6 @@ export class Form extends Comp {
 
     compRender(): ReactNode {
         this.setChildren(this.initialChildren);
-        return S.e("div", this.attribs, this.buildChildren());
+        return this.e("div", this.attribs, this.buildChildren());
     }
 }

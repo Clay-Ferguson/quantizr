@@ -21,11 +21,6 @@ export class ToggleIcon extends Comp {
         });
     }
 
-    // onClick = (evt): void => {
-    //     let state = this.getState();
-    //     this.mergeState({toggle: !state.toggle});
-    // }
-
     _toggleClass = (): void => {
         let state = this.getState();
         this.mergeState({ toggle: !state.toggle });
@@ -35,6 +30,6 @@ export class ToggleIcon extends Comp {
         let state = this.getState();
         this.attribs.className = state.className + " " + (state.toggle ? this.toggleOnClass : this.toggleOffClass);
         /* Yes Icon used "i" tag, this is not a mistake */
-        return S.e("i", this.attribs);
+        return this.e("i", this.attribs);
     }
 }

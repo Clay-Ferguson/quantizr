@@ -21,6 +21,6 @@ export class TextareaTag extends Comp {
 
     compRender(): ReactNode {
         this.attribs.value = this.getState().value;
-        return S.e("textarea", this.attribs);
+        return this.e("textarea", this.attribs);
     }
 }

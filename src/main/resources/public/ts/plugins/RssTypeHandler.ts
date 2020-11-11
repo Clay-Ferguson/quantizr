@@ -324,9 +324,15 @@ export class RssTypeHandler extends TypeBase {
     /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px wide because
     otherwise we get rediculously large images */
     getDomPreUpdateFunction(parent: CompIntf): void {
-        S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el, i) => {
+        S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el: HTMLElement, i) => {
             el.style.borderRadius = ".6em";
             el.style.border = "1px solid gray";
+
+            /* Setting width to 100% and always removing height ensures the image does fit into our colum display
+            and also will not stretch */
+            el.style.maxWidth = "100%";
+            delete el.style.width;
+            el.removeAttribute("height");
         });
         S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-image", (el, i) => {
             el.style.maxWidth = "25%";

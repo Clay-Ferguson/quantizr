@@ -16,9 +16,8 @@ import { UserIntf } from "./intf/UserIntf";
 import { UtilIntf } from "./intf/UtilIntf";
 import { ViewIntf } from "./intf/ViewIntf";
 
-/* NOTE: If this Singleton pattern looks countrary to good module design, keep in mind all module systems
-are susceptible to circular references, and these Singtons are an unbreakable solution to that
-issue, due to the delayed pub-sub way of injecting them into wherever we need them. */
+/* Similar to a SpringContext in a Java app, these singletons are all pre-instantiated and guaranteed not
+to result in any circular-references during load time, because they instantiate only other interfaces */
 export interface Singletons {
     meta64: Meta64Intf;
     plugin: PluginMgrIntf;
@@ -37,7 +36,4 @@ export interface Singletons {
     activityPub: ActivityPubIntf;
     rssReader: RSSReaderIntf;
     localDB: LocalDBIntf;
-
-    e: Function; // React.createElement
-    log: Function; // console.log
 }

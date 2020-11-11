@@ -2,7 +2,7 @@
 // https://reactjs.org/docs/hooks-reference.html#usestate
 // #RulesOfHooks: https://fb.me/rules-of-hooks
 
-import { ReactElement, ReactNode, useEffect, useLayoutEffect, useState } from "react";
+import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import * as ReactDOM from "react-dom";
 import { renderToString } from "react-dom/server";
 import { Provider } from "react-redux";
@@ -28,6 +28,8 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     public debug: boolean = false;
     public debugState: boolean = false;
     private static guid: number = 0;
+
+    e: Function = createElement;
 
     /*
     DO NOT DELETE:
@@ -212,12 +214,12 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             ReactDOM.unmountComponentAtNode(elm);
 
             (this._render as any).displayName = this.jsClassName;
-            let reactElm = S.e(this._render, this.attribs);
+            let reactElm = this.e(this._render, this.attribs);
 
             /* If this component has a store then wrap with the Redux Provider to make it all reactive */
             if (store) {
                 // console.log("Rendering with provider");
-                let provider = S.e(Provider, { store }, reactElm);
+                let provider = this.e(Provider, { store }, reactElm);
                 ReactDOM.render(provider, elm);
             }
             else {
@@ -237,7 +239,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
                 try {
                     // console.log("ChildRender: " + child.jsClassName);
                     (this._render as any).displayName = child.jsClassName;
-                    reChild = S.e(child._render, child.attribs);
+                    reChild = this.e(child._render, child.attribs);
                 }
                 catch (e) {
                     console.error("Failed to render child " + child.jsClassName + " attribs.key=" + child.attribs.key);
@@ -288,11 +290,11 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
             if (children && children.length > 0) {
                 // console.log("Render Tag with children.");
-                return S.e(tag, props, children);
+                return this.e(tag, props, children);
             }
             else {
                 // console.log("Render Tag no children.");
-                return S.e(tag, props);
+                return this.e(tag, props);
             }
         }
         catch (e) {
@@ -334,7 +336,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
-    _render = (props: any): ReactNode => {
+    _render = (): ReactNode => {
         // console.log("render(): " + this.jsClassName);
         this.rendered = true;
 

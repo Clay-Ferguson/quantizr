@@ -24,14 +24,14 @@ export class ButtonBar extends Comp {
         if (!this.childrenExist()) return null;
 
         if (this.wrapperClass) {
-            return S.e("div", {
+            return this.e("div", {
                 className: "wrapper " + this.wrapperClass,
                 key: this.getId() + "_wrp"
             },
-                S.e("div", this.attribs, this.buildChildren()));
+                this.e("div", this.attribs, this.buildChildren()));
         }
         else {
-            return S.e("div", this.attribs, this.buildChildren());
+            return this.e("div", this.attribs, this.buildChildren());
         }
     }
 }

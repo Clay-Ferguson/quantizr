@@ -19,6 +19,6 @@ export class VideoPlayer extends Comp {
     }
 
     compRender(): ReactNode {
-        return S.e("video", this.attribs);
+        return this.e("video", this.attribs);
     }
 }

@@ -5,6 +5,7 @@ export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[
 
 export interface CompIntf {
     clazz: string;
+    e : Function;
 
     getId(): string;
     getElement(): HTMLElement;

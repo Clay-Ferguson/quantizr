@@ -32,20 +32,20 @@ export class IconButton extends Comp {
 
         let buttonChildren = [];
         if (this.imageUrl) {
-            buttonChildren.push(S.e("img", {
+            buttonChildren.push(this.e("img", {
                 key: "s_img_" + this.getId(),
                 src: this.imageUrl
             }));
         }
 
-        buttonChildren.push(S.e("i", {
+        buttonChildren.push(this.e("i", {
             key: "i_" + this.getId(),
             className: "fa fa-lg " + this.iconClass + toggleClass
-        }, [S.e("span", {
+        }, [this.e("span", {
             key: "s_txt_" + this.getId(),
             className: "button-font"
         }, this.text === null ? null : " " + this.text)], true));
 
-        return S.e("button", _attribs, buttonChildren);
+        return this.e("button", _attribs, buttonChildren);
     }
 }
