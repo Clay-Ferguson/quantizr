@@ -13,6 +13,7 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -333,7 +334,7 @@ public class AttachmentService {
 		if (ImageUtil.isImageMime(mimeType)) {
 
 			// default image to be 100% size
-			if (node.getStringProp(NodeProp.IMG_SIZE.s())==null) {
+			if (node.getStringProp(NodeProp.IMG_SIZE.s()) == null) {
 				node.setProp(NodeProp.IMG_SIZE.s(), "100%");
 			}
 
@@ -469,8 +470,7 @@ public class AttachmentService {
 
 			if (node == null) {
 				node = read.getNode(session, nodeId, false);
-			}
-			else {
+			} else {
 				nodeId = node.getId().toHexString();
 			}
 
@@ -934,11 +934,12 @@ public class AttachmentService {
 		deleteBinary(session, node);
 
 		// #saveAsPdf work in progress:
-		// todo-1: right here if saveAsPdf is true we need to convert the HTML to PDF and write that stream. 
+		// todo-1: right here if saveAsPdf is true we need to convert the HTML to PDF
+		// and write that stream.
 		// read stream into html as a string.
 		// create new outputstream (in memory) to write to (byte array stream)
 		// PdfConverterExtension.exportToPdf(out, html, "", options);
-		// get an inputstream that reads what was written, and put it in 'stream', 
+		// get an inputstream that reads what was written, and put it in 'stream',
 		// then the rest fo the code remains as is.
 
 		final String id = grid.store(stream, fileName, mimeType, metaData).toString();
@@ -966,9 +967,12 @@ public class AttachmentService {
 			final String mimeType) {
 		auth.auth(session, node, PrivilegeType.WRITE);
 		final ValContainer<Integer> streamSize = new ValContainer<Integer>();
-		final String ipfsHash = ipfsService.addFromStream(session, stream, mimeType, streamSize);
-		node.setProp(NodeProp.IPFS_LINK.s(), ipfsHash);
-		node.setProp(NodeProp.BIN_SIZE.s(), streamSize.getVal());
+		Map<String, Object> ret = ipfsService.addFromStream(session, stream, mimeType, streamSize);
+		if (ret != null) {
+			String hash = (String) ret.get("Hash");
+			node.setProp(NodeProp.IPFS_LINK.s(), hash);
+			node.setProp(NodeProp.BIN_SIZE.s(), streamSize.getVal());
+		}
 	}
 
 	public void deleteBinary(final MongoSession session, final SubNode node) {

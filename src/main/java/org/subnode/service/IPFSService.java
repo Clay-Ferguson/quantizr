@@ -8,6 +8,7 @@ import java.util.Map;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -40,6 +41,8 @@ import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
+// IPFS Reference: https://docs.ipfs.io/reference/http/api
+
 @Component
 public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
@@ -57,7 +60,6 @@ public class IPFSService {
      * one final static instance ever
      */
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
-
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
@@ -205,13 +207,56 @@ public class IPFSService {
         return ret;
     }
 
-    public String addFromStream(MongoSession session, InputStream stream, String mimeType,
+    /**
+     * Returns JSON
+     */
+    public final String dagGet(String hash) {
+        String ret = null;
+        try {
+            String url = appProp.getIPFSHost() + "/api/v0/dag/get?arg=" + hash;
+            ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
+            ret = result.getBody();
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.getForEntity", e);
+        }
+        return ret;
+    }
+
+
+    public Map<String, Object> dagPutFromString(MongoSession session, String val, String mimeType,
             ValContainer<Integer> streamSize) {
-        String hash = null;
+        return writeFromStream(session, "/api/v0/dag/put", IOUtils.toInputStream(val), mimeType, streamSize);
+    }
+
+    public Map<String, Object> dagPutFromStream(MongoSession session, InputStream stream, String mimeType,
+            ValContainer<Integer> streamSize) {
+        // {
+        //     "Cid": {
+        //     "/": "<cid-string>"
+        //     }
+        // }
+        return writeFromStream(session, "/api/v0/dag/put", stream, mimeType, streamSize);
+    }
+
+    public Map<String, Object> addFromStream(MongoSession session, InputStream stream, String mimeType,
+            ValContainer<Integer> streamSize) {
+        // the following other values are supposedly in the return...
+        // {
+        // "Bytes": "<int64>",
+        // "Hash": "<string>",
+        // "Name": "<string>",
+        // "Size": "<string>"
+        // }
+        return writeFromStream(session, "/api/v0/add?stream-channels=true", stream, mimeType, streamSize);
+    }
+
+    public Map<String, Object> writeFromStream(MongoSession session, String path, InputStream stream, String mimeType,
+            ValContainer<Integer> streamSize) {
+        Map<String, Object> ret = null;
         try {
             // https://docs-beta.ipfs.io/reference/http/api
             // --stream-channels bool - Stream channel output.
-            String url = appProp.getIPFSHost() + "/api/v0/add?stream-channels=true";
+            String url = appProp.getIPFSHost() + path;
             HttpHeaders headers = new HttpHeaders();
 
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -222,28 +267,17 @@ public class IPFSService {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {
+            });
 
-            // todo-1: create dedicated return object for this (json marshalled)
-            Map<String, Object> respMap = mapper.readValue(response.getBody(),
-                    new TypeReference<Map<String, Object>>() {
-                    });
-
-            // log.debug("respMap=" + XString.prettyPrint(respMap));
-
-            hash = (String) respMap.get("Hash");
-            streamSize.setVal((int) lis.getCount());
-            // the following other values are supposedly in the return...
-            // {
-            // "Bytes": "<int64>",
-            // "Hash": "<string>",
-            // "Name": "<string>",
-            // "Size": "<string>"
-            // }
-
+            // log.debug("respMap=" + XString.prettyPrint(ret));
+            if (streamSize != null) {
+                streamSize.setVal((int) lis.getCount());
+            }
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
         }
-        return hash;
+        return ret;
     }
 
     public InputStream getStream(MongoSession session, String hash, String mimeType) {
@@ -261,9 +295,6 @@ public class IPFSService {
 
             request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
             HttpResponse response = client.execute(request);
-            // log.debug("Response Code: " + response.getStatusLine().getStatusCode() + "
-            // reason="
-            // + response.getStatusLine().getReasonPhrase());
             InputStream is = response.getEntity().getContent();
             return is;
         } catch (Exception e) {
