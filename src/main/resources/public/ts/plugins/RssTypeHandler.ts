@@ -1,3 +1,4 @@
+import axios from "axios";
 import * as RssParser from "rss-parser";
 import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
@@ -19,6 +20,7 @@ import { Html } from "../widget/Html";
 import { TextContent } from "../widget/TextContent";
 import { TypeBase } from "./base/TypeBase";
 import { Span } from "../widget/Span";
+import { Log } from "../Log";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -154,7 +156,6 @@ export class RssTypeHandler extends TypeBase {
                 }
             });
         }
-
         return itemListContainer;
     }
 
@@ -290,7 +291,20 @@ export class RssTypeHandler extends TypeBase {
             let audioButton = new Button("Play Audio", //
                 () => {
                     let chaptersUrl = (entry.podcastChapters && entry.podcastChapters.$) ? entry.podcastChapters.$.url : null;
-                    new AudioPlayerDlg(feed.title, entry.title, entry.enclosure.url, chaptersUrl, state).open();
+                    let chaptersDiv = null;
+                    if (chaptersUrl) {
+                        chaptersDiv = new Div(null, { className: "rssChapterPanel" });
+                        chaptersDiv.preRender = () => {
+                            this.renderChapters(dlg, chaptersDiv);
+                        };
+                    }
+
+                    let dlg = new AudioPlayerDlg(feed.title, entry.title, chaptersDiv, entry.enclosure.url, state);
+                    dlg.open();
+
+                    if (chaptersDiv) {
+                        this.asyncLoadChapters(chaptersDiv, chaptersUrl);
+                    }
                 });
 
             children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));
@@ -319,6 +333,57 @@ export class RssTypeHandler extends TypeBase {
         children.push(new Div(null, { className: "clearfix" }));
 
         return new Div(null, { className: "rss-feed-item" }, children);
+    }
+
+    renderChapters = (chaptersDiv: AudioPlayerDlg, div: CompIntf): void => {
+        let state = div.getState();
+        div.setChildren([]);
+
+        if (state.chapters) {
+            for (let chapter of state.chapters.chapters) {
+
+                if (chapter.img) {
+                    div.addChild(new Img(null, {
+                        className: "rssChapterImage",
+                        src: chapter.img
+                    }));
+                }
+
+                div.addChild(new Span(chapter.title, {
+                    className: "rssChapterTitle",
+                    onClick: () => {
+                        if (chaptersDiv.player) {
+                            chaptersDiv.player.currentTime = chapter.startTime;
+                        }
+                    }
+                }));
+
+                if (chapter.url) {
+                    div.addChild(new Anchor(chapter.url, "[ Link ]", {
+                        className: "rssChapterLink",
+                        target: "_blank"
+                    }));
+                }
+            }
+        }
+    }
+
+    asyncLoadChapters = async (chaptersDiv: Div, chaptersUrl: string) => {
+        console.log("chapters: " + chaptersUrl);
+        if (!chaptersUrl) return null;
+
+        let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(chaptersUrl);
+
+        try {
+            let response = await axios.get(url, {});
+            if (response.status === 200) {
+                alert("About to render.");
+                chaptersDiv.mergeState({ chapters: response.data });
+            }
+        }
+        catch (e) {
+            Log.error(e);
+        }
     }
 
     /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px wide because

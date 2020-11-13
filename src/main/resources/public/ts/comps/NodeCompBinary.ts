@@ -110,7 +110,7 @@ export class NodeCompBinary extends Div {
         else if (S.props.hasAudio(this.node)) {
             this.setChildren([new ButtonBar([
                 new Button("Play Audio", () => {
-                    new AudioPlayerDlg(null, null, S.render.getStreamUrlForNodeAttachment(this.node), null, state).open();
+                    new AudioPlayerDlg(null, null, null, S.render.getStreamUrlForNodeAttachment(this.node), state).open();
                 }),
                 new Span("", {
                     className: "audioDownloadLink"

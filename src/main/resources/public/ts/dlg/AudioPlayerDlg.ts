@@ -57,7 +57,7 @@ export class AudioPlayerDlg extends DialogBase {
     pauseButton: Icon;
 
     /* chapters url is the "podcast:chapters" url from RSS feeds */
-    constructor(private customTitle, private customSubTitle: string, private sourceUrl: string, private chaptersUrl: string, state: AppState) {
+    constructor(private customTitle, private customSubTitle: string, private customDiv: CompIntf, private sourceUrl: string, state: AppState) {
         super(customTitle || "Audio Player", null, false, state);
 
         this.urlHash = S.util.hashOfString(sourceUrl);
@@ -65,30 +65,6 @@ export class AudioPlayerDlg extends DialogBase {
         this.intervalTimer = setInterval(() => {
             this.oneMinuteTimeslice();
         }, 60000);
-    }
-
-    preLoad(): Promise<void> {
-        if (!this.chaptersUrl) return null;
-
-        return new Promise<void>(async (resolve, reject) => {
-            let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(this.chaptersUrl);
-
-            try {
-                let response = await axios.get(url, {});
-                if (response.status === 200) {
-                    // todo-0: need to put chapters area in it's own state so that we can stop doing a wait
-                    // for the chapters query, and just start playing immediately even if chapters is going to load in the backgrouind
-                    // or potentially just timeout which can happen too, even on a 'good' feed.
-                    this.mergeState({ chapters: response.data });
-                }
-            }
-            catch (e) {
-                Log.error(e);
-            }
-            finally {
-                resolve();
-            }
-        });
     }
 
     preUnmount(): any {
@@ -175,7 +151,7 @@ export class AudioPlayerDlg extends DialogBase {
                         this.speed(2);
                     })
                 ]),
-                this.createChaptersDiv()
+                this.customDiv
             ])
         ];
 
@@ -203,43 +179,6 @@ export class AudioPlayerDlg extends DialogBase {
             this.pauseButton.whenElm((elm: HTMLAudioElement) => {
                 elm.style.display = !this.player.paused && !this.player.ended ? "inline-block" : "none";
             });
-        }
-    }
-
-    createChaptersDiv = (): Div => {
-        let div: Div = null;
-        let state = this.getState();
-        if (state.chapters) {
-            div = new Div(null, { className: "rssChapterPanel" });
-
-            for (let chapter of state.chapters.chapters) {
-                let chapDiv = new Div();
-
-                if (chapter.img) {
-                    chapDiv.addChild(new Img(null, {
-                        className: "rssChapterImage",
-                        src: chapter.img
-                    }));
-                }
-
-                chapDiv.addChild(new Span(chapter.title, {
-                    className: "rssChapterTitle",
-                    onClick: () => {
-                        if (this.player) {
-                            this.player.currentTime = chapter.startTime;
-                        }
-                    }
-                }));
-
-                if (chapter.url) {
-                    chapDiv.addChild(new Anchor(chapter.url, "[ Link ]", {
-                        className: "rssChapterLink",
-                        target: "_blank"
-                    }));
-                }
-                div.addChild(chapDiv);
-            }
-            return div;
         }
     }
 
