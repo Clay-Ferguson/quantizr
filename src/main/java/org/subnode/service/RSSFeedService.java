@@ -78,6 +78,8 @@ public class RSSFeedService {
 	// NOTE: Same value appears in RSSTypeHandler.ts
 	private static final int MAX_FEED_ITEMS = 200;
 
+	private static final int MAX_FEEDS_PER_AGGREGATE = 40;
+
 	/*
 	 * Runs immediately at startup, and then every 120 minutes, to refresh the
 	 * feedCache.
@@ -155,7 +157,6 @@ public class RSSFeedService {
 			}
 
 			feed = new SyndFeedImpl();
-
 			feed.setEncoding("UTF-8");
 			feed.setFeedType("rss_2.0");
 			feed.setTitle("");
@@ -172,6 +173,7 @@ public class RSSFeedService {
 
 			// Scan to collect all the urls.
 			if (children != null) {
+				int count = 0;
 				for (final SubNode n : children) {
 					/* avoid infinite recursion here! */
 					if (n.getId().toHexString().equals(nodeId))
@@ -180,6 +182,9 @@ public class RSSFeedService {
 					String feedSrc = n.getStringProp(NodeProp.RSS_FEED_SRC.s());
 					if (!StringUtils.isEmpty(feedSrc) && !feedSrc.contains(nodeId)) {
 						urls.add(feedSrc);
+						if (++count >= MAX_FEEDS_PER_AGGREGATE) {
+							break;
+						}
 					}
 				}
 			}

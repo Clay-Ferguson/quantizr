@@ -38,7 +38,6 @@ export class AudioPlayerDlg extends DialogBase {
 
     player: HTMLAudioElement;
     audioPlayer: AudioPlayer;
-
     startTimePending: number = null;
 
     /*
@@ -58,8 +57,8 @@ export class AudioPlayerDlg extends DialogBase {
     pauseButton: Icon;
 
     /* chapters url is the "podcast:chapters" url from RSS feeds */
-    constructor(private customTitle: string, private sourceUrl: string, private chaptersUrl: string, state: AppState) {
-        super("Audio Player", null, false, state);
+    constructor(private customTitle, private customSubTitle: string, private sourceUrl: string, private chaptersUrl: string, state: AppState) {
+        super(customTitle || "Audio Player", null, false, state);
 
         this.urlHash = S.util.hashOfString(sourceUrl);
         this.startTimePending = localStorage[this.urlHash];
@@ -77,6 +76,9 @@ export class AudioPlayerDlg extends DialogBase {
             try {
                 let response = await axios.get(url, {});
                 if (response.status === 200) {
+                    // todo-0: need to put chapters area in it's own state so that we can stop doing a wait
+                    // for the chapters query, and just start playing immediately even if chapters is going to load in the backgrouind
+                    // or potentially just timeout which can happen too, even on a 'good' feed.
                     this.mergeState({ chapters: response.data });
                 }
             }
@@ -115,7 +117,7 @@ export class AudioPlayerDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         let children = [
             new Form(null, [
-                this.customTitle ? new Div(this.customTitle, { className: "dialogTitle" }) : null,
+                this.customSubTitle ? new Div(this.customSubTitle, { className: "dialogSubTitle" }) : null,
                 this.audioPlayer = new AudioPlayer({
                     src: this.sourceUrl,
                     className: "audioPlayer",

@@ -629,7 +629,11 @@ input[type="radio"] {
 
 .anchorBigMarginBottom {
     display: inline-block;
-    margin-bottom: $bigGap; 
+    margin-bottom: $smallGap; 
+    cursor: pointer;
+    padding: 8px;
+    border-radius: .6em;
+    border: 1px solid olivedrab;
 }
 
 .microMarginTop {
@@ -890,6 +894,10 @@ input[type="radio"] {
     font-size: 30px;
 }
 
+.dialogSubTitle {
+    font-size: 20px;
+}
+
 .dialog-header {
     font-weight: bold;
     font-size: large;
@@ -978,6 +986,7 @@ input[type="radio"] {
 .nodeName {
     padding: 4px;
     margin-right: 10px;
+    cursor: pointer;
 }
 
 .content-narrow {

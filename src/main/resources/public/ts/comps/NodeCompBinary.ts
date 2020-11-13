@@ -78,11 +78,9 @@ export class NodeCompBinary extends Div {
             type: "Action_ClickImage",
             state,
             update: (s: AppState): void => {
-
                 if (s.fullScreenViewId && this.isFullScreenEmbed) {
                     s.fullScreenImageSize = s.fullScreenImageSize ? "" : "100%";
                 }
-
                 s.fullScreenViewId = nodeId;
             }
         });
@@ -112,7 +110,7 @@ export class NodeCompBinary extends Div {
         else if (S.props.hasAudio(this.node)) {
             this.setChildren([new ButtonBar([
                 new Button("Play Audio", () => {
-                    new AudioPlayerDlg(null, S.render.getStreamUrlForNodeAttachment(this.node), null, state).open();
+                    new AudioPlayerDlg(null, null, S.render.getStreamUrlForNodeAttachment(this.node), null, state).open();
                 }),
                 new Span("", {
                     className: "audioDownloadLink"

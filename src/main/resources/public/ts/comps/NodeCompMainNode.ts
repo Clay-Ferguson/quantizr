@@ -37,8 +37,6 @@ export class NodeCompMainNode extends Div {
         let selected: boolean = (focusNode && focusNode.id === node.id);
         this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main");
 
-        // console.log("fadeInId=" + S.render.fadeInId + " allowFadeInId=" + S.render.allowFadeInId);
-
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
             S.render.allowFadeInId = false;

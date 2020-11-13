@@ -17,7 +17,6 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
     constructor(public label: string = null, _attribs: Object = null, private valueIntf: ValueIntf) {
         super(_attribs);
 
-        /* Manage state internally if no valueIntf passed in */
         if (!valueIntf) {
             this.valueIntf = new CompValueHolder<string>(this, "val");
         }

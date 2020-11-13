@@ -32,8 +32,6 @@ export class NodeCompMarkdown extends Html {
         let att: any = {
         };
 
-        // console.log("Rendering NodeID=" + node.id + " content=" + node.content);
-
         if (content.startsWith(J.Constant.ENC_TAG)) {
             att.content = "[Encrypted]";
             att.pendingDecrypt = content;
@@ -56,22 +54,12 @@ export class NodeCompMarkdown extends Html {
                     this.attribs.className += " mousePointer";
                     this.attribs.title = "Click to edit";
                     this.attribs.onClick = this.clickToEdit;
-
-                    // This was an experiment to help users know where to click, and it does that, but
-                    // the margin makes the web page content 'shift' around when user is only just clicking around
-                    // and that is super ugly.
-                    // this.attribs.style = {
-                    //     border: "1px solid rgb(118, 109, 97)",
-                    //     borderRadius: ".6em",
-                    //     margin: "6px"
-                    // };
                 }
             }
         }
     }
 
     clickToEdit = (evt: any): void => {
-
         // if user clicks an anchor tag inside this markdown we want to ignore that here.
         if (evt.target.href) {
             return;
@@ -92,7 +80,6 @@ export class NodeCompMarkdown extends Html {
         let val = "";
 
         if (node.type === J.NodeType.PLAIN_TEXT) {
-
             let nowrapProp: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.NOWRAP, node);
             let wordWrap = !(nowrapProp && nowrapProp.value === "1");
 

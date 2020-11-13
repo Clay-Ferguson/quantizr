@@ -18,8 +18,6 @@ export class RightNavPanel extends Div {
     }
 
     preRender(): void {
-        const state: AppState = useSelector((state: AppState) => state);
-        // let buttons: Comp[] = this.getButtons(state);
-        // this.setChildren(buttons);
+        // const state: AppState = useSelector((state: AppState) => state);
     }
 }

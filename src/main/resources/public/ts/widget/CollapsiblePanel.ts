@@ -11,7 +11,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class CollapsiblePanel extends Comp {
 
-    /* If textLink=true that means we show just a text link and not a button */
     constructor(private collapsedButtonText: string, private expandedButtonText: string, attribs: Object = {}, initialChildren: Comp[] = null, private textLink: boolean = false,
         private stateCallback: Function = null, expanded: boolean = false, private extraToggleButtonClass = "") {
         super(attribs);

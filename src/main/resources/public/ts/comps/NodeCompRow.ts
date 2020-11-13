@@ -59,8 +59,6 @@ export class NodeCompRow extends Div {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         let id: string = node.id;
-        // console.log("Rendering NodeCompRow. id=" + node.id);
-
         this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
 
         let insertInlineButton = null;
@@ -88,7 +86,6 @@ export class NodeCompRow extends Div {
         }
 
         let layoutClass = this.isTableCell ? "node-grid-item" : "node-table-row";
-
         const layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, this.node);
 
         // if this node has children as columnar layout, and is rendering as the root node of a page or a node that is expanded inline,

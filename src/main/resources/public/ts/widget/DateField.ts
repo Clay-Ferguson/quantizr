@@ -18,7 +18,6 @@ export class DateField extends Div implements I.ValueIntf {
         super(null);
     }
 
-    // Overriding base class so we can focus the correct part of this composite component.
     focus(): void {
         this.whenElm((elm: HTMLSelectElement) => {
             this.input.focus();

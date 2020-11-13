@@ -19,9 +19,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompContent extends Div {
 
-    /* switches for performance testing. */
     static showRowHeader: boolean = true;
-
     domPreUpdateFunc: Function;
 
     constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix?: string, public isFeed?: boolean, public imgSizeOverride?: string) {
@@ -45,7 +43,6 @@ export class NodeCompContent extends Div {
 
         let children: CompIntf[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-
         this.maybeRenderDateTime(children, J.NodeProp.DATE, "Date", node);
 
         if (state.showProperties) {
@@ -89,7 +86,6 @@ export class NodeCompContent extends Div {
 
     maybeRenderDateTime = (children: CompIntf[], propName: string, displayName: string, node: J.NodeInfo): void => {
         let timestampVal = S.props.getNodePropVal(propName, node);
-        // console.log("TimestampVal id=" + node.id + " val=" + timestampVal);
         if (timestampVal) {
             let dateVal: Date = new Date(parseInt(timestampVal));
             let timeStr = dateVal.toLocaleTimeString().replace(":00 ", " ");

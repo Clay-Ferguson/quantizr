@@ -59,24 +59,32 @@ export class NodeCompRowHeader extends Div {
 
             if (node.name) {
                 children.push(new Span(node.name, {
-                    className: "btn-secondary nodeName"
+                    className: "btn-secondary nodeName",
+                    title: "Click -> URL into clipboard",
+                    onClick: () => {
+                        let url = window.location.origin + S.util.getPathPartForNamedNode(node);
+                        S.util.copyToClipboard(url);
+                        S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                    }
                 }));
             }
 
-            // only for admin user do we show ID, ordinal, and type as a string
-            if (state.isAdminUser) {
-                children.push(new Span(
-                    "ID:" + node.id + " " + //
-                    "[" + node.logicalOrdinal + "] " + //
-                    node.type + //
-                    (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") //
-                ));
-            }
-            // if not admin user just show mod time here.
-            else {
-                children.push(new Span(
-                    (node.lastModified ? " " + S.util.formatDate(new Date(node.lastModified)) : "") //
-                ));
+            children.push(new Span(
+                node.id + "-" + node.logicalOrdinal + " " + (node.type === "u" ? "" : node.type), //
+                {
+                    title: "Click -> URL into clipboard",
+                    onClick: () => {
+                        let url = window.location.origin + "/app?id=" + node.id;
+                        S.util.copyToClipboard(url);
+                        S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                    }
+                }
+            ));
+
+            if (node.lastModified) {
+                children.push(new Span(S.util.formatDate(new Date(node.lastModified)), {
+                    className: "float-right"
+                }));
             }
 
             if (priority) {

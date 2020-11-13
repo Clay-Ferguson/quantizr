@@ -214,14 +214,14 @@ export class RssTypeHandler extends TypeBase {
         let itemCount = 0;
 
         for (let item of feed.items) {
-            itemListContainer.getChildren().push(this.buildFeedItem(item, state));
+            itemListContainer.getChildren().push(this.buildFeedItem(feed, item, state));
             if (++itemCount >= RssTypeHandler.MAX_FEED_ITEMS) {
                 break;
             }
         }
     }
 
-    buildFeedItem(entry, state: AppState): Comp {
+    buildFeedItem(feed: any, entry: any, state: AppState): Comp {
         let children: Comp[] = [];
         let headerDivChildren = [];
 
@@ -290,7 +290,7 @@ export class RssTypeHandler extends TypeBase {
             let audioButton = new Button("Play Audio", //
                 () => {
                     let chaptersUrl = (entry.podcastChapters && entry.podcastChapters.$) ? entry.podcastChapters.$.url : null;
-                    new AudioPlayerDlg(entry.title, entry.enclosure.url, chaptersUrl, state).open();
+                    new AudioPlayerDlg(feed.title, entry.title, entry.enclosure.url, chaptersUrl, state).open();
                 });
 
             children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));

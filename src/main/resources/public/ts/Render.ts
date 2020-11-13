@@ -166,87 +166,104 @@ export class Render implements RenderIntf {
 
         const children = [];
 
-        // todo-1: need copy-to-clipboard links here!
-
         let url = window.location.origin + "/app?id=" + node.id;
-        children.push(new Heading(5, "View Node By ID"));
-        children.push(new Anchor(url, url, {
-            target: "_blank",
-            className: "anchorBigMarginBottom"
+        children.push(new Heading(5, "By ID"));
+        children.push(new Div(url, {
+            className: "anchorBigMarginBottom",
+            title: "Click -> Copy to clipboard",
+            onClick: () => {
+                S.util.copyToClipboard(url);
+                S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+            }
         }));
 
+        if (node.name) {
+            url = window.location.origin + S.util.getPathPartForNamedNode(node);
+            children.push(new Heading(5, "By Name"));
+            children.push(new Div(url, {
+                className: "anchorBigMarginBottom",
+                title: "Click -> Copy to clipboard",
+                onClick: () => {
+                    S.util.copyToClipboard(url);
+                    S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                }
+            }));
+        }
+
         let rssFeed = window.location.origin + "/rss?id=" + node.id;
-        children.push(new Heading(5, "RSS Feed"));
-        children.push(new Anchor(rssFeed, rssFeed, {
-            target: "_blank",
-            className: "anchorBigMarginBottom"
+        children.push(new Heading(5, "Node RSS Feed"));
+        children.push(new Div(rssFeed, {
+            className: "anchorBigMarginBottom",
+            title: "Click -> Copy to clipboard",
+            onClick: () => {
+                S.util.copyToClipboard(rssFeed);
+                S.util.flashMessage("Copied to Clipboard: " + rssFeed, "Clipboard", true);
+            }
         }));
 
         let bin = S.props.getNodePropVal(J.NodeProp.BIN, node);
         if (bin) {
             let url = window.location.origin + "/f/id/" + node.id;
             children.push(new Heading(5, "View Attachment By Id"));
-            children.push(new Anchor(url, url, {
-                target: "_blank",
-                className: "anchorBigMarginBottom"
+            children.push(new Div(url, {
+                className: "anchorBigMarginBottom",
+                title: "Click -> Copy to clipboard",
+                onClick: () => {
+                    S.util.copyToClipboard(url);
+                    S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                }
             }));
 
             url += "?download=y";
             children.push(new Heading(5, "Download Attachment By Id"));
-            children.push(new Anchor(url, url, {
-                target: "_blank",
-                className: "anchorBigMarginBottom"
+            children.push(new Div(url, {
+                className: "anchorBigMarginBottom",
+                title: "Click -> Copy to clipboard",
+                onClick: () => {
+                    S.util.copyToClipboard(url);
+                    S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                }
             }));
         }
 
         if (node.name) {
-            url = window.location.origin + S.util.getPathPartForNamedNode(node);
-            children.push(new Heading(5, "View Node By Name"));
-            children.push(new Anchor(url, url, {
-                target: "_blank",
-                className: "anchorBigMarginBottom"
-            }));
-
             if (bin) {
                 url = window.location.origin + S.util.getPathPartForNamedNodeAttachment(node);
                 children.push(new Heading(5, "View Attachment By Name"));
-                children.push(new Anchor(url, url, {
-                    target: "_blank",
-                    className: "anchorBigMarginBottom"
+                children.push(new Div(url, {
+                    className: "anchorBigMarginBottom",
+                    title: "Click -> Copy to clipboard",
+                    onClick: () => {
+                        S.util.copyToClipboard(url);
+                        S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                    }
                 }));
 
                 url += "?download=y";
                 children.push(new Heading(5, "Download Attachment By Name"));
-                children.push(new Anchor(url, url, {
-                    target: "_blank",
-                    className: "anchorBigMarginBottom"
+                children.push(new Div(url, {
+                    className: "anchorBigMarginBottom",
+                    title: "Click -> Copy to clipboard",
+                    onClick: () => {
+                        S.util.copyToClipboard(url);
+                        S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                    }
                 }));
             }
         }
 
-        // Disabling this for now since the Quanta server doesn't directly expose it's Gateway to the outside world.
-        // let attachmentIpfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
-        // if (attachmentIpfsLink) {
-        //     url = S.render.getUrlForNodeAttachment(node, true);
-        //     children.push(new Heading(5, "IPFS File Attachment"));
-        //     children.push(new Anchor(url, url, {
-        //         target: "_blank",
+        // why was this still here?
+        // const jsonIpfsLink = S.props.getNodePropVal(J.NodeProp.JSON_HASH, node);
+        // if (jsonIpfsLink) {
+        //     url = C.IPFS_IO_GATEWAY + jsonIpfsLink;
+        //     children.push(new Heading(5, "IPFS Node JSON"));
+        //     children.push(new Div(url, {
         //         className: "anchorBigMarginBottom"
         //     }));
         // }
 
-        const jsonIpfsLink = S.props.getNodePropVal(J.NodeProp.JSON_HASH, node);
-        if (jsonIpfsLink) {
-            url = C.IPFS_IO_GATEWAY + jsonIpfsLink;
-            children.push(new Heading(5, "IPFS Node JSON"));
-            children.push(new Anchor(url, url, {
-                target: "_blank",
-                className: "anchorBigMarginBottom"
-            }));
-        }
-
         const linksDiv = new Div(null, null, children);
-        new MessageDlg(null, "URLs", null, linksDiv, false, 0, null).open();
+        new MessageDlg(null, "URLs for Node " + node.id, null, linksDiv, false, 0, null).open();
     }
 
     allowAction = (typeHandler: TypeHandlerIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean => {

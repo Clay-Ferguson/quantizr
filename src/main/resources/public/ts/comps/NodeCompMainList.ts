@@ -16,7 +16,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMainList extends Div {
-
     constructor() {
         super(null);
     }
@@ -47,7 +46,6 @@ export class NodeCompMainList extends Div {
         let firstButton: Comp;
         let prevButton: Comp;
         let nextButton: Comp;
-
         let firstChild: J.NodeInfo = S.edit.getFirstChildNode(state);
 
         if (firstChild && firstChild.logicalOrdinal > 0) {

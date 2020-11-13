@@ -20,7 +20,6 @@ export class ButtonBar extends Comp {
     }
 
     compRender(): ReactNode {
-        // console.log("compRender: "+this.jsClassName);
         if (!this.childrenExist()) return null;
 
         if (this.wrapperClass) {

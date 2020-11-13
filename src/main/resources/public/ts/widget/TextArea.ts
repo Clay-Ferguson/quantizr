@@ -40,7 +40,6 @@ export class TextArea extends Span implements I.TextEditorIntf {
     }
 
     insertTextAtCursor = (text: string) => {
-        // should we implement this ? todo-1
     }
 
     setMode(mode: string): void {

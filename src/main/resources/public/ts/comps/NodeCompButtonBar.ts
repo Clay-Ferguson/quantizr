@@ -115,8 +115,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
          * intelligence to when to show these buttons or not.
          */
         if (state.userPreferences.editMode) {
-            // console.log("Editing allowed: " + nodeId);
-
             if (editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, node, state)) &&
                 // no need to ever select home node
                 node.id !== state.homeNodeId) {
@@ -216,7 +214,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
         }
 
         let buttonBar = new ButtonBar(btnArray, null, "marginLeftIfNotFirst");
-
         let navButtonBar = null;
 
         if (isPageRootNode) {

@@ -28,7 +28,6 @@ export class EditPrivsTableRow extends ListBoxRow {
                 ], "marginAll")
             );
         }, this);
-
         return div;
     }
 

@@ -12,11 +12,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class Para extends Comp {
 
-    constructor(public content: string = "", attribs : Object = {}) {
+    constructor(public content: string = null, attribs : Object = {}) {
         super(attribs);
     }
 
     compRender(): ReactNode {
-        return this.e("p", this.attribs, (this.content || ""));
+        return this.e("p", this.attribs, this.content || "");
     }
 }

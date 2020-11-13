@@ -33,9 +33,6 @@ export class NodeCompRowFooter extends Div {
                 onClick: () => S.edit.addComment(node, state)
             }));
         }
-        else {
-
-        }
         this.setChildren(children);
     }
 }

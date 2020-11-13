@@ -11,7 +11,6 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Anchor } from "./Anchor";
 import { Div } from "./Div";
-import { IconButton } from "./IconButton";
 import { Li } from "./Li";
 import { Ul } from "./Ul";
 
@@ -136,7 +135,6 @@ export class TabPanel extends Div {
         // Tab content below buttons
         let tabContent = new Div(null, {
             className: "row tab-content",
-            // id: "mainScrollingArea",
             role: "main"
         }, [
             new MainTabComp(),

@@ -6,10 +6,6 @@ export class EditPrivsTable extends ListBox {
 
     constructor(public nodePrivsInfo: I.NodePrivilegesInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
         super(null);
-
-        // let width = window.innerWidth * 0.6;
-        // let height = window.innerHeight * 0.4;
-        // (<any>this.attribs).style = `width:${width}px;height:${height}px;overflow:scroll;border:4px solid lightGray;`;
     }
 
     preRender(): void {

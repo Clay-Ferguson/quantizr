@@ -10,14 +10,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 declare var ace;
-/* FYI: Before switching to React we needed the 'escapeHtml' in here, but it appears after moving to ReactJS it was no longer necessary */
 export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
 
     aceEditor: any;
     initialValue: string;
 
     constructor(value: string, public heightString, public aceMode: string, public wordWrap: boolean = true) {
-        // super(S.util.escapeHtml(propEntry.property.value), {});
         super(value, {});
 
         this.aceMode = this.aceMode || "ace/mode/text";
@@ -31,8 +29,6 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
         });
 
         this.initialValue = value; // S.util.escapeHtml(propEntry.property.value);
-
-        // console.log("InitialValue(for Ace editor)="+this.initialValue);
 
         this.whenElm((elm: HTMLElement) => {
             this.aceEditor = ace.edit(this.getId());
@@ -102,21 +98,17 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
         return this.aceEditor;
     }
 
-    // should we make this just return a promise, and wait for the control ?
     getValue(): string {
         if (!this.aceEditor) {
-            // console.log("Ace.getValue(1)="+this.initialValue);
             return this.initialValue;
         }
         let val = this.aceEditor.getValue();
-        // console.log("Ace.getValue(2)="+val);
         return val;
     }
 
     setValue(val: string): void {
         this.whenElm((elm: HTMLElement) => {
-            // console.log("Ace.setValue="+val);
-            this.aceEditor.setValue(val /* S.util.escapeHtml(val) */, 0);
+            this.aceEditor.setValue(val, 0);
         });
     }
 }
