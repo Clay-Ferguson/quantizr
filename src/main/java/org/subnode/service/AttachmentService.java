@@ -967,7 +967,7 @@ public class AttachmentService {
 			final String mimeType) {
 		auth.auth(session, node, PrivilegeType.WRITE);
 		final ValContainer<Integer> streamSize = new ValContainer<Integer>();
-		Map<String, Object> ret = ipfsService.addFromStream(session, stream, mimeType, streamSize);
+		Map<String, Object> ret = ipfsService.addFromStream(session, stream, mimeType, streamSize, null);
 		if (ret != null) {
 			String hash = (String) ret.get("Hash");
 			node.setProp(NodeProp.IPFS_LINK.s(), hash);

@@ -216,30 +216,30 @@ public class IPFSService {
             String url = appProp.getIPFSHost() + "/api/v0/dag/get?arg=" + hash;
             ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
             ret = result.getBody();
+            log.debug("RET: " + ret);
         } catch (Exception e) {
             log.error("Failed in restTemplate.getForEntity", e);
         }
         return ret;
     }
 
-
     public Map<String, Object> dagPutFromString(MongoSession session, String val, String mimeType,
-            ValContainer<Integer> streamSize) {
-        return writeFromStream(session, "/api/v0/dag/put", IOUtils.toInputStream(val), mimeType, streamSize);
+            ValContainer<Integer> streamSize, ValContainer<String> cid) {
+        return writeFromStream(session, "/api/v0/dag/put", IOUtils.toInputStream(val), mimeType, streamSize, cid);
     }
 
     public Map<String, Object> dagPutFromStream(MongoSession session, InputStream stream, String mimeType,
-            ValContainer<Integer> streamSize) {
+            ValContainer<Integer> streamSize, ValContainer<String> cid) {
         // {
-        //     "Cid": {
-        //     "/": "<cid-string>"
-        //     }
+        // "Cid": {
+        // "/": "<cid-string>"
         // }
-        return writeFromStream(session, "/api/v0/dag/put", stream, mimeType, streamSize);
+        // }
+        return writeFromStream(session, "/api/v0/dag/put", stream, mimeType, streamSize, cid);
     }
 
     public Map<String, Object> addFromStream(MongoSession session, InputStream stream, String mimeType,
-            ValContainer<Integer> streamSize) {
+            ValContainer<Integer> streamSize, ValContainer<String> cid) {
         // the following other values are supposedly in the return...
         // {
         // "Bytes": "<int64>",
@@ -247,11 +247,11 @@ public class IPFSService {
         // "Name": "<string>",
         // "Size": "<string>"
         // }
-        return writeFromStream(session, "/api/v0/add?stream-channels=true", stream, mimeType, streamSize);
+        return writeFromStream(session, "/api/v0/add?stream-channels=true", stream, mimeType, streamSize, cid);
     }
 
     public Map<String, Object> writeFromStream(MongoSession session, String path, InputStream stream, String mimeType,
-            ValContainer<Integer> streamSize) {
+            ValContainer<Integer> streamSize, ValContainer<String> cid) {
         Map<String, Object> ret = null;
         try {
             // https://docs-beta.ipfs.io/reference/http/api
@@ -270,10 +270,58 @@ public class IPFSService {
             ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {
             });
 
+            if (cid != null) {
+                Map<?, ?> cidObj = (Map<?, ?>) ret.get("Cid");
+                cid.setVal((String) cidObj.get("/"));
+            }
+
             // log.debug("respMap=" + XString.prettyPrint(ret));
             if (streamSize != null) {
                 streamSize.setVal((int) lis.getCount());
             }
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.exchange", e);
+        }
+        return ret;
+    }
+
+    public Map<String, Object> ipnsPublish(MongoSession session, String key, String cid) {
+        Map<String, Object> ret = null;
+        try {
+            String url = appProp.getIPFSHost() + "/api/v0/name/publish?arg=" + cid + "&=" + key;
+
+            HttpHeaders headers = new HttpHeaders();
+            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {
+            });
+
+            // ret output:
+            // {
+            // "Name" : "QmYHQEW7NTczSxcaorguczFRNwAY1r7UkF8uU4FMTGMRJm",
+            // "Value" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
+            // }
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.exchange", e);
+        }
+        return ret;
+    }
+
+    public Map<String, Object> ipnsResolve(MongoSession session, String name) {
+        Map<String, Object> ret = null;
+        try {
+            String url = appProp.getIPFSHost() + "/api/v0/name/resolve?arg=" + name;
+
+            HttpHeaders headers = new HttpHeaders();
+            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {
+            });
+
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
         }

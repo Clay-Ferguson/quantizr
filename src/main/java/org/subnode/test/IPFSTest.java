@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.subnode.model.MerkleNode;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.service.IPFSService;
+import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
 @Component("IPFSTest")
@@ -26,14 +27,37 @@ public class IPFSTest implements TestIntf {
         log.debug("IPFSTest.test() running.");
         // ipfs.getPins();
         adminRunner.run(mongoSession -> {
-            Map<String, Object> ret = ipfs.dagPutFromString(mongoSession, "{\"data\": \"MY FIRST DAG PUT\"}", null,
-                    null);
-            Map<?, ?> cidObj = (Map<?, ?>) ret.get("Cid");
-            String cid = (String) cidObj.get("/");
-            log.debug("Cid=" + cid);
+            ValContainer<String> cid = new ValContainer<String>();
+            ipfs.dagPutFromString(mongoSession, "{\"data\": \"MY FIRST DAG PUT\"}", null, null, cid);
+            log.debug("Cid=" + cid.getVal());
 
-            String verify = ipfs.dagGet(cid);
+            String verify = ipfs.dagGet(cid.getVal());
             log.debug("verify: " + verify);
+
+            Map<String, Object> ret = ipfs.ipnsPublish(mongoSession, "ClaysKey", cid.getVal());
+            log.debug("ipnsPublishRet: " + XString.prettyPrint(ret));
+
+            String ipnsName = (String)ret.get("Name");
+            ret = ipfs.ipnsResolve(mongoSession, ipnsName);
+            log.debug("ipnsResolveRet: " + XString.prettyPrint(ret));
+
+            // verify = ipfs.dagGet(ipnsName);
+            // log.debug("verifyIPNS!: " + verify);
+
+            // --------------
+
+            ipfs.dagPutFromString(mongoSession, "{\"data\": \"MY SECOND DAG PUT\"}", null, null, cid);
+            log.debug("Cid (Second Version)=" + cid.getVal());
+
+            verify = ipfs.dagGet(cid.getVal());
+            log.debug("verify (second): " + verify);
+
+            ret = ipfs.ipnsPublish(mongoSession, "ClaysKey", cid.getVal());
+            log.debug("ipnsPublishRet (second): " + XString.prettyPrint(ret));
+
+            ipnsName = (String)ret.get("Name");
+            ret = ipfs.ipnsResolve(mongoSession, ipnsName);
+            log.debug("ipnsResolveRet (second): " + XString.prettyPrint(ret));
         });
     }
 
