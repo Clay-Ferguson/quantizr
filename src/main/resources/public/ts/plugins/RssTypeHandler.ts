@@ -377,7 +377,6 @@ export class RssTypeHandler extends TypeBase {
         try {
             let response = await axios.get(url, {});
             if (response.status === 200) {
-                alert("About to render.");
                 chaptersDiv.mergeState({ chapters: response.data });
             }
         }

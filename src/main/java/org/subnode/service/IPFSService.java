@@ -1,5 +1,7 @@
 package org.subnode.service;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.LinkedHashMap;
@@ -34,6 +36,7 @@ import org.subnode.model.MerkleNode;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Const;
 import org.subnode.util.LimitedInputStreamEx;
@@ -61,6 +64,9 @@ public class IPFSService {
      */
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    @Autowired
+    private RunAsMongoAdmin adminRunner;
 
     @Autowired
     private MongoRead read;
@@ -250,12 +256,34 @@ public class IPFSService {
         return writeFromStream(session, "/api/v0/add?stream-channels=true", stream, mimeType, streamSize, cid);
     }
 
+    public Map<String, Object> addTarFromFile(String fileName) {
+        adminRunner.run(mongoSession -> {
+            try {
+                addTarFromStream(mongoSession, new BufferedInputStream(new FileInputStream(fileName)), null, null,
+                        null);
+            } catch (Exception e) {
+                log.error("Failed in restTemplate.exchange", e);
+            }
+        });
+        return null;
+    }
+
+    public Map<String, Object> addTarFromStream(MongoSession session, InputStream stream, String mimeType,
+            ValContainer<Integer> streamSize, ValContainer<String> cid) {
+        // the following other values are supposedly in the return...
+        // {
+        // "Bytes": "<int64>",
+        // "Hash": "<string>",
+        // "Name": "<string>",
+        // "Size": "<string>"
+        // }
+        return writeFromStream(session, "/api/v0/tar/add", stream, mimeType, streamSize, cid);
+    }
+
     public Map<String, Object> writeFromStream(MongoSession session, String path, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
         Map<String, Object> ret = null;
         try {
-            // https://docs-beta.ipfs.io/reference/http/api
-            // --stream-channels bool - Stream channel output.
             String url = appProp.getIPFSHost() + path;
             HttpHeaders headers = new HttpHeaders();
 
@@ -275,7 +303,7 @@ public class IPFSService {
                 cid.setVal((String) cidObj.get("/"));
             }
 
-            // log.debug("respMap=" + XString.prettyPrint(ret));
+            log.debug("respMap=" + XString.prettyPrint(ret));
             if (streamSize != null) {
                 streamSize.setVal((int) lis.getCount());
             }
@@ -333,7 +361,7 @@ public class IPFSService {
 
         try {
             int timeout = 20;
-            RequestConfig config = RequestConfig.custom()//
+            RequestConfig config = RequestConfig.custom() //
                     .setConnectTimeout(timeout * 1000) //
                     .setConnectionRequestTimeout(timeout * 1000) //
                     .setSocketTimeout(timeout * 1000).build();

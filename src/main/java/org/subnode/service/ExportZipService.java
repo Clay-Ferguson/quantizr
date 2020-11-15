@@ -16,19 +16,12 @@ import java.io.InputStream;
 @Scope("prototype")
 public class ExportZipService extends ExportArchiveBase {
     private static final Logger log = LoggerFactory.getLogger(ExportZipService.class);
-
-    // JDK Version (do not delete)
-    // private ZipOutputStream zos;
-
     private ZipArchiveOutputStream out = null;
 
     @Override
     public void openOutputStream(String fileName) {
         log.debug("Opening Export File: " + fileName);
         try {
-            // JDK Version (do not delete)
-            //zos = new ZipOutputStream(new FileOutputStream(fullFileName));
-
             out = new ZipArchiveOutputStream(new FileOutputStream(fileName));
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);
@@ -38,9 +31,6 @@ public class ExportZipService extends ExportArchiveBase {
     @Override
     public void closeOutputStream() {
         try {
-            // JDK Version (do not delete)
-            //StreamUtil.close(zos);
-
             out.finish(); 
             out.close();
         } catch (Exception ex) {
@@ -66,16 +56,6 @@ public class ExportZipService extends ExportArchiveBase {
             out.putArchiveEntry(entry);
             out.write(bytes);
             out.closeArchiveEntry();
-
-            // JDK Version (do not delete)
-            // ZipEntry zi = new ZipEntry(fileName);
-            // try {
-            //     zos.putNextEntry(zi);
-            //     zos.write(bytes);
-            //     zos.closeEntry();
-            // } catch (Exception ex) {
-            //     throw ExUtil.newEx(ex);
-            // }
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);
         }
@@ -94,16 +74,6 @@ public class ExportZipService extends ExportArchiveBase {
             out.putArchiveEntry(entry);
             IOUtils.copyLarge(stream, out, 0, length);
             out.closeArchiveEntry();
-
-            // JDK Version (do not delete)
-            // ZipEntry zi = new ZipEntry(fileName);
-            // try {
-            //     zos.putNextEntry(zi);
-            //     zos.write(bytes);
-            //     zos.closeEntry();
-            // } catch (Exception ex) {
-            //     throw ExUtil.newEx(ex);
-            // }
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);
         }
