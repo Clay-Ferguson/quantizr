@@ -71,6 +71,7 @@ import org.subnode.request.MoveNodesRequest;
 import org.subnode.request.NodeFeedRequest;
 import org.subnode.request.NodeSearchRequest;
 import org.subnode.request.PingRequest;
+import org.subnode.request.PublishNodeToIpfsRequest;
 import org.subnode.request.RebuildIndexesRequest;
 import org.subnode.request.RemovePrivilegeRequest;
 import org.subnode.request.RenderCalendarRequest;
@@ -681,6 +682,13 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
 		return callProc.run("export", req, session, ms -> {
 			return nodeEditService.transferNode(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/publishNodeToIpfs", method = RequestMethod.POST)
+	public @ResponseBody Object publishNodeToIpfs(@RequestBody PublishNodeToIpfsRequest req, HttpSession session) {
+		return callProc.run("publishNodeToIpfs", req, session, ms -> {
+			return ipfsService.publishNode(ms, req);
 		});
 	}
 

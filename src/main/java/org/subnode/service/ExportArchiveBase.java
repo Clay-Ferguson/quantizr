@@ -53,7 +53,7 @@ public abstract class ExportArchiveBase {
 
 	@Autowired
 	private MongoAuth auth;
-	
+
 	@Autowired
 	private SubNodeUtil util;
 
@@ -91,7 +91,6 @@ public abstract class ExportArchiveBase {
 		}
 
 		final String nodeId = req.getNodeId();
-
 		final SubNode node = read.getNode(session, nodeId);
 		String fileName = util.getExportFileName(req.getFileName(), node);
 		shortFileName = fileName + "." + getFileExtension();
@@ -101,7 +100,6 @@ public abstract class ExportArchiveBase {
 		try {
 			openOutputStream(fullFileName);
 			writeRootFiles();
-
 			rootPathParent = node.getParentPath();
 			auth.authRequireOwnerOfNode(session, node);
 			final ArrayList<SubNode> nodeStack = new ArrayList<SubNode>();
@@ -335,7 +333,7 @@ public abstract class ExportArchiveBase {
 			}
 			final String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
 
-			//final String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK.s());
+			// final String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK.s());
 			final String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
 
 			String imgUrl = null;
@@ -371,10 +369,11 @@ public abstract class ExportArchiveBase {
 					 * fullsize
 					 * 
 					 */
-					
-					// Theoretically we could exclude the IPFS data and just export a link to a gateway but instead we export the file
+
+					// Theoretically we could exclude the IPFS data and just export a link to a
+					// gateway but instead we export the file
 					// imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + nodeId + ext)
-					// 		: (Const.IPFS_IO_GATEWAY + ipfsLink);
+					// : (Const.IPFS_IO_GATEWAY + ipfsLink);
 
 					imgUrl = "./" + relImgPath + nodeId + ext;
 
@@ -387,11 +386,13 @@ public abstract class ExportArchiveBase {
 					 * embeds an image that's 400px wide until you click it which makes it go
 					 * fullsize
 					 */
-					// Theoretically we could exclude the IPFS data and just export a link to a gateway but instead we export the file
-					// attachmentUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relPath + nodeId + ext)
-					// 		: (Const.IPFS_IO_GATEWAY + ipfsLink);
+					// Theoretically we could exclude the IPFS data and just export a link to a
+					// gateway but instead we export the file
+					// attachmentUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relPath + nodeId +
+					// ext)
+					// : (Const.IPFS_IO_GATEWAY + ipfsLink);
 					attachmentUrl = "./" + relPath + nodeId + ext;
-					
+
 					html.append("<a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: "
 							+ binFileNameStr + "</a>");
 				}

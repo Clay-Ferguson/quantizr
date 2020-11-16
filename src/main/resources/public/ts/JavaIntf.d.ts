@@ -172,6 +172,10 @@ export interface OpenSystemFileRequest extends RequestBase {
 export interface PingRequest extends RequestBase {
 }
 
+export interface PublishNodeToIpfsRequest extends RequestBase {
+    nodeId: string;
+}
+
 export interface RebuildIndexesRequest extends RequestBase {
 }
 
@@ -432,6 +436,9 @@ export interface OpenSystemFileResponse extends ResponseBase {
 
 export interface PingResponse extends ResponseBase {
     serverInfo: string;
+}
+
+export interface PublishNodeToIpfsResponse extends ResponseBase {
 }
 
 export interface RebuildIndexesResponse extends ResponseBase {

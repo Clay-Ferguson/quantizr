@@ -30,6 +30,8 @@ public class XString {
 	private static ObjectWriter jsonPrettyWriter = jsonMapper.writerWithDefaultPrettyPrinter();
 
 	public static String prettyPrint(Object obj) {
+		if (obj == null)
+			return "null";
 		try {
 			return jsonPrettyWriter.writeValueAsString(obj);
 		} catch (JsonProcessingException e) {
@@ -106,7 +108,8 @@ public class XString {
 		int idx = 0;
 		while (idx < len && val.charAt(idx) == '#') {
 			idx++;
-			if (idx >= 6) break;
+			if (idx >= 6)
+				break;
 		}
 		return idx;
 	}

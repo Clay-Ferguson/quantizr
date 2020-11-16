@@ -52,6 +52,8 @@ public class SystemService {
 
 	public String initializeAppContent() {
 		ValContainer<String> ret = new ValContainer<String>();
+
+		// todo-0: needs review. I think this capability may no longer be needed.
 		adminRunner.run(session -> {
 			ret.setVal(exportJsonService.resetNode(session, "public"));
 			// ret.setVal(exportJsonService.resetNode(session, "books"));

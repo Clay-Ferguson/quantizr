@@ -42,10 +42,10 @@ services:
             IPFS_PROFILE: "server"
             IPFS_PATH: "/data/ipfs"
             # LIBP2P_FORCE_PNET: 1
-        # expose:
+        expose:
         #    # do we need 4001. it's for swarm right?
         #     - '4001'
-        #     - '8080'
+             - '8080'
         #     - '5001'
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:

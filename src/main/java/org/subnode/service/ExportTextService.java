@@ -12,8 +12,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
-import org.subnode.config.SessionContext;
-import org.subnode.model.UserPreferences;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -37,9 +35,6 @@ public class ExportTextService {
 
 	@Autowired
 	private AppProp appProp;
-
-	@Autowired
-	private SessionContext sessionContext;
 
 	private MongoSession session;
 

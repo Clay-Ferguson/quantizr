@@ -219,6 +219,8 @@ export class MenuPanel extends Div {
 
         if (state.isAdminUser) {
             children.push(new Menu("IPFS", [
+                new MenuItem("Sync Nodes", () => S.util.publishNodeToIpfs(hltNode), //
+                    state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)), //
                 new MenuItem("Display Node Info", () => S.view.runServerCommand("ipfsGetNodeInfo", "IPFS Node Info", null, state), //
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine))
             ]));

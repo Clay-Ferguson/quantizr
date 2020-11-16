@@ -1383,4 +1383,12 @@ export class Util implements UtilIntf {
     formatCurrency = (n: number): string => {
         return currencyFormatter.format(n);
     }
+
+    publishNodeToIpfs = (node: J.NodeInfo): any => {
+        S.util.ajax<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
+            nodeId: node.id
+        }, (res) => {
+            S.util.showMessage(res.message, "Server Reply", true);
+        });
+    }
 }

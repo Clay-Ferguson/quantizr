@@ -123,4 +123,5 @@ export interface UtilIntf {
     allChildrenAreSameOwner(node: J.NodeInfo): boolean;
     nodeHasChildrenOfType(node: J.NodeInfo, type: string): boolean;
     formatCurrency(n: number): string;
+    publishNodeToIpfs(node: J.NodeInfo): any;
 }
