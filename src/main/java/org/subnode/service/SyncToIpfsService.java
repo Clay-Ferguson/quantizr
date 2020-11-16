@@ -20,7 +20,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
-/* Writes every node unser the target subnode (recursively) to an IPFS Mutable File System (MFS) file */
+/* Writes every node under the target subnode (recursively) to an IPFS Mutable File System (MFS) file */
 @Component
 @Scope("prototype")
 public class SyncToIpfsService {
@@ -65,6 +65,7 @@ public class SyncToIpfsService {
 			ipfsService.flushFiles(node.getPath());
 			ipfsService.dumpDir(node.getPath(), allFilePaths);
 			removeOrphanFiles();
+
 			success = true;
 		} catch (
 
@@ -72,12 +73,13 @@ public class SyncToIpfsService {
 			throw ExUtil.wrapEx(ex);
 		}
 
-		res.setMessage("IPFS Sync complete\n\n" + buildReport());
+		res.setMessage(buildReport());
 		res.setSuccess(success);
 	}
 
 	private String buildReport() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("IPFS Sync complete\n\n");
 		sb.append("Total Nodes: " + totalNodes + "\n");
 		sb.append("Orphans Deleted: " + orphansRemoved + "\n");
 		return sb.toString();
@@ -92,7 +94,7 @@ public class SyncToIpfsService {
 			// ascending by the length of the string, so any parent folders are guaranteed
 			// to get deleted before any of
 			// their subfolders are encountered, and we run therefore the minimal number of
-			// deletes required to accmoplish this
+			// deletes required to accomplish this
 			// in every case! Genius!
 			if (!allNodePaths.contains(path)) {
 				try {
@@ -129,18 +131,18 @@ public class SyncToIpfsService {
 		String fileName = node.getPath() + "/node.json";
 		allNodePaths.add(fileName);
 		totalNodes++;
-		addEntry(fileName, json);
+		addFile(fileName, json);
 	}
 
-	private void addEntry(String fileName, String content) {
+	private void addFile(String fileName, String content) {
 		if (content.equals(ipfsService.readFile(fileName))) {
-			log.debug("not writing. Content was up to date.");
+			// log.debug("not writing. Content was up to date.");
 			return;
 		}
-		addEntry(fileName, content.getBytes(StandardCharsets.UTF_8));
+		addFile(fileName, content.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private void addEntry(String fileName, byte[] bytes) {
+	private void addFile(String fileName, byte[] bytes) {
 		addEntry(fileName, new ByteArrayInputStream(bytes));
 	}
 

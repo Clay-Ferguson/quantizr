@@ -688,9 +688,13 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/publishNodeToIpfs", method = RequestMethod.POST)
 	public @ResponseBody Object publishNodeToIpfs(@RequestBody PublishNodeToIpfsRequest req, HttpSession session) {
 		return callProc.run("publishNodeToIpfs", req, session, ms -> {
-			return ipfsService.publishNode(ms, req);
+			return ipfsService.publishNodeToIpfs(ms, req);
 		});
 	}
+
+	// todo-0:
+	// add a loadNodeFromIpfs that takes a node which has an "ipfs:source" property on it, and builts up
+	// all the children by walking that path.
 
 	@RequestMapping(value = API_PATH + "/streamImport", method = RequestMethod.POST)
 	public @ResponseBody Object streamImport(//

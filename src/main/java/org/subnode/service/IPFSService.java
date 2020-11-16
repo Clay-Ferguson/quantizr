@@ -37,6 +37,7 @@ import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.IPFSDir;
 import org.subnode.model.IPFSDirEntry;
+import org.subnode.model.IPFSDirStat;
 import org.subnode.model.MerkleNode;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
@@ -434,6 +435,28 @@ public class IPFSService {
         return ret;
     }
 
+    public IPFSDirStat pathStat(String path) {
+        IPFSDirStat ret = null;
+        try {
+            String url = appProp.getIPFSHost() + "/api/v0/files/stat?arg=" + path;
+
+            HttpHeaders headers = new HttpHeaders();
+            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            MediaType contentType = response.getHeaders().getContentType();
+
+            if (MediaType.APPLICATION_JSON.equals(contentType)) {
+                ret = XString.jsonMapper.readValue(response.getBody(), IPFSDirStat.class);
+            }
+
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.exchange", e);
+        }
+        return ret;
+    }
+
     public String readFile(String path) {
         String ret = null;
         try {
@@ -473,7 +496,7 @@ public class IPFSService {
         }
     }
 
-    public PublishNodeToIpfsResponse publishNode(MongoSession mongoSession, PublishNodeToIpfsRequest req) {
+    public PublishNodeToIpfsResponse publishNodeToIpfs(MongoSession mongoSession, PublishNodeToIpfsRequest req) {
         if (!sessionContext.isAdmin()) {
             throw ExUtil.wrapEx("admin only function.");
         }

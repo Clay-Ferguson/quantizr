@@ -58,6 +58,9 @@ public enum NodeProp {
     SAVE_TO_IPFS("sn:saveToIpfs", "s"), //
     IPFS_LINK_NAME("ipfs:linkName", "s"), //
 
+    // This property indicates that it's data is sourced from IPFS files, and can come from another server
+    IPFS_SOURCE("ipfs:source", "s"), //
+
     FS_LINK("fs:link", "s"), //
 
     /*

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppFilter;
 import org.subnode.config.AppSessionListener;
+import org.subnode.model.IPFSDirStat;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoAppConfig;
 import org.subnode.mongo.MongoRead;
@@ -50,6 +51,9 @@ public class SystemService {
 	@Autowired
 	private AttachmentService attachmentService;
 
+	@Autowired
+	private IPFSService ipfsService;
+
 	public String initializeAppContent() {
 		ValContainer<String> ret = new ValContainer<String>();
 
@@ -75,7 +79,7 @@ public class SystemService {
 		for (Map.Entry<String, Object> set : result.entrySet()) {
 			ret.append(String.format("%s: %s%n", set.getKey(), set.getValue()));
 		}
-	
+
 		return ret.toString();
 	}
 
@@ -90,7 +94,14 @@ public class SystemService {
 	public String getJson(MongoSession session, String nodeId) {
 		SubNode node = read.getNode(session, nodeId, true);
 		if (node != null) {
-			return XString.prettyPrint(node);
+			String ret = XString.prettyPrint(node);
+
+			IPFSDirStat stat = ipfsService.pathStat(node.getPath());
+			if (stat != null) {
+				ret += "\n\nIPFS Info:\n" + XString.prettyPrint(stat);
+			}
+
+			return ret;
 		} else {
 			return "node not found!";
 		}
@@ -126,4 +137,3 @@ public class SystemService {
 		// return sb.toString();
 	}
 }
-
