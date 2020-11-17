@@ -63,6 +63,7 @@ import org.subnode.request.GraphRequest;
 import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.InsertBookRequest;
 import org.subnode.request.InsertNodeRequest;
+import org.subnode.request.LoadNodeFromIpfsRequest;
 import org.subnode.request.LoginRequest;
 import org.subnode.request.LogoutRequest;
 import org.subnode.request.LuceneIndexRequest;
@@ -692,9 +693,12 @@ public class AppController implements ErrorController {
 		});
 	}
 
-	// todo-0:
-	// add a loadNodeFromIpfs that takes a node which has an "ipfs:source" property on it, and builts up
-	// all the children by walking that path.
+	@RequestMapping(value = API_PATH + "/loadNodeFromIpfs", method = RequestMethod.POST)
+	public @ResponseBody Object loadNodeFromIpfs(@RequestBody LoadNodeFromIpfsRequest req, HttpSession session) {
+		return callProc.run("loadNodeFromIpfs", req, session, ms -> {
+			return ipfsService.loadNodeFromIpfs(ms, req);
+		});
+	}
 
 	@RequestMapping(value = API_PATH + "/streamImport", method = RequestMethod.POST)
 	public @ResponseBody Object streamImport(//
@@ -1121,10 +1125,7 @@ public class AppController implements ErrorController {
 
 			log.debug("Command: " + req.getCommand());
 
-			if (req.getCommand().equalsIgnoreCase("ipfsGetNodeInfo")) {
-				res.getMessages().add(new InfoMessage(ipfsService.getNodeInfo(ms, req.getNodeId()), null));
-			} //
-			else if (req.getCommand().equalsIgnoreCase("compactDb")) {
+			if (req.getCommand().equalsIgnoreCase("compactDb")) {
 				res.getMessages().add(new InfoMessage(systemService.compactDb(), null));
 			} //
 			else if (req.getCommand().equalsIgnoreCase("refreshRssCache")) {

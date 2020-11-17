@@ -11,6 +11,8 @@ import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { EventInput } from "@fullcalendar/react";
 import * as marked from "marked";
+import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
+import { store } from "./AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -1390,5 +1392,10 @@ export class Util implements UtilIntf {
         }, (res) => {
             S.util.showMessage(res.message, "Server Reply", true);
         });
+    }
+
+    loadNodeFromIpfs = (node: J.NodeInfo): any => {
+        let state: AppState = store.getState();
+        new LoadNodeFromIpfsDlg(state).open();
     }
 }

@@ -124,4 +124,5 @@ export interface UtilIntf {
     nodeHasChildrenOfType(node: J.NodeInfo, type: string): boolean;
     formatCurrency(n: number): string;
     publishNodeToIpfs(node: J.NodeInfo): any;
+    loadNodeFromIpfs(node: J.NodeInfo): any;
 }

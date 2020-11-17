@@ -44,7 +44,9 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.request.LoadNodeFromIpfsRequest;
 import org.subnode.request.PublishNodeToIpfsRequest;
+import org.subnode.response.LoadNodeFromIpfsResponse;
 import org.subnode.response.PublishNodeToIpfsResponse;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
@@ -232,7 +234,7 @@ public class IPFSService {
     }
 
     /**
-     * Returns JSON
+     * Returns JSON as string
      */
     public final String dagGet(String hash) {
         String ret = null;
@@ -442,16 +444,25 @@ public class IPFSService {
         return res;
     }
 
+    public LoadNodeFromIpfsResponse loadNodeFromIpfs(MongoSession mongoSession, LoadNodeFromIpfsRequest req) {
+        if (!sessionContext.isAdmin()) {
+            throw ExUtil.wrapEx("admin only function.");
+        }
+
+        LoadNodeFromIpfsResponse res = new LoadNodeFromIpfsResponse();
+        SyncFromIpfsService svc = (SyncFromIpfsService) SpringContextUtil.getBean(SyncFromIpfsService.class);
+        svc.writeNodes(mongoSession, req, res);
+        return res;
+    }
+
     public void dumpDir(String path, HashSet<String> allFilePaths) {
-        log.debug("dumpDir: " + path);
+        //log.debug("dumpDir: " + path);
         IPFSDir dir = getDir(path);
         if (dir != null) {
-            log.debug("Dir: " + XString.prettyPrint(dir) + " EntryCount: " + dir.getEntries().size());
+            // log.debug("Dir: " + XString.prettyPrint(dir) + " EntryCount: " +
+            // dir.getEntries().size());
 
-            int counter = 0;
             for (IPFSDirEntry entry : dir.getEntries()) {
-                log.debug("Entry Name [" + (counter++) + "]: " + entry.getName());
-
                 /*
                  * as a workaround to the IPFS bug, we rely on the logic of "if not a json file,
                  * it's a folder
@@ -460,7 +471,8 @@ public class IPFSService {
                     dumpDir(path + "/" + entry.getName(), allFilePaths);
                 } else {
                     String fileName = path + "/" + entry.getName();
-                    // String readTest = readFile(path + "/" + entry.getName());
+                    log.debug("dump: " + fileName);
+                    // String readTest = readFile(fileName);
                     // log.debug("readTest: " + readTest);
                     if (allFilePaths != null) {
                         allFilePaths.add(fileName);
@@ -473,15 +485,18 @@ public class IPFSService {
     public final Object postForJsonReply(String url, Class<?> clazz) {
         Object ret = null;
         try {
-            log.debug("post: " + url);
+            // log.debug("post: " + url);
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(null, null);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            MediaType contentType = response.getHeaders().getContentType();
-            if (response.getStatusCode().value() == 200 && MediaType.APPLICATION_JSON.equals(contentType)) {
+            
+            // MediaType contentType = response.getHeaders().getContentType();
+            // Warning: IPFS is inconsistent. Sometimes they return plain/text and sometimes JSON in the contentType, so we just ignore it
+
+            if (response.getStatusCode().value() == 200 /* && MediaType.APPLICATION_JSON.equals(contentType) */) {
                 if (clazz == String.class) {
                     return response.getBody();
                 } else {
-                    log.debug("postForJsonReply: " + response.getBody());
+                    // log.debug("postForJsonReply: " + response.getBody());
                     ret = XString.jsonMapper.readValue(response.getBody(), clazz);
                 }
             }

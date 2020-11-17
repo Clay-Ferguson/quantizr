@@ -128,6 +128,10 @@ export interface InsertNodeRequest extends RequestBase {
     initialValue: string;
 }
 
+export interface LoadNodeFromIpfsRequest extends RequestBase {
+    path: string;
+}
+
 export interface LoginRequest extends RequestBase {
 }
 
@@ -399,6 +403,9 @@ export interface InsertBookResponse extends ResponseBase {
 
 export interface InsertNodeResponse extends ResponseBase {
     newNode: NodeInfo;
+}
+
+export interface LoadNodeFromIpfsResponse extends ResponseBase {
 }
 
 export interface LoginResponse extends ResponseBase {

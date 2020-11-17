@@ -120,8 +120,6 @@ public class SyncToIpfsService {
 	}
 
 	private void processNode(SubNode node) {
-		log.debug("IPFS FILE: " + node.getPath() + " [" + node.getId() + "]");
-
 		// todo-0: this and other places needs to generate canonical JSON (basically
 		// just sorted properties ?)
 		// using this??
@@ -129,6 +127,7 @@ public class SyncToIpfsService {
 		// objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		String json = XString.prettyPrint(node);
 		String fileName = node.getPath() + "/node.json";
+		log.debug("Sync to IPFS: " + fileName);
 		allNodePaths.add(fileName);
 		totalNodes++;
 		addFile(fileName, json);

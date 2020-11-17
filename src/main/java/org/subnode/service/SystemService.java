@@ -96,10 +96,19 @@ public class SystemService {
 		if (node != null) {
 			String ret = XString.prettyPrint(node);
 
-			IPFSDirStat stat = ipfsService.pathStat(node.getPath());
-			if (stat != null) {
-				ret += "\n\nIPFS Info:\n" + XString.prettyPrint(stat);
+			IPFSDirStat fullStat = ipfsService.pathStat(node.getPath());
+			if (fullStat != null) {
+				ret += "\n\nIPFS Folder Stats:\n" + XString.prettyPrint(fullStat);
 			}
+
+			IPFSDirStat nodeStat = ipfsService.pathStat(node.getPath() + "/node.json");
+			if (nodeStat != null) {
+				ret += "\n\nIPFS File Stats:\n" + XString.prettyPrint(nodeStat);
+			}
+
+			// NOTE: We used to have a "Show IPFS Info" that displayed what comes from
+			// this...
+			// ipfsService.getNodeInfo(MongoSession session, String nodeId) {
 
 			return ret;
 		} else {

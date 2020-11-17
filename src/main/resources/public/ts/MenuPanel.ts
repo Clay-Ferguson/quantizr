@@ -219,10 +219,10 @@ export class MenuPanel extends Div {
 
         if (state.isAdminUser) {
             children.push(new Menu("IPFS", [
-                new MenuItem("Sync Nodes", () => S.util.publishNodeToIpfs(hltNode), //
+                new MenuItem("Sync: Nodes to IPFS", () => S.util.publishNodeToIpfs(hltNode), //
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)), //
-                new MenuItem("Display Node Info", () => S.view.runServerCommand("ipfsGetNodeInfo", "IPFS Node Info", null, state), //
-                    state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine))
+                new MenuItem("Sync: IPFS to Nodes", () => S.util.loadNodeFromIpfs(hltNode), //
+                    state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)) //
             ]));
         }
 
