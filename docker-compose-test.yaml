@@ -36,7 +36,7 @@ services:
     #         - "5001:5001"
     #     networks:
     #         - nettest
-    #     image: ipfs/go-ipfs:latest
+    #     image: ipfs/go-ipfs:v0.7.0
 
     subnode-test:
         build: 

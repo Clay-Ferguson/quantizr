@@ -75,7 +75,7 @@ public class IPFSService {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-	private SessionContext sessionContext;
+    private SessionContext sessionContext;
 
     @Autowired
     private RunAsMongoAdmin adminRunner;
@@ -122,11 +122,7 @@ public class IPFSService {
         String ret = null;
         try {
             String url = appProp.getIPFSHost() + "/api/v0/cat?arg=" + hash;
-
             ResponseEntity<byte[]> result = restTemplate.getForEntity(new URI(url), byte[].class);
-            // MediaType contentType = result.getHeaders().getContentType();
-            // log.debug("cat bytes contentType=" + contentType);
-
             ret = new String(result.getBody(), "UTF-8");
         } catch (Exception e) {
             // log.error("Failed in restTemplate.getForEntity", e);
@@ -135,61 +131,27 @@ public class IPFSService {
     }
 
     public final IPFSDir getDir(String path) {
-        IPFSDir ret = null;
-        try {
-            String url = appProp.getIPFSHost() + "/api/v0/files/ls?arg=" + path + "&long=true";
-            log.debug("getDir Query: " + path);
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(null, null);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            MediaType contentType = response.getHeaders().getContentType();
-
-            if (MediaType.APPLICATION_JSON.equals(contentType)) {
-                ret = XString.jsonMapper.readValue(response.getBody(), IPFSDir.class);
-            }
-
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return ret;
+        String url = appProp.getIPFSHost() + "/api/v0/files/ls?arg=" + path + "&long=true";
+        return (IPFSDir) postForJsonReply(url, IPFSDir.class);
     }
 
     public final boolean removePin(String cid) {
-        try {
-            String url = appProp.getIPFSHost() + "/api/v0/pin/rm?arg=" + cid;
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(null, null);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            return response.getStatusCode().value() == 200;
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return false;
+        String url = appProp.getIPFSHost() + "/api/v0/pin/rm?arg=" + cid;
+        return postForJsonReply(url, Object.class) != null;
     }
 
     /* Deletes the file or if a folder deletes it recursively */
     public final boolean deletePath(String path) {
-        try {
-            String url = appProp.getIPFSHost() + "/api/v0/files/rm?arg=" + path + "&force=true";
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(null, null);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            return response.getStatusCode().value() == 200;
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return false;
+        String url = appProp.getIPFSHost() + "/api/v0/files/rm?arg=" + path + "&force=true";
+        return postForJsonReply(url, Object.class) != null;
     }
 
     public final boolean flushFiles(String path) {
-        try {
-            String url = appProp.getIPFSHost() + "/api/v0/files/flush?arg=" + path;
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(null, null);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            return response.getStatusCode().value() == 200;
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return false;
+        String url = appProp.getIPFSHost() + "/api/v0/files/flush?arg=" + path;
+        return postForJsonReply(url, Object.class) != null;
     }
 
+    // todo-0: make this handle a type, not generic map
     public final LinkedHashMap<String, Object> getPins() {
         LinkedHashMap<String, Object> pins = null;
         try {
@@ -198,7 +160,7 @@ public class IPFSService {
             ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
             MediaType contentType = result.getHeaders().getContentType();
 
-            // log.debug("RAW RESULT: " + result.getBody());
+            log.debug("RAW PINS LIST RESULT: " + result.getBody());
 
             if (MediaType.APPLICATION_JSON.equals(contentType)) {
                 Map<String, Object> respMap = mapper.readValue(result.getBody(),
@@ -392,6 +354,7 @@ public class IPFSService {
         return ret;
     }
 
+    // todo-0: convert to actual type, not map.
     public Map<String, Object> ipnsPublish(MongoSession session, String key, String cid) {
         Map<String, Object> ret = null;
         try {
@@ -416,6 +379,7 @@ public class IPFSService {
         return ret;
     }
 
+    // todo-0: convert return val to a type (not map)
     public Map<String, Object> ipnsResolve(MongoSession session, String name) {
         Map<String, Object> ret = null;
         try {
@@ -436,42 +400,13 @@ public class IPFSService {
     }
 
     public IPFSDirStat pathStat(String path) {
-        IPFSDirStat ret = null;
-        try {
-            String url = appProp.getIPFSHost() + "/api/v0/files/stat?arg=" + path;
-
-            HttpHeaders headers = new HttpHeaders();
-            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            MediaType contentType = response.getHeaders().getContentType();
-
-            if (MediaType.APPLICATION_JSON.equals(contentType)) {
-                ret = XString.jsonMapper.readValue(response.getBody(), IPFSDirStat.class);
-            }
-
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return ret;
+        String url = appProp.getIPFSHost() + "/api/v0/files/stat?arg=" + path;
+        return (IPFSDirStat) postForJsonReply(url, IPFSDirStat.class);
     }
 
     public String readFile(String path) {
-        String ret = null;
-        try {
-            String url = appProp.getIPFSHost() + "/api/v0/files/read?arg=" + path;
-
-            HttpHeaders headers = new HttpHeaders();
-            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = response.getBody();
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return ret;
+        String url = appProp.getIPFSHost() + "/api/v0/files/read?arg=" + path;
+        return (String) postForJsonReply(url, String.class);
     }
 
     public InputStream getStream(MongoSession session, String hash, String mimeType) {
@@ -533,5 +468,27 @@ public class IPFSService {
                 }
             }
         }
+    }
+
+    public final Object postForJsonReply(String url, Class<?> clazz) {
+        Object ret = null;
+        try {
+            log.debug("post: " + url);
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(null, null);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            MediaType contentType = response.getHeaders().getContentType();
+            if (response.getStatusCode().value() == 200 && MediaType.APPLICATION_JSON.equals(contentType)) {
+                if (clazz == String.class) {
+                    return response.getBody();
+                } else {
+                    log.debug("postForJsonReply: " + response.getBody());
+                    ret = XString.jsonMapper.readValue(response.getBody(), clazz);
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.exchange", e);
+        }
+        return ret;
     }
 }

@@ -617,6 +617,7 @@ export const enum NodeProp {
     JSON_HASH = "ipfs:json",
     SAVE_TO_IPFS = "sn:saveToIpfs",
     IPFS_LINK_NAME = "ipfs:linkName",
+    IPFS_SOURCE = "ipfs:source",
     FS_LINK = "fs:link",
     IPFS_OK = "ipfs:ok",
     MIME_EXT = "sn:ext",

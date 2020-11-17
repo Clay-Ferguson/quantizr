@@ -13,7 +13,7 @@ public class IPFSDirEntry {
     private Integer size;
     
     @JsonProperty("Hash")
-    private Integer hash;
+    private String hash;
 
     public String getName() {
         return name;
@@ -39,11 +39,11 @@ public class IPFSDirEntry {
         this.size = size;
     }
 
-    public Integer getHash() {
+    public String getHash() {
         return hash;
     }
 
-    public void setHash(Integer hash) {
+    public void setHash(String hash) {
         this.hash = hash;
     }
 }

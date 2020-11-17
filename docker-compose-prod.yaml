@@ -44,7 +44,7 @@ services:
             - "5001:5001"
         networks:
             - net-prod
-        image: ipfs/go-ipfs:release
+        image: ipfs/go-ipfs:v0.7.0
 
     subnode-prod:
         build: 
