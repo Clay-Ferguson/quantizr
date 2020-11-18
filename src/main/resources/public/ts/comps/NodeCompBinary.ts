@@ -26,9 +26,11 @@ export class NodeCompBinary extends Div {
     /* editorEmbed is true when this component is inside the node editor dialog */
     constructor(public node: J.NodeInfo, private isEditorEmbed: boolean, private isFullScreenEmbed: boolean, public imgSizeOverride: string) {
         super();
+        this.mergeState({ node });
     }
 
     makeImageTag = (node: J.NodeInfo, state: AppState): Img => {
+        if (!node) return null;
         let src: string = S.render.getUrlForNodeAttachment(node, false);
 
         let imgSize = "";
@@ -88,46 +90,47 @@ export class NodeCompBinary extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        if (!this.node) {
+        let node = this.getState().node;
+        if (!node) {
             this.setChildren(null);
             return;
         }
 
         /* If this is an image render the image directly onto the page as a visible image */
-        if (S.props.hasImage(this.node)) {
-            this.setChildren([this.makeImageTag(this.node, state)]);
+        if (S.props.hasImage(node)) {
+            this.setChildren([this.makeImageTag(node, state)]);
         }
-        else if (S.props.hasVideo(this.node)) {
+        else if (S.props.hasVideo(node)) {
             this.setChildren([new ButtonBar([
                 new Button("Play Video", () => {
-                    new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(this.node), null, state).open();
+                    new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(node), null, state).open();
                 }),
                 new Span("", {
                     className: "videoDownloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(this.node, true), "[Download Video]")])
+                }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "[Download Video]")])
             ], "marginAll")]);
         }
-        else if (S.props.hasAudio(this.node)) {
+        else if (S.props.hasAudio(node)) {
             this.setChildren([new ButtonBar([
                 new Button("Play Audio", () => {
-                    new AudioPlayerDlg(null, null, null, S.render.getStreamUrlForNodeAttachment(this.node), state).open();
+                    new AudioPlayerDlg(null, null, null, S.render.getStreamUrlForNodeAttachment(node), state).open();
                 }),
                 new Span("", {
                     className: "audioDownloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(this.node, true), "[Download Audio]")])
+                }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "[Download Audio]")])
             ], "marginAll")]);
         }
         /*
          * If not an image we render a link to the attachment, so that it can be downloaded.
          */
         else {
-            let fileName: string = S.props.getNodePropVal(J.NodeProp.BIN_FILENAME, this.node);
-            let fileSize: string = S.props.getNodePropVal(J.NodeProp.BIN_SIZE, this.node);
-            let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, this.node);
+            let fileName: string = S.props.getNodePropVal(J.NodeProp.BIN_FILENAME, node);
+            let fileSize: string = S.props.getNodePropVal(J.NodeProp.BIN_SIZE, node);
+            let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
 
             let viewFileLink: Anchor = null;
             if (fileType === "application/pdf" || fileType.startsWith("text/")) {
-                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(this.node, false), "[ View ]", {
+                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(node, false), "[ View ]", {
                     target: "_blank",
                     className: "marginLeft"
                 });
@@ -144,7 +147,7 @@ export class NodeCompBinary extends Div {
                 new Span(fileName, {
                     className: "normalText marginRight"
                 }),
-                new Anchor(S.render.getUrlForNodeAttachment(this.node, true), "[ Download ]"),
+                new Anchor(S.render.getUrlForNodeAttachment(node, true), "[ Download ]"),
                 viewFileLink
             ])]);
         }

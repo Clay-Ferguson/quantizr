@@ -21,6 +21,10 @@ source ./setenv--localhost-test.sh
 
 mkdir -p ${DEPLOY_TARGET}
 
+cp ${PRJROOT}/docker-compose-test.yaml ${DEPLOY_TARGET}/docker-compose-test.yaml
+cp ${PRJROOT}/dockerfile-test ${DEPLOY_TARGET}/dockerfile-test
+cp ${PRJROOT}/define-functions.sh ${DEPLOY_TARGET}/define-functions.sh
+
 cd ${DEPLOY_TARGET}
 . ./stop-test.sh
 
@@ -37,10 +41,6 @@ docker save -o ${DEPLOY_TARGET}/subnode-test.tar subnode-test
 verifySuccess "Docker Save"
 
 cd ${PRJROOT}
-
-cp ${PRJROOT}/docker-compose-test.yaml ${DEPLOY_TARGET}/docker-compose-test.yaml
-cp ${PRJROOT}/dockerfile-test ${DEPLOY_TARGET}/dockerfile-test
-cp ${PRJROOT}/define-functions.sh ${DEPLOY_TARGET}/define-functions.sh
 
 # this is a special file we alter the owner of in the run script.
 sudo cp ${PRJROOT}/mongod--localhost-test.conf ${DEPLOY_TARGET}/mongod.conf

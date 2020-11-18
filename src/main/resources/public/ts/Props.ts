@@ -38,8 +38,15 @@ export class Props implements PropsIntf {
     transferBinaryProps = (srcNode: J.NodeInfo, dstNode: J.NodeInfo): void => {
         if (!srcNode.properties) return;
         dstNode.properties = dstNode.properties || [];
+
         this.allBinaryProps.forEach(k => {
-            this.setNodeProp(dstNode, S.props.getNodeProp(k, srcNode));
+            let propVal = S.props.getNodePropVal(k, srcNode);
+            if (propVal) {
+                this.setNodePropVal(k, dstNode, propVal);
+            }
+            else {
+                this.deleteProp(dstNode, k);
+            }
         });
     }
 

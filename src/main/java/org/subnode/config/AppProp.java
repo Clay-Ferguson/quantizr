@@ -26,7 +26,7 @@ public class AppProp /* implements EnvironmentAware */ {
 	private Environment env;
 
 	public String getLuceneDir() {
-		return "/subnode-lucene"; //todo-2: get this from prop
+		return "/subnode-lucene"; // todo-2: get this from prop
 	}
 
 	public String getStringProp(String propName) {
@@ -64,8 +64,12 @@ public class AppProp /* implements EnvironmentAware */ {
 		return env.getProperty("rssAggregatePreCacheNodeId");
 	}
 
-	public String getIPFSHost() {
-		return env.getProperty("ipfs.host");
+	public String getIPFSApiHostAndPort() {
+		return env.getProperty("ipfs.host") + ":" + env.getProperty("ipfs.apiPort");
+	}
+
+	public String getIPFSGatewayHostAndPort() {
+		return env.getProperty("ipfs.host") + ":" + env.getProperty("ipfs.gatewayPort");
 	}
 
 	public String getMongoDbHost() {
@@ -193,4 +197,3 @@ public class AppProp /* implements EnvironmentAware */ {
 		return folder.replace("{user.dir}", userDir);
 	}
 }
-

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export ipfs_data=/home/clay/.ipfs
-export ipfs_staging=/home/clay/.ipfs/staging
+export ipfs_data=/home/clay/ferguson/subnode-run/ipfs
+export ipfs_staging=/home/clay/ferguson/subnode-run/ipfs/staging
 
 source ./setenv-common.sh
 

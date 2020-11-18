@@ -4,9 +4,12 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.annotation.PostConstruct;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +41,7 @@ import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.IPFSDir;
 import org.subnode.model.IPFSDirEntry;
 import org.subnode.model.IPFSDirStat;
+import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
@@ -61,7 +65,7 @@ import org.subnode.util.XString;
 public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
-    private static String INTERNAL_IPFS_GATEWAY = "http://ipfs:8080/ipfs/";
+    private String INTERNAL_IPFS_GATEWAY;
 
     /*
      * originally this was 'data-endcoding' (or at least i got that from somewhere),
@@ -87,6 +91,11 @@ public class IPFSService {
 
     @Autowired
     private AppProp appProp;
+
+    @PostConstruct
+    public void postConstruct() {
+        INTERNAL_IPFS_GATEWAY = appProp.getIPFSGatewayHostAndPort() + "/ipfs/";
+    }
 
     /**
      * Looks up quanta node by 'nodeId', and gets the 'ipfs:link' property, which is
@@ -123,7 +132,7 @@ public class IPFSService {
     public final String objectCat(String hash) {
         String ret = null;
         try {
-            String url = appProp.getIPFSHost() + "/api/v0/cat?arg=" + hash;
+            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/cat?arg=" + hash;
             ResponseEntity<byte[]> result = restTemplate.getForEntity(new URI(url), byte[].class);
             ret = new String(result.getBody(), "UTF-8");
         } catch (Exception e) {
@@ -132,24 +141,35 @@ public class IPFSService {
         return ret;
     }
 
+    public InputStream getStreamForHash(String hash) {
+        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/cat?arg=" + hash;
+        InputStream is = null;
+        try {
+            is = new URL(url).openStream();
+        } catch (Exception e) {
+            log.error("Failed in read: " + url, e);
+        }
+        return is;
+    }
+
     public final IPFSDir getDir(String path) {
-        String url = appProp.getIPFSHost() + "/api/v0/files/ls?arg=" + path + "&long=true";
+        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/files/ls?arg=" + path + "&long=true";
         return (IPFSDir) postForJsonReply(url, IPFSDir.class);
     }
 
     public final boolean removePin(String cid) {
-        String url = appProp.getIPFSHost() + "/api/v0/pin/rm?arg=" + cid;
+        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/pin/rm?arg=" + cid;
         return postForJsonReply(url, Object.class) != null;
     }
 
     /* Deletes the file or if a folder deletes it recursively */
     public final boolean deletePath(String path) {
-        String url = appProp.getIPFSHost() + "/api/v0/files/rm?arg=" + path + "&force=true";
+        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/files/rm?arg=" + path + "&force=true";
         return postForJsonReply(url, Object.class) != null;
     }
 
     public final boolean flushFiles(String path) {
-        String url = appProp.getIPFSHost() + "/api/v0/files/flush?arg=" + path;
+        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/files/flush?arg=" + path;
         return postForJsonReply(url, Object.class) != null;
     }
 
@@ -157,7 +177,7 @@ public class IPFSService {
     public final LinkedHashMap<String, Object> getPins() {
         LinkedHashMap<String, Object> pins = null;
         try {
-            String url = appProp.getIPFSHost() + "/api/v0/pin/ls?type=recursive";
+            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/pin/ls?type=recursive";
 
             ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
             MediaType contentType = result.getHeaders().getContentType();
@@ -185,7 +205,7 @@ public class IPFSService {
     public final MerkleNode getMerkleNode(String hash, String encoding) {
         MerkleNode ret = null;
         try {
-            String url = appProp.getIPFSHost() + "/api/v0/object/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "="
+            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/object/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "="
                     + encoding;
 
             log.debug("REQ: " + url);
@@ -216,7 +236,7 @@ public class IPFSService {
     public final String getAsString(String hash, String encoding) {
         String ret = null;
         try {
-            String url = appProp.getIPFSHost() + "/api/v0/object/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "="
+            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/object/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "="
                     + encoding;
 
             ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
@@ -239,7 +259,7 @@ public class IPFSService {
     public final String dagGet(String hash) {
         String ret = null;
         try {
-            String url = appProp.getIPFSHost() + "/api/v0/dag/get?arg=" + hash;
+            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/dag/get?arg=" + hash;
             ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
             ret = result.getBody();
             log.debug("RET: " + ret);
@@ -249,12 +269,12 @@ public class IPFSService {
         return ret;
     }
 
-    public Map<String, Object> dagPutFromString(MongoSession session, String val, String mimeType,
+    public MerkleLink dagPutFromString(MongoSession session, String val, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
         return writeFromStream(session, "/api/v0/dag/put", IOUtils.toInputStream(val), mimeType, streamSize, cid);
     }
 
-    public Map<String, Object> dagPutFromStream(MongoSession session, InputStream stream, String mimeType,
+    public MerkleLink dagPutFromStream(MongoSession session, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
         // {
         // "Cid": {
@@ -264,8 +284,8 @@ public class IPFSService {
         return writeFromStream(session, "/api/v0/dag/put", stream, mimeType, streamSize, cid);
     }
 
-    public Map<String, Object> addFileFromStream(MongoSession session, String fileName, InputStream stream,
-            String mimeType, ValContainer<Integer> streamSize, ValContainer<String> cid) {
+    public MerkleLink addFileFromStream(MongoSession session, String fileName, InputStream stream, String mimeType,
+            ValContainer<Integer> streamSize, ValContainer<String> cid) {
         // the following other values are supposedly in the return...
         // {
         // "Bytes": "<int64>",
@@ -278,7 +298,7 @@ public class IPFSService {
                 streamSize, cid);
     }
 
-    public Map<String, Object> addFromStream(MongoSession session, InputStream stream, String mimeType,
+    public MerkleLink addFromStream(MongoSession session, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
         // the following other values are supposedly in the return...
         // {
@@ -302,7 +322,7 @@ public class IPFSService {
         return null;
     }
 
-    public Map<String, Object> addTarFromStream(MongoSession session, InputStream stream, String mimeType,
+    public MerkleLink addTarFromStream(MongoSession session, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
         // the following other values are supposedly in the return...
         // {
@@ -314,12 +334,12 @@ public class IPFSService {
         return writeFromStream(session, "/api/v0/tar/add", stream, mimeType, streamSize, cid);
     }
 
-    public Map<String, Object> writeFromStream(MongoSession session, String path, InputStream stream, String mimeType,
+    public MerkleLink writeFromStream(MongoSession session, String path, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
         // log.debug("Writing file: " + path);
-        Map<String, Object> ret = null;
+        MerkleLink ret = null;
         try {
-            String url = appProp.getIPFSHost() + path;
+            String url = appProp.getIPFSApiHostAndPort() + path;
             HttpHeaders headers = new HttpHeaders();
 
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -330,18 +350,13 @@ public class IPFSService {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            String body = response.getBody();
+            MediaType contentType = response.getHeaders().getContentType();
 
-            if (body != null) {
-                // log.debug("writeFromString.response: " + body);
-                ret = mapper.readValue(body, new TypeReference<Map<String, Object>>() {
-                });
-
+            if (MediaType.APPLICATION_JSON.equals(contentType)) {
+                ret = XString.jsonMapper.readValue(response.getBody(), MerkleLink.class);
                 if (cid != null) {
-                    Map<?, ?> cidObj = (Map<?, ?>) ret.get("Cid");
-                    cid.setVal((String) cidObj.get("/"));
+                    cid.setVal(ret.getHash());
                 }
-                // log.debug("respMap=" + XString.prettyPrint(ret));
             }
 
             if (streamSize != null) {
@@ -360,7 +375,7 @@ public class IPFSService {
     public Map<String, Object> ipnsPublish(MongoSession session, String key, String cid) {
         Map<String, Object> ret = null;
         try {
-            String url = appProp.getIPFSHost() + "/api/v0/name/publish?arg=" + cid + "&=" + key;
+            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/name/publish?arg=" + cid + "&=" + key;
 
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -385,7 +400,7 @@ public class IPFSService {
     public Map<String, Object> ipnsResolve(MongoSession session, String name) {
         Map<String, Object> ret = null;
         try {
-            String url = appProp.getIPFSHost() + "/api/v0/name/resolve?arg=" + name;
+            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/name/resolve?arg=" + name;
 
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -402,12 +417,12 @@ public class IPFSService {
     }
 
     public IPFSDirStat pathStat(String path) {
-        String url = appProp.getIPFSHost() + "/api/v0/files/stat?arg=" + path;
+        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/files/stat?arg=" + path;
         return (IPFSDirStat) postForJsonReply(url, IPFSDirStat.class);
     }
 
     public String readFile(String path) {
-        String url = appProp.getIPFSHost() + "/api/v0/files/read?arg=" + path;
+        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/files/read?arg=" + path;
         return (String) postForJsonReply(url, String.class);
     }
 
@@ -429,6 +444,7 @@ public class IPFSService {
             InputStream is = response.getEntity().getContent();
             return is;
         } catch (Exception e) {
+            log.error("getStream failed: sourceUrl", e);
             throw new RuntimeEx("Streaming failed.", e);
         }
     }
@@ -456,7 +472,7 @@ public class IPFSService {
     }
 
     public void dumpDir(String path, HashSet<String> allFilePaths) {
-        //log.debug("dumpDir: " + path);
+        // log.debug("dumpDir: " + path);
         IPFSDir dir = getDir(path);
         if (dir != null) {
             // log.debug("Dir: " + XString.prettyPrint(dir) + " EntryCount: " +
@@ -488,9 +504,10 @@ public class IPFSService {
             // log.debug("post: " + url);
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(null, null);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            
+
             // MediaType contentType = response.getHeaders().getContentType();
-            // Warning: IPFS is inconsistent. Sometimes they return plain/text and sometimes JSON in the contentType, so we just ignore it
+            // Warning: IPFS is inconsistent. Sometimes they return plain/text and sometimes
+            // JSON in the contentType, so we just ignore it
 
             if (response.getStatusCode().value() == 200 /* && MediaType.APPLICATION_JSON.equals(contentType) */) {
                 if (clazz == String.class) {

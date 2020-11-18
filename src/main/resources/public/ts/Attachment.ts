@@ -78,23 +78,25 @@ export class Attachment implements AttachmentIntf {
 
     /* Queries the server for the purpose of just loading the binary properties into node, and leaving everything else intact */
     refreshBinaryPropsFromServer = (node: J.NodeInfo): Promise<any> => {
-        const res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            nodeId: node.id,
-            upLevel: false,
-            siblingOffset: 0,
-            renderParentIfLeaf: false,
-            offset: 0,
-            goToLastPage: false,
-            forceIPFSRefresh: false,
-            singleNode: true
-        },
-        (res: J.RenderNodeResponse) => {
-            if (res.node.properties) {
-                S.props.transferBinaryProps(res.node, node);
-            }
-        });
+        return new Promise<boolean>(async (resolve, reject) => {
+            S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                nodeId: node.id,
+                upLevel: false,
+                siblingOffset: 0,
+                renderParentIfLeaf: false,
+                offset: 0,
+                goToLastPage: false,
+                forceIPFSRefresh: false,
+                singleNode: true
+            },
+                (res: J.RenderNodeResponse) => {
+                    if (res.node.properties) {
+                        S.props.transferBinaryProps(res.node, node);
+                    }
+                    resolve();
+                });
 
-        return res;
+        });
     }
 
     deleteAttachmentResponse = (res: J.DeleteAttachmentResponse, id: string, state: AppState): void => {

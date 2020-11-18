@@ -481,7 +481,7 @@ export class EditNodeDlg extends DialogBase {
 
         let dlg = new UploadFromFileDropzoneDlg(state.node.id, state.node, state.toIpfs, null, false, this.appState, async () => {
             await S.attachment.refreshBinaryPropsFromServer(state.node);
-            this.forceRender();
+            this.mergeState({ node: state.node });
             this.binaryDirty = true;
         });
         await dlg.open();
@@ -497,7 +497,7 @@ export class EditNodeDlg extends DialogBase {
 
             if (deleted) {
                 S.attachment.removeBinaryProperties(state.node);
-                this.forceRender();
+                this.mergeState({ node: state.node });
                 this.binaryDirty = true;
             }
             resolve();

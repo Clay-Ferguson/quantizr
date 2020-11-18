@@ -13,7 +13,6 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -56,6 +55,7 @@ import org.subnode.config.NodeName;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.OutOfSpaceException;
 import org.subnode.exception.base.RuntimeEx;
+import org.subnode.model.MerkleLink;
 import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrivilegeType;
@@ -331,6 +331,8 @@ public class AttachmentService {
 		/* Clear out any leftover binary properties */
 		deleteAllBinaryProperties(node);
 
+		// log.debug("Node JSON after BIN props removed: " + XString.prettyPrint(node));
+
 		if (ImageUtil.isImageMime(mimeType)) {
 
 			// default image to be 100% size
@@ -402,6 +404,11 @@ public class AttachmentService {
 				StreamUtil.close(is);
 			}
 		}
+
+		// log.debug("Final Node JSON after Upload: " + XString.prettyPrint(node));
+
+		// need to remove this! (todo-0)
+		// MongoThreadLocal.clearDirtyNodes();
 		update.save(session, node);
 	}
 
@@ -967,10 +974,9 @@ public class AttachmentService {
 			final String mimeType) {
 		auth.auth(session, node, PrivilegeType.WRITE);
 		final ValContainer<Integer> streamSize = new ValContainer<Integer>();
-		Map<String, Object> ret = ipfsService.addFromStream(session, stream, mimeType, streamSize, null);
+		MerkleLink ret = ipfsService.addFromStream(session, stream, mimeType, streamSize, null);
 		if (ret != null) {
-			String hash = (String) ret.get("Hash");
-			node.setProp(NodeProp.IPFS_LINK.s(), hash);
+			node.setProp(NodeProp.IPFS_LINK.s(), ret.getHash());
 			node.setProp(NodeProp.BIN_SIZE.s(), streamSize.getVal());
 		}
 	}
