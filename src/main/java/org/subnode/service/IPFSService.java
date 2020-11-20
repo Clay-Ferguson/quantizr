@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -65,8 +63,6 @@ import org.subnode.util.XString;
 public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
-    private String INTERNAL_IPFS_GATEWAY;
-
     /*
      * originally this was 'data-endcoding' (or at least i got that from somewhere),
      * but now their example page seems to show 'encoding' is the name here.
@@ -91,11 +87,6 @@ public class IPFSService {
 
     @Autowired
     private AppProp appProp;
-
-    @PostConstruct
-    public void postConstruct() {
-        INTERNAL_IPFS_GATEWAY = appProp.getIPFSGatewayHostAndPort() + "/ipfs/";
-    }
 
     /**
      * Looks up quanta node by 'nodeId', and gets the 'ipfs:link' property, which is
@@ -205,8 +196,8 @@ public class IPFSService {
     public final MerkleNode getMerkleNode(String hash, String encoding) {
         MerkleNode ret = null;
         try {
-            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/object/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "="
-                    + encoding;
+            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/object/get?arg=" + hash + "&" + ENCODING_PARAM_NAME
+                    + "=" + encoding;
 
             log.debug("REQ: " + url);
 
@@ -236,8 +227,8 @@ public class IPFSService {
     public final String getAsString(String hash, String encoding) {
         String ret = null;
         try {
-            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/object/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "="
-                    + encoding;
+            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/object/get?arg=" + hash + "&" + ENCODING_PARAM_NAME
+                    + "=" + encoding;
 
             ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
             MediaType contentType = result.getHeaders().getContentType();
@@ -427,7 +418,7 @@ public class IPFSService {
     }
 
     public InputStream getStream(MongoSession session, String hash, String mimeType) {
-        String sourceUrl = INTERNAL_IPFS_GATEWAY + hash;
+        String sourceUrl = appProp.getIPFSGatewayHostAndPort() + "/ipfs/" + hash;
 
         try {
             int timeout = 20;

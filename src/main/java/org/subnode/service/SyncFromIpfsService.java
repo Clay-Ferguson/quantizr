@@ -33,7 +33,6 @@ public class SyncFromIpfsService {
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 	{
 		jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
 	}
 
 	@Autowired

@@ -24,15 +24,9 @@ sudo rm -f ${QUANTA_BASE}/log/*
 mkdir -p ${ipfs_staging}
 
 cd ${PRJROOT}
-. ./_build.sh
 
 docker-compose -f ${docker_compose_yaml} up -d subnode-dev
 verifySuccess "Docker Compose: up"
-
-# sleep 10
-# echp "Sleeping 10 seconds before checking logs"
-# docker-compose -f ${docker_compose_yaml} logs ipfs-dev
-# verifySuccess "Docker Compose: logs"
 
 dockerCheck "subnode-dev"
 

@@ -217,7 +217,12 @@ export class MenuPanel extends Div {
             // S.edit.fullRepositoryExport();") + //
         ]));
 
-        if (state.isAdminUser) {
+        /* This was experimental, and does work perfectly well (based on a small aount of testing done). 
+          These menu items can save a node subgraph to IPFS files (MFS) and the restore those nodes back 
+          from that tree branch. But the feature is not currently needed or enabled.
+          */
+        // eslint-disable-next-line no-constant-condition
+        if (false && state.isAdminUser) {
             children.push(new Menu("IPFS", [
                 new MenuItem("Sync: Nodes to IPFS", () => S.util.publishNodeToIpfs(hltNode), //
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)), //

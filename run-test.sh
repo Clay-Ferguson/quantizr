@@ -34,10 +34,14 @@ verifySuccess "Docker Load subnode-test.tar"
 docker-compose -f ${docker_compose_yaml} up -d subnode-test
 verifySuccess "Docker Compose: up"
 
+# sleep 10
+# echp "Sleeping 10 seconds before checking logs"
+# docker-compose -f ${docker_compose_yaml} logs ipfs-test
+# verifySuccess "Docker Compose: logs"
+
 dockerCheck "subnode-test"
 
 echo ==========================
 echo Quantizr Started OK!
 echo ==========================
-echo "Sleeping 7s"
-sleep 7
+read -p "Press any key"
