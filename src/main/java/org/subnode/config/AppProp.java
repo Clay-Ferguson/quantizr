@@ -41,6 +41,10 @@ public class AppProp /* implements EnvironmentAware */ {
 		return env.getProperty("httpProtocol");
 	}
 
+	public String protocolHostAndPort() {
+		return getHttpProtocol() + "://" + getMetaHost() + ":" + getServerPort();
+	}
+
 	public List<String> getRunTests() {
 		List<String> ret = null;
 		String runTests = env.getProperty("runTests");

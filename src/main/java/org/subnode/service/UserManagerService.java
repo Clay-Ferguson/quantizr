@@ -209,7 +209,7 @@ public class UserManagerService {
 		sessionContext.setLastLoginTime(now.getTime());
 		userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), now.getTime());
 
-		// ensureValidCryptoKeys(userNode);
+		ensureValidCryptoKeys(userNode);
 		update.save(session, userNode);
 	}
 
@@ -218,26 +218,24 @@ public class UserManagerService {
 	 * 
 	 * no longer used.
 	 */
-	// public void ensureValidCryptoKeys(SubNode userNode) {
-	// try {
-	// String publicKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
-	// if (publicKey == null) {
-	// KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-	// kpg.initialize(2048);
-	// KeyPair pair = kpg.generateKeyPair();
+	public void ensureValidCryptoKeys(SubNode userNode) {
+		try {
+			String publicKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
+			if (publicKey == null) {
+				KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+				kpg.initialize(2048);
+				KeyPair pair = kpg.generateKeyPair();
 
-	// publicKey =
-	// Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
-	// String privateKey =
-	// Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
+				publicKey = Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
+				String privateKey = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
 
-	// userNode.setProp(NodeProp.CRYPTO_KEY_PUBLIC.s(), publicKey);
-	// userNode.setProp(NodeProp.CRYPTO_KEY_PRIVATE.s(), privateKey);
-	// }
-	// } catch (Exception e) {
-	// log.error("failed creating crypto keys", e);
-	// }
-	// }
+				userNode.setProp(NodeProp.CRYPTO_KEY_PUBLIC.s(), publicKey);
+				userNode.setProp(NodeProp.CRYPTO_KEY_PRIVATE.s(), privateKey);
+			}
+		} catch (Exception e) {
+			log.error("failed creating crypto keys", e);
+		}
+	}
 
 	public String getInboxNotification(MongoSession session) {
 		String userName = sessionContext.getUserName();
@@ -706,7 +704,7 @@ public class UserManagerService {
 			SubNode prefsNode = read.getUserNodeByUserName(session, userName);
 			userPrefs.setEditMode(prefsNode.getBooleanProp(NodeProp.USER_PREF_EDIT_MODE.s()));
 			userPrefs.setShowMetaData(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_METADATA.s()));
-	
+
 			long maxFileSize = prefsNode.getIntProp(NodeProp.BIN_QUOTA.s());
 			if (maxFileSize == 0) {
 				maxFileSize = Const.DEFAULT_USER_QUOTA;
