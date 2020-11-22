@@ -2,7 +2,9 @@ package org.subnode.service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -19,10 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.subnode.actpub.model.ActPubActor;
-import org.subnode.actpub.model.ActPubPublicKey;
-import org.subnode.actpub.model.WebFingerLink;
-import org.subnode.actpub.model.WebFingerResponse;
+import org.subnode.actpub.APObj;
 import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
@@ -51,48 +50,51 @@ public class ActPubService {
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    //NOTE: This didn't allow unknown properties as expected but putting the following in the JSON classes did:
+    // NOTE: This didn't allow unknown properties as expected but putting the
+    // following in the JSON classes did:
     // @JsonIgnoreProperties(ignoreUnknown = true)
     {
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	}
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
     // https://fosstodon.org/.well-known/webfinger?resource=acct:WClayFerguson@fosstodon.org'
 
     /* Get WebFinger from foreign server */
-    public WebFingerResponse getWebFinger(String host, String resource) {
-        WebFingerResponse ret = null;
+    public APObj getWebFinger(String host, String resource) {
         String url = host + "/.well-known/webfinger?resource=acct:" + resource;
+        APObj finger = getJson(url, new MediaType("application", "jrd+json"));
+        log.debug("WebFinger: " + XString.prettyPrint(finger));
+        return finger;
+    }
 
-        HttpHeaders headers = new HttpHeaders();
+    public APObj getActor(String url) {
+        if (url == null)
+            return null;
+        APObj actor = getJson(url, new MediaType("application", "ld+json"));
+        log.debug("Actor: " + XString.prettyPrint(actor));
+        return actor;
+    }
 
-        List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
-        acceptableMediaTypes.add(new MediaType("application", "jrd+json"));
-        headers.setAccept(acceptableMediaTypes);
+    public APObj getOutbox(String url) {
+        if (url == null)
+            return null;
+        APObj outbox = getJson(url, new MediaType("application", "ld+json"));
+        log.debug("Outbox: " + XString.prettyPrint(outbox));
+        return outbox;
+    }
 
-        MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-        MediaType contentType = response.getHeaders().getContentType();
-        if (contentType.toString().indexOf("application/jrd+json") != -1) {
-            try {
-                ret = mapper.readValue(response.getBody(), WebFingerResponse.class);
-                if (ret != null) {
-                    log.debug("WebFinger: " + XString.prettyPrint(ret));
-                }
-            } catch (Exception e) {
-                log.error("parsing webfinger failed", e);
-            }
-        }
-
-        return ret;
+    public APObj getOrderedCollectionPage(String url) {
+        if (url == null)
+            return null;
+        APObj outboxPage = getJson(url, new MediaType("application", "activity+json"));
+        log.debug("OrderedCollectionPage: " + XString.prettyPrint(outboxPage));
+        return outboxPage;
     }
 
     /*
      * Generate webfinger response from our server
      */
-    public WebFingerResponse generateWebFingerResponse(String resource) {
+    public APObj generateWebFinger(String resource) {
         String host = appProp.protocolHostAndPort();
 
         // resp.header("Access-Control-Allow-Origin", "*");
@@ -105,22 +107,22 @@ public class ActPubService {
                     SubNode userNode = read.getUserNodeByUserName(null, username);
                     if (userNode != null) {
 
-                        WebFingerResponse wfr = new WebFingerResponse();
-                        wfr.setSubject("acct:" + username + "@" + appProp.getMetaHost());
+                        APObj webFinger = new APObj();
+                        webFinger.put("subject", "acct:" + username + "@" + appProp.getMetaHost());
 
-                        WebFingerLink wfl = new WebFingerLink();
-                        wfl.setRel("self");
-                        wfl.setType("application/activity+json");
+                        APObj webFingerLink = new APObj();
+                        webFingerLink.put("rel", "self");
+                        webFingerLink.put("type", "application/activity+json");
 
                         // The href here is required to be the link to the "actor document"
-                        wfl.setHref(host + "/ap/u/" + username);
+                        webFingerLink.put("href", host + "/ap/u/" + username);
 
-                        List<WebFingerLink> links = new LinkedList<WebFingerLink>();
-                        links.add(wfl);
-                        wfr.setLinks(links);
+                        List<APObj> links = new LinkedList<APObj>();
+                        links.add(webFingerLink);
+                        webFinger.put("links", links);
 
-                        log.debug("Reply with WebFingerResponse: " + XString.prettyPrint(wfr));
-                        return wfr;
+                        log.debug("Reply with WebFinger: " + XString.prettyPrint(webFinger));
+                        return webFinger;
                     }
                 }
             }
@@ -130,10 +132,9 @@ public class ActPubService {
         return null;
     }
 
-    public ActPubActor getActor(String userName) {
+    public APObj generateActor(String userName) {
         String host = appProp.protocolHostAndPort();
 
-        // resp.header("Access-Control-Allow-Origin", "*");
         try {
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (userNode != null) {
@@ -142,38 +143,69 @@ public class ActPubService {
                     throw new RuntimeException("User has no crypto keys. This means they have never logged in?");
                 }
 
-                ActPubActor actor = new ActPubActor();
+                APObj actor = new APObj();
 
-                List<String> context = new LinkedList<String>();
+                List<Object> context = new LinkedList<Object>();
                 context.add("https://www.w3.org/ns/activitystreams");
                 context.add("https://w3id.org/security/v1");
-                actor.setContext(context);
+                actor.put("context", context);
 
                 // Note: this is a self-reference, and must be identical to the @RequestMapping
                 // // on this function (above)
-                actor.setId(host + "/ap/u/" + userName);
-                actor.setType("Person");
-                actor.setPreferredUsername(userName);
-                actor.setInbox(host + "/ap/inbox/" + userName); //
-                actor.setOutbox(host + "/ap/outbox/" + userName); //
-                actor.setFollowers(host + "/ap/followers/" + userName);
+                actor.put("id", host + "/ap/u/" + userName);
+                actor.put("type", "Person");
+                actor.put("preferredUsername", userName);
+                actor.put("inbox", host + "/ap/inbox/" + userName); //
+                actor.put("outbox", host + "/ap/outbox/" + userName); //
+                //actor.setFollowers("followers", host + "/ap/followers/" + userName);
 
-                ActPubPublicKey pubKey = new ActPubPublicKey();
-                pubKey.setId(actor.getId() + "#main-key");
-                pubKey.setOwner(actor.getId());
-                pubKey.setPublicKeyPem("-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n");
-                actor.setPublickey(pubKey); //
-                actor.setSupportsFriendRequests(true);
+                APObj pubKey = new APObj();
+                pubKey.put("id", actor.getStr("id") + "#main-key");
+                pubKey.put("owner", actor.getStr("id"));
+                pubKey.put("publicKeyPem", "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n");
+                actor.put("publicKey", pubKey); //
+                actor.put("supportsFriendRequests", true);
 
                 log.debug("Reply with Actor: " + XString.prettyPrint(actor));
                 return actor;
             }
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             log.error("actor query failed", e);
         }
         return null;
+    }
+
+    public Map<String, Object> getLinkByRel(APObj webFinger, String rel) {
+        if (webFinger.getList("links") == null)
+            return null;
+
+        for (Object link : webFinger.getList("links")) {
+            Map<String, Object> map = (Map<String, Object>) link;
+            if (rel.equals(map.get("rel"))) {
+                return (Map<String, Object>) link;
+            }
+        }
+        return null;
+    }
+
+    public APObj getJson(String url, MediaType mediaType) {
+        APObj ret = null;
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
+            acceptableMediaTypes.add(mediaType);
+            headers.setAccept(acceptableMediaTypes);
+
+            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+            ret = mapper.readValue(response.getBody(), new TypeReference<APObj>() {
+            });
+            log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
+        } catch (Exception e) {
+            log.error("failed getting json: " + url, e);
+        }
+        return ret;
     }
 
     // * /* WARNING: This is old code never completed yet and just the beginnings of

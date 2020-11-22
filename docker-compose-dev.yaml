@@ -35,12 +35,9 @@ services:
     ipfs-dev: 
         container_name: ipfs-dev 
         environment:
-            # I think some of these env options may be obsolete now?
-            # From go-ipfs github developer: 
-            #    Enabling the "lowpower" profile should help. That will disable background data reproviding, set really 
-            #    low connection manager limits, and put your node into dhtclient mode.
+            # IPFS_PROFILE options (lowpower | server)
             routing: "dhtclient" 
-            IPFS_PROFILE: "server"
+            IPFS_PROFILE: "lowpower" 
             IPFS_PATH: "/data/ipfs"
             # LIBP2P_FORCE_PNET: 1
         # expose:

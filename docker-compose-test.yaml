@@ -19,33 +19,30 @@ services:
         # and we don't want that happening unexpectedly
         image: mongo:4.0
 
-    ipfs-test: 
-        container_name: ipfs-test 
-        environment:
-            # I think some of these env options may be obsolete now?
-            # From go-ipfs github developer: 
-            #    Enabling the "lowpower" profile should help. That will disable background data reproviding, set really 
-            #    low connection manager limits, and put your node into dhtclient mode.
-            # routing: "dhtclient" 
-            IPFS_PROFILE: "server"
-            IPFS_PATH: "/data/ipfs"
-            # LIBP2P_FORCE_PNET: 1
-        # expose:
-        #    # do we need 4001. it's for swarm right?
-        #     - '4101'
-        #     - '8080'
-        #     - '5002'
-        # WARNING: volumes will not handle '~' character for home folder. Do not use.
-        volumes:
-            - '${ipfs_staging}:/export'
-            - '${ipfs_data}:/data/ipfs'
-        # ports:
-        #    - "4101:4001"
-        #    - "8080:8080"
-        #    - "5002:5001"
-        networks:
-            - net-test
-        image: ipfs/go-ipfs:v0.7.0
+    # ipfs-test: 
+    #     container_name: ipfs-test 
+    #     environment:
+    #         # IPFS_PROFILE options (lowpower | server)
+    #         routing: "dhtclient" 
+    #         IPFS_PROFILE: "lowpower"
+    #         IPFS_PATH: "/data/ipfs"
+    #         # LIBP2P_FORCE_PNET: 1
+    #     # expose:
+    #     #    # do we need 4001. it's for swarm right?
+    #     #     - '4101'
+    #     #     - '8080'
+    #     #     - '5002'
+    #     # WARNING: volumes will not handle '~' character for home folder. Do not use.
+    #     volumes:
+    #         - '${ipfs_staging}:/export'
+    #         - '${ipfs_data}:/data/ipfs'
+    #     # ports:
+    #     #    - "4101:4001"
+    #     #    - "8080:8080"
+    #     #    - "5002:5001"
+    #     networks:
+    #         - net-test
+    #     image: ipfs/go-ipfs:v0.7.0
 
     subnode-test:
         build: 
@@ -98,7 +95,7 @@ services:
         image: subnode-test
         depends_on:
             - mongo-test
-            - ipfs-test
+            # - ipfs-test
 
 # https://docs.docker.com/compose/networking/
 

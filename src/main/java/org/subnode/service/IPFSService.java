@@ -372,6 +372,15 @@ public class IPFSService {
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
+            //////
+            // todo-1: this kind of way can get the class directly from spring without us having to pare it as json, it just comes right
+            // back in the 'getBody' as the correctly typed json. Do this throughout the code where possible.
+            // ResponseEntity<?> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, clazz);
+            // if (response != null) {
+            //     return response.getBody();
+            // }
+            //////
+
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {
             });

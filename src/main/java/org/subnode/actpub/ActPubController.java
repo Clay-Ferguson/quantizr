@@ -27,7 +27,7 @@ public class ActPubController {
 	@RequestMapping(value = "/.well-known/webfinger", method = RequestMethod.GET, produces = "application/jrd+json")
 	public @ResponseBody Object webFinger(//
 			@RequestParam(value = "resource", required = true) String resource) {
-		Object ret = actPubService.generateWebFingerResponse(resource);
+		Object ret = actPubService.generateWebFinger(resource);
 		if (ret!=null) return ret;
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
@@ -35,7 +35,7 @@ public class ActPubController {
 	/* This is the Actor URL, and is what we send back in the webfinger */
 	@RequestMapping(value = "/ap/u/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object actor(@PathVariable(value = "userName", required = true) String userName) {
-		Object ret = actPubService.getActor(userName);
+		Object ret = actPubService.generateActor(userName);
 		if (ret!=null) return ret;
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
