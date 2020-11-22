@@ -4,6 +4,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
 
+    // Activity Pub Properties
+    ACT_PUB_ID("ap:id", "s"), //
+    ACT_PUB_OBJ_TYPE("ap:objType", "s"), //
+    ACT_PUB_OBJ_CONTENT("ap:objContent", "s"), //
+    ACT_PUB_OBJ_INREPLYTO("ap:objInReplyTo", "s"), //
+    ACT_PUB_OBJ_URL("ap:objUrl", "s"), //
+
     /* This is the encrypted symetric key to the node data, that was encrypted using the private key of the owner of the node.
     When nodes are shared to other users the cleartext copy of this key is encrypted with the public key of the user it's being
     shared to so that user can use their private key to decrypt this key and gain access to the actual data. */

@@ -1,5 +1,4 @@
 import { useSelector } from "react-redux";
-import { dispatch, store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
@@ -43,7 +42,8 @@ export class NodeCompRowHeader extends Div {
                     className: (node.owner === state.userName) ? "created-by-me" : "created-by-other"
                 }));
                 children.push(new Span(S.util.formatDate(new Date(node.lastModified)), {
-                    className: "marginLeft"
+                    className: "marginLeft",
+                    title: "Last Modified"
                 }));
             }
         }

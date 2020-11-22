@@ -106,7 +106,8 @@ public class MongoUtil {
 	// try {
 	// Resource resource =
 	// SpringContextUtil.getApplicationContext().getResource(classpath);
-	// String content = XString.loadResourceIntoString(resource); //see XString.getResourceAsString
+	// String content = XString.loadResourceIntoString(resource); //see
+	// XString.getResourceAsString
 	// node.setProperty(JcrProp.CONTENT, content);
 	// AccessControlUtil.makeNodePublic(session, node);
 	// node.setProperty(JcrProp.DISABLE_INSERT, "y");
@@ -184,6 +185,8 @@ public class MongoUtil {
 	}
 
 	public String getHashOfPassword(String password) {
+		if (password == null)
+			return null;
 		return DigestUtils.sha256Hex(password).substring(0, 20);
 	}
 
@@ -439,6 +442,11 @@ public class MongoUtil {
 	}
 
 	public SubNode createUser(MongoSession session, String user, String email, String password, boolean automated) {
+		SubNode userNode = read.getUserNodeByUserName(session, user);
+		if (userNode != null) {
+			throw new RuntimeException("User already existed: " + user);
+		}
+
 		// if (PrincipalName.ADMIN.s().equals(user)) {
 		// throw new RuntimeEx("createUser should not be called fror admin
 		// user.");
@@ -449,7 +457,7 @@ public class MongoUtil {
 		// todo-1: is user validated here (no invalid characters, etc. and invalid
 		// flowpaths tested?)
 
-		SubNode userNode = create.createNode(session, newUserNodePath, NodeType.ACCOUNT.s());
+		userNode = create.createNode(session, newUserNodePath, NodeType.ACCOUNT.s());
 		ObjectId id = new ObjectId();
 		userNode.setId(id);
 		userNode.setOwner(id);
@@ -504,8 +512,8 @@ public class MongoUtil {
 
 			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null,
 					null);
-			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.OUTBOX, null, "System Email Outbox", null, true,
-					null, null);
+			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.OUTBOX, null, "System Email Outbox", null,
+					true, null, null);
 		}
 
 		createPublicNodes(session);
@@ -514,8 +522,8 @@ public class MongoUtil {
 	public void createPublicNodes(MongoSession session) {
 		log.debug("creating PublicNodes");
 		ValContainer<Boolean> created = new ValContainer<>();
-		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null,
-				true, null, created);
+		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public",
+				null, true, null, created);
 
 		if (created.getVal()) {
 			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(),
@@ -527,14 +535,15 @@ public class MongoUtil {
 		 * initialize these two nodes (landing page, and userguide)
 		 */
 		created = new ValContainer<>();
-		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "home", "home",
-				"Public Home", null, true, null, created);
-			
+		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "home",
+				"home", "Public Home", null, true, null, created);
+
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 
 		// created = new ValContainer<>();
-		// SubNode userGuide = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "userguide",
-		// 		"User Guide", null, true, null, created);
+		// SubNode userGuide = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT +
+		// "/" + NodeName.PUBLIC, "userguide",
+		// "User Guide", null, true, null, created);
 		// log.debug("UserGuide Node exists at id: " + userGuide.getId());
 
 		/* Ensure Content folder is created and synced to file system */

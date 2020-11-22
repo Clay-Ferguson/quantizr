@@ -658,6 +658,7 @@ input[type="radio"] {
 .horizontalLayout {
     //margin-top: 5px;
     //margin-left: 5px;
+    display: inline-block;
 }
 
 @import 'button.scss';

@@ -602,6 +602,11 @@ export const enum Constant {
 }
 
 export const enum NodeProp {
+    ACT_PUB_ID = "ap:id",
+    ACT_PUB_OBJ_TYPE = "ap:objType",
+    ACT_PUB_OBJ_CONTENT = "ap:objContent",
+    ACT_PUB_OBJ_INREPLYTO = "ap:objInReplyTo",
+    ACT_PUB_OBJ_URL = "ap:objUrl",
     ENC_KEY = "sn:encKey",
     RSS_FEED_SRC = "sn:rssFeedSrc",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",
@@ -670,6 +675,7 @@ export const enum NodeType {
     FRIEND_LIST = "sn:friendList",
     FRIEND = "sn:friend",
     USER_FEED = "sn:userFeed",
+    ACT_PUB_ITEM = "ap:item",
     NONE = "u",
     PLAIN_TEXT = "sn:txt",
     FS_FILE = "fs:file",

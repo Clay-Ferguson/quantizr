@@ -87,6 +87,9 @@ public class NodeEditService {
 	private RunAsMongoAdmin adminRunner;
 
 	@Autowired
+	private ActPubService actPubService;
+
+	@Autowired
 	private MongoAuth auth;
 
 	/*
@@ -253,7 +256,7 @@ public class NodeEditService {
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
 
-		//log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
+		// log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
 		SubNode node = read.getNode(session, nodeId);
 		auth.authRequireOwnerOfNode(session, node);
 
@@ -357,6 +360,15 @@ public class NodeEditService {
 				// if USER_NODE_ID has not been set on the node yet then get it and set it first
 				// here.
 				if (friendUserName != null) {
+					// todo-0: For now any userName containing "@" is considered a foreign Fediverse
+					// user and will trigger
+					// a finger search of them, and a load/update of their outbox
+					if (friendUserName.contains("@")) {
+						adminRunner.run(s -> {
+							actPubService.loadForeignUser(s, friendUserName);
+						});
+					}
+
 					ValContainer<SubNode> _userNode = new ValContainer<SubNode>();
 					final String _userName = friendUserName;
 					adminRunner.run(s -> {
@@ -558,8 +570,11 @@ public class NodeEditService {
 		return res;
 	}
 
-	/* todo-1: update to use subgraph query and then just use the slash-count in the path to determine
-	relative tree level here. Relative part being important of course. */
+	/*
+	 * todo-1: update to use subgraph query and then just use the slash-count in the
+	 * path to determine relative tree level here. Relative part being important of
+	 * course.
+	 */
 	private void updateHeadingsRecurseNode(MongoSession session, SubNode node, int level, int baseLevel) {
 		if (node == null)
 			return;

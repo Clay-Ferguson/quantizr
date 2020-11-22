@@ -18,6 +18,8 @@ public enum NodeType {
     FRIEND("sn:friend"), //
     USER_FEED("sn:userFeed"), //
 
+    ACT_PUB_ITEM("ap:item"), //
+
     NONE("u"), //same as 'markdown' really
     PLAIN_TEXT("sn:txt"), //
     FS_FILE("fs:file"), //

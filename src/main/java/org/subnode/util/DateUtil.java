@@ -2,10 +2,11 @@ package org.subnode.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -198,24 +199,30 @@ public class DateUtil {
 	}
 
 	// This is from a trustworthy-looking StackOverflow article, but untested by me.
-	public static Date parse8601Time(String timeStr) {
+	public static Date parseISOTime(String s) {
 		// if you know the input is UTC:
 		// java.util.Date date = Date.from( Instant.parse( "2014-12-12T10:39:40Z" ));
 
-		// else, if could be ANY timezone:
-		OffsetDateTime odt = OffsetDateTime.parse(timeStr);
-		return Date.from(odt.toInstant());
+		// These two from stack overflow were my original 'find'
+		// OffsetDateTime odt = OffsetDateTime.parse(timeStr);
+		// return Date.from(odt.toInstant());
+
+		// But this also came from StackOverflow...
+		TemporalAccessor ta = DateTimeFormatter.ISO_INSTANT.parse(s);
+		Instant i = Instant.from(ta);
+		Date d = Date.from(i);
+		return d;
 	}
 
 	public static long getMillisFromDuration(String durationStr) {
-		if (StringUtils.isEmpty(durationStr)) return 0;
+		if (StringUtils.isEmpty(durationStr))
+			return 0;
 
 		int colonIdx = durationStr.indexOf(":");
-		if (colonIdx==-1) {
-			//if no colon, assume minutes
+		if (colonIdx == -1) {
+			// if no colon, assume minutes
 			return Integer.parseInt(durationStr) * 60 * 1000;
-		}
-		else {
+		} else {
 			String hrs = durationStr.substring(0, colonIdx);
 			String mins = durationStr.substring(colonIdx + 1);
 			return (Integer.parseInt(hrs) * 60 + Integer.parseInt(mins)) * 60 * 1000;

@@ -1,5 +1,7 @@
 package org.subnode.service;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +24,15 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.actpub.APObj;
+import org.subnode.actpub.VisitAPObj;
 import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
+import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
-import org.subnode.mongo.RunAsMongoAdminEx;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
@@ -35,13 +42,19 @@ public class ActPubService {
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
     @Autowired
+    private MongoUtil util;
+
+    @Autowired
     private MongoRead read;
 
     @Autowired
-    private AppProp appProp;
+    private MongoUpdate update;
 
     @Autowired
-    private RunAsMongoAdminEx<Object> adminRunnerEx;
+    private MongoCreate create;
+
+    @Autowired
+    private AppProp appProp;
 
     /*
      * RestTempalte is thread-safe and reusable, and has no state, so we need only
@@ -55,6 +68,151 @@ public class ActPubService {
     // @JsonIgnoreProperties(ignoreUnknown = true)
     {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    /*
+     * Reads in a user from the Fediverse with a name like:
+     * WClayFerguson@fosstodon.org
+     */
+    public void loadForeignUser(MongoSession session, String userName) {
+        String host = getHostFromUserName(userName);
+        log.debug("Host of username: [" + host + "]");
+        APObj webFinger = getWebFinger("https://" + host, userName);
+
+        Map<String, Object> self = getLinkByRel(webFinger, "self");
+        log.debug("Self Link: " + XString.prettyPrint(self));
+        if (self != null) {
+            APObj actor = getActor((String) self.get("href"));
+
+            // if webfinger was successful, ensure the user is imported into our system.
+            if (actor != null) {
+                importActor(session, userName, actor);
+            }
+        }
+    }
+
+    // todo-0: need to disallow '@' symbol at least in our signup dialog, although
+    // techncally the DB will allow it
+    // and it will reference other foreign servers only
+    public void importActor(MongoSession session, String userName, APObj actor) {
+        if (userName == null)
+            return;
+
+        SubNode userNode = read.getUserNodeByUserName(session, userName);
+
+        // If we don't have this user in our system, create them. (todo-0: Need to
+        // specifically avoid any users
+        // here that somehow contain "@ourserver". That would basically duplicate a
+        // user.)
+        if (userNode == null) {
+            userNode = util.createUser(session, userName, null, null, true);
+        }
+
+        SubNode feedNode = read.getUserNodeByType(session, userName, null, null, NodeType.USER_FEED.s());
+        Iterable<SubNode> feedItems = read.getSubGraph(session, feedNode);
+
+        /*
+         * Generate a list of known AP IDs so we can ignore them and load only the
+         * unknown ones from the foreign server
+         */
+        HashSet<String> apIdSet = new HashSet<String>();
+        for (SubNode n : feedItems) {
+            String apId = n.getStringProp(NodeProp.ACT_PUB_ID.s());
+            if (apId != null) {
+                apIdSet.add(apId);
+            }
+        }
+
+        // todo-0: add error reporting here.
+        APObj outbox = getOutbox(actor.getStr("outbox"));
+        if (outbox == null)
+            return;
+
+        APObj ocPage = getOrderedCollectionPage(outbox.getStr("first"));
+        int pageNo = 0;
+        while (ocPage != null) {
+            pageNo++;
+            final int _pageNo = pageNo;
+
+            Object orderedItems = ocPage.getList("orderedItems");
+            iterate(orderedItems, apObj -> {
+                String apId = apObj.getStr("id");
+                if (!apIdSet.contains(apId)) {
+                    log.debug("CREATING NODE (AP Obj): " + apId);
+                    saveOutboxItem(session, feedNode, apObj, _pageNo);
+                    apIdSet.add(apId);
+                }
+                return true; // true=keep iterating.
+            });
+
+            String nextPage = ocPage.getStr("next");
+            log.debug("NextPage: " + nextPage);
+            if (nextPage != null) {
+                ocPage = getOrderedCollectionPage(nextPage);
+            } else {
+                break;
+            }
+        }
+
+        // Now process last page. No guarantee we already encountered it ? Need to verify this IS needed.
+        ocPage = getOrderedCollectionPage(outbox.getStr("last"));
+        Object orderedItems = ocPage.getList("orderedItems");
+        iterate(orderedItems, apObj -> {
+            String apId = apObj.getStr("id");
+            if (!apIdSet.contains(apId)) {
+                log.debug("CREATING NODE (AP Obj): " + apId);
+                saveOutboxItem(session, feedNode, apObj, -1);
+                apIdSet.add(apId);
+            }
+            return true; // true=keep iterating.
+        });
+
+    }
+
+    public void saveOutboxItem(MongoSession session, SubNode userFeedNode, APObj apObj, int pageNo) {
+        APObj object = apObj.getAPObj("object");
+
+        SubNode outboxNode = create.createNode(session, userFeedNode.getPath() + "/?", NodeType.NONE.s());
+        outboxNode.setProp(NodeProp.ACT_PUB_ID.s(), apObj.getStr("id"));
+        outboxNode.setProp(NodeProp.ACT_PUB_OBJ_TYPE.s(), object.getStr("type"));
+        outboxNode.setProp(NodeProp.ACT_PUB_OBJ_URL.s(), object.getStr("url"));
+        outboxNode.setProp(NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), object.getStr("inReplyTo"));
+        outboxNode.setProp(NodeProp.ACT_PUB_OBJ_CONTENT.s(),
+                object != null ? (/* "Page: " + pageNo + "<br>" + */ object.getStr("content")) : "no content");
+        outboxNode.setType(NodeType.ACT_PUB_ITEM.s());
+
+        Date published = apObj.getDate("published");
+        if (published != null) {
+            outboxNode.setModifyTime(published);
+        }
+
+        update.save(session, outboxNode, false);
+    }
+
+    public void iterate(Object list, VisitAPObj visitor) {
+        if (list instanceof List) {
+            for (Object obj : (List<?>) list) {
+                if (!visitor.visit(new APObj(obj))) {
+                    break;
+                }
+            }
+            return;
+        }
+        throw new RuntimeException("Unable to iterate type: " + list.getClass().getName());
+    }
+
+    public String getHostFromUserName(String userName) {
+        int atIdx = userName.indexOf("@");
+        if (atIdx == -1)
+            return null;
+        return userName.substring(atIdx + 1);
+    }
+
+    public String stripHostFromUserName(String userName) {
+        int atIdx = userName.indexOf("@");
+        if (atIdx == -1)
+            return userName;
+        return userName.substring(0, atIdx);
     }
 
     // https://fosstodon.org/.well-known/webfinger?resource=acct:WClayFerguson@fosstodon.org'
@@ -157,7 +315,7 @@ public class ActPubService {
                 actor.put("preferredUsername", userName);
                 actor.put("inbox", host + "/ap/inbox/" + userName); //
                 actor.put("outbox", host + "/ap/outbox/" + userName); //
-                //actor.setFollowers("followers", host + "/ap/followers/" + userName);
+                // actor.setFollowers("followers", host + "/ap/followers/" + userName);
 
                 APObj pubKey = new APObj();
                 pubKey.put("id", actor.getStr("id") + "#main-key");
