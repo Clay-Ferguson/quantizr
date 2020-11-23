@@ -610,6 +610,7 @@ export const enum NodeProp {
     ACT_PUB_OBJ_INREPLYTO = "ap:objInReplyTo",
     ACT_PUB_OBJ_URL = "ap:objUrl",
     ACT_PUB_USER_ICON_URL = "ap:userIcon",
+    ACT_PUB_USER_URL = "ap:userUrl",
     ENC_KEY = "sn:encKey",
     RSS_FEED_SRC = "sn:rssFeedSrc",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",

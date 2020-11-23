@@ -4,6 +4,7 @@ import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { Anchor } from "../widget/Anchor";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
@@ -67,16 +68,26 @@ export class FriendTypeHandler extends TypeBase {
         let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
 
         let img: Img = null;
+        let src: string = null;
         if (avatarVer) {
-            let src: string = S.render.getAvatarImgUrl(userNodeId, avatarVer);
-            if (src) {
-                img = new Img(null, {
-                    className: "friendImage",
-                    align: "left", // causes text to flow around
-                    src
-                });
-            }
+            src = S.render.getAvatarImgUrl(userNodeId, avatarVer);
         }
+
+        // finally resort to looking for avatar url as a property which will be how it's found for Foreign Federated users.
+        if (!src) {
+            src = S.props.getNodePropVal(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
+        }
+
+        if (src) {
+            img = new Img(null, {
+                className: "friendImage",
+                align: "left", // causes text to flow around
+                src
+            });
+        }
+
+        debugger;
+        let userUrl = S.props.getNodePropVal(J.NodeProp.ACT_PUB_USER_URL, node);
 
         return new Div(null, {
             // className: "marginLeft"
@@ -89,6 +100,7 @@ export class FriendTypeHandler extends TypeBase {
                 new Div(userBio, {
                     className: "userBio"
                 })]),
+            userUrl ? new Anchor(userUrl, "User Page") : null,
             new Div(null, null, [
                 new ButtonBar([
                     new Button("Show Feed", () => S.srch.feed("~" + J.NodeType.FRIEND_LIST, user), {

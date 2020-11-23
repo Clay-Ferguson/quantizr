@@ -232,10 +232,11 @@ a {
 }
 
 .friendImage {
-    width: 200px;
+    width: 150px;
     cursor: pointer;
     border: 2px solid $nodeBorderBottomColor;
-    margin: 10px;
+    border-radius: $borderRadiusLarge;
+    margin: 0 10px 10px 10px;
 }
 
 .userBio {

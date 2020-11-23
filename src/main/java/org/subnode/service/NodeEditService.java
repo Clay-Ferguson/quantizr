@@ -360,12 +360,14 @@ public class NodeEditService {
 				// if USER_NODE_ID has not been set on the node yet then get it and set it first
 				// here.
 				if (friendUserName != null) {
-					// todo-0: For now any userName containing "@" is considered a foreign Fediverse
-					// user and will trigger
-					// a finger search of them, and a load/update of their outbox
+					/*
+					 * todo-0: For now any userName containing "@" is considered a foreign Fediverse
+					 * user and will trigger a finger search of them, and a load/update of their
+					 * outbox
+					 */
 					if (friendUserName.contains("@")) {
 						adminRunner.run(s -> {
-							actPubService.loadForeignUser(s, friendUserName);
+							actPubService.loadForeignUser(s, friendUserName, node);
 						});
 					}
 

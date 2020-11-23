@@ -75,7 +75,7 @@ public class ActPubService {
      * Reads in a user from the Fediverse with a name like:
      * WClayFerguson@fosstodon.org
      */
-    public void loadForeignUser(MongoSession session, String apUserName) {
+    public void loadForeignUser(MongoSession session, String apUserName, SubNode friendNode) {
         String host = getHostFromUserName(apUserName);
         log.debug("Host of username: [" + host + "]");
         APObj webFinger = getWebFinger("https://" + host, apUserName);
@@ -87,7 +87,7 @@ public class ActPubService {
 
             // if webfinger was successful, ensure the user is imported into our system.
             if (actor != null) {
-                importActor(session, apUserName, actor);
+                importActor(session, apUserName, actor, friendNode);
             }
         }
     }
@@ -95,7 +95,7 @@ public class ActPubService {
     // todo-0: need to disallow '@' symbol at least in our signup dialog, although
     // techncally the DB will allow it
     // and it will reference other foreign servers only
-    public void importActor(MongoSession session, String apUserName, APObj actor) {
+    public void importActor(MongoSession session, String apUserName, APObj actor, SubNode friendNode) {
         if (apUserName == null)
             return;
 
@@ -119,6 +119,20 @@ public class ActPubService {
                     userNode.setProp(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl);
                     update.save(session, userNode, false);
                 }
+                /*
+                 * Note: we also replicate some of the user info onto the friendNode, so that it
+                 * can render rapidly with no queries onto other nodes
+                 */
+                if (friendNode != null) {
+                    friendNode.setProp(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl);
+                }
+            }
+        }
+
+        if (friendNode != null) {
+            String userUrl = actor.getStr("url");
+            if (userUrl != null) {
+                friendNode.setProp(NodeProp.ACT_PUB_USER_URL.s(), userUrl);
             }
         }
 
