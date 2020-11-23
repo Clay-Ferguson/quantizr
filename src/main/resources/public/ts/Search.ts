@@ -96,9 +96,10 @@ export class Search implements SearchIntf {
         }, this.timelineResponse);
     }
 
-    feed = (nodeId: string) => {
+    feed = (nodeId: string, feedUserName: string) => {
         S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
-            nodeId
+            nodeId,
+            feedUserName
         }, this.feedResponse);
     }
 

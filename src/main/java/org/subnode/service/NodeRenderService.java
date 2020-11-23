@@ -488,6 +488,7 @@ public class NodeRenderService {
 	}
 
 	public void populateSocialCardProps(SubNode node, Model model) {
+		if (node!=null) return;
 		NodeMetaInfo metaInfo = subNodeUtil.getNodeMetaInfo(node);
 		model.addAttribute("ogTitle", metaInfo.getTitle());
 		model.addAttribute("ogDescription", metaInfo.getDescription());

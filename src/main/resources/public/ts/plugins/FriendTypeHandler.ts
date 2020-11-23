@@ -5,6 +5,8 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
+import { Button } from "../widget/Button";
+import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { Img } from "../widget/Img";
@@ -22,10 +24,10 @@ export class FriendTypeHandler extends TypeBase {
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
-        case NodeActionType.editNode:
-            return true;
-        default:
-            return false;
+            case NodeActionType.editNode:
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -70,13 +72,14 @@ export class FriendTypeHandler extends TypeBase {
             if (src) {
                 img = new Img(null, {
                     className: "friendImage",
+                    align: "left", // causes text to flow around
                     src
                 });
             }
         }
 
         return new Div(null, {
-            className: "row marginLeft"
+            // className: "marginLeft"
         }, [
             img,
             new Div(null, null, [
@@ -85,7 +88,14 @@ export class FriendTypeHandler extends TypeBase {
                 }),
                 new Div(userBio, {
                     className: "userBio"
-                })])
+                })]),
+            new Div(null, null, [
+                new ButtonBar([
+                    new Button("Show Feed", () => S.srch.feed("~" + J.NodeType.FRIEND_LIST, user), {
+                        title: "Show the Feed of this user"
+                    })
+                ], null, "float-right marginBottom"),
+                new Div(null, { className: "clearfix" })])
         ]);
     }
 }

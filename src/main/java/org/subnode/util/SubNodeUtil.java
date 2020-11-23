@@ -211,20 +211,22 @@ public class SubNodeUtil {
 		NodeMetaInfo ret = new NodeMetaInfo();
 
 		String content = node.getContent();
-		int newLineIdx = content.indexOf("\n");
-		if (newLineIdx != -1) {
-			String ogTitle = content.substring(0, newLineIdx).trim();
+		if (content != null) {
+			int newLineIdx = content.indexOf("\n");
+			if (newLineIdx != -1) {
+				String ogTitle = content.substring(0, newLineIdx).trim();
 
-			// remove leading hash marks which will be there if this is a markdown heading.
-			while (ogTitle.startsWith("#")) {
-				ogTitle = XString.stripIfStartsWith(ogTitle, "#");
+				// remove leading hash marks which will be there if this is a markdown heading.
+				while (ogTitle.startsWith("#")) {
+					ogTitle = XString.stripIfStartsWith(ogTitle, "#");
+				}
+				ogTitle = ogTitle.trim();
+
+				ret.setTitle(ogTitle);
+				ret.setDescription(content.substring(newLineIdx + 1).trim());
+			} else {
+				ret.setDescription(content);
 			}
-			ogTitle = ogTitle.trim();
-
-			ret.setTitle(ogTitle);
-			ret.setDescription(content.substring(newLineIdx + 1).trim());
-		} else {
-			ret.setDescription(content);
 		}
 
 		ret.setLink(getAttachmentUrl(node));
