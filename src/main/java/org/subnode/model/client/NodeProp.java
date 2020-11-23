@@ -10,6 +10,7 @@ public enum NodeProp {
     ACT_PUB_OBJ_CONTENT("ap:objContent", "s"), //
     ACT_PUB_OBJ_INREPLYTO("ap:objInReplyTo", "s"), //
     ACT_PUB_OBJ_URL("ap:objUrl", "s"), //
+    ACT_PUB_USER_ICON_URL("ap:userIcon", "s"), //
 
     /* This is the encrypted symetric key to the node data, that was encrypted using the private key of the owner of the node.
     When nodes are shared to other users the cleartext copy of this key is encrypted with the public key of the user it's being

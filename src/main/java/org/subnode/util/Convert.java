@@ -81,7 +81,6 @@ public class Convert {
 		// log.trace("hasNodes=" + hasChildren + " node: "+node.getId().toHexString());
 
 		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly, initNodeEdit);
-
 		List<AccessControlInfo> acList = buildAccessControlList(sessionContext, node);
 
 		String ownerId = node.getOwner().toHexString();
@@ -139,12 +138,14 @@ public class Convert {
 			}
 		}
 
+		String apAvatar = userNode != null ? userNode.getStringProp(NodeProp.ACT_PUB_USER_ICON_URL) : null;
+
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), owner,
 				ownerId, node.getOrdinal(), //
 				node.getModifyTime(), propList, acList, hasChildren, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
-				node.getType(), logicalOrdinal, lastChild, cipherKey, dataUrl, node.isDeleted(), avatarVer);
+				node.getType(), logicalOrdinal, lastChild, cipherKey, dataUrl, node.isDeleted(), avatarVer, apAvatar);
 
 		/*
 		 * Special case for "Friend" type nodes, to get enough information for the
@@ -300,7 +301,9 @@ public class Convert {
 	public PropertyInfo convertToPropertyInfo(SessionContext sessionContext, SubNode node, String propName,
 			SubNodePropVal prop, boolean htmlOnly, boolean initNodeEdit) {
 		try {
-			String value = "content".equals(propName) ? formatValue(sessionContext, prop.getValue(), false, initNodeEdit) : prop.getValue().toString();
+			String value = "content".equals(propName)
+					? formatValue(sessionContext, prop.getValue(), false, initNodeEdit)
+					: prop.getValue().toString();
 			/* log.trace(String.format("prop[%s]=%s", prop.getName(), value)); */
 
 			PropertyInfo propInfo = new PropertyInfo(propName, value);

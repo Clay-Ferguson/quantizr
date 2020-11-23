@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,10 +75,10 @@ public class ActPubService {
      * Reads in a user from the Fediverse with a name like:
      * WClayFerguson@fosstodon.org
      */
-    public void loadForeignUser(MongoSession session, String userName) {
-        String host = getHostFromUserName(userName);
+    public void loadForeignUser(MongoSession session, String apUserName) {
+        String host = getHostFromUserName(apUserName);
         log.debug("Host of username: [" + host + "]");
-        APObj webFinger = getWebFinger("https://" + host, userName);
+        APObj webFinger = getWebFinger("https://" + host, apUserName);
 
         Map<String, Object> self = getLinkByRel(webFinger, "self");
         log.debug("Self Link: " + XString.prettyPrint(self));
@@ -86,7 +87,7 @@ public class ActPubService {
 
             // if webfinger was successful, ensure the user is imported into our system.
             if (actor != null) {
-                importActor(session, userName, actor);
+                importActor(session, apUserName, actor);
             }
         }
     }
@@ -94,21 +95,35 @@ public class ActPubService {
     // todo-0: need to disallow '@' symbol at least in our signup dialog, although
     // techncally the DB will allow it
     // and it will reference other foreign servers only
-    public void importActor(MongoSession session, String userName, APObj actor) {
-        if (userName == null)
+    public void importActor(MongoSession session, String apUserName, APObj actor) {
+        if (apUserName == null)
             return;
 
-        SubNode userNode = read.getUserNodeByUserName(session, userName);
+        SubNode userNode = read.getUserNodeByUserName(session, apUserName);
 
         // If we don't have this user in our system, create them. (todo-0: Need to
         // specifically avoid any users
         // here that somehow contain "@ourserver". That would basically duplicate a
         // user.)
         if (userNode == null) {
-            userNode = util.createUser(session, userName, null, null, true);
+            userNode = util.createUser(session, apUserName, null, null, true);
         }
 
-        SubNode feedNode = read.getUserNodeByType(session, userName, null, null, NodeType.USER_FEED.s());
+        /* Update user icon */
+        APObj icon = actor.getAPObj("icon");
+        if (icon != null) {
+            String iconUrl = icon.getStr("url");
+            if (iconUrl != null) {
+                String curIconUrl = userNode.getStringProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
+                if (!iconUrl.equals(curIconUrl)) {
+                    userNode.setProp(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl);
+                    update.save(session, userNode, false);
+                }
+            }
+        }
+
+        final SubNode _userNode = userNode;
+        SubNode feedNode = read.getUserNodeByType(session, apUserName, null, null, NodeType.USER_FEED.s());
         Iterable<SubNode> feedItems = read.getSubGraph(session, feedNode);
 
         /*
@@ -139,7 +154,7 @@ public class ActPubService {
                 String apId = apObj.getStr("id");
                 if (!apIdSet.contains(apId)) {
                     log.debug("CREATING NODE (AP Obj): " + apId);
-                    saveOutboxItem(session, feedNode, apObj, _pageNo);
+                    saveOutboxItem(session, feedNode, apObj, _pageNo, _userNode.getId());
                     apIdSet.add(apId);
                 }
                 return true; // true=keep iterating.
@@ -154,25 +169,28 @@ public class ActPubService {
             }
         }
 
-        // Now process last page. No guarantee we already encountered it ? Need to verify this IS needed.
+        // Now process last page. No guarantee we already encountered it ? Need to
+        // verify this IS needed.
         ocPage = getOrderedCollectionPage(outbox.getStr("last"));
-        Object orderedItems = ocPage.getList("orderedItems");
-        iterate(orderedItems, apObj -> {
-            String apId = apObj.getStr("id");
-            if (!apIdSet.contains(apId)) {
-                log.debug("CREATING NODE (AP Obj): " + apId);
-                saveOutboxItem(session, feedNode, apObj, -1);
-                apIdSet.add(apId);
-            }
-            return true; // true=keep iterating.
-        });
-
+        if (ocPage != null) {
+            Object orderedItems = ocPage.getList("orderedItems");
+            iterate(orderedItems, apObj -> {
+                String apId = apObj.getStr("id");
+                if (!apIdSet.contains(apId)) {
+                    log.debug("CREATING NODE (AP Obj): " + apId);
+                    saveOutboxItem(session, feedNode, apObj, -1, _userNode.getId());
+                    apIdSet.add(apId);
+                }
+                return true; // true=keep iterating.
+            });
+        }
     }
 
-    public void saveOutboxItem(MongoSession session, SubNode userFeedNode, APObj apObj, int pageNo) {
+    public void saveOutboxItem(MongoSession session, SubNode userFeedNode, APObj apObj, int pageNo, ObjectId ownerId) {
         APObj object = apObj.getAPObj("object");
 
-        SubNode outboxNode = create.createNode(session, userFeedNode.getPath() + "/?", NodeType.NONE.s());
+        SubNode outboxNode = create.createNodeAsOwner(session, userFeedNode.getPath() + "/?", NodeType.NONE.s(),
+                ownerId);
         outboxNode.setProp(NodeProp.ACT_PUB_ID.s(), apObj.getStr("id"));
         outboxNode.setProp(NodeProp.ACT_PUB_OBJ_TYPE.s(), object.getStr("type"));
         outboxNode.setProp(NodeProp.ACT_PUB_OBJ_URL.s(), object.getStr("url"));

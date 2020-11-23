@@ -471,7 +471,8 @@ export class Render implements RenderIntf {
     }
 
     makeAvatarImage = (node: J.NodeInfo, state: AppState) => {
-        const src: string = this.getAvatarImgUrl(node.ownerId, node.avatarVer);
+        let src: string = node.apAvatar || this.getAvatarImgUrl(node.ownerId, node.avatarVer);
+
         if (!src) {
             return null;
         }

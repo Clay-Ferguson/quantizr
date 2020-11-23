@@ -33,35 +33,25 @@ export class ActPubItemTypeHandler extends TypeBase {
         return false;
     }
 
-    // getCustomProperties(): string[] {
-    //     return [J.NodeProp.USER];
-    // }
-
-    // allowPropertyEdit(propName: string, state: AppState): boolean {
-    //     // USER_NODE_ID is generated and maintained by the server, and we can ignore it in the editor.
-    //     return propName === J.NodeProp.USER;
-    // }
-
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
         let content: string = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_CONTENT, node);
         let url: string = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_URL, node);
         let inReplyTo: string = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_INREPLYTO, node);
 
         return new Div(null, {
-            className: "marginLeft"
         }, [
             new Div(null, null, [
                 new Html(content, {
-                    className: "marginAll"
+                    className: "marginTop marginLeft"
                 })
             ]),
-            new HorizontalLayout([
+            url || inReplyTo ? new HorizontalLayout([
                 url ? new Anchor(url, "Link", {
-                    className: "marginAll"
+                    className: "marginLeft"
                 }) : null,
                 inReplyTo ? new Anchor(inReplyTo, "Replied to", {
-                    className: "marginAll"
-                }) : null])
+                    className: "marginLeft"
+                }) : null]) : null
         ]);
     }
 }

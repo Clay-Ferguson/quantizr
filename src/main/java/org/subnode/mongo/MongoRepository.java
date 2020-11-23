@@ -142,7 +142,8 @@ public class MongoRepository {
 			// todo-0: temporary crutch to help with ActivityPub development.
 			if (constProvider.getProfileName().equals("dev")) {
 				adminRunner.run(s -> {
-					actPubService.loadForeignUser(s, "WClayFerguson@fosstodon.org");
+					//actPubService.loadForeignUser(s, "WClayFerguson@fosstodon.org");
+					actPubService.loadForeignUser(s, "WClayFerguson@social.teci.world");
 				});
 			}
 

@@ -72,6 +72,7 @@ public class NodeInfo {
 
 	private String dataUrl;
 	private String avatarVer;
+	private String apAvatar;
 
 	public NodeInfo() {
 	}
@@ -79,7 +80,7 @@ public class NodeInfo {
 	public NodeInfo(String id, String path, String name, String content, String owner, String ownerId, Long ordinal,
 			Date lastModified, List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
 			int width, int height, String type, long logicalOrdinal, boolean lastChild, String cipherKey,
-			String dataUrl, boolean deleted, String avatarVer) {
+			String dataUrl, boolean deleted, String avatarVer, String apAvatar) {
 		this.id = id;
 		this.path = path;
 		this.name = name;
@@ -101,6 +102,7 @@ public class NodeInfo {
 		this.dataUrl = dataUrl;
 		this.deleted = deleted;
 		this.avatarVer = avatarVer;
+		this.apAvatar = apAvatar;
 	}
 
 	public String getContent() {
@@ -285,5 +287,13 @@ public class NodeInfo {
 
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	public String getApAvatar() {
+		return apAvatar;
+	}
+
+	public void setApAvatar(String apAvatar) {
+		this.apAvatar = apAvatar;
 	}
 }

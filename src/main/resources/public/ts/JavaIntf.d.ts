@@ -557,6 +557,7 @@ export interface NodeInfo {
     ownerId: string;
     dataUrl: string;
     avatarVer: string;
+    apAvatar: string;
 }
 
 export interface UserPreferences {
@@ -607,6 +608,7 @@ export const enum NodeProp {
     ACT_PUB_OBJ_CONTENT = "ap:objContent",
     ACT_PUB_OBJ_INREPLYTO = "ap:objInReplyTo",
     ACT_PUB_OBJ_URL = "ap:objUrl",
+    ACT_PUB_USER_ICON_URL = "ap:userIcon",
     ENC_KEY = "sn:encKey",
     RSS_FEED_SRC = "sn:rssFeedSrc",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",

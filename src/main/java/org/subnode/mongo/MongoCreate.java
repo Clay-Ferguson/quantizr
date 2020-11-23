@@ -53,6 +53,16 @@ public class MongoCreate {
 		return node;
 	}
 
+	public SubNode createNodeAsOwner(MongoSession session, String path, String type, ObjectId ownerId) {
+		if (type == null) {
+			type = NodeType.NONE.s();
+		}
+		// ObjectId ownerId = read.getOwnerNodeIdFromSession(session);
+		SubNode node = new SubNode(ownerId, path, type, null);
+		return node;
+	}
+
+
 	/*
 	 * Creates a node, but does NOT persist it. If parent==null it assumes it's
 	 * adding a root node. This is required, because all the nodes at the root level
