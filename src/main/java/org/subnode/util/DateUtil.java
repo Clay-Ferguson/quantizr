@@ -189,6 +189,11 @@ public class DateUtil {
 		return sb.toString();
 	}
 
+	// Smitherene ActivityPub code uses this:
+	// SimpleDateFormat dateFormat=new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+	// dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+	// String date=dateFormat.format(new Date());
+
 	public static String getFormattedDateTime() {
 		return ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
 

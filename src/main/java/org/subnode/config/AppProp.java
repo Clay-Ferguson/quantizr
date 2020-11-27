@@ -25,6 +25,8 @@ public class AppProp /* implements EnvironmentAware */ {
 	@Autowired
 	private Environment env;
 
+	private String protocolHostAndPort = null;
+
 	public String getLuceneDir() {
 		return "/subnode-lucene"; // todo-2: get this from prop
 	}
@@ -42,7 +44,18 @@ public class AppProp /* implements EnvironmentAware */ {
 	}
 
 	public String protocolHostAndPort() {
-		return getHttpProtocol() + "://" + getMetaHost() + ":" + getServerPort();
+		if (protocolHostAndPort != null)
+			return protocolHostAndPort;
+
+		protocolHostAndPort = getHttpProtocol() + "://" + getMetaHost();
+
+		// If port is needed (not default) then add it.
+		if (!(getHttpProtocol().equals("https") && getServerPort().equals("443"))
+				&& !(getHttpProtocol().equals("http") && getServerPort().equals("80"))) {
+			protocolHostAndPort += ":" + getServerPort();
+		}
+
+		return protocolHostAndPort;
 	}
 
 	public List<String> getRunTests() {

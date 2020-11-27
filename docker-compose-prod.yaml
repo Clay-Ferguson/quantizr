@@ -95,7 +95,8 @@ services:
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/tmp" 
             
-            # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
+            # Uncomment for debugging... (don't forget to open ufw firewall for port on server, and only from your own IP)
+            # sudo ufw allow from xxx.xxx.xxx.xxx to any port 8000
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
             
             ipfs.host: "http://ipfs"

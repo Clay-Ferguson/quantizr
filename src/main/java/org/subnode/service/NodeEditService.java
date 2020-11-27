@@ -340,6 +340,26 @@ public class NodeEditService {
 				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
 			}
 
+			SubNode parent = read.getNode(session, node.getParentPath(), false);
+
+			// todo-0: Temporary Proof-of-Concept hack to send a reply to a foreign server.
+			if (sessionContext.getUserName().equals("WClayFerguson") && parent.isType(NodeType.ACT_PUB_ITEM)) {
+				SubNode userNode = read.getUserNodeByUserName(session, sessionContext.getUserName());
+				if (userNode != null) {
+					String privateKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PRIVATE);
+					if (privateKey != null) {
+						String inReplyTo = parent.getStringProp(NodeProp.ACT_PUB_ID); 
+
+						SubNode ownerOfParent = read.getNode(session, parent.getOwner(), false);
+						String toInbox = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_INBOX.s());
+						String toActor = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+
+						actPubService.sendNote(privateKey, toInbox, sessionContext.getUserName(), inReplyTo, node.getContent(),
+								toActor);
+					}
+				}
+			}
+
 			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1, false,
 					false);
 			res.setNode(newNodeInfo);

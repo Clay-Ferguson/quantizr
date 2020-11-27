@@ -37,6 +37,7 @@ export class ActPubItemTypeHandler extends TypeBase {
         let content: string = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_CONTENT, node);
         let url: string = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_URL, node);
         let inReplyTo: string = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_INREPLYTO, node);
+        // let apId: string = S.props.getNodePropVal(J.NodeProp.ACT_PUB_ID, node);
 
         return new Div(null, {
         }, [

@@ -1,10 +1,24 @@
 package org.subnode.service;
 
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -25,6 +39,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.actpub.APObj;
+import org.subnode.actpub.ActPubFactory;
 import org.subnode.actpub.VisitAPObj;
 import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
@@ -55,6 +70,9 @@ public class ActPubService {
     private MongoCreate create;
 
     @Autowired
+    private ActPubFactory apFactory;
+
+    @Autowired
     private AppProp appProp;
 
     /*
@@ -71,9 +89,78 @@ public class ActPubService {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
+    public void sendNote(String privateKey, String toInbox, String fromUser, String inReplyTo, String content,
+            String toActor) {
+        String actor = appProp.protocolHostAndPort() + "/ap/u/" + fromUser;
+
+        APObj message = apFactory.newCreateMessageForNote(actor, inReplyTo, content, toActor);
+        String body = XString.prettyPrint(message);
+        byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
+        log.debug("Sending Message: " + body);
+
+        byte[] privKeyBytes = Base64.getDecoder().decode(privateKey);
+        // byte[] publicKeyBytes = Base64.getDecoder().decode(publicKey);
+        PrivateKey privKey = null;
+        // PublicKey pubKey = null;
+
+        try {
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+
+            PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(privKeyBytes);
+            privKey = kf.generatePrivate(keySpecPKCS8);
+
+            // X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(publicKeyBytes);
+            // pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
+        } catch (Exception e) {
+            log.error("RSA Key Parsing failed", e);
+            return;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String date = dateFormat.format(new Date());
+
+        String digestHeader = "SHA-256=";
+        try {
+            digestHeader += Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes));
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
+        URL url = null;
+        try {
+            url = new URL(toInbox);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        String host = url.getHost();
+        String path = url.getPath();
+
+        String strToSign = "(request-target): post " + path + "\nhost: " + host + "\ndate: " + date + "\ndigest: "
+                + digestHeader;
+
+        Signature sig;
+        byte[] signature;
+        try {
+            sig = Signature.getInstance("SHA256withRSA");
+            sig.initSign(privKey);
+            sig.update(strToSign.getBytes(StandardCharsets.UTF_8));
+            signature = sig.sign();
+        } catch (Exception e) {
+            log.error("Signature creation failed", e);
+            throw new RuntimeException(e);
+        }
+
+        String keyID = actor + "#main-key";
+        String headerSig = "keyId=\"" + keyID + "\",headers=\"(request-target) host date digest\",signature=\""
+                + Base64.getEncoder().encodeToString(signature) + "\"";
+
+        postJson(toInbox, host, date, headerSig, digestHeader, bodyBytes);
+    }
+
     /*
-     * Reads in a user from the Fediverse with a name like:
-     * WClayFerguson@fosstodon.org
+     * Reads in a user from the Fediverse with a name like: someuser@fosstodon.org
      */
     public void loadForeignUser(MongoSession session, String apUserName, SubNode friendNode) {
         String host = getHostFromUserName(apUserName);
@@ -92,9 +179,13 @@ public class ActPubService {
         }
     }
 
-    // todo-0: need to disallow '@' symbol at least in our signup dialog, although
-    // techncally the DB will allow it
-    // and it will reference other foreign servers only
+    /*
+     * todo-0: need to disallow '@' symbol at least in our signup dialog, although
+     * techncally the DB will allow it and it will reference other foreign servers
+     * only
+     * 
+     * todo-0: I think 'friendNode' shouldn't be involved with this method at all.
+     */
     public void importActor(MongoSession session, String apUserName, APObj actor, SubNode friendNode) {
         if (apUserName == null)
             return;
@@ -108,6 +199,12 @@ public class ActPubService {
         if (userNode == null) {
             userNode = util.createUser(session, apUserName, null, null, true);
         }
+
+        /*
+         * todo-0: setting properties on userNode here needs to detect if we changed the
+         * prop, and then only call update.save() if the node HAS changed. Do it by
+         * making setProp return boolean if changed.
+         */
 
         /* Update user icon */
         APObj icon = actor.getAPObj("icon");
@@ -128,6 +225,14 @@ public class ActPubService {
                 }
             }
         }
+
+        String actorUrl = actor.getStr("id");
+        userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), actorUrl);
+
+        String actorInbox = actor.getStr("inbox");
+        userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), actorInbox);
+
+        update.save(session, userNode, false);
 
         if (friendNode != null) {
             String userUrl = actor.getStr("url");
@@ -247,7 +352,7 @@ public class ActPubService {
         return userName.substring(0, atIdx);
     }
 
-    // https://fosstodon.org/.well-known/webfinger?resource=acct:WClayFerguson@fosstodon.org'
+    // https://server.org/.well-known/webfinger?resource=acct:WClayFerguson@server.org'
 
     /* Get WebFinger from foreign server */
     public APObj getWebFinger(String host, String resource) {
@@ -287,7 +392,6 @@ public class ActPubService {
     public APObj generateWebFinger(String resource) {
         String host = appProp.protocolHostAndPort();
 
-        // resp.header("Access-Control-Allow-Origin", "*");
         try {
             if (StringUtils.isNotEmpty(resource) && resource.startsWith("acct:")) {
                 String[] parts = resource.substring(5).split("@", 2);
@@ -338,16 +442,23 @@ public class ActPubService {
                 List<Object> context = new LinkedList<Object>();
                 context.add("https://www.w3.org/ns/activitystreams");
                 context.add("https://w3id.org/security/v1");
-                actor.put("context", context);
+                actor.put("@context", context);
 
                 // Note: this is a self-reference, and must be identical to the @RequestMapping
                 // // on this function (above)
                 actor.put("id", host + "/ap/u/" + userName);
                 actor.put("type", "Person");
                 actor.put("preferredUsername", userName);
+                actor.put("name", userName); // this should be ordinary name (first last)
                 actor.put("inbox", host + "/ap/inbox/" + userName); //
                 actor.put("outbox", host + "/ap/outbox/" + userName); //
-                // actor.setFollowers("followers", host + "/ap/followers/" + userName);
+                actor.put("followers", host + "/ap/followers/" + userName);
+                actor.put("following", host + "/ap/following/" + userName);
+                actor.put("url", host + "/ap/user/" + userName);
+
+                APObj endpoints = new APObj();
+                endpoints.put("sharedInbox", host + "/ap/inbox");
+                actor.put("endpoints", endpoints);
 
                 APObj pubKey = new APObj();
                 pubKey.put("id", actor.getStr("id") + "#main-key");
@@ -376,6 +487,43 @@ public class ActPubService {
             }
         }
         return null;
+    }
+
+    public APObj postJson(String url, String headerHost, String headerDate, String headerSig, String digestHeader,
+            byte[] bodyBytes) {
+        APObj ret = null;
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            // List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
+            // acceptableMediaTypes.add(mediaType);
+            // headers.setAccept(acceptableMediaTypes);
+            if (headerHost != null) {
+                headers.add("Host", headerHost);
+            }
+
+            if (headerDate != null) {
+                headers.add("Date", headerDate);
+            }
+
+            if (headerSig != null) {
+                headers.add("Signature", headerSig);
+            }
+
+            if (digestHeader != null) {
+                headers.add("Digest", digestHeader);
+            }
+
+            HttpEntity<byte[]> requestEntity = new HttpEntity<>(bodyBytes, headers);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            log.debug("Post to " + url + " RESULT: " + response.getStatusCode() + " response=" + response.getBody());
+
+            // ret = mapper.readValue(response.getBody(), new TypeReference<APObj>() {
+            // });
+            // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
+        } catch (Exception e) {
+            log.error("postJson failed: " + url, e);
+        }
+        return ret;
     }
 
     public APObj getJson(String url, MediaType mediaType) {

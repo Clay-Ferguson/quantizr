@@ -75,7 +75,7 @@ public class UserFeedService {
 
 	static HashMap<String, NodeInfo> nodeInfoMapByPath = new HashMap<String, NodeInfo>();
 
-	static final boolean verboseLog = true;
+	static final boolean verboseLog = false;
 
 	/* Runs immediately at startup, and then every 30 minutes run a full reinit. */
 	@Scheduled(fixedDelay = 30 * 60 * 1000)
