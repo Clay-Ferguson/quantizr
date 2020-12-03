@@ -8,67 +8,132 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.subnode.service.ActPubService;
+import org.subnode.util.XString;
 
 @Controller
 @CrossOrigin
 public class ActPubController {
 	private static final Logger log = LoggerFactory.getLogger(ActPubController.class);
 
-	private static final String CONTENT_TYPE_JSON_ACTIVITY = "application/activity+json";
-	private static final String CONTENT_TYPE_JSON_LD = "application/ld+json;";
+	private static final String CONTENT_TYPE_JSON_ACTIVITY = "application/activity+json; charset=utf-8";
+	private static final String CONTENT_TYPE_JSON_LD = "application/ld+json; charset=utf-8";
+	private static final String CONTENT_TYPE_JSON_JRD= "application/jrd+json; charset=utf-8";
 
 	@Autowired
 	private ActPubService actPubService;
 
-	@RequestMapping(value = "/.well-known/webfinger", method = RequestMethod.GET, produces = "application/jrd+json")
+	//=====================================
+	// WEBFINGER & ACTOR
+	//=====================================
+
+	@RequestMapping(value = "/.well-known/webfinger", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_JRD)
 	public @ResponseBody Object webFinger(//
 			@RequestParam(value = "resource", required = true) String resource) {
 		Object ret = actPubService.generateWebFinger(resource);
-		if (ret!=null) return ret;
+		if (ret != null)
+			return ret;
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	/* This is the Actor URL, and is what we send back in the webfinger */
+	/* This is the ActivityPub 'Actor' URL */
 	@RequestMapping(value = "/ap/u/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object actor(@PathVariable(value = "userName", required = true) String userName) {
 		Object ret = actPubService.generateActor(userName);
-		if (ret!=null) return ret;
+		if (ret != null)
+			return ret;
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
+	//=====================================
+	// INBOX
+	//=====================================
+
 	/* If no userName specified it's the system 'sharedInbox' */
-	@RequestMapping(value = "/ap/u/inbox/{userName}", method = RequestMethod.POST, produces = CONTENT_TYPE_JSON_LD)
-	public @ResponseBody Object inbox(@PathVariable(value = "userName", required = false) String userName) {
+	@RequestMapping(value = "/ap/inbox/{userName}", method = RequestMethod.POST, produces = CONTENT_TYPE_JSON_LD)
+	public @ResponseBody Object inboxPost(@RequestBody APObj payload,
+			@PathVariable(value = "userName", required = false) String userName) {
 		// todo-0: implement
-		log.debug("inbox REST call dummied out");
+		log.debug("inbox (post) REST data ignored: data=" + XString.prettyPrint(payload));
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/ap/u/outbox/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
-	public @ResponseBody Object outbox(@PathVariable(value = "userName", required = false) String userName) {
+	@RequestMapping(value = "/ap/inbox/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
+	public @ResponseBody Object inboxGet(
+			@PathVariable(value = "userName", required = false) String userName) {
 		// todo-0: implement
-		log.debug("outbox REST call dummied out");
+		log.debug("inbox (get) returning empty result");
+		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/inbox/" + userName);
+		if (ret != null)
+			return ret;
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/ap/u/followers/{userName}", method = RequestMethod.POST, produces = CONTENT_TYPE_JSON_LD)
-	public @ResponseBody Object followers(@PathVariable(value = "userName", required = false) String userName) {
-		// todo-0: implement
-		log.debug("followers REST call dummied out");
+	//=====================================
+	// OUTBOX
+	//=====================================
+
+	@RequestMapping(value = "/ap/outbox/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
+	public @ResponseBody Object outbox(@PathVariable(value = "userName", required = true) String userName) {
+		log.debug("outbox (get) returning empty result");
+		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/outbox/" + userName);
+		if (ret != null)
+			return ret;
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/ap/u/following/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
-	public @ResponseBody Object following(@PathVariable(value = "userName", required = false) String userName) {
-		// todo-0: implement
-		log.debug("following REST call dummied out");
+	//=====================================
+	// FOLLOWERS
+	//=====================================
+
+	@RequestMapping(value = "/ap/followers/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
+	public @ResponseBody Object getFollowers(@PathVariable(value = "userName", required = false) String userName) {
+		log.debug("followers (get) returning empty result");
+		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/followers/" + userName);
+		if (ret != null)
+			return ret;
 		return new ResponseEntity(HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "/ap/followers/{userName}", method = RequestMethod.POST, produces = CONTENT_TYPE_JSON_LD)
+	public @ResponseBody Object postFollowers(@PathVariable(value = "userName", required = false) String userName) {
+		log.debug("followers (post) returning empty result");
+		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/followers/" + userName);
+		if (ret != null)
+			return ret;
+		return new ResponseEntity(HttpStatus.OK);
+	}
+
+    //=====================================
+	// FOLLOWING
+	//=====================================
+
+	@RequestMapping(value = "/ap/following/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
+	public @ResponseBody Object getFollowing(@PathVariable(value = "userName", required = false) String userName) {
+		log.debug("following (get) returning empty result");
+		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/following/" + userName);
+		if (ret != null)
+			return ret;
+		return new ResponseEntity(HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/ap/following/{userName}", method = RequestMethod.POST, produces = CONTENT_TYPE_JSON_LD)
+	public @ResponseBody Object postFollowing(@PathVariable(value = "userName", required = false) String userName) {
+		log.debug("following (post) returning empty result");
+		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/following/" + userName);
+		if (ret != null)
+			return ret;
+		return new ResponseEntity(HttpStatus.OK);
+	}
+
+	//=====================================
+	// OTHER...
+	//=====================================
 
 	@RequestMapping(value = "/ap/user/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object user(@PathVariable(value = "userName", required = false) String userName) {

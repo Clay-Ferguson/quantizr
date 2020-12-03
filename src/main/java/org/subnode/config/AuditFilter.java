@@ -12,19 +12,20 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
  * Servlet filter that intercepts calls coming into a server and logs all the
  * request info as well as all request and session parameters/attributes.
  */
-//Currently we disable this by removing the annoation.
-//@Component
+// todo-0: Currently we disable this by removing the annoation.
+@Component
 public class AuditFilter extends GenericFilterBean {
 
 	private static final Logger log = LoggerFactory.getLogger(AuditFilter.class);
 	private static String INDENT = "    ";
+	private static boolean verbose = false;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -39,7 +40,9 @@ public class AuditFilter extends GenericFilterBean {
 			preProcess(sreq);
 			chain.doFilter(request, response);
 		} finally {
-			postProcess(sreq);
+			if (verbose) {
+				postProcess(sreq);
+			}
 		}
 	}
 
@@ -236,9 +239,27 @@ public class AuditFilter extends GenericFilterBean {
 	}
 
 	private void preProcess(HttpServletRequest sreq) {
+		if (sreq == null)
+			return;
+
+		if (!verbose) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("REQ: ");
+			sb.append(sreq.getMethod());
+			sb.append(" ");
+			sb.append(sreq.getRequestURI());
+			if (sreq.getQueryString() != null) {
+				sb.append(" -> ");
+				sb.append(sreq.getQueryString());
+			}
+			sb.append(" [from ");
+			sb.append(sreq.getRemoteAddr());
+			sb.append("]");
+			log.debug(sb.toString());
+			return;
+		}
+
 		try {
-			if (sreq == null)
-				return;
 			StringBuilder sb = new StringBuilder();
 			sb.append("PRE REQ INFO:\n");
 			sb.append(getConfigParamInfo());

@@ -26,17 +26,28 @@ public class ActPubFactory {
 	}
 
 	public APObj newNoteObject(String attributedTo, String inReplyTo, String content, String toActor, ZonedDateTime now) {
+		APObj ret = new APObj();
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
+
+		LinkedList<Object> contextArray = new LinkedList<Object>();
+		contextArray.add("https://www.w3.org/ns/activitystreams");
+		contextArray.add(newContextObj());
+		ret.put("@context", contextArray);
 
 		// todo-0: does this url need to be responsive for the message send to succeed?
 		String fullId = appProp.protocolHostAndPort() + "/ap/note/note-" + idTime;
-		APObj ret = new APObj();
 		ret.put("id", fullId);
-		// ret.put("@context", "https://www.w3.org/ns/activitystreams");
 		ret.put("type", "Note");
 		ret.put("published", now.format(DateTimeFormatter.ISO_INSTANT));
 		ret.put("attributedTo", attributedTo);
-		ret.put("inReplyTo", inReplyTo);
+
+		// testing only direct messages for now so this won't be here.
+		// ret.put("inReplyTo", inReplyTo);
+
+		ret.put("inReplyTo", null);
+		ret.put("summary", null);
+		// ret.put("url", fullId);
+		ret.put("sensitive", false);
 		ret.put("content", content);
 
 		LinkedList<String> toArray = new LinkedList<String>();
@@ -51,6 +62,13 @@ public class ActPubFactory {
 		return ret;
 	}
 
+	public APObj newContextObj() {
+		APObj ret = new APObj();
+		ret.put("language", "en");
+		ret.put("toot", "http://joinmastodon.org/ns#");
+		return ret;
+	}
+
 	public APObj newCreateMessage(APObj object, String actor, String to, ZonedDateTime now) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 
@@ -58,10 +76,16 @@ public class ActPubFactory {
 		String fullId = appProp.protocolHostAndPort() + "/ap/create/create-" + idTime;
 		APObj ret = new APObj();
 
-		ret.put("@context", "https://www.w3.org/ns/activitystreams");
+		// ret.put("@context", "https://www.w3.org/ns/activitystreams");
+		LinkedList<Object> contextArray = new LinkedList<Object>();
+		contextArray.add("https://www.w3.org/ns/activitystreams");
+		contextArray.add(newContextObj());
+		ret.put("@context", contextArray);
+
 		ret.put("id", fullId);
 		ret.put("type", "Create");
 		ret.put("actor", actor);
+		ret.put("published", now.format(DateTimeFormatter.ISO_INSTANT));
 		ret.put("object", object);
 
 		LinkedList<String> toArray = new LinkedList<String>();

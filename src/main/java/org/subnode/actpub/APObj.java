@@ -34,6 +34,8 @@ public class APObj extends HashMap<String, Object> {
 
     public APObj getAPObj(String prop) {
         Object obj = get(prop);
+        if (obj == null)
+            return null;
         if (obj instanceof APObj) {
             return (APObj) obj;
         }

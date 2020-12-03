@@ -5,11 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.Signature;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
@@ -76,7 +73,7 @@ public class ActPubService {
     private AppProp appProp;
 
     /*
-     * RestTempalte is thread-safe and reusable, and has no state, so we need only
+     * RestTemplate is thread-safe and reusable, and has no state, so we need only
      * one final static instance ever
      */
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
@@ -91,72 +88,54 @@ public class ActPubService {
 
     public void sendNote(String privateKey, String toInbox, String fromUser, String inReplyTo, String content,
             String toActor) {
-        String actor = appProp.protocolHostAndPort() + "/ap/u/" + fromUser;
-
-        APObj message = apFactory.newCreateMessageForNote(actor, inReplyTo, content, toActor);
-        String body = XString.prettyPrint(message);
-        byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
-        log.debug("Sending Message: " + body);
-
-        byte[] privKeyBytes = Base64.getDecoder().decode(privateKey);
-        // byte[] publicKeyBytes = Base64.getDecoder().decode(publicKey);
-        PrivateKey privKey = null;
-        // PublicKey pubKey = null;
-
         try {
+            String actor = appProp.protocolHostAndPort() + "/ap/u/" + fromUser;
+
+            APObj message = apFactory.newCreateMessageForNote(actor, inReplyTo, content, toActor);
+            String body = XString.prettyPrint(message);
+            byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
+            log.debug("Sending Message: " + body);
+
+            byte[] privKeyBytes = Base64.getDecoder().decode(privateKey);
             KeyFactory kf = KeyFactory.getInstance("RSA");
-
             PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(privKeyBytes);
-            privKey = kf.generatePrivate(keySpecPKCS8);
+            PrivateKey privKey = kf.generatePrivate(keySpecPKCS8);
 
+            // import java.security.PublicKey;
+            // import java.security.interfaces.RSAPublicKey;
+            // import java.security.spec.X509EncodedKeySpec;
+            // byte[] publicKeyBytes = Base64.getDecoder().decode(publicKey);
             // X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(publicKeyBytes);
-            // pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
-        } catch (Exception e) {
-            log.error("RSA Key Parsing failed", e);
-            return;
-        }
+            // PUblicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String date = dateFormat.format(new Date());
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+            String date = dateFormat.format(new Date());
 
-        String digestHeader = "SHA-256=";
-        try {
-            digestHeader += Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes));
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+            String digestHeader = "SHA-256="
+                    + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes));
 
-        URL url = null;
-        try {
-            url = new URL(toInbox);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+            URL url = new URL(toInbox);
+            String host = url.getHost();
+            String path = url.getPath();
 
-        String host = url.getHost();
-        String path = url.getPath();
+            String strToSign = "(request-target): post " + path + "\nhost: " + host + "\ndate: " + date + "\ndigest: "
+                    + digestHeader;
 
-        String strToSign = "(request-target): post " + path + "\nhost: " + host + "\ndate: " + date + "\ndigest: "
-                + digestHeader;
-
-        Signature sig;
-        byte[] signature;
-        try {
-            sig = Signature.getInstance("SHA256withRSA");
+            Signature sig = Signature.getInstance("SHA256withRSA");
             sig.initSign(privKey);
             sig.update(strToSign.getBytes(StandardCharsets.UTF_8));
-            signature = sig.sign();
+            byte[] signature = sig.sign();
+
+            String keyID = actor + "#main-key";
+            String headerSig = "keyId=\"" + keyID + "\",headers=\"(request-target) host date digest\",signature=\""
+                    + Base64.getEncoder().encodeToString(signature) + "\"";
+
+            postJson(toInbox, host, date, headerSig, digestHeader, bodyBytes);
         } catch (Exception e) {
-            log.error("Signature creation failed", e);
+            log.error("sendNote failed", e);
             throw new RuntimeException(e);
         }
-
-        String keyID = actor + "#main-key";
-        String headerSig = "keyId=\"" + keyID + "\",headers=\"(request-target) host date digest\",signature=\""
-                + Base64.getEncoder().encodeToString(signature) + "\"";
-
-        postJson(toInbox, host, date, headerSig, digestHeader, bodyBytes);
     }
 
     /*
@@ -164,7 +143,6 @@ public class ActPubService {
      */
     public void loadForeignUser(MongoSession session, String apUserName, SubNode friendNode) {
         String host = getHostFromUserName(apUserName);
-        log.debug("Host of username: [" + host + "]");
         APObj webFinger = getWebFinger("https://" + host, apUserName);
 
         Map<String, Object> self = getLinkByRel(webFinger, "self");
@@ -192,10 +170,11 @@ public class ActPubService {
 
         SubNode userNode = read.getUserNodeByUserName(session, apUserName);
 
-        // If we don't have this user in our system, create them. (todo-0: Need to
-        // specifically avoid any users
-        // here that somehow contain "@ourserver". That would basically duplicate a
-        // user.)
+        /*
+         * If we don't have this user in our system, create them. (todo-0: Need to
+         * specifically avoid any users here that somehow contain "@ourserver". That
+         * would basically duplicate a user.)
+         */
         if (userNode == null) {
             userNode = util.createUser(session, apUserName, null, null, true);
         }
@@ -422,8 +401,29 @@ public class ActPubService {
             }
         } catch (Exception e) {
             log.error("webfinger failed", e);
+            throw new RuntimeException(e);
         }
         return null;
+    }
+
+    // {
+    // "@context": "https://www.w3.org/ns/activitystreams",
+    // "id": "https://fosstodon.org/users/WClayFerguson/outbox",
+    // "type": "OrderedCollection",
+    // "totalItems": 14,
+    // "first": "https://fosstodon.org/users/WClayFerguson/outbox?page=true",
+    // "last":
+    // "https://fosstodon.org/users/WClayFerguson/outbox?min_id=0\u0026page=true"
+    // }
+
+    public APObj generateDummyOrderedCollection(String userName, String path) {
+        String host = appProp.protocolHostAndPort();
+        APObj outbox = new APObj();
+        outbox.put("@context", "https://www.w3.org/ns/activitystreams");
+        outbox.put("id", host + path);
+        outbox.put("type", "OrderedCollection");
+        outbox.put("totalItems", 0);
+        return outbox;
     }
 
     public APObj generateActor(String userName) {
@@ -454,7 +454,7 @@ public class ActPubService {
                 actor.put("outbox", host + "/ap/outbox/" + userName); //
                 actor.put("followers", host + "/ap/followers/" + userName);
                 actor.put("following", host + "/ap/following/" + userName);
-                actor.put("url", host + "/ap/user/" + userName);
+                actor.put("url", host + "/ap/u/" + userName);
 
                 APObj endpoints = new APObj();
                 endpoints.put("sharedInbox", host + "/ap/inbox");
@@ -472,6 +472,7 @@ public class ActPubService {
             }
         } catch (Exception e) {
             log.error("actor query failed", e);
+            throw new RuntimeException(e);
         }
         return null;
     }
@@ -493,10 +494,15 @@ public class ActPubService {
             byte[] bodyBytes) {
         APObj ret = null;
         try {
+            // MediaType type = new MediaType("application", "ld+json"); //;
+            // profile=\"https://www.w3.org/ns/activitystreams\"");
             HttpHeaders headers = new HttpHeaders();
             // List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
-            // acceptableMediaTypes.add(mediaType);
+            // acceptableMediaTypes.add(type);
             // headers.setAccept(acceptableMediaTypes);
+            // headers.add("Accept", "application/ld+json;
+            // profile=\"https://www.w3.org/ns/activitystreams\"");
+
             if (headerHost != null) {
                 headers.add("Host", headerHost);
             }
@@ -522,6 +528,7 @@ public class ActPubService {
             // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
         } catch (Exception e) {
             log.error("postJson failed: " + url, e);
+            throw new RuntimeException(e);
         }
         return ret;
     }
@@ -542,6 +549,7 @@ public class ActPubService {
             log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
         } catch (Exception e) {
             log.error("failed getting json: " + url, e);
+            throw new RuntimeException(e);
         }
         return ret;
     }
