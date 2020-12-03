@@ -7,7 +7,9 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.OutboxMgr;
@@ -17,12 +19,12 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.CreateNodeLocation;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AppDropRequest;
@@ -47,7 +49,6 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
-import org.springframework.data.domain.Sort;
 
 /**
  * Service for editing content of nodes. That is, this method updates property
@@ -88,6 +89,9 @@ public class NodeEditService {
 
 	@Autowired
 	private ActPubService actPubService;
+
+	@Autowired
+	private AppProp appProp;
 
 	@Autowired
 	private MongoAuth auth;
@@ -354,8 +358,10 @@ public class NodeEditService {
 						String toInbox = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_INBOX.s());
 						String toActor = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_URL.s());
 
+						String noteUrl = appProp.protocolHostAndPort()+"/app?id="+node.getId().toHexString();
+
 						actPubService.sendNote(privateKey, toInbox, sessionContext.getUserName(), inReplyTo, node.getContent(),
-								toActor);
+								toActor, noteUrl);
 					}
 				}
 			}

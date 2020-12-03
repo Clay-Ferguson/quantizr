@@ -20,33 +20,33 @@ public class ActPubFactory {
 	@Autowired
 	private AppProp appProp;
 
-	public APObj newCreateMessageForNote(String actor, String inReplyTo, String content, String toActor) {
+	public APObj newCreateMessageForNote(String actor, String inReplyTo, String content, String toActor,
+			String noteUrl) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-		return newCreateMessage(newNoteObject(actor, inReplyTo, content, toActor, now), actor, toActor, now);
+		log.debug("sending note to actor[" + actor + "] inReplyTo[" + inReplyTo + "] toActor[" + toActor + "]");
+		return newCreateMessage(newNoteObject(actor, inReplyTo, content, toActor, noteUrl, now), actor, toActor,
+				noteUrl, now);
 	}
 
-	public APObj newNoteObject(String attributedTo, String inReplyTo, String content, String toActor, ZonedDateTime now) {
+	public APObj newNoteObject(String attributedTo, String inReplyTo, String content, String toActor, String noteUrl,
+			ZonedDateTime now) {
 		APObj ret = new APObj();
-		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 
 		LinkedList<Object> contextArray = new LinkedList<Object>();
 		contextArray.add("https://www.w3.org/ns/activitystreams");
 		contextArray.add(newContextObj());
 		ret.put("@context", contextArray);
 
-		// todo-0: does this url need to be responsive for the message send to succeed?
-		String fullId = appProp.protocolHostAndPort() + "/ap/note/note-" + idTime;
-		ret.put("id", fullId);
+		ret.put("id", noteUrl);
 		ret.put("type", "Note");
 		ret.put("published", now.format(DateTimeFormatter.ISO_INSTANT));
 		ret.put("attributedTo", attributedTo);
 
-		// testing only direct messages for now so this won't be here.
 		// ret.put("inReplyTo", inReplyTo);
+		ret.put("inReplyTo", null); // this is null for DMs (Direct Messages)
 
-		ret.put("inReplyTo", null);
 		ret.put("summary", null);
-		// ret.put("url", fullId);
+		ret.put("url", noteUrl);
 		ret.put("sensitive", false);
 		ret.put("content", content);
 
@@ -69,11 +69,9 @@ public class ActPubFactory {
 		return ret;
 	}
 
-	public APObj newCreateMessage(APObj object, String actor, String to, ZonedDateTime now) {
+	public APObj newCreateMessage(APObj object, String actor, String to, String noteUrl, ZonedDateTime now) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 
-		// todo-0: does this url need to be responsive for the message send to succeed?
-		String fullId = appProp.protocolHostAndPort() + "/ap/create/create-" + idTime;
 		APObj ret = new APObj();
 
 		// ret.put("@context", "https://www.w3.org/ns/activitystreams");
@@ -82,7 +80,7 @@ public class ActPubFactory {
 		contextArray.add(newContextObj());
 		ret.put("@context", contextArray);
 
-		ret.put("id", fullId);
+		ret.put("id", noteUrl + "&apCreateTime=" + idTime);
 		ret.put("type", "Create");
 		ret.put("actor", actor);
 		ret.put("published", now.format(DateTimeFormatter.ISO_INSTANT));
