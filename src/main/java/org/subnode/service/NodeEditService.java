@@ -388,12 +388,12 @@ public class NodeEditService {
 				if (friendUserName != null) {
 					/*
 					 * todo-0: For now any userName containing "@" is considered a foreign Fediverse
-					 * user and will trigger a finger search of them, and a load/update of their
+					 * user and will trigger a WebFinger search of them, and a load/update of their
 					 * outbox
 					 */
 					if (friendUserName.contains("@")) {
 						adminRunner.run(s -> {
-							actPubService.loadForeignUser(s, friendUserName, node);
+							actPubService.loadForeignUser(s, friendUserName);
 						});
 					}
 

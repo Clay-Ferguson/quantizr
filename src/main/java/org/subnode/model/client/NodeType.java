@@ -16,6 +16,8 @@ public enum NodeType {
     RSS_FEED("sn:rssfeed"), //
     FRIEND_LIST("sn:friendList"), //
     FRIEND("sn:friend"), //
+
+    /* Represents social media OUTBOX node also used to source ActivitiPub outboxes from */
     USER_FEED("sn:userFeed"), //
 
     ACT_PUB_ITEM("ap:item"), //

@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.AppServer;
 import org.subnode.config.AppProp;
-import org.subnode.config.ConstantsProvider;
-import org.subnode.service.ActPubService;
 
 @Component
 public class MongoRepository {
@@ -17,9 +15,6 @@ public class MongoRepository {
 
 	// hack for now to make RSS deamon wait.
 	public static boolean fullInit = false;
-
-	@Autowired
-	private ActPubService actPubService;
 
 	@Autowired
 	private MongoAppConfig mac;
@@ -33,21 +28,11 @@ public class MongoRepository {
 	@Autowired
 	private MongoAuth auth;
 
-	// MongoTest moved to test package and no longer available in prod code.
-	// @Autowired
-	// private MongoTest mongoTest;
-
 	@Autowired
 	private MongoUtil util;
 
 	@Autowired
 	private MongoDelete delete;
-
-	@Autowired
-	private RunAsMongoAdmin adminRunner;
-
-	@Autowired
-	private ConstantsProvider constProvider;
 
 	/*
 	 * Because of the criticality of this variable, I am not using the Spring getter
@@ -133,17 +118,7 @@ public class MongoRepository {
 				util.reSaveAll(adminSession);
 			}
 
-			// if (appProp.getMongoTest()) {
-			// mongoTest.mainTest();
-			// }
-
 			delete.removeAbandonedNodes(adminSession);
-
-			// if (constProvider.getProfileName().equals("dev")) {
-			// 	adminRunner.run(s -> {
-			// 		actPubService.loadForeignUser(s, "someuser@fosstodon.org", null);
-			// 	});
-			// }
 
 			log.debug("MongoRepository fully initialized.");
 			fullInit = true;

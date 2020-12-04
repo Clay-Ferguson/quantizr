@@ -23,14 +23,14 @@ public class ActPubController {
 
 	private static final String CONTENT_TYPE_JSON_ACTIVITY = "application/activity+json; charset=utf-8";
 	private static final String CONTENT_TYPE_JSON_LD = "application/ld+json; charset=utf-8";
-	private static final String CONTENT_TYPE_JSON_JRD= "application/jrd+json; charset=utf-8";
+	private static final String CONTENT_TYPE_JSON_JRD = "application/jrd+json; charset=utf-8";
 
 	@Autowired
 	private ActPubService actPubService;
 
-	//=====================================
+	// =====================================
 	// WEBFINGER & ACTOR
-	//=====================================
+	// =====================================
 
 	@RequestMapping(value = "/.well-known/webfinger", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_JRD)
 	public @ResponseBody Object webFinger(//
@@ -50,9 +50,9 @@ public class ActPubController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	//=====================================
+	// =====================================
 	// INBOX
-	//=====================================
+	// =====================================
 
 	/* If no userName specified it's the system 'sharedInbox' */
 	@RequestMapping(value = "/ap/inbox/{userName}", method = RequestMethod.POST, produces = CONTENT_TYPE_JSON_LD)
@@ -64,8 +64,7 @@ public class ActPubController {
 	}
 
 	@RequestMapping(value = "/ap/inbox/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
-	public @ResponseBody Object inboxGet(
-			@PathVariable(value = "userName", required = false) String userName) {
+	public @ResponseBody Object inboxGet(@PathVariable(value = "userName", required = false) String userName) {
 		// todo-0: implement
 		log.debug("inbox (get) returning empty result");
 		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/inbox/" + userName);
@@ -74,22 +73,28 @@ public class ActPubController {
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-	//=====================================
-	// OUTBOX
-	//=====================================
+	// =====================================
+	// OUTBOX min_id page
+	// =====================================
 
 	@RequestMapping(value = "/ap/outbox/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
-	public @ResponseBody Object outbox(@PathVariable(value = "userName", required = true) String userName) {
-		log.debug("outbox (get) returning empty result");
-		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/outbox/" + userName);
+	public @ResponseBody Object outbox(@PathVariable(value = "userName", required = true) String userName,
+			@RequestParam(value = "min_id", required = false) String minId,
+			@RequestParam(value = "page", required = false) String page) {
+		Object ret = null;
+		if ("true".equals(page)) {
+			ret = actPubService.generateOutboxPage(userName, minId);
+		} else {
+			ret = actPubService.generateOutbox(userName);
+		}
 		if (ret != null)
 			return ret;
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-	//=====================================
+	// =====================================
 	// FOLLOWERS
-	//=====================================
+	// =====================================
 
 	@RequestMapping(value = "/ap/followers/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object getFollowers(@PathVariable(value = "userName", required = false) String userName) {
@@ -109,9 +114,9 @@ public class ActPubController {
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-    //=====================================
+	// =====================================
 	// FOLLOWING
-	//=====================================
+	// =====================================
 
 	@RequestMapping(value = "/ap/following/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object getFollowing(@PathVariable(value = "userName", required = false) String userName) {
@@ -131,9 +136,9 @@ public class ActPubController {
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-	//=====================================
+	// =====================================
 	// OTHER...
-	//=====================================
+	// =====================================
 
 	@RequestMapping(value = "/ap/user/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object user(@PathVariable(value = "userName", required = false) String userName) {

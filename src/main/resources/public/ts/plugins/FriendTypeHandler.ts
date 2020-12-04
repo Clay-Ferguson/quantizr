@@ -74,9 +74,11 @@ export class FriendTypeHandler extends TypeBase {
         }
 
         // finally resort to looking for avatar url as a property which will be how it's found for Foreign Federated users.
-        if (!src) {
-            src = S.props.getNodePropVal(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
-        }
+        // I removed this only because I don't want the prop replicated on both the AccountRoot node AND all the friend nodes.
+        // (todo-0: find a way to source this from the Account node itself)
+        // if (!src) {
+        //     src = S.props.getNodePropVal(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
+        // }
 
         if (src) {
             img = new Img(null, {
@@ -86,7 +88,6 @@ export class FriendTypeHandler extends TypeBase {
             });
         }
 
-        debugger;
         let userUrl = S.props.getNodePropVal(J.NodeProp.ACT_PUB_USER_URL, node);
 
         return new Div(null, {

@@ -57,6 +57,9 @@ public class UserFeedService {
 	private Convert convert;
 
 	@Autowired
+	private ActPubService actPubService;
+
+	@Autowired
 	private SessionContext sessionContext;
 
 	/*
@@ -117,10 +120,18 @@ public class UserFeedService {
 	/*
 	 * If feedNode is already available, it can be passed in, or else accountNode
 	 * must be passed in, so it can be used to get the feedNode
+	 * 
+	 * todo-0: passing userName in as a param is redundant. get it from accountNode.
 	 */
 	public void addUserFeedInfo(MongoSession session, SubNode feedNode, SubNode accountNode, String userName) {
+		log.debug("addUserFeedInfo: " + userName);
 		UserFeedInfo userFeedInfo = new UserFeedInfo();
 		userFeedInfo.setUserName(userName);
+
+		if (userName.contains("@")) {
+			log.debug("Noticed user is foreign. Refreshing from their outbox: " + userName);
+			actPubService.loadForeignUser(session, userName);
+		}
 
 		if (feedNode == null) {
 			feedNode = read.findTypedNodeUnderPath(session, accountNode.getPath(), NodeType.USER_FEED.s());
@@ -415,8 +426,20 @@ public class UserFeedService {
 			}
 
 			userNodeIds.add(userNodeId);
-
 			log.debug("user " + sessionContext.getUserName() + " has friend: " + friendUserName);
+
+			/*
+			 * If there is an '@' symbol in the user name then it's a foreign user and we
+			 * need to sync their outbox from foreign ActivityPub server
+			 */
+			boolean isApNode = friendUserName.contains("@");
+			if (isApNode) {
+				log.debug("feedNode reading an AP user: " + friendUserName);
+				adminRunner.run(s -> {
+					SubNode accountNode = read.getUserNodeByUserName(s, friendUserName);
+					addUserFeedInfo(s, null, accountNode, friendUserName);
+				});
+			}
 
 			/*
 			 * Look up the cached Outbox nodes (in memory) and add all of 'userName' cached

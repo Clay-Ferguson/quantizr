@@ -141,7 +141,7 @@ public class ActPubService {
     /*
      * Reads in a user from the Fediverse with a name like: someuser@fosstodon.org
      */
-    public void loadForeignUser(MongoSession session, String apUserName, SubNode friendNode) {
+    public void loadForeignUser(MongoSession session, String apUserName) {
         String host = getHostFromUserName(apUserName);
         APObj webFinger = getWebFinger("https://" + host, apUserName);
 
@@ -152,7 +152,7 @@ public class ActPubService {
 
             // if webfinger was successful, ensure the user is imported into our system.
             if (actor != null) {
-                importActor(session, apUserName, actor, friendNode);
+                importActor(session, apUserName, actor);
             }
         }
     }
@@ -161,12 +161,12 @@ public class ActPubService {
      * todo-0: need to disallow '@' symbol at least in our signup dialog, although
      * techncally the DB will allow it and it will reference other foreign servers
      * only
-     * 
-     * todo-0: I think 'friendNode' shouldn't be involved with this method at all.
      */
-    public void importActor(MongoSession session, String apUserName, APObj actor, SubNode friendNode) {
+    public void importActor(MongoSession session, String apUserName, APObj actor) {
         if (apUserName == null)
             return;
+
+        log.debug("importing Actor: " + apUserName);
 
         SubNode userNode = read.getUserNodeByUserName(session, apUserName);
 
@@ -193,17 +193,12 @@ public class ActPubService {
                 String curIconUrl = userNode.getStringProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
                 if (!iconUrl.equals(curIconUrl)) {
                     userNode.setProp(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl);
-                    update.save(session, userNode, false);
-                }
-                /*
-                 * Note: we also replicate some of the user info onto the friendNode, so that it
-                 * can render rapidly with no queries onto other nodes
-                 */
-                if (friendNode != null) {
-                    friendNode.setProp(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl);
                 }
             }
         }
+
+        String userBio = actor.getStr("summary");
+        userNode.setProp(NodeProp.USER_BIO.s(), userBio);
 
         String actorUrl = actor.getStr("id");
         userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), actorUrl);
@@ -211,36 +206,52 @@ public class ActPubService {
         String actorInbox = actor.getStr("inbox");
         userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), actorInbox);
 
-        update.save(session, userNode, false);
+        String userUrl = actor.getStr("url");
+        userNode.setProp(NodeProp.ACT_PUB_USER_URL.s(), userUrl);
 
-        if (friendNode != null) {
-            String userUrl = actor.getStr("url");
-            if (userUrl != null) {
-                friendNode.setProp(NodeProp.ACT_PUB_USER_URL.s(), userUrl);
-            }
+        update.save(session, userNode, false);
+        refreshOutboxFromForeignServer(session, actor, userNode, apUserName);
+    }
+
+    /*
+     * Caller can pass in userNode if it's already available, but if not just pass
+     * null and the apUserName will be used to look up the userNode
+     */
+    public void refreshOutboxFromForeignServer(MongoSession session, APObj actor, SubNode userNode, String apUserName) {
+
+        if (userNode == null) {
+            userNode = read.getUserNodeByUserName(session, apUserName);
         }
 
         final SubNode _userNode = userNode;
-        SubNode feedNode = read.getUserNodeByType(session, apUserName, null, null, NodeType.USER_FEED.s());
-        Iterable<SubNode> feedItems = read.getSubGraph(session, feedNode);
+        SubNode outboxNode = read.getUserNodeByType(session, apUserName, null, null, NodeType.USER_FEED.s());
+        Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode);
 
         /*
          * Generate a list of known AP IDs so we can ignore them and load only the
          * unknown ones from the foreign server
          */
         HashSet<String> apIdSet = new HashSet<String>();
-        for (SubNode n : feedItems) {
+        for (SubNode n : outboxItems) {
             String apId = n.getStringProp(NodeProp.ACT_PUB_ID.s());
             if (apId != null) {
                 apIdSet.add(apId);
             }
         }
 
-        // todo-0: add error reporting here.
         APObj outbox = getOutbox(actor.getStr("outbox"));
-        if (outbox == null)
+        if (outbox == null) {
+            log.debug("Unable to get outbox for AP user: " + apUserName);
             return;
+        }
 
+        /*
+         * Warning: There are times when even with only two items in the outbox Mastodon
+         * might send back an empty array in the "first" page and the two items in teh
+         * "last" page, which makes no sense, but it just means we have to read and
+         * deduplicate all the items from all pages to be sure we don't end up with a
+         * empty array even when there ARE some
+         */
         APObj ocPage = getOrderedCollectionPage(outbox.getStr("first"));
         int pageNo = 0;
         while (ocPage != null) {
@@ -252,7 +263,7 @@ public class ActPubService {
                 String apId = apObj.getStr("id");
                 if (!apIdSet.contains(apId)) {
                     log.debug("CREATING NODE (AP Obj): " + apId);
-                    saveOutboxItem(session, feedNode, apObj, _pageNo, _userNode.getId());
+                    saveOutboxItem(session, outboxNode, apObj, _pageNo, _userNode.getId());
                     apIdSet.add(apId);
                 }
                 return true; // true=keep iterating.
@@ -267,8 +278,6 @@ public class ActPubService {
             }
         }
 
-        // Now process last page. No guarantee we already encountered it ? Need to
-        // verify this IS needed.
         ocPage = getOrderedCollectionPage(outbox.getStr("last"));
         if (ocPage != null) {
             Object orderedItems = ocPage.getList("orderedItems");
@@ -276,7 +285,7 @@ public class ActPubService {
                 String apId = apObj.getStr("id");
                 if (!apIdSet.contains(apId)) {
                     log.debug("CREATING NODE (AP Obj): " + apId);
-                    saveOutboxItem(session, feedNode, apObj, -1, _userNode.getId());
+                    saveOutboxItem(session, outboxNode, apObj, -1, _userNode.getId());
                     apIdSet.add(apId);
                 }
                 return true; // true=keep iterating.
@@ -357,6 +366,8 @@ public class ActPubService {
         return outbox;
     }
 
+    // todo-0: this is somehow now returning an empty array even though I can see
+    // 'statuses' on the account.
     public APObj getOrderedCollectionPage(String url) {
         if (url == null)
             return null;
@@ -406,21 +417,34 @@ public class ActPubService {
         return null;
     }
 
-    // {
-    // "@context": "https://www.w3.org/ns/activitystreams",
-    // "id": "https://fosstodon.org/users/WClayFerguson/outbox",
-    // "type": "OrderedCollection",
-    // "totalItems": 14,
-    // "first": "https://fosstodon.org/users/WClayFerguson/outbox?page=true",
-    // "last":
-    // "https://fosstodon.org/users/WClayFerguson/outbox?min_id=0\u0026page=true"
-    // }
-
     public APObj generateDummyOrderedCollection(String userName, String path) {
         String host = appProp.protocolHostAndPort();
+        APObj obj = new APObj();
+        obj.put("@context", "https://www.w3.org/ns/activitystreams");
+        obj.put("id", host + path);
+        obj.put("type", "OrderedCollection");
+        obj.put("totalItems", 0);
+        return obj;
+    }
+
+    public APObj generateOutbox(String userName) {
+        String url = appProp.protocolHostAndPort() + "/ap/outbox/" + userName;
         APObj outbox = new APObj();
         outbox.put("@context", "https://www.w3.org/ns/activitystreams");
-        outbox.put("id", host + path);
+        outbox.put("id", url);
+        outbox.put("type", "OrderedCollection");
+        outbox.put("totalItems", 0);
+        outbox.put("first", url + "?page=true");
+        outbox.put("last", url + "?min_id=0&page=true");
+        return outbox;
+    }
+
+    // if minId=="0" that means "last page"
+    public APObj generateOutboxPage(String userName, String minId) {
+        String url = appProp.protocolHostAndPort() + "/ap/outbox/" + userName;
+        APObj outbox = new APObj();
+        outbox.put("@context", "https://www.w3.org/ns/activitystreams");
+        outbox.put("id", url);
         outbox.put("type", "OrderedCollection");
         outbox.put("totalItems", 0);
         return outbox;

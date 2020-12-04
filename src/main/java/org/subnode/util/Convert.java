@@ -138,6 +138,8 @@ public class Convert {
 			}
 		}
 
+		/* todo-0: Need to detect if this is a Friend-type node and get the avatar of the friend for ActivityPub. BTW, how
+		is this done in this case for non-ActivityPub user? Be as consistent as possible in how this is done. */
 		String apAvatar = userNode != null ? userNode.getStringProp(NodeProp.ACT_PUB_USER_ICON_URL) : null;
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), owner,
