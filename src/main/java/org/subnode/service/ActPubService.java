@@ -86,12 +86,12 @@ public class ActPubService {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    public void sendNote(String privateKey, String toInbox, String fromUser, String inReplyTo, String content,
+    public void sendNote(String toUserName, String privateKey, String toInbox, String fromUser, String inReplyTo, String content,
             String toActor, String noteUrl, boolean privateMessage) {
         try {
             String actor = appProp.protocolHostAndPort() + "/ap/u/" + fromUser;
 
-            APObj message = apFactory.newCreateMessageForNote(actor, inReplyTo, content, toActor, noteUrl, privateMessage);
+            APObj message = apFactory.newCreateMessageForNote(toUserName, actor, inReplyTo, content, toActor, noteUrl, privateMessage);
             String body = XString.prettyPrint(message);
             byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
             log.debug("Sending Message: " + body);
@@ -468,16 +468,21 @@ public class ActPubService {
                 context.add("https://w3id.org/security/v1");
                 actor.put("@context", context);
 
-                // Note: this is a self-reference, and must be identical to the @RequestMapping
-                // // on this function (above)
+                /* Note: this is a self-reference, and must be identical to the URL that returns this object */
                 actor.put("id", host + "/ap/u/" + userName);
                 actor.put("type", "Person");
                 actor.put("preferredUsername", userName);
                 actor.put("name", userName); // this should be ordinary name (first last)
+
+                String avatarVer = userNode.getStringProp(NodeProp.BIN.s());
+                actor.put("icon",  appProp.protocolHostAndPort()  + "/mobile/api/bin/avatar" + "?nodeId=" + userNode.getId().toHexString() + "&v=" + avatarVer);
+                actor.put("summary",  userNode.getStringProp(NodeProp.USER_BIO.s()));
                 actor.put("inbox", host + "/ap/inbox/" + userName); //
                 actor.put("outbox", host + "/ap/outbox/" + userName); //
                 actor.put("followers", host + "/ap/followers/" + userName);
                 actor.put("following", host + "/ap/following/" + userName);
+
+                //todo-0: this shouldn't e actor but should just be the home node of the user? How do we define home node?
                 actor.put("url", host + "/ap/u/" + userName);
 
                 APObj endpoints = new APObj();

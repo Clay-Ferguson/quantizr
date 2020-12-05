@@ -138,8 +138,11 @@ public class Convert {
 			}
 		}
 
-		/* todo-0: Need to detect if this is a Friend-type node and get the avatar of the friend for ActivityPub. BTW, how
-		is this done in this case for non-ActivityPub user? Be as consistent as possible in how this is done. */
+		/*
+		 * todo-0: Need to detect if this is a Friend-type node and get the avatar of
+		 * the friend for ActivityPub. BTW, how is this done in this case for
+		 * non-ActivityPub user? Be as consistent as possible in how this is done.
+		 */
 		String apAvatar = userNode != null ? userNode.getStringProp(NodeProp.ACT_PUB_USER_ICON_URL) : null;
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), owner,
@@ -172,10 +175,11 @@ public class Convert {
 
 					String userBio = friendAccountNode.getStringProp(NodeProp.USER_BIO.s());
 
-					// A property prefixed with "_" is an indicator that this is a 'payload data'
-					// item sent to help client render
-					// but not a 'true' property of the actual node. These two properties are enough
-					// to render the link to the avatar image
+					/*
+					 * A property prefixed with "_" is an indicator that this is a 'payload data'
+					 * item sent to help client render but not a 'true' property of the actual node.
+					 * These two properties are enough to render the link to the avatar image
+					 */
 					if (friendAvatarVer != null) {
 						nodeInfo.getProperties().add(new PropertyInfo("_avatarVer", friendAvatarVer));
 					}

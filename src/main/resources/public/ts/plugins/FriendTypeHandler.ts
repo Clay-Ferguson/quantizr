@@ -10,6 +10,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
+import { Html } from "../widget/Html";
 import { Img } from "../widget/Img";
 import { TypeBase } from "./base/TypeBase";
 
@@ -98,7 +99,7 @@ export class FriendTypeHandler extends TypeBase {
                 new Heading(4, "User: " + (user || ""), {
                     className: "marginAll"
                 }),
-                new Div(userBio, {
+                new Html(userBio, {
                     className: "userBio"
                 })]),
             userUrl ? new Anchor(userUrl, "User Page") : null,

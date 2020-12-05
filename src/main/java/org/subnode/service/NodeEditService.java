@@ -360,11 +360,12 @@ public class NodeEditService {
 						SubNode ownerOfParent = read.getNode(session, parent.getOwner(), false);
 						String toInbox = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_INBOX.s());
 						String toActor = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+						String toUserName = ownerOfParent.getStringProp(NodeProp.USER.s());
 						boolean privateMessage = node.getBooleanProp(NodeProp.ACT_PUB_PRIVATE.s());
 
 						String noteUrl = appProp.protocolHostAndPort()+"/app?id="+node.getId().toHexString();
 
-						actPubService.sendNote(privateKey, toInbox, sessionContext.getUserName(), inReplyTo, node.getContent(),
+						actPubService.sendNote(toUserName, privateKey, toInbox, sessionContext.getUserName(), inReplyTo, node.getContent(),
 								toActor, noteUrl, privateMessage);
 					}
 				}

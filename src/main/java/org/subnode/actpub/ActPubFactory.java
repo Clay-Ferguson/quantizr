@@ -15,17 +15,17 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class ActPubFactory {
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
-
-	public APObj newCreateMessageForNote(String actor, String inReplyTo, String content, String toActor, String noteUrl,
-			boolean privateMessage) {
+	public APObj newCreateMessageForNote(String toUserName, String actor, String inReplyTo, String content,
+			String toActor, String noteUrl, boolean privateMessage) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 		log.debug("sending note to actor[" + actor + "] inReplyTo[" + inReplyTo + "] toActor[" + toActor + "]");
-		return newCreateMessage(newNoteObject(actor, inReplyTo, content, toActor, noteUrl, now, privateMessage), actor,
+		return newCreateMessage(
+				newNoteObject(toUserName, actor, inReplyTo, content, toActor, noteUrl, now, privateMessage), actor,
 				toActor, noteUrl, now);
 	}
 
-	public APObj newNoteObject(String attributedTo, String inReplyTo, String content, String toActor, String noteUrl,
-			ZonedDateTime now, boolean privateMessage) {
+	public APObj newNoteObject(String toUserName, String attributedTo, String inReplyTo, String content, String toActor,
+			String noteUrl, ZonedDateTime now, boolean privateMessage) {
 		APObj ret = new APObj();
 
 		LinkedList<Object> contextArray = new LinkedList<Object>();
@@ -55,6 +55,14 @@ public class ActPubFactory {
 			toArray.add("https://www.w3.org/ns/activitystreams#Public");
 		}
 		ret.put("to", toArray);
+
+		LinkedList<APObj> tagArray = new LinkedList<APObj>();
+		APObj tagMention = new APObj();
+		tagMention.put("type", "Mention");
+		tagMention.put("href", toActor);
+		tagMention.put("name", "@" + toUserName); // prepend character to make it like '@user@server.com'
+		tagArray.add(tagMention);
+		ret.put("tag", tagArray);
 
 		// LinkedList<String> ccArray = new LinkedList<String>();
 		// ccArray.add("https://www.w3.org/ns/activitystreams#Public");
