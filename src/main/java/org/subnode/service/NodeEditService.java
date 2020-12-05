@@ -142,6 +142,10 @@ public class NodeEditService {
 
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
 
+		if (req.isPrivateReply()) {
+			newNode.setProp(NodeProp.ACT_PUB_PRIVATE.s(), Boolean.valueOf(true));
+		}
+
 		if (req.isTypeLock()) {
 			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 		}
@@ -346,7 +350,6 @@ public class NodeEditService {
 
 			SubNode parent = read.getNode(session, node.getParentPath(), false);
 
-			// todo-0: Temporary Proof-of-Concept hack to send a reply to a foreign server.
 			if (sessionContext.getUserName().equals("WClayFerguson") && parent.isType(NodeType.ACT_PUB_ITEM)) {
 				SubNode userNode = read.getUserNodeByUserName(session, sessionContext.getUserName());
 				if (userNode != null) {
@@ -357,11 +360,12 @@ public class NodeEditService {
 						SubNode ownerOfParent = read.getNode(session, parent.getOwner(), false);
 						String toInbox = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_INBOX.s());
 						String toActor = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+						boolean privateMessage = node.getBooleanProp(NodeProp.ACT_PUB_PRIVATE.s());
 
 						String noteUrl = appProp.protocolHostAndPort()+"/app?id="+node.getId().toHexString();
 
 						actPubService.sendNote(privateKey, toInbox, sessionContext.getUserName(), inReplyTo, node.getContent(),
-								toActor, noteUrl);
+								toActor, noteUrl, privateMessage);
 					}
 				}
 			}

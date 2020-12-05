@@ -7,6 +7,10 @@ public enum NodeProp {
     // Activity Pub Properties
     ACT_PUB_ID("ap:id", "s"), //
     ACT_PUB_OBJ_TYPE("ap:objType", "s"), //
+
+    // Indicates when this node is sent it will be a DM (Private Message, Direct Message) to a user
+    ACT_PUB_PRIVATE("ap:privateMessage", "s"), //
+
     ACT_PUB_OBJ_CONTENT("ap:objContent", "s"), //
     ACT_PUB_OBJ_INREPLYTO("ap:objInReplyTo", "s"), //
     ACT_PUB_OBJ_URL("ap:objUrl", "s"), //

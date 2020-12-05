@@ -36,6 +36,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     typeLock: boolean;
     properties: PropertyInfo[];
     updateModTime: boolean;
+    privateReply: boolean;
 }
 
 export interface DeleteAttachmentRequest extends RequestBase {
@@ -606,6 +607,7 @@ export const enum Constant {
 export const enum NodeProp {
     ACT_PUB_ID = "ap:id",
     ACT_PUB_OBJ_TYPE = "ap:objType",
+    ACT_PUB_PRIVATE = "ap:privateMessage",
     ACT_PUB_OBJ_CONTENT = "ap:objContent",
     ACT_PUB_OBJ_INREPLYTO = "ap:objInReplyTo",
     ACT_PUB_OBJ_URL = "ap:objUrl",

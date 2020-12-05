@@ -208,7 +208,8 @@ export class Edit implements EditIntf {
                             createAtTop,
                             content: clipboardText,
                             typeLock: false,
-                            properties: null
+                            properties: null,
+                            privateReply: false
                         }, (res) => { S.meta64.refresh(state); });
                     }
                 }, null, null, null, state
@@ -233,7 +234,8 @@ export class Edit implements EditIntf {
                     createAtTop,
                     content: null,
                     typeLock: false,
-                    properties: null
+                    properties: null,
+                    privateReply: false
                 }, (res) => {
                     this.createSubNodeResponse(res, state);
                 });
@@ -744,7 +746,8 @@ export class Edit implements EditIntf {
             createAtTop: true,
             content: clipText,
             typeLock: false,
-            properties: null
+            properties: null,
+            privateReply: false
         },
             () => {
                 let message = parentId ? "Clipboard saved" : "Clipboard saved under Notes node";
@@ -782,7 +785,8 @@ export class Edit implements EditIntf {
         }
     }
 
-    addComment = (node: J.NodeInfo, state: AppState) => {
+    /* If publicReply is true, this goes to the public inbox of the server, or else it will be a DM to the user */
+    addComment = (node: J.NodeInfo, publicReply: boolean, state: AppState) => {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
@@ -793,7 +797,8 @@ export class Edit implements EditIntf {
             createAtTop: false,
             content: null,
             typeLock: false,
-            properties: null
+            properties: null,
+            privateReply: !publicReply
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });
@@ -810,7 +815,8 @@ export class Edit implements EditIntf {
             createAtTop: true,
             content: null,
             typeLock: true,
-            properties: null
+            properties: null,
+            privateReply: false
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });
@@ -827,8 +833,8 @@ export class Edit implements EditIntf {
             createAtTop: true,
             content: null,
             typeLock: true,
-            properties: [{ name: "date", value: "" + initDate }]
-
+            properties: [{ name: "date", value: "" + initDate }],
+            privateReply: false
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });

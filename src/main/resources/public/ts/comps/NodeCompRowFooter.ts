@@ -22,16 +22,25 @@ export class NodeCompRowFooter extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let node = this.node;
         let children = [];
 
         /* We show a simplified header for User Feed rows, because these are always visible and don't need a lot of the info */
         if (this.isFeed) {
             children.push(new Icon({
-                title: "Create a new reply",
+                title: "Public reply",
                 className: "fa fa-comments fa-lg rowFooterIcon",
-                onClick: () => S.edit.addComment(node, state)
+                onClick: () => S.edit.addComment(this.node, true, state)
             }));
+
+            /* If ActivityPub type is on the node then it makes sense to have a Direct Message option also */
+            let apType = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_TYPE, this.node);
+            if (apType) {
+                children.push(new Icon({
+                    title: "Private Reply (Direct Message)",
+                    className: "fa fa-comment fa-lg rowFooterIcon",
+                    onClick: () => S.edit.addComment(this.node, false, state)
+                }));
+            }
         }
         this.setChildren(children);
     }

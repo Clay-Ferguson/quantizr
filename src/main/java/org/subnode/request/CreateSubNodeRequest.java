@@ -24,6 +24,9 @@ public class CreateSubNodeRequest extends RequestBase {
 
 	private boolean updateModTime;
 
+	/* Used only for creating a reply to an ActivityPub foreign node */
+	private boolean privateReply;
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -86,5 +89,13 @@ public class CreateSubNodeRequest extends RequestBase {
 
 	public void setUpdateModTime(boolean updateModTime) {
 		this.updateModTime = updateModTime;
+	}
+
+	public boolean isPrivateReply() {
+		return privateReply;
+	}
+
+	public void setPrivateReply(boolean privateReply) {
+		this.privateReply = privateReply;
 	}
 }

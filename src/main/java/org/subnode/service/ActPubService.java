@@ -87,11 +87,11 @@ public class ActPubService {
     }
 
     public void sendNote(String privateKey, String toInbox, String fromUser, String inReplyTo, String content,
-            String toActor, String noteUrl) {
+            String toActor, String noteUrl, boolean privateMessage) {
         try {
             String actor = appProp.protocolHostAndPort() + "/ap/u/" + fromUser;
 
-            APObj message = apFactory.newCreateMessageForNote(actor, inReplyTo, content, toActor, noteUrl);
+            APObj message = apFactory.newCreateMessageForNote(actor, inReplyTo, content, toActor, noteUrl, privateMessage);
             String body = XString.prettyPrint(message);
             byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
             log.debug("Sending Message: " + body);
