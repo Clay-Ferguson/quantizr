@@ -342,14 +342,20 @@ export class RssTypeHandler extends TypeBase {
         if (state.chapters) {
             for (let chapter of state.chapters.chapters) {
 
+                let chapterDiv = new Div();
                 if (chapter.img) {
-                    div.addChild(new Img(null, {
+                    chapterDiv.addChild(new Img(null, {
                         className: "rssChapterImage",
-                        src: chapter.img
+                        src: chapter.img,
+                        onClick: () => {
+                            if (chaptersDiv.player) {
+                                chaptersDiv.player.currentTime = chapter.startTime;
+                            }
+                        }
                     }));
                 }
 
-                div.addChild(new Span(chapter.title, {
+                chapterDiv.addChild(new Span(chapter.title, {
                     className: "rssChapterTitle",
                     onClick: () => {
                         if (chaptersDiv.player) {
@@ -359,11 +365,13 @@ export class RssTypeHandler extends TypeBase {
                 }));
 
                 if (chapter.url) {
-                    div.addChild(new Anchor(chapter.url, "[ Link ]", {
+                    chapterDiv.addChild(new Anchor(chapter.url, "[ Link ]", {
                         className: "rssChapterLink",
                         target: "_blank"
                     }));
                 }
+
+                div.addChild(chapterDiv);
             }
         }
     }
