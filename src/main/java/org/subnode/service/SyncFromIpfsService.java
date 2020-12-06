@@ -84,7 +84,7 @@ public class SyncFromIpfsService {
 				res.setMessage(buildReport());
 				res.setSuccess(true);
 			} else {
-				res.setMessage("Unable to process: "+req.getPath());
+				res.setMessage("Unable to process: " + req.getPath());
 				res.setSuccess(false);
 			}
 		} catch (Exception ex) {
@@ -92,8 +92,6 @@ public class SyncFromIpfsService {
 		}
 	}
 
-	// todo-0: put catch block in here so any one file can fail and not blow up the
-	// entire process.
 	public boolean processPath(String path) {
 		boolean success = false;
 		log.debug("dumpDir: " + path);
@@ -121,15 +119,15 @@ public class SyncFromIpfsService {
 						// we found the ipfs file json, so convert it to SubNode, and save
 						SubNodeIdentity node = null;
 						try {
-							// todo-0: WOW. Simply deserializing a SubNode object causes it to become a REAL
-							// node and behave as if
-							// it were inserted into the DB, so that after json parses it even the
-							// 'read.getNode()' Mongo query will
-							// find it and 'claim' that it's been inserted into the DB already. WTF.
-							// Solution: I created SubNodeIdentity to perform a pure (partial)
-							// deserialization, but I need to check the
-							// rest of the codebase to be sure there's nowhere that this surprise will break
-							// things. (import/export logic?)
+							/*
+							 * todo-1: WOW. Simply deserializing a SubNode object causes it to become a REAL
+							 * node and behave as if it were inserted into the DB, so that after json parses
+							 * it even the 'read.getNode()' Mongo query will find it and 'claim' that it's
+							 * been inserted into the DB already. WTF. Solution: I created SubNodeIdentity
+							 * to perform a pure (partial) deserialization, but I need to check the rest of
+							 * the codebase to be sure there's nowhere that this surprise will break things.
+							 * (import/export logic?)
+							 */
 							node = jsonMapper.readValue(json, SubNodeIdentity.class);
 
 							// we assume the node.id values can be the same across Federated instances.
@@ -137,7 +135,7 @@ public class SyncFromIpfsService {
 							if (findNode != null) {
 								log.debug("Node existed: " + node.getId());
 								matchingFiles++;
-								// todo-0: check if node is same content here.
+								// todo-1: check if node is same content here.
 							} else {
 								SubNode realNode = jsonMapper.readValue(json, SubNode.class);
 								update.save(session, realNode);

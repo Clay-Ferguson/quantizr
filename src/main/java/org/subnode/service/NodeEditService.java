@@ -355,7 +355,7 @@ public class NodeEditService {
 				if (userNode != null) {
 					String privateKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PRIVATE);
 					if (privateKey != null) {
-						String inReplyTo = parent.getStringProp(NodeProp.ACT_PUB_ID); 
+						String inReplyTo = parent.getStringProp(NodeProp.ACT_PUB_ID);
 
 						SubNode ownerOfParent = read.getNode(session, parent.getOwner(), false);
 						String toInbox = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_INBOX.s());
@@ -363,10 +363,10 @@ public class NodeEditService {
 						String toUserName = ownerOfParent.getStringProp(NodeProp.USER.s());
 						boolean privateMessage = node.getBooleanProp(NodeProp.ACT_PUB_PRIVATE.s());
 
-						String noteUrl = appProp.protocolHostAndPort()+"/app?id="+node.getId().toHexString();
+						String noteUrl = appProp.protocolHostAndPort() + "/app?id=" + node.getId().toHexString();
 
-						actPubService.sendNote(toUserName, privateKey, toInbox, sessionContext.getUserName(), inReplyTo, node.getContent(),
-								toActor, noteUrl, privateMessage);
+						actPubService.sendNote(toUserName, privateKey, toInbox, sessionContext.getUserName(), inReplyTo,
+								node.getContent(), toActor, noteUrl, privateMessage);
 					}
 				}
 			}
@@ -392,9 +392,8 @@ public class NodeEditService {
 				// here.
 				if (friendUserName != null) {
 					/*
-					 * todo-0: For now any userName containing "@" is considered a foreign Fediverse
-					 * user and will trigger a WebFinger search of them, and a load/update of their
-					 * outbox
+					 * A userName containing "@" is considered a foreign Fediverse user and will
+					 * trigger a WebFinger search of them, and a load/update of their outbox
 					 */
 					if (friendUserName.contains("@")) {
 						adminRunner.run(s -> {

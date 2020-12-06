@@ -407,7 +407,6 @@ public class AttachmentService {
 
 		// log.debug("Final Node JSON after Upload: " + XString.prettyPrint(node));
 
-		// need to remove this! (todo-0)
 		// MongoThreadLocal.clearDirtyNodes();
 		update.save(session, node);
 	}

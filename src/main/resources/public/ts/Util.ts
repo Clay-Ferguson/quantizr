@@ -69,6 +69,7 @@ export class Util implements UtilIntf {
     pgrsDlg: ProgressDlg = null;
 
     // accepts letters, numbers, underscore, dash.
+    // todo-1: enforce this same rule on the server side (Java)
     validUsername = (v: string): boolean => {
         return !!v.match(/^[0-9a-zA-Z\-_]+$/);
     }

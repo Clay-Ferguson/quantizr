@@ -164,7 +164,7 @@ public class IPFSService {
         return postForJsonReply(url, Object.class) != null;
     }
 
-    // todo-0: make this handle a type, not generic map
+    // todo-1: make this handle a type, not generic map
     public final LinkedHashMap<String, Object> getPins() {
         LinkedHashMap<String, Object> pins = null;
         try {
@@ -354,15 +354,12 @@ public class IPFSService {
                 streamSize.setVal((int) lis.getCount());
             }
         } catch (Exception e) {
-            // log.debug("nope. file might have existed.");
-            // todo-0: temporary remove because we get this writing over an existin file
-            // (when that fails to succeed)
             log.error("Failed in restTemplate.exchange", e);
         }
         return ret;
     }
 
-    // todo-0: convert to actual type, not map.
+    // todo-1: convert to actual type, not map.
     public Map<String, Object> ipnsPublish(MongoSession session, String key, String cid) {
         Map<String, Object> ret = null;
         try {
@@ -396,7 +393,7 @@ public class IPFSService {
         return ret;
     }
 
-    // todo-0: convert return val to a type (not map)
+    // todo-1: convert return val to a type (not map)
     public Map<String, Object> ipnsResolve(MongoSession session, String name) {
         Map<String, Object> ret = null;
         try {

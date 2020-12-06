@@ -104,8 +104,8 @@ export class Edit implements EditIntf {
                     });
                 }
             } else {
-                // todo-0: when edit mode is not on, and a user tries to use the social 'reply' button this error comes up
-                // which is completely wrong an misleading in that context.
+                /* todo-0: when edit mode is not on, and a user tries to use the social 'reply' button this error comes up
+                which is completely wrong an misleading in that context. */
                 S.util.showMessage("You cannot edit nodes that you don't own.", "Warning");
             }
         }

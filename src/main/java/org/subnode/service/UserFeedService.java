@@ -121,7 +121,7 @@ public class UserFeedService {
 	 * If feedNode is already available, it can be passed in, or else accountNode
 	 * must be passed in, so it can be used to get the feedNode
 	 * 
-	 * todo-0: passing userName in as a param is redundant. get it from accountNode.
+	 * todo-1: passing userName in as a param is redundant. get it from accountNode.
 	 */
 	public void addUserFeedInfo(MongoSession session, SubNode feedNode, SubNode accountNode, String userName) {
 		log.debug("addUserFeedInfo: " + userName);

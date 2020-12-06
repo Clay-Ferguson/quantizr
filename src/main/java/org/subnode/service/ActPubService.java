@@ -157,30 +157,28 @@ public class ActPubService {
         }
     }
 
-    /*
-     * todo-0: need to disallow '@' symbol at least in our signup dialog, although
-     * techncally the DB will allow it and it will reference other foreign servers
-     * only
-     */
     public void importActor(MongoSession session, String apUserName, APObj actor) {
         if (apUserName == null)
             return;
 
+        apUserName = apUserName.trim();
+        if (apUserName.endsWith("@"+appProp.getMetaHost().toLowerCase())) {
+            log.debug("Can't import a user that's not from a foreign server.");
+            return;
+        }
         log.debug("importing Actor: " + apUserName);
 
         SubNode userNode = read.getUserNodeByUserName(session, apUserName);
 
         /*
-         * If we don't have this user in our system, create them. (todo-0: Need to
-         * specifically avoid any users here that somehow contain "@ourserver". That
-         * would basically duplicate a user.)
+         * If we don't have this user in our system, create them. 
          */
         if (userNode == null) {
             userNode = util.createUser(session, apUserName, null, null, true);
         }
 
         /*
-         * todo-0: setting properties on userNode here needs to detect if we changed the
+         * todo-1: setting properties on userNode here needs to detect if we changed the
          * prop, and then only call update.save() if the node HAS changed. Do it by
          * making setProp return boolean if changed.
          */
@@ -366,8 +364,6 @@ public class ActPubService {
         return outbox;
     }
 
-    // todo-0: this is somehow now returning an empty array even though I can see
-    // 'statuses' on the account.
     public APObj getOrderedCollectionPage(String url) {
         if (url == null)
             return null;
@@ -717,7 +713,6 @@ public class ActPubService {
     // });
     // }
     // } catch (Exception e) {
-    // // todo-0
     // }
     // return null;
     // }

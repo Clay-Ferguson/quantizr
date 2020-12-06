@@ -88,14 +88,15 @@ public class SyncToIpfsService {
 	private void removeOrphanFiles() {
 		allFilePaths.forEach(path -> {
 
-			// if any file path is not a node path, it needes to be deleted.
-			// todo-0: this will run more efficiently if we put path values into a list and
-			// then sort that list
-			// ascending by the length of the string, so any parent folders are guaranteed
-			// to get deleted before any of
-			// their subfolders are encountered, and we run therefore the minimal number of
-			// deletes required to accomplish this
-			// in every case! Genius!
+			/*
+			 * if any file path is not a node path, it needes to be deleted.
+			 * 
+			 * todo-0: this will run more efficiently if we put path values into a list and
+			 * then sort that list ascending by the length of the string, so any parent
+			 * folders are guaranteed to get deleted before any of their subfolders are
+			 * encountered, and we run therefore the minimal number of deletes required to
+			 * accomplish this in every case!
+			 */
 			if (!allNodePaths.contains(path)) {
 				try {
 					// to delete the files we really just delete it's parent folder instead, because
@@ -106,14 +107,15 @@ public class SyncToIpfsService {
 					ipfsService.deletePath(path);
 					orphansRemoved++;
 				} catch (Exception e) {
-					// I'm expecting this to fail when it attempts to delete any subfolders under
-					// folders
-					// that were already deleted because we may have just deleted their parents
-					// already in this same loop
-					// so...
-					// todo-0: when we delete a folder, scan for all other folders that have that
-					// matching prefix
-					// and remove them too, because there's no need to call deleteFile on those.
+					/*
+					 * I'm expecting this to fail when it attempts to delete any subfolders under
+					 * folders that were already deleted because we may have just deleted their
+					 * parents already in this same loop so... 
+					 * 
+					 * todo-0: when we delete a folder, scan
+					 * for all other folders that have that matching prefix and remove them too,
+					 * because there's no need to call deleteFile on those.
+					 */
 				}
 			}
 		});
