@@ -86,12 +86,13 @@ public class ActPubService {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    public void sendNote(String toUserName, String privateKey, String toInbox, String fromUser, String inReplyTo, String content,
-            String toActor, String noteUrl, boolean privateMessage) {
+    public void sendNote(String toUserName, String privateKey, String toInbox, String fromUser, String inReplyTo,
+            String content, String toActor, String noteUrl, boolean privateMessage) {
         try {
             String actor = appProp.protocolHostAndPort() + "/ap/u/" + fromUser;
 
-            APObj message = apFactory.newCreateMessageForNote(toUserName, actor, inReplyTo, content, toActor, noteUrl, privateMessage);
+            APObj message = apFactory.newCreateMessageForNote(toUserName, actor, inReplyTo, content, toActor, noteUrl,
+                    privateMessage);
             String body = XString.prettyPrint(message);
             byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
             log.debug("Sending Message: " + body);
@@ -162,7 +163,7 @@ public class ActPubService {
             return;
 
         apUserName = apUserName.trim();
-        if (apUserName.endsWith("@"+appProp.getMetaHost().toLowerCase())) {
+        if (apUserName.endsWith("@" + appProp.getMetaHost().toLowerCase())) {
             log.debug("Can't import a user that's not from a foreign server.");
             return;
         }
@@ -171,7 +172,7 @@ public class ActPubService {
         SubNode userNode = read.getUserNodeByUserName(session, apUserName);
 
         /*
-         * If we don't have this user in our system, create them. 
+         * If we don't have this user in our system, create them.
          */
         if (userNode == null) {
             userNode = util.createUser(session, apUserName, null, null, true);
@@ -464,21 +465,34 @@ public class ActPubService {
                 context.add("https://w3id.org/security/v1");
                 actor.put("@context", context);
 
-                /* Note: this is a self-reference, and must be identical to the URL that returns this object */
+                /*
+                 * Note: this is a self-reference, and must be identical to the URL that returns
+                 * this object
+                 */
                 actor.put("id", host + "/ap/u/" + userName);
                 actor.put("type", "Person");
                 actor.put("preferredUsername", userName);
                 actor.put("name", userName); // this should be ordinary name (first last)
 
+                String avatarMime = userNode.getStringProp(NodeProp.BIN_MIME.s());
                 String avatarVer = userNode.getStringProp(NodeProp.BIN.s());
-                actor.put("icon",  appProp.protocolHostAndPort()  + "/mobile/api/bin/avatar" + "?nodeId=" + userNode.getId().toHexString() + "&v=" + avatarVer);
-                actor.put("summary",  userNode.getStringProp(NodeProp.USER_BIO.s()));
+                String avatarUrl = appProp.protocolHostAndPort() + "/mobile/api/bin/avatar" + "?nodeId="
+                        + userNode.getId().toHexString() + "&v=" + avatarVer;
+
+                APObj avatarObj = new APObj();
+                avatarObj.put("type", "Image");
+                avatarObj.put("mediaType", avatarMime);
+                avatarObj.put("url", avatarUrl);
+                actor.put("icon", avatarObj);
+
+                actor.put("summary", userNode.getStringProp(NodeProp.USER_BIO.s()));
                 actor.put("inbox", host + "/ap/inbox/" + userName); //
                 actor.put("outbox", host + "/ap/outbox/" + userName); //
                 actor.put("followers", host + "/ap/followers/" + userName);
                 actor.put("following", host + "/ap/following/" + userName);
 
-                //todo-0: this shouldn't e actor but should just be the home node of the user? How do we define home node?
+                // todo-0: this shouldn't e actor but should just be the home node of the user?
+                // How do we define home node?
                 actor.put("url", host + "/ap/u/" + userName);
 
                 APObj endpoints = new APObj();

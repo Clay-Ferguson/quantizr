@@ -485,8 +485,10 @@ public class AppController implements ErrorController {
 			}
 
 			if (cacheBytes != null) {
-				//limiting the stream just becasue for now this is only used in feed processing, and 5MB is plenty
-				IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 5*Const.ONE_MB), response.getOutputStream());
+				// limiting the stream just becasue for now this is only used in feed
+				// processing, and 5MB is plenty
+				IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 5 * Const.ONE_MB),
+						response.getOutputStream());
 			}
 			// not in cache then read and update cache
 			else {
@@ -913,10 +915,19 @@ public class AppController implements ErrorController {
 			HttpSession session, HttpServletResponse response) {
 
 		if (token == null) {
-			callProc.run("bin", null, session, ms -> {
-				attachmentService.getBinary(null, null, nodeId, download != null, response);
-				return null;
-			});
+			// Check if this is an 'avatar' request and if so bypass security
+			if ("avatar".equals(binId)) {
+				adminRunner.run(mongoSession -> {
+					attachmentService.getBinary(mongoSession, null, nodeId, download != null, response);
+				});
+			} 
+			/* Else if not an avatar request then do a securer acccess */
+			else {
+				callProc.run("bin", null, session, ms -> {
+					attachmentService.getBinary(null, null, nodeId, download != null, response);
+					return null;
+				});
+			}
 		} else {
 			if (SessionContext.validToken(token)) {
 				adminRunner.run(mongoSession -> {
