@@ -28,10 +28,9 @@ public class ActPubFactory {
 			String noteUrl, ZonedDateTime now, boolean privateMessage) {
 		APObj ret = new APObj();
 
-		LinkedList<Object> contextArray = new LinkedList<Object>();
-		contextArray.add("https://www.w3.org/ns/activitystreams");
-		contextArray.add(newContextObj());
-		ret.put("@context", contextArray);
+		ret.put("@context", new APList() //
+				.val("https://www.w3.org/ns/activitystreams") //
+				.val(newContextObj()));
 
 		ret.put("id", noteUrl);
 		ret.put("type", "Note");
@@ -56,13 +55,11 @@ public class ActPubFactory {
 		}
 		ret.put("to", toArray);
 
-		LinkedList<APObj> tagArray = new LinkedList<APObj>();
-		APObj tagMention = new APObj();
-		tagMention.put("type", "Mention");
-		tagMention.put("href", toActor);
-		tagMention.put("name", "@" + toUserName); // prepend character to make it like '@user@server.com'
-		tagArray.add(tagMention);
-		ret.put("tag", tagArray);
+		ret.put("tag", new APList().val(new APObj() //
+				.put("type", "Mention") //
+				.put("href", toActor) //
+				.put("name", "@" + toUserName) // prepend character to make it like '@user@server.com'
+		));
 
 		// LinkedList<String> ccArray = new LinkedList<String>();
 		// ccArray.add("https://www.w3.org/ns/activitystreams#Public");
@@ -72,10 +69,9 @@ public class ActPubFactory {
 	}
 
 	public APObj newContextObj() {
-		APObj ret = new APObj();
-		ret.put("language", "en");
-		ret.put("toot", "http://joinmastodon.org/ns#");
-		return ret;
+		return new APObj() //
+				.put("language", "en") //
+				.put("toot", "http://joinmastodon.org/ns#");
 	}
 
 	public APObj newCreateMessage(APObj object, String actor, String to, String noteUrl, ZonedDateTime now) {
@@ -83,11 +79,9 @@ public class ActPubFactory {
 
 		APObj ret = new APObj();
 
-		// ret.put("@context", "https://www.w3.org/ns/activitystreams");
-		LinkedList<Object> contextArray = new LinkedList<Object>();
-		contextArray.add("https://www.w3.org/ns/activitystreams");
-		contextArray.add(newContextObj());
-		ret.put("@context", contextArray);
+		ret.put("@context", new APList() //
+				.val("https://www.w3.org/ns/activitystreams") //
+				.val(newContextObj()));
 
 		ret.put("id", noteUrl + "&apCreateTime=" + idTime);
 		ret.put("type", "Create");
@@ -95,10 +89,9 @@ public class ActPubFactory {
 		ret.put("published", now.format(DateTimeFormatter.ISO_INSTANT));
 		ret.put("object", object);
 
-		LinkedList<String> toArray = new LinkedList<String>();
-		toArray.add(to);
-		toArray.add("https://www.w3.org/ns/activitystreams#Public");
-		ret.put("to", toArray);
+		ret.put("to", new APList() //
+				.val(to) //
+				.val("https://www.w3.org/ns/activitystreams#Public"));
 
 		// LinkedList<String> ccArray = new LinkedList<String>();
 		// ccArray.add("https://www.w3.org/ns/activitystreams#Public");

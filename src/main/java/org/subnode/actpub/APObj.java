@@ -49,4 +49,9 @@ public class APObj extends HashMap<String, Object> {
     public List<Object> getList(String prop) {
         return (List<Object>) get(prop);
     }
+
+    public APObj put(String key, Object val) {
+        super.put(key, val);
+        return this;
+    }
 }

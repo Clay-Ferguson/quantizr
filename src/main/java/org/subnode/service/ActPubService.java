@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.subnode.actpub.APList;
 import org.subnode.actpub.APObj;
 import org.subnode.actpub.ActPubFactory;
 import org.subnode.actpub.VisitAPObj;
@@ -168,7 +169,6 @@ public class ActPubService {
             return;
         }
         log.debug("importing Actor: " + apUserName);
-
         SubNode userNode = read.getUserNodeByUserName(session, apUserName);
 
         /*
@@ -183,8 +183,6 @@ public class ActPubService {
          * prop, and then only call update.save() if the node HAS changed. Do it by
          * making setProp return boolean if changed.
          */
-
-        /* Update user icon */
         APObj icon = actor.getAPObj("icon");
         if (icon != null) {
             String iconUrl = icon.getStr("url");
@@ -196,17 +194,10 @@ public class ActPubService {
             }
         }
 
-        String userBio = actor.getStr("summary");
-        userNode.setProp(NodeProp.USER_BIO.s(), userBio);
-
-        String actorUrl = actor.getStr("id");
-        userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), actorUrl);
-
-        String actorInbox = actor.getStr("inbox");
-        userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), actorInbox);
-
-        String userUrl = actor.getStr("url");
-        userNode.setProp(NodeProp.ACT_PUB_USER_URL.s(), userUrl);
+        userNode.setProp(NodeProp.USER_BIO.s(), actor.getStr("summary"));
+        userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), actor.getStr("id"));
+        userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), actor.getStr("inbox"));
+        userNode.setProp(NodeProp.ACT_PUB_USER_URL.s(), actor.getStr("url"));
 
         update.save(session, userNode, false);
         refreshOutboxFromForeignServer(session, actor, userNode, apUserName);
@@ -387,20 +378,14 @@ public class ActPubService {
 
                     SubNode userNode = read.getUserNodeByUserName(null, username);
                     if (userNode != null) {
-
-                        APObj webFinger = new APObj();
-                        webFinger.put("subject", "acct:" + username + "@" + appProp.getMetaHost());
-
-                        APObj webFingerLink = new APObj();
-                        webFingerLink.put("rel", "self");
-                        webFingerLink.put("type", "application/activity+json");
-
-                        // The href here is required to be the link to the "actor document"
-                        webFingerLink.put("href", host + "/ap/u/" + username);
-
-                        List<APObj> links = new LinkedList<APObj>();
-                        links.add(webFingerLink);
-                        webFinger.put("links", links);
+                        APObj webFinger = new APObj() //
+                                .put("subject", "acct:" + username + "@" + appProp.getMetaHost()) //
+                                .put("links", new APList() //
+                                        .val(new APObj() //
+                                                .put("rel", "self") //
+                                                .put("type", "application/activity+json") //
+                                                .put("href", host + "/ap/u/" + username) // ActivityPub "actor" url
+                                        ));
 
                         log.debug("Reply with WebFinger: " + XString.prettyPrint(webFinger));
                         return webFinger;
@@ -426,25 +411,23 @@ public class ActPubService {
 
     public APObj generateOutbox(String userName) {
         String url = appProp.protocolHostAndPort() + "/ap/outbox/" + userName;
-        APObj outbox = new APObj();
-        outbox.put("@context", "https://www.w3.org/ns/activitystreams");
-        outbox.put("id", url);
-        outbox.put("type", "OrderedCollection");
-        outbox.put("totalItems", 0);
-        outbox.put("first", url + "?page=true");
-        outbox.put("last", url + "?min_id=0&page=true");
-        return outbox;
+        return new APObj() //
+                .put("@context", "https://www.w3.org/ns/activitystreams") //
+                .put("id", url) //
+                .put("type", "OrderedCollection") //
+                .put("totalItems", 0) //
+                .put("first", url + "?page=true") //
+                .put("last", url + "?min_id=0&page=true");
     }
 
     // if minId=="0" that means "last page"
     public APObj generateOutboxPage(String userName, String minId) {
         String url = appProp.protocolHostAndPort() + "/ap/outbox/" + userName;
-        APObj outbox = new APObj();
-        outbox.put("@context", "https://www.w3.org/ns/activitystreams");
-        outbox.put("id", url);
-        outbox.put("type", "OrderedCollection");
-        outbox.put("totalItems", 0);
-        return outbox;
+        return new APObj() //
+                .put("@context", "https://www.w3.org/ns/activitystreams") //
+                .put("id", url) //
+                .put("type", "OrderedCollection") //
+                .put("totalItems", 0);
     }
 
     public APObj generateActor(String userName) {
@@ -458,12 +441,16 @@ public class ActPubService {
                     throw new RuntimeException("User has no crypto keys. This means they have never logged in?");
                 }
 
+                String avatarMime = userNode.getStringProp(NodeProp.BIN_MIME.s());
+                String avatarVer = userNode.getStringProp(NodeProp.BIN.s());
+                String avatarUrl = appProp.protocolHostAndPort() + "/mobile/api/bin/avatar" + "?nodeId="
+                        + userNode.getId().toHexString() + "&v=" + avatarVer;
+
                 APObj actor = new APObj();
 
-                List<Object> context = new LinkedList<Object>();
-                context.add("https://www.w3.org/ns/activitystreams");
-                context.add("https://w3id.org/security/v1");
-                actor.put("@context", context);
+                actor.put("@context", new APList() //
+                        .val("https://www.w3.org/ns/activitystreams") //
+                        .val("https://w3id.org/security/v1"));
 
                 /*
                  * Note: this is a self-reference, and must be identical to the URL that returns
@@ -474,16 +461,10 @@ public class ActPubService {
                 actor.put("preferredUsername", userName);
                 actor.put("name", userName); // this should be ordinary name (first last)
 
-                String avatarMime = userNode.getStringProp(NodeProp.BIN_MIME.s());
-                String avatarVer = userNode.getStringProp(NodeProp.BIN.s());
-                String avatarUrl = appProp.protocolHostAndPort() + "/mobile/api/bin/avatar" + "?nodeId="
-                        + userNode.getId().toHexString() + "&v=" + avatarVer;
-
-                APObj avatarObj = new APObj();
-                avatarObj.put("type", "Image");
-                avatarObj.put("mediaType", avatarMime);
-                avatarObj.put("url", avatarUrl);
-                actor.put("icon", avatarObj);
+                actor.put("icon", new APObj() //
+                        .put("type", "Image") //
+                        .put("mediaType", avatarMime) //
+                        .put("url", avatarUrl));
 
                 actor.put("summary", userNode.getStringProp(NodeProp.USER_BIO.s()));
                 actor.put("inbox", host + "/ap/inbox/" + userName); //
@@ -495,15 +476,14 @@ public class ActPubService {
                 // How do we define home node?
                 actor.put("url", host + "/ap/u/" + userName);
 
-                APObj endpoints = new APObj();
-                endpoints.put("sharedInbox", host + "/ap/inbox");
-                actor.put("endpoints", endpoints);
+                actor.put("endpoints", new APObj().put("sharedInbox", host + "/ap/inbox"));
 
-                APObj pubKey = new APObj();
-                pubKey.put("id", actor.getStr("id") + "#main-key");
-                pubKey.put("owner", actor.getStr("id"));
-                pubKey.put("publicKeyPem", "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n");
-                actor.put("publicKey", pubKey); //
+                actor.put("publicKey", new APObj() //
+                        .put("id", actor.getStr("id") + "#main-key") //
+                        .put("owner", actor.getStr("id")) //
+                        .put("publicKeyPem",
+                                "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n"));
+
                 actor.put("supportsFriendRequests", true);
 
                 log.debug("Reply with Actor: " + XString.prettyPrint(actor));
