@@ -26,6 +26,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -47,7 +48,9 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
+import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.util.DateUtil;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
 
@@ -69,6 +72,9 @@ public class ActPubService {
 
     @Autowired
     private ActPubFactory apFactory;
+
+    @Autowired
+    private RunAsMongoAdminEx adminRunner;
 
     @Autowired
     private AppProp appProp;
@@ -420,14 +426,23 @@ public class ActPubService {
                 .put("last", url + "?min_id=0&page=true");
     }
 
-    // if minId=="0" that means "last page"
+    /*
+     * if minId=="0" that means "last page", and if minId==null it means first page
+     */
     public APObj generateOutboxPage(String userName, String minId) {
-        String url = appProp.protocolHostAndPort() + "/ap/outbox/" + userName;
+        APList items = getOutboxItems(userName, minId);
+
+        // this is a self-reference url (id)
+        String url = appProp.protocolHostAndPort() + "/ap/outbox/" + userName + "?min_id=" + minId + "&page=true";
+
         return new APObj() //
                 .put("@context", "https://www.w3.org/ns/activitystreams") //
                 .put("id", url) //
-                .put("type", "OrderedCollection") //
-                .put("totalItems", 0);
+                .put("type", "OrderedCollectionPage") //
+                .put("orderedItems", items) //
+
+                // todo-0: is this to spec? does Mastodon generate this ? AND which total is it, this page or all pages total ?
+                .put("totalItems", items.size());
     }
 
     public APObj generateActor(String userName) {
@@ -472,8 +487,11 @@ public class ActPubService {
                 actor.put("followers", host + "/ap/followers/" + userName);
                 actor.put("following", host + "/ap/following/" + userName);
 
-                /* This "/u/[user]/home" url format access the node the user has named 'home'. This node is auto-created if not found,
-                and will also be public (readable) to all users because any node named 'home' is automatically madd public */
+                /*
+                 * This "/u/[user]/home" url format access the node the user has named 'home'.
+                 * This node is auto-created if not found, and will also be public (readable) to
+                 * all users because any node named 'home' is automatically madd public
+                 */
                 actor.put("url", host + "/u/" + userName + "/home");
 
                 actor.put("endpoints", new APObj().put("sharedInbox", host + "/ap/inbox"));
@@ -573,141 +591,83 @@ public class ActPubService {
         return ret;
     }
 
-    // * /* WARNING: This is old code never completed yet and just the beginnings of
-    // * some experimenting with an outbox
-    // */
-    // public Object getOutbox(String userName, String page) {
-    // String host = "https://" + appProp.getMetaHost();
-    // ValContainer<Object> ret = new ValContainer<Object>();
+    public APList getOutboxItems(String userName, String minId) {
+        String host = appProp.protocolHostAndPort();
+        APList retItems = null;
+        String nodeIdBase = host + "/app?id=";
 
-    // String outboxBase = host + "/ap/outbox/" + userName;
+        try {
+            SubNode userNode = read.getUserNodeByUserName(null, userName);
+            if (userNode == null) {
+                return null;
+            }
 
-    // // temp hack (todo-1)
-    // String nodeIdBase = "https://quantizr.com/app?id=";
+            retItems = (APList) adminRunner.run(mongoSession -> {
+                APList items = new APList();
+                SubNode userFeedNode = read.getUserNodeByType(mongoSession, null, userNode, "### Posts",
+                        NodeType.USER_FEED.s());
 
-    // // resp.header("Access-Control-Allow-Origin", "*");
-    // try {
-    // SubNode userNode = read.getUserNodeByUserName(null, userName);
-    // if (userNode != null) {
+                // long childCount = read.getChildCount(mongoSession, userFeedNode);
 
-    // adminRunnerEx.run(mongoSession -> {
-    // SubNode userFeedNode = read.getUserNodeByType(mongoSession, null, userNode,
-    // "### Posts",
-    // NodeType.USER_FEED.s());
+                int MAX_PER_PAGE = 3;
+                boolean collecting = false;
 
-    // long childCount = read.getChildCount(mongoSession, userFeedNode);
+                if (minId == null) {
+                    collecting = true;
+                }
 
-    // ////////
-    // List<ActPubOutboxItem> items = new LinkedList<ActPubOutboxItem>();
+                for (SubNode child : read.getChildren(mongoSession, userFeedNode,
+                        Sort.by(Sort.Direction.DESC, SubNode.FIELD_CREATE_TIME), null, 0)) {
 
-    // int MAX_PER_PAGE = 3;
-    // String attributedTo = host + "/ap/u/" + userName;
-    // int counter = 0;
-    // boolean collecting = false;
-    // boolean getLastPage = false;
-    // int pgNo = 0;
-    // int startingCounter = 0;
+                    if (items.size() >= MAX_PER_PAGE) {
+                        // ocPage.setPrev(outboxBase + "?page=" + String.valueOf(pgNo - 1));
+                        // ocPage.setNext(outboxBase + "?page=" + String.valueOf(pgNo + 1));
+                        break;
+                    }
 
-    // if ("last".equals(page)) {
-    // getLastPage = true;
-    // } else {
-    // // pgNo is not zero offset. Starts at '1'
-    // try {
-    // pgNo = Integer.valueOf(page);
-    // } catch (Exception e) {
-    // }
+                    if (collecting) {
+                        String hexId = child.getId().toHexString();
+                        String published = DateUtil.isoStringFromDate(child.getModifyTime());
+                        String actor = host + "/ap/u/" + userName;
+                        // APObj item = new APObj();
+                        // item.put("type", "Note");
+                        // item.put("name", "node:" + hexId);
+                        // item.put("id", nodeIdBase + hexId);
+                        // item.put("content", child.getContent());
+                        // item.put("attributedTo", attributedTo);
+                        items.add(new APObj() //
+                                .put("id", nodeIdBase + hexId + "&create=t") //
+                                .put("type", "Create") //
+                                .put("actor", actor) //
+                                .put("published", published) //
+                                .put("to", new APList().val("https://www.w3.org/ns/activitystreams#Public")) //
+                                // todo-0: pending implement followers
+                                // .put("cc", new APList().val(host + "/ap/followers/" + userName)) //
+                                .put("object", new APObj() //
+                                        .put("id", nodeIdBase + hexId) //
+                                        .put("type", "Note") //
+                                        .put("summary", null) //
+                                        .put("replyTo", null) //
+                                        .put("published", published) //
+                                        .put("url", nodeIdBase + hexId) //
+                                        .put("attributedTo", actor) //
+                                        .put("to", new APList().val("https://www.w3.org/ns/activitystreams#Public")) //
+                                        // todo-0: pending implement followers
+                                        // .put("cc", new APList().val(host + "/ap/followers/" + userName)) //
+                                        .put("sensitive", false) //
+                                        .put("content", child.getContent())//
+                        ) //
+                        );
+                    }
+                }
 
-    // if (pgNo < 0) {
-    // pgNo = 0;
-    // }
-    // startingCounter = (pgNo - 1) * MAX_PER_PAGE;
-    // }
+                return items;
+            });
 
-    // for (SubNode child : read.getChildren(mongoSession, userFeedNode,
-    // Sort.by(Sort.Direction.DESC, SubNode.FIELD_CREATE_TIME), null, 0)) {
-
-    // if (items.size() >= MAX_PER_PAGE) {
-    // // ocPage.setPrev(outboxBase + "?page=" + String.valueOf(pgNo - 1));
-    // // ocPage.setNext(outboxBase + "?page=" + String.valueOf(pgNo + 1));
-    // break;
-    // }
-
-    // if (counter >= startingCounter) {
-    // collecting = true;
-    // }
-
-    // if (collecting) {
-    // String hexId = child.getId().toHexString();
-    // ActPubOutboxItem item = new ActPubOutboxItem();
-    // item.setType("Note");
-    // item.setName("node:" + hexId);
-    // item.setId(nodeIdBase + hexId);
-    // item.setContent(child.getContent());
-    // item.setAttributedTo(attributedTo);
-    // items.add(item);
-    // }
-
-    // if (!collecting && getLastPage && counter >= childCount - MAX_PER_PAGE) {
-    // collecting = true;
-    // }
-
-    // counter++;
-    // }
-    // ////////
-
-    // if (page == null) {
-    // ActPubOutbox outbox = new ActPubOutbox();
-    // ret.setVal(outbox);
-
-    // outbox.setOrderedItems(items);
-    // outbox.setPartOf(outboxBase);
-
-    // outbox.setId(host + "/ap/outbox/" + userName);
-
-    // outbox.setTotalItems((int) childCount);
-    // outbox.setFirst(outboxBase + "?page=true");
-    // outbox.setLast(outboxBase + "?min_id=0&page=true");
-    // } else {
-    // OrderedCollectionPage ocPage = new OrderedCollectionPage();
-    // ret.setVal(ocPage);
-    // ocPage.setOrderedItems(items);
-
-    // // defaul to these values.
-    // ocPage.setPrev(outboxBase + "?page=true");
-    // ocPage.setNext(outboxBase + "?page=true");
-
-    // ocPage.setId(outboxBase + "?page=" + page);
-    // ocPage.setPartOf(outboxBase);
-
-    // // List<ActPubOutboxItem> items = new LinkedList<ActPubOutboxItem>();
-    // // ocPage.setOrderedItems(items);
-
-    // // int MAX_PER_PAGE = 3;
-    // // String attributedTo = host + "/ap/u/" + userName;
-    // // int counter = 0;
-    // // boolean collecting = false;
-    // // boolean getLastPage = false;
-    // // int pgNo = 0;
-    // // int startingCounter = 0;
-
-    // // if (page.equals("last")) {
-    // // getLastPage = true;
-    // // } else {
-    // // // pgNo is not zero offset. Starts at '1'
-    // // pgNo = Integer.valueOf(page);
-    // // if (pgNo < 0) {
-    // // pgNo = 0;
-    // // }
-    // // startingCounter = (pgNo - 1) * MAX_PER_PAGE;
-    // // }
-    // }
-
-    // log.debug("Reply with Outbox: " + XString.prettyPrint(ret.getVal()));
-    // return ret.getVal();
-    // });
-    // }
-    // } catch (Exception e) {
-    // }
-    // return null;
-    // }
+        } catch (Exception e) {
+            log.error("failed generating outbox page: ", e);
+            throw new RuntimeException(e);
+        }
+        return retItems;
+    }
 }

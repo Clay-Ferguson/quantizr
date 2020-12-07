@@ -3,6 +3,7 @@ package org.subnode.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -187,6 +188,11 @@ public class DateUtil {
 		}
 
 		return sb.toString();
+	}
+
+	public static String isoStringFromDate(Date date) {
+		// todo-0: fix timezone for user.
+		return date.toInstant().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_INSTANT);
 	}
 
 	// Smitherene ActivityPub code uses this:

@@ -82,7 +82,10 @@ public class MongoAuth {
 	}
 
 	public void auth(MongoSession session, SubNode node, PrivilegeType... privs) {
-		if (session.isAdmin()) return; // admin can do anything. skip auth
+		if (node == null)
+			return;
+		if (session.isAdmin())
+			return; // admin can do anything. skip auth
 		auth(session, node, Arrays.asList(privs));
 	}
 
@@ -99,7 +102,7 @@ public class MongoAuth {
 	public void auth(MongoSession session, SubNode node, List<PrivilegeType> priv) {
 
 		/* Special case if this node is named 'home' it is readable by anyone */
-		if ("home".equals(node.getName()) && priv.size()==1 && priv.get(0).name().equals("READ")) {
+		if (node != null && "home".equals(node.getName()) && priv.size() == 1 && priv.get(0).name().equals("READ")) {
 			return;
 		}
 

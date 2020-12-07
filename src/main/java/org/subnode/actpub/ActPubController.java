@@ -87,8 +87,10 @@ public class ActPubController {
 		} else {
 			ret = actPubService.generateOutbox(userName);
 		}
-		if (ret != null)
+		if (ret != null) {
+			log.debug("Reply with Outbox: " + XString.prettyPrint(ret));
 			return ret;
+		}
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
