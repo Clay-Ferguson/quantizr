@@ -472,9 +472,9 @@ public class ActPubService {
                 actor.put("followers", host + "/ap/followers/" + userName);
                 actor.put("following", host + "/ap/following/" + userName);
 
-                // todo-0: this shouldn't e actor but should just be the home node of the user?
-                // How do we define home node?
-                actor.put("url", host + "/ap/u/" + userName);
+                /* This "/u/[user]/home" url format access the node the user has named 'home'. This node is auto-created if not found,
+                and will also be public (readable) to all users because any node named 'home' is automatically madd public */
+                actor.put("url", host + "/u/" + userName + "/home");
 
                 actor.put("endpoints", new APObj().put("sharedInbox", host + "/ap/inbox"));
 

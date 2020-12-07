@@ -1,6 +1,5 @@
 package org.subnode.mongo;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -189,20 +188,37 @@ public class MongoRead {
 
         ObjectId nodeOwnerId;
         int colonIdx = -1;
+        boolean isUserNode = false;
+        SubNode userNode = null;
+
+        /*
+         * if 'name' doesn't contain a colon it's known to be just an admin-owned global
+         * named node without a user prefix
+         */
         if ((colonIdx = name.indexOf(":")) == -1) {
             nodeOwnerId = util.getSystemRootNode().getOwner();
             // log.debug("no leading colon, so this is expected to have admin owner=" +
             // nodeOwnerId.toHexString());
-        } else {
+        }
+        /*
+         * If there is a colon in the name then it's of the format 'userName:nodeName'
+         */
+        else {
+            isUserNode = true;
             String userName = name.substring(0, colonIdx);
 
             /*
              * pass a null session here to cause adminSession to be used which is required
              * to get a user node, but it always safe to get this node this way here.
              */
-            SubNode userNode = getUserNodeByUserName(null, userName);
+            userNode = getUserNodeByUserName(null, userName);
             nodeOwnerId = userNode.getOwner();
             name = name.substring(colonIdx + 1);
+
+            /* we know this is a public node, so we can bypass any security check */
+            if ("home".equalsIgnoreCase(name)) {
+                allowAuth = false;
+            }
         }
 
         query.addCriteria(Criteria.where(SubNode.FIELD_NAME).is(name)//
@@ -210,9 +226,31 @@ public class MongoRead {
 
         SubNode ret = getOps(session).findOne(query, SubNode.class);
 
-        // if (ret != null) {
-        // log.debug("Node found: id=" + ret.getId().toHexString());
-        // }
+        /*
+         * If this was a request like 'userName:home' (home node of the user) and we
+         * didn't find a node the user has named 'home' then we forcabily create a
+         * 'home' node for this user, and then return it.
+         */
+        if (userNode != null && ret == null && isUserNode && "home".equalsIgnoreCase(name)) {
+            ret = create.createNode(session, userNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null);
+            ret.setOwner(userNode.getId());
+            String userName = userNode.getStringProp(NodeProp.USER.s());
+            ret.setContent("### User: " + userName + "\n\nUser has not yet edited this default home node.");
+            ret.setName(name);
+
+            /*
+             * This would be redundant. I like the overriding rule that any node named
+             * 'home' becomes public, which is how auth is implemented.
+             * aclService.addPrivilege(session, ret, PrincipalName.PUBLIC.s(),
+             * Arrays.asList(PrivilegeType.READ.s()), null);
+             */
+
+            update.save(session, ret);
+        }
+
+        if (ret != null) {
+            log.debug("Node found: id=" + ret.getId().toHexString());
+        }
 
         if (allowAuth) {
             auth.auth(session, ret, PrivilegeType.READ);
@@ -370,7 +408,8 @@ public class MongoRead {
      * If node is null it's path is considered empty string, and it represents the
      * 'root' of the tree. There is no actual NODE that is root node,
      */
-    public Iterable<SubNode> getChildrenUnderParentPath(MongoSession session, String path, Sort sort, Integer limit, int skip) {
+    public Iterable<SubNode> getChildrenUnderParentPath(MongoSession session, String path, Sort sort, Integer limit,
+            int skip) {
 
         Query query = new Query();
         if (limit != null) {
@@ -625,7 +664,10 @@ public class MongoRead {
         return getOps(session).find(query, SubNode.class);
     }
 
-    /* todo-1: This is very low hanging fruit to make this a feature on the Search menu */
+    /*
+     * todo-1: This is very low hanging fruit to make this a feature on the Search
+     * menu
+     */
     public Iterable<SubNode> getNamedNodes(MongoSession session, SubNode node) {
         auth.auth(session, node, PrivilegeType.READ);
 
@@ -661,7 +703,7 @@ public class MongoRead {
 
     /*
      * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
-     * userNode if you know it, to save cycles
+     * userNode if you have it, so avoid a DB query.
      */
     public SubNode getUserNodeByType(MongoSession session, String user, SubNode userNode, String nodeName,
             String type) {
@@ -789,7 +831,7 @@ public class MongoRead {
         return ret;
     }
 
-     /*
+    /*
      * Returns one (or first) node that has a matching propName and propVal
      */
     public SubNode findSubNodeByProp(MongoSession session, String propName, String propVal) {
@@ -797,7 +839,7 @@ public class MongoRead {
         Criteria criteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + propName + ".value").is(propVal);
         query.addCriteria(criteria);
         SubNode ret = getOps(session).findOne(query, SubNode.class);
-        auth.auth(session, ret, PrivilegeType.READ);  
+        auth.auth(session, ret, PrivilegeType.READ);
         return ret;
     }
 }

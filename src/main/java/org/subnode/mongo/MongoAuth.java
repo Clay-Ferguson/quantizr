@@ -97,6 +97,12 @@ public class MongoAuth {
 
 	/* Returns true if this user on this session has privType access to 'node' */
 	public void auth(MongoSession session, SubNode node, List<PrivilegeType> priv) {
+
+		/* Special case if this node is named 'home' it is readable by anyone */
+		if ("home".equals(node.getName()) && priv.size()==1 && priv.get(0).name().equals("READ")) {
+			return;
+		}
+
 		if (priv == null || priv.size() == 0) {
 			throw new RuntimeEx("privileges not specified.");
 		}

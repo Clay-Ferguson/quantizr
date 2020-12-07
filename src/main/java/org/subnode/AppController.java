@@ -294,7 +294,6 @@ public class AppController implements ErrorController {
 	 */
 	@RequestMapping(value = { "/app", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}" })
 	public String index(//
-
 			// node name on 'admin' account. Non-admin named nodes use url
 			// "/u/userName/nodeName"
 			@PathVariable(value = "nameOnAdminNode", required = false) String nameOnAdminNode, //
@@ -310,7 +309,6 @@ public class AppController implements ErrorController {
 			@RequestParam(value = "n", required = false) String name, //
 			@RequestParam(value = "passCode", required = false) String passCode, //
 			Model model) {
-
 		try {
 			// if in DEV mode we always update cache buster in case files have changed.
 			if (constProvider.getProfileName().equals("dev")) {
