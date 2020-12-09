@@ -64,8 +64,8 @@ export class FriendTypeHandler extends TypeBase {
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
         let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
 
-        let avatarVer: string = S.props.getNodePropVal("_avatarVer", node);
-        let userBio: string = S.props.getNodePropVal("_userBio", node);
+        let avatarVer: string = S.props.getClientPropVal("avatarVer", node);
+        let userBio: string = S.props.getClientPropVal("userBio", node);
         let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
 
         let img: Img = null;

@@ -169,23 +169,11 @@ public class Convert {
 				if (friendAccountNode != null) {
 					String friendAvatarVer = friendAccountNode.getStringProp(NodeProp.BIN.s());
 
-					if (nodeInfo.getProperties() == null) {
-						nodeInfo.setProperties(new LinkedList<PropertyInfo>());
-					}
-
 					/* NOTE: This will be the bio for both ActivityPub users and local users */
 					String userBio = friendAccountNode.getStringProp(NodeProp.USER_BIO.s());
 
-					/*
-					 * todo-0: added 'clientProps' to nodeInfo to use that instead of the leading
-					 * underscore, but haven't het added it here.
-					 * 
-					 * A property prefixed with "_" is an indicator that this is a 'payload data'
-					 * item sent to help client render but not a 'true' property of the actual node.
-					 * These two properties are enough to render the link to the avatar image
-					 */
 					if (friendAvatarVer != null) {
-						nodeInfo.getProperties().add(new PropertyInfo("_avatarVer", friendAvatarVer));
+						nodeInfo.safeGetClientProps().add(new PropertyInfo("avatarVer", friendAvatarVer));
 					}
 					/*
 					 * Note: for ActivityPub foreign users we have xxx property on their account
@@ -195,18 +183,13 @@ public class Convert {
 					else {
 						String userIconUrl = friendAccountNode.getStringProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
 						if (userIconUrl != null) {
-							if (nodeInfo.getClientProps() == null) {
-								nodeInfo.setClientProps(new LinkedList<PropertyInfo>());
-							}
-
-							// todo-0: make a function called getOrCreateClientProps() to create the collection lazily
-							nodeInfo.getClientProps()
+							nodeInfo.safeGetClientProps()
 									.add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userIconUrl));
 						}
 					}
 
 					if (userBio != null) {
-						nodeInfo.getProperties().add(new PropertyInfo("_userBio", userBio));
+						nodeInfo.safeGetClientProps().add(new PropertyInfo("userBio", userBio));
 					}
 				}
 			}
@@ -225,9 +208,6 @@ public class Convert {
 					}
 					SubNode n = iterator.next();
 
-					if (nodeInfo.getChildren() == null) {
-						nodeInfo.setChildren(new LinkedList<NodeInfo>());
-					}
 					// log.debug("renderNode DUMP[count=" + count + " idx=" +
 					// String.valueOf(idx) + " logicalOrdinal=" + String.valueOf(offset
 					// + count) + "]: "
@@ -237,7 +217,7 @@ public class Convert {
 					// the 'inlineChildren' capability
 					boolean multiLevel = true;
 
-					nodeInfo.getChildren().add(convertToNodeInfo(sessionContext, session, n, htmlOnly, initNodeEdit,
+					nodeInfo.safeGetChildren().add(convertToNodeInfo(sessionContext, session, n, htmlOnly, initNodeEdit,
 							logicalOrdinal, multiLevel, lastChild));
 				}
 			}

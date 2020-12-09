@@ -1,6 +1,7 @@
 package org.subnode.model;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -32,10 +33,13 @@ public class NodeInfo {
 	private String type;
 	private List<PropertyInfo> properties;
 
-	/* Holds information that the server needs to send back to the client to support client features, but that are not actually stored
-	properties on the actual node */
+	/*
+	 * Holds information that the server needs to send back to the client to support
+	 * client features, but that are not actually stored properties on the actual
+	 * node
+	 */
 	private List<PropertyInfo> clientProps;
-	
+
 	private List<AccessControlInfo> ac;
 	private boolean hasChildren;
 	private boolean deleted;
@@ -134,6 +138,12 @@ public class NodeInfo {
 		this.lastModified = lastModified;
 	}
 
+	public List<NodeInfo> safeGetChildren() {
+		if (children != null)
+			return children;
+		return children = new LinkedList<NodeInfo>();
+	}
+
 	public List<NodeInfo> getChildren() {
 		return children;
 	}
@@ -156,6 +166,12 @@ public class NodeInfo {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public List<PropertyInfo> safeGetProperties() {
+		if (properties != null)
+			return properties;
+		return properties = new LinkedList<PropertyInfo>();
 	}
 
 	public List<PropertyInfo> getProperties() {
@@ -300,6 +316,12 @@ public class NodeInfo {
 
 	public void setApAvatar(String apAvatar) {
 		this.apAvatar = apAvatar;
+	}
+
+	public List<PropertyInfo> safeGetClientProps() {
+		if (clientProps != null)
+			return clientProps;
+		return clientProps = new LinkedList<PropertyInfo>();
 	}
 
 	public List<PropertyInfo> getClientProps() {
