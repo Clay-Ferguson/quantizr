@@ -173,15 +173,36 @@ public class Convert {
 						nodeInfo.setProperties(new LinkedList<PropertyInfo>());
 					}
 
+					/* NOTE: This will be the bio for both ActivityPub users and local users */
 					String userBio = friendAccountNode.getStringProp(NodeProp.USER_BIO.s());
 
 					/*
+					 * todo-0: added 'clientProps' to nodeInfo to use that instead of the leading
+					 * underscore, but haven't het added it here.
+					 * 
 					 * A property prefixed with "_" is an indicator that this is a 'payload data'
 					 * item sent to help client render but not a 'true' property of the actual node.
 					 * These two properties are enough to render the link to the avatar image
 					 */
 					if (friendAvatarVer != null) {
 						nodeInfo.getProperties().add(new PropertyInfo("_avatarVer", friendAvatarVer));
+					}
+					/*
+					 * Note: for ActivityPub foreign users we have xxx property on their account
+					 * node that points to the live URL of their account avatar as it was found in
+					 * their Actor object
+					 */
+					else {
+						String userIconUrl = friendAccountNode.getStringProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
+						if (userIconUrl != null) {
+							if (nodeInfo.getClientProps() == null) {
+								nodeInfo.setClientProps(new LinkedList<PropertyInfo>());
+							}
+
+							// todo-0: make a function called getOrCreateClientProps() to create the collection lazily
+							nodeInfo.getClientProps()
+									.add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userIconUrl));
+						}
 					}
 
 					if (userBio != null) {

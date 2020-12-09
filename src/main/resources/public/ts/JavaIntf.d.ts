@@ -545,6 +545,7 @@ export interface NodeInfo {
     ordinal: number;
     type: string;
     properties: PropertyInfo[];
+    clientProps: PropertyInfo[];
     ac: AccessControlInfo[];
     hasChildren: boolean;
     deleted: boolean;

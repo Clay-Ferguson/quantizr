@@ -14,7 +14,9 @@ export interface PropsIntf {
     deleteProp(node: J.NodeInfo, propertyName : string): void;
     renderProperties(properties : J.PropertyInfo[]): PropTable;
     getNodeProp(propertyName: string, node: J.NodeInfo): J.PropertyInfo;
+    getClientProp(propertyName: string, node: J.NodeInfo): J.PropertyInfo;
     getNodePropVal(propertyName : string, node: J.NodeInfo): string;
+    getClientPropVal(propertyName : string, node: J.NodeInfo): string;
     setNodePropVal(propertyName : string, node: J.NodeInfo, val: string): void;
     setNodeProp(node: J.NodeInfo, newProp: J.PropertyInfo): void;
     isEncrypted(node: J.NodeInfo): boolean;

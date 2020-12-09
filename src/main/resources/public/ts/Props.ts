@@ -13,6 +13,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
+// todo-0: replace "S.props" in this class to 'this'
 export class Props implements PropsIntf {
 
     readOnlyPropertyList: Set<string> = new Set<string>();
@@ -142,6 +143,14 @@ export class Props implements PropsIntf {
         return node.properties.find(p => p.name === propName);
     }
 
+    getClientProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {
+        if (!node || !node.clientProps) {
+            return null;
+        }
+
+        return node.clientProps.find(p => p.name === propName);
+    }
+
     /* Gets the crypto key from this node that will allow user to decrypt the node. If the user is the owner of the
     node this simply returns the ENC_KEY property but if not we look up in the ACL on the node a copy of the encrypted
     key that goes with the current user (us, logged in user), which should decrypt using our private key.
@@ -201,6 +210,11 @@ export class Props implements PropsIntf {
 
     getNodePropVal = (propertyName: string, node: J.NodeInfo): string => {
         const prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
+        return prop ? prop.value : null;
+    }
+
+    getClientPropVal = (propertyName: string, node: J.NodeInfo): string => {
+        const prop: J.PropertyInfo = this.getClientProp(propertyName, node);
         return prop ? prop.value : null;
     }
 

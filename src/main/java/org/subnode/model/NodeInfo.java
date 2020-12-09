@@ -31,6 +31,11 @@ public class NodeInfo {
 	private Long ordinal;
 	private String type;
 	private List<PropertyInfo> properties;
+
+	/* Holds information that the server needs to send back to the client to support client features, but that are not actually stored
+	properties on the actual node */
+	private List<PropertyInfo> clientProps;
+	
 	private List<AccessControlInfo> ac;
 	private boolean hasChildren;
 	private boolean deleted;
@@ -295,5 +300,13 @@ public class NodeInfo {
 
 	public void setApAvatar(String apAvatar) {
 		this.apAvatar = apAvatar;
+	}
+
+	public List<PropertyInfo> getClientProps() {
+		return clientProps;
+	}
+
+	public void setClientProps(List<PropertyInfo> clientProps) {
+		this.clientProps = clientProps;
 	}
 }
