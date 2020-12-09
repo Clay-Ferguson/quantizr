@@ -58,8 +58,8 @@ public class ActPubController {
 	@RequestMapping(value = "/ap/inbox/{userName}", method = RequestMethod.POST, produces = CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object inboxPost(@RequestBody APObj payload,
 			@PathVariable(value = "userName", required = false) String userName) {
-		// todo-0: implement
-		log.debug("inbox (post) REST data ignored: data=" + XString.prettyPrint(payload));
+		log.debug("INBOX incoming payload: " + XString.prettyPrint(payload));
+		actPubService.processInboxPost(payload);
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
@@ -74,10 +74,10 @@ public class ActPubController {
 	}
 
 	// =====================================
-	// OUTBOX min_id page
+	// OUTBOX
 	// =====================================
 
-	@RequestMapping(value = "/ap/outbox/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
+	@RequestMapping(value = "/ap/outbox/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object outbox(@PathVariable(value = "userName", required = true) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {

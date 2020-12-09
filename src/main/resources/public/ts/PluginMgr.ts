@@ -2,6 +2,7 @@ import { PluginMgrIntf } from "./intf/PluginMgrIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { AccountTypeHandler } from "./plugins/AccountTypeHandler";
 import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
+import { FollowersListTypeHandler } from "./plugins/FollowersListTypeHandler";
 import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
 import { ActPubItemTypeHandler } from "./plugins/ActPubItemTypeHandler";
 import { InboxEntryTypeHandler } from "./plugins/InboxEntryTypeHandler";
@@ -54,6 +55,7 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new InboxEntryTypeHandler());
         this.addTypeHandler(new NotesNodeTypeHandler());
         this.addTypeHandler(new FriendsListTypeHandler());
+        this.addTypeHandler(new FollowersListTypeHandler());
         this.addTypeHandler(new FriendTypeHandler());
         this.addTypeHandler(new ActPubItemTypeHandler());
         this.addTypeHandler(new UserFeedTypeHandler());

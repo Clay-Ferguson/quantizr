@@ -44,6 +44,7 @@ import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoCreate;
+import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
@@ -69,6 +70,9 @@ public class ActPubService {
 
     @Autowired
     private MongoCreate create;
+
+    @Autowired
+    private MongoDelete delete;
 
     @Autowired
     private ActPubFactory apFactory;
@@ -405,6 +409,154 @@ public class ActPubService {
         return null;
     }
 
+    public APObj processInboxPost(APObj payload) {
+        // Process Follow
+        if ("Follow".equals(payload.getStr("type"))) {
+            return processFollowAction(payload);
+        }
+        // Process Undo (Unfollow, etc)
+        else if ("Undo".equals(payload.getStr("type"))) {
+            return processUndoAction(payload);
+        }
+        // else report unhandled
+        else {
+            log.debug("inbox (post) REST not handled:" + XString.prettyPrint(payload));
+        }
+        return null;
+    }
+
+    public APObj processUndoAction(APObj payload) {
+        APObj object = payload.getAPObj("object");
+        if (object != null && "Follow".equals(object.getStr("type"))) {
+            return processUnfollowAction(object);
+        }
+        return null;
+    }
+
+    public APObj processUnfollowAction(APObj object) {
+        // Actor URL of actor doing the folloing
+        String followerActor = object.getStr("actor");
+        if (followerActor == null) {
+            log.debug("no 'actor' found on follows action request posted object");
+            return null;
+        }
+
+        // Actor being followed (local to our server)
+        String actorUrl = object.getStr("object");
+        if (actorUrl == null) {
+            log.debug("no 'object' found on follows action request posted object");
+            return null;
+        }
+
+        /*
+         * Not sure if this is the best way to convert one of our own actor URL into the
+         * username, but unless paths change this should work
+         */
+        int lastIdx = actorUrl.lastIndexOf("/");
+        String userToFollow = null;
+        if (lastIdx == -1) {
+            log.debug("unable to get a user name from actor url: " + actorUrl);
+            return null;
+        }
+
+        userToFollow = actorUrl.substring(lastIdx + 1);
+        final String _userToFollow = userToFollow;
+
+        APObj _ret = (APObj) adminRunner.run(session -> {
+            SubNode followersListNode = read.getUserNodeByType(session, _userToFollow, null, null,
+                    NodeType.FOLLOWERS_LIST.s());
+            Iterable<SubNode> followers = read.searchSubGraph(session, followersListNode,
+                    NodeProp.ACT_PUB_ACTOR_URL.s(), followerActor, null, 0, false, true);
+
+            /*
+             * There should only be a maximum of one item in this loop ever, but it's still
+             * correct to delete all if there were ever any multiples
+             */
+            for (SubNode n : followers) {
+                delete.deleteNode(session, n, false);
+            }
+
+            /*
+             * todo-0: this is my 'guess' at what a response to an Unto would look like.
+             * Haven't confirmed yet. I'm betting even if this is wrong things will still
+             * work ok (for now)
+             */
+            APObj ret = new APObj() //
+                    .put("@context", "https://www.w3.org/ns/activitystreams") //
+                    .put("summary", "Accepted unfollow request") //
+                    .put("type", "Accept") //
+                    .put("actor", actorUrl) //
+                    .put("object", new APObj() //
+                            .put("type", "Undo") //
+                            .put("actor", followerActor) //
+                            .put("object", actorUrl) //
+            );
+            log.debug("Reply to Undo Follow Request: " + XString.prettyPrint(ret));
+            return ret;
+        });
+        return _ret;
+    }
+
+    public APObj processFollowAction(APObj followAction) {
+
+        // Actor URL of actor doing the following
+        String followerActor = followAction.getStr("actor");
+        if (followerActor == null) {
+            log.debug("no 'actor' found on follows action request posted object");
+            return null;
+        }
+
+        // Actor being followed (local to our server)
+        String actorUrl = followAction.getStr("object");
+        if (actorUrl == null) {
+            log.debug("no 'object' found on follows action request posted object");
+            return null;
+        }
+
+        /*
+         * Not sure if this is the best way to convert one of our own actor URL into the
+         * username, but unless paths change this should work
+         */
+        int lastIdx = actorUrl.lastIndexOf("/");
+        String userToFollow = null;
+        if (lastIdx == -1) {
+            log.debug("unable to get a user name from actor url: " + actorUrl);
+            return null;
+        }
+
+        userToFollow = actorUrl.substring(lastIdx + 1);
+        final String _userToFollow = userToFollow;
+
+        APObj _ret = (APObj) adminRunner.run(session -> {
+            SubNode followersListNode = read.getUserNodeByType(session, _userToFollow, null, null,
+                    NodeType.FOLLOWERS_LIST.s());
+
+            Iterable<SubNode> followers = read.searchSubGraph(session, followersListNode,
+                    NodeProp.ACT_PUB_ACTOR_URL.s(), followerActor, null, 0, false, true);
+
+            if (followers == null || !followers.iterator().hasNext()) {
+                SubNode followerNode = create.createNode(session, followersListNode.getPath() + "/?",
+                        NodeType.FRIEND.s());
+                followerNode.setProp(NodeProp.ACT_PUB_USER_URL.s(), followerActor);
+                update.save(session, followerNode);
+            }
+
+            APObj ret = new APObj() //
+                    .put("@context", "https://www.w3.org/ns/activitystreams") //
+                    .put("summary", "Accepted follow request") //
+                    .put("type", "Accept") //
+                    .put("actor", actorUrl) //
+                    .put("object", new APObj() //
+                            .put("type", "Follow") //
+                            .put("actor", followerActor) //
+                            .put("object", actorUrl) //
+            );
+            log.debug("Reply to Follow Request: " + XString.prettyPrint(ret));
+            return ret;
+        });
+        return _ret;
+    }
+
     public APObj generateDummyOrderedCollection(String userName, String path) {
         String host = appProp.protocolHostAndPort();
         APObj obj = new APObj();
@@ -417,13 +569,30 @@ public class ActPubService {
 
     public APObj generateOutbox(String userName) {
         String url = appProp.protocolHostAndPort() + "/ap/outbox/" + userName;
+        Long totalItems = getOutboxItemCount(userName);
+
         return new APObj() //
                 .put("@context", "https://www.w3.org/ns/activitystreams") //
                 .put("id", url) //
                 .put("type", "OrderedCollection") //
-                .put("totalItems", 0) //
+                .put("totalItems", totalItems) //
                 .put("first", url + "?page=true") //
                 .put("last", url + "?min_id=0&page=true");
+    }
+
+    public Long getOutboxItemCount(final String userName) {
+        Long totalItems = (Long) adminRunner.run(mongoSession -> {
+            long count = 0;
+            SubNode userNode = read.getUserNodeByUserName(null, userName);
+            if (userNode != null) {
+                SubNode userFeedNode = read.getUserNodeByType(mongoSession, null, userNode, "### Posts",
+                        NodeType.USER_FEED.s());
+
+                count = read.getChildCount(mongoSession, userFeedNode);
+            }
+            return Long.valueOf(count);
+        });
+        return totalItems;
     }
 
     /*
@@ -441,7 +610,8 @@ public class ActPubService {
                 .put("type", "OrderedCollectionPage") //
                 .put("orderedItems", items) //
 
-                // todo-0: is this to spec? does Mastodon generate this ? AND which total is it, this page or all pages total ?
+                // todo-0: is this to spec? does Mastodon generate this ? AND which total is it,
+                // this page or all pages total ?
                 .put("totalItems", items.size());
     }
 

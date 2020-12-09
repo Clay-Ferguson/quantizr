@@ -91,6 +91,11 @@ export class FriendTypeHandler extends TypeBase {
 
         let userUrl = S.props.getNodePropVal(J.NodeProp.ACT_PUB_USER_URL, node);
 
+        // todo-0: this is an ugly hack but the users can get the idea who this is from the URL (for now)
+        if (!user) {
+            user = userUrl;
+        }
+
         return new Div(null, {
             // className: "marginLeft"
         }, [
