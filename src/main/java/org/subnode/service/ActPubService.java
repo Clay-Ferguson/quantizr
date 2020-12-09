@@ -41,6 +41,7 @@ import org.subnode.actpub.APObj;
 import org.subnode.actpub.ActPubFactory;
 import org.subnode.actpub.VisitAPObj;
 import org.subnode.config.AppProp;
+import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoCreate;
@@ -52,6 +53,7 @@ import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.DateUtil;
+import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
 
@@ -81,7 +83,13 @@ public class ActPubService {
     private RunAsMongoAdminEx adminRunner;
 
     @Autowired
+    private SessionContext sessionContext;
+
+    @Autowired
     private AppProp appProp;
+
+    @Autowired
+    private SubNodeUtil subNodeUtil;
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only
@@ -95,6 +103,50 @@ public class ActPubService {
     // @JsonIgnoreProperties(ignoreUnknown = true)
     {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    /*
+     * When 'node' has been created under 'parent' (by the sessionContext user) this
+     * will send a notification to foreign servers
+     */
+    public void sendNotificationForNodeEdit(SubNode parent, SubNode node) {
+        adminRunner.run(session -> {
+
+            /* get the userNode for the current user who edited a node */
+            SubNode userNode = read.getUserNodeByUserName(session, sessionContext.getUserName());
+            if (userNode == null) {
+                return null;
+            }
+
+            String privateKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PRIVATE);
+            if (privateKey == null) {
+                log.debug("Unable to update federated users. Our local user didn't have a private key on his userNode: "
+                        + sessionContext.getUserName());
+                return null;
+            }
+            String inReplyTo = parent.getStringProp(NodeProp.ACT_PUB_ID);
+
+            /*
+             * Get the owner node of the parent because that's where the properties are that
+             * we need to send this message to the outbox of that user
+             */
+            SubNode ownerOfParent = read.getNode(session, parent.getOwner(), false);
+            String toInbox = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_INBOX.s());
+            String toActor = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+            String toUserName = ownerOfParent.getStringProp(NodeProp.USER.s());
+
+            /*
+             * Depending on which icon (public reply or DM (private message)) the user clicked when creating this node, it can be a
+             * public or a private reply, and we will have set the ACT_PUB_PRIVATE flag at
+             * that time so that we can detect it now for sending out
+             */
+            boolean privateMessage = node.getBooleanProp(NodeProp.ACT_PUB_PRIVATE.s());
+
+            sendNote(toUserName, privateKey, toInbox, sessionContext.getUserName(), inReplyTo, node.getContent(),
+                    toActor, subNodeUtil.getIdBasedUrl(node), privateMessage);
+
+            return null;
+        });
     }
 
     public void sendNote(String toUserName, String privateKey, String toInbox, String fromUser, String inReplyTo,
@@ -409,6 +461,10 @@ public class ActPubService {
         return null;
     }
 
+    /*
+     * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by
+     * foreign servers to follow a user on this server
+     */
     public APObj processInboxPost(APObj payload) {
         // Process Follow
         if ("Follow".equals(payload.getStr("type"))) {
@@ -729,10 +785,6 @@ public class ActPubService {
             HttpEntity<byte[]> requestEntity = new HttpEntity<>(bodyBytes, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             log.debug("Post to " + url + " RESULT: " + response.getStatusCode() + " response=" + response.getBody());
-
-            // ret = mapper.readValue(response.getBody(), new TypeReference<APObj>() {
-            // });
-            // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
         } catch (Exception e) {
             log.error("postJson failed: " + url, e);
             throw new RuntimeException(e);

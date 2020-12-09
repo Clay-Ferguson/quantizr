@@ -327,54 +327,46 @@ public class NodeEditService {
 					}
 				}
 			}
+		}
 
-			// If removing encryption, remove it from all the ACL entries too.
-			String encKey = node.getStringProp(NodeProp.ENC_KEY.s());
-			if (encKey == null) {
-				util.removeAllEncryptionKeys(node);
-			}
-			/* if node is currently encrypted */
-			else {
-				res.setAclEntries(auth.getAclEntries(session, node));
-			}
+		// If removing encryption, remove it from all the ACL entries too.
+		String encKey = node.getStringProp(NodeProp.ENC_KEY.s());
+		if (encKey == null) {
+			util.removeAllEncryptionKeys(node);
+		}
+		/* if node is currently encrypted */
+		else {
+			res.setAclEntries(auth.getAclEntries(session, node));
+		}
 
-			if (!req.isUpdateModTime()) {
-				node.setModifyTime(null);
-			}
+		if (!req.isUpdateModTime()) {
+			node.setModifyTime(null);
+		}
 
-			if (req.isUpdateModTime() && !StringUtils.isEmpty(node.getContent()) //
-			// don't evern send notifications when 'admin' is the one doing the editing.
-					&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
-				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
-			}
+		/* Send notification to local server or to remote server when a node is added */
+		if (req.isUpdateModTime() && !StringUtils.isEmpty(node.getContent()) //
+		// don't evern send notifications when 'admin' is the one doing the editing.
+				&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 
 			SubNode parent = read.getNode(session, node.getParentPath(), false);
 
-			if (sessionContext.getUserName().equals("WClayFerguson") && parent.isType(NodeType.ACT_PUB_ITEM)) {
-				SubNode userNode = read.getUserNodeByUserName(session, sessionContext.getUserName());
-				if (userNode != null) {
-					String privateKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PRIVATE);
-					if (privateKey != null) {
-						String inReplyTo = parent.getStringProp(NodeProp.ACT_PUB_ID);
-
-						SubNode ownerOfParent = read.getNode(session, parent.getOwner(), false);
-						String toInbox = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_INBOX.s());
-						String toActor = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_URL.s());
-						String toUserName = ownerOfParent.getStringProp(NodeProp.USER.s());
-						boolean privateMessage = node.getBooleanProp(NodeProp.ACT_PUB_PRIVATE.s());
-
-						String noteUrl = appProp.protocolHostAndPort() + "/app?id=" + node.getId().toHexString();
-
-						actPubService.sendNote(toUserName, privateKey, toInbox, sessionContext.getUserName(), inReplyTo,
-								node.getContent(), toActor, noteUrl, privateMessage);
-					}
-				}
+			/*
+			 * If we are saving a node under an ActivityPub item then we need to send a
+			 * notification to the owner of this node who will, by definition, be a foreign
+			 * user.
+			 * 
+			 * todo-0: To avoid sending duplicate messages we can do this only when the mod
+			 * time is being set for the first time.
+			 */
+			if (req.isUpdateModTime() && parent != null && parent.isType(NodeType.ACT_PUB_ITEM)) {
+				actPubService.sendNotificationForNodeEdit(parent, node);
+			} else {
+				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
 			}
-
-			NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1, false,
-					false);
-			res.setNode(newNodeInfo);
 		}
+
+		NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1, false, false);
+		res.setNode(newNodeInfo);
 
 		// todo-1: eventually we need a plugin-type architecture to decouple this kind
 		// of type-specific code from the general node saving.

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.AppController;
+import org.subnode.config.AppProp;
 import org.subnode.config.ConstantsProvider;
 import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.NodeProp;
@@ -42,6 +43,9 @@ public class SubNodeUtil {
 
 	@Autowired
 	private ConstantsProvider constProvider;
+
+	@Autowired
+    private AppProp appProp;
 
 	/*
 	 * These are properties we should never allow the client to send back as part of
@@ -252,5 +256,9 @@ public class SubNodeUtil {
 					+ node.getId().toHexString();
 		}
 		return null;
+	}
+
+	public String getIdBasedUrl(SubNode node) {
+		return appProp.protocolHostAndPort() + "/app?id=" + node.getId().toHexString();
 	}
 }
