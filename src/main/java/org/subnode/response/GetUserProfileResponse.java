@@ -10,6 +10,8 @@ public class GetUserProfileResponse extends ResponseBase {
 	// Moving out of here into getUserProfile
 	private String avatarVer;
 
+	private String headerImageVer;
+
 	private String userNodeId;
 
 	public String getUserName() {
@@ -42,5 +44,13 @@ public class GetUserProfileResponse extends ResponseBase {
 
 	public void setUserNodeId(String userNodeId) {
 		this.userNodeId = userNodeId;
+	}
+
+	public String getHeaderImageVer() {
+		return headerImageVer;
+	}
+
+	public void setHeaderImageVer(String headerImageVer) {
+		this.headerImageVer = headerImageVer;
 	}
 }

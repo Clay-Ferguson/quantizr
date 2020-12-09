@@ -150,7 +150,7 @@ public abstract class ImportArchiveBase {
 			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
 
 			// log.debug("Attaching binary to nodeId: " + node.getId().toHexString());
-			attachmentService.attachBinaryFromStream(session, node, null, fileName, length, lzis, mimeType, -1, -1,
+			attachmentService.attachBinaryFromStream(session, "", node, null, fileName, length, lzis, mimeType, -1, -1,
 					false, false, false, true, false, false);
 		} else {
 			// this is normal to get here and indicates this file is NOT an attachment file.

@@ -36,7 +36,7 @@ public class MongoDelete {
 
 	public void deleteNode(MongoSession session, SubNode node, boolean childrenOnly) {
 		if (!childrenOnly) {
-			attachmentService.deleteBinary(session, node);
+			attachmentService.deleteBinary(session, "", node);
 		}
 		delete(session, node, childrenOnly);
 	}
@@ -63,7 +63,6 @@ public class MongoDelete {
 	 */
 	public void delete(MongoSession session, SubNode node, boolean childrenOnly) {
 		auth.authRequireOwnerOfNode(session, node);
-
 		log.debug("Deleting under path: " + node.getPath());
 
 		/*

@@ -882,7 +882,7 @@ public class AppController implements ErrorController {
 						log.debug("Node did not exist: " + _id);
 						throw new RuntimeException("Node not found.");
 					} else {
-						attachmentService.getBinary(mongoSession, node, null, download != null, response);
+						attachmentService.getBinary(mongoSession, "", node, null, download != null, response);
 					}
 				});
 			}
@@ -916,20 +916,29 @@ public class AppController implements ErrorController {
 			// Check if this is an 'avatar' request and if so bypass security
 			if ("avatar".equals(binId)) {
 				adminRunner.run(mongoSession -> {
-					attachmentService.getBinary(mongoSession, null, nodeId, download != null, response);
+					attachmentService.getBinary(mongoSession, "", null, nodeId, download != null, response);
+				});
+			} 
+			// Check if this is an 'profileHeader Image' request and if so bypass security
+			else if ("profileHeader".equals(binId)) {
+				adminRunner.run(mongoSession -> {
+					//Note: the "Header" suffix will be applied to all image-related property names to distinguish
+					//them from normal 'bin' properties. This way we now to support multiple uploads onto any node, 
+					//in this very limites way.
+					attachmentService.getBinary(mongoSession, "Header", null, nodeId, download != null, response);
 				});
 			} 
 			/* Else if not an avatar request then do a securer acccess */
 			else {
 				callProc.run("bin", null, session, ms -> {
-					attachmentService.getBinary(null, null, nodeId, download != null, response);
+					attachmentService.getBinary(null, "", null, nodeId, download != null, response);
 					return null;
 				});
 			}
 		} else {
 			if (SessionContext.validToken(token)) {
 				adminRunner.run(mongoSession -> {
-					attachmentService.getBinary(mongoSession, null, nodeId, download != null, response);
+					attachmentService.getBinary(mongoSession, "", null, nodeId, download != null, response);
 				});
 			}
 		}
@@ -1034,18 +1043,27 @@ public class AppController implements ErrorController {
 	// }
 	//
 
+	/* binSuffix, will be concatenated to all binary-related properties to distinguish them
+	where possible from the normal node attachment. For normal attachments this is an empty string, which
+	makes it no suffix (no effect of concatenating)
+	
+	todo-0: For properties other than bin here the lifecycle (how to delete and cleanup) hasn't yet been finalized (or done)
+	*/
 	@RequestMapping(value = API_PATH + "/upload", method = RequestMethod.POST)
 	public @ResponseBody Object upload(//
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
+			@RequestParam(value = "binSuffix", required = false) String binSuffix, //
 			@RequestParam(value = "explodeZips", required = true) String explodeZips, //
 			@RequestParam(value = "saveAsPdf", required = true) String saveAsPdf, //
 			@RequestParam(value = "ipfs", required = true) String ipfs, //
 			@RequestParam(value = "createAsChildren", required = true) String createAsChildren, //
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
 			HttpSession session) {
+		final String _binSuffix = binSuffix == null ? "" : binSuffix;
+				
 		return callProc.run("upload", null, session, ms -> {
 			// log.debug("Uploading as user: "+ms.getUser());
-			return attachmentService.uploadMultipleFiles(ms, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
+			return attachmentService.uploadMultipleFiles(ms, _binSuffix, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
 					"true".equalsIgnoreCase(ipfs), "true".equalsIgnoreCase(createAsChildren));
 		});
 	}

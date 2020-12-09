@@ -209,7 +209,7 @@ public class ExportPdfServicePdfBox {
 				sizeFactor = Float.valueOf(size).floatValue() / 100;
 			}
 
-			InputStream is = attachmentService.getStream(session, node, false);
+			InputStream is = attachmentService.getStream(session, "", node, false);
 			if (is == null)
 				return;
 

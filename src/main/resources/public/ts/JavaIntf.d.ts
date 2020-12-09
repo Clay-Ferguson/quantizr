@@ -376,6 +376,7 @@ export interface GetUserProfileResponse extends ResponseBase {
     userName: string;
     userBio: string;
     avatarVer: string;
+    headerImageVer: string;
     userNodeId: string;
 }
 

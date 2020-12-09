@@ -430,7 +430,7 @@ public abstract class ExportArchiveBase {
 
 					InputStream is = null;
 					try {
-						is = attachmentService.getStream(session, node, false);
+						is = attachmentService.getStream(session, "", node, false);
 						final BufferedInputStream bis = new BufferedInputStream(is);
 						final long length = node.getIntProp(NodeProp.BIN_SIZE.s());
 						final String binFileName = parentFolder + "/" + fileName + "/" + nodeId + ext;

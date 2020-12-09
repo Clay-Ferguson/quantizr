@@ -150,7 +150,7 @@ public class ExportJsonService {
 				Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 				is = resource.getInputStream();
 				lis = new LimitedInputStreamEx(is, session.getMaxUploadSize());
-				attachmentService.writeStream(session, node, lis, binFileName, binMime);
+				attachmentService.writeStream(session, "", node, lis, binFileName, binMime);
 				update.save(session, node);
 
 			} catch (Exception e) {
@@ -170,7 +170,7 @@ public class ExportJsonService {
 			log.debug("FileName: " + binFileName);
 		}
 
-		InputStream is = attachmentService.getStreamByNode(node);
+		InputStream is = attachmentService.getStreamByNode(node, "");
 		if (is != null) {
 			try {
 				String targetFileName = targetFolder + File.separator + node.getId().toHexString() + "-" + binFileName;
@@ -225,7 +225,7 @@ public class ExportJsonService {
 
 					String binFileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
 					if (binFileName != null) {
-						attachmentService.deleteBinary(session, node);
+						attachmentService.deleteBinary(session, "", node);
 						readBinaryFromResource(session, node, binFileName, subFolder);
 					}
 				}

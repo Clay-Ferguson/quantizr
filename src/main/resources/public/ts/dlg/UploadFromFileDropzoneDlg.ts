@@ -48,7 +48,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     ipfsCheckbox: Checkbox;
 
-    constructor(private nodeId: string, private node: J.NodeInfo, private toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
+    constructor(private nodeId: string, private node: J.NodeInfo, private binSuffix: string, private toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
         super(importMode ? "Import File" : "Upload File", null, false, state);
     }
 
@@ -253,6 +253,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     // nodeId as a comma delimted list which is wrong.
                     if (!formData.has("nodeId")) {
                         formData.append("nodeId", dlg.nodeId);
+                        formData.append("binSuffix", dlg.binSuffix);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
                         formData.append("saveAsPdf", false); // todo-1: fix (work in progress: Save HTML from clipboard as PDF) #saveAsPdf work in progress:
                         formData.append("ipfs", dlg.ipfsCheckbox && dlg.ipfsCheckbox.getChecked() ? "true" : "false");

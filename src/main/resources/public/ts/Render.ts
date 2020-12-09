@@ -470,6 +470,11 @@ export class Render implements RenderIntf {
         return S.util.getRpcPath() + "bin/avatar" + "?nodeId=" + ownerId + "&v=" + avatarVer;
     }
 
+    getProfileHeaderImgUrl = (ownerId: string, avatarVer: string) => {
+        if (!avatarVer) return null;
+        return S.util.getRpcPath() + "bin/profileHeader" + "?nodeId=" + ownerId + "&v=" + avatarVer;
+    }
+
     makeAvatarImage = (node: J.NodeInfo, state: AppState) => {
         let src: string = node.apAvatar || this.getAvatarImgUrl(node.ownerId, node.avatarVer);
         if (!src) {

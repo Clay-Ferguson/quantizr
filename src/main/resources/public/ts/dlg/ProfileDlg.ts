@@ -32,12 +32,34 @@ export class ProfileDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         let profileImg: CompIntf = this.makeProfileImg();
+        let profileHeaderImg: CompIntf = this.makeProfileHeaderImg();
 
         let children = [
             new Form(null, [
                 new Div(null, {
                     className: "row"
                 }, [
+                    new Div(null, {
+                        className: "col-12"
+                    }, [
+                        this.readOnly ? null : new Div(null, null, [
+                            new Label("Profile Header Image")
+                        ]),
+                        profileHeaderImg
+                    ])
+                ]),
+
+                new Div(null, {
+                    className: "row"
+                }, [
+                    new Div(null, {
+                        className: "col-6"
+                    }, [
+                        this.readOnly ? null : new Div(null, null, [
+                            new Label("Profile Picture")
+                        ]),
+                        profileImg
+                    ]),
                     new Div(null, {
                         className: "col-6"
                     }, [
@@ -48,15 +70,6 @@ export class ProfileDlg extends DialogBase {
                                     rows: 15
                                 }, this.bioState)
                         ])
-                    ]),
-
-                    new Div(null, {
-                        className: "col-6"
-                    }, [
-                        this.readOnly ? null : new Div(null, null, [
-                            new Label("Profile Picture")
-                        ]),
-                        profileImg
                     ])
                 ]),
 
@@ -95,6 +108,7 @@ export class ProfileDlg extends DialogBase {
                     this.mergeState({
                         defaultUserName: res.userName,
                         avatarVer: res.avatarVer,
+                        headerImageVer: res.headerImageVer,
                         userNodeId: res.userNodeId
                     });
                     this.bioState.setValue(res.userBio);
@@ -138,7 +152,7 @@ export class ProfileDlg extends DialogBase {
         let onClick = (evt) => {
             if (this.readOnly) return;
 
-            let dlg = new UploadFromFileDropzoneDlg(state.userNodeId, null, false, null, false, this.appState, () => {
+            let dlg = new UploadFromFileDropzoneDlg(state.userNodeId, null, "", false, null, false, this.appState, () => {
 
                 S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: this.userId
@@ -174,6 +188,54 @@ export class ProfileDlg extends DialogBase {
         else {
             return new Div("Click to upload Profile Image", {
                 className: "profileImageHolder",
+                onClick
+            });
+        }
+    }
+
+    makeProfileHeaderImg(): CompIntf {
+        let state = this.getState();
+        let headerImageVer = this.getState().headerImageVer;
+        let src: string = S.render.getProfileHeaderImgUrl(this.userId || this.appState.homeNodeId, headerImageVer);
+
+        let onClick = (evt) => {
+            if (this.readOnly) return;
+
+            let dlg = new UploadFromFileDropzoneDlg(state.userNodeId, null, "Header", false, null, false, this.appState, () => {
+
+                S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                    userId: this.userId
+                }, (res: J.GetUserProfileResponse): void => {
+                    if (res) {
+                        this.mergeState({
+                            // NOTE: It's correct here to get only image info back from server on this query, and ignore
+                            // the other info, that may be currently being edited.
+                            avatarVer: res.avatarVer,
+                            headerImageVer: res.headerImageVer,
+                            userNodeId: res.userNodeId
+                        });
+                    }
+                });
+            });
+            dlg.open();
+        };
+
+        if (src) {
+            let att: any = {
+                className: this.readOnly ? "readOnlyProfileHeaderImage" : "profileHeaderImage",
+                src,
+                onClick
+            };
+            if (!this.readOnly) {
+                att.title = "Click to upload new Header Image";
+            }
+
+            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+            return new Img("profile-img", att);
+        }
+        else {
+            return new Div("Click to upload Profile Image", {
+                className: "profileHeaderImageHolder",
                 onClick
             });
         }

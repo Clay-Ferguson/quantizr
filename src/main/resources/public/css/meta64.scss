@@ -221,12 +221,29 @@ a {
     padding: 8px;
 }
 
+.profileHeaderImageBase {
+    border-radius: $borderRadiusLarge;
+    cursor: pointer;
+    padding: 8px;
+    max-width: 100%;
+}
+
 .profileImage {
     @extend .profileImageBase;
-    border: 6px dotted $nodeBorderBottomColor;
+    border: 4px dotted $nodeBorderBottomColor;
 }
 
 .readOnlyProfileImage {
+    @extend .profileImageBase;
+    border: 1px solid $nodeBorderBottomColor;
+}
+
+.profileHeaderImage {
+    @extend .profileHeaderImageBase;
+    border: 4px dotted $nodeBorderBottomColor;
+}
+
+.readOnlyProfileHeaderImage {
     @extend .profileImageBase;
     border: 1px solid $nodeBorderBottomColor;
 }
@@ -247,6 +264,14 @@ a {
     border-radius: $borderRadiusLarge;
     width: 300px;
     height: 300px;
+    cursor: pointer;
+    padding: 8px;
+    border: 6px dotted $nodeBorderBottomColor;
+}
+
+.profileHeaderImageHolder {
+    border-radius: $borderRadiusLarge;
+    max-height: 300px;
     cursor: pointer;
     padding: 8px;
     border: 6px dotted $nodeBorderBottomColor;

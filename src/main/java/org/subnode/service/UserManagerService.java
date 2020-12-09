@@ -686,6 +686,7 @@ public class UserManagerService {
 				res.setUserName(userNode.getStringProp(NodeProp.USER.s()));
 				res.setUserBio(userNode.getStringProp(NodeProp.USER_BIO.s()));
 				res.setAvatarVer(userNode.getStringProp(NodeProp.BIN.s()));
+				res.setHeaderImageVer(userNode.getStringProp(NodeProp.BIN.s()+"Header"));
 				res.setUserNodeId(userNode.getId().toHexString());
 				res.setSuccess(true);
 			}

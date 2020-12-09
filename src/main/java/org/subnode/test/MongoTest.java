@@ -256,12 +256,12 @@ public class MongoTest {
 			SubNode node = create.createNode(session, "/binaries");
 			update.save(session, node);
 			int maxFileSize = session.getMaxUploadSize(); 
-			attachmentService.writeStream(session, node, new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png");
+			attachmentService.writeStream(session, "", node, new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png");
 			update.save(session, node);
 
 			log.debug("inserted root for binary testing.", null, "image/png", null);
 
-			InputStream inStream = attachmentService.getStream(session, node, true);
+			InputStream inStream = attachmentService.getStream(session, "", node, true);
 			FileUtils.copyInputStreamToFile(inStream, new File("/home/clay/test-image2.png"));
 			log.debug("completed reading back the file, and writing out a copy.");
 		}
