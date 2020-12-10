@@ -1,6 +1,7 @@
 
 @import "variables.scss";
 
+$profileImgSize: 200px;
 $rootNodeBorder: true;
 $highlightActiveMenuItems: false;
 
@@ -216,16 +217,22 @@ a {
 
 .profileImageBase {
     border-radius: $borderRadiusLarge;
-    width: 300px;
+    width: $profileImgSize;
     cursor: pointer;
     padding: 8px;
+    // these three props shift the image to overlay on the main header image
+    // position: relative;
+    // top: -100px;
+    // left: 50px;
 }
 
 .profileHeaderImageBase {
     border-radius: $borderRadiusLarge;
     cursor: pointer;
     padding: 8px;
-    max-width: 100%;
+    width: 100%;
+    max-height: $profileImgSize;
+    object-fit: cover;
 }
 
 .profileImage {
@@ -244,7 +251,7 @@ a {
 }
 
 .readOnlyProfileHeaderImage {
-    @extend .profileImageBase;
+    @extend .profileHeaderImageBase;
     border: 1px solid $nodeBorderBottomColor;
 }
 
@@ -262,8 +269,8 @@ a {
 
 .profileImageHolder {
     border-radius: $borderRadiusLarge;
-    width: 300px;
-    height: 300px;
+    width: $profileImgSize;
+    height: $profileImgSize;
     cursor: pointer;
     padding: 8px;
     border: 6px dotted $nodeBorderBottomColor;
@@ -271,7 +278,7 @@ a {
 
 .profileHeaderImageHolder {
     border-radius: $borderRadiusLarge;
-    max-height: 300px;
+    max-height: $profileImgSize;
     cursor: pointer;
     padding: 8px;
     border: 6px dotted $nodeBorderBottomColor;

@@ -42,7 +42,7 @@ export class ProfileDlg extends DialogBase {
                     new Div(null, {
                         className: "col-12"
                     }, [
-                        this.readOnly ? null : new Div(null, null, [
+                        new Div(null, null, [
                             new Label("Profile Header Image")
                         ]),
                         profileHeaderImg
@@ -53,21 +53,21 @@ export class ProfileDlg extends DialogBase {
                     className: "row"
                 }, [
                     new Div(null, {
-                        className: "col-6"
+                        className: "col-4"
                     }, [
-                        this.readOnly ? null : new Div(null, null, [
-                            new Label("Profile Picture")
+                        new Div(null, null, [
+                            new Label("Avatar Image")
                         ]),
                         profileImg
                     ]),
                     new Div(null, {
-                        className: "col-6"
+                        className: "col-8"
                     }, [
-                        new Div(null, null, [
+                        new Div(null, { className: "marginTop" }, [
                             this.readOnly
                                 ? new Html(S.util.markdown(this.bioState.getValue()) || "This user hasn't entered a bio yet")
                                 : new TextArea("Bio", {
-                                    rows: 15
+                                    rows: 8
                                 }, this.bioState)
                         ])
                     ])
@@ -77,7 +77,7 @@ export class ProfileDlg extends DialogBase {
                     className: "row"
                 }, [
                     new Div(null, {
-                        className: "col-12"
+                        className: "col-12 marginTop"
                     }, [
                         new ButtonBar([
                             this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),

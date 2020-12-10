@@ -395,7 +395,7 @@ public class AttachmentService {
 		} else {
 			LimitedInputStreamEx is = null;
 			try {
-				node.setProp(NodeProp.BIN_SIZE.s(), imageBytes.length);
+				node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, imageBytes.length);
 				is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
 				if (toIpfs) {
 					writeStreamToIpfs(session, binSuffix, node, is, mimeType);
@@ -714,7 +714,7 @@ public class AttachmentService {
 			final long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 
 			if (size == 0) {
-				throw new RuntimeEx("Can't stream video without the file size. sn:size property missing");
+				throw new RuntimeEx("Can't stream video without the file size. BIN_SIZE property missing");
 			}
 
 			inStream = new BufferedInputStream(is);
