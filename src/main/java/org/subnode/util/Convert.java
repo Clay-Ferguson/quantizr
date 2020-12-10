@@ -167,11 +167,19 @@ public class Convert {
 			if (friendAccountId != null) {
 				SubNode friendAccountNode = read.getNode(session, friendAccountId, false);
 				if (friendAccountNode != null) {
-					String friendAvatarVer = friendAccountNode.getStringProp(NodeProp.BIN.s());
 
 					/* NOTE: This will be the bio for both ActivityPub users and local users */
 					String userBio = friendAccountNode.getStringProp(NodeProp.USER_BIO.s());
+					if (userBio != null) {
+						nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.USER_BIO.s(), userBio));
+					}
 
+					String userUrl = friendAccountNode.getStringProp(NodeProp.ACT_PUB_USER_URL.s());
+					if (userUrl != null) {
+						nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_USER_URL.s(), userUrl));
+					}
+
+					String friendAvatarVer = friendAccountNode.getStringProp(NodeProp.BIN.s());
 					if (friendAvatarVer != null) {
 						nodeInfo.safeGetClientProps().add(new PropertyInfo("avatarVer", friendAvatarVer));
 					}
@@ -186,10 +194,6 @@ public class Convert {
 							nodeInfo.safeGetClientProps()
 									.add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userIconUrl));
 						}
-					}
-
-					if (userBio != null) {
-						nodeInfo.safeGetClientProps().add(new PropertyInfo("userBio", userBio));
 					}
 				}
 			}

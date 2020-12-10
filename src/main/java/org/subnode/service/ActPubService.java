@@ -44,6 +44,7 @@ import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
@@ -467,11 +468,15 @@ public class ActPubService {
      * foreign servers to follow a user on this server
      */
     public APObj processInboxPost(APObj payload) {
-        // Process Follow
-        if ("Follow".equals(payload.getStr("type"))) {
+        // Process Create Action
+        if ("Create".equals(payload.getStr("type"))) {
+            return processCreateAction(payload);
+        } 
+        // Process Follow Action
+        else if ("Follow".equals(payload.getStr("type"))) {
             return processFollowAction(payload);
         }
-        // Process Undo (Unfollow, etc)
+        // Process Undo Action (Unfollow, etc)
         else if ("Undo".equals(payload.getStr("type"))) {
             return processUndoAction(payload);
         }
@@ -552,6 +557,106 @@ public class ActPubService {
             return ret;
         });
         return _ret;
+    }
+
+    public APObj processCreateAction(APObj payload) {
+        APObj _ret = (APObj) adminRunner.run(session -> {
+            APObj object = payload.getAPObj("object");
+            if (object != null && "Note".equals(object.getStr("type"))) {
+                return processCreateNote(session, object);
+            } else {
+                log.debug("Unhandled Create action (object type not supported): " + XString.prettyPrint(payload));
+            }
+            return null;
+        });
+        return _ret;
+    }
+
+    /* obj is the 'Note' object */
+    public APObj processCreateNote(MongoSession session, APObj obj) {
+        APObj ret = new APObj();
+
+        // ID only used for (future) deduplication
+        String id = obj.getStr("id");
+        Date published = obj.getDate("published");
+
+        //todo-0: these two values aren't being used yet (implement something)
+        String url = obj.getStr("url"); // link to this post on the foreign server
+        String fromActorUrl = obj.getStr("attributedTo");
+
+        String contentHtml = obj.getStr("content");
+
+        List<Object> toList = obj.getList("to"); // [ "https://quanta.wiki/ap/u/WClayFerguson" ],
+        if (toList != null) {
+            for (Object to : toList) {
+                if (to instanceof String) {
+                    String toActor = (String) to;
+                    saveNoteToUserInboxNode(session, toActor, contentHtml, id, published);
+                } else {
+                    log.debug("to list entry not supported: " + to.toString());
+                }
+            }
+        }
+
+        // todo-0: add cc processing. Same format as 'to' list above
+        // "cc" : [ ],
+
+        return ret;
+    }
+
+    public void saveNoteToUserInboxNode(MongoSession session, String actorUrl, String contentHtml, String id, Date published) {
+        String localUserName = getLocalUserNameFromActorUrl(actorUrl);
+        if (localUserName == null) {
+            log.debug("actorUrl not handled: " + actorUrl);
+            return;
+        }
+        SubNode userNode = read.getUserNodeByUserName(session, localUserName);
+        if (userNode == null)
+            return;
+
+        SubNode userInbox = read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s());
+        if (userInbox == null)
+            return;
+
+        /*
+         * First look to see if there is a target node already existing in this persons
+         * inbox that points to the node in question
+         */
+        SubNode inboxNode = read.findSubNodeByProp(session, userInbox.getPath(), NodeProp.ACT_PUB_ID.s(), id);
+
+        /*
+         * If there's no notification for this node already in the user's inbox then add
+         * one
+         */
+        if (inboxNode == null) {
+            inboxNode = create.createNode(session, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L,
+                    CreateNodeLocation.FIRST, null);
+
+            inboxNode.setOwner(userInbox.getOwner());
+            // todo-0: need a new node prop type that is just 'html' and tells us to render content as raw html if set, or for now
+            // we could be clever and just detect if it DOES have tags and does NOT have '```' 
+            inboxNode.setContent(contentHtml);
+            inboxNode.setModifyTime(published);
+            inboxNode.setProp(NodeProp.ACT_PUB_ID.s(), id); // must be the pop and val we searched for above
+            update.save(session, inboxNode);
+        }
+    }
+
+    /*
+     * we know our own actor layout is this: https://ourserver.com/ap/u/userName, so
+     * this method just strips the user name by taking what's after the rightmost
+     * slash
+     */
+    public String getLocalUserNameFromActorUrl(String actorUrl) {
+        int lastIdx = actorUrl.lastIndexOf("/");
+        String ret = null;
+        if (lastIdx == -1) {
+            log.debug("unable to get a user name from actor url: " + actorUrl);
+            return null;
+        }
+
+        ret = actorUrl.substring(lastIdx + 1);
+        return ret;
     }
 
     public APObj processFollowAction(APObj followAction) {

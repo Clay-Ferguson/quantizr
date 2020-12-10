@@ -65,7 +65,7 @@ export class FriendTypeHandler extends TypeBase {
         let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
 
         let avatarVer: string = S.props.getClientPropVal("avatarVer", node);
-        let userBio: string = S.props.getClientPropVal("userBio", node);
+        let userBio: string = S.props.getClientPropVal(J.NodeProp.USER_BIO, node);
         let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
 
         let img: Img = null;
@@ -79,15 +79,18 @@ export class FriendTypeHandler extends TypeBase {
             src = S.props.getClientPropVal(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
         }
 
+        let userUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_USER_URL, node);
+
         if (src) {
             img = new Img(null, {
                 className: "friendImage",
                 align: "left", // causes text to flow around
-                src
+                src,
+                onClick: userUrl ? () => {
+                    window.open(userUrl, "_blank");
+                } : null
             });
         }
-
-        let userUrl = S.props.getNodePropVal(J.NodeProp.ACT_PUB_USER_URL, node);
 
         // todo-0: this is an ugly hack but the users can get the idea who this is from the URL (for now)
         if (!user) {
@@ -105,7 +108,6 @@ export class FriendTypeHandler extends TypeBase {
                 new Html(userBio, {
                     className: "userBio"
                 })]),
-            userUrl ? new Anchor(userUrl, "User Page") : null,
             new Div(null, null, [
                 new ButtonBar([
                     new Button("Show Feed", () => S.srch.feed("~" + J.NodeType.FRIEND_LIST, user), {

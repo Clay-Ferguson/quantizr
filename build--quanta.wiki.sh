@@ -25,5 +25,12 @@ cp ${docker_compose_yaml} ${PROD_DEPLOYER_BASE}/${quanta_domain}/${docker_compos
 #
 docker save -o ${PROD_DEPLOYER_BASE}/${quanta_domain}/subnode-prod.tar subnode-prod
 verifySuccess "Docker Save"
+read -p "Build Successful. press a key"
 
-read -p "Build Complete. press a key"
+cd ${PROD_DEPLOYER_BASE}/management/${quanta_domain}
+./deploy.sh
+
+cd ${PROD_DEPLOYER_BASE}/management/${quanta_domain}
+./ssh-remote-run.sh
+
+read -p "All done. press a key"
