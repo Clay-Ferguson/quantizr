@@ -136,9 +136,10 @@ public class ActPubService {
             String toUserName = ownerOfParent.getStringProp(NodeProp.USER.s());
 
             /*
-             * Depending on which icon (public reply or DM (private message)) the user clicked when creating this node, it can be a
-             * public or a private reply, and we will have set the ACT_PUB_PRIVATE flag at
-             * that time so that we can detect it now for sending out
+             * Depending on which icon (public reply or DM (private message)) the user
+             * clicked when creating this node, it can be a public or a private reply, and
+             * we will have set the ACT_PUB_PRIVATE flag at that time so that we can detect
+             * it now for sending out
              */
             boolean privateMessage = node.getBooleanProp(NodeProp.ACT_PUB_PRIVATE.s());
 
@@ -671,6 +672,7 @@ public class ActPubService {
                 .put("totalItems", items.size());
     }
 
+    /* Generates an Actor object for one of our own local users */
     public APObj generateActor(String userName) {
         String host = appProp.protocolHostAndPort();
 
@@ -686,6 +688,11 @@ public class ActPubService {
                 String avatarVer = userNode.getStringProp(NodeProp.BIN.s());
                 String avatarUrl = appProp.protocolHostAndPort() + "/mobile/api/bin/avatar" + "?nodeId="
                         + userNode.getId().toHexString() + "&v=" + avatarVer;
+
+                String headerImageMime = userNode.getStringProp(NodeProp.BIN_MIME.s() + "Header");
+                String headerImageVer = userNode.getStringProp(NodeProp.BIN.s() + "Header");
+                String headerImageUrl = appProp.protocolHostAndPort() + "/mobile/api/bin/profileHeader" + "?nodeId="
+                        + userNode.getId().toHexString() + "&v=" + headerImageVer;
 
                 APObj actor = new APObj();
 
@@ -706,6 +713,11 @@ public class ActPubService {
                         .put("type", "Image") //
                         .put("mediaType", avatarMime) //
                         .put("url", avatarUrl));
+
+                actor.put("image", new APObj() //
+                        .put("type", "Image") //
+                        .put("mediaType", headerImageMime) //
+                        .put("url", headerImageUrl));
 
                 actor.put("summary", userNode.getStringProp(NodeProp.USER_BIO.s()));
                 actor.put("inbox", host + "/ap/inbox/" + userName); //
