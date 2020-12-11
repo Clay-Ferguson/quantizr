@@ -721,9 +721,11 @@ public class MongoRead {
 
         String path = userNode.getPath();
 
-        // todo-0: when accessing 'outbox' menu item on 'adam' user account we get an
-        // auth fail here when it finds the node/
-        // probably like the account nodes aren't owned by the user type of thing.
+        /*
+         * todo-0: when accessing 'outbox' menu item on 'adam' user account we get an
+         * auth fail here when it finds the node probably like the account nodes aren't
+         * owned by the user type of thing.
+         */
         SubNode node = findTypedNodeUnderPath(session, path, type);
 
         if (node == null) {
@@ -817,8 +819,10 @@ public class MongoRead {
         query.addCriteria(criteria);
         SubNode ret = getOps(session).findOne(query, SubNode.class);
 
-        // todo-0: temp fix. UserFeed (i.e. outbox) node is always public so shirt
-        // circuit the auth call here.
+        /*
+         * todo-0: temp fix. UserFeed (i.e. outbox) node is always public so short
+         * circuit the auth call here.
+         */
         if (type.equals(NodeType.USER_FEED.s())) {
             return ret;
         }

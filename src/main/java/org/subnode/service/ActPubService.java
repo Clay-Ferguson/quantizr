@@ -539,7 +539,7 @@ public class ActPubService {
             }
 
             /*
-             * todo-0: this is my 'guess' at what a response to an Unto would look like.
+             * todo-0: this is my 'guess' at what a response to an Undo would look like.
              * Haven't confirmed yet. I'm betting even if this is wrong things will still
              * work ok (for now)
              */
@@ -586,7 +586,7 @@ public class ActPubService {
 
         String contentHtml = obj.getStr("content");
 
-        List<Object> toList = obj.getList("to"); // [ "https://quanta.wiki/ap/u/WClayFerguson" ],
+        List<Object> toList = obj.getList("to"); 
         if (toList != null) {
             for (Object to : toList) {
                 if (to instanceof String) {

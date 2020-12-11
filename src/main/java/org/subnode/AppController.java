@@ -1046,8 +1046,6 @@ public class AppController implements ErrorController {
 	/* binSuffix, will be concatenated to all binary-related properties to distinguish them
 	where possible from the normal node attachment. For normal attachments this is an empty string, which
 	makes it no suffix (no effect of concatenating)
-	
-	todo-0: For properties other than bin here the lifecycle (how to delete and cleanup) hasn't yet been finalized (or done)
 	*/
 	@RequestMapping(value = API_PATH + "/upload", method = RequestMethod.POST)
 	public @ResponseBody Object upload(//

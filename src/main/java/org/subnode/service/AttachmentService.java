@@ -1131,7 +1131,16 @@ public class AttachmentService {
 					final Document meta = file.getMetadata();
 					if (meta != null) {
 						/* Get which nodeId owns this grid file */
-						final ObjectId id = (ObjectId) meta.get("nodeId");
+						ObjectId id = (ObjectId) meta.get("nodeId");
+
+						/* If the grid file is not based off 'nodeId' then we still need to check if it's a Header image (special case) */
+						if (id == null) {
+							// todo-1: currently we only have "Header" as a (binSuffix), and it may stay
+							// that way forever, as the only violation of
+							// the one-binary-per-node rule.
+							id = (ObjectId) meta.get("nodeIdHeader");
+						}
+
 						if (id != null) {
 							/* Find the node */
 							final SubNode subNode = read.getNode(session, id);
