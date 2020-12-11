@@ -21,48 +21,6 @@ public class ActPubTest implements TestIntf {
     public void test() throws Exception {
         try {
             // log.debug("Running ActPubTest.");
-
-            // String urlStr = "http://localhost:3000/.well-known/webfinger";
-            // URL url = new URL(urlStr);
-            // HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            // con.setRequestMethod("GET");
-
-            // Map<String, String> parameters = new HashMap<>();
-            // parameters.put("resource", "acct:alice@localhost:3000");
-
-            // con.setDoOutput(true);
-            // DataOutputStream out = new DataOutputStream(con.getOutputStream());
-            // out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
-            // out.flush();
-            // out.close();
-
-            // String inReplyTo =
-            // "https://social.teci.world/objects/c159dd9b-9394-4536-bb82-b801aa2ff8db";
-            // String toInbox = "https://social.teci.world/users/WClayFerguson/inbox";
-            // String toActor = "https://social.teci.world/users/WClayFerguson";
-            // actPubService.sendNote(toInbox, "WClayFerguson", inReplyTo, "Hello world
-            // (Second Try).", toActor);
-
-            // //
-            // https://fosstodon.org/.well-known/webfinger?resource=acct:WClayFerguson@fosstodon.org'
-            // APObj webFinger = actPubService.getWebFinger("https://fosstodon.org",
-            // "WClayFerguson@fosstodon.org");
-            // //"tychi@fosstodon.org");
-            // Map<String,Object> self = actPubService.getLinkByRel(webFinger, "self");
-            // log.debug("Self Link: "+XString.prettyPrint(self));
-            // if (self != null) {
-            // APObj actor = actPubService.getActor((String)self.get("href"));
-            // APObj outbox = actPubService.getOutbox(actor.getStr("outbox"));
-            // APObj ocPage =
-            // actPubService.getOrderedCollectionPage(outbox.getStr("first"));
-
-            // // // get 3 pages of the outbox
-            // // int page = 1;
-            // // while (ocPage != null && ++page <= 3) {
-            // // log.debug("$$$$$$$$$$$$$$$$$$ PAGE " + page);
-            // // ocPage = actPubService.getOrderedCollectionPage(outbox.getStr("next"));
-            // // }
-            // }
         } finally {
         }
     }

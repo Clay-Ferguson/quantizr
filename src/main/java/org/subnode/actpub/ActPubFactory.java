@@ -37,6 +37,7 @@ public class ActPubFactory {
 		ret.put("published", now.format(DateTimeFormatter.ISO_INSTANT));
 		ret.put("attributedTo", attributedTo);
 
+		//Note: inReplyTo can be null here, and this is fine.
 		if (privateMessage) {
 			ret.put("inReplyTo", inReplyTo);
 		} else {

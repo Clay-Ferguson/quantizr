@@ -539,6 +539,12 @@ public class SubNode {
 		return type.s().equals(this.type);
 	}
 
+	/* todo-0: currently this is only checking for a 'friend' node, and returns true even if not a 'foreign' user */
+	@JsonIgnore
+	public boolean isForeignFriendNode() {
+		return this.type.equals(NodeType.FRIEND.s());
+	}
+
 	@JsonProperty(FIELD_TYPE)
 	public String getType() {
 		return type;

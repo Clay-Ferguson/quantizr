@@ -108,7 +108,7 @@ public class ActPubService {
 
     /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this
-     * will send a notification to foreign servers
+     * will send a notification to foreign servers.
      */
     public void sendNotificationForNodeEdit(SubNode parent, SubNode node) {
         adminRunner.run(session -> {
@@ -125,24 +125,63 @@ public class ActPubService {
                         + sessionContext.getUserName());
                 return null;
             }
-            String inReplyTo = parent.getStringProp(NodeProp.ACT_PUB_ID);
+
+            String inReplyTo = null;
+            String toInbox = null;
+            String toActor = null;
+            String toUserName = null;
+            boolean privateMessage = true;
+            SubNode apUserNode = null;
 
             /*
-             * Get the owner node of the parent because that's where the properties are that
-             * we need to send this message to the outbox of that user
+             * Note: The 'parent' node here can be either an ActivityPub ACT_PUB_ITEM node
+             * or else a FRIEND node of a foreign friend,
+             * 
+             * If this is a friend-type node we get "sn:user" property and expect that to be
+             * something like user@foreignServer.com.
              */
-            SubNode ownerOfParent = read.getNode(session, parent.getOwner(), false);
-            String toInbox = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_INBOX.s());
-            String toActor = ownerOfParent.getStringProp(NodeProp.ACT_PUB_ACTOR_URL.s());
-            String toUserName = ownerOfParent.getStringProp(NodeProp.USER.s());
+            // parent==ACT_PUB_ITEM
+            if (parent.getType().equals(NodeType.ACT_PUB_ITEM.s())) {
+                inReplyTo = parent.getStringProp(NodeProp.ACT_PUB_ID);
 
-            /*
-             * Depending on which icon (public reply or DM (private message)) the user
-             * clicked when creating this node, it can be a public or a private reply, and
-             * we will have set the ACT_PUB_PRIVATE flag at that time so that we can detect
-             * it now for sending out
-             */
-            boolean privateMessage = node.getBooleanProp(NodeProp.ACT_PUB_PRIVATE.s());
+                /*
+                 * Get the owner node of the parent because that's where the properties are that
+                 * we need to send this message to the outbox of that user
+                 */
+                apUserNode = read.getNode(session, parent.getOwner(), false);
+
+                if (apUserNode == null) {
+                    throw new RuntimeException(
+                            "unable to get apUserNode from the owner of parent (an ACT_PUB_ITEM type) node with id="
+                                    + parent.getId().toHexString());
+                }
+
+                /*
+                 * Depending on which icon (public reply or DM (private message)) the user
+                 * clicked when creating this node, it can be a public or a private reply, and
+                 * we will have set the ACT_PUB_PRIVATE flag at that time so that we can detect
+                 * it now for sending out
+                 */
+                privateMessage = node.getBooleanProp(NodeProp.ACT_PUB_PRIVATE.s());
+            }
+            // parent==Friend node
+            else if (parent.getType().equals(NodeType.FRIEND.s())) {
+                String apUserName = parent.getStringProp(NodeProp.USER.s());
+                apUserNode = read.getUserNodeByUserName(session, apUserName);
+                privateMessage = true;
+
+                if (apUserNode == null) {
+                    throw new RuntimeException(
+                            "unable to get apUserNode from the sn:user property of parent (a FRIEND type) node with id="
+                                    + parent.getId().toHexString());
+                }
+            } else {
+                throw new RuntimeException("Unable to send message under node type: " + node.getType());
+            }
+
+            toInbox = apUserNode.getStringProp(NodeProp.ACT_PUB_ACTOR_INBOX.s());
+            toActor = apUserNode.getStringProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+            toUserName = apUserNode.getStringProp(NodeProp.USER.s());
 
             sendNote(toUserName, privateKey, toInbox, sessionContext.getUserName(), inReplyTo, node.getContent(),
                     toActor, subNodeUtil.getIdBasedUrl(node), privateMessage);
@@ -471,7 +510,7 @@ public class ActPubService {
         // Process Create Action
         if ("Create".equals(payload.getStr("type"))) {
             return processCreateAction(payload);
-        } 
+        }
         // Process Follow Action
         else if ("Follow".equals(payload.getStr("type"))) {
             return processFollowAction(payload);
@@ -580,13 +619,13 @@ public class ActPubService {
         String id = obj.getStr("id");
         Date published = obj.getDate("published");
 
-        //todo-0: these two values aren't being used yet (implement something)
+        // todo-0: these two values aren't being used yet (implement something)
         String url = obj.getStr("url"); // link to this post on the foreign server
         String fromActorUrl = obj.getStr("attributedTo");
 
         String contentHtml = obj.getStr("content");
 
-        List<Object> toList = obj.getList("to"); 
+        List<Object> toList = obj.getList("to");
         if (toList != null) {
             for (Object to : toList) {
                 if (to instanceof String) {
@@ -604,7 +643,8 @@ public class ActPubService {
         return ret;
     }
 
-    public void saveNoteToUserInboxNode(MongoSession session, String actorUrl, String contentHtml, String id, Date published) {
+    public void saveNoteToUserInboxNode(MongoSession session, String actorUrl, String contentHtml, String id,
+            Date published) {
         String localUserName = getLocalUserNameFromActorUrl(actorUrl);
         if (localUserName == null) {
             log.debug("actorUrl not handled: " + actorUrl);
@@ -633,8 +673,10 @@ public class ActPubService {
                     CreateNodeLocation.FIRST, null);
 
             inboxNode.setOwner(userInbox.getOwner());
-            // todo-0: need a new node prop type that is just 'html' and tells us to render content as raw html if set, or for now
-            // we could be clever and just detect if it DOES have tags and does NOT have '```' 
+            // todo-0: need a new node prop type that is just 'html' and tells us to render
+            // content as raw html if set, or for now
+            // we could be clever and just detect if it DOES have tags and does NOT have
+            // '```'
             inboxNode.setContent(contentHtml);
             inboxNode.setModifyTime(published);
             inboxNode.setProp(NodeProp.ACT_PUB_ID.s(), id); // must be the pop and val we searched for above
