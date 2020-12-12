@@ -623,6 +623,33 @@ public class ActPubService {
         String url = obj.getStr("url"); // link to this post on the foreign server
         String fromActorUrl = obj.getStr("attributedTo");
 
+        /*
+         * If this is a 'reply' post then parse the ID out of this, and if we can find
+         * that node by that id then insert the reply under that, instead of the default
+         * without this id which is to put in 'inbox'
+         * 
+         * Also todo-0: how are we notifying the user in realtime that this reply was
+         * just come in?
+         */
+        String inReplyTo = obj.getStr("inReplyTo");
+
+        /* This will say null unless inReplyTo is used to get an id to lookup */
+        SubNode nodeBeingRepliedTo = null;
+
+        /*
+         * Detect if inReplyTo is formatted like this:
+         * 'https://quanta.wiki/app?id=xxxxx' and if so lookup the nodeBeingRepliedTo by
+         * using that nodeId
+         */
+        if (inReplyTo != null && inReplyTo.startsWith(appProp.getHttpProtocol() + "://" + appProp.getMetaHost())) {
+            int lastIdx = inReplyTo.lastIndexOf("=");
+            String replyToId = null;
+            if (lastIdx != -1) {
+                replyToId = inReplyTo.substring(lastIdx + 1);
+                nodeBeingRepliedTo = read.getNode(session, replyToId, false);
+            }
+        }
+
         String contentHtml = obj.getStr("content");
 
         List<Object> toList = obj.getList("to");
@@ -630,7 +657,11 @@ public class ActPubService {
             for (Object to : toList) {
                 if (to instanceof String) {
                     String toActor = (String) to;
-                    saveNoteToUserInboxNode(session, toActor, contentHtml, id, published);
+                    if (nodeBeingRepliedTo != null) {
+                        saveNoteAsReplyUnderNode(session, toActor, contentHtml, id, published, nodeBeingRepliedTo);
+                    } else {
+                        saveNoteToUserInboxNode(session, toActor, contentHtml, id, published);
+                    }
                 } else {
                     log.debug("to list entry not supported: " + to.toString());
                 }
@@ -641,6 +672,42 @@ public class ActPubService {
         // "cc" : [ ],
 
         return ret;
+    }
+
+    public void saveNoteAsReplyUnderNode(MongoSession session, String actorUrl, String contentHtml, String id,
+            Date published, SubNode nodeBeingRepliedTo) {
+        String localUserName = getLocalUserNameFromActorUrl(actorUrl);
+        if (localUserName == null) {
+            log.debug("actorUrl not handled: " + actorUrl);
+            return;
+        }
+        SubNode userNode = read.getUserNodeByUserName(session, localUserName);
+        if (userNode == null)
+            return;
+
+        /*
+         * First look to see if there is a target node already existing in this so we
+         * don't add a dupliate
+         */
+        SubNode newNode = read.findSubNodeByProp(session, nodeBeingRepliedTo.getPath(), NodeProp.ACT_PUB_ID.s(), id);
+        if (newNode != null) {
+            log.debug("duplicate ActivityPub post ignored: " + id);
+            return;
+        }
+
+        newNode = create.createNode(session, nodeBeingRepliedTo, null, NodeType.INBOX_ENTRY.s(), 0L,
+                CreateNodeLocation.FIRST, null);
+
+        newNode.setOwner(userNode.getId());
+
+        // todo-0: need a new node prop type that is just 'html' and tells us to render
+        // content as raw html if set, or for now
+        // we could be clever and just detect if it DOES have tags and does NOT have
+        // '```'
+        newNode.setContent(contentHtml);
+        newNode.setModifyTime(published);
+        newNode.setProp(NodeProp.ACT_PUB_ID.s(), id); // must be the pop and val we searched for above
+        update.save(session, newNode);
     }
 
     public void saveNoteToUserInboxNode(MongoSession session, String actorUrl, String contentHtml, String id,
