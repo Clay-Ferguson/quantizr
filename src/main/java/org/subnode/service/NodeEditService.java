@@ -358,7 +358,7 @@ public class NodeEditService {
 			 * todo-0: To avoid sending duplicate messages we can do this only when the mod
 			 * time is being set for the first time.
 			 */
-			if (req.isUpdateModTime() && parent != null && (parent.isType(NodeType.ACT_PUB_ITEM) || parent.isForeignFriendNode())) {
+			if (req.isUpdateModTime() && parent != null && (parent.hasProperty(NodeProp.ACT_PUB_ID) || parent.isType(NodeType.ACT_PUB_ITEM) || parent.isForeignFriendNode())) {
 				actPubService.sendNotificationForNodeEdit(parent, node);
 			} else {
 				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());

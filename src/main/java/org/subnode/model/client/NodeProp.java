@@ -14,6 +14,7 @@ public enum NodeProp {
     ACT_PUB_OBJ_CONTENT("ap:objContent", "s"), //
     ACT_PUB_OBJ_INREPLYTO("ap:objInReplyTo", "s"), //
     ACT_PUB_OBJ_URL("ap:objUrl", "s"), //
+    ACT_PUB_OBJ_ATTRIBUTED_TO("ap:objAttributedTo", "s"), //
     ACT_PUB_USER_ICON_URL("ap:userIcon", "s"), //
     ACT_PUB_USER_URL("ap:userUrl", "s"), //
     ACT_PUB_ACTOR_URL("ap:actorUrl", "s"), //

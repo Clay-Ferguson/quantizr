@@ -421,12 +421,14 @@ public class SubNode {
 		properties().remove(key);
 	}
 
+	/* todo-0: Refactor to 'getStrProp' */
 	@Transient
 	@JsonIgnore
 	public String getStringProp(NodeProp prop) {
 		return getStringProp(prop.s());
 	}
 
+	/* todo-0: Refactor to 'getStrProp' */
 	@JsonIgnore
 	public String getStringProp(String key) {
 		try {
@@ -539,7 +541,15 @@ public class SubNode {
 		return type.s().equals(this.type);
 	}
 
-	/* todo-0: currently this is only checking for a 'friend' node, and returns true even if not a 'foreign' user */
+	@JsonIgnore
+	public boolean hasProperty(NodeProp prop) {
+		return properties != null && properties.containsKey(prop.s());
+	}
+
+	/*
+	 * todo-0: currently this is only checking for a 'friend' node, and returns true
+	 * even if not a 'foreign' user
+	 */
 	@JsonIgnore
 	public boolean isForeignFriendNode() {
 		return this.type.equals(NodeType.FRIEND.s());

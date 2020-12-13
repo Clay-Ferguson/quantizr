@@ -91,6 +91,7 @@ export class TypeBase implements TypeHandlerIntf {
                 ])
             ]);
         }
+
         // I was trying to let this button decrypt, but react is saying the component got unmounted
         // and thrownging an error when the decrypt call below tries to update the state on a component
         // that somehow is already gone by the time it runs.

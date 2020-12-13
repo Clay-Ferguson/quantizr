@@ -33,8 +33,12 @@ export class NodeCompRowFooter extends Div {
         }
 
         /* If ActivityPub type is on the node then it makes sense to have a Direct Message option also */
-        let apType = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_TYPE, this.node);
-        if (apType) {
+        let apObjType = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_TYPE, this.node);
+        let apId = S.props.getNodePropVal(J.NodeProp.ACT_PUB_ID, this.node);
+
+        /* todo-0: is it redundant to check apObjType here? That is: Do all nodes with an apObjType also have an apId? ...because
+        if so then this is redundant */
+        if (apObjType || apId) {
             children.push(new Icon({
                 title: "Private Reply (Direct Message)",
                 className: "fa fa-comment fa-lg rowFooterIcon",

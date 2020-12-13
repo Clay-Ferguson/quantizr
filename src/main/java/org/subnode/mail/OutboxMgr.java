@@ -180,8 +180,10 @@ public class OutboxMgr {
 				update.save(session, notifyNode);
 			}
 
-			// and then always send out a push notification so the user sees live there's a
-			// new share comming in or being re-added even.
+			/*
+			 * Send push notification so the user sees live there's a new share comming in
+			 * or being re-added even.
+			 */
 			userFeedService.sendServerPushInfo(recieverUserName, new InboxPushInfo(node.getId().toHexString()));
 
 			SubNode recieverAccountNode = read.getUserNodeByUserName(session, recieverUserName);
@@ -235,7 +237,7 @@ public class OutboxMgr {
 	 * Get node that contains all preferences for this user, as properties on it.
 	 */
 	public SubNode getSystemOutbox(MongoSession session) {
-		return apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.OUTBOX + "/", NodeName.SYSTEM, null,
-				"System Messages", null, true, null, null);
+		return apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.OUTBOX + "/", NodeName.SYSTEM,
+				null, "System Messages", null, true, null, null);
 	}
 }

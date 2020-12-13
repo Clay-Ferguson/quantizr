@@ -1,6 +1,7 @@
-import { dispatch } from "./AppRedux";
+import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
+import { InboxNotifyDlg } from "./dlg/InboxNotifyDlg";
 import { ServerPushIntf } from "./intf/ServerPushIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -68,13 +69,7 @@ export class ServerPush implements ServerPushIntf {
         }, false);
 
         eventSource.addEventListener("inboxPush", function (e: any) {
-            // Removing this type notification for now, because it's not really ready. For example, if bob creates a reply to a feed item bob gets
-            // the notification, which is wrong. In other words based on the new 'feed' capability notification can
-            // end up being just a redundant annoyance.
-
-            // temporary remove: I was seeing this come up when I replied to someone ELSES node, or in other words I was getting
-            // a notification about my own node that I creted.
-            // todo-1
+            debugger;
             // new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
         }, false);
     }
