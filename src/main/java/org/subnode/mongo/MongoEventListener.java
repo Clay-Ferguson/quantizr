@@ -152,13 +152,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void removeDefaultProps(SubNode node) {
 
 		/* If layout=="v" then remove the property */
-		String layout = node.getStringProp(NodeProp.LAYOUT.s());
+		String layout = node.getStrProp(NodeProp.LAYOUT.s());
 		if ("v".equals(layout)) {
 			node.deleteProp(NodeProp.LAYOUT.s());
 		}
 
 		/* If priority=="0" then remove the property */
-		String priority = node.getStringProp(NodeProp.PRIORITY.s());
+		String priority = node.getStrProp(NodeProp.PRIORITY.s());
 		if ("0".equals(priority)) {
 			node.deleteProp(NodeProp.PRIORITY.s());
 		}

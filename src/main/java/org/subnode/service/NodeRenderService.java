@@ -226,7 +226,7 @@ public class NodeRenderService {
 		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode="
 		// + scanToNode);
 
-		String orderBy = node.getStringProp(NodeProp.ORDER_BY.s());
+		String orderBy = node.getStrProp(NodeProp.ORDER_BY.s());
 		Sort sort = null;
 
 		if (!StringUtils.isEmpty(orderBy)) {
@@ -513,7 +513,7 @@ public class NodeRenderService {
 		for (SubNode n : read.getCalendar(session, node)) {
 			CalendarItem item = new CalendarItem();
 
-			String durationStr = n.getStringProp(NodeProp.DURATION.s());
+			String durationStr = n.getStrProp(NodeProp.DURATION.s());
 			long duration = DateUtil.getMillisFromDuration(durationStr);
 			if (duration == 0) {
 				duration = 60 * 60 * 1000;

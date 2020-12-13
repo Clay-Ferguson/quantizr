@@ -97,7 +97,7 @@ public class IPFSService {
         String ret = "";
         SubNode node = read.getNode(session, nodeId);
         if (node != null) {
-            String hash = node.getStringProp(NodeProp.IPFS_LINK);
+            String hash = node.getStrProp(NodeProp.IPFS_LINK);
             if (StringUtils.isEmpty(hash)) {
                 ret = "Node is missing IPFS link property: " + NodeProp.IPFS_LINK.s();
             } else {

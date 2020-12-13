@@ -421,16 +421,14 @@ public class SubNode {
 		properties().remove(key);
 	}
 
-	/* todo-0: Refactor to 'getStrProp' */
 	@Transient
 	@JsonIgnore
-	public String getStringProp(NodeProp prop) {
-		return getStringProp(prop.s());
+	public String getStrProp(NodeProp prop) {
+		return getStrProp(prop.s());
 	}
 
-	/* todo-0: Refactor to 'getStrProp' */
 	@JsonIgnore
-	public String getStringProp(String key) {
+	public String getStrProp(String key) {
 		try {
 			SubNodePropVal v = properties().get(key);
 			if (v == null)

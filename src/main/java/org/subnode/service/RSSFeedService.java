@@ -179,7 +179,7 @@ public class RSSFeedService {
 					if (n.getId().toHexString().equals(nodeId))
 						continue;
 
-					String feedSrc = n.getStringProp(NodeProp.RSS_FEED_SRC.s());
+					String feedSrc = n.getStrProp(NodeProp.RSS_FEED_SRC.s());
 					if (!StringUtils.isEmpty(feedSrc) && !feedSrc.contains(nodeId)) {
 						urls.add(feedSrc);
 						if (++count >= MAX_FEEDS_PER_AGGREGATE) {

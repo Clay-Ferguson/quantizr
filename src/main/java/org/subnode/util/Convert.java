@@ -58,14 +58,14 @@ public class Convert {
 
 		ImageSize imageSize = null;
 		String dataUrl = null;
-		String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
+		String mimeType = node.getStrProp(NodeProp.BIN_MIME.s());
 		if (mimeType != null) {
 			boolean isImage = util.isImageAttached(node);
 
 			if (isImage) {
 				imageSize = util.getImageSize(node);
 
-				String dataUrlProp = node.getStringProp(NodeProp.BIN_DATA_URL.s());
+				String dataUrlProp = node.getStrProp(NodeProp.BIN_DATA_URL.s());
 				if (dataUrlProp != null) {
 					dataUrl = attachmentService.getStringByNode(session, node);
 
@@ -103,8 +103,8 @@ public class Convert {
 			// node.getId().toHexString())) + //
 			// " tried to find owner=" + node.getOwner().toHexString());
 		} else {
-			nameProp = userNode.getStringProp(NodeProp.USER.s());
-			avatarVer = userNode.getStringProp(NodeProp.BIN.s());
+			nameProp = userNode.getStrProp(NodeProp.USER.s());
+			avatarVer = userNode.getStrProp(NodeProp.BIN.s());
 
 			/*
 			 * todo-1: right here, get user profile off 'userNode', and put it into a map
@@ -138,7 +138,7 @@ public class Convert {
 			}
 		}
 
-		String apAvatar = userNode != null ? userNode.getStringProp(NodeProp.ACT_PUB_USER_ICON_URL) : null;
+		String apAvatar = userNode != null ? userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL) : null;
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), owner,
 				ownerId, node.getOrdinal(), //
@@ -155,7 +155,7 @@ public class Convert {
 		 * type-specific logic
 		 */
 		if (node.getType().equals(NodeType.FRIEND.s())) {
-			String friendAccountId = node.getStringProp(NodeProp.USER_NODE_ID);
+			String friendAccountId = node.getStrProp(NodeProp.USER_NODE_ID);
 
 			// NOTE: Right when the Friend node is first created, before a person has been
 			// selected, this WILL be null, and is normal
@@ -164,17 +164,17 @@ public class Convert {
 				if (friendAccountNode != null) {
 
 					/* NOTE: This will be the bio for both ActivityPub users and local users */
-					String userBio = friendAccountNode.getStringProp(NodeProp.USER_BIO.s());
+					String userBio = friendAccountNode.getStrProp(NodeProp.USER_BIO.s());
 					if (userBio != null) {
 						nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.USER_BIO.s(), userBio));
 					}
 
-					String userUrl = friendAccountNode.getStringProp(NodeProp.ACT_PUB_USER_URL.s());
+					String userUrl = friendAccountNode.getStrProp(NodeProp.ACT_PUB_USER_URL.s());
 					if (userUrl != null) {
 						nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_USER_URL.s(), userUrl));
 					}
 
-					String friendAvatarVer = friendAccountNode.getStringProp(NodeProp.BIN.s());
+					String friendAvatarVer = friendAccountNode.getStrProp(NodeProp.BIN.s());
 					if (friendAvatarVer != null) {
 						nodeInfo.safeGetClientProps().add(new PropertyInfo("avatarVer", friendAvatarVer));
 					}
@@ -184,7 +184,7 @@ public class Convert {
 					 * their Actor object
 					 */
 					else {
-						String userIconUrl = friendAccountNode.getStringProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
+						String userIconUrl = friendAccountNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
 						if (userIconUrl != null) {
 							nodeInfo.safeGetClientProps()
 									.add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userIconUrl));

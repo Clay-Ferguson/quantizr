@@ -282,8 +282,8 @@ public class MongoAuth {
 			if (principalNode == null) {
 				return null;
 			}
-			principalName = principalNode.getStringProp(NodeProp.USER.s());
-			publicKey = principalNode.getStringProp(NodeProp.USER_PREF_PUBLIC_KEY.s());
+			principalName = principalNode.getStrProp(NodeProp.USER.s());
+			publicKey = principalNode.getStrProp(NodeProp.USER_PREF_PUBLIC_KEY.s());
 		}
 
 		AccessControlInfo info = new AccessControlInfo(principalName, principalId, publicKey);
@@ -345,7 +345,7 @@ public class MongoAuth {
 					success = true;
 				}
 				// else it's an ordinary user so we check the password against their user node
-				else if (userNode.getStringProp(NodeProp.PWD_HASH.s()).equals(util.getHashOfPassword(password))) {
+				else if (userNode.getStrProp(NodeProp.PWD_HASH.s()).equals(util.getHashOfPassword(password))) {
 					success = true;
 				}
 			}

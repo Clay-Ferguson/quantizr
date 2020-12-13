@@ -330,7 +330,7 @@ public class NodeEditService {
 		}
 
 		// If removing encryption, remove it from all the ACL entries too.
-		String encKey = node.getStringProp(NodeProp.ENC_KEY.s());
+		String encKey = node.getStrProp(NodeProp.ENC_KEY.s());
 		if (encKey == null) {
 			util.removeAllEncryptionKeys(node);
 		}
@@ -371,14 +371,14 @@ public class NodeEditService {
 		// todo-1: eventually we need a plugin-type architecture to decouple this kind
 		// of type-specific code from the general node saving.
 		if (node.getType().equals(NodeType.FRIEND.s())) {
-			String userNodeId = node.getStringProp(NodeProp.USER_NODE_ID.s());
+			String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
 
 			/*
 			 * when user first adds, this friendNode won't have the userNodeId yet, so add
 			 * if not yet existing
 			 */
 			if (userNodeId == null) {
-				String friendUserName = node.getStringProp(NodeProp.USER.s());
+				String friendUserName = node.getStrProp(NodeProp.USER.s());
 
 				// if USER_NODE_ID has not been set on the node yet then get it and set it first
 				// here.

@@ -196,7 +196,7 @@ public class OutboxMgr {
 	}
 
 	public void sendEmailNotification(MongoSession session, String userName, SubNode userNode, SubNode node) {
-		String email = userNode.getStringProp(NodeProp.EMAIL.s());
+		String email = userNode.getStrProp(NodeProp.EMAIL.s());
 		log.debug("sending email to: " + email + " because his node was appended under.");
 
 		String content = String.format("User '%s' replied to you.<p>\n\n" + //

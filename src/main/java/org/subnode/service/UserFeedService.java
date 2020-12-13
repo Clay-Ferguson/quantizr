@@ -103,7 +103,7 @@ public class UserFeedService {
 					null, 0);
 
 			for (SubNode accountNode : accountNodes) {
-				String userName = accountNode.getStringProp(NodeProp.USER);
+				String userName = accountNode.getStrProp(NodeProp.USER);
 
 				if (userFeedInfoMapByUserName.containsKey(userName)) {
 					log.error("ERROR: Multiple accounts named " + userName
@@ -407,14 +407,14 @@ public class UserFeedService {
 		// Process all friends, to accumulate all of fullFeedList items
 		for (SubNode friendNode : friendNodes) {
 			// get userNodeId off friend node
-			String userNodeId = friendNode.getStringProp(NodeProp.USER_NODE_ID.s());
+			String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID.s());
 			if (userNodeId == null) {
 				log.warn("user node id missing on node: " + friendNode.getId().toHexString());
 				continue;
 			}
 
 			// get user name of this friend
-			String friendUserName = friendNode.getStringProp(NodeProp.USER.s());
+			String friendUserName = friendNode.getStrProp(NodeProp.USER.s());
 			if (friendUserName == null) {
 				log.warn("user missing on node: " + friendNode.getId().toHexString());
 				continue;

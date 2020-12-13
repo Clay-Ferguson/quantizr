@@ -338,7 +338,7 @@ public class AttachmentService {
 		if (ImageUtil.isImageMime(mimeType)) {
 
 			// default image to be 100% size
-			if (node.getStringProp(NodeProp.IMG_SIZE.s() + binSuffix) == null) {
+			if (node.getStrProp(NodeProp.IMG_SIZE.s() + binSuffix) == null) {
 				node.setProp(NodeProp.IMG_SIZE.s() + binSuffix, "100%");
 			}
 
@@ -486,7 +486,7 @@ public class AttachmentService {
 				throw ExUtil.wrapEx("node not found.");
 			}
 
-			final boolean ipfs = StringUtils.isNotEmpty(node.getStringProp(NodeProp.IPFS_LINK.s() + binSuffix));
+			final boolean ipfs = StringUtils.isNotEmpty(node.getStrProp(NodeProp.IPFS_LINK.s() + binSuffix));
 
 			// Everyone's account node can publish it's attachment and is assumed to be an
 			// avatar.
@@ -499,12 +499,12 @@ public class AttachmentService {
 				auth.auth(session, node, PrivilegeType.READ);
 			}
 
-			final String mimeTypeProp = node.getStringProp(NodeProp.BIN_MIME.s() + binSuffix);
+			final String mimeTypeProp = node.getStrProp(NodeProp.BIN_MIME.s() + binSuffix);
 			if (mimeTypeProp == null) {
 				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
-			String fileName = node.getStringProp(NodeProp.BIN_FILENAME.s() + binSuffix);
+			String fileName = node.getStrProp(NodeProp.BIN_FILENAME.s() + binSuffix);
 			if (fileName == null) {
 				fileName = "filename";
 			}
@@ -622,7 +622,7 @@ public class AttachmentService {
 			if (node == null) {
 				throw new RuntimeEx("node not found: " + nodeId);
 			}
-			final String fullFileName = node.getStringProp(NodeProp.FS_LINK);
+			final String fullFileName = node.getStrProp(NodeProp.FS_LINK);
 			final File file = new File(fullFileName);
 
 			if (!file.exists() || !file.isFile()) {
@@ -670,7 +670,7 @@ public class AttachmentService {
 
 			auth.auth(session, node, PrivilegeType.READ);
 
-			final String fullFileName = node.getStringProp(NodeProp.FS_LINK);
+			final String fullFileName = node.getStrProp(NodeProp.FS_LINK);
 			final File file = new File(fullFileName);
 
 			if (!file.exists() || !file.isFile()) {
@@ -700,12 +700,12 @@ public class AttachmentService {
 			final SubNode node = read.getNode(session, nodeId, false);
 			auth.auth(session, node, PrivilegeType.READ);
 
-			final String mimeTypeProp = node.getStringProp(NodeProp.BIN_MIME.s());
+			final String mimeTypeProp = node.getStrProp(NodeProp.BIN_MIME.s());
 			if (mimeTypeProp == null) {
 				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
-			String fileName = node.getStringProp(NodeProp.BIN_FILENAME.s());
+			String fileName = node.getStrProp(NodeProp.BIN_FILENAME.s());
 			if (fileName == null) {
 				fileName = "filename";
 			}
@@ -982,7 +982,7 @@ public class AttachmentService {
 
 	public void deleteBinary(final MongoSession session, final String binSuffix, final SubNode node) {
 		auth.auth(session, node, PrivilegeType.WRITE);
-		final String id = node.getStringProp(NodeProp.BIN.s() + binSuffix);
+		final String id = node.getStrProp(NodeProp.BIN.s() + binSuffix);
 		if (id == null) {
 			return;
 		}
@@ -1005,9 +1005,9 @@ public class AttachmentService {
 		}
 
 		InputStream is = null;
-		String ipfsHash = node.getStringProp(NodeProp.IPFS_LINK.s() + binSuffix);
+		String ipfsHash = node.getStrProp(NodeProp.IPFS_LINK.s() + binSuffix);
 		if (ipfsHash != null) {
-			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s() + binSuffix);
+			String mimeType = node.getStrProp(NodeProp.BIN_MIME.s() + binSuffix);
 			// log.debug("Getting IPFS Stream: hash=" + ipfsHash + " mime=" + mimeType);
 			is = ipfsService.getStream(session, ipfsHash, mimeType);
 		} else {
@@ -1021,7 +1021,7 @@ public class AttachmentService {
 			return null;
 		log.debug("getStreamByNode: " + node.getId().toHexString());
 
-		String id = node.getStringProp(NodeProp.BIN.s() + binSuffix);
+		String id = node.getStrProp(NodeProp.BIN.s() + binSuffix);
 		if (id == null) {
 			return null;
 		}
@@ -1063,7 +1063,7 @@ public class AttachmentService {
 			return null;
 		log.debug("getStringByNode: " + node.getId().toHexString());
 
-		final String id = node.getStringProp("bin");
+		final String id = node.getStrProp("bin");
 		if (id == null) {
 			return null;
 		}

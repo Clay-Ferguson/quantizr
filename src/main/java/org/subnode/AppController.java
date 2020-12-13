@@ -860,9 +860,9 @@ public class AppController implements ErrorController {
 					// if no cachebuster gid was on url then redirect to a url that does have the
 					// gid
 					if (_gid == null) {
-						_gid = node.getStringProp(NodeProp.IPFS_LINK.s());
+						_gid = node.getStrProp(NodeProp.IPFS_LINK.s());
 						if (_gid == null) {
-							_gid = node.getStringProp(NodeProp.BIN.s());
+							_gid = node.getStrProp(NodeProp.BIN.s());
 						}
 
 						if (_gid != null) {

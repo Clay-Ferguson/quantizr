@@ -184,13 +184,13 @@ public class ExportServiceFlexmark {
 	}
 
 	private void writeImage(SubNode node) {
-		String bin = node.getStringProp(NodeProp.BIN.s());
+		String bin = node.getStrProp(NodeProp.BIN.s());
 		if (bin == null) {
 			return;
 		}
 
 		String style = "";
-		String imgSize = node.getStringProp(NodeProp.IMG_SIZE.s());
+		String imgSize = node.getStrProp(NodeProp.IMG_SIZE.s());
 		if (imgSize != null && imgSize.endsWith("%") || imgSize.endsWith("px")) {
 			style = " style='width:" + imgSize + "'";
 		}

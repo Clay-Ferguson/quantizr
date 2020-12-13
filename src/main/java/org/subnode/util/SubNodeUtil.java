@@ -239,7 +239,7 @@ public class SubNodeUtil {
 	}
 
 	public String getAttachmentUrl(SubNode node) {
-		String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK);
+		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
 
 		/*
 		 * If we had a public gateway we could actually trust we could return this, but
@@ -250,7 +250,7 @@ public class SubNodeUtil {
 		// return Const.IPFS_IO_GATEWAY + ipfsLink;
 		// }
 
-		String bin = ipfsLink != null ? ipfsLink : node.getStringProp(NodeProp.BIN);
+		String bin = ipfsLink != null ? ipfsLink : node.getStrProp(NodeProp.BIN);
 		if (bin != null) {
 			return constProvider.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId="
 					+ node.getId().toHexString();

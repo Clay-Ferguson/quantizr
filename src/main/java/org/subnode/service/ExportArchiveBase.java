@@ -207,7 +207,7 @@ public abstract class ExportArchiveBase {
 			 * the current page
 			 */
 			for (final SubNode n : children) {
-				final String inlineChildren = n.getStringProp(NodeProp.INLINE_CHILDREN.s());
+				final String inlineChildren = n.getStrProp(NodeProp.INLINE_CHILDREN.s());
 				final boolean allowOpenButton = !"1".equals(inlineChildren);
 
 				processNodeExport(session, parentFolder, "", n, html, false, null, allowOpenButton, 0, false);
@@ -252,7 +252,7 @@ public abstract class ExportArchiveBase {
 			 * the current page
 			 */
 			for (final SubNode n : children) {
-				final String inlineChildren = n.getStringProp(NodeProp.INLINE_CHILDREN.s());
+				final String inlineChildren = n.getStrProp(NodeProp.INLINE_CHILDREN.s());
 				final boolean allowOpenButton = !"1".equals(inlineChildren);
 				final String folder = n.getId().toHexString();
 
@@ -324,7 +324,7 @@ public abstract class ExportArchiveBase {
 			}
 
 			String ext = null;
-			final String binFileNameProp = node.getStringProp(NodeProp.BIN_FILENAME.s());
+			final String binFileNameProp = node.getStrProp(NodeProp.BIN_FILENAME.s());
 			if (binFileNameProp != null) {
 				ext = FilenameUtils.getExtension(binFileNameProp);
 				if (!StringUtils.isEmpty(ext)) {
@@ -334,7 +334,7 @@ public abstract class ExportArchiveBase {
 			final String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
 
 			// final String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK.s());
-			final String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
+			final String mimeType = node.getStrProp(NodeProp.BIN_MIME.s());
 
 			String imgUrl = null;
 			String attachmentUrl = null;
@@ -344,7 +344,7 @@ public abstract class ExportArchiveBase {
 			 * if this is a 'data:' encoded image read it from binary storage and put that
 			 * directly in url src
 			 */
-			final String dataUrl = node.getStringProp(NodeProp.BIN_DATA_URL.s());
+			final String dataUrl = node.getStrProp(NodeProp.BIN_DATA_URL.s());
 
 			if ("t".equals(dataUrl)) {
 				imgUrl = attachmentService.getStringByNode(session, node);

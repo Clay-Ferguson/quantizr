@@ -146,7 +146,7 @@ public abstract class ImportArchiveBase {
 				throw new RuntimeEx("Unable to find node by id: " + nodeId);
 			}
 			Long length = node.getIntProp(NodeProp.BIN_SIZE.s());
-			String mimeType = node.getStringProp(NodeProp.BIN_MIME.s());
+			String mimeType = node.getStrProp(NodeProp.BIN_MIME.s());
 			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
 
 			// log.debug("Attaching binary to nodeId: " + node.getId().toHexString());

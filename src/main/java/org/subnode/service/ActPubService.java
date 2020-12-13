@@ -130,7 +130,7 @@ public class ActPubService {
                 }
 
                 /* get private key of this user so we can sign the outbound message */
-                String privateKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PRIVATE);
+                String privateKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PRIVATE);
                 if (privateKey == null) {
                     log.debug(
                             "Unable to update federated users. Our local user didn't have a private key on his userNode: "
@@ -154,7 +154,7 @@ public class ActPubService {
                  */
                 // parent==ACT_PUB_ITEM
                 if (parent.getType().equals(NodeType.ACT_PUB_ITEM.s())) {
-                    inReplyTo = parent.getStringProp(NodeProp.ACT_PUB_ID);
+                    inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_ID);
 
                     /*
                      * Get the owner node of the parent because that's where the properties are that
@@ -176,13 +176,13 @@ public class ActPubService {
                      */
                     privateMessage = node.getBooleanProp(NodeProp.ACT_PUB_PRIVATE.s());
 
-                    toInbox = apUserNode.getStringProp(NodeProp.ACT_PUB_ACTOR_INBOX);
-                    toActor = apUserNode.getStringProp(NodeProp.ACT_PUB_ACTOR_URL);
-                    toUserName = apUserNode.getStringProp(NodeProp.USER.s());
+                    toInbox = apUserNode.getStrProp(NodeProp.ACT_PUB_ACTOR_INBOX);
+                    toActor = apUserNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL);
+                    toUserName = apUserNode.getStrProp(NodeProp.USER.s());
                 }
                 // parent==Friend node
                 else if (parent.getType().equals(NodeType.FRIEND.s())) {
-                    String apUserName = parent.getStringProp(NodeProp.USER);
+                    String apUserName = parent.getStrProp(NodeProp.USER);
                     apUserNode = read.getUserNodeByUserName(session, apUserName);
                     privateMessage = true;
 
@@ -192,18 +192,18 @@ public class ActPubService {
                                         + parent.getId().toHexString());
                     }
 
-                    toInbox = apUserNode.getStringProp(NodeProp.ACT_PUB_ACTOR_INBOX);
-                    toActor = apUserNode.getStringProp(NodeProp.ACT_PUB_ACTOR_URL);
-                    toUserName = apUserNode.getStringProp(NodeProp.USER.s());
+                    toInbox = apUserNode.getStrProp(NodeProp.ACT_PUB_ACTOR_INBOX);
+                    toActor = apUserNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL);
+                    toUserName = apUserNode.getStrProp(NodeProp.USER.s());
                 }
                 // parent==InboxEntry node (a node in a user's inbox)
                 else if (parent.getType().equals(NodeType.INBOX_ENTRY.s())) {
                     // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
 
                     // todo-0: check this. I have only 90% confidence. (could be apId?)
-                    inReplyTo = parent.getStringProp(NodeProp.ACT_PUB_OBJ_URL);
+                    inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
 
-                    String attributedTo = parent.getStringProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
+                    String attributedTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
                     APObj actor = getActor(attributedTo);
 
                     String shortUserName = actor.getStr("preferredUserName"); // short name like 'alice'
@@ -333,7 +333,7 @@ public class ActPubService {
         if (icon != null) {
             String iconUrl = icon.getStr("url");
             if (iconUrl != null) {
-                String curIconUrl = userNode.getStringProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
+                String curIconUrl = userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
                 if (!iconUrl.equals(curIconUrl)) {
                     userNode.setProp(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl);
                 }
@@ -369,7 +369,7 @@ public class ActPubService {
          */
         HashSet<String> apIdSet = new HashSet<String>();
         for (SubNode n : outboxItems) {
-            String apId = n.getStringProp(NodeProp.ACT_PUB_ID.s());
+            String apId = n.getStrProp(NodeProp.ACT_PUB_ID.s());
             if (apId != null) {
                 apIdSet.add(apId);
             }
@@ -964,18 +964,18 @@ public class ActPubService {
         try {
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (userNode != null) {
-                String publicKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
+                String publicKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
                 if (publicKey == null) {
                     throw new RuntimeException("User has no crypto keys. This means they have never logged in?");
                 }
 
-                String avatarMime = userNode.getStringProp(NodeProp.BIN_MIME.s());
-                String avatarVer = userNode.getStringProp(NodeProp.BIN.s());
+                String avatarMime = userNode.getStrProp(NodeProp.BIN_MIME.s());
+                String avatarVer = userNode.getStrProp(NodeProp.BIN.s());
                 String avatarUrl = appProp.protocolHostAndPort() + "/mobile/api/bin/avatar" + "?nodeId="
                         + userNode.getId().toHexString() + "&v=" + avatarVer;
 
-                String headerImageMime = userNode.getStringProp(NodeProp.BIN_MIME.s() + "Header");
-                String headerImageVer = userNode.getStringProp(NodeProp.BIN.s() + "Header");
+                String headerImageMime = userNode.getStrProp(NodeProp.BIN_MIME.s() + "Header");
+                String headerImageVer = userNode.getStrProp(NodeProp.BIN.s() + "Header");
                 String headerImageUrl = appProp.protocolHostAndPort() + "/mobile/api/bin/profileHeader" + "?nodeId="
                         + userNode.getId().toHexString() + "&v=" + headerImageVer;
 
@@ -1004,7 +1004,7 @@ public class ActPubService {
                         .put("mediaType", headerImageMime) //
                         .put("url", headerImageUrl));
 
-                actor.put("summary", userNode.getStringProp(NodeProp.USER_BIO.s()));
+                actor.put("summary", userNode.getStrProp(NodeProp.USER_BIO.s()));
                 actor.put("inbox", host + "/ap/inbox/" + userName); //
                 actor.put("outbox", host + "/ap/outbox/" + userName); //
                 actor.put("followers", host + "/ap/followers/" + userName);

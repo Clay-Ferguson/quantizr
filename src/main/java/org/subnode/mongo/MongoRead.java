@@ -78,7 +78,7 @@ public class MongoRead {
             throw new RuntimeEx("Node has null owner: " + XString.prettyPrint(node));
         }
         SubNode userNode = getNode(session, node.getOwner());
-        return userNode.getStringProp(NodeProp.USER.s());
+        return userNode.getStrProp(NodeProp.USER.s());
     }
 
     public ObjectId getOwnerNodeIdFromSession(MongoSession session) {
@@ -234,7 +234,7 @@ public class MongoRead {
         if (userNode != null && ret == null && isUserNode && "home".equalsIgnoreCase(name)) {
             ret = create.createNode(session, userNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null);
             ret.setOwner(userNode.getId());
-            String userName = userNode.getStringProp(NodeProp.USER.s());
+            String userName = userNode.getStrProp(NodeProp.USER.s());
             ret.setContent("### User: " + userName + "\n\nUser has not yet edited this default home node.");
             ret.setName(name);
 

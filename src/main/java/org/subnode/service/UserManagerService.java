@@ -220,7 +220,7 @@ public class UserManagerService {
 	 */
 	public void ensureValidCryptoKeys(SubNode userNode) {
 		try {
-			String publicKey = userNode.getStringProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
+			String publicKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
 			if (publicKey == null) {
 				KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
 				kpg.initialize(2048);
@@ -382,7 +382,7 @@ public class UserManagerService {
 					return;
 				}
 
-				String userName = node.getStringProp(NodeProp.USER.s());
+				String userName = node.getStrProp(NodeProp.USER.s());
 
 				if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName)) {
 					valContainer.setVal("processSignupCode should not be called for admin user.");
@@ -683,10 +683,10 @@ public class UserManagerService {
 			}
 
 			if (userNode != null) {
-				res.setUserName(userNode.getStringProp(NodeProp.USER.s()));
-				res.setUserBio(userNode.getStringProp(NodeProp.USER_BIO.s()));
-				res.setAvatarVer(userNode.getStringProp(NodeProp.BIN.s()));
-				res.setHeaderImageVer(userNode.getStringProp(NodeProp.BIN.s()+"Header"));
+				res.setUserName(userNode.getStrProp(NodeProp.USER.s()));
+				res.setUserBio(userNode.getStrProp(NodeProp.USER_BIO.s()));
+				res.setAvatarVer(userNode.getStrProp(NodeProp.BIN.s()));
+				res.setHeaderImageVer(userNode.getStrProp(NodeProp.BIN.s()+"Header"));
 				res.setUserNodeId(userNode.getId().toHexString());
 				res.setSuccess(true);
 			}
@@ -750,13 +750,13 @@ public class UserManagerService {
 
 				String codePart = XString.parseAfterLast(passCode, "-");
 
-				String nodeCodePart = userNode[0].getStringProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
+				String nodeCodePart = userNode[0].getStrProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 				if (!codePart.equals(nodeCodePart)) {
 					throw ExUtil.wrapEx("Invald password reset code.");
 				}
 
 				String password = req.getNewPassword();
-				userName[0] = userNode[0].getStringProp(NodeProp.USER.s());
+				userName[0] = userNode[0].getStrProp(NodeProp.USER.s());
 
 				if (PrincipalName.ADMIN.s().equals(userName[0])) {
 					throw new RuntimeEx("changePassword should not be called fror admin user.");
@@ -779,7 +779,7 @@ public class UserManagerService {
 			}
 
 			String password = req.getNewPassword();
-			userName[0] = userNode[0].getStringProp(NodeProp.USER.s());
+			userName[0] = userNode[0].getStrProp(NodeProp.USER.s());
 			userNode[0].setProp(NodeProp.PWD_HASH.s(), util.getHashOfPassword(password));
 			userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
@@ -827,7 +827,7 @@ public class UserManagerService {
 			 * able to completely hijack anyone else's account simply by issuing a password
 			 * change to that account!
 			 */
-			String nodeEmail = ownerNode.getStringProp(NodeProp.EMAIL.s());
+			String nodeEmail = ownerNode.getStrProp(NodeProp.EMAIL.s());
 			if (nodeEmail == null || !nodeEmail.equals(email)) {
 				res.setMessage("Wrong user name and/or email.");
 				res.setSuccess(false);
@@ -881,7 +881,7 @@ public class UserManagerService {
 			return res;
 
 		for (SubNode friendNode : read.getChildren(session, friendsNode, null, null, 0)) {
-			String userName = friendNode.getStringProp(NodeProp.USER.s());
+			String userName = friendNode.getStrProp(NodeProp.USER.s());
 			if (userName != null) {
 				FriendInfo fi = new FriendInfo();
 				fi.setUserName(userName);

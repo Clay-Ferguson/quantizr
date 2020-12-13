@@ -280,7 +280,7 @@ public class MongoUtil {
 	}
 
 	public boolean isImageAttached(SubNode node) {
-		String mime = node.getStringProp(NodeProp.BIN_MIME.s());
+		String mime = node.getStrProp(NodeProp.BIN_MIME.s());
 		return ImageUtil.isImageMime(mime);
 	}
 
