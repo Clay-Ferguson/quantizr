@@ -34,8 +34,10 @@ export class ServerPush implements ServerPushIntf {
         };
 
         eventSource.addEventListener("feedPush", function (e: any) {
-            const obj = JSON.parse(e.data);
-            // console.log("Incomming Push: "+S.util.prettyPrint(obj));
+
+            const obj: J.FeedPushInfo = JSON.parse(e.data);
+            console.log("Incomming Push (FeedPushInfo): " + S.util.prettyPrint(obj));
+
             const nodeInfo: J.NodeInfo = obj.nodeInfo;
             if (nodeInfo) {
                 // todo-1: I think this dispatch is working, but another full FeedView refresh (from actual server query too) is somehow following after also
@@ -68,8 +70,15 @@ export class ServerPush implements ServerPushIntf {
             }
         }, false);
 
-        eventSource.addEventListener("inboxPush", function (e: any) {
-            debugger;
+        eventSource.addEventListener("apReply", function (e: any) {
+            const obj: J.InboxPushInfo = JSON.parse(e.data);
+            console.log("Incomming Push (InboxPushInfo): " + S.util.prettyPrint(obj));
+            new InboxNotifyDlg("Reply from " + obj.fromUser + ": " + obj.message, obj.nodeId, store.getState()).open();
+        }, false);
+
+        eventSource.addEventListener("newInboxNode", function (e: any) {
+            const obj: J.InboxPushInfo = JSON.parse(e.data);
+            console.log("Incomming Push (InboxPushInfo): " + S.util.prettyPrint(obj));
             // new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
         }, false);
     }

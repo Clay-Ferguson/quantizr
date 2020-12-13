@@ -89,7 +89,7 @@ public class ActPubService {
     private SessionContext sessionContext;
 
     @Autowired
-	private UserFeedService userFeedService;
+    private UserFeedService userFeedService;
 
     @Autowired
     private AppProp appProp;
@@ -206,14 +206,15 @@ public class ActPubService {
                     String attributedTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
                     APObj actor = getActor(attributedTo);
 
-                    String shortUserName = actor.getStr("preferredUserName"); // short name like 'alice'
+                    String shortUserName = actor.getStr("preferredUsername"); // short name like 'alice'
                     toInbox = actor.getStr("inbox");
                     URL url = new URL(toInbox);
                     String host = url.getHost();
                     toUserName = shortUserName + "@" + host;
                     toActor = attributedTo;
 
-                    // For now this usage pattern is only functional for a reply from an inbox, and so this is a DM only
+                    // For now this usage pattern is only functional for a reply from an inbox, and
+                    // so this is a DM only
                     // thru this code path for now (todo-0: this may change)
                     privateMessage = true;
                 }
@@ -486,6 +487,10 @@ public class ActPubService {
         return finger;
     }
 
+    /*
+     * Effeciently gets the Actor by using a cache to ensure we never get the same
+     * Actor twice until the app restarts at least
+     */
     public APObj getActor(String url) {
         if (url == null)
             return null;
@@ -774,7 +779,10 @@ public class ActPubService {
         newNode.setProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
         update.save(session, newNode);
 
-        userFeedService.sendServerPushInfo(localUserName, new InboxPushInfo(newNode.getId().toHexString()));
+        String toUserName = getLongUserNameFromActorUrl(objAttributedTo);
+
+        userFeedService.sendServerPushInfo(localUserName,
+                new InboxPushInfo("apReply", newNode.getId().toHexString(), contentHtml, toUserName));
     }
 
     public void saveNoteToUserInboxNode(MongoSession session, String actorUrl, String contentHtml, String id,
@@ -818,8 +826,30 @@ public class ActPubService {
             inboxNode.setProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
             update.save(session, inboxNode);
 
-            userFeedService.sendServerPushInfo(localUserName, new InboxPushInfo(inboxNode.getId().toHexString()));
+            String toUserName = getLongUserNameFromActorUrl(objAttributedTo);
+
+            userFeedService.sendServerPushInfo(localUserName,
+                    new InboxPushInfo("apReply", inboxNode.getId().toHexString(), contentHtml, toUserName));
         }
+    }
+
+    public String getLongUserNameFromActorUrl(String actorUrl) {
+        APObj actor = getActor(actorUrl);
+        log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" + XString.prettyPrint(actor));
+
+        String shortUserName = actor.getStr("preferredUsername"); // short name like 'alice'
+        String inbox = actor.getStr("inbox");
+        URL url = null;
+        String userName = null;
+        try {
+            url = new URL(inbox);
+            String host = url.getHost();
+            userName = shortUserName + "@" + host;
+        } catch (Exception e) {
+            log.error("failed building toUserName", e);
+            throw new RuntimeException(e);
+        }
+        return userName;
     }
 
     /*

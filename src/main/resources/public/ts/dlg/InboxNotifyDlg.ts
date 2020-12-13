@@ -19,7 +19,7 @@ export class InboxNotifyDlg extends DialogBase {
 
     static CLOSE_TIMEOUT: number = 2500;
 
-    constructor(private text: string, state: AppState) {
+    constructor(private text: string, private nodeId: string, state: AppState) {
         super("Notification", "app-modal-content-narrow-width", false, state);
 
         // setTimeout(() => {
@@ -34,11 +34,11 @@ export class InboxNotifyDlg extends DialogBase {
             new Form(null, [
                 new TextContent(this.text),
                 new ButtonBar([
-                    new Button("Go to Inbox", () => {
+                    this.nodeId ? new Button("Go to Node", () => {
                         this.close();
-                        S.nav.openContentNode("~" + J.NodeType.INBOX, this.appState);
-                    }),
-                    new Button("Maybe later", this.close)
+                        S.nav.openContentNode(this.nodeId, this.appState);
+                    }) : null,
+                    new Button("Close", this.close)
                 ])
             ])
         ];

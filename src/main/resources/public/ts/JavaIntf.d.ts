@@ -389,6 +389,8 @@ export interface ImportResponse extends ResponseBase {
 
 export interface InboxPushInfo extends ServerPushInfo {
     nodeId: string;
+    fromUser: string;
+    message: string;
 }
 
 export interface InfoMessage {

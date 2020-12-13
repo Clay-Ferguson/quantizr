@@ -183,8 +183,10 @@ public class OutboxMgr {
 			/*
 			 * Send push notification so the user sees live there's a new share comming in
 			 * or being re-added even.
+			 * 
+			 * todo-0: fill in the two null parameters here.
 			 */
-			userFeedService.sendServerPushInfo(recieverUserName, new InboxPushInfo(node.getId().toHexString()));
+			userFeedService.sendServerPushInfo(recieverUserName, new InboxPushInfo("newInboxNode", node.getId().toHexString(), null, null));
 
 			SubNode recieverAccountNode = read.getUserNodeByUserName(session, recieverUserName);
 			if (recieverAccountNode != null) {

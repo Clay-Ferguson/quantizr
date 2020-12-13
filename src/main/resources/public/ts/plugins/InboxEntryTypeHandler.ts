@@ -39,7 +39,7 @@ export class InboxEntryTypeHandler extends TypeBase {
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
         return new Div(null, null, [
             new NodeCompMarkdown(node, state),
-            new Div(null, null, [
+            new Div(null, { className: "marginLeft" }, [
                 new Icon({
                     title: "Private Reply (Direct Message)",
                     className: "fa fa-comment fa-lg rowFooterIcon",

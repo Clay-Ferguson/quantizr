@@ -277,7 +277,7 @@ export class View implements ViewIntf {
 
                     res.messages.forEach(m => {
                         if (m.type === "inbox") {
-                            new InboxNotifyDlg(m.message, state).open();
+                            new InboxNotifyDlg(m.message, null, state).open();
                         }
                     });
                 }
