@@ -73,7 +73,7 @@ export class ServerPush implements ServerPushIntf {
         eventSource.addEventListener("apReply", function (e: any) {
             const obj: J.InboxPushInfo = JSON.parse(e.data);
             console.log("Incomming Push (InboxPushInfo): " + S.util.prettyPrint(obj));
-            new InboxNotifyDlg("Reply from " + obj.fromUser + ": " + obj.message, obj.nodeId, store.getState()).open();
+            new InboxNotifyDlg("Reply from " + obj.fromUser + ": \n\n" + obj.message, obj.nodeId, store.getState()).open();
         }, false);
 
         eventSource.addEventListener("newInboxNode", function (e: any) {

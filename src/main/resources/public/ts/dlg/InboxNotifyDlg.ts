@@ -22,6 +22,8 @@ export class InboxNotifyDlg extends DialogBase {
     constructor(private text: string, private nodeId: string, state: AppState) {
         super("Notification", "app-modal-content-narrow-width", false, state);
 
+        S.meta64.showSystemNotification("New Message", text);
+
         // setTimeout(() => {
         //     this.whenElmEx((elm: HTMLElement) => {
         //         this.close();

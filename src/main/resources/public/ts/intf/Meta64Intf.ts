@@ -41,6 +41,7 @@ export interface Meta64Intf {
     rebuildIndexes(): void;
     shutdownServerNode(string): void;
     sendTestEmail(string): void;
+    showSystemNotification(title: string, message: string): void;
     refresh(state: AppState): void;
     selectTab(pageName: string, clickEvent?: boolean): void;
     getSelNodeUidsArray(state: AppState): string[];

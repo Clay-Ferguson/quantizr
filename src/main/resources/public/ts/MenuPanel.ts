@@ -254,6 +254,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Rebuild Indexes", () => S.meta64.rebuildIndexes()),
                 new MenuItem("Shutdown Server Node", () => S.meta64.shutdownServerNode(state)),
                 new MenuItem("Send Test Email", () => S.meta64.sendTestEmail(state)),
+                new MenuItem("Test Notification Display", () => S.meta64.showSystemNotification("Test Title", "This is a test message")),
                 new MenuItem("Encryption Test", async () => {
                     await S.encryption.test();
                     S.util.showMessage("Encryption Test Complete. Check browser console for output.", "Note", true);

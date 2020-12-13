@@ -88,6 +88,20 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
+    showSystemNotification = (title: string, message: string): void => {
+        if (window.Notification && Notification.permission !== "denied") {
+            Notification.requestPermission(function (status) { // status is "granted", if accepted by user
+                let n = new Notification(title, {
+                    body: message,
+
+                    /* Chrome is showing it's own icon/image instead of the quanta one and I'm not sure why. I've tried
+                     both image and icon here and neither works. */
+                    image: window.location.origin + "/images/eagle-logo-50px-tr.jpg"
+                });
+            });
+        }
+    }
+
     refresh = (state: AppState): void => {
         S.view.refreshTree(null, false, true, null, false, true, true, state);
     }
