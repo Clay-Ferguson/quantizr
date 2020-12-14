@@ -25,7 +25,7 @@ let currencyFormatter = new Intl.NumberFormat("en-US", {
     // These options are needed to round to whole numbers if that's what you want.
     // minimumFractionDigits: 0,
     // maximumFractionDigits: 0,
-  });
+});
 
 export class Util implements UtilIntf {
 
@@ -1183,6 +1183,14 @@ export class Util implements UtilIntf {
         else {
             return "/f/" + node.owner + "/" + node.name;
         }
+    }
+
+    removeHtmlTags = (text: string) => {
+        if (!text) return text;
+        text = this.replaceAll(text, "```", " ");
+        let doc = new DOMParser().parseFromString(text, "text/html");
+        let ret = doc.body.textContent || "";
+        return ret.trim();
     }
 
     // DO NOT DELETE: THIS CODE WORKS FINE

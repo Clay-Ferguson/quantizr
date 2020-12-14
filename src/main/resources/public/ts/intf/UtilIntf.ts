@@ -115,6 +115,7 @@ export interface UtilIntf {
     perfEnd(message: string, startTime: number): void;
     getPathPartForNamedNode(node: J.NodeInfo): string;
     getPathPartForNamedNodeAttachment(node: J.NodeInfo): string;
+    removeHtmlTags(text: string): string;
     setDropHandler(attribs: any, func: (elm: any) => void): void;
     resetDropHandler(attribs: any): void;
     generateNewCryptoKeys(state: AppState): any;

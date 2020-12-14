@@ -200,7 +200,6 @@ public class ActPubService {
                 else if (parent.getType().equals(NodeType.INBOX_ENTRY.s())) {
                     // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
 
-                    // todo-0: check this. I have only 90% confidence. (could be apId?)
                     inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
 
                     String attributedTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);

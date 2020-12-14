@@ -48,7 +48,9 @@ export class BreadcrumbsPanel extends Div {
                     }
                 }
 
-                children.push(new Span(bc.name, {
+                let name = S.util.removeHtmlTags(bc.name);
+
+                children.push(new Span(name, {
                     onClick: () => { S.view.refreshTree(bc.id, true, true, bc.id, false, true, true, state); },
                     className: "breadcrumbItem"
                 }));
