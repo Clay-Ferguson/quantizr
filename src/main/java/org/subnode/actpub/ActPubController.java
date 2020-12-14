@@ -42,7 +42,7 @@ public class ActPubController {
 	}
 
 	/* This is the ActivityPub 'Actor' URL */
-	@RequestMapping(value = "/ap/u/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = ActPubConstants.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object actor(@PathVariable(value = "userName", required = true) String userName) {
 		Object ret = actPubService.generateActor(userName);
 		if (ret != null)
@@ -144,14 +144,14 @@ public class ActPubController {
 
 	@RequestMapping(value = "/ap/user/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object user(@PathVariable(value = "userName", required = false) String userName) {
-		// todo-0: implement
+		// todo-0: implement (or change?)
 		log.debug("user REST call dummied out");
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/ap/note/{userName}", method = RequestMethod.GET, produces = CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object note(@PathVariable(value = "userName", required = false) String userName) {
-		// todo-0: implement
+		// todo-0: implement (or change?)
 		log.debug("note REST call dummied out");
 		return new ResponseEntity(HttpStatus.OK);
 	}

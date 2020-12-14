@@ -39,6 +39,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.actpub.APList;
 import org.subnode.actpub.APObj;
+import org.subnode.actpub.ActPubConstants;
 import org.subnode.actpub.ActPubFactory;
 import org.subnode.actpub.VisitAPObj;
 import org.subnode.config.AppProp;
@@ -233,10 +234,14 @@ public class ActPubService {
         });
     }
 
+    public String makeActorUrlForUserName(String userName) {
+        return appProp.protocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/" + userName;
+    }
+
     public void sendNote(String toUserName, String privateKey, String toInbox, String fromUser, String inReplyTo,
             String content, String toActor, String noteUrl, boolean privateMessage) {
         try {
-            String actor = appProp.protocolHostAndPort() + "/ap/u/" + fromUser;
+            String actor = makeActorUrlForUserName(fromUser);
 
             APObj message = apFactory.newCreateMessageForNote(toUserName, actor, inReplyTo, content, toActor, noteUrl,
                     privateMessage);
@@ -552,7 +557,7 @@ public class ActPubService {
                                         .val(new APObj() //
                                                 .put("rel", "self") //
                                                 .put("type", "application/activity+json") //
-                                                .put("href", host + "/ap/u/" + username) // ActivityPub "actor" url
+                                                .put("href", makeActorUrlForUserName(username)) 
                                         ));
 
                         log.debug("Reply with WebFinger: " + XString.prettyPrint(webFinger));
@@ -583,7 +588,6 @@ public class ActPubService {
         }
         // Process Undo Action (Unfollow, etc)
         else if ("Undo".equals(payload.getStr("type"))) {
-            // todo-0: display browser notification of this event.
             return processUndoAction(payload);
         }
         // else report unhandled
@@ -593,6 +597,7 @@ public class ActPubService {
         return null;
     }
 
+    /* Process inbound undo actions (comming from foreign servers) */
     public APObj processUndoAction(APObj payload) {
         APObj object = payload.getAPObj("object");
         if (object != null && "Follow".equals(object.getStr("type"))) {
@@ -601,6 +606,7 @@ public class ActPubService {
         return null;
     }
 
+    /* Process inbound Unfollow actions (comming from foreign servers) */
     public APObj processUnfollowAction(APObj object) {
         // Actor URL of actor doing the folloing
         String followerActor = object.getStr("actor");
@@ -857,6 +863,11 @@ public class ActPubService {
      * slash
      */
     public String getLocalUserNameFromActorUrl(String actorUrl) {
+        if (!actorUrl.startsWith(appProp.protocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/")) {
+            log.debug("Invalid quanta actor Url: " + actorUrl);
+            return null;
+        }
+
         int lastIdx = actorUrl.lastIndexOf("/");
         String ret = null;
         if (lastIdx == -1) {
@@ -868,6 +879,7 @@ public class ActPubService {
         return ret;
     }
 
+    /* Process inbound 'Follow' actions (comming from foreign servers) */
     public APObj processFollowAction(APObj followAction) {
 
         // Actor URL of actor doing the following
@@ -896,6 +908,7 @@ public class ActPubService {
         }
 
         userToFollow = actorUrl.substring(lastIdx + 1);
+
         final String _userToFollow = userToFollow;
 
         APObj _ret = (APObj) adminRunner.run(session -> {
@@ -1018,7 +1031,7 @@ public class ActPubService {
                  * Note: this is a self-reference, and must be identical to the URL that returns
                  * this object
                  */
-                actor.put("id", host + "/ap/u/" + userName);
+                actor.put("id", makeActorUrlForUserName(userName));
                 actor.put("type", "Person");
                 actor.put("preferredUsername", userName);
                 actor.put("name", userName); // this should be ordinary name (first last)
@@ -1176,7 +1189,7 @@ public class ActPubService {
                     if (collecting) {
                         String hexId = child.getId().toHexString();
                         String published = DateUtil.isoStringFromDate(child.getModifyTime());
-                        String actor = host + "/ap/u/" + userName;
+                        String actor = makeActorUrlForUserName(userName);
                         // APObj item = new APObj();
                         // item.put("type", "Note");
                         // item.put("name", "node:" + hexId);
