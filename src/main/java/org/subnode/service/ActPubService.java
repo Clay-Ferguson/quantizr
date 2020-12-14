@@ -213,9 +213,10 @@ public class ActPubService {
                     toUserName = shortUserName + "@" + host;
                     toActor = attributedTo;
 
-                    // For now this usage pattern is only functional for a reply from an inbox, and
-                    // so this is a DM only
-                    // thru this code path for now (todo-0: this may change)
+                    /*
+                     * For now this usage pattern is only functional for a reply from an inbox, and
+                     * so this is a DM only thru this code path for now (todo-0: this may change)
+                     */
                     privateMessage = true;
                 }
                 // otherwise we can't handle
@@ -541,8 +542,6 @@ public class ActPubService {
      * Generate webfinger response from our server
      */
     public APObj generateWebFinger(String resource) {
-        String host = appProp.protocolHostAndPort();
-
         try {
             if (StringUtils.isNotEmpty(resource) && resource.startsWith("acct:")) {
                 String[] parts = resource.substring(5).split("@", 2);
@@ -557,8 +556,7 @@ public class ActPubService {
                                         .val(new APObj() //
                                                 .put("rel", "self") //
                                                 .put("type", "application/activity+json") //
-                                                .put("href", makeActorUrlForUserName(username)) 
-                                        ));
+                                                .put("href", makeActorUrlForUserName(username))));
 
                         log.debug("Reply with WebFinger: " + XString.prettyPrint(webFinger));
                         return webFinger;
@@ -656,7 +654,7 @@ public class ActPubService {
              * work ok (for now)
              */
             APObj ret = new APObj() //
-                    .put("@context", "https://www.w3.org/ns/activitystreams") //
+                    .put("@context", ActPubConstants.CONTEXT_STREAMS) //
                     .put("summary", "Accepted unfollow request") //
                     .put("type", "Accept") //
                     .put("actor", actorUrl) //
@@ -896,28 +894,31 @@ public class ActPubService {
             return null;
         }
 
-        /*
-         * Not sure if this is the best way to convert one of our own actor URL into the
-         * username, but unless paths change this should work
-         */
-        int lastIdx = actorUrl.lastIndexOf("/");
-        String userToFollow = null;
-        if (lastIdx == -1) {
+        String userToFollow = this.getLocalUserNameFromActorUrl(actorUrl);
+        if (userToFollow == null) {
             log.debug("unable to get a user name from actor url: " + actorUrl);
             return null;
         }
 
-        userToFollow = actorUrl.substring(lastIdx + 1);
-
         final String _userToFollow = userToFollow;
 
         APObj _ret = (APObj) adminRunner.run(session -> {
+            /* Gets FOLLOWERS_LIST node and create it if not already existing */
             SubNode followersListNode = read.getUserNodeByType(session, _userToFollow, null, null,
                     NodeType.FOLLOWERS_LIST.s());
 
+            /*
+             * Search to see if we already have this followerActor as a follower, which will
+             * exist as a FRIEND node (under our FOLLOWERS_LIST node) that has the
+             * ACT_PUB_ACTOR_URL property set to the follower's actor url
+             */
             Iterable<SubNode> followers = read.searchSubGraph(session, followersListNode,
                     NodeProp.ACT_PUB_ACTOR_URL.s(), followerActor, null, 0, false, true);
 
+            /*
+             * If we don't find the user already following us add the FRIEND node
+             * designating them as a follower
+             */
             if (followers == null || !followers.iterator().hasNext()) {
                 SubNode followerNode = create.createNode(session, followersListNode.getPath() + "/?",
                         NodeType.FRIEND.s());
@@ -925,8 +926,9 @@ public class ActPubService {
                 update.save(session, followerNode);
             }
 
+            /* Build the response object to send back to ActivityPub server */
             APObj ret = new APObj() //
-                    .put("@context", "https://www.w3.org/ns/activitystreams") //
+                    .put("@context", ActPubConstants.CONTEXT_STREAMS) //
                     .put("summary", "Accepted follow request") //
                     .put("type", "Accept") //
                     .put("actor", actorUrl) //
@@ -944,7 +946,7 @@ public class ActPubService {
     public APObj generateDummyOrderedCollection(String userName, String path) {
         String host = appProp.protocolHostAndPort();
         APObj obj = new APObj();
-        obj.put("@context", "https://www.w3.org/ns/activitystreams");
+        obj.put("@context", ActPubConstants.CONTEXT_STREAMS);
         obj.put("id", host + path);
         obj.put("type", "OrderedCollection");
         obj.put("totalItems", 0);
@@ -956,7 +958,7 @@ public class ActPubService {
         Long totalItems = getOutboxItemCount(userName);
 
         return new APObj() //
-                .put("@context", "https://www.w3.org/ns/activitystreams") //
+                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
                 .put("id", url) //
                 .put("type", "OrderedCollection") //
                 .put("totalItems", totalItems) //
@@ -989,7 +991,7 @@ public class ActPubService {
         String url = appProp.protocolHostAndPort() + "/ap/outbox/" + userName + "?min_id=" + minId + "&page=true";
 
         return new APObj() //
-                .put("@context", "https://www.w3.org/ns/activitystreams") //
+                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
                 .put("id", url) //
                 .put("type", "OrderedCollectionPage") //
                 .put("orderedItems", items) //
@@ -1024,7 +1026,7 @@ public class ActPubService {
                 APObj actor = new APObj();
 
                 actor.put("@context", new APList() //
-                        .val("https://www.w3.org/ns/activitystreams") //
+                        .val(ActPubConstants.CONTEXT_STREAMS) //
                         .val("https://w3id.org/security/v1"));
 
                 /*
@@ -1201,7 +1203,7 @@ public class ActPubService {
                                 .put("type", "Create") //
                                 .put("actor", actor) //
                                 .put("published", published) //
-                                .put("to", new APList().val("https://www.w3.org/ns/activitystreams#Public")) //
+                                .put("to", new APList().val(ActPubConstants.CONTEXT_STREAMS + "#Public")) //
                                 // todo-0: pending implement followers
                                 // .put("cc", new APList().val(host + "/ap/followers/" + userName)) //
                                 .put("object", new APObj() //
@@ -1212,7 +1214,7 @@ public class ActPubService {
                                         .put("published", published) //
                                         .put("url", nodeIdBase + hexId) //
                                         .put("attributedTo", actor) //
-                                        .put("to", new APList().val("https://www.w3.org/ns/activitystreams#Public")) //
+                                        .put("to", new APList().val(ActPubConstants.CONTEXT_STREAMS + "#Public")) //
                                         // todo-0: pending implement followers
                                         // .put("cc", new APList().val(host + "/ap/followers/" + userName)) //
                                         .put("sensitive", false) //

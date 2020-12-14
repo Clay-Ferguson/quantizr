@@ -29,7 +29,7 @@ public class ActPubFactory {
 		APObj ret = new APObj();
 
 		ret.put("@context", new APList() //
-				.val("https://www.w3.org/ns/activitystreams") //
+				.val(ActPubConstants.CONTEXT_STREAMS) //
 				.val(newContextObj()));
 
 		ret.put("id", noteUrl);
@@ -52,7 +52,7 @@ public class ActPubFactory {
 		LinkedList<String> toArray = new LinkedList<String>();
 		toArray.add(toActor);
 		if (!privateMessage) {
-			toArray.add("https://www.w3.org/ns/activitystreams#Public");
+			toArray.add(ActPubConstants.CONTEXT_STREAMS + "#Public");
 		}
 		ret.put("to", toArray);
 
@@ -81,7 +81,7 @@ public class ActPubFactory {
 		APObj ret = new APObj();
 
 		ret.put("@context", new APList() //
-				.val("https://www.w3.org/ns/activitystreams") //
+				.val(ActPubConstants.CONTEXT_STREAMS) //
 				.val(newContextObj()));
 
 		ret.put("id", noteUrl + "&apCreateTime=" + idTime);
@@ -92,7 +92,7 @@ public class ActPubFactory {
 
 		ret.put("to", new APList() //
 				.val(to) //
-				.val("https://www.w3.org/ns/activitystreams#Public"));
+				.val(ActPubConstants.CONTEXT_STREAMS + "#Public"));
 
 		// LinkedList<String> ccArray = new LinkedList<String>();
 		// ccArray.add("https://www.w3.org/ns/activitystreams#Public");
