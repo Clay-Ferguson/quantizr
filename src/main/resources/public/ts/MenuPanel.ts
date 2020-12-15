@@ -69,6 +69,7 @@ export class MenuPanel extends Div {
             new MenuItem("Inbox", () => S.nav.openContentNode("~" + J.NodeType.INBOX, state), !state.isAnonUser),
             new MenuItem("Outbox", () => S.nav.openContentNode("~" + J.NodeType.USER_FEED, state), !state.isAnonUser),
             new MenuItem("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), !state.isAnonUser),
+            new MenuItem("Followers", () => S.nav.openContentNode("~" + J.NodeType.FOLLOWERS_LIST, state), !state.isAnonUser),
 
             // this appears to be broken for user 'bob' at least. Also "Show Feed" is broken on the feed node
             new MenuItem("Feed", () => S.nav.navFeed(state), !state.isAnonUser)

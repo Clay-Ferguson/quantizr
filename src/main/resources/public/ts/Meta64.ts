@@ -91,6 +91,8 @@ export class Meta64 implements Meta64Intf {
     showSystemNotification = (title: string, message: string): void => {
         if (window.Notification && Notification.permission !== "denied") {
             Notification.requestPermission(function (status) { // status is "granted", if accepted by user
+                message = S.util.removeHtmlTags(message);
+
                 let n = new Notification(title, {
                     body: message,
 
