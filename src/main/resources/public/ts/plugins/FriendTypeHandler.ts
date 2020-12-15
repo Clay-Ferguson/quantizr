@@ -79,7 +79,7 @@ export class FriendTypeHandler extends TypeBase {
             src = S.props.getClientPropVal(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
         }
 
-        let userUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_USER_URL, node);
+        let userUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_ACTOR_URL, node);
 
         if (src) {
             img = new Img(null, {

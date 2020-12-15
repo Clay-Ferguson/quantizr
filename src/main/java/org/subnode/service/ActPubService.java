@@ -347,9 +347,9 @@ public class ActPubService {
         }
 
         userNode.setProp(NodeProp.USER_BIO.s(), actor.getStr("summary"));
-        userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), actor.getStr("id"));
+        userNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), actor.getStr("id"));
         userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), actor.getStr("inbox"));
-        userNode.setProp(NodeProp.ACT_PUB_USER_URL.s(), actor.getStr("url"));
+        userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), actor.getStr("url"));
 
         update.save(session, userNode, false);
         refreshOutboxFromForeignServer(session, actor, userNode, apUserName);
@@ -922,7 +922,8 @@ public class ActPubService {
             if (followers == null || !followers.iterator().hasNext()) {
                 SubNode followerNode = create.createNode(session, followersListNode.getPath() + "/?",
                         NodeType.FRIEND.s());
-                followerNode.setProp(NodeProp.ACT_PUB_USER_URL.s(), followerActor);
+                // Showing this actor url on the GUI for this friend node is not ideal. Need to show better info/name
+                followerNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), followerActor);
                 update.save(session, followerNode);
             }
 
@@ -951,6 +952,19 @@ public class ActPubService {
         obj.put("type", "OrderedCollection");
         obj.put("totalItems", 0);
         return obj;
+    }
+
+    public APObj generateFollowers(String userName) {
+        String url = appProp.protocolHostAndPort() + "/ap/followers/" + userName;
+        Long totalItems = getFollowersCount(userName);
+
+        return new APObj() //
+                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
+                .put("id", url) //
+                .put("type", "OrderedCollection") //
+                .put("totalItems", totalItems) //
+                .put("first", url + "?page=true") //
+                .put("last", url + "?min_id=0&page=true");
     }
 
     public APObj generateOutbox(String userName) {
@@ -1001,7 +1015,66 @@ public class ActPubService {
                 .put("totalItems", items.size());
     }
 
-    /* Generates an Actor object for one of our own local users */
+    public APObj generateFollowersPage(String userName, String minId) {
+        List<String> followers = getFollowers(userName, minId);
+
+        // this is a self-reference url (id)
+        String url = appProp.protocolHostAndPort() + "/ap/followers/" + userName + "?page=true";
+        if (minId != null) {
+            url += "&min_id=" + minId;
+        }
+        return new APObj() //
+                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
+                .put("id", url) //
+                .put("type", "OrderedCollectionPage") //
+                .put("orderedItems", followers) //
+                // todo-0: my outbox isn't returning the 'partOf', so somehow that must mean the
+                // mastodon replies don't. Make sure we are doing same as Mastodon behavior
+                // here.
+                .put("partOf", appProp.protocolHostAndPort() + "/ap/followers/" + userName)//
+
+                // todo-0: is this to spec? does Mastodon generate this ? AND which total is it,
+                // this page or all pages total ?
+                .put("totalItems", followers.size());
+    }
+
+    public List<String> getFollowers(String userName, String minId) {
+        final List<String> followers = new LinkedList<String>();
+
+        adminRunner.run(session -> {
+            SubNode followersListNode = read.getUserNodeByType(session, userName, null, null,
+                    NodeType.FOLLOWERS_LIST.s());
+
+            if (followersListNode != null) {
+                Iterable<SubNode> iter = read.getChildren(session, followersListNode, null, null, 0);
+
+                for (SubNode n : iter) {
+                    log.debug("Follower found: "+XString.prettyPrint(n));
+                    followers.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
+                }
+            }
+            return null;
+        });
+
+        return followers;
+    }
+
+    public Long getFollowersCount(String userName) {
+        Long ret = (Long) adminRunner.run(session -> {
+            SubNode followersListNode = read.getUserNodeByType(session, userName, null, null,
+                    NodeType.FOLLOWERS_LIST.s());
+            if (followersListNode == null)
+                return 0L;
+            return read.getChildCount(session, followersListNode);
+        });
+        return ret;
+    }
+
+    /*
+     * Generates an Actor object for one of our own local users
+     * 
+     * todo-0: use the defined constants for the paths in here.
+     */
     public APObj generateActor(String userName) {
         String host = appProp.protocolHostAndPort();
 

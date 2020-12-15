@@ -169,9 +169,11 @@ public class Convert {
 						nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.USER_BIO.s(), userBio));
 					}
 
-					String userUrl = friendAccountNode.getStrProp(NodeProp.ACT_PUB_USER_URL.s());
+					// todo-0: this should be making the FRIEND node of the followers (under FOLLOWERS_LIST parent node)
+					// show this but it's showing up blank right now.
+					String userUrl = friendAccountNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
 					if (userUrl != null) {
-						nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_USER_URL.s(), userUrl));
+						nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_ACTOR_URL.s(), userUrl));
 					}
 
 					String friendAvatarVer = friendAccountNode.getStrProp(NodeProp.BIN.s());

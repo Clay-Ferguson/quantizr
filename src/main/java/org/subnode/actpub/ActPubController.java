@@ -38,7 +38,8 @@ public class ActPubController {
 	}
 
 	/* This is the ActivityPub 'Actor' URL */
-	@RequestMapping(value = ActPubConstants.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = ActPubConstants.ACTOR_PATH
+			+ "/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object actor(@PathVariable(value = "userName", required = true) String userName) {
 		Object ret = actPubService.generateActor(userName);
 		if (ret != null)
@@ -94,12 +95,20 @@ public class ActPubController {
 	// FOLLOWERS
 	// =====================================
 
-	@RequestMapping(value = "/ap/followers/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
-	public @ResponseBody Object getFollowers(@PathVariable(value = "userName", required = false) String userName) {
-		log.debug("followers (get) returning empty result");
-		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/followers/" + userName);
-		if (ret != null)
+	@RequestMapping(value = "/ap/followers/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
+	public @ResponseBody Object getFollowers(@PathVariable(value = "userName", required = false) String userName,
+			@RequestParam(value = "min_id", required = false) String minId,
+			@RequestParam(value = "page", required = false) String page) {
+		Object ret = null;
+		if ("true".equals(page)) {
+			ret = actPubService.generateFollowersPage(userName, minId);
+		} else {
+			ret = actPubService.generateFollowers(userName);
+		}
+		if (ret != null) {
+			log.debug("Reply with Outbox: " + XString.prettyPrint(ret));
 			return ret;
+		}
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
