@@ -115,6 +115,24 @@ public class ActPubService {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
+    /* Gets private RSA key from current user session */
+    private String getPrivateKey(MongoSession session, String userName) {
+        /* get the userNode for the current user who edited a node */
+        SubNode userNode = read.getUserNodeByUserName(session, userName);
+        if (userNode == null) {
+            return null;
+        }
+
+        /* get private key of this user so we can sign the outbound message */
+        String privateKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PRIVATE);
+        if (privateKey == null) {
+            log.debug("Unable to update federated users. Our local user didn't have a private key on his userNode: "
+                    + sessionContext.getUserName());
+            return null;
+        }
+        return privateKey;
+    }
+
     /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this
      * will send a notification to foreign servers. There are various kinds of types
@@ -124,21 +142,6 @@ public class ActPubService {
     public void sendNotificationForNodeEdit(SubNode parent, SubNode node) {
         adminRunner.run(session -> {
             try {
-                /* get the userNode for the current user who edited a node */
-                SubNode userNode = read.getUserNodeByUserName(session, sessionContext.getUserName());
-                if (userNode == null) {
-                    return null;
-                }
-
-                /* get private key of this user so we can sign the outbound message */
-                String privateKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PRIVATE);
-                if (privateKey == null) {
-                    log.debug(
-                            "Unable to update federated users. Our local user didn't have a private key on his userNode: "
-                                    + sessionContext.getUserName());
-                    return null;
-                }
-
                 String inReplyTo = null;
                 String toInbox = null;
                 String toActor = null;
@@ -224,7 +227,7 @@ public class ActPubService {
                     throw new RuntimeException("Unable to send message under node type: " + node.getType());
                 }
 
-                sendNote(toUserName, privateKey, toInbox, sessionContext.getUserName(), inReplyTo, node.getContent(),
+                sendNote(session, toUserName, toInbox, sessionContext.getUserName(), inReplyTo, node.getContent(),
                         toActor, subNodeUtil.getIdBasedUrl(node), privateMessage);
             } //
             catch (Exception e) {
@@ -239,16 +242,23 @@ public class ActPubService {
         return appProp.protocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/" + userName;
     }
 
-    public void sendNote(String toUserName, String privateKey, String toInbox, String fromUser, String inReplyTo,
+    public void sendNote(MongoSession session, String toUserName, String toInbox, String fromUser, String inReplyTo,
             String content, String toActor, String noteUrl, boolean privateMessage) {
-        try {
-            String actor = makeActorUrlForUserName(fromUser);
 
-            APObj message = apFactory.newCreateMessageForNote(toUserName, actor, inReplyTo, content, toActor, noteUrl,
-                    privateMessage);
+        String actor = makeActorUrlForUserName(fromUser);
+
+        APObj message = apFactory.newCreateMessageForNote(toUserName, actor, inReplyTo, content, toActor, noteUrl,
+                privateMessage);
+
+        String privateKey = getPrivateKey(session, sessionContext.getUserName());
+        securePost(session, privateKey, toInbox, actor, message);
+    }
+
+    private void securePost(MongoSession session, String privateKey, String toInbox, String actor, APObj message) {
+        try {
             String body = XString.prettyPrint(message);
             byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
-            log.debug("Sending Message: " + body);
+            log.debug("Posting to inbox " + toInbox + ":\n" + body);
 
             byte[] privKeyBytes = Base64.getDecoder().decode(privateKey);
             KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -287,7 +297,7 @@ public class ActPubService {
 
             postJson(toInbox, host, date, headerSig, digestHeader, bodyBytes);
         } catch (Exception e) {
-            log.error("sendNote failed", e);
+            log.error("secure http post failed", e);
             throw new RuntimeException(e);
         }
     }
@@ -888,15 +898,15 @@ public class ActPubService {
         }
 
         // Actor being followed (local to our server)
-        String actorUrl = followAction.getStr("object");
-        if (actorUrl == null) {
+        String actorBeingFollowedUrl = followAction.getStr("object");
+        if (actorBeingFollowedUrl == null) {
             log.debug("no 'object' found on follows action request posted object");
             return null;
         }
 
-        String userToFollow = this.getLocalUserNameFromActorUrl(actorUrl);
+        String userToFollow = this.getLocalUserNameFromActorUrl(actorBeingFollowedUrl);
         if (userToFollow == null) {
-            log.debug("unable to get a user name from actor url: " + actorUrl);
+            log.debug("unable to get a user name from actor url: " + actorBeingFollowedUrl);
             return null;
         }
 
@@ -922,24 +932,54 @@ public class ActPubService {
             if (followers == null || !followers.iterator().hasNext()) {
                 SubNode followerNode = create.createNode(session, followersListNode.getPath() + "/?",
                         NodeType.FRIEND.s());
-                // Showing this actor url on the GUI for this friend node is not ideal. Need to show better info/name
+                // Showing this actor url on the GUI for this friend node is not ideal. Need to
+                // show better info/name
                 followerNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), followerActor);
                 update.save(session, followerNode);
             }
 
-            /* Build the response object to send back to ActivityPub server */
-            APObj ret = new APObj() //
-                    .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                    .put("summary", "Accepted follow request") //
-                    .put("type", "Accept") //
-                    .put("actor", actorUrl) //
-                    .put("object", new APObj() //
-                            .put("type", "Follow") //
-                            .put("actor", followerActor) //
-                            .put("object", actorUrl) //
-            );
-            log.debug("Reply to Follow Request: " + XString.prettyPrint(ret));
-            return ret;
+            String privateKey = getPrivateKey(session, userToFollow);
+
+            /*
+             * Build the response object to send back to ActivityPub server
+             * 
+             * 
+             * From the spec:
+             * "Only if an Accept activity is subsequently received with this Follow activity as its object."
+             * should we consider the follow complete, but it's not clear yet (todo-0) if
+             * this 'subsequently recieved' means we need to do a POST back to the calling
+             * server or if we send back this object HERE ????
+             * 
+             * Wait for three seconds before sending the confirmation message.
+             */
+            Runnable runnable = () -> {
+                try {
+                    Thread.sleep(500);
+
+                    // Must send either Accept or Reject. Currently we auto-accept all.
+                    APObj acceptFollow = new APObj() //
+                            .put("@context", ActPubConstants.CONTEXT_STREAMS) //
+                            .put("summary", "Accepted follow request") //
+                            .put("type", "Accept") //
+                            .put("actor", actorBeingFollowedUrl) //
+                            .put("object", new APObj() //
+                                    .put("type", "Follow") //
+                                    .put("actor", followerActor) //
+                                    .put("object", actorBeingFollowedUrl)); //
+
+                    APObj followerActorObj = getActor(followerActor);
+                    String followerInbox = followerActorObj.getStr("inbox");
+
+                    log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
+                    securePost(session, privateKey, followerInbox, actorBeingFollowedUrl, acceptFollow);
+                } catch (Exception e) {
+                }
+
+            };
+            Thread thread = new Thread(runnable);
+            thread.start();
+
+            return null;
         });
         return _ret;
     }
@@ -1049,7 +1089,7 @@ public class ActPubService {
                 Iterable<SubNode> iter = read.getChildren(session, followersListNode, null, null, 0);
 
                 for (SubNode n : iter) {
-                    log.debug("Follower found: "+XString.prettyPrint(n));
+                    log.debug("Follower found: " + XString.prettyPrint(n));
                     followers.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
                 }
             }

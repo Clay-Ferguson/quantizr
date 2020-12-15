@@ -155,6 +155,12 @@ public class Convert {
 		 * type-specific logic
 		 */
 		if (node.getType().equals(NodeType.FRIEND.s())) {
+
+			String userUrl = node.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+			if (userUrl != null) {
+				nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_ACTOR_URL.s(), userUrl));
+			}
+
 			String friendAccountId = node.getStrProp(NodeProp.USER_NODE_ID);
 
 			// NOTE: Right when the Friend node is first created, before a person has been
@@ -169,11 +175,16 @@ public class Convert {
 						nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.USER_BIO.s(), userBio));
 					}
 
-					// todo-0: this should be making the FRIEND node of the followers (under FOLLOWERS_LIST parent node)
-					// show this but it's showing up blank right now.
-					String userUrl = friendAccountNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
-					if (userUrl != null) {
-						nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_ACTOR_URL.s(), userUrl));
+					/* todo-0: Check this. Above we just tried to get this prop from the FRIEND node, in a way such that
+					 the friend may not have even been imported into the system and thus won't have a "foreign account node" locally
+					 in our system. So need to decide if we want to always have the ACTOR URL inside FRIEND node itself or not
+					 becasue we should be 100% consistent across all 'foreign' friends regarding having this property or not */
+					if (userUrl == null) {
+						userUrl = friendAccountNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+						if (userUrl != null) {
+							nodeInfo.safeGetClientProps()
+									.add(new PropertyInfo(NodeProp.ACT_PUB_ACTOR_URL.s(), userUrl));
+						}
 					}
 
 					String friendAvatarVer = friendAccountNode.getStrProp(NodeProp.BIN.s());
