@@ -70,9 +70,12 @@ export class NodeCompButtonBar extends HorizontalLayout {
         }
 
         let editingAllowed = S.edit.isEditAllowed(node, state);
+        let deleteAllowed = false;
         let editableNode = true;
+
         if (typeHandler) {
             editingAllowed = state.isAdminUser || (editingAllowed && typeHandler.allowAction(NodeActionType.editNode, node, state));
+            deleteAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.delete, node, state);
             editableNode = state.isAdminUser || typeHandler.allowAction(NodeActionType.editNode, node, state);
         }
 
@@ -115,7 +118,11 @@ export class NodeCompButtonBar extends HorizontalLayout {
          * intelligence to when to show these buttons or not.
          */
         if (state.userPreferences.editMode) {
-            if (editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, node, state)) &&
+
+            let checkboxForEdit = editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, node, state));
+            let checkboxForDelete = state.isAdminUser || deleteAllowed;
+
+            if ((checkboxForEdit || checkboxForDelete) &&
                 // no need to ever select home node
                 node.id !== state.homeNodeId) {
                 selButton = new Checkbox(null, {
@@ -184,7 +191,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
                         });
                     }
                 }
+            }
 
+            if (deleteAllowed) {
                 // not user's account node!
                 if (node.id !== state.homeNodeId) {
                     deleteNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_softDeleteSelNodes, "S.edit.softDeleteSelNodes", node.id), {
@@ -192,7 +201,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
                         title: "Move Node(s) to Trash Bin"
                     });
                 }
+            }
 
+            if (editingAllowed) {
                 if (!!state.nodesToMove && userCanPaste) {
                     pasteInsideButton = new Button("Paste Inside", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodesInside, "S.edit.pasteSelNodesInside", node.id), null, "btn-secondary pasteButton");
                     pasteInlineButton = new Button("Paste Here", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_InlineAbove, "S.edit.pasteSelNodes_InlineAbove", node.id), null, "btn-secondary pasteButton");

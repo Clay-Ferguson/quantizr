@@ -26,6 +26,7 @@ export class FriendTypeHandler extends TypeBase {
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
+            case NodeActionType.delete:
             case NodeActionType.editNode:
                 return true;
             default:
