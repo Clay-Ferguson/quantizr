@@ -219,7 +219,7 @@ public class ActPubService {
 
                     /*
                      * For now this usage pattern is only functional for a reply from an inbox, and
-                     * so this is a DM only thru this code path for now (todo-0: this may change)
+                     * so this supports only DMs thru this code path for now (todo-0: this may change)
                      */
                     privateMessage = true;
                 }
@@ -661,7 +661,9 @@ public class ActPubService {
             /*
              * todo-0: this is my 'guess' at what a response to an Undo would look like.
              * Haven't confirmed yet. I'm betting even if this is wrong things will still
-             * work ok (for now)
+             * work ok (for now). Actually based on the "Follow" example, I had concluded this 
+             * kinf of "Accept" should be sent as an async transation to server (rather than a reply),
+             * but I need to confirm by analyzing what Mastodon does.
              */
             APObj ret = new APObj() //
                     .put("@context", ActPubConstants.CONTEXT_STREAMS) //
@@ -707,9 +709,6 @@ public class ActPubService {
          * If this is a 'reply' post then parse the ID out of this, and if we can find
          * that node by that id then insert the reply under that, instead of the default
          * without this id which is to put in 'inbox'
-         * 
-         * Also todo-0: how are we notifying the user in realtime that this reply was
-         * just come in?
          */
         String inReplyTo = obj.getStr("inReplyTo");
 
@@ -946,18 +945,7 @@ public class ActPubService {
 
             String privateKey = getPrivateKey(session, userToFollow);
 
-            /*
-             * Build the response object to send back to ActivityPub server
-             * 
-             * 
-             * From the spec:
-             * "Only if an Accept activity is subsequently received with this Follow activity as its object."
-             * should we consider the follow complete, but it's not clear yet (todo-0) if
-             * this 'subsequently recieved' means we need to do a POST back to the calling
-             * server or if we send back this object HERE ????
-             * 
-             * Wait for three seconds before sending the confirmation message.
-             */
+            /* Protocol says we need to send this acceptance back */
             Runnable runnable = () -> {
                 try {
                     Thread.sleep(500);
@@ -976,7 +964,7 @@ public class ActPubService {
                     APObj followerActorObj = getActor(followerActor);
                     String followerInbox = followerActorObj.getStr("inbox");
 
-                    log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
+                    // log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
                     securePost(session, privateKey, followerInbox, actorBeingFollowedUrl, acceptFollow);
                 } catch (Exception e) {
                 }
@@ -1056,9 +1044,6 @@ public class ActPubService {
                 .put("id", url) //
                 .put("type", "OrderedCollectionPage") //
                 .put("orderedItems", items) //
-
-                // todo-0: is this to spec? does Mastodon generate this ? AND which total is it,
-                // this page or all pages total ?
                 .put("totalItems", items.size());
     }
 
@@ -1076,12 +1061,9 @@ public class ActPubService {
                 .put("type", "OrderedCollectionPage") //
                 .put("orderedItems", followers) //
                 // todo-0: my outbox isn't returning the 'partOf', so somehow that must mean the
-                // mastodon replies don't. Make sure we are doing same as Mastodon behavior
+                // mastodon replies don't? Make sure we are doing same as Mastodon behavior
                 // here.
                 .put("partOf", appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName)//
-
-                // todo-0: is this to spec? does Mastodon generate this ? AND which total is it,
-                // this page or all pages total ?
                 .put("totalItems", followers.size());
     }
 
@@ -1119,8 +1101,6 @@ public class ActPubService {
 
     /*
      * Generates an Actor object for one of our own local users
-     * 
-     * todo-0: use the defined constants for the paths in here.
      */
     public APObj generateActor(String userName) {
         String host = appProp.protocolHostAndPort();
@@ -1324,9 +1304,7 @@ public class ActPubService {
                                 .put("actor", actor) //
                                 .put("published", published) //
                                 .put("to", new APList().val(ActPubConstants.CONTEXT_STREAMS + "#Public")) //
-                                // todo-0: pending implement followers
-                                // .put("cc", new APList().val(host + ActPubConstants.PATH_FOLLOWERS + "/" +
-                                // userName)) //
+                                // .put("cc", ...) //
                                 .put("object", new APObj() //
                                         .put("id", nodeIdBase + hexId) //
                                         .put("type", "Note") //
@@ -1336,13 +1314,10 @@ public class ActPubService {
                                         .put("url", nodeIdBase + hexId) //
                                         .put("attributedTo", actor) //
                                         .put("to", new APList().val(ActPubConstants.CONTEXT_STREAMS + "#Public")) //
-                                        // todo-0: pending implement followers
-                                        // .put("cc", new APList().val(host + ActPubConstants.PATH_FOLLOWERS + "/" +
-                                        // userName)) //
+                                        // .put("cc", ...) //
                                         .put("sensitive", false) //
                                         .put("content", child.getContent())//
-                        ) //
-                        );
+                        ));
                     }
                 }
 

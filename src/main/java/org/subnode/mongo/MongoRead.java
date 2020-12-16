@@ -720,12 +720,6 @@ public class MongoRead {
         }
 
         String path = userNode.getPath();
-
-        /*
-         * todo-0: when accessing 'outbox' menu item on 'adam' user account we get an
-         * auth fail here when it finds the node probably like the account nodes aren't
-         * owned by the user type of thing.
-         */
         SubNode node = findTypedNodeUnderPath(session, path, type);
 
         if (node == null) {

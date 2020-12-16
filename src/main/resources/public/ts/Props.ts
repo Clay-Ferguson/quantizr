@@ -13,7 +13,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-// todo-0: replace "S.props" in this class to 'this'
 export class Props implements PropsIntf {
 
     readOnlyPropertyList: Set<string> = new Set<string>();
@@ -41,7 +40,7 @@ export class Props implements PropsIntf {
         dstNode.properties = dstNode.properties || [];
 
         this.allBinaryProps.forEach(k => {
-            let propVal = S.props.getNodePropVal(k, srcNode);
+            let propVal = this.getNodePropVal(k, srcNode);
             if (propVal) {
                 this.setNodePropVal(k, dstNode, propVal);
             }
@@ -160,7 +159,7 @@ export class Props implements PropsIntf {
 
         /* if we own this node then this cipherKey for it will be ENC_KEY for us */
         if (state.userName === node.owner) {
-            cipherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
+            cipherKey = this.getNodePropVal(J.NodeProp.ENC_KEY, node);
             // console.log("getting cipherKey for node, from ENC_KEY: " + cipherKey);
         }
         /* else if the server has provided the cipher key to us from the ACL (AccessControl) then use it. */
@@ -185,26 +184,26 @@ export class Props implements PropsIntf {
     }
 
     isEncrypted = (node: J.NodeInfo): boolean => {
-        return !!S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
+        return !!this.getNodePropVal(J.NodeProp.ENC_KEY, node);
     }
 
     hasBinary = (node: J.NodeInfo): boolean => {
-        return !!S.props.getNodePropVal(J.NodeProp.BIN, node) ||
-            !!S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+        return !!this.getNodePropVal(J.NodeProp.BIN, node) ||
+            !!this.getNodePropVal(J.NodeProp.IPFS_LINK, node);
     }
 
     hasImage = (node: J.NodeInfo): boolean => {
-        const target = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+        const target = this.getNodePropVal(J.NodeProp.BIN_MIME, node);
         return (target && target.startsWith("image/"));
     }
 
     hasAudio = (node: J.NodeInfo): boolean => {
-        const target = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+        const target = this.getNodePropVal(J.NodeProp.BIN_MIME, node);
         return (target && target.startsWith("audio/"));
     }
 
     hasVideo = (node: J.NodeInfo): boolean => {
-        const target = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+        const target = this.getNodePropVal(J.NodeProp.BIN_MIME, node);
         return (target && target.startsWith("video/"));
     }
 

@@ -354,9 +354,6 @@ public class NodeEditService {
 			 * If we are saving a node under an ActivityPub item then we need to send a
 			 * notification to the owner of this node who will, by definition, be a foreign
 			 * user.
-			 * 
-			 * todo-0: To avoid sending duplicate messages we can do this only when the mod
-			 * time is being set for the first time.
 			 */
 			if (req.isUpdateModTime() && parent != null && (parent.hasProperty(NodeProp.ACT_PUB_ID) || parent.isType(NodeType.ACT_PUB_ITEM) || parent.isForeignFriendNode())) {
 				actPubService.sendNotificationForNodeEdit(parent, node);
