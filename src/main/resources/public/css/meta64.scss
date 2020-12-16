@@ -390,6 +390,16 @@ strong em {
     font-size: 150%;
 }
 
+.rssChapterDiv {
+    cursor: pointer;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    &:not(:last-child) { 
+        border-bottom: 2px solid $nodeBorderBottomColor;
+    }
+}
+
 .rssChapterLink {
     cursor: pointer;
     font-size: 18px;
@@ -1208,7 +1218,8 @@ i'm backing out for now
 }
 
 .timeRemainingEditField {
-    width: 7em !important;
+    width: 5em !important;
+    margin-left: 5px;
 }
 
 .border-top {

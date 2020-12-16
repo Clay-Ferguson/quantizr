@@ -21,6 +21,7 @@ import { TextContent } from "../widget/TextContent";
 import { TypeBase } from "./base/TypeBase";
 import { Span } from "../widget/Span";
 import { Log } from "../Log";
+import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -31,6 +32,8 @@ export class RssTypeHandler extends TypeBase {
 
     // NOTE: Same value appears in RSSFeedService.ts
     static MAX_FEED_ITEMS: number = 200;
+
+    static expansionState: any = {};
 
     constructor() {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
@@ -293,7 +296,10 @@ export class RssTypeHandler extends TypeBase {
                     let chaptersUrl = (entry.podcastChapters && entry.podcastChapters.$) ? entry.podcastChapters.$.url : null;
                     let chaptersDiv = null;
                     if (chaptersUrl) {
+
+                        // todo-2: would be nicer to have chapters in a collapsable panel?
                         chaptersDiv = new Div(null, { className: "rssChapterPanel" });
+
                         chaptersDiv.preRender = () => {
                             this.renderChapters(dlg, chaptersDiv);
                         };
@@ -311,15 +317,27 @@ export class RssTypeHandler extends TypeBase {
         }
 
         children.push(new Div(null, { className: "clearBoth" }));
-
-        if (entry["content:encoded"]) {
+        let contentDiv = null;
+        if (entry.content) {
             /* set the dangerously flag for this stuff and render as html */
-            let contentDiv = new Html(entry["content:encoded"]);
-            children.push(contentDiv);
+            contentDiv = new Html(entry.content);
+        }
+        else if (entry["content:encoded"]) {
+            /* set the dangerously flag for this stuff and render as html */
+            contentDiv = new Html(entry["content:encoded"]);
         }
         else if (entry.contentSnippet) {
-            let contentDiv = new Html(entry.contentSnippet);
-            children.push(contentDiv);
+            contentDiv = new Html(entry.contentSnippet);
+        }
+
+        if (contentDiv) {
+            children.push(new CollapsiblePanel(null, null, null, [
+               contentDiv
+            ], false,
+                (state: boolean) => {
+                    debugger;
+                    RssTypeHandler.expansionState[entry.guid] = state;
+                }, RssTypeHandler.expansionState[entry.guid], "float-right"));
         }
 
         let dateStr = entry.pubDate;
@@ -329,7 +347,7 @@ export class RssTypeHandler extends TypeBase {
                 dateStr = S.util.formatDateShort(new Date(date));
             }
         }
-        children.push(new Div(dateStr, { className: "float-right" }));
+        children.push(new Div(dateStr, { className: "float-right marginRight" }));
         children.push(new Div(null, { className: "clearfix" }));
 
         return new Div(null, { className: "rss-feed-item" }, children);
@@ -342,7 +360,8 @@ export class RssTypeHandler extends TypeBase {
         if (state.chapters) {
             for (let chapter of state.chapters.chapters) {
 
-                let chapterDiv = new Div();
+                let chapterDiv = new Div(null, { className: "rssChapterDiv" });
+
                 if (chapter.img) {
                     chapterDiv.addChild(new Img(null, {
                         className: "rssChapterImage",
