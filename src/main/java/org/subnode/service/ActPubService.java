@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.subnode.AppController;
 import org.subnode.actpub.APList;
 import org.subnode.actpub.APObj;
 import org.subnode.actpub.ActPubConstants;
@@ -496,7 +497,7 @@ public class ActPubService {
 
     /* Get WebFinger from foreign server */
     public APObj getWebFinger(String host, String resource) {
-        String url = host + "/.well-known/webfinger?resource=acct:" + resource;
+        String url = host + ActPubConstants.PATH_WEBFINGER + "?resource=acct:" + resource;
         APObj finger = getJson(url, new MediaType("application", "jrd+json"));
         log.debug("WebFinger: " + XString.prettyPrint(finger));
         return finger;
@@ -995,7 +996,7 @@ public class ActPubService {
     }
 
     public APObj generateFollowers(String userName) {
-        String url = appProp.protocolHostAndPort() + "/ap/followers/" + userName;
+        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName;
         Long totalItems = getFollowersCount(userName);
 
         return new APObj() //
@@ -1008,7 +1009,7 @@ public class ActPubService {
     }
 
     public APObj generateOutbox(String userName) {
-        String url = appProp.protocolHostAndPort() + "/ap/outbox/" + userName;
+        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName;
         Long totalItems = getOutboxItemCount(userName);
 
         return new APObj() //
@@ -1042,7 +1043,7 @@ public class ActPubService {
         APList items = getOutboxItems(userName, minId);
 
         // this is a self-reference url (id)
-        String url = appProp.protocolHostAndPort() + "/ap/outbox/" + userName + "?min_id=" + minId + "&page=true";
+        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
 
         return new APObj() //
                 .put("@context", ActPubConstants.CONTEXT_STREAMS) //
@@ -1059,7 +1060,7 @@ public class ActPubService {
         List<String> followers = getFollowers(userName, minId);
 
         // this is a self-reference url (id)
-        String url = appProp.protocolHostAndPort() + "/ap/followers/" + userName + "?page=true";
+        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName + "?page=true";
         if (minId != null) {
             url += "&min_id=" + minId;
         }
@@ -1071,7 +1072,7 @@ public class ActPubService {
                 // todo-0: my outbox isn't returning the 'partOf', so somehow that must mean the
                 // mastodon replies don't. Make sure we are doing same as Mastodon behavior
                 // here.
-                .put("partOf", appProp.protocolHostAndPort() + "/ap/followers/" + userName)//
+                .put("partOf", appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS+ "/" + userName)//
 
                 // todo-0: is this to spec? does Mastodon generate this ? AND which total is it,
                 // this page or all pages total ?
@@ -1128,19 +1129,19 @@ public class ActPubService {
 
                 String avatarMime = userNode.getStrProp(NodeProp.BIN_MIME.s());
                 String avatarVer = userNode.getStrProp(NodeProp.BIN.s());
-                String avatarUrl = appProp.protocolHostAndPort() + "/mobile/api/bin/avatar" + "?nodeId="
+                String avatarUrl = appProp.protocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
                         + userNode.getId().toHexString() + "&v=" + avatarVer;
 
                 String headerImageMime = userNode.getStrProp(NodeProp.BIN_MIME.s() + "Header");
                 String headerImageVer = userNode.getStrProp(NodeProp.BIN.s() + "Header");
-                String headerImageUrl = appProp.protocolHostAndPort() + "/mobile/api/bin/profileHeader" + "?nodeId="
+                String headerImageUrl = appProp.protocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader" + "?nodeId="
                         + userNode.getId().toHexString() + "&v=" + headerImageVer;
 
                 APObj actor = new APObj();
 
                 actor.put("@context", new APList() //
                         .val(ActPubConstants.CONTEXT_STREAMS) //
-                        .val("https://w3id.org/security/v1"));
+                        .val(ActPubConstants.CONTEXT_SECURITY));
 
                 /*
                  * Note: this is a self-reference, and must be identical to the URL that returns
@@ -1162,10 +1163,10 @@ public class ActPubService {
                         .put("url", headerImageUrl));
 
                 actor.put("summary", userNode.getStrProp(NodeProp.USER_BIO.s()));
-                actor.put("inbox", host + "/ap/inbox/" + userName); //
-                actor.put("outbox", host + "/ap/outbox/" + userName); //
-                actor.put("followers", host + "/ap/followers/" + userName);
-                actor.put("following", host + "/ap/following/" + userName);
+                actor.put("inbox", host + ActPubConstants.PATH_INBOX + "/" + userName); //
+                actor.put("outbox", host + ActPubConstants.PATH_OUTBOX + "/" + userName); //
+                actor.put("followers", host + ActPubConstants.PATH_FOLLOWERS + "/" + userName);
+                actor.put("following", host + ActPubConstants.PATH_FOLLOWING + "/" + userName);
 
                 /*
                  * This "/u/[user]/home" url format access the node the user has named 'home'.
@@ -1174,7 +1175,7 @@ public class ActPubService {
                  */
                 actor.put("url", host + "/u/" + userName + "/home");
 
-                actor.put("endpoints", new APObj().put("sharedInbox", host + "/ap/inbox"));
+                actor.put("endpoints", new APObj().put("sharedInbox", host + ActPubConstants.PATH_INBOX));
 
                 actor.put("publicKey", new APObj() //
                         .put("id", actor.getStr("id") + "#main-key") //
@@ -1318,7 +1319,7 @@ public class ActPubService {
                                 .put("published", published) //
                                 .put("to", new APList().val(ActPubConstants.CONTEXT_STREAMS + "#Public")) //
                                 // todo-0: pending implement followers
-                                // .put("cc", new APList().val(host + "/ap/followers/" + userName)) //
+                                // .put("cc", new APList().val(host + ActPubConstants.PATH_FOLLOWERS + "/" + userName)) //
                                 .put("object", new APObj() //
                                         .put("id", nodeIdBase + hexId) //
                                         .put("type", "Note") //
@@ -1329,7 +1330,7 @@ public class ActPubService {
                                         .put("attributedTo", actor) //
                                         .put("to", new APList().val(ActPubConstants.CONTEXT_STREAMS + "#Public")) //
                                         // todo-0: pending implement followers
-                                        // .put("cc", new APList().val(host + "/ap/followers/" + userName)) //
+                                        // .put("cc", new APList().val(host + ActPubConstants.PATH_FOLLOWERS + "/" + userName)) //
                                         .put("sensitive", false) //
                                         .put("content", child.getContent())//
                         ) //

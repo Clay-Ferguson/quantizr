@@ -28,7 +28,7 @@ public class ActPubController {
 	// WEBFINGER & ACTOR
 	// =====================================
 
-	@RequestMapping(value = "/.well-known/webfinger", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_JRD)
+	@RequestMapping(value = ActPubConstants.PATH_WEBFINGER, method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_JRD)
 	public @ResponseBody Object webFinger(//
 			@RequestParam(value = "resource", required = true) String resource) {
 		Object ret = actPubService.generateWebFinger(resource);
@@ -52,7 +52,7 @@ public class ActPubController {
 	// =====================================
 
 	/* If no userName specified it's the system 'sharedInbox' */
-	@RequestMapping(value = "/ap/inbox/{userName}", method = RequestMethod.POST, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
+	@RequestMapping(value = ActPubConstants.PATH_INBOX + "/{userName}", method = RequestMethod.POST, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object inboxPost(@RequestBody APObj payload,
 			@PathVariable(value = "userName", required = false) String userName) {
 		log.debug("INBOX incoming payload: " + XString.prettyPrint(payload));
@@ -60,11 +60,11 @@ public class ActPubController {
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/ap/inbox/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
+	@RequestMapping(value = ActPubConstants.PATH_INBOX + "/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object inboxGet(@PathVariable(value = "userName", required = false) String userName) {
 		// todo-0: implement
 		log.debug("inbox (get) returning empty result");
-		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/inbox/" + userName);
+		Object ret = actPubService.generateDummyOrderedCollection(userName, ActPubConstants.PATH_INBOX + "/" + userName);
 		if (ret != null)
 			return ret;
 		return new ResponseEntity(HttpStatus.OK);
@@ -74,7 +74,7 @@ public class ActPubController {
 	// OUTBOX
 	// =====================================
 
-	@RequestMapping(value = "/ap/outbox/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = ActPubConstants.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object outbox(@PathVariable(value = "userName", required = true) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
@@ -95,7 +95,7 @@ public class ActPubController {
 	// FOLLOWERS
 	// =====================================
 
-	@RequestMapping(value = "/ap/followers/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = ActPubConstants.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object getFollowers(@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
@@ -112,10 +112,10 @@ public class ActPubController {
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/ap/followers/{userName}", method = RequestMethod.POST, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
+	@RequestMapping(value = ActPubConstants.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.POST, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object postFollowers(@PathVariable(value = "userName", required = false) String userName) {
 		log.debug("followers (post) returning empty result");
-		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/followers/" + userName);
+		Object ret = actPubService.generateDummyOrderedCollection(userName, ActPubConstants.PATH_FOLLOWERS + "/" + userName);
 		if (ret != null)
 			return ret;
 		return new ResponseEntity(HttpStatus.OK);
@@ -125,19 +125,19 @@ public class ActPubController {
 	// FOLLOWING
 	// =====================================
 
-	@RequestMapping(value = "/ap/following/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
+	@RequestMapping(value = ActPubConstants.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object getFollowing(@PathVariable(value = "userName", required = false) String userName) {
 		log.debug("following (get) returning empty result");
-		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/following/" + userName);
+		Object ret = actPubService.generateDummyOrderedCollection(userName, ActPubConstants.PATH_FOLLOWING + "/" + userName);
 		if (ret != null)
 			return ret;
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/ap/following/{userName}", method = RequestMethod.POST, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
+	@RequestMapping(value = ActPubConstants.PATH_FOLLOWING + "/{userName}", method = RequestMethod.POST, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object postFollowing(@PathVariable(value = "userName", required = false) String userName) {
 		log.debug("following (post) returning empty result");
-		Object ret = actPubService.generateDummyOrderedCollection(userName, "/ap/following/" + userName);
+		Object ret = actPubService.generateDummyOrderedCollection(userName, ActPubConstants.PATH_FOLLOWING + "/" + userName);
 		if (ret != null)
 			return ret;
 		return new ResponseEntity(HttpStatus.OK);
