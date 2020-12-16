@@ -1,7 +1,6 @@
 package org.subnode.response;
 
-/* todo-0: rename this class to MessageNotification */
-public class InboxPushInfo extends ServerPushInfo {
+public class NotificationMessage extends ServerPushInfo {
 
 	private String nodeId;
 
@@ -9,10 +8,10 @@ public class InboxPushInfo extends ServerPushInfo {
 	private String message;
 
 	//WARNING: parameterless constructor required for marshalling.
-	public InboxPushInfo() {
+	public NotificationMessage() {
 	}
 
-	public InboxPushInfo(String type, String nodeId, String message, String fromUser) {
+	public NotificationMessage(String type, String nodeId, String message, String fromUser) {
 		super(type);
 		this.nodeId = nodeId;
 		this.message = message;

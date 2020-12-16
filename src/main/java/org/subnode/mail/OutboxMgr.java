@@ -20,7 +20,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.response.InboxPushInfo;
+import org.subnode.response.NotificationMessage;
 import org.subnode.service.UserFeedService;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.XString;
@@ -186,7 +186,7 @@ public class OutboxMgr {
 			 * 
 			 * todo-0: fill in the two null parameters here.
 			 */
-			userFeedService.sendServerPushInfo(recieverUserName, new InboxPushInfo("newInboxNode", node.getId().toHexString(), null, null));
+			userFeedService.sendServerPushInfo(recieverUserName, new NotificationMessage("newInboxNode", node.getId().toHexString(), null, null));
 
 			SubNode recieverAccountNode = read.getUserNodeByUserName(session, recieverUserName);
 			if (recieverAccountNode != null) {

@@ -387,7 +387,7 @@ export interface GraphResponse extends ResponseBase {
 export interface ImportResponse extends ResponseBase {
 }
 
-export interface InboxPushInfo extends ServerPushInfo {
+export interface NotificationMessage extends ServerPushInfo {
     nodeId: string;
     fromUser: string;
     message: string;

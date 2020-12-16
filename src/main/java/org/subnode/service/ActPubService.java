@@ -56,7 +56,7 @@ import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.response.InboxPushInfo;
+import org.subnode.response.NotificationMessage;
 import org.subnode.util.DateUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
@@ -592,7 +592,6 @@ public class ActPubService {
         }
         // Process Follow Action
         else if ("Follow".equals(payload.getStr("type"))) {
-            // todo-0: display browser notification of this event.
             return processFollowAction(payload);
         }
         // Process Undo Action (Unfollow, etc)
@@ -796,7 +795,7 @@ public class ActPubService {
         String toUserName = getLongUserNameFromActorUrl(objAttributedTo);
 
         userFeedService.sendServerPushInfo(localUserName,
-                new InboxPushInfo("apReply", newNode.getId().toHexString(), contentHtml, toUserName));
+                new NotificationMessage("apReply", newNode.getId().toHexString(), contentHtml, toUserName));
     }
 
     public void saveNoteToUserInboxNode(MongoSession session, String actorUrl, String contentHtml, String id,
@@ -843,7 +842,7 @@ public class ActPubService {
             String toUserName = getLongUserNameFromActorUrl(objAttributedTo);
 
             userFeedService.sendServerPushInfo(localUserName,
-                    new InboxPushInfo("apReply", inboxNode.getId().toHexString(), contentHtml, toUserName));
+                    new NotificationMessage("apReply", inboxNode.getId().toHexString(), contentHtml, toUserName));
         }
     }
 
@@ -933,10 +932,16 @@ public class ActPubService {
             if (followers == null || !followers.iterator().hasNext()) {
                 SubNode followerNode = create.createNode(session, followersListNode.getPath() + "/?",
                         NodeType.FRIEND.s());
-                // Showing this actor url on the GUI for this friend node is not ideal. Need to
-                // show better info/name
+                /*
+                 * Showing this actor url on the GUI for this friend node is not ideal. Need to
+                 * show better info/name
+                 */
                 followerNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), followerActor);
                 update.save(session, followerNode);
+
+                // todo-1: do a message like this that says "User X has followed you."
+                // userFeedService.sendServerPushInfo(localUserName,
+                //         new NotificationMessage("apReply", null, contentHtml, toUserName));
             }
 
             String privateKey = getPrivateKey(session, userToFollow);
@@ -1043,7 +1048,8 @@ public class ActPubService {
         APList items = getOutboxItems(userName, minId);
 
         // this is a self-reference url (id)
-        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
+        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName + "?min_id=" + minId
+                + "&page=true";
 
         return new APObj() //
                 .put("@context", ActPubConstants.CONTEXT_STREAMS) //
@@ -1072,7 +1078,7 @@ public class ActPubService {
                 // todo-0: my outbox isn't returning the 'partOf', so somehow that must mean the
                 // mastodon replies don't. Make sure we are doing same as Mastodon behavior
                 // here.
-                .put("partOf", appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS+ "/" + userName)//
+                .put("partOf", appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName)//
 
                 // todo-0: is this to spec? does Mastodon generate this ? AND which total is it,
                 // this page or all pages total ?
@@ -1134,8 +1140,8 @@ public class ActPubService {
 
                 String headerImageMime = userNode.getStrProp(NodeProp.BIN_MIME.s() + "Header");
                 String headerImageVer = userNode.getStrProp(NodeProp.BIN.s() + "Header");
-                String headerImageUrl = appProp.protocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader" + "?nodeId="
-                        + userNode.getId().toHexString() + "&v=" + headerImageVer;
+                String headerImageUrl = appProp.protocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
+                        + "?nodeId=" + userNode.getId().toHexString() + "&v=" + headerImageVer;
 
                 APObj actor = new APObj();
 
@@ -1319,7 +1325,8 @@ public class ActPubService {
                                 .put("published", published) //
                                 .put("to", new APList().val(ActPubConstants.CONTEXT_STREAMS + "#Public")) //
                                 // todo-0: pending implement followers
-                                // .put("cc", new APList().val(host + ActPubConstants.PATH_FOLLOWERS + "/" + userName)) //
+                                // .put("cc", new APList().val(host + ActPubConstants.PATH_FOLLOWERS + "/" +
+                                // userName)) //
                                 .put("object", new APObj() //
                                         .put("id", nodeIdBase + hexId) //
                                         .put("type", "Note") //
@@ -1330,7 +1337,8 @@ public class ActPubService {
                                         .put("attributedTo", actor) //
                                         .put("to", new APList().val(ActPubConstants.CONTEXT_STREAMS + "#Public")) //
                                         // todo-0: pending implement followers
-                                        // .put("cc", new APList().val(host + ActPubConstants.PATH_FOLLOWERS + "/" + userName)) //
+                                        // .put("cc", new APList().val(host + ActPubConstants.PATH_FOLLOWERS + "/" +
+                                        // userName)) //
                                         .put("sensitive", false) //
                                         .put("content", child.getContent())//
                         ) //
