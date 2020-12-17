@@ -6,7 +6,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -112,6 +114,20 @@ public class NodeInfo {
 		this.deleted = deleted;
 		this.avatarVer = avatarVer;
 		this.apAvatar = apAvatar;
+	}
+
+	@Transient
+	@JsonIgnore
+	public String getPropVal(String propName) {
+		if (properties == null)
+			return null;
+
+		for (PropertyInfo prop : properties) {
+			if (prop.getName().equals(propName)) {
+				return prop.getValue();
+			}
+		}
+		return null;
 	}
 
 	public String getContent() {

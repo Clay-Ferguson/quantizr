@@ -219,7 +219,8 @@ public class ActPubService {
 
                     /*
                      * For now this usage pattern is only functional for a reply from an inbox, and
-                     * so this supports only DMs thru this code path for now (todo-0: this may change)
+                     * so this supports only DMs thru this code path for now (todo-0: this may
+                     * change)
                      */
                     privateMessage = true;
                 }
@@ -255,6 +256,9 @@ public class ActPubService {
         securePost(session, privateKey, toInbox, actor, message);
     }
 
+    /*
+     * Note: 'actor' here is the actor URL of a local Quanta-based user,
+     */
     private void securePost(MongoSession session, String privateKey, String toInbox, String actor, APObj message) {
         try {
             String body = XString.prettyPrint(message);
@@ -479,6 +483,11 @@ public class ActPubService {
         throw new RuntimeException("Unable to iterate type: " + list.getClass().getName());
     }
 
+    /*
+     * input: clay@server.com
+     * 
+     * output: server.com
+     */
     public String getHostFromUserName(String userName) {
         int atIdx = userName.indexOf("@");
         if (atIdx == -1)
@@ -486,6 +495,11 @@ public class ActPubService {
         return userName.substring(atIdx + 1);
     }
 
+    /*
+     * input: clay@server.com
+     * 
+     * output: clay
+     */
     public String stripHostFromUserName(String userName) {
         int atIdx = userName.indexOf("@");
         if (atIdx == -1)
@@ -495,7 +509,11 @@ public class ActPubService {
 
     // https://server.org/.well-known/webfinger?resource=acct:WClayFerguson@server.org'
 
-    /* Get WebFinger from foreign server */
+    /*
+     * Get WebFinger from foreign server
+     * 
+     * resource example: WClayFerguson@server.org
+     */
     public APObj getWebFinger(String host, String resource) {
         String url = host + ActPubConstants.PATH_WEBFINGER + "?resource=acct:" + resource;
         APObj finger = getJson(url, new MediaType("application", "jrd+json"));
@@ -582,6 +600,55 @@ public class ActPubService {
     }
 
     /*
+     * outbound message to follow/unfollow users on remote servers
+     * 
+     * apUserName is full user name like alice@quantizr.com
+     */
+    public void setFollowing(String apUserName, boolean following) {
+        String hostOfUserBeingFollowed = getHostFromUserName(apUserName);
+        APObj webFingerOfUserBeingFollowed = getWebFinger("https://" + hostOfUserBeingFollowed, apUserName);
+
+        Map<String, Object> selfOfUserBeingFollowed = getLinkByRel(webFingerOfUserBeingFollowed, "self");
+        String actorUrlOfUserBeingFollowed = (String) selfOfUserBeingFollowed.get("href");
+
+        adminRunner.run(session -> {
+            String sessionActorUrl = makeActorUrlForUserName(sessionContext.getUserName());
+            APObj followAction = new APObj();
+
+            // send follow action 
+            if (following) {
+                followAction //
+                        .put("@context", ActPubConstants.CONTEXT_STREAMS) //
+                        .put("id", appProp.protocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
+                        .put("type", "Follow") //
+                        .put("actor", sessionActorUrl) //
+                        .put("object", actorUrlOfUserBeingFollowed);
+            }
+            // send unfollow action
+            else {
+                followAction //
+                        .put("@context", ActPubConstants.CONTEXT_STREAMS) //
+                        .put("id", appProp.protocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
+                        .put("type", "Undo") //
+                        .put("actor", sessionActorUrl) //
+                        .put("object", new APObj() //
+                                .put("id",
+                                        appProp.protocolHostAndPort() + "/unfollow-obj/"
+                                                + String.valueOf(new Date().getTime())) //
+                                .put("type", "Follow") //
+                                .put("actor", sessionActorUrl) //
+                                .put("object", actorUrlOfUserBeingFollowed));
+            }
+
+            String privateKey = getPrivateKey(session, sessionContext.getUserName());
+            APObj toActor = getActor(actorUrlOfUserBeingFollowed);
+            String toInbox = toActor.getStr("inbox");
+            securePost(session, privateKey, toInbox, sessionActorUrl, followAction);
+            return null;
+        });
+    }
+
+    /*
      * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by
      * foreign servers to follow a user on this server
      */
@@ -661,9 +728,9 @@ public class ActPubService {
             /*
              * todo-0: this is my 'guess' at what a response to an Undo would look like.
              * Haven't confirmed yet. I'm betting even if this is wrong things will still
-             * work ok (for now). Actually based on the "Follow" example, I had concluded this 
-             * kinf of "Accept" should be sent as an async transation to server (rather than a reply),
-             * but I need to confirm by analyzing what Mastodon does.
+             * work ok (for now). Actually based on the "Follow" example, I had concluded
+             * this kinf of "Accept" should be sent as an async transation to server (rather
+             * than a reply), but I need to confirm by analyzing what Mastodon does.
              */
             APObj ret = new APObj() //
                     .put("@context", ActPubConstants.CONTEXT_STREAMS) //
@@ -940,7 +1007,7 @@ public class ActPubService {
 
                 // todo-1: do a message like this that says "User X has followed you."
                 // userFeedService.sendServerPushInfo(localUserName,
-                //         new NotificationMessage("apReply", null, contentHtml, toUserName));
+                // new NotificationMessage("apReply", null, contentHtml, toUserName));
             }
 
             String privateKey = getPrivateKey(session, userToFollow);

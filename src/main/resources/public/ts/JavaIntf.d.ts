@@ -387,12 +387,6 @@ export interface GraphResponse extends ResponseBase {
 export interface ImportResponse extends ResponseBase {
 }
 
-export interface NotificationMessage extends ServerPushInfo {
-    nodeId: string;
-    fromUser: string;
-    message: string;
-}
-
 export interface InfoMessage {
     message: string;
     type: string;
@@ -441,6 +435,12 @@ export interface NodeFeedResponse extends ResponseBase {
 
 export interface NodeSearchResponse extends ResponseBase {
     searchResults: NodeInfo[];
+}
+
+export interface NotificationMessage extends ServerPushInfo {
+    nodeId: string;
+    fromUser: string;
+    message: string;
 }
 
 export interface OpenSystemFileResponse extends ResponseBase {
@@ -620,6 +620,7 @@ export const enum NodeProp {
     ACT_PUB_ACTOR_ID = "ap:actorId",
     ACT_PUB_ACTOR_URL = "ap:actorUrl",
     ACT_PUB_ACTOR_INBOX = "ap:actorInbox",
+    ACT_PUB_FOLLOWING = "ap:following",
     ENC_KEY = "sn:encKey",
     RSS_FEED_SRC = "sn:rssFeedSrc",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",

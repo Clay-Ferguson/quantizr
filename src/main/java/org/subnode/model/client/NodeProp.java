@@ -19,6 +19,7 @@ public enum NodeProp {
     ACT_PUB_ACTOR_ID("ap:actorId", "s"), //
     ACT_PUB_ACTOR_URL("ap:actorUrl", "s"), //
     ACT_PUB_ACTOR_INBOX("ap:actorInbox", "s"), //
+    ACT_PUB_FOLLOWING("ap:following", "s"), //
 
     /* This is the encrypted symetric key to the node data, that was encrypted using the private key of the owner of the node.
     When nodes are shared to other users the cleartext copy of this key is encrypted with the public key of the user it's being

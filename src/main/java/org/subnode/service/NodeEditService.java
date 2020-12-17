@@ -282,6 +282,7 @@ public class NodeEditService {
 
 		node.setContent(nodeInfo.getContent());
 		node.setType(nodeInfo.getType());
+		String curFollowing = node.getStrProp(NodeProp.ACT_PUB_FOLLOWING.s());
 
 		if (StringUtils.isEmpty(nodeInfo.getName())) {
 			node.setName(null);
@@ -355,7 +356,8 @@ public class NodeEditService {
 			 * notification to the owner of this node who will, by definition, be a foreign
 			 * user.
 			 */
-			if (req.isUpdateModTime() && parent != null && (parent.hasProperty(NodeProp.ACT_PUB_ID) || parent.isType(NodeType.ACT_PUB_ITEM) || parent.isForeignFriendNode())) {
+			if (req.isUpdateModTime() && parent != null && (parent.hasProperty(NodeProp.ACT_PUB_ID)
+					|| parent.isType(NodeType.ACT_PUB_ITEM) || parent.isForeignFriendNode())) {
 				actPubService.sendNotificationForNodeEdit(parent, node);
 			} else {
 				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
@@ -369,6 +371,17 @@ public class NodeEditService {
 		// of type-specific code from the general node saving.
 		if (node.getType().equals(NodeType.FRIEND.s())) {
 			String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
+			String following = nodeInfo.getPropVal(NodeProp.ACT_PUB_FOLLOWING.s());
+
+			if (curFollowing == null)
+				curFollowing = "";
+			if (following == null)
+				following = "";
+
+			/* if 'following' has changed send message to the server */
+			if (!curFollowing.equals(following)) {
+				actPubService.setFollowing(node.getStrProp(NodeProp.USER.s()), following.equals("true"));
+			}	
 
 			/*
 			 * when user first adds, this friendNode won't have the userNodeId yet, so add
