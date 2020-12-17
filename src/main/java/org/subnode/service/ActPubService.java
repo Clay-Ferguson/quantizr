@@ -232,8 +232,10 @@ public class ActPubService {
                     throw new RuntimeException("Unable to send message under node type: " + node.getType());
                 }
 
+                APList attachments = createAttachmentsList(node);
+
                 sendNote(session, toUserName, toInbox, sessionContext.getUserName(), inReplyTo, node.getContent(),
-                        toActor, subNodeUtil.getIdBasedUrl(node), privateMessage);
+                        attachments, toActor, subNodeUtil.getIdBasedUrl(node), privateMessage);
             } //
             catch (Exception e) {
                 log.error("sendNote failed", e);
@@ -243,17 +245,34 @@ public class ActPubService {
         });
     }
 
+    public APList createAttachmentsList(SubNode node) {
+        APList attachments = null;
+
+        String bin = node.getStrProp(NodeProp.BIN);
+        String mime = node.getStrProp(NodeProp.BIN_MIME);
+
+        if (bin != null && mime != null) {
+            attachments = new APList().val(//
+                    new APObj() //
+                            .put("type", "Document") //
+                            .put("mediaType", mime) //
+                            .put("url", appProp.protocolHostAndPort() + "/f/id/" + node.getId().toHexString()));
+        }
+
+        return attachments;
+    }
+
     public String makeActorUrlForUserName(String userName) {
         return appProp.protocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/" + userName;
     }
 
     public void sendNote(MongoSession session, String toUserName, String toInbox, String fromUser, String inReplyTo,
-            String content, String toActor, String noteUrl, boolean privateMessage) {
+            String content, APList attachments, String toActor, String noteUrl, boolean privateMessage) {
 
         String actor = makeActorUrlForUserName(fromUser);
 
         APObj message = apFactory.newCreateMessageForNote(toUserName, actor, inReplyTo, content, toActor, noteUrl,
-                privateMessage);
+                privateMessage, attachments);
 
         String privateKey = getPrivateKey(session, sessionContext.getUserName());
         securePost(session, privateKey, toInbox, actor, message);
@@ -895,7 +914,7 @@ public class ActPubService {
             if (mediaType != null && url != null) {
                 attachmentService.readFromUrl(session, url, node.getId().toHexString(), mediaType, -1);
 
-                //for now we only support one attachment so break out after uploading one.
+                // for now we only support one attachment so break out after uploading one.
                 break;
             }
         }

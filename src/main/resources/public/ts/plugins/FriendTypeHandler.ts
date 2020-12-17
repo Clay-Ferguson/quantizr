@@ -138,8 +138,9 @@ export class FriendTypeHandler extends TypeBase {
             updateModTime: true,
             node
         }, (res) => {
-            // not needed
-            // S.meta64.refresh(state);
+            // todo-0: we should just update the 'node' property here to be the 'following' instead of requerying the server
+            // this is a very simple fix to do that. For now this lazy approach refreshes the whole page. ugh.
+            S.meta64.refresh(state);
         });
     }
 }

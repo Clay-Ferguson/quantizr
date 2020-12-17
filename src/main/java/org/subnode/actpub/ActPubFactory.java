@@ -16,16 +16,16 @@ public class ActPubFactory {
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
 	public APObj newCreateMessageForNote(String toUserName, String actor, String inReplyTo, String content,
-			String toActor, String noteUrl, boolean privateMessage) {
+			String toActor, String noteUrl, boolean privateMessage, APList attachments) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 		log.debug("sending note to actor[" + actor + "] inReplyTo[" + inReplyTo + "] toActor[" + toActor + "]");
 		return newCreateMessage(
-				newNoteObject(toUserName, actor, inReplyTo, content, toActor, noteUrl, now, privateMessage), actor,
+				newNoteObject(toUserName, actor, inReplyTo, content, toActor, noteUrl, now, privateMessage, attachments), actor,
 				toActor, noteUrl, now);
 	}
 
 	public APObj newNoteObject(String toUserName, String attributedTo, String inReplyTo, String content, String toActor,
-			String noteUrl, ZonedDateTime now, boolean privateMessage) {
+			String noteUrl, ZonedDateTime now, boolean privateMessage, APList attachments) {
 		APObj ret = new APObj();
 
 		ret.put("@context", new APList() //
@@ -55,6 +55,8 @@ public class ActPubFactory {
 			toArray.add(ActPubConstants.CONTEXT_STREAMS + "#Public");
 		}
 		ret.put("to", toArray);
+
+		ret.put("attachment", attachments);
 
 		ret.put("tag", new APList().val(new APObj() //
 				.put("type", "Mention") //
