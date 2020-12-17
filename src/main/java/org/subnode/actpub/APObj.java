@@ -46,6 +46,7 @@ public class APObj extends HashMap<String, Object> {
         return (String) get(prop);
     }
 
+    /* todo-0: make this return a list of APObj objects */
     public List<Object> getList(String prop) {
         return (List<Object>) get(prop);
     }

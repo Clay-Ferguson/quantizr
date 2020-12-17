@@ -36,7 +36,7 @@ public class MongoDelete {
 
 	public void deleteNode(MongoSession session, SubNode node, boolean childrenOnly) {
 		if (!childrenOnly) {
-			attachmentService.deleteBinary(session, "", node);
+			attachmentService.deleteBinary(session, "", node, null);
 		}
 		delete(session, node, childrenOnly);
 	}

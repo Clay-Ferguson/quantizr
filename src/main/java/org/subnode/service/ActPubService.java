@@ -97,6 +97,9 @@ public class ActPubService {
     private AppProp appProp;
 
     @Autowired
+    private AttachmentService attachmentService;
+
+    @Autowired
     private SubNodeUtil subNodeUtil;
 
     /* Cache Actor objects by URL in memory only for now */
@@ -615,7 +618,7 @@ public class ActPubService {
             String sessionActorUrl = makeActorUrlForUserName(sessionContext.getUserName());
             APObj followAction = new APObj();
 
-            // send follow action 
+            // send follow action
             if (following) {
                 followAction //
                         .put("@context", ActPubConstants.CONTEXT_STREAMS) //
@@ -769,9 +772,6 @@ public class ActPubService {
         String id = obj.getStr("id");
         Date published = obj.getDate("published");
 
-        String objUrl = obj.getStr("url");
-        String objAttributedTo = obj.getStr("attributedTo");
-
         /*
          * If this is a 'reply' post then parse the ID out of this, and if we can find
          * that node by that id then insert the reply under that, instead of the default
@@ -804,10 +804,9 @@ public class ActPubService {
                 if (to instanceof String) {
                     String toActor = (String) to;
                     if (nodeBeingRepliedTo != null) {
-                        saveNoteAsReplyUnderNode(session, toActor, contentHtml, id, published, nodeBeingRepliedTo,
-                                objUrl, objAttributedTo);
+                        saveNoteAsReplyUnderNode(session, toActor, contentHtml, id, published, nodeBeingRepliedTo, obj);
                     } else {
-                        saveNoteToUserInboxNode(session, toActor, contentHtml, id, published, objUrl, objAttributedTo);
+                        saveNoteToUserInboxNode(session, toActor, contentHtml, id, published, obj);
                     }
                 } else {
                     log.debug("to list entry not supported: " + to.toString());
@@ -822,7 +821,10 @@ public class ActPubService {
     }
 
     public void saveNoteAsReplyUnderNode(MongoSession session, String actorUrl, String contentHtml, String id,
-            Date published, SubNode nodeBeingRepliedTo, String objUrl, String objAttributedTo) {
+            Date published, SubNode nodeBeingRepliedTo, APObj obj) {
+        String objUrl = obj.getStr("url");
+        String objAttributedTo = obj.getStr("attributedTo");
+
         String localUserName = getLocalUserNameFromActorUrl(actorUrl);
         if (localUserName == null) {
             log.debug("actorUrl not handled: " + actorUrl);
@@ -858,14 +860,52 @@ public class ActPubService {
         newNode.setProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
         update.save(session, newNode);
 
+        addAttachmentIfExists(session, newNode, obj);
+
+        // attachmentService.readFromUrl(session, final String sourceUrl, final String
+        // nodeId,
+        // final String mimeHint, final int maxFileSize) {
+        //
+        // "attachment" : [ {
+        // "type" : "Document",
+        // "mediaType" : "image/jpeg",
+        // "url" :
+        // "https://quantizr.com/system/media_attachments/files/105/396/552/862/680/349/original/b98xacaa0c2cf9ad1b2.jpeg",
+        // "blurhash" : "UGC6W1%g01Q-?HxtV]Rk4.ad%MbwE1WVoyf5"
+        // } ],
+
         String toUserName = getLongUserNameFromActorUrl(objAttributedTo);
 
         userFeedService.sendServerPushInfo(localUserName,
                 new NotificationMessage("apReply", newNode.getId().toHexString(), contentHtml, toUserName));
     }
 
+    private void addAttachmentIfExists(MongoSession session, SubNode node, APObj obj) {
+        List<Object> attachments = obj.getList("attachment");
+
+        if (attachments == null)
+            return;
+
+        for (Object att : attachments) {
+            Map<String, Object> map = (Map<String, Object>) att;
+
+            String mediaType = (String) map.get("mediaType");
+            String url = (String) map.get("url");
+
+            if (mediaType != null && url != null) {
+                attachmentService.readFromUrl(session, url, node.getId().toHexString(), mediaType, -1);
+
+                //for now we only support one attachment so break out after uploading one.
+                break;
+            }
+        }
+    }
+
     public void saveNoteToUserInboxNode(MongoSession session, String actorUrl, String contentHtml, String id,
-            Date published, String objUrl, String objAttributedTo) {
+            Date published, APObj obj) {
+        String objUrl = obj.getStr("url");
+        String objAttributedTo = obj.getStr("attributedTo");
+
         String localUserName = getLocalUserNameFromActorUrl(actorUrl);
         if (localUserName == null) {
             log.debug("actorUrl not handled: " + actorUrl);
@@ -904,6 +944,8 @@ public class ActPubService {
             inboxNode.setProp(NodeProp.ACT_PUB_OBJ_URL.s(), objUrl);
             inboxNode.setProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
             update.save(session, inboxNode);
+
+            addAttachmentIfExists(session, inboxNode, obj);
 
             String toUserName = getLongUserNameFromActorUrl(objAttributedTo);
 

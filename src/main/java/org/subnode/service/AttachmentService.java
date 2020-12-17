@@ -379,13 +379,15 @@ public class AttachmentService {
 			node.setProp(NodeProp.BIN_DATA_URL.s() + binSuffix, "t"); // t=true
 		}
 
+		SubNode userNode = read.getNode(session, node.getOwner());
+
 		if (imageBytes == null) {
 			try {
 				node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, size);
 				if (toIpfs) {
 					writeStreamToIpfs(session, binSuffix, node, inputStream, mimeType);
 				} else {
-					writeStream(session, binSuffix, node, inputStream, fileName, mimeType);
+					writeStream(session, binSuffix, node, inputStream, fileName, mimeType, userNode);
 				}
 			} finally {
 				if (closeStream) {
@@ -400,7 +402,7 @@ public class AttachmentService {
 				if (toIpfs) {
 					writeStreamToIpfs(session, binSuffix, node, is, mimeType);
 				} else {
-					writeStream(session, binSuffix, node, is, fileName, mimeType);
+					writeStream(session, binSuffix, node, is, fileName, mimeType, userNode);
 				}
 			} finally {
 				StreamUtil.close(is);
@@ -424,7 +426,7 @@ public class AttachmentService {
 
 		final String nodeId = req.getNodeId();
 		final SubNode node = read.getNode(session, nodeId);
-		deleteBinary(session, "", node);
+		deleteBinary(session, "", node, null);
 		deleteAllBinaryProperties(node, "");
 		update.saveSession(session);
 		res.setSuccess(true);
@@ -766,7 +768,7 @@ public class AttachmentService {
 
 	public void readFromDataUrl(MongoSession session, final String sourceUrl, final String nodeId,
 			final String mimeHint, int maxFileSize) {
-		if (maxFileSize == 0) {
+		if (maxFileSize <= 0) {
 			maxFileSize = session.getMaxUploadSize();
 		}
 
@@ -791,7 +793,7 @@ public class AttachmentService {
 	// https://tools.ietf.org/html/rfc2397
 	public void readFromStandardUrl(MongoSession session, final String sourceUrl, final String nodeId,
 			final String mimeHint, int maxFileSize) {
-		if (maxFileSize == 0) {
+		if (maxFileSize <= 0) {
 			maxFileSize = session.getMaxUploadSize();
 		}
 
@@ -926,18 +928,21 @@ public class AttachmentService {
 	}
 
 	public void writeStream(final MongoSession session, final String binSuffix, final SubNode node,
-			final LimitedInputStreamEx stream, final String fileName, final String mimeType) {
+			final LimitedInputStreamEx stream, final String fileName, final String mimeType, SubNode userNode) {
 
 		auth.auth(session, node, PrivilegeType.WRITE);
 		final DBObject metaData = new BasicDBObject();
 		metaData.put("nodeId" + binSuffix, node.getId());
-		final SubNode userNode = read.getUserNodeByUserName(null, null);
+
+		if (userNode == null) {
+			userNode = read.getUserNodeByUserName(null, null);
+		}
 
 		/*
 		 * Delete any existing grid data stored under this node, before saving new
 		 * attachment
 		 */
-		deleteBinary(session, binSuffix, node);
+		deleteBinary(session, binSuffix, node, userNode);
 
 		// #saveAsPdf work in progress:
 		// todo-1: right here if saveAsPdf is true we need to convert the HTML to PDF
@@ -980,7 +985,7 @@ public class AttachmentService {
 		}
 	}
 
-	public void deleteBinary(final MongoSession session, final String binSuffix, final SubNode node) {
+	public void deleteBinary(final MongoSession session, final String binSuffix, final SubNode node, SubNode userNode) {
 		auth.auth(session, node, PrivilegeType.WRITE);
 		final String id = node.getStrProp(NodeProp.BIN.s() + binSuffix);
 		if (id == null) {
@@ -988,7 +993,7 @@ public class AttachmentService {
 		}
 
 		if (!session.isAdmin()) {
-			userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
+			userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
 		}
 
 		grid.delete(new Query(Criteria.where("_id").is(id)));
@@ -1133,7 +1138,10 @@ public class AttachmentService {
 						/* Get which nodeId owns this grid file */
 						ObjectId id = (ObjectId) meta.get("nodeId");
 
-						/* If the grid file is not based off 'nodeId' then we still need to check if it's a Header image (special case) */
+						/*
+						 * If the grid file is not based off 'nodeId' then we still need to check if
+						 * it's a Header image (special case)
+						 */
 						if (id == null) {
 							// todo-1: currently we only have "Header" as a (binSuffix), and it may stay
 							// that way forever, as the only violation of
