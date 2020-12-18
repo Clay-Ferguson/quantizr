@@ -40,9 +40,9 @@ import org.springframework.web.client.RestTemplate;
 import org.subnode.AppController;
 import org.subnode.actpub.APList;
 import org.subnode.actpub.APObj;
+import org.subnode.actpub.AP;
 import org.subnode.actpub.ActPubConstants;
 import org.subnode.actpub.ActPubFactory;
-import org.subnode.actpub.VisitAPObj;
 import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
@@ -213,8 +213,8 @@ public class ActPubService {
                     String attributedTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
                     APObj actor = getActor(attributedTo);
 
-                    String shortUserName = actor.getStr("preferredUsername"); // short name like 'alice'
-                    toInbox = actor.getStr("inbox");
+                    String shortUserName = AP.str(actor, "preferredUsername"); // short name like 'alice'
+                    toInbox = AP.str(actor, "inbox");
                     URL url = new URL(toInbox);
                     String host = url.getHost();
                     toUserName = shortUserName + "@" + host;
@@ -336,10 +336,10 @@ public class ActPubService {
         String host = getHostFromUserName(apUserName);
         APObj webFinger = getWebFinger("https://" + host, apUserName);
 
-        Map<String, Object> self = getLinkByRel(webFinger, "self");
+        Object self = getLinkByRel(webFinger, "self");
         log.debug("Self Link: " + XString.prettyPrint(self));
         if (self != null) {
-            APObj actor = getActor((String) self.get("href"));
+            Object actor = getActor(AP.str(self, "href"));
 
             // if webfinger was successful, ensure the user is imported into our system.
             if (actor != null) {
@@ -348,7 +348,7 @@ public class ActPubService {
         }
     }
 
-    public void importActor(MongoSession session, String apUserName, APObj actor) {
+    public void importActor(MongoSession session, String apUserName, Object actor) {
         if (apUserName == null)
             return;
 
@@ -372,9 +372,9 @@ public class ActPubService {
          * prop, and then only call update.save() if the node HAS changed. Do it by
          * making setProp return boolean if changed.
          */
-        APObj icon = actor.getAPObj("icon");
+        Object icon = AP.obj(actor, "icon");
         if (icon != null) {
-            String iconUrl = icon.getStr("url");
+            String iconUrl = AP.str(icon, "url");
             if (iconUrl != null) {
                 String curIconUrl = userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
                 if (!iconUrl.equals(curIconUrl)) {
@@ -383,10 +383,10 @@ public class ActPubService {
             }
         }
 
-        userNode.setProp(NodeProp.USER_BIO.s(), actor.getStr("summary"));
-        userNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), actor.getStr("id"));
-        userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), actor.getStr("inbox"));
-        userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), actor.getStr("url"));
+        userNode.setProp(NodeProp.USER_BIO.s(), AP.str(actor, "summary"));
+        userNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), AP.str(actor, "id"));
+        userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), AP.str(actor, "inbox"));
+        userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), AP.str(actor, "url"));
 
         update.save(session, userNode, false);
         refreshOutboxFromForeignServer(session, actor, userNode, apUserName);
@@ -396,7 +396,7 @@ public class ActPubService {
      * Caller can pass in userNode if it's already available, but if not just pass
      * null and the apUserName will be used to look up the userNode
      */
-    public void refreshOutboxFromForeignServer(MongoSession session, APObj actor, SubNode userNode, String apUserName) {
+    public void refreshOutboxFromForeignServer(MongoSession session, Object actor, SubNode userNode, String apUserName) {
 
         if (userNode == null) {
             userNode = read.getUserNodeByUserName(session, apUserName);
@@ -418,7 +418,7 @@ public class ActPubService {
             }
         }
 
-        APObj outbox = getOutbox(actor.getStr("outbox"));
+        Object outbox = getOutbox(AP.str(actor, "outbox"));
         if (outbox == null) {
             log.debug("Unable to get outbox for AP user: " + apUserName);
             return;
@@ -431,24 +431,23 @@ public class ActPubService {
          * deduplicate all the items from all pages to be sure we don't end up with a
          * empty array even when there ARE some
          */
-        APObj ocPage = getOrderedCollectionPage(outbox.getStr("first"));
+        Object ocPage = getOrderedCollectionPage(AP.str(outbox, "first"));
         int pageNo = 0;
         while (ocPage != null) {
             pageNo++;
             final int _pageNo = pageNo;
 
-            Object orderedItems = ocPage.getList("orderedItems");
-            iterate(orderedItems, apObj -> {
-                String apId = apObj.getStr("id");
+            List<?> orderedItems = AP.list(ocPage, "orderedItems");
+            for (Object apObj : orderedItems) {
+                String apId = AP.str(apObj, "id");
                 if (!apIdSet.contains(apId)) {
                     log.debug("CREATING NODE (AP Obj): " + apId);
                     saveOutboxItem(session, outboxNode, apObj, _pageNo, _userNode.getId());
                     apIdSet.add(apId);
                 }
-                return true; // true=keep iterating.
-            });
+            }
 
-            String nextPage = ocPage.getStr("next");
+            String nextPage = AP.str(ocPage, "next");
             log.debug("NextPage: " + nextPage);
             if (nextPage != null) {
                 ocPage = getOrderedCollectionPage(nextPage);
@@ -457,52 +456,39 @@ public class ActPubService {
             }
         }
 
-        ocPage = getOrderedCollectionPage(outbox.getStr("last"));
+        ocPage = getOrderedCollectionPage(AP.str(outbox, "last"));
         if (ocPage != null) {
-            Object orderedItems = ocPage.getList("orderedItems");
-            iterate(orderedItems, apObj -> {
-                String apId = apObj.getStr("id");
+            List<?> orderedItems = AP.list(ocPage, "orderedItems");
+            for (Object apObj : orderedItems) {
+                String apId = AP.str(apObj, "id");
                 if (!apIdSet.contains(apId)) {
                     log.debug("CREATING NODE (AP Obj): " + apId);
                     saveOutboxItem(session, outboxNode, apObj, -1, _userNode.getId());
                     apIdSet.add(apId);
                 }
-                return true; // true=keep iterating.
-            });
+            }
         }
     }
 
-    public void saveOutboxItem(MongoSession session, SubNode userFeedNode, APObj apObj, int pageNo, ObjectId ownerId) {
-        APObj object = apObj.getAPObj("object");
+    public void saveOutboxItem(MongoSession session, SubNode userFeedNode, Object apObj, int pageNo, ObjectId ownerId) {
+        Object object = AP.obj(apObj, "object");
 
         SubNode outboxNode = create.createNodeAsOwner(session, userFeedNode.getPath() + "/?", NodeType.NONE.s(),
                 ownerId);
-        outboxNode.setProp(NodeProp.ACT_PUB_ID.s(), apObj.getStr("id"));
-        outboxNode.setProp(NodeProp.ACT_PUB_OBJ_TYPE.s(), object.getStr("type"));
-        outboxNode.setProp(NodeProp.ACT_PUB_OBJ_URL.s(), object.getStr("url"));
-        outboxNode.setProp(NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), object.getStr("inReplyTo"));
+        outboxNode.setProp(NodeProp.ACT_PUB_ID.s(), AP.str(apObj, "id"));
+        outboxNode.setProp(NodeProp.ACT_PUB_OBJ_TYPE.s(), AP.str(object, "type"));
+        outboxNode.setProp(NodeProp.ACT_PUB_OBJ_URL.s(), AP.str(object, "url"));
+        outboxNode.setProp(NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), AP.str(object, "inReplyTo"));
         outboxNode.setProp(NodeProp.ACT_PUB_OBJ_CONTENT.s(),
-                object != null ? (/* "Page: " + pageNo + "<br>" + */ object.getStr("content")) : "no content");
+                object != null ? (/* "Page: " + pageNo + "<br>" + */ AP.str(object, "content")) : "no content");
         outboxNode.setType(NodeType.ACT_PUB_ITEM.s());
 
-        Date published = apObj.getDate("published");
+        Date published = AP.date(apObj, "published");
         if (published != null) {
             outboxNode.setModifyTime(published);
         }
 
         update.save(session, outboxNode, false);
-    }
-
-    public void iterate(Object list, VisitAPObj visitor) {
-        if (list instanceof List) {
-            for (Object obj : (List<?>) list) {
-                if (!visitor.visit(new APObj(obj))) {
-                    break;
-                }
-            }
-            return;
-        }
-        throw new RuntimeException("Unable to iterate type: " + list.getClass().getName());
     }
 
     /*
@@ -630,8 +616,8 @@ public class ActPubService {
         String hostOfUserBeingFollowed = getHostFromUserName(apUserName);
         APObj webFingerOfUserBeingFollowed = getWebFinger("https://" + hostOfUserBeingFollowed, apUserName);
 
-        Map<String, Object> selfOfUserBeingFollowed = getLinkByRel(webFingerOfUserBeingFollowed, "self");
-        String actorUrlOfUserBeingFollowed = (String) selfOfUserBeingFollowed.get("href");
+        Object selfOfUserBeingFollowed = getLinkByRel(webFingerOfUserBeingFollowed, "self");
+        String actorUrlOfUserBeingFollowed = AP.str(selfOfUserBeingFollowed, "href");
 
         adminRunner.run(session -> {
             String sessionActorUrl = makeActorUrlForUserName(sessionContext.getUserName());
@@ -664,7 +650,7 @@ public class ActPubService {
 
             String privateKey = getPrivateKey(session, sessionContext.getUserName());
             APObj toActor = getActor(actorUrlOfUserBeingFollowed);
-            String toInbox = toActor.getStr("inbox");
+            String toInbox = AP.str(toActor, "inbox");
             securePost(session, privateKey, toInbox, sessionActorUrl, followAction);
             return null;
         });
@@ -674,17 +660,19 @@ public class ActPubService {
      * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by
      * foreign servers to follow a user on this server
      */
-    public APObj processInboxPost(APObj payload) {
+    public APObj processInboxPost(Object payload) {
+        String type = AP.str(payload, "type");
+
         // Process Create Action
-        if ("Create".equals(payload.getStr("type"))) {
+        if ("Create".equals(type)) {
             return processCreateAction(payload);
         }
         // Process Follow Action
-        else if ("Follow".equals(payload.getStr("type"))) {
+        else if ("Follow".equals(type)) {
             return processFollowAction(payload);
         }
         // Process Undo Action (Unfollow, etc)
-        else if ("Undo".equals(payload.getStr("type"))) {
+        else if ("Undo".equals(type)) {
             return processUndoAction(payload);
         }
         // else report unhandled
@@ -695,25 +683,25 @@ public class ActPubService {
     }
 
     /* Process inbound undo actions (comming from foreign servers) */
-    public APObj processUndoAction(APObj payload) {
-        APObj object = payload.getAPObj("object");
-        if (object != null && "Follow".equals(object.getStr("type"))) {
+    public APObj processUndoAction(Object payload) {
+        Object object = AP.obj(payload, "object");
+        if (object != null && "Follow".equals(AP.str(object, "type"))) {
             return processUnfollowAction(object);
         }
         return null;
     }
 
     /* Process inbound Unfollow actions (comming from foreign servers) */
-    public APObj processUnfollowAction(APObj object) {
+    public APObj processUnfollowAction(Object object) {
         // Actor URL of actor doing the folloing
-        String followerActor = object.getStr("actor");
+        String followerActor = AP.str(object, "actor");
         if (followerActor == null) {
             log.debug("no 'actor' found on follows action request posted object");
             return null;
         }
 
         // Actor being followed (local to our server)
-        String actorUrl = object.getStr("object");
+        String actorUrl = AP.str(object, "object");
         if (actorUrl == null) {
             log.debug("no 'object' found on follows action request posted object");
             return null;
@@ -770,10 +758,10 @@ public class ActPubService {
         return _ret;
     }
 
-    public APObj processCreateAction(APObj payload) {
+    public APObj processCreateAction(Object payload) {
         APObj _ret = (APObj) adminRunner.run(session -> {
-            APObj object = payload.getAPObj("object");
-            if (object != null && "Note".equals(object.getStr("type"))) {
+            Object object = AP.obj(payload, "object");
+            if (object != null && "Note".equals(AP.str(object, "type"))) {
                 return processCreateNote(session, object);
             } else {
                 log.debug("Unhandled Create action (object type not supported): " + XString.prettyPrint(payload));
@@ -784,19 +772,19 @@ public class ActPubService {
     }
 
     /* obj is the 'Note' object */
-    public APObj processCreateNote(MongoSession session, APObj obj) {
+    public APObj processCreateNote(MongoSession session, Object obj) {
         APObj ret = new APObj();
 
         // ID only used for (future) deduplication
-        String id = obj.getStr("id");
-        Date published = obj.getDate("published");
+        String id = AP.str(obj, "id");
+        Date published = AP.date(obj, "published");
 
         /*
          * If this is a 'reply' post then parse the ID out of this, and if we can find
          * that node by that id then insert the reply under that, instead of the default
          * without this id which is to put in 'inbox'
          */
-        String inReplyTo = obj.getStr("inReplyTo");
+        String inReplyTo = AP.str(obj, "inReplyTo");
 
         /* This will say null unless inReplyTo is used to get an id to lookup */
         SubNode nodeBeingRepliedTo = null;
@@ -815,9 +803,9 @@ public class ActPubService {
             }
         }
 
-        String contentHtml = obj.getStr("content");
+        String contentHtml = AP.str(obj, "content");
 
-        List<Object> toList = obj.getList("to");
+        List<?> toList = AP.list(obj, "to");
         if (toList != null) {
             for (Object to : toList) {
                 if (to instanceof String) {
@@ -840,9 +828,9 @@ public class ActPubService {
     }
 
     public void saveNoteAsReplyUnderNode(MongoSession session, String actorUrl, String contentHtml, String id,
-            Date published, SubNode nodeBeingRepliedTo, APObj obj) {
-        String objUrl = obj.getStr("url");
-        String objAttributedTo = obj.getStr("attributedTo");
+            Date published, SubNode nodeBeingRepliedTo, Object obj) {
+        String objUrl = AP.str(obj, "url");
+        String objAttributedTo = AP.str(obj, "attributedTo");
 
         String localUserName = getLocalUserNameFromActorUrl(actorUrl);
         if (localUserName == null) {
@@ -899,17 +887,15 @@ public class ActPubService {
                 new NotificationMessage("apReply", newNode.getId().toHexString(), contentHtml, toUserName));
     }
 
-    private void addAttachmentIfExists(MongoSession session, SubNode node, APObj obj) {
-        List<Object> attachments = obj.getList("attachment");
+    private void addAttachmentIfExists(MongoSession session, SubNode node, Object obj) {
+        List<?> attachments = AP.list(obj, "attachment");
 
         if (attachments == null)
             return;
 
         for (Object att : attachments) {
-            Map<String, Object> map = (Map<String, Object>) att;
-
-            String mediaType = (String) map.get("mediaType");
-            String url = (String) map.get("url");
+            String mediaType = AP.str(att, "mediaType");
+            String url = AP.str(att, "url");
 
             if (mediaType != null && url != null) {
                 attachmentService.readFromUrl(session, url, node.getId().toHexString(), mediaType, -1);
@@ -921,9 +907,9 @@ public class ActPubService {
     }
 
     public void saveNoteToUserInboxNode(MongoSession session, String actorUrl, String contentHtml, String id,
-            Date published, APObj obj) {
-        String objUrl = obj.getStr("url");
-        String objAttributedTo = obj.getStr("attributedTo");
+            Date published, Object obj) {
+        String objUrl = AP.str(obj, "url");
+        String objAttributedTo = AP.str(obj, "attributedTo");
 
         String localUserName = getLocalUserNameFromActorUrl(actorUrl);
         if (localUserName == null) {
@@ -977,8 +963,8 @@ public class ActPubService {
         APObj actor = getActor(actorUrl);
         log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" + XString.prettyPrint(actor));
 
-        String shortUserName = actor.getStr("preferredUsername"); // short name like 'alice'
-        String inbox = actor.getStr("inbox");
+        String shortUserName = AP.str(actor, "preferredUsername"); // short name like 'alice'
+        String inbox = AP.str(actor, "inbox");
         URL url = null;
         String userName = null;
         try {
@@ -1015,17 +1001,17 @@ public class ActPubService {
     }
 
     /* Process inbound 'Follow' actions (comming from foreign servers) */
-    public APObj processFollowAction(APObj followAction) {
+    public APObj processFollowAction(Object followAction) {
 
         // Actor URL of actor doing the following
-        String followerActor = followAction.getStr("actor");
+        String followerActor = AP.str(followAction, "actor");
         if (followerActor == null) {
             log.debug("no 'actor' found on follows action request posted object");
             return null;
         }
 
         // Actor being followed (local to our server)
-        String actorBeingFollowedUrl = followAction.getStr("object");
+        String actorBeingFollowedUrl = AP.str(followAction, "object");
         if (actorBeingFollowedUrl == null) {
             log.debug("no 'object' found on follows action request posted object");
             return null;
@@ -1090,7 +1076,7 @@ public class ActPubService {
                                     .put("object", actorBeingFollowedUrl)); //
 
                     APObj followerActorObj = getActor(followerActor);
-                    String followerInbox = followerActorObj.getStr("inbox");
+                    String followerInbox = AP.str(followerActorObj, "inbox");
 
                     // log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
                     securePost(session, privateKey, followerInbox, actorBeingFollowedUrl, acceptFollow);
@@ -1292,8 +1278,8 @@ public class ActPubService {
                 actor.put("endpoints", new APObj().put("sharedInbox", host + ActPubConstants.PATH_INBOX));
 
                 actor.put("publicKey", new APObj() //
-                        .put("id", actor.getStr("id") + "#main-key") //
-                        .put("owner", actor.getStr("id")) //
+                        .put("id", AP.str(actor, "id") + "#main-key") //
+                        .put("owner", AP.str(actor, "id")) //
                         .put("publicKeyPem",
                                 "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n"));
 
@@ -1309,14 +1295,20 @@ public class ActPubService {
         return null;
     }
 
-    public Map<String, Object> getLinkByRel(APObj webFinger, String rel) {
-        if (webFinger.getList("links") == null)
+    /*
+     * Searches thru the 'links' array property on webFinger and returns the links
+     * array object that has a 'rel' property that matches the value in the rel
+     * param string
+     */
+    public Object getLinkByRel(Object webFinger, String rel) {
+        List<?> linksList = AP.list(webFinger, "links");
+
+        if (linksList == null)
             return null;
 
-        for (Object link : webFinger.getList("links")) {
-            Map<String, Object> map = (Map<String, Object>) link;
-            if (rel.equals(map.get("rel"))) {
-                return (Map<String, Object>) link;
+        for (Object link : linksList) {
+            if (rel.equals(AP.str(link,"rel"))) {
+                return link;
             }
         }
         return null;
