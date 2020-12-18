@@ -16,7 +16,9 @@ public class AP {
     public static String str(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             Object val = ((Map<?, ?>) obj).get(prop);
-            if (val instanceof String) {
+            if (val == null) {
+                return null;
+            } else if (val instanceof String) {
                 return (String) val;
             } else {
                 throw new RuntimeException(
@@ -29,8 +31,10 @@ public class AP {
     public static Date date(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             Object val = ((Map<?, ?>) obj).get(prop);
-            if (val instanceof String) {
-                return DateUtil.parseISOTime((String)val);
+            if (val == null) {
+                return null;
+            } else if (val instanceof String) {
+                return DateUtil.parseISOTime((String) val);
             } else {
                 throw new RuntimeException(
                         "unhandled type on date() return val: " + (val != null ? val.getClass().getName() : "null"));
@@ -42,8 +46,14 @@ public class AP {
     public static List<?> list(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             Object val = ((Map<?, ?>) obj).get(prop);
-            if (val instanceof List<?>) {
-                return (List<?>)val;
+            if (val == null) {
+                return null;
+            } else if (val instanceof List<?>) {
+                return (List<?>) val;
+            }
+            else {
+                throw new RuntimeException(
+                        "unhandled type on list() return val: " + (val != null ? val.getClass().getName() : "null"));
             }
         }
         throw new RuntimeException("unhandled type on list(): " + (obj != null ? obj.getClass().getName() : "null"));
