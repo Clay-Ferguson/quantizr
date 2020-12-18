@@ -103,8 +103,8 @@ public class OutboxMgr {
 				UserFeedInfo userFeedInfo = userFeedService.findAncestorUserFeedInfo(session, node);
 
 				/*
-				 * Check first that we are not creating a node under one WE OWN, becasue we
-				 * don't need to send a notification to ourselves. The 'userFeedInfo' check here
+				 * Check first that we are not creating a node under one WE OWN, so we
+				 * won't send a notification to ourselves. The 'userFeedInfo' check here
 				 * is to be sure if this is going into a feed it won't be sent as email or inbox
 				 * notification.
 				 */

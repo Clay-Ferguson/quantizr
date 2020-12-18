@@ -21,6 +21,7 @@ import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
+import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
@@ -74,6 +75,9 @@ public class NodeEditService {
 
 	@Autowired
 	private MongoUpdate update;
+
+	@Autowired
+	private MongoDelete delete; 
 
 	@Autowired
 	private SessionContext sessionContext;
@@ -272,6 +276,26 @@ public class NodeEditService {
 			throw new RuntimeEx("Unable find node to save: nodeId=" + nodeId);
 		}
 
+		/* todo-1: eventually we need a plugin-type architecture to decouple this kind
+		 of type-specific code from the general node saving.
+
+		 Here, we are enforcing that only one node under the user's FRIENDS list is allowed for each user. No duplicate friend nodes. 
+		 */
+		if (node.getType().equals(NodeType.FRIEND.s())) {
+			String friendUserName = nodeInfo.getPropVal(NodeProp.USER.s());
+			Iterable<SubNode> friendNodes = read.findSubNodesByProp(session, node.getParentPath(), NodeProp.USER.s(),
+					friendUserName);
+
+			for (SubNode friendNode : friendNodes) {
+
+				/* If we find any node that isn't the one we're editing then it's a duplicate and we just should 
+				reject any saves. We delete it to fix the problem, and abort this save */
+				if (!friendNode.getId().toHexString().equals(nodeId)) {
+					delete.delete(session, node, false);
+					throw new RuntimeEx("User already exists: "+friendUserName);
+				}
+			}
+		}
 		/*
 		 * The only purpose of this limit is to stop hackers from using up lots of
 		 * space, because our only current quota is on attachment file size uploads
@@ -381,7 +405,7 @@ public class NodeEditService {
 			/* if 'following' has changed send message to the server */
 			if (!curFollowing.equals(following)) {
 				actPubService.setFollowing(node.getStrProp(NodeProp.USER.s()), following.equals("true"));
-			}	
+			}
 
 			/*
 			 * when user first adds, this friendNode won't have the userNodeId yet, so add

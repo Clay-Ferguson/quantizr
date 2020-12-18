@@ -846,6 +846,22 @@ public class MongoRead {
     }
 
     /*
+     * Same as findSubNodeByProp but returns multiples. Finda ALL nodes contained directly under path (non-recursively)
+     * that has a matching propName and propVal
+     */
+    public Iterable<SubNode> findSubNodesByProp(MongoSession session, String path, String propName, String propVal) {
+
+        // Other wise for ordinary users root is based off their username
+        Query query = new Query();
+        Criteria criteria = Criteria.where(//
+                SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(path))//
+                .and(SubNode.FIELD_PROPERTIES + "." + propName + ".value").is(propVal);
+
+        query.addCriteria(criteria);
+        return getOps(session).find(query, SubNode.class);
+    }
+
+    /*
      * Returns one (or first) node that has a matching propName and propVal
      */
     public SubNode findSubNodeByProp(MongoSession session, String propName, String propVal) {
