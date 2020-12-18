@@ -173,6 +173,10 @@ export class User implements UserIntf {
 
                         S.meta64.userName = usr;
                         S.meta64.password = pwd;
+
+                        setTimeout(() => {
+                            S.encryption.initKeys();
+                        }, 2000);
                     }
 
                     S.meta64.setStateVarsUsingLoginResponse(res, state);

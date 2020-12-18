@@ -495,10 +495,6 @@ export class Meta64 implements Meta64Intf {
                 S.view.displayNotifications(null, store.getState());
             }, 1000);
 
-            setTimeout(() => {
-                S.encryption.initKeys();
-            }, 2000);
-
             // todo-1: could replace this pull with a push.
             setTimeout(() => {
                 this.maintenanceCycle();
