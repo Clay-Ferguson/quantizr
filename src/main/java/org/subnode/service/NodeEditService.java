@@ -77,7 +77,7 @@ public class NodeEditService {
 	private MongoUpdate update;
 
 	@Autowired
-	private MongoDelete delete; 
+	private MongoDelete delete;
 
 	@Autowired
 	private SessionContext sessionContext;
@@ -276,10 +276,12 @@ public class NodeEditService {
 			throw new RuntimeEx("Unable find node to save: nodeId=" + nodeId);
 		}
 
-		/* todo-1: eventually we need a plugin-type architecture to decouple this kind
-		 of type-specific code from the general node saving.
-
-		 Here, we are enforcing that only one node under the user's FRIENDS list is allowed for each user. No duplicate friend nodes. 
+		/*
+		 * todo-1: eventually we need a plugin-type architecture to decouple this kind
+		 * of type-specific code from the general node saving.
+		 * 
+		 * Here, we are enforcing that only one node under the user's FRIENDS list is
+		 * allowed for each user. No duplicate friend nodes.
 		 */
 		if (node.getType().equals(NodeType.FRIEND.s())) {
 			String friendUserName = nodeInfo.getPropVal(NodeProp.USER.s());
@@ -288,11 +290,20 @@ public class NodeEditService {
 
 			for (SubNode friendNode : friendNodes) {
 
-				/* If we find any node that isn't the one we're editing then it's a duplicate and we just should 
-				reject any saves. We delete it to fix the problem, and abort this save */
+				/*
+				 * If we find any node that isn't the one we're editing then it's a duplicate
+				 * and we just should reject any saves. We delete it to fix the problem, and
+				 * abort this save
+				 */
 				if (!friendNode.getId().toHexString().equals(nodeId)) {
 					delete.delete(session, node, false);
-					throw new RuntimeEx("User already exists: "+friendUserName);
+					throw new RuntimeEx("User already exists: " + friendUserName);
+				}
+
+				String userName = friendNode.getStrProp(NodeProp.USER.s());
+				if (sessionContext.getUserName().equals(userName)) {
+					delete.delete(session, friendNode, false);
+					throw new RuntimeEx("You can't have a Friend that is defined as yourself.");
 				}
 			}
 		}
