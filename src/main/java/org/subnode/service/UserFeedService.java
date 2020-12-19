@@ -406,6 +406,13 @@ public class UserFeedService {
 
 		// Process all friends, to accumulate all of fullFeedList items
 		for (SubNode friendNode : friendNodes) {
+
+			/* If we aren't following this friend, then ignore and skip to next frield */
+			String following = friendNode.getStrProp(NodeProp.ACT_PUB_FOLLOWING.s());
+			if (!"true".equals(following)) {
+				continue;
+			}
+
 			// get userNodeId off friend node
 			String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID.s());
 			if (userNodeId == null) {

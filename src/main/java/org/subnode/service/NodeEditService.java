@@ -415,7 +415,12 @@ public class NodeEditService {
 
 			/* if 'following' has changed send message to the server */
 			if (!curFollowing.equals(following)) {
-				actPubService.setFollowing(node.getStrProp(NodeProp.USER.s()), following.equals("true"));
+				String friendUserName = node.getStrProp(NodeProp.USER.s());
+
+				// if a foreign user, update thru ActivityPub
+				if (friendUserName.contains("@")) {
+					actPubService.setFollowing(friendUserName, following.equals("true"));
+				}
 			}
 
 			/*
