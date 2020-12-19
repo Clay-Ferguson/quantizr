@@ -1,4 +1,3 @@
-import axios from "axios";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
@@ -6,7 +5,6 @@ import * as I from "../Interfaces";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
-import { Anchor } from "../widget/Anchor";
 import { AudioPlayer } from "../widget/AudioPlayer";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
@@ -14,9 +12,6 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
 import { Icon } from "../widget/Icon";
-import { Img } from "../widget/Img";
-import { Span } from "../widget/Span";
-import { Log } from "../Log";
 import { TextField } from "../widget/TextField";
 
 let S: Singletons;
@@ -57,14 +52,17 @@ export class AudioPlayerDlg extends DialogBase {
     pauseButton: Icon;
 
     /* chapters url is the "podcast:chapters" url from RSS feeds */
-    constructor(private customTitle, private customSubTitle: string, private customDiv: CompIntf, private sourceUrl: string, state: AppState) {
+    constructor(private customTitle, private customSubTitle: string, private customDiv: CompIntf, private sourceUrl: string, private startTimePendingOverride: number, state: AppState) {
         super(customTitle || "Audio Player", null, false, state);
-
         this.urlHash = S.util.hashOfString(sourceUrl);
         this.startTimePending = localStorage[this.urlHash];
         this.intervalTimer = setInterval(() => {
             this.oneMinuteTimeslice();
         }, 60000);
+
+        setTimeout(() => {
+            this.updatePlayButton();
+        }, 750);
     }
 
     preUnmount(): any {
@@ -151,6 +149,9 @@ export class AudioPlayerDlg extends DialogBase {
                         this.speed(2);
                     })
                 ]),
+                new ButtonBar([
+                    new Button("Copy", this.copyToClipboard)
+                ]),
                 this.customDiv
             ])
         ];
@@ -209,11 +210,25 @@ export class AudioPlayerDlg extends DialogBase {
         this.cancel();
     }
 
+    copyToClipboard = (): void => {
+        let port = (location.port !== "80" && location.port !== "443") ? (":" + location.port) : "";
+        let link = location.protocol + "//" + location.hostname + port + "/app?audioUrl=" + this.sourceUrl + "&t=" + Math.trunc(this.player.currentTime);
+        S.util.copyToClipboard(link);
+        S.util.flashMessage("Copied link clipboard, with timecode.", "Clipboard", true);
+    }
+
     restoreStartTime = () => {
         /* makes player always start wherever the user last was when they clicked "pause" */
-        if (this.player && this.startTimePending) {
-            this.player.currentTime = this.startTimePending;
-            this.startTimePending = null;
+        if (this.player) {
+            if (this.startTimePendingOverride > 0) {
+                this.player.currentTime = this.startTimePendingOverride;
+                this.startTimePendingOverride = null;
+                this.startTimePending = null;
+            }
+            else if (this.startTimePending) {
+                this.player.currentTime = this.startTimePending;
+                this.startTimePending = null;
+            }
         }
     }
 

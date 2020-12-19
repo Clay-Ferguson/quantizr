@@ -164,7 +164,6 @@ export class RssTypeHandler extends TypeBase {
 
     renderItem(feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) {
         let feedOut: Comp[] = [];
-
         // console.log("FEED: " + S.util.prettyPrint(feed));
 
         if (feed.image) {
@@ -297,15 +296,18 @@ export class RssTypeHandler extends TypeBase {
                     let chaptersDiv = null;
                     if (chaptersUrl) {
 
-                        // todo-2: would be nicer to have chapters in a collapsable panel?
-                        chaptersDiv = new Div(null, { className: "rssChapterPanel" });
+                        // todo-2: would be nicer to have chapters in a collapsable panel, but this may have to be a div inside a div
+                        // because I'm not sure how we can update this div class by altering the state.
+                        chaptersDiv = new Div(null, null /* { className: "rssChapterPanel" } */);
 
+                        // todo-0: should we make preRender function be able to return a boolean that can even tell
+                        // the component not to render at all, or render hidden, when no chapters will exist ?
                         chaptersDiv.preRender = () => {
                             this.renderChapters(dlg, chaptersDiv);
                         };
                     }
 
-                    let dlg = new AudioPlayerDlg(feed.title, entry.title, chaptersDiv, entry.enclosure.url, state);
+                    let dlg = new AudioPlayerDlg(feed.title, entry.title, chaptersDiv, entry.enclosure.url, 0, state);
                     dlg.open();
 
                     if (chaptersDiv) {

@@ -1,6 +1,7 @@
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
+import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { Meta64Intf } from "./intf/Meta64Intf";
@@ -503,9 +504,22 @@ export class Meta64 implements Meta64Intf {
             // Initialize the 'ServerPush' client-side connection
             S.push.init();
 
+            this.playAudioIfRequested();
+
             console.log("initApp complete.");
             resolve();
         });
+    }
+
+    playAudioIfRequested = () => {
+        let audioUrl = S.util.getParameterByName("audioUrl");
+        if (audioUrl) {
+            let startTimeStr = S.util.getParameterByName("t");
+            let startTime = startTimeStr ? parseInt(startTimeStr) : 0;
+            setTimeout(() => {
+                new AudioPlayerDlg(null, null, null, audioUrl, startTime, store.getState()).open();
+            }, 500);
+        }
     }
 
     keyDebounce = () => {

@@ -49,7 +49,9 @@ export class FeedView extends Div {
         let rowCount = 0;
         let children: Comp[] = [];
 
-        let refreshFeedButton = new ButtonBar([
+        // todo-0: put radiobuttons here for filtering "Local", "Federated", "My Friends", ???
+
+        let refreshFeedButtonBar = new ButtonBar([
             new Div(null, {
                 className: (state.feedDirty ? "feedDirtyButton" : "feedNotDirtyButton")
             }, [
@@ -59,7 +61,7 @@ export class FeedView extends Div {
             ])
         ], null, "float-right marginBottom");
 
-        children.push(refreshFeedButton);
+        children.push(refreshFeedButtonBar);
 
         children.push(new Div(null, { className: "clearfix" }));
 
