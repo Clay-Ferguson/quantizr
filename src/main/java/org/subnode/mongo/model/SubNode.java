@@ -332,63 +332,85 @@ public class SubNode {
 	}
 
 	@JsonIgnore
-	public void setProp(String key, SubNodePropVal val) {
+	public boolean setProp(String key, SubNodePropVal val) {
 		MongoThreadLocal.dirty(this);
+		boolean changed = false;
 		if (val == null) {
+			changed = properties().containsKey(key);
 			properties().remove(key);
 		} else {
+			SubNodePropVal curVal = properties().get(key);
+			changed = curVal == null || !val.getValue().equals(curVal.getValue());
 			properties().put(key, val);
 		}
+		return changed;
 	}
 
 	@JsonIgnore
-	public void setProp(String key, String val) {
+	public boolean setProp(String key, String val) {
 		MongoThreadLocal.dirty(this);
+		boolean changed = false;
 		if (val == null) {
+			changed = properties().containsKey(key);
 			properties().remove(key);
 		} else {
+			SubNodePropVal curVal = properties().get(key);
+			changed = curVal == null || !val.equals(curVal.getValue());
 			properties().put(key, new SubNodePropVal(val));
 		}
+		return changed;
 	}
 
 	@JsonIgnore
-	public void setProp(SubNodeProperty prop, String val) {
-		MongoThreadLocal.dirty(this);
-		if (val == null) {
-			properties().remove(prop.getName());
-		} else {
-			properties().put(prop.getName(), new SubNodePropVal(val));
-		}
+	public boolean setProp(SubNodeProperty prop, String val) {
+		return setProp(prop.getName(), val);
 	}
 
 	@JsonIgnore
-	public void setProp(String key, Date val) {
+	public boolean setProp(String key, Date val) {
 		MongoThreadLocal.dirty(this);
+		boolean changed = false;
 		if (val == null) {
+			changed = properties().containsKey(key);
 			properties().remove(key);
 		} else {
+			SubNodePropVal curVal = properties().get(key);
+			changed = curVal == null || !val.equals(curVal.getValue());
 			properties().put(key, new SubNodePropVal(val));
 		}
+		return changed;
 	}
 
 	@JsonIgnore
-	public void setProp(String key, Double val) {
+	public boolean setProp(String key, Double val) {
 		MongoThreadLocal.dirty(this);
+		boolean changed = false;
 		if (val == null) {
+			changed = properties().containsKey(key);
 			properties().remove(key);
 		} else {
+			SubNodePropVal curVal = properties().get(key);
+			//todo-0: Do we want an 'equals' here or should we build in a small range check which is the normal way to
+			//compare floats.
+			changed = curVal == null || !val.equals(curVal.getValue());
 			properties().put(key, new SubNodePropVal(val));
 		}
+		return changed;
 	}
 
 	@JsonIgnore
-	public void setProp(String key, Boolean val) {
+	public boolean setProp(String key, Boolean val) {
 		MongoThreadLocal.dirty(this);
+		boolean changed = false;
 		if (val == null) {
+			changed = properties().containsKey(key);
 			properties().remove(key);
 		} else {
+			SubNodePropVal curVal = properties().get(key);
+			changed = curVal == null || !val.equals(curVal.getValue());
 			properties().put(key, new SubNodePropVal(val));
 		}
+		return changed;
 	}
 
 	@JsonIgnore
@@ -396,23 +418,33 @@ public class SubNode {
 	// property set
 	// will have no effect (value not changing), and in that case then NOT add to
 	// the list of dirty nodes.
-	public void setProp(String key, Long val) {
+	public boolean setProp(String key, Long val) {
 		MongoThreadLocal.dirty(this);
+		boolean changed = false;
 		if (val == null) {
+			changed = properties().containsKey(key);
 			properties().remove(key);
 		} else {
+			SubNodePropVal curVal = properties().get(key);
+			changed = curVal == null || !val.equals(curVal.getValue());
 			properties().put(key, new SubNodePropVal(val));
 		}
+		return changed;
 	}
 
 	@JsonIgnore
-	public void setProp(String key, Integer val) {
+	public boolean setProp(String key, Integer val) {
 		MongoThreadLocal.dirty(this);
+		boolean changed = false;
 		if (val == null) {
+			changed = properties().containsKey(key);
 			properties().remove(key);
 		} else {
+			SubNodePropVal curVal = properties().get(key);
+			changed = curVal == null || !val.equals(curVal.getValue());
 			properties().put(key, new SubNodePropVal(val));
 		}
+		return changed;
 	}
 
 	@JsonIgnore

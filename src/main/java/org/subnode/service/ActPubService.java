@@ -342,7 +342,7 @@ public class ActPubService {
             actor = actorCacheByUserName.get(apUserName);
 
             // if we have actor object skip the step of getting it an import using it.
-            if (actor!=null) {
+            if (actor != null) {
                 importActor(session, apUserName, actor);
                 return;
             }
@@ -382,28 +382,26 @@ public class ActPubService {
             userNode = util.createUser(session, apUserName, null, null, true);
         }
 
-        /*
-         * todo-0: setting properties on userNode here needs to detect if we changed the
-         * prop, and then only call update.save() if the node HAS changed. Do it by
-         * making setProp return boolean if changed.
-         */
+        boolean changed = false;
         Object icon = AP.obj(actor, "icon");
         if (icon != null) {
             String iconUrl = AP.str(icon, "url");
             if (iconUrl != null) {
                 String curIconUrl = userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
                 if (!iconUrl.equals(curIconUrl)) {
-                    userNode.setProp(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl);
+                    changed = changed || userNode.setProp(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl);
                 }
             }
         }
 
-        userNode.setProp(NodeProp.USER_BIO.s(), AP.str(actor, "summary"));
-        userNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), AP.str(actor, "id"));
-        userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), AP.str(actor, "inbox"));
-        userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), AP.str(actor, "url"));
+        changed = changed || userNode.setProp(NodeProp.USER_BIO.s(), AP.str(actor, "summary"));
+        changed = changed || userNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), AP.str(actor, "id"));
+        changed = changed || userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), AP.str(actor, "inbox"));
+        changed = changed || userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), AP.str(actor, "url"));
 
-        update.save(session, userNode, false);
+        if (changed) {
+            update.save(session, userNode, false);
+        }
         refreshOutboxFromForeignServer(session, actor, userNode, apUserName);
     }
 
@@ -411,11 +409,13 @@ public class ActPubService {
      * Caller can pass in userNode if it's already available, but if not just pass
      * null and the apUserName will be used to look up the userNode.
      * 
-     * todo-0: need to verify it's possible to run this only when the user is initially imported
-     * or when the server is first restarted, and then queue into memory messages that come into
-     * the server as normal inbox events that we can hold in memory (or at least the most recent)
+     * todo-0: need to verify it's possible to run this only when the user is
+     * initially imported or when the server is first restarted, and then queue into
+     * memory messages that come into the server as normal inbox events that we can
+     * hold in memory (or at least the most recent)
      */
-    public void refreshOutboxFromForeignServer(MongoSession session, Object actor, SubNode userNode, String apUserName) {
+    public void refreshOutboxFromForeignServer(MongoSession session, Object actor, SubNode userNode,
+            String apUserName) {
 
         if (userNode == null) {
             userNode = read.getUserNodeByUserName(session, apUserName);
@@ -988,7 +988,8 @@ public class ActPubService {
 
     public String getLongUserNameFromActorUrl(String actorUrl) {
         APObj actor = getActorByUrl(actorUrl);
-        // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" + XString.prettyPrint(actor));
+        // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
+        // XString.prettyPrint(actor));
         return getLongUserNameFromActor(actor);
     }
 
@@ -1337,7 +1338,7 @@ public class ActPubService {
             return null;
 
         for (Object link : linksList) {
-            if (rel.equals(AP.str(link,"rel"))) {
+            if (rel.equals(AP.str(link, "rel"))) {
                 return link;
             }
         }
