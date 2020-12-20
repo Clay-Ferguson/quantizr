@@ -390,7 +390,7 @@ public class SubNode {
 			properties().remove(key);
 		} else {
 			SubNodePropVal curVal = properties().get(key);
-			//todo-0: Do we want an 'equals' here or should we build in a small range check which is the normal way to
+			//todo-1: Do we want an 'equals' here or should we build in a small range check which is the normal way to
 			//compare floats.
 			changed = curVal == null || !val.equals(curVal.getValue());
 			properties().put(key, new SubNodePropVal(val));

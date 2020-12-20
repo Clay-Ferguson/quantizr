@@ -410,7 +410,7 @@ public class ActPubService {
      * null and the apUserName will be used to look up the userNode.
      * 
      * todo-0: need to verify it's possible to run this only when the user is
-     * initially imported or when the server is first restarted, and then queue into
+     * initially imported or server restarted, and then queue into
      * memory messages that come into the server as normal inbox events that we can
      * hold in memory (or at least the most recent)
      */
