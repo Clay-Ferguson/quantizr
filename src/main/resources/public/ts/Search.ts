@@ -1,4 +1,4 @@
-import { dispatch } from "./AppRedux";
+import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { NodeCompContent } from "./comps/NodeCompContent";
 import { NodeCompRowFooter } from "./comps/NodeCompRowFooter";
@@ -8,6 +8,7 @@ import { SearchIntf } from "./intf/SearchIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
+import { State } from "./State";
 import { Comp } from "./widget/base/Comp";
 import { Button } from "./widget/Button";
 import { Div } from "./widget/Div";
@@ -97,9 +98,13 @@ export class Search implements SearchIntf {
     }
 
     feed = (nodeId: string, feedUserName: string) => {
+        let appState = store.getState();
+
         S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             nodeId,
-            feedUserName
+            feedUserName,
+            userFilter: appState.feedUserFilter,
+            serverFilter: appState.feedServerFilter
         }, this.feedResponse);
     }
 

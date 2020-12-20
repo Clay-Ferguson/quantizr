@@ -323,7 +323,13 @@ strong em {
 }
 
 .radioButtonsBar {
-    line-height: 2.5rem;
+    padding: $smallGap 0px 0px 10px;
+}
+
+.feedFilterRadioButtons {
+    display: inline-block;
+    margin-bottom: $smallGap;
+    margin-right: $smallGap;
 }
 
 .checkboxContainerHeight {

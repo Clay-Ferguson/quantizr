@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { dispatch, store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
@@ -8,6 +9,9 @@ import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
+import { RadioButton } from "../widget/RadioButton";
+import { RadioButtonGroup } from "../widget/RadioButtonGroup";
+import { Span } from "../widget/Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -17,7 +21,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class FeedView extends Div {
 
-    constructor () {
+    constructor() {
         super(null, {
             id: "feedTab"
         });
@@ -49,8 +53,6 @@ export class FeedView extends Div {
         let rowCount = 0;
         let children: Comp[] = [];
 
-        // todo-0: put radiobuttons here for filtering "Local", "Federated", "My Friends", ???
-
         let refreshFeedButtonBar = new ButtonBar([
             new Div(null, {
                 className: (state.feedDirty ? "feedDirtyButton" : "feedNotDirtyButton")
@@ -61,6 +63,7 @@ export class FeedView extends Div {
             ])
         ], null, "float-right marginBottom");
 
+        children.push(this.makeFilterButtonsBar());
         children.push(refreshFeedButtonBar);
 
         children.push(new Div(null, { className: "clearfix" }));
@@ -75,5 +78,38 @@ export class FeedView extends Div {
         });
 
         this.setChildren(children);
+    }
+
+    makeFilterButtonsBar = (): Span => {
+        return new Span(null, null, [
+            new RadioButtonGroup([
+                this.createRadioButton("feedUserFilter", "Friends", "friends"),
+                this.createRadioButton("feedUserFilter", "All", "all")
+            ], "radioButtonsBar form-group-border feedFilterRadioButtons"),
+
+            new RadioButtonGroup([
+                this.createRadioButton("feedServerFilter", "Local", "local"),
+                this.createRadioButton("feedServerFilter", "Federated", "federated")
+            ], "radioButtonsBar form-group-border feedFilterRadioButtons")
+        ]);
+    }
+
+    createRadioButton = (propName: string, name: string, val: string) => {
+        return new RadioButton(name, false, propName + "_Group", null, {
+            setValue: (checked: boolean): void => {
+                if (checked) {
+                    dispatch({
+                        type: "Action_SetFeedFilterType",
+                        update: (s: AppState): void => {
+                            s[propName] = val;
+                        }
+                    });
+                    S.nav.navFeed(store.getState());
+                }
+            },
+            getValue: (): boolean => {
+                return store.getState()[propName] === val;
+            }
+        });
     }
 }

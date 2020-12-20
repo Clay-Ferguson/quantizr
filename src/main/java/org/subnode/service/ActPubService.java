@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -103,7 +102,10 @@ public class ActPubService {
     private SubNodeUtil subNodeUtil;
 
     /* Cache Actor objects by URL in memory only for now */
-    private static final HashMap<String, APObj> actorCache = new HashMap<String, APObj>();
+    private static final HashMap<String, APObj> actorCacheByUrl = new HashMap<String, APObj>();
+
+    /* Cache Actor objects by UserName in memory only for now */
+    private static final HashMap<String, APObj> actorCacheByUserName = new HashMap<String, APObj>();
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only
@@ -211,7 +213,7 @@ public class ActPubService {
                     inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
 
                     String attributedTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
-                    APObj actor = getActor(attributedTo);
+                    APObj actor = getActorByUrl(attributedTo);
 
                     String shortUserName = AP.str(actor, "preferredUsername"); // short name like 'alice'
                     toInbox = AP.str(actor, "inbox");
@@ -333,13 +335,26 @@ public class ActPubService {
      * Reads in a user from the Fediverse with a name like: someuser@fosstodon.org
      */
     public void loadForeignUser(MongoSession session, String apUserName) {
+        Object actor = null;
+
+        /* First try to use the actor from cache, if we have it cached */
+        synchronized (actorCacheByUserName) {
+            actor = actorCacheByUserName.get(apUserName);
+
+            // if we have actor object skip the step of getting it an import using it.
+            if (actor!=null) {
+                importActor(session, apUserName, actor);
+                return;
+            }
+        }
+
         String host = getHostFromUserName(apUserName);
         APObj webFinger = getWebFinger("https://" + host, apUserName);
 
         Object self = getLinkByRel(webFinger, "self");
         log.debug("Self Link: " + XString.prettyPrint(self));
         if (self != null) {
-            Object actor = getActor(AP.str(self, "href"));
+            actor = getActorByUrl(AP.str(self, "href"));
 
             // if webfinger was successful, ensure the user is imported into our system.
             if (actor != null) {
@@ -368,7 +383,7 @@ public class ActPubService {
         }
 
         /*
-         * todo-1: setting properties on userNode here needs to detect if we changed the
+         * todo-0: setting properties on userNode here needs to detect if we changed the
          * prop, and then only call update.save() if the node HAS changed. Do it by
          * making setProp return boolean if changed.
          */
@@ -394,7 +409,11 @@ public class ActPubService {
 
     /*
      * Caller can pass in userNode if it's already available, but if not just pass
-     * null and the apUserName will be used to look up the userNode
+     * null and the apUserName will be used to look up the userNode.
+     * 
+     * todo-0: need to verify it's possible to run this only when the user is initially imported
+     * or when the server is first restarted, and then queue into memory messages that come into
+     * the server as normal inbox events that we can hold in memory (or at least the most recent)
      */
     public void refreshOutboxFromForeignServer(MongoSession session, Object actor, SubNode userNode, String apUserName) {
 
@@ -406,6 +425,12 @@ public class ActPubService {
         SubNode outboxNode = read.getUserNodeByType(session, apUserName, null, null, NodeType.USER_FEED.s());
         Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode);
 
+        Object outbox = getOutbox(AP.str(actor, "outbox"));
+        if (outbox == null) {
+            log.debug("Unable to get outbox for AP user: " + apUserName);
+            return;
+        }
+
         /*
          * Generate a list of known AP IDs so we can ignore them and load only the
          * unknown ones from the foreign server
@@ -416,12 +441,6 @@ public class ActPubService {
             if (apId != null) {
                 apIdSet.add(apId);
             }
-        }
-
-        Object outbox = getOutbox(AP.str(actor, "outbox"));
-        if (outbox == null) {
-            log.debug("Unable to get outbox for AP user: " + apUserName);
-            return;
         }
 
         /*
@@ -533,30 +552,38 @@ public class ActPubService {
      * Effeciently gets the Actor by using a cache to ensure we never get the same
      * Actor twice until the app restarts at least
      */
-    public APObj getActor(String url) {
+    public APObj getActorByUrl(String url) {
         if (url == null)
             return null;
 
         APObj actor = null;
 
         // return actor from cache if already cached
-        synchronized (actorCache) {
-            actor = actorCache.get(url);
+        synchronized (actorCacheByUrl) {
+            actor = actorCacheByUrl.get(url);
             if (actor != null) {
                 return actor;
             }
         }
 
         actor = getJson(url, new MediaType("application", "ld+json"));
-
-        if (actor != null) {
-            synchronized (actorCache) {
-                actorCache.put(url, actor);
-            }
-        }
+        cacheActor(url, actor);
 
         log.debug("Actor: " + XString.prettyPrint(actor));
         return actor;
+    }
+
+    public void cacheActor(String url, APObj actor) {
+        if (actor != null) {
+            synchronized (actorCacheByUrl) {
+                actorCacheByUrl.put(url, actor);
+            }
+
+            synchronized (actorCacheByUserName) {
+                String userName = getLongUserNameFromActor(actor);
+                actorCacheByUserName.put(userName, actor);
+            }
+        }
     }
 
     public APObj getOutbox(String url) {
@@ -649,7 +676,7 @@ public class ActPubService {
             }
 
             String privateKey = getPrivateKey(session, sessionContext.getUserName());
-            APObj toActor = getActor(actorUrlOfUserBeingFollowed);
+            APObj toActor = getActorByUrl(actorUrlOfUserBeingFollowed);
             String toInbox = AP.str(toActor, "inbox");
             securePost(session, privateKey, toInbox, sessionActorUrl, followAction);
             return null;
@@ -960,9 +987,12 @@ public class ActPubService {
     }
 
     public String getLongUserNameFromActorUrl(String actorUrl) {
-        APObj actor = getActor(actorUrl);
-        log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" + XString.prettyPrint(actor));
+        APObj actor = getActorByUrl(actorUrl);
+        // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" + XString.prettyPrint(actor));
+        return getLongUserNameFromActor(actor);
+    }
 
+    public String getLongUserNameFromActor(Object actor) {
         String shortUserName = AP.str(actor, "preferredUsername"); // short name like 'alice'
         String inbox = AP.str(actor, "inbox");
         URL url = null;
@@ -1075,7 +1105,7 @@ public class ActPubService {
                                     .put("actor", followerActor) //
                                     .put("object", actorBeingFollowedUrl)); //
 
-                    APObj followerActorObj = getActor(followerActor);
+                    APObj followerActorObj = getActorByUrl(followerActor);
                     String followerInbox = AP.str(followerActorObj, "inbox");
 
                     // log.debug("Sending Accept of Follow Request to inbox " + followerInbox);

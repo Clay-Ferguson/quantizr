@@ -158,6 +158,8 @@ export interface MoveNodesRequest extends RequestBase {
 export interface NodeFeedRequest extends RequestBase {
     nodeId: string;
     feedUserName: string;
+    userFilter: string;
+    serverFilter: string;
 }
 
 export interface NodeSearchRequest extends RequestBase {

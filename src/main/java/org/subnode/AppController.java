@@ -918,16 +918,18 @@ public class AppController implements ErrorController {
 				adminRunner.run(mongoSession -> {
 					attachmentService.getBinary(mongoSession, "", null, nodeId, download != null, response);
 				});
-			} 
+			}
 			// Check if this is an 'profileHeader Image' request and if so bypass security
 			else if ("profileHeader".equals(binId)) {
 				adminRunner.run(mongoSession -> {
-					//Note: the "Header" suffix will be applied to all image-related property names to distinguish
-					//them from normal 'bin' properties. This way we now to support multiple uploads onto any node, 
-					//in this very limites way.
+					/*
+					 * Note: the "Header" suffix will be applied to all image-related property names
+					 * to distinguish them from normal 'bin' properties. This way we now to support
+					 * multiple uploads onto any node, in this very limites way.
+					 */
 					attachmentService.getBinary(mongoSession, "Header", null, nodeId, download != null, response);
 				});
-			} 
+			}
 			/* Else if not an avatar request then do a securer acccess */
 			else {
 				callProc.run("bin", null, session, ms -> {
@@ -1043,10 +1045,12 @@ public class AppController implements ErrorController {
 	// }
 	//
 
-	/* binSuffix, will be concatenated to all binary-related properties to distinguish them
-	where possible from the normal node attachment. For normal attachments this is an empty string, which
-	makes it no suffix (no effect of concatenating)
-	*/
+	/*
+	 * binSuffix, will be concatenated to all binary-related properties to
+	 * distinguish them where possible from the normal node attachment. For normal
+	 * attachments this is an empty string, which makes it no suffix (no effect of
+	 * concatenating)
+	 */
 	@RequestMapping(value = API_PATH + "/upload", method = RequestMethod.POST)
 	public @ResponseBody Object upload(//
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
@@ -1058,11 +1062,12 @@ public class AppController implements ErrorController {
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
 			HttpSession session) {
 		final String _binSuffix = binSuffix == null ? "" : binSuffix;
-				
+
 		return callProc.run("upload", null, session, ms -> {
 			// log.debug("Uploading as user: "+ms.getUser());
-			return attachmentService.uploadMultipleFiles(ms, _binSuffix, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
-					"true".equalsIgnoreCase(ipfs), "true".equalsIgnoreCase(createAsChildren));
+			return attachmentService.uploadMultipleFiles(ms, _binSuffix, nodeId, uploadFiles,
+					explodeZips.equalsIgnoreCase("true"), "true".equalsIgnoreCase(ipfs),
+					"true".equalsIgnoreCase(createAsChildren));
 		});
 	}
 
@@ -1097,7 +1102,11 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/nodeFeed", method = RequestMethod.POST)
 	public @ResponseBody Object nodeFeed(@RequestBody NodeFeedRequest req, HttpSession session) {
 		return callProc.run("nodeFeed", req, session, ms -> {
-			return userFeedService.nodeFeed(ms, req);
+			if ("friends".equals(req.getUserFilter())) {
+				return userFeedService.friendsFeed(ms, req);
+			} else {
+				return userFeedService.serverFeed(req);
+			}
 		});
 	}
 

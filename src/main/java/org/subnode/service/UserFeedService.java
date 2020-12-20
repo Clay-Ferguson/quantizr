@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,7 +30,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.NodeFeedRequest;
 import org.subnode.response.FeedPushInfo;
@@ -51,7 +52,7 @@ public class UserFeedService {
 	private MongoRead read;
 
 	@Autowired
-	private RunAsMongoAdmin adminRunner;
+	private RunAsMongoAdminEx adminRunner;
 
 	@Autowired
 	private Convert convert;
@@ -79,6 +80,7 @@ public class UserFeedService {
 	static HashMap<String, NodeInfo> nodeInfoMapByPath = new HashMap<String, NodeInfo>();
 
 	static final boolean verboseLog = false;
+	static final int MAX_FEED_ITEMS = 100;
 
 	/* Runs immediately at startup, and then every 30 minutes run a full reinit. */
 	@Scheduled(fixedDelay = 30 * 60 * 1000)
@@ -95,29 +97,39 @@ public class UserFeedService {
 	public void init() {
 		log.debug("UserFeedService.init()");
 
-		userFeedInfoMapByUserName.clear();
-		userFeedInfoMapByPath.clear();
+		synchronized (userFeedInfoMapByUserName) {
+			userFeedInfoMapByUserName.clear();
+			userFeedInfoMapByPath.clear();
 
-		adminRunner.run(session -> {
-			Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
-					null, 0);
+			adminRunner.run(session -> {
+				/* Query for all user account nodes */
+				Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS,
+						null, null, 0);
 
-			for (SubNode accountNode : accountNodes) {
-				String userName = accountNode.getStrProp(NodeProp.USER);
+				/* Run addUserFeedInfo for each account */
+				for (SubNode accountNode : accountNodes) {
+					String userName = accountNode.getStrProp(NodeProp.USER);
 
-				if (userFeedInfoMapByUserName.containsKey(userName)) {
-					log.error("ERROR: Multiple accounts named " + userName
-							+ " skipping redundant one for UserFeedService initializing.");
-					continue;
+					if (userFeedInfoMapByUserName.containsKey(userName)) {
+						log.error("ERROR: Multiple accounts named " + userName
+								+ " skipping redundant one for UserFeedService initializing.");
+						continue;
+					}
+
+					log.debug("User " + userName + ". NodeId=" + accountNode.getId().toHexString());
+					addUserFeedInfo(session, null, accountNode, userName);
 				}
-
-				log.debug("User " + userName + ". NodeId=" + accountNode.getId().toHexString());
-				addUserFeedInfo(session, null, accountNode, userName);
-			}
-		});
+				return null;
+			});
+		}
 	}
 
-	/*
+	/**
+	 * Loads into our static singleton maps the latest 25 feed items for the given
+	 * user, so that this info will be in memory to be able to be rapidly accessed
+	 * from memory by requests by any followers needing to build up their
+	 * consolidated feeds for the users they're following.
+	 *
 	 * If feedNode is already available, it can be passed in, or else accountNode
 	 * must be passed in, so it can be used to get the feedNode
 	 * 
@@ -145,6 +157,7 @@ public class UserFeedService {
 					false)) {
 
 				UserFeedItem userFeedItem = new UserFeedItem();
+				userFeedItem.setUserName(userName);
 				userFeedItem.setNodeId(node.getId());
 				userFeedItem.setModTime(node.getModifyTime());
 				userFeedItem.setNode(node);
@@ -163,9 +176,11 @@ public class UserFeedService {
 		 * NOTE: Even if we don't have any posts yet in userFeedInfo, we still add to
 		 * the cache.
 		 */
-		userFeedInfoMapByUserName.put(userName, userFeedInfo);
-		if (feedNode != null) {
-			userFeedInfoMapByPath.put(feedNode.getPath(), userFeedInfo);
+		synchronized (userFeedInfoMapByUserName) {
+			userFeedInfoMapByUserName.put(userName, userFeedInfo);
+			if (feedNode != null) {
+				userFeedInfoMapByPath.put(feedNode.getPath(), userFeedInfo);
+			}
 		}
 	}
 
@@ -207,7 +222,7 @@ public class UserFeedService {
 	/*
 	 * Ensure the 'node' is in the userFeedInfo by creating or updating if it
 	 * already is there. When called we already know 'node' is a descendant of
-	 * someone's USER_FEED node and so it does need to be acced into the cache.
+	 * someone's USER_FEED node and so it does need to be added into the cache.
 	 */
 	public void ensureNodeInUserFeedInfo(MongoSession session, UserFeedInfo userFeedInfo, SubNode node) {
 		UserFeedItem userFeedItem = null;
@@ -235,6 +250,7 @@ public class UserFeedService {
 
 		userFeedItem.setModTime(node.getModifyTime());
 		userFeedItem.setNode(node);
+		userFeedItem.setUserName(userFeedInfo.getUserName());
 
 		pushNodeUpdateToAllFriends(session, node);
 	}
@@ -326,21 +342,23 @@ public class UserFeedService {
 
 	/* Called whenever a node is deleted to get it out of the memory cache */
 	public void nodeDeleteNotify(String nodeId) {
-		for (UserFeedInfo ufinf : userFeedInfoMapByUserName.values()) {
-			UserFeedItem itemFound = null;
+		synchronized (userFeedInfoMapByUserName) {
+			for (UserFeedInfo ufinf : userFeedInfoMapByUserName.values()) {
+				UserFeedItem itemFound = null;
 
-			for (UserFeedItem ufi : ufinf.getUserFeedList()) {
-				if (ufi.getNodeId().toHexString().equals(nodeId)) {
-					itemFound = ufi;
-					break; // break inner loop
+				for (UserFeedItem ufi : ufinf.getUserFeedList()) {
+					if (ufi.getNodeId().toHexString().equals(nodeId)) {
+						itemFound = ufi;
+						break; // break inner loop
+					}
 				}
-			}
 
-			if (itemFound != null) {
-				// todo-1: this won't yet update browsers automatically if something's deleted,
-				// and I'm not sure this is important to have.
-				ufinf.getUserFeedList().remove(itemFound);
-				break; // break outter loop (returns)
+				if (itemFound != null) {
+					// todo-1: this won't yet update browsers automatically if something's deleted,
+					// and I'm not sure this is important to have.
+					ufinf.getUserFeedList().remove(itemFound);
+					break; // break outter loop (returns)
+				}
 			}
 		}
 	}
@@ -355,8 +373,10 @@ public class UserFeedService {
 	 * 
 	 * Currently req.nodeId is always just "~sn:friendList" (Note the tilde-prefix
 	 * syntax designating it's a special node type (i.e. not a name, path, or id))
+	 * 
+	 * todo-0: this code does not yet distinguish between req.getServerFilter=="local" v.s. "federated"
 	 */
-	public NodeFeedResponse nodeFeed(MongoSession session, NodeFeedRequest req) {
+	public NodeFeedResponse friendsFeed(MongoSession session, NodeFeedRequest req) {
 		/*
 		 * todo-1: This is TEMPORARY, we will end up keeping userFeedService up to date
 		 * another way later. For now we could at least add an admin menu option to run
@@ -407,7 +427,7 @@ public class UserFeedService {
 		// Process all friends, to accumulate all of fullFeedList items
 		for (SubNode friendNode : friendNodes) {
 
-			/* If we aren't following this friend, then ignore and skip to next frield */
+			/* If we aren't following this friend, then ignore and skip to next friend */
 			String following = friendNode.getStrProp(NodeProp.ACT_PUB_FOLLOWING.s());
 			if (!"true".equals(following)) {
 				continue;
@@ -438,6 +458,16 @@ public class UserFeedService {
 			/*
 			 * If there is an '@' symbol in the user name then it's a foreign user and we
 			 * need to sync their outbox from foreign ActivityPub server
+			 * 
+			 * todo-0: Need to finalize a strategy for how to (i.e. when) to actually run
+			 * this refresh code. Currently during development we run it every time the user
+			 * is requesting a feed. Obviously this approach will not scale at all.
+			 * 
+			 * Theoretically can we just run this code only once at startup, and then expect
+			 * the incomming messages from other federated servers to keep the information
+			 * up to date? That is, we want to avoid executing loadForeignUser until
+			 * absoluely necessary because that involves several HTML calls to a remote
+			 * Fediserver for EACH user.
 			 */
 			boolean isApNode = friendUserName.contains("@");
 			if (isApNode) {
@@ -445,6 +475,7 @@ public class UserFeedService {
 				adminRunner.run(s -> {
 					SubNode accountNode = read.getUserNodeByUserName(s, friendUserName);
 					addUserFeedInfo(s, null, accountNode, friendUserName);
+					return null;
 				});
 			}
 
@@ -494,13 +525,7 @@ public class UserFeedService {
 			}
 		}
 
-		/* Sort the feed items chrononologially, reversed with newest on top */
-		Collections.sort(fullFeedList, new Comparator<UserFeedItem>() {
-			@Override
-			public int compare(UserFeedItem s1, UserFeedItem s2) {
-				return s2.getModTime().compareTo(s1.getModTime());
-			}
-		});
+		fullFeedList = sortAndTruncateFeedItems(fullFeedList);
 
 		/*
 		 * Generate the final presentation info objects to send back to client (NodeInfo
@@ -559,6 +584,125 @@ public class UserFeedService {
 
 		// log.debug("feed count: " + counter);
 		return res;
+	}
+
+	public NodeFeedResponse serverFeed(NodeFeedRequest req) {
+		return (NodeFeedResponse) adminRunner.run(session -> {
+			/*
+			 * todo-1: This is TEMPORARY, we will end up keeping userFeedService up to date
+			 * another way later. For now we could at least add an admin menu option to run
+			 * this on demand ?
+			 */
+			init();
+
+			NodeFeedResponse res = new NodeFeedResponse();
+			int MAX_NODES = 100;
+			int counter = 0;
+
+			/*
+			 * This collection will hold the merged list of all the Outbox content of all
+			 * Friends
+			 */
+			List<UserFeedItem> fullFeedList = new LinkedList<UserFeedItem>();
+
+			synchronized (UserFeedService.userFeedInfoMapByUserName) {
+
+				for (Map.Entry<String, UserFeedInfo> set : UserFeedService.userFeedInfoMapByUserName.entrySet()) {
+					UserFeedInfo userFeed = set.getValue();
+
+					/* if federsted add all userFeed items (adds both foreign users and local users) */
+					if ("federated".equals(req.getServerFilter())) {
+						// todo-0: this list will have scaling issues on large servers.
+						fullFeedList.addAll(userFeed.getUserFeedList());
+					}
+					/* If local we only add the userFeed items that don't contain "@" in their name which is the 
+					we detect foreign server users */
+					else {
+						for (UserFeedItem ufi : userFeed.getUserFeedList()) {
+							if (!ufi.getUserName().contains("@")) {
+								fullFeedList.add(ufi);
+							}
+						}
+					}
+				}
+			}
+
+			/* Sort the feed items chrononologially, reversed with newest on top */
+			fullFeedList = sortAndTruncateFeedItems(fullFeedList);
+
+			/*
+			 * Generate the final presentation info objects to send back to client (NodeInfo
+			 * list)
+			 */
+			List<NodeInfo> results = new LinkedList<NodeInfo>();
+
+			/*
+			 * The set of all IDs that were put into any 'NodeInfo.parent' objects in the
+			 * loop below
+			 */
+			HashSet<String> parentIdSet = new HashSet<String>();
+
+			for (UserFeedItem ufi : fullFeedList) {
+				SubNode node = ufi.getNode();
+
+				/*
+				 * If this node is a parent already, then skip it, becasue it's already known to
+				 * be rendering in the output as a parent, and we don't need it showing up
+				 * twice.
+				 */
+				if (node == null || parentIdSet.contains(node.getId().toHexString())) {
+					continue;
+				}
+
+				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1,
+						false, false);
+				results.add(info);
+
+				/*
+				 * If this node is not a direct child of a POSTS (USER_FEED) type node, then
+				 * that means it's a reply to someone's post and so we need to lookup the parent
+				 * and assign that so the client can render this node with the node it's a reply
+				 * to displayed directly above it in the feed
+				 */
+				if (lookupParent(session, info, node.getPath())) {
+					parentIdSet.add(info.getParent().getId());
+				}
+
+				if (counter++ > MAX_NODES) {
+					break;
+				}
+			}
+
+			/*
+			 * Now to remove a bit of redundancy and make the feed look nicer, we remove any
+			 * of the items from 'results' that are in the list some other place as an
+			 * 'NodeInfo.parent'
+			 */
+			List<NodeInfo> filteredResults = results.stream().filter(ninf -> !parentIdSet.contains(ninf.getId()))
+					.collect(Collectors.toList());
+
+			res.setSearchResults(filteredResults);
+			res.setSuccess(true);
+
+			// log.debug("feed count: " + counter);
+			return res;
+		});
+	}
+
+	public List<UserFeedItem> sortAndTruncateFeedItems(List<UserFeedItem> list) {
+		/* Sort the feed items chrononologially, reversed with newest on top */
+		Collections.sort(list, new Comparator<UserFeedItem>() {
+			@Override
+			public int compare(UserFeedItem s1, UserFeedItem s2) {
+				return s2.getModTime().compareTo(s1.getModTime());
+			}
+		});
+
+		/* Truncate list down to max length */
+		if (list.size() > MAX_FEED_ITEMS) {
+			list = list.subList(0, MAX_FEED_ITEMS - 1);
+		}
+		return list;
 	}
 
 	/*
