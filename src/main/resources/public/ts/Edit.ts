@@ -785,7 +785,6 @@ export class Edit implements EditIntf {
         }
     }
 
-    /* If publicReply is true, this goes to the public inbox of the server, or else it will be a DM to the user */
     addComment = (node: J.NodeInfo, publicReply: boolean, state: AppState) => {
         state = appState(state);
 

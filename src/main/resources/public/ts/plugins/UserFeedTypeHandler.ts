@@ -15,38 +15,31 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* Type of node that hosts the user's social media posts, which I think will
-also have an option to include (or not) other friends who they are following */
+also have an option to include (or not) other friends who they are following.
+
+NOTE: This node really should have been called "OUTBOX". We can rename it eventually.
+*/
 export class UserFeedTypeHandler extends TypeBase {
     constructor() {
-        super(J.NodeType.USER_FEED, "User Feed", "fa-th-list", true);
+        super(J.NodeType.USER_FEED, "Outbox", "fa-th-list", true);
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
-        case NodeActionType.addChild:
-            return S.props.isMine(node, appState) || appState.isAdminUser;
-        case NodeActionType.editNode:
-            return false;
-        default:
-            return true;
+            case NodeActionType.addChild:
+                return S.props.isMine(node, appState) || appState.isAdminUser;
+            case NodeActionType.editNode:
+                return false;
+            default:
+                return true;
         }
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
-
-        // let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
         return new Div(null, null, [
-            new Heading(4, "Posts: " + node.owner, {
+            new Heading(4, "Outbox: " + node.owner, {
                 className: "marginAll"
             })
-
-            // this works perfectly but might be confusing to user to have too many different buttons doing the same thing
-            // new ButtonBar([
-            //     new Button("Refresh Feed", () => {
-            //         S.nav.navFeed(state)
-            //     })
-            // ], null, "float-right marginBottom"),
-            // new Div(null, { className: "clearfix" })
         ]);
     }
 }

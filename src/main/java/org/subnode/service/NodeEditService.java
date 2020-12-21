@@ -391,8 +391,9 @@ public class NodeEditService {
 			 * notification to the owner of this node who will, by definition, be a foreign
 			 * user.
 			 */
-			if (req.isUpdateModTime() && parent != null && (parent.hasProperty(NodeProp.ACT_PUB_ID)
-					|| parent.isType(NodeType.ACT_PUB_ITEM) || parent.isForeignFriendNode())) {
+			if (req.isUpdateModTime() && parent != null
+					&& (parent.hasProperty(NodeProp.ACT_PUB_ID) || parent.isType(NodeType.ACT_PUB_ITEM)
+							|| parent.isType(NodeType.USER_FEED) || parent.isForeignFriendNode())) {
 				actPubService.sendNotificationForNodeEdit(parent, node);
 			} else {
 				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());

@@ -107,6 +107,9 @@ public class ActPubService {
     /* Cache Actor objects by UserName in memory only for now */
     private static final HashMap<String, APObj> actorCacheByUserName = new HashMap<String, APObj>();
 
+    /* Cache WebFinger objects by UserName in memory only for now */
+    private static final HashMap<String, APObj> webFingerCacheByUserName = new HashMap<String, APObj>();
+
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only
      * one final static instance ever
@@ -119,6 +122,26 @@ public class ActPubService {
     // @JsonIgnoreProperties(ignoreUnknown = true)
     {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    public HashSet<String> parseUserNames(String message) {
+        HashSet<String> userNames = new HashSet<String>();
+
+        // prepare to that newlines is compatable with out tokenizing
+        message = message.replace("\n", " ");
+        message = message.replace("\r", " ");
+
+        List<String> words = XString.tokenize(message, " ", true);
+        if (words != null) {
+            for (String word : words) {
+                // detect the pattern @name@server.com
+                if (word.startsWith("@") && StringUtils.countMatches(word, "@") == 2) {
+                    word = word.substring(1);
+                    userNames.add(word);
+                }
+            }
+        }
+        return userNames;
     }
 
     /* Gets private RSA key from current user session */
@@ -148,9 +171,14 @@ public class ActPubService {
     public void sendNotificationForNodeEdit(SubNode parent, SubNode node) {
         adminRunner.run(session -> {
             try {
+                List<String> toUserNames = new LinkedList<String>();
+
+                // Any 'mentions' inside the message text get pulled out into this
+                // 'toUserNamesSet'
+                HashSet<String> toUserNamesSet = parseUserNames(node.getContent());
+                toUserNames.addAll(toUserNamesSet);
+
                 String inReplyTo = null;
-                String toInbox = null;
-                String toActor = null;
                 String toUserName = null;
                 boolean privateMessage = true;
                 SubNode apUserNode = null;
@@ -186,9 +214,9 @@ public class ActPubService {
                      */
                     privateMessage = node.getBooleanProp(NodeProp.ACT_PUB_PRIVATE.s());
 
-                    toInbox = apUserNode.getStrProp(NodeProp.ACT_PUB_ACTOR_INBOX);
-                    toActor = apUserNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL);
                     toUserName = apUserNode.getStrProp(NodeProp.USER.s());
+
+                    toUserNames.add(toUserName);
                 }
                 // parent==Friend node
                 else if (parent.getType().equals(NodeType.FRIEND.s())) {
@@ -202,25 +230,25 @@ public class ActPubService {
                                         + parent.getId().toHexString());
                     }
 
-                    toInbox = apUserNode.getStrProp(NodeProp.ACT_PUB_ACTOR_INBOX);
-                    toActor = apUserNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL);
                     toUserName = apUserNode.getStrProp(NodeProp.USER.s());
+
+                    toUserNames.add(toUserName);
                 }
                 // parent==InboxEntry node (a node in a user's inbox)
+                // Is this flow path still being used?
                 else if (parent.getType().equals(NodeType.INBOX_ENTRY.s())) {
                     // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
 
                     inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
 
+                    /* Get the userName of the user we're replying to. */
                     String attributedTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
                     APObj actor = getActorByUrl(attributedTo);
-
                     String shortUserName = AP.str(actor, "preferredUsername"); // short name like 'alice'
-                    toInbox = AP.str(actor, "inbox");
+                    String toInbox = AP.str(actor, "inbox");
                     URL url = new URL(toInbox);
                     String host = url.getHost();
                     toUserName = shortUserName + "@" + host;
-                    toActor = attributedTo;
 
                     /*
                      * For now this usage pattern is only functional for a reply from an inbox, and
@@ -228,6 +256,16 @@ public class ActPubService {
                      * change)
                      */
                     privateMessage = true;
+                    toUserNames.add(toUserName);
+                }
+                /*
+                 * parent==USER_FEED (Aka, user is adding a node into their OUTBOX, which is the
+                 * main way to post to the fediverse if this isn't a reply. Note: This will only
+                 * post to the 'inboxes' of the foreign server mentions
+                 */
+                else if (parent.getType().equals(NodeType.USER_FEED.s())) {
+                    // todo-0: Public/Private needs to be specified from the gui
+                    privateMessage = false;
                 }
                 // otherwise we can't handle
                 else {
@@ -236,8 +274,8 @@ public class ActPubService {
 
                 APList attachments = createAttachmentsList(node);
 
-                sendNote(session, toUserName, toInbox, sessionContext.getUserName(), inReplyTo, node.getContent(),
-                        attachments, toActor, subNodeUtil.getIdBasedUrl(node), privateMessage);
+                sendNote(session, toUserNames, sessionContext.getUserName(), inReplyTo, node.getContent(), attachments,
+                        subNodeUtil.getIdBasedUrl(node), privateMessage);
             } //
             catch (Exception e) {
                 log.error("sendNote failed", e);
@@ -268,16 +306,42 @@ public class ActPubService {
         return appProp.protocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/" + userName;
     }
 
-    public void sendNote(MongoSession session, String toUserName, String toInbox, String fromUser, String inReplyTo,
-            String content, APList attachments, String toActor, String noteUrl, boolean privateMessage) {
+    public void sendNote(MongoSession session, List<String> toUserNames, String fromUser, String inReplyTo,
+            String content, APList attachments, String noteUrl, boolean privateMessage) {
 
-        String actor = makeActorUrlForUserName(fromUser);
+        String host = appProp.getMetaHost();
+        String fromActor = makeActorUrlForUserName(fromUser);
 
-        APObj message = apFactory.newCreateMessageForNote(toUserName, actor, inReplyTo, content, toActor, noteUrl,
-                privateMessage, attachments);
+        /*
+         * todo-0: Need to analyze the scenario where there are multiple 'quanta.wiki'
+         * users recieving a notification, and see if this results in multiple inbound
+         * posts from a Mastodon server, of if somehow all the mentions are wrapped into
+         * a single post to one user or perhaps the global inbox?
+         */
+        for (String toUserName : toUserNames) {
 
-        String privateKey = getPrivateKey(session, sessionContext.getUserName());
-        securePost(session, privateKey, toInbox, actor, message);
+            // Ignore userNames that are for our own host
+            String userHost = getHostFromUserName(toUserName);
+            if (userHost.equals(host)) {
+                continue;
+            }
+
+            APObj webFinger = getWebFinger("https://" + userHost, toUserName);
+            if (webFinger == null) {
+                log.debug("Unable to get webfinger for " + toUserName);
+                continue;
+            }
+
+            String toActorUrl = getActorUrlFromWebFingerObj(webFinger);
+            Object toActorObj = getActorByUrl(toActorUrl);
+            String inbox = AP.str(toActorObj, "inbox");
+
+            APObj message = apFactory.newCreateMessageForNote(toUserName, fromActor, inReplyTo, content, toActorUrl,
+                    noteUrl, privateMessage, attachments);
+
+            String privateKey = getPrivateKey(session, sessionContext.getUserName());
+            securePost(session, privateKey, inbox, fromActor, message);
+        }
     }
 
     /*
@@ -363,6 +427,18 @@ public class ActPubService {
         }
     }
 
+    // todo-0: refactor loadForeignUser to call this instead of replicating the code
+    // there
+    public String getActorUrlFromWebFingerObj(Object webFinger) {
+        String actorUrl = null;
+        Object self = getLinkByRel(webFinger, "self");
+        log.debug("Self Link: " + XString.prettyPrint(self));
+        if (self != null) {
+            actorUrl = AP.str(self, "href");
+        }
+        return actorUrl;
+    }
+
     public void importActor(MongoSession session, String apUserName, Object actor) {
         if (apUserName == null)
             return;
@@ -410,9 +486,9 @@ public class ActPubService {
      * null and the apUserName will be used to look up the userNode.
      * 
      * todo-0: need to verify it's possible to run this only when the user is
-     * initially imported or server restarted, and then queue into
-     * memory messages that come into the server as normal inbox events that we can
-     * hold in memory (or at least the most recent)
+     * initially imported or server restarted, and then queue into memory messages
+     * that come into the server as normal inbox events that we can hold in memory
+     * (or at least the most recent)
      */
     public void refreshOutboxFromForeignServer(MongoSession session, Object actor, SubNode userNode,
             String apUserName) {
@@ -540,11 +616,34 @@ public class ActPubService {
      * Get WebFinger from foreign server
      * 
      * resource example: WClayFerguson@server.org
+     * 
+     * todo-0: remove 'host' as an argument and just parse it off the 'resource'
+     * which we already have a method to do.
      */
     public APObj getWebFinger(String host, String resource) {
+        APObj finger = null;
+
+        if (resource.startsWith("@")) {
+            resource = resource.substring(1);
+        }
+
+        // return from cache if we have this cached
+        synchronized (webFingerCacheByUserName) {
+            finger = webFingerCacheByUserName.get(resource);
+            if (finger != null) {
+                return finger;
+            }
+        }
+
         String url = host + ActPubConstants.PATH_WEBFINGER + "?resource=acct:" + resource;
-        APObj finger = getJson(url, new MediaType("application", "jrd+json"));
-        log.debug("WebFinger: " + XString.prettyPrint(finger));
+        finger = getJson(url, new MediaType("application", "jrd+json"));
+
+        synchronized (webFingerCacheByUserName) {
+            if (finger != null) {
+                log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
+                webFingerCacheByUserName.put(resource, finger);
+            }
+        }
         return finger;
     }
 

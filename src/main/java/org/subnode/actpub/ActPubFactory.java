@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class ActPubFactory {
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
-	public APObj newCreateMessageForNote(String toUserName, String actor, String inReplyTo, String content,
+	public APObj newCreateMessageForNote(String toUserName, String fromActor, String inReplyTo, String content,
 			String toActor, String noteUrl, boolean privateMessage, APList attachments) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-		log.debug("sending note to actor[" + actor + "] inReplyTo[" + inReplyTo + "] toActor[" + toActor + "]");
+		log.debug("sending note from actor[" + fromActor + "] inReplyTo[" + inReplyTo + "] toActor[" + toActor + "]");
 		return newCreateMessage(
-				newNoteObject(toUserName, actor, inReplyTo, content, toActor, noteUrl, now, privateMessage, attachments), actor,
+				newNoteObject(toUserName, fromActor, inReplyTo, content, toActor, noteUrl, now, privateMessage, attachments), fromActor,
 				toActor, noteUrl, now);
 	}
 
@@ -77,7 +77,7 @@ public class ActPubFactory {
 				.put("toot", "http://joinmastodon.org/ns#");
 	}
 
-	public APObj newCreateMessage(APObj object, String actor, String to, String noteUrl, ZonedDateTime now) {
+	public APObj newCreateMessage(APObj object, String fromActor, String to, String noteUrl, ZonedDateTime now) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 
 		APObj ret = new APObj();
@@ -88,7 +88,7 @@ public class ActPubFactory {
 
 		ret.put("id", noteUrl + "&apCreateTime=" + idTime);
 		ret.put("type", "Create");
-		ret.put("actor", actor);
+		ret.put("actor", fromActor);
 		ret.put("published", now.format(DateTimeFormatter.ISO_INSTANT));
 		ret.put("object", object);
 

@@ -20,7 +20,7 @@ public class ActPubTest implements TestIntf {
     @Override
     public void test() throws Exception {
         try {
-            // log.debug("Running ActPubTest.");
+            log.debug("Running ActPubTest.");
         } finally {
         }
     }
