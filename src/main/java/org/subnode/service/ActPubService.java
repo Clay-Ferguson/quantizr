@@ -396,19 +396,20 @@ public class ActPubService {
     }
 
     /*
-     * Reads in a user from the Fediverse with a name like: someuser@fosstodon.org
+     * todo-0: rename this method to: loadForeignUserByUserName Reads in a user from
+     * the Fediverse with a name like: someuser@fosstodon.org
+     * 
+     * Returns account node of the user
      */
-    public void loadForeignUser(MongoSession session, String apUserName) {
-        Object actor = null;
+    public SubNode loadForeignUser(MongoSession session, String apUserName) {
 
         /* First try to use the actor from cache, if we have it cached */
         synchronized (actorCacheByUserName) {
-            actor = actorCacheByUserName.get(apUserName);
+            Object actor = actorCacheByUserName.get(apUserName);
 
             // if we have actor object skip the step of getting it an import using it.
             if (actor != null) {
-                importActor(session, apUserName, actor);
-                return;
+                return importActor(session, actor);
             }
         }
 
@@ -418,13 +419,19 @@ public class ActPubService {
         Object self = getLinkByRel(webFinger, "self");
         log.debug("Self Link: " + XString.prettyPrint(self));
         if (self != null) {
-            actor = getActorByUrl(AP.str(self, "href"));
-
-            // if webfinger was successful, ensure the user is imported into our system.
-            if (actor != null) {
-                importActor(session, apUserName, actor);
-            }
+            return loadForeignUserByActorUrl(session, AP.str(self, "href"));
         }
+        return null;
+    }
+
+    public SubNode loadForeignUserByActorUrl(MongoSession session, String actorUrl) {
+        Object actor = getActorByUrl(actorUrl);
+
+        // if webfinger was successful, ensure the user is imported into our system.
+        if (actor != null) {
+            return importActor(session, actor);
+        }
+        return null;
     }
 
     // todo-0: refactor loadForeignUser to call this instead of replicating the code
@@ -439,14 +446,20 @@ public class ActPubService {
         return actorUrl;
     }
 
-    public void importActor(MongoSession session, String apUserName, Object actor) {
-        if (apUserName == null)
-            return;
+    /*
+     * Returns account node of the user, creating one if not already existing
+     * 
+     * todo-0: it's redundant to even allow apUserName to be a parameter. We can
+     * build it from the actor object
+     */
+    public SubNode importActor(MongoSession session, Object actor) {
+
+        String apUserName = getLongUserNameFromActor(actor);
 
         apUserName = apUserName.trim();
         if (apUserName.endsWith("@" + appProp.getMetaHost().toLowerCase())) {
             log.debug("Can't import a user that's not from a foreign server.");
-            return;
+            return null;
         }
         log.debug("importing Actor: " + apUserName);
         SubNode userNode = read.getUserNodeByUserName(session, apUserName);
@@ -479,6 +492,7 @@ public class ActPubService {
             update.save(session, userNode, false);
         }
         refreshOutboxFromForeignServer(session, actor, userNode, apUserName);
+        return userNode;
     }
 
     /*
@@ -901,10 +915,6 @@ public class ActPubService {
     public APObj processCreateNote(MongoSession session, Object obj) {
         APObj ret = new APObj();
 
-        // ID only used for (future) deduplication
-        String id = AP.str(obj, "id");
-        Date published = AP.date(obj, "published");
-
         /*
          * If this is a 'reply' post then parse the ID out of this, and if we can find
          * that node by that id then insert the reply under that, instead of the default
@@ -929,20 +939,31 @@ public class ActPubService {
             }
         }
 
-        String contentHtml = AP.str(obj, "content");
+        if (nodeBeingRepliedTo != null) {
+            saveNoteAsReplyUnderNode(session, nodeBeingRepliedTo, obj);
+        } else {
+            List<?> toList = AP.list(obj, "to");
+            if (toList != null) {
+                for (Object to : toList) {
+                    if (to instanceof String) {
+                        String toActor = (String) to;
 
-        List<?> toList = AP.list(obj, "to");
-        if (toList != null) {
-            for (Object to : toList) {
-                if (to instanceof String) {
-                    String toActor = (String) to;
-                    if (nodeBeingRepliedTo != null) {
-                        saveNoteAsReplyUnderNode(session, toActor, contentHtml, id, published, nodeBeingRepliedTo, obj);
+                        /*
+                         * todo-0: leave this code commented just in case, but then change it to store
+                         * in the outbox of the sender, but have a recipients property on the node that
+                         * contains all the 'mentions' so we can later use that to be sure we are able
+                         * to make this node private to them only when this is not a 'public' post. So
+                         * the new rule is that not ALL nodes in a user's outbox will continue to be
+                         * 'public', which means instead of flaggin the USER POSTS root node as public,
+                         * we mark each item inside the outbox individually with it's own sharing.
+                         * Outbox node itself will no longer be shared at all.
+                         */
+                        // saveNoteToUserInboxNode(session, toActor, obj);
+                        throw new RuntimeException("AP feature path not yet functional.");
+
                     } else {
-                        saveNoteToUserInboxNode(session, toActor, contentHtml, id, published, obj);
+                        log.debug("to list entry not supported: " + to.toString());
                     }
-                } else {
-                    log.debug("to list entry not supported: " + to.toString());
                 }
             }
         }
@@ -953,19 +974,31 @@ public class ActPubService {
         return ret;
     }
 
-    public void saveNoteAsReplyUnderNode(MongoSession session, String actorUrl, String contentHtml, String id,
-            Date published, SubNode nodeBeingRepliedTo, Object obj) {
+    /*
+     * todo-0: this node needs to also have it's sharing set to be shared with all
+     * the peop on the recipients list, unless any of the recipients is '#Public' in
+     * which case we share to public
+     * 
+     * Before this functionality can be implemented we need to stop OUTBOX nodes
+     * from beind default public, and get the rest of the non-Federated (local only)
+     * users working otherwise per current design
+     */
+    public void saveNoteAsReplyUnderNode(MongoSession session, SubNode nodeBeingRepliedTo, Object obj) {
+
+        String id = AP.str(obj, "id");
+        Date published = AP.date(obj, "published");
+        String contentHtml = AP.str(obj, "content");
         String objUrl = AP.str(obj, "url");
         String objAttributedTo = AP.str(obj, "attributedTo");
 
-        String localUserName = getLocalUserNameFromActorUrl(actorUrl);
-        if (localUserName == null) {
-            log.debug("actorUrl not handled: " + actorUrl);
-            return;
-        }
-        SubNode userNode = read.getUserNodeByUserName(session, localUserName);
-        if (userNode == null)
-            return;
+        // String localUserName = getLocalUserNameFromActorUrl(toActor);
+        // if (localUserName == null) {
+        // log.debug("actorUrl not handled: " + toActor);
+        // return;
+        // }
+        // SubNode userNode = read.getUserNodeByUserName(session, localUserName);
+        // if (userNode == null)
+        // return;
 
         /*
          * First look to see if there is a target node already existing in this so we
@@ -980,7 +1013,9 @@ public class ActPubService {
         newNode = create.createNode(session, nodeBeingRepliedTo, null, NodeType.INBOX_ENTRY.s(), 0L,
                 CreateNodeLocation.FIRST, null);
 
-        newNode.setOwner(userNode.getId());
+        // foreign account will own this node.
+        SubNode toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
+        newNode.setOwner(toAccountNode.getId());
 
         // todo-0: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now
@@ -994,46 +1029,18 @@ public class ActPubService {
         update.save(session, newNode);
 
         addAttachmentIfExists(session, newNode, obj);
+        String fromUserName = getLongUserNameFromActorUrl(objAttributedTo);
 
-        // attachmentService.readFromUrl(session, final String sourceUrl, final String
-        // nodeId,
-        // final String mimeHint, final int maxFileSize) {
-        //
-        // "attachment" : [ {
-        // "type" : "Document",
-        // "mediaType" : "image/jpeg",
-        // "url" :
-        // "https://quantizr.com/system/media_attachments/files/105/396/552/862/680/349/original/b98xacaa0c2cf9ad1b2.jpeg",
-        // "blurhash" : "UGC6W1%g01Q-?HxtV]Rk4.ad%MbwE1WVoyf5"
-        // } ],
-
-        String toUserName = getLongUserNameFromActorUrl(objAttributedTo);
-
-        userFeedService.sendServerPushInfo(localUserName,
-                new NotificationMessage("apReply", newNode.getId().toHexString(), contentHtml, toUserName));
+        NotificationMessage msg = new NotificationMessage("apReply", newNode.getId().toHexString(), contentHtml,
+                fromUserName);
+        notifyAllObjectRecipients(obj, "to", msg);
+        notifyAllObjectRecipients(obj, "cc", msg);
     }
 
-    private void addAttachmentIfExists(MongoSession session, SubNode node, Object obj) {
-        List<?> attachments = AP.list(obj, "attachment");
-
-        if (attachments == null)
-            return;
-
-        for (Object att : attachments) {
-            String mediaType = AP.str(att, "mediaType");
-            String url = AP.str(att, "url");
-
-            if (mediaType != null && url != null) {
-                attachmentService.readFromUrl(session, url, node.getId().toHexString(), mediaType, -1);
-
-                // for now we only support one attachment so break out after uploading one.
-                break;
-            }
-        }
-    }
-
-    public void saveNoteToUserInboxNode(MongoSession session, String actorUrl, String contentHtml, String id,
-            Date published, Object obj) {
+    public void saveNoteToUserInboxNode__obsolets(MongoSession session, String actorUrl, Object obj) {
+        String id = AP.str(obj, "id");
+        Date published = AP.date(obj, "published");
+        String contentHtml = AP.str(obj, "content");
         String objUrl = AP.str(obj, "url");
         String objAttributedTo = AP.str(obj, "attributedTo");
 
@@ -1085,6 +1092,44 @@ public class ActPubService {
         }
     }
 
+    /* propName = to | cc */
+    private void notifyAllObjectRecipients(Object obj, String propName, NotificationMessage msg) {
+        List<?> list = AP.list(obj, propName);
+        if (list != null) {
+            for (Object to : list) {
+                if (to instanceof String) {
+                    String toStr = (String) to;
+
+                    // If this is a user destination (not public) send message to user.
+                    if (!toStr.endsWith("#Public")) {
+                        userFeedService.sendServerPushInfo((String) toStr, msg);
+                    }
+                } else {
+                    log.debug("to list entry not supported: " + to.toString());
+                }
+            }
+        }
+    }
+
+    private void addAttachmentIfExists(MongoSession session, SubNode node, Object obj) {
+        List<?> attachments = AP.list(obj, "attachment");
+
+        if (attachments == null)
+            return;
+
+        for (Object att : attachments) {
+            String mediaType = AP.str(att, "mediaType");
+            String url = AP.str(att, "url");
+
+            if (mediaType != null && url != null) {
+                attachmentService.readFromUrl(session, url, node.getId().toHexString(), mediaType, -1);
+
+                // for now we only support one attachment so break out after uploading one.
+                break;
+            }
+        }
+    }
+
     public String getLongUserNameFromActorUrl(String actorUrl) {
         APObj actor = getActorByUrl(actorUrl);
         // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
@@ -1092,6 +1137,10 @@ public class ActPubService {
         return getLongUserNameFromActor(actor);
     }
 
+    /*
+     * There's at least one place in this method that should be calling this method
+     * but is embedding the code inline instead (fix it: todo-0)
+     */
     public String getLongUserNameFromActor(Object actor) {
         String shortUserName = AP.str(actor, "preferredUsername"); // short name like 'alice'
         String inbox = AP.str(actor, "inbox");
