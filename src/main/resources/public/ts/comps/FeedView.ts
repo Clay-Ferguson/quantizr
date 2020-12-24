@@ -63,7 +63,7 @@ export class FeedView extends Div {
             ])
         ], null, "float-right marginBottom");
 
-        children.push(this.makeFilterButtonsBar());
+        // children.push(this.makeFilterButtonsBar());
         children.push(refreshFeedButtonBar);
         children.push(new Div(null, { className: "clearfix" }));
 

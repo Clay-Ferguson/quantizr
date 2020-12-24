@@ -33,7 +33,9 @@ export class SharingDlg extends DialogBase {
                     new Button("Make Public", this.shareNodeToPublic, null, "btn-primary"),
                     new Button("Close", () => {
                         this.close();
-                        S.meta64.refresh(this.appState);
+                        if (this.dirty) {
+                            S.meta64.refresh(this.appState);
+                        }
                     })
                 ])
             ])
@@ -61,6 +63,7 @@ export class SharingDlg extends DialogBase {
     }
 
     removePrivilege = (principalNodeId: string, privilege: string): void => {
+        this.dirty = true;
         S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId,
@@ -79,6 +82,7 @@ export class SharingDlg extends DialogBase {
     }
 
     shareToPersonDlg = async (): Promise<void> => {
+        this.dirty = true;
         let dlg = new ShareToPersonDlg(this.node, this.reload, this.appState);
         await dlg.open();
 
@@ -87,6 +91,7 @@ export class SharingDlg extends DialogBase {
     }
 
     shareNodeToPublic = (): void => {
+        this.dirty = true;
         let encrypted = S.props.isEncrypted(this.node);
         if (encrypted) {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");

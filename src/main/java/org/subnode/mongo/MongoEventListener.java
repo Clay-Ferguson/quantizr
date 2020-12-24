@@ -103,7 +103,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		 * of the leaf 'name' part of the path
 		 */
 		if (node.getPath().endsWith("/?")) {
-			// Note: Any code here prior to 11/6/2020, did NOT have the last path part as the ID, but was
+			// Note: Any code here prior to 11/6/2020, did NOT have the last path part as
+			// the ID, but was
 			// instad a function of the hash of the ID.
 			String path = XString.removeLastChar(node.getPath()) + id.toHexString();
 			dbObj.put(SubNode.FIELD_PATH, path);
@@ -136,6 +137,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		removeDefaultProps(node);
+
+		// Remove any share to self because that never makes sense
+		if (node.getAc() != null) {
+			if (node.getAc().remove(node.getOwner().toHexString()) != null) {
+				dbObj.put(SubNode.FIELD_AC, node.getAc());
+			}
+		}
 	}
 
 	/*
@@ -182,10 +190,10 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void onBeforeDelete(BeforeDeleteEvent<SubNode> event) {
 		// Document doc = event.getDocument();
 		// if (doc != null) {
-		// 	Object val = doc.get("_id");
-		// 	if (val instanceof ObjectId) {
-		// 		userFeedService.nodeDeleteNotify(((ObjectId) val).toHexString());
-		// 	}
+		// Object val = doc.get("_id");
+		// if (val instanceof ObjectId) {
+		// userFeedService.nodeDeleteNotify(((ObjectId) val).toHexString());
+		// }
 		// }
 	}
 }
