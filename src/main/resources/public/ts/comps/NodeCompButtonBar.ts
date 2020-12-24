@@ -142,13 +142,15 @@ export class NodeCompButtonBar extends HorizontalLayout {
             }
 
             let insertAllowed = true;
-            if (typeHandler) {
-                insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, node, state);
+
+            // if this is our own account node, we can always leave insertAllowed=true
+            if (state.homeNodeId !== node.id) {
+                if (typeHandler) {
+                    insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, node, state);
+                }
             }
 
-            if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node, state) &&
-                // not page root node 'or' page no children exist.
-                (node.id !== state.node.id || !node.children || node.children.length === 0)) {
+            if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node, state)) {
                 createSubNodeButton = new Button("New", S.meta64.getNodeFunc(S.edit.cached_newSubNode, "S.edit.newSubNode", node.id),
                     { title: "Create new Node as a child of this node." });
             }

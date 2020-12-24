@@ -94,6 +94,7 @@ export class AppState {
     allowFileSystemSearch: boolean;
     anonUserLandingPageNode: any;
 
+    // UserAccount node ID
     homeNodeId: string;
     homeNodePath: string;
 

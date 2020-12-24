@@ -155,6 +155,9 @@ export class Edit implements EditIntf {
     }
 
     isInsertAllowed = (node: J.NodeInfo, state: AppState): boolean => {
+        if (state.homeNodeId === node.id) {
+            return true;
+        }
         let owner: string = node.owner;
 
         // if we don't know who owns this node assume the admin owns it.

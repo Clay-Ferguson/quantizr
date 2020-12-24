@@ -146,8 +146,15 @@ public class MongoAuth {
 	 * sharing to himselv which is never done.
 	 */
 	public void setDefaultReplyAcl(SubNode parent, SubNode child) {
-		HashMap<String, AccessControl> ac = (HashMap<String, AccessControl>) parent.getAc().clone();
-		ac.remove(child.getOwner().toHexString());
+		if (parent == null || child == null)
+			return;
+		HashMap<String, AccessControl> ac = parent.getAc();
+		if (ac == null) {
+			ac = new HashMap<String, AccessControl>();
+		} else {
+			ac = (HashMap<String, AccessControl>) ac.clone();
+			ac.remove(child.getOwner().toHexString());
+		}
 		ac.put(parent.getOwner().toHexString(), new AccessControl("prvs", "rd,wr"));
 		child.setAc(ac);
 	}
