@@ -12,7 +12,6 @@ being a problem is by having the rule that no other modules are allowed to impor
 but only the interface of it.
 */
 import * as React from "react";
-import { ActivityPub } from "./ActivityPub";
 import { Attachment } from "./Attachment";
 import { Constants as C } from "./Constants";
 import { Edit } from "./Edit";
@@ -50,7 +49,6 @@ export class Factory {
             attachment: new Attachment(),
             encryption: new Encryption(),
             nav: new Nav(),
-            activityPub: new ActivityPub(),
             props: new Props(),
             render: new Render(),
             srch: new Search(),

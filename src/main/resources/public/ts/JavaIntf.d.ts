@@ -1,10 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export interface ActivityPubPostRequest extends RequestBase {
-    nodeId: string;
-}
-
 export interface AddPrivilegeRequest extends RequestBase {
     nodeId: string;
     privileges: string[];
@@ -284,9 +280,6 @@ export interface RequestBase {
     password?: string;
     tzOffset?: number;
     dst?: boolean;
-}
-
-export interface ActivityPubPostResponse extends ResponseBase {
 }
 
 export interface AddPrivilegeResponse extends ResponseBase {

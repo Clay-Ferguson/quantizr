@@ -1,4 +1,3 @@
-import { ActivityPubIntf } from "./intf/ActivityPubIntf";
 import { AttachmentIntf } from "./intf/AttachmentIntf";
 import { EditIntf } from "./intf/EditIntf";
 import { EncryptionIntf } from "./intf/EncryptionIntf";
@@ -33,7 +32,6 @@ export interface Singletons {
     share: ShareIntf;
     user: UserIntf;
     view: ViewIntf;
-    activityPub: ActivityPubIntf;
     rssReader: RSSReaderIntf;
     localDB: LocalDBIntf;
 }
