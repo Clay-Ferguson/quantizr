@@ -57,12 +57,59 @@ public class MongoAuth {
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
 
+	public static final HashMap<String, String> userNamesByAccountId = new HashMap<String, String>();
+
 	public MongoSession getAdminSession() {
 		return adminSession;
 	}
 
 	public MongoSession getAnonSession() {
 		return anonSession;
+	}
+
+	public void populateUserNamesInAcl(MongoSession session, SubNode node) {
+
+		// iterate all acls on the node
+		List<AccessControlInfo> acList = getAclEntries(session, node);
+		if (acList != null) {
+			for (AccessControlInfo info : acList) {
+
+				// get user account node for this sharing entry
+				String userNodeId = info.getPrincipalNodeId();
+				if (userNodeId != null) {
+					info.setPrincipalName(getUserNameFromAccountNodeId(session, userNodeId));
+				}
+			}
+		}
+	}
+
+	public String getUserNameFromAccountNodeId(MongoSession session, String accountId) {
+
+		// special case of a public share
+		if ("public".equals(accountId)) {
+			return "public";
+		}
+
+		// if the userName is cached get it from the cache, and then continue looping.
+		synchronized (userNamesByAccountId) {
+			String userName = userNamesByAccountId.get(accountId);
+			if (userName != null) {
+				return userName;
+			}
+		}
+
+		// if userName not found in cache we read the node to get the userName from it.
+		SubNode accountNode = read.getNode(session, accountId);
+		if (accountNode != null) {
+			synchronized (userNamesByAccountId) {
+				// get the userName from the node, then put it in 'info' and cache it also.
+				String userName = accountNode.getStrProp(NodeProp.USER);
+
+				userNamesByAccountId.put(accountId, userName);
+				return userName;
+			}
+		}
+		return null;
 	}
 
 	/* Returns a list of all user names that are shared to on this node */
@@ -340,8 +387,8 @@ public class MongoAuth {
 	 * Finds all subnodes that have a share targeting the userNodeId (account node
 	 * ID of a person being shared with), regardless of the type of share 'rd,rw'
 	 */
-	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession session, String pathToSearch, String accountNodeId, String sortField,
-			int limit) {
+	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession session, String pathToSearch, String accountNodeId,
+			String sortField, int limit) {
 
 		// this will be node.getPath() to search under the node, or null for searching
 		// under all user content.

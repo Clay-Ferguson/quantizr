@@ -43,9 +43,6 @@ public class UserFeedService {
 	private MongoRead read;
 
 	@Autowired
-	private RunAsMongoAdminEx adminRunner;
-
-	@Autowired
 	private Convert convert;
 
 	@Autowired

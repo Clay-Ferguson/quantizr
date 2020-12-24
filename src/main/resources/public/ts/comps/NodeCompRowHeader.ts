@@ -27,6 +27,8 @@ export class NodeCompRowHeader extends Div {
         let node = this.node;
         let children = [];
 
+        // console.log("NodeCompHeaderRow: " + S.util.prettyPrint(node));
+
         let avatarImg: Img = null;
         if ((this.allowAvatars || node.id === state.node.id) && node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeAvatarImage(node, state);
@@ -93,6 +95,12 @@ export class NodeCompRowHeader extends Div {
                 }));
             }
         }
+
+        let sharingNames = S.util.getSharingNames(node);
+        if (sharingNames) {
+            children.push(new Span("(Shared to: " + sharingNames + ")"));
+        }
+
         this.setChildren(children);
     }
 }

@@ -21,6 +21,8 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoUtil;
+import org.subnode.mongo.RunAsMongoAdminEx;
+import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.AccessControl;
@@ -41,7 +43,13 @@ public class Convert {
 	private MongoRead read;
 
 	@Autowired
+	private MongoAuth auth;
+
+	@Autowired
 	private AttachmentService attachmentService;
+
+	@Autowired
+	private RunAsMongoAdminEx adminRunner;
 
 	public static final PropertyInfoComparator propertyInfoComparator = new PropertyInfoComparator();
 
@@ -175,10 +183,14 @@ public class Convert {
 						nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.USER_BIO.s(), userBio));
 					}
 
-					/* todo-0: Check this. Above we just tried to get this prop from the FRIEND node, in a way such that
-					 the friend may not have even been imported into the system and thus won't have a "foreign account node" locally
-					 in our system. So need to decide if we want to always have the ACTOR URL inside FRIEND node itself or not
-					 becasue we should be 100% consistent across all 'foreign' friends regarding having this property or not */
+					/*
+					 * todo-0: Check this. Above we just tried to get this prop from the FRIEND
+					 * node, in a way such that the friend may not have even been imported into the
+					 * system and thus won't have a "foreign account node" locally in our system. So
+					 * need to decide if we want to always have the ACTOR URL inside FRIEND node
+					 * itself or not becasue we should be 100% consistent across all 'foreign'
+					 * friends regarding having this property or not
+					 */
 					if (userUrl == null) {
 						userUrl = friendAccountNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
 						if (userUrl != null) {
@@ -314,6 +326,13 @@ public class Convert {
 			AccessControl ac) {
 		AccessControlInfo acInfo = new AccessControlInfo();
 		acInfo.setPrincipalNodeId(principalId);
+
+		if (principalId != null) {
+			adminRunner.run(s -> {
+				acInfo.setPrincipalName(auth.getUserNameFromAccountNodeId(s, principalId));
+				return null;
+			});
+		}
 		return acInfo;
 	}
 

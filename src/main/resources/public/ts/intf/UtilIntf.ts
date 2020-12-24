@@ -126,4 +126,5 @@ export interface UtilIntf {
     formatCurrency(n: number): string;
     publishNodeToIpfs(node: J.NodeInfo): any;
     loadNodeFromIpfs(node: J.NodeInfo): any;
+    getSharingNames(node: J.NodeInfo): string;
 }
