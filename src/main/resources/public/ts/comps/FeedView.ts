@@ -65,7 +65,6 @@ export class FeedView extends Div {
 
         children.push(this.makeFilterButtonsBar());
         children.push(refreshFeedButtonBar);
-
         children.push(new Div(null, { className: "clearfix" }));
 
         let i = 0;
@@ -85,12 +84,13 @@ export class FeedView extends Div {
             new RadioButtonGroup([
                 this.createRadioButton("feedUserFilter", "Friends", "friends"),
                 this.createRadioButton("feedUserFilter", "All", "all")
-            ], "radioButtonsBar form-group-border feedFilterRadioButtons"),
-
-            new RadioButtonGroup([
-                this.createRadioButton("feedServerFilter", "Local", "local"),
-                this.createRadioButton("feedServerFilter", "Federated", "federated")
             ], "radioButtonsBar form-group-border feedFilterRadioButtons")
+
+            // todo-0: temporarily removed due to refactoring
+            // new RadioButtonGroup([
+            //     this.createRadioButton("feedServerFilter", "Local", "local"),
+            //     this.createRadioButton("feedServerFilter", "Federated", "federated")
+            // ], "radioButtonsBar form-group-border feedFilterRadioButtons")
         ]);
     }
 

@@ -26,23 +26,9 @@ export class NodeCompRowFooter extends Div {
 
         if (this.isFeed) {
             children.push(new Icon({
-                title: "Public reply",
-                className: "fa fa-comments fa-lg rowFooterIcon",
-                onClick: () => S.edit.addComment(this.node, true, state)
-            }));
-        }
-
-        /* If ActivityPub type is on the node then it makes sense to have a Direct Message option also */
-        let apObjType = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_TYPE, this.node);
-        let apId = S.props.getNodePropVal(J.NodeProp.ACT_PUB_ID, this.node);
-
-        /* todo-0: is it redundant to check apObjType here? That is: Do all nodes with an apObjType also have an apId? ...because
-        if so then this is redundant */
-        if (apObjType || apId) {
-            children.push(new Icon({
-                title: "Private Reply (Direct Message)",
+                title: "Reply",
                 className: "fa fa-comment fa-lg rowFooterIcon",
-                onClick: () => S.edit.addComment(this.node, false, state)
+                onClick: () => S.edit.addComment(this.node, state)
             }));
         }
 

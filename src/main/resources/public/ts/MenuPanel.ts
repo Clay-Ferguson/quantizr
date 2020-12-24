@@ -67,7 +67,6 @@ export class MenuPanel extends Div {
             // new MenuItem("Account Root", () => S.nav.navHome(state), !state.isAnonUser),
 
             new MenuItem("Inbox", () => S.nav.openContentNode("~" + J.NodeType.INBOX, state), !state.isAnonUser),
-            new MenuItem("Outbox", () => S.nav.openContentNode("~" + J.NodeType.USER_FEED, state), !state.isAnonUser),
             new MenuItem("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), !state.isAnonUser),
             new MenuItem("Followers", () => S.nav.openContentNode("~" + J.NodeType.FOLLOWERS_LIST, state), !state.isAnonUser),
 
@@ -106,8 +105,7 @@ export class MenuPanel extends Div {
             new MenuItem("Move to Bottom", () => S.edit.moveNodeToBottom(null, state), canMoveDown), //
             new MenuItemSeparator(), //
 
-            new MenuItem("Permanent Delete", () => S.edit.deleteSelNodes(null, true, state), !state.isAnonUser && selNodeCount > 0 && selNodeIsMine), //
-            new MenuItem("Show Trash Bin", () => S.nav.openContentNode(state.homeNodePath + "/d", state), !state.isAnonUser)
+            new MenuItem("Delete", () => S.edit.deleteSelNodes(null, state), !state.isAnonUser && selNodeCount > 0 && selNodeIsMine) //
 
             // todo-1: disabled during mongo conversion
             // new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //

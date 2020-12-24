@@ -96,7 +96,6 @@ public class NodeRenderService {
 			res.setMessage("Unauthorized.");
 			res.setExceptionType("auth");
 			log.error("error", e);
-			// throw e;
 			return res;
 		}
 

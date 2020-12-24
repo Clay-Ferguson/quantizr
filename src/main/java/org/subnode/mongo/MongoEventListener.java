@@ -136,10 +136,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		removeDefaultProps(node);
-
-		if (node.isDeleted()) {
-			userFeedService.nodeDeleteNotify(node.getId().toHexString());
-		}
 	}
 
 	/*
@@ -184,12 +180,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Override
 	public void onBeforeDelete(BeforeDeleteEvent<SubNode> event) {
-		Document doc = event.getDocument();
-		if (doc != null) {
-			Object val = doc.get("_id");
-			if (val instanceof ObjectId) {
-				userFeedService.nodeDeleteNotify(((ObjectId) val).toHexString());
-			}
-		}
+		// Document doc = event.getDocument();
+		// if (doc != null) {
+		// 	Object val = doc.get("_id");
+		// 	if (val instanceof ObjectId) {
+		// 		userFeedService.nodeDeleteNotify(((ObjectId) val).toHexString());
+		// 	}
+		// }
 	}
 }

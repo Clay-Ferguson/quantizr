@@ -208,8 +208,7 @@ export class Edit implements EditIntf {
                             createAtTop,
                             content: clipboardText,
                             typeLock: false,
-                            properties: null,
-                            privateReply: false
+                            properties: null
                         }, (res) => { S.meta64.refresh(state); });
                     }
                 }, null, null, null, state
@@ -234,8 +233,7 @@ export class Edit implements EditIntf {
                     createAtTop,
                     content: null,
                     typeLock: false,
-                    properties: null,
-                    privateReply: false
+                    properties: null
                 }, (res) => {
                     this.createSubNodeResponse(res, state);
                 });
@@ -431,6 +429,7 @@ export class Edit implements EditIntf {
         if (S.meta64.ctrlKeyCheck()) {
             new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
                 async () => {
+                    // todo-0: document this under 'tips and tricks' in the user guide
                     this.saveClipboardToChildNode(id);
                 }, null, null, null, state
             ).open();
@@ -475,30 +474,6 @@ export class Edit implements EditIntf {
         });
     }
 
-    emptyTrash = (state: AppState): void => {
-        S.meta64.clearSelNodes(state);
-
-        new ConfirmDlg("Permanently delete the nodes in your trash bin?", "Empty Trash",
-            () => {
-                // do not delete (see note above)
-                // let postDeleteSelNode: J.NodeInfo = this.getBestPostDeleteSelNode();
-
-                S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
-                    nodeIds: [state.homeNodePath + "/d"],
-                    hardDelete: true,
-                    childrenOnly: true
-                }, (res: J.DeleteNodesResponse) => {
-                    // if user was viewing trash when the deleted it that's a proble, so for now the short term
-                    // solution is send user to their root now.
-                    S.nav.openContentNode(state.homeNodePath, state);
-
-                    // do not delete (see note above)
-                    // this.deleteNodesResponse(res, { "postDeleteSelNode": postDeleteSelNode });
-                });
-            }, null, "btn-danger", "alert alert-danger", state
-        ).open();
-    }
-
     clearInbox = (state: AppState): void => {
         S.meta64.clearSelNodes(state);
 
@@ -506,7 +481,6 @@ export class Edit implements EditIntf {
             () => {
                 S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                     nodeIds: ["~" + J.NodeType.INBOX],
-                    hardDelete: true,
                     childrenOnly: true
                 }, (res: J.DeleteNodesResponse) => {
                     S.nav.openContentNode(state.homeNodePath, state);
@@ -515,15 +489,15 @@ export class Edit implements EditIntf {
         ).open();
     }
 
-    cached_softDeleteSelNodes = (nodeId: string) => {
-        this.deleteSelNodes(nodeId, false);
+    cached_deleteSelNodes = (nodeId: string) => {
+        this.deleteSelNodes(nodeId);
     }
 
     /*
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
      * has currenly selected (via checkboxes)
      */
-    deleteSelNodes = (nodeId: string, hardDelete: boolean, state?: AppState): void => {
+    deleteSelNodes = (nodeId: string, state?: AppState): void => {
         state = appState(state);
 
         // if a nodeId was specified we use it as the selected nodes to delete
@@ -551,13 +525,7 @@ export class Edit implements EditIntf {
 
         /* todo-1: would be better to check if ANY of the nodes are deleted not just arbitary first one */
         const nodeCheck: J.NodeInfo = state.idToNodeMap[firstNodeId];
-        let confirmMsg = null;
-        if (nodeCheck.deleted || hardDelete) {
-            confirmMsg = "Permanently Delete " + selNodesArray.length + " node(s) ?";
-        }
-        else {
-            confirmMsg = "Move " + selNodesArray.length + " node(s) to the trash bin ?";
-        }
+        let confirmMsg = "Delete " + selNodesArray.length + " node(s) ?";
 
         new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
             () => {
@@ -570,7 +538,6 @@ export class Edit implements EditIntf {
 
                 S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                     nodeIds: selNodesArray,
-                    hardDelete,
                     childrenOnly: false
                 }, (res: J.DeleteNodesResponse) => {
 
@@ -584,10 +551,7 @@ export class Edit implements EditIntf {
                     }
                 });
             },
-            null, // no callback
-            (nodeCheck.deleted || hardDelete) ? "btn-danger" : null,
-            (nodeCheck.deleted || hardDelete) ? "alert alert-danger" : null,
-            state
+            null, "btn-danger", "alert alert-danger", state
         ).open();
     }
 
@@ -746,8 +710,7 @@ export class Edit implements EditIntf {
             createAtTop: true,
             content: clipText,
             typeLock: false,
-            properties: null,
-            privateReply: false
+            properties: null
         },
             () => {
                 let message = parentId ? "Clipboard saved" : "Clipboard saved under Notes node";
@@ -785,7 +748,7 @@ export class Edit implements EditIntf {
         }
     }
 
-    addComment = (node: J.NodeInfo, publicReply: boolean, state: AppState) => {
+    addComment = (node: J.NodeInfo, state: AppState) => {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
@@ -796,8 +759,7 @@ export class Edit implements EditIntf {
             createAtTop: false,
             content: null,
             typeLock: false,
-            properties: null,
-            privateReply: !publicReply
+            properties: null
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });
@@ -814,8 +776,7 @@ export class Edit implements EditIntf {
             createAtTop: true,
             content: null,
             typeLock: true,
-            properties: null,
-            privateReply: false
+            properties: null
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });
@@ -832,8 +793,7 @@ export class Edit implements EditIntf {
             createAtTop: true,
             content: null,
             typeLock: true,
-            properties: [{ name: "date", value: "" + initDate }],
-            privateReply: false
+            properties: [{ name: "date", value: "" + initDate }]
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });

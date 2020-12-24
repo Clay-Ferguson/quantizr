@@ -1,6 +1,5 @@
 package org.subnode.service;
 
-import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -119,7 +118,9 @@ public class NodeSearchService {
 		//search under account root only
 		SubNode searchRoot = read.getNode(session, sessionContext.getRootId());
 
-		for (SubNode node : auth.searchSubGraphByAcl(session, searchRoot, SubNode.FIELD_MODIFY_TIME, MAX_NODES)) {
+		/* todo-0: Eventually we want two way so of searching here. 1) All my shared nodes under my account, 2) all my shared nodes globally,
+		and the globally is done simply by passing null for the path here */
+		for (SubNode node : auth.searchSubGraphByAcl(session, searchRoot.getPath(), searchRoot.getOwner(), SubNode.FIELD_MODIFY_TIME, MAX_NODES)) {
 
 			/*
 			 * If we're only looking for shares to a specific person (or public) then check

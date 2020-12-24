@@ -15,8 +15,6 @@ import { RssTypeHandler } from "./plugins/RssTypeHandler";
 import { CalcTypeHandler } from "./plugins/CalcTypeHandler";
 import { CalendarTypeHandler } from "./plugins/CalendarTypeHandler";
 import { TextTypeHandler } from "./plugins/TextTypeHandler";
-import { TrashNodeTypeHandler } from "./plugins/TrashNodeTypeHandler";
-import { UserFeedTypeHandler } from "./plugins/UserFeedTypeHandler";
 
 export class PluginMgr implements PluginMgrIntf {
 
@@ -50,7 +48,6 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new IPFSNodeTypeHandler());
         this.addTypeHandler(new RepoRootTypeHandler());
         this.addTypeHandler(new AccountTypeHandler());
-        this.addTypeHandler(new TrashNodeTypeHandler());
         this.addTypeHandler(new InboxNodeTypeHandler());
         this.addTypeHandler(new InboxEntryTypeHandler());
         this.addTypeHandler(new NotesNodeTypeHandler());
@@ -58,7 +55,6 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new FollowersListTypeHandler());
         this.addTypeHandler(new FriendTypeHandler());
         this.addTypeHandler(new ActPubItemTypeHandler());
-        this.addTypeHandler(new UserFeedTypeHandler());
 
         // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());
         // S.plugin.addTypeHandler("fs:folder", new FolderTypeHandler());

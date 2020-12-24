@@ -46,9 +46,9 @@ export class InboxEntryTypeHandler extends TypeBase {
             new NodeCompMarkdown(node, state),
             new Div(null, { className: "marginLeft" }, [
                 new Icon({
-                    title: "Private Reply (Direct Message)",
+                    title: "Reply",
                     className: "fa fa-comment fa-lg rowFooterIcon",
-                    onClick: () => S.edit.addComment(node, false, state)
+                    onClick: () => S.edit.addComment(node, state)
                 })
             ])
         ]);

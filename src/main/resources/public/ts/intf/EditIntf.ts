@@ -30,8 +30,8 @@ export interface EditIntf {
     cached_toolbarInsertNode(id: string): void;
     createSubNode(id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void;
     selectAllNodes(state: AppState) : void;
-    cached_softDeleteSelNodes(nodeId: string);
-    deleteSelNodes(nodeId: string, hardDelete: boolean, state?: AppState): void;
+    cached_deleteSelNodes(nodeId: string);
+    deleteSelNodes(nodeId: string, state?: AppState): void;
     getBestPostDeleteSelNode(state: AppState): J.NodeInfo;
     cached_cutSelNodes(nodeId: string, state?: AppState): void;
     undoCutSelNodes(state: AppState): void;
@@ -40,10 +40,9 @@ export interface EditIntf {
     cached_pasteSelNodes_InlineAbove(nodeId: string);
     cached_pasteSelNodes_Inline(nodeId: string);
     insertBookWarAndPeace(state: AppState): void;
-    emptyTrash(state: AppState): void;
     clearInbox(state: AppState): void;
     cached_newSubNode(id: string);
-    addComment(node: J.NodeInfo, publicReply: boolean, state: AppState): void;
+    addComment(node: J.NodeInfo, state: AppState): void;
     addFriend(node: J.NodeInfo, state: AppState): void;
     addCalendarEntry(initDate: number, state: AppState): void;
     moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): void;

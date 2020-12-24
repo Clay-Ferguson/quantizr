@@ -726,44 +726,6 @@ public class MongoRead {
             node = create.createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST, null);
             node.setOwner(userNode.getId());
             node.setContent(nodeName);
-
-            /*
-             * todo-1: and make this some kind of hook so that we don't have an ugly tight
-             * coupling here for this type, although this technical debt isn't that bad
-             */
-            if (type.equals(NodeType.USER_FEED.s())) {
-                List<String> privileges = new LinkedList<String>();
-                privileges.add(PrivilegeType.READ.s());
-                privileges.add(PrivilegeType.WRITE.s());
-                aclService.addPrivilege(session, node, "public", privileges, null);
-            }
-
-            update.save(session, node);
-
-            if (type.equals(NodeType.USER_FEED.s())) {
-                userFeedService.addUserFeedInfo(session, node, null, sessionContext.getUserName());
-            }
-        }
-        return node;
-    }
-
-    public SubNode getTrashNode(MongoSession session, String user, SubNode userNode) {
-        if (userNode == null) {
-            userNode = getUserNodeByUserName(session, user);
-        }
-
-        if (userNode == null) {
-            log.warn("userNode not found for user name: " + user);
-            return null;
-        }
-
-        String path = userNode.getPath() + "/" + NodeName.TRASH;
-        SubNode node = getNode(session, path);
-
-        if (node == null) {
-            node = create.createNode(session, userNode, NodeName.TRASH, NodeType.TRASH_BIN.s(), 0L,
-                    CreateNodeLocation.LAST, null);
-            node.setOwner(userNode.getId());
             update.save(session, node);
         }
         return node;
@@ -815,16 +777,24 @@ public class MongoRead {
         query.addCriteria(criteria);
         SubNode ret = getOps(session).findOne(query, SubNode.class);
 
-        /*
-         * todo-0: temp fix. UserFeed (i.e. outbox) node is always public so short
-         * circuit the auth call here.
-         */
-        if (type.equals(NodeType.USER_FEED.s())) {
-            return ret;
-        }
-
         auth.auth(session, ret, PrivilegeType.READ);
         return ret;
+    }
+
+    /*
+     * Finds the first node matching 'type' under 'path' (non-recursively, direct
+     * children only)
+     */
+    public Iterable<SubNode> findTypedNodesUnderPath(MongoSession session, String path, String type) {
+
+        // Other wise for ordinary users root is based off their username
+        Query query = new Query();
+        Criteria criteria = Criteria.where(//
+                SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(path))//
+                .and(SubNode.FIELD_TYPE).is(type);
+
+        query.addCriteria(criteria);
+        return getOps(session).find(query, SubNode.class);
     }
 
     /*

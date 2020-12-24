@@ -1102,11 +1102,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/nodeFeed", method = RequestMethod.POST)
 	public @ResponseBody Object nodeFeed(@RequestBody NodeFeedRequest req, HttpSession session) {
 		return callProc.run("nodeFeed", req, session, ms -> {
-			if ("friends".equals(req.getUserFilter())) {
-				return userFeedService.friendsFeed(ms, req);
-			} else {
-				return userFeedService.serverFeed(req);
-			}
+			return userFeedService.generateFeed(ms, req);
 		});
 	}
 

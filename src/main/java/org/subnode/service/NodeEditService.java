@@ -102,6 +102,8 @@ public class NodeEditService {
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request.
+	 * 
+	 * todo-0: need to always default all sharing to be same as sharing of parent
 	 */
 	public CreateSubNodeResponse createSubNode(MongoSession session, CreateSubNodeRequest req) {
 		CreateSubNodeResponse res = new CreateSubNodeResponse();
@@ -122,20 +124,6 @@ public class NodeEditService {
 			return res;
 		}
 
-		/*
-		 * We have this hack (until the privileges are more nuanced, or updated) which
-		 * verifies if someone is inserting under a USER_FEED node we don't allow it
-		 * unless its' the person who OWNS the USER_FEED, and we have this check because
-		 * right now our design is that USER_FEED nodes are by definition automatically
-		 * 'public'
-		 */
-		if (node.getType().equals(NodeType.USER_FEED.s())
-				&& !sessionContext.getRootId().equals(node.getOwner().toHexString())) {
-			res.setMessage("You aren't allowed to create a node here.");
-			res.setSuccess(false);
-			return res;
-		}
-
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
 		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties());
@@ -146,20 +134,15 @@ public class NodeEditService {
 
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
 
-		if (req.isPrivateReply()) {
-			newNode.setProp(NodeProp.ACT_PUB_PRIVATE.s(), Boolean.valueOf(true));
-		}
-
 		if (req.isTypeLock()) {
 			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 		}
 
+		// we always copy the access controls from the parent for any new nodes
+		auth.setDefaultReplyAcl(node, newNode);
+
 		update.save(session, newNode);
 		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));
-
-		if (newNode.getType().equals(NodeType.USER_FEED.s())) {
-			userFeedService.addUserFeedInfo(session, newNode, null, sessionContext.getUserName());
-		}
 
 		res.setSuccess(true);
 		return res;
@@ -216,20 +199,6 @@ public class NodeEditService {
 		log.debug("Inserting under parent: " + parentNodeId);
 		SubNode parentNode = read.getNode(session, parentNodeId);
 
-		/*
-		 * We have this hack (until the privileges are more nuanced, or updated) which
-		 * verifies if someone is inserting under a USER_FEED node we don't allow it
-		 * unless its' the person who OWNS the USER_FEED, and we have this check because
-		 * right now our design is that USER_FEED nodes are by definition automatically
-		 * 'public'
-		 */
-		if (parentNode.getType().equals(NodeType.USER_FEED.s())
-				&& !sessionContext.getRootId().equals(parentNode.getOwner().toHexString())) {
-			res.setMessage("You aren't allowed to create a node here.");
-			res.setSuccess(false);
-			return res;
-		}
-
 		SubNode newNode = create.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
 				CreateNodeLocation.ORDINAL, null);
 
@@ -243,18 +212,17 @@ public class NodeEditService {
 			newNode.setModifyTime(null);
 		}
 
+		// we always copy the access controls from the parent for any new nodes
+		auth.setDefaultReplyAcl(parentNode, newNode);
+
 		update.save(session, newNode);
 		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));
 
-		if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
-		// don't evern send notifications when 'admin' is the one doing the editing.
-				&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
-			outboxMgr.sendNotificationForNodeEdit(newNode, sessionContext.getUserName());
-		}
-
-		if (newNode.getType().equals(NodeType.USER_FEED.s())) {
-			userFeedService.addUserFeedInfo(session, newNode, null, sessionContext.getUserName());
-		}
+		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
+		// // don't evern send notifications when 'admin' is the one doing the editing.
+		// && !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
+		// outboxMgr.sendNotificationForNodeEdit(newNode, sessionContext.getUserName());
+		// }
 
 		res.setSuccess(true);
 		return res;
@@ -317,7 +285,6 @@ public class NodeEditService {
 
 		node.setContent(nodeInfo.getContent());
 		node.setType(nodeInfo.getType());
-		String curFollowing = node.getStrProp(NodeProp.ACT_PUB_FOLLOWING.s());
 
 		if (StringUtils.isEmpty(nodeInfo.getName())) {
 			node.setName(null);
@@ -390,13 +357,20 @@ public class NodeEditService {
 			 * If we are saving a node under an ActivityPub item then we need to send a
 			 * notification to the owner of this node who will, by definition, be a foreign
 			 * user.
+			 * 
+			 * todo-0: this will all change now that there's a new social architecture.
 			 */
-			if (req.isUpdateModTime() && parent != null
-					&& (parent.hasProperty(NodeProp.ACT_PUB_ID) || parent.isType(NodeType.ACT_PUB_ITEM)
-							|| parent.isType(NodeType.USER_FEED) || parent.isForeignFriendNode())) {
+			if (req.isUpdateModTime() && parent != null && (parent.hasProperty(NodeProp.ACT_PUB_ID)
+					|| parent.isType(NodeType.ACT_PUB_ITEM) || parent.isForeignFriendNode())) {
+
 				actPubService.sendNotificationForNodeEdit(parent, node);
 			} else {
-				outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
+				adminRunner.run(s -> {
+					userFeedService.pushNodeUpdateToAllFriends(s, node);
+				});
+
+				// do not delete (yet, this one will remain obsolet though)
+				// outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
 			}
 		}
 
@@ -407,21 +381,13 @@ public class NodeEditService {
 		// of type-specific code from the general node saving.
 		if (node.getType().equals(NodeType.FRIEND.s())) {
 			String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
-			String following = nodeInfo.getPropVal(NodeProp.ACT_PUB_FOLLOWING.s());
+			String friendUserName = node.getStrProp(NodeProp.USER.s());
 
-			if (curFollowing == null)
-				curFollowing = "";
-			if (following == null)
-				following = "";
-
-			/* if 'following' has changed send message to the server */
-			if (!curFollowing.equals(following)) {
-				String friendUserName = node.getStrProp(NodeProp.USER.s());
-
-				// if a foreign user, update thru ActivityPub
-				if (friendUserName.contains("@")) {
-					actPubService.setFollowing(friendUserName, following.equals("true"));
-				}
+			// if a foreign user, update thru ActivityPub
+			if (friendUserName.contains("@")) {
+				// todo-0: go into node listener for delete action on nodes and when any nodes are deleted
+				// run this with 'false'
+				actPubService.setFollowing(friendUserName, true);
 			}
 
 			/*
@@ -429,8 +395,6 @@ public class NodeEditService {
 			 * if not yet existing
 			 */
 			if (userNodeId == null) {
-				String friendUserName = node.getStrProp(NodeProp.USER.s());
-
 				// if USER_NODE_ID has not been set on the node yet then get it and set it first
 				// here.
 				if (friendUserName != null) {

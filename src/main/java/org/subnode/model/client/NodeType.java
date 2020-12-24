@@ -7,7 +7,6 @@ public enum NodeType {
     // INTERNAL types
     ACCOUNT("sn:account"),//
     REPO_ROOT("sn:repoRoot"), //
-    TRASH_BIN("sn:trashBin"), //
     INBOX("sn:inbox"), //
     INBOX_ENTRY("sn:inboxEntry"), //
     NOTES("sn:notes"), //
@@ -17,9 +16,6 @@ public enum NodeType {
     FRIEND_LIST("sn:friendList"), //
     FOLLOWERS_LIST("sn:followersList"), //
     FRIEND("sn:friend"), //
-
-    /* Represents social media OUTBOX node also used to source ActivitiPub outboxes from */
-    USER_FEED("sn:userFeed"), //
 
     ACT_PUB_ITEM("ap:item"), //
 

@@ -26,6 +26,11 @@ public class AccessControl {
 	public AccessControl() {
 	}
 
+	public AccessControl(String key, String prvs) {
+		this.key = key;
+		this.prvs = prvs;
+	}
+
 	@JsonProperty(FIELD_PRVS)
 	public String getPrvs() {
 		return this.prvs;

@@ -70,12 +70,6 @@ public class SessionContext {
 	private static final Random rand = new Random();
 	private String userToken = String.valueOf(rand.nextInt());
 
-	/*
-	 * Whenever the user views their feed we store in this list all the userIds of
-	 * all their friends. (the account root ids of all their friend's accounts)
-	 */
-	private HashSet<String> feedUserNodeIds;
-
 	public SessionContext() {
 		log.trace(String.format("Creating Session object hashCode[%d]", hashCode()));
 		synchronized (sessionsByToken) {
@@ -249,13 +243,5 @@ public class SessionContext {
 
 	public void setPushEmitter(SseEmitter pushEmitter) {
 		this.pushEmitter = pushEmitter;
-	}
-
-	public HashSet<String> getFeedUserNodeIds() {
-		return feedUserNodeIds;
-	}
-
-	public void setFeedUserNodeIds(HashSet<String> feedUserNodeIds) {
-		this.feedUserNodeIds = feedUserNodeIds;
 	}
 }

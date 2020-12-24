@@ -142,30 +142,6 @@ public class NodeMoveService {
 	 * Deletes the set of nodes specified in the request
 	 */
 	public DeleteNodesResponse deleteNodes(MongoSession session, DeleteNodesRequest req) {
-
-		// sample the first node to see if this is a garbage bin delete or not
-		SubNode firstNode = read.getNode(session, req.getNodeIds().get(0));
-
-		/*
-		 * Note: the 'endsWith("/d")' condition is checking if this is the actual trash
-		 * node itself being deleted
-		 */
-		if (req.isHardDelete() || firstNode.getPath().contains("/d/") || firstNode.getPath().endsWith("/d")) {
-			return hardDeleteNodes(session, req);
-		} else {
-			DeleteNodesResponse res = new DeleteNodesResponse();
-			if (session == null) {
-				session = ThreadLocals.getMongoSession();
-			}
-
-			SubNode trashNode = read.getTrashNode(session, session.getUser(), null);
-			moveNodesInternal(session, "inside", trashNode.getId().toHexString(), req.getNodeIds());
-			res.setSuccess(true);
-			return res;
-		}
-	}
-
-	private DeleteNodesResponse hardDeleteNodes(MongoSession session, DeleteNodesRequest req) {
 		DeleteNodesResponse res = new DeleteNodesResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();

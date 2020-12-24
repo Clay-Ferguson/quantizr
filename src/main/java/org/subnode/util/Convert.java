@@ -145,7 +145,7 @@ public class Convert {
 				node.getModifyTime(), propList, acList, hasChildren, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
-				node.getType(), logicalOrdinal, lastChild, cipherKey, dataUrl, node.isDeleted(), avatarVer, apAvatar);
+				node.getType(), logicalOrdinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar);
 
 		/*
 		 * Special case for "Friend" type nodes, to get enough information for the

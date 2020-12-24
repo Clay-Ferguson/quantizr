@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoThreadLocal;
@@ -622,14 +621,6 @@ public class SubNode {
 	@JsonIgnore
 	public boolean isDisableParentCheck() {
 		return disableParentCheck;
-	}
-
-	@Transient
-	@JsonIgnore
-	public boolean isDeleted() {
-		boolean deleted = getPath() != null
-				&& (getPath().contains("/" + NodeName.TRASH + "/") || getPath().endsWith("/" + NodeName.TRASH));
-		return deleted;
 	}
 
 	@Transient

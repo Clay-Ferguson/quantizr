@@ -36,7 +36,6 @@ export interface CreateSubNodeRequest extends RequestBase {
     typeLock: boolean;
     properties: PropertyInfo[];
     updateModTime: boolean;
-    privateReply: boolean;
 }
 
 export interface DeleteAttachmentRequest extends RequestBase {
@@ -45,7 +44,6 @@ export interface DeleteAttachmentRequest extends RequestBase {
 
 export interface DeleteNodesRequest extends RequestBase {
     nodeIds: string[];
-    hardDelete: boolean;
     childrenOnly: boolean;
 }
 
@@ -553,7 +551,6 @@ export interface NodeInfo {
     clientProps: PropertyInfo[];
     ac: AccessControlInfo[];
     hasChildren: boolean;
-    deleted: boolean;
     cipherKey: string;
     lastChild: boolean;
     width: number;
@@ -613,7 +610,6 @@ export const enum Constant {
 export const enum NodeProp {
     ACT_PUB_ID = "ap:id",
     ACT_PUB_OBJ_TYPE = "ap:objType",
-    ACT_PUB_PRIVATE = "ap:privateMessage",
     ACT_PUB_OBJ_CONTENT = "ap:objContent",
     ACT_PUB_OBJ_INREPLYTO = "ap:objInReplyTo",
     ACT_PUB_OBJ_URL = "ap:objUrl",
@@ -622,7 +618,6 @@ export const enum NodeProp {
     ACT_PUB_ACTOR_ID = "ap:actorId",
     ACT_PUB_ACTOR_URL = "ap:actorUrl",
     ACT_PUB_ACTOR_INBOX = "ap:actorInbox",
-    ACT_PUB_FOLLOWING = "ap:following",
     ENC_KEY = "sn:encKey",
     RSS_FEED_SRC = "sn:rssFeedSrc",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",
@@ -682,7 +677,6 @@ export const enum NodeProp {
 export const enum NodeType {
     ACCOUNT = "sn:account",
     REPO_ROOT = "sn:repoRoot",
-    TRASH_BIN = "sn:trashBin",
     INBOX = "sn:inbox",
     INBOX_ENTRY = "sn:inboxEntry",
     NOTES = "sn:notes",
@@ -691,7 +685,6 @@ export const enum NodeType {
     FRIEND_LIST = "sn:friendList",
     FOLLOWERS_LIST = "sn:followersList",
     FRIEND = "sn:friend",
-    USER_FEED = "sn:userFeed",
     ACT_PUB_ITEM = "ap:item",
     NONE = "u",
     PLAIN_TEXT = "sn:txt",

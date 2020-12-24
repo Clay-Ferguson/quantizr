@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import org.subnode.config.ConstantsProvider;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
-import org.subnode.model.UserFeedInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.CreateNodeLocation;
@@ -68,8 +67,11 @@ public class OutboxMgr {
 	 * 
 	 * userName = username of person who just created node (also the owner of
 	 * 'node')
+	 * 
+	 * Based on newer architecture for social and sharing this method is no longer needed
+	 * but I'll keep it for now.
 	 */
-	public void sendNotificationForNodeEdit(final SubNode node, final String userName) {
+	public void sendNotificationForNodeEdit__unused(final SubNode node, final String userName) {
 		boolean sendEmail = false;
 		boolean addToInbox = true;
 
@@ -96,32 +98,15 @@ public class OutboxMgr {
 				}
 
 				/*
-				 * If the parentNode has any ancestry (parents) that are anyone's actual
-				 * USER_FEED node then we know this node will being seen by everyone who wants
-				 * to see it in their feeds, and nobody's INBOX gets notifiations
+				 * Check first that we are not creating a node under one WE OWN, so we won't
+				 * send a notification to ourselves.
 				 */
-				UserFeedInfo userFeedInfo = userFeedService.findAncestorUserFeedInfo(session, node);
-
-				/*
-				 * Check first that we are not creating a node under one WE OWN, so we
-				 * won't send a notification to ourselves. The 'userFeedInfo' check here
-				 * is to be sure if this is going into a feed it won't be sent as email or inbox
-				 * notification.
-				 */
-				if (userFeedInfo == null) {
-					if (parentNode != null && !parentNode.getOwner().equals(node.getOwner())) {
-						if (sendEmail) {
-							sendEmailNotification(session, userName, userNode, node);
-						} else if (addToInbox) {
-							addInboxNotification(session, userName, userNode, node, "replied to you.");
-						}
+				if (parentNode != null && !parentNode.getOwner().equals(node.getOwner())) {
+					if (sendEmail) {
+						sendEmailNotification(session, userName, userNode, node);
+					} else if (addToInbox) {
+						addInboxNotification(session, userName, userNode, node, "replied to you.");
 					}
-				} else {
-					/*
-					 * But for live-updating feeds we DO need to send even if it's our own node
-					 * being created
-					 */
-					userFeedService.ensureNodeInUserFeedInfo(session, userFeedInfo, node);
 				}
 
 			} catch (Exception e) {
@@ -186,7 +171,8 @@ public class OutboxMgr {
 			 * 
 			 * todo-0: fill in the two null parameters here.
 			 */
-			userFeedService.sendServerPushInfo(recieverUserName, new NotificationMessage("newInboxNode", node.getId().toHexString(), null, null));
+			userFeedService.sendServerPushInfo(recieverUserName,
+					new NotificationMessage("newInboxNode", node.getId().toHexString(), null, null));
 
 			SubNode recieverAccountNode = read.getUserNodeByUserName(session, recieverUserName);
 			if (recieverAccountNode != null) {
@@ -239,7 +225,7 @@ public class OutboxMgr {
 	 * Get node that contains all preferences for this user, as properties on it.
 	 */
 	public SubNode getSystemOutbox(MongoSession session) {
-		return apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.OUTBOX + "/", NodeName.SYSTEM,
+		return apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/outbox/", NodeName.SYSTEM,
 				null, "System Messages", null, true, null, null);
 	}
 }

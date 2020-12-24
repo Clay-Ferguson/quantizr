@@ -512,8 +512,6 @@ public class MongoUtil {
 
 			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null,
 					null);
-			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.OUTBOX, null, "System Email Outbox", null,
-					true, null, null);
 		}
 
 		createPublicNodes(session);

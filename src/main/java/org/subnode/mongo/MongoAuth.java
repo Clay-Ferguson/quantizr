@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
+import org.subnode.config.SessionContext;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.AccessControlInfo;
@@ -49,6 +51,9 @@ public class MongoAuth {
 	@Autowired
 	private MongoUtil util;
 
+	@Autowired
+	private SessionContext sessionContext;
+
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
 
@@ -58,6 +63,46 @@ public class MongoAuth {
 
 	public MongoSession getAnonSession() {
 		return anonSession;
+	}
+
+	/* Returns a list of all user names that are shared to on this node */
+	public List<String> getUsersSharedTo(MongoSession session, SubNode node) {
+		List<String> userNames = null;
+
+		List<AccessControlInfo> acList = getAclEntries(session, node);
+		if (acList != null) {
+			for (AccessControlInfo info : acList) {
+				String userNodeId = info.getPrincipalNodeId();
+				if (userNodeId != null) {
+					SubNode accountNode = read.getNode(session, userNodeId);
+					if (accountNode != null) {
+						String userName = accountNode.getStrProp(NodeProp.USER);
+						if (userName != null) {
+							if (userNames == null) {
+								userNames = new LinkedList<String>();
+							}
+							userNames.add(userName);
+						}
+					}
+				}
+			}
+		}
+		return userNames;
+	}
+
+	/*
+	 * When a child is created under a parent we want to default the sharing on the
+	 * child so that there's an explicit share to the parent which is redundant in
+	 * terms of sharing auth, but is necessary and desiret for User Feeds and social
+	 * media queries to work. Also we be sure to remove any share to 'child' user
+	 * that may be in the parent Acl, because that would represent 'child' not
+	 * sharing to himselv which is never done.
+	 */
+	public void setDefaultReplyAcl(SubNode parent, SubNode child) {
+		HashMap<String, AccessControl> ac = (HashMap<String, AccessControl>) parent.getAc().clone();
+		ac.remove(child.getOwner().toHexString());
+		ac.put(parent.getOwner().toHexString(), new AccessControl("prvs", "rd,wr"));
+		child.setAc(ac);
 	}
 
 	public boolean isAllowedUserName(String userName) {
@@ -291,8 +336,62 @@ public class MongoAuth {
 		return info;
 	}
 
-	public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, SubNode node, String sortField, int limit) {
-		auth(session, node, PrivilegeType.READ);
+	/*
+	 * Finds all subnodes that have a share targeting the userNodeId (account node
+	 * ID of a person being shared with), regardless of the type of share 'rd,rw'
+	 */
+	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession session, String pathToSearch, String accountNodeId, String sortField,
+			int limit) {
+
+		// this will be node.getPath() to search under the node, or null for searching
+		// under all user content.
+		if (pathToSearch == null) {
+			pathToSearch = NodeName.ROOT_OF_ALL_USERS;
+		}
+
+		update.saveSession(session);
+		Query query = new Query();
+		query.limit(limit);
+
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
+				.and(SubNode.FIELD_AC + "." + accountNodeId).ne(null);
+
+		query.addCriteria(criteria);
+
+		if (!StringUtils.isEmpty(sortField)) {
+			query.with(Sort.by(Sort.Direction.DESC, sortField));
+		}
+		return ops.find(query, SubNode.class);
+	}
+
+	public long countSubGraphByAclUser(MongoSession session, String pathToSearch, String accountNodeId) {
+
+		// this will be node.getPath() to search under the node, or null for searching
+		// under all user content.
+		if (pathToSearch == null) {
+			pathToSearch = NodeName.ROOT_OF_ALL_USERS;
+		}
+
+		update.saveSession(session);
+		Query query = new Query();
+
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
+				.and(SubNode.FIELD_AC + "." + accountNodeId).ne(null);
+
+		query.addCriteria(criteria);
+		return ops.count(query, SubNode.class);
+	}
+
+	/* Finds nodes that have any sharing on them at all */
+	public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, String pathToSearch, ObjectId ownerIdMatch,
+			String sortField, int limit) {
+		// auth(session, node, PrivilegeType.READ);
+
+		// this will be node.getPath() to search under the node, or null for searching
+		// under all user content.
+		if (pathToSearch == null) {
+			pathToSearch = NodeName.ROOT_OF_ALL_USERS;
+		}
 
 		update.saveSession(session);
 		Query query = new Query();
@@ -302,16 +401,12 @@ public class MongoAuth {
 		 * before the end of the string. Without the trailing (.+)$ we would be
 		 * including the node itself in addition to all its children.
 		 */
-
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath())) //
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
 				.and(SubNode.FIELD_AC).ne(null);
 
-		// examples from online:
-		// Aggregation aggregation = Aggregation.newAggregation(
-		// Aggregation.match(Criteria.where("docs").exists(true)));
-		// Aggregation aggregation =
-		// Aggregation.newAggregation(Aggregation.match(Criteria.where("docs").ne(Collections.EMPTY_LIST)));
-		// Criteria.where("docs").not().size(0);
+		if (ownerIdMatch != null) {
+			criteria = criteria.and(SubNode.FIELD_OWNER).is(ownerIdMatch);
+		}
 
 		query.addCriteria(criteria);
 
@@ -320,6 +415,29 @@ public class MongoAuth {
 		}
 
 		return ops.find(query, SubNode.class);
+	}
+
+	/* Finds nodes that have any sharing on them at all */
+	public long countSubGraphByAcl(MongoSession session, SubNode node, ObjectId ownerIdMatch) {
+		auth(session, node, PrivilegeType.READ);
+
+		update.saveSession(session);
+		Query query = new Query();
+
+		/*
+		 * This regex finds all that START WITH path, have some characters after path,
+		 * before the end of the string. Without the trailing (.+)$ we would be
+		 * including the node itself in addition to all its children.
+		 */
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath())) //
+				.and(SubNode.FIELD_AC).ne(null);
+
+		if (ownerIdMatch != null) {
+			criteria = criteria.and(SubNode.FIELD_OWNER).is(ownerIdMatch);
+		}
+
+		query.addCriteria(criteria);
+		return ops.count(query, SubNode.class);
 	}
 
 	public MongoSession login(String userName, String password) {

@@ -32,6 +32,9 @@ public class MongoDelete {
 	private MongoAuth auth;
 
 	@Autowired
+	private MongoRead read;
+
+	@Autowired
 	private MongoUtil util;
 
 	public void deleteNode(MongoSession session, SubNode node, boolean childrenOnly) {
@@ -47,10 +50,24 @@ public class MongoDelete {
 	any and all of the orphans */
 	public void removeAbandonedNodes(MongoSession session) {
 		Query query = new Query();
+
+		/* todo-0: we need to also include a condition for creat time being over 30m ago to avoid blowing something away 
+		that someone is still using */
 		query.addCriteria(Criteria.where(SubNode.FIELD_MODIFY_TIME).is(null));
 
 		DeleteResult res = ops.remove(query, SubNode.class);
 		log.debug("Num abandoned nodes deleted: " + res.getDeletedCount());
+
+		//todo-0: temporary code (delete all trash bins and outboxes, those are obsolete)
+		Iterable<SubNode> iter = read.findTypedNodesUnderPath(session, "/r", "sn:trashBin");
+		for (SubNode node : iter) {
+			delete(session, node, false);
+		}
+
+		iter = read.findTypedNodesUnderPath(session, "/r", "sn:userFeed");
+		for (SubNode node : iter) {
+			delete(session, node, false);
+		}
 	}
 
 	/**

@@ -196,9 +196,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
             if (deleteAllowed) {
                 // not user's account node!
                 if (node.id !== state.homeNodeId) {
-                    deleteNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_softDeleteSelNodes, "S.edit.softDeleteSelNodes", node.id), {
+                    deleteNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_deleteSelNodes, "S.edit.deleteSelNodes", node.id), {
                         iconclass: "fa fa-trash fa-lg",
-                        title: "Move Node(s) to Trash Bin"
+                        title: "Delete selected nodes"
                     });
                 }
             }

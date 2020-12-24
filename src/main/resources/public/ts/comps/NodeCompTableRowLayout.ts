@@ -64,15 +64,9 @@ export class NodeCompTableRowLayout extends Div {
 
         let allowInsert = S.edit.isInsertAllowed(this.node, state);
 
-        /* We have this hack (until the privileges are more nuanced, or updated) which verifies if someone is
-        inserting under a USER_FEED node we don't allow it unless its' the person who OWNS the USER_FEED, and we have this check
-        because right now our design is that USER_FEED nodes are by definition automatically 'public'
-
-        NOTE: Server also enforces this check if it gets by the client.
-        */
-        if (allowInsert && typeHandler) {
-            allowInsert = state.isAdminUser || typeHandler.allowAction(NodeActionType.addChild, this.node, state);
-        }
+        // if (allowInsert && typeHandler) {
+        //     allowInsert = state.isAdminUser || typeHandler.allowAction(NodeActionType.addChild, this.node, state);
+        // }
 
         let curCols = 0;
         let lastNode: J.NodeInfo = null;

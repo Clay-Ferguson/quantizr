@@ -47,6 +47,7 @@ import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.CreateNodeLocation;
+import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
@@ -100,6 +101,9 @@ public class ActPubService {
 
     @Autowired
     private SubNodeUtil subNodeUtil;
+
+    @Autowired
+    private MongoAuth auth;
 
     /* Cache Actor objects by URL in memory only for now */
     private static final HashMap<String, APObj> actorCacheByUrl = new HashMap<String, APObj>();
@@ -206,16 +210,8 @@ public class ActPubService {
                                         + parent.getId().toHexString());
                     }
 
-                    /*
-                     * Depending on which icon (public reply or DM (private message)) the user
-                     * clicked when creating this node, it can be a public or a private reply, and
-                     * we will have set the ACT_PUB_PRIVATE flag at that time so that we can detect
-                     * it now for sending out
-                     */
-                    privateMessage = node.getBooleanProp(NodeProp.ACT_PUB_PRIVATE.s());
-
+                    privateMessage = true;
                     toUserName = apUserNode.getStrProp(NodeProp.USER.s());
-
                     toUserNames.add(toUserName);
                 }
                 // parent==Friend node
@@ -257,15 +253,6 @@ public class ActPubService {
                      */
                     privateMessage = true;
                     toUserNames.add(toUserName);
-                }
-                /*
-                 * parent==USER_FEED (Aka, user is adding a node into their OUTBOX, which is the
-                 * main way to post to the fediverse if this isn't a reply. Note: This will only
-                 * post to the 'inboxes' of the foreign server mentions
-                 */
-                else if (parent.getType().equals(NodeType.USER_FEED.s())) {
-                    // todo-0: Public/Private needs to be specified from the gui
-                    privateMessage = false;
                 }
                 // otherwise we can't handle
                 else {
@@ -507,76 +494,84 @@ public class ActPubService {
     public void refreshOutboxFromForeignServer(MongoSession session, Object actor, SubNode userNode,
             String apUserName) {
 
-        if (userNode == null) {
-            userNode = read.getUserNodeByUserName(session, apUserName);
-        }
+        // Temporarily removing this because we no longer have USER _FEED (outbox) so we
+        // will have to rethink
+        // if we want to pull in this data in this way or not, or just dump it directly
+        // into some node in the user's
+        // account.
 
-        final SubNode _userNode = userNode;
-        SubNode outboxNode = read.getUserNodeByType(session, apUserName, null, null, NodeType.USER_FEED.s());
-        Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode);
+        // if (userNode == null) {
+        // userNode = read.getUserNodeByUserName(session, apUserName);
+        // }
 
-        Object outbox = getOutbox(AP.str(actor, "outbox"));
-        if (outbox == null) {
-            log.debug("Unable to get outbox for AP user: " + apUserName);
-            return;
-        }
+        // final SubNode _userNode = userNode;
+        // SubNode outboxNode = read.getUserNodeByType(session, apUserName, null, null,
+        // NodeType.USER _FEED.s());
+        // Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode);
 
-        /*
-         * Generate a list of known AP IDs so we can ignore them and load only the
-         * unknown ones from the foreign server
-         */
-        HashSet<String> apIdSet = new HashSet<String>();
-        for (SubNode n : outboxItems) {
-            String apId = n.getStrProp(NodeProp.ACT_PUB_ID.s());
-            if (apId != null) {
-                apIdSet.add(apId);
-            }
-        }
+        // Object outbox = getOutbox(AP.str(actor, "outbox"));
+        // if (outbox == null) {
+        // log.debug("Unable to get outbox for AP user: " + apUserName);
+        // return;
+        // }
 
-        /*
-         * Warning: There are times when even with only two items in the outbox Mastodon
-         * might send back an empty array in the "first" page and the two items in teh
-         * "last" page, which makes no sense, but it just means we have to read and
-         * deduplicate all the items from all pages to be sure we don't end up with a
-         * empty array even when there ARE some
-         */
-        Object ocPage = getOrderedCollectionPage(AP.str(outbox, "first"));
-        int pageNo = 0;
-        while (ocPage != null) {
-            pageNo++;
-            final int _pageNo = pageNo;
+        // /*
+        // * Generate a list of known AP IDs so we can ignore them and load only the
+        // * unknown ones from the foreign server
+        // */
+        // HashSet<String> apIdSet = new HashSet<String>();
+        // for (SubNode n : outboxItems) {
+        // String apId = n.getStrProp(NodeProp.ACT_PUB_ID.s());
+        // if (apId != null) {
+        // apIdSet.add(apId);
+        // }
+        // }
 
-            List<?> orderedItems = AP.list(ocPage, "orderedItems");
-            for (Object apObj : orderedItems) {
-                String apId = AP.str(apObj, "id");
-                if (!apIdSet.contains(apId)) {
-                    log.debug("CREATING NODE (AP Obj): " + apId);
-                    saveOutboxItem(session, outboxNode, apObj, _pageNo, _userNode.getId());
-                    apIdSet.add(apId);
-                }
-            }
+        // /*
+        // * Warning: There are times when even with only two items in the outbox
+        // Mastodon
+        // * might send back an empty array in the "first" page and the two items in teh
+        // * "last" page, which makes no sense, but it just means we have to read and
+        // * deduplicate all the items from all pages to be sure we don't end up with a
+        // * empty array even when there ARE some
+        // */
+        // Object ocPage = getOrderedCollectionPage(AP.str(outbox, "first"));
+        // int pageNo = 0;
+        // while (ocPage != null) {
+        // pageNo++;
+        // final int _pageNo = pageNo;
 
-            String nextPage = AP.str(ocPage, "next");
-            log.debug("NextPage: " + nextPage);
-            if (nextPage != null) {
-                ocPage = getOrderedCollectionPage(nextPage);
-            } else {
-                break;
-            }
-        }
+        // List<?> orderedItems = AP.list(ocPage, "orderedItems");
+        // for (Object apObj : orderedItems) {
+        // String apId = AP.str(apObj, "id");
+        // if (!apIdSet.contains(apId)) {
+        // log.debug("CREATING NODE (AP Obj): " + apId);
+        // saveOutboxItem(session, outboxNode, apObj, _pageNo, _userNode.getId());
+        // apIdSet.add(apId);
+        // }
+        // }
 
-        ocPage = getOrderedCollectionPage(AP.str(outbox, "last"));
-        if (ocPage != null) {
-            List<?> orderedItems = AP.list(ocPage, "orderedItems");
-            for (Object apObj : orderedItems) {
-                String apId = AP.str(apObj, "id");
-                if (!apIdSet.contains(apId)) {
-                    log.debug("CREATING NODE (AP Obj): " + apId);
-                    saveOutboxItem(session, outboxNode, apObj, -1, _userNode.getId());
-                    apIdSet.add(apId);
-                }
-            }
-        }
+        // String nextPage = AP.str(ocPage, "next");
+        // log.debug("NextPage: " + nextPage);
+        // if (nextPage != null) {
+        // ocPage = getOrderedCollectionPage(nextPage);
+        // } else {
+        // break;
+        // }
+        // }
+
+        // ocPage = getOrderedCollectionPage(AP.str(outbox, "last"));
+        // if (ocPage != null) {
+        // List<?> orderedItems = AP.list(ocPage, "orderedItems");
+        // for (Object apObj : orderedItems) {
+        // String apId = AP.str(apObj, "id");
+        // if (!apIdSet.contains(apId)) {
+        // log.debug("CREATING NODE (AP Obj): " + apId);
+        // saveOutboxItem(session, outboxNode, apObj, -1, _userNode.getId());
+        // apIdSet.add(apId);
+        // }
+        // }
+        // }
     }
 
     public void saveOutboxItem(MongoSession session, SubNode userFeedNode, Object apObj, int pageNo, ObjectId ownerId) {
@@ -1037,7 +1032,7 @@ public class ActPubService {
         notifyAllObjectRecipients(obj, "cc", msg);
     }
 
-    public void saveNoteToUserInboxNode__obsolets(MongoSession session, String actorUrl, Object obj) {
+    public void saveNoteToUserInboxNode__obsolete(MongoSession session, String actorUrl, Object obj) {
         String id = AP.str(obj, "id");
         Date published = AP.date(obj, "published");
         String contentHtml = AP.str(obj, "content");
@@ -1312,10 +1307,7 @@ public class ActPubService {
             long count = 0;
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (userNode != null) {
-                SubNode userFeedNode = read.getUserNodeByType(mongoSession, null, userNode, "### Posts",
-                        NodeType.USER_FEED.s());
-
-                count = read.getChildCount(mongoSession, userFeedNode);
+                count = auth.countSubGraphByAclUser(mongoSession, null, userNode.getId().toHexString());
             }
             return Long.valueOf(count);
         });
@@ -1553,6 +1545,8 @@ public class ActPubService {
         return ret;
     }
 
+    // todo-0: Security isn't implemented on this call yet so a hacker can theoretically inject
+    // any userName into the api for this to retrieve shared nodes anyone has shared.
     public APList getOutboxItems(String userName, String minId) {
         String host = appProp.protocolHostAndPort();
         APList retItems = null;
@@ -1566,20 +1560,15 @@ public class ActPubService {
 
             retItems = (APList) adminRunner.run(mongoSession -> {
                 APList items = new APList();
-                SubNode userFeedNode = read.getUserNodeByType(mongoSession, null, userNode, "### Posts",
-                        NodeType.USER_FEED.s());
-
-                // long childCount = read.getChildCount(mongoSession, userFeedNode);
-
-                int MAX_PER_PAGE = 3;
+                int MAX_PER_PAGE = 25;
                 boolean collecting = false;
 
                 if (minId == null) {
                     collecting = true;
                 }
 
-                for (SubNode child : read.getChildren(mongoSession, userFeedNode,
-                        Sort.by(Sort.Direction.DESC, SubNode.FIELD_CREATE_TIME), null, 0)) {
+                for (SubNode child : auth.searchSubGraphByAclUser(mongoSession, null, userNode.getId().toHexString(),
+                        SubNode.FIELD_MODIFY_TIME, MAX_PER_PAGE)) {
 
                     if (items.size() >= MAX_PER_PAGE) {
                         // ocPage.setPrev(outboxBase + "?page=" + String.valueOf(pgNo - 1));
@@ -1591,12 +1580,7 @@ public class ActPubService {
                         String hexId = child.getId().toHexString();
                         String published = DateUtil.isoStringFromDate(child.getModifyTime());
                         String actor = makeActorUrlForUserName(userName);
-                        // APObj item = new APObj();
-                        // item.put("type", "Note");
-                        // item.put("name", "node:" + hexId);
-                        // item.put("id", nodeIdBase + hexId);
-                        // item.put("content", child.getContent());
-                        // item.put("attributedTo", attributedTo);
+                       
                         items.add(new APObj() //
                                 .put("id", nodeIdBase + hexId + "&create=t") //
                                 .put("type", "Create") //

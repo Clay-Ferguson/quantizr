@@ -44,7 +44,6 @@ public class NodeInfo {
 
 	private List<AccessControlInfo> ac;
 	private boolean hasChildren;
-	private boolean deleted;
 
 	/*
 	 * For nodes that are encrypted but shared to the current user, we send back the
@@ -91,7 +90,7 @@ public class NodeInfo {
 	public NodeInfo(String id, String path, String name, String content, String owner, String ownerId, Long ordinal,
 			Date lastModified, List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
 			int width, int height, String type, long logicalOrdinal, boolean lastChild, String cipherKey,
-			String dataUrl, boolean deleted, String avatarVer, String apAvatar) {
+			String dataUrl, String avatarVer, String apAvatar) {
 		this.id = id;
 		this.path = path;
 		this.name = name;
@@ -111,7 +110,6 @@ public class NodeInfo {
 		this.logicalOrdinal = logicalOrdinal;
 		this.cipherKey = cipherKey;
 		this.dataUrl = dataUrl;
-		this.deleted = deleted;
 		this.avatarVer = avatarVer;
 		this.apAvatar = apAvatar;
 	}
@@ -292,14 +290,6 @@ public class NodeInfo {
 
 	public void setDataUrl(String dataUrl) {
 		this.dataUrl = dataUrl;
-	}
-
-	public boolean isDeleted() {
-		return deleted;
-	}
-
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
 	}
 
 	public String getAvatarVer() {
