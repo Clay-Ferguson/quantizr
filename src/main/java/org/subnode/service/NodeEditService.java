@@ -1,6 +1,8 @@
 package org.subnode.service;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -146,6 +148,26 @@ public class NodeEditService {
 
 		res.setSuccess(true);
 		return res;
+	}
+
+	public SubNode createFriendNode(MongoSession session, SubNode parentFriendsList, String userToFollow,
+			String followerActorUrl) {
+		List<PropertyInfo> properties = new LinkedList<PropertyInfo>();
+		properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
+
+		SubNode newNode = create.createNode(session, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
+				CreateNodeLocation.LAST, properties);
+		newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
+
+		if (followerActorUrl != null) {
+			newNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), followerActorUrl);
+		}
+
+		// we always copy the access controls from the parent for any new nodes
+		// auth.setDefaultReplyAcl(parentFriendsList, newNode);
+
+		update.save(session, newNode);
+		return newNode;
 	}
 
 	public AppDropResponse appDrop(MongoSession session, AppDropRequest req) {
@@ -385,8 +407,10 @@ public class NodeEditService {
 
 			// if a foreign user, update thru ActivityPub
 			if (friendUserName.contains("@")) {
-				// todo-0: go into node listener for delete action on nodes and when any nodes are deleted
-				// run this with 'false'
+				/*
+				 * todo-0: go into node listener for delete action on nodes and when any nodes
+				 * are deleted run this with 'false'
+				 */
 				actPubService.setFollowing(friendUserName, true);
 			}
 

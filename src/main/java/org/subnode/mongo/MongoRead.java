@@ -282,8 +282,6 @@ public class MongoRead {
         // log.debug("getNode identifier=" + identifier);
         SubNode ret = null;
 
-        // inbox, friend_list, and user_feed need to be passed as type instead, prefixed
-        // with tilde.
         if (identifier.startsWith("~")) {
             String typeName = identifier.substring(1);
             if (!typeName.startsWith("sn:")) {
@@ -577,6 +575,32 @@ public class MongoRead {
         return getOps(session).find(query, SubNode.class);
     }
 
+    public Iterable<SubNode> findFollowersOfUser(MongoSession session, String userName) {
+        update.saveSession(session);
+        Query query = new Query();
+
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
+                .regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+                .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s()).is(userName) //
+                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
+
+        query.addCriteria(criteria);
+        return getOps(session).find(query, SubNode.class);
+    }
+
+    public long countFollowersOfUser(MongoSession session, String userName) {
+        update.saveSession(session);
+        Query query = new Query();
+
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
+                .regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+                .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s()).is(userName) //
+                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
+
+        query.addCriteria(criteria);
+        return getOps(session).count(query, SubNode.class);
+    }
+
     /**
      * prop is optional and if non-null means we should search only that one field.
      * 
@@ -737,8 +761,10 @@ public class MongoRead {
         }
 
         if (user == null) {
-            // todo-0: if we ever get into here in a REST call from a foreign server (not browser user), this will fail.
-            // Need some kind of across-the-board protection from this scenario as best as we can.
+            // todo-0: if we ever get into here in a REST call from a foreign server (not
+            // browser user), this will fail.
+            // Need some kind of across-the-board protection from this scenario as best as
+            // we can.
             user = sessionContext.getUserName();
         }
         user = user.trim();
@@ -782,6 +808,26 @@ public class MongoRead {
     }
 
     /*
+     * Finds and returns the FRIEND node matching userName under the
+     * friendsListNode, or null if not existing
+     */
+    public SubNode findFriendOfUser(MongoSession session, SubNode friendsListNode, String userName) {
+
+        // Other wise for ordinary users root is based off their username
+        Query query = new Query();
+        Criteria criteria = Criteria.where(//
+                SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(friendsListNode.getPath()))//
+                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND) //
+                .and(NodeProp.USER.s()).is(userName);
+
+        query.addCriteria(criteria);
+        SubNode ret = getOps(session).findOne(query, SubNode.class);
+
+        // auth.auth(session, ret, PrivilegeType.READ);
+        return ret;
+    }
+
+    /*
      * Finds the first node matching 'type' under 'path' (non-recursively, direct
      * children only)
      */
@@ -789,12 +835,26 @@ public class MongoRead {
 
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
-        Criteria criteria = Criteria.where(//
-                SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(path))//
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(path))//
                 .and(SubNode.FIELD_TYPE).is(type);
 
         query.addCriteria(criteria);
         return getOps(session).find(query, SubNode.class);
+    }
+
+  /*
+     * Finds the first node matching 'type' under 'path' (non-recursively, direct
+     * children only)
+     */
+    public long countTypedNodesUnderPath(MongoSession session, String path, String type) {
+
+        // Other wise for ordinary users root is based off their username
+        Query query = new Query();
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(path))//
+                .and(SubNode.FIELD_TYPE).is(type);
+
+        query.addCriteria(criteria);
+        return getOps(session).count(query, SubNode.class);
     }
 
     /*
@@ -816,8 +876,9 @@ public class MongoRead {
     }
 
     /*
-     * Same as findSubNodeByProp but returns multiples. Finda ALL nodes contained directly under path (non-recursively)
-     * that has a matching propName and propVal
+     * Same as findSubNodeByProp but returns multiples. Finda ALL nodes contained
+     * directly under path (non-recursively) that has a matching propName and
+     * propVal
      */
     public Iterable<SubNode> findSubNodesByProp(MongoSession session, String path, String propName, String propVal) {
 

@@ -68,7 +68,10 @@ export class MenuPanel extends Div {
 
             new MenuItem("Inbox", () => S.nav.openContentNode("~" + J.NodeType.INBOX, state), !state.isAnonUser),
             new MenuItem("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), !state.isAnonUser),
-            new MenuItem("Followers", () => S.nav.openContentNode("~" + J.NodeType.FOLLOWERS_LIST, state), !state.isAnonUser),
+
+            // this will have to be implemented as a custom search that's build dynamically from (FRIEND) type nodes that match this,
+            // and we should see if we can use "Friends" dialog that already exists?
+            // new MenuItem("Followers", () => {???}, !state.isAnonUser),
 
             // this appears to be broken for user 'bob' at least. Also "Show Feed" is broken on the feed node
             new MenuItem("Feed", () => S.nav.navFeed(state), !state.isAnonUser)

@@ -68,6 +68,11 @@ public class MongoDelete {
 		for (SubNode node : iter) {
 			delete(session, node, false);
 		}
+
+		iter = read.findTypedNodesUnderPath(session, "/r", "sn:followersList");
+		for (SubNode node : iter) {
+			delete(session, node, false);
+		}
 	}
 
 	/**

@@ -14,7 +14,6 @@ public enum NodeType {
     
     RSS_FEED("sn:rssfeed"), //
     FRIEND_LIST("sn:friendList"), //
-    FOLLOWERS_LIST("sn:followersList"), //
     FRIEND("sn:friend"), //
 
     ACT_PUB_ITEM("ap:item"), //

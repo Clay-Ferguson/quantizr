@@ -26,7 +26,6 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -37,9 +36,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.AppController;
+import org.subnode.actpub.AP;
 import org.subnode.actpub.APList;
 import org.subnode.actpub.APObj;
-import org.subnode.actpub.AP;
 import org.subnode.actpub.ActPubConstants;
 import org.subnode.actpub.ActPubFactory;
 import org.subnode.config.AppProp;
@@ -101,6 +100,9 @@ public class ActPubService {
 
     @Autowired
     private SubNodeUtil subNodeUtil;
+
+    @Autowired
+    private NodeEditService edit;
 
     @Autowired
     private MongoAuth auth;
@@ -394,7 +396,7 @@ public class ActPubService {
         synchronized (actorCacheByUserName) {
             Object actor = actorCacheByUserName.get(apUserName);
 
-            // if we have actor object skip the step of getting it an import using it.
+            // if we have actor object skip the step of getting it and import using it.
             if (actor != null) {
                 return importActor(session, actor);
             }
@@ -804,7 +806,7 @@ public class ActPubService {
         }
         // Process Follow Action
         else if ("Follow".equals(type)) {
-            return processFollowAction(payload);
+            return processFollowAction(payload, false);
         }
         // Process Undo Action (Unfollow, etc)
         else if ("Undo".equals(type)) {
@@ -821,76 +823,9 @@ public class ActPubService {
     public APObj processUndoAction(Object payload) {
         Object object = AP.obj(payload, "object");
         if (object != null && "Follow".equals(AP.str(object, "type"))) {
-            return processUnfollowAction(object);
+            return processFollowAction(object, true);
         }
         return null;
-    }
-
-    /* Process inbound Unfollow actions (comming from foreign servers) */
-    public APObj processUnfollowAction(Object object) {
-        // Actor URL of actor doing the folloing
-        String followerActor = AP.str(object, "actor");
-        if (followerActor == null) {
-            log.debug("no 'actor' found on follows action request posted object");
-            return null;
-        }
-
-        // Actor being followed (local to our server)
-        String actorUrl = AP.str(object, "object");
-        if (actorUrl == null) {
-            log.debug("no 'object' found on follows action request posted object");
-            return null;
-        }
-
-        /*
-         * Not sure if this is the best way to convert one of our own actor URL into the
-         * username, but unless paths change this should work
-         */
-        int lastIdx = actorUrl.lastIndexOf("/");
-        String userToFollow = null;
-        if (lastIdx == -1) {
-            log.debug("unable to get a user name from actor url: " + actorUrl);
-            return null;
-        }
-
-        userToFollow = actorUrl.substring(lastIdx + 1);
-        final String _userToFollow = userToFollow;
-
-        APObj _ret = (APObj) adminRunner.run(session -> {
-            SubNode followersListNode = read.getUserNodeByType(session, _userToFollow, null, null,
-                    NodeType.FOLLOWERS_LIST.s());
-            Iterable<SubNode> followers = read.searchSubGraph(session, followersListNode,
-                    NodeProp.ACT_PUB_ACTOR_URL.s(), followerActor, null, 0, false, true);
-
-            /*
-             * There should only be a maximum of one item in this loop ever, but it's still
-             * correct to delete all if there were ever any multiples
-             */
-            for (SubNode n : followers) {
-                delete.deleteNode(session, n, false);
-            }
-
-            /*
-             * todo-0: this is my 'guess' at what a response to an Undo would look like.
-             * Haven't confirmed yet. I'm betting even if this is wrong things will still
-             * work ok (for now). Actually based on the "Follow" example, I had concluded
-             * this kinf of "Accept" should be sent as an async transation to server (rather
-             * than a reply), but I need to confirm by analyzing what Mastodon does.
-             */
-            APObj ret = new APObj() //
-                    .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                    .put("summary", "Accepted unfollow request") //
-                    .put("type", "Accept") //
-                    .put("actor", actorUrl) //
-                    .put("object", new APObj() //
-                            .put("type", "Undo") //
-                            .put("actor", followerActor) //
-                            .put("object", actorUrl) //
-            );
-            log.debug("Reply to Undo Follow Request: " + XString.prettyPrint(ret));
-            return ret;
-        });
-        return _ret;
     }
 
     public APObj processCreateAction(Object payload) {
@@ -1174,61 +1109,67 @@ public class ActPubService {
         return ret;
     }
 
-    /* Process inbound 'Follow' actions (comming from foreign servers) */
-    public APObj processFollowAction(Object followAction) {
+    /*
+     * Process inbound 'Follow' actions (comming from foreign servers). This results
+     * in the follower an account node in our local DB created if not already
+     * existing, and then a FRIEND node under his FRIENDS_LIST created to represent
+     * the person he's following, if not already existing.
+     * 
+     * If 'unFollow' is true we actually do an unfollow instead of a follow.
+     */
+    public APObj processFollowAction(Object followAction, boolean unFollow) {
 
-        // Actor URL of actor doing the following
-        String followerActor = AP.str(followAction, "actor");
-        if (followerActor == null) {
-            log.debug("no 'actor' found on follows action request posted object");
-            return null;
-        }
+        return (APObj) adminRunner.run(session -> {
+            // Actor URL of actor doing the following
+            String followerActorUrl = AP.str(followAction, "actor");
+            if (followerActorUrl == null) {
+                log.debug("no 'actor' found on follows action request posted object");
+                return null;
+            }
 
-        // Actor being followed (local to our server)
-        String actorBeingFollowedUrl = AP.str(followAction, "object");
-        if (actorBeingFollowedUrl == null) {
-            log.debug("no 'object' found on follows action request posted object");
-            return null;
-        }
+            APObj followerActorObj = getActorByUrl(followerActorUrl);
 
-        String userToFollow = this.getLocalUserNameFromActorUrl(actorBeingFollowedUrl);
-        if (userToFollow == null) {
-            log.debug("unable to get a user name from actor url: " + actorBeingFollowedUrl);
-            return null;
-        }
+            // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
+            // XString.prettyPrint(actor));
+            String followerUserName = getLongUserNameFromActor(followerActorObj);
 
-        final String _userToFollow = userToFollow;
+            // todo-0: make sure repeat calls to this don't redundantly call foreign servers
+            // (after could have cached results)
+            SubNode followerAccountNode = loadForeignUser(session, followerUserName);
 
-        APObj _ret = (APObj) adminRunner.run(session -> {
-            /* Gets FOLLOWERS_LIST node and create it if not already existing */
-            SubNode followersListNode = read.getUserNodeByType(session, _userToFollow, null, null,
-                    NodeType.FOLLOWERS_LIST.s());
+            // Actor being followed (local to our server)
+            String actorBeingFollowedUrl = AP.str(followAction, "object");
+            if (actorBeingFollowedUrl == null) {
+                log.debug("no 'object' found on follows action request posted object");
+                return null;
+            }
+
+            String userToFollow = this.getLocalUserNameFromActorUrl(actorBeingFollowedUrl);
+            if (userToFollow == null) {
+                log.debug("unable to get a user name from actor url: " + actorBeingFollowedUrl);
+                return null;
+            }
+
+            // get the Friend List of the follower
+            SubNode followerFriendList = read.getUserNodeByType(session, followerUserName, null, null,
+                    NodeType.FRIEND_LIST.s());
 
             /*
-             * Search to see if we already have this followerActor as a follower, which will
-             * exist as a FRIEND node (under our FOLLOWERS_LIST node) that has the
-             * ACT_PUB_ACTOR_URL property set to the follower's actor url
+             * lookup to see if this followerFriendList node already has userToFollow
+             * already under it
              */
-            Iterable<SubNode> followers = read.searchSubGraph(session, followersListNode,
-                    NodeProp.ACT_PUB_ACTOR_URL.s(), followerActor, null, 0, false, true);
-
-            /*
-             * If we don't find the user already following us add the FRIEND node
-             * designating them as a follower
-             */
-            if (followers == null || !followers.iterator().hasNext()) {
-                SubNode followerNode = create.createNode(session, followersListNode.getPath() + "/?",
-                        NodeType.FRIEND.s());
-                /*
-                 * Showing this actor url on the GUI for this friend node is not ideal. Need to
-                 * show better info/name
-                 */
-                followerNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), followerActor);
-                update.save(session, followerNode);
-
-                // todo-1: do a message like this that says "User X has followed you."
-                // userFeedService.sendServerPushInfo(localUserName,
-                // new NotificationMessage("apReply", null, contentHtml, toUserName));
+            SubNode friendNode = read.findFriendOfUser(session, followerFriendList, userToFollow);
+            if (friendNode == null) {
+                if (!unFollow) {
+                    friendNode = edit.createFriendNode(session, followerFriendList, userToFollow, followerActorUrl);
+                    // userFeedService.sendServerPushInfo(localUserName,
+                    // new NotificationMessage("apReply", null, contentHtml, toUserName));
+                }
+            } else {
+                // if this is an unfollow delete the friend node
+                if (unFollow) {
+                    delete.deleteNode(session, friendNode, false);
+                }
             }
 
             String privateKey = getPrivateKey(session, userToFollow);
@@ -1241,29 +1182,26 @@ public class ActPubService {
                     // Must send either Accept or Reject. Currently we auto-accept all.
                     APObj acceptFollow = new APObj() //
                             .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                            .put("summary", "Accepted follow request") //
+                            .put("summary", "Accepted " + (unFollow ? "unfollow" : "follow") + " request") //
                             .put("type", "Accept") //
                             .put("actor", actorBeingFollowedUrl) //
                             .put("object", new APObj() //
-                                    .put("type", "Follow") //
-                                    .put("actor", followerActor) //
+                                    .put("type", unFollow ? "Undo" : "Follow") //
+                                    .put("actor", followerActorUrl) //
                                     .put("object", actorBeingFollowedUrl)); //
 
-                    APObj followerActorObj = getActorByUrl(followerActor);
                     String followerInbox = AP.str(followerActorObj, "inbox");
 
                     // log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
                     securePost(session, privateKey, followerInbox, actorBeingFollowedUrl, acceptFollow);
                 } catch (Exception e) {
                 }
-
             };
             Thread thread = new Thread(runnable);
             thread.start();
 
             return null;
         });
-        return _ret;
     }
 
     public APObj generateDummyOrderedCollection(String userName, String path) {
@@ -1356,16 +1294,11 @@ public class ActPubService {
         final List<String> followers = new LinkedList<String>();
 
         adminRunner.run(session -> {
-            SubNode followersListNode = read.getUserNodeByType(session, userName, null, null,
-                    NodeType.FOLLOWERS_LIST.s());
+            Iterable<SubNode> iter = read.findFollowersOfUser(session, userName);
 
-            if (followersListNode != null) {
-                Iterable<SubNode> iter = read.getChildren(session, followersListNode, null, null, 0);
-
-                for (SubNode n : iter) {
-                    log.debug("Follower found: " + XString.prettyPrint(n));
-                    followers.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
-                }
+            for (SubNode n : iter) {
+                log.debug("Follower found: " + XString.prettyPrint(n));
+                followers.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
             }
             return null;
         });
@@ -1374,14 +1307,10 @@ public class ActPubService {
     }
 
     public Long getFollowersCount(String userName) {
-        Long ret = (Long) adminRunner.run(session -> {
-            SubNode followersListNode = read.getUserNodeByType(session, userName, null, null,
-                    NodeType.FOLLOWERS_LIST.s());
-            if (followersListNode == null)
-                return 0L;
-            return read.getChildCount(session, followersListNode);
+        return (Long) adminRunner.run(session -> {
+            Long count = read.countFollowersOfUser(session, userName);
+            return count;
         });
-        return ret;
     }
 
     /*
@@ -1545,8 +1474,11 @@ public class ActPubService {
         return ret;
     }
 
-    // todo-0: Security isn't implemented on this call yet so a hacker can theoretically inject
-    // any userName into the api for this to retrieve shared nodes anyone has shared.
+    /*
+     * todo-0: Security isn't implemented on this call yet so a hacker can
+     * theoretically inject any userName into the api for this to retrieve shared
+     * nodes anyone has shared.
+     */
     public APList getOutboxItems(String userName, String minId) {
         String host = appProp.protocolHostAndPort();
         APList retItems = null;
@@ -1580,7 +1512,7 @@ public class ActPubService {
                         String hexId = child.getId().toHexString();
                         String published = DateUtil.isoStringFromDate(child.getModifyTime());
                         String actor = makeActorUrlForUserName(userName);
-                       
+
                         items.add(new APObj() //
                                 .put("id", nodeIdBase + hexId + "&create=t") //
                                 .put("type", "Create") //
