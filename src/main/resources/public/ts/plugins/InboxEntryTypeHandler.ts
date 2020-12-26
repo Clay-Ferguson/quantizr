@@ -41,16 +41,16 @@ export class InboxEntryTypeHandler extends TypeBase {
         return false;
     }
 
-    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
-        return new Div(null, null, [
-            new NodeCompMarkdown(node, state),
-            new Div(null, { className: "marginLeft" }, [
-                new Icon({
-                    title: "Reply",
-                    className: "fa fa-comment fa-lg rowFooterIcon",
-                    onClick: () => S.edit.addComment(node, state)
-                })
-            ])
-        ]);
-    }
+    // render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
+    //     return new Div(null, null, [
+    //         new NodeCompMarkdown(node, state),
+    //         new Div(null, { className: "marginLeft" }, [
+    //             new Icon({
+    //                 title: "Reply",
+    //                 className: "fa fa-comment fa-lg rowFooterIcon",
+    //                 onClick: () => S.edit.addComment(node, state)
+    //             })
+    //         ])
+    //     ]);
+    // }
 }

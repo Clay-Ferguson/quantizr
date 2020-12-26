@@ -678,6 +678,7 @@ export const enum NodeType {
     FRIEND_LIST = "sn:friendList",
     FRIEND = "sn:friend",
     ACT_PUB_ITEM = "ap:item",
+    ACT_PUB_POSTS = "ap:posts",
     NONE = "u",
     PLAIN_TEXT = "sn:txt",
     FS_FILE = "fs:file",

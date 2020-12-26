@@ -18,6 +18,9 @@ public enum NodeType {
 
     ACT_PUB_ITEM("ap:item"), //
 
+    //todo-0: we can create a plugin for this type, but it's not really necessary.
+    ACT_PUB_POSTS("ap:posts"), //
+
     NONE("u"), //same as 'markdown' really
     PLAIN_TEXT("sn:txt"), //
     FS_FILE("fs:file"), //

@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
+import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
@@ -25,6 +26,7 @@ import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.AclService;
+import org.subnode.service.ActPubService;
 import org.subnode.service.UserFeedService;
 import org.subnode.util.XString;
 
@@ -54,6 +56,9 @@ public class MongoRead {
     private UserFeedService userFeedService;
 
     @Autowired
+    private ActPubService apService;
+
+    @Autowired
     private MongoCreate create;
 
     @Autowired
@@ -64,6 +69,9 @@ public class MongoRead {
 
     @Autowired
     private MongoUtil util;
+
+    @Autowired
+    private AppProp appProp;
 
     private MongoTemplate getOps(MongoSession session) {
         update.saveSession(session);
@@ -755,19 +763,34 @@ public class MongoRead {
         return node;
     }
 
-    public SubNode getUserNodeByUserName(MongoSession session, String user) {
-        if (session == null) {
-            session = auth.getAdminSession();
+    public String convertIfLocalName(String userName) {
+        if (!userName.endsWith("@" + appProp.getMetaHost())) {
+            return userName;
         }
+        int atIdx = userName.indexOf("@");
+        if (atIdx == -1)
+            return userName;
+        return userName.substring(0, atIdx);
+    }
 
+    public SubNode getUserNodeByUserName(MongoSession session, String user) {
         if (user == null) {
-            // todo-0: if we ever get into here in a REST call from a foreign server (not
-            // browser user), this will fail.
-            // Need some kind of across-the-board protection from this scenario as best as
-            // we can.
+            /*
+             * todo-0: if we ever get into here in a REST call from a foreign server (not
+             * browser user), this will fail. Need some kind of across-the-board protection
+             * from this scenario as best as we can.
+             */
             user = sessionContext.getUserName();
         }
         user = user.trim();
+
+        // if user name ends with "@quanta.wiki" for example, truncate it after the '@'
+        // character.
+        user = convertIfLocalName(user);
+
+        if (session == null) {
+            session = auth.getAdminSession();
+        }
 
         // For the ADMIN user their root node is considered to be the entire root of the
         // whole DB
@@ -785,6 +808,26 @@ public class MongoRead {
 
         SubNode ret = getOps(session).findOne(query, SubNode.class);
         auth.auth(session, ret, PrivilegeType.READ);
+        return ret;
+    }
+
+    /*
+     * Finds and returns the FRIEND node matching userName under the
+     * friendsListNode, or null if not existing
+     */
+    public SubNode findFriendOfUser(MongoSession session, SubNode friendsListNode, String userName) {
+
+        // Other wise for ordinary users root is based off their username
+        Query query = new Query();
+        Criteria criteria = Criteria.where(//
+                SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(friendsListNode.getPath()))//
+                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s()) //
+                .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(userName);
+
+        query.addCriteria(criteria);
+        SubNode ret = getOps(session).findOne(query, SubNode.class);
+
+        // auth.auth(session, ret, PrivilegeType.READ);
         return ret;
     }
 
@@ -808,26 +851,6 @@ public class MongoRead {
     }
 
     /*
-     * Finds and returns the FRIEND node matching userName under the
-     * friendsListNode, or null if not existing
-     */
-    public SubNode findFriendOfUser(MongoSession session, SubNode friendsListNode, String userName) {
-
-        // Other wise for ordinary users root is based off their username
-        Query query = new Query();
-        Criteria criteria = Criteria.where(//
-                SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(friendsListNode.getPath()))//
-                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND) //
-                .and(NodeProp.USER.s()).is(userName);
-
-        query.addCriteria(criteria);
-        SubNode ret = getOps(session).findOne(query, SubNode.class);
-
-        // auth.auth(session, ret, PrivilegeType.READ);
-        return ret;
-    }
-
-    /*
      * Finds the first node matching 'type' under 'path' (non-recursively, direct
      * children only)
      */
@@ -842,7 +865,7 @@ public class MongoRead {
         return getOps(session).find(query, SubNode.class);
     }
 
-  /*
+    /*
      * Finds the first node matching 'type' under 'path' (non-recursively, direct
      * children only)
      */

@@ -45,6 +45,7 @@ import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
@@ -54,6 +55,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdminEx;
+import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.NotificationMessage;
 import org.subnode.util.DateUtil;
@@ -91,6 +93,9 @@ public class ActPubService {
 
     @Autowired
     private UserFeedService userFeedService;
+
+    @Autowired
+    private AclService acl;
 
     @Autowired
     private AppProp appProp;
@@ -830,9 +835,18 @@ public class ActPubService {
 
     public APObj processCreateAction(Object payload) {
         APObj _ret = (APObj) adminRunner.run(session -> {
+
+            String actorUrl = AP.str(payload, "actor");
+            if (actorUrl == null) {
+                log.debug("no 'actor' found on create action request posted object");
+                return null;
+            }
+
+            APObj actorObj = getActorByUrl(actorUrl);
+
             Object object = AP.obj(payload, "object");
             if (object != null && "Note".equals(AP.str(object, "type"))) {
-                return processCreateNote(session, object);
+                return processCreateNote(session, actorUrl, actorObj, object);
             } else {
                 log.debug("Unhandled Create action (object type not supported): " + XString.prettyPrint(payload));
             }
@@ -842,7 +856,7 @@ public class ActPubService {
     }
 
     /* obj is the 'Note' object */
-    public APObj processCreateNote(MongoSession session, Object obj) {
+    public APObj processCreateNote(MongoSession session, String actorUrl, Object actorObj, Object obj) {
         APObj ret = new APObj();
 
         /*
@@ -869,33 +883,34 @@ public class ActPubService {
             }
         }
 
+        /*
+         * If a foreign user is replying to a specific node, we put the reply under that
+         * node
+         */
         if (nodeBeingRepliedTo != null) {
-            saveNoteAsReplyUnderNode(session, nodeBeingRepliedTo, obj);
-        } else {
-            List<?> toList = AP.list(obj, "to");
-            if (toList != null) {
-                for (Object to : toList) {
-                    if (to instanceof String) {
-                        String toActor = (String) to;
+            saveNote(session, nodeBeingRepliedTo, obj);
+        }
+        /*
+         * Otherwise the node is not a reply so we put it under POSTS node inside the
+         * foreign account node on our server, and then we add 'sharing' to it for each
+         * person in the 'to/cc' so that from quanta this new node will show up in those
+         * people's FEEDs
+         */
+        else {
+            SubNode actorAccountNode = loadForeignUserByActorUrl(session, actorUrl);
+            SubNode postsNode = read.findTypedNodeUnderPath(session, actorAccountNode.getPath(),
+                    NodeType.ACT_PUB_POSTS.s());
 
-                        /*
-                         * todo-0: leave this code commented just in case, but then change it to store
-                         * in the outbox of the sender, but have a recipients property on the node that
-                         * contains all the 'mentions' so we can later use that to be sure we are able
-                         * to make this node private to them only when this is not a 'public' post. So
-                         * the new rule is that not ALL nodes in a user's outbox will continue to be
-                         * 'public', which means instead of flaggin the USER POSTS root node as public,
-                         * we mark each item inside the outbox individually with it's own sharing.
-                         * Outbox node itself will no longer be shared at all.
-                         */
-                        // saveNoteToUserInboxNode(session, toActor, obj);
-                        throw new RuntimeException("AP feature path not yet functional.");
-
-                    } else {
-                        log.debug("to list entry not supported: " + to.toString());
-                    }
-                }
+            // if node was not found, create it.
+            if (postsNode == null) {
+                postsNode = create.createNode(session, actorAccountNode, null, NodeType.ACT_PUB_POSTS.s(), 0L,
+                        CreateNodeLocation.LAST, null);
+                postsNode.setOwner(actorAccountNode.getId());
+                postsNode.setContent("### Posts");
+                update.save(session, postsNode);
             }
+
+            saveNote(session, postsNode, obj);
         }
 
         // todo-0: add cc processing. Same format as 'to' list above
@@ -904,16 +919,7 @@ public class ActPubService {
         return ret;
     }
 
-    /*
-     * todo-0: this node needs to also have it's sharing set to be shared with all
-     * the peop on the recipients list, unless any of the recipients is '#Public' in
-     * which case we share to public
-     * 
-     * Before this functionality can be implemented we need to stop OUTBOX nodes
-     * from beind default public, and get the rest of the non-Federated (local only)
-     * users working otherwise per current design
-     */
-    public void saveNoteAsReplyUnderNode(MongoSession session, SubNode nodeBeingRepliedTo, Object obj) {
+    public void saveNote(MongoSession session, SubNode parentNode, Object obj) {
 
         String id = AP.str(obj, "id");
         Date published = AP.date(obj, "published");
@@ -921,27 +927,18 @@ public class ActPubService {
         String objUrl = AP.str(obj, "url");
         String objAttributedTo = AP.str(obj, "attributedTo");
 
-        // String localUserName = getLocalUserNameFromActorUrl(toActor);
-        // if (localUserName == null) {
-        // log.debug("actorUrl not handled: " + toActor);
-        // return;
-        // }
-        // SubNode userNode = read.getUserNodeByUserName(session, localUserName);
-        // if (userNode == null)
-        // return;
-
         /*
          * First look to see if there is a target node already existing in this so we
-         * don't add a dupliate
+         * don't add a duplicate
          */
-        SubNode newNode = read.findSubNodeByProp(session, nodeBeingRepliedTo.getPath(), NodeProp.ACT_PUB_ID.s(), id);
+        SubNode newNode = read.findSubNodeByProp(session, parentNode.getPath(), NodeProp.ACT_PUB_ID.s(), id);
         if (newNode != null) {
             log.debug("duplicate ActivityPub post ignored: " + id);
             return;
         }
 
-        newNode = create.createNode(session, nodeBeingRepliedTo, null, NodeType.INBOX_ENTRY.s(), 0L,
-                CreateNodeLocation.FIRST, null);
+        newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST,
+                null);
 
         // foreign account will own this node.
         SubNode toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
@@ -956,6 +953,10 @@ public class ActPubService {
         newNode.setProp(NodeProp.ACT_PUB_ID.s(), id);
         newNode.setProp(NodeProp.ACT_PUB_OBJ_URL.s(), objUrl);
         newNode.setProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
+
+        shareToAllObjectRecipients(session, newNode, obj, "to");
+        shareToAllObjectRecipients(session, newNode, obj, "cc");
+
         update.save(session, newNode);
 
         addAttachmentIfExists(session, newNode, obj);
@@ -1022,6 +1023,46 @@ public class ActPubService {
         }
     }
 
+    /*
+     * Adds node sharing (ACL) entries for all recipients (i.e. propName==to | cc)
+     * 
+     * The node save is expected to be done external to this function after this
+     * function runs.
+     */
+    private void shareToAllObjectRecipients(MongoSession session, SubNode node, Object obj, String propName) {
+        List<?> list = AP.list(obj, propName);
+        if (list != null) {
+            HashMap<String, AccessControl> ac = node.getAc();
+            if (ac == null) {
+                ac = new HashMap<String, AccessControl>();
+            }
+
+            /* Build up all the access controls */
+            for (Object to : list) {
+                if (to instanceof String) {
+                    String toActorUrl = (String) to;
+
+                    // If this is a user destination (not public) send message to user.
+                    if (toActorUrl.endsWith("#Public")) {
+                        ac.put("public", new AccessControl("prvs", PrivilegeType.READ.s()));
+                    } else {
+                        String longUserName = getLongUserNameFromActorUrl(toActorUrl);
+                        SubNode acctNode = read.getUserNodeByUserName(session, longUserName);
+                        if (acctNode != null) {
+                            ac.put(acctNode.getId().toHexString(), //
+                                    new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+                        }
+                    }
+                } else {
+                    log.debug("to list entry not supported: " + to.toString());
+                }
+            }
+
+            /* Put the access controls on the node */
+            node.setAc(ac);
+        }
+    }
+
     /* propName = to | cc */
     private void notifyAllObjectRecipients(Object obj, String propName, NotificationMessage msg) {
         List<?> list = AP.list(obj, propName);
@@ -1061,6 +1102,14 @@ public class ActPubService {
     }
 
     public String getLongUserNameFromActorUrl(String actorUrl) {
+
+        /* Detect if this actorUrl points to out local server, and get the long name the easy way if so */
+        if (actorUrl.startsWith(appProp.getHttpProtocol() + "://" + appProp.getMetaHost())) {
+            String shortUserName = getLocalUserNameFromActorUrl(actorUrl);
+            String longUserName = shortUserName + "@" + appProp.getMetaHost();
+            return longUserName;
+        }
+
         APObj actor = getActorByUrl(actorUrl);
         // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
         // XString.prettyPrint(actor));

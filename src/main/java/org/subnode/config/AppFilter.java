@@ -39,6 +39,13 @@ public class AppFilter extends GenericFilterBean {
 	 */
 	private static int simulateSlowServer = 0;
 
+	/*
+	 * For debugging we can turn this flag on and disable the server from processing
+	 * multiple requests simultenaously this is every helpful for debugging
+	 */
+	private static boolean singleThreadDebugging = false;
+	private static final Object lock = new Object();
+
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
@@ -88,7 +95,13 @@ public class AppFilter extends GenericFilterBean {
 		}
 
 		try {
-			chain.doFilter(req, res);
+			if (singleThreadDebugging) {
+				synchronized (lock) {
+					chain.doFilter(req, res);
+				}
+			} else {
+				chain.doFilter(req, res);
+			}
 
 			if (logResponses) {
 				HttpServletResponse httpRes = (HttpServletResponse) res;
