@@ -184,6 +184,108 @@ public class ActPubService {
             try {
                 List<String> toUserNames = new LinkedList<String>();
 
+                /*
+                 * Any 'mentions' inside the message text get pulled out into this
+                 * 'toUserNamesSet'.
+                 */
+                HashSet<String> toUserNamesSet = parseUserNames(node.getContent());
+                toUserNames.addAll(toUserNamesSet);
+
+                boolean acChanged = false;
+                HashMap<String, AccessControl> ac = node.getAc();
+                if (ac == null) {
+                    ac = new HashMap<String, AccessControl>();
+                }
+
+                // make sure all parsed toUserNamesSet user names are saved into the node acl */
+                for (String userName : toUserNamesSet) {
+                    SubNode acctNode = read.getUserNodeByUserName(session, userName);
+                    if (acctNode != null) {
+                        if (!ac.containsKey(acctNode.getId().toHexString())) {
+                            acChanged = true;
+                            ac.put(acctNode.getId().toHexString(), //
+                                    new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+                        }
+                    }
+                }
+
+                if (acChanged) {
+                    node.setAc(ac);
+                    update.save(session, node);
+                }
+                boolean privateMessage = true;
+                /*
+                 * Now we need to lookup all userNames from the ACL info, to add them all to
+                 * 'toUserNames', and we can avoid doing any work for the ones in
+                 * 'toUserNamesSet', because we know they already are taken care of (in the
+                 * list)
+                 */
+                for (String k : ac.keySet()) {
+                    if ("public".equals(k)) {
+                        privateMessage = false;
+                    } else {
+                        // k will be a nodeId of an account node here.
+                        SubNode accountNode = read.getNode(session, k);
+
+                        /*
+                         * todo-0: If user has entered a 'mention' user name that is not imported into
+                         * our system, we auto-import that user now
+                         */
+                        if (accountNode == null) {
+                            accountNode = loadForeignUser(session, k);
+                        }
+
+                        if (accountNode != null) {
+                            String userName = accountNode.getStrProp(NodeProp.USER.s());
+                            toUserNames.add(userName);
+                        }
+                    }
+                }
+
+                // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
+                String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
+
+                /*
+                 * Get the userName of the user we're replying to. Note: This path works for a
+                 * DM to a node, but won't the more general solution be to use whatever
+                 * 
+                 * In case there's a case where attributedTo can be here, and not already been
+                 * taken care of this code will come back but for now I consider this redundant
+                 * until further researched.
+                 */
+                // String attributedTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
+                // APObj actor = getActorByUrl(attributedTo);
+                // String shortUserName = AP.str(actor, "preferredUsername"); // short name like
+                // 'alice'
+                // String toInbox = AP.str(actor, "inbox");
+                // URL url = new URL(toInbox);
+                // String host = url.getHost();
+                // String toUserName = shortUserName + "@" + host;
+                // toUserNames.add(toUserName);
+                /*
+                 * For now this usage pattern is only functional for a reply from an inbox, and
+                 * so this supports only DMs thru this code path for now (todo-0: this may
+                 * change)
+                 */
+
+                APList attachments = createAttachmentsList(node);
+
+                sendNote(session, toUserNames, sessionContext.getUserName(), inReplyTo, node.getContent(), attachments,
+                        subNodeUtil.getIdBasedUrl(node), privateMessage);
+            } //
+            catch (Exception e) {
+                log.error("sendNote failed", e);
+                throw new RuntimeException(e);
+            }
+            return null;
+        });
+    }
+
+    public void sendNotificationForNodeEdit__original(SubNode parent, SubNode node) {
+        adminRunner.run(session -> {
+            try {
+                List<String> toUserNames = new LinkedList<String>();
+
                 // Any 'mentions' inside the message text get pulled out into this
                 // 'toUserNamesSet'
                 HashSet<String> toUserNamesSet = parseUserNames(node.getContent());
@@ -937,8 +1039,7 @@ public class ActPubService {
             return;
         }
 
-        newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST,
-                null);
+        newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null);
 
         // foreign account will own this node.
         SubNode toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
@@ -1103,7 +1204,10 @@ public class ActPubService {
 
     public String getLongUserNameFromActorUrl(String actorUrl) {
 
-        /* Detect if this actorUrl points to out local server, and get the long name the easy way if so */
+        /*
+         * Detect if this actorUrl points to out local server, and get the long name the
+         * easy way if so
+         */
         if (actorUrl.startsWith(appProp.getHttpProtocol() + "://" + appProp.getMetaHost())) {
             String shortUserName = getLocalUserNameFromActorUrl(actorUrl);
             String longUserName = shortUserName + "@" + appProp.getMetaHost();
