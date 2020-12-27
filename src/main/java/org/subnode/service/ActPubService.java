@@ -1065,63 +1065,9 @@ public class ActPubService {
 
         NotificationMessage msg = new NotificationMessage("apReply", newNode.getId().toHexString(), contentHtml,
                 fromUserName);
+
         notifyAllObjectRecipients(obj, "to", msg);
         notifyAllObjectRecipients(obj, "cc", msg);
-    }
-
-    public void saveNoteToUserInboxNode__obsolete(MongoSession session, String actorUrl, Object obj) {
-        String id = AP.str(obj, "id");
-        Date published = AP.date(obj, "published");
-        String contentHtml = AP.str(obj, "content");
-        String objUrl = AP.str(obj, "url");
-        String objAttributedTo = AP.str(obj, "attributedTo");
-
-        String localUserName = getLocalUserNameFromActorUrl(actorUrl);
-        if (localUserName == null) {
-            log.debug("actorUrl not handled: " + actorUrl);
-            return;
-        }
-        SubNode userNode = read.getUserNodeByUserName(session, localUserName);
-        if (userNode == null)
-            return;
-
-        SubNode userInbox = read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s());
-        if (userInbox == null)
-            return;
-
-        /*
-         * First look to see if there is a target node already existing in this persons
-         * inbox that points to the node in question
-         */
-        SubNode inboxNode = read.findSubNodeByProp(session, userInbox.getPath(), NodeProp.ACT_PUB_ID.s(), id);
-
-        /*
-         * If there's no notification for this node already in the user's inbox then add
-         * one
-         */
-        if (inboxNode == null) {
-            inboxNode = create.createNode(session, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L,
-                    CreateNodeLocation.FIRST, null);
-
-            inboxNode.setOwner(userInbox.getOwner());
-            // todo-0: need a new node prop type that is just 'html' and tells us to render
-            // content as raw html if set, or for now
-            // we could be clever and just detect if it DOES have tags and does NOT have
-            // '```'
-            inboxNode.setContent(contentHtml);
-            inboxNode.setModifyTime(published);
-            inboxNode.setProp(NodeProp.ACT_PUB_ID.s(), id);
-            inboxNode.setProp(NodeProp.ACT_PUB_OBJ_URL.s(), objUrl);
-            inboxNode.setProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
-            update.save(session, inboxNode);
-
-            addAttachmentIfExists(session, inboxNode, obj);
-
-            String toUserName = getLongUserNameFromActorUrl(objAttributedTo);
-
-            userFeedService.sendServerPushInfo(localUserName,
-                    new NotificationMessage("apReply", inboxNode.getId().toHexString(), contentHtml, toUserName));
-        }
     }
 
     /*
@@ -1170,11 +1116,12 @@ public class ActPubService {
         if (list != null) {
             for (Object to : list) {
                 if (to instanceof String) {
-                    String toStr = (String) to;
+                    String actorUrl = (String) to;
 
                     // If this is a user destination (not public) send message to user.
-                    if (!toStr.endsWith("#Public")) {
-                        userFeedService.sendServerPushInfo((String) toStr, msg);
+                    if (!actorUrl.endsWith("#Public") && isLocalActorUrl(actorUrl)) {
+                        String userName = getLocalUserNameFromActorUrl(actorUrl);
+                        userFeedService.sendServerPushInfo(userName, msg);
                     }
                 } else {
                     log.debug("to list entry not supported: " + to.toString());
@@ -1240,13 +1187,17 @@ public class ActPubService {
         return userName;
     }
 
+    boolean isLocalActorUrl(String actorUrl) {
+        return actorUrl.startsWith(appProp.protocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/");
+    }
+
     /*
      * we know our own actor layout is this: https://ourserver.com/ap/u/userName, so
      * this method just strips the user name by taking what's after the rightmost
      * slash
      */
     public String getLocalUserNameFromActorUrl(String actorUrl) {
-        if (!actorUrl.startsWith(appProp.protocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/")) {
+        if (!isLocalActorUrl(actorUrl)) {
             log.debug("Invalid quanta actor Url: " + actorUrl);
             return null;
         }
