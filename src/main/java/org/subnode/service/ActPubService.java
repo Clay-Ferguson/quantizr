@@ -135,7 +135,7 @@ public class ActPubService {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    public HashSet<String> parseUserNames(String message) {
+    public HashSet<String> parseMentions(String message) {
         HashSet<String> userNames = new HashSet<String>();
 
         // prepare to that newlines is compatable with out tokenizing
@@ -145,10 +145,15 @@ public class ActPubService {
         List<String> words = XString.tokenize(message, " ", true);
         if (words != null) {
             for (String word : words) {
-                // detect the pattern @name@server.com
-                if (word.startsWith("@") && StringUtils.countMatches(word, "@") == 2) {
+                // detect the pattern @name@server.com or @name
+                if (word.startsWith("@") && StringUtils.countMatches(word, "@") <= 2) {
                     word = word.substring(1);
-                    userNames.add(word);
+
+                    // This second 'startsWith' check ensures we ignore patterns that start with
+                    // "@@"
+                    if (!word.startsWith("@")) {
+                        userNames.add(word);
+                    }
                 }
             }
         }
@@ -179,206 +184,119 @@ public class ActPubService {
      * of parents this can happen on (Node types), each being some kind of foreign
      * AP message to reply to.
      */
-    public void sendNotificationForNodeEdit(SubNode parent, SubNode node) {
-        adminRunner.run(session -> {
-            try {
-                List<String> toUserNames = new LinkedList<String>();
+    public void sendNotificationForNodeEdit(MongoSession session, SubNode parent, SubNode node) {
+        try {
+            List<String> toUserNames = new LinkedList<String>();
 
-                /*
-                 * Any 'mentions' inside the message text get pulled out into this
-                 * 'toUserNamesSet'.
-                 */
-                HashSet<String> toUserNamesSet = parseUserNames(node.getContent());
-                toUserNames.addAll(toUserNamesSet);
+            HashSet<String> mentionsSet = saveMentionsToNodeACL(session, node);
+            toUserNames.addAll(mentionsSet);
 
-                boolean acChanged = false;
-                HashMap<String, AccessControl> ac = node.getAc();
-                if (ac == null) {
-                    ac = new HashMap<String, AccessControl>();
-                }
+            boolean privateMessage = true;
+            /*
+             * Now we need to lookup all userNames from the ACL info, to add them all to
+             * 'toUserNames', and we can avoid doing any work for the ones in
+             * 'toUserNamesSet', because we know they already are taken care of (in the
+             * list)
+             */
+            for (String k : node.getAc().keySet()) {
+                if ("public".equals(k)) {
+                    privateMessage = false;
+                } else {
+                    // k will be a nodeId of an account node here.
+                    SubNode accountNode = read.getNode(session, k);
 
-                // make sure all parsed toUserNamesSet user names are saved into the node acl */
-                for (String userName : toUserNamesSet) {
-                    SubNode acctNode = read.getUserNodeByUserName(session, userName);
-                    if (acctNode != null) {
-                        if (!ac.containsKey(acctNode.getId().toHexString())) {
-                            acChanged = true;
-                            ac.put(acctNode.getId().toHexString(), //
-                                    new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
-                        }
+                    if (accountNode != null) {
+                        String userName = accountNode.getStrProp(NodeProp.USER.s());
+                        toUserNames.add(userName);
                     }
                 }
-
-                if (acChanged) {
-                    node.setAc(ac);
-                    update.save(session, node);
-                }
-                boolean privateMessage = true;
-                /*
-                 * Now we need to lookup all userNames from the ACL info, to add them all to
-                 * 'toUserNames', and we can avoid doing any work for the ones in
-                 * 'toUserNamesSet', because we know they already are taken care of (in the
-                 * list)
-                 */
-                for (String k : ac.keySet()) {
-                    if ("public".equals(k)) {
-                        privateMessage = false;
-                    } else {
-                        // k will be a nodeId of an account node here.
-                        SubNode accountNode = read.getNode(session, k);
-
-                        /*
-                         * todo-0: If user has entered a 'mention' user name that is not imported into
-                         * our system, we auto-import that user now
-                         */
-                        if (accountNode == null) {
-                            accountNode = loadForeignUser(session, k);
-                        }
-
-                        if (accountNode != null) {
-                            String userName = accountNode.getStrProp(NodeProp.USER.s());
-                            toUserNames.add(userName);
-                        }
-                    }
-                }
-
-                // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
-                String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
-
-                /*
-                 * Get the userName of the user we're replying to. Note: This path works for a
-                 * DM to a node, but won't the more general solution be to use whatever
-                 * 
-                 * In case there's a case where attributedTo can be here, and not already been
-                 * taken care of this code will come back but for now I consider this redundant
-                 * until further researched.
-                 */
-                // String attributedTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
-                // APObj actor = getActorByUrl(attributedTo);
-                // String shortUserName = AP.str(actor, "preferredUsername"); // short name like
-                // 'alice'
-                // String toInbox = AP.str(actor, "inbox");
-                // URL url = new URL(toInbox);
-                // String host = url.getHost();
-                // String toUserName = shortUserName + "@" + host;
-                // toUserNames.add(toUserName);
-                /*
-                 * For now this usage pattern is only functional for a reply from an inbox, and
-                 * so this supports only DMs thru this code path for now (todo-0: this may
-                 * change)
-                 */
-
-                APList attachments = createAttachmentsList(node);
-
-                sendNote(session, toUserNames, sessionContext.getUserName(), inReplyTo, node.getContent(), attachments,
-                        subNodeUtil.getIdBasedUrl(node), privateMessage);
-            } //
-            catch (Exception e) {
-                log.error("sendNote failed", e);
-                throw new RuntimeException(e);
             }
-            return null;
-        });
+
+            // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
+            String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
+
+            /*
+             * Get the userName of the user we're replying to. Note: This path works for a
+             * DM to a node, but won't the more general solution be to use whatever
+             * 
+             * In case there's a case where attributedTo can be here, and not already been
+             * taken care of this code will come back but for now I consider this redundant
+             * until further researched.
+             */
+            // String attributedTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
+            // APObj actor = getActorByUrl(attributedTo);
+            // String shortUserName = AP.str(actor, "preferredUsername"); // short name like
+            // 'alice'
+            // String toInbox = AP.str(actor, "inbox");
+            // URL url = new URL(toInbox);
+            // String host = url.getHost();
+            // String toUserName = shortUserName + "@" + host;
+            // toUserNames.add(toUserName);
+            /*
+             * For now this usage pattern is only functional for a reply from an inbox, and
+             * so this supports only DMs thru this code path for now (todo-0: this may
+             * change)
+             */
+
+            APList attachments = createAttachmentsList(node);
+
+            sendNote(session, toUserNames, sessionContext.getUserName(), inReplyTo, node.getContent(), attachments,
+                    subNodeUtil.getIdBasedUrl(node), privateMessage);
+        } //
+        catch (Exception e) {
+            log.error("sendNote failed", e);
+            throw new RuntimeException(e);
+        }
     }
 
-    public void sendNotificationForNodeEdit__original(SubNode parent, SubNode node) {
-        adminRunner.run(session -> {
-            try {
-                List<String> toUserNames = new LinkedList<String>();
+    /*
+     * Parses all mentions (like '@bob@server.com') in the node content text and
+     * adds them (if not existing) to the node sharing on the node, which ensures
+     * the person mentioned has visibility of this node and that it will also appear
+     * in their FEED listing
+     */
+    public HashSet<String> saveMentionsToNodeACL(MongoSession session, SubNode node) {
+        HashSet<String> mentionsSet = parseMentions(node.getContent());
 
-                // Any 'mentions' inside the message text get pulled out into this
-                // 'toUserNamesSet'
-                HashSet<String> toUserNamesSet = parseUserNames(node.getContent());
-                toUserNames.addAll(toUserNamesSet);
+        boolean acChanged = false;
+        HashMap<String, AccessControl> ac = node.getAc();
 
-                String inReplyTo = null;
-                String toUserName = null;
-                boolean privateMessage = true;
-                SubNode apUserNode = null;
+        // make sure all parsed toUserNamesSet user names are saved into the node acl */
+        for (String userName : mentionsSet) {
+            SubNode acctNode = read.getUserNodeByUserName(session, userName);
 
-                /*
-                 * Note: The 'parent' node here can be either an ActivityPub ACT_PUB_ITEM node
-                 * or else a FRIEND node of a foreign friend,
-                 * 
-                 * If this is a friend-type node we get "sn:user" property and expect that to be
-                 * something like user@foreignServer.com.
-                 */
-                // parent==ACT_PUB_ITEM
-                if (parent.getType().equals(NodeType.ACT_PUB_ITEM.s())) {
-                    inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_ID);
-
-                    /*
-                     * Get the owner node of the parent because that's where the properties are that
-                     * we need to send this message to the outbox of that user
-                     */
-                    apUserNode = read.getNode(session, parent.getOwner(), false);
-
-                    if (apUserNode == null) {
-                        throw new RuntimeException(
-                                "unable to get apUserNode from the owner of parent (an ACT_PUB_ITEM type) node with id="
-                                        + parent.getId().toHexString());
-                    }
-
-                    privateMessage = true;
-                    toUserName = apUserNode.getStrProp(NodeProp.USER.s());
-                    toUserNames.add(toUserName);
-                }
-                // parent==Friend node
-                else if (parent.getType().equals(NodeType.FRIEND.s())) {
-                    String apUserName = parent.getStrProp(NodeProp.USER);
-                    apUserNode = read.getUserNodeByUserName(session, apUserName);
-                    privateMessage = true;
-
-                    if (apUserNode == null) {
-                        throw new RuntimeException(
-                                "unable to get apUserNode from the sn:user property of parent (a FRIEND type) node with id="
-                                        + parent.getId().toHexString());
-                    }
-
-                    toUserName = apUserNode.getStrProp(NodeProp.USER.s());
-
-                    toUserNames.add(toUserName);
-                }
-                // parent==InboxEntry node (a node in a user's inbox)
-                // Is this flow path still being used?
-                else if (parent.getType().equals(NodeType.INBOX_ENTRY.s())) {
-                    // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
-
-                    inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
-
-                    /* Get the userName of the user we're replying to. */
-                    String attributedTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
-                    APObj actor = getActorByUrl(attributedTo);
-                    String shortUserName = AP.str(actor, "preferredUsername"); // short name like 'alice'
-                    String toInbox = AP.str(actor, "inbox");
-                    URL url = new URL(toInbox);
-                    String host = url.getHost();
-                    toUserName = shortUserName + "@" + host;
-
-                    /*
-                     * For now this usage pattern is only functional for a reply from an inbox, and
-                     * so this supports only DMs thru this code path for now (todo-0: this may
-                     * change)
-                     */
-                    privateMessage = true;
-                    toUserNames.add(toUserName);
-                }
-                // otherwise we can't handle
-                else {
-                    throw new RuntimeException("Unable to send message under node type: " + node.getType());
-                }
-
-                APList attachments = createAttachmentsList(node);
-
-                sendNote(session, toUserNames, sessionContext.getUserName(), inReplyTo, node.getContent(), attachments,
-                        subNodeUtil.getIdBasedUrl(node), privateMessage);
-            } //
-            catch (Exception e) {
-                log.error("sendNote failed", e);
-                throw new RuntimeException(e);
+            /*
+             * If this is a foreign 'mention' user name that is not imported into our
+             * system, we auto-import that user now
+             */
+            if (acctNode == null && StringUtils.countMatches(userName, "@") == 1) {
+                acctNode = loadForeignUser(session, userName);
             }
-            return null;
-        });
+
+            if (acctNode != null) {
+                String acctNodeId = acctNode.getId().toHexString();
+                if (ac == null || !ac.containsKey(acctNodeId)) {
+                    /*
+                     * Lazy create 'ac' so that the net result of this method is never to assign non
+                     * null when it could be left null
+                     */
+                    if (ac == null) {
+                        ac = new HashMap<String, AccessControl>();
+                    }
+                    acChanged = true;
+                    ac.put(acctNodeId,
+                            new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+                }
+            } else {
+                log.debug("Mentioned user not found: " + userName);
+            }
+        }
+
+        if (acChanged) {
+            node.setAc(ac);
+            update.save(session, node);
+        }
+        return mentionsSet;
     }
 
     public APList createAttachmentsList(SubNode node) {
@@ -406,7 +324,7 @@ public class ActPubService {
             String content, APList attachments, String noteUrl, boolean privateMessage) {
 
         String host = appProp.getMetaHost();
-        String fromActor = makeActorUrlForUserName(fromUser);
+        String fromActor = null;
 
         /*
          * todo-0: Need to analyze the scenario where there are multiple 'quanta.wiki'
@@ -415,6 +333,11 @@ public class ActPubService {
          * a single post to one user or perhaps the global inbox?
          */
         for (String toUserName : toUserNames) {
+
+            // Ignore userNames that are not foreign server names
+            if (!toUserName.contains("@")) {
+                continue;
+            }
 
             // Ignore userNames that are for our own host
             String userHost = getHostFromUserName(toUserName);
@@ -431,6 +354,11 @@ public class ActPubService {
             String toActorUrl = getActorUrlFromWebFingerObj(webFinger);
             Object toActorObj = getActorByUrl(toActorUrl);
             String inbox = AP.str(toActorObj, "inbox");
+
+            /* lazy create fromActor here */
+            if (fromActor == null) {
+                fromActor = makeActorUrlForUserName(fromUser);
+            }
 
             APObj message = apFactory.newCreateMessageForNote(toUserName, fromActor, inReplyTo, content, toActorUrl,
                     noteUrl, privateMessage, attachments);
@@ -498,7 +426,12 @@ public class ActPubService {
      * Returns account node of the user
      */
     public SubNode loadForeignUser(MongoSession session, String apUserName) {
+        if (!apUserName.contains("@")) {
+            log.debug("Invalid foreign user name: " + apUserName);
+            return null;
+        }
 
+        log.debug("Load foreign user: " + apUserName);
         /* First try to use the actor from cache, if we have it cached */
         synchronized (actorCacheByUserName) {
             Object actor = actorCacheByUserName.get(apUserName);

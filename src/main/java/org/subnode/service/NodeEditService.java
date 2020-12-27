@@ -375,19 +375,9 @@ public class NodeEditService {
 
 			SubNode parent = read.getNode(session, node.getParentPath(), false);
 
-			/*
-			 * If we are saving a node under an ActivityPub item then we need to send a
-			 * notification to the owner of this node who will, by definition, be a foreign
-			 * user.
-			 * 
-			 * todo-0: this will all change now that there's a new social architecture.
-			 */
-			if (req.isUpdateModTime() && parent != null && (parent.hasProperty(NodeProp.ACT_PUB_ID)
-					|| parent.isType(NodeType.ACT_PUB_ITEM) || parent.isForeignFriendNode())) {
-
-				actPubService.sendNotificationForNodeEdit(parent, node);
-			} else {
+			if (parent != null) {
 				adminRunner.run(s -> {
+					actPubService.sendNotificationForNodeEdit(s, parent, node);
 					userFeedService.pushNodeUpdateToAllFriends(s, node);
 				});
 
