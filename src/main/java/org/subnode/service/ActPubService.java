@@ -1020,13 +1020,23 @@ public class ActPubService {
             /* Build up all the access controls */
             for (Object to : list) {
                 if (to instanceof String) {
-                    String toActorUrl = (String) to;
+                    String shareToUrl = (String) to;
 
                     // If this is a user destination (not public) send message to user.
-                    if (toActorUrl.endsWith("#Public")) {
+                    if (shareToUrl.endsWith("#Public")) {
                         ac.put("public", new AccessControl("prvs", PrivilegeType.READ.s()));
-                    } else {
-                        String longUserName = getLongUserNameFromActorUrl(toActorUrl);
+                    }
+                    /*
+                     * todo-0: The spec for ActPub is very awkward becasue if this is a followers
+                     * URL instead of an ActorURL there's no way to detect that without reading from
+                     * the URL to determine what it sends back, so for now we don't yet handle
+                     * 'followers'
+                     */
+                    else if (shareToUrl.endsWith("/followers")) {
+                        log.debug("Not handling the " + propName + " value " + shareToUrl);
+                    } //
+                    else {
+                        String longUserName = getLongUserNameFromActorUrl(shareToUrl);
                         SubNode acctNode = read.getUserNodeByUserName(session, longUserName);
                         if (acctNode != null) {
                             ac.put(acctNode.getId().toHexString(), //
@@ -1083,9 +1093,12 @@ public class ActPubService {
     }
 
     public String getLongUserNameFromActorUrl(String actorUrl) {
+        if (actorUrl == null) {
+            return null;
+        }
 
         /*
-         * Detect if this actorUrl points to out local server, and get the long name the
+         * Detect if this actorUrl points to our local server, and get the long name the
          * easy way if so
          */
         if (actorUrl.startsWith(appProp.getHttpProtocol() + "://" + appProp.getMetaHost())) {
@@ -1095,6 +1108,9 @@ public class ActPubService {
         }
 
         APObj actor = getActorByUrl(actorUrl);
+        if (actor == null) {
+            return null;
+        }
         // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
         // XString.prettyPrint(actor));
         return getLongUserNameFromActor(actor);

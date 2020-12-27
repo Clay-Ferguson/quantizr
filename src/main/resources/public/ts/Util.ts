@@ -1409,22 +1409,16 @@ export class Util implements UtilIntf {
     }
 
     getSharingNames = (node: J.NodeInfo): string => {
+        if (!node || !node.ac) return null;
+
         let names = "";
         for (let ac of node.ac) {
-
-            // todo-0: server 'save' event need to enforce that any time 'public' is one of the shares, all the other
-            // shares get deleted, and also make this make sense in the GUI too.
-            // todo-0: make sure any node that is attempted to share to itself has the 'itself' share deleted, and make it
-            // clear in the Sharing Dialog also.
-            if (ac.principalName === "public") {
-                return "public";
-            }
-
             if (names) {
                 names += ", ";
             }
             names += ac.principalName;
         }
+
         return names;
     }
 }

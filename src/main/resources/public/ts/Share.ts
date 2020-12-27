@@ -16,16 +16,20 @@ export class Share implements ShareIntf {
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
-    editNodeSharing = (state: AppState, node: J.NodeInfo): void => {
-        if (!node) {
-            node = S.meta64.getHighlightedNode(state);
-        }
+    editNodeSharing = async (state: AppState, node: J.NodeInfo): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            if (!node) {
+                node = S.meta64.getHighlightedNode(state);
+            }
 
-        if (!node) {
-            S.util.showMessage("No node is selected.", "Warning");
-            return;
-        }
-        new SharingDlg(node, state).open();
+            if (!node) {
+                S.util.showMessage("No node is selected.", "Warning");
+                return;
+            }
+            let dlg: SharingDlg = new SharingDlg(node, state);
+            await dlg.open();
+            resolve();
+        });
     }
 
     /* If target is non-null we only return shares to that particlar person (or public) */

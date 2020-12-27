@@ -120,7 +120,7 @@ public class MongoAuth {
 		if (acList != null) {
 			for (AccessControlInfo info : acList) {
 				String userNodeId = info.getPrincipalNodeId();
-				if (userNodeId != null) {
+				if (userNodeId != null && !userNodeId.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
 					SubNode accountNode = read.getNode(session, userNodeId);
 					if (accountNode != null) {
 						String userName = accountNode.getStrProp(NodeProp.USER);

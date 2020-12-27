@@ -33,8 +33,10 @@ export class EditPrivsTableRow extends ListBoxRow {
 
     preRender(): void {
         this.setChildren([
-            new Heading(5, this.aclEntry.principalName),
-            this.renderAclPrivileges(this.aclEntry)
+            new Div(null, { className: "marginAll" }, [
+                new Heading(5, this.aclEntry.principalName),
+                this.renderAclPrivileges(this.aclEntry)
+            ])
         ]);
     }
 }

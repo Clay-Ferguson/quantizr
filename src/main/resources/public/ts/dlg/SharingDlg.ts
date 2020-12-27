@@ -58,6 +58,7 @@ export class SharingDlg extends DialogBase {
             includeAcl: true,
             includeOwners: true
         }, (res: J.GetNodePrivilegesResponse): void => {
+            this.node.ac = res.aclEntries;
             this.mergeState({ nodePrivsInfo: res });
         });
     }
@@ -77,6 +78,7 @@ export class SharingDlg extends DialogBase {
             includeAcl: true,
             includeOwners: true
         }, (res: J.GetNodePrivilegesResponse): void => {
+            this.node.ac = res.aclEntries;
             this.mergeState({ nodePrivsInfo: res });
         });
     }

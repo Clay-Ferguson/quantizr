@@ -337,7 +337,6 @@ export class RssTypeHandler extends TypeBase {
                contentDiv
             ], false,
                 (state: boolean) => {
-                    debugger;
                     RssTypeHandler.expansionState[entry.guid] = state;
                 }, RssTypeHandler.expansionState[entry.guid], "float-right"));
         }

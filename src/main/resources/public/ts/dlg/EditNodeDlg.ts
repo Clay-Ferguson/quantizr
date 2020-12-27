@@ -33,6 +33,7 @@ import { Icon } from "../widget/Icon";
 import { Label } from "../widget/Label";
 import { LayoutRow } from "../widget/LayoutRow";
 import { Selection } from "../widget/Selection";
+import { Span } from "../widget/Span";
 import { TextArea } from "../widget/TextArea";
 import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
@@ -366,7 +367,13 @@ export class EditNodeDlg extends DialogBase {
 
         this.nameState.setValue(state.node.name);
 
-        this.propertyEditFieldContainer.setChildren([mainPropsTable, binarySection, collapsiblePanel]);
+        let sharingNames = S.util.getSharingNames(state.node);
+        let sharingSpan = null;
+        if (sharingNames) {
+            sharingSpan = new Span("Shared to: " + sharingNames);
+        }
+
+        this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingSpan, binarySection, collapsiblePanel]);
         return children;
     }
 
@@ -471,9 +478,11 @@ export class EditNodeDlg extends DialogBase {
         new ChangeNodeTypeDlg(this.getState().node.type, this.setNodeType, this.appState).open();
     }
 
-    share = (): void => {
+    share = async (): Promise<void> => {
         let state = this.getState();
-        S.share.editNodeSharing(this.appState, state.node);
+        await S.share.editNodeSharing(this.appState, state.node);
+        this.mergeState({ node: state.node });
+        return null;
     }
 
     upload = async (): Promise<void> => {
