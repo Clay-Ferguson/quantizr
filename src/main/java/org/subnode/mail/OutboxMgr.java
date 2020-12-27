@@ -70,6 +70,8 @@ public class OutboxMgr {
 	 * 
 	 * Based on newer architecture for social and sharing this method is no longer needed
 	 * but I'll keep it for now.
+	 * 
+	 * todo-0: delete this method (soon)
 	 */
 	public void sendNotificationForNodeEdit__unused(final SubNode node, final String userName) {
 		boolean sendEmail = false;

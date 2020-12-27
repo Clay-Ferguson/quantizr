@@ -129,10 +129,10 @@ public class UserFeedService {
 
 	/*
 	 * New version of this just does a global query for all nodes that are shared to
-	 * this user (todo-0: Also eventually we will being back the
+	 * this user (todo-0: Also eventually we will bring back the
 	 * "only friends I'm following" option to this query, using the two props in the
 	 * request for the filtering options but be VERY careful not to expose data
-	 * without 'auth', when you do a wider search. )
+	 * without 'auth', when you do a wider search.)
 	 */
 	public NodeFeedResponse generateFeed(MongoSession session, NodeFeedRequest req) {
 

@@ -51,7 +51,7 @@ public class MongoDelete {
 	public void removeAbandonedNodes(MongoSession session) {
 		Query query = new Query();
 
-		/* todo-0: we need to also include a condition for creat time being over 30m ago to avoid blowing something away 
+		/* todo-0: we need to also include a condition for create time being over 30m ago to avoid blowing something away 
 		that someone is still using */
 		query.addCriteria(Criteria.where(SubNode.FIELD_MODIFY_TIME).is(null));
 

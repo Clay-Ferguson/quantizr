@@ -104,8 +104,6 @@ public class NodeEditService {
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request.
-	 * 
-	 * todo-0: need to always default all sharing to be same as sharing of parent
 	 */
 	public CreateSubNodeResponse createSubNode(MongoSession session, CreateSubNodeRequest req) {
 		CreateSubNodeResponse res = new CreateSubNodeResponse();
@@ -418,7 +416,7 @@ public class NodeEditService {
 					 */
 					if (friendUserName.contains("@")) {
 						adminRunner.run(s -> {
-							actPubService.loadForeignUser(s, friendUserName);
+							actPubService.loadForeignUserByUserName(s, friendUserName);
 						});
 					}
 

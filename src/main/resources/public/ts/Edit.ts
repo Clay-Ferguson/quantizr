@@ -432,7 +432,7 @@ export class Edit implements EditIntf {
         if (S.meta64.ctrlKeyCheck()) {
             new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
                 async () => {
-                    // todo-0: document this under 'tips and tricks' in the user guide
+                    // todo-1: document this under 'tips and tricks' in the user guide
                     this.saveClipboardToChildNode(id);
                 }, null, null, null, state
             ).open();

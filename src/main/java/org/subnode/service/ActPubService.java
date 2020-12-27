@@ -270,7 +270,7 @@ public class ActPubService {
              * system, we auto-import that user now
              */
             if (acctNode == null && StringUtils.countMatches(userName, "@") == 1) {
-                acctNode = loadForeignUser(session, userName);
+                acctNode = loadForeignUserByUserName(session, userName);
             }
 
             if (acctNode != null) {
@@ -329,7 +329,7 @@ public class ActPubService {
         /*
          * todo-0: Need to analyze the scenario where there are multiple 'quanta.wiki'
          * users recieving a notification, and see if this results in multiple inbound
-         * posts from a Mastodon server, of if somehow all the mentions are wrapped into
+         * posts from a Mastodon server, or if somehow all the mentions are wrapped into
          * a single post to one user or perhaps the global inbox?
          */
         for (String toUserName : toUserNames) {
@@ -345,7 +345,7 @@ public class ActPubService {
                 continue;
             }
 
-            APObj webFinger = getWebFinger("https://" + userHost, toUserName);
+            APObj webFinger = getWebFinger(toUserName);
             if (webFinger == null) {
                 log.debug("Unable to get webfinger for " + toUserName);
                 continue;
@@ -420,12 +420,11 @@ public class ActPubService {
     }
 
     /*
-     * todo-0: rename this method to: loadForeignUserByUserName Reads in a user from
-     * the Fediverse with a name like: someuser@fosstodon.org
+     * Reads in a user from the Fediverse with a name like: someuser@fosstodon.org
      * 
      * Returns account node of the user
      */
-    public SubNode loadForeignUser(MongoSession session, String apUserName) {
+    public SubNode loadForeignUserByUserName(MongoSession session, String apUserName) {
         if (!apUserName.contains("@")) {
             log.debug("Invalid foreign user name: " + apUserName);
             return null;
@@ -442,8 +441,7 @@ public class ActPubService {
             }
         }
 
-        String host = getHostFromUserName(apUserName);
-        APObj webFinger = getWebFinger("https://" + host, apUserName);
+        APObj webFinger = getWebFinger(apUserName);
 
         Object self = getLinkByRel(webFinger, "self");
         log.debug("Self Link: " + XString.prettyPrint(self));
@@ -477,9 +475,6 @@ public class ActPubService {
 
     /*
      * Returns account node of the user, creating one if not already existing
-     * 
-     * todo-0: it's redundant to even allow apUserName to be a parameter. We can
-     * build it from the actor object
      */
     public SubNode importActor(MongoSession session, Object actor) {
 
@@ -671,12 +666,13 @@ public class ActPubService {
      * todo-0: remove 'host' as an argument and just parse it off the 'resource'
      * which we already have a method to do.
      */
-    public APObj getWebFinger(String host, String resource) {
+    public APObj getWebFinger(String resource) {
         APObj finger = null;
 
         if (resource.startsWith("@")) {
             resource = resource.substring(1);
         }
+        String host = "https://" + getHostFromUserName(resource);
 
         // return from cache if we have this cached
         synchronized (webFingerCacheByUserName) {
@@ -790,8 +786,7 @@ public class ActPubService {
      * apUserName is full user name like alice@quantizr.com
      */
     public void setFollowing(String apUserName, boolean following) {
-        String hostOfUserBeingFollowed = getHostFromUserName(apUserName);
-        APObj webFingerOfUserBeingFollowed = getWebFinger("https://" + hostOfUserBeingFollowed, apUserName);
+        APObj webFingerOfUserBeingFollowed = getWebFinger(apUserName);
 
         Object selfOfUserBeingFollowed = getLinkByRel(webFingerOfUserBeingFollowed, "self");
         String actorUrlOfUserBeingFollowed = AP.str(selfOfUserBeingFollowed, "href");
@@ -1027,10 +1022,11 @@ public class ActPubService {
                         ac.put("public", new AccessControl("prvs", PrivilegeType.READ.s()));
                     }
                     /*
-                     * todo-0: The spec for ActPub is very awkward becasue if this is a followers
+                     * todo-0: The spec for ActPub is awkward because if this is a followers
                      * URL instead of an ActorURL there's no way to detect that without reading from
                      * the URL to determine what it sends back, so for now we don't yet handle
-                     * 'followers'
+                     * 'followers' and we also only can detect the followers URL that is compatible with 
+                     * how Mastodon formats it by ending with "/followers"
                      */
                     else if (shareToUrl.endsWith("/followers")) {
                         log.debug("Not handling the " + propName + " value " + shareToUrl);
@@ -1188,7 +1184,7 @@ public class ActPubService {
 
             // todo-0: make sure repeat calls to this don't redundantly call foreign servers
             // (after could have cached results)
-            SubNode followerAccountNode = loadForeignUser(session, followerUserName);
+            SubNode followerAccountNode = loadForeignUserByUserName(session, followerUserName);
 
             // Actor being followed (local to our server)
             String actorBeingFollowedUrl = AP.str(followAction, "object");
