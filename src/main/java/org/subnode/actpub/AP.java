@@ -13,6 +13,10 @@ import org.subnode.util.DateUtil;
  * incomming JSON trees of content
  */
 public class AP {
+    public static boolean hasProps(Object obj) {
+        return obj instanceof Map<?, ?>;
+    }
+
     public static String str(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             Object val = ((Map<?, ?>) obj).get(prop);

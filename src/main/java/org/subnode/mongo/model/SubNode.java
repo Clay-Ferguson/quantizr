@@ -313,6 +313,14 @@ public class SubNode {
 		return ac;
 	}
 
+	@JsonIgnore
+	public HashMap<String, AccessControl> safeGetAc() {
+		if (ac == null) {
+			ac = new HashMap<String, AccessControl>();
+		}
+		return ac;
+	}
+
 	@JsonProperty(FIELD_AC)
 	public void setAc(HashMap<String, AccessControl> ac) {
 		MongoThreadLocal.dirty(this);
@@ -389,8 +397,9 @@ public class SubNode {
 			properties().remove(key);
 		} else {
 			SubNodePropVal curVal = properties().get(key);
-			//todo-1: Do we want an 'equals' here or should we build in a small range check which is the normal way to
-			//compare floats.
+			// todo-1: Do we want an 'equals' here or should we build in a small range check
+			// which is the normal way to
+			// compare floats.
 			changed = curVal == null || !val.equals(curVal.getValue());
 			properties().put(key, new SubNodePropVal(val));
 		}

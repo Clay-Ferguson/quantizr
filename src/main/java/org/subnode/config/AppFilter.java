@@ -43,8 +43,8 @@ public class AppFilter extends GenericFilterBean {
 	 * For debugging we can turn this flag on and disable the server from processing
 	 * multiple requests simultenaously this is every helpful for debugging
 	 */
-	private static boolean singleThreadDebugging = false;
-	private static final Object lock = new Object();
+	private static boolean singleThreadDebugging = true;
+	private static final HashMap<String, Object> locksByIp = new HashMap<String, Object>();
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -53,9 +53,11 @@ public class AppFilter extends GenericFilterBean {
 		int thisReqId = ++reqId;
 
 		boolean initialSessionExisted = false;
+		String ip = null;
 
 		if (req instanceof HttpServletRequest) {
 			HttpServletRequest httpReq = (HttpServletRequest) req;
+			ip = getClientIpAddr(httpReq);
 
 			HttpSession session = httpReq.getSession(false);
 			if (session == null) {
@@ -95,7 +97,21 @@ public class AppFilter extends GenericFilterBean {
 		}
 
 		try {
+			/*
+			 * singleThreadDebugging creates one lock per IP so that each machine calling
+			 * our server gets single threaded, but other servers can call in parallel
+			 */
 			if (singleThreadDebugging) {
+				if (ip == null) {
+					ip = "unknown";
+				}
+
+				Object lock = locksByIp.get(ip);
+				if (lock == null) {
+					lock = new Object();
+					locksByIp.put(ip, lock);
+				}
+
 				synchronized (lock) {
 					chain.doFilter(req, res);
 				}

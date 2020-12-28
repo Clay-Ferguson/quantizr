@@ -372,6 +372,7 @@ public class NodeEditService {
 
 			if (parent != null) {
 				adminRunner.run(s -> {
+					auth.saveMentionsToNodeACL(s, node);
 					actPubService.sendNotificationForNodeEdit(s, parent, node);
 					userFeedService.pushNodeUpdateToAllFriends(s, node);
 				});
@@ -388,25 +389,24 @@ public class NodeEditService {
 		// of type-specific code from the general node saving.
 		if (node.getType().equals(NodeType.FRIEND.s())) {
 			String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
-			String friendUserName = node.getStrProp(NodeProp.USER.s());
 
-			// if a foreign user, update thru ActivityPub
-			if (friendUserName.contains("@")) {
+			final String friendUserName = node.getStrProp(NodeProp.USER.s());
+			if (friendUserName != null) {
+				// if a foreign user, update thru ActivityPub
+				if (friendUserName.contains("@")) {
+					/*
+					 * todo-0: go into node listener for delete action on nodes and when any nodes
+					 * are deleted run this with 'false'
+					 */
+					actPubService.setFollowing(friendUserName, true);
+				}
+
 				/*
-				 * todo-0: go into node listener for delete action on nodes and when any nodes
-				 * are deleted run this with 'false'
+				 * when user first adds, this friendNode won't have the userNodeId yet, so add
+				 * if not yet existing
 				 */
-				actPubService.setFollowing(friendUserName, true);
-			}
+				if (userNodeId == null) {
 
-			/*
-			 * when user first adds, this friendNode won't have the userNodeId yet, so add
-			 * if not yet existing
-			 */
-			if (userNodeId == null) {
-				// if USER_NODE_ID has not been set on the node yet then get it and set it first
-				// here.
-				if (friendUserName != null) {
 					/*
 					 * A userName containing "@" is considered a foreign Fediverse user and will
 					 * trigger a WebFinger search of them, and a load/update of their outbox
@@ -418,9 +418,8 @@ public class NodeEditService {
 					}
 
 					ValContainer<SubNode> _userNode = new ValContainer<SubNode>();
-					final String _userName = friendUserName;
 					adminRunner.run(s -> {
-						_userNode.setVal(read.getUserNodeByUserName(s, _userName));
+						_userNode.setVal(read.getUserNodeByUserName(s, friendUserName));
 					});
 
 					if (_userNode.getVal() != null) {

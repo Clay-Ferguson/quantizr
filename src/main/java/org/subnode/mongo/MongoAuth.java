@@ -2,6 +2,7 @@ package org.subnode.mongo;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -29,6 +30,8 @@ import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.service.ActPubService;
+import org.subnode.util.XString;
 
 /**
  * Utilities related to management of the JCR Repository
@@ -51,6 +54,9 @@ public class MongoAuth {
 
 	@Autowired
 	private MongoUtil util;
+
+	@Autowired
+	private ActPubService actPub;
 
 	@Autowired
 	private SessionContext sessionContext;
@@ -561,4 +567,80 @@ public class MongoAuth {
 		}
 		return session;
 	}
+
+	public HashSet<String> parseMentions(String message) {
+        HashSet<String> userNames = new HashSet<String>();
+
+        // prepare to that newlines is compatable with out tokenizing
+        message = message.replace("\n", " ");
+        message = message.replace("\r", " ");
+
+        List<String> words = XString.tokenize(message, " ", true);
+        if (words != null) {
+            for (String word : words) {
+                // detect the pattern @name@server.com or @name
+                if (word.startsWith("@") && StringUtils.countMatches(word, "@") <= 2) {
+                    word = word.substring(1);
+
+                    // This second 'startsWith' check ensures we ignore patterns that start with
+                    // "@@"
+                    if (!word.startsWith("@")) {
+                        userNames.add(word);
+                    }
+                }
+            }
+        }
+        return userNames;
+    }
+
+	    /*
+     * Parses all mentions (like '@bob@server.com') in the node content text and
+     * adds them (if not existing) to the node sharing on the node, which ensures
+     * the person mentioned has visibility of this node and that it will also appear
+     * in their FEED listing
+     */
+    public HashSet<String> saveMentionsToNodeACL(MongoSession session, SubNode node) {
+        HashSet<String> mentionsSet = parseMentions(node.getContent());
+
+        boolean acChanged = false;
+        HashMap<String, AccessControl> ac = node.getAc();
+
+        // make sure all parsed toUserNamesSet user names are saved into the node acl */
+        for (String userName : mentionsSet) {
+            SubNode acctNode = read.getUserNodeByUserName(session, userName);
+
+            /*
+             * If this is a foreign 'mention' user name that is not imported into our
+             * system, we auto-import that user now
+             */
+            if (acctNode == null && StringUtils.countMatches(userName, "@") == 1) {
+                acctNode = actPub.loadForeignUserByUserName(session, userName);
+            }
+
+            if (acctNode != null) {
+                String acctNodeId = acctNode.getId().toHexString();
+                if (ac == null || !ac.containsKey(acctNodeId)) {
+                    /*
+                     * Lazy create 'ac' so that the net result of this method is never to assign non
+                     * null when it could be left null
+                     */
+                    if (ac == null) {
+                        ac = new HashMap<String, AccessControl>();
+                    }
+                    acChanged = true;
+                    ac.put(acctNodeId,
+                            new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+                }
+            } else {
+                log.debug("Mentioned user not found: " + userName);
+            }
+        }
+
+        if (acChanged) {
+            node.setAc(ac);
+            update.save(session, node);
+        }
+        return mentionsSet;
+    }
+
 }
