@@ -138,8 +138,8 @@ public class NodeEditService {
 			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 		}
 
-		// we always copy the access controls from the parent for any new nodes
-		auth.setDefaultReplyAcl(node, newNode);
+		// we always determine the access controls from the parent for any new nodes
+		auth.setDefaultReplyAcl(null, node, newNode);
 
 		update.save(session, newNode);
 		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));
@@ -160,9 +160,6 @@ public class NodeEditService {
 		if (followerActorUrl != null) {
 			newNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), followerActorUrl);
 		}
-
-		// we always copy the access controls from the parent for any new nodes
-		// auth.setDefaultReplyAcl(parentFriendsList, newNode);
 
 		update.save(session, newNode);
 		return newNode;
@@ -233,7 +230,7 @@ public class NodeEditService {
 		}
 
 		// we always copy the access controls from the parent for any new nodes
-		auth.setDefaultReplyAcl(parentNode, newNode);
+		auth.setDefaultReplyAcl(null, parentNode, newNode);
 
 		update.save(session, newNode);
 		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));

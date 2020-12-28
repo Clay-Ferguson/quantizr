@@ -110,9 +110,6 @@ export class FriendTypeHandler extends TypeBase {
                 })]),
             new Div(null, null, [
                 new ButtonBar([
-                    new Button("Show Feed", () => S.srch.feed("~" + J.NodeType.FRIEND_LIST, user), {
-                        title: "Show the Feed of this user"
-                    }),
                     new Button("Message", S.meta64.getNodeFunc(S.edit.cached_newSubNode, "S.edit.newSubNode", node.id), {
                         title: "Send Private Message"
                     })

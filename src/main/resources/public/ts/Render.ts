@@ -494,7 +494,12 @@ export class Render implements RenderIntf {
             // align: "left", // causes text to flow around
 
             onClick: (evt) => {
-                new ProfileDlg(state, true, node.ownerId, node.owner).open();
+                // show profile dialog only for local users (no '@' in name)
+                // todo-1: We can eventually get this working (and make the images be URLS
+                // from the remote server, but this is low priority)
+                if (node.owner.indexOf("@") === -1) {
+                    new ProfileDlg(state, true, node.ownerId, node.owner).open();
+                }
             }
         });
     }

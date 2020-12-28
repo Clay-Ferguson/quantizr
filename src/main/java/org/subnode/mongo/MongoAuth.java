@@ -24,6 +24,7 @@ import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.AccessControlInfo;
 import org.subnode.model.PrivilegeInfo;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.AccessControl;
@@ -144,10 +145,17 @@ public class MongoAuth {
 	 * media queries to work. Also we be sure to remove any share to 'child' user
 	 * that may be in the parent Acl, because that would represent 'child' not
 	 * sharing to himselv which is never done.
+	 * 
+	 * session should be null, or else an existing admin session.
 	 */
-	public void setDefaultReplyAcl(SubNode parent, SubNode child) {
+	public void setDefaultReplyAcl(MongoSession session, SubNode parent, SubNode child) {
 		if (parent == null || child == null)
 			return;
+
+		if (session == null) {
+			session = getAdminSession();
+		}
+
 		HashMap<String, AccessControl> ac = parent.getAc();
 		if (ac == null) {
 			ac = new HashMap<String, AccessControl>();
@@ -155,7 +163,29 @@ public class MongoAuth {
 			ac = (HashMap<String, AccessControl>) ac.clone();
 			ac.remove(child.getOwner().toHexString());
 		}
-		ac.put(parent.getOwner().toHexString(), new AccessControl("prvs", "rd,wr"));
+
+		/*
+		 * Special case of replying to (appending under) a FRIEND-type node is always to
+		 * make this a private message to the user that friend node represents
+		 */
+		if (parent.getType().equals(NodeType.FRIEND.s())) {
+			// get user prop from node
+			String userName = parent.getStrProp(NodeProp.USER.s());
+
+			// if we have a userProp, find the account node for the user
+			if (userName != null) {
+				SubNode accountNode = read.getUserNodeByUserName(session, userName);
+				if (accountNode != null) {
+					ac.put(accountNode.getId().toHexString(), new AccessControl("prvs", "rd,wr"));
+				}
+			}
+		}
+		/*
+		 * otherwise if not a FRIEND node we just share to the owner of the parent node
+		 */
+		else {
+			ac.put(parent.getOwner().toHexString(), new AccessControl("prvs", "rd,wr"));
+		}
 		child.setAc(ac);
 	}
 
