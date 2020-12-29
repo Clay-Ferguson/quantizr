@@ -126,6 +126,9 @@ public class ActPubService {
     /* Account Node by actor Url */
     private static final ConcurrentHashMap<String, SubNode> accountNodesByActorUrl = new ConcurrentHashMap<String, SubNode>();
 
+    /* Account Node by User Name */
+    private static final ConcurrentHashMap<String, SubNode> accountNodesByUserName = new ConcurrentHashMap<String, SubNode>();
+
     /* Account Node by node ID */
     private static final ConcurrentHashMap<String, SubNode> accountNodesById = new ConcurrentHashMap<String, SubNode>();
 
@@ -163,9 +166,7 @@ public class ActPubService {
 
     /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this
-     * will send a notification to foreign servers. There are various kinds of types
-     * of parents this can happen on (Node types), each being some kind of foreign
-     * AP message to reply to.
+     * will send a notification to foreign servers.
      */
     public void sendNotificationForNodeEdit(MongoSession session, SubNode parent, SubNode node) {
         try {
@@ -197,29 +198,6 @@ public class ActPubService {
 
             // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
             String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
-
-            /*
-             * Get the userName of the user we're replying to. Note: This path works for a
-             * DM to a node, but won't the more general solution be to use whatever
-             * 
-             * In case there's a case where attributedTo can be here, and not already been
-             * taken care of this code will come back but for now I consider this redundant
-             * until further researched.
-             */
-            // String attributedTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
-            // APObj actor = getActorByUrl(attributedTo);
-            // String shortUserName = AP.str(actor, "preferredUsername"); // short name like
-            // 'alice'
-            // String toInbox = AP.str(actor, "inbox");
-            // URL url = new URL(toInbox);
-            // String host = url.getHost();
-            // String toUserName = shortUserName + "@" + host;
-            // toUserNames.add(toUserName);
-            /*
-             * For now this usage pattern is only functional for a reply from an inbox, and
-             * so this supports only DMs thru this code path for now (todo-0: this may
-             * change)
-             */
 
             APList attachments = createAttachmentsList(node);
 
@@ -361,34 +339,41 @@ public class ActPubService {
      * Returns account node of the user
      */
     public SubNode loadForeignUserByUserName(MongoSession session, String apUserName) {
+        // return from cache if we already have the value cached
+        SubNode acctNode = accountNodesByUserName.get(apUserName);
+        if (acctNode != null) {
+            return acctNode;
+        }
+
         if (!apUserName.contains("@")) {
             log.debug("Invalid foreign user name: " + apUserName);
             return null;
         }
 
-        log.debug("Load foreign user: " + apUserName);
         /* First try to use the actor from cache, if we have it cached */
-
         Object actor = actorCacheByUserName.get(apUserName);
 
         // if we have actor object skip the step of getting it and import using it.
         if (actor != null) {
-            return importActor(session, actor);
+            acctNode = importActor(session, actor);
+            accountNodesByUserName.put(apUserName, acctNode);
+            return acctNode;
         }
 
+        log.debug("Load foreign user: " + apUserName);
         APObj webFinger = getWebFinger(apUserName);
 
-        Object self = getLinkByRel(webFinger, "self");
-        log.debug("Self Link: " + XString.prettyPrint(self));
-        if (self != null) {
-            return loadForeignUserByActorUrl(session, AP.str(self, "href"));
+        String actorUrl = getActorUrlFromWebFingerObj(webFinger);
+        if (actorUrl != null) {
+            acctNode = loadForeignUserByActorUrl(session, actorUrl);
+            accountNodesByUserName.put(apUserName, acctNode);
+            return acctNode;
         }
         return null;
     }
 
-    // todo-0: make sure enough caching is happening that this is efficient to call
-    // multple times
     public SubNode loadForeignUserByActorUrl(MongoSession session, String actorUrl) {
+        /* return node from cache if already cached */
         SubNode acctNode = accountNodesByActorUrl.get(actorUrl);
         if (acctNode != null) {
             return acctNode;
@@ -403,12 +388,13 @@ public class ActPubService {
         return acctNode;
     }
 
-    // todo-0: refactor loadForeignUser to call this instead of replicating the code
-    // there
     public String getActorUrlFromWebFingerObj(Object webFinger) {
-        String actorUrl = null;
+        if (webFinger == null)
+            return null;
         Object self = getLinkByRel(webFinger, "self");
-        log.debug("Self Link: " + XString.prettyPrint(self));
+        // log.debug("Self Link: " + XString.prettyPrint(self));
+
+        String actorUrl = null;
         if (self != null) {
             actorUrl = AP.str(self, "href");
         }
@@ -482,8 +468,8 @@ public class ActPubService {
             userNode = read.getUserNodeByUserName(session, apUserName);
         }
 
-        final SubNode _userNode = userNode;
-        SubNode outboxNode = read.getUserNodeByType(session, apUserName, null, "### Posts", NodeType.ACT_PUB_POSTS.s());
+        SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts",
+                NodeType.ACT_PUB_POSTS.s());
 
         /*
          * Query all existing known outbox items we have already saved for this foreign
@@ -514,9 +500,12 @@ public class ActPubService {
             String apId = AP.str(obj, "id");
             if (!apIdSet.contains(apId)) {
                 Object object = AP.obj(obj, "object");
-                // todo-0: don't assume everything here is a "Note" object. Should support any
-                // kind of object.
-                saveNote(session, outboxNode, object);
+
+                if (object != null && "Note".equals(AP.str(object, "type"))) {
+                    saveNote(session, outboxNode, object);
+                } else {
+                    log.debug("Object type not supported: " + XString.prettyPrint(object));
+                }
             }
         });
     }
@@ -763,9 +752,7 @@ public class ActPubService {
      */
     public void setFollowing(String apUserName, boolean following) {
         APObj webFingerOfUserBeingFollowed = getWebFinger(apUserName);
-
-        Object selfOfUserBeingFollowed = getLinkByRel(webFingerOfUserBeingFollowed, "self");
-        String actorUrlOfUserBeingFollowed = AP.str(selfOfUserBeingFollowed, "href");
+        String actorUrlOfUserBeingFollowed = getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
 
         adminRunner.run(session -> {
             String sessionActorUrl = makeActorUrlForUserName(sessionContext.getUserName());
@@ -908,23 +895,12 @@ public class ActPubService {
          */
         else {
             SubNode actorAccountNode = loadForeignUserByActorUrl(session, actorUrl);
-            SubNode postsNode = read.findTypedNodeUnderPath(session, actorAccountNode.getPath(),
-                    NodeType.ACT_PUB_POSTS.s());
-
-            // todo-0: call getUserNodeByType here and let it autocreate node if not found.
-            // SubNode outboxNode = read.getUserNodeByType(session, apUserName, null, "###
-            // Posts", NodeType.ACT_PUB_POSTS.s());
-
-            // if node was not found, create it.
-            if (postsNode == null) {
-                postsNode = create.createNode(session, actorAccountNode, null, NodeType.ACT_PUB_POSTS.s(), 0L,
-                        CreateNodeLocation.LAST, null, null);
-                postsNode.setOwner(actorAccountNode.getId());
-                postsNode.setContent("### Posts");
-                update.save(session, postsNode);
+            if (actorAccountNode != null) {
+                String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
+                SubNode postsNode = read.getUserNodeByType(session, userName, actorAccountNode, "### Posts",
+                        NodeType.ACT_PUB_POSTS.s());
+                saveNote(session, postsNode, obj);
             }
-
-            saveNote(session, postsNode, obj);
         }
         return ret;
     }
@@ -1129,24 +1105,17 @@ public class ActPubService {
         return getLongUserNameFromActor(actor);
     }
 
-    /*
-     * There's at least one place in this class that should be calling this method
-     * but is embedding the code inline instead (fix it: todo-0)
-     */
     public String getLongUserNameFromActor(Object actor) {
         String shortUserName = AP.str(actor, "preferredUsername"); // short name like 'alice'
         String inbox = AP.str(actor, "inbox");
-        URL url = null;
-        String userName = null;
         try {
-            url = new URL(inbox);
+            URL url = new URL(inbox);
             String host = url.getHost();
-            userName = shortUserName + "@" + host;
+            return shortUserName + "@" + host;
         } catch (Exception e) {
             log.error("failed building toUserName", e);
-            throw new RuntimeException(e);
         }
-        return userName;
+        return null;
     }
 
     boolean isLocalActorUrl(String actorUrl) {
@@ -1198,9 +1167,6 @@ public class ActPubService {
             // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
             // XString.prettyPrint(actor));
             String followerUserName = getLongUserNameFromActor(followerActorObj);
-
-            // todo-0: make sure repeat calls to this don't redundantly call foreign servers
-            // (after could have cached results)
             SubNode followerAccountNode = loadForeignUserByUserName(session, followerUserName);
 
             // Actor being followed (local to our server)
@@ -1350,7 +1316,8 @@ public class ActPubService {
                 .put("type", "OrderedCollectionPage") //
                 .put("orderedItems", followers) //
                 // todo-0: my outbox isn't returning the 'partOf', so somehow that must mean the
-                // mastodon replies don't? Make sure we are doing same as Mastodon behavior
+                // mastodon replies don't (because I followed that example) ? Make sure we are
+                // doing same as Mastodon behavior
                 // here.
                 .put("partOf", appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName)//
                 .put("totalItems", followers.size());
