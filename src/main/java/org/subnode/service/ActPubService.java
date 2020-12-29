@@ -10,19 +10,18 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +57,6 @@ import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.response.NotificationMessage;
 import org.subnode.util.DateUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
@@ -114,19 +112,22 @@ public class ActPubService {
     private MongoAuth auth;
 
     /* Cache Actor objects by URL in memory only for now */
-    private static final HashMap<String, APObj> actorCacheByUrl = new HashMap<String, APObj>();
+    private static final ConcurrentHashMap<String, APObj> actorCacheByUrl = new ConcurrentHashMap<String, APObj>();
 
     /* Cache Actor objects by UserName in memory only for now */
-    private static final HashMap<String, APObj> actorCacheByUserName = new HashMap<String, APObj>();
+    private static final ConcurrentHashMap<String, APObj> actorCacheByUserName = new ConcurrentHashMap<String, APObj>();
 
     /* Cache WebFinger objects by UserName in memory only for now */
-    private static final HashMap<String, APObj> webFingerCacheByUserName = new HashMap<String, APObj>();
+    private static final ConcurrentHashMap<String, APObj> webFingerCacheByUserName = new ConcurrentHashMap<String, APObj>();
 
     /* Cache of user account node Ids by actor url */
-    private static final HashMap<String, String> acctIdByActorUrl = new HashMap<String, String>();
+    private static final ConcurrentHashMap<String, String> acctIdByActorUrl = new ConcurrentHashMap<String, String>();
 
     /* Account Node by actor Url */
-    private static final HashMap<String, SubNode> accountNodesByActorUrl = new HashMap<String, SubNode>();
+    private static final ConcurrentHashMap<String, SubNode> accountNodesByActorUrl = new ConcurrentHashMap<String, SubNode>();
+
+    /* Account Node by node ID */
+    private static final ConcurrentHashMap<String, SubNode> accountNodesById = new ConcurrentHashMap<String, SubNode>();
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only
@@ -182,9 +183,10 @@ public class ActPubService {
                     privateMessage = false;
                 } else {
                     // k will be a nodeId of an account node here.
-                    // (todo-0: easy optimization here: Create a cache of userNames by accountIds,
-                    // to avoid most of these getNode calls)
-                    SubNode accountNode = read.getNode(session, k);
+                    SubNode accountNode = accountNodesById.get(k);
+                    if (accountNode == null) {
+                        accountNodesById.put(k, accountNode = read.getNode(session, k));
+                    }
 
                     if (accountNode != null) {
                         String userName = accountNode.getStrProp(NodeProp.USER.s());
@@ -366,13 +368,12 @@ public class ActPubService {
 
         log.debug("Load foreign user: " + apUserName);
         /* First try to use the actor from cache, if we have it cached */
-        synchronized (actorCacheByUserName) {
-            Object actor = actorCacheByUserName.get(apUserName);
 
-            // if we have actor object skip the step of getting it and import using it.
-            if (actor != null) {
-                return importActor(session, actor);
-            }
+        Object actor = actorCacheByUserName.get(apUserName);
+
+        // if we have actor object skip the step of getting it and import using it.
+        if (actor != null) {
+            return importActor(session, actor);
         }
 
         APObj webFinger = getWebFinger(apUserName);
@@ -388,22 +389,16 @@ public class ActPubService {
     // todo-0: make sure enough caching is happening that this is efficient to call
     // multple times
     public SubNode loadForeignUserByActorUrl(MongoSession session, String actorUrl) {
-        SubNode acctNode = null;
-        synchronized (accountNodesByActorUrl) {
-            acctNode = accountNodesByActorUrl.get(actorUrl);
-            if (acctNode != null) {
-                return acctNode;
-            }
+        SubNode acctNode = accountNodesByActorUrl.get(actorUrl);
+        if (acctNode != null) {
+            return acctNode;
         }
 
         Object actor = getActorByUrl(actorUrl);
 
         // if webfinger was successful, ensure the user is imported into our system.
         if (actor != null) {
-            acctNode = importActor(session, actor);
-            synchronized (accountNodesByActorUrl) {
-                accountNodesByActorUrl.put(actorUrl, acctNode);
-            }
+            accountNodesByActorUrl.put(actorUrl, acctNode = importActor(session, actor));
         }
         return acctNode;
     }
@@ -463,16 +458,16 @@ public class ActPubService {
             update.save(session, userNode, false);
         }
 
-        // don't call this here, because it leads to infinite recursion, and for now we don't need this. This is essentially
-        // a look back into old posts from before we followed the user so we can get by without it for now.
+        // don't call this here, because it leads to infinite recursion, and for now we
+        // don't need this. This is essentially
+        // a look back into old posts from before we followed the user so we can get by
+        // without it for now.
         // refreshOutboxFromForeignServer(session, actor, userNode, apUserName);
 
         /* cache the account node id for this user by the actor url */
-        synchronized (acctIdByActorUrl) {
-            String selfRefId = AP.str(actor, "id"); // actor url of 'actor' object, is the same as the 'id'
-            acctIdByActorUrl.put(selfRefId, userNode.getId().toHexString());
-        }
 
+        String selfRefId = AP.str(actor, "id"); // actor url of 'actor' object, is the same as the 'id'
+        acctIdByActorUrl.put(selfRefId, userNode.getId().toHexString());
         return userNode;
     }
 
@@ -663,29 +658,23 @@ public class ActPubService {
      * resource example: WClayFerguson@server.org
      */
     public APObj getWebFinger(String resource) {
-        APObj finger = null;
-
         if (resource.startsWith("@")) {
             resource = resource.substring(1);
         }
         String host = "https://" + getHostFromUserName(resource);
 
         // return from cache if we have this cached
-        synchronized (webFingerCacheByUserName) {
-            finger = webFingerCacheByUserName.get(resource);
-            if (finger != null) {
-                return finger;
-            }
+        APObj finger = webFingerCacheByUserName.get(resource);
+        if (finger != null) {
+            return finger;
         }
 
         String url = host + ActPubConstants.PATH_WEBFINGER + "?resource=acct:" + resource;
         finger = getJson(url, new MediaType("application", "jrd+json"));
 
-        synchronized (webFingerCacheByUserName) {
-            if (finger != null) {
-                log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
-                webFingerCacheByUserName.put(resource, finger);
-            }
+        if (finger != null) {
+            log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
+            webFingerCacheByUserName.put(resource, finger);
         }
         return finger;
     }
@@ -698,14 +687,9 @@ public class ActPubService {
         if (url == null)
             return null;
 
-        APObj actor = null;
-
-        // return actor from cache if already cached
-        synchronized (actorCacheByUrl) {
-            actor = actorCacheByUrl.get(url);
-            if (actor != null) {
-                return actor;
-            }
+        APObj actor = actorCacheByUrl.get(url);
+        if (actor != null) {
+            return actor;
         }
 
         actor = getJson(url, new MediaType("application", "ld+json"));
@@ -717,14 +701,10 @@ public class ActPubService {
 
     public void cacheActor(String url, APObj actor) {
         if (actor != null) {
-            synchronized (actorCacheByUrl) {
-                actorCacheByUrl.put(url, actor);
-            }
+            actorCacheByUrl.put(url, actor);
 
-            synchronized (actorCacheByUserName) {
-                String userName = getLongUserNameFromActor(actor);
-                actorCacheByUserName.put(userName, actor);
-            }
+            String userName = getLongUserNameFromActor(actor);
+            actorCacheByUserName.put(userName, actor);
         }
     }
 
@@ -971,8 +951,8 @@ public class ActPubService {
 
         // foreign account will own this node.
         SubNode toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
-        newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST,
-                null, toAccountNode.getId());
+        newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null,
+                toAccountNode.getId());
 
         // todo-0: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now
@@ -992,7 +972,7 @@ public class ActPubService {
 
         update.save(session, newNode);
         addAttachmentIfExists(session, newNode, obj);
-		userFeedService.pushNodeUpdateToBrowsers(session, newNode);
+        userFeedService.pushNodeUpdateToBrowsers(session, newNode);
     }
 
     /*
@@ -1078,12 +1058,8 @@ public class ActPubService {
             return;
         }
 
-        String acctId = null;
-
         /* try to get account id from cache first */
-        synchronized (acctIdByActorUrl) {
-            acctId = acctIdByActorUrl.get(actorUrl);
-        }
+        String acctId = acctIdByActorUrl.get(actorUrl);
 
         /*
          * if acctId not found in cache load foreign user (will cause it to also get
