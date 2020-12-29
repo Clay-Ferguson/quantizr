@@ -123,7 +123,7 @@ public class SubNodeUtil {
 
 				/* Note if parent PARAMETER here is null we are adding a root node */
 				parent = create.createNode(session, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST,
-						null);
+						null, null);
 
 				if (parent == null) {
 					throw ExUtil.wrapEx("unable to create " + nameToken);

@@ -26,7 +26,7 @@ public class MongoCreate {
 
 	public SubNode createNode(MongoSession session, SubNode parent, String type, Long ordinal,
 			CreateNodeLocation location) {
-		return createNode(session, parent, null, type, ordinal, location, null);
+		return createNode(session, parent, null, type, ordinal, location, null, null);
 	}
 
 	public SubNode createNode(MongoSession session, String path) {
@@ -62,7 +62,6 @@ public class MongoCreate {
 		return node;
 	}
 
-
 	/*
 	 * Creates a node, but does NOT persist it. If parent==null it assumes it's
 	 * adding a root node. This is required, because all the nodes at the root level
@@ -72,7 +71,7 @@ public class MongoCreate {
 	 * relPath can be null if no path is known
 	 */
 	public SubNode createNode(MongoSession session, SubNode parent, String relPath, String type, Long ordinal,
-			CreateNodeLocation location, List<PropertyInfo> properties) {
+			CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId) {
 		if (relPath == null) {
 			/*
 			 * Adding a node ending in '?' will trigger for the system to generate a leaf
@@ -87,7 +86,9 @@ public class MongoCreate {
 
 		String path = (parent == null ? "" : parent.getPath()) + "/" + relPath;
 
-		ObjectId ownerId = read.getOwnerNodeIdFromSession(session);
+		if (ownerId == null) {
+			ownerId = read.getOwnerNodeIdFromSession(session);
+		}
 
 		// for now not worried about ordinals for root nodes.
 		if (parent == null) {

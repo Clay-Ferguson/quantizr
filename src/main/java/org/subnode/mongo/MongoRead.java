@@ -240,7 +240,7 @@ public class MongoRead {
          * 'home' node for this user, and then return it.
          */
         if (userNode != null && ret == null && isUserNode && "home".equalsIgnoreCase(name)) {
-            ret = create.createNode(session, userNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null);
+            ret = create.createNode(session, userNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null);
             ret.setOwner(userNode.getId());
             String userName = userNode.getStrProp(NodeProp.USER.s());
             ret.setContent("### User: " + userName + "\n\nUser has not yet edited this default home node.");
@@ -755,7 +755,7 @@ public class MongoRead {
         SubNode node = findTypedNodeUnderPath(session, path, type);
 
         if (node == null) {
-            node = create.createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST, null);
+            node = create.createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null);
             node.setOwner(userNode.getId());
             node.setContent(nodeName);
             update.save(session, node);

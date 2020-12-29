@@ -3,7 +3,6 @@ import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { AccountTypeHandler } from "./plugins/AccountTypeHandler";
 import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
 import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
-import { ActPubItemTypeHandler } from "./plugins/ActPubItemTypeHandler";
 import { InboxEntryTypeHandler } from "./plugins/InboxEntryTypeHandler";
 import { InboxNodeTypeHandler } from "./plugins/InboxNodeTypeHandler";
 import { IPFSNodeTypeHandler } from "./plugins/IPFSNodeTypeHandler";
@@ -52,7 +51,6 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new NotesNodeTypeHandler());
         this.addTypeHandler(new FriendsListTypeHandler());
         this.addTypeHandler(new FriendTypeHandler());
-        this.addTypeHandler(new ActPubItemTypeHandler());
 
         // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());
         // S.plugin.addTypeHandler("fs:folder", new FolderTypeHandler());

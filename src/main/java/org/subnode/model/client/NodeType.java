@@ -16,8 +16,6 @@ public enum NodeType {
     FRIEND_LIST("sn:friendList"), //
     FRIEND("sn:friend"), //
 
-    ACT_PUB_ITEM("ap:item"), //
-
     //todo-0: we can create a plugin for this type, but it's not really necessary.
     ACT_PUB_POSTS("ap:posts"), //
 

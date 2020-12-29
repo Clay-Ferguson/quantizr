@@ -152,7 +152,7 @@ public class OutboxMgr {
 			 */
 			if (notifyNode == null) {
 				notifyNode = create.createNode(session, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L,
-						CreateNodeLocation.FIRST, null);
+						CreateNodeLocation.FIRST, null, null);
 
 				// trim to 280 like twitter.
 				String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";

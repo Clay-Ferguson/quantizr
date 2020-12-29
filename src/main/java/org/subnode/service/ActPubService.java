@@ -125,6 +125,9 @@ public class ActPubService {
     /* Cache of user account node Ids by actor url */
     private static final HashMap<String, String> acctIdByActorUrl = new HashMap<String, String>();
 
+    /* Account Node by actor Url */
+    private static final HashMap<String, SubNode> accountNodesByActorUrl = new HashMap<String, SubNode>();
+
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only
      * one final static instance ever
@@ -385,13 +388,24 @@ public class ActPubService {
     // todo-0: make sure enough caching is happening that this is efficient to call
     // multple times
     public SubNode loadForeignUserByActorUrl(MongoSession session, String actorUrl) {
+        SubNode acctNode = null;
+        synchronized (accountNodesByActorUrl) {
+            acctNode = accountNodesByActorUrl.get(actorUrl);
+            if (acctNode != null) {
+                return acctNode;
+            }
+        }
+
         Object actor = getActorByUrl(actorUrl);
 
         // if webfinger was successful, ensure the user is imported into our system.
         if (actor != null) {
-            return importActor(session, actor);
+            acctNode = importActor(session, actor);
+            synchronized (accountNodesByActorUrl) {
+                accountNodesByActorUrl.put(actorUrl, acctNode);
+            }
         }
-        return null;
+        return acctNode;
     }
 
     // todo-0: refactor loadForeignUser to call this instead of replicating the code
@@ -448,7 +462,10 @@ public class ActPubService {
         if (changed) {
             update.save(session, userNode, false);
         }
-        refreshOutboxFromForeignServer(session, actor, userNode, apUserName);
+
+        // don't call this here, because it leads to infinite recursion, and for now we don't need this. This is essentially
+        // a look back into old posts from before we followed the user so we can get by without it for now.
+        // refreshOutboxFromForeignServer(session, actor, userNode, apUserName);
 
         /* cache the account node id for this user by the actor url */
         synchronized (acctIdByActorUrl) {
@@ -462,8 +479,6 @@ public class ActPubService {
     /*
      * Caller can pass in userNode if it's already available, but if not just pass
      * null and the apUserName will be used to look up the userNode.
-     * 
-     * todo-0: these aren't reading attachments yet!
      */
     public void refreshOutboxFromForeignServer(MongoSession session, Object actor, SubNode userNode,
             String apUserName) {
@@ -503,7 +518,10 @@ public class ActPubService {
         iterateOrderedCollection(outbox, obj -> {
             String apId = AP.str(obj, "id");
             if (!apIdSet.contains(apId)) {
-                saveOutboxItem(session, outboxNode, obj, 0, _userNode.getId());
+                Object object = AP.obj(obj, "object");
+                // todo-0: don't assume everything here is a "Note" object. Should support any
+                // kind of object.
+                saveNote(session, outboxNode, object);
             }
         });
     }
@@ -611,26 +629,6 @@ public class ActPubService {
                 }
             }
         }
-    }
-
-    public void saveOutboxItem(MongoSession session, SubNode parentNode, Object apObj, int pageNo, ObjectId ownerId) {
-        Object object = AP.obj(apObj, "object");
-
-        SubNode node = create.createNodeAsOwner(session, parentNode.getPath() + "/?", NodeType.NONE.s(), ownerId);
-        node.setProp(NodeProp.ACT_PUB_ID.s(), AP.str(apObj, "id"));
-        node.setProp(NodeProp.ACT_PUB_OBJ_TYPE.s(), AP.str(object, "type"));
-        node.setProp(NodeProp.ACT_PUB_OBJ_URL.s(), AP.str(object, "url"));
-        node.setProp(NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), AP.str(object, "inReplyTo"));
-        node.setProp(NodeProp.ACT_PUB_OBJ_CONTENT.s(),
-                object != null ? (/* "Page: " + pageNo + "<br>" + */ AP.str(object, "content")) : "no content");
-        node.setType(NodeType.ACT_PUB_ITEM.s());
-
-        Date published = AP.date(apObj, "published");
-        if (published != null) {
-            node.setModifyTime(published);
-        }
-
-        update.save(session, node, false);
     }
 
     /*
@@ -940,7 +938,7 @@ public class ActPubService {
             // if node was not found, create it.
             if (postsNode == null) {
                 postsNode = create.createNode(session, actorAccountNode, null, NodeType.ACT_PUB_POSTS.s(), 0L,
-                        CreateNodeLocation.LAST, null);
+                        CreateNodeLocation.LAST, null, null);
                 postsNode.setOwner(actorAccountNode.getId());
                 postsNode.setContent("### Posts");
                 update.save(session, postsNode);
@@ -955,9 +953,11 @@ public class ActPubService {
 
         String id = AP.str(obj, "id");
         Date published = AP.date(obj, "published");
+        String inReplyTo = AP.str(obj, "inReplyTo");
         String contentHtml = AP.str(obj, "content");
         String objUrl = AP.str(obj, "url");
         String objAttributedTo = AP.str(obj, "attributedTo");
+        String objType = AP.str(obj, "type");
 
         /*
          * First look to see if there is a target node already existing in this so we
@@ -969,11 +969,10 @@ public class ActPubService {
             return;
         }
 
-        newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null);
-
         // foreign account will own this node.
         SubNode toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
-        newNode.setOwner(toAccountNode.getId());
+        newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST,
+                null, toAccountNode.getId());
 
         // todo-0: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now
@@ -981,23 +980,19 @@ public class ActPubService {
         // '```'
         newNode.setContent(contentHtml);
         newNode.setModifyTime(published);
+
         newNode.setProp(NodeProp.ACT_PUB_ID.s(), id);
         newNode.setProp(NodeProp.ACT_PUB_OBJ_URL.s(), objUrl);
+        newNode.setProp(NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), inReplyTo);
+        newNode.setProp(NodeProp.ACT_PUB_OBJ_TYPE.s(), objType);
         newNode.setProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
 
         shareToAllObjectRecipients(session, newNode, obj, "to");
         shareToAllObjectRecipients(session, newNode, obj, "cc");
 
         update.save(session, newNode);
-
         addAttachmentIfExists(session, newNode, obj);
-        String fromUserName = getLongUserNameFromActorUrl(objAttributedTo);
-
-        NotificationMessage msg = new NotificationMessage("apReply", newNode.getId().toHexString(), contentHtml,
-                fromUserName);
-
-        notifyAllObjectRecipients(obj, "to", msg);
-        notifyAllObjectRecipients(obj, "cc", msg);
+		userFeedService.pushNodeUpdateToBrowsers(session, newNode);
     }
 
     /*
@@ -1015,7 +1010,7 @@ public class ActPubService {
                     String shareToUrl = (String) to;
 
                     /* The spec allows either a 'followers' URL here or an 'actor' URL here */
-                    shareToUsersForUrl(session, node, shareToUrl);                    
+                    shareToUsersForUrl(session, node, shareToUrl);
                 } else {
                     log.debug("to list entry not supported: " + to.getClass().getName());
                 }
@@ -1074,7 +1069,10 @@ public class ActPubService {
      */
     private void shareNodeToActorByUrl(MongoSession session, SubNode node, String actorUrl) {
 
-        /* Yes we tolerate for this to execute with the 'public' designation in place of an actorUrl here */
+        /*
+         * Yes we tolerate for this to execute with the 'public' designation in place of
+         * an actorUrl here
+         */
         if (actorUrl.endsWith("#Public")) {
             node.safeGetAc().put("public", new AccessControl("prvs", PrivilegeType.READ.s()));
             return;
@@ -1093,7 +1091,7 @@ public class ActPubService {
          */
         if (acctId == null) {
             SubNode acctNode = null;
-            
+
             if (isLocalActorUrl(actorUrl)) {
                 String longUserName = getLongUserNameFromActorUrl(actorUrl);
                 acctNode = read.getUserNodeByUserName(session, longUserName);
@@ -1107,27 +1105,8 @@ public class ActPubService {
         }
 
         if (acctId != null) {
-            node.safeGetAc().put(acctId, new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
-        }
-    }
-
-    /* propName = to | cc */
-    private void notifyAllObjectRecipients(Object obj, String propName, NotificationMessage msg) {
-        List<?> list = AP.list(obj, propName);
-        if (list != null) {
-            for (Object to : list) {
-                if (to instanceof String) {
-                    String actorUrl = (String) to;
-
-                    // If this is a user destination (not public) send message to user.
-                    if (!actorUrl.endsWith("#Public") && isLocalActorUrl(actorUrl)) {
-                        String userName = getLocalUserNameFromActorUrl(actorUrl);
-                        userFeedService.sendServerPushInfo(userName, msg);
-                    }
-                } else {
-                    log.debug("to list entry not supported: " + to.toString());
-                }
-            }
+            node.safeGetAc().put(acctId,
+                    new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
         }
     }
 

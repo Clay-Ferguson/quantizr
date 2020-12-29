@@ -126,7 +126,7 @@ public class NodeEditService {
 
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
-		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties());
+		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null);
 
 		if (!req.isUpdateModTime()) {
 			newNode.setModifyTime(null);
@@ -154,7 +154,7 @@ public class NodeEditService {
 		properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
 
 		SubNode newNode = create.createNode(session, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
-				CreateNodeLocation.LAST, properties);
+				CreateNodeLocation.LAST, properties, null);
 		newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 
 		if (followerActorUrl != null) {
@@ -190,7 +190,7 @@ public class NodeEditService {
 		}
 
 		SubNode newNode = create.createNode(session, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST,
-				null);
+				null, null);
 
 		String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
 		String content = title != null ? "#### " + title + "\n" : "";
@@ -217,7 +217,7 @@ public class NodeEditService {
 		SubNode parentNode = read.getNode(session, parentNodeId);
 
 		SubNode newNode = create.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
-				CreateNodeLocation.ORDINAL, null);
+				CreateNodeLocation.ORDINAL, null, null);
 
 		if (req.getInitialValue() != null) {
 			newNode.setContent(req.getInitialValue());
@@ -374,11 +374,8 @@ public class NodeEditService {
 				adminRunner.run(s -> {
 					auth.saveMentionsToNodeACL(s, node);
 					actPubService.sendNotificationForNodeEdit(s, parent, node);
-					userFeedService.pushNodeUpdateToAllFriends(s, node);
+					userFeedService.pushNodeUpdateToBrowsers(s, node);
 				});
-
-				// do not delete (yet, this one will remain obsolet though)
-				// outboxMgr.sendNotificationForNodeEdit(node, sessionContext.getUserName());
 			}
 		}
 

@@ -262,7 +262,7 @@ public class AttachmentService {
 		if (addAsChild) {
 			try {
 				final SubNode newNode = create.createNode(session, node, null, null, null, CreateNodeLocation.LAST,
-						null);
+						null, null);
 				newNode.setContent(fileName);
 
 				/*

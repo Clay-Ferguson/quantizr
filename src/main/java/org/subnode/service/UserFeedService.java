@@ -55,7 +55,7 @@ public class UserFeedService {
 	private MongoAuth auth;
 
 	/* Notify all users being shared to on this node */
-	public void pushNodeUpdateToAllFriends(MongoSession session, SubNode node) {
+	public void pushNodeUpdateToBrowsers(MongoSession session, SubNode node) {
 		log.debug("Pushing update to all friends: from user " + sessionContext.getUserName() + ": id="
 				+ node.getId().toHexString());
 		Set<String> loggedInUserNames = null;
