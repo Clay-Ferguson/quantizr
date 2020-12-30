@@ -5,9 +5,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashSet;
@@ -16,6 +20,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -283,7 +289,8 @@ public class ActPubService {
     }
 
     /*
-     * Note: 'actor' here is the actor URL of a local Quanta-based user,
+     * Note: 'actor' here is the actor URL of the local Quanta-based user doing the
+     * post
      */
     private void securePost(MongoSession session, String privateKey, String toInbox, String actor, APObj message) {
         try {
@@ -795,12 +802,12 @@ public class ActPubService {
      * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by
      * foreign servers to follow a user on this server
      */
-    public APObj processInboxPost(Object payload) {
+    public APObj processInboxPost(HttpServletRequest httpReq, Object payload) {
         String type = AP.str(payload, "type");
 
         // Process Create Action
         if ("Create".equals(type)) {
-            return processCreateAction(payload);
+            return processCreateAction(httpReq, payload);
         }
         // Process Follow Action
         else if ("Follow".equals(type)) {
@@ -817,6 +824,149 @@ public class ActPubService {
         return null;
     }
 
+    public void verifySignature(HttpServletRequest httpReq, PublicKey pubKey) {
+        String reqHeaderSignature = httpReq.getHeader("Signature");
+        if (reqHeaderSignature == null) {
+            throw new RuntimeException("Signature missing from http header.");
+        }
+
+        final List<String> sigTokens = XString.tokenize(reqHeaderSignature, ",", true);
+        if (sigTokens == null || sigTokens.size() < 3) {
+            throw new RuntimeException("Signature tokens missing from http header.");
+        }
+
+        String keyID = null;
+        String signature = null;
+        List<String> headers = null;
+
+        for (String sigToken : sigTokens) {
+            int equalIdx = sigToken.indexOf("=");
+
+            // ignore tokens not containing equals
+            if (equalIdx == -1)
+                continue;
+
+            String key = sigToken.substring(0, equalIdx);
+            String val = sigToken.substring(equalIdx + 1);
+
+            if (val.charAt(0) == '"') {
+                val = val.substring(1, val.length() - 1);
+            }
+
+            if (key.equalsIgnoreCase("keyId")) {
+                keyID = val;
+            } else if (key.equalsIgnoreCase("headers")) {
+                headers = Arrays.asList(val.split(" "));
+            } else if (key.equalsIgnoreCase("signature")) {
+                signature = val;
+            }
+        }
+
+        if (keyID == null)
+            throw new RuntimeException("Header signature missing 'keyId'");
+        if (headers == null)
+            throw new RuntimeException("Header signature missing 'headers'");
+        if (signature == null)
+            throw new RuntimeException("Header signature missing 'signature'");
+        if (!headers.contains("(request-target)"))
+            throw new RuntimeException("(request-target) is not in signed headers");
+        if (!headers.contains("date"))
+            throw new RuntimeException("date is not in signed headers");
+        if (!headers.contains("host"))
+            throw new RuntimeException("host is not in signed headers");
+
+        String date = httpReq.getHeader("date");
+        validateRequestTime(date);
+
+        /*
+         * NOTE: keyId will be the actor url with "#main-key" appended to it, and if we
+         * wanted to verify that only incomming messages from users we 'know' are
+         * allowed, we could do that, but for now we simply verify that they are who
+         * they claim to be using the signature check below, and that is all we want.
+         * (i.e. unknown users can post in)
+         */
+
+        byte[] signableBytes = getHeaderSignatureBytes(httpReq, headers);
+        byte[] sigBytes = Base64.getDecoder().decode(signature);
+
+        try {
+            Signature verifier = Signature.getInstance("SHA256withRSA");
+            verifier.initVerify(pubKey);
+            verifier.update(signableBytes);
+            if (!verifier.verify(sigBytes)) {
+                throw new RuntimeException("Signature verify failed.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Signature check failed.");
+        }
+    }
+
+    byte[] getHeaderSignatureBytes(HttpServletRequest httpReq, List<String> headers) {
+        ArrayList<String> sigParts = new ArrayList<>();
+        for (String header : headers) {
+            String value;
+            if (header.equals("(request-target)")) {
+                value = httpReq.getMethod().toLowerCase() + " " + httpReq.getRequestURI();
+            } else {
+                value = httpReq.getHeader(header);
+            }
+            sigParts.add(header + ": " + value);
+        }
+
+        String strToSign = String.join("\n", sigParts);
+        byte[] signableBytes = strToSign.getBytes(StandardCharsets.UTF_8);
+        return signableBytes;
+    }
+
+    public void validateRequestTime(String date) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+            long unixtime = dateFormat.parse(date).getTime();
+            long now = System.currentTimeMillis();
+            long diff = now - unixtime;
+            if (diff > 30000L)
+                throw new IllegalArgumentException("Date is too far in the future (difference: " + diff + "ms)");
+            if (diff < -30000L)
+                throw new IllegalArgumentException("Date is too far in the past (difference: " + diff + "ms)");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed checking time on http request.");
+        }
+    }
+
+    public PublicKey getPublicKeyFromActor(Object actorObj) {
+        PublicKey pubKey = null;
+        Object pubKeyObj = AP.obj(actorObj, "publicKey");
+        if (pubKeyObj == null)
+            return null;
+
+        String pkeyEncoded = AP.str(pubKeyObj, "publicKeyPem");
+        if (pkeyEncoded == null)
+            return null;
+
+        // I took this replacement logic from 'Smitherene' project, and it seems to work
+        // ok, but I haven't really fully vetted it myself.
+        pkeyEncoded = pkeyEncoded.replaceAll("-----(BEGIN|END) (RSA )?PUBLIC KEY-----", "").replace("\n", "").trim();
+
+        byte[] key = Base64.getDecoder().decode(pkeyEncoded);
+        try {
+            X509EncodedKeySpec spec = new X509EncodedKeySpec(key);
+            pubKey = KeyFactory.getInstance("RSA").generatePublic(spec);
+        } catch (Exception ex) {
+            log.debug("Failed to generate publicKey from encoded: " + pkeyEncoded);
+            // As long as this code path is never needed for Mastogon/Pleroma I'm not going
+            // to worry about it, but I can always
+            // dig this implementation out of my saved copy of Smitherene if ever needed.
+            //
+            // a simpler RSA key format, used at least by Misskey
+            // FWIW, Misskey user objects also contain a key "isCat" which I ignore
+            // RSAPublicKeySpec spec=decodeSimpleRSAKey(key);
+            // pubKey=KeyFactory.getInstance("RSA").generatePublic(spec);
+        }
+
+        return pubKey;
+    }
+
     /* Process inbound undo actions (comming from foreign servers) */
     public APObj processUndoAction(Object payload) {
         Object object = AP.obj(payload, "object");
@@ -826,7 +976,7 @@ public class ActPubService {
         return null;
     }
 
-    public APObj processCreateAction(Object payload) {
+    public APObj processCreateAction(HttpServletRequest httpReq, Object payload) {
         APObj _ret = (APObj) adminRunner.run(session -> {
 
             String actorUrl = AP.str(payload, "actor");
@@ -836,6 +986,13 @@ public class ActPubService {
             }
 
             APObj actorObj = getActorByUrl(actorUrl);
+            if (actorObj == null) {
+                log.debug("Unable to load actorUrl: " + actorUrl);
+                return null;
+            }
+
+            PublicKey pubKey = getPublicKeyFromActor(actorObj);
+            verifySignature(httpReq, pubKey);
 
             Object object = AP.obj(payload, "object");
             if (object != null && "Note".equals(AP.str(object, "type"))) {
