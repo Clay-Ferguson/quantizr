@@ -30,7 +30,8 @@ public class ActPubController {
 	// WEBFINGER & ACTOR
 	// =====================================
 
-	@RequestMapping(value = ActPubConstants.PATH_WEBFINGER, method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_JRD)
+	@RequestMapping(value = ActPubConstants.PATH_WEBFINGER, method = RequestMethod.GET,
+			produces = ActPubConstants.CONTENT_TYPE_JSON_JRD)
 	public @ResponseBody Object webFinger(//
 			@RequestParam(value = "resource", required = true) String resource) {
 		Object ret = actPubService.generateWebFinger(resource);
@@ -40,8 +41,8 @@ public class ActPubController {
 	}
 
 	/* This is the ActivityPub 'Actor' URL */
-	@RequestMapping(value = ActPubConstants.ACTOR_PATH
-			+ "/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = ActPubConstants.ACTOR_PATH + "/{userName}", method = RequestMethod.GET,
+			produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object actor(@PathVariable(value = "userName", required = true) String userName) {
 		Object ret = actPubService.generateActor(userName);
 		if (ret != null)
@@ -54,8 +55,8 @@ public class ActPubController {
 	// =====================================
 
 	/* If no userName specified it's the system 'sharedInbox' */
-	@RequestMapping(value = ActPubConstants.PATH_INBOX
-			+ "/{userName}", method = RequestMethod.POST, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
+	@RequestMapping(value = ActPubConstants.PATH_INBOX + "/{userName}", method = RequestMethod.POST,
+			produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object inboxPost(@RequestBody APObj payload, //
 			@PathVariable(value = "userName", required = false) String userName, //
 			HttpServletRequest httpReq) {
@@ -71,8 +72,8 @@ public class ActPubController {
 	// OUTBOX
 	// =====================================
 
-	@RequestMapping(value = ActPubConstants.PATH_OUTBOX
-			+ "/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = ActPubConstants.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET,
+			produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object outbox(@PathVariable(value = "userName", required = true) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
@@ -80,6 +81,16 @@ public class ActPubController {
 		if ("true".equals(page)) {
 			ret = actPubService.generateOutboxPage(userName, minId);
 		} else {
+			/*
+			 * Mastodon calls this method, but never calls back in (to generateOutboxPage above) for any pages.
+			 * I'm not sure if this is something we're doing wrong or what, because I don't know enough about
+			 * what Mastodon is "supposed" to do, to be able to even say if this is incorrect or not.
+			 * 
+			 * From analyzing other 'server to server' calls on other Mastodon instances it seems like at least
+			 * the "toot count" should be showing up, but when I search a Quanta.wiki user and it gets the
+			 * outbox, mastodon still shows "0 toots", even though it just queried my inbox and there ARE toots
+			 * and we DID return the correct number of them.
+			 */
 			ret = actPubService.generateOutbox(userName);
 		}
 		if (ret != null) {
@@ -93,8 +104,8 @@ public class ActPubController {
 	// FOLLOWERS
 	// =====================================
 
-	@RequestMapping(value = ActPubConstants.PATH_FOLLOWERS
-			+ "/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = ActPubConstants.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET,
+			produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object getFollowers(@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
@@ -115,14 +126,13 @@ public class ActPubController {
 	// FOLLOWING
 	// =====================================
 
-	@RequestMapping(value = ActPubConstants.PATH_FOLLOWING
-			+ "/{userName}", method = RequestMethod.GET, produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
+	@RequestMapping(value = ActPubConstants.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET,
+			produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object getFollowing(@PathVariable(value = "userName", required = false) String userName) {
 		log.debug("following (get) returning empty result");
 
 		// todo-0: either implement or delete.
-		Object ret = actPubService.generateDummyOrderedCollection(userName,
-				ActPubConstants.PATH_FOLLOWING + "/" + userName);
+		Object ret = actPubService.generateDummyOrderedCollection(userName, ActPubConstants.PATH_FOLLOWING + "/" + userName);
 		if (ret != null)
 			return ret;
 		return new ResponseEntity(HttpStatus.OK);

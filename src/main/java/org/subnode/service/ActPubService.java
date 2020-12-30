@@ -139,8 +139,8 @@ public class ActPubService {
     private static final ConcurrentHashMap<String, SubNode> accountNodesById = new ConcurrentHashMap<String, SubNode>();
 
     /*
-     * RestTemplate is thread-safe and reusable, and has no state, so we need only
-     * one final static instance ever
+     * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
+     * instance ever
      */
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -171,8 +171,8 @@ public class ActPubService {
     }
 
     /*
-     * When 'node' has been created under 'parent' (by the sessionContext user) this
-     * will send a notification to foreign servers.
+     * When 'node' has been created under 'parent' (by the sessionContext user) this will send a
+     * notification to foreign servers.
      */
     public void sendNotificationForNodeEdit(MongoSession session, SubNode parent, SubNode node) {
         try {
@@ -180,10 +180,9 @@ public class ActPubService {
 
             boolean privateMessage = true;
             /*
-             * Now we need to lookup all userNames from the ACL info, to add them all to
-             * 'toUserNames', and we can avoid doing any work for the ones in
-             * 'toUserNamesSet', because we know they already are taken care of (in the
-             * list)
+             * Now we need to lookup all userNames from the ACL info, to add them all to 'toUserNames', and we
+             * can avoid doing any work for the ones in 'toUserNamesSet', because we know they already are taken
+             * care of (in the list)
              */
             for (String k : node.getAc().keySet()) {
                 if ("public".equals(k)) {
@@ -237,20 +236,19 @@ public class ActPubService {
         return appProp.protocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/" + userName;
     }
 
-    public void sendNote(MongoSession session, List<String> toUserNames, String fromUser, String inReplyTo,
-            String content, APList attachments, String noteUrl, boolean privateMessage) {
+    public void sendNote(MongoSession session, List<String> toUserNames, String fromUser, String inReplyTo, String content,
+            APList attachments, String noteUrl, boolean privateMessage) {
 
         String host = appProp.getMetaHost();
         String fromActor = null;
 
         /*
-         * todo-0: Need to analyze the scenario where there are multiple 'quanta.wiki'
-         * users recieving a notification, and see if this results in multiple inbound
-         * posts from a Mastodon server, or if somehow all the mentions are wrapped into
-         * a single post to one user or perhaps the global inbox? Because we will use
-         * this example/info to determine how to send notifications to other federated
-         * servers also with the least number of posts to the least number of inboxes
-         * (i.e. will it be one post PER user or not?)
+         * todo-0: Need to analyze the scenario where there are multiple 'quanta.wiki' users recieving a
+         * notification, and see if this results in multiple inbound posts from a Mastodon server, or if
+         * somehow all the mentions are wrapped into a single post to one user or perhaps the global inbox?
+         * Because we will use this example/info to determine how to send notifications to other federated
+         * servers also with the least number of posts to the least number of inboxes (i.e. will it be one
+         * post PER user or not?)
          */
         for (String toUserName : toUserNames) {
 
@@ -280,8 +278,8 @@ public class ActPubService {
                 fromActor = makeActorUrlForUserName(fromUser);
             }
 
-            APObj message = apFactory.newCreateMessageForNote(toUserName, fromActor, inReplyTo, content, toActorUrl,
-                    noteUrl, privateMessage, attachments);
+            APObj message = apFactory.newCreateMessageForNote(toUserName, fromActor, inReplyTo, content, toActorUrl, noteUrl,
+                    privateMessage, attachments);
 
             String privateKey = getPrivateKey(session, sessionContext.getUserName());
             securePost(session, privateKey, inbox, fromActor, message);
@@ -289,8 +287,7 @@ public class ActPubService {
     }
 
     /*
-     * Note: 'actor' here is the actor URL of the local Quanta-based user doing the
-     * post
+     * Note: 'actor' here is the actor URL of the local Quanta-based user doing the post
      */
     private void securePost(MongoSession session, String privateKey, String toInbox, String actor, APObj message) {
         try {
@@ -314,15 +311,15 @@ public class ActPubService {
             dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             String date = dateFormat.format(new Date());
 
-            String digestHeader = "SHA-256="
-                    + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes));
+            String digestHeader =
+                    "SHA-256=" + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes));
 
             URL url = new URL(toInbox);
             String host = url.getHost();
             String path = url.getPath();
 
-            String strToSign = "(request-target): post " + path + "\nhost: " + host + "\ndate: " + date + "\ndigest: "
-                    + digestHeader;
+            String strToSign =
+                    "(request-target): post " + path + "\nhost: " + host + "\ndate: " + date + "\ndigest: " + digestHeader;
 
             Signature sig = Signature.getInstance("SHA256withRSA");
             sig.initSign(privKey);
@@ -465,22 +462,19 @@ public class ActPubService {
     }
 
     /*
-     * Caller can pass in userNode if it's already available, but if not just pass
-     * null and the apUserName will be used to look up the userNode.
+     * Caller can pass in userNode if it's already available, but if not just pass null and the
+     * apUserName will be used to look up the userNode.
      */
-    public void refreshOutboxFromForeignServer(MongoSession session, Object actor, SubNode userNode,
-            String apUserName) {
+    public void refreshOutboxFromForeignServer(MongoSession session, Object actor, SubNode userNode, String apUserName) {
 
         if (userNode == null) {
             userNode = read.getUserNodeByUserName(session, apUserName);
         }
 
-        SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts",
-                NodeType.ACT_PUB_POSTS.s());
+        SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s());
 
         /*
-         * Query all existing known outbox items we have already saved for this foreign
-         * user
+         * Query all existing known outbox items we have already saved for this foreign user
          */
         Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode);
 
@@ -492,8 +486,8 @@ public class ActPubService {
         }
 
         /*
-         * Generate a list of known AP IDs so we can ignore them and load only the
-         * unknown ones from the foreign server
+         * Generate a list of known AP IDs so we can ignore them and load only the unknown ones from the
+         * foreign server
          */
         HashSet<String> apIdSet = new HashSet<String>();
         for (SubNode n : outboxItems) {
@@ -519,21 +513,20 @@ public class ActPubService {
 
     public void iterateOrderedCollection(Object collectionObj, ActPubObserver observer) {
         /*
-         * We user apIdSet to avoid processing any dupliates, because the AP spec calls
-         * on us to do this and doesn't guarantee it's own dedupliation
+         * We user apIdSet to avoid processing any dupliates, because the AP spec calls on us to do this and
+         * doesn't guarantee it's own dedupliation
          */
         HashSet<String> apIdSet = new HashSet<String>();
 
         /*
-         * The collection object itself is allowed to have orderedItems, which if
-         * present we process, in addition to the paging, although normally when the
-         * collection has the items it means it won't have any paging
+         * The collection object itself is allowed to have orderedItems, which if present we process, in
+         * addition to the paging, although normally when the collection has the items it means it won't
+         * have any paging
          */
         List<?> orderedItems = AP.list(collectionObj, "orderedItems");
         if (orderedItems != null) {
             /*
-             * Commonly this will just be an array strings (like in a 'followers' collection
-             * on Mastodon)
+             * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
              */
             for (Object apObj : orderedItems) {
                 observer.item(apObj);
@@ -541,11 +534,10 @@ public class ActPubService {
         }
 
         /*
-         * Warning: There are times when even with only two items in the outbox Mastodon
-         * might send back an empty array in the "first" page and the two items in teh
-         * "last" page, which makes no sense, but it just means we have to read and
-         * deduplicate all the items from all pages to be sure we don't end up with a
-         * empty array even when there ARE some
+         * Warning: There are times when even with only two items in the outbox Mastodon might send back an
+         * empty array in the "first" page and the two items in teh "last" page, which makes no sense, but
+         * it just means we have to read and deduplicate all the items from all pages to be sure we don't
+         * end up with a empty array even when there ARE some
          */
         String firstPageUrl = AP.str(collectionObj, "first");
         if (firstPageUrl != null) {
@@ -676,8 +668,8 @@ public class ActPubService {
     }
 
     /*
-     * Effeciently gets the Actor by using a cache to ensure we never get the same
-     * Actor twice until the app restarts at least
+     * Effeciently gets the Actor by using a cache to ensure we never get the same Actor twice until the
+     * app restarts at least
      */
     public APObj getActorByUrl(String url) {
         if (url == null)
@@ -783,8 +775,7 @@ public class ActPubService {
                         .put("actor", sessionActorUrl) //
                         .put("object", new APObj() //
                                 .put("id",
-                                        appProp.protocolHostAndPort() + "/unfollow-obj/"
-                                                + String.valueOf(new Date().getTime())) //
+                                        appProp.protocolHostAndPort() + "/unfollow-obj/" + String.valueOf(new Date().getTime())) //
                                 .put("type", "Follow") //
                                 .put("actor", sessionActorUrl) //
                                 .put("object", actorUrlOfUserBeingFollowed));
@@ -799,8 +790,8 @@ public class ActPubService {
     }
 
     /*
-     * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by
-     * foreign servers to follow a user on this server
+     * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by foreign servers to
+     * follow a user on this server
      */
     public APObj processInboxPost(HttpServletRequest httpReq, Object payload) {
         String type = AP.str(payload, "type");
@@ -879,11 +870,10 @@ public class ActPubService {
         validateRequestTime(date);
 
         /*
-         * NOTE: keyId will be the actor url with "#main-key" appended to it, and if we
-         * wanted to verify that only incomming messages from users we 'know' are
-         * allowed, we could do that, but for now we simply verify that they are who
-         * they claim to be using the signature check below, and that is all we want.
-         * (i.e. unknown users can post in)
+         * NOTE: keyId will be the actor url with "#main-key" appended to it, and if we wanted to verify
+         * that only incomming messages from users we 'know' are allowed, we could do that, but for now we
+         * simply verify that they are who they claim to be using the signature check below, and that is all
+         * we want. (i.e. unknown users can post in)
          */
 
         byte[] signableBytes = getHeaderSignatureBytes(httpReq, headers);
@@ -1014,9 +1004,9 @@ public class ActPubService {
         APObj ret = new APObj();
 
         /*
-         * If this is a 'reply' post then parse the ID out of this, and if we can find
-         * that node by that id then insert the reply under that, instead of the default
-         * without this id which is to put in 'inbox'
+         * If this is a 'reply' post then parse the ID out of this, and if we can find that node by that id
+         * then insert the reply under that, instead of the default without this id which is to put in
+         * 'inbox'
          */
         String inReplyTo = AP.str(obj, "inReplyTo");
 
@@ -1024,9 +1014,8 @@ public class ActPubService {
         SubNode nodeBeingRepliedTo = null;
 
         /*
-         * Detect if inReplyTo is formatted like this:
-         * 'https://quanta.wiki/app?id=xxxxx' and if so lookup the nodeBeingRepliedTo by
-         * using that nodeId
+         * Detect if inReplyTo is formatted like this: 'https://quanta.wiki/app?id=xxxxx' and if so lookup
+         * the nodeBeingRepliedTo by using that nodeId
          */
         if (isLocalUrl(inReplyTo)) {
             int lastIdx = inReplyTo.lastIndexOf("=");
@@ -1038,24 +1027,22 @@ public class ActPubService {
         }
 
         /*
-         * If a foreign user is replying to a specific node, we put the reply under that
-         * node
+         * If a foreign user is replying to a specific node, we put the reply under that node
          */
         if (nodeBeingRepliedTo != null) {
             saveNote(session, nodeBeingRepliedTo, obj);
         }
         /*
-         * Otherwise the node is not a reply so we put it under POSTS node inside the
-         * foreign account node on our server, and then we add 'sharing' to it for each
-         * person in the 'to/cc' so that from quanta this new node will show up in those
-         * people's FEEDs
+         * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
+         * on our server, and then we add 'sharing' to it for each person in the 'to/cc' so that from quanta
+         * this new node will show up in those people's FEEDs
          */
         else {
             SubNode actorAccountNode = loadForeignUserByActorUrl(session, actorUrl);
             if (actorAccountNode != null) {
                 String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
-                SubNode postsNode = read.getUserNodeByType(session, userName, actorAccountNode, "### Posts",
-                        NodeType.ACT_PUB_POSTS.s());
+                SubNode postsNode =
+                        read.getUserNodeByType(session, userName, actorAccountNode, "### Posts", NodeType.ACT_PUB_POSTS.s());
                 saveNote(session, postsNode, obj);
             }
         }
@@ -1073,8 +1060,7 @@ public class ActPubService {
         String objType = AP.str(obj, "type");
 
         /*
-         * First look to see if there is a target node already existing in this so we
-         * don't add a duplicate
+         * First look to see if there is a target node already existing in this so we don't add a duplicate
          */
         SubNode newNode = read.findSubNodeByProp(session, parentNode.getPath(), NodeProp.ACT_PUB_ID.s(), id);
         if (newNode != null) {
@@ -1084,8 +1070,7 @@ public class ActPubService {
 
         // foreign account will own this node.
         SubNode toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
-        newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null,
-                toAccountNode.getId());
+        newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null, toAccountNode.getId());
 
         // todo-0: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now
@@ -1111,8 +1096,7 @@ public class ActPubService {
     /*
      * Adds node sharing (ACL) entries for all recipients (i.e. propName==to | cc)
      * 
-     * The node save is expected to be done external to this function after this
-     * function runs.
+     * The node save is expected to be done external to this function after this function runs.
      */
     private void shareToAllObjectRecipients(MongoSession session, SubNode node, Object obj, String propName) {
         List<?> list = AP.list(obj, propName);
@@ -1132,9 +1116,8 @@ public class ActPubService {
     }
 
     /*
-     * Reads the object from 'url' to determine if it's a 'followers' URL or an
-     * 'actor' URL, and then shares the node to either all the followers or the
-     * specific actor
+     * Reads the object from 'url' to determine if it's a 'followers' URL or an 'actor' URL, and then
+     * shares the node to either all the followers or the specific actor
      */
     private void shareToUsersForUrl(MongoSession session, SubNode node, String url) {
         log.debug("shareToUsersForUrl: " + url);
@@ -1145,27 +1128,25 @@ public class ActPubService {
         }
 
         /*
-         * if url does not contain "/followers" then the best first try is to assume
-         * it's an actor url and try that first
+         * if url does not contain "/followers" then the best first try is to assume it's an actor url and
+         * try that first
          */
         if (!url.contains("/followers")) {
             shareNodeToActorByUrl(session, node, url);
         }
         /*
-         * else assume this is a 'followers' url. Sharing normally will include a
-         * 'followers' and run this code path when some foreign user has a mention of
-         * our local user and is also a public post, and the foreign mastodon will then
-         * encode a 'followers' url into the 'to' or 'cc' of the incomming node
-         * designating that it's shared to all the followers (I think even 'private'
-         * messages to all followers will have this as well)
+         * else assume this is a 'followers' url. Sharing normally will include a 'followers' and run this
+         * code path when some foreign user has a mention of our local user and is also a public post, and
+         * the foreign mastodon will then encode a 'followers' url into the 'to' or 'cc' of the incomming
+         * node designating that it's shared to all the followers (I think even 'private' messages to all
+         * followers will have this as well)
          */
         else {
             APObj followersObj = getJson(url, new MediaType("application", "activity+json"));
             if (followersObj != null) {
                 iterateOrderedCollection(followersObj, obj -> {
                     /*
-                     * Mastodon seems to have the followers items as strings, which are the actor
-                     * urls of the followers.
+                     * Mastodon seems to have the followers items as strings, which are the actor urls of the followers.
                      */
                     if (obj instanceof String) {
                         String followerActorUrl = (String) obj;
@@ -1177,14 +1158,13 @@ public class ActPubService {
     }
 
     /*
-     * Shares this node to the designated user using their actorUrl and is expected
-     * to work even if the actorUrl points to a local user
+     * Shares this node to the designated user using their actorUrl and is expected to work even if the
+     * actorUrl points to a local user
      */
     private void shareNodeToActorByUrl(MongoSession session, SubNode node, String actorUrl) {
 
         /*
-         * Yes we tolerate for this to execute with the 'public' designation in place of
-         * an actorUrl here
+         * Yes we tolerate for this to execute with the 'public' designation in place of an actorUrl here
          */
         if (actorUrl.endsWith("#Public")) {
             node.safeGetAc().put("public", new AccessControl("prvs", PrivilegeType.READ.s()));
@@ -1195,8 +1175,7 @@ public class ActPubService {
         String acctId = acctIdByActorUrl.get(actorUrl);
 
         /*
-         * if acctId not found in cache load foreign user (will cause it to also get
-         * cached)
+         * if acctId not found in cache load foreign user (will cause it to also get cached)
          */
         if (acctId == null) {
             SubNode acctNode = null;
@@ -1214,8 +1193,7 @@ public class ActPubService {
         }
 
         if (acctId != null) {
-            node.safeGetAc().put(acctId,
-                    new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+            node.safeGetAc().put(acctId, new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
         }
     }
 
@@ -1244,8 +1222,7 @@ public class ActPubService {
         }
 
         /*
-         * Detect if this actorUrl points to our local server, and get the long name the
-         * easy way if so
+         * Detect if this actorUrl points to our local server, and get the long name the easy way if so
          */
         if (isLocalActorUrl(actorUrl)) {
             String shortUserName = getLocalUserNameFromActorUrl(actorUrl);
@@ -1280,9 +1257,8 @@ public class ActPubService {
     }
 
     /*
-     * we know our own actor layout is this: https://ourserver.com/ap/u/userName, so
-     * this method just strips the user name by taking what's after the rightmost
-     * slash
+     * we know our own actor layout is this: https://ourserver.com/ap/u/userName, so this method just
+     * strips the user name by taking what's after the rightmost slash
      */
     public String getLocalUserNameFromActorUrl(String actorUrl) {
         if (!isLocalActorUrl(actorUrl)) {
@@ -1302,10 +1278,9 @@ public class ActPubService {
     }
 
     /*
-     * Process inbound 'Follow' actions (comming from foreign servers). This results
-     * in the follower an account node in our local DB created if not already
-     * existing, and then a FRIEND node under his FRIENDS_LIST created to represent
-     * the person he's following, if not already existing.
+     * Process inbound 'Follow' actions (comming from foreign servers). This results in the follower an
+     * account node in our local DB created if not already existing, and then a FRIEND node under his
+     * FRIENDS_LIST created to represent the person he's following, if not already existing.
      * 
      * If 'unFollow' is true we actually do an unfollow instead of a follow.
      */
@@ -1340,12 +1315,10 @@ public class ActPubService {
             }
 
             // get the Friend List of the follower
-            SubNode followerFriendList = read.getUserNodeByType(session, followerUserName, null, null,
-                    NodeType.FRIEND_LIST.s());
+            SubNode followerFriendList = read.getUserNodeByType(session, followerUserName, null, null, NodeType.FRIEND_LIST.s());
 
             /*
-             * lookup to see if this followerFriendList node already has userToFollow
-             * already under it
+             * lookup to see if this followerFriendList node already has userToFollow already under it
              */
             SubNode friendNode = read.findFriendOfUser(session, followerFriendList, userToFollow);
             if (friendNode == null) {
@@ -1448,8 +1421,8 @@ public class ActPubService {
         APList items = getOutboxItems(userName, minId);
 
         // this is a self-reference url (id)
-        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName + "?min_id=" + minId
-                + "&page=true";
+        String url =
+                appProp.protocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
 
         return new APObj() //
                 .put("@context", ActPubConstants.CONTEXT_STREAMS) //
@@ -1524,8 +1497,8 @@ public class ActPubService {
 
                 String headerImageMime = userNode.getStrProp(NodeProp.BIN_MIME.s() + "Header");
                 String headerImageVer = userNode.getStrProp(NodeProp.BIN.s() + "Header");
-                String headerImageUrl = appProp.protocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
-                        + "?nodeId=" + userNode.getId().toHexString() + "&v=" + headerImageVer;
+                String headerImageUrl = appProp.protocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader" + "?nodeId="
+                        + userNode.getId().toHexString() + "&v=" + headerImageVer;
 
                 APObj actor = new APObj();
 
@@ -1534,8 +1507,7 @@ public class ActPubService {
                         .val(ActPubConstants.CONTEXT_SECURITY));
 
                 /*
-                 * Note: this is a self-reference, and must be identical to the URL that returns
-                 * this object
+                 * Note: this is a self-reference, and must be identical to the URL that returns this object
                  */
                 actor.put("id", makeActorUrlForUserName(userName));
                 actor.put("type", "Person");
@@ -1559,9 +1531,9 @@ public class ActPubService {
                 actor.put("following", host + ActPubConstants.PATH_FOLLOWING + "/" + userName);
 
                 /*
-                 * This "/u/[user]/home" url format access the node the user has named 'home'.
-                 * This node is auto-created if not found, and will also be public (readable) to
-                 * all users because any node named 'home' is automatically madd public
+                 * This "/u/[user]/home" url format access the node the user has named 'home'. This node is
+                 * auto-created if not found, and will also be public (readable) to all users because any node named
+                 * 'home' is automatically madd public
                  */
                 actor.put("url", host + "/u/" + userName + "/home");
 
@@ -1570,8 +1542,7 @@ public class ActPubService {
                 actor.put("publicKey", new APObj() //
                         .put("id", AP.str(actor, "id") + "#main-key") //
                         .put("owner", AP.str(actor, "id")) //
-                        .put("publicKeyPem",
-                                "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n"));
+                        .put("publicKeyPem", "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n"));
 
                 actor.put("supportsFriendRequests", true);
 
@@ -1586,9 +1557,8 @@ public class ActPubService {
     }
 
     /*
-     * Searches thru the 'links' array property on webFinger and returns the links
-     * array object that has a 'rel' property that matches the value in the rel
-     * param string
+     * Searches thru the 'links' array property on webFinger and returns the links array object that has
+     * a 'rel' property that matches the value in the rel param string
      */
     public Object getLinkByRel(Object webFinger, String rel) {
         List<?> linksList = AP.list(webFinger, "links");
@@ -1665,9 +1635,8 @@ public class ActPubService {
     }
 
     /*
-     * todo-0: Security isn't implemented on this call yet so a hacker can
-     * theoretically inject any userName into the api for this to retrieve shared
-     * nodes anyone has shared.
+     * todo-0: Security isn't implemented on this call yet so a hacker can theoretically inject any
+     * userName into the api for this to retrieve shared nodes anyone has shared.
      */
     public APList getOutboxItems(String userName, String minId) {
         String host = appProp.protocolHostAndPort();

@@ -43,7 +43,7 @@ public class AppFilter extends GenericFilterBean {
 	 * For debugging we can turn this flag on and disable the server from processing
 	 * multiple requests simultenaously this is every helpful for debugging
 	 */
-	private static boolean singleThreadDebugging = true;
+	private static boolean singleThreadDebugging = false;
 	private static final HashMap<String, Object> locksByIp = new HashMap<String, Object>();
 
 	@Override
