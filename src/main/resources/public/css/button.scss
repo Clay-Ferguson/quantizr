@@ -36,11 +36,13 @@
 
 .feedDirtyButton {
     border: 4px solid green;
+    display: inline-block;
 }
 
 //This class exists only so the space for the border is always taken up
 .feedNotDirtyButton {
     border: 4px solid transparent;
+    display: inline-block;
 }
 
 .bash-exec-button {

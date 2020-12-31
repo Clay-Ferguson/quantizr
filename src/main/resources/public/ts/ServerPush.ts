@@ -70,6 +70,8 @@ export class ServerPush implements ServerPushIntf {
                             in local memory)
                             */
                             s.feedDirty = true;
+
+                            S.meta64.showSystemNotification("New Message", nodeInfo.owner + ": " + nodeInfo.content);
                         }
                     }
                 });

@@ -83,8 +83,11 @@ public class SessionContext {
 	}
 
 	public static boolean validToken(String token) {
+		if (token == null)
+			return false;
+
 		for (SessionContext sc : allSessions) {
-			if (sc.getUserToken().equals(token)) {
+			if (token.equals(sc.getUserToken())) {
 				return true;
 			}
 		}
@@ -96,10 +99,13 @@ public class SessionContext {
 	}
 
 	public static List<SessionContext> getSessionsByUserName(String userName) {
+		if (userName == null)
+			return null;
+
 		List<SessionContext> list = null;
 
 		for (SessionContext sc : allSessions) {
-			if (sc.getUserName().equals(userName)) {
+			if (userName.equals(sc.getUserName())) {
 				if (list == null) {
 					list = new LinkedList<SessionContext>();
 				}

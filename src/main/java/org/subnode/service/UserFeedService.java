@@ -87,6 +87,10 @@ public class UserFeedService {
 
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : allSessions) {
+
+			/* Anonymous sessions won't have userName and can be ignored */
+			if (sc.getUserName()==null) continue;
+			
 			/*
 			 * push if...
 			 * 

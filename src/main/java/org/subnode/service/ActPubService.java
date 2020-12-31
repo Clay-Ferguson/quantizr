@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1400,12 +1401,16 @@ public class ActPubService {
                 .put("last", url + "?min_id=0&page=true");
     }
 
-    // userName represents the person whose outbox is being QUERIED, and the identity of the 
+    // userName represents the person whose outbox is being QUERIED, and the identity of the
     // user DOING the querying will come from the http header:
     //
-    // todo-0: So for now we just query the PUBLIC shares from the outbox, and verify that public query works before we try to 
+    // todo-0: So for now we just query the PUBLIC shares from the outbox, and verify that public query
+    // works before we try to
     // figure out how to do private auth comming from specific user(s)
-    // signature: keyId="https://quantizr.com/actor#main-key",algorithm="rsa-sha256",headers="(request-target) host date accept",signature="Cx3h3esROhhwMYUXBCZ5zyckN37Eyq+jj7ur4neGoi7Ym3GdddIEPSDiv3hdwQkFEpUNeYgPWD4rzgCOclok2bcTTwza0CHOKlXnkHtKhI8MK8X9UyQgG47xjS9Ifk6a4oBcGUTniKus8fkLH7g3HHNTXrigOWSfM9mZCkicicMSyC2lbvCAOnafZ0nZEzhKwAH83Hcrelpw7leLTOSRXw8D0NFhiQJR4oFrX7hpuM42I58C0Y4dNng6XrzydqZj/FFjXnpw6NEG4fuoyQ9+J5WH3e9UNZiuzsnloYyQDbb2lgPB0YwFHWSp+W2SwpUykGCyZMNlx+ri/JiauOudvw=="
+    // signature:
+    // keyId="https://quantizr.com/actor#main-key",algorithm="rsa-sha256",headers="(request-target) host
+    // date
+    // accept",signature="Cx3h3esROhhwMYUXBCZ5zyckN37Eyq+jj7ur4neGoi7Ym3GdddIEPSDiv3hdwQkFEpUNeYgPWD4rzgCOclok2bcTTwza0CHOKlXnkHtKhI8MK8X9UyQgG47xjS9Ifk6a4oBcGUTniKus8fkLH7g3HHNTXrigOWSfM9mZCkicicMSyC2lbvCAOnafZ0nZEzhKwAH83Hcrelpw7leLTOSRXw8D0NFhiQJR4oFrX7hpuM42I58C0Y4dNng6XrzydqZj/FFjXnpw6NEG4fuoyQ9+J5WH3e9UNZiuzsnloYyQDbb2lgPB0YwFHWSp+W2SwpUykGCyZMNlx+ri/JiauOudvw=="
     public Long getOutboxItemCount(final String userName, String sharedTo) {
         Long totalItems = (Long) adminRunner.run(mongoSession -> {
             long count = 0;
@@ -1671,8 +1676,8 @@ public class ActPubService {
                 List<String> sharedToList = new LinkedList<String>();
                 sharedToList.add(sharedTo);
 
-                for (SubNode child : auth.searchSubGraphByAclUser(mongoSession, null, sharedToList,
-                        SubNode.FIELD_MODIFY_TIME, MAX_PER_PAGE, userNode.getOwner())) {
+                for (SubNode child : auth.searchSubGraphByAclUser(mongoSession, null, sharedToList, SubNode.FIELD_MODIFY_TIME,
+                        MAX_PER_PAGE, userNode.getOwner())) {
 
                     if (items.size() >= MAX_PER_PAGE) {
                         // ocPage.setPrev(outboxBase + "?page=" + String.valueOf(pgNo - 1));
@@ -1716,5 +1721,29 @@ public class ActPubService {
             throw new RuntimeException(e);
         }
         return retItems;
+    }
+
+    /*
+     * Every node getting deleted will call into here, so we can do whatever we need to in this hook,
+     * which for now is just to manage unfollowing a Friend if a friend is deleted, but later will also
+     * entail (todo-0) deleting nodes that were posted to foreign servers by issuing an 'undo' command
+     */
+    public void deleteNodeNotify(ObjectId nodeId) {
+
+        adminRunner.run(session -> {
+            SubNode node = read.getNode(session, nodeId);
+            if (node != null) {
+                if (node.getType().equals(NodeType.FRIEND.s())) {
+                    String friendUserName = node.getStrProp(NodeProp.USER.s());
+                    if (friendUserName != null) {
+                        // if a foreign user, update thru ActivityPub
+                        if (friendUserName.contains("@")) {
+                            setFollowing(friendUserName, false);
+                        }
+                    }
+                }
+            }
+            return null;
+        });
     }
 }

@@ -16,6 +16,7 @@ import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.service.ActPubService;
 import org.subnode.service.UserFeedService;
 import org.subnode.util.XString;
 
@@ -29,25 +30,25 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Autowired
 	private UserFeedService userFeedService;
 
+	@Autowired
+	private ActPubService actPub;
+
 	/*
-	 * todo-2: This is a temporary hack to allow our ExportJsonService.resetNode
-	 * importer to work. This is importing nodes that should be all self contained
-	 * as a directed graph and there's no risk if nodes without parents, but they
-	 * MAY be out of order so that the children of some nodes may appear in the JSON
-	 * being imported BEFORE their parents (which would cause the parent check to
-	 * fail, up until the full node graph has been imported), and so I'm creating
-	 * this hack to globally disable the check during the import only.
+	 * todo-2: This is a temporary hack to allow our ExportJsonService.resetNode importer to work. This
+	 * is importing nodes that should be all self contained as a directed graph and there's no risk if
+	 * nodes without parents, but they MAY be out of order so that the children of some nodes may appear
+	 * in the JSON being imported BEFORE their parents (which would cause the parent check to fail, up
+	 * until the full node graph has been imported), and so I'm creating this hack to globally disable
+	 * the check during the import only.
 	 */
 	public static boolean parentCheckEnabled = false;
 
 	/**
-	 * What we are doing in this method is assigning the ObjectId ourselves, because
-	 * our path must include this id at the very end, since the path itself must be
-	 * unique. So we assign this prior to persisting so that when we persist
-	 * everything is perfect.
+	 * What we are doing in this method is assigning the ObjectId ourselves, because our path must
+	 * include this id at the very end, since the path itself must be unique. So we assign this prior to
+	 * persisting so that when we persist everything is perfect.
 	 * 
-	 * WARNING: updating properties on 'node' in here has NO EFFECT. Always update
-	 * dbObj only!
+	 * WARNING: updating properties on 'node' in here has NO EFFECT. Always update dbObj only!
 	 */
 	@Override
 	public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
@@ -58,9 +59,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		ObjectId id = node.getId();
 
 		/*
-		 * Note: There's a special case in MongoApi#createUser where the new User root
-		 * node ID is assigned there, along with setting that on the owner property so
-		 * we can do one save and have both updated
+		 * Note: There's a special case in MongoApi#createUser where the new User root node ID is assigned
+		 * there, along with setting that on the owner property so we can do one save and have both updated
 		 */
 		if (id == null) {
 			id = new ObjectId();
@@ -73,8 +73,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		// DO NOT DELETE
 		/*
-		 * If we ever add a unique-index for "Name" (not currently the case), then we'd
-		 * need something like this to be sure each node WOULD have a unique name.
+		 * If we ever add a unique-index for "Name" (not currently the case), then we'd need something like
+		 * this to be sure each node WOULD have a unique name.
 		 */
 		// if (StringUtils.isEmpty(node.getName())) {
 		// node.setName(id.toHexString())
@@ -99,8 +99,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		/*
-		 * New nodes can be given a path where they will allow the ID to play the role
-		 * of the leaf 'name' part of the path
+		 * New nodes can be given a path where they will allow the ID to play the role of the leaf 'name'
+		 * part of the path
 		 */
 		if (node.getPath().endsWith("/?")) {
 			// Note: Any code here prior to 11/6/2020, did NOT have the last path part as
@@ -147,11 +147,10 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	}
 
 	/*
-	 * For properties that are being set to their default behaviors as if the
-	 * property didn't exist (such as vertical layout is assumed if no layout
-	 * property is specified) we remove those properties when the client is passing
-	 * them in to be saved, or from any other source they are being passed to be
-	 * saved
+	 * For properties that are being set to their default behaviors as if the property didn't exist
+	 * (such as vertical layout is assumed if no layout property is specified) we remove those
+	 * properties when the client is passing them in to be saved, or from any other source they are
+	 * being passed to be saved
 	 */
 	public void removeDefaultProps(SubNode node) {
 
@@ -188,12 +187,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Override
 	public void onBeforeDelete(BeforeDeleteEvent<SubNode> event) {
-		// Document doc = event.getDocument();
-		// if (doc != null) {
-		// Object val = doc.get("_id");
-		// if (val instanceof ObjectId) {
-		// userFeedService.nodeDeleteNotify(((ObjectId) val).toHexString());
-		// }
-		// }
+		Document doc = event.getDocument();
+		if (doc != null) {
+			Object val = doc.get("_id");
+			if (val instanceof ObjectId) {
+				actPub.deleteNodeNotify((ObjectId) val);
+			}
+		}
 	}
 }
