@@ -1364,19 +1364,22 @@ public class ActPubService {
         });
     }
 
-    public APObj generateDummyOrderedCollection(String userName, String path) {
-        String host = appProp.protocolHostAndPort();
-        APObj obj = new APObj();
-        obj.put("@context", ActPubConstants.CONTEXT_STREAMS);
-        obj.put("id", host + path);
-        obj.put("type", "OrderedCollection");
-        obj.put("totalItems", 0);
-        return obj;
-    }
-
     public APObj generateFollowers(String userName) {
         String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName;
         Long totalItems = getFollowersCount(userName);
+
+        return new APObj() //
+                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
+                .put("id", url) //
+                .put("type", "OrderedCollection") //
+                .put("totalItems", totalItems) //
+                .put("first", url + "?page=true") //
+                .put("last", url + "?min_id=0&page=true");
+    }
+
+    public APObj generateFollowing(String userName) {
+        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName;
+        Long totalItems = getFollowingCount(userName);
 
         return new APObj() //
                 .put("@context", ActPubConstants.CONTEXT_STREAMS) //
@@ -1437,6 +1440,7 @@ public class ActPubService {
 
         return new APObj() //
                 .put("@context", ActPubConstants.CONTEXT_STREAMS) //
+                .put("partOf", appProp.protocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName) //
                 .put("id", url) //
                 .put("type", "OrderedCollectionPage") //
                 .put("orderedItems", items) //
@@ -1456,12 +1460,25 @@ public class ActPubService {
                 .put("id", url) //
                 .put("type", "OrderedCollectionPage") //
                 .put("orderedItems", followers) //
-                // todo-0: my outbox isn't returning the 'partOf', so somehow that must mean the
-                // mastodon replies don't (because I followed that example) ? Make sure we are
-                // doing same as Mastodon behavior
-                // here.
                 .put("partOf", appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName)//
                 .put("totalItems", followers.size());
+    }
+
+    public APObj generateFollowingPage(String userName, String minId) {
+        List<String> following = getFollowing(userName, minId);
+
+        // this is a self-reference url (id)
+        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName + "?page=true";
+        if (minId != null) {
+            url += "&min_id=" + minId;
+        }
+        return new APObj() //
+                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
+                .put("id", url) //
+                .put("type", "OrderedCollectionPage") //
+                .put("orderedItems", following) //
+                .put("partOf", appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName)//
+                .put("totalItems", following.size());
     }
 
     public List<String> getFollowers(String userName, String minId) {
@@ -1480,9 +1497,32 @@ public class ActPubService {
         return followers;
     }
 
+    public List<String> getFollowing(String userName, String minId) {
+        final List<String> following = new LinkedList<String>();
+
+        adminRunner.run(session -> {
+            Iterable<SubNode> iter = read.findFollowingOfUser(session, userName);
+
+            for (SubNode n : iter) {
+                log.debug("Follower found: " + XString.prettyPrint(n));
+                following.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
+            }
+            return null;
+        });
+
+        return following;
+    }
+
     public Long getFollowersCount(String userName) {
         return (Long) adminRunner.run(session -> {
             Long count = read.countFollowersOfUser(session, userName);
+            return count;
+        });
+    }
+
+    public Long getFollowingCount(String userName) {
+        return (Long) adminRunner.run(session -> {
+            Long count = read.countFollowingOfUser(session, userName);
             return count;
         });
     }

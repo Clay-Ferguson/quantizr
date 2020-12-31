@@ -38,10 +38,9 @@ public class MongoRead {
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
 
     /*
-     * always access this thru 'getOps()' so we can be sure to always save all dirty
-     * nodes before doing any reads, and be sure we can't read any inconsistent
-     * data. This is similar to an RDBMS 'Transaction Isolation' that disables dirty
-     * reads
+     * always access this thru 'getOps()' so we can be sure to always save all dirty nodes before doing
+     * any reads, and be sure we can't read any inconsistent data. This is similar to an RDBMS
+     * 'Transaction Isolation' that disables dirty reads
      */
     @Autowired
     private MongoTemplate _ops;
@@ -98,8 +97,7 @@ public class MongoRead {
             SubNode ownerNode = getUserNodeByUserName(auth.getAdminSession(), session.getUser());
             if (ownerNode == null) {
                 /*
-                 * slight mod to help bootstrapping when the admin doesn't initially have an
-                 * ownernode until created
+                 * slight mod to help bootstrapping when the admin doesn't initially have an ownernode until created
                  */
                 if (!session.isAdmin()) {
                     throw new RuntimeEx("No user node found for user: " + session.getUser());
@@ -182,12 +180,12 @@ public class MongoRead {
     }
 
     /*
-     * The name can have either of two different formats: 1) "globalName" (admin
-     * owned node) 2) "userName:nodeName" (a named node some user has created)
+     * The name can have either of two different formats: 1) "globalName" (admin owned node) 2)
+     * "userName:nodeName" (a named node some user has created)
      * 
-     * NOTE: It's a bit confusing but also either 1 or 2 above will be prefixed with
-     * ":" before send into this method and this 'name', but any leading colon is
-     * stripped before it's passed into this method.
+     * NOTE: It's a bit confusing but also either 1 or 2 above will be prefixed with ":" before send
+     * into this method and this 'name', but any leading colon is stripped before it's passed into this
+     * method.
      */
     public SubNode getNodeByName(MongoSession session, String name, boolean allowAuth) {
         Query query = new Query();
@@ -200,8 +198,8 @@ public class MongoRead {
         SubNode userNode = null;
 
         /*
-         * if 'name' doesn't contain a colon it's known to be just an admin-owned global
-         * named node without a user prefix
+         * if 'name' doesn't contain a colon it's known to be just an admin-owned global named node without
+         * a user prefix
          */
         if ((colonIdx = name.indexOf(":")) == -1) {
             nodeOwnerId = util.getSystemRootNode().getOwner();
@@ -216,8 +214,8 @@ public class MongoRead {
             String userName = name.substring(0, colonIdx);
 
             /*
-             * pass a null session here to cause adminSession to be used which is required
-             * to get a user node, but it always safe to get this node this way here.
+             * pass a null session here to cause adminSession to be used which is required to get a user node,
+             * but it always safe to get this node this way here.
              */
             userNode = getUserNodeByUserName(null, userName);
             nodeOwnerId = userNode.getOwner();
@@ -235,9 +233,8 @@ public class MongoRead {
         SubNode ret = getOps(session).findOne(query, SubNode.class);
 
         /*
-         * If this was a request like 'userName:home' (home node of the user) and we
-         * didn't find a node the user has named 'home' then we forcabily create a
-         * 'home' node for this user, and then return it.
+         * If this was a request like 'userName:home' (home node of the user) and we didn't find a node the
+         * user has named 'home' then we forcabily create a 'home' node for this user, and then return it.
          */
         if (userNode != null && ret == null && isUserNode && "home".equalsIgnoreCase(name)) {
             ret = create.createNode(session, userNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null);
@@ -247,9 +244,8 @@ public class MongoRead {
             ret.setName(name);
 
             /*
-             * This would be redundant. I like the overriding rule that any node named
-             * 'home' becomes public, which is how auth is implemented.
-             * aclService.addPrivilege(session, ret, PrincipalName.PUBLIC.s(),
+             * This would be redundant. I like the overriding rule that any node named 'home' becomes public,
+             * which is how auth is implemented. aclService.addPrivilege(session, ret, PrincipalName.PUBLIC.s(),
              * Arrays.asList(PrivilegeType.READ.s()), null);
              */
 
@@ -361,8 +357,8 @@ public class MongoRead {
     }
 
     public List<SubNode> getChildrenAsList(MongoSession session, SubNode node, boolean ordered, Integer limit) {
-        Iterable<SubNode> iter = getChildren(session, node,
-                ordered ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, limit, 0);
+        Iterable<SubNode> iter =
+                getChildren(session, node, ordered ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, limit, 0);
         return iterateToList(iter);
     }
 
@@ -384,19 +380,18 @@ public class MongoRead {
         }
 
         /*
-         * This regex finds all that START WITH "path/" and then end with some other
-         * string that does NOT contain "/", so that we know it's not at a deeper level
-         * of the tree, but is immediate children of 'node'
+         * This regex finds all that START WITH "path/" and then end with some other string that does NOT
+         * contain "/", so that we know it's not at a deeper level of the tree, but is immediate children of
+         * 'node'
          * 
          * ^:aa:bb:([^:])*$
          * 
-         * example: To find all DIRECT children (non-recursive) under path /aa/bb regex
-         * is ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\
-         * below...)
+         * example: To find all DIRECT children (non-recursive) under path /aa/bb regex is
+         * ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
          * 
          */
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-                .regex(util.regexDirectChildrenOfPath(node == null ? "" : node.getPath()));
+        Criteria criteria =
+                Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node == null ? "" : node.getPath()));
         if (ordered) {
             query.with(Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
         }
@@ -411,11 +406,10 @@ public class MongoRead {
     }
 
     /*
-     * If node is null it's path is considered empty string, and it represents the
-     * 'root' of the tree. There is no actual NODE that is root node,
+     * If node is null it's path is considered empty string, and it represents the 'root' of the tree.
+     * There is no actual NODE that is root node,
      */
-    public Iterable<SubNode> getChildrenUnderParentPath(MongoSession session, String path, Sort sort, Integer limit,
-            int skip) {
+    public Iterable<SubNode> getChildrenUnderParentPath(MongoSession session, String path, Sort sort, Integer limit, int skip) {
 
         Query query = new Query();
         if (limit != null) {
@@ -427,22 +421,21 @@ public class MongoRead {
         }
 
         /*
-         * This regex finds all that START WITH "path/" and then end with some other
-         * string that does NOT contain "/", so that we know it's not at a deeper level
-         * of the tree, but is immediate children of 'node'
+         * This regex finds all that START WITH "path/" and then end with some other string that does NOT
+         * contain "/", so that we know it's not at a deeper level of the tree, but is immediate children of
+         * 'node'
          * 
          * ^:aa:bb:([^:])*$
          * 
-         * example: To find all DIRECT children (non-recursive) under path /aa/bb regex
-         * is ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\
-         * below...)
+         * example: To find all DIRECT children (non-recursive) under path /aa/bb regex is
+         * ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
          * 
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(path));
 
         /*
-         * This condition ensures that when users create a node and are still editing
-         * that node will be invisible to others until they click "save"
+         * This condition ensures that when users create a node and are still editing that node will be
+         * invisible to others until they click "save"
          */
         criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
 
@@ -455,8 +448,8 @@ public class MongoRead {
     }
 
     /*
-     * If node is null it's path is considered empty string, and it represents the
-     * 'root' of the tree. There is no actual NODE that is root node
+     * If node is null it's path is considered empty string, and it represents the 'root' of the tree.
+     * There is no actual NODE that is root node
      */
     public Iterable<SubNode> getChildren(MongoSession session, SubNode node, Sort sort, Integer limit, int skip) {
         auth.auth(session, node, PrivilegeType.READ);
@@ -464,12 +457,11 @@ public class MongoRead {
     }
 
     /*
-     * All we need to do here is query for children an do a "max(ordinal)" operation
-     * on that, but digging the information off the web for how to do this appears
-     * to be something that may take a few hours so i'm skipping it for now and just
-     * doing an inverse sort on ORDER and pulling off the top one and using that for
-     * my MAX operation. AFAIK this might even be the most efficient approach. Who
-     * knows. MongoDb is stil the wild wild west of databases.
+     * All we need to do here is query for children an do a "max(ordinal)" operation on that, but
+     * digging the information off the web for how to do this appears to be something that may take a
+     * few hours so i'm skipping it for now and just doing an inverse sort on ORDER and pulling off the
+     * top one and using that for my MAX operation. AFAIK this might even be the most efficient
+     * approach. Who knows. MongoDb is stil the wild wild west of databases.
      */
     public Long getMaxChildOrdinal(MongoSession session, SubNode node) {
         // Do not delete this commented stuff. Can be helpful to get aggregates
@@ -529,8 +521,7 @@ public class MongoRead {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query query = new Query();
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-                .regex(util.regexDirectChildrenOfPath(node.getParentPath()));
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getParentPath()));
         query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_ORDINAL));
         query.addCriteria(criteria);
 
@@ -551,8 +542,7 @@ public class MongoRead {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query query = new Query();
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-                .regex(util.regexDirectChildrenOfPath(node.getParentPath()));
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getParentPath()));
         query.with(Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL));
         query.addCriteria(criteria);
 
@@ -565,17 +555,16 @@ public class MongoRead {
     }
 
     /*
-     * Gets (recursively) all nodes under 'node', by using all paths starting with
-     * the path of that node
+     * Gets (recursively) all nodes under 'node', by using all paths starting with the path of that node
      */
     public Iterable<SubNode> getSubGraph(MongoSession session, SubNode node) {
         auth.auth(session, node, PrivilegeType.READ);
 
         Query query = new Query();
         /*
-         * This regex finds all that START WITH path, have some characters after path,
-         * before the end of the string. Without the trailing (.+)$ we would be
-         * including the node itself in addition to all its children.
+         * This regex finds all that START WITH path, have some characters after path, before the end of the
+         * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+         * children.
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);
@@ -583,14 +572,16 @@ public class MongoRead {
         return getOps(session).find(query, SubNode.class);
     }
 
+    // For all the Criteria that are used in a 'count' and a 'search' create a method that generates
+    // just the query itself and reuse (todo-0). An example already exists ending in "_query()"
     public Iterable<SubNode> findFollowersOfUser(MongoSession session, String userName) {
         update.saveSession(session);
         Query query = new Query();
 
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-                .regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
-                .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s()).is(userName) //
-                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
+        Criteria criteria =
+                Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+                        .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s()).is(userName) //
+                        .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
 
         query.addCriteria(criteria);
         return getOps(session).find(query, SubNode.class);
@@ -600,13 +591,51 @@ public class MongoRead {
         update.saveSession(session);
         Query query = new Query();
 
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-                .regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
-                .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s()).is(userName) //
-                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
+        Criteria criteria =
+                Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+                        .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s()).is(userName) //
+                        .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
 
         query.addCriteria(criteria);
         return getOps(session).count(query, SubNode.class);
+    }
+
+    /* Returns FRIEND nodes for every user 'userName' is following */
+    public Iterable<SubNode> findFollowingOfUser(MongoSession session, String userName) {
+        update.saveSession(session);
+
+        Query query = findFollowingOfUser_query(session, userName);
+        if (query == null)
+            return null;
+
+        return getOps(session).find(query, SubNode.class);
+    }
+
+    public long countFollowingOfUser(MongoSession session, String userName) {
+        update.saveSession(session);
+
+        Query query = findFollowingOfUser_query(session, userName);
+        if (query == null)
+            return 0;
+
+        return getOps(session).count(query, SubNode.class);
+    }
+
+    private Query findFollowingOfUser_query(MongoSession session, String userName) {
+        Query query = new Query();
+
+        // get friends list node
+        SubNode friendsListNode = getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s());
+        if (friendsListNode == null)
+            return null;
+
+        // query all the friends under
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH) //
+                .regex(util.regexRecursiveChildrenOfPath(friendsListNode.getPath())) //
+                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
+
+        query.addCriteria(criteria);
+        return query;
     }
 
     /**
@@ -614,8 +643,8 @@ public class MongoRead {
      * 
      * WARNING. "SubNode.prp" is a COLLECTION and therefore not searchable. Beware.
      */
-    public Iterable<SubNode> searchSubGraph(MongoSession session, SubNode node, String prop, String text,
-            String sortField, int limit, boolean fuzzy, boolean caseSensitive) {
+    public Iterable<SubNode> searchSubGraph(MongoSession session, SubNode node, String prop, String text, String sortField,
+            int limit, boolean fuzzy, boolean caseSensitive) {
         auth.auth(session, node, PrivilegeType.READ);
 
         Query query = new Query();
@@ -624,17 +653,16 @@ public class MongoRead {
             query.limit(limit);
         }
         /*
-         * This regex finds all that START WITH path, have some characters after path,
-         * before the end of the string. Without the trailing (.+)$ we would be
-         * including the node itself in addition to all its children.
+         * This regex finds all that START WITH path, have some characters after path, before the end of the
+         * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+         * children.
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
 
         /*
-         * This condition ensures that when users create a node and are still editing
-         * that node will be invisible to others until they click "save" todo-1: at some
-         * future time we can write code to find any nodes which are orphaned by a user
-         * creating but never saving changes.
+         * This condition ensures that when users create a node and are still editing that node will be
+         * invisible to others until they click "save" todo-1: at some future time we can write code to find
+         * any nodes which are orphaned by a user creating but never saving changes.
          */
         criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
 
@@ -700,8 +728,7 @@ public class MongoRead {
     }
 
     /*
-     * todo-1: This is very low hanging fruit to make this a feature on the Search
-     * menu
+     * todo-1: This is very low hanging fruit to make this a feature on the Search menu
      */
     public Iterable<SubNode> getNamedNodes(MongoSession session, SubNode node) {
         auth.auth(session, node, PrivilegeType.READ);
@@ -715,9 +742,8 @@ public class MongoRead {
     }
 
     /*
-     * Builds the 'criteria' object using the kind of searching Google does where
-     * anything in quotes is considered a phrase and anything else separated by
-     * spaces are separate search terms.
+     * Builds the 'criteria' object using the kind of searching Google does where anything in quotes is
+     * considered a phrase and anything else separated by spaces are separate search terms.
      */
     public static void populateTextCriteria(TextCriteria criteria, String text) {
         String regex = "\"([^\"]*)\"|(\\S+)";
@@ -737,11 +763,10 @@ public class MongoRead {
     }
 
     /*
-     * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass
-     * userNode if you have it, so avoid a DB query.
+     * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass userNode if you have
+     * it, so avoid a DB query.
      */
-    public SubNode getUserNodeByType(MongoSession session, String user, SubNode userNode, String nodeName,
-            String type) {
+    public SubNode getUserNodeByType(MongoSession session, String user, SubNode userNode, String nodeName, String type) {
         if (userNode == null) {
             userNode = getUserNodeByUserName(session, user);
         }
@@ -776,9 +801,8 @@ public class MongoRead {
     public SubNode getUserNodeByUserName(MongoSession session, String user) {
         if (user == null) {
             /*
-             * todo-0: if we ever get into here in a REST call from a foreign server (not
-             * browser user), this will fail. Need some kind of across-the-board protection
-             * from this scenario as best as we can.
+             * todo-0: if we ever get into here in a REST call from a foreign server (not browser user), this
+             * will fail. Need some kind of across-the-board protection from this scenario as best as we can.
              */
             user = sessionContext.getUserName();
         }
@@ -812,8 +836,8 @@ public class MongoRead {
     }
 
     /*
-     * Finds and returns the FRIEND node matching userName under the
-     * friendsListNode, or null if not existing
+     * Finds and returns the FRIEND node matching userName under the friendsListNode, or null if not
+     * existing
      */
     public SubNode findFriendOfUser(MongoSession session, SubNode friendsListNode, String userName) {
 
@@ -832,8 +856,7 @@ public class MongoRead {
     }
 
     /*
-     * Finds the first node matching 'type' under 'path' (non-recursively, direct
-     * children only)
+     * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
     public SubNode findTypedNodeUnderPath(MongoSession session, String path, String type) {
 
@@ -851,8 +874,7 @@ public class MongoRead {
     }
 
     /*
-     * Finds the first node matching 'type' under 'path' (non-recursively, direct
-     * children only)
+     * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
     public Iterable<SubNode> findTypedNodesUnderPath(MongoSession session, String path, String type) {
 
@@ -866,8 +888,7 @@ public class MongoRead {
     }
 
     /*
-     * Finds the first node matching 'type' under 'path' (non-recursively, direct
-     * children only)
+     * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
     public long countTypedNodesUnderPath(MongoSession session, String path, String type) {
 
@@ -881,8 +902,8 @@ public class MongoRead {
     }
 
     /*
-     * Returns one (or first) node contained directly under path (non-recursively)
-     * that has a matching propName and propVal
+     * Returns one (or first) node contained directly under path (non-recursively) that has a matching
+     * propName and propVal
      */
     public SubNode findSubNodeByProp(MongoSession session, String path, String propName, String propVal) {
 
@@ -899,9 +920,8 @@ public class MongoRead {
     }
 
     /*
-     * Same as findSubNodeByProp but returns multiples. Finda ALL nodes contained
-     * directly under path (non-recursively) that has a matching propName and
-     * propVal
+     * Same as findSubNodeByProp but returns multiples. Finda ALL nodes contained directly under path
+     * (non-recursively) that has a matching propName and propVal
      */
     public Iterable<SubNode> findSubNodesByProp(MongoSession session, String path, String propName, String propVal) {
 
