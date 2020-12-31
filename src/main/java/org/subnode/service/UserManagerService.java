@@ -237,38 +237,6 @@ public class UserManagerService {
 		}
 	}
 
-	public String getInboxNotification(MongoSession session) {
-		String userName = sessionContext.getUserName();
-		if (userName == null) {
-			return null;
-		}
-		SubNode userNode = read.getUserNodeByUserName(session, userName);
-		if (userNode == null)
-			return null;
-
-		String ret = null;
-		SubNode userInbox = read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s());
-
-		Date now = new Date();
-		long lastInboxNotifyTime = userNode.getIntProp(NodeProp.LAST_INBOX_NOTIFY_TIME.s());
-
-		if (userInbox != null) {
-			SubNode inboxNode = read.getNewestChild(session, userInbox);
-			if (inboxNode != null) {
-				long inboxNodeTimeLong = inboxNode.getModifyTime().getTime();
-
-				if (inboxNodeTimeLong - lastInboxNotifyTime > 0) {
-					ret = "Your inbox has new information, added "
-							+ DateUtil.formatDurationMillis(now.getTime() - inboxNodeTimeLong) + " ago.";
-				}
-			}
-		}
-
-		userNode.setProp(NodeProp.LAST_INBOX_NOTIFY_TIME.s(), now.getTime());
-		update.save(session, userNode);
-		return ret;
-	}
-
 	public CloseAccountResponse closeAccount(CloseAccountRequest req) {
 		CloseAccountResponse res = new CloseAccountResponse();
 		log.debug("Closing Account: " + sessionContext.getUserName());

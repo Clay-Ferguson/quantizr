@@ -119,7 +119,10 @@ public class MongoAuth {
 		return null;
 	}
 
-	/* Returns a list of all user names that are shared to on this node */
+	/*
+	 * Returns a list of all user names that are shared to on this node, including "public" if any are
+	 * public.
+	 */
 	public List<String> getUsersSharedTo(MongoSession session, SubNode node) {
 		List<String> userNames = null;
 
@@ -127,17 +130,24 @@ public class MongoAuth {
 		if (acList != null) {
 			for (AccessControlInfo info : acList) {
 				String userNodeId = info.getPrincipalNodeId();
-				if (userNodeId != null && !userNodeId.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
+				String name = null;
+
+				if (PrincipalName.PUBLIC.s().equals(userNodeId)) {
+					name = PrincipalName.PUBLIC.s();
+				} //
+				else if (userNodeId != null) {
 					SubNode accountNode = read.getNode(session, userNodeId);
 					if (accountNode != null) {
-						String userName = accountNode.getStrProp(NodeProp.USER);
-						if (userName != null) {
-							if (userNames == null) {
-								userNames = new LinkedList<String>();
-							}
-							userNames.add(userName);
-						}
+						name = accountNode.getStrProp(NodeProp.USER);
 					}
+				}
+
+				if (name != null) {
+					// lazy create the list
+					if (userNames == null) {
+						userNames = new LinkedList<String>();
+					}
+					userNames.add(name);
 				}
 			}
 		}
@@ -145,11 +155,10 @@ public class MongoAuth {
 	}
 
 	/*
-	 * When a child is created under a parent we want to default the sharing on the
-	 * child so that there's an explicit share to the parent which is redundant in
-	 * terms of sharing auth, but is necessary and desiret for User Feeds and social
-	 * media queries to work. Also we be sure to remove any share to 'child' user
-	 * that may be in the parent Acl, because that would represent 'child' not
+	 * When a child is created under a parent we want to default the sharing on the child so that
+	 * there's an explicit share to the parent which is redundant in terms of sharing auth, but is
+	 * necessary and desiret for User Feeds and social media queries to work. Also we be sure to remove
+	 * any share to 'child' user that may be in the parent Acl, because that would represent 'child' not
 	 * sharing to himselv which is never done.
 	 * 
 	 * session should be null, or else an existing admin session.
@@ -171,8 +180,8 @@ public class MongoAuth {
 		}
 
 		/*
-		 * Special case of replying to (appending under) a FRIEND-type node is always to
-		 * make this a private message to the user that friend node represents
+		 * Special case of replying to (appending under) a FRIEND-type node is always to make this a private
+		 * message to the user that friend node represents
 		 */
 		if (parent.getType().equals(NodeType.FRIEND.s())) {
 			// get user prop from node
@@ -225,9 +234,9 @@ public class MongoAuth {
 	}
 
 	/*
-	 * The way know a node is an account node is that it is its id matches its'
-	 * owner. Self owned node. This is because the very definition of the 'owner' on
-	 * any given node is the ID of the user's root node of the user who owns it
+	 * The way know a node is an account node is that it is its id matches its' owner. Self owned node.
+	 * This is because the very definition of the 'owner' on any given node is the ID of the user's root
+	 * node of the user who owns it
 	 */
 	public boolean isAnAccountNode(MongoSession session, SubNode node) {
 		return node.getId().toHexString().equals(node.getOwner().toHexString());
@@ -301,14 +310,12 @@ public class MongoAuth {
 			String fullPathStr = fullPath.toString();
 
 			/*
-			 * get node from cache if possible. Note: This cache does have the slight
-			 * imperfection that it assumes once it reads a node for the purposes of
-			 * checking auth (acl) then within the context of the same transaction it can
-			 * always use that same node again meaning the security context on the node
-			 * can't have changed DURING the request. This is fine because we never update
-			 * security on a node and then expect ourselves to find different security on
-			 * the node. Because the only user who can update the security is the owner
-			 * anyway.
+			 * get node from cache if possible. Note: This cache does have the slight imperfection that it
+			 * assumes once it reads a node for the purposes of checking auth (acl) then within the context of
+			 * the same transaction it can always use that same node again meaning the security context on the
+			 * node can't have changed DURING the request. This is fine because we never update security on a
+			 * node and then expect ourselves to find different security on the node. Because the only user who
+			 * can update the security is the owner anyway.
 			 */
 			SubNode tryNode = MongoThreadLocal.getNodesByPath().get(fullPathStr);
 
@@ -339,9 +346,9 @@ public class MongoAuth {
 	}
 
 	/*
-	 * NOTE: It is the normal flow that we expect sessionUserNodeId to be null for
-	 * any anonymous requests and this is fine because we are basically going to
-	 * only be pulling 'public' acl to check, and this is by design.
+	 * NOTE: It is the normal flow that we expect sessionUserNodeId to be null for any anonymous
+	 * requests and this is fine because we are basically going to only be pulling 'public' acl to
+	 * check, and this is by design.
 	 */
 	public boolean nodeAuth(SubNode node, String sessionUserNodeId, List<PrivilegeType> privs) {
 		HashMap<String, AccessControl> acl = node.getAc();
@@ -356,8 +363,8 @@ public class MongoAuth {
 		}
 
 		/*
-		 * We always add on any privileges assigned to the PUBLIC when checking privs
-		 * for this user, becasue the auth equivalent is really the union of this set.
+		 * We always add on any privileges assigned to the PUBLIC when checking privs for this user, becasue
+		 * the auth equivalent is really the union of this set.
 		 */
 		AccessControl acPublic = acl.get(PrincipalName.PUBLIC.s());
 		String privsForPublic = acPublic != null ? acPublic.getPrvs() : null;
@@ -388,8 +395,8 @@ public class MongoAuth {
 		}
 
 		/*
-		 * I'd like this to not be created unless needed but that pesky lambda below
-		 * needs a 'final' thing to work with.
+		 * I'd like this to not be created unless needed but that pesky lambda below needs a 'final' thing
+		 * to work with.
 		 */
 		List<AccessControlInfo> ret = new LinkedList<AccessControlInfo>();
 
@@ -427,11 +434,15 @@ public class MongoAuth {
 	}
 
 	/*
-	 * Finds all subnodes that have a share targeting the userNodeId (account node
-	 * ID of a person being shared with), regardless of the type of share 'rd,rw'
+	 * Finds all subnodes that have a share targeting the sharedTo (account node ID of a person being
+	 * shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public' in
+	 * sharedTo instead
+	 * 
+	 * todo-0: this query needs to take an array as sharedTo so we can get the feed in one query meaning
+	 * it will contain a specific shareTo user AND the 'public' also.
 	 */
-	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession session, String pathToSearch, String accountNodeId,
-			String sortField, int limit) {
+	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession session, String pathToSearch, List<String> sharedToAny,
+			String sortField, int limit, ObjectId ownerIdMatch) {
 
 		// this will be node.getPath() to search under the node, or null for searching
 		// under all user content.
@@ -443,8 +454,31 @@ public class MongoAuth {
 		Query query = new Query();
 		query.limit(limit);
 
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
-				.and(SubNode.FIELD_AC + "." + accountNodeId).ne(null);
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch));
+
+		if (sharedToAny != null && sharedToAny.size() > 0) {
+			List<Criteria> orCriteria = new LinkedList<Criteria>();
+			for (String share : sharedToAny) {
+				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
+			}
+
+			/*
+			 * todo-0: This uglyness is because orOperator us using variable args and it threw exceptions, when
+			 * I tried to pass an array, so to save time I just hard coded the 1 and 2 parameter case and moved
+			 * on. need to research
+			 */
+			if (orCriteria.size() == 1) {
+				criteria.orOperator(orCriteria.get(0));
+			} else if (orCriteria.size() == 2) {
+				criteria.orOperator(orCriteria.get(0), orCriteria.get(1));
+			} else {
+				throw new RuntimeException("number of criteria not handled.");
+			}
+		}
+
+		if (ownerIdMatch != null) {
+			criteria = criteria.and(SubNode.FIELD_OWNER).is(ownerIdMatch);
+		}
 
 		query.addCriteria(criteria);
 
@@ -454,8 +488,16 @@ public class MongoAuth {
 		return ops.find(query, SubNode.class);
 	}
 
-	public long countSubGraphByAclUser(MongoSession session, String pathToSearch, String accountNodeId) {
-
+	/*
+	 * counts all subnodes that have a share targeting the sharedTo (account node ID of a person being
+	 * shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public' in
+	 * sharedTo instead
+	 * 
+	 * todo-0: this query needs to take an array as sharedTo so we can get the feed in one query meaning
+	 * it will contain a specific shareTo user AND the 'public' also.
+	 */
+	public long countSubGraphByAclUser(MongoSession session, String pathToSearch, List<String> sharedToAny,
+			ObjectId ownerIdMatch) {
 		// this will be node.getPath() to search under the node, or null for searching
 		// under all user content.
 		if (pathToSearch == null) {
@@ -465,11 +507,23 @@ public class MongoAuth {
 		update.saveSession(session);
 		Query query = new Query();
 
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
-				.and(SubNode.FIELD_AC + "." + accountNodeId).ne(null);
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch));
+
+		if (sharedToAny != null && sharedToAny.size() > 0) {
+			List<Criteria> orCriteria = new LinkedList<Criteria>();
+			for (String share : sharedToAny) {
+				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
+			}
+			criteria.orOperator((Criteria[]) orCriteria.toArray());
+		}
+
+		if (ownerIdMatch != null) {
+			criteria = criteria.and(SubNode.FIELD_OWNER).is(ownerIdMatch);
+		}
 
 		query.addCriteria(criteria);
-		return ops.count(query, SubNode.class);
+		Long ret = ops.count(query, SubNode.class);
+		return ret;
 	}
 
 	/* Finds nodes that have any sharing on them at all */
@@ -487,9 +541,9 @@ public class MongoAuth {
 		Query query = new Query();
 		query.limit(limit);
 		/*
-		 * This regex finds all that START WITH path, have some characters after path,
-		 * before the end of the string. Without the trailing (.+)$ we would be
-		 * including the node itself in addition to all its children.
+		 * This regex finds all that START WITH path, have some characters after path, before the end of the
+		 * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+		 * children.
 		 */
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
 				.and(SubNode.FIELD_AC).ne(null);
@@ -515,9 +569,9 @@ public class MongoAuth {
 		Query query = new Query();
 
 		/*
-		 * This regex finds all that START WITH path, have some characters after path,
-		 * before the end of the string. Without the trailing (.+)$ we would be
-		 * including the node itself in addition to all its children.
+		 * This regex finds all that START WITH path, have some characters after path, before the end of the
+		 * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+		 * children.
 		 */
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath())) //
 				.and(SubNode.FIELD_AC).ne(null);
@@ -535,8 +589,8 @@ public class MongoAuth {
 		MongoSession session = MongoSession.createFromUser(PrincipalName.ANON.s());
 
 		/*
-		 * If username is null or anonymous, we assume anonymous is acceptable and
-		 * return anonymous session or else we check the credentials.
+		 * If username is null or anonymous, we assume anonymous is acceptable and return anonymous session
+		 * or else we check the credentials.
 		 */
 		if (!PrincipalName.ANON.s().equals(userName)) {
 			log.trace("looking up user node.");
@@ -546,8 +600,8 @@ public class MongoAuth {
 			if (userNode != null) {
 
 				/*
-				 * If logging in as ADMIN we don't expect the node to contain any password in
-				 * the db, but just use the app property instead.
+				 * If logging in as ADMIN we don't expect the node to contain any password in the db, but just use
+				 * the app property instead.
 				 */
 				if (password.equals(appProp.getMongoAdminPassword())) {
 					success = true;
@@ -569,78 +623,76 @@ public class MongoAuth {
 	}
 
 	public HashSet<String> parseMentions(String message) {
-        HashSet<String> userNames = new HashSet<String>();
+		HashSet<String> userNames = new HashSet<String>();
 
-        // prepare to that newlines is compatable with out tokenizing
-        message = message.replace("\n", " ");
-        message = message.replace("\r", " ");
+		// prepare to that newlines is compatable with out tokenizing
+		message = message.replace("\n", " ");
+		message = message.replace("\r", " ");
 
-        List<String> words = XString.tokenize(message, " ", true);
-        if (words != null) {
-            for (String word : words) {
-                // detect the pattern @name@server.com or @name
-                if (word.startsWith("@") && StringUtils.countMatches(word, "@") <= 2) {
-                    word = word.substring(1);
+		List<String> words = XString.tokenize(message, " ", true);
+		if (words != null) {
+			for (String word : words) {
+				// detect the pattern @name@server.com or @name
+				if (word.startsWith("@") && StringUtils.countMatches(word, "@") <= 2) {
+					word = word.substring(1);
 
-                    // This second 'startsWith' check ensures we ignore patterns that start with
-                    // "@@"
-                    if (!word.startsWith("@")) {
-                        userNames.add(word);
-                    }
-                }
-            }
-        }
-        return userNames;
-    }
+					// This second 'startsWith' check ensures we ignore patterns that start with
+					// "@@"
+					if (!word.startsWith("@")) {
+						userNames.add(word);
+					}
+				}
+			}
+		}
+		return userNames;
+	}
 
-	    /*
-     * Parses all mentions (like '@bob@server.com') in the node content text and
-     * adds them (if not existing) to the node sharing on the node, which ensures
-     * the person mentioned has visibility of this node and that it will also appear
-     * in their FEED listing
-     */
-    public HashSet<String> saveMentionsToNodeACL(MongoSession session, SubNode node) {
-        HashSet<String> mentionsSet = parseMentions(node.getContent());
+	/*
+	 * Parses all mentions (like '@bob@server.com') in the node content text and adds them (if not
+	 * existing) to the node sharing on the node, which ensures the person mentioned has visibility of
+	 * this node and that it will also appear in their FEED listing
+	 */
+	public HashSet<String> saveMentionsToNodeACL(MongoSession session, SubNode node) {
+		HashSet<String> mentionsSet = parseMentions(node.getContent());
 
-        boolean acChanged = false;
-        HashMap<String, AccessControl> ac = node.getAc();
+		boolean acChanged = false;
+		HashMap<String, AccessControl> ac = node.getAc();
 
-        // make sure all parsed toUserNamesSet user names are saved into the node acl */
-        for (String userName : mentionsSet) {
-            SubNode acctNode = read.getUserNodeByUserName(session, userName);
+		// make sure all parsed toUserNamesSet user names are saved into the node acl */
+		for (String userName : mentionsSet) {
+			SubNode acctNode = read.getUserNodeByUserName(session, userName);
 
-            /*
-             * If this is a foreign 'mention' user name that is not imported into our
-             * system, we auto-import that user now
-             */
-            if (acctNode == null && StringUtils.countMatches(userName, "@") == 1) {
-                acctNode = actPub.loadForeignUserByUserName(session, userName);
-            }
+			/*
+			 * If this is a foreign 'mention' user name that is not imported into our system, we auto-import
+			 * that user now
+			 */
+			if (acctNode == null && StringUtils.countMatches(userName, "@") == 1) {
+				acctNode = actPub.loadForeignUserByUserName(session, userName);
+			}
 
-            if (acctNode != null) {
-                String acctNodeId = acctNode.getId().toHexString();
-                if (ac == null || !ac.containsKey(acctNodeId)) {
-                    /*
-                     * Lazy create 'ac' so that the net result of this method is never to assign non
-                     * null when it could be left null
-                     */
-                    if (ac == null) {
-                        ac = new HashMap<String, AccessControl>();
-                    }
-                    acChanged = true;
-                    ac.put(acctNodeId,
-                            new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
-                }
-            } else {
-                log.debug("Mentioned user not found: " + userName);
-            }
-        }
+			if (acctNode != null) {
+				String acctNodeId = acctNode.getId().toHexString();
+				if (ac == null || !ac.containsKey(acctNodeId)) {
+					/*
+					 * Lazy create 'ac' so that the net result of this method is never to assign non null when it could
+					 * be left null
+					 */
+					if (ac == null) {
+						ac = new HashMap<String, AccessControl>();
+					}
+					acChanged = true;
+					ac.put(acctNodeId, new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+				}
+			} else {
+				log.debug("Mentioned user not found: " + userName);
+			}
+		}
 
-        if (acChanged) {
-            node.setAc(ac);
-            update.save(session, node);
-        }
-        return mentionsSet;
-    }
+		if (acChanged) {
+			node.setAc(ac);
+			update.save(session, node);
+		}
+		return mentionsSet;
+	}
 
 }

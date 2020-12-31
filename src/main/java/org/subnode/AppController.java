@@ -1215,6 +1215,7 @@ public class AppController implements ErrorController {
 		});
 	}
 
+	/* todo-1: This needs to be replaced with push notifications? Because we're doing polling here, and is wasted CPU+bandwidth */
 	@RequestMapping(value = API_PATH + "/getNotifications", method = RequestMethod.POST)
 	public @ResponseBody Object getNotifications(@RequestBody GetServerInfoRequest req, HttpSession session) {
 		return callProc.run("getNotifications", req, session, ms -> {
@@ -1224,11 +1225,6 @@ public class AppController implements ErrorController {
 			if (sessionContext.getError() != null) {
 				res.getMessages().add(new InfoMessage(sessionContext.getError(), null));
 				sessionContext.setError(null);
-			}
-
-			String inboxMessage = userManagerService.getInboxNotification(ms);
-			if (inboxMessage != null) {
-				res.getMessages().add(new InfoMessage(inboxMessage, "inbox"));
 			}
 
 			res.setSuccess(true);

@@ -654,7 +654,6 @@ export const enum NodeProp {
     CHILDREN_IMG_SIZES = "sn:childrenImgSizes",
     BIN_TOTAL = "sn:binTot",
     LAST_LOGIN_TIME = "sn:lastLogin",
-    LAST_INBOX_NOTIFY_TIME = "sn:lastInboxNotify",
     CRYPTO_KEY_PUBLIC = "sn:cryptoKeyPublic",
     CRYPTO_KEY_PRIVATE = "sn:cryptoKeyPrivate",
     BIN_QUOTA = "sn:binQuota",

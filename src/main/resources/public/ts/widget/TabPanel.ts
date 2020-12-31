@@ -41,7 +41,7 @@ export class TabPanel extends Div {
         let mainDisplay = "inline";
         let searchDisplay = searchResults ? "inline" : "none";
         let timelineDisplay = timelineResults ? "inline" : "none";
-        let feedDisplay = feedResults ? "inline" : "none";
+        let feedDisplay = "inline";
 
         /* If mainDisplay would be the only tab showing, then don't show that tab */
         if (searchDisplay === "none" && timelineDisplay === "none" && feedDisplay === "none") {

@@ -58,36 +58,6 @@ export class MenuPanel extends Div {
             new MenuItem("Logout", () => S.nav.logout(state), !state.isAnonUser)
         ]));
 
-        // WARNING: The string 'Social' is also in Menu.activeMenu, to set the default menu that's opened
-        children.push(new Menu("Social", [
-
-            // These are unneeded, because they're icons on the upper right corner.
-            // new MenuItem("Welcome", () => { window.location.href = window.location.origin; }),
-            // new MenuItem("Home", () => S.meta64.loadAnonPageHome(state)),
-            // new MenuItem("Account Root", () => S.nav.navHome(state), !state.isAnonUser),
-
-            new MenuItem("Inbox", () => S.nav.openContentNode("~" + J.NodeType.INBOX, state), !state.isAnonUser),
-            new MenuItem("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), !state.isAnonUser),
-
-            // this will have to be implemented as a custom search that's build dynamically from (FRIEND) type nodes that match this,
-            // and we should see if we can use "Friends" dialog that already exists?
-            // new MenuItem("Followers", () => {???}, !state.isAnonUser),
-
-            // this appears to be broken for user 'bob' at least. Also "Show Feed" is broken on the feed node
-            new MenuItem("Feed", () => S.nav.navFeed(state), !state.isAnonUser)
-
-            // I'm removing my RSS feeds, for now (mainly to remove any political or interest-specific content from the platform)
-            // new MenuItem("Podcast Feeds", () => { S.nav.openContentNode("/r/rss"); }),
-
-            // new MenuItem("Sample Document", () => { S.nav.openContentNode("/r/books/war-and-peace"); }),
-
-            // this is on nav bar already
-            // new MenuItem("Logout", () => S.nav.logout(state)),
-
-            // I decided ALL information will be stored native right in mongo, and no filesystem stuff.
-            // new MenuItem("Documentation", () => { S.nav.openContentNode("/r/public/subnode-docs"); }),
-        ]));
-
         children.push(new Menu("Edit", [
             !clientInfo.isMobile ? null : new MenuItem("Toggle Edit Mode", () => S.edit.toggleEditMode(state), !state.isAnonUser), //
             !clientInfo.isMobile ? null : new MenuItemSeparator(), //

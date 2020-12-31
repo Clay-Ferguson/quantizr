@@ -118,7 +118,6 @@ public enum NodeProp {
 
     BIN_TOTAL("sn:binTot", "s"), //
     LAST_LOGIN_TIME("sn:lastLogin", "s"), //
-    LAST_INBOX_NOTIFY_TIME("sn:lastInboxNotify", "s"), //
 
     // NOTE: These crypto keys are ONLY used to make ActivityPub work. For the E2E Encryption capabilities of Quanta platform,
     // those are is unrelated to these keys, and those private keys never leave the browser.

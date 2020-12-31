@@ -2,12 +2,12 @@ package org.subnode.service;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +16,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.NodeFeedRequest;
 import org.subnode.response.FeedPushInfo;
@@ -29,9 +29,8 @@ import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
 
 /**
- * Service methods for maintaining 'in-memory' lists of the most recent UserFeed
- * posts of all users, to allow extremely fast construction of any person's
- * consolidated feed.
+ * Service methods for maintaining 'in-memory' lists of the most recent UserFeed posts of all users,
+ * to allow extremely fast construction of any person's consolidated feed.
  */
 @Component
 public class UserFeedService {
@@ -58,7 +57,8 @@ public class UserFeedService {
 	public void pushNodeUpdateToBrowsers(MongoSession session, SubNode node) {
 		log.debug("Pushing update to all friends: from user " + sessionContext.getUserName() + ": id="
 				+ node.getId().toHexString());
-		Set<String> loggedInUserNames = null;
+
+		/* get list of userNames this node is shared to (one of them may be 'public') */
 		List<String> usersSharedTo = auth.getUsersSharedTo(session, node);
 
 		// if node has no sharing we're done here
@@ -66,36 +66,48 @@ public class UserFeedService {
 			return;
 		}
 
+		// put user names in a hash set for faster performance
+		HashSet<String> usersSharedToSet = new HashSet<String>();
+		usersSharedToSet.addAll(usersSharedTo);
+
+		boolean isPublic = usersSharedToSet.contains(PrincipalName.PUBLIC.s());
+
 		/*
-		 * all we do in this synchronized block is get keys because we need to release
-		 * this lock FAST since it has the effect of making logins or other critical
-		 * processes block while locked
+		 * Get a local list of 'allSessions' so we can release the lock on the SessionContent varible
+		 * immediately
 		 */
-		synchronized (SessionContext.sessionsByUserName) {
-			loggedInUserNames = SessionContext.sessionsByUserName.keySet();
+		List<SessionContext> allSessions = new LinkedList<SessionContext>();
+		synchronized (SessionContext.allSessions) {
+			allSessions.addAll(SessionContext.allSessions);
 		}
 
+		/* build out push message payload */
 		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, 1, false, false);
 		FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
-		/*
-		 * Iterate all the users the node is shared to, and for any that are logged in
-		 * send a server push
-		 */
-		for (String userName : usersSharedTo) {
-			if (loggedInUserNames.contains(userName)) {
-				SessionContext sc = SessionContext.sessionsByUserName.get(userName);
-				if (sc != null) {
-					sendServerPushInfo(sc.getUserName(), pushInfo);
-				}
+
+		/* Scan all sessions and push message to the ones that need to see it */
+		for (SessionContext sc : allSessions) {
+			/*
+			 * push if...
+			 * 
+			 * 1) node is shared to public or
+			 * 
+			 * 2) the sc user is in the shared set or
+			 * 
+			 * 3) this session is OURs,
+			 */
+			if (isPublic || //
+					usersSharedToSet.contains(sc.getUserName()) || //
+					sc.getUserName().equals(sessionContext.getUserName())) {
+
+				// push notification message to browser
+				sendServerPushInfo(sc, pushInfo);
 			}
 		}
-
-		// push to ourselves to cause our own Feed window to update
-		sendServerPushInfo(sessionContext.getUserName(), pushInfo);
 	}
 
-	public void sendServerPushInfo(String recipientUserName, ServerPushInfo info) {
-		SessionContext userSession = SessionContext.getSessionByUserName(recipientUserName);
+	public void sendServerPushInfo(SessionContext userSession, ServerPushInfo info) {
+		// SessionContext userSession = SessionContext.getSessionByUserName(recipientUserName);
 
 		// If user is currently logged in we have a session here.
 		if (userSession != null) {
@@ -111,11 +123,10 @@ public class UserFeedService {
 						pushEmitter.send(event);
 
 						/*
-						 * DO NOT DELETE. This way of sending also works, and I was originally doing it
-						 * this way and picking up in eventSource.onmessage = e => {} on the browser,
-						 * but I decided to use the builder instead and let the 'name' in the builder
-						 * route different objects to different event listeners on the client. Not
-						 * really sure if either approach has major advantages over the other.
+						 * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
+						 * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
+						 * and let the 'name' in the builder route different objects to different event listeners on the
+						 * client. Not really sure if either approach has major advantages over the other.
 						 * 
 						 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
 						 */
@@ -128,10 +139,9 @@ public class UserFeedService {
 	}
 
 	/*
-	 * New version of this just does a global query for all nodes that are shared to
-	 * this user (todo-0: Also eventually we will bring back the
-	 * "only friends I'm following" option to this query, using the two props in the
-	 * request for the filtering options but be VERY careful not to expose data
+	 * New version of this just does a global query for all nodes that are shared to this user (todo-0:
+	 * Also eventually we will bring back the "only friends I'm following" option to this query, using
+	 * the two props in the request for the filtering options but be VERY careful not to expose data
 	 * without 'auth', when you do a wider search.)
 	 */
 	public NodeFeedResponse generateFeed(MongoSession session, NodeFeedRequest req) {
@@ -144,41 +154,40 @@ public class UserFeedService {
 		List<SubNode> nodes = new LinkedList<SubNode>();
 		int counter = 0;
 
-		// DO NOT DELETE. This pattern of code with BLOCKED_USERS instead of FRIEND_LIST
-		// will eventually be used to allow us to block users in feeds.
-		//
-		// if ("friends".equals(req.getUserFilter())) {
-		// 	List<String> followedUserNodeIds = new LinkedList<String>();
+		// todo-0: these three queryes can be comebined into one? or at least less?
+		// todo-0: is there a LinkedHashSet class we can use here?
+		HashSet<ObjectId> dedup = new HashSet<ObjectId>();
 
-		// 	SubNode userNode = read.getUserNodeByUserName(session, null);
-		// 	if (userNode == null)
-		// 		return res;
+		List<String> sharedToList = new LinkedList<String>();
 
-		// 	SubNode friendsNode = read.findTypedNodeUnderPath(session, userNode.getPath(), NodeType.FRIEND_LIST.s());
-		// 	if (friendsNode == null)
-		// 		return res;
+		// userFilter will be "all | friends". All means we want to see shares to public from all users, and
+		// not just stuff pretaining to us.
+		if ("all".equals(req.getUserFilter())) {
+			sharedToList.add("public");
+		}
 
-		// 	for (SubNode friendNode : read.getChildren(session, friendsNode, null, null, 0)) {
-		// 		String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID.s());
-		// 		followedUserNodeIds.add(userNodeId);
-		// 	}
-		// }
-
-		for (SubNode node : auth.searchSubGraphByAclUser(session, null, sessionContext.getRootId(), SubNode.FIELD_MODIFY_TIME, MAX_FEED_ITEMS)) {
-			nodes.add(node);
-			if (counter++ > MAX_FEED_ITEMS) {
-				break;
+		SubNode searchRoot = read.getNode(session, sessionContext.getRootId());
+		sharedToList.add(searchRoot.getOwner().toHexString());
+		/*
+		 * Now add all the nodes that are shared TO this user from any other users.
+		 */
+		for (SubNode node : auth.searchSubGraphByAclUser(session, null, sharedToList, SubNode.FIELD_MODIFY_TIME, MAX_FEED_ITEMS,
+				null)) {
+			if (!dedup.contains(node.getId())) {
+				nodes.add(node);
+				dedup.add(node.getId());
 			}
 		}
 
 		/*
-		 * Now add all the nodes that are shared BY this user to other users. Should be
-		 * no overlap with previous query results (code just above this)
+		 * Now add all the nodes that are shared BY this user to any other users.
 		 */
-		SubNode searchRoot = read.getNode(session, sessionContext.getRootId());
 		for (SubNode node : auth.searchSubGraphByAcl(session, null, searchRoot.getOwner(), SubNode.FIELD_MODIFY_TIME,
 				MAX_FEED_ITEMS)) {
-			nodes.add(node);
+			if (!dedup.contains(node.getId())) {
+				nodes.add(node);
+				dedup.add(node.getId());
+			}
 		}
 
 		// sort and truncate merged list into final list before converting all
@@ -188,8 +197,7 @@ public class UserFeedService {
 		res.setSearchResults(searchResults);
 		counter = 0;
 		for (SubNode node : nodes) {
-			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1, false,
-					false);
+			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1, false, false);
 			searchResults.add(info);
 		}
 

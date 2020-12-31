@@ -26,7 +26,6 @@ export class NodeCompRowHeader extends Div {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         let children = [];
-
         // console.log("NodeCompHeaderRow: " + S.util.prettyPrint(node));
 
         let avatarImg: Img = null;
@@ -96,7 +95,7 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        let sharingNames = S.util.getSharingNames(node);
+        let sharingNames = S.util.getSharingNames(node, false);
         if (sharingNames) {
             children.push(new Span("(Shared to: " + sharingNames + ")"));
         }

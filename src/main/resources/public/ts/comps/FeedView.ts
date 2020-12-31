@@ -21,6 +21,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class FeedView extends Div {
 
+    static feedQueried: boolean = false;
+
     constructor() {
         super(null, {
             id: "feedTab"
@@ -29,22 +31,10 @@ export class FeedView extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-
         this.attribs.className = "tab-pane fade my-tab-pane";
         if (state.activeTab === this.getId()) {
             this.attribs.className += " show active";
         }
-
-        if (!state.feedResults || state.feedResults.length === 0) {
-            this.setChildren([
-                new Div("Nothing to show here. Nobody has posted anything.", {
-                    id: "feedResultsPanel"
-                })
-            ]);
-            return;
-        }
-
-        let childCount = state.feedResults.length;
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
@@ -57,24 +47,40 @@ export class FeedView extends Div {
             new Div(null, {
                 className: (state.feedDirty ? "feedDirtyButton" : "feedNotDirtyButton")
             }, [
+                new Button("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state)),
                 new Button("Refresh Feed" + (state.feedDirty ? " (New Posts)" : ""), () => {
                     S.nav.navFeed(state);
                 })
             ])
         ], null, "float-right marginBottom");
 
-        // children.push(this.makeFilterButtonsBar());
+        children.push(this.makeFilterButtonsBar());
         children.push(refreshFeedButtonBar);
         children.push(new Div(null, { className: "clearfix" }));
 
-        let i = 0;
-        state.feedResults.forEach((node: J.NodeInfo) => {
-            // console.log("FEED: node id=" + node.id + " content: " + node.content);
-            S.srch.initSearchNode(node);
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, "feed", true, false, true, state));
-            i++;
-            rowCount++;
-        });
+        if (!state.feedResults || state.feedResults.length === 0) {
+            if (state.activeTab === "feedTab") {
+                if (!FeedView.feedQueried) {
+                    FeedView.feedQueried = true;
+                    children.push(new Div("Loading feed..."));
+                    setTimeout(() => { S.nav.navFeed(state); }, 250);
+                }
+                else {
+                    children.push(new Div("Nothing to display."));
+                }
+            }
+        }
+        else {
+            let i = 0;
+            let childCount = state.feedResults.length;
+            state.feedResults.forEach((node: J.NodeInfo) => {
+                // console.log("FEED: node id=" + node.id + " content: " + node.content);
+                S.srch.initSearchNode(node);
+                children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, "feed", true, false, true, state));
+                i++;
+                rowCount++;
+            });
+        }
 
         this.setChildren(children);
     }
@@ -82,8 +88,8 @@ export class FeedView extends Div {
     makeFilterButtonsBar = (): Span => {
         return new Span(null, null, [
             new RadioButtonGroup([
-                this.createRadioButton("feedUserFilter", "Friends", "friends"),
-                this.createRadioButton("feedUserFilter", "All", "all")
+                this.createRadioButton("feedUserFilter", "Friends Only", "friends"),
+                this.createRadioButton("feedUserFilter", "Everyone", "all")
             ], "radioButtonsBar form-group-border feedFilterRadioButtons")
 
             // todo-0: temporarily removed due to refactoring

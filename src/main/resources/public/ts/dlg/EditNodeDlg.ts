@@ -367,7 +367,7 @@ export class EditNodeDlg extends DialogBase {
 
         this.nameState.setValue(state.node.name);
 
-        let sharingNames = S.util.getSharingNames(state.node);
+        let sharingNames = S.util.getSharingNames(state.node, false);
         let sharingSpan = null;
         if (sharingNames) {
             sharingSpan = new Span("Shared to: " + sharingNames);

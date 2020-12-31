@@ -116,7 +116,7 @@ public class ActPubController {
 			ret = actPubService.generateFollowers(userName);
 		}
 		if (ret != null) {
-			log.debug("Reply with Outbox: " + XString.prettyPrint(ret));
+			log.debug("Reply with Followers: " + XString.prettyPrint(ret));
 			return ret;
 		}
 		return new ResponseEntity(HttpStatus.OK);

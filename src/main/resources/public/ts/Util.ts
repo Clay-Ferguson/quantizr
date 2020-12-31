@@ -1408,15 +1408,22 @@ export class Util implements UtilIntf {
         new LoadNodeFromIpfsDlg(state).open();
     }
 
-    getSharingNames = (node: J.NodeInfo): string => {
+    getSharingNames = (node: J.NodeInfo, multiLine: boolean): string => {
         if (!node || !node.ac) return null;
+        let delimiter = multiLine ? "\n" : ", ";
 
         let names = "";
         for (let ac of node.ac) {
             if (names) {
-                names += ", ";
+                names += delimiter;
             }
-            names += ac.principalName;
+
+            if (ac.principalName !== "public") {
+                names += "@" + ac.principalName;
+            }
+            else {
+                names += "public";
+            }
         }
 
         return names;

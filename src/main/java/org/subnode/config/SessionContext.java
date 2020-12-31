@@ -2,14 +2,13 @@ package org.subnode.config;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
-
 import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +23,8 @@ import org.subnode.request.base.RequestBase;
 import org.subnode.util.DateUtil;
 
 /**
- * The ScopedProxyMode.TARGET_CLASS annotation allows this session bean to be
- * available on singletons or other beans that are not themselves session
- * scoped.
+ * The ScopedProxyMode.TARGET_CLASS annotation allows this session bean to be available on
+ * singletons or other beans that are not themselves session scoped.
  */
 @Component
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -64,16 +62,16 @@ public class SessionContext {
 	/* Emitter for sending push notifications to the client */
 	private SseEmitter pushEmitter;
 
-	public static final HashMap<String, SessionContext> sessionsByUserName = new HashMap<String, SessionContext>();
-	public static final HashMap<String, SessionContext> sessionsByToken = new HashMap<String, SessionContext>();
+	// this one WILL work with multiple sessions per user
+	public static final HashSet<SessionContext> allSessions = new HashSet<SessionContext>();
 
 	private static final Random rand = new Random();
 	private String userToken = String.valueOf(rand.nextInt());
 
 	public SessionContext() {
 		log.trace(String.format("Creating Session object hashCode[%d]", hashCode()));
-		synchronized (sessionsByToken) {
-			sessionsByToken.put(userToken, this);
+		synchronized (allSessions) {
+			allSessions.add(this);
 		}
 	}
 
@@ -85,29 +83,38 @@ public class SessionContext {
 	}
 
 	public static boolean validToken(String token) {
-		synchronized (sessionsByToken) {
-			return sessionsByToken.containsKey(token);
+		for (SessionContext sc : allSessions) {
+			if (sc.getUserToken().equals(token)) {
+				return true;
+			}
 		}
+		return false;
 	}
 
 	public String getUserToken() {
 		return userToken;
 	}
 
-	public static SessionContext getSessionByUserName(String userName) {
-		synchronized (sessionsByUserName) {
-			return sessionsByUserName.get(userName);
+	public static List<SessionContext> getSessionsByUserName(String userName) {
+		List<SessionContext> list = null;
+
+		for (SessionContext sc : allSessions) {
+			if (sc.getUserName().equals(userName)) {
+				if (list == null) {
+					list = new LinkedList<SessionContext>();
+				}
+				list.add(sc);
+			}
 		}
+		return list;
 	}
 
 	@PreDestroy
 	public void preDestroy() {
 		log.trace(String.format("Destroying Session object hashCode[%d] of user %s", hashCode(), userName));
-		synchronized (sessionsByUserName) {
-			sessionsByUserName.remove(userName);
-		}
-		synchronized (sessionsByToken) {
-			sessionsByToken.remove(userToken);
+
+		synchronized (allSessions) {
+			allSessions.remove(this);
 		}
 	}
 
@@ -150,9 +157,8 @@ public class SessionContext {
 	}
 
 	/*
-	 * This can create nasty bugs. I should be always getting user name from the
-	 * actual session object itself in all the logic... in most every case except
-	 * maybe login process.
+	 * This can create nasty bugs. I should be always getting user name from the actual session object
+	 * itself in all the logic... in most every case except maybe login process.
 	 */
 	public String getUserName() {
 		return userName;
@@ -160,9 +166,6 @@ public class SessionContext {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
-		synchronized (sessionsByUserName) {
-			sessionsByUserName.put(userName, this);
-		}
 	}
 
 	public String getPassword() {

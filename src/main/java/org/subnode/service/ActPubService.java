@@ -543,11 +543,8 @@ public class ActPubService {
         if (firstPageUrl != null) {
             log.debug("First Page Url: " + firstPageUrl);
             Object ocPage = getOrderedCollectionPage(firstPageUrl);
-            int pageNo = 0;
-            while (ocPage != null) {
-                pageNo++;
-                final int _pageNo = pageNo;
 
+            while (ocPage != null) {
                 orderedItems = AP.list(ocPage, "orderedItems");
                 for (Object apObj : orderedItems) {
 
@@ -560,7 +557,7 @@ public class ActPubService {
                         }
                         // if no apId that's fine, just process item.
                         else if (!apIdSet.contains(apId)) {
-                            log.debug("Iterate Collecion Item: " + apId);
+                            log.debug("Iterate Collection Item: " + apId);
                             observer.item(apObj);
                             apIdSet.add(apId);
                         }
@@ -599,7 +596,7 @@ public class ActPubService {
                         }
                         // else process it with apId
                         else if (!apIdSet.contains(apId)) {
-                            log.debug("Iterate Collecion Item: " + apId);
+                            log.debug("Iterate Collection Item: " + apId);
                             observer.item(apObj);
                             apIdSet.add(apId);
                         }
@@ -1390,8 +1387,9 @@ public class ActPubService {
     }
 
     public APObj generateOutbox(String userName) {
+        log.debug("Generate outbox for userName: " + userName);
         String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName;
-        Long totalItems = getOutboxItemCount(userName);
+        Long totalItems = getOutboxItemCount(userName, "public");
 
         return new APObj() //
                 .put("@context", ActPubConstants.CONTEXT_STREAMS) //
@@ -1402,12 +1400,20 @@ public class ActPubService {
                 .put("last", url + "?min_id=0&page=true");
     }
 
-    public Long getOutboxItemCount(final String userName) {
+    // userName represents the person whose outbox is being QUERIED, and the identity of the 
+    // user DOING the querying will come from the http header:
+    //
+    // todo-0: So for now we just query the PUBLIC shares from the outbox, and verify that public query works before we try to 
+    // figure out how to do private auth comming from specific user(s)
+    // signature: keyId="https://quantizr.com/actor#main-key",algorithm="rsa-sha256",headers="(request-target) host date accept",signature="Cx3h3esROhhwMYUXBCZ5zyckN37Eyq+jj7ur4neGoi7Ym3GdddIEPSDiv3hdwQkFEpUNeYgPWD4rzgCOclok2bcTTwza0CHOKlXnkHtKhI8MK8X9UyQgG47xjS9Ifk6a4oBcGUTniKus8fkLH7g3HHNTXrigOWSfM9mZCkicicMSyC2lbvCAOnafZ0nZEzhKwAH83Hcrelpw7leLTOSRXw8D0NFhiQJR4oFrX7hpuM42I58C0Y4dNng6XrzydqZj/FFjXnpw6NEG4fuoyQ9+J5WH3e9UNZiuzsnloYyQDbb2lgPB0YwFHWSp+W2SwpUykGCyZMNlx+ri/JiauOudvw=="
+    public Long getOutboxItemCount(final String userName, String sharedTo) {
         Long totalItems = (Long) adminRunner.run(mongoSession -> {
             long count = 0;
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (userNode != null) {
-                count = auth.countSubGraphByAclUser(mongoSession, null, userNode.getId().toHexString());
+                List<String> sharedToList = new LinkedList<String>();
+                sharedToList.add(sharedTo);
+                count = auth.countSubGraphByAclUser(mongoSession, null, sharedToList, userNode.getOwner());
             }
             return Long.valueOf(count);
         });
@@ -1418,7 +1424,7 @@ public class ActPubService {
      * if minId=="0" that means "last page", and if minId==null it means first page
      */
     public APObj generateOutboxPage(String userName, String minId) {
-        APList items = getOutboxItems(userName, minId);
+        APList items = getOutboxItems(userName, "public", minId);
 
         // this is a self-reference url (id)
         String url =
@@ -1495,11 +1501,6 @@ public class ActPubService {
                 String avatarUrl = appProp.protocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
                         + userNode.getId().toHexString() + "&v=" + avatarVer;
 
-                String headerImageMime = userNode.getStrProp(NodeProp.BIN_MIME.s() + "Header");
-                String headerImageVer = userNode.getStrProp(NodeProp.BIN.s() + "Header");
-                String headerImageUrl = appProp.protocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader" + "?nodeId="
-                        + userNode.getId().toHexString() + "&v=" + headerImageVer;
-
                 APObj actor = new APObj();
 
                 actor.put("@context", new APList() //
@@ -1519,10 +1520,19 @@ public class ActPubService {
                         .put("mediaType", avatarMime) //
                         .put("url", avatarUrl));
 
-                actor.put("image", new APObj() //
-                        .put("type", "Image") //
-                        .put("mediaType", headerImageMime) //
-                        .put("url", headerImageUrl));
+                String headerImageMime = userNode.getStrProp(NodeProp.BIN_MIME.s() + "Header");
+                if (headerImageMime != null) {
+                    String headerImageVer = userNode.getStrProp(NodeProp.BIN.s() + "Header");
+                    if (headerImageVer != null) {
+                        String headerImageUrl = appProp.protocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
+                                + "?nodeId=" + userNode.getId().toHexString() + "&v=" + headerImageVer;
+
+                        actor.put("image", new APObj() //
+                                .put("type", "Image") //
+                                .put("mediaType", headerImageMime) //
+                                .put("url", headerImageUrl));
+                    }
+                }
 
                 actor.put("summary", userNode.getStrProp(NodeProp.USER_BIO.s()));
                 actor.put("inbox", host + ActPubConstants.PATH_INBOX + "/" + userName); //
@@ -1638,7 +1648,7 @@ public class ActPubService {
      * todo-0: Security isn't implemented on this call yet so a hacker can theoretically inject any
      * userName into the api for this to retrieve shared nodes anyone has shared.
      */
-    public APList getOutboxItems(String userName, String minId) {
+    public APList getOutboxItems(String userName, String sharedTo, String minId) {
         String host = appProp.protocolHostAndPort();
         APList retItems = null;
         String nodeIdBase = host + "/app?id=";
@@ -1658,8 +1668,11 @@ public class ActPubService {
                     collecting = true;
                 }
 
-                for (SubNode child : auth.searchSubGraphByAclUser(mongoSession, null, userNode.getId().toHexString(),
-                        SubNode.FIELD_MODIFY_TIME, MAX_PER_PAGE)) {
+                List<String> sharedToList = new LinkedList<String>();
+                sharedToList.add(sharedTo);
+
+                for (SubNode child : auth.searchSubGraphByAclUser(mongoSession, null, sharedToList,
+                        SubNode.FIELD_MODIFY_TIME, MAX_PER_PAGE, userNode.getOwner())) {
 
                     if (items.size() >= MAX_PER_PAGE) {
                         // ocPage.setPrev(outboxBase + "?page=" + String.valueOf(pgNo - 1));
