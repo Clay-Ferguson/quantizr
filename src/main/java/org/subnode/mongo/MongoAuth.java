@@ -434,7 +434,7 @@ public class MongoAuth {
 	// ========================================================================
 
 	/*
-	 * Finds all subnodes that have a share targeting the sharedTo (account node ID of a person being
+	 * Finds all subnodes that have a share targeting the sharedToAny (account node IDs of a person being
 	 * shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public' in
 	 * sharedTo instead
 	 */

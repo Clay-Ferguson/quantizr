@@ -1,6 +1,7 @@
 package org.subnode.actpub;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class APList extends LinkedList<Object> {
     private static final long serialVersionUID = 1L;
@@ -10,6 +11,11 @@ public class APList extends LinkedList<Object> {
 
     public APList val(Object val) {
         super.add(val);
+        return this;
+    }
+
+    public APList vals(List<?> val) {
+        super.addAll(val);
         return this;
     }
 }

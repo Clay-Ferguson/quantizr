@@ -29,12 +29,12 @@ export class TabPanelButtons extends Div {
         let mainDisplay = "inline";
         let searchDisplay = searchResults ? "inline" : "none";
         let timelineDisplay = timelineResults ? "inline" : "none";
-        let feedDisplay = "inline";
+        let feedDisplay = state.isAnonUser ? "none" : "inline";
 
         /* If mainDisplay would be the only tab showing, then don't show that tab */
-        // if (searchDisplay === "none" && timelineDisplay === "none" && feedDisplay === "none") {
-        //     mainDisplay = "none";
-        // }
+        if (searchDisplay === "none" && timelineDisplay === "none" && feedDisplay === "none") {
+            mainDisplay = "none";
+        }
 
         // the row of buttons that ARE the tabs where you click to change tabs.
         let tabButtons = new Div(null, {

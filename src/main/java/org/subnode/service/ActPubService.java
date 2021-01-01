@@ -237,7 +237,7 @@ public class ActPubService {
         return appProp.protocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/" + userName;
     }
 
-    /* Builds the unique set of hosts from a list of userNames */
+    /* Builds the unique set of hosts from a list of userNames (not used currently) */
     public HashSet<String> getHostsFromUserNames(List<String> userNames) {
         String host = appProp.getMetaHost();
         HashSet<String> hosts = new HashSet<String>();
@@ -266,19 +266,7 @@ public class ActPubService {
         String host = appProp.getMetaHost();
         String fromActor = null;
 
-        // HashSet<String> hosts = getHostsFromUserNames(toUserNames);
-        // if (hosts.size()==0) return;
-        // for (String foreignHost : hosts) {
-        //     // todo-0: &&& work in progress 
-        // }
-
-        /* todo-0: Need to group all the toUserNames for each mentioned 'server' into a single post per server, where each post
-        has just that set of users in the 'to/cc'. Be careful before you rip apart this method. I think I need to build the single object 
-        to post (with all mentions/cc/to on it for all servers), and then just post that one time to each unique server. 
-        
-        To know what to do here, we need to study what mastodon does when posting to multiple different quanta users in a single toot,
-        and study it as a public post, and DMs, 
-        */
+        /* Per spec (and per Mastodon reverse engineering, we post the same message to all the inboxes that need to see it */
         for (String toUserName : toUserNames) {
 
             // Ignore userNames that are not foreign server names
@@ -305,9 +293,9 @@ public class ActPubService {
             /* lazy create fromActor here */
             if (fromActor == null) {
                 fromActor = makeActorUrlForUserName(fromUser);
-            }
+            } 
 
-            APObj message = apFactory.newCreateMessageForNote(toUserName, fromActor, inReplyTo, content, toActorUrl, noteUrl,
+            APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, content, noteUrl,
                     privateMessage, attachments);
 
             String privateKey = getPrivateKey(session, sessionContext.getUserName());
@@ -776,6 +764,11 @@ public class ActPubService {
      * apUserName is full user name like alice@quantizr.com
      */
     public void setFollowing(String apUserName, boolean following) {
+        //admin doesn't follow/unfollow 
+        if (sessionContext.isAdmin()) {
+            return;
+        }
+
         APObj webFingerOfUserBeingFollowed = getWebFinger(apUserName);
         String actorUrlOfUserBeingFollowed = getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
 
@@ -1797,7 +1790,6 @@ public class ActPubService {
      * entail (todo-0) deleting nodes that were posted to foreign servers by issuing an 'undo' command
      */
     public void deleteNodeNotify(ObjectId nodeId) {
-
         adminRunner.run(session -> {
             SubNode node = read.getNode(session, nodeId);
             if (node != null) {
