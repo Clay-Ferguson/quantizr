@@ -1,10 +1,12 @@
 class ClientInfo {
 
+    /* To test mobile layout, hardcode this value to true */
     public isMobile: boolean = this.mobileCheck();
+
     public isMobileOrTablet: boolean = this.mobileOrTabletCheck();
 
     /**
-        * Detect if browser is a mobile (something smaller than tabled)
+        * Detect if browser is a mobile (something smaller than tablet)
         *
         * from: https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
         */

@@ -7,6 +7,7 @@ import { Singletons } from "../Singletons";
 import { Div } from "./Div";
 import { IconButton } from "./IconButton";
 import { Img } from "./Img";
+import { Span } from "./Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -34,18 +35,22 @@ export class LeftNavPanel extends Div {
         }, "btn-primary", "off") : null;
 
         this.setChildren([
-            new Img(this.getId() + "_logo", {
-                className: "smallLogoButton",
-                src: "/images/eagle-logo-50px-tr.jpg",
-                onClick: () => { window.location.href = window.location.origin; }
-             }),
+            new Div(null, null, [
+                new Img(this.getId() + "_logo", {
+                    className: "smallLogoButton",
+                    src: "/images/eagle-logo-50px-tr.jpg",
+                    onClick: () => { window.location.href = window.location.origin; }
+                }),
+                new Span("Quanta", { className: "logo-text" })
+            ]),
             new Div(state.title),
+
+            signupButton,
+            loginButton,
 
             new Div(null, {
                 className: "float-right menuContainer"
             }, [
-                signupButton,
-                loginButton,
                 new MenuPanel(state)
             ])
         ]);

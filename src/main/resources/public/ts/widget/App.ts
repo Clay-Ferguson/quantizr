@@ -83,8 +83,9 @@ export class App extends Div {
                 src: "/images/eagle-logo-50px-tr.jpg",
                 onClick: () => { window.location.href = window.location.origin; }
             });
+
             let title = new Span(state.title);
-            mobileTopBar = new Div(null, null, [logo, menuButton, signupButton, loginButton, title]);
+            mobileTopBar = new Div(null, null, [menuButton, logo, signupButton, loginButton, title]);
         }
 
         let main: Main = null;
