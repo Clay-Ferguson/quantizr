@@ -77,7 +77,7 @@ public class ActPubFactory {
 				.put("toot", "http://joinmastodon.org/ns#");
 	}
 
-	public APObj newCreateMessage(APObj object, String fromActor, String to, String noteUrl, ZonedDateTime now) {
+	public APObj newCreateMessage(APObj object, String fromActor, String toActor, String noteUrl, ZonedDateTime now) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 
 		APObj ret = new APObj();
@@ -93,7 +93,8 @@ public class ActPubFactory {
 		ret.put("object", object);
 
 		ret.put("to", new APList() //
-				.val(to) //
+				.val(toActor) //
+				// todo-0: research this value (double check that DMs work, and are private)
 				.val(ActPubConstants.CONTEXT_STREAMS + "#Public"));
 
 		// LinkedList<String> ccArray = new LinkedList<String>();

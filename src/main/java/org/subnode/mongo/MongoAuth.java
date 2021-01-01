@@ -437,9 +437,6 @@ public class MongoAuth {
 	 * Finds all subnodes that have a share targeting the sharedTo (account node ID of a person being
 	 * shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public' in
 	 * sharedTo instead
-	 * 
-	 * todo-0: this query needs to take an array as sharedTo so we can get the feed in one query meaning
-	 * it will contain a specific shareTo user AND the 'public' also.
 	 */
 	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession session, String pathToSearch, List<String> sharedToAny,
 			String sortField, int limit, ObjectId ownerIdMatch) {
@@ -460,9 +457,6 @@ public class MongoAuth {
 	 * counts all subnodes that have a share targeting the sharedTo (account node ID of a person being
 	 * shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public' in
 	 * sharedTo instead
-	 * 
-	 * todo-0: this query needs to take an array as sharedTo so we can get the feed in one query meaning
-	 * it will contain a specific shareTo user AND the 'public' also.
 	 */
 	public long countSubGraphByAclUser(MongoSession session, String pathToSearch, List<String> sharedToAny,
 			ObjectId ownerIdMatch) {

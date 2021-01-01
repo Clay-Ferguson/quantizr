@@ -240,19 +240,6 @@ public class AclService {
 			acl.put(mapKey, ac);
 			node.setAc(acl);
 			update.save(session, node);
-
-			// todo-0: Disabling this until I'm sure when/if we need it based on the newer way of doing social sharing and feeds.
-			// if (principalNode != null) {
-			// 	final SubNode _principalNode = principalNode;
-			// 	adminRunner.run(_session -> {
-			// 		try {
-			// 			outboxMgr.addInboxNotification(_session, principal, _principalNode, node,
-			// 					"shared this node with you:");
-			// 		} catch (Exception e) {
-			// 			log.debug("failed sending notification", e);
-			// 		}
-			// 	});
-			// }
 		}
 
 		return true;

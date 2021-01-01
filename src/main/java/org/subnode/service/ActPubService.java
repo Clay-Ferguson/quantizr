@@ -237,20 +237,48 @@ public class ActPubService {
         return appProp.protocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/" + userName;
     }
 
+    /* Builds the unique set of hosts from a list of userNames */
+    public HashSet<String> getHostsFromUserNames(List<String> userNames) {
+        String host = appProp.getMetaHost();
+        HashSet<String> hosts = new HashSet<String>();
+
+        for (String toUserName : userNames) {
+
+            // Ignore userNames that are not foreign server names
+            if (!toUserName.contains("@")) {
+                continue;
+            }
+
+            // Ignore userNames that are for our own host
+            String userHost = getHostFromUserName(toUserName);
+            if (userHost.equals(host)) {
+                continue;
+            }
+
+            hosts.add(userHost);
+        }
+        return hosts;
+    }
+
     public void sendNote(MongoSession session, List<String> toUserNames, String fromUser, String inReplyTo, String content,
             APList attachments, String noteUrl, boolean privateMessage) {
 
         String host = appProp.getMetaHost();
         String fromActor = null;
 
-        /*
-         * todo-0: Need to analyze the scenario where there are multiple 'quanta.wiki' users recieving a
-         * notification, and see if this results in multiple inbound posts from a Mastodon server, or if
-         * somehow all the mentions are wrapped into a single post to one user or perhaps the global inbox?
-         * Because we will use this example/info to determine how to send notifications to other federated
-         * servers also with the least number of posts to the least number of inboxes (i.e. will it be one
-         * post PER user or not?)
-         */
+        // HashSet<String> hosts = getHostsFromUserNames(toUserNames);
+        // if (hosts.size()==0) return;
+        // for (String foreignHost : hosts) {
+        //     // todo-0: &&& work in progress 
+        // }
+
+        /* todo-0: Need to group all the toUserNames for each mentioned 'server' into a single post per server, where each post
+        has just that set of users in the 'to/cc'. Be careful before you rip apart this method. I think I need to build the single object 
+        to post (with all mentions/cc/to on it for all servers), and then just post that one time to each unique server. 
+        
+        To know what to do here, we need to study what mastodon does when posting to multiple different quanta users in a single toot,
+        and study it as a public post, and DMs, 
+        */
         for (String toUserName : toUserNames) {
 
             // Ignore userNames that are not foreign server names
