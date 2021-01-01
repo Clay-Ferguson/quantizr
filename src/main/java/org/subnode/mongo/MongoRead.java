@@ -572,23 +572,27 @@ public class MongoRead {
         return getOps(session).find(query, SubNode.class);
     }
 
-    // For all the Criteria that are used in a 'count' and a 'search' create a method that generates
-    // just the query itself and reuse (todo-0). An example already exists ending in "_query()"
+    // =========================================================================
+    // Followers Query
+    // =========================================================================
+
     public Iterable<SubNode> findFollowersOfUser(MongoSession session, String userName) {
         update.saveSession(session);
-        Query query = new Query();
-
-        Criteria criteria =
-                Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
-                        .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s()).is(userName) //
-                        .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
-
-        query.addCriteria(criteria);
+        Query query = followersOfUser_query(session, userName);
+        if (query == null)
+            return null;
         return getOps(session).find(query, SubNode.class);
     }
 
     public long countFollowersOfUser(MongoSession session, String userName) {
         update.saveSession(session);
+        Query query = followersOfUser_query(session, userName);
+        if (query == null)
+            return 0L;
+        return getOps(session).count(query, SubNode.class);
+    }
+
+    public Query followersOfUser_query(MongoSession session, String userName) {
         Query query = new Query();
 
         Criteria criteria =
@@ -597,8 +601,12 @@ public class MongoRead {
                         .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
 
         query.addCriteria(criteria);
-        return getOps(session).count(query, SubNode.class);
+        return query;
     }
+
+    // =========================================================================
+    // Following Query
+    // =========================================================================
 
     /* Returns FRIEND nodes for every user 'userName' is following */
     public Iterable<SubNode> findFollowingOfUser(MongoSession session, String userName) {
@@ -637,6 +645,8 @@ public class MongoRead {
         query.addCriteria(criteria);
         return query;
     }
+
+    // =========================================================================
 
     /**
      * prop is optional and if non-null means we should search only that one field.
@@ -873,17 +883,15 @@ public class MongoRead {
         return ret;
     }
 
+    // ========================================================================
+    // Typed Node Under Path
+    // ========================================================================
+
     /*
      * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
     public Iterable<SubNode> findTypedNodesUnderPath(MongoSession session, String path, String type) {
-
-        // Other wise for ordinary users root is based off their username
-        Query query = new Query();
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(path))//
-                .and(SubNode.FIELD_TYPE).is(type);
-
-        query.addCriteria(criteria);
+        Query query = typedNodesUnderPath_query(session, path, type);
         return getOps(session).find(query, SubNode.class);
     }
 
@@ -891,15 +899,21 @@ public class MongoRead {
      * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
     public long countTypedNodesUnderPath(MongoSession session, String path, String type) {
+        Query query = typedNodesUnderPath_query(session, path, type);
+        return getOps(session).count(query, SubNode.class);
+    }
 
-        // Other wise for ordinary users root is based off their username
+    public Query typedNodesUnderPath_query(MongoSession session, String path, String type) {
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(path))//
                 .and(SubNode.FIELD_TYPE).is(type);
 
         query.addCriteria(criteria);
-        return getOps(session).count(query, SubNode.class);
+        return query;
     }
+
+    // ========================================================================
+
 
     /*
      * Returns one (or first) node contained directly under path (non-recursively) that has a matching

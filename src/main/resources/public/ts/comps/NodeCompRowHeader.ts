@@ -97,7 +97,7 @@ export class NodeCompRowHeader extends Div {
 
         let sharingNames = S.util.getSharingNames(node, false);
         if (sharingNames) {
-            children.push(new Span("(Shared to: " + sharingNames + ")"));
+            children.push(new Span(" (to: " + sharingNames + ")"));
         }
 
         this.setChildren(children);

@@ -75,7 +75,6 @@ public class MongoAuth {
 	}
 
 	public void populateUserNamesInAcl(MongoSession session, SubNode node) {
-
 		// iterate all acls on the node
 		List<AccessControlInfo> acList = getAclEntries(session, node);
 		if (acList != null) {
@@ -260,9 +259,6 @@ public class MongoAuth {
 			return;
 		}
 
-		// log.trace("auth: id=" + node.getId().toHexString() + " Priv: " +
-		// XString.prettyPrint(priv));
-
 		if (node.getOwner() == null) {
 			log.trace("auth fails. node had no owner: " + node.getPath());
 			throw new RuntimeEx("node had no owner: " + node.getPath());
@@ -433,6 +429,10 @@ public class MongoAuth {
 		return info;
 	}
 
+	// ========================================================================
+	// SubGraphByAclUser (query and count)
+	// ========================================================================
+
 	/*
 	 * Finds all subnodes that have a share targeting the sharedTo (account node ID of a person being
 	 * shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public' in
@@ -444,16 +444,45 @@ public class MongoAuth {
 	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession session, String pathToSearch, List<String> sharedToAny,
 			String sortField, int limit, ObjectId ownerIdMatch) {
 
+		update.saveSession(session);
+		Query query = subGraphByAclUser_query(session, pathToSearch, sharedToAny, ownerIdMatch);
+		if (query == null)
+			return null;
+
+		if (!StringUtils.isEmpty(sortField)) {
+			query.with(Sort.by(Sort.Direction.DESC, sortField));
+		}
+		query.limit(limit);
+		return ops.find(query, SubNode.class);
+	}
+
+	/*
+	 * counts all subnodes that have a share targeting the sharedTo (account node ID of a person being
+	 * shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public' in
+	 * sharedTo instead
+	 * 
+	 * todo-0: this query needs to take an array as sharedTo so we can get the feed in one query meaning
+	 * it will contain a specific shareTo user AND the 'public' also.
+	 */
+	public long countSubGraphByAclUser(MongoSession session, String pathToSearch, List<String> sharedToAny,
+			ObjectId ownerIdMatch) {
+		update.saveSession(session);
+		Query query = subGraphByAclUser_query(session, pathToSearch, sharedToAny, ownerIdMatch);
+		if (query == null)
+			return 0L;
+		Long ret = ops.count(query, SubNode.class);
+		return ret;
+	}
+
+	private Query subGraphByAclUser_query(MongoSession session, String pathToSearch, List<String> sharedToAny,
+			ObjectId ownerIdMatch) {
 		// this will be node.getPath() to search under the node, or null for searching
 		// under all user content.
 		if (pathToSearch == null) {
 			pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 		}
 
-		update.saveSession(session);
 		Query query = new Query();
-		query.limit(limit);
-
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch));
 
 		if (sharedToAny != null && sharedToAny.size() > 0) {
@@ -461,7 +490,6 @@ public class MongoAuth {
 			for (String share : sharedToAny) {
 				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
 			}
-
 			/*
 			 * todo-0: This uglyness is because orOperator us using variable args and it threw exceptions, when
 			 * I tried to pass an array, so to save time I just hard coded the 1 and 2 parameter case and moved
@@ -481,65 +509,41 @@ public class MongoAuth {
 		}
 
 		query.addCriteria(criteria);
-
-		if (!StringUtils.isEmpty(sortField)) {
-			query.with(Sort.by(Sort.Direction.DESC, sortField));
-		}
-		return ops.find(query, SubNode.class);
+		return query;
 	}
 
-	/*
-	 * counts all subnodes that have a share targeting the sharedTo (account node ID of a person being
-	 * shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public' in
-	 * sharedTo instead
-	 * 
-	 * todo-0: this query needs to take an array as sharedTo so we can get the feed in one query meaning
-	 * it will contain a specific shareTo user AND the 'public' also.
-	 */
-	public long countSubGraphByAclUser(MongoSession session, String pathToSearch, List<String> sharedToAny,
-			ObjectId ownerIdMatch) {
-		// this will be node.getPath() to search under the node, or null for searching
-		// under all user content.
-		if (pathToSearch == null) {
-			pathToSearch = NodeName.ROOT_OF_ALL_USERS;
-		}
-
-		update.saveSession(session);
-		Query query = new Query();
-
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch));
-
-		if (sharedToAny != null && sharedToAny.size() > 0) {
-			List<Criteria> orCriteria = new LinkedList<Criteria>();
-			for (String share : sharedToAny) {
-				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
-			}
-			criteria.orOperator((Criteria[]) orCriteria.toArray());
-		}
-
-		if (ownerIdMatch != null) {
-			criteria = criteria.and(SubNode.FIELD_OWNER).is(ownerIdMatch);
-		}
-
-		query.addCriteria(criteria);
-		Long ret = ops.count(query, SubNode.class);
-		return ret;
-	}
+	// ========================================================================
+	// SubGraphByAcl (query and count)
+	// ========================================================================
 
 	/* Finds nodes that have any sharing on them at all */
 	public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, String pathToSearch, ObjectId ownerIdMatch,
 			String sortField, int limit) {
-		// auth(session, node, PrivilegeType.READ);
+		update.saveSession(session);
+		Query query = subGraphByAcl_query(session, pathToSearch, ownerIdMatch);
+		
+		if (!StringUtils.isEmpty(sortField)) {
+			query.with(Sort.by(Sort.Direction.DESC, sortField));
+		}
+		query.limit(limit);
 
-		// this will be node.getPath() to search under the node, or null for searching
-		// under all user content.
+		return ops.find(query, SubNode.class);
+	}
+
+	/* Finds nodes that have any sharing on them at all */
+	public long countSubGraphByAcl(MongoSession session, String pathToSearch, ObjectId ownerIdMatch) {
+		update.saveSession(session);
+		Query query = subGraphByAcl_query(session, pathToSearch, ownerIdMatch);
+		return ops.count(query, SubNode.class);
+	}
+
+	public Query subGraphByAcl_query(MongoSession session, String pathToSearch, ObjectId ownerIdMatch) {
+		Query query = new Query();
+
 		if (pathToSearch == null) {
 			pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 		}
 
-		update.saveSession(session);
-		Query query = new Query();
-		query.limit(limit);
 		/*
 		 * This regex finds all that START WITH path, have some characters after path, before the end of the
 		 * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
@@ -553,36 +557,10 @@ public class MongoAuth {
 		}
 
 		query.addCriteria(criteria);
-
-		if (!StringUtils.isEmpty(sortField)) {
-			query.with(Sort.by(Sort.Direction.DESC, sortField));
-		}
-
-		return ops.find(query, SubNode.class);
+		return query;
 	}
 
-	/* Finds nodes that have any sharing on them at all */
-	public long countSubGraphByAcl(MongoSession session, SubNode node, ObjectId ownerIdMatch) {
-		auth(session, node, PrivilegeType.READ);
-
-		update.saveSession(session);
-		Query query = new Query();
-
-		/*
-		 * This regex finds all that START WITH path, have some characters after path, before the end of the
-		 * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
-		 * children.
-		 */
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath())) //
-				.and(SubNode.FIELD_AC).ne(null);
-
-		if (ownerIdMatch != null) {
-			criteria = criteria.and(SubNode.FIELD_OWNER).is(ownerIdMatch);
-		}
-
-		query.addCriteria(criteria);
-		return ops.count(query, SubNode.class);
-	}
+	// ========================================================================
 
 	public MongoSession login(String userName, String password) {
 		// log.debug("Mongo API login: user="+userName);
