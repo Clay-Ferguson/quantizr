@@ -1,6 +1,12 @@
 ![Quanta Logo](https://quanta.wiki/images/eagle-logo-250px-tr.jpg)
 
-# Quanta WebApp
+# Quanta Web Platform
+
+Welcome to the Fediverse! Join the Fediverse!
+
+Quanta is a new kind of decentralized and federated social media platform. Connect to the Fediverse with unique and powerful features like wikis, blogging, document collaboration, conversation threads, encrypted secure messaging, video/audio recording & sharing, file sharing, a podcatcher, and much more.
+
+Create hierarchically organized content text, documents, images, audio and video that's always editable, shareable on the Fediverse, and saved on IPFS.
 
 Quanta is a content publishing/hosting platform where everything exists on a tree-structured database and each user owns a branch on this global tree which can be shared with other users. Each piece of data on the tree is called a "Node", and each node has it's own unique URL, and can markdown text (and/or images and arbitrary file attachments) and can be shared to specific other users or made public. A node can represent anything from a full document to just a paragraph, or even one sentence of content, and it's up to the user to create whatever they want and structure it as they want.
 
@@ -32,7 +38,14 @@ https://quanta.wiki
 * MathJax for rendering Latex math formulas
 * NPM rss-parser Package
 
+## Watch some Eye Candy first
+
+https://quanta.wiki/n/screencast
 
 ## How to Build the App
 
-See **/docs/getting-started.md**, which has very detailed information on how to install prerequisistes and build the app. 
+https://quanta.wiki/n/technical-notes
+
+## Search Tags
+
+Social Media Platform, Decentralized, Fediverse, IPFS, ActivityPub, Web3.0, Mastodon/Pleroma, IPFS, MongoDB, docker compose, Java, TypesScript, ReactJS, HTML+SCSS, SpringBoot, Podcasting, RSS, Encrpytion, E2E Encryption, Secure Messaging, Blogging Platform, Wikis, Corporate Collaboration, Full-Text search, Lucene
