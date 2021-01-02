@@ -61,7 +61,7 @@ public class Convert {
 	 * by the browser to render the node
 	 */
 	public NodeInfo convertToNodeInfo(SessionContext sessionContext, MongoSession session, SubNode node,
-			boolean htmlOnly, boolean initNodeEdit, long logicalOrdinal, boolean allowInlineChildren,
+			boolean htmlOnly, boolean initNodeEdit, long ordinal, boolean allowInlineChildren,
 			boolean lastChild) {
 
 		ImageSize imageSize = null;
@@ -153,7 +153,7 @@ public class Convert {
 				node.getModifyTime(), propList, acList, hasChildren, //
 				imageSize != null ? imageSize.getWidth() : 0, //
 				imageSize != null ? imageSize.getHeight() : 0, //
-				node.getType(), logicalOrdinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar);
+				node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar);
 
 		/*
 		 * Special case for "Friend" type nodes, to get enough information for the
@@ -225,7 +225,7 @@ public class Convert {
 				Iterable<SubNode> nodeIter = read.getChildren(session, node,
 						Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100, 0);
 				Iterator<SubNode> iterator = nodeIter.iterator();
-
+				long inlineOrdinal = 0;
 				while (true) {
 					if (!iterator.hasNext()) {
 						break;
@@ -242,7 +242,7 @@ public class Convert {
 					boolean multiLevel = true;
 
 					nodeInfo.safeGetChildren().add(convertToNodeInfo(sessionContext, session, n, htmlOnly, initNodeEdit,
-							logicalOrdinal, multiLevel, lastChild));
+							inlineOrdinal++, multiLevel, lastChild));
 				}
 			}
 		}

@@ -134,7 +134,7 @@ export class NodeCompTableRowLayout extends Div {
                 }, "btn-secondary marginLeft marginTop");
                 children.push(btn);
 
-                let userCanPaste = S.props.isMine(lastNode, state) || state.isAdminUser || lastNode.id === state.homeNodeId;
+                let userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.homeNodeId;
                 if (!!state.nodesToMove && userCanPaste) {
                     children.push(new Button("Paste Here", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_Inline, "S.edit.pasteSelNodes_Inline", lastNode.id), null, "btn-secondary pasteButton"));
                 }

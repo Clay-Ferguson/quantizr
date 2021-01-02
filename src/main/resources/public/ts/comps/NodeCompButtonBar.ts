@@ -169,7 +169,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
                     { title: "Insert new Node at this location." });
             }
 
-            let userCanPaste = editingAllowed && (S.props.isMine(node, state) || state.isAdminUser || node.id === state.homeNodeId);
+            let userCanPaste = S.props.isMine(node, state) || state.isAdminUser || node.id === state.homeNodeId;
 
             if (editingAllowed) {
                 if (editableNode) {
@@ -214,9 +214,9 @@ export class NodeCompButtonBar extends HorizontalLayout {
                 }
             }
 
-            if (editingAllowed) {
-                if (!!state.nodesToMove && userCanPaste) {
-                    pasteInsideButton = new Button("Paste Inside", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodesInside, "S.edit.pasteSelNodesInside", node.id), null, "btn-secondary pasteButton");
+            if (!!state.nodesToMove && userCanPaste) {
+                pasteInsideButton = new Button("Paste Inside", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodesInside, "S.edit.pasteSelNodesInside", node.id), null, "btn-secondary pasteButton");
+                if (node.id !== state.homeNodeId) {
                     pasteInlineButton = new Button("Paste Here", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_InlineAbove, "S.edit.pasteSelNodes_InlineAbove", node.id), null, "btn-secondary pasteButton");
                 }
             }
