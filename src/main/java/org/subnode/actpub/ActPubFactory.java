@@ -17,20 +17,20 @@ import org.subnode.service.ActPubService;
 public class ActPubFactory {
 	@Autowired
 	public ActPubService actPubService;
-	
+
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
 	public APObj newCreateMessageForNote(List<String> toUserNames, String fromActor, String inReplyTo, String content,
-			 String noteUrl, boolean privateMessage, APList attachments) {
+			String noteUrl, boolean privateMessage, APList attachments) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 		log.debug("sending note from actor[" + fromActor + "] inReplyTo[" + inReplyTo);
 		return newCreateMessage(
-				newNoteObject(toUserNames, fromActor, inReplyTo, content, noteUrl, now, privateMessage, attachments),
-				fromActor, toUserNames, noteUrl, now);
+				newNoteObject(toUserNames, fromActor, inReplyTo, content, noteUrl, now, privateMessage, attachments), fromActor,
+				toUserNames, noteUrl, now);
 	}
 
-	public APObj newNoteObject(List<String> toUserNames, String attributedTo, String inReplyTo, String content,
-			String noteUrl, ZonedDateTime now, boolean privateMessage, APList attachments) {
+	public APObj newNoteObject(List<String> toUserNames, String attributedTo, String inReplyTo, String content, String noteUrl,
+			ZonedDateTime now, boolean privateMessage, APList attachments) {
 		APObj ret = new APObj();
 
 		ret.put("@context", new APList() //
@@ -41,27 +41,29 @@ public class ActPubFactory {
 		ret.put("type", "Note");
 		ret.put("published", now.format(DateTimeFormatter.ISO_INSTANT));
 		ret.put("attributedTo", attributedTo);
-
-		// Note: inReplyTo can be null here, and this is fine.
-		if (privateMessage) {
-			ret.put("inReplyTo", inReplyTo);
-		} else {
-			ret.put("inReplyTo", null);
-		}
-
 		ret.put("summary", null);
 		ret.put("url", noteUrl);
 		ret.put("sensitive", false);
 		ret.put("content", content);
 
-		LinkedList<String> toArray = new LinkedList<String>();
+		LinkedList<String> toList = new LinkedList<String>();
+		LinkedList<String> ccList = new LinkedList<String>();
 
 		APList tagList = new APList();
 		for (String userName : toUserNames) {
 			APObj webFinger = actPubService.getWebFinger(userName);
 			String actorUrl = actPubService.getActorUrlFromWebFingerObj(webFinger);
 
-			toArray.add(actorUrl);
+			/*
+			 * For public messages Mastodon puts the "Public" target in 'to' and the mentioned users in 'cc', so
+			 * we do that same thing todo-0: need to check how mastodon would to this on a 'reply'?? I bet a
+			 * reply has at least the person being replied to being put in the 'to' right ?
+			 */
+			if (privateMessage) {
+				toList.add(actorUrl);
+			} else {
+				ccList.add(actorUrl);
+			}
 			tagList.val(new APObj() //
 					.put("type", "Mention") //
 					.put("href", actorUrl) //
@@ -70,21 +72,34 @@ public class ActPubFactory {
 		ret.put("tag", tagList);
 
 		if (!privateMessage) {
-			toArray.add(ActPubConstants.CONTEXT_STREAMS + "#Public");
+			toList.add(ActPubConstants.CONTEXT_STREAMS + "#Public");
+
+			/*
+			 * public posts should always cc the followers of the person doing the post (the actor pointed to by
+			 * attributedTo)
+			 */
+			APObj actor = ActPubService.actorCacheByUrl.get(attributedTo);
+			if (actor != null) {
+				ccList.add(AP.str(actor, "followers"));
+			}
 		}
-		ret.put("to", toArray);
+
+		ret.put("to", toList);
+
+		if (ccList.size() > 0) {
+			ret.put("cc", ccList);
+		}
+
 		ret.put("attachment", attachments);
-
-		// LinkedList<String> ccArray = new LinkedList<String>();
-		// ccArray.add("https://www.w3.org/ns/activitystreams#Public");
-		// ret.put("cc", ccArray);
-
 		return ret;
 	}
 
 	public APObj newContextObj() {
 		return new APObj() //
 				.put("language", "en") //
+
+				// todo-0: I put this here very early on during mastodon testing. Need to see if we 
+				// can get rid of this.
 				.put("toot", "http://joinmastodon.org/ns#");
 	}
 

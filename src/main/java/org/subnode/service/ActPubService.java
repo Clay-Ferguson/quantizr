@@ -119,7 +119,7 @@ public class ActPubService {
     private MongoAuth auth;
 
     /* Cache Actor objects by URL in memory only for now */
-    private static final ConcurrentHashMap<String, APObj> actorCacheByUrl = new ConcurrentHashMap<String, APObj>();
+    public static final ConcurrentHashMap<String, APObj> actorCacheByUrl = new ConcurrentHashMap<String, APObj>();
 
     /* Cache Actor objects by UserName in memory only for now */
     private static final ConcurrentHashMap<String, APObj> actorCacheByUserName = new ConcurrentHashMap<String, APObj>();
@@ -155,6 +155,12 @@ public class ActPubService {
 
     /* Gets private RSA key from current user session */
     private String getPrivateKey(MongoSession session, String userName) {
+        /* First try to return the key from the cache */
+        String privateKey = UserManagerService.privateKeysByUserName.get(userName);
+        if (privateKey != null) {
+            return privateKey;
+        }
+
         /* get the userNode for the current user who edited a node */
         SubNode userNode = read.getUserNodeByUserName(session, userName);
         if (userNode == null) {
@@ -162,12 +168,15 @@ public class ActPubService {
         }
 
         /* get private key of this user so we can sign the outbound message */
-        String privateKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PRIVATE);
+        privateKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PRIVATE);
         if (privateKey == null) {
             log.debug("Unable to update federated users. Our local user didn't have a private key on his userNode: "
                     + sessionContext.getUserName());
             return null;
         }
+
+        // add to cache.
+        UserManagerService.privateKeysByUserName.put(userName, privateKey);
         return privateKey;
     }
 
@@ -260,13 +269,17 @@ public class ActPubService {
         return hosts;
     }
 
+    /* Sends note outbound to other servers */
     public void sendNote(MongoSession session, List<String> toUserNames, String fromUser, String inReplyTo, String content,
             APList attachments, String noteUrl, boolean privateMessage) {
 
         String host = appProp.getMetaHost();
         String fromActor = null;
 
-        /* Per spec (and per Mastodon reverse engineering, we post the same message to all the inboxes that need to see it */
+        /*
+         * Per spec (and per Mastodon reverse engineering, we post the same message to all the inboxes that
+         * need to see it
+         */
         for (String toUserName : toUserNames) {
 
             // Ignore userNames that are not foreign server names
@@ -293,13 +306,12 @@ public class ActPubService {
             /* lazy create fromActor here */
             if (fromActor == null) {
                 fromActor = makeActorUrlForUserName(fromUser);
-            } 
+            }
 
-            APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, content, noteUrl,
-                    privateMessage, attachments);
+            APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, content, noteUrl, privateMessage,
+                    attachments);
 
-            String privateKey = getPrivateKey(session, sessionContext.getUserName());
-            securePost(session, privateKey, inbox, fromActor, message);
+            securePost(session, null, inbox, fromActor, message);
         }
     }
 
@@ -308,6 +320,11 @@ public class ActPubService {
      */
     private void securePost(MongoSession session, String privateKey, String toInbox, String actor, APObj message) {
         try {
+            /* if private key not sent then get it using the session */
+            if (privateKey == null) {
+                privateKey = getPrivateKey(session, sessionContext.getUserName());
+            }
+
             String body = XString.prettyPrint(message);
             byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
             log.debug("Posting to inbox " + toInbox + ":\n" + body);
@@ -764,7 +781,7 @@ public class ActPubService {
      * apUserName is full user name like alice@quantizr.com
      */
     public void setFollowing(String apUserName, boolean following) {
-        //admin doesn't follow/unfollow 
+        // admin doesn't follow/unfollow
         if (sessionContext.isAdmin()) {
             return;
         }
@@ -800,10 +817,9 @@ public class ActPubService {
                                 .put("object", actorUrlOfUserBeingFollowed));
             }
 
-            String privateKey = getPrivateKey(session, sessionContext.getUserName());
             APObj toActor = getActorByUrl(actorUrlOfUserBeingFollowed);
             String toInbox = AP.str(toActor, "inbox");
-            securePost(session, privateKey, toInbox, sessionActorUrl, followAction);
+            securePost(session, null, toInbox, sessionActorUrl, followAction);
             return null;
         });
     }
@@ -1068,6 +1084,7 @@ public class ActPubService {
         return ret;
     }
 
+    /* Saves inbound note comming from other foreign servers */
     public void saveNote(MongoSession session, SubNode parentNode, Object obj) {
 
         String id = AP.str(obj, "id");
@@ -1161,17 +1178,25 @@ public class ActPubService {
          * followers will have this as well)
          */
         else {
-            APObj followersObj = getJson(url, new MediaType("application", "activity+json"));
-            if (followersObj != null) {
-                iterateOrderedCollection(followersObj, obj -> {
-                    /*
-                     * Mastodon seems to have the followers items as strings, which are the actor urls of the followers.
-                     */
-                    if (obj instanceof String) {
-                        String followerActorUrl = (String) obj;
-                        shareNodeToActorByUrl(session, node, followerActorUrl);
-                    }
-                });
+            /*
+             * I'm decided to disable this code, but leave it in place for future referece, but for now Quanta
+             * doesn't support the concept of sharing only to followers. Everything is either shared to public,
+             * or shared explicitly to specific users.
+             */
+            boolean allow = false;
+            if (allow) {
+                APObj followersObj = getJson(url, new MediaType("application", "activity+json"));
+                if (followersObj != null) {
+                    iterateOrderedCollection(followersObj, obj -> {
+                        /*
+                         * Mastodon seems to have the followers items as strings, which are the actor urls of the followers.
+                         */
+                        if (obj instanceof String) {
+                            String followerActorUrl = (String) obj;
+                            shareNodeToActorByUrl(session, node, followerActorUrl);
+                        }
+                    });
+                }
             }
         }
     }

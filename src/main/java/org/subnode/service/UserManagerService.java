@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
+import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -67,7 +67,6 @@ import org.subnode.response.SaveUserPreferencesResponse;
 import org.subnode.response.SaveUserProfileResponse;
 import org.subnode.response.SignupResponse;
 import org.subnode.util.Const;
-import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
@@ -76,8 +75,8 @@ import org.subnode.util.Validator;
 import org.subnode.util.XString;
 
 /**
- * Service methods for processing user management functions. Login, logout,
- * signup, user preferences, and settings persisted per-user
+ * Service methods for processing user management functions. Login, logout, signup, user
+ * preferences, and settings persisted per-user
  */
 @Component
 public class UserManagerService {
@@ -122,18 +121,20 @@ public class UserManagerService {
 	private Validator validator;
 
 	/*
-	 * RestTempalte is thread-safe and reusable, and has no state, so we need only
-	 * one final static instance ever
+	 * RestTempalte is thread-safe and reusable, and has no state, so we need only one final static
+	 * instance ever
 	 */
 	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
 
 	private static final ObjectMapper mapper = new ObjectMapper();
 
+	/* Private keys of each user by user name as key */
+	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<String, String>();
+
 	/*
-	 * Login mechanism is a bit tricky because the CallProcessor detects the
-	 * LoginRequest and performs authentication BEFORE this 'login' method even gets
-	 * called, so by the time we are in this method we can safely assume the
-	 * userName and password resulted in a successful login.
+	 * Login mechanism is a bit tricky because the CallProcessor detects the LoginRequest and performs
+	 * authentication BEFORE this 'login' method even gets called, so by the time we are in this method
+	 * we can safely assume the userName and password resulted in a successful login.
 	 */
 	public LoginResponse login(MongoSession session, RequestBase req) {
 		LoginResponse res = new LoginResponse();
@@ -150,16 +151,16 @@ public class UserManagerService {
 		}
 
 		/*
-		 * We have to get timezone information from the user's browser, so that all
-		 * times on all nodes always show up in their precise local time!
+		 * We have to get timezone information from the user's browser, so that all times on all nodes
+		 * always show up in their precise local time!
 		 */
 		sessionContext.init(req);
 
 		if (session == null) {
 			log.debug("session==null, using anonymous user");
 			/*
-			 * Note: This is not an error condition, this happens whenever the page loads
-			 * for the first time and the user has no session yet,
+			 * Note: This is not an error condition, this happens whenever the page loads for the first time and
+			 * the user has no session yet,
 			 */
 			res.setUserName(PrincipalName.ANON.s());
 			res.setMessage("not logged in.");
@@ -170,8 +171,7 @@ public class UserManagerService {
 		}
 
 		res.setAnonUserLandingPageNode(appProp.getUserLandingPageNode());
-		log.debug(
-				"Processing Login: urlId=" + (sessionContext.getUrlId() != null ? sessionContext.getUrlId() : "null"));
+		log.debug("Processing Login: urlId=" + (sessionContext.getUrlId() != null ? sessionContext.getUrlId() : "null"));
 
 		if (sessionContext.getUrlId() != null) {
 			log.debug("setHomeNodeOverride (from session urlId): " + sessionContext.getUrlId());
@@ -253,8 +253,8 @@ public class UserManagerService {
 
 	/**
 	 * @param session
-	 * @param userStats Holds a map of User Root Node (account node) IDs as key
-	 *                  mapped to the UserStats for that user.
+	 * @param userStats Holds a map of User Root Node (account node) IDs as key mapped to the UserStats
+	 *                  for that user.
 	 */
 	public void writeUserStats(final MongoSession session, HashMap<ObjectId, UserStats> userStats) {
 		userStats.forEach((final ObjectId key, final UserStats stat) -> {
@@ -270,13 +270,11 @@ public class UserManagerService {
 	}
 
 	/**
-	 * increments the userNode usasage bytes by adding the bytes the attachment uses
-	 * on 'node'
+	 * increments the userNode usasage bytes by adding the bytes the attachment uses on 'node'
 	 * 
 	 * @param node
 	 * @param userNode
-	 * @param sign     Controls if this is a subtract or an add (should be always 1
-	 *                 or -1)
+	 * @param sign     Controls if this is a subtract or an add (should be always 1 or -1)
 	 */
 	public void addNodeBytesToUserNodeBytes(SubNode node, SubNode userNode, int sign) {
 		if (node == null) {
@@ -297,8 +295,8 @@ public class UserManagerService {
 	}
 
 	/*
-	 * We have 'sign' so we can use this method to either deduct from or add to the
-	 * user's total usage amount
+	 * We have 'sign' so we can use this method to either deduct from or add to the user's total usage
+	 * amount
 	 */
 	public void addBytesToUserNodeBytes(long binSize, SubNode userNode, int sign) {
 		if (userNode == null) {
@@ -327,13 +325,12 @@ public class UserManagerService {
 	}
 
 	/*
-	 * Processes last step of signup, which is validation of registration code. This
-	 * means user has clicked the link they were sent during the signup email
-	 * verification, and they are sending in a signupCode that will turn on their
-	 * account and actually create their account.
+	 * Processes last step of signup, which is validation of registration code. This means user has
+	 * clicked the link they were sent during the signup email verification, and they are sending in a
+	 * signupCode that will turn on their account and actually create their account.
 	 * 
-	 * We return whatever a message would be to the user that just says if the
-	 * signupCode was accepted or not and it's displayed on welcome.html only.
+	 * We return whatever a message would be to the user that just says if the signupCode was accepted
+	 * or not and it's displayed on welcome.html only.
 	 */
 	public String processSignupCode(final String signupCode) {
 		log.debug("User is trying signupCode: " + signupCode);
@@ -384,9 +381,9 @@ public class UserManagerService {
 	}
 
 	/*
-	 * Processes a signup request from a user. We create the user root node in a
-	 * pending state, and like all other user accounts all information specific to
-	 * that user that we currently know is held in that node (i.e. preferences)
+	 * Processes a signup request from a user. We create the user root node in a pending state, and like
+	 * all other user accounts all information specific to that user that we currently know is held in
+	 * that node (i.e. preferences)
 	 */
 	public SignupResponse signup(SignupRequest req, boolean automated) {
 		MongoSession session = auth.getAdminSession();
@@ -455,8 +452,7 @@ public class UserManagerService {
 			if (StringUtils.isEmpty(secretKey)) {
 				return true;
 			}
-			String url = "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response="
-					+ reCaptchaToken;
+			String url = "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response=" + reCaptchaToken;
 
 			HttpHeaders headers = new HttpHeaders();
 			HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
@@ -464,9 +460,8 @@ public class UserManagerService {
 			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 			// log.debug("RAW RESULT: " + response.getBody());
 
-			Map<String, Object> respMap = mapper.readValue(response.getBody(),
-					new TypeReference<Map<String, Object>>() {
-					});
+			Map<String, Object> respMap = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {
+			});
 			// log.debug(XString.prettyPrint(respMap));
 
 			Boolean success = (Boolean) respMap.get("success");
@@ -486,8 +481,8 @@ public class UserManagerService {
 	}
 
 	/*
-	 * Adds user to the list of pending accounts and they will stay in pending
-	 * status until their signupCode has been used to validate their email address.
+	 * Adds user to the list of pending accounts and they will stay in pending status until their
+	 * signupCode has been used to validate their email address.
 	 */
 	public void initiateSignup(MongoSession session, String userName, String password, String email) {
 
@@ -499,16 +494,15 @@ public class UserManagerService {
 		SubNode newUserNode = util.createUser(session, userName, email, password, false);
 
 		/*
-		 * It's easiest to use the actua new UserNode ID as the 'signup code' to send to
-		 * the user, because it's random and tied to this user by definition
+		 * It's easiest to use the actua new UserNode ID as the 'signup code' to send to the user, because
+		 * it's random and tied to this user by definition
 		 */
 		String signupCode = newUserNode.getId().toHexString();
 		String signupLink = appProp.getHttpProtocol() + "://" + appProp.getMetaHost() + "?signupCode=" + signupCode;
 		String content = null;
 
 		/*
-		 * We print this out so we can use it in DEV mode when no email support may be
-		 * configured
+		 * We print this out so we can use it in DEV mode when no email support may be configured
 		 */
 		log.debug("Signup URL: " + signupLink);
 
@@ -592,10 +586,9 @@ public class UserManagerService {
 			prefsNode.setProp(NodeProp.USER_PREF_SHOW_METADATA.s(), showMetaData);
 
 			/*
-			 * Also update session-scope object, because server-side functions that need
-			 * preference information will get it from there instead of loading it from
-			 * repository. The only time we load user preferences from repository is during
-			 * login when we can't get it from anywhere else at that time.
+			 * Also update session-scope object, because server-side functions that need preference information
+			 * will get it from there instead of loading it from repository. The only time we load user
+			 * preferences from repository is during login when we can't get it from anywhere else at that time.
 			 */
 			userPreferences.setEditMode(editMode);
 			userPreferences.setShowMetaData(showMetaData);
@@ -654,7 +647,7 @@ public class UserManagerService {
 				res.setUserName(userNode.getStrProp(NodeProp.USER.s()));
 				res.setUserBio(userNode.getStrProp(NodeProp.USER_BIO.s()));
 				res.setAvatarVer(userNode.getStrProp(NodeProp.BIN.s()));
-				res.setHeaderImageVer(userNode.getStrProp(NodeProp.BIN.s()+"Header"));
+				res.setHeaderImageVer(userNode.getStrProp(NodeProp.BIN.s() + "Header"));
 				res.setUserNodeId(userNode.getId().toHexString());
 				res.setSuccess(true);
 			}
@@ -700,8 +693,7 @@ public class UserManagerService {
 		if (passCode != null) {
 
 			/*
-			 * We can run this block as admin, because the codePart below is secret and is
-			 * checked for a match
+			 * We can run this block as admin, because the codePart below is secret and is checked for a match
 			 */
 			adminRunner.run(mongoSession -> {
 
@@ -762,8 +754,7 @@ public class UserManagerService {
 
 	public boolean isNormalUserName(String userName) {
 		userName = userName.trim();
-		return !userName.equalsIgnoreCase(PrincipalName.ADMIN.s())
-				&& !userName.equalsIgnoreCase(PrincipalName.ANON.s());
+		return !userName.equalsIgnoreCase(PrincipalName.ADMIN.s()) && !userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
 	public ResetPasswordResponse resetPassword(final ResetPasswordRequest req) {
@@ -790,10 +781,9 @@ public class UserManagerService {
 			/*
 			 * IMPORTANT!
 			 *
-			 * verify that the email address provides IS A MATCH to the email address for
-			 * this user! Important step here because without this check anyone would be
-			 * able to completely hijack anyone else's account simply by issuing a password
-			 * change to that account!
+			 * verify that the email address provides IS A MATCH to the email address for this user! Important
+			 * step here because without this check anyone would be able to completely hijack anyone else's
+			 * account simply by issuing a password change to that account!
 			 */
 			String nodeEmail = ownerNode.getStrProp(NodeProp.EMAIL.s());
 			if (nodeEmail == null || !nodeEmail.equals(email)) {
@@ -803,14 +793,13 @@ public class UserManagerService {
 			}
 
 			/*
-			 * if we make it to here the user and email are both correct, and we can
-			 * initiate the password reset. We pick some random time between 1 and 2 days
-			 * from now into the future to serve as the unguessable auth code AND the expire
-			 * time for it. Later we can create a deamon processor that cleans up expired
-			 * authCodes, but for now we just need to HAVE the auth code.
+			 * if we make it to here the user and email are both correct, and we can initiate the password
+			 * reset. We pick some random time between 1 and 2 days from now into the future to serve as the
+			 * unguessable auth code AND the expire time for it. Later we can create a deamon processor that
+			 * cleans up expired authCodes, but for now we just need to HAVE the auth code.
 			 *
-			 * User will be emailed this code and we will perform reset when we see it, and
-			 * the user has entered new password we can use.
+			 * User will be emailed this code and we will perform reset when we see it, and the user has entered
+			 * new password we can use.
 			 */
 			int oneDayMillis = 60 * 60 * 1000;
 			long authCode = new Date().getTime() + oneDayMillis + rand.nextInt(oneDayMillis);
@@ -848,7 +837,8 @@ public class UserManagerService {
 		if (friendsNode == null)
 			return res;
 
-		//Note: findFollowingOfUser method has similar code to this, and we should unify it so we only do it one way (todo-0)
+		// Note: findFollowingOfUser method has similar code to this, and we should unify it so we only do
+		// it one way (todo-0)
 		for (SubNode friendNode : read.getChildren(session, friendsNode, null, null, 0)) {
 			String userName = friendNode.getStrProp(NodeProp.USER.s());
 			if (userName != null) {
