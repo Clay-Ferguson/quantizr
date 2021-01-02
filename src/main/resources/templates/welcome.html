@@ -64,17 +64,16 @@
                 </div>
 
                 <div th:replace="fragments/components 
-                    :: featureInfoR(title='Wikis', content=${wikis})">
+                    :: featureInfoR(title='Fediverse', content=${fediverse})">
                 </div>
             </div>
 
             <div class="row">
                 <div th:replace="fragments/components 
-                    :: featureInfoL(title='Blogs', content=${blogs})">
-                </div>
-
+                    :: featureInfoL(title='Wikis', content=${wikis})">
+            </div>
                 <div th:replace="fragments/components 
-                    :: featureInfoR(title='Friend Feeds', content=${friendFeeds})">
+                    :: featureInfoR(title='Blogs', content=${blogs})">
                 </div>
             </div>
 
