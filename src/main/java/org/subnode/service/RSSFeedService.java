@@ -2,13 +2,11 @@ package org.subnode.service;
 
 import java.io.Writer;
 import java.net.URL;
-
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
+import java.util.concurrent.ConcurrentHashMap;
 import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndContentImpl;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -18,7 +16,6 @@ import com.rometools.rome.feed.synd.SyndFeedImpl;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.SyndFeedOutput;
 import com.rometools.rome.io.XmlReader;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,17 +58,17 @@ public class RSSFeedService {
 	/*
 	 * Cache of all feeds.
 	 */
-	private static final HashMap<String, SyndFeed> feedCache = new HashMap<String, SyndFeed>();
+	private static final ConcurrentHashMap<String, SyndFeed> feedCache = new ConcurrentHashMap<String, SyndFeed>();
 
 	/*
 	 * Cache of all aggregates
 	 */
-	private static final HashMap<String, SyndFeed> aggregateCache = new HashMap<String, SyndFeed>();
+	private static final ConcurrentHashMap<String, SyndFeed> aggregateCache = new ConcurrentHashMap<String, SyndFeed>();
 
 	/*
 	 * Cache of all calls to proxyGet
 	 */
-	public static final HashMap<String, byte[]> proxyCache = new HashMap<String, byte[]>();
+	public static final ConcurrentHashMap<String, byte[]> proxyCache = new ConcurrentHashMap<String, byte[]>();
 
 	private static int runCount = 0;
 
@@ -81,8 +78,7 @@ public class RSSFeedService {
 	private static final int MAX_FEEDS_PER_AGGREGATE = 40;
 
 	/*
-	 * Runs immediately at startup, and then every 120 minutes, to refresh the
-	 * feedCache.
+	 * Runs immediately at startup, and then every 120 minutes, to refresh the feedCache.
 	 */
 	@Scheduled(fixedDelay = 120 * 60 * 1000)
 	public void run() {
@@ -138,11 +134,11 @@ public class RSSFeedService {
 	}
 
 	/*
-	 * Streams back an RSS feed that is an aggregate feed of all the children under
-	 * nodeId (recursively!) that have an RSS_FEED_SRC property
+	 * Streams back an RSS feed that is an aggregate feed of all the children under nodeId
+	 * (recursively!) that have an RSS_FEED_SRC property
 	 * 
-	 * If writer is null it means we are just running without writing to a server
-	 * like only to prewarm the cache during app startup called from startupPreCache
+	 * If writer is null it means we are just running without writing to a server like only to prewarm
+	 * the cache during app startup called from startupPreCache
 	 */
 	public void multiRss(MongoSession mongoSession, final String nodeId, Writer writer) {
 		SyndFeed feed = aggregateCache.get(nodeId);
@@ -197,11 +193,10 @@ public class RSSFeedService {
 	}
 
 	/*
-	 * NOTE: todo-1: there is a scenario here where feeds that produce large numbers
-	 * of daily results will simply crowd out the rest of the entries with all
-	 * theirs going to the top pushing all others to the end. Need some new algo
-	 * where we ensure at least X-number of items from each feed is include unless
-	 * they are at least a full day old.
+	 * NOTE: todo-1: there is a scenario here where feeds that produce large numbers of daily results
+	 * will simply crowd out the rest of the entries with all theirs going to the top pushing all others
+	 * to the end. Need some new algo where we ensure at least X-number of items from each feed is
+	 * include unless they are at least a full day old.
 	 */
 	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries) {
 		try {
@@ -211,10 +206,9 @@ public class RSSFeedService {
 					for (SyndEntry entry : inFeed.getEntries()) {
 						SyndEntry entryClone = (SyndEntry) entry.clone();
 						/*
-						 * We use this slight hack/technique to allow our client to be able to parse the
-						 * titles out of the feeds for displaying them in a nicer way, while being
-						 * unobtrusive enough that any podcast app could display it and it looks fine as
-						 * it also.
+						 * We use this slight hack/technique to allow our client to be able to parse the titles out of the
+						 * feeds for displaying them in a nicer way, while being unobtrusive enough that any podcast app
+						 * could display it and it looks fine as it also.
 						 */
 						entryClone.setTitle(inFeed.getTitle() + " :: " + entryClone.getTitle());
 						entries.add(entryClone);
@@ -224,10 +218,10 @@ public class RSSFeedService {
 			revChronSortEntries(entries);
 
 			/*
-			 * this number has to be as large at least as the number the browser will try to
-			 * show currently, because the aggregator code is sharing this object with the
-			 * ordinary single RSS feed retrival and so this number chops it down. Need to
-			 * rethink this, and only chop down what the aggreggator is working with
+			 * this number has to be as large at least as the number the browser will try to show currently,
+			 * because the aggregator code is sharing this object with the ordinary single RSS feed retrival and
+			 * so this number chops it down. Need to rethink this, and only chop down what the aggreggator is
+			 * working with
 			 */
 			while (entries.size() > MAX_FEED_ITEMS) {
 				entries.remove(entries.size() - 1);
@@ -242,12 +236,10 @@ public class RSSFeedService {
 			SyndFeed inFeed = null;
 
 			if (fromCache) {
-				synchronized (feedCache) {
-					inFeed = feedCache.get(url);
-					if (inFeed != null) {
-						// log.debug("FEED: " + XString.prettyPrint(inFeed));
-						return inFeed;
-					}
+				inFeed = feedCache.get(url);
+				if (inFeed != null) {
+					// log.debug("FEED: " + XString.prettyPrint(inFeed));
+					return inFeed;
 				}
 			}
 
@@ -257,16 +249,12 @@ public class RSSFeedService {
 			// log.debug("FEED: " + XString.prettyPrint(inFeed));
 
 			// we update the cache regardless of 'fromCache' val. this is correct.
-			synchronized (feedCache) {
-				feedCache.put(url, inFeed);
-			}
-
+			feedCache.put(url, inFeed);
 			return inFeed;
 		} catch (Exception e) {
 			/*
-			 * Leave feedCache with any existing mapping it has when it fails. Worst case
-			 * here is a stale cache remains in place rather than getting forgotten just
-			 * because it's currently unavailable
+			 * Leave feedCache with any existing mapping it has when it fails. Worst case here is a stale cache
+			 * remains in place rather than getting forgotten just because it's currently unavailable
 			 */
 			ExUtil.error(log, "Error: ", e);
 			return null;
@@ -295,8 +283,8 @@ public class RSSFeedService {
 	}
 
 	/*
-	 * Takes a newline delimited list of rss feed urls, and returns the feed for
-	 * them as an aggregate while also updating our caching
+	 * Takes a newline delimited list of rss feed urls, and returns the feed for them as an aggregate
+	 * while also updating our caching
 	 */
 	public void multiRssFeed(String urls, Writer writer) {
 
@@ -351,8 +339,8 @@ public class RSSFeedService {
 		List<SyndEntry> entries = new LinkedList<SyndEntry>();
 		feed.setEntries(entries);
 
-		final Iterable<SubNode> iter = read.getChildren(mongoSession, node,
-				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
+		final Iterable<SubNode> iter =
+				read.getChildren(mongoSession, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
 		final List<SubNode> children = read.iterateToList(iter);
 
 		if (children != null) {
@@ -370,19 +358,17 @@ public class RSSFeedService {
 				entry.setLink(metaInfo.getLink() != null ? metaInfo.getLink() : "https://quanta.wiki");
 
 				/*
-				 * todo-1: need menu item "Set Create Time", and "Set Modify Time", that prompts
-				 * with the datetime GUI, so publishers have more control over this in the feed,
-				 * or else have an rssTimestamp as an optional property which can be set on any
-				 * node to override this.
+				 * todo-1: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime
+				 * GUI, so publishers have more control over this in the feed, or else have an rssTimestamp as an
+				 * optional property which can be set on any node to override this.
 				 */
 				entry.setPublishedDate(n.getCreateTime());
 				SyndContent description = new SyndContentImpl();
 
 				/*
-				 * todo-1: NOTE: I tried putting some HTML into 'content' as a test and setting
-				 * the mime type, but it doesn't render correctly, so I just need to research
-				 * how to get HTML in RSS descriptions, but this is low priority for now so I'm
-				 * not doing it yet
+				 * todo-1: NOTE: I tried putting some HTML into 'content' as a test and setting the mime type, but
+				 * it doesn't render correctly, so I just need to research how to get HTML in RSS descriptions, but
+				 * this is low priority for now so I'm not doing it yet
 				 */
 				description.setType("text/plain");
 				// description.setType("text/html");
@@ -397,12 +383,18 @@ public class RSSFeedService {
 	}
 
 	private void fixFeed(SyndFeed feed) {
-		if (StringUtils.isEmpty(feed.getEncoding())) feed.setEncoding("UTF-8");
-		if (StringUtils.isEmpty(feed.getFeedType())) feed.setFeedType("rss_2.0");
-		if (StringUtils.isEmpty(feed.getTitle())) feed.setTitle("");
-		if (StringUtils.isEmpty(feed.getDescription())) feed.setDescription("");
-		if (StringUtils.isEmpty(feed.getAuthor())) feed.setAuthor("");
-		if (StringUtils.isEmpty(feed.getLink())) feed.setLink("");
+		if (StringUtils.isEmpty(feed.getEncoding()))
+			feed.setEncoding("UTF-8");
+		if (StringUtils.isEmpty(feed.getFeedType()))
+			feed.setFeedType("rss_2.0");
+		if (StringUtils.isEmpty(feed.getTitle()))
+			feed.setTitle("");
+		if (StringUtils.isEmpty(feed.getDescription()))
+			feed.setDescription("");
+		if (StringUtils.isEmpty(feed.getAuthor()))
+			feed.setAuthor("");
+		if (StringUtils.isEmpty(feed.getLink()))
+			feed.setLink("");
 	}
 
 	private void writeFeed(SyndFeed feed, Writer writer) {
@@ -422,8 +414,7 @@ public class RSSFeedService {
 	}
 
 	/*
-	 * Lots of feeds have characters that won't display nicely in HTML so we fix
-	 * that here
+	 * Lots of feeds have characters that won't display nicely in HTML so we fix that here
 	 */
 	private String convertStreamChars(String s) {
 		StringBuilder sb = new StringBuilder();

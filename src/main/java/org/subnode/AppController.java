@@ -260,7 +260,7 @@ public class AppController implements ErrorController {
 
 	public void initThymeleafAttribs() {
 		if (constProvider.getProfileName().equals("dev")) {
-			//force reload of attribs
+			// force reload of attribs
 			thymeleafAttribs = null;
 		}
 
@@ -469,10 +469,7 @@ public class AppController implements ErrorController {
 	public void proxyGet(@RequestParam(value = "url", required = true) String url, HttpServletResponse response) {
 		try {
 			// try to get proxy info from cache.
-			byte[] cacheBytes = null;
-			synchronized (RSSFeedService.proxyCache) {
-				cacheBytes = RSSFeedService.proxyCache.get(url);
-			}
+			byte[] cacheBytes = RSSFeedService.proxyCache.get(url);
 
 			if (cacheBytes != null) {
 				// limiting the stream just becasue for now this is only used in feed
@@ -484,10 +481,8 @@ public class AppController implements ErrorController {
 			else {
 				ResponseEntity<byte[]> resp = restTemplate.getForEntity(new URI(url), byte[].class);
 				response.setStatus(HttpStatus.OK.value());
+				RSSFeedService.proxyCache.put(url, resp.getBody());
 
-				synchronized (RSSFeedService.proxyCache) {
-					RSSFeedService.proxyCache.put(url, resp.getBody());
-				}
 				IOUtils.copy(new ByteArrayInputStream(resp.getBody()), response.getOutputStream());
 
 				// DO NOT DELETE (good example)
