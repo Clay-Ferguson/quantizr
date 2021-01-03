@@ -434,21 +434,22 @@ public class MongoAuth {
 	// ========================================================================
 
 	/*
-	 * Finds all subnodes that have a share targeting the sharedToAny (account node IDs of a person being
-	 * shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public' in
-	 * sharedTo instead
+	 * Finds all subnodes that have a share targeting the sharedToAny (account node IDs of a person
+	 * being shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public'
+	 * in sharedTo instead
 	 */
 	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession session, String pathToSearch, List<String> sharedToAny,
-			String sortField, int limit, ObjectId ownerIdMatch) {
+			Sort sort, int limit, ObjectId ownerIdMatch) {
 
 		update.saveSession(session);
 		Query query = subGraphByAclUser_query(session, pathToSearch, sharedToAny, ownerIdMatch);
 		if (query == null)
 			return null;
 
-		if (!StringUtils.isEmpty(sortField)) {
-			query.with(Sort.by(Sort.Direction.DESC, sortField));
+		if (sort != null) {
+			query.with(sort);
 		}
+
 		query.limit(limit);
 		return ops.find(query, SubNode.class);
 	}
@@ -485,8 +486,8 @@ public class MongoAuth {
 				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
 			}
 			/*
-			 * todo-0: This uglyness is because orOperator us using variable args and it threw exceptions, when
-			 * I tried to pass an array, so to save time I just hard coded the 1 and 2 parameter case and moved
+			 * todo-0: This uglyness is because orOperator uses variable args and it threw exceptions, when I
+			 * tried to pass an array, so to save time I just hard coded the 1 and 2 parameter case and moved
 			 * on. need to research
 			 */
 			if (orCriteria.size() == 1) {
@@ -511,16 +512,15 @@ public class MongoAuth {
 	// ========================================================================
 
 	/* Finds nodes that have any sharing on them at all */
-	public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, String pathToSearch, ObjectId ownerIdMatch,
-			String sortField, int limit) {
+	public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, String pathToSearch, ObjectId ownerIdMatch, Sort sort,
+			int limit) {
 		update.saveSession(session);
 		Query query = subGraphByAcl_query(session, pathToSearch, ownerIdMatch);
-		
-		if (!StringUtils.isEmpty(sortField)) {
-			query.with(Sort.by(Sort.Direction.DESC, sortField));
+
+		if (sort != null) {
+			query.with(sort);
 		}
 		query.limit(limit);
-
 		return ops.find(query, SubNode.class);
 	}
 

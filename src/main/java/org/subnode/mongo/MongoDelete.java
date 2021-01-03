@@ -52,27 +52,12 @@ public class MongoDelete {
 		Query query = new Query();
 
 		/* todo-0: we need to also include a condition for create time being over 30m ago to avoid blowing something away 
-		that someone is still using */
+		that someone is still using. We are ok for now, because this code only runs at app startup so we can be guaranteed
+		that unfortunately anyone who was editing when the server got restarted already suffered some bad luck. */
 		query.addCriteria(Criteria.where(SubNode.FIELD_MODIFY_TIME).is(null));
 
 		DeleteResult res = ops.remove(query, SubNode.class);
 		log.debug("Num abandoned nodes deleted: " + res.getDeletedCount());
-
-		//todo-0: temporary code (delete all trash bins and outboxes, those are obsolete)
-		Iterable<SubNode> iter = read.findTypedNodesUnderPath(session, "/r", "sn:trashBin");
-		for (SubNode node : iter) {
-			delete(session, node, false);
-		}
-
-		iter = read.findTypedNodesUnderPath(session, "/r", "sn:userFeed");
-		for (SubNode node : iter) {
-			delete(session, node, false);
-		}
-
-		iter = read.findTypedNodesUnderPath(session, "/r", "sn:followersList");
-		for (SubNode node : iter) {
-			delete(session, node, false);
-		}
 	}
 
 	/**

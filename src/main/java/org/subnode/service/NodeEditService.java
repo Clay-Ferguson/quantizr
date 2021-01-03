@@ -391,10 +391,6 @@ public class NodeEditService {
 			if (friendUserName != null) {
 				// if a foreign user, update thru ActivityPub
 				if (friendUserName.contains("@")) {
-					/*
-					 * todo-0: go into node listener for delete action on nodes and when any nodes
-					 * are deleted run this with 'false'
-					 */
 					actPubService.setFollowing(friendUserName, true);
 				}
 

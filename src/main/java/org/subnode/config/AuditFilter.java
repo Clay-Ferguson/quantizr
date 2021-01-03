@@ -25,7 +25,7 @@ public class AuditFilter extends GenericFilterBean {
 
 	private static final Logger log = LoggerFactory.getLogger(AuditFilter.class);
 	private static String INDENT = "    ";
-	private static boolean verbose = true;
+	private static boolean verbose = false;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

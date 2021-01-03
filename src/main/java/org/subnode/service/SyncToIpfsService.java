@@ -20,7 +20,10 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
-/* Writes every node under the target subnode (recursively) to an IPFS Mutable File System (MFS) file */
+/*
+ * Writes every node under the target subnode (recursively) to an IPFS Mutable File System (MFS)
+ * file
+ */
 @Component
 @Scope("prototype")
 public class SyncToIpfsService {
@@ -43,8 +46,7 @@ public class SyncToIpfsService {
 	int totalNodes = 0;
 	int orphansRemoved = 0;
 
-	public void writeIpfsFiles(MongoSession session, PublishNodeToIpfsRequest req,
-			final PublishNodeToIpfsResponse res) {
+	public void writeIpfsFiles(MongoSession session, PublishNodeToIpfsRequest req, final PublishNodeToIpfsResponse res) {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -91,10 +93,10 @@ public class SyncToIpfsService {
 			/*
 			 * if any file path is not a node path, it needes to be deleted.
 			 * 
-			 * todo-0: this will run more efficiently if we put path values into a list and
-			 * then sort that list ascending by the length of the string, so any parent
-			 * folders are guaranteed to get deleted before any of their subfolders are
-			 * encountered, and we run therefore the minimal number of deletes required to
+			 * todo-0: this will run more efficiently if we put path values into a list and then sort that list
+			 * ascending by the length of the string, so any parent folders are guaranteed to get deleted before
+			 * any of their subfolders (as a convenient consequence of children having to have longer paths than
+			 * their parents!) are encountered, and we run therefore the minimal number of deletes required to
 			 * accomplish this in every case!
 			 */
 			if (!allNodePaths.contains(path)) {
@@ -108,13 +110,11 @@ public class SyncToIpfsService {
 					orphansRemoved++;
 				} catch (Exception e) {
 					/*
-					 * I'm expecting this to fail when it attempts to delete any subfolders under
-					 * folders that were already deleted because we may have just deleted their
-					 * parents already in this same loop so...
+					 * I'm expecting this to fail when it attempts to delete any subfolders under folders that were
+					 * already deleted because we may have just deleted their parents already in this same loop so...
 					 * 
-					 * todo-0: when we delete a folder, scan for all other folders that have that
-					 * matching prefix and remove them too, because there's no need to call
-					 * deleteFile on those.
+					 * todo-0: when we delete a folder, scan for all other folders that have that matching prefix and
+					 * remove them too, because there's no need to call deleteFile on those.
 					 */
 				}
 			}
@@ -123,8 +123,8 @@ public class SyncToIpfsService {
 
 	private void processNode(SubNode node) {
 		/*
-		 * todo-0: this and other places needs to generate canonical JSON (basically
-		 * just sorted properties ?) using this??
+		 * todo-0: this and other places needs to generate canonical JSON (basically just sorted properties
+		 * ?) using this??
 		 */
 		// objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 		// objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);

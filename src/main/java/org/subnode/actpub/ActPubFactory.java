@@ -103,6 +103,7 @@ public class ActPubFactory {
 				.put("toot", "http://joinmastodon.org/ns#");
 	}
 
+	/* Need to check if this works using the 'to and cc' arrays that are the same as the ones built above (in newNoteObject() function) */
 	public APObj newCreateMessage(APObj object, String fromActor, List<String> toActors, String noteUrl, ZonedDateTime now) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 
@@ -112,6 +113,7 @@ public class ActPubFactory {
 				.val(ActPubConstants.CONTEXT_STREAMS) //
 				.val(newContextObj()));
 
+		//this 'id' was an early WAG, and needs a fresh look now that AP code is more complete.
 		ret.put("id", noteUrl + "&apCreateTime=" + idTime);
 		ret.put("type", "Create");
 		ret.put("actor", fromActor);

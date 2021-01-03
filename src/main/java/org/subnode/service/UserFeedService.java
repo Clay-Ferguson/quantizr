@@ -36,16 +36,13 @@ import org.subnode.util.ThreadLocals;
 public class UserFeedService {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
-	static final int MAX_FEED_ITEMS = 50;
+	static final int MAX_FEED_ITEMS = 100;
 
 	@Autowired
 	private MongoRead read;
 
 	@Autowired
 	private Convert convert;
-
-	@Autowired
-	private ActPubService actPubService;
 
 	@Autowired
 	private SessionContext sessionContext;
@@ -89,8 +86,9 @@ public class UserFeedService {
 		for (SessionContext sc : allSessions) {
 
 			/* Anonymous sessions won't have userName and can be ignored */
-			if (sc.getUserName()==null) continue;
-			
+			if (sc.getUserName() == null)
+				continue;
+
 			/*
 			 * push if...
 			 * 
@@ -158,8 +156,8 @@ public class UserFeedService {
 		List<SubNode> nodes = new LinkedList<SubNode>();
 		int counter = 0;
 
-		// todo-0: these three queryes can be comebined into one? or at least less?
-		// todo-0: is there a LinkedHashSet class we can use here?
+		// todo-0: these two queries (below) can be combined into one? (if so we also of course don't need
+		// the 'dedup' either.)
 		HashSet<ObjectId> dedup = new HashSet<ObjectId>();
 
 		List<String> sharedToList = new LinkedList<String>();
@@ -175,8 +173,7 @@ public class UserFeedService {
 		/*
 		 * Now add all the nodes that are shared TO this user from any other users.
 		 */
-		for (SubNode node : auth.searchSubGraphByAclUser(session, null, sharedToList, SubNode.FIELD_MODIFY_TIME, MAX_FEED_ITEMS,
-				null)) {
+		for (SubNode node : auth.searchSubGraphByAclUser(session, null, sharedToList, null, MAX_FEED_ITEMS, null)) {
 			if (!dedup.contains(node.getId())) {
 				nodes.add(node);
 				dedup.add(node.getId());
@@ -186,8 +183,7 @@ public class UserFeedService {
 		/*
 		 * Now add all the nodes that are shared BY this user to any other users.
 		 */
-		for (SubNode node : auth.searchSubGraphByAcl(session, null, searchRoot.getOwner(), SubNode.FIELD_MODIFY_TIME,
-				MAX_FEED_ITEMS)) {
+		for (SubNode node : auth.searchSubGraphByAcl(session, null, searchRoot.getOwner(), null, MAX_FEED_ITEMS)) {
 			if (!dedup.contains(node.getId())) {
 				nodes.add(node);
 				dedup.add(node.getId());

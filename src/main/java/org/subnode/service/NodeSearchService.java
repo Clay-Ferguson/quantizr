@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
@@ -120,7 +121,7 @@ public class NodeSearchService {
 
 		/* todo-0: Eventually we want two ways of searching here. 1) All my shared nodes under my account, 2) all my shared nodes globally,
 		and the globally is done simply by passing null for the path here */
-		for (SubNode node : auth.searchSubGraphByAcl(session, searchRoot.getPath(), searchRoot.getOwner(), SubNode.FIELD_MODIFY_TIME, MAX_NODES)) {
+		for (SubNode node : auth.searchSubGraphByAcl(session, searchRoot.getPath(), searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), MAX_NODES)) {
 
 			/*
 			 * If we're only looking for shares to a specific person (or public) then check
