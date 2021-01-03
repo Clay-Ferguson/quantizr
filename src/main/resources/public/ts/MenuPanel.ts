@@ -181,7 +181,11 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Account", [
             new MenuItem("Profile", () => S.edit.openProfileDlg(state), !state.isAnonUser), //
-            new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), // "fa-gear"
+
+            // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
+            // until we have at least one more preference the preferences dialog is not needed.
+            // new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), // "fa-gear"
+
             new MenuItem("Change Password", () => S.edit.openChangePasswordDlg(state), !state.isAnonUser), //
             new MenuItem("Manage Account", () => S.edit.openManageAccountDlg(state), !state.isAnonUser) //
 

@@ -26,6 +26,9 @@ public class MongoRepository {
 	private MongoUtil repoUtil;
 
 	@Autowired
+	private MongoUpdate update;
+
+	@Autowired
 	private MongoAuth auth;
 
 	@Autowired
@@ -119,6 +122,8 @@ public class MongoRepository {
 			}
 
 			delete.removeAbandonedNodes(adminSession);
+
+			// update.runRepairs();
 
 			log.debug("MongoRepository fully initialized.");
 			fullInit = true;

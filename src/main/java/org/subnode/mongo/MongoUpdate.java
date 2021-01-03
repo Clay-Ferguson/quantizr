@@ -3,7 +3,6 @@ package org.subnode.mongo;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,9 +63,8 @@ public class MongoUpdate {
 				}
 
 				/*
-				 * We use 'nodes' list to avoid a concurrent modification excption in the loop
-				 * below that deletes nodes, because each time we delete a node we remove it
-				 * from the 'dirtyNodes' on the threadlocals
+				 * We use 'nodes' list to avoid a concurrent modification excption in the loop below that deletes
+				 * nodes, because each time we delete a node we remove it from the 'dirtyNodes' on the threadlocals
 				 */
 				List<SubNode> nodes = new LinkedList<SubNode>();
 
@@ -85,8 +83,8 @@ public class MongoUpdate {
 				}
 
 				/*
-				 * This theoretically should never find any dirty nodes, because we just saved
-				 * them all but we definitely still want this line of code here
+				 * This theoretically should never find any dirty nodes, because we just saved them all but we
+				 * definitely still want this line of code here
 				 */
 				MongoThreadLocal.clearDirtyNodes();
 			}
@@ -96,8 +94,7 @@ public class MongoUpdate {
 	}
 
 	/*
-	 * Unpins any IPFS data that is not currently referenced by MongoDb. Cleans up
-	 * orphans.
+	 * Unpins any IPFS data that is not currently referenced by MongoDb. Cleans up orphans.
 	 */
 	public void releaseOrphanIPFSPins() {
 		adminRunner.run(session -> {
@@ -119,5 +116,14 @@ public class MongoUpdate {
 			}
 			log.debug("Number of IPFS Pins in use: " + pinCount + "\nNumber of orphans removed: " + orphanCount);
 		});
+	}
+
+	public void runRepairs(MongoSession session) {
+		// not currently used
+		// Query query = new Query();
+		// query.addCriteria(Criteria.where(SubNode.FIELD_TYPE).is("u"));
+		// Iterable<SubNode> iter = ops.find(query, SubNode.class);
+		// for (SubNode n : iter) {
+		// }
 	}
 }
