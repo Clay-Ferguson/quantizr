@@ -26,7 +26,7 @@ export class PrefsDlg extends DialogBase {
         return [
             new Form(null, [
                 new FormGroup(null, [
-                    new Checkbox("Show Metadata", null, {
+                    new Checkbox("Show Node Metadata", null, {
                         setValue: (checked: boolean): void => {
                             this.appState.userPreferences.showMetaData = checked;
                         },

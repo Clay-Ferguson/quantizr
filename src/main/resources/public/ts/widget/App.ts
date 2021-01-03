@@ -105,10 +105,10 @@ export class App extends Div {
                 title: "Turn edit mode " + (state.userPreferences.editMode ? "off" : "on")
             }, "btn-secondary floatingControlBarItem", state.userPreferences.editMode ? "on" : "off") : null;
 
-            let prefsButton = !state.isAnonUser ? new IconButton("fa-gear", null, {
-                onClick: e => { S.edit.editPreferences(state); },
-                title: "Edit user preferences"
-            }, "btn-secondary floatingControlBarItem", "off") : null;
+            let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", null, {
+                onClick: e => { S.edit.toggleShowMetaData(state); },
+                title: state.userPreferences.showMetaData ? "Hide node metadata" : "Show node metadata"
+            }, "btn-secondary floatingControlBarItem", state.userPreferences.showMetaData ? "on" : "off") : null;
 
             let rootButton = !state.isAnonUser ? new IconButton("fa-database", null, {
                 onClick: e => { S.nav.navHome(state); },
@@ -124,12 +124,12 @@ export class App extends Div {
                 onClick: e => {
                     S.edit.saveClipboardToChildNode();
                 },
-                title: "Save Clipboard"
+                title: "Save clipboard text to a new child node"
             }, "btn-secondary floatingControlBarItem", "off") : null;
 
             // these are the buttons at the upper right of the page.
             if (topScrollUpButton || rootButton || homeButton || prefsButton || editButton) {
-                floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton, rootButton, homeButton, prefsButton, clipboardPasteButton, editButton]);
+                floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton, rootButton, homeButton, clipboardPasteButton, prefsButton, editButton]);
             }
         }
 

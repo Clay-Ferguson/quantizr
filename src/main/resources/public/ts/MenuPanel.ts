@@ -134,7 +134,7 @@ export class MenuPanel extends Div {
             // new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
 
             !state.isAnonUser ? new MenuItem("Show Calendar", () => S.render.showCalendar(null, state), !!hltNode) : null, //
-            !state.isAnonUser ? new MenuItem("Save Clipboard", () => S.edit.saveClipboardToChildNode()) : null, //
+            !state.isAnonUser ? new MenuItem("Save clipboard text to a new child node", () => S.edit.saveClipboardToChildNode()) : null, //
 
             new MenuItem("Show URLs", () => S.render.showNodeUrl(null, state), !!hltNode), //
 

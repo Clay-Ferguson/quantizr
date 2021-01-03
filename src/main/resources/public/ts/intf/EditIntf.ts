@@ -19,6 +19,7 @@ export interface EditIntf {
     createSubNodeResponse(res: J.CreateSubNodeResponse, state: AppState): void;
     saveNodeResponse(node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean, state: AppState): void;
     toggleEditMode(state: AppState): void;
+    toggleShowMetaData(state: AppState): void;
     cached_moveNodeUp(id: string, state?: AppState): void;
     cached_moveNodeDown(id: string, state?: AppState): void;
     moveNodeToTop(id: string, state: AppState): void;
