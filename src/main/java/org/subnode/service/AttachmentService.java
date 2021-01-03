@@ -550,6 +550,8 @@ public class AttachmentService {
 			if (download) {
 				response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
 			}
+
+			// This is max allowed caching time, and is 1 year in seconds
 			response.setHeader("Cache-Control", "public, max-age=31536000");
 
 			inStream = new BufferedInputStream(is);
@@ -598,6 +600,8 @@ public class AttachmentService {
 			response.setContentType(mimeType);
 			response.setContentLength((int) file.length());
 			response.setHeader("Content-Disposition", disposition + "; filename=\"" + fileName + "\"");
+
+			// This is max allowed caching time, and is 1 year in seconds
 			response.setHeader("Cache-Control", "public, max-age=31536000");
 
 			final FileInputStream is = new FileInputStream(fullFileName);

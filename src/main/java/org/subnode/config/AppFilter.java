@@ -22,8 +22,7 @@ import org.subnode.util.Util;
 import org.subnode.util.XString;
 
 /**
- * This is Web Filter to measure basic application statistics (number of users,
- * etc)
+ * This is Web Filter to measure basic application statistics (number of users, etc)
  */
 @Component
 public class AppFilter extends GenericFilterBean {
@@ -34,21 +33,20 @@ public class AppFilter extends GenericFilterBean {
 	private static boolean logResponses = false;
 
 	/*
-	 * if non-zero this is used to put a millisecond delay (determined by its value)
-	 * onto every request that comes thru as an API call.
+	 * if non-zero this is used to put a millisecond delay (determined by its value) onto every request
+	 * that comes thru as an API call.
 	 */
 	private static int simulateSlowServer = 0;
 
 	/*
-	 * For debugging we can turn this flag on and disable the server from processing
-	 * multiple requests simultenaously this is every helpful for debugging
+	 * For debugging we can turn this flag on and disable the server from processing multiple requests
+	 * simultenaously this is every helpful for debugging
 	 */
 	private static boolean singleThreadDebugging = false;
 	private static final HashMap<String, Object> locksByIp = new HashMap<String, Object>();
 
 	@Override
-	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-			throws IOException, ServletException {
+	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 
 		int thisReqId = ++reqId;
 
@@ -79,9 +77,34 @@ public class AppFilter extends GenericFilterBean {
 				Util.sleep(simulateSlowServer);
 			}
 
+			/*
+			 * Yeah I know this is a hacky way to set Cache-Contro, and there's a more elegant way to do this
+			 * with spring 
+			 */
+			// Example: The better way (not yet done)
+			// @Configuration
+			// public class MvcConfigurer extends WebMvcConfigurerAdapter
+			// 		implements EmbeddedServletContainerCustomizer {
+			// 	@Override
+			// 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+			// 		// Resources without Spring Security. No cache control response headers.
+			// 		registry.addResourceHandler("/static/public/**")
+			// 			.addResourceLocations("classpath:/static/public/");
+			if (res instanceof HttpServletResponse) {
+				if (httpReq.getRequestURI().contains("/images/") || //
+						httpReq.getRequestURI().contains("/fonts/") || //
+						httpReq.getRequestURI().endsWith("/bundle.js") || //
+						httpReq.getRequestURI().endsWith("/favicon.ico") || //
+
+						//This is the tricky one. If we have versioned the URL we detect it this hacky way also picking up v param.
+						httpReq.getRequestURI().contains("?v=")) {
+					((HttpServletResponse) res).setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
+				}
+			}
+
 			if (logRequests) {
-				String url = "REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString="
-						+ queryString;
+				String url =
+						"REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString=" + queryString;
 				log.debug(url + "\nParameters: " + XString.prettyPrint(httpReq.getParameterMap()));
 			}
 
@@ -98,8 +121,8 @@ public class AppFilter extends GenericFilterBean {
 
 		try {
 			/*
-			 * singleThreadDebugging creates one lock per IP so that each machine calling
-			 * our server gets single threaded, but other servers can call in parallel
+			 * singleThreadDebugging creates one lock per IP so that each machine calling our server gets single
+			 * threaded, but other servers can call in parallel
 			 */
 			if (singleThreadDebugging) {
 				if (ip == null) {
@@ -124,6 +147,7 @@ public class AppFilter extends GenericFilterBean {
 				log.debug("    RES: [" + String.valueOf(thisReqId) + "]" /* +httpRes.getStatus() */
 						+ HttpStatus.valueOf(httpRes.getStatus()));
 			}
+
 		} catch (RuntimeException ex) {
 			log.error("Request Failed", ex);
 			throw ex;
@@ -150,8 +174,8 @@ public class AppFilter extends GenericFilterBean {
 	}
 
 	/*
-	 * I found this code online and it is not fully tested, but according to my
-	 * research it is the best way you can try determining the source IP.
+	 * I found this code online and it is not fully tested, but according to my research it is the best
+	 * way you can try determining the source IP.
 	 */
 	public static String getClientIpAddr(HttpServletRequest request) {
 		String ip = request.getHeader("X-Forwarded-For");
