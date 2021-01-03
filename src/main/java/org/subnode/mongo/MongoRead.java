@@ -123,7 +123,6 @@ public class MongoRead {
     public long getChildCount(MongoSession session, SubNode node) {
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
-        criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
         query.addCriteria(criteria);
         return getOps(session).count(query, SubNode.class);
     }
@@ -131,7 +130,6 @@ public class MongoRead {
     public boolean hasChildren(MongoSession session, SubNode node) {
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
-        criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
         query.addCriteria(criteria);
         return getOps(session).exists(query, SubNode.class);
     }
@@ -433,12 +431,6 @@ public class MongoRead {
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(path));
 
-        /*
-         * This condition ensures that when users create a node and are still editing that node will be
-         * invisible to others until they click "save"
-         */
-        criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
-
         if (sort != null) {
             query.with(sort);
         }
@@ -668,14 +660,6 @@ public class MongoRead {
          * children.
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
-
-        /*
-         * This condition ensures that when users create a node and are still editing that node will be
-         * invisible to others until they click "save" todo-1: at some future time we can write code to find
-         * any nodes which are orphaned by a user creating but never saving changes.
-         */
-        criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
-
         query.addCriteria(criteria);
 
         if (!StringUtils.isEmpty(text)) {

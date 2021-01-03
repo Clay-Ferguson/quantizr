@@ -6,7 +6,12 @@ import org.subnode.request.base.RequestBase;
  * to the end of the child list, or may even be the first (i.e. only) child.
  */
 public class InsertNodeRequest extends RequestBase {
+	//todo-0: need to rename this to 'publish', and not let it set the mod time at all, and this will trigger any paths
+	//starting in /r/p/ (pending) to go public at their same '/r/' path with the 'p' part removed. Remember whenever you do this
+	//and get rid of the 'mod time' based indicator you'll need to update removeAbandonedNodes so that it cleans out all
+	// '/r/p/' nodes instead of doing what it does currently based on timestamp.
 	private boolean updateModTime;
+	
 	private String parentId;
 	private Long targetOrdinal;
 	private String newNodeName;

@@ -118,6 +118,8 @@ public class MongoCreate {
 				break;
 			case LAST:
 				ordinal = read.getMaxChildOrdinal(session, parent) + 1;
+
+				// Are we updating this after paste operations? There *is* a known ordinal bug that pasting *can* create (todo-0)
 				parent.setMaxChildOrdinal(ordinal);
 				break;
 			case ORDINAL:
