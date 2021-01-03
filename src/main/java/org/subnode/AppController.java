@@ -129,28 +129,23 @@ import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.Util;
 
 /**
- * Primary Spring MVC controller. All application logic from the browser
- * connects directly to this controller which is the only controller.
- * Importantly the main SPA page is retrieved thru this controller, and the
- * binary attachments are also served up thru this interface.
+ * Primary Spring MVC controller. All application logic from the browser connects directly to this
+ * controller which is the only controller. Importantly the main SPA page is retrieved thru this
+ * controller, and the binary attachments are also served up thru this interface.
  * 
- * Note, it's critical to understand the OakSession AOP code or else this class
- * will be confusing regarding how the OAK transactions are managed and how
- * logging in is done.
+ * Note, it's critical to understand the OakSession AOP code or else this class will be confusing
+ * regarding how the OAK transactions are managed and how logging in is done.
  * 
- * This class has no documentation on the methods because it's a wrapper around
- * the service methods which is where the documentation can be found for each
- * operation in here. It's a better architecture to have all the AOP for any
- * given aspect be in one particular layer, because of how Spring AOP uses
- * Proxies. Things can get pretty ugly when you have various proxied objects
- * calling other proxies objects, so we have all the AOP for a service call in
- * this controller and then all the services are pure and simple Spring
- * Singletons.
+ * This class has no documentation on the methods because it's a wrapper around the service methods
+ * which is where the documentation can be found for each operation in here. It's a better
+ * architecture to have all the AOP for any given aspect be in one particular layer, because of how
+ * Spring AOP uses Proxies. Things can get pretty ugly when you have various proxied objects calling
+ * other proxies objects, so we have all the AOP for a service call in this controller and then all
+ * the services are pure and simple Spring Singletons.
  * 
- * There's a lot of boiler-plate code in here, but it's just required. This is
- * probably the only code in the system that looks 'redundant' (non-DRY), but
- * this is because we want certain things in certain layers (abstraction related
- * and for loose-coupling).
+ * There's a lot of boiler-plate code in here, but it's just required. This is probably the only
+ * code in the system that looks 'redundant' (non-DRY), but this is because we want certain things
+ * in certain layers (abstraction related and for loose-coupling).
  */
 @Controller
 @CrossOrigin
@@ -163,13 +158,13 @@ public class AppController implements ErrorController {
 	private static final Object welcomeMapLock = new Object();
 
 	// maps classpath resource names to their md5 values
-	private static HashMap<String, String> cacheBusterMd5 = null;
+	private static HashMap<String, String> thymeleafAttribs = null;
 
 	private static boolean welcomePagePresent;
 
 	/*
-	 * RestTempalte is thread-safe and reusable, and has no state, so we need only
-	 * one final static instance ever
+	 * RestTempalte is thread-safe and reusable, and has no state, so we need only one final static
+	 * instance ever
 	 */
 	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
 
@@ -252,29 +247,38 @@ public class AppController implements ErrorController {
 
 	@RequestMapping(value = ERROR_MAPPING)
 	public String error(Model model) {
+		init();
 		model.addAttribute("hostAndPort", constProvider.getHostAndPort());
-		model.addAllAttributes(cacheBusterMd5);
+		model.addAllAttributes(thymeleafAttribs);
 		// pulls up error.html
 		return "error";
 	}
 
 	public void init() {
-		initCacheBuster();
+		initThymeleafAttribs();
 	}
 
-	public void initCacheBuster() {
-		cacheBusterMd5 = new HashMap<String, String>();
+	public void initThymeleafAttribs() {
+		if (constProvider.getProfileName().equals("dev")) {
+			//force reload of attribs
+			thymeleafAttribs = null;
+		}
 
-		cacheBusterMd5.put("BUNDLE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bundle.js"));
-		cacheBusterMd5.put("MAIN_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/meta64.css"));
-		cacheBusterMd5.put("FONT_AWESOME_CSS_HASH",
+		if (thymeleafAttribs != null)
+			return;
+
+		thymeleafAttribs = new HashMap<String, String>();
+
+		thymeleafAttribs.put("metaDescription", "Quanta: Social Media Micro-blogging Platform for the Fediverse!");
+
+		thymeleafAttribs.put("BUNDLE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bundle.js"));
+		thymeleafAttribs.put("MAIN_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/meta64.css"));
+		thymeleafAttribs.put("FONT_AWESOME_CSS_HASH",
 				fileUtils.genHashOfClasspathResource("/public/font-awesome-4.7.0/css/font-awesome.min.css"));
-		cacheBusterMd5.put("DROPZONE_CSS_HASH",
-				fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.css"));
-		cacheBusterMd5.put("DARCULA_CSS_HASH",
-				fileUtils.genHashOfClasspathResource("/public/css/highlightjs/darcula.css"));
-		cacheBusterMd5.put("DROPZONE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.js"));
-		cacheBusterMd5.put("ACE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/ace/src-noconflict/ace.js"));
+		thymeleafAttribs.put("DROPZONE_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.css"));
+		thymeleafAttribs.put("DARCULA_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/highlightjs/darcula.css"));
+		thymeleafAttribs.put("DROPZONE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.js"));
+		thymeleafAttribs.put("ACE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/ace/src-noconflict/ace.js"));
 	}
 
 	@Override
@@ -283,8 +287,8 @@ public class AppController implements ErrorController {
 	}
 
 	/*
-	 * This is the actual app page loading request, for his SPA (Single Page
-	 * Application) this is the request to load the page.
+	 * This is the actual app page loading request, for his SPA (Single Page Application) this is the
+	 * request to load the page.
 	 * 
 	 * ID is optional url parameter that user can specify to access a specific node
 	 * 
@@ -292,7 +296,7 @@ public class AppController implements ErrorController {
 	 * 
 	 * Renders with Thymeleaf
 	 */
-	@RequestMapping(value = { "/app", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}" })
+	@RequestMapping(value = {"/app", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
 	public String index(//
 			// node name on 'admin' account. Non-admin named nodes use url
 			// "/u/userName/nodeName"
@@ -310,14 +314,11 @@ public class AppController implements ErrorController {
 			@RequestParam(value = "passCode", required = false) String passCode, //
 			Model model) {
 		try {
-			// if in DEV mode we always update cache buster in case files have changed.
-			if (constProvider.getProfileName().equals("dev")) {
-				initCacheBuster();
-			}
+			initThymeleafAttribs();
 
 			// log.debug("AppController.index: sessionUser=" +
 			// sessionContext.getUserName());
-			model.addAllAttributes(cacheBusterMd5);
+			model.addAllAttributes(thymeleafAttribs);
 
 			// Node Names are identified using a colon in front of it, to make it detectable
 			if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
@@ -360,13 +361,10 @@ public class AppController implements ErrorController {
 	/*
 	 * Renders with Thymeleaf
 	 */
-	@RequestMapping(value = { "/" })
+	@RequestMapping(value = {"/"})
 	public String welcome(@RequestParam(value = "signupCode", required = false) String signupCode, //
 			Model model) {
-		// if in DEV mode we always update cache buster in case files have changed.
-		if (constProvider.getProfileName().equals("dev")) {
-			initCacheBuster();
-		}
+		initThymeleafAttribs();
 
 		// Note: this refreshes only when ADMIN is accessing it, so it's slow in this
 		// case.
@@ -387,12 +385,11 @@ public class AppController implements ErrorController {
 			model.addAttribute("signupResponse", signupResponse);
 		}
 
-		model.addAllAttributes(cacheBusterMd5);
+		model.addAllAttributes(thymeleafAttribs);
 
 		/*
-		 * if welcomeMap is empty that likely means the "pg_welcome" node hasn't yet
-		 * been created on this quanta instanace so we bypass the landing page and go to
-		 * index.html instead.
+		 * if welcomeMap is empty that likely means the "pg_welcome" node hasn't yet been created on this
+		 * quanta instanace so we bypass the landing page and go to index.html instead.
 		 */
 		if (!welcomePagePresent) {
 			return "index";
@@ -407,18 +404,14 @@ public class AppController implements ErrorController {
 	/*
 	 * Renders with Thymeleaf
 	 * 
-	 * Renders statich HTML if whatever is in demo.html, used for experimenting with
-	 * HTML snippets.
+	 * Renders statich HTML if whatever is in demo.html, used for experimenting with HTML snippets.
 	 * 
 	 * Renders files in './src/main/resources/templates/demo' folder.
 	 */
-	@RequestMapping(value = { "/demo/{file}" })
+	@RequestMapping(value = {"/demo/{file}"})
 	public String demo(@PathVariable(value = "file", required = false) String file, //
 			Model model) {
-		// if in DEV mode we always update cache buster in case files have changed.
-		if (constProvider.getProfileName().equals("dev")) {
-			initCacheBuster();
-		}
+		initThymeleafAttribs();
 
 		// if (welcomeMap == null ||
 		// PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
@@ -430,20 +423,19 @@ public class AppController implements ErrorController {
 		// }
 		// }
 
-		model.addAllAttributes(cacheBusterMd5);
+		model.addAllAttributes(thymeleafAttribs);
 		return "demo/" + file;
 	}
 
 	/*
-	 * DO NOT DELETE: Leave as example for how to render plain HTML directly from a
-	 * string
+	 * DO NOT DELETE: Leave as example for how to render plain HTML directly from a string
 	 */
-	@GetMapping(value = { "/sp/{systemPage}" }, produces = MediaType.TEXT_HTML_VALUE)
+	@GetMapping(value = {"/sp/{systemPage}"}, produces = MediaType.TEXT_HTML_VALUE)
 	public @ResponseBody String systemPage(@PathVariable(value = "systemPage", required = false) String systemPage) {
 		return "<html><body>My Full Page: " + systemPage + "</body></html>";
 	}
 
-	@GetMapping(value = { "/multiRss" }, produces = MediaType.APPLICATION_RSS_XML_VALUE)
+	@GetMapping(value = {"/multiRss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
 	public void multiRss(@RequestParam(value = "id", required = true) String nodeId, //
 			HttpServletResponse response) {
 		adminRunner.run(mongoSession -> {
@@ -455,7 +447,7 @@ public class AppController implements ErrorController {
 		});
 	}
 
-	@GetMapping(value = { "/rss" }, produces = MediaType.APPLICATION_RSS_XML_VALUE)
+	@GetMapping(value = {"/rss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
 	public void getRss(@RequestParam(value = "id", required = true) String nodeId, //
 			HttpServletResponse response) {
 		adminRunner.run(mongoSession -> {
@@ -468,12 +460,12 @@ public class AppController implements ErrorController {
 	}
 
 	/*
-	 * Proxies an HTTP GET thru to the specified url. Used to avoid CORS errors when
-	 * retrieving RSS directly from arbitrary servers
+	 * Proxies an HTTP GET thru to the specified url. Used to avoid CORS errors when retrieving RSS
+	 * directly from arbitrary servers
 	 * 
 	 * todo-1: need a 'useCache' url param option
 	 */
-	@GetMapping(value = { "/proxyGet" })
+	@GetMapping(value = {"/proxyGet"})
 	public void proxyGet(@RequestParam(value = "url", required = true) String url, HttpServletResponse response) {
 		try {
 			// try to get proxy info from cache.
@@ -512,7 +504,7 @@ public class AppController implements ErrorController {
 	}
 
 	/* url can be a single RSS url, or multiple newline delimted ones */
-	@GetMapping(value = { "/multiRssFeed" })
+	@GetMapping(value = {"/multiRssFeed"})
 	public void multiRssFeed(@RequestParam(value = "url", required = true) String url, HttpServletResponse response) {
 		try {
 			rssFeedService.multiRssFeed(url, response.getWriter());
@@ -642,17 +634,15 @@ public class AppController implements ErrorController {
 
 			if ("pdf".equalsIgnoreCase(req.getExportExt())) {
 				/*
-				 * NOTE: The original implementation of PDF export is in ExportPdfServicePdfBox
-				 * and us the one using PDFBox, but the newest version is the one using
-				 * https://github.com/vsch/flexmark-java, and is the one currently in use
+				 * NOTE: The original implementation of PDF export is in ExportPdfServicePdfBox and us the one using
+				 * PDFBox, but the newest version is the one using https://github.com/vsch/flexmark-java, and is the
+				 * one currently in use
 				 */
-				ExportServiceFlexmark svc = (ExportServiceFlexmark) SpringContextUtil
-						.getBean(ExportServiceFlexmark.class);
+				ExportServiceFlexmark svc = (ExportServiceFlexmark) SpringContextUtil.getBean(ExportServiceFlexmark.class);
 				svc.export(ms, "pdf", req, res);
 			} //
 			else if ("html".equalsIgnoreCase(req.getExportExt())) {
-				ExportServiceFlexmark svc = (ExportServiceFlexmark) SpringContextUtil
-						.getBean(ExportServiceFlexmark.class);
+				ExportServiceFlexmark svc = (ExportServiceFlexmark) SpringContextUtil.getBean(ExportServiceFlexmark.class);
 				svc.export(ms, "html", req, res);
 			} //
 			else if ("md".equalsIgnoreCase(req.getExportExt())) {
@@ -725,8 +715,7 @@ public class AppController implements ErrorController {
 	}
 
 	/*
-	 * Inserts node 'inline' at the position specified in the
-	 * InsertNodeRequest.targetName
+	 * Inserts node 'inline' at the position specified in the InsertNodeRequest.targetName
 	 */
 	@RequestMapping(value = API_PATH + "/insertNode", method = RequestMethod.POST)
 	public @ResponseBody Object insertNode(@RequestBody InsertNodeRequest req, HttpSession session) {
@@ -818,10 +807,10 @@ public class AppController implements ErrorController {
 	}
 
 	/*
-	 * An alternative way to get the binary attachment from a node allowing more
-	 * friendly url format (named nodes)
+	 * An alternative way to get the binary attachment from a node allowing more friendly url format
+	 * (named nodes)
 	 */
-	@RequestMapping(value = { "/f/id/{id}", "/f/{nameOnAdminNode}", "/f/{userName}/{nameOnUserNode}" })
+	@RequestMapping(value = {"/f/id/{id}", "/f/{nameOnAdminNode}", "/f/{userName}/{nameOnUserNode}"})
 	public void attachment(//
 			// node name on 'admin' account. Non-admin named nodes use url
 			// "/u/userName/nodeName"
@@ -894,19 +883,17 @@ public class AppController implements ErrorController {
 	}
 
 	/*
-	 * binId param not uses currently but the client will send either the gridId or
-	 * the ipfsHash of the node depending on which type of attachment it sees on the
-	 * node
+	 * binId param not uses currently but the client will send either the gridId or the ipfsHash of the
+	 * node depending on which type of attachment it sees on the node
 	 */
 	@RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
 	public void getBinary(@PathVariable("binId") String binId, //
 			@RequestParam("nodeId") String nodeId, //
 			/*
-			 * The "Export To PDF" feature relies on sending this 'token' as it's form of
-			 * access/auth because it's generated from HTML intermediate file what has all
-			 * the links in it for accessing binary content, and as the PDF is being
-			 * generated calls are made to this endpoint for each image, or other file so we
-			 * use the token to auth the request
+			 * The "Export To PDF" feature relies on sending this 'token' as it's form of access/auth because
+			 * it's generated from HTML intermediate file what has all the links in it for accessing binary
+			 * content, and as the PDF is being generated calls are made to this endpoint for each image, or
+			 * other file so we use the token to auth the request
 			 */
 			@RequestParam(value = "token", required = false) String token, //
 			@RequestParam(value = "download", required = false) String download, //
@@ -923,9 +910,9 @@ public class AppController implements ErrorController {
 			else if ("profileHeader".equals(binId)) {
 				adminRunner.run(mongoSession -> {
 					/*
-					 * Note: the "Header" suffix will be applied to all image-related property names
-					 * to distinguish them from normal 'bin' properties. This way we now to support
-					 * multiple uploads onto any node, in this very limites way.
+					 * Note: the "Header" suffix will be applied to all image-related property names to distinguish them
+					 * from normal 'bin' properties. This way we now to support multiple uploads onto any node, in this
+					 * very limites way.
 					 */
 					attachmentService.getBinary(mongoSession, "Header", null, nodeId, download != null, response);
 				});
@@ -949,10 +936,9 @@ public class AppController implements ErrorController {
 	/*
 	 * todo-3: we should return proper HTTP codes when file not found, etc.
 	 *
-	 * The ":.+" is there because that is required to stop it from truncating file
-	 * extension.
-	 * https://stackoverflow.com/questions/16332092/spring-mvc-pathvariable-with-dot
-	 * -is-getting- truncated
+	 * The ":.+" is there because that is required to stop it from truncating file extension.
+	 * https://stackoverflow.com/questions/16332092/spring-mvc-pathvariable-with-dot -is-getting-
+	 * truncated
 	 */
 	@RequestMapping(value = "/file/{fileName:.+}", method = RequestMethod.GET)
 	public void getFile(//
@@ -966,26 +952,23 @@ public class AppController implements ErrorController {
 	}
 
 	/*
-	 * NOTE: this rest endpoint has -xxx appended so it never gets called, however
-	 * for efficient streaming of content for 'non-seekable' media, this works
-	 * perfectly, but i'm using the getFileSystemResourceStreamMultiPart call below
-	 * instead which DOES support seeking, which means very large video files can be
-	 * played
+	 * NOTE: this rest endpoint has -xxx appended so it never gets called, however for efficient
+	 * streaming of content for 'non-seekable' media, this works perfectly, but i'm using the
+	 * getFileSystemResourceStreamMultiPart call below instead which DOES support seeking, which means
+	 * very large video files can be played
 	 * 
-	 * I never tried this: so what I'm doing here CAN be done simpler if this
-	 * following snippet will have worked:
+	 * I never tried this: so what I'm doing here CAN be done simpler if this following snippet will
+	 * have worked:
 	 * 
 	 * @RequestMapping(method = RequestMethod.GET, value = "/testVideo")
 	 * 
-	 * @ResponseBody public FileSystemResource testVideo(Principal principal) throws
-	 * IOException { return new FileSystemResource(new File("D:\\oceans.mp4")); }
-	 * however, the above snipped might not be as powerful/flexible as what i have
-	 * implemented since my solution can be modified easier at a lower level if we
-	 * ever need to.
+	 * @ResponseBody public FileSystemResource testVideo(Principal principal) throws IOException {
+	 * return new FileSystemResource(new File("D:\\oceans.mp4")); } however, the above snipped might not
+	 * be as powerful/flexible as what i have implemented since my solution can be modified easier at a
+	 * lower level if we ever need to.
 	 * 
 	 * <pre> https://dzone.com/articles/writing-download-server-part-i
-	 * https://www.logicbig.com/tutorials/spring-framework/spring-web-mvc/streaming-
-	 * response-body.html
+	 * https://www.logicbig.com/tutorials/spring-framework/spring-web-mvc/streaming- response-body.html
 	 * https://stackoverflow.com/questions/38957245/spring-mvc-streamingresponsebody
 	 * -return-chunked-file </pre>
 	 */
@@ -1000,8 +983,8 @@ public class AppController implements ErrorController {
 	}
 
 	/*
-	 * This endpoint serves up large media files efficiently and supports seeking,
-	 * so that the fast-foward, rewind, seeking in video players works!!!
+	 * This endpoint serves up large media files efficiently and supports seeking, so that the
+	 * fast-foward, rewind, seeking in video players works!!!
 	 */
 	@RequestMapping(value = API_PATH + "/filesys/{nodeId}", method = RequestMethod.GET)
 	public void getFileSystemResourceStreamMultiPart(//
@@ -1046,10 +1029,9 @@ public class AppController implements ErrorController {
 	//
 
 	/*
-	 * binSuffix, will be concatenated to all binary-related properties to
-	 * distinguish them where possible from the normal node attachment. For normal
-	 * attachments this is an empty string, which makes it no suffix (no effect of
-	 * concatenating)
+	 * binSuffix, will be concatenated to all binary-related properties to distinguish them where
+	 * possible from the normal node attachment. For normal attachments this is an empty string, which
+	 * makes it no suffix (no effect of concatenating)
 	 */
 	@RequestMapping(value = API_PATH + "/upload", method = RequestMethod.POST)
 	public @ResponseBody Object upload(//
@@ -1196,13 +1178,11 @@ public class AppController implements ErrorController {
 			}
 
 			/*
-			 * todo-2: If we are searching a large directory structure here the search will
-			 * take a long time and just show a generic non-updated progress base on the
-			 * browser. We need a better way to push status back to server and also not make
-			 * user wait, but be able to close the dlg and move on. Probably we need a
-			 * Lucene Console tab we can just flip over to and then the user is free to look
-			 * at it or not, as they please, but it would be updating in near-realtime using
-			 * server push.
+			 * todo-2: If we are searching a large directory structure here the search will take a long time and
+			 * just show a generic non-updated progress base on the browser. We need a better way to push status
+			 * back to server and also not make user wait, but be able to close the dlg and move on. Probably we
+			 * need a Lucene Console tab we can just flip over to and then the user is free to look at it or
+			 * not, as they please, but it would be updating in near-realtime using server push.
 			 */
 			return luceneService.reindex(ms, req.getNodeId(), req.getPath());
 		});
@@ -1215,7 +1195,10 @@ public class AppController implements ErrorController {
 		});
 	}
 
-	/* todo-1: This needs to be replaced with push notifications? Because we're doing polling here, and is wasted CPU+bandwidth */
+	/*
+	 * todo-1: This needs to be replaced with push notifications? Because we're doing polling here, and
+	 * is wasted CPU+bandwidth
+	 */
 	@RequestMapping(value = API_PATH + "/getNotifications", method = RequestMethod.POST)
 	public @ResponseBody Object getNotifications(@RequestBody GetServerInfoRequest req, HttpSession session) {
 		return callProc.run("getNotifications", req, session, ms -> {
