@@ -134,7 +134,9 @@ export class MenuPanel extends Div {
             // new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
 
             !state.isAnonUser ? new MenuItem("Show Calendar", () => S.render.showCalendar(null, state), !!hltNode) : null, //
-            !state.isAnonUser ? new MenuItem("Save clipboard text to a new child node", () => S.edit.saveClipboardToChildNode()) : null, //
+
+            // I decided with this on the toolbar we don't need it repliated here.
+            // !state.isAnonUser ? new MenuItem("Save clipboard to my NOTES node", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
 
             new MenuItem("Show URLs", () => S.render.showNodeUrl(null, state), !!hltNode), //
 

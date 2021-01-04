@@ -616,7 +616,6 @@ export class EditNodeDlg extends DialogBase {
             // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
 
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-                updateModTime: true,
                 node: state.node
             }, (res) => {
                 S.render.fadeInId = state.node.id;

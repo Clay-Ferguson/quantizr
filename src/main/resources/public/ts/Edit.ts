@@ -195,7 +195,7 @@ export class Edit implements EditIntf {
                     let clipboardText = await (navigator as any).clipboard.readText();
                     if (nodeInsertTarget) {
                         S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
-                            updateModTime: true,
+                            pendingEdit: false,
                             parentId: parentNode.id,
                             targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
                             newNodeName: "",
@@ -204,7 +204,7 @@ export class Edit implements EditIntf {
                         }, (res) => { S.meta64.refresh(state); });
                     } else {
                         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                            updateModTime: true,
+                            pendingEdit: false,
                             nodeId: parentNode.id,
                             newNodeName: "",
                             typeName: typeName || "u",
@@ -220,7 +220,7 @@ export class Edit implements EditIntf {
         else {
             if (nodeInsertTarget) {
                 S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
-                    updateModTime: false,
+                    pendingEdit: true,
                     parentId: parentNode.id,
                     targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
                     newNodeName: "",
@@ -229,7 +229,7 @@ export class Edit implements EditIntf {
                 }, (res) => { this.insertNodeResponse(res, state); });
             } else {
                 S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                    updateModTime: false,
+                    pendingEdit: true,
                     nodeId: parentNode.id,
                     newNodeName: "",
                     typeName: typeName || "u",
@@ -438,13 +438,12 @@ export class Edit implements EditIntf {
         }
     }
 
-    /* Need all cached functions to be prefixed so they're recognizable, since refactoring them can break things */
     cached_newSubNode = (id: string) => {
         const state = store.getState();
         if (S.meta64.ctrlKeyCheck()) {
             new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
                 async () => {
-                    // todo-1: document this under 'tips and tricks' in the user guide
+                    // todo-1: document this feature under 'tips and tricks' in the user guide.
                     this.saveClipboardToChildNode(id);
                 }, null, null, null, state
             ).open();
@@ -695,7 +694,7 @@ export class Edit implements EditIntf {
         ).open();
     }
 
-    saveClipboardToChildNode = async (parentId?: string): Promise<void> => {
+    saveClipboardToChildNode = async (parentId: string): Promise<void> => {
         let clipText: string = await (navigator as any).clipboard.readText();
 
         // DO NOT DELETE (yet)
@@ -718,8 +717,8 @@ export class Edit implements EditIntf {
         }
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-            updateModTime: true,
-            nodeId: parentId || ("~" + J.NodeType.NOTES),
+            pendingEdit: false,
+            nodeId: parentId,
             newNodeName: "",
             typeName: "u",
             createAtTop: true,
@@ -728,7 +727,7 @@ export class Edit implements EditIntf {
             properties: null
         },
             () => {
-                let message = parentId ? "Clipboard saved" : "Clipboard saved under Notes node";
+                let message = parentId ? "Clipboard saved" : "Clipboard text saved under Notes node.";
                 S.util.flashMessage(message + "...\n\n" + clipText, "Note", true);
                 setTimeout(() => {
                     let state: AppState = store.getState();
@@ -767,7 +766,9 @@ export class Edit implements EditIntf {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-            updateModTime: true,
+            // todo-0: check pending path here. Make sure comment nodes cannot be viewed by other users
+            // until "Save" is clicked.
+            pendingEdit: false,
             nodeId: node.id,
             newNodeName: "",
             typeName: J.NodeType.NONE,
@@ -784,7 +785,7 @@ export class Edit implements EditIntf {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-            updateModTime: true,
+            pendingEdit: false,
             nodeId: node.id,
             newNodeName: "",
             typeName: J.NodeType.FRIEND,
@@ -801,7 +802,7 @@ export class Edit implements EditIntf {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-            updateModTime: true,
+            pendingEdit: false,
             nodeId: state.fullScreenCalendarId,
             newNodeName: "",
             typeName: J.NodeType.CALENDAR_ENTRY,

@@ -9,6 +9,8 @@ public class CreateSubNodeRequest extends RequestBase {
 	
 	private String nodeId;
 
+	private boolean pendingEdit;
+
 	//todo-1: is there a JSON annotaiton to make this optional on TS object
 	private String content; //optional, default content
 	
@@ -21,8 +23,6 @@ public class CreateSubNodeRequest extends RequestBase {
 
 	//default properties to add, or null if none
 	private List<PropertyInfo> properties;
-
-	private boolean updateModTime;
 
 	public String getNodeId() {
 		return nodeId;
@@ -80,11 +80,11 @@ public class CreateSubNodeRequest extends RequestBase {
 		this.properties = properties;
 	}
 
-	public boolean isUpdateModTime() {
-		return updateModTime;
+	public boolean isPendingEdit() {
+		return pendingEdit;
 	}
 
-	public void setUpdateModTime(boolean updateModTime) {
-		this.updateModTime = updateModTime;
+	public void setPendingEdit(boolean pendingEdit) {
+		this.pendingEdit = pendingEdit;
 	}
 }

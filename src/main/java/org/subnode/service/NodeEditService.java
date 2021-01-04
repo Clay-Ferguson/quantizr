@@ -113,7 +113,7 @@ public class NodeEditService {
 
 		String nodeId = req.getNodeId();
 		SubNode node = null;
-		if (nodeId.equals("~notes")) {
+		if (nodeId.equals("~" + NodeType.NOTES.s())) {
 			node = read.getUserNodeByType(session, session.getUser(), null, "### Notes", NodeType.NOTES.s());
 		} else {
 			node = read.getNode(session, nodeId);
@@ -129,9 +129,8 @@ public class NodeEditService {
 		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null);
 
 		// '/r/p/' = pending (nodes not yet published, being edited created by users)
-		newNode.setPath(newNode.getPath().replace("/r/", "/r/p/"));
-		if (!req.isUpdateModTime()) {
-			newNode.setModifyTime(null);
+		if (req.isPendingEdit() && !newNode.getPath().startsWith("/r/p/")) {
+			newNode.setPath(newNode.getPath().replace("/r/", "/r/p/"));
 		}
 
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
@@ -228,9 +227,8 @@ public class NodeEditService {
 		}
 
 		// '/r/p/' = pending (nodes not yet published, being edited created by users)
-		newNode.setPath(newNode.getPath().replace("/r/", "/r/p/"));
-		if (!req.isUpdateModTime()) {
-			newNode.setModifyTime(null);
+		if (req.isPendingEdit() && !newNode.getPath().startsWith("/r/p/")) {
+			newNode.setPath(newNode.getPath().replace("/r/", "/r/p/"));
 		}
 
 		// we always copy the access controls from the parent for any new nodes
@@ -361,9 +359,11 @@ public class NodeEditService {
 			res.setAclEntries(auth.getAclEntries(session, node));
 		}
 
-		if (!req.isUpdateModTime()) {
-			node.setModifyTime(null);
-		} else {
+		/*
+		 * If the node being saved is currently in the pending area /p/ then we publish it now, and move it
+		 * out of pending.
+		 */
+		if (node.getPath().startsWith("/r/p/")) {
 			node.setPath(node.getPath().replace("/r/p/", "/r/"));
 
 			/* Send notification to local server or to remote server when a node is added */

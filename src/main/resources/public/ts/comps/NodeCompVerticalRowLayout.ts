@@ -26,7 +26,6 @@ export class NodeCompVerticalRowLayout extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
         let childCount: number = this.node.children.length;
         let comps: Comp[] = [];
         let countToDisplay = 0;
@@ -41,10 +40,6 @@ export class NodeCompVerticalRowLayout extends Div {
         }
 
         let allowInsert = S.edit.isInsertAllowed(this.node, state);
-
-        // if (allowInsert && typeHandler) {
-        //     allowInsert = state.isAdminUser || typeHandler.allowAction(NodeActionType.addChild, this.node, state);
-        // }
 
         let rowCount: number = 0;
         let lastNode: J.NodeInfo = null;

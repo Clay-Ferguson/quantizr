@@ -64,12 +64,18 @@ export class NodeCompRow extends Div {
         let insertInlineButton = null;
         if (state.userPreferences.editMode) {
             let insertAllowed = true;
-            let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-            if (typeHandler) {
-                insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, node, state);
+
+            /* if we are at level one that means state.node is the parent of 'this.node' so that's what determines if we
+            can insert or not */
+            if (this.level === 1) {
+                let parentTypeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+                if (parentTypeHandler) {
+                    insertAllowed = state.isAdminUser || parentTypeHandler.allowAction(NodeActionType.insert, state.node, state);
+                }
             }
 
             let isPageRootNode = state.node && this.node.id === state.node.id;
+
             if (!isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
                 insertInlineButton = new IconButton("fa-plus", null, {
                     onClick: e => {

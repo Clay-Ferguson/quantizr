@@ -5,7 +5,6 @@ import org.subnode.request.base.RequestBase;
 
 public class SaveNodeRequest extends RequestBase {
 
-	boolean updateModTime;
 	private NodeInfo node;
 
 	public NodeInfo getNode() {
@@ -14,13 +13,5 @@ public class SaveNodeRequest extends RequestBase {
 
 	public void setNode(NodeInfo node) {
 		this.node = node;
-	}
-
-	public boolean isUpdateModTime() {
-		return updateModTime;
-	}
-
-	public void setUpdateModTime(boolean updateModTime) {
-		this.updateModTime = updateModTime;
 	}
 }

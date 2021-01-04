@@ -25,13 +25,13 @@ export interface CloseAccountRequest extends RequestBase {
 
 export interface CreateSubNodeRequest extends RequestBase {
     nodeId: string;
+    pendingEdit: boolean;
     content: string;
     newNodeName: string;
     typeName: string;
     createAtTop: boolean;
     typeLock: boolean;
     properties: PropertyInfo[];
-    updateModTime: boolean;
 }
 
 export interface DeleteAttachmentRequest extends RequestBase {
@@ -115,7 +115,7 @@ export interface InsertBookRequest extends RequestBase {
 }
 
 export interface InsertNodeRequest extends RequestBase {
-    updateModTime: boolean;
+    pendingEdit: boolean;
     parentId: string;
     targetOrdinal: number;
     newNodeName: string;
@@ -208,7 +208,6 @@ export interface ResetPasswordRequest extends RequestBase {
 }
 
 export interface SaveNodeRequest extends RequestBase {
-    updateModTime: boolean;
     node: NodeInfo;
 }
 

@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import clientInfo from "../ClientInfo";
 import { Constants as C } from "../Constants";
+import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
@@ -122,9 +123,9 @@ export class App extends Div {
 
             let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
                 onClick: e => {
-                    S.edit.saveClipboardToChildNode();
+                    S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
                 },
-                title: "Save clipboard text to a new child node"
+                title: "Save clipboard text to my NOTES node"
             }, "btn-secondary floatingControlBarItem", "off") : null;
 
             // these are the buttons at the upper right of the page.
