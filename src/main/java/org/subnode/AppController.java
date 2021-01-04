@@ -269,6 +269,7 @@ public class AppController implements ErrorController {
 
 		thymeleafAttribs = new HashMap<String, String>();
 
+		// todo-1: This needs to be in a property file, to help re-brandability.
 		thymeleafAttribs.put("metaDescription", "Quanta: Social Media Micro-blogging Platform for the Fediverse!");
 
 		thymeleafAttribs.put("BUNDLE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bundle.js"));
@@ -447,15 +448,20 @@ public class AppController implements ErrorController {
 		});
 	}
 
+	/* This was sort of experimental, but I need to document how it works and put in the User Guide */
 	@GetMapping(value = {"/rss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
 	public void getRss(@RequestParam(value = "id", required = true) String nodeId, //
-			HttpServletResponse response) {
-		adminRunner.run(mongoSession -> {
-			try {
-				rssFeedService.getRssFeed(mongoSession, nodeId, response.getWriter());
-			} catch (Exception e) {
-				throw new RuntimeException("internal server error");
-			}
+			HttpServletResponse response, //
+			HttpSession session) {
+		callProc.run("rss", null, session, ms -> {
+			adminRunner.run(mongoSession -> {
+				try {
+					rssFeedService.getRssFeed(mongoSession, nodeId, response.getWriter());
+				} catch (Exception e) {
+					throw new RuntimeException("internal server error");
+				}
+			});
+			return null;
 		});
 	}
 
@@ -466,47 +472,57 @@ public class AppController implements ErrorController {
 	 * todo-1: need a 'useCache' url param option
 	 */
 	@GetMapping(value = {"/proxyGet"})
-	public void proxyGet(@RequestParam(value = "url", required = true) String url, HttpServletResponse response) {
-		try {
-			// try to get proxy info from cache.
-			byte[] cacheBytes = RSSFeedService.proxyCache.get(url);
+	public void proxyGet(@RequestParam(value = "url", required = true) String url, //
+			HttpSession session, HttpServletResponse response//
+	) {
+		callProc.run("proxyGet", null, session, ms -> {
+			try {
+				// try to get proxy info from cache.
+				byte[] cacheBytes = RSSFeedService.proxyCache.get(url);
 
-			if (cacheBytes != null) {
-				// limiting the stream just becasue for now this is only used in feed
-				// processing, and 5MB is plenty
-				IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 5 * Const.ONE_MB),
-						response.getOutputStream());
+				if (cacheBytes != null) {
+					// limiting the stream just becasue for now this is only used in feed
+					// processing, and 5MB is plenty
+					IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 5 * Const.ONE_MB),
+							response.getOutputStream());
+				}
+				// not in cache then read and update cache
+				else {
+					ResponseEntity<byte[]> resp = restTemplate.getForEntity(new URI(url), byte[].class);
+					response.setStatus(HttpStatus.OK.value());
+					RSSFeedService.proxyCache.put(url, resp.getBody());
+
+					IOUtils.copy(new ByteArrayInputStream(resp.getBody()), response.getOutputStream());
+
+					// DO NOT DELETE (good example)
+					// restTemplate.execute(url, HttpMethod.GET, (ClientHttpRequest requestCallback)
+					// -> {
+					// }, responseExtractor -> {
+					// IOUtils.copy(responseExtractor.getBody(), response.getOutputStream());
+					// return null;
+					// });
+				}
+			} catch (Exception e) {
+				throw new RuntimeException("internal server error");
 			}
-			// not in cache then read and update cache
-			else {
-				ResponseEntity<byte[]> resp = restTemplate.getForEntity(new URI(url), byte[].class);
-				response.setStatus(HttpStatus.OK.value());
-				RSSFeedService.proxyCache.put(url, resp.getBody());
-
-				IOUtils.copy(new ByteArrayInputStream(resp.getBody()), response.getOutputStream());
-
-				// DO NOT DELETE (good example)
-				// restTemplate.execute(url, HttpMethod.GET, (ClientHttpRequest requestCallback)
-				// -> {
-				// }, responseExtractor -> {
-				// IOUtils.copy(responseExtractor.getBody(), response.getOutputStream());
-				// return null;
-				// });
-			}
-		} catch (Exception e) {
-			throw new RuntimeException("internal server error");
-		}
+			return null;
+		});
 	}
 
 	/* url can be a single RSS url, or multiple newline delimted ones */
 	@GetMapping(value = {"/multiRssFeed"})
-	public void multiRssFeed(@RequestParam(value = "url", required = true) String url, HttpServletResponse response) {
-		try {
-			rssFeedService.multiRssFeed(url, response.getWriter());
-		} catch (Exception e) {
-			ExUtil.error(log, "multiRssFeed Error: ", e);
-			throw new RuntimeException("internal server error");
-		}
+	public void multiRssFeed(@RequestParam(value = "url", required = true) String url, //
+			HttpServletResponse response, //
+			HttpSession session) {
+		callProc.run("multiRssFeed", null, session, ms -> {
+			try {
+				rssFeedService.multiRssFeed(url, response.getWriter());
+			} catch (Exception e) {
+				ExUtil.error(log, "multiRssFeed Error: ", e);
+				throw new RuntimeException("internal server error");
+			}
+			return null;
+		});
 	}
 
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
@@ -1309,9 +1325,11 @@ public class AppController implements ErrorController {
 
 	// reference: https://www.baeldung.com/spring-server-sent-events
 	@GetMapping(API_PATH + "/serverPush")
-	public SseEmitter serverPush() {
-		SseEmitter pushEmitter = new SseEmitter();
-		sessionContext.setPushEmitter(pushEmitter);
-		return pushEmitter;
+	public SseEmitter serverPush(HttpSession session) {
+		return (SseEmitter) callProc.run("serverPush", null, session, ms -> {
+			SseEmitter pushEmitter = new SseEmitter();
+			sessionContext.setPushEmitter(pushEmitter);
+			return pushEmitter;
+		});
 	}
 }

@@ -162,6 +162,13 @@ public class SessionContext {
 		}
 	}
 
+	public void maybeInvalidate() {
+		if (getHttpSessionToInvalidate() != null) {
+			getHttpSessionToInvalidate().invalidate();
+			setHttpSessionToInvalidate(null);
+		}
+	}
+
 	/*
 	 * This can create nasty bugs. I should be always getting user name from the actual session object
 	 * itself in all the logic... in most every case except maybe login process.

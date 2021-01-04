@@ -51,19 +51,19 @@ public class CallProcessor {
 	// Most but not all of the time this return value is ResponseBase type, or
 	// derived from that.
 	public Object run(String command, RequestBase req, HttpSession httpSession, MongoRunnableEx runner) {
+		if (AppServer.isShuttingDown()) {
+			throw ExUtil.wrapEx("Server is shutting down.");
+		}
+
 		ThreadLocals.setHttpSession(httpSession);
 		logRequest(command, req, httpSession);
 
 		/*
-		 * Instantiating this, runs its constructor and ensures our threadlocal at least
-		 * has an object, but most (not all) implenentations of methods end up
-		 * instantiating their own which overwrites this
+		 * Instantiating this, runs its constructor and ensures our threadlocal at least has respons object
+		 * on it, but most (not all) implenentations of methods end up instantiating their own which
+		 * overwrites this
 		 */
 		new ResponseBase();
-
-		if (AppServer.isShuttingDown()) {
-			throw ExUtil.wrapEx("Server is shutting down.");
-		}
 
 		Object ret = null;
 		MongoSession mongoSession = null;
@@ -82,33 +82,32 @@ public class CallProcessor {
 			// log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
 
 			/*
-			 * If no Session originally existed AND this was not a login request, then we
-			 * throw the error, that the client will pickup and use to refresh the page, as
-			 * a new login. This is what happens when the session times out and then after
-			 * that some RPC call is attempted.
+			 * If no Session originally existed AND this was not a login request, then we throw the error, that
+			 * the client will pickup and use to refresh the page, as a new login. This is what happens when the
+			 * session times out and then after that some RPC call is attempted.
 			 */
 			if (!(req instanceof LoginRequest) && //
 					!(req instanceof SignupRequest) && //
 					!(req instanceof ResetPasswordRequest) && //
 					!(req instanceof ChangePasswordRequest) && //
 					!ThreadLocals.getInitialSessionExisted()) {
-				log.debug(
-						"Ignoring attempt to process req class " + req.getClass().getName() + " when not logged in .");
+				log.debug("Ignoring attempt to process req class " + req.getClass().getName() + " when not logged in .");
 
-				/* All requests contain credentials, from the BaseRequest, so if we detect a case where the session has expired
-				we can attempt to seamlessly re-login the user again, and they never realize their session had timed out. This little
-				try block is replicated code from the main login and later someday I can 'dry' this up. */		
+				/*
+				 * All requests contain credentials, from the BaseRequest, so if we detect a case where the session
+				 * has expired we can attempt to seamlessly re-login the user again, and they never realize their
+				 * session had timed out. This little try block is replicated code from the main login and later
+				 * someday I can 'dry' this up.
+				 */
 				boolean success = false;
 				try {
 					MongoSession session = auth.login(req.getUserName(), req.getPassword());
 					sessionContext.init(req);
 					userManagerService.processLogin(session, null, req.getUserName());
-
 					success = true;
 				} catch (Exception e) {
 				}
 
-				// LoginResponse loginResponse = userManagerService.login(null, req);
 				if (!success) {
 					throw new NotLoggedInException();
 				}
@@ -172,12 +171,8 @@ public class CallProcessor {
 				/* cleanup this thread, servers reuse threads */
 				ThreadLocals.setMongoSession(null);
 				ThreadLocals.setResponse(null);
-
 				if (sessionContext != null) {
-					if (sessionContext.getHttpSessionToInvalidate() != null) {
-						sessionContext.getHttpSessionToInvalidate().invalidate();
-						sessionContext.setHttpSessionToInvalidate(null);
-					}
+					sessionContext.maybeInvalidate();
 				}
 			} catch (Exception e) {
 				ExUtil.error(log, "exception in call processor finally block. ignoring.", e);

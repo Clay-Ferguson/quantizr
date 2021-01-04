@@ -55,6 +55,7 @@ public class AppFilter extends GenericFilterBean {
 
 		if (req instanceof HttpServletRequest) {
 			HttpServletRequest httpReq = (HttpServletRequest) req;
+			HttpServletResponse httpRes = (HttpServletResponse) res;
 			ip = getClientIpAddr(httpReq);
 
 			HttpSession session = httpReq.getSession(false);
@@ -77,30 +78,7 @@ public class AppFilter extends GenericFilterBean {
 				Util.sleep(simulateSlowServer);
 			}
 
-			/*
-			 * Yeah I know this is a hacky way to set Cache-Contro, and there's a more elegant way to do this
-			 * with spring 
-			 */
-			// Example: The better way (not yet done)
-			// @Configuration
-			// public class MvcConfigurer extends WebMvcConfigurerAdapter
-			// 		implements EmbeddedServletContainerCustomizer {
-			// 	@Override
-			// 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-			// 		// Resources without Spring Security. No cache control response headers.
-			// 		registry.addResourceHandler("/static/public/**")
-			// 			.addResourceLocations("classpath:/static/public/");
-			if (res instanceof HttpServletResponse) {
-				if (httpReq.getRequestURI().contains("/images/") || //
-						httpReq.getRequestURI().contains("/fonts/") || //
-						httpReq.getRequestURI().endsWith("/bundle.js") || //
-						httpReq.getRequestURI().endsWith("/favicon.ico") || //
-
-						//This is the tricky one. If we have versioned the URL we detect it this hacky way also picking up v param.
-						httpReq.getRequestURI().contains("?v=")) {
-					((HttpServletResponse) res).setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
-				}
-			}
+			setCachingHeader(httpReq, httpRes);
 
 			if (logRequests) {
 				String url =
@@ -155,6 +133,32 @@ public class AppFilter extends GenericFilterBean {
 			/* Set thread back to clean slate, for it's next cycle time in threadpool */
 			ThreadLocals.removeAll();
 			MongoThreadLocal.removeAll();
+		}
+	}
+
+	private void setCachingHeader(HttpServletRequest req, HttpServletResponse res) {
+		/*
+		 * Yeah I know this is a hacky way to set Cache-Contro, and there's a more elegant way to do this
+		 * with spring
+		 */
+		// Example: The better way (not yet done)
+		// @Configuration
+		// public class MvcConfigurer extends WebMvcConfigurerAdapter
+		// implements EmbeddedServletContainerCustomizer {
+		// @Override
+		// public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		// // Resources without Spring Security. No cache control response headers.
+		// registry.addResourceHandler("/static/public/**")
+		// .addResourceLocations("classpath:/static/public/");
+		if (req.getRequestURI().contains("/images/") || //
+				req.getRequestURI().contains("/fonts/") || //
+				req.getRequestURI().endsWith("/bundle.js") || //
+				req.getRequestURI().endsWith("/favicon.ico") || //
+
+				// This is the tricky one. If we have versioned the URL we detect it this hacky way also picking up
+				// v param.
+				req.getRequestURI().contains("?v=")) {
+			((HttpServletResponse) res).setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
 		}
 	}
 
