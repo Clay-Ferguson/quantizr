@@ -187,13 +187,6 @@ export class View implements ViewIntf {
             if (elm) {
                 // console.log("scrollIntoView=0");
                 elm.scrollIntoView(true);
-
-                // the 'scrollIntoView' function doesn't work well when we have margin/padding on the document (for our toolbar at the top)
-                // so we have to account for that by scrolling up a bit from where the 'scrollIntoView' will have put is.
-                // Only in the rare case of the very last node on the page will this have slightly undesirable effect of
-                // scrolling up more than we wanted to, but instead of worrying about that I'm keeping this simple.
-
-                scrollBy(0, -S.meta64.navBarHeight);
             }
             else {
                 // console.log("setting scrollTop=0 (b)");

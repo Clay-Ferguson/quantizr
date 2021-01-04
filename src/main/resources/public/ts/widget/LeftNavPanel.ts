@@ -60,16 +60,6 @@ export class LeftNavPanel extends Div {
     // domAddEvent(): void {
     //     let elm: HTMLElement = this.getElement();
 
-    //     // since we only ever set this height one time, and don't need it immediately i'm throwing in a timeout
-    //     // just to be sure the browser has finished calculating it's offsetHeight, but I have no actual evidence or reason
-    //     // to believe this timeout is necessary (but merely safer and harmless)
-    //     setTimeout(() => {
-    //         // see also: clientHeight, offsetHeight, scrollHeight
-    //         // NOTE: I added the additional 20, when I went to 'container-fluid' instead of 'container' for the main
-    //         // panel, which I needed to do after adding the left and right panels to the main layout.
-    //         S.meta64.navBarHeight = elm.offsetHeight + 20;
-    //     }, 750);
-
     //     elm.addEventListener("dragenter", (event) => {
     //         // console.log('DRAGENTER: ' + S.util.prettyPrint(event));
     //         event.preventDefault();

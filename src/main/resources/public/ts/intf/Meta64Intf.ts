@@ -15,7 +15,6 @@ export interface Meta64Intf {
     deviceWidth: number;
     deviceHeight: number;
 
-    navBarHeight: number;
     // todo-1: convert this to a TypeScript Map<string,string>
     parentIdToFocusNodeMap: { [key: string]: string };
     curHighlightNodeCompRow: CompIntf;

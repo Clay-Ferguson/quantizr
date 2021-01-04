@@ -27,7 +27,7 @@ export class SignupDlg extends DialogBase {
     emailState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
-        super("Crete Account", "app-modal-content-medium-width", null, state);
+        super("Create Account", "app-modal-content-medium-width", null, state);
     }
 
     renderDlg(): CompIntf[] {

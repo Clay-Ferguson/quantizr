@@ -1314,12 +1314,12 @@ i'm backing out for now
 
 .iconToggleOn {
     @extend .iconToggle;
-    border: 3px solid white;
+    border-bottom: 5px solid white;
 }
 
 .iconToggleOff {
     @extend .iconToggle;
-    border: 3px solid transparent;
+    //border-bottom: 4px solid transparent;
 }
 
 .selectLabel {

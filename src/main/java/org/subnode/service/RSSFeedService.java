@@ -85,7 +85,6 @@ public class RSSFeedService {
 		runCount++;
 		if (runCount == 1) {
 			startupPreCache();
-			return;
 		}
 
 		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {

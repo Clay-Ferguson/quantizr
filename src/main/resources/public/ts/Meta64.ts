@@ -21,7 +21,6 @@ export class Meta64 implements Meta64Intf {
     mainMenu: MainMenuDlg;
 
     app: CompIntf;
-    navBarHeight: number = 0;
     appInitialized: boolean = false;
     curUrlPath: string = window.location.pathname + window.location.search;
 
