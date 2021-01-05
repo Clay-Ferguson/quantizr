@@ -11,6 +11,7 @@ export quanta_domain=localhost
 export CLEAN=true
 
 export docker_compose_yaml=docker-compose-dev.yaml
+export docker_compose_mongo_yaml=docker-compose-dev-mongo.yaml
 export mvn_profile=dev
 
 export MONGO_BASE=/home/clay/ferguson

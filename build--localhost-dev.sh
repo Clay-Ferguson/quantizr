@@ -26,6 +26,13 @@ mkdir -p ${ipfs_staging}
 cd ${PRJROOT}
 . ./_build.sh
 
+# This first docker call starts up the network and MongoDB
+# We run mongo using a separate compose, just because we want it fully decoupled
+# for preparation and testing getting ready for running the APP in a load balancer
+docker-compose -f ${docker_compose_mongo_yaml} up -d mongo-dev
+verifySuccess "Docker Compose (Mongo): up"
+dockerCheck "mongo-dev"
+
 docker-compose -f ${docker_compose_yaml} up -d subnode-dev
 verifySuccess "Docker Compose: up"
 
