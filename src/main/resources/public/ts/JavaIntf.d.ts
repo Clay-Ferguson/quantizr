@@ -152,8 +152,9 @@ export interface MoveNodesRequest extends RequestBase {
 export interface NodeFeedRequest extends RequestBase {
     nodeId: string;
     feedUserName: string;
-    userFilter: string;
-    serverFilter: string;
+    toMe: boolean;
+    fromMe: boolean;
+    toPublic: boolean;
 }
 
 export interface NodeSearchRequest extends RequestBase {

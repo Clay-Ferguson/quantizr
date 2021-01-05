@@ -7,8 +7,10 @@ public class NodeFeedRequest extends RequestBase {
 	/* Note one of the other of these should be non-null, but not both */
 	private String nodeId;
 	private String feedUserName;
-	private String userFilter; // friends | all
-	private String serverFilter; // local | federated
+
+	private Boolean toMe;
+	private Boolean fromMe;
+	private Boolean toPublic;
 
 	public String getNodeId() {
 		return nodeId;
@@ -26,19 +28,27 @@ public class NodeFeedRequest extends RequestBase {
 		this.feedUserName = feedUserName;
 	}
 
-	public String getUserFilter() {
-		return userFilter;
+	public Boolean getToMe() {
+		return toMe;
 	}
 
-	public void setUserFilter(String userFilter) {
-		this.userFilter = userFilter;
+	public void setToMe(Boolean toMe) {
+		this.toMe = toMe;
 	}
 
-	public String getServerFilter() {
-		return serverFilter;
+	public Boolean getFromMe() {
+		return fromMe;
 	}
 
-	public void setServerFilter(String serverFilter) {
-		this.serverFilter = serverFilter;
+	public void setFromMe(Boolean fromMe) {
+		this.fromMe = fromMe;
+	}
+
+	public Boolean getToPublic() {
+		return toPublic;
+	}
+
+	public void setToPublic(Boolean toPublic) {
+		this.toPublic = toPublic;
 	}
 }

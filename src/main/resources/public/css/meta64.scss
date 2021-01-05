@@ -338,8 +338,11 @@ strong em {
     margin-right: $smallGap;
 }
 
-.checkboxContainerHeight {
-    line-height: 2.5rem;
+/* Checkboxes always refuse to obey padding or spacing of the components they're in so we have to move the
+entire thing down some times, if it's jutting up against something */
+.checkboxBar {
+    position: relative;
+    top: 20px;
 }
 
 .inline-checkbox {

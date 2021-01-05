@@ -26,11 +26,9 @@ export class AppState {
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
 
-    // friends | all
-    feedUserFilter: string = "friends";
-
-    // local | federated
-    feedServerFilter: string = "local";
+    feedFilterToMe: boolean = true;
+    feedFilterFromMe: boolean = true;
+    feedFilterToPublic: boolean = true;
 
     title: string = "";
 

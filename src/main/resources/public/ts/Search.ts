@@ -103,8 +103,9 @@ export class Search implements SearchIntf {
         S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             nodeId,
             feedUserName,
-            userFilter: appState.feedUserFilter,
-            serverFilter: appState.feedServerFilter
+            toMe: appState.feedFilterToMe,
+            fromMe: appState.feedFilterFromMe,
+            toPublic: appState.feedFilterToPublic
         }, this.feedResponse);
     }
 

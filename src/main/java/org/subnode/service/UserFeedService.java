@@ -7,19 +7,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
+import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.NodeFeedRequest;
 import org.subnode.response.FeedPushInfo;
@@ -49,6 +54,12 @@ public class UserFeedService {
 
 	@Autowired
 	private MongoAuth auth;
+
+	@Autowired
+	private MongoUtil util;
+
+	@Autowired
+	private MongoTemplate ops;
 
 	/* Notify all users being shared to on this node */
 	public void pushNodeUpdateToBrowsers(MongoSession session, SubNode node) {
@@ -153,50 +164,74 @@ public class UserFeedService {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		List<SubNode> nodes = new LinkedList<SubNode>();
 		int counter = 0;
+		List<String> sharedToAny = new LinkedList<String>();
 
-		// todo-0: these two queries (below) can be combined into one? (if so we also of course don't need
-		// the 'dedup' either.)
-		HashSet<ObjectId> dedup = new HashSet<ObjectId>();
-
-		List<String> sharedToList = new LinkedList<String>();
-
+		// todo-0: this needs to change to "shared-by-me, shared-to-me, shared-to-public (each being a
+		// checkbox)"
 		// userFilter will be "all | friends". All means we want to see shares to public from all users, and
 		// not just stuff pretaining to us.
-		if ("all".equals(req.getUserFilter())) {
-			sharedToList.add("public");
+		if (req.getToPublic()) {
+			sharedToAny.add("public");
 		}
 
 		SubNode searchRoot = read.getNode(session, sessionContext.getRootId());
-		sharedToList.add(searchRoot.getOwner().toHexString());
-		/*
-		 * Now add all the nodes that are shared TO this user from any other users.
-		 */
-		for (SubNode node : auth.searchSubGraphByAclUser(session, null, sharedToList, null, MAX_FEED_ITEMS, null)) {
-			if (!dedup.contains(node.getId())) {
-				nodes.add(node);
-				dedup.add(node.getId());
-			}
+
+		// includes shares TO me.
+		if (req.getToMe()) {
+			sharedToAny.add(searchRoot.getOwner().toHexString());
 		}
-
-		/*
-		 * Now add all the nodes that are shared BY this user to any other users.
-		 */
-		for (SubNode node : auth.searchSubGraphByAcl(session, null, searchRoot.getOwner(), null, MAX_FEED_ITEMS)) {
-			if (!dedup.contains(node.getId())) {
-				nodes.add(node);
-				dedup.add(node.getId());
-			}
-		}
-
-		// sort and truncate merged list into final list before converting all
-		nodes = sortAndTruncateFeedItems(nodes);
-
 		List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
 		res.setSearchResults(searchResults);
-		counter = 0;
-		for (SubNode node : nodes) {
+
+		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
+
+		Query query = new Query();
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch));
+
+		List<Criteria> orCriteria = new LinkedList<Criteria>();
+
+		if (req.getFromMe()) {
+			orCriteria.add(
+					// where node is owned by us.
+					Criteria.where(SubNode.FIELD_OWNER).is(searchRoot.getOwner()) //
+							// and the node has any sharing on it.
+							.and(SubNode.FIELD_AC).ne(null));
+		}
+
+		// or a node that is shared to any of the sharedToAny users
+		for (String share : sharedToAny) {
+			orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
+		}
+
+		if (orCriteria.size() == 0) {
+			res.setSuccess(true);
+			return res;
+		}
+
+		/*
+		 * todo-0: This uglyness is because orOperator uses variable args and it threw exceptions, when I
+		 * tried to pass an array, so to save time I just hard coded the 1,2,and 3 parameter cases and moved
+		 * on. need to research
+		 */
+		if (orCriteria.size() == 1) {
+			criteria.orOperator(orCriteria.get(0));
+		} else if (orCriteria.size() == 2) {
+			criteria.orOperator(orCriteria.get(0), orCriteria.get(1));
+		} //
+		else if (orCriteria.size() == 3) {
+			criteria.orOperator(orCriteria.get(0), orCriteria.get(1), orCriteria.get(2));
+		} //
+		else {
+			throw new RuntimeException("number of criteria not handled.");
+		}
+
+		query.addCriteria(criteria);
+		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+		query.limit(MAX_FEED_ITEMS);
+
+		Iterable<SubNode> iter = ops.find(query, SubNode.class);
+		for (SubNode node : iter) {
 			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1, false, false);
 			searchResults.add(info);
 		}
@@ -206,6 +241,7 @@ public class UserFeedService {
 		return res;
 	}
 
+	// unused (but I want to keep for an example)
 	public List<SubNode> sortAndTruncateFeedItems(List<SubNode> list) {
 		/* Sort the feed items chrononologially, reversed with newest on top */
 		Collections.sort(list, new Comparator<SubNode>() {

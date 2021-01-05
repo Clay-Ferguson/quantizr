@@ -8,9 +8,8 @@ import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Checkbox } from "../widget/Checkbox";
 import { Div } from "../widget/Div";
-import { RadioButton } from "../widget/RadioButton";
-import { RadioButtonGroup } from "../widget/RadioButtonGroup";
 import { Span } from "../widget/Span";
 
 let S: Singletons;
@@ -86,11 +85,54 @@ export class FeedView extends Div {
     }
 
     makeFilterButtonsBar = (): Span => {
-        return new Span(null, null, [
-            new RadioButtonGroup([
-                this.createRadioButton("feedUserFilter", "Friends Only", "friends"),
-                this.createRadioButton("feedUserFilter", "Everyone", "all")
-            ], "radioButtonsBar form-group-border feedFilterRadioButtons")
+        return new Span(null, { className: "checkboxBar" }, [
+            new Checkbox("To Me", null, {
+                setValue: (checked: boolean): void => {
+                    dispatch({
+                        type: "Action_SetFeedFilterType",
+                        update: (s: AppState): void => {
+                            s.feedFilterToMe = checked;
+                        }
+                    });
+                    S.nav.navFeed(store.getState());
+                },
+                getValue: (): boolean => {
+                    return store.getState().feedFilterToMe;
+                }
+            }),
+            new Checkbox("From Me", null, {
+                setValue: (checked: boolean): void => {
+                    dispatch({
+                        type: "Action_SetFeedFilterType",
+                        update: (s: AppState): void => {
+                            s.feedFilterFromMe = checked;
+                        }
+                    });
+                    S.nav.navFeed(store.getState());
+                },
+                getValue: (): boolean => {
+                    return store.getState().feedFilterFromMe;
+                }
+            }),
+            new Checkbox("To Public", null, {
+                setValue: (checked: boolean): void => {
+                    dispatch({
+                        type: "Action_SetFeedFilterType",
+                        update: (s: AppState): void => {
+                            s.feedFilterToPublic = checked;
+                        }
+                    });
+                    S.nav.navFeed(store.getState());
+                },
+                getValue: (): boolean => {
+                    return store.getState().feedFilterToPublic;
+                }
+            })
+
+            // new RadioButtonGroup([
+            //     this.createRadioButton("feedUserFilter", "Friends Only", "friends"),
+            //     this.createRadioButton("feedUserFilter", "Everyone", "all")
+            // ], "radioButtonsBar form-group-border feedFilterRadioButtons")
 
             // todo-0: temporarily removed due to refactoring
             // new RadioButtonGroup([
@@ -100,22 +142,22 @@ export class FeedView extends Div {
         ]);
     }
 
-    createRadioButton = (propName: string, name: string, val: string) => {
-        return new RadioButton(name, false, propName + "_Group", null, {
-            setValue: (checked: boolean): void => {
-                if (checked) {
-                    dispatch({
-                        type: "Action_SetFeedFilterType",
-                        update: (s: AppState): void => {
-                            s[propName] = val;
-                        }
-                    });
-                    S.nav.navFeed(store.getState());
-                }
-            },
-            getValue: (): boolean => {
-                return store.getState()[propName] === val;
-            }
-        });
-    }
+    // createRadioButton = (propName: string, name: string, val: string) => {
+    //     return new RadioButton(name, false, propName + "_Group", null, {
+    //         setValue: (checked: boolean): void => {
+    //             if (checked) {
+    //                 dispatch({
+    //                     type: "Action_SetFeedFilterType",
+    //                     update: (s: AppState): void => {
+    //                         s[propName] = val;
+    //                     }
+    //                 });
+    //                 S.nav.navFeed(store.getState());
+    //             }
+    //         },
+    //         getValue: (): boolean => {
+    //             return store.getState()[propName] === val;
+    //         }
+    //     });
+    // }
 }
