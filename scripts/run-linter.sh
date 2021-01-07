@@ -1,6 +1,12 @@
 #!/bin/bash
+# todo-0: fix paths
+
+if [ -f ./vscode-cwd.sh ]; then
+  source ./vscode-cwd.sh
+fi
 
 source ./define-functions.sh
+source ./setenv-common.sh
 source ./setenv--localhost-dev.sh
 
 cd ${PRJROOT}/src/main/resources/public

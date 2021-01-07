@@ -62,7 +62,7 @@ services:
     subnode-dev:
         build: 
             context: .
-            dockerfile: dockerfile-dev
+            dockerfile: ./dockerfile-dev
         container_name: subnode-dev
         expose:
             - '8182'

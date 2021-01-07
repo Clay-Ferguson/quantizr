@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ -f ./vscode-cwd.sh ]; then
+  source ./vscode-cwd.sh
+fi
+
 ###############################################################################
 # 
 # This script builds a deployable subnode-test.tar, which is able to be 
@@ -15,8 +19,10 @@
 
 clear
 # show commands as they are run.
-# set -x
+set -x
+
 source ./define-functions.sh
+source ./setenv-common.sh
 source ./setenv--localhost-test.sh
 
 mkdir -p ${DEPLOY_TARGET}
@@ -26,7 +32,7 @@ cp ${PRJROOT}/dockerfile-test ${DEPLOY_TARGET}/dockerfile-test
 cp ${PRJROOT}/define-functions.sh ${DEPLOY_TARGET}/define-functions.sh
 
 cd ${DEPLOY_TARGET}
-. ./stop-test.sh
+. ${SCRIPTS}/stop-test.sh
 
 sudo rm -f ${DEPLOY_TARGET}/log/*
 mkdir -p ${ipfs_staging}
@@ -35,7 +41,7 @@ mkdir -p ${ipfs_staging}
 rm -rf ${DEPLOY_TARGET}/subnode-test.tar
 
 cd ${PRJROOT}
-. ./_build.sh
+. ${SCRIPTS}/_build.sh
 
 docker save -o ${DEPLOY_TARGET}/subnode-test.tar subnode-test
 verifySuccess "Docker Save"
@@ -54,7 +60,7 @@ cp ${PRJROOT}/stop-test.sh ${DEPLOY_TARGET}/stop-test.sh
 #       script should only be run from 'inside' the docker container, which is what 'mongodb-backup.sh' actually does.
 mkdir -p ${DEPLOY_TARGET}/dumps
 
-cp ../secrets/secrets.sh ${DEPLOY_TARGET}/dumps/secrets.sh
+cp ${SECRETS}/secrets.sh ${DEPLOY_TARGET}/dumps/secrets.sh
 
 cp ${PRJROOT}/backup--localhost-test.sh ${DEPLOY_TARGET}/backup--localhost-test.sh
 cp ${PRJROOT}/_backup--localhost-test.sh ${DEPLOY_TARGET}/dumps/_backup--localhost-test.sh

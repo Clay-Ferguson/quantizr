@@ -1,12 +1,18 @@
 #!/bin/bash
 
+if [ -f ./vscode-cwd.sh ]; then
+  source ./vscode-cwd.sh
+fi
+
 clear
 # show commands as they are run.
 # set -x
+
 source ./define-functions.sh
+source ./setenv-common.sh
 source ./setenv--localhost-dev.sh
 
-sudo chown 999:999 ../secrets/mongod--localhost-dev.conf
+sudo chown 999:999 ${SECRETS}/mongod--localhost-dev.conf
 
 cd ${PRJROOT}
 docker-compose -f ${docker_compose_mongo_yaml} up -d mongo-dev

@@ -8,13 +8,19 @@
 # deployment that can be moved to some other machine.
 ###############################################################################
 
+if [ -f ./vscode-cwd.sh ]; then
+  source ./vscode-cwd.sh
+fi
+
 clear
 # show commands as they are run.
-# set -x
+set -x
+
 source ./define-functions.sh
+source ./setenv-common.sh
 source ./setenv--localhost-dev.sh
 
-sudo chown 999:999 ../secrets/mongod--localhost-dev.conf
+sudo chown 999:999 ${SECRETS}/mongod--localhost-dev.conf
 
 sudo mkdir -p ${QUANTA_BASE}/log
 sudo mkdir -p ${QUANTA_BASE}/tmp
@@ -24,10 +30,8 @@ sudo rm -f ${QUANTA_BASE}/log/*
 mkdir -p ${ipfs_staging}
 
 cd ${PRJROOT}
-
 docker-compose -f ${docker_compose_yaml} up -d subnode-dev
 verifySuccess "Docker Compose: up"
-
 dockerCheck "subnode-dev"
 
 # read -p "Build and Start Complete. press a key"

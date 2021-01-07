@@ -2,7 +2,8 @@
 
 # NOTE: This is not called directly, but indirectly thru 'backup--localhost-test.sh', and this script also
 # gets moved to the place where it is in the shared directory visible to the mongodb docker container and
-# also runs inside the docker container. mongodump isn't even available outside the mongo docker container also.
+# runs inside the docker container. 
+# BTW: mongodump isn't even available outside the mongo docker container either.
 
 # Leave this full path (this is a volume mapping)
 source /mongo-dumps/secrets.sh

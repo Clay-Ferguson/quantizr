@@ -48,8 +48,8 @@ that's used during builds.
 			</properties>
 
 			<dependencies>
-				<!--include:org.springframework.boot.xml-->
-				<!--include:common.xml-->
+				<!--include:spring-boot-->
+				<!--include:common-->
 			</dependencies>
 
 			<build>
@@ -258,8 +258,8 @@ that's used during builds.
 			</properties>
 
 			<dependencies>
-				<!--include:org.springframework.boot.xml-->
-				<!--include:common.xml-->
+				<!--include:spring-boot-->
+				<!--include:common-->
 			</dependencies>
 
 			<build>
@@ -308,8 +308,8 @@ that's used during builds.
 			</properties>
 
 			<dependencies>
-				<!--include:org.springframework.boot.xml-->
-				<!--include:common.xml-->
+				<!--include:spring-boot-->
+				<!--include:common-->
 			</dependencies>
 
 			<build>
@@ -534,8 +534,8 @@ that's used during builds.
 			</properties>
 
 			<dependencies>
-				<!--include:org.springframework.boot.xml-->
-				<!--include:common.xml-->
+				<!--include:spring-boot-->
+				<!--include:common-->
 			</dependencies>
 
 			<build>

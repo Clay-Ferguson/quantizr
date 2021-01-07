@@ -1,8 +1,15 @@
 #!/bin/bash
+
+if [ -f ./vscode-cwd.sh ]; then
+  source ./vscode-cwd.sh
+fi
+
 clear
 # show commands as they are run.
-# set -x
+set -x
+
 source ./define-functions.sh
+source ./setenv-common.sh
 source ./setenv--localhost-dev.sh
 
 # go back to folder with this script in it. sort of 'home' for this script

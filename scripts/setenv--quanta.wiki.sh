@@ -1,10 +1,5 @@
 #!/bin/bash
 
-export ipfs_data=/home/clay/.ipfs
-export ipfs_staging=/home/clay/.ipfs/staging
-
-source ./setenv-common.sh
-
 export quanta_domain=quanta.wiki
 
 # INSTANCE_FOLDER tells docker yaml volume where to find mongo-scripts folder and mongod.conf file.
@@ -15,6 +10,8 @@ export DATA_FOLDER=/home/clay/quanta-data
 
 # IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
 export CLEAN=true
+
+export PROD_DEPLOYER_BASE=/home/clay/ferguson/scripts/linode
 
 export docker_compose_yaml=docker-compose-prod.yaml
 

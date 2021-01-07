@@ -3,8 +3,6 @@
 export ipfs_data=/home/clay/ferguson/subnode-run/ipfs
 export ipfs_staging=/home/clay/ferguson/subnode-run/ipfs/staging
 
-source ./setenv-common.sh
-
 export quanta_domain=localhost
 
 # IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.

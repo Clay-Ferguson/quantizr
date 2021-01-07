@@ -48,7 +48,7 @@ that's used during builds.
 			</properties>
 
 			<dependencies>
-				<!--include:org.springframework.boot.xml-->
+				<!--include:spring-boot-->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -116,7 +116,7 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
 </dependency>
-				<!--include:common.xml-->
+				<!--include:common-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
@@ -440,7 +440,7 @@ of the spring configs for security are also perfected.
 			</properties>
 
 			<dependencies>
-				<!--include:org.springframework.boot.xml-->
+				<!--include:spring-boot-->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -508,7 +508,7 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
 </dependency>
-				<!--include:common.xml-->
+				<!--include:common-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
@@ -672,7 +672,7 @@ of the spring configs for security are also perfected.
 			</properties>
 
 			<dependencies>
-				<!--include:org.springframework.boot.xml-->
+				<!--include:spring-boot-->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -740,7 +740,7 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
 </dependency>
-				<!--include:common.xml-->
+				<!--include:common-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>
@@ -1080,7 +1080,7 @@ of the spring configs for security are also perfected.
 			</properties>
 
 			<dependencies>
-				<!--include:org.springframework.boot.xml-->
+				<!--include:spring-boot-->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -1148,7 +1148,7 @@ of the spring configs for security are also perfected.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-mongodb</artifactId>
 </dependency>
-				<!--include:common.xml-->
+				<!--include:common-->
 <dependency>
     <groupId>commons-fileupload</groupId>
     <artifactId>commons-fileupload</artifactId>

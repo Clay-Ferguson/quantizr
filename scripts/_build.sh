@@ -1,4 +1,7 @@
 #!/bin/bash
+# DO NOT call this script directly. It's called from other scripts.
+
+# todo-0: fix paths
 
 # show commands as they are run.
 # set -x
@@ -23,7 +26,7 @@ cd ${PRJROOT}/src/main/resources/public
 npm config set ignore-scripts true
 
 cd ${PRJROOT}
-./run-linter.sh
+${SCRIPTS}/run-linter.sh
 verifySuccess "Linter"
 
 cd ${PRJROOT}
@@ -31,8 +34,10 @@ docker-compose -f ${docker_compose_yaml} down --remove-orphans
 verifySuccess "Docker Compose: down"
 
 # Generate 'pom.xml' dynamically from file parts
+cd ${PRJROOT}/pom-fragments
 ./pom-generate.sh
 
+cd ${PRJROOT}
 # These aren't normally needed, so I'll just keep commented out most of time. 
 # mvn dependency:sources
 # mvn dependency:resolve -Dclassifier=javadoc
@@ -72,7 +77,6 @@ verifySuccess "Maven Build"
 #
 #   "--forceIndexRebuild=true" \
 ################################################################################################
-
 
 # IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
 # docker-compose -f ${docker_compose_yaml} config 
