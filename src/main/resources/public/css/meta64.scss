@@ -71,7 +71,8 @@ $smallBorderSize: 3px;
 // }
 
 .signupLinkText {
-    margin: 10px;
+    display: inline-block;
+    margin-top: 16px;
     cursor: pointer;
     font-size: 125%;
 }
