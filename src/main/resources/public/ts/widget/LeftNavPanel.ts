@@ -24,15 +24,10 @@ export class LeftNavPanel extends Div {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 
-        let signupButton = state.isAnonUser ? new IconButton("fa-user-plus", "Signup", {
-            onClick: e => { S.nav.signup(state); },
-            title: "Create new Account"
-        }, "btn-primary", "off") : null;
-
-        let loginButton = state.isAnonUser ? new IconButton("fa-sign-in", "Login", {
-            onClick: e => { S.nav.login(state); },
-            title: "Login to Quanta"
-        }, "btn-primary", "off") : null;
+        let loginButton = state.isAnonUser ? new Span("Login / Signup", {
+            className: "signupLinkText",
+            onClick: e => { S.nav.login(state); }
+        }) : null;
 
         this.setChildren([
             new Div(null, null, [
@@ -44,8 +39,6 @@ export class LeftNavPanel extends Div {
                 new Span("Quanta", { className: "logo-text" })
             ]),
             new Div(state.title),
-
-            signupButton,
             loginButton,
 
             new Div(null, {

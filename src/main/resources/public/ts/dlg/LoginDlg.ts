@@ -37,6 +37,7 @@ export class LoginDlg extends DialogBase {
                 ]),
                 new ButtonBar([
                     new Button("Login", this.login, null, "btn-primary"),
+                    new Button("Signup", this.signup, null),
                     new Button("Forgot Password", this.resetPassword),
                     new Button("Close", this.close)
                 ])
@@ -72,6 +73,11 @@ export class LoginDlg extends DialogBase {
 
         this.userState.setValue(user);
         this.pwdState.setValue(pwd);
+    }
+
+    signup = (): void => {
+        this.close();
+        S.nav.signup(this.appState);
     }
 
     login = (): void => {

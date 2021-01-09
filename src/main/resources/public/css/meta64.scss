@@ -70,6 +70,12 @@ $smallBorderSize: 3px;
 //     }
 // }
 
+.signupLinkText {
+    margin: 10px;
+    cursor: pointer;
+    font-size: 125%;
+}
+  
 .fullScreenToolbar {
     z-index: 2147483647;
     position: fixed;
