@@ -19,7 +19,7 @@ fi
 
 clear
 # show commands as they are run.
-set -x
+# set -x
 
 source ./define-functions.sh
 source ./setenv-common.sh

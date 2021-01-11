@@ -152,7 +152,7 @@ export class ProfileDlg extends DialogBase {
         let onClick = (evt) => {
             if (this.readOnly) return;
 
-            let dlg = new UploadFromFileDropzoneDlg(state.userNodeId, null, "", false, null, false, this.appState, () => {
+            let dlg = new UploadFromFileDropzoneDlg(state.userNodeId, null, "", false, null, false, false, this.appState, () => {
 
                 S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: this.userId
@@ -201,7 +201,7 @@ export class ProfileDlg extends DialogBase {
         let onClick = (evt) => {
             if (this.readOnly) return;
 
-            let dlg = new UploadFromFileDropzoneDlg(state.userNodeId, null, "Header", false, null, false, this.appState, () => {
+            let dlg = new UploadFromFileDropzoneDlg(state.userNodeId, null, "Header", false, null, false, false, this.appState, () => {
 
                 S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: this.userId

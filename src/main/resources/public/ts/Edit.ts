@@ -47,7 +47,7 @@ export class Edit implements EditIntf {
             return;
         }
 
-        const dlg = new UploadFromFileDropzoneDlg(node.id, node, "", false, null, true, state, () => {
+        const dlg = new UploadFromFileDropzoneDlg(node.id, node, "", false, null, true, true, state, () => {
             S.meta64.refresh(state);
         });
         dlg.open();

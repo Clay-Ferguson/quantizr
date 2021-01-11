@@ -48,7 +48,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     ipfsCheckbox: Checkbox;
 
-    constructor(private nodeId: string, private node: J.NodeInfo, private binSuffix: string, private toIpfs: boolean, private autoAddFile: File, private importMode: boolean, state: AppState, public afterUploadFunc: Function) {
+    constructor(private nodeId: string, private node: J.NodeInfo, private binSuffix: string, private toIpfs: boolean, //
+        private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, state: AppState, public afterUploadFunc: Function) {
         super(importMode ? "Import File" : "Upload File", null, false, state);
     }
 
@@ -68,7 +69,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     this.importMode ? null : new Button("From URL", this.uploadFromUrl),
                     this.importMode ? null : new Button("From Clipboard", this.uploadFromClipboard),
 
-                    this.importMode ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {
+                    this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {
                         onClick: async () => {
                             let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, false, true);
                             await dlg.open();
@@ -81,7 +82,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         title: "Record Audio to Attachment"
                     }, "btn-secondary"),
 
-                    this.importMode ? null : new IconButton("fa-video-camera", /* From WebCam */ null, {
+                    this.importMode || !this.allowRecording ? null : new IconButton("fa-video-camera", /* From WebCam */ null, {
                         onClick: async () => {
                             let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, true, true);
                             await dlg.open();

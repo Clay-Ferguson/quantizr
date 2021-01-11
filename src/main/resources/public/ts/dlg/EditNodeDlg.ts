@@ -488,7 +488,7 @@ export class EditNodeDlg extends DialogBase {
     upload = async (): Promise<void> => {
         let state = this.getState();
 
-        let dlg = new UploadFromFileDropzoneDlg(state.node.id, state.node, "", state.toIpfs, null, false, this.appState, async () => {
+        let dlg = new UploadFromFileDropzoneDlg(state.node.id, state.node, "", state.toIpfs, null, false, true, this.appState, async () => {
             await S.attachment.refreshBinaryPropsFromServer(state.node);
             this.mergeState({ node: state.node });
             this.binaryDirty = true;
