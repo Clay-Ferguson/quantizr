@@ -1304,7 +1304,7 @@ public class ActPubService {
      */
     public String getLocalUserNameFromActorUrl(String actorUrl) {
         if (!isLocalActorUrl(actorUrl)) {
-            log.debug("Invalid quanta actor Url: " + actorUrl);
+            log.debug("Invalid local actor Url: " + actorUrl);
             return null;
         }
 

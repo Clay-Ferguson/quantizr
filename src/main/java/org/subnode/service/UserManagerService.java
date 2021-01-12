@@ -25,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.config.AppProp;
-import org.subnode.config.ConstantsProvider;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.OutOfSpaceException;
 import org.subnode.exception.base.RuntimeEx;
@@ -110,9 +109,6 @@ public class UserManagerService {
 
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
-
-	@Autowired
-	private ConstantsProvider constProvider;
 
 	@Autowired
 	private AclService acu;
@@ -506,10 +502,12 @@ public class UserManagerService {
 		 */
 		log.debug("Signup URL: " + signupLink);
 
+		// todo-0: put rebrandable name here
 		content = "Welcome to Quanta: " + userName + //
 				"<p>\nClick this link to complete signup: <br>\n" + signupLink;
 
 		if (!StringUtils.isEmpty(appProp.getMailHost())) {
+			// todo-0: put rebrandable name here
 			outboxMgr.queueEmail(email, "Quanta - Account Signup", content);
 		}
 	}
@@ -809,10 +807,13 @@ public class UserManagerService {
 
 			String passCode = ownerNode.getId().toHexString() + "-" + String.valueOf(authCode);
 
-			String link = constProvider.getHostAndPort() + "?passCode=" + passCode;
+			String link = appProp.getHostAndPort() + "?passCode=" + passCode;
+
+			// todo-0: put rebrandable name here
 			String content = "Password reset was requested on Quanta account: " + user + //
 			"<p>\nGo to this link to reset your password: <br>\n" + link;
 
+			// todo-0: put rebrandable name here
 			outboxMgr.queueEmail(email, "Quanta Password Reset", content);
 
 			res.setMessage("A password reset link has been sent to your email. Check your email in a minute or so.");

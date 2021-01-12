@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.AppController;
 import org.subnode.config.AppProp;
-import org.subnode.config.ConstantsProvider;
 import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.CreateNodeLocation;
@@ -40,9 +39,6 @@ public class SubNodeUtil {
 
 	@Autowired
 	private MongoUpdate update;
-
-	@Autowired
-	private ConstantsProvider constProvider;
 
 	@Autowired
     private AppProp appProp;
@@ -234,7 +230,7 @@ public class SubNodeUtil {
 		}
 
 		ret.setLink(getAttachmentUrl(node));
-		ret.setUrl(constProvider.getHostAndPort() + "/app?id=" + node.getId().toHexString());
+		ret.setUrl(appProp.getHostAndPort() + "/app?id=" + node.getId().toHexString());
 		return ret;
 	}
 
@@ -252,7 +248,7 @@ public class SubNodeUtil {
 
 		String bin = ipfsLink != null ? ipfsLink : node.getStrProp(NodeProp.BIN);
 		if (bin != null) {
-			return constProvider.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId="
+			return appProp.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId="
 					+ node.getId().toHexString();
 		}
 		return null;

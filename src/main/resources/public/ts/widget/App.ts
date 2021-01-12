@@ -70,13 +70,11 @@ export class App extends Div {
             }, "btn-secondary marginRight", "off");
 
             let signupButton = state.isAnonUser ? new IconButton("fa-user-plus", "Signup", {
-                onClick: e => { S.nav.signup(state); },
-                title: "Create new Account"
+                onClick: e => { S.nav.signup(state); }
             }, "btn-primary marginRight", "off") : null;
 
             let loginButton = state.isAnonUser ? new IconButton("fa-sign-in", "Login", {
-                onClick: e => { S.nav.login(state); },
-                title: "Login to Quanta"
+                onClick: e => { S.nav.login(state); }
             }, "btn-primary marginRight", "off") : null;
 
             let logo = new Img(this.getId() + "_logo", {

@@ -4,8 +4,9 @@ services:
     # # Note: Container Names are automatically available as 'host names' (as in networking http://host:port)
     # # Networked service-to-service communication use the CONTAINER_PORT in [host]:[container] pairs below.
 
+    # _________________________________________________________________________
     # DO NOT DELETE
-    # Let's maintain the example of how to run it all internally
+    # Let's keep this example of how to run mongo-dev internally in case we ever want to do this again.
     #+++++++++++++++++++
     # (uncomment: for mongo internal to this docker)
     # # Theoretically it should have been possible to let mongo run internally on 27017 (it's default) and then expose it
@@ -33,6 +34,7 @@ services:
     #     # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
     #     # and we don't want that happening unexpectedly
     #     image: mongo:4.0
+    # _________________________________________________________________________
 
     # https://hub.docker.com/r/ipfs/go-ipfs/
     ipfs-dev: 

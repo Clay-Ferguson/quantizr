@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
-import org.subnode.config.ConstantsProvider;
 import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
@@ -51,9 +50,6 @@ public class ExportServiceFlexmark {
 
 	@Autowired
 	private MongoRead read;
-
-	@Autowired
-	private ConstantsProvider constProvider;
 
 	@Autowired
 	private SessionContext sessionContext;
@@ -195,7 +191,7 @@ public class ExportServiceFlexmark {
 			style = " style='width:" + imgSize + "'";
 		}
 
-		markdown.append("\n<img src='" + constProvider.getHostAndPort() + "/mobile/api/bin/" + bin + "?nodeId="
+		markdown.append("\n<img src='" + appProp.getHostAndPort() + "/mobile/api/bin/" + bin + "?nodeId="
 				+ node.getId().toHexString() + "&token=" + sessionContext.getUserToken() + "' " + style + "/>\n");
 	}
 
@@ -204,7 +200,7 @@ public class ExportServiceFlexmark {
 	 */
 	private String generateHtml(String body) {
 		String ret = XString.getResourceAsString("/public/export-includes/flexmark/html-template.html");
-		ret = ret.replace("{{hostAndPort}}", constProvider.getHostAndPort());
+		ret = ret.replace("{{hostAndPort}}", appProp.getHostAndPort());
 		ret = ret.replace("{{body}}", body);
 		return ret;
 	}

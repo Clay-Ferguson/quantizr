@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 /**
  * Primary class for accessing application properties.
  * <p>
- * NOTE: We could use EnvironmentAware but under normal circumstances apps can
- * just Autowire the Env, so that's what we do.
+ * NOTE: We could use EnvironmentAware but under normal circumstances apps can just Autowire the
+ * Env, so that's what we do.
  */
 @Component
 public class AppProp /* implements EnvironmentAware */ {
@@ -26,6 +26,10 @@ public class AppProp /* implements EnvironmentAware */ {
 	private Environment env;
 
 	private String protocolHostAndPort = null;
+
+	public String getHostAndPort() {
+		return getHttpProtocol() + "://" + getMetaHost() + ":" + getServerPort();
+	}
 
 	public String getLuceneDir() {
 		return "/subnode-lucene"; // todo-2: get this from prop

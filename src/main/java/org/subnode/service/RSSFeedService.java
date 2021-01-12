@@ -354,6 +354,8 @@ public class RSSFeedService {
 				SyndEntry entry = new SyndEntryImpl();
 
 				entry.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "ID: " + n.getId().toHexString());
+
+				// todo-0: remove hard-coded utl
 				entry.setLink(metaInfo.getLink() != null ? metaInfo.getLink() : "https://quanta.wiki");
 
 				/*

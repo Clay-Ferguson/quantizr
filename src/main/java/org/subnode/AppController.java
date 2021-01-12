@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.subnode.config.ConstantsProvider;
+import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
@@ -232,13 +232,13 @@ public class AppController implements ErrorController {
 	private UserFeedService userFeedService;
 
 	@Autowired
-	private ConstantsProvider constProvider;
-
-	@Autowired
 	private RSSFeedService rssFeedService;
 
 	@Autowired
 	private GraphNodesService graphNodesService;
+
+	@Autowired
+	private AppProp appProp;
 
 	// private final CopyOnWriteArrayList<SseEmitter> emitters = new
 	// CopyOnWriteArrayList<>();
@@ -248,7 +248,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = ERROR_MAPPING)
 	public String error(Model model) {
 		init();
-		model.addAttribute("hostAndPort", constProvider.getHostAndPort());
+		model.addAttribute("hostAndPort", appProp.getHostAndPort());
 		model.addAllAttributes(thymeleafAttribs);
 		// pulls up error.html
 		return "error";
@@ -259,7 +259,7 @@ public class AppController implements ErrorController {
 	}
 
 	public void initThymeleafAttribs() {
-		if (constProvider.getProfileName().equals("dev")) {
+		if (appProp.getProfileName().equals("dev")) {
 			// force reload of attribs
 			thymeleafAttribs = null;
 		}
@@ -269,8 +269,7 @@ public class AppController implements ErrorController {
 
 		thymeleafAttribs = new HashMap<String, String>();
 
-		// todo-1: This needs to be in a property file, to help re-brandability.
-		thymeleafAttribs.put("metaDescription", "Quanta: Social Media Micro-blogging Platform for the Fediverse!");
+		thymeleafAttribs.put("brandingMetaContent", appProp.getBrandingMetaContent());
 
 		thymeleafAttribs.put("BUNDLE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bundle.js"));
 		thymeleafAttribs.put("MAIN_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/meta64.css"));
@@ -1292,7 +1291,7 @@ public class AppController implements ErrorController {
 			synchronized (MailSender.getLock()) {
 				try {
 					mailSender.init();
-					mailSender.sendMail("wclayf@gmail.com", null, "<h1>Hello from Quanta! Time=" + timeString + "</h1>",
+					mailSender.sendMail("wclayf@gmail.com", null, "<h1>Hello! Time=" + timeString + "</h1>",
 							"Test Subject");
 				} finally {
 					mailSender.close();

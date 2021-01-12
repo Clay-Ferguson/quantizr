@@ -1,6 +1,6 @@
 package org.subnode;
 
-import org.subnode.config.ConstantsProvider;
+import org.subnode.config.AppProp;
 import org.subnode.util.ExUtil;
 
 import org.slf4j.Logger;
@@ -29,14 +29,14 @@ public class AppServer {
 	private static final Logger log = LoggerFactory.getLogger(AppServer.class);
 
 	@Autowired
-	private ConstantsProvider constProvider;
+	private AppProp appProp;
 
 	private static boolean shuttingDown;
 	private static boolean enableScheduling;
 
-	/* Java Main entry point for Quanta application */
+	/* Java Main entry point for the application */
 	public static void main(String[] args) {
-		log.debug("\nQuanta AppServer Starting\n--------------------------------------------------------------------------------------");
+		log.debug("\nAppServer Starting\n--------------------------------------------------------------------------------------");
 		log.trace("main() trace log test.");
 		/*
 		 * If we are running AppServer then enableScheduling, otherwise we may be
@@ -52,7 +52,7 @@ public class AppServer {
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
 		log.info("ContextRefreshedEvent.");
-		log.debug("PROFILE: " + constProvider.getProfileName());
+		log.debug("PROFILE: " + appProp.getProfileName());
 	}
 
 	@EventListener

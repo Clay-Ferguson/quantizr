@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.subnode.config.ConstantsProvider;
+import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
@@ -49,7 +49,7 @@ public class OutboxMgr {
 	private RunAsMongoAdmin adminRunner;
 
 	@Autowired
-	private ConstantsProvider constProvider;
+	private AppProp appProp;
 
 	private String mailBatchSize = "10";
 
@@ -101,7 +101,7 @@ public class OutboxMgr {
 				String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
 
 				String content = String.format("#### **%s** " + notifyMessage + "\n\n%s/app?id=%s\n\n%s",
-						sessionContext.getUserName(), constProvider.getHostAndPort(), node.getId().toHexString(), shortContent);
+						sessionContext.getUserName(), appProp.getHostAndPort(), node.getId().toHexString(), shortContent);
 
 				notifyNode.setOwner(userInbox.getOwner());
 				notifyNode.setContent(content);
@@ -130,7 +130,7 @@ public class OutboxMgr {
 		log.debug("sending email to: " + email + " because his node was appended under.");
 
 		String content = String.format("User '%s' replied to you.<p>\n\n" + //
-				"%s/app?id=%s", userName, constProvider.getHostAndPort(), node.getId().toHexString());
+				"%s/app?id=%s", userName, appProp.getHostAndPort(), node.getId().toHexString());
 
 		queueMailUsingAdminSession(session, email, "New SubNode Notification", content);
 	}

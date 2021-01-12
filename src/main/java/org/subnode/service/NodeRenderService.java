@@ -13,7 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.subnode.config.AppProp;
-import org.subnode.config.ConstantsProvider;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.NodeAuthFailedException;
@@ -67,9 +66,6 @@ public class NodeRenderService {
 
 	@Autowired
 	private SessionContext sessionContext;
-
-	@Autowired
-	private ConstantsProvider constProvider;
 
 	/* Note: this MUST match nav.ROWS_PER_PAGE variable in TypeScript */
 	private static int ROWS_PER_PAGE = 25;
