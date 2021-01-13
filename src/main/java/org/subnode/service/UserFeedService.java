@@ -167,10 +167,6 @@ public class UserFeedService {
 		int counter = 0;
 		List<String> sharedToAny = new LinkedList<String>();
 
-		// todo-0: this needs to change to "shared-by-me, shared-to-me, shared-to-public (each being a
-		// checkbox)"
-		// userFilter will be "all | friends". All means we want to see shares to public from all users, and
-		// not just stuff pretaining to us.
 		if (req.getToPublic()) {
 			sharedToAny.add("public");
 		}

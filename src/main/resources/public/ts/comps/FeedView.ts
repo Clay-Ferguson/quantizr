@@ -128,36 +128,6 @@ export class FeedView extends Div {
                     return store.getState().feedFilterToPublic;
                 }
             })
-
-            // new RadioButtonGroup([
-            //     this.createRadioButton("feedUserFilter", "Friends Only", "friends"),
-            //     this.createRadioButton("feedUserFilter", "Everyone", "all")
-            // ], "radioButtonsBar form-group-border feedFilterRadioButtons")
-
-            // todo-0: temporarily removed due to refactoring
-            // new RadioButtonGroup([
-            //     this.createRadioButton("feedServerFilter", "Local", "local"),
-            //     this.createRadioButton("feedServerFilter", "Federated", "federated")
-            // ], "radioButtonsBar form-group-border feedFilterRadioButtons")
         ]);
     }
-
-    // createRadioButton = (propName: string, name: string, val: string) => {
-    //     return new RadioButton(name, false, propName + "_Group", null, {
-    //         setValue: (checked: boolean): void => {
-    //             if (checked) {
-    //                 dispatch({
-    //                     type: "Action_SetFeedFilterType",
-    //                     update: (s: AppState): void => {
-    //                         s[propName] = val;
-    //                     }
-    //                 });
-    //                 S.nav.navFeed(store.getState());
-    //             }
-    //         },
-    //         getValue: (): boolean => {
-    //             return store.getState()[propName] === val;
-    //         }
-    //     });
-    // }
 }

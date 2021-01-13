@@ -64,7 +64,7 @@ export class ServerPush implements ServerPushIntf {
                             /* note: we could que up the incomming nodeInfo, adn then avoid a call to the server but for now we just
                             keep it simple and only set a dirty flag
 
-                            todo-0: Very nice feature here would be if user is browsing a tree, and a node they happen to be viewing
+                            todo-1: Very nice feature here would be if user is browsing a tree, and a node they happen to be viewing
                             didn't have any children (so the "Open" button isn't showing, this would detect that special case and trigger
                             the page to re-render (without a trip back to the server, just by setting the children flag on the node
                             in local memory)

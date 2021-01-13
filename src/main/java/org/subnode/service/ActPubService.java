@@ -1732,8 +1732,7 @@ public class ActPubService {
     }
 
     /*
-     * todo-0: Security isn't implemented on this call yet so a hacker can theoretically inject any
-     * userName into the api for this to retrieve shared nodes anyone has shared.
+     * todo-0: Security isn't implemented on this call yet
      */
     public APList getOutboxItems(String userName, String sharedTo, String minId) {
         String host = appProp.getProtocolHostAndPort();
