@@ -209,22 +209,7 @@ public class UserFeedService {
 			return res;
 		}
 
-		/*
-		 * todo-0: This uglyness is because orOperator uses variable args and it threw exceptions, when I
-		 * tried to pass an array, so to save time I just hard coded the 1,2,and 3 parameter cases and moved
-		 * on. need to research
-		 */
-		if (orCriteria.size() == 1) {
-			criteria.orOperator(orCriteria.get(0));
-		} else if (orCriteria.size() == 2) {
-			criteria.orOperator(orCriteria.get(0), orCriteria.get(1));
-		} //
-		else if (orCriteria.size() == 3) {
-			criteria.orOperator(orCriteria.get(0), orCriteria.get(1), orCriteria.get(2));
-		} //
-		else {
-			throw new RuntimeException("number of criteria not handled.");
-		}
+		criteria.orOperator((Criteria[])orCriteria.toArray());
 
 		query.addCriteria(criteria);
 		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));

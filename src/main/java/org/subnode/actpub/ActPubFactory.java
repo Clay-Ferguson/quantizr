@@ -56,7 +56,9 @@ public class ActPubFactory {
 
 			/*
 			 * For public messages Mastodon puts the "Public" target in 'to' and the mentioned users in 'cc', so
-			 * we do that same thing todo-0: need to check how mastodon would to this on a 'reply'?? I bet a
+			 * we do that same thing 
+			 * 
+			 * todo-0: need to check how mastodon would to this on a 'reply'?? I bet a
 			 * reply has at least the person being replied to being put in the 'to' right ?
 			 */
 			if (privateMessage) {

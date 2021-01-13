@@ -485,18 +485,8 @@ public class MongoAuth {
 			for (String share : sharedToAny) {
 				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
 			}
-			/*
-			 * todo-0: This uglyness is because orOperator uses variable args and it threw exceptions, when I
-			 * tried to pass an array, so to save time I just hard coded the 1 and 2 parameter case and moved
-			 * on. need to research
-			 */
-			if (orCriteria.size() == 1) {
-				criteria.orOperator(orCriteria.get(0));
-			} else if (orCriteria.size() == 2) {
-				criteria.orOperator(orCriteria.get(0), orCriteria.get(1));
-			} else {
-				throw new RuntimeException("number of criteria not handled.");
-			}
+
+			criteria.orOperator((Criteria[])orCriteria.toArray());
 		}
 
 		if (ownerIdMatch != null) {

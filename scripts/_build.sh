@@ -1,8 +1,6 @@
 #!/bin/bash
 # DO NOT call this script directly. It's called from other scripts.
 
-# todo-0: fix paths
-
 # show commands as they are run.
 # set -x
 
