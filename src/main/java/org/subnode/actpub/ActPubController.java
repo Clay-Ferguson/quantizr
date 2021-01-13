@@ -90,7 +90,7 @@ public class ActPubController {
 			 * what Mastodon is "supposed" to do, to be able to even say if this is incorrect or not.
 			 * 
 			 * From analyzing other 'server to server' calls on other Mastodon instances it seems like at least
-			 * the "toot count" should be showing up, but when I search a Quanta.wiki user and it gets the
+			 * the "toot count" should be showing up, but when I search a local user (non-federated) and it gets the
 			 * outbox, mastodon still shows "0 toots", even though it just queried my inbox and there ARE toots
 			 * and we DID return the correct number of them.
 			 */

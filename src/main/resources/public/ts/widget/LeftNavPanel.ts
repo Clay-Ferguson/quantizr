@@ -14,6 +14,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+declare var g_brandingAppName;
+
 export class LeftNavPanel extends Div {
 
     constructor() {
@@ -39,8 +41,7 @@ export class LeftNavPanel extends Div {
                     onClick: () => { window.location.href = window.location.origin; }
                 }),
 
-                // todo-0: this text needs to be rebrandable
-                new Span("Quanta", { className: "logo-text" })
+                new Span(g_brandingAppName, { className: "logo-text" })
             ]),
             new Div(state.title),
             loginButton,

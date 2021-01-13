@@ -502,13 +502,11 @@ public class UserManagerService {
 		 */
 		log.debug("Signup URL: " + signupLink);
 
-		// todo-0: put rebrandable name here
-		content = "Welcome to Quanta: " + userName + //
+		content = "Welcome to " + appProp.getBrandingAppName() + ":" + userName + //
 				"<p>\nClick this link to complete signup: <br>\n" + signupLink;
 
 		if (!StringUtils.isEmpty(appProp.getMailHost())) {
-			// todo-0: put rebrandable name here
-			outboxMgr.queueEmail(email, "Quanta - Account Signup", content);
+			outboxMgr.queueEmail(email, appProp.getBrandingAppName() + " - Account Signup", content);
 		}
 	}
 
@@ -809,12 +807,10 @@ public class UserManagerService {
 
 			String link = appProp.getHostAndPort() + "?passCode=" + passCode;
 
-			// todo-0: put rebrandable name here
-			String content = "Password reset was requested on Quanta account: " + user + //
+			String content = "Password reset was requested on " + appProp.getBrandingAppName() + " account: " + user + //
 			"<p>\nGo to this link to reset your password: <br>\n" + link;
 
-			// todo-0: put rebrandable name here
-			outboxMgr.queueEmail(email, "Quanta Password Reset", content);
+			outboxMgr.queueEmail(email, appProp.getBrandingAppName() + " Password Reset", content);
 
 			res.setMessage("A password reset link has been sent to your email. Check your email in a minute or so.");
 			res.setSuccess(true);

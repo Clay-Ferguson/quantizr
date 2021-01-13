@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.subnode.exception.base.RuntimeEx;
 
 /**
- * Quanta uses RuntimeExceptions primarily for all exception handling, throughout the app because
+ * We use RuntimeExceptions primarily for all exception handling, throughout the app because
  * of the cleanness of the API when it doesn't have to declare checked exceptions everywhere, and
  * this utility encapsulates the conversion of most checked exceptions to RuntimeExceptions.
  * 

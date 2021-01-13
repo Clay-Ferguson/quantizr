@@ -24,8 +24,8 @@ import org.subnode.mongo.model.SubNodePropertyMap;
 /**
  * Assorted general utility functions related to SubNodes.
  * 
- * todo-2: there's a lot of code calling these static methods, but need to
- * transition to singleton scope bean and non-static methods.
+ * todo-2: there's a lot of code calling these static methods, but need to transition to singleton
+ * scope bean and non-static methods.
  */
 @Component
 public class SubNodeUtil {
@@ -41,11 +41,10 @@ public class SubNodeUtil {
 	private MongoUpdate update;
 
 	@Autowired
-    private AppProp appProp;
+	private AppProp appProp;
 
 	/*
-	 * These are properties we should never allow the client to send back as part of
-	 * a save operation.
+	 * These are properties we should never allow the client to send back as part of a save operation.
 	 */
 	private static HashSet<String> nonSavableProperties = new HashSet<String>();
 
@@ -56,10 +55,9 @@ public class SubNodeUtil {
 	}
 
 	/*
-	 * Currently there's a bug in the client code where it sends nulls for some
-	 * nonsavable types, so before even fixing the client I decided to just make the
-	 * server side block those. This is more secure to always have the server allow
-	 * misbehaving javascript for security reasons.
+	 * Currently there's a bug in the client code where it sends nulls for some nonsavable types, so
+	 * before even fixing the client I decided to just make the server side block those. This is more
+	 * secure to always have the server allow misbehaving javascript for security reasons.
 	 */
 	public static boolean isSavableProperty(String propertyName) {
 		return !nonSavableProperties.contains(propertyName);
@@ -118,8 +116,7 @@ public class SubNodeUtil {
 				// log.debug("Creating " + nameToken + " node, which didn't exist.");
 
 				/* Note if parent PARAMETER here is null we are adding a root node */
-				parent = create.createNode(session, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST,
-						null, null);
+				parent = create.createNode(session, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null);
 
 				if (parent == null) {
 					throw ExUtil.wrapEx("unable to create " + nameToken);
@@ -169,10 +166,10 @@ public class SubNodeUtil {
 	}
 
 	/*
-	 * I've decided 64 bits of randomness is good enough, instead of 128, thus we
-	 * are dicing up the string to use every other character. If you want to modify
-	 * this method to return a full UUID that will not cause any problems, other
-	 * than default node names being the full string, which is kind of long
+	 * I've decided 64 bits of randomness is good enough, instead of 128, thus we are dicing up the
+	 * string to use every other character. If you want to modify this method to return a full UUID that
+	 * will not cause any problems, other than default node names being the full string, which is kind
+	 * of long
 	 */
 	public String getGUID() {
 		String uid = UUID.randomUUID().toString();
@@ -191,13 +188,11 @@ public class SubNodeUtil {
 
 		return sb.toString();
 
-		// WARNING: I remember there are some cases where SecureRandom can hang on
-		// non-user machines
-		// (i.e. production servers), as
-		// they rely no some OS level sources of entropy that may be dormant at the
-		// time. Be
-		// careful.
-		// here's another way to generate a random 64bit number...
+		/*
+		 * WARNING: I remember there are some cases where SecureRandom can hang on non-user machines (i.e.
+		 * production servers), as they rely no some OS level sources of entropy that may be dormant at the
+		 * time. Be careful. here's another way to generate a random 64bit number...
+		 */
 		// if (prng == null) {
 		// prng = SecureRandom.getInstance("SHA1PRNG");
 		// }
@@ -237,19 +232,9 @@ public class SubNodeUtil {
 	public String getAttachmentUrl(SubNode node) {
 		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
 
-		/*
-		 * If we had a public gateway we could actually trust we could return this, but
-		 * gateways have a tendency to be flaky and often appear to blacklist videos
-		 * uploated thru Quanta.wiki, and I won't even speculate why
-		 */
-		// if (ipfsLink != null) {
-		// return Const.IPFS_IO_GATEWAY + ipfsLink;
-		// }
-
 		String bin = ipfsLink != null ? ipfsLink : node.getStrProp(NodeProp.BIN);
 		if (bin != null) {
-			return appProp.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId="
-					+ node.getId().toHexString();
+			return appProp.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getId().toHexString();
 		}
 		return null;
 	}

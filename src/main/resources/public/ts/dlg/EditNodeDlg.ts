@@ -231,11 +231,6 @@ export class EditNodeDlg extends DialogBase {
                 }
             }),
 
-            // todo-1: temporarily disabling since Quanta will have it's own Gateway from now on.
-            // new Checkbox("Save To IPFS", {
-            //     className: "marginRight",
-            // }, this.makeCheckboxPropValueHandler(J.NodeProp.SAVE_TO_IPFS)),
-
             state.node.hasChildren ? new Checkbox("Inline Children", null,
                 this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null
         ]);

@@ -368,7 +368,7 @@ export class Encryption implements EncryptionIntf {
     }
 
     /**
-     * Returns a string the user can save locally containing all encryption keys stored by Quanta in their browser.
+     * Returns a string the user can save locally containing all encryption keys stored  in the browser.
      *
      * Export is in JWK format: https://tools.ietf.org/html/rfc7517
      */

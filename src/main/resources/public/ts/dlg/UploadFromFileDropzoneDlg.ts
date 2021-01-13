@@ -182,7 +182,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     configureDropZone = (): void => {
         let state = this.getState();
 
-        /* Limit based on user quota for Quanta accounts */
+        /* Limit based on user quota for our user accounts */
         let maxFileSize = this.appState.userPreferences.maxUploadFileSize;
         // console.log("configureDropZone: maxFileSize="+maxUploadSize);
 

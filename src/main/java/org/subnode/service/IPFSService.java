@@ -89,7 +89,7 @@ public class IPFSService {
     private AppProp appProp;
 
     /**
-     * Looks up quanta node by 'nodeId', and gets the 'ipfs:link' property, which is
+     * Looks up node by 'nodeId', and gets the 'ipfs:link' property, which is
      * used to retrieve the MerkleNode (as JSON), and then pretty prints it and
      * returns it.
      */

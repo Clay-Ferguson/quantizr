@@ -12,8 +12,6 @@ export class Constants {
     static readonly ONE_MB = 1048576; // 1024 * 1024;
     static readonly MAX_UPLOAD_MB = 20;
 
-    static readonly IPFS_IO_GATEWAY: string = "https://gateway.pinata.cloud/ipfs/";
-
     /* Feature Flags */
     /* ======================================================================== */
     /* Ace editor is disabled because it doesn't have spell-checker and I decided spellchecking is a requirement */

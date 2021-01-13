@@ -802,7 +802,7 @@ public class MongoRead {
         }
         user = user.trim();
 
-        // if user name ends with "@quanta.wiki" for example, truncate it after the '@'
+        // if user name ends with "@domain.com" for example, truncate it after the '@'
         // character.
         user = convertIfLocalName(user);
 

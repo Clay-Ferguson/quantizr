@@ -391,7 +391,7 @@ public class AppController implements ErrorController {
 
 		/*
 		 * if welcomeMap is empty that likely means the "pg_welcome" node hasn't yet been created on this
-		 * quanta instanace so we bypass the landing page and go to index.html instead.
+		 * server instanace so we bypass the landing page and go to index.html instead.
 		 */
 		if (!welcomePagePresent) {
 			return "index";

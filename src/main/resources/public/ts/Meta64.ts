@@ -96,7 +96,7 @@ export class Meta64 implements Meta64Intf {
                 let n = new Notification(title, {
                     body: message,
 
-                    /* Chrome is showing it's own icon/image instead of the quanta one and I'm not sure why. I've tried
+                    /* Chrome is showing it's own icon/image instead of the custom one and I'm not sure why. I've tried
                      both image and icon here and neither works. */
                     image: window.location.origin + "/images/eagle-logo-50px-tr.jpg"
                 });
@@ -459,7 +459,7 @@ export class Meta64 implements Meta64Intf {
             // todo-1: actually this is a nuisance unless user is actually EDITING a node right now
             // so until i make it able to detect if user is editing i'm removing this.
             // window.onbeforeunload = () => {
-            //     return "Leave Quanta ?";
+            //     return "Leave [appName] ?";
             // };
 
             /*

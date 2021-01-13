@@ -13,7 +13,6 @@ import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { Anchor } from "./widget/Anchor";
 import { Comp } from "./widget/base/Comp";
 import { Div } from "./widget/Div";
 import { Heading } from "./widget/Heading";
@@ -252,16 +251,6 @@ export class Render implements RenderIntf {
             }
         }
 
-        // why was this still here?
-        // const jsonIpfsLink = S.props.getNodePropVal(J.NodeProp.JSON_HASH, node);
-        // if (jsonIpfsLink) {
-        //     url = C.IPFS_IO_GATEWAY + jsonIpfsLink;
-        //     children.push(new Heading(5, "IPFS Node JSON"));
-        //     children.push(new Div(url, {
-        //         className: "anchorBigMarginBottom"
-        //     }));
-        // }
-
         const linksDiv = new Div(null, null, children);
         new MessageDlg(null, "URLs for Node " + node.id, null, linksDiv, false, 0, null).open();
     }
@@ -428,12 +417,6 @@ export class Render implements RenderIntf {
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
         const ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
-
-        /* If we had a public gateway we could actually trust we could return this, but gateways have a tendency
-         to be flaky and often appear to blacklist videos uploated thru Quanta.wiki, and I won't even speculate why */
-        // if (ipfsLink) {
-        //     return C.IPFS_IO_GATEWAY + ipfsLink;
-        // }
 
         // If there's no IPFS_LINK on the node try the BIN prop instead.
         const bin = ipfsLink || S.props.getNodePropVal(J.NodeProp.BIN, node);

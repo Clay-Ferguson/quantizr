@@ -314,7 +314,7 @@ public class ActPubService {
     }
 
     /*
-     * Note: 'actor' here is the actor URL of the local Quanta-based user doing the post
+     * Note: 'actor' here is the actor URL of the local (non-federated) user doing the post
      */
     private void securePost(MongoSession session, String privateKey, String toInbox, String actor, APObj message) {
         try {
@@ -809,7 +809,8 @@ public class ActPubService {
                         .put("actor", sessionActorUrl) //
                         .put("object", new APObj() //
                                 .put("id",
-                                        appProp.getProtocolHostAndPort() + "/unfollow-obj/" + String.valueOf(new Date().getTime())) //
+                                        appProp.getProtocolHostAndPort() + "/unfollow-obj/"
+                                                + String.valueOf(new Date().getTime())) //
                                 .put("type", "Follow") //
                                 .put("actor", sessionActorUrl) //
                                 .put("object", actorUrlOfUserBeingFollowed));
@@ -1047,8 +1048,8 @@ public class ActPubService {
         SubNode nodeBeingRepliedTo = null;
 
         /*
-         * Detect if inReplyTo is formatted like this: 'https://quanta.wiki/app?id=xxxxx' and if so lookup
-         * the nodeBeingRepliedTo by using that nodeId
+         * Detect if inReplyTo is formatted like this: 'https://domain.com/app?id=xxxxx' (proprietary URL
+         * format for this server) and if so lookup the nodeBeingRepliedTo by using that nodeId
          */
         if (isLocalUrl(inReplyTo)) {
             int lastIdx = inReplyTo.lastIndexOf("=");
@@ -1067,7 +1068,7 @@ public class ActPubService {
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
-         * on our server, and then we add 'sharing' to it for each person in the 'to/cc' so that from quanta
+         * on our server, and then we add 'sharing' to it for each person in the 'to/cc' so that 
          * this new node will show up in those people's FEEDs
          */
         else {
@@ -1177,7 +1178,7 @@ public class ActPubService {
          */
         else {
             /*
-             * I'm decided to disable this code, but leave it in place for future referece, but for now Quanta
+             * I'm decided to disable this code, but leave it in place for future referece, but for now this platform
              * doesn't support the concept of sharing only to followers. Everything is either shared to public,
              * or shared explicitly to specific users.
              */
@@ -1476,8 +1477,8 @@ public class ActPubService {
         APList items = getOutboxItems(userName, "public", minId);
 
         // this is a self-reference url (id)
-        String url =
-                appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
+        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName + "?min_id=" + minId
+                + "&page=true";
 
         return new APObj() //
                 .put("@context", ActPubConstants.CONTEXT_STREAMS) //
@@ -1757,8 +1758,8 @@ public class ActPubService {
                 List<String> sharedToList = new LinkedList<String>();
                 sharedToList.add(sharedTo);
 
-                for (SubNode child : auth.searchSubGraphByAclUser(mongoSession, null, sharedToList, Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME),
-                        MAX_PER_PAGE, userNode.getOwner())) {
+                for (SubNode child : auth.searchSubGraphByAclUser(mongoSession, null, sharedToList,
+                        Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
 
                     if (items.size() >= MAX_PER_PAGE) {
                         // ocPage.setPrev(outboxBase + "?page=" + String.valueOf(pgNo - 1));

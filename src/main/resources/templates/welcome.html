@@ -235,7 +235,10 @@
 
     </footer>
 
-    <script th:inline="none">
+    <script th:inline="javascript">
+        /* Thymeleaf vars */
+        var g_brandingAppName = [[${brandingAppName}]];
+
         // todo-1: why is the double-dollar still working with this?
         var innerArray = ['[math]', '[/math]'];
         /*<![CDATA[*/

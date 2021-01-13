@@ -31,7 +31,7 @@ public class FileUtils {
 	private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
 	/*
-	 * Creates the set of file extensions that the Quanta app will allow user to
+	 * Creates the set of file extensions that we allow user to
 	 * edit
 	 */
 	private static HashSet<String> editableExtensions = new HashSet<String>();

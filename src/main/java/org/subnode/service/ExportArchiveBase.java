@@ -370,11 +370,6 @@ public abstract class ExportArchiveBase {
 					 * 
 					 */
 
-					// Theoretically we could exclude the IPFS data and just export a link to a
-					// gateway but instead we export the file
-					// imgUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relImgPath + nodeId + ext)
-					// : (Const.IPFS_IO_GATEWAY + ipfsLink);
-
 					imgUrl = "./" + relImgPath + nodeId + ext;
 
 					html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
@@ -386,11 +381,6 @@ public abstract class ExportArchiveBase {
 					 * embeds an image that's 400px wide until you click it which makes it go
 					 * fullsize
 					 */
-					// Theoretically we could exclude the IPFS data and just export a link to a
-					// gateway but instead we export the file
-					// attachmentUrl = StringUtils.isEmpty(ipfsLink) ? ("./" + relPath + nodeId +
-					// ext)
-					// : (Const.IPFS_IO_GATEWAY + ipfsLink);
 					attachmentUrl = "./" + relPath + nodeId + ext;
 
 					html.append("<a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: "
