@@ -10,7 +10,9 @@
     <meta name="theme-color" content="#000000" />
 
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="application-name" content="Quanta" />
+    <meta name="application-name" th:attr="content=${brandingAppName}" />
+
+    <style th:replace="fragments/components :: fontLoaderStyle"></style>
 
     <meta property="og:type" th:if="${not #strings.isEmpty(ogDescription)}" content="website" />
     <meta property="og:title" th:if="${not #strings.isEmpty(ogTitle)}" th:attr="content=${ogTitle}" />
@@ -51,9 +53,7 @@
     </script>
     -->
 
-    <style th:replace="fragments/components :: fontLoaderStyle"></style>
-
-    <title>Quanta</title>
+    <title th:text="${brandingAppName}"></title>
 </head>
 
 <body class="app-body customScrollbar">
@@ -65,8 +65,11 @@
         Loading...
     </div>
 
-    <script>
+    <script th:inline="javascript">
         var __page = "index";
+
+        /* Thymeleaf vars */
+        var g_appName = [[${appName}]];
 
         function oldIEdetection() {
             var ua = window.navigator.userAgent;

@@ -47,7 +47,7 @@ public class AppProp /* implements EnvironmentAware */ {
 		return env.getProperty("httpProtocol");
 	}
 
-	public String protocolHostAndPort() {
+	public String getProtocolHostAndPort() {
 		if (protocolHostAndPort != null)
 			return protocolHostAndPort;
 
@@ -156,6 +156,10 @@ public class AppProp /* implements EnvironmentAware */ {
 
 	public String getBrandingMetaContent() {
 		return env.getProperty("brandingMetaContent");
+	}
+
+	public String getBrandingAppName() {
+		return env.getProperty("brandingAppName");
 	}
 
 	public String getResourcesBaseFolder() {

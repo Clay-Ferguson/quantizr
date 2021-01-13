@@ -234,14 +234,14 @@ public class ActPubService {
                     new APObj() //
                             .put("type", "Document") //
                             .put("mediaType", mime) //
-                            .put("url", appProp.protocolHostAndPort() + "/f/id/" + node.getId().toHexString()));
+                            .put("url", appProp.getProtocolHostAndPort() + "/f/id/" + node.getId().toHexString()));
         }
 
         return attachments;
     }
 
     public String makeActorUrlForUserName(String userName) {
-        return appProp.protocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/" + userName;
+        return appProp.getProtocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/" + userName;
     }
 
     /* Builds the unique set of hosts from a list of userNames (not used currently) */
@@ -795,7 +795,7 @@ public class ActPubService {
             if (following) {
                 followAction //
                         .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                        .put("id", appProp.protocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
+                        .put("id", appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
                         .put("type", "Follow") //
                         .put("actor", sessionActorUrl) //
                         .put("object", actorUrlOfUserBeingFollowed);
@@ -804,12 +804,12 @@ public class ActPubService {
             else {
                 followAction //
                         .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                        .put("id", appProp.protocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
+                        .put("id", appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
                         .put("type", "Undo") //
                         .put("actor", sessionActorUrl) //
                         .put("object", new APObj() //
                                 .put("id",
-                                        appProp.protocolHostAndPort() + "/unfollow-obj/" + String.valueOf(new Date().getTime())) //
+                                        appProp.getProtocolHostAndPort() + "/unfollow-obj/" + String.valueOf(new Date().getTime())) //
                                 .put("type", "Follow") //
                                 .put("actor", sessionActorUrl) //
                                 .put("object", actorUrlOfUserBeingFollowed));
@@ -1295,7 +1295,7 @@ public class ActPubService {
     }
 
     boolean isLocalActorUrl(String actorUrl) {
-        return actorUrl.startsWith(appProp.protocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/");
+        return actorUrl.startsWith(appProp.getProtocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/");
     }
 
     /*
@@ -1409,7 +1409,7 @@ public class ActPubService {
     }
 
     public APObj generateFollowers(String userName) {
-        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName;
+        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName;
         Long totalItems = getFollowersCount(userName);
 
         return new APObj() //
@@ -1422,7 +1422,7 @@ public class ActPubService {
     }
 
     public APObj generateFollowing(String userName) {
-        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName;
+        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName;
         Long totalItems = getFollowingCount(userName);
 
         return new APObj() //
@@ -1436,7 +1436,7 @@ public class ActPubService {
 
     public APObj generateOutbox(String userName) {
         log.debug("Generate outbox for userName: " + userName);
-        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName;
+        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName;
         Long totalItems = getOutboxItemCount(userName, "public");
 
         return new APObj() //
@@ -1477,11 +1477,11 @@ public class ActPubService {
 
         // this is a self-reference url (id)
         String url =
-                appProp.protocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
+                appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
 
         return new APObj() //
                 .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("partOf", appProp.protocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName) //
+                .put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName) //
                 .put("id", url) //
                 .put("type", "OrderedCollectionPage") //
                 .put("orderedItems", items) //
@@ -1492,7 +1492,7 @@ public class ActPubService {
         List<String> followers = getFollowers(userName, minId);
 
         // this is a self-reference url (id)
-        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName + "?page=true";
+        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName + "?page=true";
         if (minId != null) {
             url += "&min_id=" + minId;
         }
@@ -1501,7 +1501,7 @@ public class ActPubService {
                 .put("id", url) //
                 .put("type", "OrderedCollectionPage") //
                 .put("orderedItems", followers) //
-                .put("partOf", appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName)//
+                .put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName)//
                 .put("totalItems", followers.size());
     }
 
@@ -1509,7 +1509,7 @@ public class ActPubService {
         List<String> following = getFollowing(userName, minId);
 
         // this is a self-reference url (id)
-        String url = appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName + "?page=true";
+        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName + "?page=true";
         if (minId != null) {
             url += "&min_id=" + minId;
         }
@@ -1518,7 +1518,7 @@ public class ActPubService {
                 .put("id", url) //
                 .put("type", "OrderedCollectionPage") //
                 .put("orderedItems", following) //
-                .put("partOf", appProp.protocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName)//
+                .put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName)//
                 .put("totalItems", following.size());
     }
 
@@ -1572,7 +1572,7 @@ public class ActPubService {
      * Generates an Actor object for one of our own local users
      */
     public APObj generateActor(String userName) {
-        String host = appProp.protocolHostAndPort();
+        String host = appProp.getProtocolHostAndPort();
 
         try {
             SubNode userNode = read.getUserNodeByUserName(null, userName);
@@ -1584,7 +1584,7 @@ public class ActPubService {
 
                 String avatarMime = userNode.getStrProp(NodeProp.BIN_MIME.s());
                 String avatarVer = userNode.getStrProp(NodeProp.BIN.s());
-                String avatarUrl = appProp.protocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
+                String avatarUrl = appProp.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
                         + userNode.getId().toHexString() + "&v=" + avatarVer;
 
                 APObj actor = new APObj();
@@ -1610,7 +1610,7 @@ public class ActPubService {
                 if (headerImageMime != null) {
                     String headerImageVer = userNode.getStrProp(NodeProp.BIN.s() + "Header");
                     if (headerImageVer != null) {
-                        String headerImageUrl = appProp.protocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
+                        String headerImageUrl = appProp.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
                                 + "?nodeId=" + userNode.getId().toHexString() + "&v=" + headerImageVer;
 
                         actor.put("image", new APObj() //
@@ -1735,7 +1735,7 @@ public class ActPubService {
      * userName into the api for this to retrieve shared nodes anyone has shared.
      */
     public APList getOutboxItems(String userName, String sharedTo, String minId) {
-        String host = appProp.protocolHostAndPort();
+        String host = appProp.getProtocolHostAndPort();
         APList retItems = null;
         String nodeIdBase = host + "/app?id=";
 

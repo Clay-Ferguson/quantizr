@@ -255,6 +255,6 @@ public class SubNodeUtil {
 	}
 
 	public String getIdBasedUrl(SubNode node) {
-		return appProp.protocolHostAndPort() + "/app?id=" + node.getId().toHexString();
+		return appProp.getProtocolHostAndPort() + "/app?id=" + node.getId().toHexString();
 	}
 }

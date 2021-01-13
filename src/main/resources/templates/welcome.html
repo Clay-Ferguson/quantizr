@@ -7,21 +7,25 @@
     <meta charset="utf-8">
     <meta name="description" th:attr="content=${brandingMetaContent}" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" th:attr="content=${brandingAppName}" />
 
     <style th:replace="fragments/components :: fontLoaderStyle"></style>
 
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Quanta" />
+    <meta property="og:title" th:attr="content=${brandingAppName}" />
     <meta property="og:description" th:attr="content=${introSubtitle}" />
     <meta property="og:image" content="/images/eagle-logo-150px-tr.jpg" />
-    <meta property="og:url" content="https://quanta.wiki" />
+    <meta property="og:url" th:attr="content=${hostUrl}" />
 
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Quanta" />
+    <meta name="twitter:title" th:attr="content=${brandingAppName}" />
     <meta name="twitter:description" th:attr="content=${introSubtitle}" />
     <meta name="twitter:image" content="/images/eagle-logo-150px-tr.jpg" />
 
-    <title>Quanta</title>
+    <title th:text="${brandingAppName}"></title>
     <link rel="stylesheet" th:href="'/css/meta64.css?v='+${MAIN_CSS_HASH}" />
     <link rel="preload" href="/fonts/Roboto/Roboto-Light.ttf" as="font" crossorigin="anonymous" />
 </head>
