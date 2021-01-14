@@ -21,4 +21,5 @@ export interface TypeHandlerIntf {
     getEditorRowsForProp(propName: string): number;
     getAllowUserSelect(): boolean;
     hasCustomProp(prop: string): boolean;
+    getEditorHelp(): string;
 }

@@ -7,6 +7,7 @@ import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
@@ -18,6 +19,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class FriendsListTypeHandler extends TypeBase {
+    static helpExpanded: boolean;
+
     constructor() {
         super(J.NodeType.FRIEND_LIST, "Friends List", "fa-users", true);
     }
@@ -44,7 +47,13 @@ export class FriendsListTypeHandler extends TypeBase {
                     title: "Add a new friend to this list of friends."
                 })
             ], null, "float-right marginBottom"),
-            new Div(null, { className: "clearfix" })
+            new Div(null, { className: "clearfix" }),
+            new CollapsibleHelpPanel("This node defines your list of friends, as it's subnodes (i.e. who you follow on the Fediverse or this server will be defined by the children of this node).<p>" +
+                    "Use the 'Add Friend' button to add a new friend, and their content will then show up in your Feed tab <p>" +
+                    "You can access your Feed by clicking the 'Feed' link at the top of the page.",
+                (state: boolean) => {
+                    FriendsListTypeHandler.helpExpanded = state;
+                }, FriendsListTypeHandler.helpExpanded)
         ]);
     }
 }

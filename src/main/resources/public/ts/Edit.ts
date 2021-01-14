@@ -766,9 +766,7 @@ export class Edit implements EditIntf {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-            // todo-0: check pending path here. Make sure comment nodes cannot be viewed by other users
-            // until "Save" is clicked.
-            pendingEdit: false,
+            pendingEdit: true,
             nodeId: node.id,
             newNodeName: "",
             typeName: J.NodeType.NONE,
@@ -793,8 +791,14 @@ export class Edit implements EditIntf {
             content: null,
             typeLock: true,
             properties: null
-        }, (res) => {
+        }, async (res) => {
+            // not sure if this should be called a 'hack' or not, but we need to switch to edit mode before the user can
+            // start making changes.
+            if (!state.userPreferences.editMode) {
+                await S.edit.toggleEditMode(state);
+            }
             this.createSubNodeResponse(res, state);
+            return null;
         });
     }
 

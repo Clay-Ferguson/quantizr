@@ -23,6 +23,10 @@ export class TypeBase implements TypeHandlerIntf {
     constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string, private allowUserSelect: boolean) {
     }
 
+    getEditorHelp(): string {
+        return null;
+    }
+
     getAllowUserSelect(): boolean {
         return this.allowUserSelect;
     }

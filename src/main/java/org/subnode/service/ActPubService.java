@@ -779,48 +779,53 @@ public class ActPubService {
      * apUserName is full user name like alice@quantizr.com
      */
     public void setFollowing(String apUserName, boolean following) {
-        // admin doesn't follow/unfollow
-        if (sessionContext.isAdmin()) {
-            return;
+        try {
+            // admin doesn't follow/unfollow
+            if (sessionContext.isAdmin()) {
+                return;
+            }
+
+            APObj webFingerOfUserBeingFollowed = getWebFinger(apUserName);
+            String actorUrlOfUserBeingFollowed = getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
+
+            adminRunner.run(session -> {
+                String sessionActorUrl = makeActorUrlForUserName(sessionContext.getUserName());
+                APObj followAction = new APObj();
+
+                // send follow action
+                if (following) {
+                    followAction //
+                            .put("@context", ActPubConstants.CONTEXT_STREAMS) //
+                            .put("id", appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
+                            .put("type", "Follow") //
+                            .put("actor", sessionActorUrl) //
+                            .put("object", actorUrlOfUserBeingFollowed);
+                }
+                // send unfollow action
+                else {
+                    followAction //
+                            .put("@context", ActPubConstants.CONTEXT_STREAMS) //
+                            .put("id", appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
+                            .put("type", "Undo") //
+                            .put("actor", sessionActorUrl) //
+                            .put("object", new APObj() //
+                                    .put("id",
+                                            appProp.getProtocolHostAndPort() + "/unfollow-obj/"
+                                                    + String.valueOf(new Date().getTime())) //
+                                    .put("type", "Follow") //
+                                    .put("actor", sessionActorUrl) //
+                                    .put("object", actorUrlOfUserBeingFollowed));
+                }
+
+                APObj toActor = getActorByUrl(actorUrlOfUserBeingFollowed);
+                String toInbox = AP.str(toActor, "inbox");
+                securePost(session, null, toInbox, sessionActorUrl, followAction);
+                return null;
+            });
+        } catch (Exception e) {
+            //todo-0: handle this better;
+            log.debug("Set following Failed.");
         }
-
-        APObj webFingerOfUserBeingFollowed = getWebFinger(apUserName);
-        String actorUrlOfUserBeingFollowed = getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
-
-        adminRunner.run(session -> {
-            String sessionActorUrl = makeActorUrlForUserName(sessionContext.getUserName());
-            APObj followAction = new APObj();
-
-            // send follow action
-            if (following) {
-                followAction //
-                        .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                        .put("id", appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
-                        .put("type", "Follow") //
-                        .put("actor", sessionActorUrl) //
-                        .put("object", actorUrlOfUserBeingFollowed);
-            }
-            // send unfollow action
-            else {
-                followAction //
-                        .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                        .put("id", appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
-                        .put("type", "Undo") //
-                        .put("actor", sessionActorUrl) //
-                        .put("object", new APObj() //
-                                .put("id",
-                                        appProp.getProtocolHostAndPort() + "/unfollow-obj/"
-                                                + String.valueOf(new Date().getTime())) //
-                                .put("type", "Follow") //
-                                .put("actor", sessionActorUrl) //
-                                .put("object", actorUrlOfUserBeingFollowed));
-            }
-
-            APObj toActor = getActorByUrl(actorUrlOfUserBeingFollowed);
-            String toInbox = AP.str(toActor, "inbox");
-            securePost(session, null, toInbox, sessionActorUrl, followAction);
-            return null;
-        });
     }
 
     /*
@@ -1068,8 +1073,8 @@ public class ActPubService {
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
-         * on our server, and then we add 'sharing' to it for each person in the 'to/cc' so that 
-         * this new node will show up in those people's FEEDs
+         * on our server, and then we add 'sharing' to it for each person in the 'to/cc' so that this new
+         * node will show up in those people's FEEDs
          */
         else {
             SubNode actorAccountNode = loadForeignUserByActorUrl(session, actorUrl);
@@ -1178,9 +1183,9 @@ public class ActPubService {
          */
         else {
             /*
-             * I'm decided to disable this code, but leave it in place for future referece, but for now this platform
-             * doesn't support the concept of sharing only to followers. Everything is either shared to public,
-             * or shared explicitly to specific users.
+             * I'm decided to disable this code, but leave it in place for future referece, but for now this
+             * platform doesn't support the concept of sharing only to followers. Everything is either shared to
+             * public, or shared explicitly to specific users.
              */
             boolean allow = false;
             if (allow) {

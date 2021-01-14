@@ -9,6 +9,7 @@ import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
+import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Div } from "../widget/Div";
 import { Span } from "../widget/Span";
 
@@ -21,6 +22,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class FeedView extends Div {
 
     static feedQueried: boolean = false;
+    static helpExpanded: boolean = false;
 
     constructor() {
         super(null, {
@@ -56,6 +58,15 @@ export class FeedView extends Div {
         children.push(this.makeFilterButtonsBar());
         children.push(refreshFeedButtonBar);
         children.push(new Div(null, { className: "clearfix" }));
+
+        children.push(new CollapsibleHelpPanel(
+            "This is your Fediverse <b>feed</b> that shows a reverse chronological stream of posts from people you Follow.<p>" +
+            "Use the 'Friends' button to jump over to the part of your main tree where your Friends List is stored to manage your friends.<p>" +
+            "Use any 'Jump' button in the feed to go the the main content tree location of that post. Unlike other social media apps " +
+            "this platform stores all content on a Tree Structure, so in addition to appearing in the Feed, all nodes have a more permanent location on this large global tree.",
+            (state: boolean) => {
+                FeedView.helpExpanded = state;
+            }, FeedView.helpExpanded));
 
         if (!state.feedResults || state.feedResults.length === 0) {
             if (state.activeTab === "feedTab") {

@@ -41,7 +41,7 @@ import org.subnode.util.ThreadLocals;
 public class UserFeedService {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
-	static final int MAX_FEED_ITEMS = 100;
+	static final int MAX_FEED_ITEMS = 200;
 
 	@Autowired
 	private MongoRead read;
@@ -205,7 +205,7 @@ public class UserFeedService {
 			return res;
 		}
 
-		criteria.orOperator((Criteria[])orCriteria.toArray());
+		criteria.orOperator((Criteria[])orCriteria.toArray(new Criteria[orCriteria.size()]));
 
 		query.addCriteria(criteria);
 		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));

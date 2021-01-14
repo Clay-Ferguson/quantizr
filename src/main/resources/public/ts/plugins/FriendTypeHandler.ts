@@ -7,6 +7,7 @@ import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { Html } from "../widget/Html";
@@ -19,14 +20,20 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class FriendTypeHandler extends TypeBase {
+    static helpExpanded: boolean;
+
     constructor() {
         super(J.NodeType.FRIEND, "Friend", "fa-user", true);
+    }
+
+    getEditorHelp(): string {
+        return "Enter the name of a friend on the local server as something like <b>'bob'</b> (without quotes)<p>" +
+            "or enter a Foreign Fediverse server user name formatted like this <b>'bob@domain.com'</b> (without quotes)";
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
             case NodeActionType.delete:
-            case NodeActionType.editNode:
                 return true;
             default:
                 return false;
@@ -114,7 +121,12 @@ export class FriendTypeHandler extends TypeBase {
                         title: "Send Private Message"
                     })
                 ], null, "float-right marginBottom"),
-                new Div(null, { className: "clearfix" })])
+                new Div(null, { className: "clearfix" })]),
+            new CollapsibleHelpPanel("This node defines a friend on this server or another federated server. <br>" +
+                "You can send a DM to this person using the 'Message' button, or delete this node to stop following the person.",
+                (state: boolean) => {
+                    FriendTypeHandler.helpExpanded = state;
+                }, FriendTypeHandler.helpExpanded)
         ]);
     }
 }

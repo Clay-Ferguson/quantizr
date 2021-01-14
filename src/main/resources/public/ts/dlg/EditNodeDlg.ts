@@ -20,6 +20,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
+import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { DateTimeField } from "../widget/DateTimeField";
 import { Div } from "../widget/Div";
@@ -49,6 +50,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class EditNodeDlg extends DialogBase {
+    static helpExpanded: boolean = false;
+    editorHelp: string = null;
     header: Header;
     propertyEditFieldContainer: Div;
     uploadButton: Button;
@@ -187,11 +190,13 @@ export class EditNodeDlg extends DialogBase {
 
         let hasAttachment: boolean = S.props.hasBinary(state.node);
 
+        this.editorHelp = null;
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
         let customProps: string[] = null;
         if (typeHandler) {
             customProps = typeHandler.getCustomProperties();
             typeHandler.ensureDefaultProperties(state.node);
+            this.editorHelp = typeHandler.getEditorHelp();
         }
 
         let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
@@ -368,7 +373,12 @@ export class EditNodeDlg extends DialogBase {
             sharingSpan = new Span("Shared to: " + sharingNames);
         }
 
-        this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingSpan, binarySection, collapsiblePanel]);
+        let helpPanel = this.editorHelp ? new CollapsibleHelpPanel(this.editorHelp,
+            (state: boolean) => {
+                EditNodeDlg.helpExpanded = state;
+            }, EditNodeDlg.helpExpanded) : null;
+
+        this.propertyEditFieldContainer.setChildren([helpPanel, mainPropsTable, sharingSpan, binarySection, collapsiblePanel]);
         return children;
     }
 
@@ -404,7 +414,7 @@ export class EditNodeDlg extends DialogBase {
         // let allowEditAllProps: boolean = this.appState.isAdminUser;
 
         let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
-        let allowShare = true;
+        let allowShare: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, this.appState)) : true;
 
         let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 

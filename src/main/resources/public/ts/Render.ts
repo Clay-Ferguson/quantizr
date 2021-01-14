@@ -165,26 +165,26 @@ export class Render implements RenderIntf {
 
         const children = [];
 
-        let url = window.location.origin + "/app?id=" + node.id;
+        let byIdUrl = window.location.origin + "/app?id=" + node.id;
         children.push(new Heading(5, "By ID"));
-        children.push(new Div(url, {
+        children.push(new Div(byIdUrl, {
             className: "anchorBigMarginBottom",
             title: "Click -> Copy to clipboard",
             onClick: () => {
-                S.util.copyToClipboard(url);
-                S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                S.util.copyToClipboard(byIdUrl);
+                S.util.flashMessage("Copied to Clipboard: " + byIdUrl, "Clipboard", true);
             }
         }));
 
         if (node.name) {
-            url = window.location.origin + S.util.getPathPartForNamedNode(node);
+            let byNameUrl = window.location.origin + S.util.getPathPartForNamedNode(node);
             children.push(new Heading(5, "By Name"));
-            children.push(new Div(url, {
+            children.push(new Div(byNameUrl, {
                 className: "anchorBigMarginBottom",
                 title: "Click -> Copy to clipboard",
                 onClick: () => {
-                    S.util.copyToClipboard(url);
-                    S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                    S.util.copyToClipboard(byNameUrl);
+                    S.util.flashMessage("Copied to Clipboard: " + byNameUrl, "Clipboard", true);
                 }
             }));
         }
@@ -202,50 +202,50 @@ export class Render implements RenderIntf {
 
         let bin = S.props.getNodePropVal(J.NodeProp.BIN, node);
         if (bin) {
-            let url = window.location.origin + "/f/id/" + node.id;
+            let attByIdUrl = window.location.origin + "/f/id/" + node.id;
             children.push(new Heading(5, "View Attachment By Id"));
-            children.push(new Div(url, {
+            children.push(new Div(attByIdUrl, {
                 className: "anchorBigMarginBottom",
                 title: "Click -> Copy to clipboard",
                 onClick: () => {
-                    S.util.copyToClipboard(url);
-                    S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                    S.util.copyToClipboard(attByIdUrl);
+                    S.util.flashMessage("Copied to Clipboard: " + attByIdUrl, "Clipboard", true);
                 }
             }));
 
-            url += "?download=y";
+            let downloadttByIdUrl = attByIdUrl + "?download=y";
             children.push(new Heading(5, "Download Attachment By Id"));
-            children.push(new Div(url, {
+            children.push(new Div(downloadttByIdUrl, {
                 className: "anchorBigMarginBottom",
                 title: "Click -> Copy to clipboard",
                 onClick: () => {
-                    S.util.copyToClipboard(url);
-                    S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                    S.util.copyToClipboard(downloadttByIdUrl);
+                    S.util.flashMessage("Copied to Clipboard: " + downloadttByIdUrl, "Clipboard", true);
                 }
             }));
         }
 
         if (node.name) {
             if (bin) {
-                url = window.location.origin + S.util.getPathPartForNamedNodeAttachment(node);
+                let attByNameUrl = window.location.origin + S.util.getPathPartForNamedNodeAttachment(node);
                 children.push(new Heading(5, "View Attachment By Name"));
-                children.push(new Div(url, {
+                children.push(new Div(attByNameUrl, {
                     className: "anchorBigMarginBottom",
                     title: "Click -> Copy to clipboard",
                     onClick: () => {
-                        S.util.copyToClipboard(url);
-                        S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                        S.util.copyToClipboard(attByNameUrl);
+                        S.util.flashMessage("Copied to Clipboard: " + attByNameUrl, "Clipboard", true);
                     }
                 }));
 
-                url += "?download=y";
+                let downloadAttByNameUrl = attByNameUrl + "?download=y";
                 children.push(new Heading(5, "Download Attachment By Name"));
-                children.push(new Div(url, {
+                children.push(new Div(downloadAttByNameUrl, {
                     className: "anchorBigMarginBottom",
                     title: "Click -> Copy to clipboard",
                     onClick: () => {
-                        S.util.copyToClipboard(url);
-                        S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
+                        S.util.copyToClipboard(downloadAttByNameUrl);
+                        S.util.flashMessage("Copied to Clipboard: " + downloadAttByNameUrl, "Clipboard", true);
                     }
                 }));
             }

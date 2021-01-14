@@ -486,7 +486,7 @@ public class MongoAuth {
 				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
 			}
 
-			criteria.orOperator((Criteria[])orCriteria.toArray());
+			criteria.orOperator((Criteria[])orCriteria.toArray(new Criteria[orCriteria.size()]));
 		}
 
 		if (ownerIdMatch != null) {

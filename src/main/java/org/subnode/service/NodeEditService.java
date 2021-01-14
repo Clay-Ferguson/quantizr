@@ -365,21 +365,21 @@ public class NodeEditService {
 		 */
 		if (node.getPath().startsWith("/r/p/")) {
 			node.setPath(node.getPath().replace("/r/p/", "/r/"));
+		}
 
-			/* Send notification to local server or to remote server when a node is added */
-			if (!StringUtils.isEmpty(node.getContent()) //
-					// don't evern send notifications when 'admin' is the one doing the editing.
-					&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
+		/* Send notification to local server or to remote server when a node is added */
+		if (!StringUtils.isEmpty(node.getContent()) //
+				// don't send notifications when 'admin' is the one doing the editing.
+				&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 
-				SubNode parent = read.getNode(session, node.getParentPath(), false);
+			SubNode parent = read.getNode(session, node.getParentPath(), false);
 
-				if (parent != null) {
-					adminRunner.run(s -> {
-						auth.saveMentionsToNodeACL(s, node);
-						actPubService.sendNotificationForNodeEdit(s, parent, node);
-						userFeedService.pushNodeUpdateToBrowsers(s, node);
-					});
-				}
+			if (parent != null) {
+				adminRunner.run(s -> {
+					auth.saveMentionsToNodeACL(s, node);
+					actPubService.sendNotificationForNodeEdit(s, parent, node);
+					userFeedService.pushNodeUpdateToBrowsers(s, node);
+				});
 			}
 		}
 

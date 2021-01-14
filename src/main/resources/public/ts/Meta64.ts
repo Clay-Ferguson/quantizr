@@ -625,12 +625,16 @@ export class Meta64 implements Meta64Intf {
 
     loadAnonPageHome = (state: AppState): void => {
         console.log("loadAnonPageHome()");
+
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null,
             (res: J.RenderNodeResponse): void => {
                 if (!res.success || res.exceptionType === "auth") {
                     S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
                 }
                 S.render.renderPageFromData(res, false, null, true, true, state);
+            },
+            (res: any): void => {
+                S.nav.login(null);
             }
         );
     }

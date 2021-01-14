@@ -12,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class CollapsiblePanel extends Comp {
 
     constructor(private collapsedButtonText: string, private expandedButtonText: string, attribs: Object = {}, initialChildren: Comp[] = null, private textLink: boolean = false,
-        private stateCallback: Function = null, expanded: boolean = false, private extraToggleButtonClass = "") {
+        private stateCallback: Function = null, expanded: boolean = false, private extraToggleButtonClass = "", private extraDivStyle: string = "") {
         super(attribs);
         this.setChildren(initialChildren);
         this.collapsedButtonText = collapsedButtonText || "More ";
@@ -45,7 +45,7 @@ export class CollapsiblePanel extends Comp {
 
             // This div and it's children holds the actual collapsible content.
             this.e("div", {
-                className: collapseClass,
+                className: collapseClass + " " + this.extraDivStyle,
                 id: this.getId(),
                 key: "content_" + this.getId()
             },
