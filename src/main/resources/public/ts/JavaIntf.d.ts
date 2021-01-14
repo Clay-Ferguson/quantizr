@@ -702,6 +702,10 @@ export const enum PrincipalName {
 export const enum PrivilegeType {
     READ = "rd",
     WRITE = "wr",
+
+    // todo-0: the ADD_CHILDREN never ended up being used right? We just use 'wr' for that.
     ADD_CHILDREN = "ac",
+
+    // todo-0: this one isn't even used at all righ?
     REMOVE_CHILDREN = "rc",
 }

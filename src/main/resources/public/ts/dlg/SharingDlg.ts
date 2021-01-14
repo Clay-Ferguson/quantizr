@@ -7,6 +7,7 @@ import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { EditPrivsTable } from "../widget/EditPrivsTable";
 import { Form } from "../widget/Form";
 import { ShareToPersonDlg } from "./ShareToPersonDlg";
@@ -17,6 +18,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class SharingDlg extends DialogBase {
+    static helpExpanded: boolean = false;
     dirty: boolean = false;
 
     constructor(private node: J.NodeInfo, state: AppState) {
@@ -27,10 +29,18 @@ export class SharingDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
+                new CollapsibleHelpPanel("Configures who is allowed to see and/or append subnodes under this node.<p>" +
+                "You can share to as many people as you want and they'll be able to see and reply (create subnodes).<p>" +
+                "When sharing to 'Public' you can choose the 'Read-Only' option if you want to disable other users from being able to create subnodes under.<p>" +
+                "If you pick one of the 'Public' options then you don't need to specifically add any individual persons by name.",
+                    (state: boolean) => {
+                        SharingDlg.helpExpanded = state;
+                    }, SharingDlg.helpExpanded),
                 new EditPrivsTable(this.getState().nodePrivsInfo, this.removePrivilege),
                 new ButtonBar([
                     new Button("Add Person", this.shareToPersonDlg, null, "btn-primary"),
-                    new Button("Make Public", this.shareNodeToPublic, null, "btn-primary"),
+                    new Button("Public", () => { this.shareNodeToPublic(true); }, null, "btn-secondary"),
+                    new Button("Public (Read-only)", () => { this.shareNodeToPublic(false); }, null, "btn-secondary"),
                     new Button("Close", () => {
                         this.close();
                         if (this.dirty) {
@@ -92,7 +102,7 @@ export class SharingDlg extends DialogBase {
         return null;
     }
 
-    shareNodeToPublic = (): void => {
+    shareNodeToPublic = (allowAppends: boolean): void => {
         this.dirty = true;
         let encrypted = S.props.isEncrypted(this.node);
         if (encrypted) {
@@ -108,7 +118,7 @@ export class SharingDlg extends DialogBase {
         S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: "public",
-            privileges: [J.PrivilegeType.READ]
+            privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         }, this.reload);
     }
 }
