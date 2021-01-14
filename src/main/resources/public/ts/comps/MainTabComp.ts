@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { BreadcrumbsPanel } from "../widget/BreadcrumbsPanel";
 import { Div } from "../widget/Div";
+import { Html } from "../widget/Html";
 import { NodeCompMainList } from "./NodeCompMainList";
 import { NodeCompMainNode } from "./NodeCompMainNode";
 
@@ -35,6 +36,8 @@ export class MainTabComp extends Div {
                 className: state.rendering ? "compHidden" : "compVisible"
             }, [
                 showBreadcrumbs ? new BreadcrumbsPanel() : null,
+                state.pageMessage ? new Html(state.pageMessage, { className: "alert alert-info float-right" }) : null,
+                state.pageMessage ? new Div(null, { className: "clearfix" }) : null,
                 new NodeCompMainNode(state, null),
                 new NodeCompMainList()
             ])

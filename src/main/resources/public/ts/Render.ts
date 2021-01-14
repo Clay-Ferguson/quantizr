@@ -278,6 +278,7 @@ export class Render implements RenderIntf {
                     }
 
                     s.guiReady = true;
+                    s.pageMessage = null;
 
                     /* Note: This try block is solely to enforce the finally block to happen to guarantee setting s.rendering
                     back to false, no matter what */

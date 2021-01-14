@@ -8,7 +8,12 @@ public class ResponseBase {
 	private String stackTrace;
 	private String exceptionClass;
 
-	//for now only 'auth' is available here (will make an enum eventually)
+	/*
+	 * for now only 'auth' is available here (will make an enum eventually). This value is sent back to
+	 * client to indicate the command didn't have some kind of unexpected failure, but that some special
+	 * case did happen that means the normal return value may be discarded, or not sent back, but the
+	 * call was 'successful'
+	 */
 	private String exceptionType;
 
 	public ResponseBase() {

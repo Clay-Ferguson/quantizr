@@ -63,8 +63,13 @@ export class Nav implements NavIntf {
     }
 
     upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState): void => {
-        if (!res || !res.node) {
-            S.util.showMessage("No data is visible to you above this node.", "Warning");
+        if (!res || !res.node || res.exceptionType === "auth") {
+            dispatch({
+                type: "Action_ShowPageMessage",
+                update: (s: AppState): void => {
+                    s.pageMessage = "The node above is not shared.";
+                }
+            });
         } else {
             S.render.renderPageFromData(res, scrollToTop, id, true, true, state);
         }
@@ -131,12 +136,6 @@ export class Nav implements NavIntf {
             // success callback
             (res: J.RenderNodeResponse) => {
                 this.upLevelResponse(res, state.node.id, false, state);
-            },
-            // fail callback
-            (res: string) => {
-                // Navigating home was a bad idea. If someone tries to uplevel and cannot, we don't want to change them away from
-                // whatever page they're on. Just show the error and stay on same node.
-                // this.navHome(state);
             });
     }
 

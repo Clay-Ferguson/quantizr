@@ -7,6 +7,9 @@ export class AppState {
     // up until guiReady the main App component will just render "loading..."
     guiReady: boolean = false;
 
+    /* text at top of page, when user tries to upLevel too far etc */
+    pageMessage: string = null;
+
     /* This allows us to detect when we're rendering the main page so we can set it to hidden visibilty until the scrolling
     has been done, or else we can get a bad flicker effect when page renders at wrong scroll position and then scrolls
     while the user is watching. With this flag it helps us just pop up instantly to the correct content AND scrolled to exactly

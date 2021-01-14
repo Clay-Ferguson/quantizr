@@ -112,12 +112,12 @@ export class App extends Div {
             let rootButton = !state.isAnonUser ? new IconButton("fa-database", null, {
                 onClick: e => { S.nav.navHome(state); },
                 title: "Your Root Node"
-            }, "btn-secondary floatingControlBarItem", "off") : null;
+            }, (state.pageMessage ? "btn-primary" : "btn-secondary") + " floatingControlBarItem", "off") : null;
 
             let homeButton = new IconButton("fa-home", null, {
                 onClick: e => { S.meta64.loadAnonPageHome(state); },
                 title: "Portal Home"
-            }, "btn-secondary floatingControlBarItem", "off");
+            }, (state.pageMessage ? "btn-primary" : "btn-secondary") + " floatingControlBarItem", "off");
 
             let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
                 onClick: e => {

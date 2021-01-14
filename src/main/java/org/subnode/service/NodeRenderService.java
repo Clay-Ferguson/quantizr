@@ -167,10 +167,9 @@ public class NodeRenderService {
 						node = parent;
 					}
 				} catch (Exception e) {
-					/*
-					 * ignore the exception here. It's ok if we can't get the parent here. May not be accessible to the
-					 * user.
-					 */
+					res.setExceptionType("auth");
+					res.setSuccess(true);
+					return res;
 				}
 			}
 		}
