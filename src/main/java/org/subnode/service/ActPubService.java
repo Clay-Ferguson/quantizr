@@ -1409,7 +1409,6 @@ public class ActPubService {
             };
             Thread thread = new Thread(runnable);
             thread.start();
-
             return null;
         });
     }

@@ -81,6 +81,10 @@ export class ProfileDlg extends DialogBase {
                     }, [
                         new ButtonBar([
                             this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
+
+                            // todo-0: need to make this work for fediverse users!
+                            // (note: UserManagerService.addFriend also needs to be updated for this to work)
+                            (this.readOnly && this.userName.indexOf("@") === -1 && this.userName !== this.appState.userName) ? new Button("Add as Friend", this.addFriend) : null,
                             new Button(this.readOnly ? "Close" : "Cancel", this.close)
                         ], null, "marginTop")
                     ])
@@ -123,6 +127,14 @@ export class ProfileDlg extends DialogBase {
             userName: null, // this.userNameTextField.getValue(),
             userBio: this.bioState.getValue()
         }, this.saveResponse);
+    }
+
+    addFriend = (): void => {
+        S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
+            userName: this.userName
+        }, (res: J.AddFriendResponse) => {
+            S.util.showMessage(res.message, "New Friend");
+        });
     }
 
     saveResponse = (res: J.SaveUserPreferencesResponse): void => {

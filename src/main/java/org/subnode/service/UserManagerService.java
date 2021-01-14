@@ -42,6 +42,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.request.AddFriendRequest;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.CloseAccountRequest;
 import org.subnode.request.GetFriendsRequest;
@@ -53,6 +54,7 @@ import org.subnode.request.SaveUserPreferencesRequest;
 import org.subnode.request.SaveUserProfileRequest;
 import org.subnode.request.SignupRequest;
 import org.subnode.request.base.RequestBase;
+import org.subnode.response.AddFriendResponse;
 import org.subnode.response.ChangePasswordResponse;
 import org.subnode.response.CloseAccountResponse;
 import org.subnode.response.FriendInfo;
@@ -115,6 +117,9 @@ public class UserManagerService {
 
 	@Autowired
 	private Validator validator;
+
+	@Autowired
+	private NodeEditService edit;
 
 	/*
 	 * RestTempalte is thread-safe and reusable, and has no state, so we need only one final static
@@ -620,6 +625,43 @@ public class UserManagerService {
 				userNode.setProp(NodeProp.USER_BIO.s(), req.getUserBio());
 				// sessionContext.setUserName(req.getUserName());
 				update.save(session, userNode);
+				res.setSuccess(true);
+			}
+		});
+		return res;
+	}
+
+	/*
+	 * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
+	 * if the user wasn't already a friend
+	 */
+	public AddFriendResponse addFriend(final AddFriendRequest req) {
+		AddFriendResponse res = new AddFriendResponse();
+		final String userName = sessionContext.getUserName();
+
+		adminRunner.run(session -> {
+			// get the Friend List of the follower
+			SubNode followerFriendList = read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s());
+
+			/*
+			 * lookup to see if this followerFriendList node already has userToFollow already under it
+			 */
+			SubNode friendNode = read.findFriendOfUser(session, followerFriendList, req.getUserName());
+			if (friendNode == null) {
+				// todo-0: for local users following fediverse this value needs to be here?
+				String followerActorUrl = null;
+
+				friendNode = edit.createFriendNode(session, followerFriendList, req.getUserName(), followerActorUrl);
+				if (friendNode != null) {
+					res.setMessage("Added new Friend: " + req.getUserName());
+				}
+				else {
+					res.setMessage("Unable to add Friend: " + req.getUserName());
+				}
+
+				res.setSuccess(true);
+			} else {
+				res.setMessage("You're already following " + req.getUserName());
 				res.setSuccess(true);
 			}
 		});

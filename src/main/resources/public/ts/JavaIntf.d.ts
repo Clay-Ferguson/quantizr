@@ -1,6 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export interface AddFriendRequest extends RequestBase {
+    userName: string;
+}
+
 export interface AddPrivilegeRequest extends RequestBase {
     nodeId: string;
     privileges: string[];
@@ -280,6 +284,9 @@ export interface RequestBase {
     password?: string;
     tzOffset?: number;
     dst?: boolean;
+}
+
+export interface AddFriendResponse extends ResponseBase {
 }
 
 export interface AddPrivilegeResponse extends ResponseBase {

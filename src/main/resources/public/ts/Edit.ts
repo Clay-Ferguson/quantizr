@@ -779,6 +779,7 @@ export class Edit implements EditIntf {
         });
     }
 
+    /* This starts editing an actual Friend Node that when the user is presumably editing inside their FRIENDS_LIST node */
     addFriend = (node: J.NodeInfo, state: AppState) => {
         state = appState(state);
 

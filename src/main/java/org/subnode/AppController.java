@@ -43,6 +43,7 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.request.AddFriendRequest;
 import org.subnode.request.AddPrivilegeRequest;
 import org.subnode.request.AppDropRequest;
 import org.subnode.request.ChangePasswordRequest;
@@ -1125,6 +1126,13 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object saveUserProfile(@RequestBody SaveUserProfileRequest req, HttpSession session) {
 		return callProc.run("saveUserProfile", req, session, ms -> {
 			return userManagerService.saveUserProfile(req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/addFriend", method = RequestMethod.POST)
+	public @ResponseBody Object addFriend(@RequestBody AddFriendRequest req, HttpSession session) {
+		return callProc.run("addFriend", req, session, ms -> {
+			return userManagerService.addFriend(req);
 		});
 	}
 
