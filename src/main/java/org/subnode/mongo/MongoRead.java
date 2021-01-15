@@ -757,11 +757,14 @@ public class MongoRead {
     }
 
     /*
-     * Accepts either the 'user' or the 'userNode' for the user. It's best tp pass userNode if you have
-     * it, so avoid a DB query.
+     * Accepts either the 'user' or the 'userNode' for the user. It's best to pass userNode if you have
+     * it, to avoid a DB query.
      */
     public SubNode getUserNodeByType(MongoSession session, String user, SubNode userNode, String nodeName, String type) {
         if (userNode == null) {
+            if (user == null) {
+                user = sessionContext.getUserName();
+            }
             userNode = getUserNodeByUserName(session, user);
         }
 

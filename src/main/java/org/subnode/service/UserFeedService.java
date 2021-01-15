@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEvent
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
+import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
@@ -152,10 +153,7 @@ public class UserFeedService {
 	}
 
 	/*
-	 * New version of this just does a global query for all nodes that are shared to this user (todo-0:
-	 * Also eventually we will bring back the "only friends I'm following" option to this query, using
-	 * the two props in the request for the filtering options but be VERY careful not to expose data
-	 * without 'auth', when you do a wider search.)
+	 * Generated content of the "Feed" for a user.
 	 */
 	public NodeFeedResponse generateFeed(MongoSession session, NodeFeedRequest req) {
 
@@ -205,7 +203,7 @@ public class UserFeedService {
 			return res;
 		}
 
-		criteria.orOperator((Criteria[])orCriteria.toArray(new Criteria[orCriteria.size()]));
+		criteria.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
 
 		query.addCriteria(criteria);
 		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
@@ -213,6 +211,17 @@ public class UserFeedService {
 
 		Iterable<SubNode> iter = ops.find(query, SubNode.class);
 		for (SubNode node : iter) {
+
+			/*
+			 * We don't want FRIEND nodes in the feed, but I'm not sure if there will be a more 'generic'
+			 * encompassing way to filter out unwanted records here. I don't want this done by the DB query for
+			 * now
+			 */
+			if (NodeType.FRIEND.s().equals(node.getType()) || //
+					NodeType.POSTS.s().equals(node.getType())) {
+				continue;
+			}
+
 			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1, false, false);
 			searchResults.add(info);
 		}

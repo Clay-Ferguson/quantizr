@@ -45,7 +45,8 @@ export class FeedView extends Div {
         let children: Comp[] = [];
 
         let refreshFeedButtonBar = new ButtonBar([
-            new Button("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state)),
+            new Button("New Post", () => S.edit.addComment(null, state), { title: "Post something awesome on the Fediverse!" }, "btn-primary"),
+            new Button("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), { title: "Manage your list of frenz!" }),
             new Span(null, {
                 className: (state.feedDirty ? "feedDirtyButton" : "feedNotDirtyButton")
             }, [

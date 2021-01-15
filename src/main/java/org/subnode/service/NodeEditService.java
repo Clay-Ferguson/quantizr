@@ -1,9 +1,9 @@
 package org.subnode.service;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -11,15 +11,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.mail.OutboxMgr;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
+import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
@@ -84,9 +83,6 @@ public class NodeEditService {
 	private SessionContext sessionContext;
 
 	@Autowired
-	private OutboxMgr outboxMgr;
-
-	@Autowired
 	private UserFeedService userFeedService;
 
 	@Autowired
@@ -96,7 +92,7 @@ public class NodeEditService {
 	private ActPubService actPubService;
 
 	@Autowired
-	private AppProp appProp;
+	private AclService aclService;
 
 	@Autowired
 	private MongoAuth auth;
@@ -112,12 +108,28 @@ public class NodeEditService {
 		}
 
 		String nodeId = req.getNodeId();
+		boolean makePublic = false;
 		SubNode node = null;
-		if (nodeId.equals("~" + NodeType.NOTES.s())) {
-			node = read.getUserNodeByType(session, session.getUser(), null, "### Notes", NodeType.NOTES.s());
-		} else {
-			node = read.getNode(session, nodeId);
+
+		/*
+		 * If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
+		 * "My Posts" node
+		 */
+		if (nodeId == null) {
+			node = read.getUserNodeByType(session, null, null, "### My Posts", NodeType.POSTS.s());
+			nodeId = node.getId().toHexString();
+			makePublic = true;
 		}
+
+		/* Node still null try other ways of getting it */
+		if (node == null) {
+			if (nodeId.equals("~" + NodeType.NOTES.s())) {
+				node = read.getUserNodeByType(session, session.getUser(), null, "### Notes", NodeType.NOTES.s());
+			} else {
+				node = read.getNode(session, nodeId);
+			}
+		}
+
 		if (node == null) {
 			res.setMessage("unable to locate parent for insert");
 			res.setSuccess(false);
@@ -127,6 +139,11 @@ public class NodeEditService {
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
 		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null);
+
+		if (makePublic) {
+			aclService.addPrivilege(session, newNode, PrincipalName.PUBLIC.s(),
+					Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+		}
 
 		// '/r/p/' = pending (nodes not yet published, being edited created by users)
 		if (req.isPendingEdit() && !newNode.getPath().startsWith("/r/p/")) {

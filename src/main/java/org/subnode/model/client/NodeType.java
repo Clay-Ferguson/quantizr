@@ -15,6 +15,7 @@ public enum NodeType {
     RSS_FEED("sn:rssfeed"), //
     FRIEND_LIST("sn:friendList"), //
     FRIEND("sn:friend"), //
+    POSTS("sn:posts"), //
 
     //todo-1: we can create a plugin for this type, but it's not really necessary.
     ACT_PUB_POSTS("ap:posts"), //
