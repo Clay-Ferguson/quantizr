@@ -43,36 +43,6 @@ export class NodeCompMarkdown extends Html {
         }
 
         this.mergeState(att);
-
-        if (this.appState.userPreferences.editMode && node.owner === appState.userName) {
-            let hltNode = S.meta64.getHighlightedNode(appState);
-            if (hltNode && hltNode.id === node.id) {
-
-                // currently disabled. We don't do 'click to edit' any more because it's really annoying if you click the screen
-                // to be sure it has focus and it inadvertently goes into editing when you didn't want that.
-                if (C.clickToEditNodes) {
-                    this.attribs.className += " mousePointer";
-                    this.attribs.title = "Click to edit";
-                    this.attribs.onClick = this.clickToEdit;
-                }
-            }
-        }
-    }
-
-    clickToEdit = (evt: any): void => {
-        // if user clicks an anchor tag inside this markdown we want to ignore that here.
-        if (evt.target.href) {
-            return;
-        }
-
-        // if already editing inline editing a row ignore this click.
-        if (this.appState.inlineEditId) return;
-
-        S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
-            nodeId: this.node.id
-        }, (res) => {
-            S.edit.initNodeEditResponse(res, this.appState, false);
-        });
     }
 
     renderRawMarkdown(node: J.NodeInfo): string {

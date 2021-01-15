@@ -78,7 +78,7 @@ export class Edit implements EditIntf {
         }
     }
 
-    public initNodeEditResponse = (res: J.InitNodeEditResponse, state: AppState, dialogEditor: boolean): void => {
+    public initNodeEditResponse = (res: J.InitNodeEditResponse, state: AppState): void => {
         if (S.util.checkSuccess("Editing node", res)) {
             const node: J.NodeInfo = res.nodeInfo;
 
@@ -88,21 +88,17 @@ export class Edit implements EditIntf {
                  * Server will have sent us back the raw text content, that should be markdown instead of any HTML, so
                  * that we can display this and save.
                  */
-                const editNode = res.nodeInfo;
+                const dlg = new EditNodeDlg(res.nodeInfo, state);
+                dlg.open();
 
-                if (dialogEditor) {
-                    const dlg = new EditNodeDlg(editNode, state);
-                    dlg.open();
-                }
-                else {
-                    dispatch({
-                        type: "Action_InlineEdit",
-                        update: (s: AppState): void => {
-                            s.inlineEditId = node.id;
-                            s.inlineEditVal = node.content;
-                        }
-                    });
-                }
+                // dispatch({
+                //     type: "Action_InlineEdit",
+                //     update: (s: AppState): void => {
+                //         s.inlineEditId = node.id;
+                //         s.inlineEditVal = node.content;
+                //     }
+                // });
+
             } else {
                 /* todo-0: when edit mode is not on, and a user tries to use the social 'reply' button this error comes up
                 which is completely wrong an misleading in that context. */
@@ -410,7 +406,7 @@ export class Edit implements EditIntf {
         S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: id
         }, (res) => {
-            this.initNodeEditResponse(res, state, true);
+            this.initNodeEditResponse(res, state);
         });
     }
 
