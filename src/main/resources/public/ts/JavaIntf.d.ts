@@ -393,6 +393,7 @@ export interface InfoMessage {
 }
 
 export interface InitNodeEditResponse extends ResponseBase {
+    parentInfo: NodeInfo;
     nodeInfo: NodeInfo;
 }
 

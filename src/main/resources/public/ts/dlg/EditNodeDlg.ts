@@ -50,6 +50,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class EditNodeDlg extends DialogBase {
+    static parentDisplayExpanded: boolean = false;
     static helpExpanded: boolean = false;
     editorHelp: string = null;
     header: Header;
@@ -63,6 +64,7 @@ export class EditNodeDlg extends DialogBase {
 
     contentEditor: I.TextEditorIntf;
     contentEditorState: ValidatedState<any> = new ValidatedState<any>();
+    parentContentEditorState: ValidatedState<any> = new ValidatedState<any>();
     nameState: ValidatedState<any> = new ValidatedState<any>();
 
     static morePanelExpanded: boolean = false;
@@ -79,7 +81,7 @@ export class EditNodeDlg extends DialogBase {
     // holds a map of states by property names.
     propStates: { [key: string]: ValidatedState<any> } = {};
 
-    constructor(node: J.NodeInfo, state: AppState) {
+    constructor(node: J.NodeInfo, public parentNode: J.NodeInfo, state: AppState) {
         super("Edit", "app-modal-content", false, state);
         this.mergeState({
             node,
@@ -187,7 +189,6 @@ export class EditNodeDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         let state = this.getState();
-
         let hasAttachment: boolean = S.props.hasBinary(state.node);
 
         this.editorHelp = null;
@@ -378,7 +379,29 @@ export class EditNodeDlg extends DialogBase {
                 EditNodeDlg.helpExpanded = state;
             }, EditNodeDlg.helpExpanded) : null;
 
-        this.propertyEditFieldContainer.setChildren([helpPanel, mainPropsTable, sharingSpan, binarySection, collapsiblePanel]);
+        let parentDisplay = null;
+        if (this.parentNode) {
+            let parentContentEditor = new TextArea(null, { rows: "5" }, this.parentContentEditorState);
+            let parentVal = this.parentNode.content;
+            if (!parentVal.startsWith(J.Constant.ENC_TAG)) {
+                this.parentContentEditorState.setValue(parentVal);
+
+                let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.parentNode) !== "1";
+                parentContentEditor.setWordWrap(wrap);
+
+                let whoTo = this.parentNode.owner === this.appState.userName ? "your own" : (this.parentNode.owner + "'s");
+
+                parentDisplay = new CollapsiblePanel("Show Parent Content", "Hide Parent Content", null, [
+                    new Div("Creating under " + whoTo + " node", { className: "marginTop" }),
+                    parentContentEditor
+                ], false,
+                    (state: boolean) => {
+                        EditNodeDlg.parentDisplayExpanded = state;
+                    }, EditNodeDlg.parentDisplayExpanded);
+            }
+        }
+
+        this.propertyEditFieldContainer.setChildren([helpPanel, mainPropsTable, sharingSpan, binarySection, collapsiblePanel, parentDisplay]);
         return children;
     }
 

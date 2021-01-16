@@ -346,6 +346,10 @@ public class MongoRead {
             return null;
         }
         String parentPath = XString.truncateAfterLast(path, "/");
+
+        /* If node is in pending area take the pending part out of the path to get the real parent */
+        parentPath = parentPath.replace("/r/p/", "/r/");
+
         Query query = new Query();
         query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
 

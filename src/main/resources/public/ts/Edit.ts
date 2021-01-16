@@ -88,17 +88,8 @@ export class Edit implements EditIntf {
                  * Server will have sent us back the raw text content, that should be markdown instead of any HTML, so
                  * that we can display this and save.
                  */
-                const dlg = new EditNodeDlg(res.nodeInfo, state);
+                const dlg = new EditNodeDlg(res.nodeInfo, res.parentInfo, state);
                 dlg.open();
-
-                // dispatch({
-                //     type: "Action_InlineEdit",
-                //     update: (s: AppState): void => {
-                //         s.inlineEditId = node.id;
-                //         s.inlineEditVal = node.content;
-                //     }
-                // });
-
             } else {
                 /* todo-0: when edit mode is not on, and a user tries to use the social 'reply' button this error comes up
                 which is completely wrong an misleading in that context. */

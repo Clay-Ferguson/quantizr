@@ -34,6 +34,7 @@ import org.subnode.response.RenderCalendarResponse;
 import org.subnode.response.RenderNodeResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.DateUtil;
+import org.subnode.util.ExUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
@@ -407,6 +408,15 @@ public class NodeRenderService {
 			res.setMessage("Node not found.");
 			res.setSuccess(false);
 			return res;
+		}
+
+		try {
+			SubNode parentNode = read.getParent(session, node);
+			NodeInfo parentInfo = convert.convertToNodeInfo(sessionContext, session, parentNode, false, true, -1, false, false);
+			res.setParentInfo(parentInfo);
+		} catch (Exception e) {
+			ExUtil.error(log, "unable to load parent", e);
+			// ignore this
 		}
 
 		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, false, true, -1, false, false);
