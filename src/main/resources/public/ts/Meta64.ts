@@ -231,8 +231,10 @@ export class Meta64 implements Meta64Intf {
         return null;
     }
 
-    highlightRowById = (id: string, scroll: boolean, state: AppState): void => {
+    /* Returns true if successful */
+    highlightRowById = (id: string, scroll: boolean, state: AppState): boolean => {
         let node: J.NodeInfo = state.idToNodeMap[id];
+        let ret = true;
 
         /* If node now known, resort to taking the best, previous node we had */
         if (!node) {
@@ -246,8 +248,10 @@ export class Meta64 implements Meta64Intf {
             if (scroll) {
                 S.view.scrollToTop();
             }
+            ret = false;
             console.log("highlightRowById failed to find id: " + id);
         }
+        return ret;
     }
 
     highlightNode = (node: J.NodeInfo, scroll: boolean, state: AppState): void => {

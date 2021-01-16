@@ -51,7 +51,7 @@ export interface Meta64Intf {
     selectAllNodes(nodeIds: string[]);
     updateNodeInfo(node: J.NodeInfo);
     getHighlightedNode(state?: AppState): J.NodeInfo;
-    highlightRowById(id, scroll, state: AppState): void;
+    highlightRowById(id, scroll, state: AppState): boolean;
     highlightNode(node: J.NodeInfo, scroll: boolean, state: AppState): void;
     getSingleSelectedNode(state: AppState): J.NodeInfo;
     initApp(): Promise<void>;

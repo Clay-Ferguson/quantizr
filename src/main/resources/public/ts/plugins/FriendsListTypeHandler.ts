@@ -48,7 +48,7 @@ export class FriendsListTypeHandler extends TypeBase {
                 })
             ], null, "float-right marginBottom"),
             new Div(null, { className: "clearfix" }),
-            new CollapsibleHelpPanel("This node defines your list of friends, as it's subnodes (i.e. who you follow on the Fediverse or this server will be defined by the children of this node).<p>" +
+            new CollapsibleHelpPanel("Help", "This node defines your list of friends, as it's subnodes (i.e. who you follow on the Fediverse or this server will be defined by the children of this node).<p>" +
                     "Use the 'Add Friend' button to add a new friend, and their content will then show up in your Feed tab <p>" +
                     "You can access your Feed by clicking the 'Feed' link at the top of the page.",
                 (state: boolean) => {

@@ -355,6 +355,7 @@ entire thing down some times, if it's jutting up against something */
 .inline-checkbox {
     display: inline-block;
     cursor: pointer;
+    min-height: 3.4em;
 }
 
 .inline-radio {

@@ -344,7 +344,15 @@ export class Render implements RenderIntf {
                         }
                         else if (allowScroll && targetNodeId) {
                             // console.log("highlight: byId");
-                            S.meta64.highlightRowById(targetNodeId, true, s);
+
+                            /* todo-0 (is this the 'best' code here)
+                            This is a 'quick fix' to the situation where a new signed up user ends up getting here with
+                            some non-null targetNodeId, and it actually is somehow invalid and the initial page load never happens */
+                            if (!S.meta64.highlightRowById(targetNodeId, true, s)) {
+                                setTimeout(() => {
+                                    S.nav.navHome(state);
+                                }, 250);
+                            }
                             s.rendering = true;
                         } //
                         else if (allowScroll && (scrollToTop || !S.meta64.getHighlightedNode(s))) {

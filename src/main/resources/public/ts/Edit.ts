@@ -142,6 +142,7 @@ export class Edit implements EditIntf {
     }
 
     isInsertAllowed = (node: J.NodeInfo, state: AppState): boolean => {
+        if (!node) return false;
         if (state.homeNodeId === node.id) {
             return true;
         }

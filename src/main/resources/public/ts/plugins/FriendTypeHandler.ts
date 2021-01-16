@@ -122,7 +122,7 @@ export class FriendTypeHandler extends TypeBase {
                     })
                 ], null, "float-right marginBottom"),
                 new Div(null, { className: "clearfix" })]),
-            new CollapsibleHelpPanel("This node defines a friend on this server or another federated server. <br>" +
+            new CollapsibleHelpPanel("Help", "This node defines a friend on this server or another federated server. <br>" +
                 "You can send a DM to this person using the 'Message' button, or delete this node to stop following the person.",
                 (state: boolean) => {
                     FriendTypeHandler.helpExpanded = state;

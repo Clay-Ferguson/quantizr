@@ -60,7 +60,7 @@ export class FeedView extends Div {
         children.push(refreshFeedButtonBar);
         children.push(new Div(null, { className: "clearfix" }));
 
-        children.push(new CollapsibleHelpPanel(
+        children.push(new CollapsibleHelpPanel("Feed View Tips",
             "This is your Fediverse <b>feed</b> that shows a reverse chronological stream of posts from people you Follow.<p>" +
             "Use the 'Friends' button to jump over to the part of your main tree where your Friends List is stored to manage your friends.<p>" +
             "Use any 'Jump' button in the feed to go the the main content tree location of that post. Unlike other social media apps " +
