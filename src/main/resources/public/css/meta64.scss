@@ -1111,6 +1111,14 @@ input[type="radio"] {
     padding-bottom: 8px;
 }
 
+.feed-node-table-row {
+    position: relative;
+    padding-right: 1em;
+    outline: none;
+    padding-top: 8px;
+    // no padding on bottom because reply button bar has enough space
+}
+
 .editing-border {
     // border-bottom: 3px dotted $nodeBorderBottomColor;
     border-bottom: 1px dotted lightslategray;

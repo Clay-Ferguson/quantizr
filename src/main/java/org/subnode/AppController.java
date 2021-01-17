@@ -1132,7 +1132,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/addFriend", method = RequestMethod.POST)
 	public @ResponseBody Object addFriend(@RequestBody AddFriendRequest req, HttpSession session) {
 		return callProc.run("addFriend", req, session, ms -> {
-			return userManagerService.addFriend(req);
+			return userManagerService.addFriend(ms, req);
 		});
 	}
 

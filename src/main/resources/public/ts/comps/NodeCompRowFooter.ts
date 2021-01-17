@@ -26,8 +26,8 @@ export class NodeCompRowFooter extends Div {
 
         if (this.isFeed) {
             children.push(new Icon({
-                title: "Reply",
-                className: "fa fa-comment fa-lg rowFooterIcon",
+                title: "Reply to this Node",
+                className: "fa fa-reply fa-lg rowFooterIcon",
                 onClick: () => S.edit.addComment(this.node, state)
             }));
         }

@@ -79,9 +79,17 @@ export class NodeCompButtonBar extends HorizontalLayout {
             editableNode = true;
         }
         else if (typeHandler) {
-            editingAllowed = typeHandler.allowAction(NodeActionType.editNode, node, state);
-            deleteAllowed = typeHandler.allowAction(NodeActionType.delete, node, state);
-            editableNode = typeHandler.allowAction(NodeActionType.editNode, node, state);
+            if (editingAllowed) {
+                editingAllowed = typeHandler.allowAction(NodeActionType.editNode, node, state);
+                deleteAllowed = typeHandler.allowAction(NodeActionType.delete, node, state);
+                editableNode = typeHandler.allowAction(NodeActionType.editNode, node, state);
+            }
+        }
+        else {
+            // bug fix. this case was not covered.
+            if (editingAllowed) {
+                deleteAllowed = true;
+            }
         }
 
         if (S.props.isEncrypted(node)) {

@@ -26,9 +26,6 @@ public class MongoRepository {
 	private MongoUtil repoUtil;
 
 	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
 	private MongoAuth auth;
 
 	@Autowired

@@ -119,7 +119,11 @@ export class Edit implements EditIntf {
         }
     }
 
-    /* returns true if we can 'try to' insert under 'node' or false if not */
+    /*
+    todo-0: need to rename this method to closer represent what id CHECKS.
+
+    returns true if we can 'try to' insert under 'node' or false if not
+    */
     isEditAllowed = (node: any, state: AppState): boolean => {
         let owner: string = node.owner;
 

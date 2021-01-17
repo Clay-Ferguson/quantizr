@@ -25,7 +25,6 @@ export class View implements ViewIntf {
      */
     refreshTree = (nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean,
         allowScroll: boolean, setTab: boolean, state: AppState): void => {
-
         if (!nodeId && state.node) {
             nodeId = state.node.id;
         }

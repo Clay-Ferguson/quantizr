@@ -635,36 +635,37 @@ public class UserManagerService {
 	 * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
 	 * if the user wasn't already a friend
 	 */
-	public AddFriendResponse addFriend(final AddFriendRequest req) {
+	public AddFriendResponse addFriend(MongoSession session, final AddFriendRequest req) {
 		AddFriendResponse res = new AddFriendResponse();
 		final String userName = sessionContext.getUserName();
 
-		adminRunner.run(session -> {
-			// get the Friend List of the follower
-			SubNode followerFriendList = read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s());
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
 
-			/*
-			 * lookup to see if this followerFriendList node already has userToFollow already under it
-			 */
-			SubNode friendNode = read.findFriendOfUser(session, followerFriendList, req.getUserName());
-			if (friendNode == null) {
-				// todo-0: for local users following fediverse this value needs to be here?
-				String followerActorUrl = null;
+		// get the Friend List of the follower
+		SubNode followerFriendList = read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s());
 
-				friendNode = edit.createFriendNode(session, followerFriendList, req.getUserName(), followerActorUrl);
-				if (friendNode != null) {
-					res.setMessage("Added new Friend: " + req.getUserName());
-				}
-				else {
-					res.setMessage("Unable to add Friend: " + req.getUserName());
-				}
+		/*
+		 * lookup to see if this followerFriendList node already has userToFollow already under it
+		 */
+		SubNode friendNode = read.findFriendOfUser(session, followerFriendList, req.getUserName());
+		if (friendNode == null) {
+			// todo-0: for local users following fediverse this value needs to be here?
+			String followerActorUrl = null;
 
-				res.setSuccess(true);
+			friendNode = edit.createFriendNode(session, followerFriendList, req.getUserName(), followerActorUrl);
+			if (friendNode != null) {
+				res.setMessage("Added new Friend: " + req.getUserName());
 			} else {
-				res.setMessage("You're already following " + req.getUserName());
-				res.setSuccess(true);
+				res.setMessage("Unable to add Friend: " + req.getUserName());
 			}
-		});
+
+			res.setSuccess(true);
+		} else {
+			res.setMessage("You're already following " + req.getUserName());
+			res.setSuccess(true);
+		}
 		return res;
 	}
 

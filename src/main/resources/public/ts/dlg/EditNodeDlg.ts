@@ -382,7 +382,7 @@ export class EditNodeDlg extends DialogBase {
         let parentDisplay = null;
         if (this.parentNode) {
             let parentContentEditor = new TextArea(null, { rows: "5" }, this.parentContentEditorState);
-            let parentVal = this.parentNode.content;
+            let parentVal = this.parentNode.content || "";
             if (!parentVal.startsWith(J.Constant.ENC_TAG)) {
                 this.parentContentEditorState.setValue(parentVal);
 

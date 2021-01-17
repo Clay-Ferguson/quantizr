@@ -1,6 +1,7 @@
 package org.subnode.service;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -116,9 +117,18 @@ public class NodeEditService {
 		 * "My Posts" node
 		 */
 		if (nodeId == null) {
-			node = read.getUserNodeByType(session, null, null, "### My Posts", NodeType.POSTS.s());
-			nodeId = node.getId().toHexString();
-			makePublic = true;
+			node = read.getUserNodeByType(session, null, null, "### Public Posts", NodeType.POSTS.s());
+
+			if (node != null) {
+
+				// todo-1: make this public code only run when node is first created.
+				aclService.addPrivilege(session, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+				node.setContent("### " + sessionContext.getUserName() + "'s Public Posts");
+				update.save(session, node);
+
+				nodeId = node.getId().toHexString();
+				makePublic = true;
+			}
 		}
 
 		/* Node still null try other ways of getting it */
@@ -140,11 +150,6 @@ public class NodeEditService {
 
 		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null);
 
-		if (makePublic) {
-			aclService.addPrivilege(session, newNode, PrincipalName.PUBLIC.s(),
-					Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-		}
-
 		// '/r/p/' = pending (nodes not yet published, being edited created by users)
 		if (req.isPendingEdit() && !newNode.getPath().startsWith("/r/p/")) {
 			newNode.setPath(newNode.getPath().replace("/r/", "/r/p/"));
@@ -156,8 +161,13 @@ public class NodeEditService {
 			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 		}
 
-		// we always determine the access controls from the parent for any new nodes
-		auth.setDefaultReplyAcl(null, node, newNode);
+		if (makePublic) {
+			aclService.addPrivilege(session, newNode, PrincipalName.PUBLIC.s(),
+					Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+		} else {
+			// we always determine the access controls from the parent for any new nodes
+			auth.setDefaultReplyAcl(null, node, newNode);
+		}
 
 		update.save(session, newNode);
 		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));
@@ -519,7 +529,7 @@ public class NodeEditService {
 			update.save(session, parentForNewNodes);
 		}
 
-		Date now = new Date();
+		Date now = Calendar.getInstance().getTime();
 		int idx = 0;
 		for (String part : contentParts) {
 			// log.debug("ContentPart[" + idx + "] " + part);

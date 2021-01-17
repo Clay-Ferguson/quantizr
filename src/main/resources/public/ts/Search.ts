@@ -146,7 +146,7 @@ export class Search implements SearchIntf {
         const buttonBar = this.makeButtonBarHtml(node, state);
         const content = new NodeCompContent(node, true, true, prefix, true, null);
 
-        let clazz = "node-table-row";
+        let clazz = isFeed ? "feed-node-table-row" : "node-table-row";
         // if (state.userPreferences.editMode) {
         //    clazz += " editing-border";
         // }
