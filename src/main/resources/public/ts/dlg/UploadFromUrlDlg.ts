@@ -21,7 +21,7 @@ export class UploadFromUrlDlg extends DialogBase {
     uploadButton: Button;
     urlState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(private node: J.NodeInfo, private url: string, private onUploadFunc: Function, state: AppState) {
+    constructor(private nodeId: string, private url: string, private onUploadFunc: Function, state: AppState) {
         super("Upload File", null, false, state);
     }
 
@@ -57,7 +57,7 @@ export class UploadFromUrlDlg extends DialogBase {
         }
 
         S.util.ajax<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
-            nodeId: this.node.id,
+            nodeId: this.nodeId,
             sourceUrl: this.urlState.getValue()
         }, this.uploadFromUrlResponse);
     }

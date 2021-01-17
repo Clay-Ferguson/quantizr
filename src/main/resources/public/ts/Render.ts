@@ -101,7 +101,7 @@ export class Render implements RenderIntf {
                             if (s.startsWith(location.protocol + "//" + location.hostname)) {
                                 return;
                             }
-                            S.attachment.openUploadFromUrlDlg(node, s, null, state);
+                            S.attachment.openUploadFromUrlDlg(node ? node.id : null, s, null, state);
                         }
                         /* this is the case where a user is moving a node by dragging it over another node */
                         else if (s.startsWith(S.nav._UID_ROWID_PREFIX)) {

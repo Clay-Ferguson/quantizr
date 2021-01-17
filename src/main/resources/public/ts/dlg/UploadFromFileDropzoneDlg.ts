@@ -48,7 +48,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     ipfsCheckbox: Checkbox;
 
-    constructor(private nodeId: string, private node: J.NodeInfo, private binSuffix: string, private toIpfs: boolean, //
+    /* We allow either nodeId or 'node' to be passed in here */
+    constructor(private nodeId: string, private binSuffix: string, private toIpfs: boolean, //
         private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, state: AppState, public afterUploadFunc: Function) {
         super(importMode ? "Import File" : "Upload File", null, false, state);
     }
@@ -111,9 +112,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     uploadFromUrl = (): void => {
         let state = this.getState();
-        S.attachment.openUploadFromUrlDlg(this.node, null, () => {
+        S.attachment.openUploadFromUrlDlg(this.nodeId, null, () => {
             this.close();
-
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();
             }

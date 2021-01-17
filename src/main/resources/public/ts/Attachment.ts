@@ -26,7 +26,7 @@ export class Attachment implements AttachmentIntf {
             return;
         }
 
-        const dlg = new UploadFromFileDropzoneDlg(node.id, node, "", toIpfs, autoAddFile, false, true, state, () => {
+        const dlg = new UploadFromFileDropzoneDlg(node.id, "", toIpfs, autoAddFile, false, true, state, () => {
             S.meta64.refresh(state);
         });
         dlg.open();
@@ -37,17 +37,17 @@ export class Attachment implements AttachmentIntf {
         */
     }
 
-    openUploadFromUrlDlg = (node: J.NodeInfo, defaultUrl: string, onUploadFunc: Function, state: AppState): void => {
-        if (!node) {
-            node = S.meta64.getHighlightedNode(state);
+    openUploadFromUrlDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function, state: AppState): void => {
+        if (!nodeId) {
+            let node = S.meta64.getHighlightedNode(state);
+            if (!node) {
+                S.util.showMessage("No node is selected.", "Warning");
+                return;
+            }
+            nodeId = node.id;
         }
 
-        if (!node) {
-            S.util.showMessage("No node is selected.", "Warning");
-            return;
-        }
-
-        const dlg = new UploadFromUrlDlg(node, defaultUrl, onUploadFunc, state);
+        const dlg = new UploadFromUrlDlg(nodeId, defaultUrl, onUploadFunc, state);
         dlg.open();
     }
 
