@@ -128,6 +128,25 @@ public class NodeInfo {
 		return null;
 	}
 
+	@Transient
+	@JsonIgnore
+	public void setPropVal(String propName, String val) {
+		if (properties == null) {
+			safeGetProperties().add(new PropertyInfo(propName, val));
+			return;
+		}
+
+		/* Set property to new value if it exists already */
+		for (PropertyInfo prop : properties) {
+			if (prop.getName().equals(propName)) {
+				prop.setValue(val);
+				return;
+			}
+		}
+
+		safeGetProperties().add(new PropertyInfo(propName, val));
+	}
+
 	public String getContent() {
 		return content;
 	}

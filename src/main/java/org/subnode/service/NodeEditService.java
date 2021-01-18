@@ -299,6 +299,11 @@ public class NodeEditService {
 		 */
 		if (node.getType().equals(NodeType.FRIEND.s())) {
 			String friendUserName = nodeInfo.getPropVal(NodeProp.USER.s());
+			if (friendUserName.startsWith("@")) {
+				friendUserName = XString.stripIfStartsWith(friendUserName, "@");
+				nodeInfo.setPropVal(NodeProp.USER.s(), friendUserName);
+			}
+
 			Iterable<SubNode> friendNodes =
 					read.findSubNodesByProp(session, node.getParentPath(), NodeProp.USER.s(), friendUserName);
 
