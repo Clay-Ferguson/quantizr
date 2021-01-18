@@ -51,7 +51,6 @@ export class AudioPlayerDlg extends DialogBase {
     playButton: Icon;
     pauseButton: Icon;
 
-    /* chapters url is the "podcast:chapters" url from RSS feeds */
     constructor(private customTitle, private customSubTitle: string, private customDiv: CompIntf, private sourceUrl: string, private startTimePendingOverride: number, state: AppState) {
         super(customTitle || "Audio Player", null, false, state);
         this.urlHash = S.util.hashOfString(sourceUrl);
@@ -174,10 +173,10 @@ export class AudioPlayerDlg extends DialogBase {
 
     updatePlayButton = (): void => {
         if (this.player) {
-            this.playButton.whenElm((elm: HTMLAudioElement) => {
+            this.playButton.whenElm((elm: HTMLElement) => {
                 elm.style.display = this.player.paused || this.player.ended ? "inline-block" : "none";
             });
-            this.pauseButton.whenElm((elm: HTMLAudioElement) => {
+            this.pauseButton.whenElm((elm: HTMLElement) => {
                 elm.style.display = !this.player.paused && !this.player.ended ? "inline-block" : "none";
             });
         }

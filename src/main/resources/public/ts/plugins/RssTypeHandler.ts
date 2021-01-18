@@ -1,4 +1,3 @@
-import axios from "axios";
 import * as RssParser from "rss-parser";
 import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
@@ -13,15 +12,14 @@ import { Comp } from "../widget/base/Comp";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
-import { Img } from "../widget/Img";
 import { Html } from "../widget/Html";
+import { Img } from "../widget/Img";
+import { Span } from "../widget/Span";
 import { TextContent } from "../widget/TextContent";
 import { TypeBase } from "./base/TypeBase";
-import { Span } from "../widget/Span";
-import { Log } from "../Log";
-import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -98,7 +96,6 @@ export class RssTypeHandler extends TypeBase {
         let parser = new RssParser({
             customFields: {
                 item: [
-                    ["podcast:chapters", "podcastChapters"],
                     ["media:thumbnail", "mediaThumbnail"],
                     ["category", "category"],
                     ["itunes:image", "itunesImage"],
@@ -292,27 +289,8 @@ export class RssTypeHandler extends TypeBase {
 
             let audioButton = new Button("Play Audio", //
                 () => {
-                    let chaptersUrl = (entry.podcastChapters && entry.podcastChapters.$) ? entry.podcastChapters.$.url : null;
-                    let chaptersDiv = null;
-                    if (chaptersUrl) {
-
-                        // todo-2: would be nicer to have chapters in a collapsable panel, but this may have to be a div inside a div
-                        // because I'm not sure how we can update this div class by altering the state.
-                        chaptersDiv = new Div(null, null /* { className: "rssChapterPanel" } */);
-
-                        // todo-0: should we make preRender function be able to return a boolean that can even tell
-                        // the component not to render at all, or render hidden, when no chapters will exist ?
-                        chaptersDiv.preRender = () => {
-                            this.renderChapters(dlg, chaptersDiv);
-                        };
-                    }
-
-                    let dlg = new AudioPlayerDlg(feed.title, entry.title, chaptersDiv, entry.enclosure.url, 0, state);
+                    let dlg = new AudioPlayerDlg(feed.title, entry.title, null, entry.enclosure.url, 0, state);
                     dlg.open();
-
-                    if (chaptersDiv) {
-                        this.asyncLoadChapters(chaptersDiv, chaptersUrl);
-                    }
                 });
 
             children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));
@@ -352,65 +330,6 @@ export class RssTypeHandler extends TypeBase {
         children.push(new Div(null, { className: "clearfix" }));
 
         return new Div(null, { className: "rss-feed-item" }, children);
-    }
-
-    renderChapters = (chaptersDiv: AudioPlayerDlg, div: CompIntf): void => {
-        let state = div.getState();
-        div.setChildren([]);
-
-        if (state.chapters) {
-            for (let chapter of state.chapters.chapters) {
-
-                let chapterDiv = new Div(null, { className: "rssChapterDiv" });
-
-                if (chapter.img) {
-                    chapterDiv.addChild(new Img(null, {
-                        className: "rssChapterImage",
-                        src: chapter.img,
-                        onClick: () => {
-                            if (chaptersDiv.player) {
-                                chaptersDiv.player.currentTime = chapter.startTime;
-                            }
-                        }
-                    }));
-                }
-
-                chapterDiv.addChild(new Span(chapter.title, {
-                    className: "rssChapterTitle",
-                    onClick: () => {
-                        if (chaptersDiv.player) {
-                            chaptersDiv.player.currentTime = chapter.startTime;
-                        }
-                    }
-                }));
-
-                if (chapter.url) {
-                    chapterDiv.addChild(new Anchor(chapter.url, "[ Link ]", {
-                        className: "rssChapterLink",
-                        target: "_blank"
-                    }));
-                }
-
-                div.addChild(chapterDiv);
-            }
-        }
-    }
-
-    asyncLoadChapters = async (chaptersDiv: Div, chaptersUrl: string) => {
-        console.log("chapters: " + chaptersUrl);
-        if (!chaptersUrl) return null;
-
-        let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(chaptersUrl);
-
-        try {
-            let response = await axios.get(url, {});
-            if (response.status === 200) {
-                chaptersDiv.mergeState({ chapters: response.data });
-            }
-        }
-        catch (e) {
-            Log.error(e);
-        }
     }
 
     /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px wide because
