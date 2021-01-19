@@ -42,7 +42,7 @@ import org.subnode.util.ThreadLocals;
 public class UserFeedService {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
-	static final int MAX_FEED_ITEMS = 200;
+	static final int MAX_FEED_ITEMS = 50;
 
 	@Autowired
 	private MongoRead read;
@@ -121,8 +121,6 @@ public class UserFeedService {
 	}
 
 	public void sendServerPushInfo(SessionContext userSession, ServerPushInfo info) {
-		// SessionContext userSession = SessionContext.getSessionByUserName(recipientUserName);
-
 		// If user is currently logged in we have a session here.
 		if (userSession != null) {
 			SseEmitter pushEmitter = userSession.getPushEmitter();
@@ -169,28 +167,44 @@ public class UserFeedService {
 			sharedToAny.add("public");
 		}
 
-		SubNode searchRoot = read.getNode(session, sessionContext.getRootId());
+		SubNode searchRoot = null;
 
 		// includes shares TO me.
 		if (req.getToMe()) {
-			sharedToAny.add(searchRoot.getOwner().toHexString());
+			if (searchRoot == null) {
+				searchRoot = read.getNode(session, sessionContext.getRootId());
+			}
+
+			if (searchRoot != null) {
+				sharedToAny.add(searchRoot.getOwner().toHexString());
+			}
 		}
 		List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
 		res.setSearchResults(searchResults);
-
 		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 
 		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch));
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
+
+			//This pattern is what is required when you have multiple conditions added to a single field.
+				.andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
+						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
+						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
 
 		List<Criteria> orCriteria = new LinkedList<Criteria>();
 
 		if (req.getFromMe()) {
-			orCriteria.add(
-					// where node is owned by us.
-					Criteria.where(SubNode.FIELD_OWNER).is(searchRoot.getOwner()) //
-							// and the node has any sharing on it.
-							.and(SubNode.FIELD_AC).ne(null));
+			if (searchRoot == null) {
+				searchRoot = read.getNode(session, sessionContext.getRootId());
+			}
+
+			if (searchRoot != null) {
+				orCriteria.add(
+						// where node is owned by us.
+						Criteria.where(SubNode.FIELD_OWNER).is(searchRoot.getOwner()) //
+								// and the node has any sharing on it.
+								.and(SubNode.FIELD_AC).ne(null));
+			}
 		}
 
 		// or a node that is shared to any of the sharedToAny users
@@ -209,42 +223,22 @@ public class UserFeedService {
 		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
 		query.limit(MAX_FEED_ITEMS);
 
+		if (req.getPage() > 0) {
+			query.skip(MAX_FEED_ITEMS * req.getPage());
+		}
+
 		Iterable<SubNode> iter = ops.find(query, SubNode.class);
 		for (SubNode node : iter) {
-
-			/*
-			 * We don't want FRIEND nodes in the feed, but I'm not sure if there will be a more 'generic'
-			 * encompassing way to filter out unwanted records here. I don't want this done by the DB query for
-			 * now
-			 */
-			if (NodeType.FRIEND.s().equals(node.getType()) || //
-					NodeType.POSTS.s().equals(node.getType())) {
-				continue;
-			}
-
 			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1, false, false);
 			searchResults.add(info);
+		}
+
+		if (searchResults.size() < MAX_FEED_ITEMS) {
+			res.setEndReached(true);
 		}
 
 		res.setSuccess(true);
 		log.debug("search results count: " + counter);
 		return res;
-	}
-
-	// unused (but I want to keep for an example)
-	public List<SubNode> sortAndTruncateFeedItems(List<SubNode> list) {
-		/* Sort the feed items chrononologially, reversed with newest on top */
-		Collections.sort(list, new Comparator<SubNode>() {
-			@Override
-			public int compare(SubNode s1, SubNode s2) {
-				return s2.getModifyTime().compareTo(s1.getModifyTime());
-			}
-		});
-
-		/* Truncate list down to max length */
-		if (list.size() > MAX_FEED_ITEMS) {
-			list = list.subList(0, MAX_FEED_ITEMS - 1);
-		}
-		return list;
 	}
 }

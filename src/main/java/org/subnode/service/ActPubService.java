@@ -35,6 +35,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -47,9 +48,11 @@ import org.subnode.actpub.ActPubConstants;
 import org.subnode.actpub.ActPubFactory;
 import org.subnode.actpub.ActPubObserver;
 import org.subnode.config.AppProp;
+import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoAuth;
@@ -65,10 +68,13 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.util.DateUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
+import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
 @Component
 public class ActPubService {
+    public static final int MAX_MESSAGES = 10;
+    public static final int MAX_FOLLOWERS = 20;
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
     @Autowired
@@ -115,6 +121,13 @@ public class ActPubService {
 
     @Autowired
     private MongoAuth auth;
+
+    /*
+     * Holds users for which messages need refreshing (false value) but sets value to 'true' once
+     * completed
+     */
+    public static final ConcurrentHashMap<String, Boolean> userNamesPendingMessageRefresh =
+            new ConcurrentHashMap<String, Boolean>();
 
     /* Cache Actor objects by URL in memory only for now */
     public static final ConcurrentHashMap<String, APObj> actorCacheByUrl = new ConcurrentHashMap<String, APObj>();
@@ -450,6 +463,8 @@ public class ActPubService {
             return null;
         }
         log.debug("importing Actor: " + apUserName);
+
+        // Try to get the userNode for this actor
         SubNode userNode = read.getUserNodeByUserName(session, apUserName);
 
         /*
@@ -466,28 +481,27 @@ public class ActPubService {
             if (iconUrl != null) {
                 String curIconUrl = userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
                 if (!iconUrl.equals(curIconUrl)) {
-                    changed = changed || userNode.setProp(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl);
+                    if (userNode.setProp(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl)) {
+                        changed = true;
+                    }
                 }
             }
         }
 
-        changed = changed || userNode.setProp(NodeProp.USER_BIO.s(), AP.str(actor, "summary"));
-        changed = changed || userNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), AP.str(actor, "id"));
-        changed = changed || userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), AP.str(actor, "inbox"));
-        changed = changed || userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), AP.str(actor, "url"));
+        if (userNode.setProp(NodeProp.USER_BIO.s(), AP.str(actor, "summary")))
+            changed = true;
+        if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), AP.str(actor, "id")))
+            changed = true;
+        if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), AP.str(actor, "inbox")))
+            changed = true;
+        if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), AP.str(actor, "url")))
+            changed = true;
 
         if (changed) {
             update.save(session, userNode, false);
         }
 
-        // don't call this here, because it leads to infinite recursion, and for now we
-        // don't need this. This is essentially
-        // a look back into old posts from before we followed the user so we can get by
-        // without it for now.
-        // refreshOutboxFromForeignServer(session, actor, userNode, apUserName);
-
         /* cache the account node id for this user by the actor url */
-
         String selfRefId = AP.str(actor, "id"); // actor url of 'actor' object, is the same as the 'id'
         acctIdByActorUrl.put(selfRefId, userNode.getId().toHexString());
         return userNode;
@@ -503,7 +517,17 @@ public class ActPubService {
             userNode = read.getUserNodeByUserName(session, apUserName);
         }
 
+        //todo-0: warning the content text here is used to filter out from the Feed View. Need to make it a type instead
         SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s());
+        if (outboxNode == null) {
+            log.debug("no outbox for user: " + apUserName);
+            return;
+        }
+
+        // todo-0: this is bad to update the outboxNode here every time. fix this.
+        acl.addPrivilege(session, outboxNode, PrincipalName.PUBLIC.s(),
+                Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+        update.save(session, outboxNode);
 
         /*
          * Query all existing known outbox items we have already saved for this foreign user
@@ -529,21 +553,33 @@ public class ActPubService {
             }
         }
 
-        iterateOrderedCollection(outbox, obj -> {
+        ValContainer<Integer> count = new ValContainer<Integer>(0);
+        final SubNode _userNode = userNode;
+
+        iterateOrderedCollection(outbox, Integer.MAX_VALUE, obj -> {
             String apId = AP.str(obj, "id");
             if (!apIdSet.contains(apId)) {
                 Object object = AP.obj(obj, "object");
 
                 if (object != null && "Note".equals(AP.str(object, "type"))) {
-                    saveNote(session, outboxNode, object);
+                    try {
+                        saveNote(session, _userNode, outboxNode, object);
+                        count.setVal(count.getVal() + 1);
+                    } catch (Exception e) {
+                        // log and ignore.
+                        log.error("error in saveNode()", e);
+                    }
                 } else {
                     log.debug("Object type not supported: " + XString.prettyPrint(object));
                 }
             }
+            return (count.getVal() < MAX_MESSAGES);
         });
     }
 
-    public void iterateOrderedCollection(Object collectionObj, ActPubObserver observer) {
+    public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
+        //log.debug("interateOrderedCollection(): " + XString.prettyPrint(collectionObj));
+        int count = 0;
         /*
          * We user apIdSet to avoid processing any dupliates, because the AP spec calls on us to do this and
          * doesn't guarantee it's own dedupliation
@@ -561,7 +597,11 @@ public class ActPubService {
              * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
              */
             for (Object apObj : orderedItems) {
-                observer.item(apObj);
+                if (!observer.item(apObj)) {
+                    return;
+                }
+                if (++count >= maxCount)
+                    return;
             }
         }
 
@@ -585,20 +625,25 @@ public class ActPubService {
                         String apId = AP.str(apObj, "id");
                         // if no apId that's fine, just process item.
                         if (apId == null) {
-                            observer.item(apObj);
+                            if (!observer.item(apObj))
+                                return;
                         }
                         // if no apId that's fine, just process item.
                         else if (!apIdSet.contains(apId)) {
                             log.debug("Iterate Collection Item: " + apId);
-                            observer.item(apObj);
+                            if (!observer.item(apObj))
+                                return;
                             apIdSet.add(apId);
                         }
                     }
                     // otherwise apObj is probably a 'String' but whatever it is we call 'item' on
                     // it.
                     else {
-                        observer.item(apObj);
+                        if (!observer.item(apObj))
+                            return;
                     }
+                    if (++count >= maxCount)
+                        return;
                 }
 
                 String nextPage = AP.str(ocPage, "next");
@@ -624,20 +669,25 @@ public class ActPubService {
                         String apId = AP.str(apObj, "id");
                         // if no apId that's fine, just process item.
                         if (apId == null) {
-                            observer.item(apObj);
+                            if (!observer.item(apObj))
+                                return;
                         }
                         // else process it with apId
                         else if (!apIdSet.contains(apId)) {
                             log.debug("Iterate Collection Item: " + apId);
-                            observer.item(apObj);
+                            if (!observer.item(apObj))
+                                return;
                             apIdSet.add(apId);
                         }
                     }
                     // otherwise apObj is probably a 'String' but whatever it is we call 'item' on
                     // it.
                     else {
-                        observer.item(apObj);
+                        if (!observer.item(apObj))
+                            return;
                     }
+                    if (++count >= maxCount)
+                        return;
                 }
             }
         }
@@ -667,12 +717,12 @@ public class ActPubService {
         return userName.substring(0, atIdx);
     }
 
-    // https://server.org/.well-known/webfinger?resource=acct:WClayFerguson@server.org'
-
     /*
+     * https://server.org/.well-known/webfinger?resource=acct:someuser@server.org'
+     * 
      * Get WebFinger from foreign server
      * 
-     * resource example: WClayFerguson@server.org
+     * resource example: someuser@server.org
      */
     public APObj getWebFinger(String resource) {
         if (resource.startsWith("@")) {
@@ -823,7 +873,7 @@ public class ActPubService {
                 return null;
             });
         } catch (Exception e) {
-            //todo-0: handle this better;
+            // todo-0: handle this better;
             log.debug("Set following Failed.");
         }
     }
@@ -1069,7 +1119,7 @@ public class ActPubService {
          * If a foreign user is replying to a specific node, we put the reply under that node
          */
         if (nodeBeingRepliedTo != null) {
-            saveNote(session, nodeBeingRepliedTo, obj);
+            saveNote(session, null, nodeBeingRepliedTo, obj);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -1082,16 +1132,33 @@ public class ActPubService {
                 String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
                 SubNode postsNode =
                         read.getUserNodeByType(session, userName, actorAccountNode, "### Posts", NodeType.ACT_PUB_POSTS.s());
-                saveNote(session, postsNode, obj);
+                saveNote(session, actorAccountNode, postsNode, obj);
             }
         }
         return ret;
     }
 
-    /* Saves inbound note comming from other foreign servers */
-    public void saveNote(MongoSession session, SubNode parentNode, Object obj) {
+    /*
+     * Saves inbound note comming from other foreign servers
+     * 
+     * system==true means we have a daemon thread doing the processing.
+     * 
+     * todo-0: when importing users in bulk (like at startup or the admin menu), some of there queries
+     * in here will be redundant
+     */
+    public void saveNote(MongoSession session, SubNode toAccountNode, SubNode parentNode, Object obj) {
 
         String id = AP.str(obj, "id");
+
+        /*
+         * First look to see if there is a target node already existing for this so we don't add a duplicate
+         */
+        SubNode dupNode = read.findSubNodeByProp(session, parentNode.getPath(), NodeProp.ACT_PUB_ID.s(), id);
+        if (dupNode != null) {
+            log.debug("duplicate ActivityPub post ignored: " + id);
+            return;
+        }
+
         Date published = AP.date(obj, "published");
         String inReplyTo = AP.str(obj, "inReplyTo");
         String contentHtml = AP.str(obj, "content");
@@ -1099,18 +1166,11 @@ public class ActPubService {
         String objAttributedTo = AP.str(obj, "attributedTo");
         String objType = AP.str(obj, "type");
 
-        /*
-         * First look to see if there is a target node already existing in this so we don't add a duplicate
-         */
-        SubNode newNode = read.findSubNodeByProp(session, parentNode.getPath(), NodeProp.ACT_PUB_ID.s(), id);
-        if (newNode != null) {
-            log.debug("duplicate ActivityPub post ignored: " + id);
-            return;
+        // foreign account will own this node, this may be passed if it's known or null can be passed in.
+        if (toAccountNode == null) {
+            toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
         }
-
-        // foreign account will own this node.
-        SubNode toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
-        newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null, toAccountNode.getId());
+        SubNode newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null, toAccountNode.getId());
 
         // todo-0: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now
@@ -1128,9 +1188,12 @@ public class ActPubService {
         shareToAllObjectRecipients(session, newNode, obj, "to");
         shareToAllObjectRecipients(session, newNode, obj, "cc");
 
+        // todo-0: i'm only 90% sure this won't be redundant. (review the share setting methods above)
+        acl.addPrivilege(session, newNode, PrincipalName.PUBLIC.s(),
+                Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+
         update.save(session, newNode);
         addAttachmentIfExists(session, newNode, obj);
-        userFeedService.pushNodeUpdateToBrowsers(session, newNode);
     }
 
     /*
@@ -1191,7 +1254,7 @@ public class ActPubService {
             if (allow) {
                 APObj followersObj = getJson(url, new MediaType("application", "activity+json"));
                 if (followersObj != null) {
-                    iterateOrderedCollection(followersObj, obj -> {
+                    iterateOrderedCollection(followersObj, MAX_FOLLOWERS, obj -> {
                         /*
                          * Mastodon seems to have the followers items as strings, which are the actor urls of the followers.
                          */
@@ -1199,6 +1262,7 @@ public class ActPubService {
                             String followerActorUrl = (String) obj;
                             shareNodeToActorByUrl(session, node, followerActorUrl);
                         }
+                        return true;
                     });
                 }
             }
@@ -1348,6 +1412,7 @@ public class ActPubService {
             // XString.prettyPrint(actor));
             String followerUserName = getLongUserNameFromActor(followerActorObj);
             SubNode followerAccountNode = loadForeignUserByUserName(session, followerUserName);
+            queueUserForRefresh(followerUserName, false);
 
             // Actor being followed (local to our server)
             String actorBeingFollowedUrl = AP.str(followAction, "object");
@@ -1827,6 +1892,72 @@ public class ActPubService {
                         }
                     }
                 }
+            }
+            return null;
+        });
+    }
+
+    public void queueUserForRefresh(String apUserName, boolean force) {
+        // if not a foreign user we need to ignore.
+        if (!apUserName.contains("@"))
+            return;
+
+        if (!force) {
+            // if already added, don't add again.
+            if (userNamesPendingMessageRefresh.contains(apUserName))
+                return;
+        }
+
+        // add as 'false' meaning the refresh is not yet done
+        userNamesPendingMessageRefresh.put(apUserName, false);
+    }
+
+    /* Run every three seconds */
+    @Scheduled(fixedDelay = 3 * 1000)
+    public void messageRefresh() {
+        try {
+            for (String apUserName : userNamesPendingMessageRefresh.keySet()) {
+                Boolean done = userNamesPendingMessageRefresh.get(apUserName);
+                if (done)
+                    continue;
+
+                // flag as done.
+                userNamesPendingMessageRefresh.put(apUserName, true);
+
+                final String _apUserName = apUserName;
+                adminRunner.run(session -> {
+                    log.debug("Refreshing messages for foreign user: " + _apUserName);
+                    SubNode userNode = loadForeignUserByUserName(session, _apUserName);
+                    String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+                    APObj actor = getActorByUrl(actorUrl);
+                    if (actor != null) {
+                        if (userNode != null) {
+                            log.debug("updating children under node: " + userNode.getId().toHexString());
+                            refreshOutboxFromForeignServer(session, actor, userNode, _apUserName);
+                        }
+                    } else {
+                        log.debug("Unable to get cached actor from url: " + actorUrl);
+                    }
+                    return null;
+                });
+            }
+        } catch (Exception e) {
+            // log and ignore.
+            log.error("messageRefreshFailed", e);
+        }
+    }
+
+    public void refreshForeignUsers() {
+        adminRunner.run(session -> {
+            Iterable<SubNode> accountNodes =
+                    read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+            for (SubNode node : accountNodes) {
+                String userName = node.getStrProp(NodeProp.USER.s());
+                if (userName == null || !userName.contains("@"))
+                    continue;
+
+                log.debug("Refreshing User: " + userName);
+                queueUserForRefresh(userName, true);
             }
             return null;
         });

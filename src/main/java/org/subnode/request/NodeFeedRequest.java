@@ -4,6 +4,9 @@ import org.subnode.request.base.RequestBase;
 
 public class NodeFeedRequest extends RequestBase {
 
+	//zero offset page of results (page=0 is first page)
+	private Integer page;
+
 	/* Note one of the other of these should be non-null, but not both */
 	private String nodeId;
 	private String feedUserName;
@@ -50,5 +53,13 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setToPublic(Boolean toPublic) {
 		this.toPublic = toPublic;
+	}
+
+	public Integer getPage() {
+		return page;
+	}
+
+	public void setPage(Integer page) {
+		this.page = page;
 	}
 }

@@ -486,7 +486,7 @@ public class MongoAuth {
 				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
 			}
 
-			criteria.orOperator((Criteria[])orCriteria.toArray(new Criteria[orCriteria.size()]));
+			criteria.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
 		}
 
 		if (ownerIdMatch != null) {
@@ -628,8 +628,12 @@ public class MongoAuth {
 			 * If this is a foreign 'mention' user name that is not imported into our system, we auto-import
 			 * that user now
 			 */
-			if (acctNode == null && StringUtils.countMatches(userName, "@") == 1) {
-				acctNode = actPub.loadForeignUserByUserName(session, userName);
+			if (StringUtils.countMatches(userName, "@") == 1) {
+				if (acctNode == null) {
+					acctNode = actPub.loadForeignUserByUserName(session, userName);
+				}
+
+				actPub.queueUserForRefresh(userName, false);
 			}
 
 			if (acctNode != null) {

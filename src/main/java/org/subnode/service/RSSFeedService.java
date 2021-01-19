@@ -147,6 +147,9 @@ public class RSSFeedService {
 			SubNode node = null;
 			try {
 				node = read.getNode(mongoSession, nodeId);
+				if (node==null) {
+					return;
+				}
 			} catch (NodeAuthFailedException e) {
 				return;
 			}

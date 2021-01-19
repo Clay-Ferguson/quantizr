@@ -24,17 +24,9 @@ export class TabPanelButtons extends Div {
         let state: AppState = useSelector((state: AppState) => state);
         let searchResults = state.searchResults;
         let timelineResults = state.timelineResults;
-        let feedResults = state.feedResults;
-
-        let mainDisplay = "inline";
         let searchDisplay = searchResults ? "inline" : "none";
         let timelineDisplay = timelineResults ? "inline" : "none";
-        let feedDisplay = state.isAnonUser ? "none" : "inline";
-
-        /* If mainDisplay would be the only tab showing, then don't show that tab */
-        if (searchDisplay === "none" && timelineDisplay === "none" && feedDisplay === "none") {
-            mainDisplay = "none";
-        }
+        let feedDisplay = "inline";
 
         // the row of buttons that ARE the tabs where you click to change tabs.
         let tabButtons = new Div(null, {
@@ -47,8 +39,8 @@ export class TabPanelButtons extends Div {
             },
                 /* These 'li' (list item) elements hold the tab bar that goes across the top of every page */
                 [new Li(null, {
-                    className: "nav-item navItem",
-                    style: { display: mainDisplay }
+                    className: "nav-item navItem"
+                    // style: { display: mainDisplay }
                 }, [
                     new Anchor("#mainTab", "Main", {
                         "data-toggle": "tab",

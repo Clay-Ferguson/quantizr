@@ -12,6 +12,7 @@ import { Div } from "../widget/Div";
 import { IconButton } from "../widget/IconButton";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
+import { NodeCompRowFooter } from "./NodeCompRowFooter";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 let S: Singletons;
@@ -143,7 +144,8 @@ export class NodeCompRow extends Div {
                 className: "clearfix",
                 id: "button_bar_clearfix_" + node.id
             }) : null,
-            new NodeCompContent(node, true, true, null, null, this.imgSizeOverride)
+            new NodeCompContent(node, true, true, null, null, this.imgSizeOverride),
+            new NodeCompRowFooter(node, false)
         ]);
     }
 

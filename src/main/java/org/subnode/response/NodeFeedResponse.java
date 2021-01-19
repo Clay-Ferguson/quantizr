@@ -7,6 +7,8 @@ import org.subnode.response.base.ResponseBase;
 
 public class NodeFeedResponse extends ResponseBase {
 
+	private Boolean endReached;
+
 	/* orderablility of children not set in these objects, all will be false */
 	private List<NodeInfo> searchResults;
 
@@ -16,5 +18,13 @@ public class NodeFeedResponse extends ResponseBase {
 
 	public void setSearchResults(List<NodeInfo> searchResults) {
 		this.searchResults = searchResults;
+	}
+
+	public Boolean getEndReached() {
+		return endReached;
+	}
+
+	public void setEndReached(Boolean endReached) {
+		this.endReached = endReached;
 	}
 }

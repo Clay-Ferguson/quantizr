@@ -98,22 +98,40 @@ $smallBorderSize: 3px;
     // border: 1px solid gray;
 }
 
+// HTML comming from Mastodon includes this so tolerate if for now.
+.invisible {
+    display: none;
+    visibility: hidden !important;
+}
+
 // we tack this onto bootstrap btn-group, becasue without it, buttons stretch wider than normal when 
 // wrapped to a new line (position) that where the row isn't full and has space to stretch. 
 .btnGroup {
     display: inline;
 }
 
+/* Need a way that we can set font sizes, on anchors but this actually messes up button styling because my buttons
+are sometimes using anchorz inside them like the main landing page button which enlarges when clicked if these font size
+alterations exist */
 a:visited {
     color: #00bc8c !important;
+    font-weight: bold; 
+    cursor: pointer;
+    //font-size: 110%;
 }
 
 a:active {
     color: #00bc8c !important;
+    font-weight: bold; 
+    cursor: pointer;
+    //font-size: 110%;
 }
 
 a {
     color: #00bc8c !important;
+    font-weight: bold;
+    cursor: pointer; 
+    //font-size: 110%;
 }
 
 .myjumbotron {
@@ -138,6 +156,11 @@ a {
 
 .myFooterText {
     font-size: 80%;
+}
+
+.footerLink {
+    margin-right: $smallGap;
+    cursor: pointer;
 }
 
 .mainLogoImg {

@@ -105,6 +105,7 @@ import org.subnode.response.RebuildIndexesResponse;
 import org.subnode.response.SendTestEmailResponse;
 import org.subnode.response.ShutdownServerNodeResponse;
 import org.subnode.service.AclService;
+import org.subnode.service.ActPubService;
 import org.subnode.service.AttachmentService;
 import org.subnode.service.ExportServiceFlexmark;
 import org.subnode.service.ExportTarService;
@@ -237,6 +238,9 @@ public class AppController implements ErrorController {
 
 	@Autowired
 	private GraphNodesService graphNodesService;
+
+	@Autowired
+	private ActPubService actPub;
 
 	@Autowired
 	private AppProp appProp;
@@ -1162,6 +1166,12 @@ public class AppController implements ErrorController {
 			} //
 			else if (req.getCommand().equalsIgnoreCase("refreshRssCache")) {
 				res.getMessages().add(new InfoMessage(rssFeedService.refreshFeedCache(), null));
+			} //
+			else if (req.getCommand().equalsIgnoreCase("refreshFediverseUsers")) {
+				actPub.refreshForeignUsers();
+				//todo-0: no need to return deatils here, but in the Server Info I need to add a lot
+				//of Fediverse statistics (user counts, etc)
+				res.getMessages().add(new InfoMessage("Done", null));
 			} //
 			else if (req.getCommand().equalsIgnoreCase("initializeAppContent")) {
 				log.error("initializeAppContent is obsolet, and was also refactored without being retested");

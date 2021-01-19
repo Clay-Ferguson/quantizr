@@ -154,6 +154,7 @@ export interface MoveNodesRequest extends RequestBase {
 }
 
 export interface NodeFeedRequest extends RequestBase {
+    page: number;
     nodeId: string;
     feedUserName: string;
     toMe: boolean;
@@ -431,6 +432,7 @@ export interface MoveNodesResponse extends ResponseBase {
 }
 
 export interface NodeFeedResponse extends ResponseBase {
+    endReached: boolean;
     searchResults: NodeInfo[];
 }
 

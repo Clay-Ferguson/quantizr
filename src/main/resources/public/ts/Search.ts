@@ -97,10 +97,11 @@ export class Search implements SearchIntf {
         }, this.timelineResponse);
     }
 
-    feed = (nodeId: string, feedUserName: string) => {
+    feed = (nodeId: string, feedUserName: string, page: number) => {
         let appState = store.getState();
 
         S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
+            page,
             nodeId,
             feedUserName,
             toMe: appState.feedFilterToMe,
@@ -115,10 +116,12 @@ export class Search implements SearchIntf {
             update: (s: AppState): void => {
                 // s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
                 s.feedResults = res.searchResults;
+                s.feedEndReached = res.endReached;
                 s.feedDirty = false;
             }
         });
         S.meta64.selectTab("feedTab");
+        S.view.scrollToTop();
     }
 
     initSearchNode = (node: J.NodeInfo) => {
@@ -183,7 +186,7 @@ export class Search implements SearchIntf {
             buttonBar,
             new NodeCompRowHeader(node, allowAvatars, isFeed),
             content,
-            isFeed ? new NodeCompRowFooter(node, isFeed) : null
+            new NodeCompRowFooter(node, isFeed)
         ]);
 
         return new Div(null, {

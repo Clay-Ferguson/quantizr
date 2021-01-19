@@ -11,6 +11,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Div } from "../widget/Div";
+import { IconButton } from "../widget/IconButton";
 import { Span } from "../widget/Span";
 
 let S: Singletons;
@@ -21,6 +22,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class FeedView extends Div {
 
+    static page: number = 0;
     static feedQueried: boolean = false;
     static helpExpanded: boolean = false;
 
@@ -45,18 +47,21 @@ export class FeedView extends Div {
         let children: Comp[] = [];
 
         let refreshFeedButtonBar = new ButtonBar([
-            new Button("New Post", () => S.edit.addComment(null, state), { title: "Post something awesome on the Fediverse!" }, "btn-primary"),
-            new Button("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), { title: "Manage your list of frenz!" }),
+            state.isAnonUser ? null : new Button("New Post", () => S.edit.addComment(null, state), { title: "Post something awesome on the Fediverse!" }, "btn-primary"),
+            state.isAnonUser ? null : new Button("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), { title: "Manage your list of frenz!" }),
             new Span(null, {
                 className: (state.feedDirty ? "feedDirtyButton" : "feedNotDirtyButton")
             }, [
                 new Button("Refresh Feed" + (state.feedDirty ? " (New Posts)" : ""), () => {
-                    S.nav.navFeed(state);
+                    FeedView.page = 0;
+                    S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
                 })
             ])
         ], null, "float-right marginBottom");
 
-        children.push(this.makeFilterButtonsBar());
+        if (!state.isAnonUser) {
+            children.push(this.makeFilterButtonsBar());
+        }
         children.push(refreshFeedButtonBar);
         children.push(new Div(null, { className: "clearfix" }));
 
@@ -74,7 +79,7 @@ export class FeedView extends Div {
                 if (!FeedView.feedQueried) {
                     FeedView.feedQueried = true;
                     children.push(new Div("Loading feed..."));
-                    setTimeout(() => { S.nav.navFeed(state); }, 250);
+                    setTimeout(() => { S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page); }, 250);
                 }
                 else {
                     children.push(new Div("Nothing to display."));
@@ -93,6 +98,15 @@ export class FeedView extends Div {
             });
         }
 
+        if (!state.feedEndReached) {
+            children.push(new Div(null, null, [
+                new IconButton("fa-angle-right", "More", {
+                    onClick: () => S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page),
+                    title: "Next Page"
+                })
+            ]));
+        }
+
         this.setChildren(children);
     }
 
@@ -106,7 +120,8 @@ export class FeedView extends Div {
                             s.feedFilterToMe = checked;
                         }
                     });
-                    S.nav.navFeed(store.getState());
+                    FeedView.page = 0;
+                    S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterToMe;
@@ -120,7 +135,8 @@ export class FeedView extends Div {
                             s.feedFilterFromMe = checked;
                         }
                     });
-                    S.nav.navFeed(store.getState());
+                    FeedView.page = 0;
+                    S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterFromMe;
@@ -134,7 +150,8 @@ export class FeedView extends Div {
                             s.feedFilterToPublic = checked;
                         }
                     });
-                    S.nav.navFeed(store.getState());
+                    FeedView.page = 0;
+                    S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterToPublic;

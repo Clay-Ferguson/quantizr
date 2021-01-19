@@ -29,8 +29,8 @@ export class AppState {
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
 
-    feedFilterToMe: boolean = true;
-    feedFilterFromMe: boolean = true;
+    feedFilterToMe: boolean = false;
+    feedFilterFromMe: boolean = false;
     feedFilterToPublic: boolean = true;
 
     title: string = "";
@@ -41,6 +41,7 @@ export class AppState {
     searchResults: NodeInfo[];
     timelineResults: NodeInfo[];
     feedResults: NodeInfo[];
+    feedEndReached: boolean = false;
 
     /* Node Ids to move */
     nodesToMove: string[];

@@ -24,7 +24,6 @@ export interface NavIntf {
     setNodeSel(selected: boolean, id: string, state: AppState): void;
     navPageNodeResponse(res: J.RenderNodeResponse, state: AppState): void;
     navHome(state: AppState): void;
-    navFeed(state: AppState): void;
     navPublicHome(state: AppState): void;
     showMainMenu(state: AppState): void;
     navToSibling(siblingOffset: number, state?: AppState): void;

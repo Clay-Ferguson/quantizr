@@ -426,7 +426,7 @@ public class NodeEditService {
 			final String friendUserName = node.getStrProp(NodeProp.USER.s());
 			if (friendUserName != null) {
 				// if a foreign user, update thru ActivityPub
-				if (friendUserName.contains("@")) {
+				if (friendUserName.contains("@") && !sessionContext.isAdmin()) {
 					actPubService.setFollowing(friendUserName, true);
 				}
 
@@ -441,7 +441,10 @@ public class NodeEditService {
 					 */
 					if (friendUserName.contains("@")) {
 						adminRunner.run(s -> {
-							actPubService.loadForeignUserByUserName(s, friendUserName);
+							if (!sessionContext.isAdmin()) {
+								actPubService.loadForeignUserByUserName(s, friendUserName);
+							}
+							actPubService.queueUserForRefresh(friendUserName, false);
 						});
 					}
 

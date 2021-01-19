@@ -269,10 +269,6 @@ export class Nav implements NavIntf {
        S.meta64.mainMenu.open();
     }
 
-    navFeed = (state: AppState): void => {
-        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null);
-    }
-
     navHome = (state: AppState): void => {
         console.log("navHome()");
         if (state.isAnonUser) {

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.AppServer;
 import org.subnode.config.AppProp;
+import org.subnode.service.ActPubService;
 
 @Component
 public class MongoRepository {
@@ -33,6 +34,9 @@ public class MongoRepository {
 
 	@Autowired
 	private MongoDelete delete;
+
+	@Autowired
+	private ActPubService actPub;
 
 	/*
 	 * Because of the criticality of this variable, I am not using the Spring getter
@@ -111,6 +115,8 @@ public class MongoRepository {
 			util.createAllIndexes(adminSession);
 			util.createAdminUser(adminSession);
 			repoUtil.createTestAccounts();
+
+			actPub.refreshForeignUsers();
 
 			util.initSystemRootNode();
 
