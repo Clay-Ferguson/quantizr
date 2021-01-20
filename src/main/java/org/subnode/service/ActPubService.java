@@ -98,6 +98,7 @@ public class ActPubService {
     @Autowired
     private RunAsMongoAdminEx adminRunner;
 
+    // todo-0: see note in this class. Step 1: get it OUT of this service.
     @Autowired
     private SessionContext sessionContext;
 
@@ -517,7 +518,8 @@ public class ActPubService {
             userNode = read.getUserNodeByUserName(session, apUserName);
         }
 
-        //todo-0: warning the content text here is used to filter out from the Feed View. Need to make it a type instead
+        // todo-0: warning the content text here is used to filter out from the Feed View. Need to make it a
+        // type instead
         SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s());
         if (outboxNode == null) {
             log.debug("no outbox for user: " + apUserName);
@@ -563,7 +565,7 @@ public class ActPubService {
 
                 if (object != null && "Note".equals(AP.str(object, "type"))) {
                     try {
-                        saveNote(session, _userNode, outboxNode, object);
+                        saveNote(session, _userNode, outboxNode, object, true);
                         count.setVal(count.getVal() + 1);
                     } catch (Exception e) {
                         // log and ignore.
@@ -578,7 +580,7 @@ public class ActPubService {
     }
 
     public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
-        //log.debug("interateOrderedCollection(): " + XString.prettyPrint(collectionObj));
+        // log.debug("interateOrderedCollection(): " + XString.prettyPrint(collectionObj));
         int count = 0;
         /*
          * We user apIdSet to avoid processing any dupliates, because the AP spec calls on us to do this and
@@ -1119,7 +1121,7 @@ public class ActPubService {
          * If a foreign user is replying to a specific node, we put the reply under that node
          */
         if (nodeBeingRepliedTo != null) {
-            saveNote(session, null, nodeBeingRepliedTo, obj);
+            saveNote(session, null, nodeBeingRepliedTo, obj, false);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -1132,7 +1134,7 @@ public class ActPubService {
                 String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
                 SubNode postsNode =
                         read.getUserNodeByType(session, userName, actorAccountNode, "### Posts", NodeType.ACT_PUB_POSTS.s());
-                saveNote(session, actorAccountNode, postsNode, obj);
+                saveNote(session, actorAccountNode, postsNode, obj, false);
             }
         }
         return ret;
@@ -1146,7 +1148,7 @@ public class ActPubService {
      * todo-0: when importing users in bulk (like at startup or the admin menu), some of there queries
      * in here will be redundant
      */
-    public void saveNote(MongoSession session, SubNode toAccountNode, SubNode parentNode, Object obj) {
+    public void saveNote(MongoSession session, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic) {
 
         String id = AP.str(obj, "id");
 
@@ -1170,7 +1172,8 @@ public class ActPubService {
         if (toAccountNode == null) {
             toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
         }
-        SubNode newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null, toAccountNode.getId());
+        SubNode newNode =
+                create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null, toAccountNode.getId());
 
         // todo-0: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now
@@ -1188,12 +1191,19 @@ public class ActPubService {
         shareToAllObjectRecipients(session, newNode, obj, "to");
         shareToAllObjectRecipients(session, newNode, obj, "cc");
 
-        // todo-0: i'm only 90% sure this won't be redundant. (review the share setting methods above)
-        acl.addPrivilege(session, newNode, PrincipalName.PUBLIC.s(),
-                Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+        if (forcePublic) {
+            acl.addPrivilege(session, newNode, PrincipalName.PUBLIC.s(),
+                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+        }
 
         update.save(session, newNode);
         addAttachmentIfExists(session, newNode, obj);
+
+        try {
+            userFeedService.pushNodeUpdateToBrowsers(session, newNode);
+        } catch (Exception e) {
+            log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
+        }
     }
 
     /*
@@ -1320,7 +1330,7 @@ public class ActPubService {
             String url = AP.str(att, "url");
 
             if (mediaType != null && url != null) {
-                attachmentService.readFromUrl(session, url, node.getId().toHexString(), mediaType, -1);
+                attachmentService.readFromUrl(session, url, node.getId().toHexString(), mediaType, -1, false);
 
                 // for now we only support one attachment so break out after uploading one.
                 break;

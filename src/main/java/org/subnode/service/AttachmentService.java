@@ -87,11 +87,10 @@ import org.subnode.util.ValContainer;
 /**
  * Service for managing node attachments.
  * 
- * Node attachments are binary attachments that the user can opload onto a node.
- * Each node allows either zero or one attachments. Uploading a new attachment
- * wipes out and replaces the previous attachment. If the attachment is an
- * 'image' type then it gets displayed right on the page. Otherwise a download
- * link is what gets displayed on the node.
+ * Node attachments are binary attachments that the user can opload onto a node. Each node allows
+ * either zero or one attachments. Uploading a new attachment wipes out and replaces the previous
+ * attachment. If the attachment is an 'image' type then it gets displayed right on the page.
+ * Otherwise a download link is what gets displayed on the node.
  */
 @Component
 public class AttachmentService {
@@ -128,12 +127,10 @@ public class AttachmentService {
 	private RunAsMongoAdmin adminRunner;
 
 	/*
-	 * Upload from User's computer. Standard HTML form-based uploading of a file
-	 * from user machine
+	 * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
 	 */
 	public ResponseEntity<?> uploadMultipleFiles(MongoSession session, final String binSuffix, final String nodeId,
-			final MultipartFile[] uploadFiles, final boolean explodeZips, final boolean toIpfs,
-			final boolean addAsChildren) {
+			final MultipartFile[] uploadFiles, final boolean explodeZips, final boolean toIpfs, final boolean addAsChildren) {
 		if (nodeId == null) {
 			throw ExUtil.wrapEx("target nodeId not provided");
 		}
@@ -144,14 +141,14 @@ public class AttachmentService {
 			}
 
 			/*
-			 * OLD LOGIC: Uploading a single file attaches to the current node, but
-			 * uploading multiple files creates each file on it's own subnode (child nodes)
+			 * OLD LOGIC: Uploading a single file attaches to the current node, but uploading multiple files
+			 * creates each file on it's own subnode (child nodes)
 			 */
 			// boolean addAsChildren = countFileUploads(uploadFiles) > 1;
 
 			/*
-			 * NEW LOGIC: If the node itself currently has an attachment, leave it alone and
-			 * just upload UNDERNEATH this current node.
+			 * NEW LOGIC: If the node itself currently has an attachment, leave it alone and just upload
+			 * UNDERNEATH this current node.
 			 */
 			final SubNode node = read.getNode(session, nodeId);
 			if (node == null) {
@@ -164,10 +161,9 @@ public class AttachmentService {
 			int imageCount = 0;
 
 			/*
-			 * if uploading multiple files check quota first, to make sure there's space for
-			 * all files before we start uploading any of them If there's only one file, the
-			 * normal flow will catch an out of space problem, so we don't need to do it in
-			 * advance in here as we do for multiple file uploads only
+			 * if uploading multiple files check quota first, to make sure there's space for all files before we
+			 * start uploading any of them If there's only one file, the normal flow will catch an out of space
+			 * problem, so we don't need to do it in advance in here as we do for multiple file uploads only
 			 */
 			if (uploadFiles.length > 1) {
 				final SubNode userNode = read.getUserNodeByUserName(null, null);
@@ -209,12 +205,11 @@ public class AttachmentService {
 				if (!StringUtils.isEmpty(fileName)) {
 					// log.debug("Uploading file: " + fileName + " contentType=" + contentType);
 
-					final LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(),
-							maxFileSize);
+					final LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
 
 					// attaches AND closes the stream.
-					attachBinaryFromStream(session, binSuffix, node, nodeId, fileName, size, limitedIs, contentType, -1,
-							-1, addAsChildren, explodeZips, toIpfs, true, false, true);
+					attachBinaryFromStream(session, binSuffix, node, nodeId, fileName, size, limitedIs, contentType, -1, -1,
+							addAsChildren, explodeZips, toIpfs, true, false, true, false, null);
 				}
 			}
 
@@ -238,17 +233,16 @@ public class AttachmentService {
 	}
 
 	/*
-	 * Gets the binary attachment from a supplied stream and loads it into the
-	 * repository on the node specified in 'nodeId'
+	 * Gets the binary attachment from a supplied stream and loads it into the repository on the node
+	 * specified in 'nodeId'
 	 */
-	public void attachBinaryFromStream(final MongoSession session, final String binSuffix, SubNode node,
-			final String nodeId, final String fileName, final long size, final LimitedInputStreamEx is, String mimeType,
-			final int width, final int height, final boolean addAsChild, final boolean explodeZips,
-			final boolean toIpfs, final boolean calcImageSize, final boolean dataUrl, final boolean closeStream) {
+	public void attachBinaryFromStream(final MongoSession session, final String binSuffix, SubNode node, final String nodeId,
+			final String fileName, final long size, final LimitedInputStreamEx is, String mimeType, final int width,
+			final int height, final boolean addAsChild, final boolean explodeZips, final boolean toIpfs,
+			final boolean calcImageSize, final boolean dataUrl, final boolean closeStream, boolean storeLocally, String sourceUrl) {
 
 		/*
-		 * If caller already has 'node' it can pass node, and avoid looking up node
-		 * again
+		 * If caller already has 'node' it can pass node, and avoid looking up node again
 		 */
 		if (node == null && nodeId != null) {
 			node = read.getNode(session, nodeId);
@@ -261,13 +255,12 @@ public class AttachmentService {
 		 */
 		if (addAsChild) {
 			try {
-				final SubNode newNode = create.createNode(session, node, null, null, null, CreateNodeLocation.LAST,
-						null, null);
+				final SubNode newNode = create.createNode(session, node, null, null, null, CreateNodeLocation.LAST, null, null);
 				newNode.setContent(fileName);
 
 				/*
-				 * todo-1: saving multiple uploads isn't working right now. It's a work in
-				 * progress. This isn't a bug, but just incomplete code.
+				 * todo-1: saving multiple uploads isn't working right now. It's a work in progress. This isn't a
+				 * bug, but just incomplete code.
 				 */
 				update.save(session, newNode);
 				// api.saveSession(session);
@@ -280,14 +273,33 @@ public class AttachmentService {
 
 		/* mimeType can be passed as null if it's not yet determined */
 		if (mimeType == null) {
+			mimeType = getBestMimeFromFileTypeName(fileName);
+		}
+
+		if (explodeZips && "application/zip".equalsIgnoreCase(mimeType)) {
+			/*
+			 * This is a prototype-scope bean, with state for processing one import at a time
+			 */
+			final ImportZipService importZipStreamService = (ImportZipService) SpringContextUtil.getBean(ImportZipService.class);
+			importZipStreamService.importFromStream(session, is, node, false);
+		} else {
+			saveBinaryStreamToNode(session, binSuffix, is, mimeType, fileName, size, width, height, node, toIpfs, calcImageSize,
+					dataUrl, closeStream, storeLocally, sourceUrl);
+		}
+	}
+
+	public String getBestMimeFromFileTypeName(String fileName) {
+		String mimeType = null;
+
+		/* mimeType can be passed as null if it's not yet determined */
+		if (mimeType == null) {
 			mimeType = URLConnection.guessContentTypeFromName(fileName);
 		}
 
 		/*
-		 * Hack/Fix for ms word. Not sure why the URLConnection fails for this, but it's
-		 * new. I need to grab my old mime type map from legacy app and put in this
-		 * project. Clearly the guessContentTypeFromName implementation provided by
-		 * URLConnection has a screw loose.
+		 * Hack/Fix for ms word. Not sure why the URLConnection fails for this, but it's new. I need to grab
+		 * my old mime type map from legacy app and put in this project. Clearly the
+		 * guessContentTypeFromName implementation provided by URLConnection has a screw loose.
 		 */
 		if (mimeType == null) {
 			if (fileName.toLowerCase().endsWith(".doc")) {
@@ -300,27 +312,16 @@ public class AttachmentService {
 			mimeType = "application/octet-stream";
 		}
 
-		if (explodeZips && "application/zip".equalsIgnoreCase(mimeType)) {
-			/*
-			 * This is a prototype-scope bean, with state for processing one import at a
-			 * time
-			 */
-			final ImportZipService importZipStreamService = (ImportZipService) SpringContextUtil
-					.getBean(ImportZipService.class);
-			importZipStreamService.importFromStream(session, is, node, false);
-		} else {
-			saveBinaryStreamToNode(session, binSuffix, is, mimeType, fileName, size, width, height, node, toIpfs,
-					calcImageSize, dataUrl, closeStream);
-		}
+		return mimeType;
 	}
 
-	public void saveBinaryStreamToNode(final MongoSession session, final String binSuffix,
-			final LimitedInputStreamEx inputStream, final String mimeType, final String fileName, final long size,
-			final int width, final int height, final SubNode node, final boolean toIpfs, final boolean calcImageSize,
-			final boolean dataUrl, final boolean closeStream) {
+	public void saveBinaryStreamToNode(final MongoSession session, final String binSuffix, final LimitedInputStreamEx inputStream,
+			final String mimeType, final String fileName, final long size, final int width, final int height, final SubNode node,
+			final boolean toIpfs, final boolean calcImageSize, final boolean dataUrl, final boolean closeStream,
+			boolean storeLocally, String sourceUrl) {
 		/*
-		 * NOTE: Setting this flag to false works just fine, and is more efficient, and
-		 * will simply do everything EXCEPT calculate the image size
+		 * NOTE: Setting this flag to false works just fine, and is more efficient, and will simply do
+		 * everything EXCEPT calculate the image size
 		 */
 		BufferedImage bufImg = null;
 		byte[] imageBytes = null;
@@ -355,8 +356,8 @@ public class AttachmentService {
 						node.setProp(NodeProp.IMG_HEIGHT.s() + binSuffix, bufImg.getHeight());
 					} catch (final Exception e) {
 						/*
-						 * reading files from IPFS caused this exception, and I didn't investigate why
-						 * yet, because I don't think it's a bug in my code, but something in IPFS.
+						 * reading files from IPFS caused this exception, and I didn't investigate why yet, because I don't
+						 * think it's a bug in my code, but something in IPFS.
 						 */
 						log.error("Failed to get image length.", e);
 					}
@@ -371,9 +372,6 @@ public class AttachmentService {
 		}
 
 		node.setProp(NodeProp.BIN_MIME.s() + binSuffix, mimeType);
-		if (fileName != null) {
-			node.setProp(NodeProp.BIN_FILENAME.s() + binSuffix, fileName);
-		}
 
 		if (dataUrl) {
 			node.setProp(NodeProp.BIN_DATA_URL.s() + binSuffix, "t"); // t=true
@@ -387,7 +385,15 @@ public class AttachmentService {
 				if (toIpfs) {
 					writeStreamToIpfs(session, binSuffix, node, inputStream, mimeType);
 				} else {
-					writeStream(session, binSuffix, node, inputStream, fileName, mimeType, userNode);
+					if (storeLocally) {
+						if (fileName != null) {
+							node.setProp(NodeProp.BIN_FILENAME.s() + binSuffix, fileName);
+						}
+						writeStream(session, binSuffix, node, inputStream, fileName, mimeType, userNode);
+					}
+					else {
+						node.setProp(NodeProp.BIN_URL.s() + binSuffix, sourceUrl);
+					}
 				}
 			} finally {
 				if (closeStream) {
@@ -398,18 +404,25 @@ public class AttachmentService {
 			LimitedInputStreamEx is = null;
 			try {
 				node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, imageBytes.length);
-				is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
-				if (toIpfs) {
-					writeStreamToIpfs(session, binSuffix, node, is, mimeType);
-				} else {
-					writeStream(session, binSuffix, node, is, fileName, mimeType, userNode);
+
+				if (storeLocally) {
+					if (fileName != null) {
+						node.setProp(NodeProp.BIN_FILENAME.s() + binSuffix, fileName);
+					}
+					is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
+					if (toIpfs) {
+						writeStreamToIpfs(session, binSuffix, node, is, mimeType);
+					} else {
+						writeStream(session, binSuffix, node, is, fileName, mimeType, userNode);
+					}
+				}
+				else {
+					node.setProp(NodeProp.BIN_URL.s() + binSuffix, sourceUrl);
 				}
 			} finally {
 				StreamUtil.close(is);
 			}
 		}
-
-		// log.debug("Final Node JSON after Upload: " + XString.prettyPrint(node));
 
 		// MongoThreadLocal.clearDirtyNodes();
 		update.save(session, node);
@@ -448,23 +461,21 @@ public class AttachmentService {
 	}
 
 	/**
-	 * Returns data for an attachment (Could be an image request, or any type of
-	 * request for binary data from a node). This is the method that services all
-	 * calls from the browser to get the data for the attachment to download/display
-	 * the attachment.
+	 * Returns data for an attachment (Could be an image request, or any type of request for binary data
+	 * from a node). This is the method that services all calls from the browser to get the data for the
+	 * attachment to download/display the attachment.
 	 * 
-	 * the saga continues, after switching to InputStreamResouce images fail always
-	 * with this error in js console::
+	 * the saga continues, after switching to InputStreamResouce images fail always with this error in
+	 * js console::
 	 * 
-	 * InputStream has already been read - do not use InputStreamResource if a
-	 * stream needs to be read multiple times
+	 * InputStream has already been read - do not use InputStreamResource if a stream needs to be read
+	 * multiple times
 	 * 
-	 * I stopped using this method (for now) because of this error, which is a
-	 * Spring problem and not in my code. I created the simpler getBinary() version
-	 * (below) which works find AND is simpler.
+	 * I stopped using this method (for now) because of this error, which is a Spring problem and not in
+	 * my code. I created the simpler getBinary() version (below) which works find AND is simpler.
 	 * 
-	 * If 'download' is true we send back a "Content-Disposition: attachment;"
-	 * rather than the default of "inline" by omitting it
+	 * If 'download' is true we send back a "Content-Disposition: attachment;" rather than the default
+	 * of "inline" by omitting it
 	 * 
 	 * node can be passed in -or- nodeId. If node is passed nodeId can be null.
 	 */
@@ -518,27 +529,24 @@ public class AttachmentService {
 			response.setContentType(mimeTypeProp);
 
 			/*
-			 * we gracefully tolerate the case where no size is available but normally it
-			 * will be there.
+			 * we gracefully tolerate the case where no size is available but normally it will be there.
 			 * 
-			 * todo-1: when we detect this and then stream back some data shuld be just go
-			 * ahead and SET the correct 'size' on the node at that point?
+			 * todo-1: when we detect this and then stream back some data shuld be just go ahead and SET the
+			 * correct 'size' on the node at that point?
 			 */
 			if (size > 0) {
 				/*
-				 * todo-1: I'm getting the "disappearing image" network problem related to size
-				 * (content length), but not calling 'contentLength()' below is a workaround.
+				 * todo-1: I'm getting the "disappearing image" network problem related to size (content length),
+				 * but not calling 'contentLength()' below is a workaround.
 				 * 
-				 * You get this error if you just wait about 30s to 1 minute, and maybe scroll
-				 * out of view and back into view the images. What happens is the image loads
-				 * just fine but then some background thread in Chrome looks at content lengths
-				 * and finds some thing off somehoe and decides to make the image just disappear
-				 * and show a broken link icon instead.
+				 * You get this error if you just wait about 30s to 1 minute, and maybe scroll out of view and back
+				 * into view the images. What happens is the image loads just fine but then some background thread
+				 * in Chrome looks at content lengths and finds some thing off somehoe and decides to make the image
+				 * just disappear and show a broken link icon instead.
 				 * 
-				 * SO... I keep having to come back and remove the setContentLength every time I
-				 * think this problem is resolved and then later find out it isn't. Somehow this
-				 * is *currently* only happening for images that are served up from IPFS
-				 * storage.
+				 * SO... I keep having to come back and remove the setContentLength every time I think this problem
+				 * is resolved and then later find out it isn't. Somehow this is *currently* only happening for
+				 * images that are served up from IPFS storage.
 				 * 
 				 * Chrome shows this: Failed to load resource: net::ERR_CONTENT_LENGTH_MISMATCH
 				 */
@@ -583,8 +591,8 @@ public class AttachmentService {
 			final File file = new File(fullFileName);
 			final String checkPath = file.getCanonicalPath();
 			/*
-			 * todo-1: for better security make a REAL '/file/' folder under admin folder
-			 * and assert that the file is in there directly
+			 * todo-1: for better security make a REAL '/file/' folder under admin folder and assert that the
+			 * file is in there directly
 			 */
 			if (!checkPath.startsWith(appProp.getAdminDataFolder()))
 				throw ExUtil.wrapEx("bad request.");
@@ -617,8 +625,8 @@ public class AttachmentService {
 		}
 	}
 
-	public ResponseEntity<StreamingResponseBody> getFileSystemResourceStream(final MongoSession session,
-			final String nodeId, String disposition) {
+	public ResponseEntity<StreamingResponseBody> getFileSystemResourceStream(final MongoSession session, final String nodeId,
+			String disposition) {
 		if (!session.isAdmin()) {
 			throw new RuntimeEx("unauthorized");
 		}
@@ -641,15 +649,15 @@ public class AttachmentService {
 			}
 
 			/*
-			 * I think we could be using the MultipartFileSender here, eventually but not
-			 * until we decople it from reading directly from filesystem
+			 * I think we could be using the MultipartFileSender here, eventually but not until we decople it
+			 * from reading directly from filesystem
 			 */
 			final AutoCloseInputStream acis = new AutoCloseInputStream(new FileInputStream(fullFileName));
 
 			/*
-			 * I'm not sure if FileSystemResource is better than StreamingResponseBody, but
-			 * i do know StreamingResponseBody does EXACTLY what is needed which is to use a
-			 * small buffer size and never hold entire media file all in memory
+			 * I'm not sure if FileSystemResource is better than StreamingResponseBody, but i do know
+			 * StreamingResponseBody does EXACTLY what is needed which is to use a small buffer size and never
+			 * hold entire media file all in memory
 			 */
 			final StreamingResponseBody stream = (os) -> {
 				IOUtils.copy(acis, os);
@@ -666,8 +674,8 @@ public class AttachmentService {
 		}
 	}
 
-	public void getFileSystemResourceStreamMultiPart(final MongoSession session, final String nodeId,
-			final String disposition, final HttpServletRequest request, final HttpServletResponse response) {
+	public void getFileSystemResourceStreamMultiPart(final MongoSession session, final String nodeId, final String disposition,
+			final HttpServletRequest request, final HttpServletResponse response) {
 		try {
 			final SubNode node = read.getNode(session, nodeId, false);
 			if (node == null) {
@@ -683,16 +691,15 @@ public class AttachmentService {
 				throw new RuntimeEx("File not found: " + fullFileName);
 			}
 
-			MultipartFileSender.fromPath(file.toPath()).with(request).with(response).withDisposition(disposition)
-					.serveResource();
+			MultipartFileSender.fromPath(file.toPath()).with(request).with(response).withDisposition(disposition).serveResource();
 		} catch (final Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
 	}
 
 	/**
-	 * Returns the seekable stream of the attachment data (assuming it's a
-	 * streamable media type, like audio or video)
+	 * Returns the seekable stream of the attachment data (assuming it's a streamable media type, like
+	 * audio or video)
 	 */
 	public void getStreamMultiPart(MongoSession session, final String nodeId, final String disposition,
 			final HttpServletRequest request, final HttpServletResponse response) {
@@ -739,39 +746,36 @@ public class AttachmentService {
 	}
 
 	/*
-	 * Uploads an image attachment not from the user's machine but from some
-	 * arbitrary internet URL they have provided, that could be pointing to an image
-	 * or any other kind of content actually.
+	 * Uploads an image attachment not from the user's machine but from some arbitrary internet URL they
+	 * have provided, that could be pointing to an image or any other kind of content actually.
 	 */
 	public UploadFromUrlResponse readFromUrl(final MongoSession session, final UploadFromUrlRequest req) {
 		final UploadFromUrlResponse res = new UploadFromUrlResponse();
-		readFromUrl(session, req.getSourceUrl(), req.getNodeId(), null, 0);
+		readFromUrl(session, req.getSourceUrl(), req.getNodeId(), null, 0, req.isStoreLocally());
 		res.setSuccess(true);
 		return res;
 	}
 
 	/**
-	 * @param mimeHint This is an additional string invented because IPFS urls don't
-	 *                 contain the file extension always and in that case we need to
-	 *                 get it from the IPFS filename itself and that's what the hint
-	 *                 is in that case. Normally however mimeHint is null
+	 * @param mimeHint This is an additional string invented because IPFS urls don't contain the file
+	 *                 extension always and in that case we need to get it from the IPFS filename itself
+	 *                 and that's what the hint is in that case. Normally however mimeHint is null
 	 * 
-	 *                 'inputStream' is admittely a retrofit to this function for
-	 *                 when we want to just call this method and get an inputStream
-	 *                 handed back that can be read from. Normally the inputStream
-	 *                 ValContainer is null and not used.
+	 *                 'inputStream' is admittely a retrofit to this function for when we want to just
+	 *                 call this method and get an inputStream handed back that can be read from.
+	 *                 Normally the inputStream ValContainer is null and not used.
 	 */
-	public void readFromUrl(final MongoSession session, final String sourceUrl, final String nodeId,
-			final String mimeHint, final int maxFileSize) {
+	public void readFromUrl(final MongoSession session, final String sourceUrl, final String nodeId, final String mimeHint,
+			final int maxFileSize, boolean storeLocally) {
 		if (sourceUrl.startsWith("data:")) {
 			readFromDataUrl(session, sourceUrl, nodeId, mimeHint, maxFileSize);
 		} else {
-			readFromStandardUrl(session, sourceUrl, nodeId, mimeHint, maxFileSize);
+			readFromStandardUrl(session, sourceUrl, nodeId, mimeHint, maxFileSize, storeLocally);
 		}
 	}
 
-	public void readFromDataUrl(MongoSession session, final String sourceUrl, final String nodeId,
-			final String mimeHint, int maxFileSize) {
+	public void readFromDataUrl(MongoSession session, final String sourceUrl, final String nodeId, final String mimeHint,
+			int maxFileSize) {
 		if (maxFileSize <= 0) {
 			maxFileSize = session.getMaxUploadSize();
 		}
@@ -787,16 +791,16 @@ public class AttachmentService {
 			final LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 			// insert 0L for size now, because we don't know it yet
-			attachBinaryFromStream(session, "", null, nodeId, "data-url", 0L, limitedIs, mimeType, -1, -1, false, false,
-					false, false, true, true);
+			attachBinaryFromStream(session, "", null, nodeId, "data-url", 0L, limitedIs, mimeType, -1, -1, false, false, false,
+					false, true, true, false, sourceUrl);
 		} else {
 			throw new RuntimeEx("Unsupported inline data type.");
 		}
 	}
 
 	// https://tools.ietf.org/html/rfc2397
-	public void readFromStandardUrl(MongoSession session, final String sourceUrl, final String nodeId,
-			final String mimeHint, int maxFileSize) {
+	public void readFromStandardUrl(MongoSession session, final String sourceUrl, final String nodeId, final String mimeHint,
+			int maxFileSize, boolean storeLocally) {
 		if (maxFileSize <= 0) {
 			maxFileSize = session.getMaxUploadSize();
 		}
@@ -821,16 +825,17 @@ public class AttachmentService {
 			}
 
 			/*
-			 * if this is an image extension, handle it in a special way, mainly to extract
-			 * the width, height from it
+			 * if this is an image extension, handle it in a special way, mainly to extract the width, height
+			 * from it
 			 */
 			if (ImageUtil.isImageMime(mimeType)) {
+
 				/*
 				 * DO NOT DELETE
 				 *
-				 * Basic version without masquerading as a web browser can cause a 403 error
-				 * because some sites don't want just any old stream reading from them. Leave
-				 * this note here as a warning and explanation
+				 * Basic version without masquerading as a web browser can cause a 403 error because some sites
+				 * don't want just any old stream reading from them. Leave this note here as a warning and
+				 * explanation
 				 */
 
 				// would restTemplate be better for this ?
@@ -846,30 +851,30 @@ public class AttachmentService {
 				limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 				// insert 0L for size now, because we don't know it yet
-				attachBinaryFromStream(session, "", null, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false,
-						false, false, true, false, true);
+				attachBinaryFromStream(session, "", null, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false, false, false,
+						true, false, true, storeLocally, sourceUrl);
 			}
 			/*
-			 * if not an image extension, we can just stream directly into the database, but
-			 * we want to try to get the mime type first, from calling detectImage so that
-			 * if we do detect its an image we can handle it as one.
+			 * if not an image extension, we can just stream directly into the database, but we want to try to
+			 * get the mime type first, from calling detectImage so that if we do detect its an image we can
+			 * handle it as one.
 			 */
 			else {
-				if (!detectAndSaveImage(session, nodeId, sourceUrl, url)) {
+				if (!detectAndSaveImage(session, nodeId, sourceUrl, url, storeLocally)) {
 					final HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 					final HttpGet request = new HttpGet(sourceUrl);
 					request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
 					final HttpResponse response = client.execute(request);
-					// log.debug("Response Code: " + response.getStatusLine().getStatusCode() + "
-					// reason="
-					// + response.getStatusLine().getReasonPhrase());
+					/*
+					 * log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason=" +
+					 * response.getStatusLine().getReasonPhrase());
+					 */
 					final InputStream is = response.getEntity().getContent();
-
 					limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 					// insert 0L for size now, because we don't know it yet
-					attachBinaryFromStream(session, "", null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false,
-							false, false, true, false, true);
+					attachBinaryFromStream(session, "", null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false, false,
+							true, false, true, storeLocally, sourceUrl);
 				}
 			}
 		} catch (final Exception e) {
@@ -889,8 +894,8 @@ public class AttachmentService {
 	// String mimeType = URLConnection.guessContentTypeFromStream(inputStream);
 	//
 	/* returns true if it was detected AND saved as an image */
-	private boolean detectAndSaveImage(final MongoSession session, final String nodeId, final String fileName,
-			final URL url) {
+	private boolean detectAndSaveImage(final MongoSession session, final String nodeId, final String sourceUrl, final URL url,
+			boolean storeLocally) {
 		ImageInputStream is = null;
 		LimitedInputStreamEx is2 = null;
 		ImageReader reader = null;
@@ -908,16 +913,16 @@ public class AttachmentService {
 					formatName = formatName.toLowerCase();
 					// log.debug("determined format name of image url: " + formatName);
 					reader.setInput(is, true, false);
-					final BufferedImage bufImg = reader.read(0);
 					final String mimeType = "image/" + formatName;
 
+					final BufferedImage bufImg = reader.read(0);
 					final ByteArrayOutputStream os = new ByteArrayOutputStream();
 					ImageIO.write(bufImg, formatName, os);
 					final byte[] bytes = os.toByteArray();
 					is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
 
-					attachBinaryFromStream(session, "", null, nodeId, fileName, bytes.length, is2, mimeType,
-							bufImg.getWidth(null), bufImg.getHeight(null), false, false, false, true, false, true);
+					attachBinaryFromStream(session, "", null, nodeId, sourceUrl, bytes.length, is2, mimeType,
+							bufImg.getWidth(null), bufImg.getHeight(null), false, false, false, true, false, true, storeLocally, sourceUrl);
 
 					return true;
 				}
@@ -943,8 +948,7 @@ public class AttachmentService {
 		}
 
 		/*
-		 * Delete any existing grid data stored under this node, before saving new
-		 * attachment
+		 * Delete any existing grid data stored under this node, before saving new attachment
 		 */
 		deleteBinary(session, binSuffix, node, userNode);
 
@@ -1004,11 +1008,10 @@ public class AttachmentService {
 	}
 
 	/*
-	 * Gets the binary data attachment stream from the node regardless of wether
-	 * it's from IPFS_LINK or BIN
+	 * Gets the binary data attachment stream from the node regardless of wether it's from IPFS_LINK or
+	 * BIN
 	 */
-	public InputStream getStream(final MongoSession session, String binSuffix, final SubNode node,
-			final boolean _auth) {
+	public InputStream getStream(final MongoSession session, String binSuffix, final SubNode node, final boolean _auth) {
 		if (_auth) {
 			auth.auth(session, node, PrivilegeType.READ);
 		}
@@ -1036,16 +1039,15 @@ public class AttachmentService {
 		}
 
 		/* why not an import here? */
-		final com.mongodb.client.gridfs.model.GridFSFile gridFile = grid
-				.findOne(new Query(Criteria.where("_id").is(id)));
+		final com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(id)));
 		// new Query(Criteria.where("metadata.nodeId").is(nodeId)));
 		if (gridFile == null) {
 			log.debug("gridfs ID not found");
 			return null;
 		}
 
-		final GridFsResource gridFsResource = new GridFsResource(gridFile,
-				gridFsBucket.openDownloadStream(gridFile.getObjectId()));
+		final GridFsResource gridFsResource =
+				new GridFsResource(gridFile, gridFsBucket.openDownloadStream(gridFile.getObjectId()));
 		try {
 			final InputStream is = gridFsResource.getInputStream();
 			if (is == null) {
@@ -1077,16 +1079,15 @@ public class AttachmentService {
 			return null;
 		}
 
-		final com.mongodb.client.gridfs.model.GridFSFile gridFile = grid
-				.findOne(new Query(Criteria.where("_id").is(id)));
+		final com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(id)));
 		// new Query(Criteria.where("metadata.nodeId").is(nodeId)));
 		if (gridFile == null) {
 			log.debug("gridfs ID not found");
 			return null;
 		}
 
-		final GridFsResource gridFsResource = new GridFsResource(gridFile,
-				gridFsBucket.openDownloadStream(gridFile.getObjectId()));
+		final GridFsResource gridFsResource =
+				new GridFsResource(gridFile, gridFsBucket.openDownloadStream(gridFile.getObjectId()));
 		try {
 			final InputStream is = gridFsResource.getInputStream();
 			if (is == null) {
@@ -1107,24 +1108,22 @@ public class AttachmentService {
 	// }
 
 	/**
-	 * This method makes a single pass over all grid items doing all the daily
-	 * maintenance on each one as necessary to maintain the system health and
-	 * statistics.
+	 * This method makes a single pass over all grid items doing all the daily maintenance on each one
+	 * as necessary to maintain the system health and statistics.
 	 * 
-	 * Scans all the uploaded attachments, and finds any that aren't owned by some
-	 * SubNode, and deletes them.
+	 * Scans all the uploaded attachments, and finds any that aren't owned by some SubNode, and deletes
+	 * them.
 	 * 
-	 * I probably can hook into some listener (or just my own delete code) to be
-	 * sure to run the 'grid.delete' for the attachments whenever someone deletes a
-	 * node also. (todo-1: check into this, can't remember if I did that already)
+	 * I probably can hook into some listener (or just my own delete code) to be sure to run the
+	 * 'grid.delete' for the attachments whenever someone deletes a node also. (todo-1: check into this,
+	 * can't remember if I did that already)
 	 * 
-	 * Also keeps totals by each user account, in a hashmap to be written all out at
-	 * the end to all the nodes.
+	 * Also keeps totals by each user account, in a hashmap to be written all out at the end to all the
+	 * nodes.
 	 * 
-	 * todo-1: There's another type of background procesing that is potentially
-	 * slow/challenging which is to remove all nodes that don't have a parent. How
-	 * to do that effeciently will take some thought. These are just ordinary tree
-	 * nodes that are orphans
+	 * todo-1: There's another type of background procesing that is potentially slow/challenging which
+	 * is to remove all nodes that don't have a parent. How to do that effeciently will take some
+	 * thought. These are just ordinary tree nodes that are orphans
 	 */
 	public void gridMaintenanceScan() {
 		final HashMap<ObjectId, UserStats> statsMap = new HashMap<ObjectId, UserStats>();
@@ -1143,8 +1142,8 @@ public class AttachmentService {
 						ObjectId id = (ObjectId) meta.get("nodeId");
 
 						/*
-						 * If the grid file is not based off 'nodeId' then we still need to check if
-						 * it's a Header image (special case)
+						 * If the grid file is not based off 'nodeId' then we still need to check if it's a Header image
+						 * (special case)
 						 */
 						if (id == null) {
 							// todo-1: currently we only have "Header" as a (binSuffix), and it may stay
@@ -1173,8 +1172,7 @@ public class AttachmentService {
 								delCount++;
 							}
 							/*
-							 * else update the UserStats by adding the file length to the total for this
-							 * user
+							 * else update the UserStats by adding the file length to the total for this user
 							 */
 							else {
 								UserStats stats = statsMap.get(subNode.getOwner());
@@ -1191,12 +1189,12 @@ public class AttachmentService {
 				}
 			}
 
-			final Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS,
-					null, null, 0);
+			final Iterable<SubNode> accountNodes =
+					read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0);
 
 			/*
-			 * scan all userAccountNodes, and set a zero amount for those not found (which
-			 * will be the correct amount).
+			 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
+			 * amount).
 			 */
 			for (final SubNode accountNode : accountNodes) {
 				log.debug("Processing Account Node: id=" + accountNode.getId().toHexString());

@@ -189,6 +189,7 @@ export class Props implements PropsIntf {
 
     hasBinary = (node: J.NodeInfo): boolean => {
         return !!this.getNodePropVal(J.NodeProp.BIN, node) ||
+            !!this.getNodePropVal(J.NodeProp.BIN_URL, node) ||
             !!this.getNodePropVal(J.NodeProp.IPFS_LINK, node);
     }
 
@@ -262,6 +263,7 @@ export class Props implements PropsIntf {
             J.NodeProp.IMG_SIZE, //
             J.NodeProp.BIN_MIME, //
             J.NodeProp.BIN, //
+            J.NodeProp.BIN_URL, //
 
             J.NodeProp.BIN_FILENAME, //
             J.NodeProp.BIN_SIZE, //

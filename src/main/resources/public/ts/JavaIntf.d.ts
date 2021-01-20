@@ -276,6 +276,7 @@ export interface UpdateHeadingsRequest extends RequestBase {
 }
 
 export interface UploadFromUrlRequest extends RequestBase {
+    storeLocally: boolean;
     nodeId: string;
     sourceUrl: string;
 }
@@ -658,6 +659,7 @@ export const enum NodeProp {
     NOWRAP = "sn:nowrap",
     BIN_DATA = "sn:jcrData",
     BIN = "bin",
+    BIN_URL = "sn:extUrl",
     IMG_WIDTH = "sn:imgWidth",
     IMG_HEIGHT = "sn:imgHeight",
     IMG_SIZE = "sn:imgSize",

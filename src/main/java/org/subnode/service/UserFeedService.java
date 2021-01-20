@@ -64,8 +64,7 @@ public class UserFeedService {
 
 	/* Notify all users being shared to on this node */
 	public void pushNodeUpdateToBrowsers(MongoSession session, SubNode node) {
-		log.debug("Pushing update to all friends: from user " + sessionContext.getUserName() + ": id="
-				+ node.getId().toHexString());
+		// log.debug("Pushing update to all friends: id=" + node.getId().toHexString());
 
 		/* get list of userNames this node is shared to (one of them may be 'public') */
 		List<String> usersSharedTo = auth.getUsersSharedTo(session, node);
@@ -79,8 +78,6 @@ public class UserFeedService {
 		HashSet<String> usersSharedToSet = new HashSet<String>();
 		usersSharedToSet.addAll(usersSharedTo);
 
-		boolean isPublic = usersSharedToSet.contains(PrincipalName.PUBLIC.s());
-
 		/*
 		 * Get a local list of 'allSessions' so we can release the lock on the SessionContent varible
 		 * immediately
@@ -90,30 +87,21 @@ public class UserFeedService {
 			allSessions.addAll(SessionContext.allSessions);
 		}
 
-		/* build out push message payload */
-		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, 1, false, false);
-		FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
-
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : allSessions) {
+
+			/* build our push message payload */
+			NodeInfo nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false);
+			FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
 
 			/* Anonymous sessions won't have userName and can be ignored */
 			if (sc.getUserName() == null)
 				continue;
 
 			/*
-			 * push if...
-			 * 
-			 * 1) node is shared to public or
-			 * 
-			 * 2) the sc user is in the shared set or
-			 * 
-			 * 3) this session is OURs,
+			 * push if the sc user is in the shared set or this session is OURs,
 			 */
-			if (isPublic || //
-					usersSharedToSet.contains(sc.getUserName()) || //
-					sc.getUserName().equals(sessionContext.getUserName())) {
-
+			if (usersSharedToSet.contains(sc.getUserName())) {
 				// push notification message to browser
 				sendServerPushInfo(sc, pushInfo);
 			}
@@ -186,7 +174,7 @@ public class UserFeedService {
 		Query query = new Query();
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
 
-			//This pattern is what is required when you have multiple conditions added to a single field.
+				// This pattern is what is required when you have multiple conditions added to a single field.
 				.andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
 						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
 						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));

@@ -425,6 +425,12 @@ export class Render implements RenderIntf {
     }
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
+        /* If this node attachment points to external URL return that url */
+        let imgUrl = S.props.getNodePropVal(J.NodeProp.BIN_URL, node);
+        if (imgUrl) {
+            return imgUrl;
+        }
+
         const ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
 
         // If there's no IPFS_LINK on the node try the BIN prop instead.

@@ -8,7 +8,9 @@ import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Checkbox } from "../widget/Checkbox";
 import { Form } from "../widget/Form";
+import { Span } from "../widget/Span";
 import { TextField } from "../widget/TextField";
 
 let S: Singletons;
@@ -18,6 +20,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class UploadFromUrlDlg extends DialogBase {
 
+    static storeLocally: boolean = false;
     uploadButton: Button;
     urlState: ValidatedState<any> = new ValidatedState<any>();
 
@@ -46,8 +49,18 @@ export class UploadFromUrlDlg extends DialogBase {
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Close", this.close)
+                ]),
+                new Span(null, { className: "marginLeft" }, [
+                    new Checkbox("Store a copy on this server", null, {
+                        setValue: (checked: boolean): void => {
+                            UploadFromUrlDlg.storeLocally = checked;
+                        },
+                        getValue: (): boolean => {
+                            return UploadFromUrlDlg.storeLocally;
+                        }
+                    })
                 ])
-            ])
+        ])
         ];
     }
 
@@ -57,6 +70,7 @@ export class UploadFromUrlDlg extends DialogBase {
         }
 
         S.util.ajax<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
+            storeLocally: UploadFromUrlDlg.storeLocally,
             nodeId: this.nodeId,
             sourceUrl: this.urlState.getValue()
         }, this.uploadFromUrlResponse);
