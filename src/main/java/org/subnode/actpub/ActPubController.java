@@ -66,6 +66,7 @@ public class ActPubController {
 		// APObj payload = mapper.readValue(body, new TypeReference<APObj>() {
 		// });
 		log.debug("INBOX incoming payload: " + XString.prettyPrint(payload));
+		ActPubService.inboxCount++;
 		actPubService.processInboxPost(httpReq, payload);
 		return new ResponseEntity(HttpStatus.OK);
 	}

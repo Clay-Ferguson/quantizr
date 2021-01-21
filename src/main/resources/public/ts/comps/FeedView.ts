@@ -11,6 +11,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Div } from "../widget/Div";
+import { Heading } from "../widget/Heading";
 import { IconButton } from "../widget/IconButton";
 import { Span } from "../widget/Span";
 
@@ -21,6 +22,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class FeedView extends Div {
+
+    // I don't like this OR how much CPU load it takes, so I'm flagging it off for now
+    realtimeCheckboxes: boolean = false;
 
     static page: number = 0;
     static feedQueried: boolean = false;
@@ -74,12 +78,15 @@ export class FeedView extends Div {
                 FeedView.helpExpanded = state;
             }, FeedView.helpExpanded));
 
+        // todo-0: this is fairly easy. do it!
+        children.push(new Div("Content Warning: This feed doesn't yet have a checkbox for excluding sensitive materials (i.e. NSFW content), but that option is comming soon."));
+
         if (!state.feedResults || state.feedResults.length === 0) {
             if (state.activeTab === "feedTab") {
                 if (!FeedView.feedQueried) {
                     FeedView.feedQueried = true;
-                    children.push(new Div("Loading feed..."));
-                    setTimeout(() => { S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page); }, 250);
+                    children.push(new Heading(3, "Loading feed..."));
+                    setTimeout(() => { S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page); }, 100);
                 }
                 else {
                     children.push(new Div("Nothing to display."));
@@ -120,8 +127,11 @@ export class FeedView extends Div {
                             s.feedFilterToMe = checked;
                         }
                     });
-                    FeedView.page = 0;
-                    S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+
+                    if (this.realtimeCheckboxes) {
+                        FeedView.page = 0;
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                    }
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterToMe;
@@ -135,8 +145,11 @@ export class FeedView extends Div {
                             s.feedFilterFromMe = checked;
                         }
                     });
-                    FeedView.page = 0;
-                    S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+
+                    if (this.realtimeCheckboxes) {
+                        FeedView.page = 0;
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                    }
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterFromMe;
@@ -150,8 +163,11 @@ export class FeedView extends Div {
                             s.feedFilterToPublic = checked;
                         }
                     });
-                    FeedView.page = 0;
-                    S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+
+                    if (this.realtimeCheckboxes) {
+                        FeedView.page = 0;
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                    }
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterToPublic;

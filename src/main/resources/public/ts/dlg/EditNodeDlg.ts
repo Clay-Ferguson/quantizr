@@ -374,7 +374,7 @@ export class EditNodeDlg extends DialogBase {
             sharingSpan = new Span("Shared to: " + sharingNames);
         }
 
-        let helpPanel = this.editorHelp ? new CollapsibleHelpPanel("Editor Help", this.editorHelp,
+        let helpPanel = this.editorHelp ? new CollapsibleHelpPanel("Help", this.editorHelp,
             (state: boolean) => {
                 EditNodeDlg.helpExpanded = state;
             }, EditNodeDlg.helpExpanded) : null;

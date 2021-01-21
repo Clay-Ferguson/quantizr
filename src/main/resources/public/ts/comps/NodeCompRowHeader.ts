@@ -5,6 +5,7 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Div } from "../widget/Div";
+import { Icon } from "../widget/Icon";
 import { Img } from "../widget/Img";
 import { Span } from "../widget/Span";
 
@@ -82,10 +83,31 @@ export class NodeCompRowHeader extends Div {
                 }
             ));
 
+            let floatUpperRightDiv: Div = new Div(null, {
+                className: "float-right"
+            });
+
             if (node.lastModified) {
-                children.push(new Span(S.util.formatDate(new Date(node.lastModified)), {
-                    className: "float-right"
+                floatUpperRightDiv.addChild(new Span(S.util.formatDate(new Date(node.lastModified))));
+            }
+
+            if (S.props.isPublic(node)) {
+                floatUpperRightDiv.addChild(new Icon({
+                    style: { marginLeft: "12px", verticalAlign: "middle" },
+                    className: "fa fa-globe fa-lg",
+                    title: "Node is Public (Shared to everyone)"
                 }));
+            }
+            else if (S.props.isShared(node)) {
+                floatUpperRightDiv.addChild(new Icon({
+                    style: { marginLeft: "12px", verticalAlign: "middle" },
+                    className: "fa fa-envelope fa-lg",
+                    title: "Node is Shared"
+                }));
+            }
+
+            if (floatUpperRightDiv.childrenExist()) {
+                children.push(floatUpperRightDiv);
             }
 
             if (priority) {

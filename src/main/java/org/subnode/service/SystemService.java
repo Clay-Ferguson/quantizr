@@ -124,6 +124,8 @@ public class SystemService {
 		sb.append(String.format("Session Count: %d<br>", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());
 		sb.append("<p>" + util.getNodeReport());
+		sb.append("<p>ActivityPub Foreign Outbox Retrievals: " + ActPubService.outboxQueryCount);
+		sb.append("<p>ActivityPub Inbox Posts Count: " + ActPubService.inboxCount);
 		return sb.toString();
 	}
 

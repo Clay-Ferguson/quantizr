@@ -277,7 +277,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("success", function (file: File, resp: any, evt: ProgressEvent) {
-                    // S.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
+                    // console.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
 
                     // todo-1: get rid of the tight coupling to an exception class name here. This was a quick fix/hack
                     if (!resp.success && resp.exceptionClass && resp.exceptionClass.endsWith(".OutOfSpaceException")) {

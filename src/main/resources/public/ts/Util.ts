@@ -1412,17 +1412,13 @@ export class Util implements UtilIntf {
         if (!node || !node.ac) return null;
         let delimiter = multiLine ? "\n" : ", ";
 
-        let names = "";
+        let names = S.props.isPublic(node) ? "public" : "";
         for (let ac of node.ac) {
-            if (names) {
-                names += delimiter;
-            }
-
             if (ac.principalName !== "public") {
+                if (names) {
+                    names += delimiter;
+                }
                 names += "@" + ac.principalName;
-            }
-            else {
-                names += "public";
             }
         }
 

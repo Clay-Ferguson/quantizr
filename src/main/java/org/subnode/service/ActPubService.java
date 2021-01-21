@@ -75,6 +75,8 @@ import org.subnode.util.XString;
 public class ActPubService {
     public static final int MAX_MESSAGES = 10;
     public static final int MAX_FOLLOWERS = 20;
+    public static int outboxQueryCount = 0;
+    public static int inboxCount = 0;
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
     @Autowired
@@ -742,7 +744,7 @@ public class ActPubService {
         finger = getJson(url, new MediaType("application", "jrd+json"));
 
         if (finger != null) {
-            log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
+            // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
             webFingerCacheByUserName.put(resource, finger);
         }
         return finger;
@@ -764,7 +766,7 @@ public class ActPubService {
         actor = getJson(url, new MediaType("application", "ld+json"));
         cacheActor(url, actor);
 
-        log.debug("Actor: " + XString.prettyPrint(actor));
+        // log.debug("Actor: " + XString.prettyPrint(actor));
         return actor;
     }
 
@@ -781,7 +783,8 @@ public class ActPubService {
         if (url == null)
             return null;
         APObj outbox = getJson(url, new MediaType("application", "ld+json"));
-        log.debug("Outbox: " + XString.prettyPrint(outbox));
+        ActPubService.outboxQueryCount++;
+        // log.debug("Outbox: " + XString.prettyPrint(outbox));
         return outbox;
     }
 
@@ -789,7 +792,7 @@ public class ActPubService {
         if (url == null)
             return null;
         APObj outboxPage = getJson(url, new MediaType("application", "activity+json"));
-        log.debug("OrderedCollectionPage: " + XString.prettyPrint(outboxPage));
+        //log.debug("OrderedCollectionPage: " + XString.prettyPrint(outboxPage));
         return outboxPage;
     }
 
@@ -813,7 +816,7 @@ public class ActPubService {
                                                 .put("type", "application/activity+json") //
                                                 .put("href", makeActorUrlForUserName(username))));
 
-                        log.debug("Reply with WebFinger: " + XString.prettyPrint(webFinger));
+                        // log.debug("Reply with WebFinger: " + XString.prettyPrint(webFinger));
                         return webFinger;
                     }
                 }
@@ -1609,7 +1612,7 @@ public class ActPubService {
             Iterable<SubNode> iter = read.findFollowersOfUser(session, userName);
 
             for (SubNode n : iter) {
-                log.debug("Follower found: " + XString.prettyPrint(n));
+                // log.debug("Follower found: " + XString.prettyPrint(n));
                 followers.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
             }
             return null;
@@ -1625,7 +1628,7 @@ public class ActPubService {
             Iterable<SubNode> iter = read.findFollowingOfUser(session, userName);
 
             for (SubNode n : iter) {
-                log.debug("Follower found: " + XString.prettyPrint(n));
+                // log.debug("Follower found: " + XString.prettyPrint(n));
                 following.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
             }
             return null;
@@ -1722,7 +1725,7 @@ public class ActPubService {
 
                 actor.put("supportsFriendRequests", true);
 
-                log.debug("Reply with Actor: " + XString.prettyPrint(actor));
+                // log.debug("Reply with Actor: " + XString.prettyPrint(actor));
                 return actor;
             }
         } catch (Exception e) {
@@ -1802,7 +1805,7 @@ public class ActPubService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
             ret = mapper.readValue(response.getBody(), new TypeReference<APObj>() {
             });
-            log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
+            // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
         } catch (Exception e) {
             log.error("failed getting json: " + url, e);
             throw new RuntimeException(e);
@@ -1908,8 +1911,14 @@ public class ActPubService {
     }
 
     public void queueUserForRefresh(String apUserName, boolean force) {
-        // if not a foreign user we need to ignore.
-        if (!apUserName.contains("@"))
+
+        // if not on production we don't run ActivityPub stuff. (todo-1: need to make it optional)
+        if (!appProp.getProfileName().equals("prod")) {
+            return;
+        }
+
+        // if not a foreign then ignore.
+        if (apUserName==null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@quanta.wiki"))
             return;
 
         if (!force) {
@@ -1922,7 +1931,7 @@ public class ActPubService {
         userNamesPendingMessageRefresh.put(apUserName, false);
     }
 
-    /* Run every three seconds */
+    /* Run every few seconds */
     @Scheduled(fixedDelay = 3 * 1000)
     public void messageRefresh() {
         try {
@@ -1936,13 +1945,13 @@ public class ActPubService {
 
                 final String _apUserName = apUserName;
                 adminRunner.run(session -> {
-                    log.debug("Refreshing messages for foreign user: " + _apUserName);
+                    log.debug("Refresh user: " + _apUserName);
                     SubNode userNode = loadForeignUserByUserName(session, _apUserName);
                     String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
                     APObj actor = getActorByUrl(actorUrl);
                     if (actor != null) {
                         if (userNode != null) {
-                            log.debug("updating children under node: " + userNode.getId().toHexString());
+                            // log.debug("updating children under node: " + userNode.getId().toHexString());
                             refreshOutboxFromForeignServer(session, actor, userNode, _apUserName);
                         }
                     } else {
@@ -1966,7 +1975,6 @@ public class ActPubService {
                 if (userName == null || !userName.contains("@"))
                     continue;
 
-                log.debug("Refreshing User: " + userName);
                 queueUserForRefresh(userName, true);
             }
             return null;

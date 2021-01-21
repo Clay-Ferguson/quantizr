@@ -209,7 +209,7 @@ public class AttachmentService {
 
 					// attaches AND closes the stream.
 					attachBinaryFromStream(session, binSuffix, node, nodeId, fileName, size, limitedIs, contentType, -1, -1,
-							addAsChildren, explodeZips, toIpfs, true, false, true, false, null);
+							addAsChildren, explodeZips, toIpfs, true, false, true, true, null);
 				}
 			}
 
@@ -456,6 +456,7 @@ public class AttachmentService {
 		node.deleteProp(NodeProp.BIN_FILENAME.s() + binSuffix);
 		node.deleteProp(NodeProp.BIN_SIZE.s() + binSuffix);
 		node.deleteProp(NodeProp.BIN.s() + binSuffix);
+		node.deleteProp(NodeProp.BIN_URL.s() + binSuffix);
 		node.deleteProp(NodeProp.BIN_DATA_URL.s() + binSuffix);
 		node.deleteProp(NodeProp.IPFS_LINK.s() + binSuffix);
 	}
@@ -792,7 +793,7 @@ public class AttachmentService {
 
 			// insert 0L for size now, because we don't know it yet
 			attachBinaryFromStream(session, "", null, nodeId, "data-url", 0L, limitedIs, mimeType, -1, -1, false, false, false,
-					false, true, true, false, sourceUrl);
+					false, true, true, true, sourceUrl);
 		} else {
 			throw new RuntimeEx("Unsupported inline data type.");
 		}
