@@ -160,6 +160,7 @@ export interface NodeFeedRequest extends RequestBase {
     toMe: boolean;
     fromMe: boolean;
     toPublic: boolean;
+    nsfw: boolean;
 }
 
 export interface NodeSearchRequest extends RequestBase {
@@ -622,6 +623,7 @@ export const enum NodeProp {
     ACT_PUB_ACTOR_ID = "ap:actorId",
     ACT_PUB_ACTOR_URL = "ap:actorUrl",
     ACT_PUB_ACTOR_INBOX = "ap:actorInbox",
+    ACT_PUB_SENSITIVE = "ap:nsfw",
     ENC_KEY = "sn:encKey",
     RSS_FEED_SRC = "sn:rssFeedSrc",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",

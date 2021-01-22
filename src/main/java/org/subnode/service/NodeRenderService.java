@@ -81,6 +81,7 @@ public class NodeRenderService {
 		}
 
 		String targetId = req.getNodeId();
+		boolean isActualUplevelRequest = req.isUpLevel();
 
 		// log.debug("renderNode: \nreq=" + XString.prettyPrint(req));
 		SubNode node = null;
@@ -168,9 +169,13 @@ public class NodeRenderService {
 						node = parent;
 					}
 				} catch (Exception e) {
-					res.setExceptionType("auth");
-					res.setSuccess(true);
-					return res;
+					// failing to get parent is only an "auth" problem if this was an ACTUAL uplevel request, and not something
+					// we decided to to inside this method based on trying not to render a page with no children showing.
+					if (isActualUplevelRequest) {
+						res.setExceptionType("auth");
+						res.setSuccess(true);
+						return res;
+					}
 				}
 			}
 		}

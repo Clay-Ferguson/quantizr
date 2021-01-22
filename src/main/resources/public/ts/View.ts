@@ -25,6 +25,7 @@ export class View implements ViewIntf {
      */
     refreshTree = (nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean,
         allowScroll: boolean, setTab: boolean, state: AppState): void => {
+        // console.log("refreshTree with ID=" + nodeId);
         if (!nodeId && state.node) {
             nodeId = state.node.id;
         }
@@ -40,6 +41,7 @@ export class View implements ViewIntf {
             offset = firstChild ? firstChild.logicalOrdinal : 0;
         }
 
+        // console.log("refreshTree renderNode: " + nodeId);
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId,
             upLevel: false,

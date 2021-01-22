@@ -266,6 +266,7 @@ export class Render implements RenderIntf {
         }
 
         try {
+            // console.log("renderPageFromData: " + S.util.prettyPrint(res));
             dispatch({
                 type: "Action_RenderPage",
                 state,
@@ -347,12 +348,18 @@ export class Render implements RenderIntf {
 
                             /* todo-0 (is this the 'best' code here)
                             This is a 'quick fix' to the situation where a new signed up user ends up getting here with
-                            some non-null targetNodeId, and it actually is somehow invalid and the initial page load never happens */
-                            if (!S.meta64.highlightRowById(targetNodeId, true, s)) {
-                                setTimeout(() => {
-                                    S.nav.navHome(state);
-                                }, 250);
-                            }
+                            some non-null targetNodeId, and it actually is somehow invalid and the initial page load never happens.
+                            */
+                            // well, this wild ass guess had the wack-a-mole effect of making it where a user who is logged in already
+                            // and then accesses a url with triggers for a request of a node by name, ends up trying to fine the NAME
+                            // in this logic and it fails, so I'm backing out, and how have to go retest the original failing case
+                            // and the case of new user signup.
+                            // if (!S.meta64.highlightRowById(targetNodeId, true, s)) {
+                            //     setTimeout(() => {
+                            //         S.nav.navHome(state);
+                            //     }, 250);
+                            // }
+
                             s.rendering = true;
                         } //
                         else if (allowScroll && (scrollToTop || !S.meta64.getHighlightedNode(s))) {
@@ -497,6 +504,12 @@ export class Render implements RenderIntf {
                 // from the remote server, but this is low priority)
                 if (node.owner.indexOf("@") === -1) {
                     new ProfileDlg(state, true, node.ownerId, node.owner).open();
+                }
+                else {
+                    let attributedTo = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO, node);
+                    if (attributedTo) {
+                        window.open(attributedTo, "_blank");
+                    }
                 }
             }
         });

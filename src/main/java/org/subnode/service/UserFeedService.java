@@ -1,7 +1,5 @@
 package org.subnode.service;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,8 +18,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEvent
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
+import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
-import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -178,6 +176,10 @@ public class UserFeedService {
 				.andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
 						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
 						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+
+		if (!req.getNsfw()) {
+			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_SENSITIVE + ".value").is(null);
+		}
 
 		List<Criteria> orCriteria = new LinkedList<Criteria>();
 

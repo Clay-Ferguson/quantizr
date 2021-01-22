@@ -178,21 +178,22 @@ public class MongoRead {
     }
 
     /*
-     * The name can have either of two different formats: 1) "globalName" (admin owned node) 2)
-     * "userName:nodeName" (a named node some user has created)
+     * The name can have either of two different formats:
      * 
-     * NOTE: It's a bit confusing but also either 1 or 2 above will be prefixed with ":" before send
-     * into this method and this 'name', but any leading colon is stripped before it's passed into this
-     * method.
+     * 1) "nodeName" (admin owned node)
+     * 
+     * 2) "userName:nodeName" (a named node some user has created)
      */
     public SubNode getNodeByName(MongoSession session, String name, boolean allowAuth) {
         Query query = new Query();
 
+        if (name==null) return null;
+        //we tolerate a prefix at the FRONT of either format 1, or 2, and ignore it.
+        name = XString.stripIfStartsWith(name, ":");
         // log.debug("getNodeByName: " + name);
 
         ObjectId nodeOwnerId;
         int colonIdx = -1;
-        boolean isUserNode = false;
         SubNode userNode = null;
 
         /*
@@ -208,7 +209,6 @@ public class MongoRead {
          * If there is a colon in the name then it's of the format 'userName:nodeName'
          */
         else {
-            isUserNode = true;
             String userName = name.substring(0, colonIdx);
 
             /*
@@ -218,37 +218,12 @@ public class MongoRead {
             userNode = getUserNodeByUserName(null, userName);
             nodeOwnerId = userNode.getOwner();
             name = name.substring(colonIdx + 1);
-
-            /* we know this is a public node, so we can bypass any security check */
-            if ("home".equalsIgnoreCase(name)) {
-                allowAuth = false;
-            }
         }
 
         query.addCriteria(Criteria.where(SubNode.FIELD_NAME).is(name)//
                 .and(SubNode.FIELD_OWNER).is(nodeOwnerId));
 
         SubNode ret = getOps(session).findOne(query, SubNode.class);
-
-        /*
-         * If this was a request like 'userName:home' (home node of the user) and we didn't find a node the
-         * user has named 'home' then we forcabily create a 'home' node for this user, and then return it.
-         */
-        if (userNode != null && ret == null && isUserNode && "home".equalsIgnoreCase(name)) {
-            ret = create.createNode(session, userNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null);
-            ret.setOwner(userNode.getId());
-            String userName = userNode.getStrProp(NodeProp.USER.s());
-            ret.setContent("### User: " + userName + "\n\nUser has not yet edited this default home node.");
-            ret.setName(name);
-
-            /*
-             * This would be redundant. I like the overriding rule that any node named 'home' becomes public,
-             * which is how auth is implemented. aclService.addPrivilege(session, ret, PrincipalName.PUBLIC.s(),
-             * Arrays.asList(PrivilegeType.READ.s()), null);
-             */
-
-            update.save(session, ret);
-        }
 
         if (ret != null) {
             log.debug("Node found: id=" + ret.getId().toHexString());

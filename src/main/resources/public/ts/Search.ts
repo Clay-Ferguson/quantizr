@@ -106,7 +106,8 @@ export class Search implements SearchIntf {
             feedUserName,
             toMe: appState.feedFilterToMe,
             fromMe: appState.feedFilterFromMe,
-            toPublic: appState.feedFilterToPublic
+            toPublic: appState.feedFilterToPublic,
+            nsfw: appState.feedFilterNSFW
         }, this.feedResponse);
     }
 
@@ -146,7 +147,6 @@ export class Search implements SearchIntf {
         }
 
         const cssId = this._UID_ROWID_PREFIX + node.id;
-        const buttonBar = this.makeButtonBarHtml(node, state);
         const content = new NodeCompContent(node, true, true, prefix, true, null);
 
         let clazz = isFeed ? "feed-node-table-row" : "node-table-row";
@@ -183,28 +183,18 @@ export class Search implements SearchIntf {
             onClick: S.meta64.getNodeFunc(this.cached_clickOnSearchResultRow, "S.srch.clickOnSearchResultRow", node.id),
             id: cssId
         }, [
-            buttonBar,
-            new NodeCompRowHeader(node, allowAvatars, isFeed),
+            new NodeCompRowHeader(node, allowAvatars, isFeed, true),
             content,
             new NodeCompRowFooter(node, isFeed)
         ]);
 
+        let itemClass = (index === count - 1) ? "userFeedItemLast" : "userFeedItem";
+
         return new Div(null, {
-            className: isParent ? "userFeedItemParent" : "userFeedItem"
+            className: isParent ? "userFeedItemParent" : itemClass
         }, [parentItem, div]);
     }
 
-    makeButtonBarHtml = (node: J.NodeInfo, state: AppState): Comp => {
-        return new HorizontalLayout([
-            new Button("Jump", () => {
-                this.clickSearchNode(node.id, state);
-            }, {
-                title: "Jump to this Node in the Main Tab",
-                id: "go-" + node.id
-            }, "btn-secondary marginLeft"),
-            new Div(null, { className: "clearfix" })
-        ], "marginTop marginLeft float-right");
-    }
 
     cached_clickOnSearchResultRow = (id: string) => {
         // this implementation is obsolete (update if we ever need to uncomment this)

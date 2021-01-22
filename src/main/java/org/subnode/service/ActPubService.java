@@ -198,7 +198,7 @@ public class ActPubService {
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a
      * notification to foreign servers.
      */
-    public void sendNotificationForNodeEdit(MongoSession session, SubNode parent, SubNode node) {
+    public boolean sendNotificationForNodeEdit(MongoSession session, SubNode parent, SubNode node) {
         try {
             List<String> toUserNames = new LinkedList<String>();
 
@@ -208,26 +208,32 @@ public class ActPubService {
              * can avoid doing any work for the ones in 'toUserNamesSet', because we know they already are taken
              * care of (in the list)
              */
-            for (String k : node.getAc().keySet()) {
-                if ("public".equals(k)) {
-                    privateMessage = false;
-                } else {
-                    // k will be a nodeId of an account node here.
-                    SubNode accountNode = accountNodesById.get(k);
-                    if (accountNode == null) {
-                        accountNodesById.put(k, accountNode = read.getNode(session, k));
-                    }
+            // this check was a quick fix. Verify better that this is right (todo-0), and that the 'else return'
+            // case below
+            // is correct for when there's no sharing ON this node.
+            if (node.getAc() != null) {
+                for (String k : node.getAc().keySet()) {
+                    if ("public".equals(k)) {
+                        privateMessage = false;
+                    } else {
+                        // k will be a nodeId of an account node here.
+                        SubNode accountNode = accountNodesById.get(k);
+                        if (accountNode == null) {
+                            accountNodesById.put(k, accountNode = read.getNode(session, k));
+                        }
 
-                    if (accountNode != null) {
-                        String userName = accountNode.getStrProp(NodeProp.USER.s());
-                        toUserNames.add(userName);
+                        if (accountNode != null) {
+                            String userName = accountNode.getStrProp(NodeProp.USER.s());
+                            toUserNames.add(userName);
+                        }
                     }
                 }
+            } else {
+                return false;
             }
 
             // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
             String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
-
             APList attachments = createAttachmentsList(node);
 
             sendNote(session, toUserNames, sessionContext.getUserName(), inReplyTo, node.getContent(), attachments,
@@ -237,6 +243,7 @@ public class ActPubService {
             log.error("sendNote failed", e);
             throw new RuntimeException(e);
         }
+        return true;
     }
 
     public APList createAttachmentsList(SubNode node) {
@@ -582,6 +589,10 @@ public class ActPubService {
     }
 
     public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
+        // todo-0: I'm adding this limiter because there may be a bug.
+        int maxPageQueries = 10;
+        int pageQueries = 0;
+
         // log.debug("interateOrderedCollection(): " + XString.prettyPrint(collectionObj));
         int count = 0;
         /*
@@ -617,7 +628,9 @@ public class ActPubService {
          */
         String firstPageUrl = AP.str(collectionObj, "first");
         if (firstPageUrl != null) {
-            log.debug("First Page Url: " + firstPageUrl);
+            // log.debug("First Page Url: " + firstPageUrl);
+            if (++pageQueries > maxPageQueries)
+                return;
             Object ocPage = getOrderedCollectionPage(firstPageUrl);
 
             while (ocPage != null) {
@@ -651,8 +664,13 @@ public class ActPubService {
                 }
 
                 String nextPage = AP.str(ocPage, "next");
-                log.debug("NextPage Url: " + nextPage);
+                // the server was flooded with these messages: why? is this a bug? (todo-0)
+                // 2021-01-21 17:45:32,347 DEBUG org.subnode.service.ActPubService [pool-2-thread-1] NextPage Url:
+                // https://anime.website/users/sex/outbox?max_id=0&page=true
+                // log.debug("NextPage Url: " + nextPage);
                 if (nextPage != null) {
+                    if (++pageQueries > maxPageQueries)
+                        return;
                     ocPage = getOrderedCollectionPage(nextPage);
                 } else {
                     break;
@@ -662,8 +680,11 @@ public class ActPubService {
 
         String lastPageUrl = AP.str(collectionObj, "last");
         if (lastPageUrl != null) {
-            log.debug("Last Page Url: " + lastPageUrl);
+            // log.debug("Last Page Url: " + lastPageUrl);
+            if (++pageQueries > maxPageQueries)
+                return;
             Object ocPage = getOrderedCollectionPage(lastPageUrl);
+
             if (ocPage != null) {
                 orderedItems = AP.list(ocPage, "orderedItems");
 
@@ -792,7 +813,7 @@ public class ActPubService {
         if (url == null)
             return null;
         APObj outboxPage = getJson(url, new MediaType("application", "activity+json"));
-        //log.debug("OrderedCollectionPage: " + XString.prettyPrint(outboxPage));
+        // log.debug("OrderedCollectionPage: " + XString.prettyPrint(outboxPage));
         return outboxPage;
     }
 
@@ -1170,6 +1191,7 @@ public class ActPubService {
         String objUrl = AP.str(obj, "url");
         String objAttributedTo = AP.str(obj, "attributedTo");
         String objType = AP.str(obj, "type");
+        Boolean sensitive = AP.bool(obj, "sensitive");
 
         // foreign account will own this node, this may be passed if it's known or null can be passed in.
         if (toAccountNode == null) {
@@ -1184,6 +1206,10 @@ public class ActPubService {
         // '```'
         newNode.setContent(contentHtml);
         newNode.setModifyTime(published);
+
+        if (sensitive != null && sensitive.booleanValue()) {
+            newNode.setProp(NodeProp.ACT_PUB_SENSITIVE.s(), "y");
+        }
 
         newNode.setProp(NodeProp.ACT_PUB_ID.s(), id);
         newNode.setProp(NodeProp.ACT_PUB_OBJ_URL.s(), objUrl);
@@ -1710,9 +1736,8 @@ public class ActPubService {
                 actor.put("following", host + ActPubConstants.PATH_FOLLOWING + "/" + userName);
 
                 /*
-                 * This "/u/[user]/home" url format access the node the user has named 'home'. This node is
-                 * auto-created if not found, and will also be public (readable) to all users because any node named
-                 * 'home' is automatically madd public
+                 * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to tis
+                 * in our ActPubController. We tolerate Mastodon breaking spec here.
                  */
                 actor.put("url", host + "/u/" + userName + "/home");
 
@@ -1918,7 +1943,7 @@ public class ActPubService {
         }
 
         // if not a foreign then ignore.
-        if (apUserName==null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@quanta.wiki"))
+        if (apUserName == null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@quanta.wiki"))
             return;
 
         if (!force) {
@@ -1934,6 +1959,8 @@ public class ActPubService {
     /* Run every few seconds */
     @Scheduled(fixedDelay = 3 * 1000)
     public void messageRefresh() {
+        if (!appProp.getProfileName().equals("prod")) return;
+
         try {
             for (String apUserName : userNamesPendingMessageRefresh.keySet()) {
                 Boolean done = userNamesPendingMessageRefresh.get(apUserName);
@@ -1967,6 +1994,8 @@ public class ActPubService {
     }
 
     public void refreshForeignUsers() {
+        if (!appProp.getProfileName().equals("prod")) return;
+
         adminRunner.run(session -> {
             Iterable<SubNode> accountNodes =
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());

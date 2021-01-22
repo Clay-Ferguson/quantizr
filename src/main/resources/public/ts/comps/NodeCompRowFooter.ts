@@ -34,14 +34,6 @@ export class NodeCompRowFooter extends Div {
         }
 
         if (this.node.owner.indexOf("@") !== -1) {
-            let attributedTo = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO, this.node);
-            if (attributedTo) {
-                children.push(new Anchor(attributedTo, "Owner", {
-                    className: "footerLink",
-                    target: "_blank"
-                }));
-            }
-
             let inReplTo = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_INREPLYTO, this.node);
             if (inReplTo) {
                 children.push(new Anchor(inReplTo, "Parent", {

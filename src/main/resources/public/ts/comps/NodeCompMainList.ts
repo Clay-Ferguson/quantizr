@@ -37,7 +37,7 @@ export class NodeCompMainList extends Div {
             this.addPaginationButtons(children, state.endReached, state);
         }
 
-        children.push(new CollapsibleHelpPanel("Getting Started", "<h4>Getting Started</h4> " +
+        children.push(new CollapsibleHelpPanel("Getting Started", "<h3>Getting Started</h3> " +
         "After logged in: To create your first Social Media post, click the <b>'Feed'</b> tab, and then click <b>'New Post'</b>, enter a messsage, and click <b>'Save'</b><p> " +
         "<p>--OR--<p> Turn on <b>'Edit Mode'</b> by clicking the <b>pencil icon</b> on the right-hand side of the page. This will allow you to start creating, editing, and sharing nodes. " +
         "<h4>Public Posts</h4>" +

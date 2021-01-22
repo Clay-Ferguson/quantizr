@@ -203,7 +203,7 @@ export class Nav implements NavIntf {
     }
 
     openContentNode = (nodePathOrId: string, state: AppState): void => {
-        console.log("openContentNode()");
+        // console.log("openContentNode(): " + nodePathOrId);
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: nodePathOrId,
             upLevel: false,
@@ -213,7 +213,9 @@ export class Nav implements NavIntf {
             goToLastPage: false,
             forceIPFSRefresh: false,
             singleNode: false
-        }, (res) => { this.navPageNodeResponse(res, state); });
+        }, (res) => {
+            this.navPageNodeResponse(res, state);
+        });
     }
 
     cached_openNodeById = (id: string, state: AppState): void => {
@@ -265,8 +267,8 @@ export class Nav implements NavIntf {
     }
 
     showMainMenu = (state: AppState): void => {
-       S.meta64.mainMenu = new MainMenuDlg();
-       S.meta64.mainMenu.open();
+        S.meta64.mainMenu = new MainMenuDlg();
+        S.meta64.mainMenu.open();
     }
 
     navHome = (state: AppState): void => {
@@ -274,6 +276,7 @@ export class Nav implements NavIntf {
         if (state.isAnonUser) {
             S.meta64.loadAnonPageHome(state);
         } else {
+            // console.log("renderNode (navHome): " + state.homeNodeId);
             S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: state.homeNodeId,
                 upLevel: false,

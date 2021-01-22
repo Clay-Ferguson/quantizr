@@ -1,7 +1,7 @@
 package org.subnode.actpub;
 
 import javax.servlet.http.HttpServletRequest;
-
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.subnode.config.AppProp;
 import org.subnode.service.ActPubService;
 import org.subnode.util.XString;
 
@@ -25,6 +26,9 @@ public class ActPubController {
 
 	@Autowired
 	private ActPubService actPubService;
+
+	@Autowired
+	private AppProp appProp;
 
 	// =====================================
 	// WEBFINGER & ACTOR
@@ -38,6 +42,26 @@ public class ActPubController {
 		if (ret != null)
 			return ret;
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
+	}
+
+	/*
+	 * Mastodon insists on using this format for the URL which is NOT what we have in our Actor object
+	 * so they are breaking the spec and we tolerate it by redirecting
+	 * 
+	 * simple redirect from /ap/user/[userName] to /u/[userName]/home
+	 */
+	@RequestMapping(value = "/ap/user/{userName}", method = RequestMethod.GET)
+	public void mastodonGetUser(//
+			@PathVariable(value = "userName", required = true) String userName, //
+			HttpServletRequest req, //
+			HttpServletResponse response) {
+		String url = appProp.getProtocolHostAndPort() + "/u/" + userName + "/home";
+		try {
+			log.debug("Redirecting to: " + url);
+			response.sendRedirect(url);
+		} catch (Exception e) {
+			log.error("mastodonGetUser failed", e);
+		}
 	}
 
 	/* This is the ActivityPub 'Actor' URL */
@@ -91,9 +115,9 @@ public class ActPubController {
 			 * what Mastodon is "supposed" to do, to be able to even say if this is incorrect or not.
 			 * 
 			 * From analyzing other 'server to server' calls on other Mastodon instances it seems like at least
-			 * the "toot count" should be showing up, but when I search a local user (non-federated) and it gets the
-			 * outbox, mastodon still shows "0 toots", even though it just queried my inbox and there ARE toots
-			 * and we DID return the correct number of them.
+			 * the "toot count" should be showing up, but when I search a local user (non-federated) and it gets
+			 * the outbox, mastodon still shows "0 toots", even though it just queried my inbox and there ARE
+			 * toots and we DID return the correct number of them.
 			 */
 			ret = actPubService.generateOutbox(userName);
 		}

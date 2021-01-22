@@ -49,7 +49,7 @@ export class NodeCompMainNode extends Div {
 
         let header: CompIntf = null;
         if (state.userPreferences.showMetaData) {
-            header = new NodeCompRowHeader(node, true, false);
+            header = new NodeCompRowHeader(node, true, false, false);
         }
 
         this.setChildren([

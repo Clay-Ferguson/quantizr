@@ -6,6 +6,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Div } from "../widget/Div";
 import { Icon } from "../widget/Icon";
+import { IconButton } from "../widget/IconButton";
 import { Img } from "../widget/Img";
 import { Span } from "../widget/Span";
 
@@ -17,7 +18,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompRowHeader extends Div {
 
-    constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isFeed: boolean = false) {
+    constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isFeed: boolean = false, private jumpButton: boolean = false) {
         super(null, {
             className: "header-text"
         });
@@ -37,84 +38,91 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        /* We show a simplified header for User Feed rows, because these are always visible and don't need a lot of the info */
-        if (this.isFeed) {
-            if (node.owner && node.owner !== "?") {
-                children.push(new Span(node.owner, {
-                    className: (node.owner === state.userName) ? "created-by-me" : "created-by-other"
-                }));
-                children.push(new Span(S.util.formatDate(new Date(node.lastModified)), {
-                    className: "marginLeft",
-                    title: "Last Modified"
-                }));
-            }
+        let priorityVal = S.props.getNodePropVal(J.NodeProp.PRIORITY, node);
+        let priority = (priorityVal && priorityVal !== "0") ? "P" + priorityVal : "";
+
+        if (node.owner && node.owner !== "?") {
+            children.push(new Span(node.owner, {
+                className: (node.owner === state.userName) ? "created-by-me" : "created-by-other"
+            }));
         }
-        else {
-            let priorityVal = S.props.getNodePropVal(J.NodeProp.PRIORITY, node);
-            let priority = (priorityVal && priorityVal !== "0") ? "P" + priorityVal : "";
 
-            if (node.owner && node.owner !== "?") {
-                children.push(new Span(node.owner, {
-                    className: (node.owner === state.userName) ? "created-by-me" : "created-by-other"
-                }));
-            }
-
-            if (node.name) {
-                children.push(new Span(node.name, {
-                    className: "btn-secondary nodeName",
-                    title: "Click -> URL into clipboard",
-                    onClick: () => {
-                        let url = window.location.origin + S.util.getPathPartForNamedNode(node);
-                        S.util.copyToClipboard(url);
-                        S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
-                    }
-                }));
-            }
-
-            children.push(new Span(
-                node.id + "-" + node.logicalOrdinal + " " + (node.type === "u" ? "" : node.type), //
-                {
-                    title: "Click -> URL into clipboard",
-                    onClick: () => {
-                        let url = window.location.origin + "/app?id=" + node.id;
-                        S.util.copyToClipboard(url);
-                        S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
-                    }
+        if (node.name) {
+            children.push(new Span(node.name, {
+                className: "btn-secondary nodeName",
+                title: "Copy name-based URL to clipboard",
+                onClick: () => {
+                    let url = window.location.origin + S.util.getPathPartForNamedNode(node);
+                    S.util.copyToClipboard(url);
+                    S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
                 }
-            ));
+            }));
+        }
 
-            let floatUpperRightDiv: Div = new Div(null, {
-                className: "float-right"
-            });
+        // todo-0: don't delete until we figure out what where to display ordinal and type
+        // children.push(new Span(
+        //     node.id + "-" + node.logicalOrdinal + " " + (node.type === "u" ? "" : node.type), //
+        //     {
+        //     }
+        // ));
 
-            if (node.lastModified) {
-                floatUpperRightDiv.addChild(new Span(S.util.formatDate(new Date(node.lastModified))));
+        children.push(new Icon({
+            className: "fa fa-link fa-lg",
+            title: "Copy ID-based URL into clipboard",
+            onClick: () => {
+                let url = window.location.origin + "/app?id=" + node.id;
+                S.util.copyToClipboard(url);
+                S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
             }
+        }));
 
-            if (S.props.isPublic(node)) {
-                floatUpperRightDiv.addChild(new Icon({
-                    style: { marginLeft: "12px", verticalAlign: "middle" },
-                    className: "fa fa-globe fa-lg",
-                    title: "Node is Public (Shared to everyone)"
-                }));
-            }
-            else if (S.props.isShared(node)) {
-                floatUpperRightDiv.addChild(new Icon({
-                    style: { marginLeft: "12px", verticalAlign: "middle" },
-                    className: "fa fa-envelope fa-lg",
-                    title: "Node is Shared"
-                }));
-            }
+        if (priority) {
+            children.push(new Span(priority, {
+                className: "priorityTag" + priorityVal
+            }));
+        }
 
-            if (floatUpperRightDiv.childrenExist()) {
-                children.push(floatUpperRightDiv);
-            }
+        let floatUpperRightDiv: Div = new Div(null, {
+            className: "float-right"
+        });
 
-            if (priority) {
-                children.push(new Span(priority, {
-                    className: "priorityTag" + priorityVal
-                }));
-            }
+        if (node.lastModified) {
+            floatUpperRightDiv.addChild(new Span(S.util.formatDate(new Date(node.lastModified))));
+        }
+
+        if (S.props.isPublic(node)) {
+            floatUpperRightDiv.addChild(new Icon({
+                style: {
+                    marginLeft: "12px",
+                    verticalAlign: "middle"
+                },
+                className: "fa fa-globe fa-lg",
+                title: "Node is Public (Shared to everyone)"
+            }));
+        }
+        else if (S.props.isShared(node)) {
+            floatUpperRightDiv.addChild(new Icon({
+                style: {
+                    marginLeft: "12px",
+                    verticalAlign: "middle"
+                },
+                className: "fa fa-envelope fa-lg",
+                title: "Node is Shared"
+            }));
+        }
+
+        if (this.jumpButton) {
+            floatUpperRightDiv.addChild(new Span(null, { className: "marginLeft" }, [
+                new IconButton("fa-arrow-right", null, {
+                    className: "marginLeft",
+                    onClick: () => S.srch.clickSearchNode(node.id, state),
+                    title: "Jump to this Node in the Main Tab"
+                })
+            ]));
+        }
+
+        if (floatUpperRightDiv.childrenExist()) {
+            children.push(floatUpperRightDiv);
         }
 
         let sharingNames = S.util.getSharingNames(node, false);

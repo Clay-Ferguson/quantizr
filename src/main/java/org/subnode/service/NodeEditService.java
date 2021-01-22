@@ -336,22 +336,34 @@ public class NodeEditService {
 		node.setContent(nodeInfo.getContent());
 		node.setType(nodeInfo.getType());
 
+		/* if node name is empty or not valid (canot have ":" in the name) set it to null quietly */
 		if (StringUtils.isEmpty(nodeInfo.getName())) {
 			node.setName(null);
 		}
 		// if we're setting node name to a different node name
 		else if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0 && !nodeInfo.getName().equals(node.getName())) {
 
+			// todo-0: do better name validation here.
+			if (nodeInfo.getName().contains(":")) {
+				throw new RuntimeEx("Node names can only contain alpha numeric characters");
+			}
+			String nodeName = nodeInfo.getName().trim();
+
+			// if not admin we have to lookup the node with "userName:nodeName" format
+			if (!sessionContext.isAdmin()) {
+				nodeName = sessionContext.getUserName() + ":" + nodeName;
+			}
+
 			/*
 			 * We don't use unique index on node name, because we want to save storage space on the server, so
 			 * we have to do the uniqueness check ourselves here manually
 			 */
-			SubNode nodeByName = read.getNodeByName(session, nodeInfo.getName());
+			SubNode nodeByName = read.getNodeByName(session, nodeName);
 			if (nodeByName != null) {
 				throw new RuntimeEx("Node name is already in use. Duplicates not allowed.");
 			}
 
-			node.setName(nodeInfo.getName());
+			node.setName(nodeInfo.getName().trim());
 		}
 
 		if (nodeInfo.getProperties() != null) {
@@ -409,8 +421,9 @@ public class NodeEditService {
 			if (parent != null) {
 				adminRunner.run(s -> {
 					auth.saveMentionsToNodeACL(s, node);
-					actPubService.sendNotificationForNodeEdit(s, parent, node);
-					userFeedService.pushNodeUpdateToBrowsers(s, node);
+					if (actPubService.sendNotificationForNodeEdit(s, parent, node)) {
+						userFeedService.pushNodeUpdateToBrowsers(s, node);
+					}
 				});
 			}
 		}

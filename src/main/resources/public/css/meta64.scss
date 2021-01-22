@@ -1342,9 +1342,17 @@ i'm backing out for now
 
 .userFeedItem {
     border-radius: $borderRadiusMedium;
-    border: 2px solid $nodeBorderBottomColor;
-    margin-bottom: 8px;
+    border-top: 2px solid $nodeBorderBottomColor;
+    border-right: 2px solid $nodeBorderBottomColor;
+    border-left: 2px solid $nodeBorderBottomColor;
 }
+
+.userFeedItemLast {
+    border-radius: $borderRadiusMedium;
+    border: 2px solid $nodeBorderBottomColor;
+    margin-bottom: 10px;
+}
+
 
 .userFeedParent {
     border: 2px solid $nodeBorderBottomColor;

@@ -78,9 +78,6 @@ export class FeedView extends Div {
                 FeedView.helpExpanded = state;
             }, FeedView.helpExpanded));
 
-        // todo-0: this is fairly easy. do it!
-        children.push(new Div("Content Warning: This feed doesn't yet have a checkbox for excluding sensitive materials (i.e. NSFW content), but that option is comming soon."));
-
         if (!state.feedResults || state.feedResults.length === 0) {
             if (state.activeTab === "feedTab") {
                 if (!FeedView.feedQueried) {
@@ -106,12 +103,11 @@ export class FeedView extends Div {
         }
 
         if (!state.feedEndReached) {
-            children.push(new Div(null, null, [
+            children.push(new ButtonBar([
                 new IconButton("fa-angle-right", "More", {
                     onClick: () => S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page),
                     title: "Next Page"
-                })
-            ]));
+                })], "text-center marginTop marginBottom"));
         }
 
         this.setChildren(children);
@@ -119,7 +115,9 @@ export class FeedView extends Div {
 
     makeFilterButtonsBar = (): Span => {
         return new Span(null, { className: "checkboxBar" }, [
-            new Checkbox("To Me", null, {
+            new Checkbox("To Me", {
+                title: "Include Nodes shares specifically to you"
+            }, {
                 setValue: (checked: boolean): void => {
                     dispatch({
                         type: "Action_SetFeedFilterType",
@@ -137,7 +135,9 @@ export class FeedView extends Div {
                     return store.getState().feedFilterToMe;
                 }
             }),
-            new Checkbox("From Me", null, {
+            new Checkbox("From Me", {
+                title: "Include Nodes created by you"
+            }, {
                 setValue: (checked: boolean): void => {
                     dispatch({
                         type: "Action_SetFeedFilterType",
@@ -155,7 +155,9 @@ export class FeedView extends Div {
                     return store.getState().feedFilterFromMe;
                 }
             }),
-            new Checkbox("To Public", null, {
+            new Checkbox("To Public", {
+                title: "Include Nodes shared to 'Public' (everyone)"
+            }, {
                 setValue: (checked: boolean): void => {
                     dispatch({
                         type: "Action_SetFeedFilterType",
@@ -171,6 +173,26 @@ export class FeedView extends Div {
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterToPublic;
+                }
+            }),
+            new Checkbox("NSFW", {
+                title: "Include NSFW Content (Allows material flagged as 'Sensitive')"
+            }, {
+                setValue: (checked: boolean): void => {
+                    dispatch({
+                        type: "Action_SetFeedFilterType",
+                        update: (s: AppState): void => {
+                            s.feedFilterNSFW = checked;
+                        }
+                    });
+
+                    if (this.realtimeCheckboxes) {
+                        FeedView.page = 0;
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                    }
+                },
+                getValue: (): boolean => {
+                    return store.getState().feedFilterNSFW;
                 }
             })
         ]);

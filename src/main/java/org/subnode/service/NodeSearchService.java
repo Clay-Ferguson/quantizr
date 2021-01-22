@@ -69,18 +69,6 @@ public class NodeSearchService {
 				searchResults.add(info);
 			}
 		}
-		/*
-		 * node.name is a special indicator meaning we're doing a node name lookup. Not
-		 * a fuzzy search but an exact lookup.
-		 */
-		else if ("node.name".equals(req.getSearchProp())) {
-			SubNode node = read.getNode(session, ":" + req.getSearchText(), true);
-			if (node != null) {
-				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1,
-						false, false);
-				searchResults.add(info);
-			}
-		}
 		// othwerwise we're searching all node properties, only under the selected node.
 		else {
 			SubNode searchRoot = read.getNode(session, req.getNodeId());
@@ -127,7 +115,7 @@ public class NodeSearchService {
 			 * If we're only looking for shares to a specific person (or public) then check
 			 * here
 			 */
-			if (req.getShareTarget() != null && !node.getAc().containsKey(req.getShareTarget())) {
+			if (req.getShareTarget() != null && !node.safeGetAc().containsKey(req.getShareTarget())) {
 				continue;
 			}
 

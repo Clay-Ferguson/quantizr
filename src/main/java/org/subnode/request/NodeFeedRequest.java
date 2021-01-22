@@ -14,6 +14,7 @@ public class NodeFeedRequest extends RequestBase {
 	private Boolean toMe;
 	private Boolean fromMe;
 	private Boolean toPublic;
+	private Boolean nsfw;
 
 	public String getNodeId() {
 		return nodeId;
@@ -61,5 +62,13 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setPage(Integer page) {
 		this.page = page;
+	}
+
+	public Boolean getNsfw() {
+		return nsfw;
+	}
+
+	public void setNsfw(Boolean nsfw) {
+		this.nsfw = nsfw;
 	}
 }

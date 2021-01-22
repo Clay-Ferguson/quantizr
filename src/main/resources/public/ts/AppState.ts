@@ -33,6 +33,9 @@ export class AppState {
     feedFilterFromMe: boolean = false;
     feedFilterToPublic: boolean = true;
 
+    // must be true to allow NSFW materials.
+    feedFilterNSFW: boolean = false;
+
     title: string = "";
 
     node: J.NodeInfo;

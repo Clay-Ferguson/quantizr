@@ -128,7 +128,7 @@ export class NodeCompRow extends Div {
 
         let header: CompIntf = null;
         if (state.userPreferences.showMetaData) {
-            header = new NodeCompRowHeader(node, true, false);
+            header = new NodeCompRowHeader(node, true, false, false);
         }
 
         // if editMode is on, an this isn't the page root node

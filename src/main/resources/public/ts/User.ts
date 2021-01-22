@@ -105,10 +105,10 @@ export class User implements UserIntf {
                             S.meta64.loadAnonPageHome(state);
                         }
                     },
-                    async (error: string) => {
-                        await S.user.deleteAllUserLocalDbEntries();
-                        S.meta64.loadAnonPageHome(state);
-                    });
+                        async (error: string) => {
+                            await S.user.deleteAllUserLocalDbEntries();
+                            S.meta64.loadAnonPageHome(state);
+                        });
                 }
             }
             finally {
@@ -177,6 +177,8 @@ export class User implements UserIntf {
                         setTimeout(() => {
                             S.encryption.initKeys();
                         }, 2000);
+
+                        // console.log("Logged in as: " + usr);
                     }
 
                     S.meta64.setStateVarsUsingLoginResponse(res, state);
@@ -203,6 +205,7 @@ export class User implements UserIntf {
                         }
                     }
 
+                    // console.log("login is refreshingTree with ID=" + id);
                     S.view.refreshTree(id, true, renderLeafIfParent, childId, false, true, true, state);
                 } else {
                     console.log("LocalDb login failed.");
