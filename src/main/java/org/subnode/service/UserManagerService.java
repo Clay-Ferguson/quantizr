@@ -861,25 +861,13 @@ public class UserManagerService {
 		return res;
 	}
 
-	public GetFriendsResponse getFriends(MongoSession session, GetFriendsRequest req) {
+	public GetFriendsResponse getFriends(MongoSession session) {
 		GetFriendsResponse res = new GetFriendsResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
 
+		List<SubNode> friendNodes = getFriendsList(session);
 		List<FriendInfo> friends = new LinkedList<FriendInfo>();
-
-		SubNode userNode = read.getUserNodeByUserName(session, null);
-		if (userNode == null)
-			return res;
-
-		SubNode friendsNode = read.findTypedNodeUnderPath(session, userNode.getPath(), NodeType.FRIEND_LIST.s());
-		if (friendsNode == null)
-			return res;
-
-		// Note: findFollowingOfUser method has similar code to this, and we should unify it so we only do
-		// it one way (todo-0)
-		for (SubNode friendNode : read.getChildren(session, friendsNode, null, null, 0)) {
+		
+		for (SubNode friendNode : friendNodes) {
 			String userName = friendNode.getStrProp(NodeProp.USER.s());
 			if (userName != null) {
 				FriendInfo fi = new FriendInfo();
@@ -891,5 +879,28 @@ public class UserManagerService {
 		res.setFriends(friends);
 		res.setSuccess(true);
 		return res;
+	}
+
+	public List<SubNode> getFriendsList(MongoSession session) {
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+
+		List<SubNode> friends = new LinkedList<SubNode>();
+
+		SubNode userNode = read.getUserNodeByUserName(session, null);
+		if (userNode == null)
+			return null;
+
+		SubNode friendsNode = read.findTypedNodeUnderPath(session, userNode.getPath(), NodeType.FRIEND_LIST.s());
+		if (friendsNode == null)
+			return null;
+
+		// Note: findFollowingOfUser method has similar code to this, and we should unify it so we only do
+		// it one way (todo-0)
+		for (SubNode friendNode : read.getChildren(session, friendsNode, null, null, 0)) {
+			friends.add(friendNode);
+		}
+		return friends;
 	}
 }

@@ -18,6 +18,7 @@ export class AppState {
 
     /* flag that indicates the user can click "Refresh Feed" because there are new changes read */
     feedDirty: boolean = false;
+    feedLoading: boolean = false;
 
     inlineEditId: string;
     inlineEditVal: string;
@@ -29,12 +30,19 @@ export class AppState {
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
 
+    feedFilterFriends: boolean = false;
     feedFilterToMe: boolean = false;
     feedFilterFromMe: boolean = false;
+
+    // Note: don't default this to 'false' because then Anonymous users don't have a way to change it.
     feedFilterToPublic: boolean = true;
 
     // must be true to allow NSFW materials.
     feedFilterNSFW: boolean = false;
+
+    // when true indicates the Feed will show "Refresh when ready..." and not display data
+    // until user has set their checkboxes and clicks "Refresh Feed" button.
+    feedWaitingForUserRefresh: boolean = true;
 
     title: string = "";
 

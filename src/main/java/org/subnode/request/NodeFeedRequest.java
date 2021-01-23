@@ -13,6 +13,7 @@ public class NodeFeedRequest extends RequestBase {
 
 	private Boolean toMe;
 	private Boolean fromMe;
+	private Boolean fromFriends;
 	private Boolean toPublic;
 	private Boolean nsfw;
 
@@ -70,5 +71,13 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setNsfw(Boolean nsfw) {
 		this.nsfw = nsfw;
+	}
+
+	public Boolean getFromFriends() {
+		return fromFriends;
+	}
+
+	public void setFromFriends(Boolean fromFriends) {
+		this.fromFriends = fromFriends;
 	}
 }

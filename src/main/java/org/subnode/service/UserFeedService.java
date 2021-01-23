@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,9 @@ public class UserFeedService {
 
 	@Autowired
 	private MongoUtil util;
+
+	@Autowired
+	private UserManagerService userManagerService;
 
 	@Autowired
 	private MongoTemplate ops;
@@ -147,6 +151,8 @@ public class UserFeedService {
 		}
 
 		int counter = 0;
+
+		/* Finds nodes that have shares to any of the people listed in sharedToAny */
 		List<String> sharedToAny = new LinkedList<String>();
 
 		if (req.getToPublic()) {
@@ -194,6 +200,20 @@ public class UserFeedService {
 						Criteria.where(SubNode.FIELD_OWNER).is(searchRoot.getOwner()) //
 								// and the node has any sharing on it.
 								.and(SubNode.FIELD_AC).ne(null));
+			}
+		}
+
+		if (req.getFromFriends()) {
+			List<SubNode> friendNodes = userManagerService.getFriendsList(session);
+			if (friendNodes != null) {
+				for (SubNode friendNode : friendNodes) {
+
+					// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
+					String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
+					if (userNodeId != null) {
+						orCriteria.add(Criteria.where(SubNode.FIELD_OWNER).is( new ObjectId(userNodeId)));
+					}
+				}
 			}
 		}
 

@@ -107,6 +107,7 @@ export class Search implements SearchIntf {
             toMe: appState.feedFilterToMe,
             fromMe: appState.feedFilterFromMe,
             toPublic: appState.feedFilterToPublic,
+            fromFriends: appState.feedFilterFriends,
             nsfw: appState.feedFilterNSFW
         }, this.feedResponse);
     }
@@ -119,6 +120,8 @@ export class Search implements SearchIntf {
                 s.feedResults = res.searchResults;
                 s.feedEndReached = res.endReached;
                 s.feedDirty = false;
+                s.feedLoading = false;
+                s.feedWaitingForUserRefresh = false;
             }
         });
         S.meta64.selectTab("feedTab");
@@ -194,7 +197,6 @@ export class Search implements SearchIntf {
             className: isParent ? "userFeedItemParent" : itemClass
         }, [parentItem, div]);
     }
-
 
     cached_clickOnSearchResultRow = (id: string) => {
         // this implementation is obsolete (update if we ever need to uncomment this)

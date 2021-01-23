@@ -612,7 +612,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getFriends", method = RequestMethod.POST)
 	public @ResponseBody Object getFriends(@RequestBody GetFriendsRequest req, HttpSession session) {
 		return callProc.run("getFriends", req, session, ms -> {
-			return userManagerService.getFriends(ms, req);
+			return userManagerService.getFriends(ms);
 		});
 	}
 

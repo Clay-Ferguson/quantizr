@@ -27,7 +27,6 @@ export class FeedView extends Div {
     realtimeCheckboxes: boolean = false;
 
     static page: number = 0;
-    static feedQueried: boolean = false;
     static helpExpanded: boolean = false;
 
     constructor() {
@@ -54,41 +53,51 @@ export class FeedView extends Div {
             state.isAnonUser ? null : new Button("New Post", () => S.edit.addComment(null, state), { title: "Post something awesome on the Fediverse!" }, "btn-primary"),
             state.isAnonUser ? null : new Button("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), { title: "Manage your list of frenz!" }),
             new Span(null, {
-                className: (state.feedDirty ? "feedDirtyButton" : "feedNotDirtyButton")
+                className: ((state.feedDirty || state.feedWaitingForUserRefresh) ? "feedDirtyButton" : "feedNotDirtyButton")
             }, [
                 new Button("Refresh Feed" + (state.feedDirty ? " (New Posts)" : ""), () => {
                     FeedView.page = 0;
+                    dispatch({
+                        type: "Action_SetFeedFilterType",
+                        update: (s: AppState): void => {
+                            s.feedLoading = true;
+                        }
+                    });
+
                     S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
                 })
             ])
         ], null, "float-right marginBottom");
 
-        if (!state.isAnonUser) {
-            children.push(this.makeFilterButtonsBar());
-        }
+        children.push(this.makeFilterButtonsBar(state));
         children.push(refreshFeedButtonBar);
         children.push(new Div(null, { className: "clearfix" }));
 
-        children.push(new CollapsibleHelpPanel("Feed View Tips",
+        children.push(new CollapsibleHelpPanel("Help",
             "This is your Fediverse <b>feed</b> that shows a reverse chronological stream of posts from people you Follow.<p>" +
             "Use the 'Friends' button to jump over to the part of your main tree where your Friends List is stored to manage your friends.<p>" +
             "Use any 'Jump' button in the feed to go the the main content tree location of that post. Unlike other social media apps " +
-            "this platform stores all content on a Tree Structure, so in addition to appearing in the Feed, all nodes have a more permanent location on this large global tree.",
+            "this platform stores all content on a Tree Structure, so in addition to appearing in the Feed, all nodes have a more permanent location on this large global tree." +
+            "<p>" +
+            "<h4>Filter Options</h4>" +
+            "Friends &rarr; Includes your Friends <br>" +
+            "To Me &rarr; Includes nodes shared to you by name <br>" +
+            "From Me &rarr; Includes nodes you created <br>" +
+            "To Public &rarr; Includes nodes that are shared to everyone (public sharing) <br>" +
+            "NSFW &rarr; Includes nodes flagged as 'sensitive' or potentially offensive or NSFW"
+            ,
             (state: boolean) => {
                 FeedView.helpExpanded = state;
             }, FeedView.helpExpanded));
 
-        if (!state.feedResults || state.feedResults.length === 0) {
-            if (state.activeTab === "feedTab") {
-                if (!FeedView.feedQueried) {
-                    FeedView.feedQueried = true;
-                    children.push(new Heading(3, "Loading feed..."));
-                    setTimeout(() => { S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page); }, 100);
-                }
-                else {
-                    children.push(new Div("Nothing to display."));
-                }
-            }
+        if (state.feedLoading) {
+            children.push(new Heading(4, "Loading feed..."));
+        }
+        else if (state.feedWaitingForUserRefresh) {
+            children.push(new Div("Make selections, then 'Refresh Feed'"));
+        }
+        else if (!state.feedResults || state.feedResults.length === 0) {
+            children.push(new Div("Nothing to display."));
         }
         else {
             let i = 0;
@@ -100,28 +109,51 @@ export class FeedView extends Div {
                 i++;
                 rowCount++;
             });
-        }
 
-        if (!state.feedEndReached) {
-            children.push(new ButtonBar([
-                new IconButton("fa-angle-right", "More", {
-                    onClick: () => S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page),
-                    title: "Next Page"
-                })], "text-center marginTop marginBottom"));
+            if (rowCount > 0 && !state.feedEndReached) {
+                children.push(new ButtonBar([
+                    new IconButton("fa-angle-right", "More", {
+                        onClick: () => S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page),
+                        title: "Next Page"
+                    })], "text-center marginTop marginBottom"));
+            }
         }
 
         this.setChildren(children);
     }
 
-    makeFilterButtonsBar = (): Span => {
+    makeFilterButtonsBar = (state: AppState): Span => {
         return new Span(null, { className: "checkboxBar" }, [
-            new Checkbox("To Me", {
+            state.isAnonUser ? null : new Checkbox("Friends", {
+                title: "Include Nodes posted by your friends"
+            }, {
+                setValue: (checked: boolean): void => {
+                    dispatch({
+                        type: "Action_SetFeedFilterType",
+                        update: (s: AppState): void => {
+                            s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+                            s.feedFilterFriends = checked;
+                        }
+                    });
+
+                    if (this.realtimeCheckboxes) {
+                        FeedView.page = 0;
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                    }
+                },
+                getValue: (): boolean => {
+                    return store.getState().feedFilterFriends;
+                }
+            }),
+
+            state.isAnonUser ? null : new Checkbox("To Me", {
                 title: "Include Nodes shares specifically to you"
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch({
                         type: "Action_SetFeedFilterType",
                         update: (s: AppState): void => {
+                            s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterToMe = checked;
                         }
                     });
@@ -135,13 +167,14 @@ export class FeedView extends Div {
                     return store.getState().feedFilterToMe;
                 }
             }),
-            new Checkbox("From Me", {
+            state.isAnonUser ? null : new Checkbox("From Me", {
                 title: "Include Nodes created by you"
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch({
                         type: "Action_SetFeedFilterType",
                         update: (s: AppState): void => {
+                            s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterFromMe = checked;
                         }
                     });
@@ -155,13 +188,14 @@ export class FeedView extends Div {
                     return store.getState().feedFilterFromMe;
                 }
             }),
-            new Checkbox("To Public", {
+            state.isAnonUser ? null : new Checkbox("To Public", {
                 title: "Include Nodes shared to 'Public' (everyone)"
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch({
                         type: "Action_SetFeedFilterType",
                         update: (s: AppState): void => {
+                            s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterToPublic = checked;
                         }
                     });
@@ -182,6 +216,7 @@ export class FeedView extends Div {
                     dispatch({
                         type: "Action_SetFeedFilterType",
                         update: (s: AppState): void => {
+                            s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterNSFW = checked;
                         }
                     });
