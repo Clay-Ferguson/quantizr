@@ -1,5 +1,7 @@
 package org.subnode.service;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Map;
 
 import com.mongodb.client.MongoDatabase;
@@ -124,9 +126,45 @@ public class SystemService {
 		sb.append(String.format("Session Count: %d<br>", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());
 		sb.append("<p>" + util.getNodeReport());
-		sb.append("<p>ActivityPub Foreign Outbox Retrievals: " + ActPubService.outboxQueryCount);
-		sb.append("<p>ActivityPub Inbox Posts Count: " + ActPubService.inboxCount);
+		sb.append("<p>\n");
+		sb.append("ActivityPub Foreign Outbox Retrievals: " + ActPubService.outboxQueryCount + "<br>");
+		sb.append("ActivityPub Inbox Posts " + ActPubService.inboxCount + "<br>");
+
+		// oops this is worthless, because it's inside the docker image, but I'm leaving
+		// in place just in case in the future we do need to run some commands docker
+		// sb.append(runBashCommand("DISK STORAGE", "df -h"));
 		return sb.toString();
+	}
+
+	private static String runBashCommand(String title, String command) {
+		ProcessBuilder pb = new ProcessBuilder();
+		pb.command("bash", "-c", command);
+
+		// pb.directory(new File(dir));
+		// pb.redirectErrorStream(true);
+
+		StringBuilder output = new StringBuilder();
+		output.append("<pre>");
+		output.append(title);
+		try {
+			Process p = pb.start();
+			String s;
+
+			BufferedReader stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			while ((s = stdout.readLine()) != null) {
+				output.append(s);
+				output.append("\n");
+			}
+
+			// output.append("Exit value: " + p.waitFor());
+			// p.getInputStream().close();
+			// p.getOutputStream().close();
+			// p.getErrorStream().close();
+		} catch (Exception e) {
+			//todo-0: do something here.
+		}
+		output.append("</pre><p>");
+		return output.toString();
 	}
 
 	private static String getIpReport() {

@@ -209,7 +209,7 @@ public class MongoUtil {
 		 * here or see if there's an apachie string function for it.
 		 */
 		float kb = totalJsonBytes / 1024f;
-		return "Node Count: " + numDocs + "<br>Total JSON Size: " + kb + " KB";
+		return "Node Count: " + numDocs + "<br>Total JSON Size: " + kb + " KB<br>";
 	}
 
 	/*
