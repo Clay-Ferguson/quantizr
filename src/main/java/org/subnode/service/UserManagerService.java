@@ -12,7 +12,6 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -25,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.config.AppProp;
+import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.OutOfSpaceException;
 import org.subnode.exception.base.RuntimeEx;
@@ -34,18 +34,17 @@ import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddFriendRequest;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.CloseAccountRequest;
-import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetUserAccountInfoRequest;
 import org.subnode.request.GetUserProfileRequest;
 import org.subnode.request.ResetPasswordRequest;
@@ -866,7 +865,7 @@ public class UserManagerService {
 
 		List<SubNode> friendNodes = getFriendsList(session);
 		List<FriendInfo> friends = new LinkedList<FriendInfo>();
-		
+
 		for (SubNode friendNode : friendNodes) {
 			String userName = friendNode.getStrProp(NodeProp.USER.s());
 			if (userName != null) {
@@ -902,5 +901,34 @@ public class UserManagerService {
 			friends.add(friendNode);
 		}
 		return friends;
+	}
+
+	/*
+	 * For all foreign servers we remove posts that are older than a certain number of days just to keep
+	 * our DB from growing too large
+	 */
+	public void cleanUserAccounts(MongoSession session) {
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+
+		final Iterable<SubNode> accountNodes =
+				read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0);
+
+		int count = 0;
+		for (final SubNode accountNode : accountNodes) {
+			String userName = accountNode.getStrProp(NodeProp.USER);
+
+			// if account is a 'foreign server' one, then clean it up
+			if (userName.contains("@")) {
+				log.debug("Foreign Accnt Cleanup: " + userName);
+				delete.cleanupOldTempNodesForUser(session, accountNode);
+			}
+
+			//todo-0: to study this code need to just start with 10 at a time.
+			if (count++ > 10) {
+				break;
+			}
+		}
 	}
 }

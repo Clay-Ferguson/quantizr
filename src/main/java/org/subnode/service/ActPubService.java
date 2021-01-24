@@ -573,9 +573,9 @@ public class ActPubService {
 
         iterateOrderedCollection(outbox, Integer.MAX_VALUE, obj -> {
             try {
-                if (obj != null) {
-                    log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
-                }
+                // if (obj != null) {
+                //     log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
+                // }
 
                 String apId = AP.str(obj, "id");
                 if (!apIdSet.contains(apId)) {
@@ -586,7 +586,7 @@ public class ActPubService {
                             log.debug("Not Handled: Object was a string: " + object);
                         } else if ("Note".equals(AP.str(object, "type"))) {
                             try {
-                                saveNote(session, _userNode, outboxNode, object, true);
+                                saveNote(session, _userNode, outboxNode, object, true, true);
                                 count.setVal(count.getVal() + 1);
                             } catch (Exception e) {
                                 // log and ignore.
@@ -663,7 +663,7 @@ public class ActPubService {
                         }
                         // if no apId that's fine, just process item.
                         else if (!apIdSet.contains(apId)) {
-                            log.debug("Iterate Collection Item: " + apId);
+                            // log.debug("Iterate Collection Item: " + apId);
                             if (!observer.item(apObj))
                                 return;
                             apIdSet.add(apId);
@@ -715,7 +715,7 @@ public class ActPubService {
                         }
                         // else process it with apId
                         else if (!apIdSet.contains(apId)) {
-                            log.debug("Iterate Collection Item: " + apId);
+                            // log.debug("Iterate Collection Item: " + apId);
                             if (!observer.item(apObj))
                                 return;
                             apIdSet.add(apId);
@@ -1161,7 +1161,7 @@ public class ActPubService {
          * If a foreign user is replying to a specific node, we put the reply under that node
          */
         if (nodeBeingRepliedTo != null) {
-            saveNote(session, null, nodeBeingRepliedTo, obj, false);
+            saveNote(session, null, nodeBeingRepliedTo, obj, false, false);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -1174,7 +1174,7 @@ public class ActPubService {
                 String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
                 SubNode postsNode =
                         read.getUserNodeByType(session, userName, actorAccountNode, "### Posts", NodeType.ACT_PUB_POSTS.s());
-                saveNote(session, actorAccountNode, postsNode, obj, false);
+                saveNote(session, actorAccountNode, postsNode, obj, false, false);
             }
         }
         return ret;
@@ -1187,9 +1187,11 @@ public class ActPubService {
      * 
      * todo-0: when importing users in bulk (like at startup or the admin menu), some of there queries
      * in here will be redundant
+     * 
+     * temp = true, means we are loading an outbox of a user and not, recieving a message specifically to a local user
+     * so the node should be considered 'temporary' and can be deleted after a week or so to clean the Db.
      */
-    public void saveNote(MongoSession session, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic) {
-
+    public void saveNote(MongoSession session, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic, boolean temp) {
         String id = AP.str(obj, "id");
 
         /*
@@ -1230,7 +1232,7 @@ public class ActPubService {
             }
             else {
                 // todo-0: this is temporary so I can check that my english detection is working by viewing nodes online.
-                lang = "en-chk";
+                lang = "en-ck2";
             }
         }
 
@@ -1250,6 +1252,10 @@ public class ActPubService {
 
         if (sensitive != null && sensitive.booleanValue()) {
             newNode.setProp(NodeProp.ACT_PUB_SENSITIVE.s(), "y");
+        }
+
+        if (temp) {
+            newNode.setProp(NodeProp.TEMP.s(), "1");    
         }
 
         newNode.setProp(NodeProp.ACT_PUB_ID.s(), id);
@@ -2041,20 +2047,21 @@ public class ActPubService {
     }
 
     public void refreshForeignUsers() {
-        if (!appProp.getProfileName().equals("prod"))
-            return;
+        // todo-0: we need to be more strategic about who to read from at every startup. Need to have a curated list
+        // if (!appProp.getProfileName().equals("prod"))
+        //     return;
 
-        adminRunner.run(session -> {
-            Iterable<SubNode> accountNodes =
-                    read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
-            for (SubNode node : accountNodes) {
-                String userName = node.getStrProp(NodeProp.USER.s());
-                if (userName == null || !userName.contains("@"))
-                    continue;
+        // adminRunner.run(session -> {
+        //     Iterable<SubNode> accountNodes =
+        //             read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+        //     for (SubNode node : accountNodes) {
+        //         String userName = node.getStrProp(NodeProp.USER.s());
+        //         if (userName == null || !userName.contains("@"))
+        //             continue;
 
-                queueUserForRefresh(userName, true);
-            }
-            return null;
-        });
+        //         queueUserForRefresh(userName, true);
+        //     }
+        //     return null;
+        // });
     }
 }

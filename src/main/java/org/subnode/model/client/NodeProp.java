@@ -23,6 +23,9 @@ public enum NodeProp {
     shared to so that user can use their private key to decrypt this key and gain access to the actual data. */
     ENC_KEY("sn:encKey", "s"),
 
+    // finding this on a node means it can be safely deleted without affecting any local users
+    TEMP("tmp", "s"),
+
     /*
      * this is the one entered by the admin which DEFINES the feed, and is not to be
      * overwritten ever by the code

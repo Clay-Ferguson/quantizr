@@ -83,7 +83,7 @@ export class FeedView extends Div {
             "Friends &rarr; Includes your Friends <br>" +
             "To Me &rarr; Includes nodes shared to you by name <br>" +
             "From Me &rarr; Includes nodes you created <br>" +
-            "To Public &rarr; Includes nodes that are shared to everyone (public sharing) <br>" +
+            "Fediverse &rarr; Includes nodes that are shared to everyone (public sharing) <br>" +
             "NSFW &rarr; Includes nodes flagged as 'sensitive' or potentially offensive or NSFW"
             ,
             (state: boolean) => {
@@ -188,7 +188,7 @@ export class FeedView extends Div {
                     return store.getState().feedFilterFromMe;
                 }
             }),
-            state.isAnonUser ? null : new Checkbox("To Public", {
+            state.isAnonUser ? null : new Checkbox("Fediverse", {
                 title: "Include Nodes shared to 'Public' (everyone)"
             }, {
                 setValue: (checked: boolean): void => {

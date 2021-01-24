@@ -118,14 +118,13 @@ public class MongoUtil {
 	// }
 
 	/*
-	 * We create these users just so there's an easy way to start doing multi-user
-	 * testing (sharing nodes from user to user, etc) without first having to
-	 * manually register users.
+	 * We create these users just so there's an easy way to start doing multi-user testing (sharing
+	 * nodes from user to user, etc) without first having to manually register users.
 	 */
 	public void createTestAccounts() {
 		/*
-		 * The testUserAccounts is a comma delimited list of user accounts where each
-		 * user account is a colon-delimited list like username:password:email.
+		 * The testUserAccounts is a comma delimited list of user accounts where each user account is a
+		 * colon-delimited list like username:password:email.
 		 */
 		final List<String> testUserAccountsList = XString.tokenize(appProp.getTestUserAccounts(), ",", true);
 		if (testUserAccountsList == null) {
@@ -158,8 +157,8 @@ public class MongoUtil {
 				}
 
 				/*
-				 * keep track of these names, because some API methods need to know if a given
-				 * account is a test account
+				 * keep track of these names, because some API methods need to know if a given account is a test
+				 * account
 				 */
 				testAccountNames.add(userName);
 			}
@@ -187,7 +186,11 @@ public class MongoUtil {
 		return DigestUtils.sha256Hex(password).substring(0, 20);
 	}
 
-	public String getNodeReport() {
+	/*
+	 * This was early code, and it not even practical in a large database. Leaving this code in place as
+	 * an example of how to call databae directly without spring.
+	 */
+	public String getNodeReport_obsolete() {
 		int numDocs = 0;
 		int totalJsonBytes = 0;
 		MongoDatabase database = mac.mongoClient().getDatabase(MongoAppConfig.databaseName);
@@ -205,31 +208,29 @@ public class MongoUtil {
 		}
 
 		/*
-		 * todo-1: I have a 'formatMemory' written in javascript, and need to do same
-		 * here or see if there's an apachie string function for it.
+		 * todo-1: I have a 'formatMemory' written in javascript, and need to do same here or see if there's
+		 * an apachie string function for it.
 		 */
 		float kb = totalJsonBytes / 1024f;
 		return "Node Count: " + numDocs + "<br>Total JSON Size: " + kb + " KB<br>";
 	}
 
 	/*
-	 * Whenever we do something like reindex in a new way, we might need to
-	 * reprocess every object, to generate any kind of auto-generated fields that
-	 * need to be there before indexes build we call this.
+	 * Whenever we do something like reindex in a new way, we might need to reprocess every object, to
+	 * generate any kind of auto-generated fields that need to be there before indexes build we call
+	 * this.
 	 * 
-	 * For example when the path hash was introduced (i.e. SubNode.FIELD_PATH_HASH)
-	 * we ran this to create all the path hashes so that a unique index could be
-	 * built, because the uniqueness test would fail until we generated all the
-	 * proper data, which required a modification on every node in the entire DB.
+	 * For example when the path hash was introduced (i.e. SubNode.FIELD_PATH_HASH) we ran this to
+	 * create all the path hashes so that a unique index could be built, because the uniqueness test
+	 * would fail until we generated all the proper data, which required a modification on every node in
+	 * the entire DB.
 	 * 
-	 * Note that MongoEventListener#onBeforeSave does execute even if all we are
-	 * doing is reading nodes and then resaving them.
+	 * Note that MongoEventListener#onBeforeSave does execute even if all we are doing is reading nodes
+	 * and then resaving them.
 	 */
 	// ********* DO NOT DELETE *********
 	// (this is needed from time to time)
 	public void reSaveAll(MongoSession session) {
-		log.debug("Processing reSaveAll: Beginning Node Report: " + getNodeReport());
-
 		// processAllNodes(session);
 	}
 
@@ -313,9 +314,8 @@ public class MongoUtil {
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
 
 		/*
-		 * NOTE: Every non-admin owned noded must have only names that are prefixed with
-		 * "UserName--" of the user. That is, prefixed by their username followed by two
-		 * dashes
+		 * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
+		 * user. That is, prefixed by their username followed by two dashes
 		 */
 		createIndex(session, SubNode.class, SubNode.FIELD_NAME);
 
@@ -375,10 +375,10 @@ public class MongoUtil {
 	/*
 	 * DO NOT DELETE.
 	 * 
-	 * I tried to create just ONE full text index, and i get exceptions, and even if
-	 * i try to build a text index on a specific property I also get exceptions, so
-	 * currently i am having to resort to using only the createTextIndexes() below
-	 * which does the 'onAllFields' option which DOES work for some readonly
+	 * I tried to create just ONE full text index, and i get exceptions, and even if i try to build a
+	 * text index on a specific property I also get exceptions, so currently i am having to resort to
+	 * using only the createTextIndexes() below which does the 'onAllFields' option which DOES work for
+	 * some readonly
 	 */
 	// public void createUniqueTextIndex(MongoSession session, Class<?> clazz,
 	// String property) {
@@ -424,14 +424,12 @@ public class MongoUtil {
 	}
 
 	/*
-	 * todo-2: I think now that I'm including the trailing slash after path in this
-	 * regex that I can remove the (.+) piece? I think i need to write some test
-	 * cases just to test my regex functions!
+	 * todo-2: I think now that I'm including the trailing slash after path in this regex that I can
+	 * remove the (.+) piece? I think i need to write some test cases just to test my regex functions!
 	 * 
-	 * todo-1: Also what's the 'human readable' description of what's going on here?
-	 * substring or prefix? For performance we DO want this to be finding all nodes
-	 * that 'start with' the path as opposed to simply 'contain' the path right? To
-	 * make best use of indexes etc?
+	 * todo-1: Also what's the 'human readable' description of what's going on here? substring or
+	 * prefix? For performance we DO want this to be finding all nodes that 'start with' the path as
+	 * opposed to simply 'contain' the path right? To make best use of indexes etc?
 	 */
 	public String regexRecursiveChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
@@ -486,20 +484,19 @@ public class MongoUtil {
 	}
 
 	/*
-	 * Initialize admin user account credentials into repository if not yet done.
-	 * This should only get triggered the first time the repository is created, the
-	 * first time the app is started.
+	 * Initialize admin user account credentials into repository if not yet done. This should only get
+	 * triggered the first time the repository is created, the first time the app is started.
 	 * 
-	 * The admin node is also the repository root node, so it owns all other nodes,
-	 * by the definition of they way security is inheritive.
+	 * The admin node is also the repository root node, so it owns all other nodes, by the definition of
+	 * they way security is inheritive.
 	 */
 	public void createAdminUser(MongoSession session) {
 		String adminUser = appProp.getMongoAdminUserName();
 
 		SubNode adminNode = read.getUserNodeByUserName(auth.getAdminSession(), adminUser);
 		if (adminNode == null) {
-			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(),
-					true, null, null);
+			adminNode =
+					apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
 
 			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
 
@@ -507,8 +504,7 @@ public class MongoUtil {
 			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 			update.save(session, adminNode);
 
-			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null,
-					null);
+			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null, null);
 		}
 
 		createPublicNodes(session);
@@ -517,21 +513,20 @@ public class MongoUtil {
 	public void createPublicNodes(MongoSession session) {
 		log.debug("creating PublicNodes");
 		ValContainer<Boolean> created = new ValContainer<>();
-		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public",
-				null, true, null, created);
+		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null, true,
+				null, created);
 
 		if (created.getVal()) {
-			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(),
-					Arrays.asList(PrivilegeType.READ.s()), null);
+			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 
 		/*
-		 * todo-1: update docs to say that admin is supposed to do something to
-		 * initialize these two nodes (landing page, and userguide)
+		 * todo-1: update docs to say that admin is supposed to do something to initialize these two nodes
+		 * (landing page, and userguide)
 		 */
 		created = new ValContainer<>();
-		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "home",
-				"home", "Public Home", null, true, null, created);
+		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "home", "home",
+				"Public Home", null, true, null, created);
 
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 

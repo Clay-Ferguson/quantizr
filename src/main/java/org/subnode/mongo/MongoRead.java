@@ -135,11 +135,10 @@ public class MongoRead {
     }
 
     public long getNodeCount(MongoSession session) {
+        if (session == null) {
+            session = auth.getAdminSession();
+        }
         Query query = new Query();
-        // Criteria criteria =
-        // Criteria.where(SubNode.FIELD_PATH).regex(regexDirectChildrenOfPath(node.getPath()));
-        // query.addCriteria(criteria);
-
         return getOps(session).count(query, SubNode.class);
     }
 
@@ -187,8 +186,9 @@ public class MongoRead {
     public SubNode getNodeByName(MongoSession session, String name, boolean allowAuth) {
         Query query = new Query();
 
-        if (name==null) return null;
-        //we tolerate a prefix at the FRONT of either format 1, or 2, and ignore it.
+        if (name == null)
+            return null;
+        // we tolerate a prefix at the FRONT of either format 1, or 2, and ignore it.
         name = XString.stripIfStartsWith(name, ":");
         // log.debug("getNodeByName: " + name);
 

@@ -38,6 +38,7 @@ public class EnglishDictionary {
 			// log and ignore.
 			log.error("Failed initializing dictionary", ex);
 		}
+		test();
 	}
 
 	/*
@@ -53,32 +54,50 @@ public class EnglishDictionary {
 		if (text == null)
 			return false;
 
+		// log.debug("Checking english: " + text);
 		int englishCount = 0;
 		int unknownCount = 0;
 
 		/*
-		 * NOTE: Do not include '@' or '#' in the delimiters, because by leaving it out we have the effect
-		 * of ignoring usernames and also hashtags which we don't want to check for english or not.
+		 * Counts all the 'words' in the text that consist purely of alphabet strings (letters) and returns
+		 * true only of known English words outnumber unknown words, making the assumption that despite that
+		 * some popular English slang won't be in the dictionary (i.e. Frens==Friends), we can still detect
+		 * if text is not in English language at all using this statistical technique.
+		 * 
+		 * NOTE: Do not include '@' or '#' in the delimiters, because by leaving those out we have the
+		 * effect of ignoring usernames and also hashtags which we don't want to check for English or not.
 		 */
 		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"'`!?()*", false);
 		while (tokens.hasMoreTokens()) {
 			String token = tokens.nextToken().trim();
 
 			// only consider words that are all alpha characters
-			if (!StringUtils.isAlpha(token))
+			if (!StringUtils.isAlpha(token) || token.length() < 5) {
+				// log.debug(" ignoring: " + token);
 				continue;
+			}
 
 			token = token.toLowerCase();
 			if (words.contains(token)) {
 				englishCount++;
+				// log.debug(" isEnglish: " + token);
 			} else {
 				unknownCount++;
+				// log.debug(" notEnglish: " + token);
 			}
 		}
-		if (unknownCount == 0)
+
+		if (englishCount == 0 && unknownCount == 0)
 			return true;
 
-		// if it's more english than not, consider it english.
-		return englishCount > unknownCount;
+		float percent = (float) englishCount / (englishCount + unknownCount);
+		// log.debug("eng=" + englishCount + " nonEng=" + unknownCount + " %=" + percent);
+
+		// if it's over 60% English, return true
+		return percent > 0.60f;
+	}
+
+	public void test() {
+		log.debug("English TEST1=" + isEnglish("kann ich auch noch ein gentoo badge haben"));
 	}
 }

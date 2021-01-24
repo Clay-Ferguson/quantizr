@@ -54,6 +54,9 @@ public class SystemService {
 	private AttachmentService attachmentService;
 
 	@Autowired
+	private UserManagerService userManagerService;
+
+	@Autowired
 	private IPFSService ipfsService;
 
 	public String initializeAppContent() {
@@ -69,6 +72,7 @@ public class SystemService {
 	}
 
 	public String compactDb() {
+		userManagerService.cleanUserAccounts(null);
 		attachmentService.gridMaintenanceScan();
 		update.releaseOrphanIPFSPins();
 
@@ -125,7 +129,7 @@ public class SystemService {
 		sb.append(String.format("Server Free Memory: %dMB<br>", freeMem));
 		sb.append(String.format("Session Count: %d<br>", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());
-		sb.append("<p>" + util.getNodeReport());
+		sb.append("<p>Node Count: " + read.getNodeCount(null));
 		sb.append("<p>\n");
 		sb.append("ActivityPub Foreign Outbox Retrievals: " + ActPubService.outboxQueryCount + "<br>");
 		sb.append("ActivityPub Inbox Posts " + ActPubService.inboxCount + "<br>");
