@@ -633,7 +633,7 @@ public class MongoAuth {
 					acctNode = actPub.loadForeignUserByUserName(session, userName);
 				}
 
-				actPub.queueUserForRefresh(userName, false);
+				actPub.userEncountered(userName, false);
 			}
 
 			if (acctNode != null) {

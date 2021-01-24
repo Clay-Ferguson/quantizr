@@ -48,7 +48,6 @@ import org.subnode.actpub.ActPubConstants;
 import org.subnode.actpub.ActPubFactory;
 import org.subnode.actpub.ActPubObserver;
 import org.subnode.config.AppProp;
-import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
@@ -574,7 +573,7 @@ public class ActPubService {
         iterateOrderedCollection(outbox, Integer.MAX_VALUE, obj -> {
             try {
                 // if (obj != null) {
-                //     log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
+                // log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
                 // }
 
                 String apId = AP.str(obj, "id");
@@ -1188,10 +1187,12 @@ public class ActPubService {
      * todo-0: when importing users in bulk (like at startup or the admin menu), some of there queries
      * in here will be redundant
      * 
-     * temp = true, means we are loading an outbox of a user and not, recieving a message specifically to a local user
-     * so the node should be considered 'temporary' and can be deleted after a week or so to clean the Db.
+     * temp = true, means we are loading an outbox of a user and not, recieving a message specifically
+     * to a local user so the node should be considered 'temporary' and can be deleted after a week or
+     * so to clean the Db.
      */
-    public void saveNote(MongoSession session, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic, boolean temp) {
+    public void saveNote(MongoSession session, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
+            boolean temp) {
         String id = AP.str(obj, "id");
 
         /*
@@ -1229,9 +1230,9 @@ public class ActPubService {
             if (!englishDictionary.isEnglish(contentHtml)) {
                 log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
                 return;
-            }
-            else {
-                // todo-0: this is temporary so I can check that my english detection is working by viewing nodes online.
+            } else {
+                // todo-0: this is temporary so I can check that my english detection is working by viewing nodes
+                // online.
                 lang = "en-ck2";
             }
         }
@@ -1255,7 +1256,7 @@ public class ActPubService {
         }
 
         if (temp) {
-            newNode.setProp(NodeProp.TEMP.s(), "1");    
+            newNode.setProp(NodeProp.TEMP.s(), "1");
         }
 
         newNode.setProp(NodeProp.ACT_PUB_ID.s(), id);
@@ -1503,7 +1504,7 @@ public class ActPubService {
             // XString.prettyPrint(actor));
             String followerUserName = getLongUserNameFromActor(followerActorObj);
             SubNode followerAccountNode = loadForeignUserByUserName(session, followerUserName);
-            queueUserForRefresh(followerUserName, false);
+            userEncountered(followerUserName, false);
 
             // Actor being followed (local to our server)
             String actorBeingFollowedUrl = AP.str(followAction, "object");
@@ -1987,6 +1988,17 @@ public class ActPubService {
         });
     }
 
+    /*
+     * This will get called for every user the system encounters no matter what it's doing, so if you
+     * want to build a Fediverse crawler this will cause quite a big chain reaction of events where, if
+     * you want to call queueUserForRefresh you can load quite a lot of messages from all over the world
+     * in this database like a firehose
+     */
+    public void userEncountered(String apUserName, boolean force) {
+        // todo-0: for now turning the "Crawler" capability off by commenting out this line.
+        // queueUserForRefresh(appUserName, force);
+    }
+
     public void queueUserForRefresh(String apUserName, boolean force) {
 
         // if not on production we don't run ActivityPub stuff. (todo-1: need to make it optional)
@@ -2047,21 +2059,22 @@ public class ActPubService {
     }
 
     public void refreshForeignUsers() {
-        // todo-0: we need to be more strategic about who to read from at every startup. Need to have a curated list
+        // todo-0: we need to be more strategic about who to read from at every startup. Need to have a
+        // curated list
         // if (!appProp.getProfileName().equals("prod"))
-        //     return;
+        // return;
 
         // adminRunner.run(session -> {
-        //     Iterable<SubNode> accountNodes =
-        //             read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
-        //     for (SubNode node : accountNodes) {
-        //         String userName = node.getStrProp(NodeProp.USER.s());
-        //         if (userName == null || !userName.contains("@"))
-        //             continue;
+        // Iterable<SubNode> accountNodes =
+        // read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+        // for (SubNode node : accountNodes) {
+        // String userName = node.getStrProp(NodeProp.USER.s());
+        // if (userName == null || !userName.contains("@"))
+        // continue;
 
-        //         queueUserForRefresh(userName, true);
-        //     }
-        //     return null;
+        // queueUserForRefresh(userName, true);
+        // }
+        // return null;
         // });
     }
 }

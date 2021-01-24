@@ -457,7 +457,7 @@ public class NodeEditService {
 							if (!sessionContext.isAdmin()) {
 								actPubService.loadForeignUserByUserName(s, friendUserName);
 							}
-							actPubService.queueUserForRefresh(friendUserName, false);
+							actPubService.userEncountered(friendUserName, false);
 						});
 					}
 

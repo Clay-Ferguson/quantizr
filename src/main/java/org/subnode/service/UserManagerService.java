@@ -925,10 +925,37 @@ public class UserManagerService {
 				delete.cleanupOldTempNodesForUser(session, accountNode);
 			}
 
-			//todo-0: to study this code need to just start with 10 at a time.
+			// todo-0: to study this code need to just start with 10 at a time.
 			if (count++ > 10) {
 				break;
 			}
 		}
+	}
+
+	public String getUserAccountsReport(MongoSession session) {
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+
+		int localUserCount = 0;
+		int foreignUserCount = 0;
+
+		StringBuilder sb = new StringBuilder();
+		final Iterable<SubNode> accountNodes =
+				read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0);
+
+		for (final SubNode accountNode : accountNodes) {
+			String userName = accountNode.getStrProp(NodeProp.USER);
+
+			// if account is a 'foreign server' one, then clean it up
+			if (userName.contains("@")) {
+				foreignUserCount++;
+			} else {
+				localUserCount++;
+			}
+		}
+		sb.append("Local User Count: " + localUserCount + "<br>");
+		sb.append("Foreign User Count: " + foreignUserCount + "<br>");
+		return sb.toString();
 	}
 }

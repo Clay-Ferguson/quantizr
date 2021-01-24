@@ -16,6 +16,7 @@ import org.subnode.config.AppSessionListener;
 import org.subnode.model.IPFSDirStat;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoAppConfig;
+import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
@@ -40,6 +41,9 @@ public class SystemService {
 
 	@Autowired
 	private MongoRead read;
+
+	@Autowired
+	private MongoDelete delete;
 
 	@Autowired
 	private MongoUpdate update;
@@ -72,6 +76,7 @@ public class SystemService {
 	}
 
 	public String compactDb() {
+		delete.deleteNodeOrphans(null);
 		userManagerService.cleanUserAccounts(null);
 		attachmentService.gridMaintenanceScan();
 		update.releaseOrphanIPFSPins();
@@ -130,7 +135,8 @@ public class SystemService {
 		sb.append(String.format("Session Count: %d<br>", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());
 		sb.append("<p>Node Count: " + read.getNodeCount(null));
-		sb.append("<p>\n");
+		sb.append("<p>"+userManagerService.getUserAccountsReport(null));
+		sb.append("<p>");
 		sb.append("ActivityPub Foreign Outbox Retrievals: " + ActPubService.outboxQueryCount + "<br>");
 		sb.append("ActivityPub Inbox Posts " + ActPubService.inboxCount + "<br>");
 
