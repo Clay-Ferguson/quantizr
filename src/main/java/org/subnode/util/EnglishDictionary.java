@@ -58,7 +58,9 @@ public class EnglishDictionary {
 		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;()", false);
 		while (tokens.hasMoreTokens()) {
 			String token = tokens.nextToken().trim();
-			if (token.length() < 4 || !StringUtils.isAlpha(token))
+
+			// only consider words that are all alpha characters
+			if (!StringUtils.isAlpha(token))
 				continue;
 
 			token = token.toLowerCase();
