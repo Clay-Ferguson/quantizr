@@ -55,7 +55,12 @@ public class EnglishDictionary {
 
 		int englishCount = 0;
 		int unknownCount = 0;
-		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;()", false);
+
+		/*
+		 * NOTE: Do not include '@' or '#' in the delimiters, because by leaving it out we have the effect
+		 * of ignoring usernames and also hashtags which we don't want to check for english or not.
+		 */
+		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"'`!?()*", false);
 		while (tokens.hasMoreTokens()) {
 			String token = tokens.nextToken().trim();
 
