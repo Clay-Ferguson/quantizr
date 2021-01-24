@@ -66,6 +66,7 @@ import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.DateUtil;
+import org.subnode.util.EnglishDictionary;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
@@ -96,6 +97,9 @@ public class ActPubService {
 
     @Autowired
     private ActPubFactory apFactory;
+
+    @Autowired
+    private EnglishDictionary englishDictionary;
 
     @Autowired
     private RunAsMongoAdminEx adminRunner;
@@ -568,21 +572,33 @@ public class ActPubService {
         final SubNode _userNode = userNode;
 
         iterateOrderedCollection(outbox, Integer.MAX_VALUE, obj -> {
-            String apId = AP.str(obj, "id");
-            if (!apIdSet.contains(apId)) {
-                Object object = AP.obj(obj, "object");
-
-                if (object != null && "Note".equals(AP.str(object, "type"))) {
-                    try {
-                        saveNote(session, _userNode, outboxNode, object, true);
-                        count.setVal(count.getVal() + 1);
-                    } catch (Exception e) {
-                        // log and ignore.
-                        log.error("error in saveNode()", e);
-                    }
-                } else {
-                    log.debug("Object type not supported: " + XString.prettyPrint(object));
+            try {
+                if (obj != null) {
+                    log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
                 }
+
+                String apId = AP.str(obj, "id");
+                if (!apIdSet.contains(apId)) {
+                    Object object = AP.obj(obj, "object");
+
+                    if (object != null) {
+                        if (object instanceof String) {
+                            log.debug("Not Handled: Object was a string: " + object);
+                        } else if ("Note".equals(AP.str(object, "type"))) {
+                            try {
+                                saveNote(session, _userNode, outboxNode, object, true);
+                                count.setVal(count.getVal() + 1);
+                            } catch (Exception e) {
+                                // log and ignore.
+                                log.error("error in saveNode()", e);
+                            }
+                        } else {
+                            log.debug("Object type not supported: " + XString.prettyPrint(object));
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Failes processing collection item.", e);
             }
             return (count.getVal() < MAX_MESSAGES);
         });
@@ -1193,6 +1209,31 @@ public class ActPubService {
         String objType = AP.str(obj, "type");
         Boolean sensitive = AP.bool(obj, "sensitive");
 
+        // Ignore non-english for now (later we can make this a user-defined language selection)
+        String lang = "0";
+        Object context = AP.obj(obj, "@context");
+        if (context != null) {
+            String language = AP.str(context, "@language");
+            if (language != null) {
+                lang = language;
+                if (!"en".equalsIgnoreCase(language)) {
+                    log.debug("Ignoring Non-English");
+                    return;
+                }
+            }
+        }
+
+        if (lang.equals("0")) {
+            if (!englishDictionary.isEnglish(contentHtml)) {
+                log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
+                return;
+            }
+            else {
+                // todo-0: this is temporary so I can check that my english detection is working by viewing nodes online.
+                lang = "en-chk";
+            }
+        }
+
         // foreign account will own this node, this may be passed if it's known or null can be passed in.
         if (toAccountNode == null) {
             toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
@@ -1217,6 +1258,9 @@ public class ActPubService {
         newNode.setProp(NodeProp.ACT_PUB_OBJ_TYPE.s(), objType);
         newNode.setProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
 
+        // todo-0: temporary troubleshooting. trying to find why foregin languages are getting in.
+        newNode.setProp("lang", lang);
+
         shareToAllObjectRecipients(session, newNode, obj, "to");
         shareToAllObjectRecipients(session, newNode, obj, "cc");
 
@@ -1224,6 +1268,8 @@ public class ActPubService {
             acl.addPrivilege(session, newNode, PrincipalName.PUBLIC.s(),
                     Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
         }
+
+        // log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
 
         update.save(session, newNode);
         addAttachmentIfExists(session, newNode, obj);
@@ -1959,7 +2005,8 @@ public class ActPubService {
     /* Run every few seconds */
     @Scheduled(fixedDelay = 3 * 1000)
     public void messageRefresh() {
-        if (!appProp.getProfileName().equals("prod")) return;
+        if (!appProp.getProfileName().equals("prod"))
+            return;
 
         try {
             for (String apUserName : userNamesPendingMessageRefresh.keySet()) {
@@ -1994,7 +2041,8 @@ public class ActPubService {
     }
 
     public void refreshForeignUsers() {
-        if (!appProp.getProfileName().equals("prod")) return;
+        if (!appProp.getProfileName().equals("prod"))
+            return;
 
         adminRunner.run(session -> {
             Iterable<SubNode> accountNodes =

@@ -1,9 +1,5 @@
 package org.subnode.config;
 
-import org.subnode.AppController;
-import org.subnode.exception.base.RuntimeEx;
-import org.subnode.mongo.MongoRepository;
-import org.subnode.service.RSSFeedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -11,6 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.subnode.AppController;
+import org.subnode.exception.base.RuntimeEx;
+import org.subnode.mongo.MongoRepository;
+import org.subnode.util.EnglishDictionary;
 
 /**
  * Manages certain aspects of Spring application context.
@@ -28,6 +28,9 @@ public class SpringContextUtil implements ApplicationContextAware {
 	private AppController appController;
 
 	@Autowired
+	private EnglishDictionary englishDictionary;
+
+	@Autowired
 	private TestRunner testRunner;
 
 	/* main() entrypoint */
@@ -39,6 +42,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 		try {
 			mongoRepo.init();
 			appController.init();
+			englishDictionary.init();
 		}
 		catch (Exception e) {
 			log.error("application startup failed.");
