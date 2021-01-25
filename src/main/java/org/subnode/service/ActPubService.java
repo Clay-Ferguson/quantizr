@@ -2003,6 +2003,7 @@ public class ActPubService {
         }
 
         // if not a foreign then ignore.
+        // todo-0: oops dont' hardcode the domain name!
         if (apUserName == null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@quanta.wiki"))
             return;
 

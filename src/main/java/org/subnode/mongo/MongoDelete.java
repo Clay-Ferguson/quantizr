@@ -60,8 +60,8 @@ public class MongoDelete {
 		 * todo-0: we need to also include a condition for create time being over 30m ago to avoid blowing
 		 * something away that someone is still using. We are ok for now, because this code only runs at app
 		 * startup so we can be guaranteed that unfortunately anyone who was editing when the server got
-		 * restarted already suffered some bad luck. Load balancer is eventual production solution but all we 
-		 * have for now is single instance.
+		 * restarted already suffered some bad luck. Load balancer is eventual production solution but all
+		 * we have for now is single instance.
 		 */
 		query.addCriteria(Criteria.where(SubNode.FIELD_MODIFY_TIME).is(null));
 
@@ -148,34 +148,42 @@ public class MongoDelete {
 	 */
 	public void deleteNodeOrphans(MongoSession session) {
 		log.debug("deleteNodeOrphans()");
+		// long nodeCount = read.getNodeCount(null);
+		// log.debug("initial Node Count: " + nodeCount);
+
 		HashSet<String> pathHashSet = new HashSet<String>();
 		if (session == null) {
 			session = auth.getAdminSession();
 		}
+
 		Query query = new Query();
 
-		/* Scan ever node in the database and store it's path hash in the set */
+		/* Scan every node in the database and store it's path hash in the set */
 		Iterable<SubNode> nodes = ops.find(query, SubNode.class);
-		int counter = 0;
 		for (SubNode node : nodes) {
+			/*
+			 * Theoretically the node.getPathHash() should already contain this hash, but to be super paranoid
+			 * we just recalculate that hash here since the consequences of it being out of sync could be data
+			 * loss.
+			 */
 			pathHashSet.add(DigestUtils.sha256Hex(node.getPath()));
-			if (++counter % 100 == 0) {
-				log.debug("scanned " + counter);
-			}
 		}
 
-		boolean done = false;
 		int orphanCount = 0;
 		int loops = 0;
 
-		// Run this up to 10 times to ensure no more orphans are left.
-		while (!done && ++loops < 10) {
+		/*
+		 * Run this up to 10 per call. Note that for large orphaned subgraphs we only end up pruning off the
+		 * 10 deepest levels at a time, so running this multiple times will be required, but this is ideal.
+		 * We could raise this 10 to a larger number larger than any possible tree depth, but there's no
+		 * need. Running this several times has the same effect
+		 */
+		while (++loops < 10) {
 			/*
-			 * Now scan every node again and any PARENT has not in the set, means that parent doesn't exist and
-			 * so the node is an orphan and can be deleted.
+			 * Now scan every node again and any PARENT not in the set means that parent doesn't exist and so
+			 * the node is an orphan and can be deleted.
 			 */
 			nodes = ops.find(query, SubNode.class);
-			counter = 0;
 			int deleteCount = 0;
 			for (SubNode node : nodes) {
 				// ignore the root node and any of it's children.
@@ -185,19 +193,31 @@ public class MongoDelete {
 				}
 
 				if (!pathHashSet.contains(DigestUtils.sha256Hex(node.getParentPath()))) {
-					// log.debug("ORPHAN NODE id=" + node.getId().toHexString() + " Content=" + node.getContent());
+					log.debug("ORPHAN NODE id=" + node.getId().toHexString() + " path=" + node.getPath() + " Content="
+							+ node.getContent());
 					orphanCount++;
 					deleteCount++;
 					ops.remove(node);
-				}
-				if (++counter % 100 == 0) {
-					log.debug("processed " + counter);
+
+					/*
+					 * Theoretically the node.getPathHash() should already contain this hash, but to be super paranoid
+					 * we just recalculate that hash here since the consequences of it being out of sync could be data
+					 * loss. Also I do realize we alrady calculated this hash above and could have stored it in memory to use
+					 * here, but we already have pathHashSet being a large memory use here, so we opt to burn more CPU cycles 
+					 * for this second hash calc than to burn the memory by storing it above.
+					 */
+					pathHashSet.remove(DigestUtils.sha256Hex(node.getPath()));
 				}
 			}
+
+			// if no deletes were done, break out of while loop and return.
 			if (deleteCount == 0) {
-				done = true;
+				break;
 			}
 		}
+
 		log.debug("ORPHAN NODES DELETED=" + orphanCount);
+		// nodeCount = read.getNodeCount(null);
+		// log.debug("final Node Count: " + nodeCount);
 	}
 }

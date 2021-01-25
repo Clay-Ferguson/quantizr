@@ -13,19 +13,16 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -65,7 +62,7 @@ import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.request.DeleteAttachmentRequest;
@@ -124,7 +121,7 @@ public class AttachmentService {
 	private IPFSService ipfsService;
 
 	@Autowired
-	private RunAsMongoAdmin adminRunner;
+	private RunAsMongoAdminEx adminRunner;
 
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
@@ -239,7 +236,8 @@ public class AttachmentService {
 	public void attachBinaryFromStream(final MongoSession session, final String binSuffix, SubNode node, final String nodeId,
 			final String fileName, final long size, final LimitedInputStreamEx is, String mimeType, final int width,
 			final int height, final boolean addAsChild, final boolean explodeZips, final boolean toIpfs,
-			final boolean calcImageSize, final boolean dataUrl, final boolean closeStream, boolean storeLocally, String sourceUrl) {
+			final boolean calcImageSize, final boolean dataUrl, final boolean closeStream, boolean storeLocally,
+			String sourceUrl) {
 
 		/*
 		 * If caller already has 'node' it can pass node, and avoid looking up node again
@@ -390,8 +388,7 @@ public class AttachmentService {
 							node.setProp(NodeProp.BIN_FILENAME.s() + binSuffix, fileName);
 						}
 						writeStream(session, binSuffix, node, inputStream, fileName, mimeType, userNode);
-					}
-					else {
+					} else {
 						node.setProp(NodeProp.BIN_URL.s() + binSuffix, sourceUrl);
 					}
 				}
@@ -415,8 +412,7 @@ public class AttachmentService {
 					} else {
 						writeStream(session, binSuffix, node, is, fileName, mimeType, userNode);
 					}
-				}
-				else {
+				} else {
 					node.setProp(NodeProp.BIN_URL.s() + binSuffix, sourceUrl);
 				}
 			} finally {
@@ -923,7 +919,8 @@ public class AttachmentService {
 					is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
 
 					attachBinaryFromStream(session, "", null, nodeId, sourceUrl, bytes.length, is2, mimeType,
-							bufImg.getWidth(null), bufImg.getHeight(null), false, false, false, true, false, true, storeLocally, sourceUrl);
+							bufImg.getWidth(null), bufImg.getHeight(null), false, false, false, true, false, true, storeLocally,
+							sourceUrl);
 
 					return true;
 				}
@@ -1101,6 +1098,25 @@ public class AttachmentService {
 		}
 	}
 
+	public int getGridItemCount() {
+		return (Integer) adminRunner.run(session -> {
+			int count = 0;
+			final GridFSFindIterable files = gridFsBucket.find();
+
+			/* Scan all files in the grid */
+			if (files != null) {
+				/*
+				 * I am needing this quick and didn't find another way to do this other than brute force scan. Maybe
+				 * they are using a linked list so that there genuinely is no faster way ?
+				 */
+				for (final GridFSFile file : files) {
+					count++;
+				}
+			}
+			return Integer.valueOf(count);
+		});
+	}
+
 	// public AutoCloseInputStream getAutoClosingStream(MongoSession session,
 	// SubNode node, boolean auth,
 	// boolean ipfs) {
@@ -1126,7 +1142,6 @@ public class AttachmentService {
 		final HashMap<ObjectId, UserStats> statsMap = new HashMap<ObjectId, UserStats>();
 
 		adminRunner.run(session -> {
-
 			int delCount = 0;
 			final GridFSFindIterable files = gridFsBucket.find();
 
@@ -1143,9 +1158,10 @@ public class AttachmentService {
 						 * (special case)
 						 */
 						if (id == null) {
-							// todo-1: currently we only have "Header" as a (binSuffix), and it may stay
-							// that way forever, as the only violation of
-							// the one-binary-per-node rule.
+							/*
+							 * todo-1: currently we only have "Header" as a (binSuffix), and it may stay that way forever, as
+							 * the only violation of the one-binary-per-node rule.
+							 */
 							id = (ObjectId) meta.get("nodeIdHeader");
 						}
 
@@ -1205,6 +1221,7 @@ public class AttachmentService {
 
 			log.debug(String.valueOf(delCount) + " orphans found and deleted.");
 			userManagerService.writeUserStats(session, statsMap);
+			return null;
 		});
 	}
 }

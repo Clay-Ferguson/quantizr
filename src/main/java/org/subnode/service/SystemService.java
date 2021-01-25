@@ -86,7 +86,7 @@ public class SystemService {
 		} catch (Exception e) {
 			// I noticed this failing in Jan 2021. I think IPFS made and API change we aren't accounting for yet. 
 			// needs research (todo-0)
-			log.error("releaseOrphanIPFSPins failed.", e);
+			//log.error("releaseOrphanIPFSPins failed.", e);
 		}
 
 		MongoDatabase database = mac.mongoClient().getDatabase(MongoAppConfig.databaseName);
@@ -143,6 +143,7 @@ public class SystemService {
 		sb.append(String.format("Session Count: %d<br>", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());
 		sb.append("<p>Node Count: " + read.getNodeCount(null));
+		sb.append("<p>Attachment Count: " + attachmentService.getGridItemCount());
 		sb.append("<p>" + userManagerService.getUserAccountsReport(null));
 		sb.append("<p>");
 		sb.append("ActivityPub Foreign Outbox Retrievals: " + ActPubService.outboxQueryCount + "<br>");

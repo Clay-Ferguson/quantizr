@@ -92,6 +92,12 @@ export class NodeCompButtonBar extends HorizontalLayout {
             }
         }
 
+        /* putting this logic separate from setters above, but this is because we don't allow the actual page root
+        to be deleted WHILE you're looking at it */
+        if (isPageRootNode) {
+            deleteAllowed = false;
+        }
+
         if (S.props.isEncrypted(node)) {
             encIcon = new Icon({
                 className: "fa fa-lock fa-lg rowIcon",
