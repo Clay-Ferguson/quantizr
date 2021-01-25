@@ -629,10 +629,12 @@ public class MongoAuth {
 			 * that user now
 			 */
 			if (StringUtils.countMatches(userName, "@") == 1) {
-				if (acctNode == null) {
-					acctNode = actPub.loadForeignUserByUserName(session, userName);
-				}
-
+				// todo-0: Warning: this sets off a chain reaction of crawling unless/until you
+				// invent some way to stop that. 
+				// Don't delete this code until you think this thru more.
+				// if (acctNode == null) {
+				// 	acctNode = actPub.loadForeignUserByUserName(session, userName);
+				// }
 				actPub.userEncountered(userName, false);
 			}
 

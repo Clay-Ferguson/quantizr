@@ -457,7 +457,9 @@ public class NodeEditService {
 							if (!sessionContext.isAdmin()) {
 								actPubService.loadForeignUserByUserName(s, friendUserName);
 							}
-							actPubService.userEncountered(friendUserName, false);
+
+							// The only time we pass true to load the user into the system is when they're being added as a friend.
+							actPubService.userEncountered(friendUserName, true);
 						});
 					}
 

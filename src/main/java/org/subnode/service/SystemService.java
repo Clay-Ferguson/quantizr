@@ -77,9 +77,15 @@ public class SystemService {
 
 	public String compactDb() {
 		delete.deleteNodeOrphans(null);
-		userManagerService.cleanUserAccounts(null);
+		// do not delete.
+		// userManagerService.cleanUserAccounts();
 		attachmentService.gridMaintenanceScan();
-		update.releaseOrphanIPFSPins();
+
+		try {
+			update.releaseOrphanIPFSPins();
+		} catch (Exception e) {
+			// todo-0: ignoring this for now.
+		}
 
 		MongoDatabase database = mac.mongoClient().getDatabase(MongoAppConfig.databaseName);
 		Document result = database.runCommand(new Document("compact", "nodes"));
@@ -135,7 +141,7 @@ public class SystemService {
 		sb.append(String.format("Session Count: %d<br>", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());
 		sb.append("<p>Node Count: " + read.getNodeCount(null));
-		sb.append("<p>"+userManagerService.getUserAccountsReport(null));
+		sb.append("<p>" + userManagerService.getUserAccountsReport(null));
 		sb.append("<p>");
 		sb.append("ActivityPub Foreign Outbox Retrievals: " + ActPubService.outboxQueryCount + "<br>");
 		sb.append("ActivityPub Inbox Posts " + ActPubService.inboxCount + "<br>");
@@ -171,7 +177,7 @@ public class SystemService {
 			// p.getOutputStream().close();
 			// p.getErrorStream().close();
 		} catch (Exception e) {
-			//todo-0: do something here.
+			// todo-0: do something here.
 		}
 		output.append("</pre><p>");
 		return output.toString();

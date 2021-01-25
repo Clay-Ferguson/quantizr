@@ -48,6 +48,7 @@ import org.subnode.actpub.ActPubConstants;
 import org.subnode.actpub.ActPubFactory;
 import org.subnode.actpub.ActPubObserver;
 import org.subnode.config.AppProp;
+import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
@@ -604,8 +605,9 @@ public class ActPubService {
     }
 
     public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
-        // todo-0: I'm adding this limiter because there may be a bug.
-        int maxPageQueries = 10;
+        // todo-0: to reduce load for our purposes we can limit to just getting 5 pages of results to update
+        // a user.
+        int maxPageQueries = 5;
         int pageQueries = 0;
 
         // log.debug("interateOrderedCollection(): " + XString.prettyPrint(collectionObj));
@@ -1388,7 +1390,13 @@ public class ActPubService {
                 String longUserName = getLongUserNameFromActorUrl(actorUrl);
                 acctNode = read.getUserNodeByUserName(session, longUserName);
             } else {
-                acctNode = loadForeignUserByActorUrl(session, actorUrl);
+                /*
+                 * todo-0: this is also contributing to our unwanted CRAWLER effect (FediCrawler!) chain reaction. The rule
+                 * here should be either don't load foreign users whose outboxes you don't plan to load or else have
+                 * some property on the node that designates if we need to read the actual outbox or if you DO
+                 * want to add a user and not load their outbox.
+                 */
+                // acctNode = loadForeignUserByActorUrl(session, actorUrl);
             }
 
             if (acctNode != null) {
@@ -1989,14 +1997,13 @@ public class ActPubService {
     }
 
     /*
-     * This will get called for every user the system encounters no matter what it's doing, so if you
-     * want to build a Fediverse crawler this will cause quite a big chain reaction of events where, if
-     * you want to call queueUserForRefresh you can load quite a lot of messages from all over the world
-     * in this database like a firehose
+     * Be careful, becasue any user you queue into here will have their outbox loaded into Quanta, and
+     * it's easy to set off a chain reaction where more users keep comming in like a FediCrawler
      */
     public void userEncountered(String apUserName, boolean force) {
-        // todo-0: for now turning the "Crawler" capability off by commenting out this line.
-        // queueUserForRefresh(appUserName, force);
+        if (force) {
+            queueUserForRefresh(apUserName, force);
+        }
     }
 
     public void queueUserForRefresh(String apUserName, boolean force) {
@@ -2018,6 +2025,12 @@ public class ActPubService {
 
         // add as 'false' meaning the refresh is not yet done
         userNamesPendingMessageRefresh.put(apUserName, false);
+    }
+
+    // 30 minutes
+    @Scheduled(fixedDelay = 1800000)
+    public void bigRefresh() {
+        refreshForeignUsers();
     }
 
     /* Run every few seconds */
@@ -2058,23 +2071,28 @@ public class ActPubService {
         }
     }
 
+    /*
+     * todo-0: this currently runs by admin menu option or once at startup. Need to make it run once
+     * every 30min also in a deamon thread, at least until there are many more users, and then we can
+     * back off and have another strategy
+     */
     public void refreshForeignUsers() {
-        // todo-0: we need to be more strategic about who to read from at every startup. Need to have a
-        // curated list
-        // if (!appProp.getProfileName().equals("prod"))
-        // return;
+        if (!appProp.getProfileName().equals("prod"))
+            return;
 
-        // adminRunner.run(session -> {
-        // Iterable<SubNode> accountNodes =
-        // read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
-        // for (SubNode node : accountNodes) {
-        // String userName = node.getStrProp(NodeProp.USER.s());
-        // if (userName == null || !userName.contains("@"))
-        // continue;
+        log.debug("refreshForeignUsers()");
 
-        // queueUserForRefresh(userName, true);
-        // }
-        // return null;
-        // });
+        adminRunner.run(session -> {
+            Iterable<SubNode> accountNodes =
+                    read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+            for (SubNode node : accountNodes) {
+                String userName = node.getStrProp(NodeProp.USER.s());
+                if (userName == null || !userName.contains("@"))
+                    continue;
+
+                queueUserForRefresh(userName, true);
+            }
+            return null;
+        });
     }
 }

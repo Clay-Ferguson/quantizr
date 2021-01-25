@@ -69,13 +69,14 @@ public class MongoDelete {
 		log.debug("Num abandoned nodes deleted: " + res.getDeletedCount());
 	}
 
+	/* This is a way to cleanup old records, but it's needed yet */
 	public void cleanupOldTempNodesForUser(MongoSession session, SubNode userNode) {
 		Query query = new Query();
 
 		LocalDate ldt = LocalDate.now().minusDays(5);
 		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(userNode.getPath())) //
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(userNode.getPath())) //
 				.and(SubNode.FIELD_MODIFY_TIME).lt(date); //
 
 		// once we've had the TEMP prop in place for 7 days, we can then process this code from the
@@ -137,11 +138,16 @@ public class MongoDelete {
 		}
 	}
 
+	public void delete(SubNode node) {
+		ops.remove(node);
+	}
+
 	/*
 	 * This algorithm requires one hash value of memory for every non-leaf node in the DB to run so it's
 	 * very fast but at the cost of memory use
 	 */
 	public void deleteNodeOrphans(MongoSession session) {
+		log.debug("deleteNodeOrphans()");
 		HashSet<String> pathHashSet = new HashSet<String>();
 		if (session == null) {
 			session = auth.getAdminSession();
@@ -150,27 +156,46 @@ public class MongoDelete {
 
 		/* Scan ever node in the database and store it's path hash in the set */
 		Iterable<SubNode> nodes = ops.find(query, SubNode.class);
+		int counter = 0;
 		for (SubNode node : nodes) {
 			pathHashSet.add(DigestUtils.sha256Hex(node.getPath()));
+			if (++counter % 100 == 0) {
+				log.debug("scanned " + counter);
+			}
 		}
 
-		/*
-		 * Now scan every node again and any PARENT has not in the set, means that parent doesn't exist and
-		 * so the node is an orphan and can be deleted.
-		 */
-		nodes = ops.find(query, SubNode.class);
+		boolean done = false;
 		int orphanCount = 0;
-		for (SubNode node : nodes) {
-			// ignore the root node and any of it's children.
-			if ("/r".equalsIgnoreCase(node.getPath()) || //
-					"/r".equalsIgnoreCase(node.getParentPath())) {
-				continue;
-			}
+		int loops = 0;
 
-			if (!pathHashSet.contains(DigestUtils.sha256Hex(node.getParentPath()))) {
-				// log.debug("ORPHAN NODE id=" + node.getId().toHexString() + " Content=" + node.getContent());
-				orphanCount++;
-				ops.remove(node);
+		// Run this up to 10 times to ensure no more orphans are left.
+		while (!done && ++loops < 10) {
+			/*
+			 * Now scan every node again and any PARENT has not in the set, means that parent doesn't exist and
+			 * so the node is an orphan and can be deleted.
+			 */
+			nodes = ops.find(query, SubNode.class);
+			counter = 0;
+			int deleteCount = 0;
+			for (SubNode node : nodes) {
+				// ignore the root node and any of it's children.
+				if ("/r".equalsIgnoreCase(node.getPath()) || //
+						"/r".equalsIgnoreCase(node.getParentPath())) {
+					continue;
+				}
+
+				if (!pathHashSet.contains(DigestUtils.sha256Hex(node.getParentPath()))) {
+					// log.debug("ORPHAN NODE id=" + node.getId().toHexString() + " Content=" + node.getContent());
+					orphanCount++;
+					deleteCount++;
+					ops.remove(node);
+				}
+				if (++counter % 100 == 0) {
+					log.debug("processed " + counter);
+				}
+			}
+			if (deleteCount == 0) {
+				done = true;
 			}
 		}
 		log.debug("ORPHAN NODES DELETED=" + orphanCount);

@@ -905,31 +905,34 @@ public class UserManagerService {
 
 	/*
 	 * For all foreign servers we remove posts that are older than a certain number of days just to keep
-	 * our DB from growing too large
+	 * our DB from growing too large.
 	 */
-	public void cleanUserAccounts(MongoSession session) {
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+	public void cleanUserAccounts() {
+		// not currently used.
+		if (true) return;
 
-		final Iterable<SubNode> accountNodes =
-				read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0);
+		adminRunner.run(session -> {
+			final Iterable<SubNode> accountNodes =
+					read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0);
 
-		int count = 0;
-		for (final SubNode accountNode : accountNodes) {
-			String userName = accountNode.getStrProp(NodeProp.USER);
+			for (final SubNode accountNode : accountNodes) {
+				String userName = accountNode.getStrProp(NodeProp.USER);
 
-			// if account is a 'foreign server' one, then clean it up
-			if (userName.contains("@")) {
-				log.debug("Foreign Accnt Cleanup: " + userName);
-				delete.cleanupOldTempNodesForUser(session, accountNode);
+				// if account is a 'foreign server' one, then clean it up
+				if (userName != null) {
+					log.debug("userName: " + userName);
+
+					if (userName.contains("@")) {
+						log.debug("Foreign Accnt Kill: " + userName);
+						delete.delete(accountNode);
+
+						// delete.cleanupOldTempNodesForUser(session, accountNode);
+					}
+				}
 			}
 
-			// todo-0: to study this code need to just start with 10 at a time.
-			if (count++ > 10) {
-				break;
-			}
-		}
+			ActPubService.userNamesPendingMessageRefresh.clear();
+		});
 	}
 
 	public String getUserAccountsReport(MongoSession session) {
