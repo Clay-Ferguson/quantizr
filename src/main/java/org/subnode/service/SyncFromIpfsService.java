@@ -63,7 +63,7 @@ public class SyncFromIpfsService {
 	 * todo-0: currently this is an inefficient AND imcomplete algo, and needs these
 	 * two enhancements:
 	 * 
-	 * do a subGraph query of mongo at the root first (req.getPath()) and build up a
+	 * do a subGraph query at the root first (req.getPath()) and build up a
 	 * HashSet of all IDs, then use that to know which nodes already do exist, as a
 	 * performance aid. Then at the end any of those that are NOT in the HashSet of
 	 * all the node IDs that came from IPFS file scanning are known to be orphans to

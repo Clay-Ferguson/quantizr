@@ -1169,9 +1169,7 @@ public class AppController implements ErrorController {
 			} //
 			else if (req.getCommand().equalsIgnoreCase("refreshFediverseUsers")) {
 				actPub.refreshForeignUsers();
-				//todo-0: no need to return deatils here, but in the Server Info I need to add a lot
-				//of Fediverse statistics (user counts, etc)
-				res.getMessages().add(new InfoMessage("Done", null));
+				res.getMessages().add(new InfoMessage("Fediverse refresh initiated...", null));
 			} //
 			else if (req.getCommand().equalsIgnoreCase("initializeAppContent")) {
 				log.error("initializeAppContent is obsolet, and was also refactored without being retested");

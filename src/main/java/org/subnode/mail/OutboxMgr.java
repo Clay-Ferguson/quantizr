@@ -112,13 +112,12 @@ public class OutboxMgr {
 			/*
 			 * Send push notification so the user sees live there's a new share comming in or being re-added
 			 * even.
-			 * 
-			 * todo-0: fill in the two null parameters here.
 			 */
 			List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
 			if (scList != null) {
 				for (SessionContext sc : scList) {
 					userFeedService.sendServerPushInfo(sc,
+							// todo-0: fill in the two null parameters here.
 							new NotificationMessage("newInboxNode", node.getId().toHexString(), null, null));
 				}
 			}

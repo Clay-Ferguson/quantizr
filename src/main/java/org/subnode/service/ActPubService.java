@@ -104,7 +104,6 @@ public class ActPubService {
     @Autowired
     private RunAsMongoAdminEx adminRunner;
 
-    // todo-0: see note in this class. Step 1: get it OUT of this service.
     @Autowired
     private SessionContext sessionContext;
 
@@ -212,9 +211,6 @@ public class ActPubService {
              * can avoid doing any work for the ones in 'toUserNamesSet', because we know they already are taken
              * care of (in the list)
              */
-            // this check was a quick fix. Verify better that this is right (todo-0), and that the 'else return'
-            // case below
-            // is correct for when there's no sharing ON this node.
             if (node.getAc() != null) {
                 for (String k : node.getAc().keySet()) {
                     if ("public".equals(k)) {
@@ -531,8 +527,6 @@ public class ActPubService {
             userNode = read.getUserNodeByUserName(session, apUserName);
         }
 
-        // todo-0: warning the content text here is used to filter out from the Feed View. Need to make it a
-        // type instead
         SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s());
         if (outboxNode == null) {
             log.debug("no outbox for user: " + apUserName);
@@ -681,10 +675,6 @@ public class ActPubService {
                 }
 
                 String nextPage = AP.str(ocPage, "next");
-                // the server was flooded with these messages: why? is this a bug? (todo-0)
-                // 2021-01-21 17:45:32,347 DEBUG org.subnode.service.ActPubService [pool-2-thread-1] NextPage Url:
-                // https://anime.website/users/sex/outbox?max_id=0&page=true
-                // log.debug("NextPage Url: " + nextPage);
                 if (nextPage != null) {
                     if (++pageQueries > maxPageQueries)
                         return;
@@ -916,7 +906,6 @@ public class ActPubService {
                 return null;
             });
         } catch (Exception e) {
-            // todo-0: handle this better;
             log.debug("Set following Failed.");
         }
     }
@@ -1186,7 +1175,7 @@ public class ActPubService {
      * 
      * system==true means we have a daemon thread doing the processing.
      * 
-     * todo-0: when importing users in bulk (like at startup or the admin menu), some of there queries
+     * todo-0: when importing users in bulk (like at startup or the admin menu), some of these queries
      * in here will be redundant
      * 
      * temp = true, means we are loading an outbox of a user and not, recieving a message specifically
@@ -1235,7 +1224,7 @@ public class ActPubService {
             } else {
                 // todo-0: this is temporary so I can check that my english detection is working by viewing nodes
                 // online.
-                lang = "en-ck2";
+                lang = "en-ck3";
             }
         }
 
@@ -1267,7 +1256,7 @@ public class ActPubService {
         newNode.setProp(NodeProp.ACT_PUB_OBJ_TYPE.s(), objType);
         newNode.setProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
 
-        // todo-0: temporary troubleshooting. trying to find why foregin languages are getting in.
+        // todo-0: temporary troubleshooting. trying to find why foregin languages are getting allowed in.
         newNode.setProp("lang", lang);
 
         shareToAllObjectRecipients(session, newNode, obj, "to");
@@ -1974,9 +1963,9 @@ public class ActPubService {
 
     /*
      * Every node getting deleted will call into here (via a hook in MongoEventListener), so we can do
-     * whatever we need to in this hook, which for now is just to manage unfollowing a Friend if a
+     * whatever we need to in this hook, which for now is just used to manage unfollowing a Friend if a
      * friend is deleted, but later will also entail (todo-0) deleting nodes that were posted to foreign
-     * servers by issuing an 'undo' command
+     * servers by posting an 'undo' action to the foreign servers
      */
     public void deleteNodeNotify(ObjectId nodeId) {
         adminRunner.run(session -> {
@@ -2050,7 +2039,7 @@ public class ActPubService {
 
                 final String _apUserName = apUserName;
                 adminRunner.run(session -> {
-                    //log.debug("Reload user outbox: " + _apUserName);
+                    // log.debug("Reload user outbox: " + _apUserName);
                     SubNode userNode = loadForeignUserByUserName(session, _apUserName);
                     if (userNode != null) {
                         String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
@@ -2070,11 +2059,6 @@ public class ActPubService {
         }
     }
 
-    /*
-     * todo-0: this currently runs by admin menu option or once at startup. Need to make it run once
-     * every 30min also in a deamon thread, at least until there are many more users, and then we can
-     * back off and have another strategy
-     */
     public void refreshForeignUsers() {
         if (!appProp.getProfileName().equals("prod"))
             return;

@@ -57,9 +57,6 @@ public class ActPubFactory {
 			/*
 			 * For public messages Mastodon puts the "Public" target in 'to' and the mentioned users in 'cc', so
 			 * we do that same thing 
-			 * 
-			 * todo-0: need to check how mastodon would to this on a 'reply'?? I bet a
-			 * reply has at least the person being replied to being put in the 'to' right ?
 			 */
 			if (privateMessage) {
 				toList.add(actorUrl);
@@ -124,7 +121,6 @@ public class ActPubFactory {
 
 		ret.put("to", new APList() //
 				.vals(toActors) //
-				// todo-0: research this value (double check that DMs work, and are private)
 				.val(ActPubConstants.CONTEXT_STREAMS + "#Public"));
 
 		// LinkedList<String> ccArray = new LinkedList<String>();

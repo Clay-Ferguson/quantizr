@@ -89,7 +89,6 @@ public class SyncToIpfsService {
 
 	private void removeOrphanFiles() {
 		allFilePaths.forEach(path -> {
-
 			/*
 			 * if any file path is not a node path, it needes to be deleted.
 			 * 

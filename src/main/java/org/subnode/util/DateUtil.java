@@ -191,7 +191,7 @@ public class DateUtil {
 	}
 
 	public static String isoStringFromDate(Date date) {
-		// todo-0: fix timezone for user.
+		// todo-0: is timezone ok here?
 		return date.toInstant().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_INSTANT);
 	}
 
@@ -202,7 +202,6 @@ public class DateUtil {
 
 	public static String getFormattedDateTime() {
 		return ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
-
 		// supposedly this also works:
 		// thisMoment = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmX")
 		// .withZone(ZoneOffset.UTC)

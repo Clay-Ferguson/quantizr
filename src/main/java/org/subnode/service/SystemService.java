@@ -84,7 +84,9 @@ public class SystemService {
 		try {
 			update.releaseOrphanIPFSPins();
 		} catch (Exception e) {
-			// todo-0: ignoring this for now.
+			// I noticed this failing in Jan 2021. I think IPFS made and API change we aren't accounting for yet. 
+			// needs research (todo-0)
+			log.error("releaseOrphanIPFSPins failed.", e);
 		}
 
 		MongoDatabase database = mac.mongoClient().getDatabase(MongoAppConfig.databaseName);

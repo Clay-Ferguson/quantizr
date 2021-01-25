@@ -1121,10 +1121,6 @@ public class AttachmentService {
 	 * 
 	 * Also keeps totals by each user account, in a hashmap to be written all out at the end to all the
 	 * nodes.
-	 * 
-	 * todo-0: There's another type of background procesing that is potentially slow/challenging which
-	 * is to remove all nodes that don't have a parent. How to do that effeciently will take some
-	 * thought, in other words how to clean up ordinary tree nodes that are orphans
 	 */
 	public void gridMaintenanceScan() {
 		final HashMap<ObjectId, UserStats> statsMap = new HashMap<ObjectId, UserStats>();

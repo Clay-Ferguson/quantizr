@@ -895,8 +895,6 @@ public class UserManagerService {
 		if (friendsNode == null)
 			return null;
 
-		// Note: findFollowingOfUser method has similar code to this, and we should unify it so we only do
-		// it one way (todo-0)
 		for (SubNode friendNode : read.getChildren(session, friendsNode, null, null, 0)) {
 			friends.add(friendNode);
 		}

@@ -776,10 +776,6 @@ public class MongoRead {
 
     public SubNode getUserNodeByUserName(MongoSession session, String user) {
         if (user == null) {
-            /*
-             * todo-0: if we ever get into here in a REST call from a foreign server (not browser user), this
-             * will fail. Need some kind of across-the-board protection from this scenario.
-             */
             user = sessionContext.getUserName();
         }
         user = user.trim();
