@@ -577,8 +577,10 @@ public class ActPubService {
 
                     if (object != null) {
                         if (object instanceof String) {
-                            log.debug("Not Handled: Object was a string: " + object);
-                        } else if ("Note".equals(AP.str(object, "type"))) {
+                            log.debug("Not Handled: Object was a string: " + object + " in outbox item: "
+                                    + XString.prettyPrint(obj));
+                        } //
+                        else if ("Note".equals(AP.str(object, "type"))) {
                             try {
                                 saveNote(session, _userNode, outboxNode, object, true, true);
                                 count.setVal(count.getVal() + 1);
@@ -587,7 +589,7 @@ public class ActPubService {
                                 log.error("error in saveNode()", e);
                             }
                         } else {
-                            log.debug("Object type not supported: " + XString.prettyPrint(object));
+                            log.debug("Object type not supported: " + XString.prettyPrint(obj));
                         }
                     }
                 }
@@ -1217,16 +1219,19 @@ public class ActPubService {
             }
         }
 
-        if (lang.equals("0")) {
-            if (!englishDictionary.isEnglish(contentHtml)) {
-                log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
-                return;
-            } else {
-                // todo-0: this is temporary so I can check that my english detection is working by viewing nodes
-                // online.
-                lang = "en-ck3";
-            }
-        }
+        // We needed this for our FediCrawler where we gather everything in the world, but going back to
+        // curated feeds for not it's no longer
+        // needed.
+        // if (lang.equals("0")) {
+        // if (!englishDictionary.isEnglish(contentHtml)) {
+        // log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
+        // return;
+        // } else {
+        // // todo-0: this is temporary so I can check that my english detection is working by viewing nodes
+        // // online.
+        // lang = "en-ck3";
+        // }
+        // }
 
         // foreign account will own this node, this may be passed if it's known or null can be passed in.
         if (toAccountNode == null) {
@@ -1309,7 +1314,7 @@ public class ActPubService {
         log.debug("shareToUsersForUrl: " + url);
 
         if (url.endsWith("#Public")) {
-            node.safeGetAc().put("public", new AccessControl("prvs", PrivilegeType.READ.s()));
+            node.safeGetAc().put("public", new AccessControl(null, PrivilegeType.READ.s()));
             return;
         }
 
@@ -1362,7 +1367,7 @@ public class ActPubService {
          * Yes we tolerate for this to execute with the 'public' designation in place of an actorUrl here
          */
         if (actorUrl.endsWith("#Public")) {
-            node.safeGetAc().put("public", new AccessControl("prvs", PrivilegeType.READ.s()));
+            node.safeGetAc().put("public", new AccessControl(null, PrivilegeType.READ.s()));
             return;
         }
 
@@ -1394,7 +1399,7 @@ public class ActPubService {
         }
 
         if (acctId != null) {
-            node.safeGetAc().put(acctId, new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+            node.safeGetAc().put(acctId, new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
         }
     }
 

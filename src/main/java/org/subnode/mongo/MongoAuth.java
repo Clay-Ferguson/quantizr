@@ -190,7 +190,7 @@ public class MongoAuth {
 			if (userName != null) {
 				SubNode accountNode = read.getUserNodeByUserName(session, userName);
 				if (accountNode != null) {
-					ac.put(accountNode.getId().toHexString(), new AccessControl("prvs", "rd,wr"));
+					ac.put(accountNode.getId().toHexString(), new AccessControl(null, "rd,wr"));
 				}
 			}
 		}
@@ -198,7 +198,7 @@ public class MongoAuth {
 		 * otherwise if not a FRIEND node we just share to the owner of the parent node
 		 */
 		else {
-			ac.put(parent.getOwner().toHexString(), new AccessControl("prvs", "rd,wr"));
+			ac.put(parent.getOwner().toHexString(), new AccessControl(null, "rd,wr"));
 		}
 		child.setAc(ac);
 	}
@@ -650,7 +650,7 @@ public class MongoAuth {
 						ac = new HashMap<String, AccessControl>();
 					}
 					acChanged = true;
-					ac.put(acctNodeId, new AccessControl("prvs", PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+					ac.put(acctNodeId, new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
 				}
 			} else {
 				log.debug("Mentioned user not found: " + userName);

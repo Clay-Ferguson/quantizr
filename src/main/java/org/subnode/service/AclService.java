@@ -204,8 +204,9 @@ public class AclService {
 			}
 		}
 
-		/* initialize acl to a map if it's null */
 		HashMap<String, AccessControl> acl = node.getAc();
+
+		/* initialize acl to a map if it's null */
 		if (acl == null) {
 			acl = new HashMap<String, AccessControl>();
 		}
@@ -225,7 +226,11 @@ public class AclService {
 		}
 
 		boolean authAdded = false;
+
+		/* Scan all the privileges to be added to this principal (rd, rw, etc) */
 		for (String priv : privileges) {
+
+			/* If this privilege is not already on ac.prvs string then append it */
 			if (prvs.indexOf(priv) == -1) {
 				authAdded = true;
 				if (prvs.length() > 0) {

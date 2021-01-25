@@ -163,28 +163,28 @@ public class DateUtil {
 
 		if (days > 0) {
 			sb.append(String.valueOf(days));
-			sb.append(" days");
+			sb.append("d");
 		}
 
 		if (hours > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(hours));
-			sb.append(" hours");
+			sb.append("h");
 		}
 
 		if (days == 0 && minutes > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(minutes));
-			sb.append(" minutes");
+			sb.append("m");
 		}
 
 		if (days == 0 && hours == 0 && minutes < 3 && seconds > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(seconds));
-			sb.append(" seconds");
+			sb.append("s");
 		}
 
 		return sb.toString();

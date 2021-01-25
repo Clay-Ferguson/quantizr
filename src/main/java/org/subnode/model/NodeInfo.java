@@ -26,6 +26,10 @@ public class NodeInfo {
 	private String content;
 	private Date lastModified;
 
+	// todo-0: make this show something like 1hr ago or 2d ago, etc using DateUtil.formatDurationMillis,
+	// and then let the GUI show that instad of the time.
+	// private String timeAgo;
+
 	// This is the 0-offset position (index) of the node within the resultset that
 	// queried it, and is relative not to a specific page
 	// but the entire resultset.

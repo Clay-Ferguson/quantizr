@@ -1,24 +1,27 @@
 package org.subnode.mongo.model;
 
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.mongodb.core.mapping.Field;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
- * Models access privileges of a single 'share', along with the encrypted
- * symetric key to the data, for the user it represents.
+ * Models access privileges of a single 'share', along with the encrypted symetric key to the data,
+ * for the user it represents.
  */
 @TypeAlias("ac")
 @JsonInclude(Include.NON_NULL)
 public class AccessControl {
+	private static final Logger log = LoggerFactory.getLogger(AccessControl.class);
 
+	// todo-1: There's lots of places "prvs" is hardcoded that need to use this variable instead.
 	public static final String FIELD_PRVS = "prvs";
 	@Field(FIELD_PRVS)
 	private String prvs;
-	
+
 	public static final String FIELD_KEY = "key";
 	@Field(FIELD_KEY)
 	private String key;
