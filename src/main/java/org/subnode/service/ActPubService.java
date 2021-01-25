@@ -605,9 +605,9 @@ public class ActPubService {
     }
 
     public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
-        // todo-0: to reduce load for our purposes we can limit to just getting 5 pages of results to update
+        // todo-0: to reduce load for our purposes we can limit to just getting 2 pages of results to update
         // a user.
-        int maxPageQueries = 5;
+        int maxPageQueries = 2;
         int pageQueries = 0;
 
         // log.debug("interateOrderedCollection(): " + XString.prettyPrint(collectionObj));
@@ -1391,10 +1391,10 @@ public class ActPubService {
                 acctNode = read.getUserNodeByUserName(session, longUserName);
             } else {
                 /*
-                 * todo-0: this is also contributing to our unwanted CRAWLER effect (FediCrawler!) chain reaction. The rule
-                 * here should be either don't load foreign users whose outboxes you don't plan to load or else have
-                 * some property on the node that designates if we need to read the actual outbox or if you DO
-                 * want to add a user and not load their outbox.
+                 * todo-0: this is also contributing to our unwanted CRAWLER effect (FediCrawler!) chain reaction.
+                 * The rule here should be either don't load foreign users whose outboxes you don't plan to load or
+                 * else have some property on the node that designates if we need to read the actual outbox or if
+                 * you DO want to add a user and not load their outbox.
                  */
                 // acctNode = loadForeignUserByActorUrl(session, actorUrl);
             }
@@ -2027,8 +2027,8 @@ public class ActPubService {
         userNamesPendingMessageRefresh.put(apUserName, false);
     }
 
-    // 30 minutes
-    @Scheduled(fixedDelay = 1800000)
+    /* every 30 minutes ping all the outboxes */
+    @Scheduled(fixedDelay = 30 * DateUtil.MINUTE_MILLIS)
     public void bigRefresh() {
         refreshForeignUsers();
     }
@@ -2050,17 +2050,16 @@ public class ActPubService {
 
                 final String _apUserName = apUserName;
                 adminRunner.run(session -> {
-                    log.debug("Refresh user: " + _apUserName);
+                    //log.debug("Reload user outbox: " + _apUserName);
                     SubNode userNode = loadForeignUserByUserName(session, _apUserName);
-                    String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
-                    APObj actor = getActorByUrl(actorUrl);
-                    if (actor != null) {
-                        if (userNode != null) {
-                            // log.debug("updating children under node: " + userNode.getId().toHexString());
+                    if (userNode != null) {
+                        String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+                        APObj actor = getActorByUrl(actorUrl);
+                        if (actor != null) {
                             refreshOutboxFromForeignServer(session, actor, userNode, _apUserName);
+                        } else {
+                            log.debug("Unable to get cached actor from url: " + actorUrl);
                         }
-                    } else {
-                        log.debug("Unable to get cached actor from url: " + actorUrl);
                     }
                     return null;
                 });
