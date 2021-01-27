@@ -60,7 +60,7 @@ public class SyncFromIpfsService {
 	int orphansRemoved = 0;
 
 	/*
-	 * todo-0: currently this is an inefficient AND imcomplete algo, and needs these
+	 * todo-1: currently this is an inefficient AND imcomplete algo, and needs these
 	 * two enhancements:
 	 * 
 	 * do a subGraph query at the root first (req.getPath()) and build up a

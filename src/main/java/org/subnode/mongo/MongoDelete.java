@@ -56,13 +56,6 @@ public class MongoDelete {
 	 */
 	public void removeAbandonedNodes(MongoSession session) {
 		Query query = new Query();
-		/*
-		 * todo-0: we need to also include a condition for create time being over 30m ago to avoid blowing
-		 * something away that someone is still using. We are ok for now, because this code only runs at app
-		 * startup so we can be guaranteed that unfortunately anyone who was editing when the server got
-		 * restarted already suffered some bad luck. Load balancer is eventual production solution but all
-		 * we have for now is single instance.
-		 */
 		query.addCriteria(Criteria.where(SubNode.FIELD_MODIFY_TIME).is(null));
 
 		DeleteResult res = ops.remove(query, SubNode.class);

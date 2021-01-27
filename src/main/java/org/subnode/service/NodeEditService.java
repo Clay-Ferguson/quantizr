@@ -343,7 +343,7 @@ public class NodeEditService {
 		// if we're setting node name to a different node name
 		else if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0 && !nodeInfo.getName().equals(node.getName())) {
 
-			// todo-0: do better name validation here.
+			// todo-1: do better name validation here.
 			if (nodeInfo.getName().contains(":")) {
 				throw new RuntimeEx("Node names can only contain alpha numeric characters");
 			}

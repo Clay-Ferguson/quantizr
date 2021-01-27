@@ -56,7 +56,7 @@ public class ActPubFactory {
 
 			/*
 			 * For public messages Mastodon puts the "Public" target in 'to' and the mentioned users in 'cc', so
-			 * we do that same thing 
+			 * we do that same thing
 			 */
 			if (privateMessage) {
 				toList.add(actorUrl);
@@ -95,14 +95,23 @@ public class ActPubFactory {
 
 	public APObj newContextObj() {
 		return new APObj() //
+				/*
+				 * todo-1: How does this language relate to the other format inside the @context object where we
+				 * have '@language' inside and object stored on the '@context' object ?
+				 */
 				.put("language", "en") //
 
-				// todo-0: I put this here very early on during mastodon testing. Need to see if we 
-				// can get rid of this.
+				/*
+				 * todo-1: I put this here very early on during mastodon testing. Need to see if we can get rid of
+				 * this, and still be 'compatible' with Mastodon.
+				 */
 				.put("toot", "http://joinmastodon.org/ns#");
 	}
 
-	/* Need to check if this works using the 'to and cc' arrays that are the same as the ones built above (in newNoteObject() function) */
+	/*
+	 * Need to check if this works using the 'to and cc' arrays that are the same as the ones built
+	 * above (in newNoteObject() function)
+	 */
 	public APObj newCreateMessage(APObj object, String fromActor, List<String> toActors, String noteUrl, ZonedDateTime now) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 
@@ -112,7 +121,7 @@ public class ActPubFactory {
 				.val(ActPubConstants.CONTEXT_STREAMS) //
 				.val(newContextObj()));
 
-		//this 'id' was an early WAG, and needs a fresh look now that AP code is more complete.
+		// this 'id' was an early WAG, and needs a fresh look now that AP code is more complete.
 		ret.put("id", noteUrl + "&apCreateTime=" + idTime);
 		ret.put("type", "Create");
 		ret.put("actor", fromActor);

@@ -26,9 +26,9 @@ import org.subnode.util.DateUtil;
  * The ScopedProxyMode.TARGET_CLASS annotation allows this session bean to be available on
  * singletons or other beans that are not themselves session scoped.
  * 
- * todo-0: I think the best to fix the thread problem is to ONLY instantiate this bean
- * AppController.java only set the threadlocal in there. Do this incrementally and
- * carefully or you would wreak haveoc and have problems hard to find.
+ * todo-0: I think the best to fix the thread problem is to ONLY instantiate this bean in
+ * AppController.java set a threadlocal in there. Do this incrementally and
+ * carefully or you could wreak haveoc and have problems hard to find.
  */
 @Component
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)

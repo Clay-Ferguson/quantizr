@@ -630,8 +630,9 @@ public class MongoAuth {
 			 */
 			if (StringUtils.countMatches(userName, "@") == 1) {
 				/*
-				 * todo-0: WARNING: this sets off a chain reaction of fediverse crawling!! Unless/until you invent
-				 * some way to stop that. Don't delete this code until you think this thru more.
+				 * todo-1: WARNING: this sets off a chain reaction of fediverse crawling!! Unless/until you invent
+				 * some way to stop that (or decide you WANT a FediCrawler) then keep this commented out. Don't
+				 * delete this code until you think this thru more.
 				 */
 				// if (acctNode == null) {
 				// acctNode = actPub.loadForeignUserByUserName(session, userName);

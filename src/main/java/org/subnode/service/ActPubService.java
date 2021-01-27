@@ -533,7 +533,7 @@ public class ActPubService {
             return;
         }
 
-        // todo-0: this is bad to update the outboxNode here every time. fix this.
+        // todo-1: this is bad to update the outboxNode here every time. fix this.
         acl.addPrivilege(session, outboxNode, PrincipalName.PUBLIC.s(),
                 Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
         update.save(session, outboxNode);
@@ -577,8 +577,20 @@ public class ActPubService {
 
                     if (object != null) {
                         if (object instanceof String) {
-                            log.debug("Not Handled: Object was a string: " + object + " in outbox item: "
-                                    + XString.prettyPrint(obj));
+                            // todo-1: handle boosts.
+                            //
+                            // log.debug("Not Handled: Object was a string: " + object + " in outbox item: "
+                            // + XString.prettyPrint(obj));
+                            // Example of what needs to be handled here is when 'obj' contains a 'boost' (retweet)
+                            // {
+                            // "id" : "https://dobbs.town/users/onan/statuses/105613730170001141/activity",
+                            // "type" : "Announce",
+                            // "actor" : "https://dobbs.town/users/onan",
+                            // "published" : "2021-01-25T01:20:30Z",
+                            // "to" : [ "https://www.w3.org/ns/activitystreams#Public" ],
+                            // "cc" : [ "https://mastodon.sdf.org/users/stunder", "https://dobbs.town/users/onan/followers" ],
+                            // "object" : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
+                            // }
                         } //
                         else if ("Note".equals(AP.str(object, "type"))) {
                             try {
@@ -601,8 +613,11 @@ public class ActPubService {
     }
 
     public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
-        // todo-0: to reduce load for our purposes we can limit to just getting 2 pages of results to update
-        // a user.
+        /*
+         * To reduce load for our purposes we can limit to just getting 2 pages of results to update a user,
+         * and really just one page would be ideal if not for the fact that some servers return an empty
+         * first page and put the results in the 'last' page
+         */
         int maxPageQueries = 2;
         int pageQueries = 0;
 
@@ -1177,8 +1192,8 @@ public class ActPubService {
      * 
      * system==true means we have a daemon thread doing the processing.
      * 
-     * todo-0: when importing users in bulk (like at startup or the admin menu), some of these queries
-     * in here will be redundant
+     * todo-1: when importing users in bulk (like at startup or the admin menu), some of these queries
+     * in here will be redundant. Look for ways to optimize.
      * 
      * temp = true, means we are loading an outbox of a user and not, recieving a message specifically
      * to a local user so the node should be considered 'temporary' and can be deleted after a week or
@@ -1193,7 +1208,7 @@ public class ActPubService {
          */
         SubNode dupNode = read.findSubNodeByProp(session, parentNode.getPath(), NodeProp.ACT_PUB_ID.s(), id);
         if (dupNode != null) {
-            log.debug("duplicate ActivityPub post ignored: " + id);
+            // log.debug("duplicate ActivityPub post ignored: " + id);
             return;
         }
 
@@ -1227,7 +1242,7 @@ public class ActPubService {
         // log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
         // return;
         // } else {
-        // // todo-0: this is temporary so I can check that my english detection is working by viewing nodes
+        // // todo-1: this is temporary so I can check that my english detection is working by viewing nodes
         // // online.
         // lang = "en-ck3";
         // }
@@ -1240,7 +1255,7 @@ public class ActPubService {
         SubNode newNode =
                 create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null, toAccountNode.getId());
 
-        // todo-0: need a new node prop type that is just 'html' and tells us to render
+        // todo-1: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now
         // we could be clever and just detect if it DOES have tags and does NOT have
         // '```'
@@ -1261,8 +1276,8 @@ public class ActPubService {
         newNode.setProp(NodeProp.ACT_PUB_OBJ_TYPE.s(), objType);
         newNode.setProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
 
-        // todo-0: temporary troubleshooting. trying to find why foregin languages are getting allowed in.
-        newNode.setProp("lang", lang);
+        // todo-1: temporary troubleshooting. trying to find why foregin languages are getting allowed in.
+        // newNode.setProp("lang", lang);
 
         shareToAllObjectRecipients(session, newNode, obj, "to");
         shareToAllObjectRecipients(session, newNode, obj, "cc");
@@ -1311,7 +1326,7 @@ public class ActPubService {
      * shares the node to either all the followers or the specific actor
      */
     private void shareToUsersForUrl(MongoSession session, SubNode node, String url) {
-        log.debug("shareToUsersForUrl: " + url);
+        // log.debug("shareToUsersForUrl: " + url);
 
         if (url.endsWith("#Public")) {
             node.safeGetAc().put("public", new AccessControl(null, PrivilegeType.READ.s()));
@@ -1385,10 +1400,10 @@ public class ActPubService {
                 acctNode = read.getUserNodeByUserName(session, longUserName);
             } else {
                 /*
-                 * todo-0: this is also contributing to our unwanted CRAWLER effect (FediCrawler!) chain reaction.
-                 * The rule here should be either don't load foreign users whose outboxes you don't plan to load or
-                 * else have some property on the node that designates if we need to read the actual outbox or if
-                 * you DO want to add a user and not load their outbox.
+                 * todo-1: this is contributing to our unwanted CRAWLER effect (FediCrawler!) chain reaction. The
+                 * rule here should be either don't load foreign users whose outboxes you don't plan to load or else
+                 * have some property on the node that designates if we need to read the actual outbox or if you DO
+                 * want to add a user and not load their outbox.
                  */
                 // acctNode = loadForeignUserByActorUrl(session, actorUrl);
             }
@@ -1616,7 +1631,7 @@ public class ActPubService {
      * userName represents the person whose outbox is being QUERIED, and the identity of the user DOING
      * the querying will come from the http header:
      * 
-     * todo-0: For now we just query the PUBLIC shares from the outbox, and verify that public query
+     * todo-1: For now we just query the PUBLIC shares from the outbox, and verify that public query
      * works before we try to figure out how to do private auth comming from specific user(s)
      */
     public Long getOutboxItemCount(final String userName, String sharedTo) {
@@ -1894,7 +1909,9 @@ public class ActPubService {
     }
 
     /*
-     * todo-0: Security isn't implemented on this call yet
+     * todo-1: Security isn't implemented on this call yet, but the only caller to this is passing
+     * "public" as 'sharedTo' so we are safe to implement this outbox currently as only able to send
+     * back public info.
      */
     public APList getOutboxItems(String userName, String sharedTo, String minId) {
         String host = appProp.getProtocolHostAndPort();
@@ -2007,9 +2024,7 @@ public class ActPubService {
             return;
         }
 
-        // if not a foreign then ignore.
-        // todo-0: oops dont' hardcode the domain name!
-        if (apUserName == null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@quanta.wiki"))
+        if (apUserName == null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@" + appProp.getMetaHost()))
             return;
 
         if (!force) {

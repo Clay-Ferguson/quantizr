@@ -85,7 +85,7 @@ public class SystemService {
 			update.releaseOrphanIPFSPins();
 		} catch (Exception e) {
 			// I noticed this failing in Jan 2021. I think IPFS made and API change we aren't accounting for yet. 
-			// needs research (todo-0)
+			// needs research (todo-1)
 			//log.error("releaseOrphanIPFSPins failed.", e);
 		}
 
@@ -180,7 +180,7 @@ public class SystemService {
 			// p.getOutputStream().close();
 			// p.getErrorStream().close();
 		} catch (Exception e) {
-			// todo-0: do something here.
+			// todo-1: do something here.
 		}
 		output.append("</pre><p>");
 		return output.toString();

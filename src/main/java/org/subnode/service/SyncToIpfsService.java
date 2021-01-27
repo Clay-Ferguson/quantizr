@@ -92,7 +92,7 @@ public class SyncToIpfsService {
 			/*
 			 * if any file path is not a node path, it needes to be deleted.
 			 * 
-			 * todo-0: this will run more efficiently if we put path values into a list and then sort that list
+			 * todo-1: this will run more efficiently if we put path values into a list and then sort that list
 			 * ascending by the length of the string, so any parent folders are guaranteed to get deleted before
 			 * any of their subfolders (as a convenient consequence of children having to have longer paths than
 			 * their parents!) are encountered, and we run therefore the minimal number of deletes required to
@@ -112,7 +112,7 @@ public class SyncToIpfsService {
 					 * I'm expecting this to fail when it attempts to delete any subfolders under folders that were
 					 * already deleted because we may have just deleted their parents already in this same loop so...
 					 * 
-					 * todo-0: when we delete a folder, scan for all other folders that have that matching prefix and
+					 * todo-1: when we delete a folder, scan for all other folders that have that matching prefix and
 					 * remove them too, because there's no need to call deleteFile on those.
 					 */
 				}
@@ -122,7 +122,7 @@ public class SyncToIpfsService {
 
 	private void processNode(SubNode node) {
 		/*
-		 * todo-0: this and other places needs to generate canonical JSON (basically just sorted properties
+		 * todo-1: this and other places needs to generate canonical JSON (basically just sorted properties
 		 * ?) using this??
 		 */
 		// objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);

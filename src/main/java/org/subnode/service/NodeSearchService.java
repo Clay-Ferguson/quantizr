@@ -107,7 +107,7 @@ public class NodeSearchService {
 		//search under account root only
 		SubNode searchRoot = read.getNode(session, sessionContext.getRootId());
 
-		/* todo-0: Eventually we want two ways of searching here. 1) All my shared nodes under my account, 2) all my shared nodes globally,
+		/* todo-1: Eventually we want two ways of searching here. 1) All my shared nodes under my account, 2) all my shared nodes globally,
 		and the globally is done simply by passing null for the path here */
 		for (SubNode node : auth.searchSubGraphByAcl(session, searchRoot.getPath(), searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), MAX_NODES)) {
 
