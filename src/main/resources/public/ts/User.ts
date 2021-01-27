@@ -1,4 +1,5 @@
 import { AppState } from "./AppState";
+import { FeedView } from "./comps/FeedView";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
@@ -56,6 +57,16 @@ export class User implements UserIntf {
         new SignupDlg(state).open();
     }
 
+    defaultHandleAnonUser = (state: AppState) => {
+        var tab = S.util.getParameterByName("tab");
+        if (tab === "feed") {
+            S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+        }
+        else {
+            S.meta64.loadAnonPageHome(state);
+        }
+    }
+
     refreshLogin = async (state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
@@ -65,8 +76,8 @@ export class User implements UserIntf {
 
                 /* if we have known state as logged out, then do nothing here */
                 if (loginState === "0") {
-                    console.log("loginState known as logged out. Sending to anon home page.");
-                    S.meta64.loadAnonPageHome(state);
+                    console.log("loginState known as logged out.");
+                    this.defaultHandleAnonUser(state);
                     return;
                 }
 
@@ -83,7 +94,7 @@ export class User implements UserIntf {
                 console.log("refreshLogin with name: " + callUsr);
 
                 if (!callUsr) {
-                    S.meta64.loadAnonPageHome(state);
+                    this.defaultHandleAnonUser(state);
                 } else {
                     S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
                         userName: callUsr,
@@ -102,7 +113,7 @@ export class User implements UserIntf {
                                 S.meta64.setStateVarsUsingLoginResponse(res, state);
                             }
 
-                            S.meta64.loadAnonPageHome(state);
+                            this.defaultHandleAnonUser(state);
                         }
                     },
                         async (error: string) => {
@@ -206,7 +217,13 @@ export class User implements UserIntf {
                     }
 
                     // console.log("login is refreshingTree with ID=" + id);
-                    S.view.refreshTree(id, true, renderLeafIfParent, childId, false, true, true, state);
+                    var tab = S.util.getParameterByName("tab");
+                    if (tab === "feed") {
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                    }
+                    else {
+                        S.view.refreshTree(id, true, renderLeafIfParent, childId, false, true, true, state);
+                    }
                 } else {
                     console.log("LocalDb login failed.");
 

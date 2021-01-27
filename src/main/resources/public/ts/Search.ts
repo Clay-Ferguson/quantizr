@@ -99,7 +99,6 @@ export class Search implements SearchIntf {
 
     feed = (nodeId: string, feedUserName: string, page: number) => {
         let appState = store.getState();
-
         S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
             nodeId,
@@ -117,6 +116,7 @@ export class Search implements SearchIntf {
             type: "Action_RenderFeedResults",
             update: (s: AppState): void => {
                 // s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
+                s.guiReady = true;
                 s.feedResults = res.searchResults;
                 s.feedEndReached = res.endReached;
                 s.feedDirty = false;
