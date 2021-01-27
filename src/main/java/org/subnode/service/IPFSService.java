@@ -53,6 +53,7 @@ import org.subnode.response.PublishNodeToIpfsResponse;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
@@ -75,9 +76,6 @@ public class IPFSService {
      */
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
     private static final ObjectMapper mapper = new ObjectMapper();
-
-    @Autowired
-    private SessionContext sessionContext;
 
     @Autowired
     private RunAsMongoAdmin adminRunner;
@@ -447,7 +445,7 @@ public class IPFSService {
     }
 
     public PublishNodeToIpfsResponse publishNodeToIpfs(MongoSession mongoSession, PublishNodeToIpfsRequest req) {
-        if (!sessionContext.isAdmin()) {
+        if (!ThreadLocals.getSessionContext().isAdmin()) {
             throw ExUtil.wrapEx("admin only function.");
         }
 
@@ -458,7 +456,7 @@ public class IPFSService {
     }
 
     public LoadNodeFromIpfsResponse loadNodeFromIpfs(MongoSession mongoSession, LoadNodeFromIpfsRequest req) {
-        if (!sessionContext.isAdmin()) {
+        if (!ThreadLocals.getSessionContext().isAdmin()) {
             throw ExUtil.wrapEx("admin only function.");
         }
 

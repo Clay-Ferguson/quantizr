@@ -64,9 +64,6 @@ public class NodeRenderService {
 	@Autowired
 	private MongoAuth auth;
 
-	@Autowired
-	private SessionContext sessionContext;
-
 	/* Note: this MUST match nav.ROWS_PER_PAGE variable in TypeScript */
 	private static int ROWS_PER_PAGE = 25;
 
@@ -75,6 +72,7 @@ public class NodeRenderService {
 	 * page, this method gets called once per page and retrieves all the data for that page.
 	 */
 	public RenderNodeResponse renderNode(MongoSession session, RenderNodeRequest req) {
+
 		RenderNodeResponse res = new RenderNodeResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
@@ -120,7 +118,7 @@ public class NodeRenderService {
 
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
-			NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1, false, false);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -169,8 +167,10 @@ public class NodeRenderService {
 						node = parent;
 					}
 				} catch (Exception e) {
-					// failing to get parent is only an "auth" problem if this was an ACTUAL uplevel request, and not something
-					// we decided to to inside this method based on trying not to render a page with no children showing.
+					// failing to get parent is only an "auth" problem if this was an ACTUAL uplevel request, and not
+					// something
+					// we decided to to inside this method based on trying not to render a page with no children
+					// showing.
 					if (isActualUplevelRequest) {
 						res.setExceptionType("auth");
 						res.setSuccess(true);
@@ -190,7 +190,7 @@ public class NodeRenderService {
 			SubNode scanToNode, long logicalOrdinal, int level) {
 
 		NodeInfo nodeInfo =
-				convert.convertToNodeInfo(sessionContext, session, node, true, false, logicalOrdinal, level > 0, false);
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, logicalOrdinal, level > 0, false);
 
 		if (level > 0) {
 			return nodeInfo;
@@ -417,14 +417,14 @@ public class NodeRenderService {
 
 		try {
 			SubNode parentNode = read.getParent(session, node);
-			NodeInfo parentInfo = convert.convertToNodeInfo(sessionContext, session, parentNode, false, true, -1, false, false);
+			NodeInfo parentInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, parentNode, false, true, -1, false, false);
 			res.setParentInfo(parentInfo);
 		} catch (Exception e) {
 			ExUtil.error(log, "unable to load parent", e);
 			// ignore this
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(sessionContext, session, node, false, true, -1, false, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;
@@ -441,9 +441,10 @@ public class NodeRenderService {
 		}
 
 		String id = null;
-		if (sessionContext.getUrlId() != null) {
-			id = sessionContext.getUrlId();
-			sessionContext.setUrlId(null);
+		SessionContext sc = ThreadLocals.getSessionContext();
+		if (sc.getUrlId() != null) {
+			id = sc.getUrlId();
+			sc.setUrlId(null);
 			log.debug("anonPageRedirected it's id to load to: " + id);
 		} //
 		else {

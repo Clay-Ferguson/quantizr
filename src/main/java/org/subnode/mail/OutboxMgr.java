@@ -22,6 +22,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.response.NotificationMessage;
 import org.subnode.service.UserFeedService;
 import org.subnode.util.SubNodeUtil;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 /**
@@ -55,9 +56,6 @@ public class OutboxMgr {
 
 	@Autowired
 	private SubNodeUtil apiUtil;
-
-	@Autowired
-	private SessionContext sessionContext;
 
 	@Autowired
 	private UserFeedService userFeedService;
@@ -101,7 +99,8 @@ public class OutboxMgr {
 				String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
 
 				String content = String.format("#### **%s** " + notifyMessage + "\n\n%s/app?id=%s\n\n%s",
-						sessionContext.getUserName(), appProp.getHostAndPort(), node.getId().toHexString(), shortContent);
+						ThreadLocals.getSessionContext().getUserName(), appProp.getHostAndPort(), node.getId().toHexString(),
+						shortContent);
 
 				notifyNode.setOwner(userInbox.getOwner());
 				notifyNode.setContent(content);

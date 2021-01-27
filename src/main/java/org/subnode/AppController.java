@@ -128,6 +128,7 @@ import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.LimitedInputStreamEx;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 
 /**
@@ -184,9 +185,6 @@ public class AppController implements ErrorController {
 
 	@Autowired
 	private MongoRead read;
-
-	@Autowired
-	private SessionContext sessionContext;
 
 	@Autowired
 	private UserManagerService userManagerService;
@@ -337,7 +335,7 @@ public class AppController implements ErrorController {
 			}
 
 			if (id != null) {
-				sessionContext.setUrlId(id);
+				ThreadLocals.getSessionContext().setUrlId(id);
 				// log.debug("ID specified on url=" + id);
 				String _id = id;
 				adminRunner.run(mongoSession -> {
@@ -347,13 +345,13 @@ public class AppController implements ErrorController {
 					nodeRenderService.populateSocialCardProps(node, model);
 					if (node == null) {
 						log.debug("Node did not exist.");
-						sessionContext.setUrlId(null);
+						ThreadLocals.getSessionContext().setUrlId(null);
 					} else {
 						log.debug("Node exists.");
 					}
 				});
 			} else {
-				sessionContext.setUrlId(null);
+				ThreadLocals.getSessionContext().setUrlId(null);
 			}
 
 		} catch (Exception e) {
@@ -375,7 +373,7 @@ public class AppController implements ErrorController {
 
 		// Note: this refreshes only when ADMIN is accessing it, so it's slow in this
 		// case.
-		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
+		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(ThreadLocals.getSessionContext().getUserName())) {
 			synchronized (welcomeMapLock) {
 				HashMap<String, String> newMap = new HashMap<String, String>();
 				// load content from a place that will not be a node visible to users
@@ -744,7 +742,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/insertBook", method = RequestMethod.POST)
 	public @ResponseBody Object insertBook(@RequestBody InsertBookRequest req, HttpSession session) {
 		return callProc.run("insertBook", req, session, ms -> {
-			if (!sessionContext.isAdmin()) {
+			if (!ThreadLocals.getSessionContext().isAdmin()) {
 				throw ExUtil.wrapEx("admin only function.");
 			}
 
@@ -757,7 +755,7 @@ public class AppController implements ErrorController {
 		return callProc.run("executeNode", req, session, ms -> {
 			ExecuteNodeResponse res = new ExecuteNodeResponse();
 
-			if (!sessionContext.isAdmin()) {
+			if (!ThreadLocals.getSessionContext().isAdmin()) {
 				throw ExUtil.wrapEx("admin only function.");
 			}
 
@@ -1155,7 +1153,7 @@ public class AppController implements ErrorController {
 
 			if (req.getCommand().equalsIgnoreCase("getJson")) {
 				// allow this one if user owns node.
-			} else if (!sessionContext.isAdmin()) {
+			} else if (!ThreadLocals.getSessionContext().isAdmin()) {
 				throw ExUtil.wrapEx("admin only function.");
 			}
 
@@ -1201,7 +1199,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/luceneIndex", method = RequestMethod.POST)
 	public @ResponseBody Object luceneIndex(@RequestBody LuceneIndexRequest req, HttpSession session) {
 		return callProc.run("luceneIndex", req, session, ms -> {
-			if (!sessionContext.isAdmin()) {
+			if (!ThreadLocals.getSessionContext().isAdmin()) {
 				throw ExUtil.wrapEx("admin only function.");
 			}
 
@@ -1233,9 +1231,9 @@ public class AppController implements ErrorController {
 			GetServerInfoResponse res = new GetServerInfoResponse();
 			res.setMessages(new LinkedList<InfoMessage>());
 
-			if (sessionContext.getError() != null) {
-				res.getMessages().add(new InfoMessage(sessionContext.getError(), null));
-				sessionContext.setError(null);
+			if (ThreadLocals.getSessionContext().getError() != null) {
+				res.getMessages().add(new InfoMessage(ThreadLocals.getSessionContext().getError(), null));
+				ThreadLocals.getSessionContext().setError(null);
 			}
 
 			res.setSuccess(true);
@@ -1257,7 +1255,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object rebuildIndexes(@RequestBody RebuildIndexesRequest req, HttpSession session) {
 		return callProc.run("rebuildIndexes", req, session, ms -> {
 			RebuildIndexesResponse res = new RebuildIndexesResponse();
-			if (!sessionContext.isAdmin()) {
+			if (!ThreadLocals.getSessionContext().isAdmin()) {
 				throw ExUtil.wrapEx("admin only function.");
 			}
 
@@ -1274,7 +1272,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object shutdownServerNode(@RequestBody ShutdownServerNodeRequest req, HttpSession session) {
 		return callProc.run("shutdownServerNode", req, session, ms -> {
 			ShutdownServerNodeResponse res = new ShutdownServerNodeResponse();
-			if (!sessionContext.isAdmin()) {
+			if (!ThreadLocals.getSessionContext().isAdmin()) {
 				throw ExUtil.wrapEx("admin only function.");
 			}
 
@@ -1300,7 +1298,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object sendTestEmail(@RequestBody SendTestEmailRequest req, HttpSession session) {
 		return callProc.run("sendTestEmail", req, session, ms -> {
 			SendTestEmailResponse res = new SendTestEmailResponse();
-			if (!sessionContext.isAdmin()) {
+			if (!ThreadLocals.getSessionContext().isAdmin()) {
 				throw ExUtil.wrapEx("admin only function.");
 			}
 			log.debug("SendEmailTest detected on server.");
@@ -1345,7 +1343,7 @@ public class AppController implements ErrorController {
 	public SseEmitter serverPush(HttpSession session) {
 		return (SseEmitter) callProc.run("serverPush", null, session, ms -> {
 			SseEmitter pushEmitter = new SseEmitter();
-			sessionContext.setPushEmitter(pushEmitter);
+			ThreadLocals.getSessionContext().setPushEmitter(pushEmitter);
 			return pushEmitter;
 		});
 	}

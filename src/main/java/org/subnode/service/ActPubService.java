@@ -68,6 +68,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.util.DateUtil;
 import org.subnode.util.EnglishDictionary;
 import org.subnode.util.SubNodeUtil;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
@@ -103,9 +104,6 @@ public class ActPubService {
 
     @Autowired
     private RunAsMongoAdminEx adminRunner;
-
-    @Autowired
-    private SessionContext sessionContext;
 
     @Autowired
     private UserFeedService userFeedService;
@@ -188,7 +186,7 @@ public class ActPubService {
         privateKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PRIVATE);
         if (privateKey == null) {
             log.debug("Unable to update federated users. Our local user didn't have a private key on his userNode: "
-                    + sessionContext.getUserName());
+                    + ThreadLocals.getSessionContext().getUserName());
             return null;
         }
 
@@ -236,7 +234,7 @@ public class ActPubService {
             String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
             APList attachments = createAttachmentsList(node);
 
-            sendNote(session, toUserNames, sessionContext.getUserName(), inReplyTo, node.getContent(), attachments,
+            sendNote(session, toUserNames, ThreadLocals.getSessionContext().getUserName(), inReplyTo, node.getContent(), attachments,
                     subNodeUtil.getIdBasedUrl(node), privateMessage);
         } //
         catch (Exception e) {
@@ -343,7 +341,7 @@ public class ActPubService {
         try {
             /* if private key not sent then get it using the session */
             if (privateKey == null) {
-                privateKey = getPrivateKey(session, sessionContext.getUserName());
+                privateKey = getPrivateKey(session, ThreadLocals.getSessionContext().getUserName());
             }
 
             String body = XString.prettyPrint(message);
@@ -881,7 +879,7 @@ public class ActPubService {
     public void setFollowing(String apUserName, boolean following) {
         try {
             // admin doesn't follow/unfollow
-            if (sessionContext.isAdmin()) {
+            if (ThreadLocals.getSessionContext().isAdmin()) {
                 return;
             }
 
@@ -889,7 +887,7 @@ public class ActPubService {
             String actorUrlOfUserBeingFollowed = getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
 
             adminRunner.run(session -> {
-                String sessionActorUrl = makeActorUrlForUserName(sessionContext.getUserName());
+                String sessionActorUrl = makeActorUrlForUserName(ThreadLocals.getSessionContext().getUserName());
                 APObj followAction = new APObj();
 
                 // send follow action
@@ -1992,14 +1990,12 @@ public class ActPubService {
     public void deleteNodeNotify(ObjectId nodeId) {
         adminRunner.run(session -> {
             SubNode node = read.getNode(session, nodeId);
-            if (node != null) {
-                if (node.getType().equals(NodeType.FRIEND.s())) {
-                    String friendUserName = node.getStrProp(NodeProp.USER.s());
-                    if (friendUserName != null) {
-                        // if a foreign user, update thru ActivityPub
-                        if (friendUserName.contains("@")) {
-                            setFollowing(friendUserName, false);
-                        }
+            if (node != null && node.getType().equals(NodeType.FRIEND.s())) {
+                String friendUserName = node.getStrProp(NodeProp.USER.s());
+                if (friendUserName != null) {
+                    // if a foreign user, update thru ActivityPub
+                    if (friendUserName.contains("@")) {
+                        setFollowing(friendUserName, false);
                     }
                 }
             }

@@ -45,9 +45,6 @@ public class NodeSearchService {
 	@Autowired
 	private Convert convert;
 
-	@Autowired
-	private SessionContext sessionContext;
-
 	public NodeSearchResponse search(MongoSession session, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();
 		if (session == null) {
@@ -64,7 +61,7 @@ public class NodeSearchService {
 		if ("node.id".equals(req.getSearchProp())) {
 			SubNode node = read.getNode(session, req.getSearchText(), true);
 			if (node != null) {
-				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1,
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1,
 						false, false);
 				searchResults.add(info);
 			}
@@ -76,7 +73,7 @@ public class NodeSearchService {
 			for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText,
 					req.getSortField(), MAX_NODES, req.getFuzzy(), req.getCaseSensitive())) {
 				// log.debug("NodeFound: node: "+ XString.prettyPrint(node));
-				NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1,
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1,
 						false, false);
 				searchResults.add(info);
 				if (counter++ > MAX_NODES) {
@@ -105,7 +102,7 @@ public class NodeSearchService {
 		//SubNode searchRoot = api.getNode(session, req.getNodeId());
 
 		//search under account root only
-		SubNode searchRoot = read.getNode(session, sessionContext.getRootId());
+		SubNode searchRoot = read.getNode(session, ThreadLocals.getSessionContext().getRootId());
 
 		/* todo-1: Eventually we want two ways of searching here. 1) All my shared nodes under my account, 2) all my shared nodes globally,
 		and the globally is done simply by passing null for the path here */
@@ -119,7 +116,7 @@ public class NodeSearchService {
 				continue;
 			}
 
-			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1, false,
+			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1, false,
 					 false);
 			searchResults.add(info);
 			if (counter++ > MAX_NODES) {

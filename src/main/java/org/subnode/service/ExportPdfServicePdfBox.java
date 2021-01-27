@@ -1,10 +1,9 @@
 package org.subnode.service;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
-
 import javax.imageio.ImageIO;
-
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -22,8 +21,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
-import org.subnode.config.SessionContext;
-import org.subnode.model.UserPreferences;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -35,8 +32,6 @@ import org.subnode.util.FileUtils;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
-
-import java.awt.image.BufferedImage;
 
 /**
  * Exporter using PDFBox
@@ -57,9 +52,6 @@ public class ExportPdfServicePdfBox {
 
 	@Autowired
 	private AttachmentService attachmentService;
-
-	@Autowired
-	private SessionContext sessionContext;
 
 	private MongoSession session;
 

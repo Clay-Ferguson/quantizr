@@ -50,9 +50,6 @@ public class UserFeedService {
 	private Convert convert;
 
 	@Autowired
-	private SessionContext sessionContext;
-
-	@Autowired
 	private MongoAuth auth;
 
 	@Autowired
@@ -164,7 +161,7 @@ public class UserFeedService {
 		// includes shares TO me.
 		if (req.getToMe()) {
 			if (searchRoot == null) {
-				searchRoot = read.getNode(session, sessionContext.getRootId());
+				searchRoot = read.getNode(session, ThreadLocals.getSessionContext().getRootId());
 			}
 
 			if (searchRoot != null) {
@@ -191,7 +188,7 @@ public class UserFeedService {
 
 		if (req.getFromMe()) {
 			if (searchRoot == null) {
-				searchRoot = read.getNode(session, sessionContext.getRootId());
+				searchRoot = read.getNode(session, ThreadLocals.getSessionContext().getRootId());
 			}
 
 			if (searchRoot != null) {
@@ -239,7 +236,7 @@ public class UserFeedService {
 
 		Iterable<SubNode> iter = ops.find(query, SubNode.class);
 		for (SubNode node : iter) {
-			NodeInfo info = convert.convertToNodeInfo(sessionContext, session, node, true, false, counter + 1, false, false);
+			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1, false, false);
 			searchResults.add(info);
 		}
 

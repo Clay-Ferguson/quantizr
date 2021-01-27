@@ -2,7 +2,7 @@ package org.subnode.util;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
+import org.subnode.config.SessionContext;
 import org.subnode.mongo.MongoSession;
 import org.subnode.response.base.ResponseBase;
 
@@ -19,12 +19,14 @@ import org.subnode.response.base.ResponseBase;
 public class ThreadLocals {
 	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<HttpServletResponse>();
 	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<HttpSession>();
+	private static final ThreadLocal<SessionContext> sessionContext = new ThreadLocal<SessionContext>();
 	private static final ThreadLocal<Boolean> initialSessionExisted = new ThreadLocal<Boolean>();
 	private static final ThreadLocal<MongoSession> mongoSession = new ThreadLocal<MongoSession>();
 	private static final ThreadLocal<ResponseBase> oakResponse = new ThreadLocal<ResponseBase>();
 
 	public static void removeAll() {
 		httpSession.remove();
+		sessionContext.remove();
 		servletResponse.remove();
 		initialSessionExisted.remove();
 		oakResponse.remove();
@@ -37,6 +39,14 @@ public class ThreadLocals {
 
 	public static HttpSession getHttpSession() {
 		return httpSession.get();
+	}
+
+	public static void setSessionContext(SessionContext sc) {
+		sessionContext.set(sc);
+	}
+
+	public static SessionContext getSessionContext() {
+		return sessionContext.get();
 	}
 
 	public static void setServletResponse(HttpServletResponse res) {

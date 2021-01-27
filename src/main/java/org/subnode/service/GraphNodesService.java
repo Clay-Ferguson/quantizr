@@ -27,9 +27,6 @@ public class GraphNodesService {
 	static int guid = 0;
 
 	@Autowired
-	private SessionContext sessionContext;
-
-	@Autowired
 	private MongoRead read;
 
 	public GraphResponse graphNodes(MongoSession session, GraphRequest req) {
@@ -54,7 +51,7 @@ public class GraphNodesService {
 			if (StringUtils.isEmpty(req.getSearchText())) {
 				results = read.getSubGraph(session, node);
 			} else {
-				int limit = sessionContext.isAdmin() ? Integer.MAX_VALUE : 1000;
+				int limit = ThreadLocals.getSessionContext().isAdmin() ? Integer.MAX_VALUE : 1000;
 				results = read.searchSubGraph(session, node, "content", req.getSearchText(), null, limit, false, false);
 			}
 

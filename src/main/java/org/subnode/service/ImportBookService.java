@@ -33,15 +33,12 @@ public class ImportBookService {
 	@Autowired
 	private MongoUpdate update;
 
-	@Autowired
-	private SessionContext sessionContext;
-
 	public InsertBookResponse insertBook(MongoSession session, InsertBookRequest req) {
 		InsertBookResponse res = new InsertBookResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
-		if (!sessionContext.isAdmin() && !sessionContext.isTestAccount()) {
+		if (!ThreadLocals.getSessionContext().isAdmin() && !ThreadLocals.getSessionContext().isTestAccount()) {
 			throw ExUtil.wrapEx("insertBook is an admin-only feature.");
 		}
 

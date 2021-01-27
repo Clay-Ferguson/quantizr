@@ -33,9 +33,6 @@ public class BashService {
 	@Autowired
 	private SubNodeUtil util;
 
-	@Autowired
-	private SessionContext sessionContext;
-
 	/*
 	 * For now we only support synchronous runs, so that the response from the
 	 * server happens only after the script has completed
@@ -49,7 +46,7 @@ public class BashService {
 			throw ExUtil.wrapEx("disabled pending security review.");
 		}
 
-		if (!sessionContext.isAdmin()) {
+		if (!ThreadLocals.getSessionContext().isAdmin()) {
 			throw ExUtil.wrapEx("executeNode is an admin-only feature.");
 		}
 

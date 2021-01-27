@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
@@ -32,6 +33,9 @@ public class AppFilter extends GenericFilterBean {
 	private static boolean logRequests = false;
 	private static boolean logResponses = false;
 
+	@Autowired
+	private SessionContext sessionContext;
+
 	/*
 	 * if non-zero this is used to put a millisecond delay (determined by its value) onto every request
 	 * that comes thru as an API call.
@@ -47,89 +51,92 @@ public class AppFilter extends GenericFilterBean {
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-
-		int thisReqId = ++reqId;
-
-		boolean initialSessionExisted = false;
-		String ip = null;
-
-		if (req instanceof HttpServletRequest) {
-			HttpServletRequest httpReq = (HttpServletRequest) req;
-			HttpServletResponse httpRes = (HttpServletResponse) res;
-			ip = getClientIpAddr(httpReq);
-
-			HttpSession session = httpReq.getSession(false);
-			if (session == null) {
-				log.trace("******** NO SESSION.");
-			} else {
-				log.trace("******** SESSION existed: lastAccessed: "
-						+ ((System.currentTimeMillis() - session.getLastAccessedTime()) / 1000) + "secs ago.");
-
-				initialSessionExisted = true;
-			}
-
-			if (session == null) {
-				session = httpReq.getSession(true);
-			}
-			ThreadLocals.setHttpSession(session);
-			String queryString = httpReq.getQueryString();
-
-			if (simulateSlowServer > 0 && httpReq.getRequestURI().contains("/mobile/api/")) {
-				Util.sleep(simulateSlowServer);
-			}
-
-			setCachingHeader(httpReq, httpRes);
-
-			if (logRequests) {
-				String url =
-						"REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString=" + queryString;
-				log.debug(url + "\nParameters: " + XString.prettyPrint(httpReq.getParameterMap()));
-			}
-
-			updateHitCounter(httpReq);
-		} else {
-			// log.debug("******* req class: "+req.getClass().getName());
-		}
-
-		ThreadLocals.setInitialSessionExisted(initialSessionExisted);
-
-		if (res instanceof HttpServletResponse) {
-			ThreadLocals.setServletResponse((HttpServletResponse) res);
-		}
-
 		try {
-			/*
-			 * singleThreadDebugging creates one lock per IP so that each machine calling our server gets single
-			 * threaded, but other servers can call in parallel
-			 */
-			if (singleThreadDebugging) {
-				if (ip == null) {
-					ip = "unknown";
+			int thisReqId = ++reqId;
+
+			boolean initialSessionExisted = false;
+			String ip = null;
+
+			if (req instanceof HttpServletRequest) {
+				HttpServletRequest httpReq = (HttpServletRequest) req;
+				HttpServletResponse httpRes = (HttpServletResponse) res;
+				ip = getClientIpAddr(httpReq);
+
+				HttpSession session = httpReq.getSession(false);
+				if (session == null) {
+					log.trace("******** NO SESSION.");
+				} else {
+					log.trace("******** SESSION existed: lastAccessed: "
+							+ ((System.currentTimeMillis() - session.getLastAccessedTime()) / 1000) + "secs ago.");
+
+					initialSessionExisted = true;
 				}
 
-				Object lock = locksByIp.get(ip);
-				if (lock == null) {
-					lock = new Object();
-					locksByIp.put(ip, lock);
+				if (session == null) {
+					session = httpReq.getSession(true);
+				}
+				ThreadLocals.setHttpSession(session);
+				ThreadLocals.setSessionContext(sessionContext);
+				String queryString = httpReq.getQueryString();
+
+				if (simulateSlowServer > 0 && httpReq.getRequestURI().contains("/mobile/api/")) {
+					Util.sleep(simulateSlowServer);
 				}
 
-				synchronized (lock) {
+				setCachingHeader(httpReq, httpRes);
+
+				if (logRequests) {
+					String url = "REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString="
+							+ queryString;
+					log.debug(url + "\nParameters: " + XString.prettyPrint(httpReq.getParameterMap()));
+				}
+
+				updateHitCounter(httpReq);
+			} else {
+				// log.debug("******* req class: "+req.getClass().getName());
+			}
+
+			ThreadLocals.setInitialSessionExisted(initialSessionExisted);
+
+			if (res instanceof HttpServletResponse) {
+				ThreadLocals.setServletResponse((HttpServletResponse) res);
+			}
+
+			try {
+				/*
+				 * singleThreadDebugging creates one lock per IP so that each machine calling our server gets single
+				 * threaded, but other servers can call in parallel
+				 */
+				if (singleThreadDebugging) {
+					if (ip == null) {
+						ip = "unknown";
+					}
+
+					Object lock = locksByIp.get(ip);
+					if (lock == null) {
+						lock = new Object();
+						locksByIp.put(ip, lock);
+					}
+
+					synchronized (lock) {
+						chain.doFilter(req, res);
+					}
+				} else {
 					chain.doFilter(req, res);
 				}
-			} else {
-				chain.doFilter(req, res);
-			}
 
-			if (logResponses) {
-				HttpServletResponse httpRes = (HttpServletResponse) res;
-				log.debug("    RES: [" + String.valueOf(thisReqId) + "]" /* +httpRes.getStatus() */
-						+ HttpStatus.valueOf(httpRes.getStatus()));
-			}
+				if (logResponses) {
+					HttpServletResponse httpRes = (HttpServletResponse) res;
+					log.debug("    RES: [" + String.valueOf(thisReqId) + "]" /* +httpRes.getStatus() */
+							+ HttpStatus.valueOf(httpRes.getStatus()));
+				}
 
-		} catch (RuntimeException ex) {
-			log.error("Request Failed", ex);
-			throw ex;
-		} finally {
+			} catch (RuntimeException ex) {
+				log.error("Request Failed", ex);
+				throw ex;
+			}
+		}
+		finally {
 			/* Set thread back to clean slate, for it's next cycle time in threadpool */
 			ThreadLocals.removeAll();
 			MongoThreadLocal.removeAll();
@@ -138,7 +145,7 @@ public class AppFilter extends GenericFilterBean {
 
 	private void setCachingHeader(HttpServletRequest req, HttpServletResponse res) {
 		/*
-		 * Yeah I know this is a hacky way to set Cache-Contro, and there's a more elegant way to do this
+		 * Yeah I know this is a hacky way to set Cache-Control, and there's a more elegant way to do this
 		 * with spring
 		 */
 		// Example: The better way (not yet done)

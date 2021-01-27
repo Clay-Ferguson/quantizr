@@ -103,9 +103,6 @@ public class UserManagerService {
 	private AppProp appProp;
 
 	@Autowired
-	private SessionContext sessionContext;
-
-	@Autowired
 	private OutboxMgr outboxMgr;
 
 	@Autowired
@@ -142,11 +139,12 @@ public class UserManagerService {
 			session = ThreadLocals.getMongoSession();
 		}
 
+		SessionContext sc = ThreadLocals.getSessionContext();
 		String userName = req.getUserName();
 		log.debug("login: user=" + userName);
 
 		if (userName.equals("")) {
-			userName = sessionContext.getUserName();
+			userName = sc.getUserName();
 			req.setUserName(userName);
 		}
 
@@ -154,7 +152,7 @@ public class UserManagerService {
 		 * We have to get timezone information from the user's browser, so that all times on all nodes
 		 * always show up in their precise local time!
 		 */
-		sessionContext.init(req);
+		sc.init(req);
 
 		if (session == null) {
 			log.debug("session==null, using anonymous user");
@@ -171,11 +169,11 @@ public class UserManagerService {
 		}
 
 		res.setAnonUserLandingPageNode(appProp.getUserLandingPageNode());
-		log.debug("Processing Login: urlId=" + (sessionContext.getUrlId() != null ? sessionContext.getUrlId() : "null"));
+		log.debug("Processing Login: urlId=" + (sc.getUrlId() != null ? sc.getUrlId() : "null"));
 
-		if (sessionContext.getUrlId() != null) {
-			log.debug("setHomeNodeOverride (from session urlId): " + sessionContext.getUrlId());
-			res.setHomeNodeOverride(sessionContext.getUrlId());
+		if (sc.getUrlId() != null) {
+			log.debug("setHomeNodeOverride (from session urlId): " + sc.getUrlId());
+			res.setHomeNodeOverride(sc.getUrlId());
 		}
 
 		if (res.getUserPreferences() == null) {
@@ -191,11 +189,12 @@ public class UserManagerService {
 			throw new RuntimeEx("User not found: " + userName);
 		}
 
+		SessionContext sc = ThreadLocals.getSessionContext();
 		String id = userNode.getId().toHexString();
-		sessionContext.setRootId(id);
+		sc.setRootId(id);
 
 		UserPreferences userPreferences = getUserPreferences(userName);
-		sessionContext.setUserPreferences(userPreferences);
+		sc.setUserPreferences(userPreferences);
 
 		if (res != null) {
 			res.setRootNode(id);
@@ -206,7 +205,7 @@ public class UserManagerService {
 		}
 
 		Date now = new Date();
-		sessionContext.setLastLoginTime(now.getTime());
+		sc.setLastLoginTime(now.getTime());
 		userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), now.getTime());
 
 		ensureValidCryptoKeys(userNode);
@@ -239,9 +238,9 @@ public class UserManagerService {
 
 	public CloseAccountResponse closeAccount(CloseAccountRequest req) {
 		CloseAccountResponse res = new CloseAccountResponse();
-		log.debug("Closing Account: " + sessionContext.getUserName());
+		log.debug("Closing Account: " + ThreadLocals.getSessionContext().getUserName());
 		adminRunner.run(session -> {
-			String userName = sessionContext.getUserName();
+			String userName = ThreadLocals.getSessionContext().getUserName();
 
 			SubNode ownerNode = read.getUserNodeByUserName(session, userName);
 			if (ownerNode != null) {
@@ -520,7 +519,7 @@ public class UserManagerService {
 
 	public SavePublicKeyResponse savePublicKey(final SavePublicKeyRequest req) {
 		SavePublicKeyResponse res = new SavePublicKeyResponse();
-		final String userName = sessionContext.getUserName();
+		final String userName = ThreadLocals.getSessionContext().getUserName();
 
 		adminRunner.run(session -> {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
@@ -540,7 +539,7 @@ public class UserManagerService {
 
 	public GetUserAccountInfoResponse getUserAccountInfo(final GetUserAccountInfoRequest req) {
 		GetUserAccountInfoResponse res = new GetUserAccountInfoResponse();
-		final String userName = sessionContext.getUserName();
+		final String userName = ThreadLocals.getSessionContext().getUserName();
 
 		adminRunner.run(session -> {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
@@ -563,13 +562,13 @@ public class UserManagerService {
 	public SaveUserPreferencesResponse saveUserPreferences(final SaveUserPreferencesRequest req) {
 		SaveUserPreferencesResponse res = new SaveUserPreferencesResponse();
 
-		UserPreferences userPreferences = sessionContext.getUserPreferences();
+		UserPreferences userPreferences = ThreadLocals.getSessionContext().getUserPreferences();
 		// note: This will be null if session has timed out.
 		if (userPreferences == null) {
 			return res;
 		}
 
-		final String userName = sessionContext.getUserName();
+		final String userName = ThreadLocals.getSessionContext().getUserName();
 
 		adminRunner.run(session -> {
 			SubNode prefsNode = read.getUserNodeByUserName(session, userName);
@@ -600,7 +599,7 @@ public class UserManagerService {
 
 	public SaveUserProfileResponse saveUserProfile(final SaveUserProfileRequest req) {
 		SaveUserProfileResponse res = new SaveUserProfileResponse();
-		final String userName = sessionContext.getUserName();
+		final String userName = ThreadLocals.getSessionContext().getUserName();
 
 		adminRunner.run(session -> {
 			boolean failed = false;
@@ -636,7 +635,7 @@ public class UserManagerService {
 	 */
 	public AddFriendResponse addFriend(MongoSession session, final AddFriendRequest req) {
 		AddFriendResponse res = new AddFriendResponse();
-		final String userName = sessionContext.getUserName();
+		final String userName = ThreadLocals.getSessionContext().getUserName();
 
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
@@ -670,7 +669,7 @@ public class UserManagerService {
 
 	public GetUserProfileResponse getUserProfile(final GetUserProfileRequest req) {
 		GetUserProfileResponse res = new GetUserProfileResponse();
-		final String userName = sessionContext.getUserName();
+		final String userName = ThreadLocals.getSessionContext().getUserName();
 
 		adminRunner.run(session -> {
 			SubNode userNode = null;
@@ -785,7 +784,7 @@ public class UserManagerService {
 		}
 
 		res.setUser(userName[0]);
-		sessionContext.setPassword(req.getNewPassword());
+		ThreadLocals.getSessionContext().setPassword(req.getNewPassword());
 		res.setSuccess(true);
 		return res;
 	}

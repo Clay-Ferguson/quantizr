@@ -19,7 +19,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
-import org.subnode.config.SessionContext;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.AccessControlInfo;
@@ -57,9 +56,6 @@ public class MongoAuth {
 
 	@Autowired
 	private ActPubService actPub;
-
-	@Autowired
-	private SessionContext sessionContext;
 
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());

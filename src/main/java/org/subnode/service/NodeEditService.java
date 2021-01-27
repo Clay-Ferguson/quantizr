@@ -81,9 +81,6 @@ public class NodeEditService {
 	private MongoDelete delete;
 
 	@Autowired
-	private SessionContext sessionContext;
-
-	@Autowired
 	private UserFeedService userFeedService;
 
 	@Autowired
@@ -123,7 +120,7 @@ public class NodeEditService {
 
 				// todo-1: make this public code only run when node is first created.
 				aclService.addPrivilege(session, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
-				node.setContent("### " + sessionContext.getUserName() + "'s Public Posts");
+				node.setContent("### " + ThreadLocals.getSessionContext().getUserName() + "'s Public Posts");
 				update.save(session, node);
 
 				nodeId = node.getId().toHexString();
@@ -170,7 +167,7 @@ public class NodeEditService {
 		}
 
 		update.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));
+		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false));
 
 		res.setSuccess(true);
 		return res;
@@ -262,7 +259,7 @@ public class NodeEditService {
 		auth.setDefaultReplyAcl(null, parentNode, newNode);
 
 		update.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(sessionContext, session, newNode, true, false, -1, false, false));
+		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -319,7 +316,7 @@ public class NodeEditService {
 				}
 
 				String userName = friendNode.getStrProp(NodeProp.USER.s());
-				if (sessionContext.getUserName().equals(userName)) {
+				if (ThreadLocals.getSessionContext().getUserName().equals(userName)) {
 					delete.delete(session, friendNode, false);
 					throw new RuntimeEx("You can't have a Friend that is defined as yourself.");
 				}
@@ -350,8 +347,8 @@ public class NodeEditService {
 			String nodeName = nodeInfo.getName().trim();
 
 			// if not admin we have to lookup the node with "userName:nodeName" format
-			if (!sessionContext.isAdmin()) {
-				nodeName = sessionContext.getUserName() + ":" + nodeName;
+			if (!ThreadLocals.getSessionContext().isAdmin()) {
+				nodeName = ThreadLocals.getSessionContext().getUserName() + ":" + nodeName;
 			}
 
 			/*
@@ -414,7 +411,7 @@ public class NodeEditService {
 		/* Send notification to local server or to remote server when a node is added */
 		if (!StringUtils.isEmpty(node.getContent()) //
 				// don't send notifications when 'admin' is the one doing the editing.
-				&& !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
+				&& !PrincipalName.ADMIN.s().equals(ThreadLocals.getSessionContext().getUserName())) {
 
 			SubNode parent = read.getNode(session, node.getParentPath(), false);
 
@@ -428,7 +425,7 @@ public class NodeEditService {
 			}
 		}
 
-		NodeInfo newNodeInfo = convert.convertToNodeInfo(sessionContext, session, node, true, false, -1, false, false);
+		NodeInfo newNodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false);
 		res.setNode(newNodeInfo);
 
 		// todo-1: eventually we need a plugin-type architecture to decouple this kind
@@ -439,7 +436,7 @@ public class NodeEditService {
 			final String friendUserName = node.getStrProp(NodeProp.USER.s());
 			if (friendUserName != null) {
 				// if a foreign user, update thru ActivityPub. 
-				if (friendUserName.contains("@") && !sessionContext.isAdmin()) {
+				if (friendUserName.contains("@") && !ThreadLocals.getSessionContext().isAdmin()) {
 					actPubService.setFollowing(friendUserName, true);
 				}
 
@@ -454,7 +451,7 @@ public class NodeEditService {
 					 */
 					if (friendUserName.contains("@")) {
 						adminRunner.run(s -> {
-							if (!sessionContext.isAdmin()) {
+							if (!ThreadLocals.getSessionContext().isAdmin()) {
 								actPubService.loadForeignUserByUserName(s, friendUserName);
 							}
 

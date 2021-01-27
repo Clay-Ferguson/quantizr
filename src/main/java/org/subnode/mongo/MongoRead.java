@@ -28,6 +28,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.service.AclService;
 import org.subnode.service.ActPubService;
 import org.subnode.service.UserFeedService;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 /**
@@ -47,9 +48,6 @@ public class MongoRead {
 
     @Autowired
     private AclService aclService;
-
-    @Autowired
-    private SessionContext sessionContext;
 
     @Autowired
     private UserFeedService userFeedService;
@@ -742,7 +740,7 @@ public class MongoRead {
     public SubNode getUserNodeByType(MongoSession session, String user, SubNode userNode, String nodeName, String type) {
         if (userNode == null) {
             if (user == null) {
-                user = sessionContext.getUserName();
+                user = ThreadLocals.getSessionContext().getUserName();
             }
             userNode = getUserNodeByUserName(session, user);
         }
@@ -776,7 +774,7 @@ public class MongoRead {
 
     public SubNode getUserNodeByUserName(MongoSession session, String user) {
         if (user == null) {
-            user = sessionContext.getUserName();
+            user = ThreadLocals.getSessionContext().getUserName();
         }
         user = user.trim();
 

@@ -51,9 +51,6 @@ public class ExportServiceFlexmark {
 	@Autowired
 	private MongoRead read;
 
-	@Autowired
-	private SessionContext sessionContext;
-
 	private MongoSession session;
 
 	private String shortFileName;
@@ -192,7 +189,7 @@ public class ExportServiceFlexmark {
 		}
 
 		markdown.append("\n<img src='" + appProp.getHostAndPort() + "/mobile/api/bin/" + bin + "?nodeId="
-				+ node.getId().toHexString() + "&token=" + sessionContext.getUserToken() + "' " + style + "/>\n");
+				+ node.getId().toHexString() + "&token=" + ThreadLocals.getSessionContext().getUserToken() + "' " + style + "/>\n");
 	}
 
 	/**
