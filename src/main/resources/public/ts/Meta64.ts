@@ -1,4 +1,5 @@
 import { appState, dispatch, store } from "./AppRedux";
+import { useSelector } from "react-redux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
@@ -57,6 +58,10 @@ export class Meta64 implements Meta64Intf {
     // maps the hash of an encrypted block of text to the unencrypted text, so that we never run the same
     // decryption code twice.
     decryptCache: { [key: string]: string } = {};
+
+    lastScrollPos: number = 0;
+    lastScrollPosMap: { [key: string]: number } = {};
+    ticking: boolean = false;
 
     /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
     getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {
@@ -442,6 +447,20 @@ export class Meta64 implements Meta64Intf {
                 }
             });
 
+            document.addEventListener("scroll", (e) => {
+                this.lastScrollPos = window.scrollY;
+
+                if (!this.ticking) {
+                    window.requestAnimationFrame(() => {
+                        let state: AppState = useSelector((state: AppState) => state);
+                        this.lastScrollPosMap[state.activeTab || "mainTab"] = this.lastScrollPos;
+                        this.ticking = false;
+                    });
+
+                    this.ticking = true;
+                }
+            });
+
             if (this.appInitialized) {
                 return;
             }
@@ -512,6 +531,15 @@ export class Meta64 implements Meta64Intf {
             console.log("initApp complete.");
             resolve();
         });
+    }
+
+    queueScrollPosition = () => {
+        // this is a work in progress, to scroll to where the last scroll position was on a given tab.
+        // I may or may not finish this.
+        // setTimeout(() => {
+        //     let state: AppState = useSelector((state: AppState) => state);
+        //     window.scrollTo(0, this.lastScrollPosMap[state.activeTab || "mainTab"]);
+        // }, 250);
     }
 
     playAudioIfRequested = () => {
