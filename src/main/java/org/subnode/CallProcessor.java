@@ -2,7 +2,6 @@ package org.subnode;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -20,8 +19,6 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.LoginRequest;
-import org.subnode.request.ResetPasswordRequest;
-import org.subnode.request.SignupRequest;
 import org.subnode.request.base.RequestBase;
 import org.subnode.response.LoginResponse;
 import org.subnode.response.base.ResponseBase;
@@ -48,7 +45,7 @@ public class CallProcessor {
 	private static final boolean logRequests = true;
 	// private static int mutexCounter = 0;
 
-	// Most but not all of the time this return value is ResponseBase type, or
+	// Most (but not all) of the time this return value is ResponseBase type, or
 	// derived from that.
 	public Object run(String command, RequestBase req, HttpSession httpSession, MongoRunnableEx runner) {
 		if (AppServer.isShuttingDown()) {
@@ -80,38 +77,6 @@ public class CallProcessor {
 			}
 			// mutexCounter++;
 			// log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
-
-			/*
-			 * If no Session originally existed AND this was not a login request, then we throw the error, that
-			 * the client will pickup and use to refresh the page, as a new login. This is what happens when the
-			 * session times out and then after that some RPC call is attempted.
-			 */
-			if (!(req instanceof LoginRequest) && //
-					!(req instanceof SignupRequest) && //
-					!(req instanceof ResetPasswordRequest) && //
-					!(req instanceof ChangePasswordRequest) && //
-					!ThreadLocals.getInitialSessionExisted()) {
-				log.debug("Ignoring attempt to process req class " + req.getClass().getName() + " when not logged in .");
-
-				/*
-				 * All requests contain credentials, from the BaseRequest, so if we detect a case where the session
-				 * has expired we can attempt to seamlessly re-login the user again, and they never realize their
-				 * session had timed out. This little try block is replicated code from the main login and later
-				 * someday I can 'dry' this up.
-				 */
-				boolean success = false;
-				try {
-					MongoSession session = auth.login(req.getUserName(), req.getPassword());
-					sessionContext.init(req);
-					userManagerService.processLogin(session, null, req.getUserName());
-					success = true;
-				} catch (Exception e) {
-				}
-
-				if (!success) {
-					throw new NotLoggedInException();
-				}
-			}
 
 			mongoSession = login(req, sessionContext);
 			ThreadLocals.setMongoSession(mongoSession);
@@ -163,7 +128,6 @@ public class CallProcessor {
 			if (mutex != null) {
 				mutex.unlockEx();
 			}
-
 			// mutexCounter--;
 			// log.debug("Exit: mutexCounter: "+String.valueOf(mutexCounter));
 
@@ -186,8 +150,9 @@ public class CallProcessor {
 	/* Creates a logged in session for any method call */
 	private MongoSession login(RequestBase req, SessionContext sessionContext) {
 
-		String userName = PrincipalName.ANON.s();
-		String password = PrincipalName.ANON.s();
+		// default to anonymous user
+		String userName = req == null || StringUtils.isEmpty(req.getUserName()) ? PrincipalName.ANON.s() : req.getUserName();
+		String password = req == null || StringUtils.isEmpty(req.getPassword()) ? PrincipalName.ANON.s() : req.getPassword();
 
 		LoginResponse res = null;
 		if (req instanceof LoginRequest) {
@@ -195,46 +160,31 @@ public class CallProcessor {
 			res.setUserPreferences(new UserPreferences());
 			ThreadLocals.setResponse(res);
 
-			LoginRequest loginRequest = (LoginRequest) req;
-			userName = loginRequest.getUserName();
-			password = loginRequest.getPassword();
-
-			if (userName.equals("")) {
+			userName = req.getUserName();
+			password = req.getPassword();
+		} else {
+			// If the session already contains user and pwd use those creds
+			if (sessionContext.getUserName() != null && sessionContext.getPassword() != null) {
 				userName = sessionContext.getUserName();
 				password = sessionContext.getPassword();
-			}
-
-			/* not logged in and page load is checking for logged in session */
-			if (userName == null) {
-				return null;
-			}
-		} else if (req instanceof ChangePasswordRequest && ((ChangePasswordRequest) req).getPassCode() != null) {
-			/*
-			 * we will have no session for user here, return null;
-			 */
-			return null;
-		} else if (req instanceof SignupRequest) {
-			// allow to proceed as 'anon'
-		} else {
-			userName = sessionContext.getUserName();
-			password = sessionContext.getPassword();
-
-			if (userName == null) {
-				userName = PrincipalName.ANON.s();
-			}
-
-			if (password == null) {
-				password = PrincipalName.ANON.s();
 			}
 		}
 
 		try {
+			/* in this auth.login we check credentials and throw exception if invalid */
 			MongoSession session = auth.login(userName, password);
+			sessionContext.setUserName(userName);
+			sessionContext.setPassword(password);
+
+			if (req instanceof LoginRequest) {
+				sessionContext.init(req);
+				userManagerService.processLogin(session, null, req.getUserName());
+			}
 			return session;
 		} catch (Exception e) {
 			if (res != null) {
 				res.setSuccess(false);
-				res.setMessage("Wrong username/password.");
+				res.setMessage("Unauthorized.");
 			}
 			throw ExUtil.wrapEx(e);
 		}

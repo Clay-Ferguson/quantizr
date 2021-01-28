@@ -539,7 +539,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
 	public @ResponseBody Object login(@RequestBody LoginRequest req, HttpSession session) {
 		return callProc.run("login", req, session, ms -> {
-			return userManagerService.login(null, req);
+			return userManagerService.postLogin(null, req);
 		});
 	}
 

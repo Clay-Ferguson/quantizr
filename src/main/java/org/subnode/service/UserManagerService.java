@@ -131,9 +131,10 @@ public class UserManagerService {
 	/*
 	 * Login mechanism is a bit tricky because the CallProcessor detects the LoginRequest and performs
 	 * authentication BEFORE this 'login' method even gets called, so by the time we are in this method
-	 * we can safely assume the userName and password resulted in a successful login.
+	 * we can safely assume the userName and password resulted in a successful login, so this method
+	 * really just is used to process some other higher level events after the login.
 	 */
-	public LoginResponse login(MongoSession session, RequestBase req) {
+	public LoginResponse postLogin(MongoSession session, RequestBase req) {
 		LoginResponse res = new LoginResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
@@ -728,7 +729,6 @@ public class UserManagerService {
 
 		String passCode = req.getPassCode();
 		if (passCode != null) {
-
 			/*
 			 * We can run this block as admin, because the codePart below is secret and is checked for a match
 			 */
@@ -845,8 +845,7 @@ public class UserManagerService {
 			update.save(session, ownerNode);
 
 			String passCode = ownerNode.getId().toHexString() + "-" + String.valueOf(authCode);
-
-			String link = appProp.getHostAndPort() + "?passCode=" + passCode;
+			String link = appProp.getHostAndPort() + "/app?passCode=" + passCode;
 
 			String content = "Password reset was requested on " + appProp.getBrandingAppName() + " account: " + user + //
 			"<p>\nGo to this link to reset your password: <br>\n" + link;
@@ -906,7 +905,8 @@ public class UserManagerService {
 	 */
 	public void cleanUserAccounts() {
 		// not currently used.
-		if (true) return;
+		if (true)
+			return;
 
 		adminRunner.run(session -> {
 			final Iterable<SubNode> accountNodes =

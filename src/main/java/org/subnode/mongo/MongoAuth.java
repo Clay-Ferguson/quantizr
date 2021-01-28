@@ -543,23 +543,37 @@ public class MongoAuth {
 	// ========================================================================
 
 	public MongoSession login(String userName, String password) {
-		// log.debug("Mongo API login: user="+userName);
-		MongoSession session = MongoSession.createFromUser(PrincipalName.ANON.s());
+		log.debug("Mongo API login: user=" + userName);
 
-		/*
+		/* 
+		 * Anonymous
+		 * 
 		 * If username is null or anonymous, we assume anonymous is acceptable and return anonymous session
 		 * or else we check the credentials.
 		 */
-		if (!PrincipalName.ANON.s().equals(userName)) {
-			log.trace("looking up user node.");
+		if (PrincipalName.ANON.s().equals(userName)) {
+			return MongoSession.createFromUser(PrincipalName.ANON.s());
+		}
+		/* Admin Login */
+		else if (PrincipalName.ADMIN.s().equals(userName)) {
+			if (password.equals(appProp.getMongoAdminPassword())) {
+				MongoSession session = MongoSession.createFromUser(PrincipalName.ANON.s());
+				session.setUser(userName);
+				SubNode userNode = read.getUserNodeByUserName(getAdminSession(), userName);
+				session.setUserNode(userNode);
+				return session;
+			}
+			else throw new RuntimeEx("Login failed.");
+		} 
+		/* User Login */
+		else {
+			MongoSession session = MongoSession.createFromUser(PrincipalName.ANON.s());
 			SubNode userNode = read.getUserNodeByUserName(getAdminSession(), userName);
 			boolean success = false;
 
 			if (userNode != null) {
-
-				/*
-				 * If logging in as ADMIN we don't expect the node to contain any password in the db, but just use
-				 * the app property instead.
+				/**
+				 * We can log in as any user we want if we have the admin password.
 				 */
 				if (password.equals(appProp.getMongoAdminPassword())) {
 					success = true;
@@ -576,8 +590,8 @@ public class MongoAuth {
 			} else {
 				throw new RuntimeEx("Login failed.");
 			}
+			return session;
 		}
-		return session;
 	}
 
 	public HashSet<String> parseMentions(String message) {

@@ -11,7 +11,6 @@ import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
@@ -30,9 +29,6 @@ import org.subnode.util.DateUtil;
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class SessionContext {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
-
-	@Autowired
-	MongoUtil repoUtil;
 
 	private String error;
 
@@ -78,8 +74,6 @@ public class SessionContext {
 	public void init(RequestBase req) {
 		setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
 		setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
-		setUserName(req.getUserName());
-		setPassword(req.getPassword());
 	}
 
 	public static boolean validToken(String token) {
@@ -133,7 +127,7 @@ public class SessionContext {
 	}
 
 	public boolean isTestAccount() {
-		return repoUtil.isTestAccountName(userName);
+		return MongoUtil.isTestAccountName(userName);
 	}
 
 	public String formatTimeForUserTimezone(Date date) {

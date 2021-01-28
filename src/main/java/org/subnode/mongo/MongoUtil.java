@@ -61,7 +61,7 @@ public class MongoUtil {
 	@Autowired
 	private MongoRead read;
 
-	private HashSet<String> testAccountNames = new HashSet<String>();
+	private static HashSet<String> testAccountNames = new HashSet<String>();
 
 	@Autowired
 	private MongoAppConfig mac;
@@ -165,7 +165,7 @@ public class MongoUtil {
 		});
 	}
 
-	public boolean isTestAccountName(String userName) {
+	public static boolean isTestAccountName(String userName) {
 		return testAccountNames.contains(userName);
 	}
 

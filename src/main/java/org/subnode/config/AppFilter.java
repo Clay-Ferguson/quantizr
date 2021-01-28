@@ -53,8 +53,6 @@ public class AppFilter extends GenericFilterBean {
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 		try {
 			int thisReqId = ++reqId;
-
-			boolean initialSessionExisted = false;
 			String ip = null;
 
 			if (req instanceof HttpServletRequest) {
@@ -68,8 +66,6 @@ public class AppFilter extends GenericFilterBean {
 				} else {
 					log.trace("******** SESSION existed: lastAccessed: "
 							+ ((System.currentTimeMillis() - session.getLastAccessedTime()) / 1000) + "secs ago.");
-
-					initialSessionExisted = true;
 				}
 
 				if (session == null) {
@@ -95,8 +91,6 @@ public class AppFilter extends GenericFilterBean {
 			} else {
 				// log.debug("******* req class: "+req.getClass().getName());
 			}
-
-			ThreadLocals.setInitialSessionExisted(initialSessionExisted);
 
 			if (res instanceof HttpServletResponse) {
 				ThreadLocals.setServletResponse((HttpServletResponse) res);

@@ -20,7 +20,6 @@ public class ThreadLocals {
 	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<HttpServletResponse>();
 	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<HttpSession>();
 	private static final ThreadLocal<SessionContext> sessionContext = new ThreadLocal<SessionContext>();
-	private static final ThreadLocal<Boolean> initialSessionExisted = new ThreadLocal<Boolean>();
 	private static final ThreadLocal<MongoSession> mongoSession = new ThreadLocal<MongoSession>();
 	private static final ThreadLocal<ResponseBase> oakResponse = new ThreadLocal<ResponseBase>();
 
@@ -28,7 +27,6 @@ public class ThreadLocals {
 		httpSession.remove();
 		sessionContext.remove();
 		servletResponse.remove();
-		initialSessionExisted.remove();
 		oakResponse.remove();
 		mongoSession.remove();
 	}
@@ -71,16 +69,5 @@ public class ThreadLocals {
 
 	public static ResponseBase getResponse() {
 		return oakResponse.get();
-	}
-
-	public static void setInitialSessionExisted(Boolean val) {
-		initialSessionExisted.set(val);
-	}
-
-	public static Boolean getInitialSessionExisted() {
-		if (initialSessionExisted.get() == null) {
-			return false;
-		}
-		return initialSessionExisted.get();
 	}
 }
