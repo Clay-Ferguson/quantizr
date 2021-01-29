@@ -244,8 +244,9 @@ public class MongoRead {
      * 1) ID (hex string, no special prefix)
      * 2) path (starts with slash), 
      * 3) global name (name of admin owned node, starts with colon, and only contains one colon)
-     * 4) name of user owned node fomratted as (":userName:nodeName")
-     * 5) special named location, like '~sn:inbox', or '~sn:friendList' (starts with tilde)
+     * 4) name of user owned node formatted as (":userName:nodeName")
+     * 5) name of an admin-owned node formatted as ":nodeName"
+     * 6) special named location, like '~sn:inbox', or '~sn:friendList' (starts with tilde)
      *    (we support just '~inbox' also as a type shorthand where the sn: is missing)
      * </pre>
      */
