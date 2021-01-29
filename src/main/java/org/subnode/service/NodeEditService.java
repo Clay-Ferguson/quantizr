@@ -131,7 +131,7 @@ public class NodeEditService {
 		/* Node still null try other ways of getting it */
 		if (node == null) {
 			if (nodeId.equals("~" + NodeType.NOTES.s())) {
-				node = read.getUserNodeByType(session, session.getUser(), null, "### Notes", NodeType.NOTES.s());
+				node = read.getUserNodeByType(session, session.getUserName(), null, "### Notes", NodeType.NOTES.s());
 			} else {
 				node = read.getNode(session, nodeId);
 			}
@@ -207,7 +207,7 @@ public class NodeEditService {
 			return res;
 		}
 
-		SubNode linksNode = read.getUserNodeByType(session, session.getUser(), null, "### Notes", NodeType.NOTES.s());
+		SubNode linksNode = read.getUserNodeByType(session, session.getUserName(), null, "### Notes", NodeType.NOTES.s());
 
 		if (linksNode == null) {
 			log.warn("unable to get linksNode");

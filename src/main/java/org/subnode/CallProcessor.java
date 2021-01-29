@@ -82,7 +82,7 @@ public class CallProcessor {
 				mongoSession = processCredentialsAndGetSession(req);
 				ThreadLocals.setMongoSession(mongoSession);
 
-				if (mongoSession == null || mongoSession.getUser() == null) {
+				if (mongoSession == null || mongoSession.getUserName() == null) {
 					if (!(req instanceof ChangePasswordRequest)) {
 						throw new NotLoggedInException();
 					}
@@ -153,7 +153,6 @@ public class CallProcessor {
 		if (req instanceof LoginRequest) {
 			res = new LoginResponse();
 			res.setUserPreferences(new UserPreferences());
-			ThreadLocals.setResponse(res); // todo-0: doesn't LoginResponse do this in the superclass?
 
 			userName = req.getUserName();
 			password = req.getPassword();

@@ -92,13 +92,13 @@ public class MongoRead {
         if (session.getUserNode() != null) {
             ownerId = session.getUserNode().getOwner();
         } else {
-            SubNode ownerNode = getUserNodeByUserName(auth.getAdminSession(), session.getUser());
+            SubNode ownerNode = getUserNodeByUserName(auth.getAdminSession(), session.getUserName());
             if (ownerNode == null) {
                 /*
                  * slight mod to help bootstrapping when the admin doesn't initially have an ownernode until created
                  */
                 if (!session.isAdmin()) {
-                    throw new RuntimeEx("No user node found for user: " + session.getUser());
+                    throw new RuntimeEx("No user node found for user: " + session.getUserName());
                 } else
                     return null;
             } else {
@@ -263,7 +263,7 @@ public class MongoRead {
             if (!typeName.startsWith("sn:")) {
                 typeName = "sn:" + typeName;
             }
-            ret = getUserNodeByType(session, session.getUser(), null, null, typeName);
+            ret = getUserNodeByType(session, session.getUserName(), null, null, typeName);
         }
         // Node name lookups are done by prefixing the search with a colon (:)
         else if (identifier.startsWith(":")) {

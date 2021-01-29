@@ -771,7 +771,7 @@ public class UserManagerService {
 				// note: the adminRunner.run saves the session so we don't do that here.
 			});
 		} else {
-			userNode[0] = read.getUserNodeByUserName(session, session.getUser());
+			userNode[0] = read.getUserNodeByUserName(session, session.getUserName());
 
 			if (userNode[0] == null) {
 				throw ExUtil.wrapEx("changePassword cannot find user.");

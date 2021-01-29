@@ -12,9 +12,7 @@ where we pass this value from function to function endlessly */
 public class MongoSession {
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
 
-	//todo-0: rename this to userName
-	private String user;
-
+	private String userName;
 	private SubNode userNode;
 
 	// tiny bit of a hack to detect and avoid recursion in the saveSession
@@ -26,7 +24,7 @@ public class MongoSession {
 
 	public static MongoSession createFromUser(String user) {
 		MongoSession session = new MongoSession();
-		session.setUser(user);
+		session.setUserName(user);
 		return session;
 	}
 
@@ -37,19 +35,19 @@ public class MongoSession {
 	}
 
 	public boolean isAdmin() {
-		return PrincipalName.ADMIN.s().equals(user);
+		return PrincipalName.ADMIN.s().equals(userName);
 	}
 
 	public boolean isAnon() {
-		return PrincipalName.ANON.s().equals(user);
+		return PrincipalName.ANON.s().equals(userName);
 	}
 
-	public String getUser() {
-		return user;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setUser(String user) {
-		this.user = user;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 	public SubNode getUserNode() {

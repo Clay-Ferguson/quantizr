@@ -570,7 +570,7 @@ public class MongoAuth {
 		else if (PrincipalName.ADMIN.s().equals(userName)) {
 			if (password.equals(appProp.getMongoAdminPassword())) {
 				session = MongoSession.createFromUser(PrincipalName.ANON.s());
-				session.setUser(userName);
+				session.setUserName(userName);
 				userNode = read.getUserNodeByUserName(getAdminSession(), userName);
 				session.setUserNode(userNode);
 				success = true;
@@ -596,7 +596,7 @@ public class MongoAuth {
 			}
 
 			if (success) {
-				session.setUser(userName);
+				session.setUserName(userName);
 				session.setUserNode(userNode);
 			} else {
 				throw new RuntimeEx("Login failed.");
