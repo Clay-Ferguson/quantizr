@@ -12,7 +12,9 @@ where we pass this value from function to function endlessly */
 public class MongoSession {
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
 
+	//todo-0: rename this to userName
 	private String user;
+
 	private SubNode userNode;
 
 	// tiny bit of a hack to detect and avoid recursion in the saveSession

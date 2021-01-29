@@ -165,7 +165,7 @@ public class UserManagerService {
 			res.setMessage("not logged in.");
 			res.setSuccess(false);
 		} else {
-			processLogin(session, res, userName);
+			processLogin(session, res, userName, null);
 			res.setSuccess(true);
 		}
 
@@ -184,8 +184,11 @@ public class UserManagerService {
 		return res;
 	}
 
-	public void processLogin(MongoSession session, LoginResponse res, String userName) {
-		SubNode userNode = read.getUserNodeByUserName(session, userName);
+	/* userNode should be passed if you have it already, but can be null of you don't */
+	public void processLogin(MongoSession session, LoginResponse res, String userName, SubNode userNode) {
+		if (userNode == null) {
+			userNode = read.getUserNodeByUserName(session, userName);
+		}
 		if (userNode == null) {
 			throw new RuntimeEx("User not found: " + userName);
 		}
@@ -194,7 +197,7 @@ public class UserManagerService {
 		String id = userNode.getId().toHexString();
 		sc.setRootId(id);
 
-		UserPreferences userPreferences = getUserPreferences(userName);
+		UserPreferences userPreferences = getUserPreferences(userName, userNode);
 		sc.setUserPreferences(userPreferences);
 
 		if (res != null) {
@@ -697,11 +700,14 @@ public class UserManagerService {
 		return new UserPreferences();
 	}
 
-	public UserPreferences getUserPreferences(String userName) {
+	public UserPreferences getUserPreferences(String userName, SubNode _prefsNode) {
 		final UserPreferences userPrefs = new UserPreferences();
 
 		adminRunner.run(session -> {
-			SubNode prefsNode = read.getUserNodeByUserName(session, userName);
+			SubNode prefsNode = _prefsNode;
+			if (prefsNode == null) {
+				prefsNode = read.getUserNodeByUserName(session, userName);
+			}
 			userPrefs.setEditMode(prefsNode.getBooleanProp(NodeProp.USER_PREF_EDIT_MODE.s()));
 			userPrefs.setShowMetaData(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_METADATA.s()));
 

@@ -6,7 +6,7 @@ import org.subnode.response.base.ResponseBase;
 public class LoginResponse extends ResponseBase {
 
 	// Node Id of user account logged in.
-	private String /* Ref Info */ rootNode;
+	private String rootNode;
 
 	private String rootNodePath;
 

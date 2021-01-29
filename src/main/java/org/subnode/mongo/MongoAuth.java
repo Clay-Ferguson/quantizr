@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
+import org.subnode.config.SessionContext;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.AccessControlInfo;
@@ -29,7 +30,11 @@ import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.request.LoginRequest;
+import org.subnode.request.base.RequestBase;
 import org.subnode.service.ActPubService;
+import org.subnode.service.UserManagerService;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 /**
@@ -56,6 +61,9 @@ public class MongoAuth {
 
 	@Autowired
 	private ActPubService actPub;
+
+	@Autowired
+	private UserManagerService userManagerService;
 
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
@@ -542,34 +550,37 @@ public class MongoAuth {
 
 	// ========================================================================
 
-	public MongoSession login(String userName, String password) {
-		log.debug("Mongo API login: user=" + userName);
+	public MongoSession processCredentials(String userName, String password, RequestBase req) {
+		// log.debug("Mongo API: user=" + userName);
+		MongoSession session = null;
+		SubNode userNode = null;
+		boolean success = false;
 
-		/* 
+		/*
 		 * Anonymous
 		 * 
 		 * If username is null or anonymous, we assume anonymous is acceptable and return anonymous session
 		 * or else we check the credentials.
 		 */
 		if (PrincipalName.ANON.s().equals(userName)) {
-			return MongoSession.createFromUser(PrincipalName.ANON.s());
+			session = MongoSession.createFromUser(PrincipalName.ANON.s());
+			success = true;
 		}
 		/* Admin Login */
 		else if (PrincipalName.ADMIN.s().equals(userName)) {
 			if (password.equals(appProp.getMongoAdminPassword())) {
-				MongoSession session = MongoSession.createFromUser(PrincipalName.ANON.s());
+				session = MongoSession.createFromUser(PrincipalName.ANON.s());
 				session.setUser(userName);
-				SubNode userNode = read.getUserNodeByUserName(getAdminSession(), userName);
+				userNode = read.getUserNodeByUserName(getAdminSession(), userName);
 				session.setUserNode(userNode);
-				return session;
-			}
-			else throw new RuntimeEx("Login failed.");
-		} 
+				success = true;
+			} else
+				throw new RuntimeEx("Login failed.");
+		}
 		/* User Login */
 		else {
-			MongoSession session = MongoSession.createFromUser(PrincipalName.ANON.s());
-			SubNode userNode = read.getUserNodeByUserName(getAdminSession(), userName);
-			boolean success = false;
+			session = MongoSession.createFromUser(PrincipalName.ANON.s());
+			userNode = read.getUserNodeByUserName(getAdminSession(), userName);
 
 			if (userNode != null) {
 				/**
@@ -590,8 +601,23 @@ public class MongoAuth {
 			} else {
 				throw new RuntimeEx("Login failed.");
 			}
-			return session;
 		}
+
+		if (success) {
+			SessionContext sc = ThreadLocals.getSessionContext();
+			/*
+			 * if we get here then userName and password are guaranteed valid, and this should be the only place
+			 * in our code where we set userName or password on any sessionContext object
+			 */
+			sc.setUserName(userName);
+			sc.setPassword(password);
+
+			if (req instanceof LoginRequest) {
+				sc.init(req);
+				userManagerService.processLogin(session, null, req.getUserName(), userNode);
+			}
+		}
+		return session;
 	}
 
 	public HashSet<String> parseMentions(String message) {

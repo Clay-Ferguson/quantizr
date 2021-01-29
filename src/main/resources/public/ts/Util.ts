@@ -13,6 +13,7 @@ import { EventInput } from "@fullcalendar/react";
 import * as marked from "marked";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import { store } from "./AppRedux";
+import { DialogBase } from "./DialogBase";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -412,7 +413,7 @@ export class Util implements UtilIntf {
         postData.userName = postData.userName || S.meta64.userName;
         postData.password = postData.password || S.meta64.password;
         postData.tzOffset = postData.tzOffset || new Date().getTimezoneOffset();
-        postData.dst = postData.dst || S.util.daylightSavingsTime;
+        postData.dst = postData.dst || this.daylightSavingsTime;
 
         let axiosRequest;
 
@@ -466,14 +467,14 @@ export class Util implements UtilIntf {
 
                     if (!response.data.success) {
                         if (response.data.message) {
-                            this.showMessage(response.data.message, "Warning");
-
                             console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
                                 this.prettyPrint(response));
 
-                            // calling the failCallback here is new. (6/24/2020)
                             if (typeof failCallback === "function") {
                                 failCallback(null);
+                            }
+                            else {
+                                this.showMessage(response.data.message, "Message");
                             }
 
                             return;
@@ -517,14 +518,14 @@ export class Util implements UtilIntf {
                         }
 
                         // we wait about a second for user to have time to see the message that their session had timed out.
-                        setTimeout(async () => {
-                            // window.onbeforeunload = null;
-                            // window.location.href = window.location.origin;
-                            // await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
+                        // setTimeout(async () => {
+                        //     // window.onbeforeunload = null;
+                        //     // window.location.href = window.location.origin;
+                        //     // await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
 
-                            // NOTE: This opens the login dialog. Requires user to click login before attempting a login.
-                            S.nav.login(null);
-                        }, 200);
+                        //     // NOTE: This opens the login dialog. Requires user to click login before attempting a login.
+                        //     S.nav.login(state);
+                        // }, 200);
                         return;
                     }
 
@@ -626,8 +627,8 @@ export class Util implements UtilIntf {
         new MessageDlg(message, title, null, null, preformatted, 4500, null).open();
     }
 
-    showMessage = (message: string, title: string, preformatted: boolean = false, sizeStyle: string = null): void => {
-        new MessageDlg(message, title, null, null, preformatted, 0, null).open();
+    showMessage = (message: string, title: string, preformatted: boolean = false, sizeStyle: string = null): Promise<DialogBase> => {
+        return new MessageDlg(message, title, null, null, preformatted, 0, null).open();
     }
 
     addAllToSet = (set: Set<string>, array): void => {
@@ -1360,8 +1361,8 @@ export class Util implements UtilIntf {
 
         // the marked adds a 'p tag' wrapping we don't need so we remove it just to speed up DOM as much as possible
         val = val.trim();
-        val = S.util.stripIfStartsWith(val, "<p>");
-        val = S.util.stripIfEndsWith(val, "</p>");
+        val = this.stripIfStartsWith(val, "<p>");
+        val = this.stripIfEndsWith(val, "</p>");
 
         return val;
     }
@@ -1396,10 +1397,10 @@ export class Util implements UtilIntf {
     }
 
     publishNodeToIpfs = (node: J.NodeInfo): any => {
-        S.util.ajax<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
+        this.ajax<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
             nodeId: node.id
         }, (res) => {
-            S.util.showMessage(res.message, "Server Reply", true);
+            this.showMessage(res.message, "Server Reply", true);
         });
     }
 

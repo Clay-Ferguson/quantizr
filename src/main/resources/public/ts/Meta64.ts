@@ -666,7 +666,7 @@ export class Meta64 implements Meta64Intf {
                 S.render.renderPageFromData(res, false, null, true, true, state);
             },
             (res: any): void => {
-                S.nav.login(null);
+                S.nav.login(state);
             }
         );
     }

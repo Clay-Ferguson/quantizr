@@ -547,10 +547,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object closeAccount(@RequestBody CloseAccountRequest req, HttpSession session) {
 		return callProc.run("closeAccount", req, session, ms -> {
 			CloseAccountResponse res = userManagerService.closeAccount(req);
-			SessionContext sessionContext = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
-			if (sessionContext != null) {
-				sessionContext.setHttpSessionToInvalidate(session);
-			}
+			session.invalidate();
 			return res;
 		});
 	}
@@ -558,6 +555,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/logout", method = RequestMethod.POST)
 	public @ResponseBody Object logout(@RequestBody LogoutRequest req, HttpSession session) {
 		return callProc.run("logout", req, session, ms -> {
+			//WARNING: ms will be null here always. Don't use.
 			session.invalidate();
 			LogoutResponse res = new LogoutResponse();
 			res.setSuccess(true);

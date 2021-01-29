@@ -33,7 +33,7 @@ export class SignupDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new TextField("User", false, null, null, false, this.userState),
+                new TextField("User Name", false, null, null, false, this.userState),
                 new TextField("Password", true, null, null, false, this.passwordState),
                 new TextField("Email", false, null, null, false, this.emailState),
                 new ButtonBar([
@@ -110,7 +110,6 @@ export class SignupDlg extends DialogBase {
     }
 
     signupNow = (reCaptchaToken: string): void => {
-
         S.util.ajax<J.SignupRequest, J.SignupResponse>("signup", {
             userName: this.userState.getValue(),
             password: this.passwordState.getValue(),
@@ -119,14 +118,16 @@ export class SignupDlg extends DialogBase {
         }, this.signupResponse);
     }
 
-    signupResponse = (res: J.SignupResponse): void => {
+    signupResponse = async (res: J.SignupResponse): Promise<void> => {
         if (res.success) {
             /* close the signup dialog */
             this.close();
 
-            S.util.showMessage(
+            await S.util.showMessage(
                 "User Information Accepted.<p/><p/>Check your email for verification link.", "Note"
             );
+
+            window.location.href = window.location.origin;
         }
         else {
             let errors: any = {};
@@ -136,5 +137,6 @@ export class SignupDlg extends DialogBase {
             this.passwordState.setError(res.passwordError);
             this.emailState.setError(res.emailError);
         }
+        return null;
     }
 }

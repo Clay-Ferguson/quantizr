@@ -307,9 +307,7 @@ export class Render implements RenderIntf {
                             }
 
                             S.render.fadeInId = targetNodeId;
-
-                            // this is new. not fully vetted.
-                            state.pendingLocationHash = null;
+                            s.pendingLocationHash = null;
                         }
                         else {
                             if (!S.render.fadeInId) {
@@ -319,7 +317,7 @@ export class Render implements RenderIntf {
 
                         s.selectedNodes = {};
 
-                        if (s.node && !state.isAnonUser) {
+                        if (s.node && !s.isAnonUser) {
                             // now that 'redux' is in control and we call this method less directly/often, I need to check to see if
                             // this method is getting called every time it should.
                             S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
@@ -332,16 +330,16 @@ export class Render implements RenderIntf {
 
                         // NOTE: In these blocks we set rendering=true only if we're scrolling so that the user doesn't see
                         // a jump in position during scroll, but a smooth reveal of the post-scroll location/rendering.
-                        if (state.pendingLocationHash) {
+                        if (s.pendingLocationHash) {
                             // console.log("highlight: pendingLocationHash");
-                            window.location.hash = state.pendingLocationHash;
+                            window.location.hash = s.pendingLocationHash;
                             // Note: the substring(1) trims the "#" character off.
                             if (allowScroll) {
                                 // console.log("highlight: pendingLocationHash (allowScroll)");
-                                S.meta64.highlightRowById(state.pendingLocationHash.substring(1), true, s);
+                                S.meta64.highlightRowById(s.pendingLocationHash.substring(1), true, s);
                                 s.rendering = true;
                             }
-                            state.pendingLocationHash = null;
+                            s.pendingLocationHash = null;
                         }
                         else if (allowScroll && targetNodeId) {
                             // console.log("highlight: byId");

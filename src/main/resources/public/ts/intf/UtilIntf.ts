@@ -3,6 +3,7 @@ import { AppState } from "../AppState";
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { EventInput } from "@fullcalendar/react";
+import { DialogBase } from "../DialogBase";
 
 export interface UtilIntf {
     logAjax: boolean;
@@ -65,7 +66,7 @@ export interface UtilIntf {
     delayedFocus(id: string): void;
     checkSuccess(opFriendlyName, res): boolean;
     flashMessage(message: string, title: string, preformatted?: boolean, sizeStyle?: string): void;
-    showMessage(message: string, title: string, preformatted?: boolean, sizeStyle?: string): void;
+    showMessage(message: string, title: string, preformatted?: boolean, sizeStyle?: string): Promise<DialogBase>;
     addAllToSet(set: Set<string>, array): void;
     nullOrUndef(obj): boolean;
     elementExists(id): boolean;

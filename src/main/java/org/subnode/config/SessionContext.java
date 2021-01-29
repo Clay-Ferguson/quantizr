@@ -53,8 +53,6 @@ public class SessionContext {
 
 	public int counter;
 
-	private HttpSession httpSessionToInvalidate;
-
 	/* Emitter for sending push notifications to the client */
 	private SseEmitter pushEmitter;
 
@@ -156,13 +154,6 @@ public class SessionContext {
 		}
 	}
 
-	public void maybeInvalidate() {
-		if (getHttpSessionToInvalidate() != null) {
-			getHttpSessionToInvalidate().invalidate();
-			setHttpSessionToInvalidate(null);
-		}
-	}
-
 	/*
 	 * This can create nasty bugs. I should be always getting user name from the actual session object
 	 * itself in all the logic... in most every case except maybe login process.
@@ -221,14 +212,6 @@ public class SessionContext {
 
 	public void setUserPreferences(UserPreferences userPreferences) {
 		this.userPreferences = userPreferences;
-	}
-
-	public HttpSession getHttpSessionToInvalidate() {
-		return httpSessionToInvalidate;
-	}
-
-	public void setHttpSessionToInvalidate(HttpSession httpSessionToInvalidate) {
-		this.httpSessionToInvalidate = httpSessionToInvalidate;
 	}
 
 	public String getError() {

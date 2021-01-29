@@ -31,7 +31,7 @@ export class ResetPasswordDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new TextContent("Enter your user name and email address and a change-password link will be sent to you"),
+                new TextContent("Enter your user name and email address to recieve a reset link."),
                 new TextField("User Name", false, null, null, false, this.userState),
                 new TextField("Email Address", false, null, null, false, this.emailState),
                 new ButtonBar([
@@ -84,7 +84,7 @@ export class ResetPasswordDlg extends DialogBase {
     resetPasswordResponse = (res: J.ResetPasswordResponse): void => {
         if (S.util.checkSuccess("Reset password", res)) {
             this.close();
-            S.util.showMessage("Password reset email was sent. Check your email.", "Warning");
+            S.util.showMessage("Password reset email was sent. Check your email.", "Note");
         }
     }
 }

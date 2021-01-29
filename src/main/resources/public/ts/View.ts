@@ -41,7 +41,6 @@ export class View implements ViewIntf {
             offset = firstChild ? firstChild.logicalOrdinal : 0;
         }
 
-        // console.log("refreshTree renderNode: " + nodeId);
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId,
             upLevel: false,

@@ -17,7 +17,7 @@ export class User implements UserIntf {
 
     private logoutResponse = (res: J.LogoutResponse): void => {
         /* reloads browser with the query parameters stripped off the path */
-        window.location.href = window.location.origin + "/app";
+        window.location.href = window.location.origin; // + "/app";
     }
 
     closeAccountResponse = (res: J.CloseAccountResponse): void => {
@@ -70,8 +70,6 @@ export class User implements UserIntf {
     refreshLogin = async (state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                console.log("refreshLogin.");
-
                 const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
 
                 /* if we have known state as logged out, then do nothing here */

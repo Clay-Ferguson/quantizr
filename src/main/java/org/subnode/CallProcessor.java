@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 import org.subnode.config.SessionContext;
-import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.NotLoggedInException;
 import org.subnode.model.UserPreferences;
 import org.subnode.model.client.PrincipalName;
@@ -19,10 +18,10 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.LoginRequest;
+import org.subnode.request.LogoutRequest;
 import org.subnode.request.base.RequestBase;
 import org.subnode.response.LoginResponse;
 import org.subnode.response.base.ResponseBase;
-import org.subnode.service.UserManagerService;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LockEx;
 import org.subnode.util.MongoRunnableEx;
@@ -39,17 +38,16 @@ public class CallProcessor {
 	@Autowired
 	private MongoAuth auth;
 
-	@Autowired
-	private UserManagerService userManagerService;
-
 	private static final boolean logRequests = true;
 	// private static int mutexCounter = 0;
 
-	// Most (but not all) of the time this return value is ResponseBase type, or
-	// derived from that.
+	/*
+	 * Wraps the processing of any command by using whatever info is on the session and/or the request
+	 * to perform the login if the user is not logged in, and then call the function to be processed
+	 */
 	public Object run(String command, RequestBase req, HttpSession httpSession, MongoRunnableEx runner) {
 		if (AppServer.isShuttingDown()) {
-			throw ExUtil.wrapEx("Server is shutting down.");
+			throw ExUtil.wrapEx("Server not available.");
 		}
 
 		ThreadLocals.setHttpSession(httpSession);
@@ -64,8 +62,6 @@ public class CallProcessor {
 
 		Object ret = null;
 		MongoSession mongoSession = null;
-		SessionContext sessionContext = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
-
 		LockEx mutex = (LockEx) WebUtils.getSessionMutex(ThreadLocals.getHttpSession());
 		if (mutex == null) {
 			log.error("Session mutex lock is null.");
@@ -75,20 +71,26 @@ public class CallProcessor {
 			if (mutex != null) {
 				mutex.lockEx();
 			}
-			// mutexCounter++;
-			// log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
 
-			mongoSession = login(req, sessionContext);
-			ThreadLocals.setMongoSession(mongoSession);
+			if (req instanceof LogoutRequest) {
+				// Note: all this run will be doing in this case is a session invalidate.
+				ret = runner.run(null);
+			} else {
+				// mutexCounter++;
+				// log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
 
-			if (mongoSession == null || mongoSession.getUser() == null) {
-				if (!(req instanceof ChangePasswordRequest)) {
-					throw new NotLoggedInException();
+				mongoSession = processCredentialsAndGetSession(req);
+				ThreadLocals.setMongoSession(mongoSession);
+
+				if (mongoSession == null || mongoSession.getUser() == null) {
+					if (!(req instanceof ChangePasswordRequest)) {
+						throw new NotLoggedInException();
+					}
 				}
-			}
 
-			ret = runner.run(mongoSession);
-			update.saveSession(mongoSession);
+				ret = runner.run(mongoSession);
+				update.saveSession(mongoSession);
+			}
 
 		} catch (NotLoggedInException e1) {
 			HttpServletResponse res = ThreadLocals.getServletResponse();
@@ -131,16 +133,9 @@ public class CallProcessor {
 			// mutexCounter--;
 			// log.debug("Exit: mutexCounter: "+String.valueOf(mutexCounter));
 
-			try {
-				/* cleanup this thread, servers reuse threads */
-				ThreadLocals.setMongoSession(null);
-				ThreadLocals.setResponse(null);
-				if (sessionContext != null) {
-					sessionContext.maybeInvalidate();
-				}
-			} catch (Exception e) {
-				ExUtil.error(log, "exception in call processor finally block. ignoring.", e);
-			}
+			/* cleanup this thread, servers reuse threads */
+			ThreadLocals.setMongoSession(null);
+			ThreadLocals.setResponse(null);
 		}
 
 		logResponse(ret);
@@ -148,38 +143,36 @@ public class CallProcessor {
 	}
 
 	/* Creates a logged in session for any method call */
-	private MongoSession login(RequestBase req, SessionContext sessionContext) {
+	private MongoSession processCredentialsAndGetSession(RequestBase req) {
 
-		// default to anonymous user
-		String userName = req == null || StringUtils.isEmpty(req.getUserName()) ? PrincipalName.ANON.s() : req.getUserName();
-		String password = req == null || StringUtils.isEmpty(req.getPassword()) ? PrincipalName.ANON.s() : req.getPassword();
+		SessionContext sc = ThreadLocals.getSessionContext();
+		String userName = null;
+		String password = null;
 
 		LoginResponse res = null;
 		if (req instanceof LoginRequest) {
 			res = new LoginResponse();
 			res.setUserPreferences(new UserPreferences());
-			ThreadLocals.setResponse(res);
+			ThreadLocals.setResponse(res); // todo-0: doesn't LoginResponse do this in the superclass?
 
 			userName = req.getUserName();
 			password = req.getPassword();
 		} else {
 			// If the session already contains user and pwd use those creds
-			if (sessionContext.getUserName() != null && sessionContext.getPassword() != null) {
-				userName = sessionContext.getUserName();
-				password = sessionContext.getPassword();
+			if (sc.getUserName() != null && sc.getPassword() != null) {
+				userName = sc.getUserName();
+				password = sc.getPassword();
+			}
+			// Otherwise take the creds off the 'req' if existing, or use 'anon' for both if not.
+			else {
+				userName = req == null || StringUtils.isEmpty(req.getUserName()) ? PrincipalName.ANON.s() : req.getUserName();
+				password = req == null || StringUtils.isEmpty(req.getPassword()) ? PrincipalName.ANON.s() : req.getPassword();
 			}
 		}
 
 		try {
 			/* in this auth.login we check credentials and throw exception if invalid */
-			MongoSession session = auth.login(userName, password);
-			sessionContext.setUserName(userName);
-			sessionContext.setPassword(password);
-
-			if (req instanceof LoginRequest) {
-				sessionContext.init(req);
-				userManagerService.processLogin(session, null, req.getUserName());
-			}
+			MongoSession session = auth.processCredentials(userName, password, req);
 			return session;
 		} catch (Exception e) {
 			if (res != null) {
