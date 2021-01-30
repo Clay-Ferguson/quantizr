@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -18,7 +17,6 @@ import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
-import org.subnode.config.SessionContext;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
@@ -31,9 +29,6 @@ import org.subnode.service.UserFeedService;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
-/**
- * Utilities related to management of the JCR Repository
- */
 @Component
 public class MongoRead {
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);

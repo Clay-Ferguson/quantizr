@@ -54,7 +54,7 @@ import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
 /**
- * Service for editing content of nodes. That is, this method updates property values of JCR nodes.
+ * Service for editing content of nodes. That is, this method updates property values of nodes.
  * As the user is using the application and moving, copy+paste, or editing node content this is the
  * service that performs those operations on the server, directly called from the HTML 'controller'
  */
@@ -128,7 +128,7 @@ public class NodeEditService {
 			}
 		}
 
-		/* Node still null try other ways of getting it */
+		/* Node still null, then try other ways of getting it */
 		if (node == null) {
 			if (nodeId.equals("~" + NodeType.NOTES.s())) {
 				node = read.getUserNodeByType(session, session.getUserName(), null, "### Notes", NodeType.NOTES.s());
@@ -145,6 +145,11 @@ public class NodeEditService {
 
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
+		String parentHashTags = parseHashTags(node.getContent());
+		if (parentHashTags.length() > 0) {
+			parentHashTags = "\n\n" + parentHashTags + "\n";
+		}
+
 		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null);
 
 		// '/r/p/' = pending (nodes not yet published, being edited created by users)
@@ -152,7 +157,7 @@ public class NodeEditService {
 			newNode.setPath(newNode.getPath().replace("/r/", "/r/p/"));
 		}
 
-		newNode.setContent(req.getContent() != null ? req.getContent() : "");
+		newNode.setContent(parentHashTags + (req.getContent() != null ? req.getContent() : ""));
 
 		if (req.isTypeLock()) {
 			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
@@ -171,6 +176,41 @@ public class NodeEditService {
 
 		res.setSuccess(true);
 		return res;
+	}
+
+	/* Takes a message that may have some hashtags in it and returns a string with all those hashtags in it
+	space delimited */
+	public String parseHashTags(String message) {
+		if (message==null) return "";
+		StringBuilder tags = new StringBuilder();
+
+		// prepare so that newlines are compatable with out tokenizing
+		message = message.replace("\n", " ");
+		message = message.replace("\r", " ");
+
+		/* Mastodon jams a bunch of html together like this for example: #<span>bot</span>
+		So we replace that html with spaces to make the tokenizer work. However I think it also stores
+		tags in structured JSON?
+		*/
+		message = message.replace("#<span>", "#");
+		message = message.replace("<span>", " ");
+		message = message.replace("</span>", " ");
+		message = message.replace("<", " ");
+		message = message.replace(">", " ");
+
+		List<String> words = XString.tokenize(message, " ", true);
+		if (words != null) {
+			for (String word : words) {
+				// be sure there aren't multiple pound signs other than just the first character. 
+				if (word.length() > 2 && word.startsWith("#") && StringUtils.countMatches(word, "#") == 1) {
+					if (tags.length() > 0) {
+						tags.append(" ");
+					}
+					tags.append(word);
+				}
+			}
+		}
+		return tags.toString();
 	}
 
 	public SubNode createFriendNode(MongoSession session, SubNode parentFriendsList, String userToFollow,
@@ -305,7 +345,6 @@ public class NodeEditService {
 					read.findSubNodesByProp(session, node.getParentPath(), NodeProp.USER.s(), friendUserName);
 
 			for (SubNode friendNode : friendNodes) {
-
 				/*
 				 * If we find any node that isn't the one we're editing then it's a duplicate and we just should
 				 * reject any saves. We delete it to fix the problem, and abort this save
@@ -322,6 +361,7 @@ public class NodeEditService {
 				}
 			}
 		}
+		
 		/*
 		 * The only purpose of this limit is to stop hackers from using up lots of space, because our only
 		 * current quota is on attachment file size uploads

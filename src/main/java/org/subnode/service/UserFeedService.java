@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
@@ -208,7 +210,7 @@ public class UserFeedService {
 					// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
 					String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
 					if (userNodeId != null) {
-						orCriteria.add(Criteria.where(SubNode.FIELD_OWNER).is( new ObjectId(userNodeId)));
+						orCriteria.add(Criteria.where(SubNode.FIELD_OWNER).is(new ObjectId(userNodeId)));
 					}
 				}
 			}
@@ -226,6 +228,13 @@ public class UserFeedService {
 
 		criteria.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
 
+		if (!StringUtils.isEmpty(req.getSearchText())) {
+			TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
+			MongoRead.populateTextCriteria(textCriteria, req.getSearchText());
+			textCriteria.caseSensitive(true);
+			query.addCriteria(textCriteria);
+		}
+
 		query.addCriteria(criteria);
 		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
 		query.limit(MAX_FEED_ITEMS);
@@ -236,7 +245,8 @@ public class UserFeedService {
 
 		Iterable<SubNode> iter = ops.find(query, SubNode.class);
 		for (SubNode node : iter) {
-			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1, false, false);
+			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1,
+					false, false);
 			searchResults.add(info);
 		}
 

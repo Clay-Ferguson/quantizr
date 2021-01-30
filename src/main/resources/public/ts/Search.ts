@@ -97,7 +97,7 @@ export class Search implements SearchIntf {
         }, this.timelineResponse);
     }
 
-    feed = (nodeId: string, feedUserName: string, page: number) => {
+    feed = (nodeId: string, feedUserName: string, page: number, searchText: string) => {
         let appState = store.getState();
         S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
@@ -107,7 +107,8 @@ export class Search implements SearchIntf {
             fromMe: appState.feedFilterFromMe,
             toPublic: appState.feedFilterToPublic,
             fromFriends: appState.feedFilterFriends,
-            nsfw: appState.feedFilterNSFW
+            nsfw: appState.feedFilterNSFW,
+            searchText
         }, this.feedResponse);
     }
 

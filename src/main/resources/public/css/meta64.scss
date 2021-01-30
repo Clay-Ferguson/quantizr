@@ -70,6 +70,10 @@ $smallBorderSize: 3px;
 //     }
 // }
 
+.feedSearchField {
+    max-width: 30em;
+}
+
 .signupLinkText {
     display: inline-block;
     margin-top: 16px;
@@ -350,7 +354,7 @@ strong em {
 
 .checkboxLabel {
     margin-right: 16px;
-    margin-bottom: $smallGap;
+    // margin-bottom: $smallGap;
 }
 
 .radioLabel {
@@ -378,7 +382,7 @@ entire thing down some times, if it's jutting up against something */
 .inline-checkbox {
     display: inline-block;
     cursor: pointer;
-    min-height: 3.4em;
+    min-height: 3em;
 }
 
 .inline-radio {

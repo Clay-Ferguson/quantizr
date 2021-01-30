@@ -75,11 +75,6 @@ public class NodeInfo {
 
 	private List<NodeInfo> children;
 
-	/*
-	 * These next three WERE (in jcr design) set on Client Side only but I need to
-	 * probably set them on server side instead or else completely generate
-	 * dynamically if based on properties.
-	 */
 	private String imgId;
 	private String owner;
 	private String ownerId;

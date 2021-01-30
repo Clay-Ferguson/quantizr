@@ -13,9 +13,6 @@ import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.IPFSService;
 
-/**
- * Utilities related to management of the JCR Repository
- */
 @Component
 public class MongoUpdate {
 	private static final Logger log = LoggerFactory.getLogger(MongoUpdate.class);

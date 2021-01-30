@@ -80,6 +80,7 @@ export class NodeCompBinary extends Div {
             type: "Action_ClickImage",
             state,
             update: (s: AppState): void => {
+                S.meta64.savedScrollPosition = window.scrollY;
                 if (s.fullScreenViewId && this.isFullScreenEmbed) {
                     s.fullScreenImageSize = s.fullScreenImageSize ? "" : "100%";
                 }

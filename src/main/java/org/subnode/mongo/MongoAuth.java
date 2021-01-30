@@ -37,9 +37,6 @@ import org.subnode.service.UserManagerService;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
-/**
- * Utilities related to management of the JCR Repository
- */
 @Component
 public class MongoAuth {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
@@ -623,7 +620,7 @@ public class MongoAuth {
 	public HashSet<String> parseMentions(String message) {
 		HashSet<String> userNames = new HashSet<String>();
 
-		// prepare to that newlines is compatable with out tokenizing
+		// prepare so that newlines are compatable with out tokenizing
 		message = message.replace("\n", " ");
 		message = message.replace("\r", " ");
 
@@ -631,7 +628,7 @@ public class MongoAuth {
 		if (words != null) {
 			for (String word : words) {
 				// detect the pattern @name@server.com or @name
-				if (word.startsWith("@") && StringUtils.countMatches(word, "@") <= 2) {
+				if (word.length() > 6 && word.startsWith("@") && StringUtils.countMatches(word, "@") <= 2) {
 					word = word.substring(1);
 
 					// This second 'startsWith' check ensures we ignore patterns that start with

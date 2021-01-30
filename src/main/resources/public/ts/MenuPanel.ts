@@ -52,16 +52,13 @@ export class MenuPanel extends Div {
         const children = [];
 
         children.push(new Menu("Site Nav", [
-            new MenuItem("Your Root Node", () => S.nav.navHome(state), !state.isAnonUser),
+            new MenuItem("Account Node", () => S.nav.navHome(state), !state.isAnonUser),
             new MenuItem("Portal Home", () => S.meta64.loadAnonPageHome(state)),
             new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide", state)),
             new MenuItem("Logout", () => S.nav.logout(state), !state.isAnonUser)
         ]));
 
         children.push(new Menu("Edit", [
-            !clientInfo.isMobile ? null : new MenuItem("Toggle Edit Mode", () => S.edit.toggleEditMode(state), !state.isAnonUser), //
-            !clientInfo.isMobile ? null : new MenuItemSeparator(), //
-
             // new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
             new MenuItem("Undo Cut", () => S.edit.undoCutSelNodes(state), !state.isAnonUser && !!state.nodesToMove), //
 
@@ -76,6 +73,12 @@ export class MenuPanel extends Div {
 
             new MenuItem("Move to Top", () => S.edit.moveNodeToTop(null, state), canMoveUp), //
             new MenuItem("Move to Bottom", () => S.edit.moveNodeToBottom(null, state), canMoveDown), //
+
+            new MenuItemSeparator(), //
+
+            new MenuItem("Toggle Edit Mode", () => S.edit.toggleEditMode(state), !state.isAnonUser), //
+            new MenuItem("Toggle Metadata", () => S.edit.toggleShowMetaData(state), !state.isAnonUser), //
+            new MenuItem("Save Clipboard", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES), !state.isAnonUser), //
             new MenuItemSeparator(), //
 
             new MenuItem("Delete", () => S.edit.deleteSelNodes(null, state), !state.isAnonUser && selNodeCount > 0 && selNodeIsMine) //

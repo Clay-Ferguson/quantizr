@@ -54,6 +54,7 @@ export class Meta64 implements Meta64Intf {
 
     ctrlKey: boolean;
     ctrlKeyTime: number;
+    savedScrollPosition: number = 0;
 
     // maps the hash of an encrypted block of text to the unencrypted text, so that we never run the same
     // decryption code twice.

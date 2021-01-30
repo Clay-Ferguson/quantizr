@@ -14,7 +14,7 @@ public class Validator {
 	 * UserName requirements, between 5 and 100 characters (inclusive) long, and only allowing
 	 * digits, letters, underscore, dash, and space.
 	 * 
-	 * Note that part of our requirement is that it must also be a valid substring inside JCR path
+	 * Note that part of our requirement is that it must also be a valid substring inside node path
 	 * names, that are used or looking up things about this user.
 	 */
 	public String checkUserName(String userName) {

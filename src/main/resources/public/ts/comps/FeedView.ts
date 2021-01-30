@@ -5,6 +5,7 @@ import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
@@ -14,6 +15,7 @@ import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { IconButton } from "../widget/IconButton";
 import { Span } from "../widget/Span";
+import { TextField } from "../widget/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -22,6 +24,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class FeedView extends Div {
+
+    static searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     // I don't like this OR how much CPU load it takes, so I'm flagging it off for now
     realtimeCheckboxes: boolean = false;
@@ -64,7 +68,7 @@ export class FeedView extends Div {
                         }
                     });
 
-                    S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                    S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
                 })
             ])
         ], null, "float-right marginBottom");
@@ -73,7 +77,7 @@ export class FeedView extends Div {
         children.push(refreshFeedButtonBar);
         children.push(new Div(null, { className: "clearfix" }));
 
-        children.push(new CollapsibleHelpPanel("Help",
+        let helpPanel = new CollapsibleHelpPanel("Help",
             "This is your Fediverse <b>feed</b> that shows a reverse chronological stream of posts from people you Follow.<p>" +
             "Use the 'Friends' button to jump over to the part of your main tree where your Friends List is stored to manage your friends.<p>" +
             "Use any 'Jump' button in the feed to go the the main content tree location of that post. Unlike other social media apps " +
@@ -88,7 +92,10 @@ export class FeedView extends Div {
             ,
             (state: boolean) => {
                 FeedView.helpExpanded = state;
-            }, FeedView.helpExpanded));
+            }, FeedView.helpExpanded);
+
+        let searchPanel = new TextField("Search", false, null, "feedSearchField float-right", false, FeedView.searchTextState);
+        children.push(searchPanel);
 
         if (state.feedLoading) {
             children.push(new Heading(4, "Loading feed..."));
@@ -113,11 +120,13 @@ export class FeedView extends Div {
             if (rowCount > 0 && !state.feedEndReached) {
                 children.push(new ButtonBar([
                     new IconButton("fa-angle-right", "More", {
-                        onClick: () => S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page),
+                        onClick: () => S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page, FeedView.searchTextState.getValue()),
                         title: "Next Page"
                     })], "text-center marginTop marginBottom"));
             }
         }
+
+        children.push(helpPanel);
 
         this.setChildren(children);
     }
@@ -138,7 +147,7 @@ export class FeedView extends Div {
 
                     if (this.realtimeCheckboxes) {
                         FeedView.page = 0;
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
                     }
                 },
                 getValue: (): boolean => {
@@ -160,7 +169,7 @@ export class FeedView extends Div {
 
                     if (this.realtimeCheckboxes) {
                         FeedView.page = 0;
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
                     }
                 },
                 getValue: (): boolean => {
@@ -181,7 +190,7 @@ export class FeedView extends Div {
 
                     if (this.realtimeCheckboxes) {
                         FeedView.page = 0;
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
                     }
                 },
                 getValue: (): boolean => {
@@ -202,7 +211,7 @@ export class FeedView extends Div {
 
                     if (this.realtimeCheckboxes) {
                         FeedView.page = 0;
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
                     }
                 },
                 getValue: (): boolean => {
@@ -223,7 +232,7 @@ export class FeedView extends Div {
 
                     if (this.realtimeCheckboxes) {
                         FeedView.page = 0;
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
                     }
                 },
                 getValue: (): boolean => {

@@ -305,19 +305,4 @@ export class Props implements PropsIntf {
         }
         return null;
     }
-
-    // /*
-    //  * Returns trus if this is a node the current user doesn't own. Used to disable "edit", "delete",
-    //  * etc. on the GUI.
-    //  */
-    // isNonOwnedNode = (node: J.NodeInfo): boolean => {
-    //     let owner: string = node.owner;
-
-    //     // if we don't know who owns this node assume the admin owns it.
-    //     if (!owner) {
-    //         owner = "admin";
-    //     }
-
-    //     return owner != meta64.userName;
-    // }
 }

@@ -60,7 +60,7 @@ export class User implements UserIntf {
     defaultHandleAnonUser = (state: AppState) => {
         var tab = S.util.getParameterByName("tab");
         if (tab === "feed") {
-            S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+            S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, null);
         }
         else {
             S.meta64.loadAnonPageHome(state);
@@ -217,7 +217,7 @@ export class User implements UserIntf {
                     // console.log("login is refreshingTree with ID=" + id);
                     var tab = S.util.getParameterByName("tab");
                     if (tab === "feed") {
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page);
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, null);
                     }
                     else {
                         S.view.refreshTree(id, true, renderLeafIfParent, childId, false, true, true, state);

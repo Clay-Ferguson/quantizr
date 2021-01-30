@@ -19,6 +19,7 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
     public void customize(Connector connector) {
         this.connector = connector;
     }
+    
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
         log.debug("GracefulShudown: Pausing connector");

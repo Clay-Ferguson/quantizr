@@ -1031,7 +1031,6 @@ public class AppController implements ErrorController {
 	// Model model) {
 	//
 	// logRequest("view", null);
-	// checkJcr();
 	//
 	// model.addAttribute("content", attachmentService.getFileContent(null,
 	// fileName));
@@ -1329,7 +1328,6 @@ public class AppController implements ErrorController {
 	// public @ResponseBody OpenSystemFileResponse saveUserPreferences(@RequestBody
 	// OpenSystemFileRequest req) {
 	// logRequest("openSystemFile", req);
-	// checkJcr();
 	// OpenSystemFileResponse res = new OpenSystemFileResponse();
 	//
 	// DesktopApi.open(new File(req.getFileName()));

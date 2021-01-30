@@ -17,6 +17,8 @@ public class NodeFeedRequest extends RequestBase {
 	private Boolean toPublic;
 	private Boolean nsfw;
 
+	private String searchText;
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -79,5 +81,13 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setFromFriends(Boolean fromFriends) {
 		this.fromFriends = fromFriends;
+	}
+
+	public String getSearchText() {
+		return searchText;
+	}
+
+	public void setSearchText(String searchText) {
+		this.searchText = searchText;
 	}
 }

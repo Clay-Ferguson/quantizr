@@ -11,9 +11,6 @@ import org.subnode.model.PropertyInfo;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.model.SubNode;
 
-/**
- * Utilities related to management of the JCR Repository
- */
 @Component
 public class MongoCreate {
 	private static final Logger log = LoggerFactory.getLogger(MongoCreate.class);

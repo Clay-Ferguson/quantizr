@@ -16,9 +16,6 @@ import org.springframework.stereotype.Component;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.AttachmentService;
 
-/**
- * Utilities related to management of the JCR Repository
- */
 @Component
 public class MongoDelete {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);

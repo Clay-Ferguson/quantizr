@@ -162,6 +162,7 @@ export interface NodeFeedRequest extends RequestBase {
     fromFriends: boolean;
     toPublic: boolean;
     nsfw: boolean;
+    searchText: string;
 }
 
 export interface NodeSearchRequest extends RequestBase {

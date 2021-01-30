@@ -111,7 +111,7 @@ export class App extends Div {
 
             let rootButton = !state.isAnonUser ? new IconButton("fa-database", null, {
                 onClick: e => { S.nav.navHome(state); },
-                title: "Your Root Node"
+                title: "Account Node"
             }, (state.pageMessage ? "btn-primary" : "btn-secondary") + " floatingControlBarItem", "off") : null;
 
             let homeButton = new IconButton("fa-home", null, {
@@ -164,12 +164,20 @@ export class App extends Div {
         ]);
 
         if (main) {
-            /* This is where we send an event that lets code hook into the render cycle to process whatever needs
-            to be done AFTER the main render is complete, like doing scrolling for example */
-            main.domUpdateEvent = () => {
-                PubSub.pub(C.PUBSUB_mainWindowScroll);
-                PubSub.pub(C.PUBSUB_postMainWindowScroll);
-            };
+            /* This will run if for example the user closed a fullscreen viewer and we need to pop the main window back to 
+            it's previous scroll position */
+            if (S.meta64.savedScrollPosition > 0) {
+                S.view.docElm.scrollTop = S.meta64.savedScrollPosition;
+                S.meta64.savedScrollPosition = -1;
+            }
+            else {
+                /* This is where we send an event that lets code hook into the render cycle to process whatever needs
+                to be done AFTER the main render is complete, like doing scrolling for example */
+                main.domUpdateEvent = () => {
+                    PubSub.pub(C.PUBSUB_mainWindowScroll);
+                    PubSub.pub(C.PUBSUB_postMainWindowScroll);
+                };
+            }
         }
         else if (fullScreenViewer) {
             fullScreenViewer.domUpdateEvent = () => {

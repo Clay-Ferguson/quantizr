@@ -45,7 +45,7 @@ export class NodeCompMainList extends Div {
         "<h4>Private Posts</h4>" +
         "To share a node only to specific people, use the Share button on the node and add them. That will post to their feed and also if " +
         "they want they can use the 'direct link' to any node to go directly to it in the future without going thru their Feed tab.<p> " +
-        "<p>If you get lost, click the 'cylinder' icon to get back to your Root Node.<p> " +
+        "<p>If you get lost, click the 'cylinder' icon to get back to your Account Node.<p> " +
         "To learn more click <b>'Site Nav &rarr; User Guide'</b> ",
             (state: boolean) => {
                 NodeCompMainList.helpExpanded = state;

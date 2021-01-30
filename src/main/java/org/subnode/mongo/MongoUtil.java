@@ -42,9 +42,6 @@ import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
-/**
- * Utilities related to management of the JCR Repository
- */
 @Component
 public class MongoUtil {
 	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);
@@ -86,7 +83,7 @@ public class MongoUtil {
 
 	private static SubNode systemRootNode;
 
-	// todo-1: need to look into bulk-ops for doing this saveSession updating
+	// todo-0: need to look into bulk-ops for doing this saveSession updating
 	// tips:
 	// https://stackoverflow.com/questions/26657055/spring-data-mongodb-and-bulk-update
 	// BulkOperations ops = template.bulkOps(BulkMode.UNORDERED, Match.class);
@@ -97,25 +94,6 @@ public class MongoUtil {
 	// }
 	// ops.execute();
 	//
-
-	// private void initPageNodeFromClasspath(Session session, Node node, String
-	// classpath) {
-	// try {
-	// Resource resource =
-	// SpringContextUtil.getApplicationContext().getResource(classpath);
-	// String content = XString.loadResourceIntoString(resource); //see
-	// XString.getResourceAsString
-	// node.setProperty(JcrProp.CONTENT, content);
-	// AccessControlUtil.makeNodePublic(session, node);
-	// node.setProperty(JcrProp.DISABLE_INSERT, "y");
-	// JcrUtil.save(session);
-	// }
-	// catch (Exception e) {
-	// // IMPORTANT: don't rethrow from here, or this could blow up app
-	// // initialization.
-	// e.printStackTrace();
-	// }
-	// }
 
 	/*
 	 * We create these users just so there's an easy way to start doing multi-user testing (sharing

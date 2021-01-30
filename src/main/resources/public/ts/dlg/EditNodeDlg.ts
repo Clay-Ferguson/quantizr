@@ -223,29 +223,29 @@ export class EditNodeDlg extends DialogBase {
             ])
         ];
 
-        let optionsBar = new Div("", { className: "marginBottom" }, [
-            new Checkbox("Word Wrap", null, {
-                setValue: (checked: boolean): void => {
-                    // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
-                    S.props.setNodePropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
-                    if (this.contentEditor) {
-                        this.contentEditor.setWordWrap(checked);
-                    }
-                },
-                getValue: (): boolean => {
-                    return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) !== "1";
+        let wordWrapCheckbox = new Checkbox("Word Wrap", { className: "marginLeft" }, {
+            setValue: (checked: boolean): void => {
+                // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
+                S.props.setNodePropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
+                if (this.contentEditor) {
+                    this.contentEditor.setWordWrap(checked);
                 }
-            }),
+            },
+            getValue: (): boolean => {
+                return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) !== "1";
+            }
+        });
 
-            state.node.hasChildren ? new Checkbox("Inline Children", null,
-                this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null
-        ]);
-
+        /* Note: Using FormInline causes the elements to be laid out left to right, rather than one per row */
         let selectionsBar = new FormInline(null, [
             state.node.hasChildren ? this.createLayoutSelection() : null,
             state.node.hasChildren ? this.createImgSizeSelection("Images", true, null, //
                 new PropValueHolder(this.getState().node, J.NodeProp.CHILDREN_IMG_SIZES, "n")) : null,
-            this.createPrioritySelection()
+            this.createPrioritySelection(),
+
+            state.node.hasChildren ? new Checkbox("Inline Children", null,
+                this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null,
+            wordWrapCheckbox
         ]);
 
         let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, "float-right", //
@@ -313,10 +313,6 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
-        if (!propsParent.childrenExist()) {
-            propsParent.addChild(new TextContent("No properties on this node."));
-        }
-
         let allowPropertyAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
 
         if (allowPropertyAdd) {
@@ -330,7 +326,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
-            nodeNameTextField, optionsBar, selectionsBar, propsTable
+            nodeNameTextField, selectionsBar, propsTable
         ], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
@@ -355,8 +351,8 @@ export class EditNodeDlg extends DialogBase {
                     new Div(null, null, [
                         imgSizeSelection,
                         new ButtonBar([
-                            this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
-                            this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
+                            this.deleteUploadButton = new Button("Delete Attachment", this.deleteUpload, { title: "Delete this Attachment" }),
+                            this.uploadButton = new Button("Replace Attachment", this.upload, { title: "Upload a new Attachment" }),
                             ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
                         ], null, "float-right"),
                         ipfsLink ? new Div("Stored on IPFS", { className: "marginTop" }) : null

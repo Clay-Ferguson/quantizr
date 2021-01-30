@@ -82,7 +82,7 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Editing node", res)) {
             const node: J.NodeInfo = res.nodeInfo;
 
-            const editingAllowed = this.isEditAllowed(node, state);
+            const editingAllowed = state.userPreferences.editMode && this.isEditAllowed(node, state);
             if (editingAllowed) {
                 /*
                  * Server will have sent us back the raw text content, that should be markdown instead of any HTML, so
@@ -119,11 +119,7 @@ export class Edit implements EditIntf {
         }
     }
 
-    /*
-    todo-0: need to rename this method to closer represent what id CHECKS.
-
-    returns true if we can 'try to' insert under 'node' or false if not
-    */
+    /* returns true if we are admin or else the owner of the node */
     isEditAllowed = (node: any, state: AppState): boolean => {
         let owner: string = node.owner;
 
@@ -132,17 +128,7 @@ export class Edit implements EditIntf {
             owner = "admin";
         }
 
-        // if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to
-        // make nodes editable by any other user.
-        if (owner === "admin" && !state.isAdminUser) return false;
-
-        return state.userPreferences.editMode &&
-            (state.isAdminUser || state.userName === owner);
-        // /*
-        //  * Check that if we have a commentBy property we are the commenter, before allowing edit button also.
-        //  */
-        // (!props.isNonOwnedCommentNode(node) || props.isOwnedCommentNode(node)) //
-        // && !props.isNonOwnedNode(node);
+        return state.isAdminUser || state.userName === owner;
     }
 
     isInsertAllowed = (node: J.NodeInfo, state: AppState): boolean => {

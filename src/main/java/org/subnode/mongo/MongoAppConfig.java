@@ -57,7 +57,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	@PostConstruct
 	public void postConstruct() {
-		log.debug("MongoAppConfig.postConstruct: mongoAdminPassword=" + appProp.getMongoAdminPassword());
+		// log.debug("MongoAppConfig.postConstruct: mongoAdminPassword=" + appProp.getMongoAdminPassword());
 	}
 
 	@Bean
