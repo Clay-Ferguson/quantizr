@@ -69,6 +69,7 @@ export class AppState {
     calendarData: EventInput[];
     calendarShowWeekends: boolean = false;
 
+    savedScrollPosition: number = -1;
     fullScreenImageSize: string = "100%";
 
     /* holds array of all parent items all the way up the tree (as far as user is authorized) */

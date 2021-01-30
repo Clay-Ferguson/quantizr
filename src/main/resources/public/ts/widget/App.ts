@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { fastDispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import clientInfo from "../ClientInfo";
 import { Constants as C } from "../Constants";
@@ -164,11 +165,23 @@ export class App extends Div {
         ]);
 
         if (main) {
-            /* This will run if for example the user closed a fullscreen viewer and we need to pop the main window back to 
+            /* This will run if for example the user closed a fullscreen viewer and we need to pop the main window back to
             it's previous scroll position */
-            if (S.meta64.savedScrollPosition > 0) {
-                S.view.docElm.scrollTop = S.meta64.savedScrollPosition;
-                S.meta64.savedScrollPosition = -1;
+            if (state.savedScrollPosition !== -1) {
+                let restoreScrollPos = state.savedScrollPosition;
+                S.view.docElm.scrollTop = restoreScrollPos;
+                setTimeout(() => {
+                    fastDispatch({
+                        type: "Action_FastRefresh",
+                        updateNew: (s: AppState): AppState => {
+                            state.savedScrollPosition = -1;
+                            // console.log("reset ScrollPos");
+                            return { ...state };
+                        }
+                    });
+                    // console.log("Restore ScrollPos: " + restoreScrollPos);
+                    S.view.docElm.scrollTop = restoreScrollPos;
+                }, 250);
             }
             else {
                 /* This is where we send an event that lets code hook into the render cycle to process whatever needs

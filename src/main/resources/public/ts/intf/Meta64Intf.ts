@@ -30,8 +30,6 @@ export interface Meta64Intf {
     ctrlKey: boolean;
     ctrlKeyTime: number;
     ctrlKeyCheck(): boolean;
-
-    savedScrollPosition: number;
     decryptCache: { [key: string]: string };
 
     // function cache accessor

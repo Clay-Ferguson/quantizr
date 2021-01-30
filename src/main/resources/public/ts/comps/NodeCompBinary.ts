@@ -80,7 +80,12 @@ export class NodeCompBinary extends Div {
             type: "Action_ClickImage",
             state,
             update: (s: AppState): void => {
-                S.meta64.savedScrollPosition = window.scrollY;
+                /* When we click to enlarge an image we need to save the current scroll position
+                after we close the image. */
+                if (s.savedScrollPosition === -1) {
+                    s.savedScrollPosition = window.scrollY;
+                    // console.log("Saved ScrollPos: " + s.savedScrollPosition);
+                }
                 if (s.fullScreenViewId && this.isFullScreenEmbed) {
                     s.fullScreenImageSize = s.fullScreenImageSize ? "" : "100%";
                 }

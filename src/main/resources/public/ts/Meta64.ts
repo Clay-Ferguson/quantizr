@@ -54,15 +54,14 @@ export class Meta64 implements Meta64Intf {
 
     ctrlKey: boolean;
     ctrlKeyTime: number;
-    savedScrollPosition: number = 0;
 
     // maps the hash of an encrypted block of text to the unencrypted text, so that we never run the same
     // decryption code twice.
     decryptCache: { [key: string]: string } = {};
 
-    lastScrollPos: number = 0;
-    lastScrollPosMap: { [key: string]: number } = {};
-    ticking: boolean = false;
+    // lastScrollPos: number = 0;
+    // lastScrollPosMap: { [key: string]: number } = {};
+    // ticking: boolean = false;
 
     /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
     getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {
@@ -448,19 +447,21 @@ export class Meta64 implements Meta64Intf {
                 }
             });
 
-            document.addEventListener("scroll", (e) => {
-                this.lastScrollPos = window.scrollY;
+            // WARNING: The 'useSelector' makes react bark at us here, but we didn't
+            // end up needing this code for now anyway so i'm removing it.
+            // document.addEventListener("scroll", (e) => {
+            //     this.lastScrollPos = window.scrollY;
 
-                if (!this.ticking) {
-                    window.requestAnimationFrame(() => {
-                        let state: AppState = useSelector((state: AppState) => state);
-                        this.lastScrollPosMap[state.activeTab || "mainTab"] = this.lastScrollPos;
-                        this.ticking = false;
-                    });
+            //     if (!this.ticking) {
+            //         window.requestAnimationFrame(() => {
+            //             let state: AppState = useSelector((state: AppState) => state);
+            //             this.lastScrollPosMap[state.activeTab || "mainTab"] = this.lastScrollPos;
+            //             this.ticking = false;
+            //         });
 
-                    this.ticking = true;
-                }
-            });
+            //         this.ticking = true;
+            //     }
+            // });
 
             if (this.appInitialized) {
                 return;
