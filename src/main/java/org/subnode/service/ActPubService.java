@@ -49,7 +49,6 @@ import org.subnode.actpub.ActPubFactory;
 import org.subnode.actpub.ActPubObserver;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
-import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
@@ -75,6 +74,7 @@ import org.subnode.util.XString;
 
 @Component
 public class ActPubService {
+    public static final boolean ENGLISH_LANGUAGE_CHECK = false;
     public static final int MAX_MESSAGES = 10;
     public static final int MAX_FOLLOWERS = 20;
     public static int outboxQueryCount = 0;
@@ -234,8 +234,8 @@ public class ActPubService {
             String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
             APList attachments = createAttachmentsList(node);
 
-            sendNote(session, toUserNames, ThreadLocals.getSessionContext().getUserName(), inReplyTo, node.getContent(), attachments,
-                    subNodeUtil.getIdBasedUrl(node), privateMessage);
+            sendNote(session, toUserNames, ThreadLocals.getSessionContext().getUserName(), inReplyTo, node.getContent(),
+                    attachments, subNodeUtil.getIdBasedUrl(node), privateMessage);
         } //
         catch (Exception e) {
             log.error("sendNote failed", e);
@@ -1232,19 +1232,16 @@ public class ActPubService {
             }
         }
 
-        // We needed this for our FediCrawler where we gather everything in the world, but going back to
-        // curated feeds for not it's no longer
-        // needed.
-        // if (lang.equals("0")) {
-        // if (!englishDictionary.isEnglish(contentHtml)) {
-        // log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
-        // return;
-        // } else {
-        // // todo-1: this is temporary so I can check that my english detection is working by viewing nodes
-        // // online.
-        // lang = "en-ck3";
-        // }
-        // }
+        if (ENGLISH_LANGUAGE_CHECK) {
+            if (lang.equals("0")) {
+                if (!englishDictionary.isEnglish(contentHtml)) {
+                    log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
+                    return;
+                } else {
+                    lang = "en-ck3";
+                }
+            }
+        }
 
         // foreign account will own this node, this may be passed if it's known or null can be passed in.
         if (toAccountNode == null) {
@@ -1274,7 +1271,7 @@ public class ActPubService {
         newNode.setProp(NodeProp.ACT_PUB_OBJ_TYPE.s(), objType);
         newNode.setProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
 
-        // todo-1: temporary troubleshooting. trying to find why foregin languages are getting allowed in.
+        // part of troubleshooting the non-english language detection
         // newNode.setProp("lang", lang);
 
         shareToAllObjectRecipients(session, newNode, obj, "to");

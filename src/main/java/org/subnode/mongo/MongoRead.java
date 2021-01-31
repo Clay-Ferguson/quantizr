@@ -23,9 +23,6 @@ import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.service.AclService;
-import org.subnode.service.ActPubService;
-import org.subnode.service.UserFeedService;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
@@ -40,15 +37,6 @@ public class MongoRead {
      */
     @Autowired
     private MongoTemplate _ops;
-
-    @Autowired
-    private AclService aclService;
-
-    @Autowired
-    private UserFeedService userFeedService;
-
-    @Autowired
-    private ActPubService apService;
 
     @Autowired
     private MongoCreate create;

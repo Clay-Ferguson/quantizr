@@ -37,9 +37,6 @@ public class SystemService {
 	private MongoAppConfig mac;
 
 	@Autowired
-	private MongoUtil util;
-
-	@Autowired
 	private MongoRead read;
 
 	@Autowired

@@ -22,7 +22,6 @@ public class RunAsMongoAdminEx<T> {
 	@Autowired
 	private MongoAuth auth;
 
-
 	public T run(MongoRunnableEx runner) {
 		MongoSession session = null;
 		Object ret = null;

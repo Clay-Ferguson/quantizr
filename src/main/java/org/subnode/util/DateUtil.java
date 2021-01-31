@@ -19,6 +19,7 @@ import org.subnode.exception.base.RuntimeEx;
  * Date-related functions
  */
 public class DateUtil {
+	//todo-1: move these to 'Const.java'
 	public static final int SECOND_MILLIS = 1000;
 	public static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
 	public static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;

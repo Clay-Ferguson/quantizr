@@ -351,8 +351,8 @@ export class EditNodeDlg extends DialogBase {
                     new Div(null, null, [
                         imgSizeSelection,
                         new ButtonBar([
-                            this.deleteUploadButton = new Button("Delete Attachment", this.deleteUpload, { title: "Delete this Attachment" }),
-                            this.uploadButton = new Button("Replace Attachment", this.upload, { title: "Upload a new Attachment" }),
+                            this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
+                            this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
                             ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
                         ], null, "float-right"),
                         ipfsLink ? new Div("Stored on IPFS", { className: "marginTop" }) : null

@@ -7,6 +7,8 @@ import java.util.Observer;
 
 /**
  * Encapsulates the process of recursively walking a folder to process each file contained under it.
+ * 
+ * todo-1: Observer class is deprecated by Java.
  *
  */
 public class FileLister implements Observer {

@@ -98,6 +98,6 @@ public class EnglishDictionary {
 	}
 
 	public void test() {
-		log.debug("English TEST1=" + isEnglish("kann ich auch noch ein gentoo badge haben"));
+		log.debug("English TEST1=" + isEnglish("ooga booga wooga tooga"));
 	}
 }

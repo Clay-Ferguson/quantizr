@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;

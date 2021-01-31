@@ -1,10 +1,8 @@
 package org.subnode.service;
 
 import java.util.HashSet;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.subnode.model.IPFSDir;
 import org.subnode.model.IPFSDirEntry;
-import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
@@ -24,7 +21,10 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
-/* Writes every node under the target subnode (recursively) to an IPFS Mutable File System (MFS) file */
+/*
+ * Writes every node under the target subnode (recursively) to an IPFS Mutable File System (MFS)
+ * file
+ */
 @Component
 @Scope("prototype")
 public class SyncFromIpfsService {
@@ -44,9 +44,6 @@ public class SyncFromIpfsService {
 	@Autowired
 	private MongoUpdate update;
 
-	@Autowired
-	private MongoAuth auth;
-
 	int failedFiles = 0;
 	int matchingFiles = 0;
 	int createdFiles = 0;
@@ -60,18 +57,15 @@ public class SyncFromIpfsService {
 	int orphansRemoved = 0;
 
 	/*
-	 * todo-1: currently this is an inefficient AND imcomplete algo, and needs these
-	 * two enhancements:
+	 * todo-1: currently this is an inefficient AND imcomplete algo, and needs these two enhancements:
 	 * 
-	 * do a subGraph query at the root first (req.getPath()) and build up a
-	 * HashSet of all IDs, then use that to know which nodes already do exist, as a
-	 * performance aid. Then at the end any of those that are NOT in the HashSet of
-	 * all the node IDs that came from IPFS file scanning are known to be orphans to
-	 * be removed.
+	 * do a subGraph query at the root first (req.getPath()) and build up a HashSet of all IDs, then use
+	 * that to know which nodes already do exist, as a performance aid. Then at the end any of those
+	 * that are NOT in the HashSet of all the node IDs that came from IPFS file scanning are known to be
+	 * orphans to be removed.
 	 * 
-	 * So, for now, this algo will be slow, and will leave orphans around after
-	 * pulling in from ipfs. (orphans meaning those nodes didn't exist in the ipfs
-	 * files)
+	 * So, for now, this algo will be slow, and will leave orphans around after pulling in from ipfs.
+	 * (orphans meaning those nodes didn't exist in the ipfs files)
 	 */
 	public void writeNodes(MongoSession session, LoadNodeFromIpfsRequest req, final LoadNodeFromIpfsResponse res) {
 		if (session == null) {
@@ -101,8 +95,7 @@ public class SyncFromIpfsService {
 
 			for (IPFSDirEntry entry : dir.getEntries()) {
 				/*
-				 * as a workaround to the IPFS bug, we rely on the logic of "if not a json file,
-				 * it's a folder
+				 * as a workaround to the IPFS bug, we rely on the logic of "if not a json file, it's a folder
 				 */
 				if (!entry.getName().endsWith(".json")) {
 					processPath(path + "/" + entry.getName());
@@ -120,12 +113,12 @@ public class SyncFromIpfsService {
 						SubNodeIdentity node = null;
 						try {
 							/*
-							 * todo-1: WOW. Simply deserializing a SubNode object causes it to become a REAL
-							 * node and behave as if it were inserted into the DB, so that after json parses
-							 * it even the 'read.getNode()' Mongo query will find it and 'claim' that it's
-							 * been inserted into the DB already. WTF. Solution: I created SubNodeIdentity
-							 * to perform a pure (partial) deserialization, but I need to check the rest of
-							 * the codebase to be sure there's nowhere that this surprise will break things.
+							 * todo-1: WARNING! Simply deserializing a SubNode object causes it to become a REAL node and behave
+							 * as if it were inserted into the DB, so that after json parses it even the 'read.getNode()' Mongo
+							 * query will find it and 'claim' that it's been inserted into the DB already.
+							 * 
+							 * Solution: I created SubNodeIdentity to perform a pure (partial) deserialization, but I need to
+							 * check the rest of the codebase to be sure there's nowhere that this surprise will break things.
 							 * (import/export logic?)
 							 */
 							node = jsonMapper.readValue(json, SubNodeIdentity.class);

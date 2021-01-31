@@ -1,7 +1,3 @@
-/**
- * 
- * @author clay
- */
 package org.subnode.util;
 
 import java.io.File;

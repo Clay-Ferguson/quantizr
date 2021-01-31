@@ -17,7 +17,6 @@ import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.ActPubService;
-import org.subnode.service.UserFeedService;
 import org.subnode.util.XString;
 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
@@ -26,9 +25,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Autowired
 	private MongoRead read;
-
-	@Autowired
-	private UserFeedService userFeedService;
 
 	@Autowired
 	private ActPubService actPub;

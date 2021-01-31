@@ -7,20 +7,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.mail.OutboxMgr;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.MongoPrincipal;
 import org.subnode.mongo.model.SubNode;
@@ -55,12 +52,6 @@ public class AclService {
 
 	@Autowired
 	private UserManagerService userManagerService;
-
-	@Autowired
-	private OutboxMgr outboxMgr;
-
-	@Autowired
-	private RunAsMongoAdmin adminRunner;
 
 	/**
 	 * Returns the privileges that exist on the node identified in the request.

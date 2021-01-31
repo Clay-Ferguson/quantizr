@@ -33,9 +33,6 @@ public class MongoDelete {
 	private MongoAuth auth;
 
 	@Autowired
-	private MongoRead read;
-
-	@Autowired
 	private MongoUtil util;
 
 	public void deleteNode(MongoSession session, SubNode node, boolean childrenOnly) {

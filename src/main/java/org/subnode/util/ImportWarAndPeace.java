@@ -19,8 +19,9 @@ import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 
 /**
- * Reads the special proprietary-formatted file of the book 'War and Peace' to load into the
- * repository, because we use this book as sample/example content.
+ * Reads the special proprietary-formatted file (not invented by the Quantizr developers) of the
+ * book 'War and Peace' to load into the repository, because we use this book as sample/example
+ * content.
  */
 @Component
 @Scope("prototype")
@@ -66,8 +67,7 @@ public class ImportWarAndPeace {
 					line = line.trim();
 
 					/*
-					 * if we see a blank line we add the current paragraph text as a node and
-					 * continue
+					 * if we see a blank line we add the current paragraph text as a node and continue
 					 */
 					if (line.length() == 0) {
 						if (paragraph.length() > 0) {
@@ -81,21 +81,20 @@ public class ImportWarAndPeace {
 					}
 
 					/*
-					 * if we processed the chapter, the last paragraph is also added before starting
-					 * the new chapter
+					 * if we processed the chapter, the last paragraph is also added before starting the new chapter
 					 */
 					if (processChapter(line)) {
 						continue;
 					}
 
 					/*
-					 * if we processed the book, the last paragraph is also added before starting
-					 * the new book
+					 * if we processed the book, the last paragraph is also added before starting the new book
 					 */
 					if (processBook(line)) {
 						continue;
 					}
-					if (globalBook > maxBooks) break;
+					if (globalBook > maxBooks)
+						break;
 
 					/* keep appending each line to the current paragraph */
 					if (paragraph.length() > 0) {
@@ -103,15 +102,14 @@ public class ImportWarAndPeace {
 					}
 					paragraph.append(line);
 
-					if (++lineCount > maxLines) break;
+					if (++lineCount > maxLines)
+						break;
 				}
-			}
-			finally {
+			} finally {
 				StreamUtil.close(in);
 			}
 			log.debug("book import successful.");
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
 	}
@@ -120,7 +118,8 @@ public class ImportWarAndPeace {
 		if (line.startsWith("CHAPTER ")) {
 			globalChapter++;
 			log.debug("Processing Chapter: " + line);
-			if (curBook == null) throw ExUtil.wrapEx("book is null.");
+			if (curBook == null)
+				throw ExUtil.wrapEx("book is null.");
 
 			addParagraph();
 
@@ -142,8 +141,10 @@ public class ImportWarAndPeace {
 		 */
 		line = line.replace(".   ", ".  ");
 
-		if (line.length() == 0) return false;
-		if (curChapter == null || curBook == null) return false;
+		if (line.length() == 0)
+			return false;
+		if (curChapter == null || curBook == null)
+			return false;
 		globalVerse++;
 
 		// line = XString.injectForQuotations(line);
@@ -165,7 +166,8 @@ public class ImportWarAndPeace {
 	private boolean processBook(String line) {
 		if (line.startsWith("BOOK ") || anyEpilogue(line)) {
 			globalBook++;
-			if (globalBook > maxBooks) return false;
+			if (globalBook > maxBooks)
+				return false;
 			addParagraph();
 
 			curBook = create.createNode(session, root, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST);
@@ -176,4 +178,3 @@ public class ImportWarAndPeace {
 		return false;
 	}
 }
-

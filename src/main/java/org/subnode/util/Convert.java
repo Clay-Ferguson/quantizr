@@ -50,6 +50,7 @@ public class Convert {
 
 	@Autowired
 	private RunAsMongoAdminEx adminRunner;
+	
 	public static final PropertyInfoComparator propertyInfoComparator = new PropertyInfoComparator();
 
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);

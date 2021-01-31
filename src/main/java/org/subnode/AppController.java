@@ -222,9 +222,6 @@ public class AppController implements ErrorController {
 	@Autowired
 	private IPFSService ipfsService;
 
-	// @Autowired
-	// private ApplicationEventPublisher eventPublisher;
-
 	@Autowired
 	private MailSender mailSender;
 
@@ -242,9 +239,6 @@ public class AppController implements ErrorController {
 
 	@Autowired
 	private AppProp appProp;
-
-	// private final CopyOnWriteArrayList<SseEmitter> emitters = new
-	// CopyOnWriteArrayList<>();
 
 	private static final String ERROR_MAPPING = "/error";
 
