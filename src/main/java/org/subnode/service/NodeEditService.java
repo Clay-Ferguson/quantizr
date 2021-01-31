@@ -54,8 +54,8 @@ import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
 /**
- * Service for editing content of nodes. That is, this method updates property values of nodes.
- * As the user is using the application and moving, copy+paste, or editing node content this is the
+ * Service for editing content of nodes. That is, this method updates property values of nodes. As
+ * the user is using the application and moving, copy+paste, or editing node content this is the
  * service that performs those operations on the server, directly called from the HTML 'controller'
  */
 @Component
@@ -172,26 +172,31 @@ public class NodeEditService {
 		}
 
 		update.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false));
+		res.setNewNode(
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false));
 
 		res.setSuccess(true);
 		return res;
 	}
 
-	/* Takes a message that may have some hashtags in it and returns a string with all those hashtags in it
-	space delimited */
+	/*
+	 * Takes a message that may have some hashtags in it and returns a string with all those hashtags in
+	 * it space delimited
+	 */
 	public String parseHashTags(String message) {
-		if (message==null) return "";
+		if (message == null)
+			return "";
 		StringBuilder tags = new StringBuilder();
 
 		// prepare so that newlines are compatable with out tokenizing
 		message = message.replace("\n", " ");
 		message = message.replace("\r", " ");
 
-		/* Mastodon jams a bunch of html together like this for example: #<span>bot</span>
-		So we replace that html with spaces to make the tokenizer work. However I think it also stores
-		tags in structured JSON?
-		*/
+		/*
+		 * Mastodon jams a bunch of html together like this for example: #<span>bot</span> So we replace
+		 * that html with spaces to make the tokenizer work. However I think it also stores tags in
+		 * structured JSON?
+		 */
 		message = message.replace("#<span>", "#");
 		message = message.replace("<span>", " ");
 		message = message.replace("</span>", " ");
@@ -201,7 +206,7 @@ public class NodeEditService {
 		List<String> words = XString.tokenize(message, " ", true);
 		if (words != null) {
 			for (String word : words) {
-				// be sure there aren't multiple pound signs other than just the first character. 
+				// be sure there aren't multiple pound signs other than just the first character.
 				if (word.length() > 2 && word.startsWith("#") && StringUtils.countMatches(word, "#") == 1) {
 					if (tags.length() > 0) {
 						tags.append(" ");
@@ -299,7 +304,8 @@ public class NodeEditService {
 		auth.setDefaultReplyAcl(null, parentNode, newNode);
 
 		update.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false));
+		res.setNewNode(
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -361,7 +367,7 @@ public class NodeEditService {
 				}
 			}
 		}
-		
+
 		/*
 		 * The only purpose of this limit is to stop hackers from using up lots of space, because our only
 		 * current quota is on attachment file size uploads
@@ -465,7 +471,8 @@ public class NodeEditService {
 			}
 		}
 
-		NodeInfo newNodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false);
+		NodeInfo newNodeInfo =
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false);
 		res.setNode(newNodeInfo);
 
 		// todo-1: eventually we need a plugin-type architecture to decouple this kind
@@ -475,7 +482,7 @@ public class NodeEditService {
 
 			final String friendUserName = node.getStrProp(NodeProp.USER.s());
 			if (friendUserName != null) {
-				// if a foreign user, update thru ActivityPub. 
+				// if a foreign user, update thru ActivityPub.
 				if (friendUserName.contains("@") && !ThreadLocals.getSessionContext().isAdmin()) {
 					actPubService.setFollowing(friendUserName, true);
 				}
@@ -495,7 +502,8 @@ public class NodeEditService {
 								actPubService.loadForeignUserByUserName(s, friendUserName);
 							}
 
-							// The only time we pass true to load the user into the system is when they're being added as a friend.
+							// The only time we pass true to load the user into the system is when they're being added as a
+							// friend.
 							actPubService.userEncountered(friendUserName, true);
 						});
 					}
@@ -691,8 +699,11 @@ public class NodeEditService {
 
 		SubNode node = read.getNode(session, req.getNodeId(), true);
 		String content = node.getContent();
-		int baseLevel = XString.getHeadingLevel(content);
-		updateHeadingsRecurseNode(session, node, 0, baseLevel < 0 ? 0 : baseLevel);
+		if (content != null) {
+			content = content.trim();
+			int baseLevel = XString.getHeadingLevel(content);
+			updateHeadingsForNode(session, node, 0, baseLevel);
+		}
 		return res;
 	}
 
@@ -700,65 +711,66 @@ public class NodeEditService {
 	 * todo-1: update to use subgraph query and then just use the slash-count in the path to determine
 	 * relative tree level here. Relative part being important of course.
 	 */
-	private void updateHeadingsRecurseNode(MongoSession session, SubNode node, int level, int baseLevel) {
-		if (node == null)
-			return;
+	private void updateHeadingsForNode(MongoSession session, SubNode node, int level, int baseLevel) {
+		// This needs to be re-written to be compatible with hashtags, so for now we will remove it.
+		// if (node == null)
+		// 	return;
 
-		String nodeContent = node.getContent();
-		String content = nodeContent;
-		if (content.startsWith("#") && content.indexOf(" ") < 7) {
-			int spaceIdx = content.indexOf(" ");
-			if (spaceIdx != -1) {
-				content = content.substring(spaceIdx + 1);
+		// String nodeContent = node.getContent();
+		// String content = nodeContent;
+		// if (content.startsWith("#") && content.indexOf(" ") < 7) {
+		// 	int spaceIdx = content.indexOf(" ");
+		// 	if (spaceIdx != -1) {
+		// 		content = content.substring(spaceIdx + 1);
 
-				/*
-				 * These strings (pound sign headings) could be generated dynamically, but this switch with them
-				 * hardcoded is more performant
-				 */
-				switch (level + baseLevel) {
-					case 0: // this will be the root node (user selected node)
-						break;
-					case 1:
-						if (!nodeContent.startsWith("# ")) {
-							node.setContent("# " + content);
-						}
-						break;
-					case 2:
-						if (!nodeContent.startsWith("## ")) {
-							node.setContent("## " + content);
-						}
-						break;
-					case 3:
-						if (!nodeContent.startsWith("### ")) {
-							node.setContent("### " + content);
-						}
-						break;
-					case 4:
-						if (!nodeContent.startsWith("#### ")) {
-							node.setContent("#### " + content);
-						}
-						break;
-					case 5:
-						if (!nodeContent.startsWith("##### ")) {
-							node.setContent("##### " + content);
-						}
-						break;
-					case 6:
-						if (!nodeContent.startsWith("###### ")) {
-							node.setContent("###### " + content);
-						}
-						break;
-					default:
-						break;
-				}
-			}
-		}
+		// 		/*
+		// 		 * These strings (pound sign headings) could be generated dynamically, but this switch with them
+		// 		 * hardcoded is more performant
+		// 		 */
+		// 		switch (level + baseLevel) {
+		// 			case 0: // this will be the root node (user selected node)
+		// 				break;
+		// 			case 1:
+		// 				if (!nodeContent.startsWith("# ")) {
+		// 					node.setContent("# " + content);
+		// 				}
+		// 				break;
+		// 			case 2:
+		// 				if (!nodeContent.startsWith("## ")) {
+		// 					node.setContent("## " + content);
+		// 				}
+		// 				break;
+		// 			case 3:
+		// 				if (!nodeContent.startsWith("### ")) {
+		// 					node.setContent("### " + content);
+		// 				}
+		// 				break;
+		// 			case 4:
+		// 				if (!nodeContent.startsWith("#### ")) {
+		// 					node.setContent("#### " + content);
+		// 				}
+		// 				break;
+		// 			case 5:
+		// 				if (!nodeContent.startsWith("##### ")) {
+		// 					node.setContent("##### " + content);
+		// 				}
+		// 				break;
+		// 			case 6:
+		// 				if (!nodeContent.startsWith("###### ")) {
+		// 					node.setContent("###### " + content);
+		// 				}
+		// 				break;
+		// 			default:
+		// 				break;
+		// 		}
+		// 	}
+		// }
 
-		Sort sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
-		for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
-			updateHeadingsRecurseNode(session, n, level + 1, baseLevel);
-		}
+		// Sort sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
+		// for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
+		// 	updateHeadingsForNode(session, n, level + 1, baseLevel);
+		// }
 
-		update.saveSession(session);
+		// update.saveSession(session);
 	}
 }

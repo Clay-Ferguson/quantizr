@@ -67,7 +67,9 @@ export class MenuPanel extends Div {
             new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state), !state.isAnonUser), //
             new MenuItem("Split Node", () => new SplitNodeDlg(null, state).open(), !state.isAnonUser && selNodeIsMine), //
             new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open(); }, !state.isAnonUser && selNodeIsMine), //
-            new MenuItem("Update Headings", () => { S.edit.updateHeadings(state); }, !state.isAnonUser && selNodeIsMine), //
+
+            // Remove pending rewrite on server side.
+            // new MenuItem("Update Headings", () => { S.edit.updateHeadings(state); }, !state.isAnonUser && selNodeIsMine), //
 
             new MenuItemSeparator(), //
 

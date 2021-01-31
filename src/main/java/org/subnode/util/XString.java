@@ -102,7 +102,7 @@ public class XString {
 
 	public static int getHeadingLevel(String val) {
 		if (!val.startsWith("#")) {
-			return -1;
+			return 0;
 		}
 		int len = val.length();
 		int idx = 0;
