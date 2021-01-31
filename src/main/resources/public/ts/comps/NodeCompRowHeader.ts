@@ -59,12 +59,11 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        // todo-0: don't delete until we figure out what where to display ordinal and type
-        // children.push(new Span(
-        //     node.id + "-" + node.logicalOrdinal + " " + (node.type === "u" ? "" : node.type), //
-        //     {
-        //     }
-        // ));
+        /* for admin user shwo id, ordinal, and type right on the row. We have a bug where
+        the logicalOrdinal is showing as -1 here, but it's just because it's not being set on the server. */
+        if (state.isAdminUser) {
+            children.push(new Span(node.logicalOrdinal + " " + node.type, { className: "marginRight" }));
+        }
 
         children.push(new Icon({
             className: "fa fa-link fa-lg",

@@ -91,7 +91,7 @@ export class Edit implements EditIntf {
                 const dlg = new EditNodeDlg(res.nodeInfo, res.parentInfo, state);
                 dlg.open();
             } else {
-                /* todo-0: when edit mode is not on, and a user tries to use the social 'reply' button this error comes up
+                /* todo-1: when edit mode is not on, and a user tries to use the social 'reply' button this error comes up
                 which is completely wrong an misleading in that context. */
                 S.util.showMessage("You cannot edit nodes that you don't own.", "Warning");
             }

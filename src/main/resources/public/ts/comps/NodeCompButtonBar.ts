@@ -106,7 +106,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
         }
 
         /* DO NOT DELETE
-            todo-0: need to make this if condition:
+            todo-1: need to make this if condition:
              if ((state.isAdminUser || S.props.isMine(node, state)) && S.props.isShared(node)) {
             show cause a clickable link to show up on the "shared to: " text
             to run the editNodeSharing()

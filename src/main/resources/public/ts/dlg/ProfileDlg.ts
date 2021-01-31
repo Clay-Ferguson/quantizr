@@ -81,9 +81,6 @@ export class ProfileDlg extends DialogBase {
                     }, [
                         new ButtonBar([
                             this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-
-                            // todo-0: need to make this work for fediverse users!
-                            // (note: UserManagerService.addFriend also needs to be updated for this to work)
                             (this.readOnly && this.userName.indexOf("@") === -1 && this.userName !== this.appState.userName) ? new Button("Add as Friend", this.addFriend) : null,
                             new Button(this.readOnly ? "Close" : "Cancel", this.close)
                         ], null, "marginTop")

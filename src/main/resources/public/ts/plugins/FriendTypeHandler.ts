@@ -99,7 +99,7 @@ export class FriendTypeHandler extends TypeBase {
             });
         }
 
-        // todo-0: this is an ugly hack but the users can get the idea who this is from the URL (for now)
+        // todo-1: this is a slight hack but the users can get the idea who this is from the URL (for now)
         if (!user) {
             user = actPubActorUrl;
         }

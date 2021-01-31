@@ -653,7 +653,7 @@ public class UserManagerService {
 		 */
 		SubNode friendNode = read.findFriendOfUser(session, followerFriendList, req.getUserName());
 		if (friendNode == null) {
-			// todo-0: for local users following fediverse this value needs to be here?
+			// todo-1: for local users following fediverse this value needs to be here?
 			String followerActorUrl = null;
 
 			friendNode = edit.createFriendNode(session, followerFriendList, req.getUserName(), followerActorUrl);

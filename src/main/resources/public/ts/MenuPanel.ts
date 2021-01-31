@@ -64,7 +64,7 @@ export class MenuPanel extends Div {
 
             // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
-            new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state), !state.isAnonUser && selNodeCount > 0), //
+            new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state), !state.isAnonUser), //
             new MenuItem("Split Node", () => new SplitNodeDlg(null, state).open(), !state.isAnonUser && selNodeIsMine), //
             new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open(); }, !state.isAnonUser && selNodeIsMine), //
             new MenuItem("Update Headings", () => { S.edit.updateHeadings(state); }, !state.isAnonUser && selNodeIsMine), //
@@ -81,7 +81,7 @@ export class MenuPanel extends Div {
             new MenuItem("Save Clipboard", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES), !state.isAnonUser), //
             new MenuItemSeparator(), //
 
-            new MenuItem("Delete", () => S.edit.deleteSelNodes(null, state), !state.isAnonUser && selNodeCount > 0 && selNodeIsMine) //
+            new MenuItem("Delete", () => S.edit.deleteSelNodes(null, state), !state.isAnonUser && selNodeIsMine) //
 
             // todo-1: disabled during mongo conversion
             // new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //

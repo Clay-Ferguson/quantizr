@@ -58,19 +58,7 @@ public class OutboxMgr {
 	@Autowired
 	private UserFeedService userFeedService;
 
-	/**
-	 * Puts an inbox notification into 'userNode's inbox, telling them that the new 'node' has been
-	 * added under one of their nodes as a reply to it.
-	 * 
-	 * In these parameters 'userName' is the owner of 'node' that the notification is 'about'
-	 * 
-	 * Example sentence structure of notifyMessage:
-	 * 
-	 * <pre>
-	 * 		"shared a node with you." 
-	 * 		"replied to you."
-	 * </pre>
-	 */
+	/* Currently unused. Let's leave this capability here and not delete this code, but it's no longer being used. */
 	public void addInboxNotification(MongoSession session, String recieverUserName, SubNode userNode, SubNode node,
 			String notifyMessage) {
 
@@ -114,7 +102,7 @@ public class OutboxMgr {
 			if (scList != null) {
 				for (SessionContext sc : scList) {
 					userFeedService.sendServerPushInfo(sc,
-							// todo-0: fill in the two null parameters here.
+							// todo-1: fill in the two null parameters here if/when you ever bring this method back.
 							new NotificationMessage("newInboxNode", node.getId().toHexString(), null, null));
 				}
 			}
