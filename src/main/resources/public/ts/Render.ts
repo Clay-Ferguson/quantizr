@@ -328,6 +328,10 @@ export class Render implements RenderIntf {
                             console.log("RENDER NODE: " + s.node.id);
                         }
 
+                        if (s.activeTab !== "mainTab") {
+                            allowScroll = false;
+                        }
+
                         // NOTE: In these blocks we set rendering=true only if we're scrolling so that the user doesn't see
                         // a jump in position during scroll, but a smooth reveal of the post-scroll location/rendering.
                         if (s.pendingLocationHash) {
