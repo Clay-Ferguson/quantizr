@@ -881,13 +881,15 @@ input[type="radio"] {
     margin-left: $smallGap;
     margin-bottom: $smallGap;
     border-radius: .6em;
-    border: 1px solid $gray-700
+    border: 1px solid $gray-700;
+    vertical-align: top;
 }
 
 .attached-img-in-editor {
     cursor: pointer;
     border-radius: .6em;
-    border: 1px solid $gray-700
+    border: 1px solid $gray-700;
+    vertical-align: top;
 }
 
 .meta64-input {
