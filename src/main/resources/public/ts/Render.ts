@@ -403,6 +403,7 @@ export class Render implements RenderIntf {
     renderChildren = (node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp => {
         if (!node || !node.children) return null;
 
+        // todo-0: this will probably just confuse users. consider removing this.
         let allowAvatars = !S.util.allChildrenAreSameOwner(node);
 
         /*
@@ -411,14 +412,14 @@ export class Render implements RenderIntf {
          */
         const layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
         if (!layout || layout === "v") {
-            return new NodeCompVerticalRowLayout(node, level, allowNodeMove, allowAvatars);
+            return new NodeCompVerticalRowLayout(node, level, allowNodeMove, allowAvatars, true);
         }
         else if (layout.indexOf("c") === 0) {
-            return new NodeCompTableRowLayout(node, level, layout, allowNodeMove, allowAvatars);
+            return new NodeCompTableRowLayout(node, level, layout, allowNodeMove, allowAvatars, true);
         }
         else {
             // of no layout is valid, fall back on vertical.
-            return new NodeCompVerticalRowLayout(node, level, allowNodeMove, allowAvatars);
+            return new NodeCompVerticalRowLayout(node, level, allowNodeMove, allowAvatars, true);
         }
     }
 

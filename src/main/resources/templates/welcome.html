@@ -53,8 +53,8 @@
                         <p class="text-center" th:text="${intro1}"></p>
                         <p class="text-center" th:text="${intro2}"></p>
 
-                        <p class="text-center"><a class="btn btn-outline-danger btn-lg" href="/app"
-                                role="button"><span class="appEnterButton">Enter</span></a></p>
+                        <p class="text-center"><a class="btn btn-outline-danger btn-lg" href="/app" role="button"><span
+                                    class="appEnterButton">Enter</span></a></p>
 
                     </div>
 
@@ -63,163 +63,17 @@
         </div>
 
         <div class="container-fluid welcome-container-no-navbar">
-
-            <div class="row">
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Social Media', content=${socialMedia})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Fediverse', content=${fediverse})">
+            <div class="row align-items-center h-100">
+                <div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xl-8 mx-auto">
+                    <div id="welcomePanel"></div>
                 </div>
             </div>
-
-            <div class="row">
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Wikis', content=${wikis})">
-            </div>
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Blogs', content=${blogs})">
-                </div>
-            </div>
-
-            <div class="row">
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Web3/IPFS', content=${web3})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='File Sharing', content=${fileSharing})">
-                </div>
-            </div>
-
-            <div class="row">
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Secure Messaging', content=${secureMessaging})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Access Controls', content=${acl})">
-                </div>
-            </div>
-
-            <div class="row">
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Advanced Editing', content=${advancedEditing})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='PDF Creator', content=${pdfCreator})">
-                </div>
-            </div>
-
-            <div class="row">
-
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Powerful Search', content=${powerfulSearch})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Timelines', content=${timelines})">
-                </div>
-
-            </div>
-
-            <div class="row">
-
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Quantized', content=${quantized})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='RSS/Podcasts', content=${rss})">
-                </div>
-
-            </div>
-
-            <div class="row">
-
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='RSS Publishing', content=${rssPublishing})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Audio/Video Player', content=${audioVideo})">
-                </div>
-            </div>
-
-            <div class="row">
-
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Audio/Video Recording', content=${avRecorder})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Audio/Video Messaging', content=${avMessaging})">
-                </div>
-            </div>
-
-            <div class="row">
-
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Drag-n-Drop', content=${dragAndDrop})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Custom URLs', content=${customUrls})">
-                </div>
-            </div>
-
-            <div class="row">
-
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Markdown', content=${markdown})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Math Formulas', content=${math})">
-                </div>
-            </div>
-
-            <div class="row">
-
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Hierarchical', content=${hierarchial})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Node Types', content=${nodeTypes})">
-                </div>
-            </div>
-
-            <div class="row">
-
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='Import/Export', content=${importExport})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Mobile Support', content=${mobile})">
-                </div>
-
-            </div>
-
-            <div class="row">
-                <div th:replace="fragments/components 
-                    :: featureInfoL(title='D3 Graphs', content=${d3Graph})">
-                </div>
-
-                <div th:replace="fragments/components 
-                    :: featureInfoR(title='Open Source', content=${openSource})">
-                </div>
-
-            </div>
-
+          
         </div>
     </main>
 
     <footer class="container">
-        <div class="col-6 mx-auto text-center myFooterText">
+        <div class="col-6 mx-auto text-center myFooterText marginTop">
             <p>
                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YD984BLHTSZYL&currency_code=USD&source=url"
                     target="_blank">
@@ -237,22 +91,54 @@
     </footer>
 
     <script th:inline="javascript">
-        /* Thymeleaf vars */
-        var g_brandingAppName = [[${brandingAppName}]];
+        var __page = "welcome";
 
-        // todo-1: why is the double-dollar still working with this?
-        var innerArray = ['[math]', '[/math]'];
+        /* Thymeleaf vars */
+        var g_brandingAppName = [[${ brandingAppName }]];
+
+        function oldIEdetection() {
+            var ua = window.navigator.userAgent;
+            var msie = ua.indexOf('MSIE ');
+            if (msie > 0) {
+                __page = null;
+                // IE 10 or older, return version number
+                return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+            }
+            var trident = ua.indexOf('Trident/');
+            if (trident > 0) {
+                __page = null;
+                // IE 11, return version number
+                var rv = ua.indexOf('rv:');
+                return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+            }
+            var edge = ua.indexOf('Edge/');
+            if (edge > 0) {
+                //Edge (IE 12+), return version number
+                //return 'IE ' + parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+                return null;
+            }
+            // User uses other browser
+            return null;
+        }
+        var result = oldIEdetection();
+        if (result) {
+            document.write("Browser not supported: IE " + result);
+            document.write("<br>Try a modern browser like Chrome, Firefox, or Edge.")
+        }
+    </script>
+
+    <div id="overlayDiv" class="overlay"></div>
+
+    <script th:inline="none">
         /*<![CDATA[*/
+        var math = ['[math]', '[/math]'];
         MathJax = {
             tex: {
-                //warning: Don't combine these two arrays and let '[ [' get into the script. That will trigger thymeleaf to pick up 
-                //the string and try to interpret it. Also the "th:inline: none" all by itself can fix this too, which we do use.
-                inlineMath: [innerArray]
+                inlineMath: [math]
             }
         };
         /*]]>*/
     </script>
-
     <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
     <script th:src="'/js/dropzone/dropzone.js?v='+${DROPZONE_JS_HASH}"></script>
     <script th:src="'/js/ace/src-noconflict/ace.js?v='+${ACE_JS_HASH}"></script>

@@ -1,7 +1,6 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
-import { NodeActionType } from "../enums/NodeActionType";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
@@ -20,13 +19,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompTableRowLayout extends Div {
 
-    constructor(public node: J.NodeInfo, public level: number, public layout: string, public allowNodeMove: boolean, private allowAvatars: boolean) {
+    constructor(public node: J.NodeInfo, public level: number, public layout: string, public allowNodeMove: boolean, private allowAvatars: boolean, private allowHeaders: boolean) {
         super(null, { className: "node-grid-table" });
     }
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
         let nodesToMove = state.nodesToMove;
         let curRow = new Div(null, { className: "node-grid-row" });
         let children: Comp[] = [];
@@ -88,7 +86,7 @@ export class NodeCompTableRowLayout extends Div {
                 }
                 else {
                     lastNode = n;
-                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowAvatars, state);
+                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowAvatars, this.allowHeaders, state);
                     comps.push(row);
                 }
 
@@ -119,7 +117,7 @@ export class NodeCompTableRowLayout extends Div {
             children.push(curRow);
         }
 
-        if (allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
+        if (this.allowHeaders && allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
             let attribs = {};
             if (state.userPreferences.editMode) {
                 S.render.setNodeDropHandler(attribs, lastNode, false, state);

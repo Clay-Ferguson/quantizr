@@ -20,7 +20,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompVerticalRowLayout extends Div {
 
-    constructor(public node: J.NodeInfo, public level: number, public allowNodeMove: boolean, public allowAvatars: boolean) {
+    constructor(public node: J.NodeInfo, public level: number, public allowNodeMove: boolean, public allowAvatars: boolean, private allowHeaders: boolean) {
         super();
     }
 
@@ -59,7 +59,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 }
                 else {
                     lastNode = n;
-                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, false, this.allowNodeMove, childrenImgSizes, this.allowAvatars, state);
+                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, false, this.allowNodeMove, childrenImgSizes, this.allowAvatars, this.allowHeaders, state);
                     comps.push(row);
                 }
 
@@ -70,7 +70,7 @@ export class NodeCompVerticalRowLayout extends Div {
             }
         }
 
-        if (allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
+        if (this.allowHeaders && allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
             let attribs = {};
             if (state.userPreferences.editMode) {
                 S.render.setNodeDropHandler(attribs, lastNode, false, state);

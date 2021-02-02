@@ -67,11 +67,20 @@ public class NodeRenderService {
 	/* Note: this MUST match nav.ROWS_PER_PAGE variable in TypeScript */
 	private static int ROWS_PER_PAGE = 25;
 
+	private static RenderNodeResponse welcomePage;
+
 	/*
 	 * This is the call that gets all the data to show on a page. Whenever user is browsing to a new
 	 * page, this method gets called once per page and retrieves all the data for that page.
 	 */
 	public RenderNodeResponse renderNode(MongoSession session, RenderNodeRequest req) {
+
+		boolean isWelcomePage = req.getNodeId().equals(":welcome-page");
+		/* Return cached version of welcome page if generated, but not for admin because admin
+		should be able to make edits and then those edits update the cache */
+		if (isWelcomePage && welcomePage != null && !session.isAdmin()) {
+			return welcomePage;
+		}
 
 		RenderNodeResponse res = new RenderNodeResponse();
 		if (session == null) {
@@ -118,7 +127,8 @@ public class NodeRenderService {
 
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
-			NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false);
+			NodeInfo nodeInfo =
+					convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -180,17 +190,26 @@ public class NodeRenderService {
 			}
 		}
 
-		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, -1, 0);
+		if ("welcome-page".equals(node.getName())) {
+			isWelcomePage = true;
+		}
+
+		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, -1, 0, isWelcomePage ? 100 : ROWS_PER_PAGE);
 		res.setNode(nodeInfo);
 		res.setSuccess(true);
+
+		if (isWelcomePage) {
+			NodeRenderService.welcomePage = res;
+		}
+
 		return res;
 	}
 
 	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res, final SubNode node,
-			SubNode scanToNode, long logicalOrdinal, int level) {
+			SubNode scanToNode, long logicalOrdinal, int level, int limit) {
 
-		NodeInfo nodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, logicalOrdinal, level > 0, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+				logicalOrdinal, level > 0, false);
 
 		if (level > 0) {
 			return nodeInfo;
@@ -218,7 +237,7 @@ public class NodeRenderService {
 		 * is by a timestamp we'd need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1,
 		 * because that is enough to trigger 'endReached' logic to be set correctly
 		 */
-		int queryLimit = scanToNode != null ? 1000 : offset + ROWS_PER_PAGE + 2;
+		int queryLimit = scanToNode != null ? 1000 : offset + limit + 2;
 
 		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode="
 		// + scanToNode);
@@ -287,7 +306,7 @@ public class NodeRenderService {
 							for (int i = count - 1; i >= 0; i--) {
 								SubNode sn = slidingWindow.get(i);
 								relativeIdx--;
-								ninfo = processRenderNode(session, req, res, sn, null, relativeIdx, level + 1);
+								ninfo = processRenderNode(session, req, res, sn, null, relativeIdx, level + 1, limit);
 								nodeInfo.getChildren().add(0, ninfo);
 
 								/*
@@ -297,7 +316,7 @@ public class NodeRenderService {
 								 * performance by iterating the smallese number of results in order to get a page that contains
 								 * what we need (namely the target node as indiated by scanToNode item)
 								 */
-								if (nodeInfo.getChildren().size() >= ROWS_PER_PAGE - 1) {
+								if (nodeInfo.getChildren().size() >= limit - 1) {
 									break;
 								}
 							}
@@ -320,7 +339,7 @@ public class NodeRenderService {
 
 					/* update sliding window */
 					slidingWindow.add(n);
-					if (slidingWindow.size() > ROWS_PER_PAGE) {
+					if (slidingWindow.size() > limit) {
 						slidingWindow.remove(0);
 					}
 
@@ -329,10 +348,10 @@ public class NodeRenderService {
 			}
 
 			/* if we get here we're accumulating rows */
-			ninfo = processRenderNode(session, req, res, n, null, idx - 1L, level + 1);
+			ninfo = processRenderNode(session, req, res, n, null, idx - 1L, level + 1, limit);
 			nodeInfo.getChildren().add(ninfo);
 
-			if (nodeInfo.getChildren().size() >= ROWS_PER_PAGE) {
+			if (nodeInfo.getChildren().size() >= limit) {
 				if (!iterator.hasNext()) {
 					endReached = true;
 				}
@@ -346,7 +365,7 @@ public class NodeRenderService {
 		 * if we accumulated less than ROWS_PER_PAGE, then try to scan back up the sliding window to build
 		 * up the ROW_PER_PAGE by looking at nodes that we encountered before we reached the end.
 		 */
-		if (slidingWindow != null && nodeInfo.getChildren().size() < ROWS_PER_PAGE) {
+		if (slidingWindow != null && nodeInfo.getChildren().size() < limit) {
 			int count = slidingWindow.size();
 			if (count > 0) {
 				int relativeIdx = idx - 1;
@@ -354,11 +373,11 @@ public class NodeRenderService {
 					SubNode sn = slidingWindow.get(i);
 					relativeIdx--;
 
-					ninfo = processRenderNode(session, req, res, sn, null, (long) relativeIdx, level + 1);
+					ninfo = processRenderNode(session, req, res, sn, null, (long) relativeIdx, level + 1, limit);
 					nodeInfo.getChildren().add(0, ninfo);
 
 					// If we have enough records we're done
-					if (nodeInfo.getChildren().size() >= ROWS_PER_PAGE) {
+					if (nodeInfo.getChildren().size() >= limit) {
 						break;
 					}
 				}
@@ -417,14 +436,16 @@ public class NodeRenderService {
 
 		try {
 			SubNode parentNode = read.getParent(session, node);
-			NodeInfo parentInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, parentNode, false, true, -1, false, false);
+			NodeInfo parentInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, parentNode, false, true,
+					-1, false, false);
 			res.setParentInfo(parentInfo);
 		} catch (Exception e) {
 			ExUtil.error(log, "unable to load parent", e);
 			// ignore this
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false, false);
+		NodeInfo nodeInfo =
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;

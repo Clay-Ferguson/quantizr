@@ -371,6 +371,7 @@ public class AppController implements ErrorController {
 			synchronized (welcomeMapLock) {
 				HashMap<String, String> newMap = new HashMap<String, String>();
 				// load content from a place that will not be a node visible to users
+				// todo-0: some of this will be going away now that our main welcome page renders directly a tree node as a grid layout.
 				welcomePagePresent = nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
 
 				// load also from another place that will be visible to users.

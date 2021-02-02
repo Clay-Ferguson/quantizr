@@ -371,7 +371,7 @@ public class MongoRead {
     public Iterable<SubNode> getChildrenUnderParentPath(MongoSession session, String path, Sort sort, Integer limit, int skip) {
 
         Query query = new Query();
-        if (limit != null) {
+        if (limit != null && limit.intValue() > 0) {
             query.limit(limit.intValue());
         }
 

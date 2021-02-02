@@ -27,7 +27,8 @@ export class NodeCompRow extends Div {
     static showButtonBar: boolean = true;
 
     constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number,
-        public isTableCell: boolean, public allowNodeMove: boolean, public imgSizeOverride: string, private allowAvatars: boolean, appState: AppState) {
+        public isTableCell: boolean, public allowNodeMove: boolean, public imgSizeOverride: string, private allowAvatars: boolean, private allowHeaders: boolean,
+        appState: AppState) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + node.id
         });
@@ -60,10 +61,13 @@ export class NodeCompRow extends Div {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         let id: string = node.id;
-        this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
+
+        if (this.allowHeaders) {
+            this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
+        }
 
         let insertInlineButton = null;
-        if (state.userPreferences.editMode) {
+        if (this.allowHeaders && state.userPreferences.editMode) {
             let insertAllowed = true;
 
             /* if we are at level one that means state.node is the parent of 'this.node' so that's what determines if we
@@ -88,7 +92,7 @@ export class NodeCompRow extends Div {
         }
 
         let buttonBar: Comp = null;
-        if (NodeCompRow.showButtonBar && !state.inlineEditId) {
+        if (this.allowHeaders && NodeCompRow.showButtonBar && !state.inlineEditId) {
             buttonBar = new NodeCompButtonBar(node, this.allowAvatars, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null);
         }
 
@@ -127,7 +131,7 @@ export class NodeCompRow extends Div {
         this.attribs.style = style;
 
         let header: CompIntf = null;
-        if (state.userPreferences.showMetaData) {
+        if (this.allowHeaders && state.userPreferences.showMetaData) {
             header = new NodeCompRowHeader(node, true, false, false);
         }
 
@@ -145,7 +149,7 @@ export class NodeCompRow extends Div {
                 id: "button_bar_clearfix_" + node.id
             }) : null,
             new NodeCompContent(node, true, true, null, null, this.imgSizeOverride),
-            new NodeCompRowFooter(node, false)
+            this.allowHeaders ? new NodeCompRowFooter(node, false) : null
         ]);
     }
 

@@ -8,7 +8,8 @@ import { Log } from "./Log";
 // set in index.html
 declare var __page;
 
-if ((window as any).__page === "index") {
+if ((window as any).__page === "index" || //
+    (window as any).__page === "welcome") {
     let factory = new Factory();
 }
 else if ((window as any).__page === "tsx-test") {

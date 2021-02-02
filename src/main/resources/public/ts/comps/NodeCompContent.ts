@@ -5,11 +5,10 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { Comp } from "../widget/base/Comp";
-import { Div } from "../widget/Div";
-import { NodeCompBinary } from "./NodeCompBinary";
-import { Heading } from "../widget/Heading";
 import { CompIntf } from "../widget/base/CompIntf";
+import { Div } from "../widget/Div";
+import { Heading } from "../widget/Heading";
+import { NodeCompBinary } from "./NodeCompBinary";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

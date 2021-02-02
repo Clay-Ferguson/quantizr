@@ -11,6 +11,7 @@ import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { App } from "./widget/App";
 import { CompIntf } from "./widget/base/CompIntf";
+import { WelcomePanel } from "./widget/WelcomePanel";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -500,7 +501,14 @@ export class Meta64 implements Meta64Intf {
 
             // This is the root react App component that contains the entire application
             this.app = new App(); // new AppDemo
-            this.app.updateDOM(store, "app");
+
+            if ((window as any).__page === "index") {
+                this.app.updateDOM(store, "app");
+            }
+            else if ((window as any).__page === "welcome") {
+                let welcomePanel = new WelcomePanel();
+                welcomePanel.updateDOM(store, "welcomePanel");
+            }
 
             /*
              * This call checks the server to see if we have a session already, and gets back the login information from
