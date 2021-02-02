@@ -144,6 +144,7 @@ public class UserFeedService {
 	 */
 	public NodeFeedResponse generateFeed(MongoSession session, NodeFeedRequest req) {
 
+		SessionContext sc = ThreadLocals.getSessionContext();
 		NodeFeedResponse res = new NodeFeedResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
@@ -163,7 +164,7 @@ public class UserFeedService {
 		// includes shares TO me.
 		if (req.getToMe()) {
 			if (searchRoot == null) {
-				searchRoot = read.getNode(session, ThreadLocals.getSessionContext().getRootId());
+				searchRoot = read.getNode(session, sc.getRootId());
 			}
 
 			if (searchRoot != null) {
@@ -186,11 +187,20 @@ public class UserFeedService {
 			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_SENSITIVE + ".value").is(null);
 		}
 
+		// reset feedMaxTime if we're getting first page of results
+		if (req.getPage() == 0) {
+			sc.setFeedMaxTime(null);
+		} 
+		// if not getting first page of results use the modifyTime < feedMaxTime to ensure good paging.
+		else if (sc.getFeedMaxTime() != null) {
+			criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).lt(sc.getFeedMaxTime());
+		}
+
 		List<Criteria> orCriteria = new LinkedList<Criteria>();
 
 		if (req.getFromMe()) {
 			if (searchRoot == null) {
-				searchRoot = read.getNode(session, ThreadLocals.getSessionContext().getRootId());
+				searchRoot = read.getNode(session, sc.getRootId());
 			}
 
 			if (searchRoot != null) {
@@ -245,8 +255,13 @@ public class UserFeedService {
 
 		Iterable<SubNode> iter = ops.find(query, SubNode.class);
 		for (SubNode node : iter) {
-			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1,
-					false, false);
+
+			// For first record of first results page query, record the modify time, for use in subsequent page queries.
+			if (req.getPage() == 0 && searchResults.size() == 0) {
+				sc.setFeedMaxTime(node.getModifyTime());
+			}
+
+			NodeInfo info = convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false);
 			searchResults.add(info);
 		}
 

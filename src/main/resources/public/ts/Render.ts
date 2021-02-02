@@ -403,8 +403,7 @@ export class Render implements RenderIntf {
     renderChildren = (node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp => {
         if (!node || !node.children) return null;
 
-        // todo-0: this will probably just confuse users. consider removing this.
-        let allowAvatars = !S.util.allChildrenAreSameOwner(node);
+        let allowAvatars = true; // !S.util.allChildrenAreSameOwner(node);
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on
