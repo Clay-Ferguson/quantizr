@@ -29,8 +29,6 @@ import org.subnode.util.DateUtil;
 public class SessionContext {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
 
-	private String error;
-
 	/* Identification of user's account root node */
 	private String rootId;
 
@@ -221,14 +219,6 @@ public class SessionContext {
 
 	public void setUserPreferences(UserPreferences userPreferences) {
 		this.userPreferences = userPreferences;
-	}
-
-	public String getError() {
-		return error;
-	}
-
-	public void setError(String error) {
-		this.error = error;
 	}
 
 	public long getLastLoginTime() {

@@ -525,11 +525,6 @@ export class Meta64 implements Meta64Intf {
 
             // todo-1: could replace this pull with a push.
             setTimeout(() => {
-                S.view.displayNotifications(null, store.getState());
-            }, 1000);
-
-            // todo-1: could replace this pull with a push.
-            setTimeout(() => {
                 this.maintenanceCycle();
             }, 30000);
 

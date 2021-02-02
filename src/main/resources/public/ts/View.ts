@@ -251,29 +251,4 @@ export class View implements ViewIntf {
                 }
             });
     }
-
-    displayNotifications = (command: string, state: AppState) => {
-        const node = S.meta64.getHighlightedNode(state);
-
-        S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getNotifications", {
-            command: command,
-            nodeId: node ? node.id : null
-        },
-            (res: J.GetServerInfoResponse) => {
-                if (res.messages) {
-                    res.messages.forEach(m => {
-                        if (m.type !== "inbox") {
-                            // todo-1: really need to put ALL messages into a single dialog display
-                            S.util.showMessage(m.message, "Notifications", false);
-                        }
-                    });
-
-                    res.messages.forEach(m => {
-                        if (m.type === "inbox") {
-                            new InboxNotifyDlg(m.message, null, state).open();
-                        }
-                    });
-                }
-            });
-    }
 }

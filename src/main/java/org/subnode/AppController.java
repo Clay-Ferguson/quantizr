@@ -1208,26 +1208,6 @@ public class AppController implements ErrorController {
 		});
 	}
 
-	/*
-	 * todo-1: This needs to be replaced with push notifications? Because we're doing polling here, and
-	 * is wasted CPU+bandwidth
-	 */
-	@RequestMapping(value = API_PATH + "/getNotifications", method = RequestMethod.POST)
-	public @ResponseBody Object getNotifications(@RequestBody GetServerInfoRequest req, HttpSession session) {
-		return callProc.run("getNotifications", req, session, ms -> {
-			GetServerInfoResponse res = new GetServerInfoResponse();
-			res.setMessages(new LinkedList<InfoMessage>());
-
-			if (ThreadLocals.getSessionContext().getError() != null) {
-				res.getMessages().add(new InfoMessage(ThreadLocals.getSessionContext().getError(), null));
-				ThreadLocals.getSessionContext().setError(null);
-			}
-
-			res.setSuccess(true);
-			return res;
-		});
-	}
-
 	@RequestMapping(value = API_PATH + "/ping", method = RequestMethod.POST)
 	public @ResponseBody Object ping(@RequestBody PingRequest req, HttpSession session) {
 		return callProc.run("ping", req, session, ms -> {
