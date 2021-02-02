@@ -38,9 +38,10 @@ https://quanta.wiki
 * MathJax for rendering Latex math formulas
 * NPM rss-parser Package
 
-## Watch some Eye Candy first
+## Fun Links to get you started
 
 https://quanta.wiki/n/screencast
+https://quanta.wiki/app?tab=feed
 
 ## How to Build the App
 
