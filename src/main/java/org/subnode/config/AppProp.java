@@ -162,6 +162,18 @@ public class AppProp /* implements EnvironmentAware */ {
 		return env.getProperty("brandingAppName");
 	}
 
+	public String getIntroSubtitle() {
+		return env.getProperty("introSubtitle");
+	}
+
+	public String getIntro1() {
+		return env.getProperty("intro1");
+	}
+
+	public String getIntro2() {
+		return env.getProperty("intro2");
+	}
+
 	public String getResourcesBaseFolder() {
 		return env.getProperty("resourcesBaseFolder");
 	}

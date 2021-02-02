@@ -157,13 +157,12 @@ public class AppController implements ErrorController {
 
 	public static final String API_PATH = "/mobile/api";
 
+	private static boolean THYMELEAF_VARS_FROM_TREE = false;
 	private static HashMap<String, String> welcomeMap = null;
 	private static final Object welcomeMapLock = new Object();
 
 	// maps classpath resource names to their md5 values
 	private static HashMap<String, String> thymeleafAttribs = null;
-
-	private static boolean welcomePagePresent;
 
 	/*
 	 * RestTempalte is thread-safe and reusable, and has no state, so we need only one final static
@@ -269,6 +268,9 @@ public class AppController implements ErrorController {
 		thymeleafAttribs.put("brandingAppName", appProp.getBrandingAppName());
 		thymeleafAttribs.put("brandingMetaContent", appProp.getBrandingMetaContent());
 		thymeleafAttribs.put("hostUrl", appProp.getProtocolHostAndPort());
+		thymeleafAttribs.put("introSubtitle", appProp.getIntroSubtitle());
+		thymeleafAttribs.put("intro1", appProp.getIntro1());
+		thymeleafAttribs.put("intro2", appProp.getIntro2());
 
 		thymeleafAttribs.put("BUNDLE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bundle.js"));
 		thymeleafAttribs.put("MAIN_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/meta64.css"));
@@ -277,6 +279,7 @@ public class AppController implements ErrorController {
 		thymeleafAttribs.put("DROPZONE_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.css"));
 		thymeleafAttribs.put("DARCULA_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/highlightjs/darcula.css"));
 		thymeleafAttribs.put("DROPZONE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.js"));
+		thymeleafAttribs.put("MATHJAX_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/math-jax/tex-chtml.js"));
 		thymeleafAttribs.put("ACE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/ace/src-noconflict/ace.js"));
 	}
 
@@ -365,19 +368,23 @@ public class AppController implements ErrorController {
 			Model model) {
 		initThymeleafAttribs();
 
-		// Note: this refreshes only when ADMIN is accessing it, so it's slow in this
-		// case.
-		if (welcomeMap == null || PrincipalName.ADMIN.s().equals(ThreadLocals.getSessionContext().getUserName())) {
-			synchronized (welcomeMapLock) {
-				HashMap<String, String> newMap = new HashMap<String, String>();
-				// load content from a place that will not be a node visible to users
-				// todo-0: some of this will be going away now that our main welcome page renders directly a tree node as a grid layout.
-				welcomePagePresent = nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
+		// NOTE: Not currently used. For now we are not initializing any of these page properties from the tree (database)
+		if (THYMELEAF_VARS_FROM_TREE) {
+			/*
+			 * Note: this refreshes only when ADMIN is accessing it, so it's slow in this case.
+			 */
+			if (welcomeMap == null || PrincipalName.ADMIN.s().equals(ThreadLocals.getSessionContext().getUserName())) {
+				synchronized (welcomeMapLock) {
+					HashMap<String, String> newMap = new HashMap<String, String>();
+					// load content from a place that will not be a node visible to users
+					nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
 
-				// load also from another place that will be visible to users.
-				nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome_public");
-				welcomeMap = newMap;
+					// load also from another place that will be visible to users.
+					nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome_public");
+					welcomeMap = newMap;
+				}
 			}
+			model.addAllAttributes(welcomeMap);
 		}
 
 		if (signupCode != null) {
@@ -386,19 +393,7 @@ public class AppController implements ErrorController {
 		}
 
 		model.addAllAttributes(thymeleafAttribs);
-
-		/*
-		 * if welcomeMap is empty that likely means the "pg_welcome" node hasn't yet been created on this
-		 * server instanace so we bypass the landing page and go to index.html instead.
-		 */
-		if (!welcomePagePresent) {
-			return "index";
-		}
-		/* otherwise rener the landing page */
-		else {
-			model.addAllAttributes(welcomeMap);
-			return "welcome";
-		}
+		return "welcome";
 	}
 
 	/*
@@ -550,7 +545,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/logout", method = RequestMethod.POST)
 	public @ResponseBody Object logout(@RequestBody LogoutRequest req, HttpSession session) {
 		return callProc.run("logout", req, session, ms -> {
-			//WARNING: ms will be null here always. Don't use.
+			// WARNING: ms will be null here always. Don't use.
 			session.invalidate();
 			LogoutResponse res = new LogoutResponse();
 			res.setSuccess(true);
@@ -1299,8 +1294,7 @@ public class AppController implements ErrorController {
 			synchronized (MailSender.getLock()) {
 				try {
 					mailSender.init();
-					mailSender.sendMail("wclayf@gmail.com", null, "<h1>Hello! Time=" + timeString + "</h1>",
-							"Test Subject");
+					mailSender.sendMail("wclayf@gmail.com", null, "<h1>Hello! Time=" + timeString + "</h1>", "Test Subject");
 				} finally {
 					mailSender.close();
 				}
