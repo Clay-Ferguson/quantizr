@@ -120,4 +120,5 @@ export interface UtilIntf {
     publishNodeToIpfs(node: J.NodeInfo): any;
     loadNodeFromIpfs(node: J.NodeInfo): any;
     getSharingNames(node: J.NodeInfo, multiLine: boolean): string;
+    insertString(val: string, text: string, position: number): string;
 }

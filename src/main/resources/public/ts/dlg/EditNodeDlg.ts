@@ -217,9 +217,6 @@ export class EditNodeDlg extends DialogBase {
                     this.propertyEditFieldContainer = new Div("", {
                     })
                 ])
-                //     //this.insertTimeButton = new Button("Ins. Time", this.insertTime),
-                //     this.cancelButton = new Button("Cancel", this.cancelEdit)
-                // ])
             ])
         ];
 
@@ -456,9 +453,13 @@ export class EditNodeDlg extends DialogBase {
                 ? new Button("Delete", () => {
                     S.edit.deleteSelNodes(state.node.id);
                     this.close();
-                }) : null
+                }) : null,
 
-            // this.insertTimeButton = new Button("Ins. Time", this.insertTime),
+            new Icon({
+                className: "fa fa-clock-o fa-lg insertTimeIcon",
+                title: "Insert current time at editor cursor.",
+                onClick: this.insertTime
+            })
         ]);
     }
 

@@ -774,6 +774,10 @@ export class Util implements UtilIntf {
         return (<any>this.domElm(id)).value;
     }
 
+    insertString = (val: string, text: string, position: number): string => {
+        return [val.slice(0, position), text, val.slice(position)].join("");
+    }
+
     /* returns true if element was found, or false if element not found */
     setInputVal = (id: string, val: string): boolean => {
         if (val == null) {

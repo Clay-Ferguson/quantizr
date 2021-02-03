@@ -955,6 +955,11 @@ input[type="radio"] {
     // margin: $smallGap;
 }
 
+.insertTimeIcon {
+    margin-left: $smallGap;
+    cursor: pointer;
+}
+
 .mainNodeContentStyle {
     outline: none;
 
