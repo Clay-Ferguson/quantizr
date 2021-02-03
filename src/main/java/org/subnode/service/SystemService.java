@@ -3,9 +3,7 @@ package org.subnode.service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Map;
-
 import com.mongodb.client.MongoDatabase;
-
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.subnode.config.AppFilter;
 import org.subnode.config.AppSessionListener;
 import org.subnode.model.IPFSDirStat;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.MongoAppConfig;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;

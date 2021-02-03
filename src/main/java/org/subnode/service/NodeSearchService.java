@@ -80,7 +80,7 @@ public class NodeSearchService {
 
 			for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
 					MAX_NODES, req.getFuzzy(), req.getCaseSensitive())) {
-				// log.debug("NodeFound: node: "+ XString.prettyPrint(node));
+		
 				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
 						counter + 1, false, false);
 				searchResults.add(info);
@@ -90,7 +90,6 @@ public class NodeSearchService {
 			}
 		}
 		res.setSuccess(true);
-		log.debug("search results count: " + counter);
 		return res;
 	}
 

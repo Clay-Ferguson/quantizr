@@ -41,9 +41,7 @@ public class ExportTextService {
 	private BufferedOutputStream output = null;
 	private String shortFileName;
 	private String fullFileName;
-
 	private static final byte[] NL = "\n".getBytes(StandardCharsets.UTF_8);
-
 	private ExportRequest req;
 
 	/*

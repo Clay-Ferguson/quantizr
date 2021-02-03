@@ -463,7 +463,7 @@ public class AppController implements ErrorController {
 	 * Proxies an HTTP GET thru to the specified url. Used to avoid CORS errors when retrieving RSS
 	 * directly from arbitrary servers
 	 * 
-	 * todo-1: need a 'useCache' url param option
+	 * todo-2: need a 'useCache' url param option
 	 */
 	@GetMapping(value = {"/proxyGet"})
 	public void proxyGet(@RequestParam(value = "url", required = true) String url, //

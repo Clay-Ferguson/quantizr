@@ -32,10 +32,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
  * 
- * There's a lot of commented code in here, but most of it I'm keeping just for
- * future reference, because there's always numerous different ways to do
- * things, and I want to keep all that stuff as FYI, and to remind the other
- * ways of doing things.
+ * There's a lot of commented code in here, but most of it I'm keeping just for future reference,
+ * because there's always numerous different ways to do things, and I want to keep all that stuff as
+ * FYI, and to remind the other ways of doing things.
  */
 @Configuration
 public class AppConfiguration implements WebMvcConfigurer {
@@ -46,8 +45,8 @@ public class AppConfiguration implements WebMvcConfigurer {
 
 	/*
 	 * To avoid error message during startup
-	 * "No qualifying bean of type 'org.springframework.scheduling.TaskScheduler' available"
-	 * we have to provide spring with a Task Scheduler.
+	 * "No qualifying bean of type 'org.springframework.scheduling.TaskScheduler' available" we have to
+	 * provide spring with a Task Scheduler.
 	 */
 	@Bean
 	public TaskScheduler taskScheduler() {
@@ -61,13 +60,11 @@ public class AppConfiguration implements WebMvcConfigurer {
 		// .addResourceLocations("/public/");
 
 		/*
-		 * This is how we enable the JS files to be edited and tested without doing a
-		 * rebuild and restart of server code. We can just run TSC compile to generate
-		 * the new JS files (or let webpack do that), and then refresh the browser to
-		 * reload them. This jsBaseFolder should of course be empty (unused) in
-		 * production environment, or any time the JAR (build) should be used
-		 * exclusively at runtime, rather than serving from actual directories at
-		 * runtime
+		 * This is how we enable the JS files to be edited and tested without doing a rebuild and restart of
+		 * server code. We can just run TSC compile to generate the new JS files (or let webpack do that),
+		 * and then refresh the browser to reload them. This jsBaseFolder should of course be empty (unused)
+		 * in production environment, or any time the JAR (build) should be used exclusively at runtime,
+		 * rather than serving from actual directories at runtime
 		 * 
 		 * NOTE: There is another way to do this also:
 		 * https://stackoverflow.com/questions/21123437/how-do-i-use-spring-boot-to-
@@ -86,10 +83,10 @@ public class AppConfiguration implements WebMvcConfigurer {
 		// }
 
 		/*
-		 * I was using this property as a way to be able to load resources directly out
-		 * of todo-1: the 'resourceBaseFolder' can actually be removed now, but just for
-		 * a short time I want to leave it in place, before I comment out. I will not be
-		 * deleting but commenting.
+		 * I was using this property as a way to be able to load resources
+		 * 
+		 * todo-1: the 'resourceBaseFolder' can actually be removed now, but just for a short time I want to
+		 * leave it in place, before I comment out. I will not be deleting but commenting.
 		 */
 		if (!StringUtils.isEmpty(appProp.getResourcesBaseFolder())) {
 			ResourceHandlerRegistration reg = registry.addResourceHandler("/**");
@@ -156,8 +153,8 @@ public class AppConfiguration implements WebMvcConfigurer {
 	}
 
 	private Connector redirectConnector() {
-		Connector connector = new Connector(
-				TomcatServletWebServerFactory.DEFAULT_PROTOCOL /* "org.apache.coyote.http11.Http11NioProtocol" */);
+		Connector connector =
+				new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL /* "org.apache.coyote.http11.Http11NioProtocol" */);
 		connector.setScheme("http");
 		connector.setPort(80);
 		connector.setSecure(false);

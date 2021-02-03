@@ -34,7 +34,7 @@ public class MultipartFileSender {
     private static final Logger log = LoggerFactory.getLogger(MultipartFileSender.class);
 
     private static final int DEFAULT_BUFFER_SIZE = 4096;
-    private static final long DEFAULT_EXPIRE_TIME = 604800000L; // ..ms = 1 week.
+    private static final long DEFAULT_EXPIRE_TIME = 604800000L; // ms = 1 week.
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
 
     /*

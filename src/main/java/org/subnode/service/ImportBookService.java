@@ -14,7 +14,6 @@ import org.subnode.response.InsertBookResponse;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ImportWarAndPeace;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.VarUtil;
 import org.subnode.util.XString;
 
 /**
@@ -49,10 +48,14 @@ public class ImportBookService {
 		 * for now we don't check book name. Only one book exists: War and Peace
 		 */
 		ImportWarAndPeace iwap = SpringContextUtil.getApplicationContext().getBean(ImportWarAndPeace.class);
-		iwap.importBook(session, "classpath:war-and-peace.txt", node, VarUtil.safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE);
+		iwap.importBook(session, "classpath:war-and-peace.txt", node, safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE);
 
 		update.saveSession(session);
 		res.setSuccess(true);
 		return res;
+	}
+
+	public static boolean safeBooleanVal(Boolean val) {
+		return val != null && val.booleanValue();
 	}
 }
