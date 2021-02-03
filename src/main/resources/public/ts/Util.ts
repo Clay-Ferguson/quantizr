@@ -861,18 +861,6 @@ export class Util implements UtilIntf {
         Array.prototype.forEach.call(elements, callback);
     }
 
-    /* Equivalent of ES6 Object.assign(). Takes all properties from src and merges them onto dst
-    todo-1: get rid of this function and just use Object.assign
-    */
-    mergeProps = (dst: Object, src: Object): void => {
-        if (!src || !dst) return;
-        Object.assign(dst, src);
-        // this.forEachProp(src, (k, v): boolean => {
-        //     dst[k] = v;
-        //     return true;
-        // });
-    }
-
     /* Very similar to ES6 Object.assign(), but slightly different. Takes all properties from src and merges them onto dst, except this one
     will notice if the src and dest both have any of the keys defined and will combine the dest by concatinating it to the source
     rather than setting (overwriting) that property value from the source */
@@ -980,93 +968,6 @@ export class Util implements UtilIntf {
         const instance = Object.create(context[name].prototype);
         instance.constructor.apply(instance, args);
         return <T>instance;
-    }
-
-    // todo-1: is this still used ? eliminate it.
-    changeOrAddClassToElm = (elm: HTMLElement, oldClass: string, newClass: string) => {
-        this.removeClassFromElmById(elm.id, oldClass);
-        this.addClassToElmById(elm.id, newClass);
-    }
-
-    /*
-     * Removed oldClass from element and replaces with newClass, and if oldClass is not present it simply adds
-     * newClass. If old class existed, in the list of classes, then the new class will now be at that position. If
-     * old class didn't exist, then new Class is added at end of class list.
-     */
-    changeOrAddClass = (id: string, oldClass: string, newClass: string) => {
-        this.removeClassFromElmById(id, oldClass);
-        this.addClassToElmById(id, newClass);
-    }
-
-    // todo-1: is this still used ? eliminate it.
-    removeClassFromElmById = (id: string, clazz: string) => {
-        this.getElm(id, (elm: HTMLElement) => {
-            this.removeClassFromElm(elm, clazz);
-        });
-    }
-
-    // todo-1: is this still used ? eliminate it.
-    removeClassFromElm = (el: HTMLElement, clazz: string): void => {
-        if (el.classList) {
-            // console.log("remove to classList " + clazz);
-            el.classList.remove(clazz);
-        }
-        else if (el.className) {
-            // WCF: I think this came from here: http://youmightnotneedjquery.com/
-            // I personally would have never written this mess of RegExp and found some other way. I hate RegExp!
-            el.className = el.className.replace(new RegExp("(^|\\b)" + clazz.split(" ").join("|") + "(\\b|$)", "gi"), " ");
-        }
-    }
-
-    // todo-1: is this still used ? eliminate it.
-    addClassToElmById = (id: string, clazz: string): void => {
-        // console.log("Adding class "+clazz+" to dom id "+id);
-        this.getElm(id, (elm: HTMLElement) => {
-            // console.log("found dom id, adding class now.");
-            this.addClassToElm(elm, clazz);
-        });
-    }
-
-    // todo-1: is this still used ? eliminate it.
-    addClassToElm = (el: HTMLElement, clazz: string): void => {
-        if (el.classList) {
-            // console.log("add to classList " + clazz);
-            el.classList.add(clazz);
-        }
-        else {
-            if (el.className) {
-                // console.log("appending to className " + clazz);
-                el.className += " " + clazz;
-            }
-            else {
-                // console.log("setting className " + clazz);
-                el.className = clazz;
-            }
-        }
-    }
-
-    // todo-1: is this still used ? eliminate it.
-    toggleClassFromElm = (el: any, clazz: string): void => {
-        if (el.classList) {
-            el.classList.toggle(clazz);
-        } else {
-            if (el.className) {
-                const classes = el.className.split(" ");
-                const existingIndex = classes.indexOf(clazz);
-
-                if (existingIndex >= 0) {
-                    classes.splice(existingIndex, 1);
-                }
-                else {
-                    classes.push(clazz);
-                }
-
-                el.className = classes.join(" ");
-            }
-            else {
-                el.className = clazz;
-            }
-        }
     }
 
     copyToClipboard = (text: string) => {

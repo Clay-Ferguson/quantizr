@@ -220,25 +220,4 @@ export class Search implements SearchIntf {
 
         S.view.refreshTree(this.highlightRowNode.id, true, true, this.highlightRowNode.id, false, true, true, state);
     }
-
-    /*
-     * turn of row selection styling of whatever row is currently selected
-     */
-    setRowHighlight = (state: boolean) => {
-
-        if (!this.highlightRowNode) {
-            return;
-        }
-
-        /* now make CSS id from node */
-        const nodeId = this._UID_ROWID_PREFIX + this.highlightRowNode.id;
-
-        const elm: HTMLElement = S.util.domElm(nodeId);
-        if (elm) {
-            /* change class on element */
-            S.util.changeOrAddClassToElm(elm,
-                state ? "inactive-row" : "active-row",
-                state ? "active-row" : "inactive-row");
-        }
-    }
 }

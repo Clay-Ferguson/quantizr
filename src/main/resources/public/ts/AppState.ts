@@ -81,14 +81,6 @@ export class AppState {
         maxUploadFileSize: 0
     };
 
-    /*
-    * maps all node uids to true if selected, otherwise the property should be deleted (not existing)
-   todo-1: Javascript has a Set object we can use in cases like this!
-   new Set([1, 2, 3]).forEach(el => {
-       console.log(el * 2);
-   });
-    */
-    // todo-1: implement this as Set<string>
     selectedNodes: any = {};
 
     /* maps node.id values to NodeInfo.java objects

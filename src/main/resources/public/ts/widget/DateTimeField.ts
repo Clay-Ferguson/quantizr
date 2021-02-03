@@ -18,7 +18,7 @@ export class DateTimeField extends Span {
     // dateTimeState holds the string value of the date number milliseconds
     constructor(private dateTimeState: ValidatedState<any>) {
         super(null);
-        S.util.mergeProps(this.attribs, {
+        Object.assign(this.attribs, {
             className: "input-group"
         });
 

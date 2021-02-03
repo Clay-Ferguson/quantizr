@@ -23,7 +23,7 @@ export class AceEditPropTextarea extends Div implements I.TextEditorIntf {
         /* for safety, I'm setting this here redundantly, just to protect against me renaming this class someday and inadvertently breaking code. */
         this.clazz = "AceEditPropTextarea";
 
-        S.util.mergeProps(this.attribs, {
+        Object.assign(this.attribs, {
             className: "my-ace-editor",
             style: { height: heightString }
         });

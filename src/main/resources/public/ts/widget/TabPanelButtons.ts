@@ -104,7 +104,6 @@ export class TabPanelButtons extends Div {
                                 type: "Action_SetTab",
                                 update: (s: AppState): void => {
                                     s.activeTab = "feedTab";
-                                    S.meta64.queueScrollPosition();
                                 }
                             });
                         }

@@ -343,7 +343,7 @@ export class Nav implements NavIntf {
         }
     }
 
-    // todo-1: need to make view.scrollRelativeToNode use this function instead of embedding all the same logic.
+    // todo-2: need to make view.scrollRelativeToNode use this function instead of embedding all the same logic.
     getAdjacentNode = (dir: string, state: AppState): J.NodeInfo => {
 
         let newNode: J.NodeInfo = null;

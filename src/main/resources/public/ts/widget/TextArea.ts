@@ -23,8 +23,10 @@ export class TextArea extends Span implements I.TextEditorIntf {
         super(null);
         this.attribs.style = { fontFamily: "monospace" };
 
-        S.util.mergeProps(this.textareaAttribs, attribs);
-        S.util.mergeProps(this.textareaAttribs, {
+        if (attribs) {
+            Object.assign(this.textareaAttribs, attribs);
+        }
+        Object.assign(this.textareaAttribs, {
             className: customClass || "form-control pre-textarea"
         });
 

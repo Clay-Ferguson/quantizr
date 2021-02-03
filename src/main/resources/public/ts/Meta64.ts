@@ -32,8 +32,8 @@ export class Meta64 implements Meta64Intf {
     parentIdToFocusNodeMap: { [key: string]: string } = {};
     curHighlightNodeCompRow: CompIntf = null;
 
-    // Function cache: Creating NEW functions (like "let a = () => {...do something}"), is an expensive operation (performance) so we have this
-    // cache to allow reuse of function definitions.
+    // Function cache: Creating NEW functions (like "let a = () => {...do something}"), is an expensive operation (performance) if done in super
+    // high numbers so we have this cache to allow reuse of function definitions.
     private fc: { [key: string]: () => void } = {};
     private fcCount: number = 0;
 
@@ -59,10 +59,6 @@ export class Meta64 implements Meta64Intf {
     // maps the hash of an encrypted block of text to the unencrypted text, so that we never run the same
     // decryption code twice.
     decryptCache: { [key: string]: string } = {};
-
-    // lastScrollPos: number = 0;
-    // lastScrollPosMap: { [key: string]: number } = {};
-    // ticking: boolean = false;
 
     /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
     getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {
@@ -343,7 +339,7 @@ export class Meta64 implements Meta64Intf {
             state.pendingLocationHash = window.location.hash;
             S.plugin.initPlugins();
 
-            // SystemFolder and File handling stuff is disabled for now (todo-1), but will eventually be brought
+            // SystemFolder and File handling stuff is disabled for now (todo-2), but will eventually be brought
             // back as a plugin similar to rssPlugin, coreTypesPlugin, etc. Also the new way of doing this
             // rendering and property ordering is what's being done in BashPlugin and CoreTypesPlugin via TypeHandlers so refer
             // to that when you ever bring back these types.
@@ -448,22 +444,6 @@ export class Meta64 implements Meta64Intf {
                 }
             });
 
-            // WARNING: The 'useSelector' makes react bark at us here, but we didn't
-            // end up needing this code for now anyway so i'm removing it.
-            // document.addEventListener("scroll", (e) => {
-            //     this.lastScrollPos = window.scrollY;
-
-            //     if (!this.ticking) {
-            //         window.requestAnimationFrame(() => {
-            //             let state: AppState = useSelector((state: AppState) => state);
-            //             this.lastScrollPosMap[state.activeTab || "mainTab"] = this.lastScrollPos;
-            //             this.ticking = false;
-            //         });
-
-            //         this.ticking = true;
-            //     }
-            // });
-
             if (this.appInitialized) {
                 return;
             }
@@ -482,7 +462,7 @@ export class Meta64 implements Meta64Intf {
                 this.deviceHeight = window.innerHeight;
             });
 
-            // todo-1: actually this is a nuisance unless user is actually EDITING a node right now
+            // todo-2: actually this is a nuisance unless user is actually EDITING a node right now
             // so until i make it able to detect if user is editing i'm removing this.
             // window.onbeforeunload = () => {
             //     return "Leave [appName] ?";
@@ -520,10 +500,8 @@ export class Meta64 implements Meta64Intf {
 
             S.util.initProgressMonitor();
             this.processUrlParams(null);
-
             this.setOverlay(false);
 
-            // todo-1: could replace this pull with a push.
             setTimeout(() => {
                 this.maintenanceCycle();
             }, 30000);
@@ -536,15 +514,6 @@ export class Meta64 implements Meta64Intf {
             console.log("initApp complete.");
             resolve();
         });
-    }
-
-    queueScrollPosition = () => {
-        // this is a work in progress, to scroll to where the last scroll position was on a given tab.
-        // I may or may not finish this.
-        // setTimeout(() => {
-        //     let state: AppState = useSelector((state: AppState) => state);
-        //     window.scrollTo(0, this.lastScrollPosMap[state.activeTab || "mainTab"]);
-        // }, 250);
     }
 
     playAudioIfRequested = () => {

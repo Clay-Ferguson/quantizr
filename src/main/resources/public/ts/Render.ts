@@ -89,7 +89,7 @@ export class Render implements RenderIntf {
         S.util.setDropHandler(attribs, (evt: DragEvent) => {
             const data = evt.dataTransfer.items;
 
-            // todo-1: right now we only actually support one file being dragged. Would be nice to support multiples
+            // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (let i = 0; i < data.length; i++) {
                 const d = data[i];
                 console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
@@ -482,17 +482,14 @@ export class Render implements RenderIntf {
         return new Img(key, {
             src,
             className: "avatarImage",
-
-            // todo-1: need to make server include after '\n\n' the user profile text of the user but first
-            // 1) consider performance on server, and number of queries cost
-            // 2) and also we would need to limit to a max number of characters that's like a small paragrah
             title: "User: " + node.owner + "\n\nClick for Bio",
             // align: "left", // causes text to flow around
 
             onClick: (evt) => {
                 // show profile dialog only for local users (no '@' in name)
-                // todo-1: We can eventually get this working (and make the images be URLS
-                // from the remote server, but this is low priority)
+                // todo-1: Need to have a way to make a click on avatar show this dialog if the user is importet locally
+                // or if not at least make it pull up in a new browser tab the user's remote page, which should be the url from
+                // their ActivityPub Actor object
                 if (node.owner.indexOf("@") === -1) {
                     new ProfileDlg(state, true, node.ownerId, node.owner).open();
                 }

@@ -23,6 +23,5 @@ export interface SearchIntf {
     renderSearchResultAsListItem(node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string, isFeed: boolean, isParent: boolean, allowAvatars: boolean, state: AppState): any;
     cached_clickOnSearchResultRow(id : string): any;
     clickSearchNode(id: string, state: AppState): any;
-    setRowHighlight(state: boolean): any;
     feed(nodeId: string, feedUserName: string, page: number, searchText: string): any;
 }

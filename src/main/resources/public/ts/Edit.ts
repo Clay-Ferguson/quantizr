@@ -148,7 +148,7 @@ export class Edit implements EditIntf {
         if (owner === "admin" && !state.isAdminUser) return false;
 
         // right now, for logged in users, we enable the 'new' button because the CPU load for determining it's enablement is too much, so
-        // we throw an exception if they cannot. todo-1: need to make this work better.
+        // we throw an exception if they cannot. todo-2: need to make this work better.
         // however we CAN check if this node is an "admin" node and at least disallow any inserts under admin-owned nodess
         if (state.isAdminUser) return true;
         if (state.isAnonUser) return false;
@@ -421,7 +421,7 @@ export class Edit implements EditIntf {
         if (S.meta64.ctrlKeyCheck()) {
             new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
                 async () => {
-                    // todo-1: document this feature under 'tips and tricks' in the user guide.
+                    // todo-2: document this feature under 'tips and tricks' in the user guide.
                     this.saveClipboardToChildNode(id);
                 }, null, null, null, state
             ).open();

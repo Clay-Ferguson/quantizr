@@ -25,7 +25,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         // do not pass valState into base class, we want it to have state separately
         super(null);
 
-        S.util.mergeProps(this.attribs, {
+        Object.assign(this.attribs, {
             name: this.getId(),
             className: "form-group" + (labelOnLeft ? " form-inline" : "")
         });

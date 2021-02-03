@@ -34,7 +34,7 @@ export class PluginMgr implements PluginMgrIntf {
         return this.typeHandlers;
     }
 
-    // todo-1: make it so that some plugins can be flagged as 'admin only' and not show up on the menu to pick them.
+    // todo-2: make it so that some plugins can be flagged as 'admin only' and not show up on the menu to pick them.
     initPlugins = (): void => {
         /* We could have made each type base-class automatically register here, but they'd executed in nondeterminisitic order
         so it's better to just have this one place where we define all them in the order we want */

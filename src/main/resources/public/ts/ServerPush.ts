@@ -61,16 +61,15 @@ export class ServerPush implements ServerPushIntf {
                             // s.feedResults = S.meta64.removeRedundantFeedItems(s.feedResults);
                         }
                         else {
-                            /* note: we could que up the incomming nodeInfo, adn then avoid a call to the server but for now we just
+                            /* note: we could que up the incomming nodeInfo, and then avoid a call to the server but for now we just
                             keep it simple and only set a dirty flag
 
-                            todo-1: Very nice feature here would be if user is browsing a tree, and a node they happen to be viewing
-                            didn't have any children (so the "Open" button isn't showing, this would detect that special case and trigger
+                            todo-2: Very nice feature here would be if user is browsing a tree, and a node they happen to be viewing
+                            didn't have any children (so the "Open" button isn't showing), this would detect that special case and trigger
                             the page to re-render (without a trip back to the server, just by setting the children flag on the node
                             in local memory)
                             */
                             s.feedDirty = true;
-
                             S.meta64.showSystemNotification("New Message", nodeInfo.owner + ": " + nodeInfo.content);
                         }
                     }

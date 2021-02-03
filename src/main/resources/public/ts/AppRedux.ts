@@ -53,7 +53,6 @@ export const appState = (state?: AppState): AppState => {
 
 export const dispatch = (action: AppAction) => {
     PubSub.pub(C.PUBSUB_ClearComponentCache);
-
     store.dispatch(action);
     // console.log("Dispatch Complete: " + action.type);
 };

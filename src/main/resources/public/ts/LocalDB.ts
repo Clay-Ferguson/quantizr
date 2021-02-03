@@ -45,7 +45,7 @@ export class LocalDB implements LocalDBIntf {
 
             tx.oncomplete = () => {
                 if (!this.keepDbOpen) {
-                    // todo-1: need to research best practice for this, and see if we should be closing the DB here or if there's
+                    // todo-2: need to research best practice for this, and see if we should be closing the DB here or if there's
                     // some better pattern for keeping it open for more transactions.
                     this.db.close();
                     this.db = null;

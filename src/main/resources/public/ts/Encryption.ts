@@ -87,7 +87,8 @@ export class Encryption implements EncryptionIntf {
         WARNING: If you change this you will NEVER be able to recover any data encrypted with it in effect, even with the correct password. So
         beware if you change this you've basically lost ALL your passwords. So just don't change it.
 
-        todo-1: Some crypto experts told me this IV should not be reused like this but instead stored along with the encryption key.
+        todo-1: According to some crypto experts, this initialization vector should not be reused like this but instead stored
+        along with the encryption key.
         */
         // iv = window.crypto.getRandomValues(new Uint8Array(16)); <--- I saw this in a reputable example. Try it out!
         this.vector = new Uint8Array([71, 73, 79, 83, 89, 37, 41, 47, 53, 67, 97, 103, 107, 109, 127, 131]);
@@ -549,7 +550,7 @@ export class Encryption implements EncryptionIntf {
                 S.meta64.decryptCache[cipherHash] = ret;
             }
             catch (ex) {
-                // todo-1: this was happening when 'importKey' failed for admin user, but I think admin user may not store keys? Need to just
+                // todo-2: this was happening when 'importKey' failed for admin user, but I think admin user may not store keys? Need to just
                 // retest encryption
                 // S.util.logAndReThrow("decryptSharableString failed", ex);
             }

@@ -65,5 +65,4 @@ export interface Meta64Intf {
     getNodeByName(node: J.NodeInfo, name: string, state: AppState): J.NodeInfo;
     findNodeById(state: AppState, nodeId: string): J.NodeInfo;
     fullscreenViewerActive(state: AppState): boolean;
-    queueScrollPosition(): void;
 }
