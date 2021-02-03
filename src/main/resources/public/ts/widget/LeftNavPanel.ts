@@ -36,7 +36,7 @@ export class LeftNavPanel extends Div {
                 new Img(this.getId() + "_logo", {
                     className: "smallLogoButton",
 
-                    // todo-1: needs to be rebrandable
+                    // todo-1: needs to be rebrandable (defined in property file)
                     src: "/images/eagle-logo-50px-tr.jpg",
                     onClick: () => { window.location.href = window.location.origin; }
                 }),

@@ -618,7 +618,7 @@ export class EditNodeDlg extends DialogBase {
             if (this.contentEditor) {
                 content = this.contentEditor.getValue();
 
-                // todo-1: an optimization can be done here such that if we just ENCRYPTED the node, we use this.skpd.symKey becuase that
+                // todo-1: an optimization can be done here such that if we just ENCRYPTED the node, we use this.skpd.symKey because that
                 // will already be available
                 let cipherKey = S.props.getCryptoKey(state.node, this.appState);
                 if (cipherKey) {

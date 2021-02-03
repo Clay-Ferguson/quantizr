@@ -100,7 +100,7 @@ export class View implements ViewIntf {
         });
     }
 
-    // todo-1: need to add logic to detect if this is root node on the page, and if so, we consider the first child the target
+    // todo-2: need to add logic to detect if this is root node on the page, and if so, we consider the first child the target
     scrollRelativeToNode = (dir: string, state: AppState) => {
         const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!currentSelNode) return;
@@ -241,7 +241,7 @@ export class View implements ViewIntf {
                             m.message += "<br>Profile: " + PROFILE;
                         }
 
-                        /* For now just prefix description onto the text. This will be made 'prettier' later todo-1 */
+                        /* For now just prefix description onto the text. This will be made 'prettier' later todo-2 */
                         if (dlgDescription) {
                             m.message = dlgDescription + "\n\n" + m.message;
                         }

@@ -123,7 +123,7 @@ export class NodeCompMarkdown extends Html {
             let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
             if (clearText === null) {
-                clearText = "[Decrrypt Failed]";
+                clearText = "[Decrypt Failed]";
             }
 
             this.mergeState({

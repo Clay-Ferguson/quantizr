@@ -63,21 +63,7 @@ export class NodeCompContent extends Div {
         let isAnAccountNode = node.ownerId && node.id === node.ownerId;
 
         if (S.props.hasBinary(node) && !isAnAccountNode) {
-            let binary = new NodeCompBinary(node, false, false, this.imgSizeOverride);
-
-            // todo-1: bring this back. I already needed it again.
-            /*
-             * We append the binary image or resource link either at the end of the text or at the location where
-             * the user has put {{insert-attachment}} if they are using that to make the image appear in a specific
-             * location in the content text.
-             *
-             * NOTE: temporarily removing during refactoring.
-             */
-            // if (util.contains(ret, cnst.INSERT_ATTACHMENT)) {
-            //     ret = S.util.replaceAll(ret, cnst.INSERT_ATTACHMENT, binary.render());
-            // } else {
-            children.push(binary);
-            // }
+            children.push(new NodeCompBinary(node, false, false, this.imgSizeOverride));
         }
 
         this.setChildren(children);

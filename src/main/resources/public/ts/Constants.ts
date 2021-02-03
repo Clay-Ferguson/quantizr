@@ -13,7 +13,6 @@ export class Constants {
     /* Ace editor is disabled because it doesn't have spell-checker and I decided spellchecking is a requirement */
     static readonly ENABLE_ACE_EDITOR: boolean = false;
 
-    static readonly INSERT_ATTACHMENT: string = "{{insert-attachment}}";
     static readonly NEW_ON_ROOT: boolean = false;
     static readonly NEW_ON_TOOLBAR: boolean = true;
     static readonly INS_ON_TOOLBAR: boolean = false;

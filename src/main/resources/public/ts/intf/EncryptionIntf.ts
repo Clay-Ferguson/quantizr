@@ -34,7 +34,7 @@ export interface EncryptionIntf {
     getPrivateKey(): Promise<CryptoKey>;
     getPublicKey(): Promise<CryptoKey>;
 
-    // todo-1: there's lots of places i pass 'extractable=true' and also more keyUsages than required. See if limiting those wokrs, because
+    // todo-1: there's lots of places we pass 'extractable=true' and also more keyUsages than required. See if limiting those works, because
     // doing so is bound to help performance and resources
     importKey(key: JsonWebKey, algos: any, extractable: boolean, keyUsages: string[]): Promise<CryptoKey>;
 

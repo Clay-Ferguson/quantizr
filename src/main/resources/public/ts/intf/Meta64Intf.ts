@@ -15,7 +15,7 @@ export interface Meta64Intf {
     deviceWidth: number;
     deviceHeight: number;
 
-    // todo-1: convert this to a TypeScript Map<string,string>
+    // todo-2: convert this to a TypeScript Map<string,string>
     parentIdToFocusNodeMap: { [key: string]: string };
     curHighlightNodeCompRow: CompIntf;
 

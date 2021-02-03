@@ -55,7 +55,6 @@ export class NodeCompButtonBar extends HorizontalLayout {
 
         let isPageRootNode = state.node && this.node.id === state.node.id;
 
-        // todo-1: need to DRY up places where this code block is repeated
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass();
