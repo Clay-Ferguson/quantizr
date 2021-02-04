@@ -80,7 +80,7 @@ export class App extends Div {
 
             let logo = new Img(this.getId() + "_logo", {
                 className: "marginRight smallLogoButton",
-                src: "/images/eagle-logo-50px-tr.jpg",
+                src: "/images/logo-50px-tr.jpg",
                 onClick: () => { window.location.href = window.location.origin; }
             });
 

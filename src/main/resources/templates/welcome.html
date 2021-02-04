@@ -17,13 +17,13 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" th:attr="content=${brandingAppName}" />
     <meta property="og:description" th:attr="content=${introSubtitle}" />
-    <meta property="og:image" content="/images/eagle-logo-150px-tr.jpg" />
+    <meta property="og:image" content="/images/logo-150px-tr.jpg" />
     <meta property="og:url" th:attr="content=${hostUrl}" />
 
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" th:attr="content=${brandingAppName}" />
     <meta name="twitter:description" th:attr="content=${introSubtitle}" />
-    <meta name="twitter:image" content="/images/eagle-logo-150px-tr.jpg" />
+    <meta name="twitter:image" content="/images/logo-150px-tr.jpg" />
 
     <title th:text="${brandingAppName}"></title>
     <link rel="stylesheet" th:href="'/css/meta64.css?v='+${MAIN_CSS_HASH}" />
@@ -42,7 +42,7 @@
                         <h4 class="alert alert-info justify-content-center"
                             th:if="${not #strings.isEmpty(signupResponse)}" th:text="${signupResponse}"></h4>
 
-                        <img class="mainLogoImg" src="/images/eagle-logo-250px-tr.jpg"></img>
+                        <img class="mainLogoImg" src="/images/logo-250px-tr.jpg"></img>
 
                         <h1 class="text-center">Quanta</h1>
 

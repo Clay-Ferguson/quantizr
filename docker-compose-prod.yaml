@@ -58,7 +58,7 @@ services:
             - '80'
             
             # Uncomment for debugging...
-            #- '8000'
+            # - '8000'
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
             - '${DATA_FOLDER}/docs:/docs'
@@ -70,15 +70,27 @@ services:
             - '80:80'
 
             # Uncomment for debugging...
-            #- '8000:8000'
+            # - '8000:8000'
         networks:
             - net-prod
         environment:
+            brandingAppName: Quanta
+            brandingMetaContent: "Quanta: Social Media Micro-blogging Platform for the Fediverse!"
+            introSubtitle: Welcome to the Fediverse!
+            intro1: Quanta is a decentralized and federated content management, social media, and publishing platform. Join the Fediverse Revolution!
+            intro2:
             mongoAdminPassword: "${subnodePassword}"
             reCaptcha3SiteKey: "${reCaptcha3SiteKey}"
             reCaptcha3SecretKey: "${reCaptcha3SecretKey}" 
             mongoSecurity: "true"
-            testUserAccounts: "adam:${testPassword}:${devEmail},bob:${testPassword}:${devEmail},cory:${testPassword}:${devEmail},dan:${testPassword}:${devEmail}" 
+
+            # NOTE: '>-' removes all newline characters and makes one long string
+            testUserAccounts: >- 
+                adam:${testPassword}:${devEmail},
+                bob:${testPassword}:${devEmail},
+                cory:${testPassword}:${devEmail},
+                dan:${testPassword}:${devEmail}
+
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "mongo-prod" 
             mongodb.port: "27017"
@@ -97,7 +109,7 @@ services:
             
             # Uncomment for debugging... (don't forget to open ufw firewall for port on server, and only from your own IP)
             # sudo ufw allow from xxx.xxx.xxx.xxx to any port 8000
-            #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+            # JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
             
             ipfs.host: "http://ipfs"
             ipfs.apiPort: "5001"

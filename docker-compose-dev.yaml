@@ -6,7 +6,7 @@ services:
 
     # _________________________________________________________________________
     # DO NOT DELETE
-    # Let's keep this example of how to run mongo-dev internally in case we ever want to do this again.
+    # Let's keep this example of how to run mongo-dev from this same yaml in case we ever want to do this again.
     #+++++++++++++++++++
     # (uncomment: for mongo internal to this docker)
     # # Theoretically it should have been possible to let mongo run internally on 27017 (it's default) and then expose it
@@ -85,6 +85,12 @@ services:
         networks:
             - net-dev
         environment:
+            brandingAppName: Quanta
+            brandingMetaContent: "Quanta: Social Media Micro-blogging Platform for the Fediverse!"
+            introSubtitle: Welcome to the Fediverse!
+            intro1: Quanta is a decentralized and federated content management, social media, and publishing platform. Join the Fediverse Revolution!
+            intro2:
+
             # Can be a comma-delimited list of TestIntf-derived tests to run
             # runTests: "ActPubTest"
             
@@ -92,7 +98,16 @@ services:
             reCaptcha3SiteKey: "${reCaptcha3SiteKey}"
             reCaptcha3SecretKey: "${reCaptcha3SecretKey}" 
             mongoSecurity: "true"
-            testUserAccounts: "adam:${testPassword}:${devEmail},bob:${testPassword}:${devEmail},cory:${testPassword}:${devEmail},dan:${testPassword}:${devEmail}" 
+
+            # NOTE: '>-' removes all newline characters and makes one long string
+            # Using '|' there instead would preserve the newlines after read in
+            # The '-' after either of those removes any trailing newline
+            testUserAccounts: >- 
+                adam:${testPassword}:${devEmail},
+                bob:${testPassword}:${devEmail},
+                cory:${testPassword}:${devEmail},
+                dan:${testPassword}:${devEmail}
+
             resourcesBaseFolder: "file:///dev-resource-base/" 
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "mongo-dev" 
